@@ -1,0 +1,147 @@
+﻿<Window x:Class="Gekko.WindowRunStatus"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:jas="clr-namespace:Gekko"
+    Title="Run status" Height="250" Width="980"
+    FontSize="12"
+    WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Closed="Window_Closed">
+    <Window.Resources>
+        <Style x:Key="ItemContStyle" TargetType="ListViewItem">            
+            <Setter Property="Height" Value="25" />
+            <Setter Property="Padding" Value="0,4" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <!-- The default control template for ListViewItem has a Border
+           which contains the item's content. -->
+            <Setter Property="Border.BorderThickness" Value="0,0,0,.5" />
+            <Setter Property="Border.BorderBrush" Value="{Binding LineColor}" />           
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <TabControl SelectionChanged="TabControl_SelectionChanged">
+            <TabItem Header="Stack" Name="tabStack">
+                <DockPanel LastChildFill="True">
+                    <TextBox Name ="yellow" Text="This window shows the 'stack' of command files calling each other (and the line number currently executing). The window is practical for tracking the progress of larger jobs." DockPanel.Dock="Bottom" IsReadOnly="True" TextWrapping="Wrap" Background="LightYellow">
+                    </TextBox>
+                    <Grid>
+                        <ListView Name="listView"    
+                            ItemContainerStyle="{StaticResource ItemContStyle}"
+                                  Margin="4,4,0,4"
+                                  Padding="2"
+                                  SelectionMode="Single"
+                                  FontFamily="Calibri" 
+                                  FontSize="13"       
+                                  Height="Auto">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="70" Header="">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Calling}" TextAlignment="Left" Foreground="Silver">
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Width="200" Header="File name" DisplayMemberBinding="{Binding Name}">
+                                        <GridViewColumn.HeaderContainerStyle>
+                                            <Style  TargetType="{x:Type GridViewColumnHeader}">
+                                                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                            </Style>
+                                        </GridViewColumn.HeaderContainerStyle>
+                                    </GridViewColumn>                                    
+
+                                    <GridViewColumn Width="Auto" Header="Line">
+                                        <GridViewColumn.HeaderContainerStyle>
+                                            <Style  TargetType="{x:Type GridViewColumnHeader}">
+                                                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                            </Style>
+                                        </GridViewColumn.HeaderContainerStyle>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Value}" TextAlignment="Right" Width="40">
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    
+                                    <GridViewColumn Width="500" Header="Full path" DisplayMemberBinding="{Binding FullName}">
+                                        <GridViewColumn.HeaderContainerStyle>
+                                            <Style  TargetType="{x:Type GridViewColumnHeader}">
+                                                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                            </Style>
+                                        </GridViewColumn.HeaderContainerStyle>
+                                    </GridViewColumn>
+                                    
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+
+                    </Grid>
+
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="Status" Name="tabStatus">
+                <DockPanel LastChildFill="True">
+                    <TextBox Name ="yellow2" Text="This window shows the list of command files that have finished (possibly more than one time, see 'Runs') in the current user input session. Status 'OK' means the file ran successfully, whereas 'Failed' indicates that the command file (or a command file it calls) failed with a  run-time error." DockPanel.Dock="Bottom" IsReadOnly="True" TextWrapping="Wrap" Background="LightYellow">
+                    </TextBox>
+                    <Grid>
+                        <ListView Name="listView2"    
+                            ItemContainerStyle="{StaticResource ItemContStyle}"
+                                  Margin="4,4,0,4"
+                                  Padding="2"
+                                  SelectionMode="Single"
+                                  FontFamily="Calibri" 
+                                  FontSize="13"       
+                                  Height="Auto">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="200" Header="File name" DisplayMemberBinding="{Binding Name}">
+                                        <GridViewColumn.HeaderContainerStyle>
+                                            <Style  TargetType="{x:Type GridViewColumnHeader}">
+                                                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                            </Style>
+                                        </GridViewColumn.HeaderContainerStyle>
+                                    </GridViewColumn>
+                                    
+                                    <GridViewColumn Width="Auto" Header="Runs">
+                                        <GridViewColumn.HeaderContainerStyle>
+                                            <Style  TargetType="{x:Type GridViewColumnHeader}">
+                                                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                            </Style>
+                                        </GridViewColumn.HeaderContainerStyle>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Value}" TextAlignment="Right" Width="40">
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    
+                                    <GridViewColumn Width="50" Header="Status" DisplayMemberBinding="{Binding Status}">
+                                        <GridViewColumn.HeaderContainerStyle>
+                                            <Style  TargetType="{x:Type GridViewColumnHeader}">
+                                                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                            </Style>
+                                        </GridViewColumn.HeaderContainerStyle>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Width="500" Header="Full path" DisplayMemberBinding="{Binding FullName}">
+                                        <GridViewColumn.HeaderContainerStyle>
+                                            <Style  TargetType="{x:Type GridViewColumnHeader}">
+                                                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                            </Style>
+                                        </GridViewColumn.HeaderContainerStyle>
+                                    </GridViewColumn>
+
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+
+                    </Grid>
+
+                </DockPanel>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

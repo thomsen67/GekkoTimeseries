@@ -1,0 +1,553 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{977BF459-F717-4C88-992E-D68159D95F45}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Gekko</RootNamespace>
+    <AssemblyName>Gekko</AssemblyName>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ProductName>PCIM2</ProductName>
+    <PublisherName>Thomas Thomsen</PublisherName>
+    <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>0.0.1.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>0</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <DocumentationFile>bin\Debug\Gekko.XML</DocumentationFile>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Gekko.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release32bit|AnyCPU' ">
+    <OutputPath>bin\Release32bit\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>bin\Release\Gekko.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>bin\Release\Gekko.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release32bit|x86' ">
+    <OutputPath>bin\x86\Release32bit\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>bin\Release\Gekko.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Antlr3.Runtime, Version=3.1.3.42154, Culture=neutral, PublicKeyToken=3a9cab8f8d22bfb7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Diverse\ExternalDllFiles\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="GAMS.net4, Version=24.3.3.48116, Culture=neutral, PublicKeyToken=cf883e4b1185248b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Diverse\ExternalDllFiles\GAMS.net4.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.4.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Diverse\ExternalDllFiles\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="PresentationFramework">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="protobuf-net, Version=2.0.0.594, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Diverse\ExternalDllFiles\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="SevenZipSharp, Version=1.0.3537.37869, Culture=neutral, PublicKeyToken=20de82c62b055c88, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Diverse\ExternalDllFiles\SevenZipSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UIAutomationProvider">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsFormsIntegration">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AList.cs" />
+    <Compile Include="ATimeSeries.cs" />
+    <Compile Include="AutoComplete.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CompareUtility3Way.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CompareUtility3Way.designer.cs">
+      <DependentUpon>CompareUtility3Way.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CompareUtilityDatabanks.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CompareUtilityDatabanks.Designer.cs">
+      <DependentUpon>CompareUtilityDatabanks.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CompareUtilityEquations.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CompareUtilityEquations.Designer.cs">
+      <DependentUpon>CompareUtilityEquations.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DragAdorner.cs" />
+    <Compile Include="Functions.cs" />
+    <Compile Include="GekkoTime.cs" />
+    <Compile Include="GekkoTuple.cs" />
+    <Compile Include="GuiDialogMakeShortcut.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GuiDialogMakeShortcut.Designer.cs">
+      <DependentUpon>GuiDialogMakeShortcut.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CrossThreadStuff.cs" />
+    <Compile Include="DfsaneSolver.cs" />
+    <Compile Include="Genr.cs" />
+    <Compile Include="GListBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Databank.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Databanks.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Gui.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Gui.designer.cs">
+      <DependentUpon>Gui.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GuiDialogMakeBatfile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GuiDialogMakeBatfile.Designer.cs">
+      <DependentUpon>GuiDialogMakeBatfile.cs</DependentUpon>
+    </Compile>
+    <Compile Include="InputBox.cs" />
+    <Compile Include="Intelli.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Intelli.Designer.cs">
+      <DependentUpon>Intelli.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IVariable.cs" />
+    <Compile Include="ListViewDragDropManager.cs" />
+    <Compile Include="LongProcess.cs" />
+    <Compile Include="LruCache.cs" />
+    <Compile Include="Matrix.cs" />
+    <Compile Include="Menu.xaml.cs">
+      <DependentUpon>Menu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Model.cs" />
+    <Compile Include="MouseUtilities.cs" />
+    <Compile Include="O.cs" />
+    <Compile Include="OnlineDatabanks.cs" />
+    <Compile Include="Operators.cs" />
+    <Compile Include="Options.cs" />
+    <Compile Include="Parser.cs">
+    </Compile>
+    <Compile Include="Parser\AST.cs" />
+    <Compile Include="Parser\ASTNode.cs" />
+    <Compile Include="Parser\Frm\ParserFrmCommon.cs" />
+    <Compile Include="Parser\Frm\ParserFrmCompileAST.cs" />
+    <Compile Include="Parser\Frm\ParserFrmCreateAST.cs" />
+    <Compile Include="Parser\Frm\ParserFrmTemplates.cs" />
+    <Compile Include="Parser\Frm\ParserFrmWalkAST.cs" />
+    <Compile Include="Parser\GekkoST.cs" />
+    <Compile Include="Parser\Gek\ParserGekCommon.cs" />
+    <Compile Include="Parser\Gek\ParserGekCompileAndRunAST.cs" />
+    <Compile Include="Parser\Gek\ParserGekCreateAST.cs" />
+    <Compile Include="Parser\Gek\ParserGekTemplates.cs" />
+    <Compile Include="Parser\Gek\ParserGekWalkASTAndEmit.cs" />
+    <Compile Include="Parser\Gek\Tokens.cs" />
+    <Compile Include="Parser\ParserCommon.cs" />
+    <Compile Include="RichTextBoxEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ScalarDate.cs" />
+    <Compile Include="ScalarString.cs" />
+    <Compile Include="ScalarVal.cs" />
+    <Compile Include="SimpleUnitTestWindow.xaml.cs">
+      <DependentUpon>SimpleUnitTestWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SplitContainerFix.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Table.cs" />
+    <Compile Include="Task.cs" />
+    <Compile Include="Timer.cs" />
+    <Compile Include="Translator2.cs" />
+    <Compile Include="Translators.cs" />
+    <Compile Include="TspUtilitiesDataGui.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TspUtilitiesDataGui.Designer.cs">
+      <DependentUpon>TspUtilitiesDataGui.cs</DependentUpon>
+    </Compile>
+    <Compile Include="G.cs" />
+    <Compile Include="Globals.cs" />
+    <Compile Include="Graph.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="GuiDialogMakeBatfile.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>GuiDialogMakeBatfile.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Intelli.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Intelli.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TspUtilitiesDataGui.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>TspUtilitiesDataGui.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Graph.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Graph.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TspUtilitiesGui.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>TspUtilitiesGui.cs</DependentUpon>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Settings.cs" />
+    <Compile Include="StringTokenizer2.cs" />
+    <Compile Include="TimeSeries.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Token.cs" />
+    <Compile Include="TspUtilities.cs" />
+    <Compile Include="TspUtilitiesGui.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TspUtilitiesGui.Designer.cs">
+      <DependentUpon>TspUtilitiesGui.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserSettings.cs" />
+    <Compile Include="Window1.xaml.cs">
+      <DependentUpon>Window1.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Window2.xaml.cs">
+      <DependentUpon>Window2.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WindowIntellisense.xaml.cs">
+      <DependentUpon>WindowIntellisense.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WindowMessageBox.xaml.cs">
+      <DependentUpon>WindowMessageBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WindowOpenDatabanks.xaml.cs">
+      <DependentUpon>WindowOpenDatabanks.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WindowRunStatus.xaml.cs">
+      <DependentUpon>WindowRunStatus.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WindowSletmig.xaml.cs">
+      <DependentUpon>WindowSletmig.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WindowTets.xaml.cs">
+      <DependentUpon>WindowTets.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XML_To_TreeView.xaml.cs">
+      <DependentUpon>XML_To_TreeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ZipWriter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\alglib\alglib.csproj">
+      <Project>{52254553-EF42-469A-BB19-700C9065338A}</Project>
+      <Name>alglib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ANTLR\ANTLR.csproj">
+      <Project>{80843646-B8DD-4BEE-8B8C-5E59E9900463}</Project>
+      <Name>ANTLR</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GekkoFlowChart\GekkoFlowChart.csproj">
+      <Project>{348405FA-5AAC-4F8B-BB47-211CAD2294AC}</Project>
+      <Name>GekkoFlowChart</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\popup\SimplePopup\src\PopupControl\PopupControl.csproj">
+      <Project>{E305A89A-00AD-47F8-AC0E-95431A94BD37}</Project>
+      <Name>PopupControl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\com.calitha.goldparser\LexerParser.csproj">
+      <Project>{72FE7760-F96F-4ECC-9CE4-946BD831E405}</Project>
+      <Name>LexerParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MathNet.Numerics\Numerics.csproj">
+      <Project>{8D2A69DC-7A76-44B3-B976-C078AF604763}</Project>
+      <Name>Numerics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WA\WA.csproj">
+      <Project>{97DF83D0-2418-44F0-950B-B4BE29717AF2}</Project>
+      <Name>WA</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CompareUtility3Way.resx">
+      <DependentUpon>CompareUtility3Way.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CompareUtilityDatabanks.resx">
+      <DependentUpon>CompareUtilityDatabanks.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CompareUtilityEquations.resx">
+      <DependentUpon>CompareUtilityEquations.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GuiDialogMakeShortcut.resx">
+      <DependentUpon>GuiDialogMakeShortcut.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Gui.resx">
+      <DependentUpon>Gui.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="yellow.gif" />
+    <Content Include="Gekko.ico" />
+    <Content Include="__progress.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="IWshRuntimeLibrary">
+      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>4</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="Microsoft.Office.Interop.Excel">
+      <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>6</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Menu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SimpleUnitTestWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Window1.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Window2.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WindowIntellisense.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WindowMessageBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WindowOpenDatabanks.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WindowRunStatus.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WindowSletmig.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WindowTets.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="XML_To_TreeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+</Project>
