@@ -1,0 +1,25 @@
+      ---------------------------------------------------------
+          Gekko Simulation Software (www.t-t.dk/gekko).
+          Copyright (C) 2016, Thomas Thomsen, T-T Analyse.
+      ---------------------------------------------------------
+
+These files are source code regarding Gekko Simulation Software. The source code
+is mostly in C#.NET, and is open source licensed (GNU GPL).
+
+Open the solution file (GekkoCS.sln) with Visual Studio 2010 or later. Make sure that the
+solution configuration is set to "Debug", and the solution platform is set to "Any CPU".
+Also make sure that the Gekko project is chosen as "StartUp Project". Next, it should be
+possible to start the Gekko application under Visual Studio by simply pressing F5.
+
+Please note that the software is open source (GNU GPL). That is, it is free of charge, but
+the source code cannot be used in commercial applications. The source code can only be
+used and modified in other open source projects. See the GNU GPL licence in the file COPYING, or
+at http://www.gnu.org/licenses.
+
+Much more information about Gekko can be found at www.t-t.dk/gekko.
+
+Good luck with using the source code. Improvements, bug fixes, suggestions etc. can be sent to
+the mail address shown at www.t-t.dk.
+
+  Thomas Thomsen/T-T Analyse, editor of the Gekko project (see www.t-t.dk/gekko/fundats.html).
+

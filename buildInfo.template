@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<version>
+    <revision>$WCREV$</revision>
+    <revisionRange>$WCRANGE$</revisionRange>
+    <revisionTime>$WCDATE$</revisionTime>
+    <modified>$WCMODS?code modified since revision:code not modified since revision$</modified>
+    <buildTime>$WCNOW$</buildTime>
+    <url>$WCURL$</url>
+</version>
