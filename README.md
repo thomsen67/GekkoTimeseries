@@ -6,7 +6,7 @@ Gekko is a free time-series oriented software package for handling and analyzing
 [![Main window](https://github.com/thomsen67/GekkoTimeseries/blob/master/main1.png "Main window")](https://github.com/thomsen67/GekkoTimeseries/blob/master/main2.png "Main window")
 
 Some features:
-* Timeseries-oriented software, with flexible databanks. Very suitable for modelling and data revision programs.
+* Timeseries-oriented software, with flexible databanks. Very suitable for modeling and data revision programs.
 * Annual, quarters, months and undated frequencies supported, more to come. Conversions between these are in-built.
 * Dynamically loaded and compiled models, including failsafe mode.
 * Gauss and Newton solvers, with ordering and feedback logic. Fair-Taylor or Newton-Fair-Taylor solver for forward-looking models. Any number of simultaneous goals/means possible.
