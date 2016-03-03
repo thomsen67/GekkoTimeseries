@@ -1,0 +1,581 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8D2A69DC-7A76-44B3-B976-C078AF604763}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>MathNet.Numerics</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <RootNamespace>MathNet.Numerics</RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>bin\Debug\MathNet.Numerics.xml</DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>bin\Release\MathNet.Numerics.xml</DocumentationFile>
+    <DebugSymbols>false</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release-Mono|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>bin\Release\MathNet.Numerics.xml</DocumentationFile>
+    <DebugSymbols>false</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release32bit|AnyCPU' ">
+    <OutputPath>bin\Release32bit\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>bin\Release\MathNet.Numerics.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <FileAlignment>4096</FileAlignment>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <DocumentationFile>bin\Debug\MathNet.Numerics.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <FileAlignment>4096</FileAlignment>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>bin\Release\MathNet.Numerics.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <FileAlignment>4096</FileAlignment>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release-Mono|x86' ">
+    <OutputPath>bin\x86\Release-Mono\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>bin\Release\MathNet.Numerics.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <FileAlignment>4096</FileAlignment>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release32bit|x86' ">
+    <OutputPath>bin\x86\Release32bit\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>bin\Release\MathNet.Numerics.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <FileAlignment>4096</FileAlignment>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.2.9.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Diverse\ExternalDllFiles\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Data">
+      <Name>System.Data</Name>
+    </Reference>
+    <Reference Include="System.Xml">
+      <Name>System.XML</Name>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Collection.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Complex.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Distributions\CumulativeNormalDistribution.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Distributions\InvCumulativeNormalDistribution.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Distributions\NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Double.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Equations\NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Equations\ScalarIterator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Generators\BinomialGenerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Generators\CombinationGenerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Generators\DiscreteGenerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Generators\ExponentialGenerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Generators\GammaGenerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Generators\NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Generators\NormalGenerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Generators\PermutationGenerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Generators\PoissonGenerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Generators\ZipfGenerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="IRealFunction.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="IRealGenerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\CholeskyDecomposition.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\EigenvalueDecomposition.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\LinalgTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\LUDecomposition.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Matrix.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\QRDecomposition.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\SingularValueDecomposition.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\AbstractBLAS.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\AbstractIteration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\AbstractMatrix.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\AbstractVector.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\BlasTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\BlockMatrix.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\BlockVector.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\CoordinateMatrix.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\DenseVector.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\AbstractEigenvalueIteration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\AbstractEigenvalueSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\AbstractEigenvalueTransformation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\ArrayEigenvalueIterationMonitor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\DefaultEigenvalueIteration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\IEigenvalueIteration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\IEigenvalueIterationMonitor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\IEigenvalueSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\IEigenvalueTransformation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\LanczosSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\LockedShiftEigenvalueTransformation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\LockedShiftInvertEigenvalueTransformation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\NormalEigenvalueTransformation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\NullEigenvalueIterationMonitor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\OutputEigenvalueIterationMonitor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\PowerIterationSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\ShiftEigenvalueTransformation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Eigenvalue\ShiftInvertEigenvalueTransformation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Factory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\IBLAS.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\IMatrix.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\IntDoubleVectorPair.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\IntIntDoubleVectorTriple.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\IShellMatrix.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Iteration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\IVector.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\AbstractLinearIteration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\AbstractLinearSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\AbstractPreconditioner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\ArrayLinearIterationMonitor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\BiCGSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\BiCGstabSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\CGSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\CGSSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\ChebyshevSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\CholeskyPreconditioner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\CompositePreconditioner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\LinearSolverTests2.cs" />
+    <Compile Include="LinearAlgebra\Sparse\Linear\LinearSolverTests1.cs" />
+    <Compile Include="LinearAlgebra\Sparse\Linear\DecompositionPreconditioner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\DefaultLinearIteration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\GaussSeidelPreconditioner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\GMRESSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\ICCPreconditioner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\IdentityPreconditioner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\ILinearIteration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\ILinearIterationMonitor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\ILinearSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\ILUPreconditioner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\IPreconditioner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\IRSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\IterativeSolverPreconditioner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\LinearNotConvergedException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\LinearSolverTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\LUPreconditioner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\MatrixLinearIteration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\MultigridPreconditioner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\NullLinearIterationMonitor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\OutputLinearIterationMonitor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\PolynomialPreconditioner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\QMRSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\QRPreconditioner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\SORPreconditioner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Linear\SSORPreconditioner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Mixed\AbstractMixedSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Mixed\CGUzawaSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Mixed\GradientUzawaSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Mixed\IMixedSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Mixed\NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Mixed\UzawaSolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\NotConvergedException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\SequentialBLAS.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\SparseColumnMatrix.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\SparseColumnRowMatrix.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\SparseRowColumnMatrix.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\SparseRowMatrix.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\SparseVector.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\TesterUtilities.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAlgebra\Sparse\Utilities.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Polynomial.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Quaternion.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Rational.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Statistics\Accumulator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Statistics\NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Transformations\ComplexFourierTransformation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Transformations\FourierHelper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Transformations\NamespaceDoc.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Transformations\RealFourierTransformation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Transformations\Transformations.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Trigonometry.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Content Include="Guidelines.txt" />
+    <Content Include="License.txt" />
+    <Content Include="release-changes.txt" />
+    <Content Include="release-notes.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Integration\" />
+    <Folder Include="Interpolation\" />
+    <Folder Include="LinearAlgebra\UnitTests\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>
