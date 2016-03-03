@@ -1,0 +1,30 @@
+﻿<Window x:Class="GekkoFlowChart.HelpTextWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Flowchart help" 
+    Height="500" 
+    Width="650"
+    WindowStyle="ToolWindow"
+    ShowInTaskbar="False" 
+    ShowActivated="False" WindowState="Minimized">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- 
+                Merge in the resource dictionary that contains the help text that is displayed in the window.
+                This is in a separate file to remove some of the clutter and simplify this file.
+                -->
+                <ResourceDictionary 
+                    Source="HelpText.xaml"
+                    />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+        
+    <!--
+    Some text that describes the input bindings.
+    -->
+    <FlowDocumentPageViewer
+        Document="{StaticResource helpText}"
+        />
+</Window>

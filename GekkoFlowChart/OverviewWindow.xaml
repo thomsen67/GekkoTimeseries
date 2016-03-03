@@ -1,0 +1,152 @@
+﻿<Window x:Class="GekkoFlowChart.OverviewWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:GekkoFlowChart"
+    xmlns:ZoomAndPan="clr-namespace:ZoomAndPan;assembly=ZoomAndPan"
+    Title="Overview" 
+    Height="200" 
+    Width="200" 
+    WindowStyle="ToolWindow"
+    ShowInTaskbar="False" 
+    ShowActivated="False"
+    MouseDown="Window_MouseDown"
+    >
+    <Window.Resources>
+        
+        <!-- 
+        Converts a color value to a brush.
+        -->
+        <local:ColorToBrushConverter 
+            x:Key="colorToBrushConverter"
+            />
+
+        <!--
+        Defines the UI for an instance of RectangleData.
+        -->
+        <DataTemplate 
+            DataType="{x:Type local:RectangleData}"
+            >
+            <TextBox
+                Width="{Binding Width}"
+                Height="{Binding Height}"
+                Background="{Binding Color, Converter={StaticResource colorToBrushConverter}}"
+                Text="{Binding Label}"
+                />            
+        </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type local:ArrowData}">
+            <local:Arrow                
+                Width="{Binding Width}"
+                Height="{Binding Height}"                
+                HeadWidth="7" HeadHeight="5" Stroke="{Binding Color, Converter={StaticResource colorToBrushConverter}}" StrokeThickness="2.0"                 
+                />
+        </DataTemplate>
+        
+    </Window.Resources>
+    
+    <!--
+    Embed a zoom and pan control.
+    This is used so that we can scale the content to fit the overview window,
+    therefore we see an overview of all of the content at once.
+    -->
+    <ZoomAndPan:ZoomAndPanControl
+        x:Name="overview"
+        Background="LightGray"
+        SizeChanged="overview_SizeChanged"
+        >
+        
+        <!-- 
+        This is the content that is displayed.
+        -->
+        <Grid
+            Width="{Binding Source={x:Static local:DataModel.Instance}, Path=ContentWidth}"
+            Height="{Binding Source={x:Static local:DataModel.Instance}, Path=ContentHeight}"
+            >                       
+            
+
+            <!--
+        	This ItemsControl is the main part of the content that is displayed.
+            It contains instances of RectangleData, the DataTemplate for RectangleData is in
+            the UserControl.Resources section of this file.
+            -->
+            <ItemsControl
+                x:Name="content"
+                ItemsSource="{Binding Source={x:Static local:DataModel.Instance}, Path=Rectangles}"
+                Background="White"
+                >
+
+                <ItemsControl.ItemContainerStyle>
+                    <Style>
+                        <Setter Property="Canvas.Left" Value="{Binding X}" />
+                        <Setter Property="Canvas.Top" Value="{Binding Y}" />
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+
+            <!--
+        	This ItemsControl is the main part of the content that is displayed.
+            It contains instances of RectangleData, the DataTemplate for RectangleData is in
+            the UserControl.Resources section of this file.
+            -->
+            <ItemsControl
+                x:Name="content2"
+                ItemsSource="{Binding Source={x:Static local:DataModel.Instance}, Path=Arrows}"
+                Background="Transparent"
+                >
+                <ItemsControl.ItemContainerStyle>
+                    <Style>
+                        <Setter Property="Canvas.Left" Value="{Binding X}" />
+                        <Setter Property="Canvas.Top" Value="{Binding Y}" />
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+            
+
+            <!--
+            This Canvas and Border are used to draw the 'overview' zoom rect. 
+            This show the area of the content that is being viewed in the main window.
+            -->
+            <Canvas>
+                <!--<local:Arrow X1="13" Y1="13" X2="330" Y2="525" HeadWidth="15" HeadHeight="5" Stroke="Red" StrokeThickness="12.0" />-->
+
+                <Thumb
+                    x:Name="overviewZoomRectThumb"
+                    Canvas.Left="{Binding Source={x:Static local:DataModel.Instance}, Path=ContentOffsetX, Mode=TwoWay}"
+                    Canvas.Top="{Binding Source={x:Static local:DataModel.Instance}, Path=ContentOffsetY, Mode=TwoWay}"
+                    Width="{Binding Source={x:Static local:DataModel.Instance}, Path=ContentViewportWidth}"
+                    Height="{Binding Source={x:Static local:DataModel.Instance}, Path=ContentViewportHeight}"
+                    DragDelta="overviewZoomRectThumb_DragDelta"
+                    Opacity="0.5"
+                    >
+                    <Thumb.Template>
+                        <ControlTemplate 
+                            TargetType="{x:Type Thumb}"
+                            >
+                            
+                            <Border 
+                                BorderBrush="Black"
+                                BorderThickness="1"
+                                Background="Khaki"
+                                CornerRadius="1"                                        
+                                />
+                            
+                        </ControlTemplate>
+                    </Thumb.Template>
+                </Thumb>
+            </Canvas>                             
+            
+        </Grid>                        
+    </ZoomAndPan:ZoomAndPanControl>
+
+</Window>
