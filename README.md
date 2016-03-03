@@ -1,6 +1,8 @@
 # GekkoTimeseries
 Gekko Timeseries Software: Timeseries handling, and solving of large-scale economic models.
+
 Gekko is a free time-series oriented software package for handling and analyzing timeseries data, and for solving and analyzing large-scale economic models. Since 2009, Gekko is being used by Danish ministeries, banks, interest groups and universities, for the simulation of economic and energy-related models (more). The software runs under Windows (.NET), and is open source (GNU GPL).
+
 Some features:
 * Timeseries-oriented software, with flexible databanks. Very suitable for modelling and data revision programs.
 * Annual, quarters, months and undated frequencies supported, more to come. Conversions between these are in-built.
