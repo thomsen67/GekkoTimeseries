@@ -171,8 +171,7 @@ namespace Gekko
             this.Name = "Gekko " + version;
 
             green = Image.FromFile(Application.StartupPath + "\\images\\green.png");
-            yellow = Image.FromFile(Application.StartupPath + "\\images\\yellow.png");
-            //gray = Image.FromFile(Application.StartupPath + "\\images\\gray.png");
+            yellow = Image.FromFile(Application.StartupPath + "\\images\\yellow.png");            
             red = Image.FromFile(Application.StartupPath + "\\images\\red.png");
             target = Image.FromFile(Application.StartupPath + "\\images\\target.png");
 

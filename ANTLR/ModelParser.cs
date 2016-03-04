@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 Model.g 2016-03-02 10:13:52
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 Model.g 2016-03-03 11:35:01
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -1453,7 +1453,7 @@ public partial class ModelParser : Parser
 
 
             	// AST REWRITE
-            	// elements:          Ident, MINUS, number
+            	// elements:          MINUS, number, Ident
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -3180,7 +3180,7 @@ public partial class ModelParser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          ident, numberPlusMinus
+                    	// elements:          numberPlusMinus, ident
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
