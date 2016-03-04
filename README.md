@@ -31,8 +31,8 @@ Some features:
 * [Releases on GitHub](https://github.com/thomsen67/GekkoTimeseries/releases)
 
 ## Contributing + source code
+* You may fork and clone the source code from here, or simply download it as a zip file. You may consider working a stable [release](https://github.com/thomsen67/GekkoTimeseries/releases).
 * [Source code documentation](http://www.t-t.dk/gekko/source_code_documentation.html)
-* You may fork and clone the source code from here, or simply download it as a zip file. You may consider working a stable [release](https://github.com/thomsen67/GekkoTimeseries/releases)
 * Advice on running the code in Visual Studion 2010 (or later): open the solution file (GekkoCS.sln) with Visual Studio. Make sure that the solution configuration is set to "Debug" and the solution platform is set to "Any CPU". Also make sure that the Gekko project is chosen as "StartUp Project". Next, it should be possible to start the Gekko application under Visual Studio by simply pressing F5. If you change the ANTLR .g files, use the .bat files to transform to C# (this demands Java and ANTLR 3.1.3).
 * Please note that the software is open source (GNU GPL). That is, it is free of charge, but the source code cannot be used in commercial applications. The source code can only be used and modified in other open source projects.
 
