@@ -3,7 +3,7 @@ Gekko Timeseries Software: Timeseries handling, and solving of large-scale econo
 
 Gekko is an open-source time-series oriented software package for handling and analyzing timeseries data, and for solving and analyzing large-scale economic models. Since 2009, Gekko is being used by Danish ministeries, banks, interest groups and universities, for the simulation of economic and energy-related models (more). The software runs under Windows (.NET), and is licenced under GNU GPL.
 
-[![Main window](https://github.com/thomsen67/GekkoTimeseries/blob/master/main1.png "Main window")](https://github.com/thomsen67/GekkoTimeseries/blob/master/main2.png "Main window")
+[![Main window](https://github.com/thomsen67/GekkoTimeseries/blob/master/Diverse/main1.png "Main window")](https://github.com/thomsen67/GekkoTimeseries/blob/master/Diverse/main2.png "Main window")
 
 Some features:
 * Timeseries-oriented software, with flexible databanks. Very suitable for modeling and data revision programs.
@@ -32,7 +32,7 @@ Some features:
 
 ## Contributing + source code
 * [Source code documentation](http://www.t-t.dk/gekko/source_code_documentation.html)
-* You may fork and clone the source code from here, or simply download it as a zip file.
+* You may fork and clone the source code from here, or simply download it as a zip file. You may consider working a stable [release](https://github.com/thomsen67/GekkoTimeseries/releases)
 * Advice on running the code in Visual Studion 2010 (or later): open the solution file (GekkoCS.sln) with Visual Studio. Make sure that the solution configuration is set to "Debug" and the solution platform is set to "Any CPU". Also make sure that the Gekko project is chosen as "StartUp Project". Next, it should be possible to start the Gekko application under Visual Studio by simply pressing F5. If you change the ANTLR .g files, use the .bat files to transform to C# (this demands Java and ANTLR 3.1.3).
 * Please note that the software is open source (GNU GPL). That is, it is free of charge, but the source code cannot be used in commercial applications. The source code can only be used and modified in other open source projects.
 
