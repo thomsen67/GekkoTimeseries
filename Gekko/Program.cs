@@ -6291,7 +6291,7 @@ namespace Gekko
 
             Process r = new Process();
 
-            r.StartInfo.FileName = RPath + "\\bin\\R";
+            r.StartInfo.FileName = RPath + "\\bin\\R";            
 
             //r.StartInfo.Arguments = "CMD BATCH " + Globals.QT + RFileName + Globals.QT + " " + Globals.QT + RFileName + ".txt" + Globals.QT;
             r.StartInfo.Arguments = " CMD BATCH --no-save " + Globals.QT + RFileName + Globals.QT + " " + Globals.QT + RFileName + ".txt" + Globals.QT;
@@ -6303,7 +6303,12 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                MessageBox.Show("*** ERROR: R problem, R path =  " + RPath);
+                string s7 = null;
+                if (!File.Exists(r.StartInfo.FileName + ".exe"))
+                {
+                    s7 = "\nThe file " + r.StartInfo.FileName + ".exe does not seem to exist";
+                }
+                MessageBox.Show("*** ERROR:\nR problem, R path =  " + RPath + "\nMessage: " + e.Message + s7);
                 throw new Exception("", e);
             }
 
