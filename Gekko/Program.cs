@@ -6390,10 +6390,11 @@ namespace Gekko
             {
                 string s3 = GetTextFromFileWithWait(RFileName + ".txt");
                 List<string> ss = G.ExtractLinesFromText(s3);
-                bool skip = false;  //avoid the method in input
+                bool skip = true;  //avoid the method and the R header in input
+                G.Writeln();
                 foreach (string s2 in ss)
                 {
-                    if (s2.Contains(def1)) skip = true;                    
+                    //if (s2.Contains(def1)) skip = true;                    
                     if (!skip) G.Writeln(s2);
                     if (s2.Contains(def2)) skip = false;                                        
                 }
