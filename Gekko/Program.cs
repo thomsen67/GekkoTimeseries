@@ -6286,13 +6286,54 @@ namespace Gekko
                 sw.Close();
             }
 
-            string RPath = GetRhomeWin32NT(null);
-            //use this if not explicitely set with "option folder r = ..."
+            string RPathUsedHere = null;
+            if (Program.options.r_exe_path.Trim() == "")
+            {
+                //no path stated manually
+                if (Globals.detectedRPath == null || Globals.detectedRPath == "[[RDetectFailed]]")
+                {
+                    //do not do this every time R is called!
+                    string RPath = GetRhomeWin32NT(null);
+                    if (RPath == null || RPath.Trim() == "") Globals.detectedRPath = "[[RDetectFailed]]";
+                    else Globals.detectedRPath = RPath + "\\bin\\R.exe";                 
+                }
+                else
+                {
+                    //either second etc. time, or previous detect fail                    
+                }
+                RPathUsedHere = Globals.detectedRPath;
+            }
+            else
+            {
+                //overrides
+                if (Program.options.r_exe_path.ToLower().EndsWith("\\r.exe"))
+                {
+                    RPathUsedHere = Program.options.r_exe_path;                    
+                }
+                else
+                {
+                    if (Program.options.r_exe_path.EndsWith("\\")) RPathUsedHere = Program.options.r_exe_path + "R.exe";
+                    else RPathUsedHere = Program.options.r_exe_path + "\\R.exe";
+                }                
+            }
+
+            //Now RPathUsedHere should be either
+            // - A file path ending with "\R.exe"
+            // - "[[RDetectFailed]]"
+
+            if (RPathUsedHere == "[[RDetectFailed]]")
+            {
+                G.Writeln2("*** ERROR: R.exe path could not be auto-detected.");
+                G.Writeln("           Please state the R.exe path manually with OPTION r exe path = ...");
+                throw new GekkoException();
+            }
+
+            //Now RPathUsedHere is a file path ending with "\R.exe"            
 
             Process r = new Process();
 
             //It seems that \bin\R.exe calls \i386\R.exe or \x64\R.exe depending on R settings on the user's computer.
-            r.StartInfo.FileName = RPath + "\\bin\\R.exe";                        
+            r.StartInfo.FileName = RPathUsedHere;                        
             r.StartInfo.Arguments = " CMD BATCH --no-save " + Globals.QT + RFileName + Globals.QT + " " + Globals.QT + RFileName + ".txt" + Globals.QT;
             r.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
@@ -6302,13 +6343,40 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                string s7 = null;
                 if (!File.Exists(r.StartInfo.FileName))
                 {
-                    s7 = "\nThe file " + r.StartInfo.FileName + " does not seem to exist";
+                    if (Program.options.r_exe_path.Trim() == "")
+                    {
+                        //auto-detect
+                        G.Writeln2("*** ERROR: Error message: " + e.Message);
+                        G.Writeln("*** ERROR: The file " + RPathUsedHere + " does not seem to exist.");
+                        G.Writeln("           You may try to manually set \"OPTION r exe path = ... , if you know the R.exe location.");
+                        G.Writeln("           R.exe file locations may be similar to these:");
+                        G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\R.exe");
+                        G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\i386\\R.exe");
+                        G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\x64\\R.exe");
+                        G.Writeln("           The first one is generic, the second is 32-bit, and the last is 64-bit");
+                    }
+                    else
+                    {
+                        //stated manually
+                        G.Writeln2("*** ERROR: Error message: " + e.Message);
+                        G.Writeln("*** ERROR: The file " + RPathUsedHere + " does not seem to exist.");
+                        G.Writeln("           You may try to set \"OPTION r exe path = '';\" (or remove the option),");
+                        G.Writeln("           which will make Gekko try to auto-detect the R.exe path.");
+                        G.Writeln("           R.exe file locations may be similar to these:");
+                        G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\R.exe");
+                        G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\i386\\R.exe");
+                        G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\x64\\R.exe");
+                        G.Writeln("           The first one is generic, the second is 32-bit, and the last is 64-bit");
+                    }
                 }
-                MessageBox.Show("*** ERROR:\nR problem, R path =  " + RPath + "\nMessage: " + e.Message + s7);
-                throw new Exception("", e);
+                else
+                {
+                    G.Writeln2("*** ERROR: Error message: " + e.Message);
+                    G.Writeln("*** ERROR: The file " + RPathUsedHere + " exists, but R fails");                    
+                }                
+                throw new GekkoException();
             }
 
             r.WaitForExit();
@@ -17243,6 +17311,8 @@ namespace Gekko
             Globals.globalPeriodTimeSpans = new GekkoTimeSpans();  //Probably not used anymore
             Globals.globalPeriodTimeFilters = new GekkoTimeSpans();  //nothing in .data yet.
             Globals.globalPeriodTimeFilters2 = new List<GekkoTime>();
+
+            Globals.detectedRPath = null;  //we reset this, too
 
             if (workingFolder != null && workingFolder != "")
             {

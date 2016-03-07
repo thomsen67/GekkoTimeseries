@@ -350,7 +350,7 @@ namespace Gekko
                 else
                 {
                     Globals.ch.windowsGraphCloseCounter++;
-                    g.Invoke(new CloseDelegate(g.Close));
+                    g.Invoke(new CloseDelegate(g.Close));  //Why not just g.Close() ??
                 }
             }
             catch { };  //fail silently
@@ -371,7 +371,7 @@ namespace Gekko
                 {
                     //w.Close();
                     Globals.ch.windowsDecompCloseCounter++;
-                    w.Close();
+                    w.Dispatcher.Invoke(new CloseDelegate(w.Close));  //Why not just w.Close() ??                    
                 }
             }
             catch { };  //fail silently

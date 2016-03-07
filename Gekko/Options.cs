@@ -61,7 +61,7 @@ Additionally, there are model, solve, equation options.
         public string folder_help = "";
         public string folder_menu = "";
         public string folder_model = "";
-        public string folder_pipe = "";
+        public string folder_pipe = "";        
         public string folder_table = "";
         public string folder_table1 = "";
         public string folder_table2 = "";
@@ -104,6 +104,7 @@ Additionally, there are model, solve, equation options.
         public bool print_prt_pch = true;  //p
         public bool print_prt_gdif = false;  //dp        
         public int print_width = 100;  //so that eqs look ok in DISP
+        public string r_exe_path = "";  //there will probably be more R options later on
         public bool sheet_mulprt_lev = false;  //n
         public bool sheet_mulprt_abs = true;  //m
         public bool sheet_mulprt_pch = false;  //q

@@ -654,6 +654,7 @@ tokens {
     ENDO             = 'ENDO'            ;
     ENGLISH          = 'ENGLISH';
     EXCEL            = 'EXCEL'           ;
+	EXE            = 'EXE'           ;
     EXIT             = 'EXIT';
     EXO              = 'EXO'             ;
     EXP              = 'EXP';
@@ -795,6 +796,7 @@ tokens {
     PARAM = 'PARAM';
     PARAM;
     PATCH        = 'PATCH';
+	PATH        = 'PATH';
     PAUSE            = 'PAUSE';
     PCH              = 'PCH'             ;     //  --> don't activate this function --> will give problems (DLOG etc. are not stated either, they are recognized as idents)
     PCIM             = 'PCIM'       ;
@@ -1091,6 +1093,7 @@ tokens {
                                         d.Add("endo"    , ENDO      );
                                         d.Add("english"              , ENGLISH);
                                         d.Add("excel"   , EXCEL     );
+										d.Add("exe"   , EXE     );
                                         d.Add("exit"    , EXIT       );
                                         d.Add("exo"     , EXO       );
                                         d.Add("exp"     , EXP       );
@@ -1228,6 +1231,7 @@ tokens {
                                         d.Add("p"       , P        );
                                         d.Add("PARAM", PARAM);
                                         d.Add("PATCH"       , PATCH        );
+										d.Add("PATH"       , PATH        );
                                         d.Add("pause"   , PAUSE        );
                                         d.Add("pch"     , PCH        );
                                         d.Add("pcim"    , PCIM );
@@ -2547,7 +2551,7 @@ optionType :
              | FOLDER HELP   '='? fileName ->  FOLDER HELP ^(ASTSTRINGSIMPLE fileName)
              | FOLDER MENU     '='? fileName ->  FOLDER MENU ^(ASTSTRINGSIMPLE fileName)
              | FOLDER MODEL   '='? fileName ->  FOLDER MODEL ^(ASTSTRINGSIMPLE fileName)
-             | FOLDER PIPE '='? fileName ->  FOLDER PIPE ^(ASTSTRINGSIMPLE fileName)
+             | FOLDER PIPE '='? fileName ->  FOLDER PIPE ^(ASTSTRINGSIMPLE fileName)			 
              | FOLDER TABLE    '='? fileName ->  FOLDER TABLE ^(ASTSTRINGSIMPLE fileName)
              | FOLDER TABLE1   '='? fileName ->  FOLDER TABLE1 ^(ASTSTRINGSIMPLE fileName)
              | FOLDER TABLE2   '='? fileName ->  FOLDER TABLE2 ^(ASTSTRINGSIMPLE fileName)
@@ -2601,6 +2605,8 @@ optionType :
              | PRINT PRT ABS '='? yesNoSimple -> PRINT PRT ABS ^(ASTBOOL yesNoSimple)
              | PRINT PRT PCH '='? yesNoSimple -> PRINT PRT PCH ^(ASTBOOL yesNoSimple)
 			 | PRINT WIDTH '='? Integer -> PRINT WIDTH ^(ASTINTEGER Integer)
+
+			 | R EXE PATH '='? fileName -> R EXE PATH ^(ASTSTRINGSIMPLE fileName)
 
 			 | SHEET question -> SHEET question
 			 | SHEET MULPRT (GDIF|GDIFF) '='? yesNoSimple -> SHEET MULPRT GDIF ^(ASTBOOL yesNoSimple)
@@ -2817,6 +2823,7 @@ ident                     : Ident|
                             END|
                             ENGLISH|
                             EXCEL|
+							EXE|
                             EXIT|
                             EXO|
                             EXPORT|
@@ -2950,6 +2957,7 @@ ident                     : Ident|
                             OR|
                             PARAM|
                             PATCH|
+							PATH|
                             PAUSE|
                             PCH|
                             PCIMSTYLE|

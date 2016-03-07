@@ -2646,13 +2646,13 @@ namespace Gekko
             for (int i = 0; i < windowsGraphTemp.Count; i++)
             {
                 CrossThreadStuff.CloseGraph(windowsGraphTemp[i]);  //fails silently
-            }
+            }            
             List<Window1> windowsDecompTemp = new List<Window1>();
             windowsDecompTemp.AddRange(Globals.windowsDecomp);
             for (int i = 0; i < windowsDecompTemp.Count; i++)
             {
                 CrossThreadStuff.CloseDecomp(windowsDecompTemp[i]);  //fails silently
-            }
+            }            
             G.Writeln();
             G.Writeln("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
             G.Writeln("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP windows");
