@@ -6251,16 +6251,21 @@ namespace Gekko
             string RExportFileName = Globals.localTempFilesLocation + "\\tempR2Gekko.txt";
             List<string> lines2 = new List<string>();
 
+            string def1 = "#gekkoexport function def start";
+            string def2 = "#gekkoexport function def end";
+
+            lines2.Add(def1);
             lines2.Add("gekkoexport  <- function(input) {");
-            lines2.Add("name <- deparse(substitute(input))");
-            lines2.Add("filename <- `" + RExportFileName.Replace("\\", "\\\\") + "`");
-            lines2.Add("cols <- NCOL(input)");
-            lines2.Add("write(paste(`name = `, name), filename, append=TRUE)");
-            lines2.Add("write(paste(`rows = `, as.character(NROW(input))), filename, append=TRUE)");
-            lines2.Add("write(paste(`cols = `, as.character(NCOL(input))), filename, append=TRUE)");
-            lines2.Add("write(t(input), file = filename, n=cols, append=TRUE)");
-            lines2.Add("write(`-------------------`, filename, append=TRUE)");
+            lines2.Add("  name <- deparse(substitute(input))");
+            lines2.Add("  filename <- `" + RExportFileName.Replace("\\", "\\\\") + "`");
+            lines2.Add("  cols <- NCOL(input)");
+            lines2.Add("  write(paste(`name = `, name), filename, append=TRUE)");
+            lines2.Add("  write(paste(`rows = `, as.character(NROW(input))), filename, append=TRUE)");
+            lines2.Add("  write(paste(`cols = `, as.character(NCOL(input))), filename, append=TRUE)");
+            lines2.Add("  write(t(input), file = filename, n=cols, append=TRUE)");
+            lines2.Add("  write(`-------------------`, filename, append=TRUE)");
             lines2.Add("}");
+            lines2.Add(def2);
             string f = G.ExtractTextFromLines(lines2).ToString().Replace("`", Globals.QT);
 
             using (FileStream fs = WaitForFileStream(RFileName, GekkoFileReadOrWrite.Write))
@@ -6385,9 +6390,12 @@ namespace Gekko
             {
                 string s3 = GetTextFromFileWithWait(RFileName + ".txt");
                 List<string> ss = G.ExtractLinesFromText(s3);
+                bool skip = false;  //avoid the method in input
                 foreach (string s2 in ss)
                 {
-                    G.Writeln(s2);
+                    if (s2.Contains(def1)) skip = true;                    
+                    if (!skip) G.Writeln(s2);
+                    if (s2.Contains(def2)) skip = false;                                        
                 }
                 G.Writeln();
             }
