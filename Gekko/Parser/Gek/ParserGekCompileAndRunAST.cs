@@ -31,8 +31,8 @@ namespace Gekko.Parser.Gek
             if (G.IsUnitTesting())
             {
                 //if running test cases, use this absolute path, this will never be run by users
-                compilerParams.ReferencedAssemblies.Add(Globals.ttPath + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\ANTLR.dll");
-                compilerParams.ReferencedAssemblies.Add(Globals.ttPath + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gekko.exe");
+                compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\ANTLR.dll");
+                compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gekko.exe");
             }
             else
             {

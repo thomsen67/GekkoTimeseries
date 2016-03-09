@@ -1713,7 +1713,7 @@ namespace Gekko
             if (G.IsUnitTesting())
             {
                 //if running test cases, use this absolute path                
-                compilerParams.ReferencedAssemblies.Add(Globals.ttPath + @"\GekkoCS\Gekko\bin\Debug\gekko.exe");
+                compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\gekko.exe");
             }
             else
             {

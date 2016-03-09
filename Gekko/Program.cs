@@ -5092,8 +5092,8 @@ namespace Gekko
             if (G.IsUnitTesting())
             {
                 //if running test cases, use this absolute path
-                compilerParams.ReferencedAssemblies.Add(Globals.ttPath + @"\GekkoCS\Gekko\bin\Debug\ANTLR.dll");
-                compilerParams.ReferencedAssemblies.Add(Globals.ttPath + @"\GekkoCS\Gekko\bin\Debug\gekko.exe");
+                compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\ANTLR.dll");
+                compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\gekko.exe");
             }
             else
             {
@@ -6281,6 +6281,8 @@ namespace Gekko
                 sw.Close();
             }
 
+            
+
             //Make r2gekko.txt file that R later on fills into
             using (FileStream fs = WaitForFileStream(RExportFileName, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
@@ -6533,8 +6535,16 @@ namespace Gekko
             try
             {
                 Process process = new Process();
-                string startup = @"C:\Thomas\Gekko\gekko_svn\GekkoCS\Gekko\bin\Debug";
-                if (!G.IsUnitTesting()) startup = Application.StartupPath;
+                string startup = null;
+                if (G.IsUnitTesting())
+                {
+                    startup = Globals.ttPath2 + "\\" + Globals.ttPath3 + "\\Gekko\\bin\\Debug";
+                }
+                else
+                {
+                    startup = Application.StartupPath;
+                }
+
                 process.StartInfo.FileName = startup + "\\X12A.EXE";
                 process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 process.StartInfo.Arguments = tempName + " -d " + tempName;
@@ -16515,7 +16525,7 @@ namespace Gekko
                     string sevenzPath = null;
                     if (G.IsUnitTesting())
                     {
-                        sevenzPath = Globals.ttPath + @"\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
+                        sevenzPath = Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
                     }
                     else
                     {
@@ -16582,7 +16592,7 @@ namespace Gekko
                     string sevenzPath = null;
                     if (G.IsUnitTesting())
                     {
-                        sevenzPath = Globals.ttPath + @"\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
+                        sevenzPath = Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
                     }
                     else
                     {
@@ -16687,7 +16697,7 @@ namespace Gekko
                     string sevenzPath = null;
                     if (G.IsUnitTesting())
                     {
-                        sevenzPath = Globals.ttPath + @"\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
+                        sevenzPath = Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
                     }
                     else
                     {
@@ -17322,6 +17332,7 @@ namespace Gekko
             Globals.globalPeriodTimeFilters2 = new List<GekkoTime>();
 
             Globals.detectedRPath = null;  //we reset this, too
+            Globals.r_fileContent = null;
 
             if (workingFolder != null && workingFolder != "")
             {

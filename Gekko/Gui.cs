@@ -274,7 +274,7 @@ namespace Gekko
 
         private void GuiAutoExecStuff()
         {
-            if (Directory.Exists(Globals.ttPath + @"\GekkoCS"))
+            if (Directory.Exists(Globals.ttPath2 + @"\GekkoCS"))
             {
                 Globals.runningOnTTComputer = true;  //for some debugging                
                 G.WritelnGray("DEBUGGING: Seems to be running on TT computer -- some debugging is switched on");

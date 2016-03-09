@@ -5747,46 +5747,42 @@ namespace UnitTests
             TestCell(ref counter, tab, 3, 3, CellType.Number, 10d, sharedDelta);
             Assert.AreEqual(counter, tab.Count());
 
-            if (Globals.UNITTESTFOLLOWUP)
-            {
+            I("RESET;");
+            I("TIME 2000 2004;");
+            I("SERIES<1999 1999> xx = 100;");
+            I("SERIES<2000 2004> xx % 10;");
+            I("TIMEFILTER 2000,2004;");
+            I("PRT<filter=avg> xx;");
+            tab = Globals.unitTestTablePointer;
+            counter = 0;
+            TestCell(ref counter, tab, 1, 2, CellType.Text, "xx");
+            TestCell(ref counter, tab, 1, 3, CellType.Text, "%");
+            TestCell(ref counter, tab, 2, 1, CellType.Text, "2000");
+            TestCell(ref counter, tab, 2, 2, CellType.Number, 110d, sharedDelta);
+            TestCell(ref counter, tab, 2, 3, CellType.Number, 10d, sharedDelta);
+            TestCell(ref counter, tab, 3, 1, CellType.Text, "2001-2004");
+            TestCell(ref counter, tab, 3, 2, CellType.Number, 140.39025d, sharedDelta);
+            TestCell(ref counter, tab, 3, 3, CellType.Number, 10d, sharedDelta);
+            Assert.AreEqual(counter, tab.Count());
 
-                I("RESET;");
-                I("TIME 2000 2004;");
-                I("SERIES<1999 1999> xx = 100;");
-                I("SERIES<2000 2004> xx % 10;");
-                I("TIMEFILTER 2000,2004;");
-                I("PRT<filter=avg> xx;");
-                tab = Globals.unitTestTablePointer;
-                counter = 0;
-                TestCell(ref counter, tab, 1, 2, CellType.Text, "xx");
-                TestCell(ref counter, tab, 1, 3, CellType.Text, "%");
-                TestCell(ref counter, tab, 2, 1, CellType.Text, "2000");
-                TestCell(ref counter, tab, 2, 2, CellType.Number, 110d, sharedDelta);
-                TestCell(ref counter, tab, 2, 3, CellType.Number, 10d, sharedDelta);
-                TestCell(ref counter, tab, 3, 1, CellType.Text, "2001-2004");
-                TestCell(ref counter, tab, 3, 2, CellType.Number, 140.39025d, sharedDelta);
-                TestCell(ref counter, tab, 3, 3, CellType.Number, 10d, sharedDelta);
-                Assert.AreEqual(counter, tab.Count());
-
-                I("RESET;");
-                I("TIME 2000 2004;");
-                I("SERIES<1999 1999> xx = 100;");
-                I("SERIES<2000 2003> xx % 10;");
-                I("SERIES<2004 2004> xx % 20;");
-                I("TIMEFILTER 2000,2004;");
-                I("PRT<filter=avg> xx;");
-                tab = Globals.unitTestTablePointer;
-                counter = 0;
-                TestCell(ref counter, tab, 1, 2, CellType.Text, "xx");
-                TestCell(ref counter, tab, 1, 3, CellType.Text, "%");
-                TestCell(ref counter, tab, 2, 1, CellType.Text, "2000");
-                TestCell(ref counter, tab, 2, 2, CellType.Number, 110d, sharedDelta);
-                TestCell(ref counter, tab, 2, 3, CellType.Number, 10d, sharedDelta);
-                TestCell(ref counter, tab, 3, 1, CellType.Text, "2001-2004");
-                TestCell(ref counter, tab, 3, 2, CellType.Number, 144.0505d, sharedDelta);
-                TestCell(ref counter, tab, 3, 3, CellType.Number, 12.4190d, 0.0001d);
-                Assert.AreEqual(counter, tab.Count());
-            }
+            I("RESET;");
+            I("TIME 2000 2004;");
+            I("SERIES<1999 1999> xx = 100;");
+            I("SERIES<2000 2003> xx % 10;");
+            I("SERIES<2004 2004> xx % 20;");
+            I("TIMEFILTER 2000,2004;");
+            I("PRT<filter=avg> xx;");
+            tab = Globals.unitTestTablePointer;
+            counter = 0;
+            TestCell(ref counter, tab, 1, 2, CellType.Text, "xx");
+            TestCell(ref counter, tab, 1, 3, CellType.Text, "%");
+            TestCell(ref counter, tab, 2, 1, CellType.Text, "2000");
+            TestCell(ref counter, tab, 2, 2, CellType.Number, 110d, sharedDelta);
+            TestCell(ref counter, tab, 2, 3, CellType.Number, 10d, sharedDelta);
+            TestCell(ref counter, tab, 3, 1, CellType.Text, "2001-2004");
+            TestCell(ref counter, tab, 3, 2, CellType.Number, 144.0505d, sharedDelta);
+            TestCell(ref counter, tab, 3, 3, CellType.Number, 12.4190d, 0.0001d);
+            Assert.AreEqual(counter, tab.Count());
         }
 
         private static void TestCell(ref int counter, Table tab, int row, int col, CellType type, string s)
