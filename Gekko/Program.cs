@@ -21926,8 +21926,27 @@ namespace Gekko
             p.StartInfo.FileName = Application.StartupPath + "\\gnuplot\\wgnuplot.exe";
             //p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             p.StartInfo.Arguments = path + "\\" + file3;
-            p.Start();
-            p.WaitForExit();
+
+            bool exited = false;
+            try
+            {
+                p.Start();
+                exited = p.WaitForExit(5000);  //5 sec, should always be able to do it in < 1 sec
+                if (!exited)
+                {
+                    MessageBox.Show("*** ERROR: The gnuplot call did not respond within 5 seconds, so the " + G.NL + "gnuplot call was aborted.");
+                    throw new GekkoException();
+                }
+            }
+            catch(Exception e)
+            {
+                if (exited)
+                {
+                    MessageBox.Show("*** ERROR: There was a internal problem calling gnuplot." + G.NL + "ERROR: " + e.Message);                    
+                }
+                throw new GekkoException();
+            }
+            
             p.Close();
             //resets current dir to previous location
             Directory.SetCurrentDirectory(currentDir);
