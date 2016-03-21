@@ -1398,6 +1398,13 @@ namespace Gekko
         }
 
         //Provides extra blank line
+        public static void Write2(string s)
+        {
+            Writeln();
+            Write(s);
+        }
+
+        //Provides extra blank line
         public static void Writeln2(string s, Color color)
         {
             Writeln();

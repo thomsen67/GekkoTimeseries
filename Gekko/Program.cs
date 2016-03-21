@@ -9175,16 +9175,11 @@ namespace Gekko
 
         public static string HandleOneLiners(string text)
         {
-            //Oneliner called from GUI
-            //below kind of a hack to end GENR-statements automatically with "$" if it is missing
-            //this trick is only done for gui-input, i.e. not for command files (where GENRs can
-            //be multi-line).
-            string s2 = text.Trim();
-            if (s2.EndsWith(";")) s2 = s2.Substring(0, s2.Length - 1);
-            s2 = s2.Trim();
-
             if (Globals.runningOnTTComputer)
             {
+                string s2 = text.Trim();
+                if (s2.EndsWith(";")) s2 = s2.Substring(0, s2.Length - 1);
+                s2 = s2.Trim();
 
                 if (s2.StartsWith("I(\"") && s2.EndsWith("\")"))
                 {
@@ -9252,378 +9247,379 @@ namespace Gekko
                         return "";  //no need for the parser to chew on this afterwards!
                     }
                 }
-            }
 
-            if (s2.Length == 7)
-            {
-                string sub = s2;
-                if (G.equal(sub, "packsim"))
+                if (s2.Length == 7)
                 {
-                    Globals.alwaysEnablcPackForSimulation = true;
-                    G.Writeln("alwaysEnablcPackForSimulation = " + Globals.alwaysEnablcPackForSimulation);
+                    string sub = s2;
+                    if (G.equal(sub, "packsim"))
+                    {
+                        Globals.alwaysEnablcPackForSimulation = true;
+                        G.Writeln("alwaysEnablcPackForSimulation = " + Globals.alwaysEnablcPackForSimulation);
+                    }
                 }
-            }
 
-            if (s2.Length == 6)
-            {
-                string sub = s2;
-                if (G.equal(sub, "aremos"))
+                if (s2.Length == 6)
                 {
-                    //typing "aremos" on the prompt opens the dialog for creating a wa.bat file.
-                    //not intended for "normal" Gekko users.
-                    makeBatFileForAremos();
-                    return "";  //no need for the parser to chew on this afterwards!
+                    string sub = s2;
+                    if (G.equal(sub, "aremos"))
+                    {
+                        //typing "aremos" on the prompt opens the dialog for creating a wa.bat file.
+                        //not intended for "normal" Gekko users.
+                        makeBatFileForAremos();
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
                 }
-            }
 
-            if (s2.StartsWith("dream"))
-            {
-                DecompOptions decompOptions = new DecompOptions();
-                decompOptions.dream = s2;
-                Decomp(decompOptions);
-                return "";
-            }
-
-            if (s2.Length == 5)
-            {
-                if (G.equal(s2, "eigen"))
+                if (s2.StartsWith("dream"))
                 {
-                    Eigen();
-                    return "";  //no need for the parser to chew on this afterwards!
-                }
-            }
-
-
-            if (s2.Length == 5)
-            {
-                string sub = s2;
-                if (G.equal(sub, "flush"))
-                {
-                    Flush();  //removes cached models
+                    DecompOptions decompOptions = new DecompOptions();
+                    decompOptions.dream = s2;
+                    Decomp(decompOptions);
                     return "";
                 }
-            }
 
-
-            if (s2.Length == 11)
-            {
-                string sub = s2;
-                if (G.equal(sub, "randommodel"))
+                if (s2.Length == 5)
                 {
-                    Randommodel();
-                    return "";  //no need for the parser to chew on this afterwards!
-                }
-            }
-
-            if (s2.Length == 16)
-            {
-                string sub = s2;
-                if (G.equal(sub, "randommodelcheck"))
-                {
-                    Randommodelcheck();
-                    return "";  //no need for the parser to chew on this afterwards!
-                }
-            }
-
-            if (s2.Length == 7)
-            {
-
-                string sub = s2;
-
-                if (G.equal(sub, "testsim"))
-                {
-                    int n = 1000;
-                    double[] abs = new double[3000];  //years
-                    double[] rel = new double[3000];  //years
-                    string[] absVar = new string[3000];  //years
-                    string[] relVar = new string[3000];  //years
-
-                    double[] absVs = new double[3000];  //years
-                    double[] relVs = new double[3000];  //years
-
-                    double[] absHs = new double[3000];  //years
-                    double[] relHs = new double[3000];  //years
-
-                    int min = int.MaxValue;
-                    int max = int.MinValue;
-                    List<string> list = O.GetMetaList(Program.scalars[Globals.symbolList + "endo"]).list;
-                    int x = list.Count;
-                    G.Writeln("Testing " + x + " endogenous vars");
-                    for (int i = 0; i < x; i += n)
+                    if (G.equal(s2, "eigen"))
                     {
-                        G.Writeln("Testing " + i + " up to " + (i + n - 1));
-                        List<string> res = TestSim(list, i, i + n - 1);
-                        foreach (string s in res)
+                        Eigen();
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }
+
+
+                if (s2.Length == 5)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "flush"))
+                    {
+                        Flush();  //removes cached models
+                        return "";
+                    }
+                }
+
+
+                if (s2.Length == 11)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "randommodel"))
+                    {
+                        Randommodel();
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }
+
+                if (s2.Length == 16)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "randommodelcheck"))
+                    {
+                        Randommodelcheck();
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }
+
+                if (s2.Length == 7)
+                {
+
+                    string sub = s2;
+
+                    if (G.equal(sub, "testsim"))
+                    {
+                        int n = 1000;
+                        double[] abs = new double[3000];  //years
+                        double[] rel = new double[3000];  //years
+                        string[] absVar = new string[3000];  //years
+                        string[] relVar = new string[3000];  //years
+
+                        double[] absVs = new double[3000];  //years
+                        double[] relVs = new double[3000];  //years
+
+                        double[] absHs = new double[3000];  //years
+                        double[] relHs = new double[3000];  //years
+
+                        int min = int.MaxValue;
+                        int max = int.MinValue;
+                        List<string> list = O.GetMetaList(Program.scalars[Globals.symbolList + "endo"]).list;
+                        int x = list.Count;
+                        G.Writeln("Testing " + x + " endogenous vars");
+                        for (int i = 0; i < x; i += n)
                         {
-                            string[] s3 = s.Split('¤');
-                            string type = s3[0];
-                            int year = int.Parse(s3[1]);
-                            string var = s3[2];
-                            double val = double.Parse(s3[3]);
-                            double vs = double.Parse(s3[4]);
-                            double hs = double.Parse(s3[5]);
-                            if (year < min) min = year;
-                            if (year > max) max = year;
-                            if (type == "abs")
+                            G.Writeln("Testing " + i + " up to " + (i + n - 1));
+                            List<string> res = TestSim(list, i, i + n - 1);
+                            foreach (string s in res)
                             {
-                                if (val > abs[year])
+                                string[] s3 = s.Split('¤');
+                                string type = s3[0];
+                                int year = int.Parse(s3[1]);
+                                string var = s3[2];
+                                double val = double.Parse(s3[3]);
+                                double vs = double.Parse(s3[4]);
+                                double hs = double.Parse(s3[5]);
+                                if (year < min) min = year;
+                                if (year > max) max = year;
+                                if (type == "abs")
                                 {
-                                    abs[year] = val;
-                                    absVar[year] = var;
-                                    absVs[year] = vs;
-                                    absHs[year] = hs;
+                                    if (val > abs[year])
+                                    {
+                                        abs[year] = val;
+                                        absVar[year] = var;
+                                        absVs[year] = vs;
+                                        absHs[year] = hs;
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                if (val > rel[year])
+                                else
                                 {
-                                    rel[year] = val;
-                                    relVar[year] = var;
-                                    relVs[year] = vs;
-                                    relHs[year] = hs;
+                                    if (val > rel[year])
+                                    {
+                                        rel[year] = val;
+                                        relVar[year] = var;
+                                        relVs[year] = vs;
+                                        relHs[year] = hs;
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    G.Writeln();
-                    for (int y = min; y <= max; y++)
-                    {
-                        G.Writeln("rel% " + y + " " + relVar[y] + " " + rel[y] + "%     left " + relVs[y] + " right " + relHs[y]);
-                    }
-
-                    G.Writeln();
-                    for (int y = min; y <= max; y++)
-                    {
-                        G.Writeln("abs " + y + " " + absVar[y] + " " + abs[y] + "     left " + absVs[y] + " right " + absHs[y]);
-                    }
-
-                    return "";  //no need for the parser to chew on this afterwards!
-                }
-            }
-
-            if (s2.Length == 3)
-            {
-                string sub = s2;
-                if (G.equal(sub, "lex"))
-                {
-                    //show raw tokens
-                    //only for debugging
-                    //not intended for "normal" Gekko users.
-                    if (Globals.debugTokens) Globals.debugTokens = false;
-                    else Globals.debugTokens = true;
-                    if (Globals.debugTokens == true)
-                    {
-                        G.Writeln("Lexing will be done...");
-                    }
-                    else
-                    {
-                        G.Writeln("Lexing undone...");
-                    }
-                    return "";  //no need for the parser to chew on this afterwards!
-                }
-            }
-
-            if (s2.Length == 6)
-            {
-
-                if (G.equal(s2, "newtsd"))
-                {
-                    Globals.newTsd = !Globals.newTsd;
-                    G.Writeln2("newtsd = " + Globals.newTsd.ToString());
-                    return "";
-                }
-
-            }
-
-            if (s2.Length == 5)
-            {
-                string sub = s2;
-                if (G.equal(sub, "histo"))
-                {
-                    Globals.histo = !Globals.histo;
-                    return "";  //no need for the parser to chew on this afterwards!
-                }
-            }
-
-            if (s2.Length == 3)
-            {
-                string sub = s2;
-                if (G.equal(sub, "ast"))
-                {
-                    //typing "ast" on the prompt means AST tree is printed out on screen
-                    //only for debugging
-                    //not intended for "normal" Gekko users.
-                    Globals.printAST = true;
-                    G.Writeln("AST tree will be printed...");
-                    return "";  //no need for the parser to chew on this afterwards!
-                }
-            }
-
-            if (s2.Length == 7)
-            {
-                string sub = s2;
-                if (G.equal(sub, "timings"))
-                {
-                    Globals.showTimings = true;
-                    G.Writeln("Timings shown...");
-                    return "";  //no need for the parser to chew on this afterwards!
-                }
-            }
-
-            if (s2.Length == 5)
-            {
-                string sub = s2;
-                if (G.equal(sub, "cache"))
-                {
-                    if (Globals.useCache == true)
-                    {
-                        Globals.useCache = false;
-                        G.Writeln2("Set useCache to false");
-                    }
-                    else if (Globals.useCache == false)
-                    {
-                        Globals.useCache = true;
-                        G.Writeln2("Set useCache to true");
-                    }
-                    return "";
-                }
-
-            }
-
-            if (s2.Length == 6)
-            {
-                string sub = s2;
-                if (G.equal(sub, "speed1"))
-                {
-                    double n = 10000000d;
-                    string s = "val k   = 0; val m   = 0; val k1  = 1; val k2  = " + n + "; for val k=%k1 to %k2; val m=%m+%k; end;";
-                    DateTime t0 = DateTime.Now;
-                    obeyCommandCalledFromGUI(s, new P());
-                    DateTime t1 = DateTime.Now;
-                    double ms = (t1 - t0).TotalMilliseconds;
-                    G.Writeln2("Speed1 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
-                    double x = Program.scalars["m"].GetVal(Globals.tNull);
-                    G.Writeln("Difference from true: " + (x - (n * (n + 1) / 2)));
-                    return "";  //no need for the parser to chew on this afterwards!
-                }
-                else if (G.equal(sub, "speed2"))
-                {
-                    DateTime t0 = DateTime.Now;
-
-                    //runs 2-3 x faster as integer loop, but never mind
-                    double n = 100000000d;
-                    double sum = 0;
-                    for (double i = 1; i <= n; i++)
-                    {
-                        sum += i;
-                    }
-
-                    DateTime t1 = DateTime.Now;
-                    double ms = (t1 - t0).TotalMilliseconds;
-                    G.Writeln2("C# Speed1 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
-                    double x = sum;
-                    G.Writeln("Difference from true: " + (x - (n * (n + 1) / 2)));
-                    return "";  //no need for the parser to chew on this afterwards!
-                }
-                else if (G.equal(sub, "speed3"))
-                {
-                    double n = 100000d;
-                    string s = "time 95 2020; create y1, y2, y3, x1; upd <95 2020> y1 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> y2 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> y3 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> x1 = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26; val k = 0; val x  = 1; val k1 = 0; val k2 = " + n + "; for val k = %k1 to %k2; GENR <2000 2020> x1 = y1 + y1[-1] + y2 + y2[-1] + y3[2000] + %x + 1 + 2; end;";
-                    DateTime t0 = DateTime.Now;
-                    obeyCommandCalledFromGUI(s, new P());
-                    DateTime t1 = DateTime.Now;
-                    double ms = (t1 - t0).TotalMilliseconds;
-                    G.Writeln2("Speed3 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
-                    return "";  //no need for the parser to chew on this afterwards!
-                }
-            }
-
-            if (s2.Length == 5)
-            {
-                string sub = s2;
-                if (G.equal(sub, "proto"))
-                {
-                    if (Globals.databanksAsProtobuffers == true) Globals.databanksAsProtobuffers = false;
-                    else Globals.databanksAsProtobuffers = true;
-                    G.Writeln("Protobuf using is set to: " + Globals.databanksAsProtobuffers);
-                    return "";  //no need for the parser to chew on this afterwards!
-                }
-            }
-
-            if (s2.Length == 4)
-            {
-                string sub = s2;
-                if (G.equal(sub, "gray"))
-                {
-                    if (Globals.printGrayLinesForDebugging == true) Globals.printGrayLinesForDebugging = false;
-                    else Globals.printGrayLinesForDebugging = true;
-                    G.Writeln("Gray printing (debug) is set to: " + Globals.printGrayLinesForDebugging);
-                    return "";  //no need for the parser to chew on this afterwards!
-                }
-            }
-
-            if (s2.StartsWith("prune "))
-            {
-                string[] ss2 = s2.Split(' ');
-                double prune = double.Parse(ss2[1].Trim());
-                Globals.pruneDecomp = prune;
-                G.Writeln("Flowchart prune set to: " + Globals.pruneDecomp);
-                G.Writeln();
-                return "";
-            }
-
-            if (s2.Length == 4)
-            {
-                string sub = s2;
-                if (G.equal(sub, "ast2"))
-                {
-                    //typing "ast2" on the prompt means AST tree is printed out on screen
-                    //and test parser is used
-                    //only for debugging
-                    //not intended for "normal" Gekko users.
-                    Globals.printAST = true;
-                    Globals.useTestParser = true;
-                    G.Writeln("AST tree will be printed...");
-                    G.Writeln("Testparser is used...");
-                    return "";  //no need for the parser to chew on this afterwards!
-                }
-            }
-
-            if (s2.Length == 6)
-            {
-                string sub = s2;
-                if (G.equal(sub, "locked"))
-                {
-                    //typing "locked" on the prompt searches for locked files (sharing violation)
-                    //in working folder and sub-dirs
-                    //intended for bug finding
-                    if (true)
-                    {
-                        string workingFolder = G.GetWorkingFolder();
-                        G.Writeln("Searching for locked files in " + workingFolder);
-                        G.Writeln("The search includes sub-folders");
-                        G.Writeln("----------- search starts --------------");
-                        Globals.lockedCounter = 0;
-                        FindLockedFiles(G.GetWorkingFolder());
-                        G.Writeln("----------- search ends   --------------");
-                        G.Writeln("Found " + Globals.lockedCounter + " locked files");
                         G.Writeln();
-                    }
-                    return "";  //no need for the parser to chew on this afterwards!
-                }
-            }
+                        for (int y = min; y <= max; y++)
+                        {
+                            G.Writeln("rel% " + y + " " + relVar[y] + " " + rel[y] + "%     left " + relVs[y] + " right " + relHs[y]);
+                        }
 
-            if (s2.Length > 4)
-            {
-                string s2a = s2.Substring(0, 4);
-                string s2b = s2.Substring(s2.Length - 1);
-                string s2c = s2.Substring(4, 1);
-                if ((G.equal(s2a, "frml") || G.equal(s2a, "series") || G.equal(s2a, "ser")) && s2c == " " && !(s2b == ";" || s2b == "$"))
-                {
-                    text += " ;";
+                        G.Writeln();
+                        for (int y = min; y <= max; y++)
+                        {
+                            G.Writeln("abs " + y + " " + absVar[y] + " " + abs[y] + "     left " + absVs[y] + " right " + absHs[y]);
+                        }
+
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
                 }
+
+                if (s2.Length == 3)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "lex"))
+                    {
+                        //show raw tokens
+                        //only for debugging
+                        //not intended for "normal" Gekko users.
+                        if (Globals.debugTokens) Globals.debugTokens = false;
+                        else Globals.debugTokens = true;
+                        if (Globals.debugTokens == true)
+                        {
+                            G.Writeln("Lexing will be done...");
+                        }
+                        else
+                        {
+                            G.Writeln("Lexing undone...");
+                        }
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }
+
+                if (s2.Length == "killexcel".Length)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "killexcel"))
+                    {
+                        Process[] procs = Process.GetProcessesByName("excel");
+                        foreach (Process proc in procs)
+                            proc.Kill();
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }
+
+                if (s2.Length == 6)
+                {
+
+                    if (G.equal(s2, "newtsd"))
+                    {
+                        Globals.newTsd = !Globals.newTsd;
+                        G.Writeln2("newtsd = " + Globals.newTsd.ToString());
+                        return "";
+                    }
+
+                }
+
+                if (s2.Length == 5)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "histo"))
+                    {
+                        Globals.histo = !Globals.histo;
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }
+
+                if (s2.Length == 3)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "ast"))
+                    {
+                        //typing "ast" on the prompt means AST tree is printed out on screen
+                        //only for debugging
+                        //not intended for "normal" Gekko users.
+                        Globals.printAST = true;
+                        G.Writeln("AST tree will be printed...");
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }
+
+                if (s2.Length == 7)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "timings"))
+                    {
+                        Globals.showTimings = true;
+                        G.Writeln("Timings shown...");
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }
+
+                if (s2.Length == 5)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "cache"))
+                    {
+                        if (Globals.useCache == true)
+                        {
+                            Globals.useCache = false;
+                            G.Writeln2("Set useCache to false");
+                        }
+                        else if (Globals.useCache == false)
+                        {
+                            Globals.useCache = true;
+                            G.Writeln2("Set useCache to true");
+                        }
+                        return "";
+                    }
+
+                }
+
+                if (s2.Length == 6)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "speed1"))
+                    {
+                        double n = 10000000d;
+                        string s = "val k   = 0; val m   = 0; val k1  = 1; val k2  = " + n + "; for val k=%k1 to %k2; val m=%m+%k; end;";
+                        DateTime t0 = DateTime.Now;
+                        obeyCommandCalledFromGUI(s, new P());
+                        DateTime t1 = DateTime.Now;
+                        double ms = (t1 - t0).TotalMilliseconds;
+                        G.Writeln2("Speed1 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
+                        double x = Program.scalars["m"].GetVal(Globals.tNull);
+                        G.Writeln("Difference from true: " + (x - (n * (n + 1) / 2)));
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                    else if (G.equal(sub, "speed2"))
+                    {
+                        DateTime t0 = DateTime.Now;
+
+                        //runs 2-3 x faster as integer loop, but never mind
+                        double n = 100000000d;
+                        double sum = 0;
+                        for (double i = 1; i <= n; i++)
+                        {
+                            sum += i;
+                        }
+
+                        DateTime t1 = DateTime.Now;
+                        double ms = (t1 - t0).TotalMilliseconds;
+                        G.Writeln2("C# Speed1 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
+                        double x = sum;
+                        G.Writeln("Difference from true: " + (x - (n * (n + 1) / 2)));
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                    else if (G.equal(sub, "speed3"))
+                    {
+                        double n = 100000d;
+                        string s = "time 95 2020; create y1, y2, y3, x1; upd <95 2020> y1 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> y2 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> y3 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> x1 = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26; val k = 0; val x  = 1; val k1 = 0; val k2 = " + n + "; for val k = %k1 to %k2; GENR <2000 2020> x1 = y1 + y1[-1] + y2 + y2[-1] + y3[2000] + %x + 1 + 2; end;";
+                        DateTime t0 = DateTime.Now;
+                        obeyCommandCalledFromGUI(s, new P());
+                        DateTime t1 = DateTime.Now;
+                        double ms = (t1 - t0).TotalMilliseconds;
+                        G.Writeln2("Speed3 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }
+
+                if (s2.Length == 5)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "proto"))
+                    {
+                        if (Globals.databanksAsProtobuffers == true) Globals.databanksAsProtobuffers = false;
+                        else Globals.databanksAsProtobuffers = true;
+                        G.Writeln("Protobuf using is set to: " + Globals.databanksAsProtobuffers);
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }
+
+                if (s2.Length == 4)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "gray"))
+                    {
+                        if (Globals.printGrayLinesForDebugging == true) Globals.printGrayLinesForDebugging = false;
+                        else Globals.printGrayLinesForDebugging = true;
+                        G.Writeln("Gray printing (debug) is set to: " + Globals.printGrayLinesForDebugging);
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }
+
+                if (s2.StartsWith("prune "))
+                {
+                    string[] ss2 = s2.Split(' ');
+                    double prune = double.Parse(ss2[1].Trim());
+                    Globals.pruneDecomp = prune;
+                    G.Writeln("Flowchart prune set to: " + Globals.pruneDecomp);
+                    G.Writeln();
+                    return "";
+                }
+
+                if (s2.Length == 4)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "ast2"))
+                    {
+                        //typing "ast2" on the prompt means AST tree is printed out on screen
+                        //and test parser is used
+                        //only for debugging
+                        //not intended for "normal" Gekko users.
+                        Globals.printAST = true;
+                        Globals.useTestParser = true;
+                        G.Writeln("AST tree will be printed...");
+                        G.Writeln("Testparser is used...");
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }
+
+                if (s2.Length == 6)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "locked"))
+                    {
+                        //typing "locked" on the prompt searches for locked files (sharing violation)
+                        //in working folder and sub-dirs
+                        //intended for bug finding
+                        if (true)
+                        {
+                            string workingFolder = G.GetWorkingFolder();
+                            G.Writeln("Searching for locked files in " + workingFolder);
+                            G.Writeln("The search includes sub-folders");
+                            G.Writeln("----------- search starts --------------");
+                            Globals.lockedCounter = 0;
+                            FindLockedFiles(G.GetWorkingFolder());
+                            G.Writeln("----------- search ends   --------------");
+                            G.Writeln("Found " + Globals.lockedCounter + " locked files");
+                            G.Writeln();
+                        }
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }                
             }
             return text;
         }
@@ -18799,7 +18795,7 @@ namespace Gekko
             if (!G.IsUnitTesting()) ShowPeriodInStatusField("");
         }
 
-        public static void Create(List<string> varsInput, bool questionMark)
+        public static void Create(List<string> varsInput, bool questionMark, O.Create o)
         {
             //ErrorIfDatabanksSwapped();
             if (varsInput == null && questionMark == true)
@@ -18824,8 +18820,14 @@ namespace Gekko
                 if (Program.options.databank_create_message)
                 {
                     if (counter == 0) G.Writeln2("Did not create any variables");
-                    else if (counter == 1) G.Writeln2("Created 1 variable with frequency '" + Program.options.freq + "'");
-                    else G.Writeln2("Created " + counter + " variables with frequency '" + Program.options.freq + "'");
+                    else
+                    {
+                        if (o.p.isOneLinerFromGui)
+                        {
+                            if (counter == 1) G.Writeln2("Created 1 variable with freq '" + Program.options.freq + "'" + " " + Globals.serviceMessage);
+                            else G.Writeln2("Created " + counter + " variables with freq '" + Program.options.freq + "'" + " " + Globals.serviceMessage);
+                        }
+                    }
                 }
                 //G.Writeln();
             }
@@ -18841,7 +18843,7 @@ namespace Gekko
                 {
                     if (usedInCreateCommand && Program.options.databank_create_message)
                     {
-                        G.Writeln("+++ WARNING: CREATE: variable '" + name + "' already exists");
+                        G.Writeln2("+++ WARNING: CREATE: variable '" + name + "' already exists");
                     }
                 }
                 else

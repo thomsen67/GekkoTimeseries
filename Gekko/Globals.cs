@@ -45,6 +45,8 @@ namespace Gekko
         public const string defaultCommandFileExtension = "gcm";  //merge this with the above...
         public static string extensionDatabank = "gbk";
         public static string extensionTable = "gtb";
+
+        public static string serviceMessage = "(interactive message)";
         
         public static bool nameFix = true;
         

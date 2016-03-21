@@ -500,6 +500,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.Create o" + Num(node) + " = new O.Create();" + G.NL);
                             node.Code.A(node[0].Code);
+                            node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                             break;
                         }
@@ -3101,7 +3102,9 @@ namespace Gekko.Parser.Gek
                             //TODO and what about 'xx' prefix? Maybe allow this for GENR too!
                             //TODO
                             //node.Code.A("O.Upd o" + Num(node) + " = new O.Upd();" + G.NL);
-                            node.Code.A("O.Upd o").A(Num(node)).A(" = new O.Upd();").A(G.NL);
+                            node.Code.A("O.Upd o").A(Num(node)).A(" = new O.Upd();").A(G.NL);                            
+                            node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
+
                             if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
                             {
                                 //specialExpressionAndLabelInfo[0] should be "ASTMETA" here
@@ -3448,6 +3451,7 @@ namespace Gekko.Parser.Gek
                 nodeCode += "o" + Num(node) + ".name = O.GetString(" + node[0].Code + ");" + G.NL;
             }
             nodeCode += "o" + Num(node) + ".listItems = new List<string>();" + G.NL;
+            nodeCode += "o" + Num(node) + ".p = p;" + G.NL;
 
             //Quite an ugly hack. Problem is that with "LIST<direct>xx = 0, 1, 2" Gekko will try to convert 0 into a list and will
             //throw an exception before O.List.Exe() is even called. So with <direct> we need to suppress the O.GetList()-code that 
@@ -3520,10 +3524,11 @@ namespace Gekko.Parser.Gek
         private static string HandleGenr(ASTNode node, string numNode, string childCodePeriod, string childCodeLhsName, string childCodeRhs, W w, string lhsFunction)
         {
             string nodeCode = null;
-            nodeCode += "O.Genr o" + numNode + " = new O.Genr();" + G.NL;
+            nodeCode += "O.Genr o" + numNode + " = new O.Genr();" + G.NL;            
             nodeCode = EmitLocalCacheForTimeLooping(nodeCode, w);
             nodeCode += childCodePeriod + G.NL;  //dates
-            nodeCode += "o" + numNode + ".lhs = null;";
+            nodeCode += "o" + numNode + ".lhs = null;" + G.NL;
+            nodeCode += "o" + numNode + ".p = p;" + G.NL;
             nodeCode += "foreach (GekkoTime t2 in new GekkoTimeIterator(o" + numNode + ".t1, o" + numNode + ".t2))" + G.NL;
             nodeCode += Globals.startGekkoTimeIteratorCode;
             nodeCode += "  double data = O.GetVal(" + childCodeRhs + ", t);" + G.NL;            

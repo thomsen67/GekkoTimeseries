@@ -2996,9 +2996,10 @@ namespace Gekko
         {
             public List<string> listItems = null;
             public bool question = false;
+            public P p = null;
             public void Exe()
             {
-                Program.Create(this.listItems, this.question);
+                Program.Create(this.listItems, this.question, this);
             }
         }
 
@@ -3193,7 +3194,7 @@ namespace Gekko
             public string listSort = null;
             public bool direct = false;
             public string rawfood = null;
-
+            public P p = null;
             public void Exe()
             {
                 if (this.direct)
@@ -3279,6 +3280,10 @@ namespace Gekko
                         }
                     }
                 }
+                if (p.isOneLinerFromGui)
+                {
+                    G.Write2("Created 1 list from " + this.listItems.Count + " elements "); G.Writeln(Globals.serviceMessage, Color.Gray);
+                }
             }
 
             public static void Q(string s)
@@ -3294,6 +3299,7 @@ namespace Gekko
             public string lhsFunction = null;
             public TimeSeries lhs = null;
             public string meta = null;
+            public P p = null;
             public void Exe()
             {
                 if (this.meta != null)
@@ -3304,6 +3310,10 @@ namespace Gekko
                     lhs.isDirty = true;
                 }
                 lhs.Stamp();
+                if (this.p.isOneLinerFromGui)
+                {
+                    G.Writeln2("1 series updated " + t1.ToString() + "-" + t2.ToString() + " " + Globals.serviceMessage);
+                }
             }            
         }
 
@@ -3374,6 +3384,7 @@ namespace Gekko
             public string opt_n = null;
             public string opt_keep = null;
             public string meta = null;
+            public P p = null;
             public void Exe()
             {
                 if (this.op.EndsWith(Globals.symbolDollar))
@@ -3382,6 +3393,10 @@ namespace Gekko
                     this.op = this.op.Substring(0, this.op.Length - 1);
                 }                
                 Program.Upd(this);
+                if (this.p.isOneLinerFromGui)
+                {
+                    G.Writeln2(listItems.Count + " series updated " + t1.ToString() + "-" + t2.ToString() + " " + Globals.serviceMessage);
+                }
             }
         }
 
