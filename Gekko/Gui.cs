@@ -18,6 +18,7 @@
 */
 
 using System;
+using System.Configuration;
 using System.Reflection;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -588,17 +589,29 @@ namespace Gekko
             string s1 = G.GetWorkingFolder();
             if (track) MessageBox.Show("14");
             string s2 = G.GetProgramDir();
-            if (track) MessageBox.Show("15");
+            if (track) MessageBox.Show("15");            
+            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            if (track) MessageBox.Show("15.1");
             if (folder == null)
             {
                 if (G.equal(s1, s2))  //It happens that the we get c:\\... in one of them, and C:\\ in the other, so we use case-insensitive compare
                 {
-                    if (Globals.userSettings.WorkingFolder != "")
+                    try
                     {
-                        if (Directory.Exists(Globals.userSettings.WorkingFolder))
+                        if (Globals.userSettings.WorkingFolder != "")
                         {
-                            Program.options.folder_working = Globals.userSettings.WorkingFolder;
+                            if (Directory.Exists(Globals.userSettings.WorkingFolder))
+                            {
+                                Program.options.folder_working = Globals.userSettings.WorkingFolder;
+                            }
                         }
+                    }
+                    catch (Exception e) {
+                        //May fail if xml file is corrupted
+                        //var s10 = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoaming);
+                        string s11 = e.InnerException.Message;
+                        MessageBox.Show("Gekko: The user settings file seems corrupted. Working folder set to desktop folder: " + desktop + "\n\nYou may consider deleting the user settings file, cf. this message:\n" + s11);
+                        Program.options.folder_working = desktop;
                     }
                 }
             }
@@ -606,9 +619,7 @@ namespace Gekko
             for (int i = 0; i < 2; i++)
             {
                 if (track) MessageBox.Show("16.1");
-                bool exc = false;
-                if (track) MessageBox.Show("16.2");
-                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                bool exc = false;                
                 if (track) MessageBox.Show("16.3");
                 if (!Directory.Exists(Program.options.folder_working))
                 {
@@ -972,7 +983,6 @@ namespace Gekko
             }
 
             Program.options.folder_working = us.WorkingFolder;
-
             Globals.guiGraphWindowTopDistance = us.GraphWindowTopDistance;
             Globals.guiGraphWindowLeftDistance = us.GraphWindowLeftDistance;
             Globals.guiDecompWindowTopDistance = us.DecompWindowTopDistance;
