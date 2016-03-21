@@ -18824,8 +18824,14 @@ namespace Gekko
                     {
                         if (o.p.isOneLinerFromGui)
                         {
-                            if (counter == 1) G.Writeln2("Created 1 variable with freq '" + Program.options.freq + "'" + " " + Globals.serviceMessage);
-                            else G.Writeln2("Created " + counter + " variables with freq '" + Program.options.freq + "'" + " " + Globals.serviceMessage);
+                            if (counter == 1)
+                            {
+                                G.Write2("Created 1 variable with freq '" + Program.options.freq + "'" + " "); G.ServiceMessage();
+                            }
+                            else
+                            {
+                                G.Write2("Created " + counter + " variables with freq '" + Program.options.freq + "'" + " "); G.ServiceMessage();
+                            }
                         }
                     }
                 }

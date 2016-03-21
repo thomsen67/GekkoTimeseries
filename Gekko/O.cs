@@ -3282,9 +3282,9 @@ namespace Gekko
                 }
                 if (p.isOneLinerFromGui)
                 {
-                    G.Write2("Created 1 list from " + this.listItems.Count + " elements "); G.Writeln(Globals.serviceMessage, Color.Gray);
+                    G.Write2("Created 1 list from " + this.listItems.Count + " elements "); G.ServiceMessage();
                 }
-            }
+            }            
 
             public static void Q(string s)
             {
@@ -3312,7 +3312,7 @@ namespace Gekko
                 lhs.Stamp();
                 if (this.p.isOneLinerFromGui)
                 {
-                    G.Writeln2("1 series updated " + t1.ToString() + "-" + t2.ToString() + " " + Globals.serviceMessage);
+                    G.Write2("1 series updated " + t1.ToString() + "-" + t2.ToString() + " "); G.ServiceMessage();
                 }
             }            
         }
@@ -3395,7 +3395,7 @@ namespace Gekko
                 Program.Upd(this);
                 if (this.p.isOneLinerFromGui)
                 {
-                    G.Writeln2(listItems.Count + " series updated " + t1.ToString() + "-" + t2.ToString() + " " + Globals.serviceMessage);
+                    G.Write2(listItems.Count + " series updated " + t1.ToString() + "-" + t2.ToString() + " "); G.ServiceMessage();
                 }
             }
         }

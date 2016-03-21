@@ -878,6 +878,11 @@ namespace Gekko
             return version;
         }
 
+        public static void ServiceMessage()
+        {
+            G.Writeln(Globals.serviceMessage, Color.LightGray);
+        }
+
         //1.4.9 stuff
         public static StringBuilder WriteDirs(string type, bool silent)  //"small" or "large"
         {

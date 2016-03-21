@@ -46,7 +46,7 @@ namespace Gekko
         public static string extensionDatabank = "gbk";
         public static string extensionTable = "gtb";
 
-        public static string serviceMessage = "(interactive message)";
+        public static string serviceMessage = "[service message]";
         
         public static bool nameFix = true;
         
