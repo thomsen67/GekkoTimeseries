@@ -9286,6 +9286,16 @@ namespace UnitTests
 
         }
 
+        [TestMethod]
+        public void Test__RAMLargeAware()
+        {
+            //Tests the version deployed
+            //
+            // rem c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\editbin.exe  /LARGEADDRESSAWARE Gekko.exe > zzz
+            // call editbin.exe  /LARGEADDRESSAWARE Gekko.exe > zzz, se xx.bat i c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\
+            //
+            Assert.IsTrue(Program.IsLargeAware(@"c:\Program Files (x86)\Gekko\gekko.exe"));
+        }
 
         [TestMethod]
         public void Test__ForwardLookingExhaustive()

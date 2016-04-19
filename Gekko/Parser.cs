@@ -2426,7 +2426,7 @@ namespace Gekko
                         }
                         else
                         {
-                            G.Writeln2("*** ERROR: Function '" + wh2.leftSideFunction + "' cannot be recognized. On right hand side, these");
+                            G.Writeln2("*** ERROR: Function '" + wh2.leftSideFunction + "' cannot be recognized. On left hand side, these");
                             G.Writeln("    functions are supported: log, dlog, pch, dif");
                             throw new GekkoException();
                         }
