@@ -1288,15 +1288,15 @@ namespace Gekko
                 public class " + type +
                         @"{
                 public static void eqs(double[] b)
-                {");
-
+                {");                    
+                    
                     if (modelType == ECompiledModelType.Res)
                     {
                         codeGauss.AppendLine("double [] c = new double[b.Length];");
                         codeGauss.AppendLine("for (int i5 = 0; i5 < c.Length; i5++)");
                         codeGauss.AppendLine("{");
                         codeGauss.AppendLine("   c[i5]=b[i5];");
-                        codeGauss.AppendLine("}");
+                        codeGauss.AppendLine("}");                        
                     }
 
                     List<EquationHelper> prologue = new List<EquationHelper>();
@@ -2129,7 +2129,14 @@ namespace Gekko
                             HandlePowFunction(eh, equationNode, depth, wh2, model, subTreeLag, isModel, true);
                             visitChildren = false;
                         }
-
+                        else if (G.equal(function, "CES_UC") || G.equal(function, "CES_XL") || G.equal(function, "CES_XR"))
+                        {
+                            //See #09875209837532
+                            recognized = true;
+                            wh2.rightHandSideCsCode.Append("Functions." + function + "(", EEmitType.computerReadable);
+                            wh2.rightHandSideCsCode.Append(function, EEmitType.humanReadable);
+                            numberOfRightParentheses++;                            
+                        }
 
                         if (recognized == false)
                         {

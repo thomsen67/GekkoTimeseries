@@ -1485,6 +1485,28 @@ namespace Gekko
         // LIST functions end
         // -----------------------------------
 
+        //SOME HARDCODED FUNCTIONS FOR MODELS:
+        //See #09875209837532
+
+        public static double CES_UC(double p1rel, double p2rel, double theta, double sigma)
+        {
+            double c = Math.Pow(theta * Math.Pow(p1rel, 1 - sigma) + (1 - theta) * Math.Pow(p2rel, 1 - sigma), 1 / (1 - sigma));
+            return c;
+        }
+
+        public static double CES_XL(double yrel, double p1rel, double p2rel, double theta, double sigma)
+        {
+            double uc = CES_UC(p1rel, p2rel, theta, sigma);
+            return yrel * Math.Pow(uc / p1rel, sigma);
+        }
+
+        public static double CES_XR(double yrel, double p1rel, double p2rel, double theta, double sigma)
+        {
+            double uc = CES_UC(p1rel, p2rel, theta, sigma);
+            return yrel * Math.Pow(uc / p2rel, sigma);
+        }
+
+
     }
 }
 
