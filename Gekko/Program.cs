@@ -18861,7 +18861,7 @@ public static bool IsLargeAware(Stream stream)
                     if (counter == 0) G.Writeln2("Did not create any variables");
                     else
                     {
-                        if (o.p.isOneLinerFromGui)
+                        if (o.p.IsSimple())
                         {
                             if (counter == 1)
                             {
@@ -28118,6 +28118,14 @@ public static bool IsLargeAware(Stream stream)
         public string GetStack(int i)
         {
             return stack[i];
+        }
+
+        public bool IsSimple() {
+            if (this.isOneLinerFromGui && this.counter <= 1)
+            {
+                return true;
+            }
+            return false;
         }
 
         public string GetStackCommandFileText(int i)
