@@ -46,6 +46,24 @@ namespace Gekko
     public partial class Gui : Form
     {
 
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+        
         public P p;
 
         public Image red = null;
@@ -96,6 +114,8 @@ namespace Gekko
             this.splitContainer1 = new SplitContainerFix();
 
             InitializeComponent();
+
+            this.textBox2.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 
             //
             // textBox1

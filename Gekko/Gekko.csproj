@@ -11,8 +11,7 @@
     <RootNamespace>Gekko</RootNamespace>
     <AssemblyName>Gekko</AssemblyName>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <ApplicationIcon>
-    </ApplicationIcon>
+    <ApplicationIcon>Gekko.ico</ApplicationIcon>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
@@ -431,6 +430,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="yellow.gif" />
     <Content Include="Gekko.ico" />
+    <Content Include="Images\Gekko.ico" />
     <Content Include="__progress.txt" />
   </ItemGroup>
   <ItemGroup>

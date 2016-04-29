@@ -13,24 +13,7 @@ namespace Gekko
 {
     public partial class Gui
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
-        private System.ComponentModel.IContainer components = null;
-
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-
+        
         #region Windows Form Designer generated code
 
         /// <summary>
@@ -43,6 +26,8 @@ namespace Gekko
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Gui));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.splitContainer1 = new Gekko.SplitContainerFix();
+            this.textBox2 = new System.Windows.Forms.RichTextBox();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -52,6 +37,7 @@ namespace Gekko
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.listBoxAutoComplete = new Gekko.GListBox();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabPage4 = new System.Windows.Forms.TabPage();
@@ -128,15 +114,15 @@ namespace Gekko
             this.allPPLOTUDVALGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.allPPLOTToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.allUDVALGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.updateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.allPPLOTAndUDVALGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.allPPLOTToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.allUDVALGToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.showMenuToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.manualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.allPPLOTAndUDVALGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.allPPLOTToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.allUDVALGToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -147,24 +133,21 @@ namespace Gekko
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.contextMenuStrip2 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.splitContainer1 = new Gekko.SplitContainerFix();
-            this.textBox2 = new System.Windows.Forms.RichTextBox();
-            this.listBoxAutoComplete = new Gekko.GListBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
             this.SuspendLayout();
-            //
+            // 
             // tabControl1
-            //
+            // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage4);
@@ -179,9 +162,9 @@ namespace Gekko
             this.tabControl1.Size = new System.Drawing.Size(649, 384);
             this.tabControl1.TabIndex = 0;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
-            //
+            // 
             // tabPage1
-            //
+            // 
             this.tabPage1.Controls.Add(this.splitContainer1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Margin = new System.Windows.Forms.Padding(0);
@@ -191,9 +174,53 @@ namespace Gekko
             this.tabPage1.Text = "Main";
             this.tabPage1.ToolTipText = "Main window for running Gekko (Ctrl+M)";
             this.tabPage1.UseVisualStyleBackColor = true;
-            //
+            // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer1.Margin = new System.Windows.Forms.Padding(0);
+            this.splitContainer1.Name = "splitContainer1";
+            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.BackColor = System.Drawing.Color.Transparent;
+            this.splitContainer1.Panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.splitContainer1_Panel1_Paint);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.textBox2);
+            this.splitContainer1.Panel2.Controls.Add(this.listBoxAutoComplete);
+            this.splitContainer1.Size = new System.Drawing.Size(641, 358);
+            this.splitContainer1.SplitterDistance = 275;
+            this.splitContainer1.SplitterWidth = 6;
+            this.splitContainer1.TabIndex = 6;
+            this.splitContainer1.TabStop = false;
+            // 
+            // textBox2
+            // 
+            this.textBox2.AcceptsTab = true;
+            this.textBox2.AllowDrop = true;
+            this.textBox2.AutoWordSelection = true;
+            this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBox2.ContextMenuStrip = this.contextMenuStrip1;
+            this.textBox2.DetectUrls = false;
+            this.textBox2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBox2.Location = new System.Drawing.Point(0, 0);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(641, 77);
+            this.textBox2.TabIndex = 0;
+            this.textBox2.Text = "";
+            this.textBox2.WordWrap = false;
+            this.textBox2.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
+            this.textBox2.VisibleChanged += new System.EventHandler(this.textBox2_VisibleChanged);
+            this.textBox2.KeyDown += new System.Windows.Forms.KeyEventHandler(this.richTextBox1_KeyDown);
+            this.textBox2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox2_KeyPress);
+            this.textBox2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.richTextBox1_MouseDown);
+            // 
             // contextMenuStrip1
-            //
+            // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.undoToolStripMenuItem,
             this.redoToolStripMenuItem,
@@ -205,67 +232,81 @@ namespace Gekko
             this.selectAllToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(169, 148);
-            //
+            // 
             // undoToolStripMenuItem
-            //
+            // 
             this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
             this.undoToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.undoToolStripMenuItem.Text = "Undo (Ctrl+Z)";
             this.undoToolStripMenuItem.Click += new System.EventHandler(this.undoToolStripMenuItem_Click);
-            //
+            // 
             // redoToolStripMenuItem
-            //
+            // 
             this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
             this.redoToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.redoToolStripMenuItem.Text = "Redo (Ctrl+Y)";
             this.redoToolStripMenuItem.Click += new System.EventHandler(this.redoToolStripMenuItem_Click);
-            //
+            // 
             // toolStripSeparator1
-            //
+            // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(165, 6);
-            //
+            // 
             // cutToolStripMenuItem
-            //
+            // 
             this.cutToolStripMenuItem.Name = "cutToolStripMenuItem";
             this.cutToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.cutToolStripMenuItem.Text = "Cut (Ctrl+X)";
             this.cutToolStripMenuItem.Click += new System.EventHandler(this.cutToolStripMenuItem_Click);
-            //
+            // 
             // copyToolStripMenuItem
-            //
+            // 
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
             this.copyToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.copyToolStripMenuItem.Text = "Copy (Ctrl+C)";
             this.copyToolStripMenuItem.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
-            //
+            // 
             // pasteToolStripMenuItem
-            //
+            // 
             this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
             this.pasteToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.pasteToolStripMenuItem.Text = "Paste (Ctrl-V)";
             this.pasteToolStripMenuItem.Click += new System.EventHandler(this.pasteToolStripMenuItem_Click);
-            //
+            // 
             // toolStripSeparator2
-            //
+            // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(165, 6);
-            //
+            // 
             // selectAllToolStripMenuItem
-            //
+            // 
             this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
             this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.selectAllToolStripMenuItem.Text = "Select All (Ctrl+A)";
             this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
-            //
+            // 
+            // listBoxAutoComplete
+            // 
+            this.listBoxAutoComplete.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.listBoxAutoComplete.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.listBoxAutoComplete.ImageList = this.imageList1;
+            this.listBoxAutoComplete.Location = new System.Drawing.Point(136, 288);
+            this.listBoxAutoComplete.Name = "listBoxAutoComplete";
+            this.listBoxAutoComplete.Size = new System.Drawing.Size(208, 54);
+            this.listBoxAutoComplete.TabIndex = 3;
+            this.listBoxAutoComplete.Visible = false;
+            this.listBoxAutoComplete.SelectedIndexChanged += new System.EventHandler(this.listBoxAutoComplete_SelectedIndexChanged);
+            this.listBoxAutoComplete.DoubleClick += new System.EventHandler(this.listBoxAutoComplete_DoubleClick);
+            this.listBoxAutoComplete.KeyDown += new System.Windows.Forms.KeyEventHandler(this.listBoxAutoComplete_KeyDown);
+            // 
             // imageList1
-            //
+            // 
             this.imageList1.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
             this.imageList1.ImageSize = new System.Drawing.Size(16, 16);
             this.imageList1.TransparentColor = System.Drawing.Color.Lime;
-            //
+            // 
             // tabPage2
-            //
+            // 
             this.tabPage2.BackColor = System.Drawing.Color.Transparent;
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Margin = new System.Windows.Forms.Padding(0);
@@ -275,9 +316,9 @@ namespace Gekko
             this.tabPage2.Text = "Output";
             this.tabPage2.ToolTipText = "Output of bulky stuff like long lists etc. (Ctrl+O)";
             this.tabPage2.Click += new System.EventHandler(this.tabPage2_Click);
-            //
+            // 
             // tabPage4
-            //            
+            // 
             this.tabPage4.Controls.Add(this.webBrowser);
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
@@ -286,9 +327,9 @@ namespace Gekko
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Menu";
             this.tabPage4.UseVisualStyleBackColor = true;
-            //
+            // 
             // webBrowser
-            //
+            // 
             this.webBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
             this.webBrowser.Location = new System.Drawing.Point(3, 3);
             this.webBrowser.Name = "webBrowser";
@@ -297,9 +338,9 @@ namespace Gekko
             this.webBrowser.TabIndex = 0;
             this.webBrowser.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser_DocumentCompleted);
             this.webBrowser.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this.webBrowser_Navigating);
-            //
+            // 
             // tabPage3
-            //
+            // 
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Margin = new System.Windows.Forms.Padding(0);
             this.tabPage3.Name = "tabPage3";
@@ -308,9 +349,9 @@ namespace Gekko
             this.tabPage3.Text = "Help";
             this.tabPage3.ToolTipText = "Gekko help system (Ctrl+H)";
             this.tabPage3.UseVisualStyleBackColor = true;
-            //
+            // 
             // textBoxTooltip
-            //
+            // 
             this.textBoxTooltip.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(225)))));
             this.textBoxTooltip.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxTooltip.Location = new System.Drawing.Point(368, 288);
@@ -321,9 +362,9 @@ namespace Gekko
             this.textBoxTooltip.TabIndex = 5;
             this.textBoxTooltip.Visible = false;
             this.textBoxTooltip.Enter += new System.EventHandler(this.textBoxTooltip_Enter);
-            //
+            // 
             // toolStrip1
-            //
+            // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripButton1,
             this.toolStripButton2,
@@ -335,9 +376,9 @@ namespace Gekko
             this.toolStrip1.Size = new System.Drawing.Size(649, 25);
             this.toolStrip1.TabIndex = 2;
             this.toolStrip1.Text = "toolStrip1";
-            //
+            // 
             // toolStripButton1
-            //
+            // 
             this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.toolStripButton1.Enabled = false;
             this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
@@ -347,9 +388,9 @@ namespace Gekko
             this.toolStripButton1.Text = "toolStripButton1";
             this.toolStripButton1.ToolTipText = "Browse backwards";
             this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
-            //
+            // 
             // toolStripButton2
-            //
+            // 
             this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.toolStripButton2.Enabled = false;
             this.toolStripButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton2.Image")));
@@ -359,9 +400,9 @@ namespace Gekko
             this.toolStripButton2.Text = "toolStripButton2";
             this.toolStripButton2.ToolTipText = "Browse forwards";
             this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
-            //
+            // 
             // toolStripButton5
-            //
+            // 
             this.toolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.toolStripButton5.Enabled = false;
             this.toolStripButton5.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton5.Image")));
@@ -371,9 +412,9 @@ namespace Gekko
             this.toolStripButton5.Text = "toolStripButton5";
             this.toolStripButton5.ToolTipText = "Browse to start";
             this.toolStripButton5.Click += new System.EventHandler(this.toolStripButton5_Click);
-            //
+            // 
             // toolStripButton3
-            //
+            // 
             this.toolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.toolStripButton3.Enabled = false;
             this.toolStripButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton3.Image")));
@@ -382,9 +423,9 @@ namespace Gekko
             this.toolStripButton3.Size = new System.Drawing.Size(23, 22);
             this.toolStripButton3.Text = "Stop current job";
             this.toolStripButton3.Click += new System.EventHandler(this.toolStripButton3_Click_1);
-            //
+            // 
             // toolStripButton4
-            //
+            // 
             this.toolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.toolStripButton4.Enabled = false;
             this.toolStripButton4.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton4.Image")));
@@ -393,9 +434,9 @@ namespace Gekko
             this.toolStripButton4.Size = new System.Drawing.Size(23, 22);
             this.toolStripButton4.Text = "Copy last PRT/MULPRT, SHOW or table to clipboard (for spreadsheet pasting)";
             this.toolStripButton4.Click += new System.EventHandler(this.toolStripButton4_Click);
-            //
+            // 
             // menuStrip1
-            //
+            // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem1,
             this.editToolStripMenuItem,
@@ -409,9 +450,9 @@ namespace Gekko
             this.menuStrip1.Size = new System.Drawing.Size(649, 24);
             this.menuStrip1.TabIndex = 3;
             this.menuStrip1.Text = "menuStrip1";
-            //
+            // 
             // toolStripMenuItem1
-            //
+            // 
             this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.setWorkingDirToolStripMenuItem,
             this.recentFoldersToolStripMenuItem,
@@ -422,16 +463,16 @@ namespace Gekko
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(37, 20);
             this.toolStripMenuItem1.Text = "File";
-            //
+            // 
             // setWorkingDirToolStripMenuItem
-            //
+            // 
             this.setWorkingDirToolStripMenuItem.Name = "setWorkingDirToolStripMenuItem";
             this.setWorkingDirToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
             this.setWorkingDirToolStripMenuItem.Text = "Set working folder...";
             this.setWorkingDirToolStripMenuItem.Click += new System.EventHandler(this.setWorkingDirToolStripMenuItem_Click);
-            //
+            // 
             // recentFoldersToolStripMenuItem
-            //
+            // 
             this.recentFoldersToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem3,
             this.toolStripMenuItem4,
@@ -456,174 +497,174 @@ namespace Gekko
             this.recentFoldersToolStripMenuItem.Name = "recentFoldersToolStripMenuItem";
             this.recentFoldersToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
             this.recentFoldersToolStripMenuItem.Text = "Recent folders";
-            //
+            // 
             // toolStripMenuItem3
-            //
+            // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
             this.toolStripMenuItem3.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem3.Text = "1. ";
             this.toolStripMenuItem3.Click += new System.EventHandler(this.toolStripMenuItem3_Click);
-            //
+            // 
             // toolStripMenuItem4
-            //
+            // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
             this.toolStripMenuItem4.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem4.Text = "2. ";
             this.toolStripMenuItem4.Click += new System.EventHandler(this.toolStripMenuItem4_Click);
-            //
+            // 
             // toolStripMenuItem5
-            //
+            // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
             this.toolStripMenuItem5.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem5.Text = "3. ";
             this.toolStripMenuItem5.Click += new System.EventHandler(this.toolStripMenuItem5_Click);
-            //
+            // 
             // toolStripMenuItem6
-            //
+            // 
             this.toolStripMenuItem6.Name = "toolStripMenuItem6";
             this.toolStripMenuItem6.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem6.Text = "4. ";
             this.toolStripMenuItem6.Click += new System.EventHandler(this.toolStripMenuItem6_Click);
-            //
+            // 
             // toolStripMenuItem7
-            //
+            // 
             this.toolStripMenuItem7.Name = "toolStripMenuItem7";
             this.toolStripMenuItem7.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem7.Text = "5. ";
             this.toolStripMenuItem7.Click += new System.EventHandler(this.toolStripMenuItem7_Click);
-            //
+            // 
             // toolStripMenuItem8
-            //
+            // 
             this.toolStripMenuItem8.Name = "toolStripMenuItem8";
             this.toolStripMenuItem8.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem8.Text = "6. ";
             this.toolStripMenuItem8.Click += new System.EventHandler(this.toolStripMenuItem8_Click);
-            //
+            // 
             // toolStripMenuItem9
-            //
+            // 
             this.toolStripMenuItem9.Name = "toolStripMenuItem9";
             this.toolStripMenuItem9.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem9.Text = "7. ";
             this.toolStripMenuItem9.Click += new System.EventHandler(this.toolStripMenuItem9_Click);
-            //
+            // 
             // toolStripMenuItem10
-            //
+            // 
             this.toolStripMenuItem10.Name = "toolStripMenuItem10";
             this.toolStripMenuItem10.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem10.Text = "8. ";
             this.toolStripMenuItem10.Click += new System.EventHandler(this.toolStripMenuItem10_Click);
-            //
+            // 
             // toolStripMenuItem11
-            //
+            // 
             this.toolStripMenuItem11.Name = "toolStripMenuItem11";
             this.toolStripMenuItem11.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem11.Text = "9. ";
             this.toolStripMenuItem11.Click += new System.EventHandler(this.toolStripMenuItem11_Click);
-            //
+            // 
             // toolStripMenuItem12
-            //
+            // 
             this.toolStripMenuItem12.Name = "toolStripMenuItem12";
             this.toolStripMenuItem12.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem12.Text = "10. ";
             this.toolStripMenuItem12.Click += new System.EventHandler(this.toolStripMenuItem12_Click);
-            //
+            // 
             // toolStripMenuItem14
-            //
+            // 
             this.toolStripMenuItem14.Name = "toolStripMenuItem14";
             this.toolStripMenuItem14.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem14.Text = "11.";
             this.toolStripMenuItem14.Click += new System.EventHandler(this.toolStripMenuItem14_Click);
-            //
+            // 
             // toolStripMenuItem15
-            //
+            // 
             this.toolStripMenuItem15.Name = "toolStripMenuItem15";
             this.toolStripMenuItem15.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem15.Text = "12.";
             this.toolStripMenuItem15.Click += new System.EventHandler(this.toolStripMenuItem15_Click);
-            //
+            // 
             // toolStripMenuItem16
-            //
+            // 
             this.toolStripMenuItem16.Name = "toolStripMenuItem16";
             this.toolStripMenuItem16.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem16.Text = "13.";
             this.toolStripMenuItem16.Click += new System.EventHandler(this.toolStripMenuItem16_Click);
-            //
+            // 
             // toolStripMenuItem17
-            //
+            // 
             this.toolStripMenuItem17.Name = "toolStripMenuItem17";
             this.toolStripMenuItem17.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem17.Text = "14.";
             this.toolStripMenuItem17.Click += new System.EventHandler(this.toolStripMenuItem17_Click);
-            //
+            // 
             // toolStripMenuItem18
-            //
+            // 
             this.toolStripMenuItem18.Name = "toolStripMenuItem18";
             this.toolStripMenuItem18.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem18.Text = "15.";
             this.toolStripMenuItem18.Click += new System.EventHandler(this.toolStripMenuItem18_Click);
-            //
+            // 
             // toolStripMenuItem19
-            //
+            // 
             this.toolStripMenuItem19.Name = "toolStripMenuItem19";
             this.toolStripMenuItem19.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem19.Text = "16.";
             this.toolStripMenuItem19.Click += new System.EventHandler(this.toolStripMenuItem19_Click);
-            //
+            // 
             // toolStripMenuItem20
-            //
+            // 
             this.toolStripMenuItem20.Name = "toolStripMenuItem20";
             this.toolStripMenuItem20.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem20.Text = "17.";
             this.toolStripMenuItem20.Click += new System.EventHandler(this.toolStripMenuItem20_Click);
-            //
+            // 
             // toolStripMenuItem21
-            //
+            // 
             this.toolStripMenuItem21.Name = "toolStripMenuItem21";
             this.toolStripMenuItem21.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem21.Text = "18.";
             this.toolStripMenuItem21.Click += new System.EventHandler(this.toolStripMenuItem21_Click);
-            //
+            // 
             // toolStripMenuItem22
-            //
+            // 
             this.toolStripMenuItem22.Name = "toolStripMenuItem22";
             this.toolStripMenuItem22.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem22.Text = "19.";
             this.toolStripMenuItem22.Click += new System.EventHandler(this.toolStripMenuItem22_Click);
-            //
+            // 
             // toolStripMenuItem23
-            //
+            // 
             this.toolStripMenuItem23.Name = "toolStripMenuItem23";
             this.toolStripMenuItem23.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem23.Text = "20.";
             this.toolStripMenuItem23.Click += new System.EventHandler(this.toolStripMenuItem23_Click);
-            //
+            // 
             // toolStripSeparator7
-            //
+            // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
             this.toolStripSeparator7.Size = new System.Drawing.Size(176, 6);
-            //
+            // 
             // deleteTempFilesToolStripMenuItem
-            //
+            // 
             this.deleteTempFilesToolStripMenuItem.Name = "deleteTempFilesToolStripMenuItem";
             this.deleteTempFilesToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
             this.deleteTempFilesToolStripMenuItem.Text = "Delete temp files...";
             this.deleteTempFilesToolStripMenuItem.Click += new System.EventHandler(this.deleteTempFilesToolStripMenuItem_Click);
-            //
+            // 
             // toolStripSeparator3
-            //
+            // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
             this.toolStripSeparator3.Size = new System.Drawing.Size(176, 6);
-            //
+            // 
             // closeToolStripMenuItem
-            //
+            // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
             this.closeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
             this.closeToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
             this.closeToolStripMenuItem.Text = "Exit";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
-            //
+            // 
             // editToolStripMenuItem
-            //
+            // 
             this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.undoToolStripMenuItem1,
             this.redoToolStripMenuItem1,
@@ -639,86 +680,86 @@ namespace Gekko
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editToolStripMenuItem.Text = "Edit";
-            //
+            // 
             // undoToolStripMenuItem1
-            //
+            // 
             this.undoToolStripMenuItem1.Name = "undoToolStripMenuItem1";
             this.undoToolStripMenuItem1.ShortcutKeyDisplayString = "Ctrl+Z";
             this.undoToolStripMenuItem1.Size = new System.Drawing.Size(198, 22);
             this.undoToolStripMenuItem1.Text = "Undo";
             this.undoToolStripMenuItem1.Click += new System.EventHandler(this.undoToolStripMenuItem1_Click);
-            //
+            // 
             // redoToolStripMenuItem1
-            //
+            // 
             this.redoToolStripMenuItem1.Name = "redoToolStripMenuItem1";
             this.redoToolStripMenuItem1.ShortcutKeyDisplayString = "Ctrl+Y";
             this.redoToolStripMenuItem1.Size = new System.Drawing.Size(198, 22);
             this.redoToolStripMenuItem1.Text = "Redo";
             this.redoToolStripMenuItem1.Click += new System.EventHandler(this.redoToolStripMenuItem1_Click);
-            //
+            // 
             // toolStripSeparator4
-            //
+            // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
             this.toolStripSeparator4.Size = new System.Drawing.Size(195, 6);
-            //
+            // 
             // cutToolStripMenuItem1
-            //
+            // 
             this.cutToolStripMenuItem1.Name = "cutToolStripMenuItem1";
             this.cutToolStripMenuItem1.ShortcutKeyDisplayString = "Ctrl+X";
             this.cutToolStripMenuItem1.Size = new System.Drawing.Size(198, 22);
             this.cutToolStripMenuItem1.Text = "Cut";
             this.cutToolStripMenuItem1.Click += new System.EventHandler(this.cutToolStripMenuItem1_Click);
-            //
+            // 
             // copyToolStripMenuItem1
-            //
+            // 
             this.copyToolStripMenuItem1.Name = "copyToolStripMenuItem1";
             this.copyToolStripMenuItem1.ShortcutKeyDisplayString = "Ctrl+C";
             this.copyToolStripMenuItem1.Size = new System.Drawing.Size(198, 22);
             this.copyToolStripMenuItem1.Text = "Copy";
             this.copyToolStripMenuItem1.Click += new System.EventHandler(this.copyToolStripMenuItem1_Click);
-            //
+            // 
             // pasteToolStripMenuItem1
-            //
+            // 
             this.pasteToolStripMenuItem1.Name = "pasteToolStripMenuItem1";
             this.pasteToolStripMenuItem1.ShortcutKeyDisplayString = "Ctrl+V";
             this.pasteToolStripMenuItem1.Size = new System.Drawing.Size(198, 22);
             this.pasteToolStripMenuItem1.Text = "Paste";
             this.pasteToolStripMenuItem1.Click += new System.EventHandler(this.pasteToolStripMenuItem1_Click);
-            //
+            // 
             // toolStripSeparator5
-            //
+            // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
             this.toolStripSeparator5.Size = new System.Drawing.Size(195, 6);
-            //
+            // 
             // selectAllToolStripMenuItem1
-            //
+            // 
             this.selectAllToolStripMenuItem1.Name = "selectAllToolStripMenuItem1";
             this.selectAllToolStripMenuItem1.ShortcutKeyDisplayString = "Ctrl+A";
             this.selectAllToolStripMenuItem1.Size = new System.Drawing.Size(198, 22);
             this.selectAllToolStripMenuItem1.Text = "Select All";
             this.selectAllToolStripMenuItem1.Click += new System.EventHandler(this.selectAllToolStripMenuItem1_Click);
-            //
+            // 
             // toolStripSeparator6
-            //
+            // 
             this.toolStripSeparator6.Name = "toolStripSeparator6";
             this.toolStripSeparator6.Size = new System.Drawing.Size(195, 6);
-            //
+            // 
             // commandHistoryToolStripMenuItem
-            //
+            // 
             this.commandHistoryToolStripMenuItem.Name = "commandHistoryToolStripMenuItem";
             this.commandHistoryToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
             this.commandHistoryToolStripMenuItem.Text = "Command history...";
             this.commandHistoryToolStripMenuItem.Click += new System.EventHandler(this.commandHistoryToolStripMenuItem_Click);
-            //
+            // 
             // clearCommandHistoryToolStripMenuItem
-            //
+            // 
             this.clearCommandHistoryToolStripMenuItem.Name = "clearCommandHistoryToolStripMenuItem";
             this.clearCommandHistoryToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
             this.clearCommandHistoryToolStripMenuItem.Text = "Clear command history";
             this.clearCommandHistoryToolStripMenuItem.Click += new System.EventHandler(this.clearCommandHistoryToolStripMenuItem_Click);
-            //
+            // 
             // utilitiesToolStripMenuItem
-            //
+            // 
             this.utilitiesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem2,
             this.makebatFileToolStripMenuItem,
@@ -730,156 +771,155 @@ namespace Gekko
             this.utilitiesToolStripMenuItem.Name = "utilitiesToolStripMenuItem";
             this.utilitiesToolStripMenuItem.Size = new System.Drawing.Size(58, 20);
             this.utilitiesToolStripMenuItem.Text = "Utilities";
-            //
+            // 
             // toolStripMenuItem2
-            //
+            // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
             this.toolStripMenuItem2.Size = new System.Drawing.Size(331, 22);
             this.toolStripMenuItem2.Text = "Make shortcut (.lnk file) on your desktop folder...";
             this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
-            //
+            // 
             // makebatFileToolStripMenuItem
-            //
+            // 
             this.makebatFileToolStripMenuItem.Name = "makebatFileToolStripMenuItem";
             this.makebatFileToolStripMenuItem.Size = new System.Drawing.Size(331, 22);
             this.makebatFileToolStripMenuItem.Text = "Make .bat file for easy Gekko startup...";
             this.makebatFileToolStripMenuItem.Click += new System.EventHandler(this.makebatFileToolStripMenuItem_Click);
-            //
+            // 
             // comparecheckDatabanksToolStripMenuItem
-            //
+            // 
             this.comparecheckDatabanksToolStripMenuItem.Name = "comparecheckDatabanksToolStripMenuItem";
             this.comparecheckDatabanksToolStripMenuItem.Size = new System.Drawing.Size(331, 22);
             this.comparecheckDatabanksToolStripMenuItem.Text = "Compare two databanks...";
             this.comparecheckDatabanksToolStripMenuItem.Click += new System.EventHandler(this.comparecheckDatabanksToolStripMenuItem_Click);
-            //
+            // 
             // comparecheckEquationsToolStripMenuItem
-            //
+            // 
             this.comparecheckEquationsToolStripMenuItem.Name = "comparecheckEquationsToolStripMenuItem";
             this.comparecheckEquationsToolStripMenuItem.Size = new System.Drawing.Size(331, 22);
             this.comparecheckEquationsToolStripMenuItem.Text = "Check residuals...";
             this.comparecheckEquationsToolStripMenuItem.Click += new System.EventHandler(this.comparecheckEquationsToolStripMenuItem_Click);
-            //
+            // 
             // compareModeldatabankvarlistToolStripMenuItem
-            //
+            // 
             this.compareModeldatabankvarlistToolStripMenuItem.Name = "compareModeldatabankvarlistToolStripMenuItem";
             this.compareModeldatabankvarlistToolStripMenuItem.Size = new System.Drawing.Size(331, 22);
             this.compareModeldatabankvarlistToolStripMenuItem.Text = "Compare model/databank/varlist...";
             this.compareModeldatabankvarlistToolStripMenuItem.Click += new System.EventHandler(this.compareModeldatabankvarlistToolStripMenuItem_Click);
-            //
+            // 
             // convertersToolStripMenuItem
-            //
+            // 
             this.convertersToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.pCIMConvertersToolStripMenuItem,
             this.tSPUtilitiesToolStripMenuItem});
             this.convertersToolStripMenuItem.Name = "convertersToolStripMenuItem";
             this.convertersToolStripMenuItem.Size = new System.Drawing.Size(331, 22);
             this.convertersToolStripMenuItem.Text = "Converters";
-            //
+            // 
             // pCIMConvertersToolStripMenuItem
-            //
+            // 
             this.pCIMConvertersToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.convertPCIMTablesToolStripMenuItem,
             this.convertPCIMMenusToolStripMenuItem});
             this.pCIMConvertersToolStripMenuItem.Name = "pCIMConvertersToolStripMenuItem";
             this.pCIMConvertersToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.pCIMConvertersToolStripMenuItem.Text = "PCIM converters";
-            //
+            // 
             // convertPCIMTablesToolStripMenuItem
-            //
+            // 
             this.convertPCIMTablesToolStripMenuItem.Name = "convertPCIMTablesToolStripMenuItem";
             this.convertPCIMTablesToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
             this.convertPCIMTablesToolStripMenuItem.Text = "Convert PCIM tables...";
             this.convertPCIMTablesToolStripMenuItem.Click += new System.EventHandler(this.convertPCIMTablesToolStripMenuItem_Click_1);
-            //
+            // 
             // convertPCIMMenusToolStripMenuItem
-            //
+            // 
             this.convertPCIMMenusToolStripMenuItem.Name = "convertPCIMMenusToolStripMenuItem";
             this.convertPCIMMenusToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
             this.convertPCIMMenusToolStripMenuItem.Text = "Convert PCIM menus...";
             this.convertPCIMMenusToolStripMenuItem.Click += new System.EventHandler(this.convertPCIMMenusToolStripMenuItem_Click_1);
-            //
+            // 
             // tSPUtilitiesToolStripMenuItem
-            //
+            // 
             this.tSPUtilitiesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tSPImportEqsToolStripMenuItem,
             this.tSPImportDataToolStripMenuItem1});
             this.tSPUtilitiesToolStripMenuItem.Name = "tSPUtilitiesToolStripMenuItem";
             this.tSPUtilitiesToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.tSPUtilitiesToolStripMenuItem.Text = "TSP converters";
-            //
+            // 
             // tSPImportEqsToolStripMenuItem
-            //
+            // 
             this.tSPImportEqsToolStripMenuItem.Name = "tSPImportEqsToolStripMenuItem";
             this.tSPImportEqsToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.tSPImportEqsToolStripMenuItem.Text = "TSP import eqs...";
             this.tSPImportEqsToolStripMenuItem.Click += new System.EventHandler(this.tSPImportEqsToolStripMenuItem_Click_1);
-            //
+            // 
             // tSPImportDataToolStripMenuItem1
-            //
+            // 
             this.tSPImportDataToolStripMenuItem1.Name = "tSPImportDataToolStripMenuItem1";
             this.tSPImportDataToolStripMenuItem1.Size = new System.Drawing.Size(168, 22);
             this.tSPImportDataToolStripMenuItem1.Text = "TSP import data...";
             this.tSPImportDataToolStripMenuItem1.Click += new System.EventHandler(this.tSPImportDataToolStripMenuItem1_Click_1);
-            //
+            // 
             // runStatusToolStripMenuItem
-            //
+            // 
             this.runStatusToolStripMenuItem.Name = "runStatusToolStripMenuItem";
             this.runStatusToolStripMenuItem.Size = new System.Drawing.Size(331, 22);
             this.runStatusToolStripMenuItem.Text = "Run status...";
             this.runStatusToolStripMenuItem.Click += new System.EventHandler(this.runStatusToolStripMenuItem_Click_1);
-            //
+            // 
             // optionsToolStripMenuItem
-            //
+            // 
             this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showCurrentOptionsToolStripMenuItem,
             this.restoreUserSettingsToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.optionsToolStripMenuItem.Text = "Options";
-            //
+            // 
             // showCurrentOptionsToolStripMenuItem
-            //
+            // 
             this.showCurrentOptionsToolStripMenuItem.Name = "showCurrentOptionsToolStripMenuItem";
             this.showCurrentOptionsToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
             this.showCurrentOptionsToolStripMenuItem.Text = "Show current options";
             this.showCurrentOptionsToolStripMenuItem.Click += new System.EventHandler(this.showCurrentOptionsToolStripMenuItem_Click);
-            //
+            // 
             // restoreUserSettingsToolStripMenuItem
-            //
+            // 
             this.restoreUserSettingsToolStripMenuItem.Name = "restoreUserSettingsToolStripMenuItem";
             this.restoreUserSettingsToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
             this.restoreUserSettingsToolStripMenuItem.Text = "Restore user settings...";
             this.restoreUserSettingsToolStripMenuItem.Click += new System.EventHandler(this.restoreUserSettingsToolStripMenuItem_Click);
-            //
+            // 
             // dataToolStripMenuItem
-            //
+            // 
             this.dataToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.viewDatabanksToolStripMenuItem});
             this.dataToolStripMenuItem.Name = "dataToolStripMenuItem";
             this.dataToolStripMenuItem.Size = new System.Drawing.Size(43, 20);
             this.dataToolStripMenuItem.Text = "Data";
-            //
+            // 
             // viewDatabanksToolStripMenuItem
-            //
+            // 
             this.viewDatabanksToolStripMenuItem.Name = "viewDatabanksToolStripMenuItem";
             this.viewDatabanksToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2;
             this.viewDatabanksToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.viewDatabanksToolStripMenuItem.Text = "View databanks...";
             this.viewDatabanksToolStripMenuItem.Click += new System.EventHandler(this.viewDatabanksToolStripMenuItem_Click);
-            //
+            // 
             // windowToolStripMenuItem
-            //
+            // 
             this.windowToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.closeToolStripMenuItem1,
-            //this.updateToolStripMenuItem,
             this.toolStripSeparator8,
             this.showMenuToolStripMenuItem});
             this.windowToolStripMenuItem.Name = "windowToolStripMenuItem";
             this.windowToolStripMenuItem.Size = new System.Drawing.Size(63, 20);
             this.windowToolStripMenuItem.Text = "Window";
-            //
+            // 
             // closeToolStripMenuItem1
-            //
+            // 
             this.closeToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.allPPLOTUDVALGToolStripMenuItem,
             this.allPPLOTToolStripMenuItem,
@@ -888,33 +928,71 @@ namespace Gekko
             this.closeToolStripMenuItem1.Size = new System.Drawing.Size(164, 22);
             this.closeToolStripMenuItem1.Text = "Close";
             this.closeToolStripMenuItem1.ToolTipText = "Closes all windows of specific type";
-            //
+            // 
             // allPPLOTUDVALGToolStripMenuItem
-            //
+            // 
             this.allPPLOTUDVALGToolStripMenuItem.Name = "allPPLOTUDVALGToolStripMenuItem";
-            this.allPPLOTUDVALGToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.allPPLOTUDVALGToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
             this.allPPLOTUDVALGToolStripMenuItem.Text = "Close all PLOT+DECOMP";
             this.allPPLOTUDVALGToolStripMenuItem.ToolTipText = "Close all PLOT and DECOMP windows";
             this.allPPLOTUDVALGToolStripMenuItem.Click += new System.EventHandler(this.allPPLOTUDVALGToolStripMenuItem_Click);
-            //
+            // 
             // allPPLOTToolStripMenuItem
-            //
+            // 
             this.allPPLOTToolStripMenuItem.Name = "allPPLOTToolStripMenuItem";
-            this.allPPLOTToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.allPPLOTToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
             this.allPPLOTToolStripMenuItem.Text = "Close all PLOT";
             this.allPPLOTToolStripMenuItem.ToolTipText = "Close all PLOT windows";
             this.allPPLOTToolStripMenuItem.Click += new System.EventHandler(this.allPPLOTToolStripMenuItem_Click);
-            //
+            // 
             // allUDVALGToolStripMenuItem
-            //
+            // 
             this.allUDVALGToolStripMenuItem.Name = "allUDVALGToolStripMenuItem";
-            this.allUDVALGToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.allUDVALGToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
             this.allUDVALGToolStripMenuItem.Text = "Close all DECOMP";
             this.allUDVALGToolStripMenuItem.ToolTipText = "Close all DECOMP windows";
             this.allUDVALGToolStripMenuItem.Click += new System.EventHandler(this.allUDVALGToolStripMenuItem_Click);
-            //
+            // 
+            // toolStripSeparator8
+            // 
+            this.toolStripSeparator8.Name = "toolStripSeparator8";
+            this.toolStripSeparator8.Size = new System.Drawing.Size(161, 6);
+            // 
+            // showMenuToolStripMenuItem
+            // 
+            this.showMenuToolStripMenuItem.Name = "showMenuToolStripMenuItem";
+            this.showMenuToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.showMenuToolStripMenuItem.Text = "Restart Menu tab";
+            this.showMenuToolStripMenuItem.ToolTipText = "Restart Menu system (same as using \'Browse to start\' button while on \'Menu\' tab)." +
+    "";
+            this.showMenuToolStripMenuItem.Click += new System.EventHandler(this.showMenuToolStripMenuItem_Click);
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.manualToolStripMenuItem,
+            this.aboutToolStripMenuItem});
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem.Text = "Help";
+            // 
+            // manualToolStripMenuItem
+            // 
+            this.manualToolStripMenuItem.Name = "manualToolStripMenuItem";
+            this.manualToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
+            this.manualToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+            this.manualToolStripMenuItem.Text = "Gekko Help File";
+            this.manualToolStripMenuItem.Click += new System.EventHandler(this.manualToolStripMenuItem_Click);
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+            this.aboutToolStripMenuItem.Text = "About...";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+            // 
             // updateToolStripMenuItem
-            //
+            // 
             this.updateToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.allPPLOTAndUDVALGToolStripMenuItem,
             this.allPPLOTToolStripMenuItem1,
@@ -923,70 +1001,33 @@ namespace Gekko
             this.updateToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
             this.updateToolStripMenuItem.Text = "Update";
             this.updateToolStripMenuItem.ToolTipText = "Updates/refreshes all windows of specific type";
-            //
+            // 
             // allPPLOTAndUDVALGToolStripMenuItem
-            //
+            // 
             this.allPPLOTAndUDVALGToolStripMenuItem.Name = "allPPLOTAndUDVALGToolStripMenuItem";
-            this.allPPLOTAndUDVALGToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
+            this.allPPLOTAndUDVALGToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
             this.allPPLOTAndUDVALGToolStripMenuItem.Text = "Update all PLOT+DECOMP";
             this.allPPLOTAndUDVALGToolStripMenuItem.ToolTipText = "Updates/refreshes all PLOT and DECOMP windows";
             this.allPPLOTAndUDVALGToolStripMenuItem.Click += new System.EventHandler(this.allPPLOTAndUDVALGToolStripMenuItem_Click);
-            //
+            // 
             // allPPLOTToolStripMenuItem1
-            //
+            // 
             this.allPPLOTToolStripMenuItem1.Name = "allPPLOTToolStripMenuItem1";
-            this.allPPLOTToolStripMenuItem1.Size = new System.Drawing.Size(219, 22);
+            this.allPPLOTToolStripMenuItem1.Size = new System.Drawing.Size(216, 22);
             this.allPPLOTToolStripMenuItem1.Text = "Update all PLOT";
             this.allPPLOTToolStripMenuItem1.ToolTipText = "Updates/refreshes all PLOT windows";
             this.allPPLOTToolStripMenuItem1.Click += new System.EventHandler(this.allPPLOTToolStripMenuItem1_Click);
-            //
+            // 
             // allUDVALGToolStripMenuItem1
-            //
+            // 
             this.allUDVALGToolStripMenuItem1.Name = "allUDVALGToolStripMenuItem1";
-            this.allUDVALGToolStripMenuItem1.Size = new System.Drawing.Size(219, 22);
+            this.allUDVALGToolStripMenuItem1.Size = new System.Drawing.Size(216, 22);
             this.allUDVALGToolStripMenuItem1.Text = "Update all DECOMP";
             this.allUDVALGToolStripMenuItem1.ToolTipText = "Updates/refreshes all DECOMP windows";
             this.allUDVALGToolStripMenuItem1.Click += new System.EventHandler(this.allUDVALGToolStripMenuItem1_Click);
-            //
-            // toolStripSeparator8
-            //
-            this.toolStripSeparator8.Name = "toolStripSeparator8";
-            this.toolStripSeparator8.Size = new System.Drawing.Size(161, 6);
-            //
-            // showMenuToolStripMenuItem
-            //
-            this.showMenuToolStripMenuItem.Name = "showMenuToolStripMenuItem";
-            this.showMenuToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
-            this.showMenuToolStripMenuItem.Text = "Restart Menu tab";
-            this.showMenuToolStripMenuItem.ToolTipText = "Restart Menu system (same as using \'Browse to start\' button while on \'Menu\' tab)." + "";
-            this.showMenuToolStripMenuItem.Click += new System.EventHandler(this.showMenuToolStripMenuItem_Click);
-            //
-            // helpToolStripMenuItem
-            //
-            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.manualToolStripMenuItem,
-            this.aboutToolStripMenuItem});
-            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
-            this.helpToolStripMenuItem.Text = "Help";
-            //
-            // manualToolStripMenuItem
-            //
-            this.manualToolStripMenuItem.Name = "manualToolStripMenuItem";
-            this.manualToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
-            this.manualToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
-            this.manualToolStripMenuItem.Text = "Gekko Help File";
-            this.manualToolStripMenuItem.Click += new System.EventHandler(this.manualToolStripMenuItem_Click);
-            //
-            // aboutToolStripMenuItem
-            //
-            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
-            this.aboutToolStripMenuItem.Text = "About...";
-            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
-            //
+            // 
             // statusStrip1
-            //
+            // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
             this.toolStripStatusLabel4,
@@ -1000,26 +1041,24 @@ namespace Gekko
             this.statusStrip1.Size = new System.Drawing.Size(649, 22);
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
-            //this.statusStrip1.BackColor = Color.LightGreen;
-            //
+            // 
             // toolStripStatusLabel1
-            //
+            // 
             this.toolStripStatusLabel1.AutoSize = false;
-            //this.toolStripStatusLabel1.BackColor = Color.LightGreen;
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(611, 17);
             this.toolStripStatusLabel1.Spring = true;
             this.toolStripStatusLabel1.Text = "Status field";
             this.toolStripStatusLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            //
+            // 
             // toolStripStatusLabel4
-            //
+            // 
             this.toolStripStatusLabel4.Name = "toolStripStatusLabel4";
             this.toolStripStatusLabel4.Size = new System.Drawing.Size(0, 17);
             this.toolStripStatusLabel4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            //
+            // 
             // toolStripStatusLabel5
-            //
+            // 
             this.toolStripStatusLabel5.AutoSize = false;
             this.toolStripStatusLabel5.AutoToolTip = true;
             this.toolStripStatusLabel5.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
@@ -1027,15 +1066,15 @@ namespace Gekko
             this.toolStripStatusLabel5.Size = new System.Drawing.Size(23, 17);
             this.toolStripStatusLabel5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.toolStripStatusLabel5.ToolTipText = "Number of goals set (ENDO/EXO variables)";
-            //
+            // 
             // toolStripStatusLabel2
-            //
+            // 
             this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
             this.toolStripStatusLabel2.Size = new System.Drawing.Size(0, 17);
             this.toolStripStatusLabel2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            //
+            // 
             // toolStripStatusLabel3
-            //
+            // 
             this.toolStripStatusLabel3.AutoSize = false;
             this.toolStripStatusLabel3.AutoToolTip = true;
             this.toolStripStatusLabel3.DoubleClickEnabled = true;
@@ -1044,20 +1083,21 @@ namespace Gekko
             this.toolStripStatusLabel3.Name = "toolStripStatusLabel3";
             this.toolStripStatusLabel3.Size = new System.Drawing.Size(17, 17);
             this.toolStripStatusLabel3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.toolStripStatusLabel3.ToolTipText = "Job status: green = ready // yellow = working // red = aborted\nDouble click to open \'Run status\' window.";
+            this.toolStripStatusLabel3.ToolTipText = "Job status: green = ready // yellow = working // red = aborted\nDouble click to op" +
+    "en \'Run status\' window.";
             this.toolStripStatusLabel3.DoubleClick += new System.EventHandler(this.toolStripStatusLabel3_DoubleClick);
-            //
+            // 
             // toolStripStatusLabel3a
-            //
+            // 
             this.toolStripStatusLabel3a.AutoSize = false;
             this.toolStripStatusLabel3a.AutoToolTip = true;
             this.toolStripStatusLabel3a.Name = "toolStripStatusLabel3a";
             this.toolStripStatusLabel3a.Size = new System.Drawing.Size(12, 17);
             this.toolStripStatusLabel3a.Text = " ";
             this.toolStripStatusLabel3a.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            //
+            // 
             // pictureBox1
-            //
+            // 
             this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
             this.pictureBox1.InitialImage = ((System.Drawing.Image)(resources.GetObject("pictureBox1.InitialImage")));
@@ -1066,77 +1106,15 @@ namespace Gekko
             this.pictureBox1.Size = new System.Drawing.Size(32, 15);
             this.pictureBox1.TabIndex = 6;
             this.pictureBox1.TabStop = false;
-            //
+            // 
             // contextMenuStrip2
-            //
+            // 
             this.contextMenuStrip2.Name = "contextMenuStrip2";
             this.contextMenuStrip2.Size = new System.Drawing.Size(61, 4);
             this.contextMenuStrip2.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip2_Opening);
-            //
-            // splitContainer1
-            //
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer1.Margin = new System.Windows.Forms.Padding(0);
-            this.splitContainer1.Name = "splitContainer1";
-            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            //
-            // splitContainer1.Panel1
-            //
-            this.splitContainer1.Panel1.BackColor = System.Drawing.Color.Transparent;
-            this.splitContainer1.Panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.splitContainer1_Panel1_Paint);
-            //
-            // splitContainer1.Panel2
-            //
-            this.splitContainer1.Panel2.Controls.Add(this.textBox2);
-            this.splitContainer1.Panel2.Controls.Add(this.listBoxAutoComplete);
-            this.splitContainer1.Size = new System.Drawing.Size(641, 358);
-            this.splitContainer1.SplitterDistance = 275;
-            this.splitContainer1.SplitterWidth = 6;
-            this.splitContainer1.TabIndex = 6;
-            this.splitContainer1.TabStop = false;
-            //
-            // textBox2
-            //
-            this.textBox2.AcceptsTab = true;
-            this.textBox2.AllowDrop = true;
-            this.textBox2.AutoWordSelection = true;
-            //this.textBox2.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox2.ContextMenuStrip = this.contextMenuStrip1;
-            this.textBox2.DetectUrls = false;
-            this.textBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox2.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox2.Location = new System.Drawing.Point(0, 0);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(641, 77);
-            this.textBox2.TabIndex = 0;
-            this.textBox2.Text = "";
-            this.textBox2.WordWrap = false;
-            this.textBox2.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
-            this.textBox2.VisibleChanged += new System.EventHandler(this.textBox2_VisibleChanged);
-            this.textBox2.KeyDown += new System.Windows.Forms.KeyEventHandler(this.richTextBox1_KeyDown);
-            this.textBox2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox2_KeyPress);
-            this.textBox2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.richTextBox1_MouseDown);
-            //
-            // listBoxAutoComplete
-            //
-            this.listBoxAutoComplete.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.listBoxAutoComplete.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.listBoxAutoComplete.ImageList = this.imageList1;
-            this.listBoxAutoComplete.Location = new System.Drawing.Point(136, 288);
-            this.listBoxAutoComplete.Name = "listBoxAutoComplete";
-            this.listBoxAutoComplete.Size = new System.Drawing.Size(208, 54);
-            this.listBoxAutoComplete.TabIndex = 3;
-            this.listBoxAutoComplete.Visible = false;
-            this.listBoxAutoComplete.SelectedIndexChanged += new System.EventHandler(this.listBoxAutoComplete_SelectedIndexChanged);
-            this.listBoxAutoComplete.DoubleClick += new System.EventHandler(this.listBoxAutoComplete_DoubleClick);
-            this.listBoxAutoComplete.KeyDown += new System.Windows.Forms.KeyEventHandler(this.listBoxAutoComplete_KeyDown);
-            //
+            // 
             // Gui
-            //
-            //this.Closing += new System.ComponentModel.CancelEventHandler(this.Form1_Closing);
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(649, 455);
@@ -1152,11 +1130,15 @@ namespace Gekko
             this.Name = "Gui";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Gekko";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.commands_Load);
             this.Shown += new System.EventHandler(this.Gui_Shown);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Gekko_KeyDown);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
             this.contextMenuStrip1.ResumeLayout(false);
             this.tabPage4.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
@@ -1166,9 +1148,6 @@ namespace Gekko
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
