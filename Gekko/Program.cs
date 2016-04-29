@@ -6745,9 +6745,7 @@ public static bool IsLargeAware(Stream stream)
 }
 
         public static void Stamp()
-        {
-
-                        
+        {            
             
             if (!Globals.runningOnTTComputer)
             {
@@ -16536,6 +16534,8 @@ public static bool IsLargeAware(Stream stream)
             return now;
         }
 
+       
+
         //This is a general method for zipping the contents of a folder
         public static void WaitForZipWrite(string folder, string zipFileName)
         {
@@ -16546,7 +16546,7 @@ public static bool IsLargeAware(Stream stream)
                 throw new GekkoException();
             }
 
-            int gap = Globals.waitFileGap;  //1 second
+            int gap = Globals.waitFileGap;  //2 seconds
             int totalTime = Globals.waitFileTotalTime;  //600 seconds
             int repeats = totalTime / gap;
 

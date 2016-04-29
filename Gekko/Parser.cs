@@ -1228,8 +1228,11 @@ namespace Gekko
 
                 string folder = Program.GetModelInfoPath();  //always a <modelname>__info subfolder to local temp files folder
 
-                string zipFileNameInput = Program.CreateFullPathAndFileName(Globals.modelFileName.Replace(".frm", "") + "__info.zip");
-                Program.WaitForZipWrite(folder, zipFileNameInput);
+                if (G.equal(Program.options.model_infofile, "yes"))
+                {
+                    string zipFileNameInput = Program.CreateFullPathAndFileName(Globals.modelFileName.Replace(".frm", "") + "__info.zip");
+                    Program.WaitForZipWrite(folder, zipFileNameInput);
+                }
 
                 //if (isCalledFromModelStatement) G.Writeln("Details regarding model: see " + Path.GetFileName(zipFileNameInput));
 

@@ -714,6 +714,7 @@ tokens {
     IMPORT='IMPORT';
     INDEX            = 'INDEX'           ;
     INFO             = 'INFO'            ;
+	INFOFILE             = 'INFOFILE'            ;
     INI             = 'INI'            ;
     INIT             = 'INIT'            ;
     INTERFACE        = 'INTERFACE'       ;
@@ -898,6 +899,7 @@ tokens {
     TABS             = 'TABS'            ;
     TARGET = 'TARGET';
     TELL             = 'TELL';
+	TEMP             = 'TEMP';
     TERMINAL         = 'TERMINAL';
     TEST             = 'TEST';
     TESTRANDOMMODEL  = 'TESTRANDOMMODEL'         ;
@@ -1152,6 +1154,7 @@ tokens {
                                         d.Add("import", IMPORT);
                                         d.Add("index"   , INDEX      );
                                         d.Add("info"    , INFO      );
+										d.Add("infofile"    , INFOFILE      );
                                         d.Add("ini"    , INI      );
                                         d.Add("init"    , INIT      );
                                         d.Add("interface"               , INTERFACE );
@@ -1333,6 +1336,7 @@ tokens {
                                         d.Add("tabs"     , TABS       );
                                         d.Add("TARGET" ,TARGET);
                                         d.Add("tell"     , TELL       );
+										d.Add("temp"     , TEMP       );
                                         d.Add("terminal"     , TERMINAL       );
                                         d.Add("test"               , TEST               );
                                         d.Add("TESTRANDOMMODEL", TESTRANDOMMODEL);
@@ -2582,6 +2586,7 @@ optionType :
 			 | MODEL question -> MODEL question
              | MODEL CACHE MAX '='? Integer -> MODEL CACHE MAX  ^(ASTINTEGER Integer)
              | MODEL CACHE '='? yesNoSimple -> MODEL CACHE ^(ASTBOOL yesNoSimple)
+			 | MODEL INFOFILE '='? optionModelInfoFile -> MODEL INFOFILE ^(ASTSTRINGSIMPLE optionModelInfoFile)
                           
 			 | PLOT question -> PLOT question
 			 | PLOT LINES POINTS '='? yesNoSimple -> PLOT LINES POINTS ^(ASTBOOL yesNoSimple )			 
@@ -2696,6 +2701,7 @@ optionType :
              | TIMEFILTER TYPE '='? timefilterType -> TIMEFILTER TYPE ^(ASTSTRINGSIMPLE timefilterType)
             ;
 
+			 optionModelInfoFile: YES | NO | TEMP;
 			 timefilterType: HIDE | AVG;
 			 tableType: TXT | HTML;
 			 optionPrintCollapse: AVG | TOTAL | NONE;
@@ -2881,6 +2887,7 @@ ident                     : Ident|
                             IMPORT|
                             INDEX|
                             INFO|
+							INFOFILE|
                             INIT|
                             INI|
                             INTERFACE|
@@ -3058,6 +3065,7 @@ ident                     : Ident|
                             TABS|
                             TARGET|
                             TELL|
+							TEMP|
                             TERMINAL|
                             TESTRANDOMMODELCHECK|
                             TESTRANDOMMODEL|

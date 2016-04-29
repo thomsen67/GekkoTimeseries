@@ -185,11 +185,20 @@ namespace Gekko
             //this.KeyDown += new KeyEventHandler(Gekko_KeyDown);
         }
 
+        static void CrashHandler(object sender, UnhandledExceptionEventArgs args)
+        {
+            Exception e = (Exception)args.ExceptionObject;
+            MessageBox.Show("Unexpected Gekko crash: " + e.Message + G.NL + "Terminating: " + args.IsTerminating);
+        }
 
         ///
         [STAThread]
         public static void Main(string[] args)
         {
+            //Code to handle unexpected crashes, for instance after hibernation
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            currentDomain.UnhandledException += new UnhandledExceptionEventHandler(CrashHandler);
+            
             //args can be tested in VS, see Gekko project options, debug.
             string noini = null;
             string folder = null;
