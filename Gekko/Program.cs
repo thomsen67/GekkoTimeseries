@@ -9354,7 +9354,7 @@ public static bool IsLargeAware(Stream stream)
                         Randommodelcheck();
                         return "";  //no need for the parser to chew on this afterwards!
                     }
-                }
+                }                
 
                 if (s2.Length == 7)
                 {
@@ -21967,12 +21967,12 @@ public static bool IsLargeAware(Stream stream)
 
             string emfName = path + "\\" + file2;
 
-
             Process p = new Process();
             //p.MainWindowTitle = title;
             p.StartInfo.FileName = Application.StartupPath + "\\gnuplot\\wgnuplot.exe";
             //p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            p.StartInfo.Arguments = path + "\\" + file3;
+            //NOTE: quotes added because this path may contain blanks
+            p.StartInfo.Arguments = Globals.QT + path + "\\" + file3 + Globals.QT;
 
             bool exited = false;
             try
