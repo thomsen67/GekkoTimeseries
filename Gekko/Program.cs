@@ -6547,6 +6547,8 @@ namespace Gekko
 
                 process.StartInfo.FileName = startup + "\\X12A.EXE";
                 process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                //tempName does not contain blanks, so quotes are not needed
+                //TODO: perhaps do this like PLOT with random numbers attached
                 process.StartInfo.Arguments = tempName + " -d " + tempName;
                 process.Start();
                 process.WaitForExit();
