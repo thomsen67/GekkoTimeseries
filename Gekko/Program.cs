@@ -1108,6 +1108,8 @@ namespace Gekko
 
         private static void GetTimeseriesFromWorkbookMatrix(ReadOpenMulbkHelper oRead, Databank databank, TableLight matrix2, ReadInfo readInfo)
         {
+            //TODO: gaps, READ<gap>
+            
             //We could 'taste' the file, but how to distinguish A and U for instance?
             //Perhaps augment READ/IMPORT with freq indication for such files?
             EFreq freqHere = Program.options.freq;
@@ -1358,7 +1360,7 @@ namespace Gekko
                                 {
                                     ss = double.NaN;
                                 }
-                                GekkoTime gt2 = per1.Add((col - colOffset) - 2);  //col 2 is the start col for data
+                                GekkoTime gt2 = per1.Add((col - colOffset) - 2);  //col 2 is the start col for data                                
                                 ts.SetData(gt2, ss);
                             }
                         }
@@ -1386,7 +1388,9 @@ namespace Gekko
         private static bool IsNonAvailableText(string text)
         {
             //the last ones are the Danish codes
-            bool isNonAvailableText = text == "#N/A" || text == "#NAME?" || text == "#I/T" || text == "#NAVN?";
+            //the M is Gekko standard for missing value
+            bool isNonAvailableText = false;
+            if (G.equal(text, "M") || G.equal(text, "#N/A") || G.equal(text, "#NAME?") || G.equal(text, "#I/T") || G.equal(text, "#NAVN?")) isNonAvailableText = true;
             return isNonAvailableText;
         }
 
@@ -9356,7 +9360,18 @@ public static bool IsLargeAware(Stream stream)
                         Randommodelcheck();
                         return "";  //no need for the parser to chew on this afterwards!
                     }
-                }                
+                }
+
+                if (s2.Length == 3)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "cge"))
+                    {                        
+                        CGE.Run();
+                        CGE.GamsReader();                        
+                        return "";   //no need for the parser to chew on this afterwards!
+                    }
+                }
 
                 if (s2.Length == 7)
                 {
@@ -17418,9 +17433,10 @@ public static bool IsLargeAware(Stream stream)
 
         public static void WriteRemovedDatabank(Databank removed)
         {
+            if (removed == null) return;  //See TKD mail 6/6 2016, this should not be possible, but just in case
+            if (removed.fileNameWithPath == null) return; //See TKD mail 6/6 2016, this should not be possible, but just in case
             GekkoTime tStart = Globals.tNull;
-            GekkoTime tEnd = Globals.tNull;
-            //List<string> list = GetAllVariablesFromBank(list, removed);
+            GekkoTime tEnd = Globals.tNull;            
             if (!removed.fileNameWithPath.EndsWith("." + Globals.extensionDatabank + ""))
             {
                 G.Writeln2("*** ERROR: The databank '" + removed.aliasName + "' was opened with the OPEN command.");

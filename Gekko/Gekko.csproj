@@ -147,6 +147,7 @@
     <Compile Include="AutoComplete.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CGE.cs" />
     <Compile Include="CompareUtility3Way.cs">
       <SubType>Form</SubType>
     </Compile>
