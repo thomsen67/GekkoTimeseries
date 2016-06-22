@@ -435,7 +435,7 @@ namespace Gekko
                 }
 
                 if (xy.Row > _rowMaxNumber) _rowMaxNumber = xy.Row;
-                if (xy.Col > _colMaxNumber) _colMaxNumber = xy.Col;
+                if (xy.Col > _colMaxNumber) _colMaxNumber = xy.Col;                
 
                 if (xy.Row > colInfo.RowMaxNumber) colInfo.RowMaxNumber = xy.Row;
                 if (xy.Col > rowInfo.ColMaxNumber) rowInfo.ColMaxNumber = xy.Col;
@@ -485,7 +485,7 @@ namespace Gekko
                 }
 
                 if (xy.Row > _rowMaxNumber) _rowMaxNumber = xy.Row;
-                if (xy.Col > _colMaxNumber) _colMaxNumber = xy.Col;
+                if (xy.Col > _colMaxNumber) _colMaxNumber = xy.Col;                
                 if (xy.Row > colInfo.RowMaxNumber) colInfo.RowMaxNumber = xy.Row;
                 if (xy.Col > rowInfo.ColMaxNumber) rowInfo.ColMaxNumber = xy.Col;
                 //if (cell.borderTop) rowInfo.HasAnyLineTop = true;

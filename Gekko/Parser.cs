@@ -2132,13 +2132,13 @@ namespace Gekko
                             HandlePowFunction(eh, equationNode, depth, wh2, model, subTreeLag, isModel, true);
                             visitChildren = false;
                         }
-                        else if (G.equal(function, "CES_UC") || G.equal(function, "CES_XL") || G.equal(function, "CES_XR"))
+                        else if (G.equal(function, "CES_UC") || G.equal(function, "CES_XL") || G.equal(function, "CES_XR") || G.equal(function, "CES_COSTS") || G.equal(function, "CES_FACTOR1") || G.equal(function, "CES_FACTOR2"))
                         {
                             //See #09875209837532
                             recognized = true;
                             wh2.rightHandSideCsCode.Append("Functions." + function + "(", EEmitType.computerReadable);
                             wh2.rightHandSideCsCode.Append(function, EEmitType.humanReadable);
-                            numberOfRightParentheses++;                            
+                            numberOfRightParentheses++;
                         }
 
                         if (recognized == false)
