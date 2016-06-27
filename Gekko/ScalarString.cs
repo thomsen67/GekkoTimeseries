@@ -86,17 +86,36 @@ namespace Gekko
                     {                        
                         try
                         {
-                            IVariable a = O.GetScalar(variable, false);
+                            IVariable a = O.GetScalar(variable, false);                                                        
                             if (a.Type() == EVariableType.String || a.Type() == EVariableType.Date || a.Type() == EVariableType.Val)
-                            {                                
-                                IVariable b = new ScalarString("");
-                                IVariable c = b.Add(a, Globals.tNull);
-                                string s3 = c.GetString();
-                                int x = 0;
-                                if (isDollarPercent) x = 1;
-                                string s4 = s.Substring(lastEnd + 1, j - lastEnd - 1 - x);
-                                s2 += s4 + s3;
-                                hit = true;
+                            {
+                                bool valfail = false;
+                                if (a.Type() == EVariableType.Val)
+                                {
+                                    if (j == 0)
+                                    {
+                                        valfail = true;  //for instance PRT %v, where v is a VAL, should no in-substitute
+                                    }
+                                    else
+                                    {
+                                        if (!G.IsLetterOrDigitOrUnderscore(s[j - 1])) valfail = true;  //for instance, PRT ab%v should in-substitute
+                                        else
+                                        {
+                                            //for instance, PRT ab%v, where %v = 2, should print as ab2                                            
+                                        }
+                                    }
+                                }
+                                if (!valfail)
+                                {
+                                    IVariable b = new ScalarString("");
+                                    IVariable c = b.Add(a, Globals.tNull);
+                                    string s3 = c.GetString();
+                                    int x = 0;
+                                    if (isDollarPercent) x = 1;
+                                    string s4 = s.Substring(lastEnd + 1, j - lastEnd - 1 - x);
+                                    s2 += s4 + s3;
+                                    hit = true;
+                                }
                             }
                             else
                             {
