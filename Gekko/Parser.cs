@@ -2132,7 +2132,7 @@ namespace Gekko
                             HandlePowFunction(eh, equationNode, depth, wh2, model, subTreeLag, isModel, true);
                             visitChildren = false;
                         }
-                        else if (G.equal(function, "CES_UC") || G.equal(function, "CES_XL") || G.equal(function, "CES_XR") || G.equal(function, "CES_COSTS") || G.equal(function, "CES_FACTOR1") || G.equal(function, "CES_FACTOR2"))
+                        else if (G.equal(function, "CES_UC") || G.equal(function, "CES_XL") || G.equal(function, "CES_XR") || G.equal(function, "CES_COSTS") || G.equal(function, "CES_FACTOR1") || G.equal(function, "CES_FACTOR2") || G.equal(function, "CES_AC"))
                         {
                             //See #09875209837532
                             recognized = true;

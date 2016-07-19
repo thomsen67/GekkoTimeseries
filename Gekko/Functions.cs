@@ -1506,9 +1506,16 @@ namespace Gekko
             return yrel * Math.Pow(uc / p2rel, sigma);
         }
 
+        //See also #9823750983752
+
         public static double ces_costs(double y, double p1, double p2, double kappa, double phi, double sigma)
         {
             return y / kappa * Math.Pow(Math.Pow((Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma))), sigma) * Math.Pow(p1, 1 - sigma) + Math.Pow(1 - (Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma))), sigma) * Math.Pow(p2, 1 - sigma), 1 / (1 - sigma));
+        }
+
+        public static double ces_ac(double p1, double p2, double kappa, double phi, double sigma)
+        {
+            return 1d / kappa * Math.Pow(Math.Pow((Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma))), sigma) * Math.Pow(p1, 1 - sigma) + Math.Pow(1 - (Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma))), sigma) * Math.Pow(p2, 1 - sigma), 1 / (1 - sigma));
         }
 
         public static double ces_factor1(double y, double p1, double p2, double kappa, double phi, double sigma)
