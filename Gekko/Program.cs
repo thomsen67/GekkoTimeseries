@@ -10355,7 +10355,7 @@ public static bool IsLargeAware(Stream stream)
                         {
                             /*
                                    a(      --->   a¨(     and same for the others
-                                   a[    --> special [_[ symbol
+                                   a[      --->   special [_[ symbol
                                    a{
                                    a%  //part of name
                                    a#  //part of name
@@ -10364,6 +10364,7 @@ public static bool IsLargeAware(Stream stream)
                                    ){  //same logic
                                    )%  //same logic
                                    )#  //same logic
+                                   )[  //for instance #(list%i)[2] --> special [_[ symbol
 
                                    }a
                                    }{
@@ -10400,6 +10401,7 @@ public static bool IsLargeAware(Stream stream)
                             else if (c1 == ')' && c2 == '{') glue = true;
                             else if (c1 == ')' && c2 == Globals.symbolMemvar) glue = true;
                             else if (c1 == ')' && c2 == Globals.symbolList) glue = true;
+                            else if (c1 == ')' && c2 == '[') glue2 = true;
 
                             else if (c1 == '}' && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
                             else if (c1 == '}' && c2 == '{') glue = true;
