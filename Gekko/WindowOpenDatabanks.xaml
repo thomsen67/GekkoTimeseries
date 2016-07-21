@@ -130,7 +130,7 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn Width="30" Header="Prot">
+                        <GridViewColumn Width="30" Header="Edit">
                             <GridViewColumn.HeaderContainerStyle>
                                 <Style  TargetType="{x:Type GridViewColumnHeader}">
                                     <Setter Property="HorizontalContentAlignment" Value="Left" />

@@ -1621,7 +1621,7 @@ namespace Gekko
                     //is in reality an OPEN                    
                     open = true;
                     hlp.Merge = false;  //but mixing <merge> and TO give error above anyway                
-                    hlp.protect = true;
+                    hlp.protect = true;  //superfluous but for safety
                     hlp.openType = EOpenType.Normal;
                     if (readTo == "ASTBANKISSTARCHEATCODE")
                     {
@@ -1790,7 +1790,7 @@ namespace Gekko
                     }
                     open = true;
                     hlp.Merge = false;
-                    hlp.protect = true;
+                    hlp.protect = true;  //superfluous but for safety
                     hlp.openType = EOpenType.Normal;
                                         
                     if (importTo == "ASTBANKISSTARCHEATCODE")
@@ -2318,6 +2318,7 @@ namespace Gekko
         public class Close
         {
             public string name = null;
+            public string opt_save = null;
             public void Exe()
             {
                 
@@ -2349,7 +2350,14 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     Databank removed = Program.databanks.RemoveDatabank(databank);
-                    Program.MaybeWriteOpenDatabank(removed);
+                    if (G.equal(opt_save, "no"))
+                    {
+                        //do nothing, a CLOSE<save=no>
+                    }
+                    else
+                    {
+                        Program.MaybeWriteOpenDatabank(removed);
+                    }
                 }
                 if (databanks.Count > 0)
                 {
@@ -2358,10 +2366,13 @@ namespace Gekko
                         G.Writeln2("Closed databank '" + databanks[0] + "'");
                     }
                     else
-                    {
-                        G.Writeln();
-                        G.Write("Closed " + databanks.Count + " databanks: ");
+                    {                        
+                        G.Writeln2("Closed " + databanks.Count + " databanks: ");
                         G.PrintListWithCommas(databanks, false);
+                    }
+                    if (G.equal(opt_save, "no"))
+                    {
+                        G.Writeln("+++ NOTE: CLOSE<save=no> was used.");
                     }
                 }
                 else
@@ -2389,9 +2400,21 @@ namespace Gekko
             //public string as2 = null;
             public string opt_prim = null;
             public string opt_sec = null;
-            public string opt_prot = null;
+            public string opt_prot = null;  //obsolete but gives warning
+            public string opt_edit = null;
+            public string opt_save = null;
             public void Exe()
-            {                
+            {
+                if (G.equal(opt_prot, "yes"))
+                {
+                    G.Writeln2("*** ERROR: OPEN<prot> is obsolete. In Gekko 2.1.1 and onwards, databanks");
+                    G.Writeln("           are always opened as 'protected' by default. To open a databank", Color.Red);
+                    G.Writeln("           non-protected (editable), you should use 'edit', for instance", Color.Red);
+                    G.Writeln("           OPEN<edit> or OPEN<prim edit>. (Note that Work and Ref are always", Color.Red);
+                    G.Writeln("           editable).", Color.Red);
+                    throw new GekkoException();
+                }
+
                 ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
                 hlp.openFileNames = this.openFileNames;                
                 if (this.opt_csv == "yes") hlp.Type = EDataFormat.Csv;
@@ -2417,10 +2440,14 @@ namespace Gekko
                 {
                     hlp.openType = EOpenType.Sec;
                 }
-                if (G.equal(opt_prot, "yes"))
+                //if (G.equal(opt_prot, "yes"))
+                //{
+                //    hlp.protect = true;
+                //}
+                if (G.equal(opt_edit, "yes"))
                 {
-                    hlp.protect = true;
-                }                
+                    hlp.protect = false;  //will override the born true value of the field
+                }
                 
                 List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
                 Program.OpenOrRead(hlp, true, readInfos);
@@ -2430,8 +2457,10 @@ namespace Gekko
                     readInfo.open = true;
                     if (readInfo.abortedStar) return;  //an aborted OPEN *
 
-                    //string dbName = Path.GetFileNameWithoutExtension(readInfo.fileName);
-                    //if (hlp.As != null) dbName = hlp.As;
+                    if (G.equal(opt_save, "no"))
+                    {
+                        readInfo.databank.save = false;
+                    }                    
 
                     readInfo.Print();
                 }

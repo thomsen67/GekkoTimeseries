@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 T2.g 2016-03-03 11:35:51
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 T2.g 2016-07-21 17:41:43
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -834,7 +834,7 @@ public partial class T2Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          commandName, commandRest, commandOptions
+            	// elements:          commandOptions, commandName, commandRest
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -1257,7 +1257,7 @@ public partial class T2Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          n, SEMICOLON
+            	// elements:          SEMICOLON, n
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -2287,7 +2287,7 @@ public partial class T2Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          n, LEFTPAREN, expression, n, RIGHTPAREN
+            	// elements:          expression, n, RIGHTPAREN, LEFTPAREN, n
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -2507,7 +2507,7 @@ public partial class T2Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          RIGHTANGLE, LEFTANGLE, n, expression, n
+            	// elements:          n, n, RIGHTANGLE, LEFTANGLE, expression
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -2727,7 +2727,7 @@ public partial class T2Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          RIGHTBRACKET, expression, n, n, LEFTBRACKET
+            	// elements:          n, RIGHTBRACKET, LEFTBRACKET, expression, n
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -2947,7 +2947,7 @@ public partial class T2Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          n, LEFTCURLY, expression, n, RIGHTCURLY
+            	// elements:          RIGHTCURLY, expression, n, LEFTCURLY, n
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 

@@ -1883,7 +1883,7 @@ namespace Gekko
 
                 if (open && createNewOpenFile && oRead.protect)
                 {
-                    G.Writeln2("*** ERROR: OPEN<prot>: The databank '" + file + "' could not be found");
+                    G.Writeln2("*** ERROR: OPEN: The databank '" + file + "' could not be found");
                     throw new GekkoException();
                 }
 
@@ -1969,7 +1969,7 @@ namespace Gekko
                     }
 
                     HandleCleanAndParentForTimeseries(databank, oRead.Merge);  //otherwise it will look dirty
-                    if (oRead.protect) databank.protect = true;
+                    if (open && oRead.protect) databank.protect = true;
 
                     if (Program.options.solve_data_create_auto == true)
                     {
@@ -2031,24 +2031,32 @@ namespace Gekko
                     {
                         readInfo.conversionMessage = true;
                     }
-
-                    // =========> NOT to be done when merging, either READ<merge> or IMPORT.
-                    //ok to do with OPEN or READ/IMPORT ... TO.
-                    //======> think this through
+                    
                     readInfo.databank.info1 = readInfo.info1;
                     readInfo.databank.date = readInfo.date;
                     readInfo.databank.FileNameWithPath = readInfo.fileName;
 
                     if (open && !isTsdx && !oRead.protect)
                     {
-                        G.Writeln2("The file is opened as protected, since it is not a ." + Globals.extensionDatabank + " file");
-                        readInfo.databank.protect = true;
+                        if (readInfo.databank.protect != true)
+                        {
+                            G.Writeln2("The file is opened as non-editable, since it is not a ." + Globals.extensionDatabank + " file");
+                            readInfo.databank.protect = true;
+                        }
                     }
                     readInfos.Add(readInfo);
                 }
                 //databank.Trim();  //This way, the bank is not too bulky in RAM. The operation takes almost no time, and if it is a .tsdx file, the timeseries are already trimmed and trimming is hence skipped.
                 databank.readInfo = readInfo;  //Not really used at the moment, but practical to have a pointer to this information!
+
+                //if (G.equal(databank.aliasName, Globals.Work) || G.equal(databank.aliasName, Globals.Base))
+                //{
+                //    //A hack since sometimes when reading, Work gets protected
+                //    //Any databank called 'work' or 'ref' will be set editable:
+                //    databank.protect = false;
+                //}
             }
+
             return;
         }
 
@@ -14823,7 +14831,7 @@ public static bool IsLargeAware(Stream stream)
                 //NB: This check is here, to avoid having to do it for each timeseries later on.
                 //    The data is written in a special (fast) way that does not get checked automatically regarding
                 //    dirty and protect, cf. //#98726527
-                G.Writeln2("*** ERROR: You are trying to simulate with a primary databank ('" + work.aliasName + "') that is protected");
+                G.Writeln2("*** ERROR: You are trying to simulate with a primary databank ('" + work.aliasName + "') that is non-editable");
                 throw new GekkoException();
             }
             DateTime dt4 = DateTime.Now;
@@ -17323,11 +17331,15 @@ public static bool IsLargeAware(Stream stream)
         {
             if (Program.IsDatabankDirty(removed))
             {
-                if (removed.protect)
+                if (removed.save == false)
                 {
-                    G.Writeln2("*** ERROR: Internal error #872543: a protected bank should not be possible to alter.");
-                    throw new GekkoException();
+                    G.Writeln2("Databank '" + removed.aliasName + "' closed, changes not written to file");
                 }
+                else if (removed.protect)
+                {
+                    G.Writeln2("*** ERROR: Internal error #872543: a non-editable bank should not be possible to alter.");
+                    throw new GekkoException();
+                }                
                 else
                 {
                     Program.WriteRemovedDatabank(removed);
@@ -17428,14 +17440,7 @@ public static bool IsLargeAware(Stream stream)
             GekkoTime tStart = Globals.tNull;
             GekkoTime tEnd = Globals.tNull;            
             if (!removed.FileNameWithPath.EndsWith("." + Globals.extensionDatabank + ""))
-            {
-                //===============> NOTE
-                // 1. IMPORT ... TO, hvad er det synonym for, og hvad med protect og save?
-                //    Samm med READ ... TO. Er det bare oversættelser?
-                // Det skal være sådan, at IMPORT ikke ændrer i fileNameWithPath, fordi det implicit er en READ<merge>
-                // Vær sikker på at READ<merge> heller ikke ændrer i fileNameWithPath
-                
-                
+            {                
                 G.Writeln2("*** ERROR: The databank '" + removed.aliasName + "' was opened with the OPEN command.");
                 G.Writeln("           It has been altered, but the changes cannot be written back to the", Color.Red);
                 G.Writeln("           underlying databank file, since this file is not a ." + Globals.extensionDatabank + " file.", Color.Red);
@@ -28010,7 +28015,7 @@ public static bool IsLargeAware(Stream stream)
         private string as2 = null; //for OPEN AS.
         private string orientation = null;  //rows or cols
         public EOpenType openType = EOpenType.Normal;
-        public bool protect = false;
+        public bool protect = true;
         //public bool openPrim = false;
         //public bool openSec = false;
 

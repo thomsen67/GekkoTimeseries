@@ -76,10 +76,7 @@ namespace Gekko
         //Remember new fields in Clear() method and also in G.CloneDatabank()        
         [ProtoMember(1)]
         public GekkoDictionary<string, TimeSeries> storage;
-        public string aliasName = null;
-        //public string aliasNameOriginal = null;  //only used when swapping banks (F2)
-        //public string fileNameWithPath = null;  //will be constructed when reading: do not protobuf it        
-
+        public string aliasName = null;          
         private string fileNameWithPath = null;  //will be constructed when reading: do not protobuf it        
         public string FileNameWithPath
         {
@@ -108,7 +105,7 @@ namespace Gekko
                 }                
             }
         }
-
+        public bool save = true;  //Don't use protobuffer on this field.
         public int yearStart = -12345;  //only set when reading a bank, not afterwards if timeseries change. Not meant for making loops etc. or critical, only static information about the bank        
         public int yearEnd = -12345;  //only set when reading a bank, not afterwards if timeseries change. Not meant for making loops etc. or critical, only static information about the bank        
         public string info1 = null; //must be taken from DatabankInfo.xml, don't use protobuffer        
@@ -132,7 +129,7 @@ namespace Gekko
         }     
         
         public void Clear() {
-            if (this.protect) Program.ProtectError("You cannot clear a protected databank");
+            if (this.protect) Program.ProtectError("You cannot clear a non-editable databank, see OPEN<edit>");
             //aliasName = null; --> keep that name when clearing
             //fileNameWithPath = null;  --> keep that name when clearing
             yearStart = -12345;
@@ -161,7 +158,7 @@ namespace Gekko
 
         public void RemoveVariable(EFreq eFreq, string variable)
         {
-            if (this.protect) Program.ProtectError("You cannot remove a timeseries in a protected databank");
+            if (this.protect) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit>");
             variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);            
             if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
             {
@@ -173,7 +170,7 @@ namespace Gekko
 
         public void RemoveVariable(bool freqAddToName, string variable)
         {
-            if (this.protect) Program.ProtectError("You cannot remove a timeseries in a protected databank");
+            if (this.protect) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit>");
             if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
             if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
             {
@@ -186,7 +183,7 @@ namespace Gekko
         //Generic method, not for outside use!
         private void RemoveVariable(bool freqAddToName, string freq, string variable)
         {
-            if (this.protect) Program.ProtectError("You cannot remove a timeseries in a protected databank");
+            if (this.protect) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit>");
             if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable, freq);
             if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
             {
@@ -220,7 +217,7 @@ namespace Gekko
         //generic method, not for outside use
         private void AddVariable(bool freqAddToName, string frequency, TimeSeries ts)
         {
-            if (this.protect) Program.ProtectError("You cannot add a timeseries to a protected databank");
+            if (this.protect) Program.ProtectError("You cannot add a timeseries to a non-editable databank, see OPEN<edit>");
             string variable = ts.variableName;
             if (!G.IsSimpleToken(variable))  //also checks for null and ""
             {

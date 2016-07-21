@@ -397,6 +397,7 @@ namespace Gekko.Parser.Gek
                         {                            
                             node.Code.A("O.Close o" + Num(node) + " = new O.Close();" + G.NL);
                             node.Code.A("o" + Num(node) + ".name = `" + node[0].Text + "`;" + G.NL);
+                            GetCodeFromAllChildren(node);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;

@@ -330,6 +330,7 @@ tokens {
     ASTOPT_STRING_D;
     ASTOPT_STRING_DATES;
     ASTOPT_STRING_DIRECT;
+	ASTOPT_STRING_EDIT;
     ASTOPT_STRING_FIX;
     ASTOPT_STRING_FROM;
     ASTOPT_STRING_GBK;
@@ -366,6 +367,7 @@ tokens {
     ASTOPT_STRING_RESPECT;
     ASTOPT_STRING_ROWS;
     ASTOPT_STRING_S;
+	ASTOPT_STRING_SAVE;
     ASTOPT_STRING_SEC;
     ASTOPT_STRING_SERIES;
     ASTOPT_STRING_SHEET;
@@ -784,6 +786,7 @@ tokens {
     NONE             = 'NONE'              ;
     NONMODEL = 'NONMODEL';
     NOPCH            = 'NOPCH'              ;
+	SAVE            = 'SAVE'              ;
     NOT              = 'NOT';
     NOTIFY           = 'NOTIFY';
     NOV              = 'NOV'              ;
@@ -1222,6 +1225,7 @@ tokens {
                                         d.Add("none"    , NONE        );
                                         d.Add("NONMODEL" ,NONMODEL);
                                         d.Add("nopch"      , NOPCH        );
+										d.Add("save"      , SAVE        );
                                         d.Add("not"  , NOT        );
                                         d.Add("notify"  , NOTIFY        );
                                         d.Add("nov"      , NOV        );
@@ -1525,9 +1529,12 @@ clearOpt1h				  : PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)
 						  
 clone                     : CLONE -> ^({token("ASTCLONE", ASTCLONE, $CLONE.Line)});
 
-close					  : CLOSE ident -> ^({token("ASTCLOSE", ASTCLOSE, $CLOSE.Line)} ident)
-						  | CLOSE star -> ^({token("ASTCLOSESTAR", ASTCLOSESTAR, $CLOSE.Line)} )
+close					  : CLOSE closeOpt1? ident -> ^({token("ASTCLOSE", ASTCLOSE, $CLOSE.Line)} ident closeOpt1?)
+						  | CLOSE closeOpt1? star -> ^({token("ASTCLOSESTAR", ASTCLOSESTAR, $CLOSE.Line)} closeOpt1?)
 						  ;
+closeOpt1                 : leftAngle closeOpt1h* RIGHTANGLE -> ^(ASTOPT1 closeOpt1h*);
+closeOpt1h				  : SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)							  
+						  ;						  
 
 cls						  : CLS -> ^({token("ASTCLS", ASTCLS, $CLS.Line)});
 
@@ -2039,7 +2046,9 @@ openOpt1h                 : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)						
 						  | PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)						
 						  | REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_SEC yesNo?)						
-						  | PROT (EQUAL yesNo)? -> ^(ASTOPT_STRING_PROT yesNo?)												
+						  | PROT (EQUAL yesNo)? -> ^(ASTOPT_STRING_PROT yesNo?)	
+						  | EDIT (EQUAL yesNo)? -> ^(ASTOPT_STRING_EDIT yesNo?)	
+						  | SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)	
 						  ;
 
 olsOpt1                   : leftAngle olsOpt1h? RIGHTANGLE -> olsOpt1h?;
@@ -2951,6 +2960,7 @@ ident                     : Ident|
                             NONE|
                             NONMODEL|
                             NOPCH|
+							SAVE|
                             NOTIFY|
                             NOT|
                             NOV|

@@ -128,7 +128,7 @@ namespace Gekko
                 string period = databank.yearStart + "-" + databank.yearEnd;
                 if (databank.yearStart == -12345 || databank.yearEnd == -12345) period = "";
                 string prot = null;
-                if (databank.protect) prot = Globals.protectSymbol;
+                if (!databank.protect) prot = Globals.protectSymbol;
                 else prot = "";
                 list.Add(new Task(s, System.IO.Path.GetFileName(databank.FileNameWithPath), databank.FileNameWithPath, databank.storage.Count.ToString(), period, databank.info1, databank.date, c, prot, i));
 
@@ -208,7 +208,7 @@ namespace Gekko
                     if (!higher.protect)
                     {
                         higher.protect = true;
-                        s += "Note that the databank '" + higher.aliasName + "' has been set protected. ";
+                        s += "Note that the databank '" + higher.aliasName + "' has been set non-editable. ";
                         list[lowerIdx].Prot = Globals.protectSymbol;
                     }
                     
@@ -219,7 +219,7 @@ namespace Gekko
                     if (!lower.protect)
                     {
                         lower.protect = true;
-                        s += "Note that the databank '" + lower.aliasName + "' has been set protected. ";
+                        s += "Note that the databank '" + lower.aliasName + "' has been set non-editable. ";
                         list[higherIdx].Prot = Globals.protectSymbol;
                     }                    
                 }
