@@ -130,7 +130,7 @@ namespace Gekko
                 string prot = null;
                 if (databank.protect) prot = Globals.protectSymbol;
                 else prot = "";
-                list.Add(new Task(s, System.IO.Path.GetFileName(databank.fileNameWithPath), databank.fileNameWithPath, databank.storage.Count.ToString(), period, databank.info1, databank.date, c, prot, i));
+                list.Add(new Task(s, System.IO.Path.GetFileName(databank.FileNameWithPath), databank.FileNameWithPath, databank.storage.Count.ToString(), period, databank.info1, databank.date, c, prot, i));
 
             }           
             //unswap.IsEnabled = Program.AreDatabanksSwapped();

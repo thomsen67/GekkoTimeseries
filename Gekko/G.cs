@@ -552,7 +552,7 @@ namespace Gekko
 
         public static void CloneDatabank(Databank newDatabank, Databank originalDatabank)
         {
-            newDatabank.fileNameWithPath = originalDatabank.fileNameWithPath;
+            newDatabank.FileNameWithPath = originalDatabank.FileNameWithPath;
             newDatabank.yearStart = originalDatabank.yearStart;
             newDatabank.yearEnd = originalDatabank.yearEnd;
             newDatabank.info1 = originalDatabank.info1;

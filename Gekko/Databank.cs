@@ -78,7 +78,37 @@ namespace Gekko
         public GekkoDictionary<string, TimeSeries> storage;
         public string aliasName = null;
         //public string aliasNameOriginal = null;  //only used when swapping banks (F2)
-        public string fileNameWithPath = null;  //will be constructed when reading: do not protobuf it        
+        //public string fileNameWithPath = null;  //will be constructed when reading: do not protobuf it        
+
+        private string fileNameWithPath = null;  //will be constructed when reading: do not protobuf it        
+        public string FileNameWithPath
+        {
+            get
+            {
+                return this.fileNameWithPath;
+            }
+            set
+            {
+                if (G.equal(this.aliasName, Globals.Work) || G.equal(this.aliasName, Globals.Base))
+                {
+                    this.fileNameWithPath = value;  //overwrite filename with latest bank read or merged into Work/Ref
+                }
+                else
+                {
+                    //If the bank is not Work or Ref, it must have been opened with OPEN
+                    //If there is no filename, put it in. But if there is a filename already, always keep it.
+                    //  This may happen in the IMPORT here: OPEN<prim edit>bank; IMPORT<xlsx>data;
+                    //  An IMPORT or READ statement should not alter the filename.
+                    if (this.fileNameWithPath == null) this.fileNameWithPath = value;
+                    else
+                    {
+                        //do nothing, keep the first filename encountered. This is the filename that the OPEN databank
+                        //is tied to, and that it will be trying to write to when the bank is closed.
+                    }
+                }                
+            }
+        }
+
         public int yearStart = -12345;  //only set when reading a bank, not afterwards if timeseries change. Not meant for making loops etc. or critical, only static information about the bank        
         public int yearEnd = -12345;  //only set when reading a bank, not afterwards if timeseries change. Not meant for making loops etc. or critical, only static information about the bank        
         public string info1 = null; //must be taken from DatabankInfo.xml, don't use protobuffer        

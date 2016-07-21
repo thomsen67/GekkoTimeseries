@@ -1932,7 +1932,7 @@ namespace Gekko
                     //When creating a new file with "OPEN xyz" (where xyz does not exist), of
                     //  "OPEN<prim>abc" where abc is already open, nothing should be read from file.
                     readInfo.databank = databank;
-                    readInfo.databank.fileNameWithPath = readInfo.fileName;
+                    readInfo.databank.FileNameWithPath = readInfo.fileName;
                     readInfos.Add(readInfo);
                 }
                 else
@@ -2037,7 +2037,7 @@ namespace Gekko
                     //======> think this through
                     readInfo.databank.info1 = readInfo.info1;
                     readInfo.databank.date = readInfo.date;
-                    readInfo.databank.fileNameWithPath = readInfo.fileName;
+                    readInfo.databank.FileNameWithPath = readInfo.fileName;
 
                     if (open && !isTsdx && !oRead.protect)
                     {
@@ -3159,7 +3159,7 @@ namespace Gekko
 
                     readInfo.databank.info1 = readInfo.info1;
                     readInfo.databank.date = readInfo.date;
-                    readInfo.databank.fileNameWithPath = readInfo.fileName;
+                    readInfo.databank.FileNameWithPath = readInfo.fileName;
 
                     return;
                 }
@@ -5071,7 +5071,7 @@ namespace Gekko
             string fileName = "[no bank filename]";
             if (Program.databanks.GetDatabank(bank) != null)
             {
-                fileName = Program.databanks.GetDatabank(bank).fileNameWithPath;
+                fileName = Program.databanks.GetDatabank(bank).FileNameWithPath;
             }
             return fileName;
         }
@@ -16048,19 +16048,17 @@ public static bool IsLargeAware(Stream stream)
                 throw new GekkoException();
             }
             List<string> newList = FilterListForFrequency(list);
-
-            bool hasTime = true;
+            
             if (tStart.IsNull() && tEnd.IsNull())
             {
                 if (isDefault || G.equal(o.opt_gbk, "yes") || G.equal(o.opt_tsd, "yes"))
                 {
-                    //do nothing
+                    //Do nothing, skip this, we do not need to know the timespan of the bank
+                    //Not done for GBK or TSD, would just waste time. For these formats, a null period
+                    //is handled ok    
                 }
                 else
-                {
-                    //Not done for GBK or TSD, would just waste time. For these formats, a null period
-                    //is handled ok
-                    hasTime = false;
+                {                                    
                     GetDatabankPeriodFilteredForFreq(newList, ref tStart, ref tEnd, primary);
                 }
             }
@@ -17351,8 +17349,8 @@ public static bool IsLargeAware(Stream stream)
             Program.databanks.storage.Clear();
             Program.databanks.storage.Add(w2);
             Program.databanks.storage.Add(b2);
-            w2.fileNameWithPath = null;
-            b2.fileNameWithPath = null;
+            w2.FileNameWithPath = null;
+            b2.FileNameWithPath = null;
             Globals.createdVariables.Clear();  //these should maybe live inside work databank
             Program.scalars.Clear();
             //Program.lists.Clear();
@@ -17426,10 +17424,10 @@ public static bool IsLargeAware(Stream stream)
         public static void WriteRemovedDatabank(Databank removed)
         {            
             if (removed == null) return;  //See TKD mail 6/6 2016, this should not be possible, but just in case
-            if (removed.fileNameWithPath == null) return; //See TKD mail 6/6 2016, this should not be possible, but just in case
+            if (removed.FileNameWithPath == null) return; //See TKD mail 6/6 2016, this should not be possible, but just in case
             GekkoTime tStart = Globals.tNull;
             GekkoTime tEnd = Globals.tNull;            
-            if (!removed.fileNameWithPath.EndsWith("." + Globals.extensionDatabank + ""))
+            if (!removed.FileNameWithPath.EndsWith("." + Globals.extensionDatabank + ""))
             {
                 //===============> NOTE
                 // 1. IMPORT ... TO, hvad er det synonym for, og hvad med protect og save?
@@ -17444,7 +17442,7 @@ public static bool IsLargeAware(Stream stream)
                 G.Writeln();
                 throw new GekkoException();
             }
-            int n = Write(removed, tStart, tEnd, removed.fileNameWithPath, false, null, "" + Globals.extensionDatabank + "", true, true);
+            int n = Write(removed, tStart, tEnd, removed.FileNameWithPath, false, null, "" + Globals.extensionDatabank + "", true, true);
         }
 
         public static void Ini(P p)
@@ -27111,7 +27109,7 @@ public static bool IsLargeAware(Stream stream)
             Databank secondary = Program.databanks.GetSec();
             secondary.Clear();
             G.CloneDatabank(secondary, primary);
-            secondary.fileNameWithPath = primary.fileNameWithPath;
+            secondary.FileNameWithPath = primary.FileNameWithPath;
         }
 
         public static void CreateEndoNoLagBNumbers(int[] endoNoLagPointers)
