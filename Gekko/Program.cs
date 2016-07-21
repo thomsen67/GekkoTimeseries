@@ -16007,8 +16007,8 @@ public static bool IsLargeAware(Stream stream)
             fileName = StripQuotes(fileName);
             bool isCaps = true; if (G.equal(o.opt_caps, "no")) isCaps = false;
             GekkoTime tStart = o.t1;
-            GekkoTime tEnd = o.t2;
-            bool hasTime = true; if (tStart.IsNull() && tEnd.IsNull()) hasTime = false;
+            GekkoTime tEnd = o.t2;           
+            
             List<string> list = o.listItems;
             bool writeAllVariables = false;
             if (list == null) writeAllVariables = true;
@@ -16040,46 +16040,44 @@ public static bool IsLargeAware(Stream stream)
                 G.Writeln2("*** ERROR: There are 0 variables -- nothing to write/export.");
                 throw new GekkoException();
             }
+            List<string> newList = FilterListForFrequency(list);
+
+            bool hasTime = true;
+            if (tStart.IsNull() && tEnd.IsNull())
+            {
+                //TODO:
+                //This need not be done for RECORDS-type, for instance GBK and TSD
+                //But probably does not waste much time anyway, compared to file writing.
+                hasTime = false;
+                GetDatabankPeriodFilteredForFreq(newList, ref tStart, ref tEnd, primary);
+            }
 
             string writeOption = "" + Globals.extensionDatabank + "";  //default
             if (G.equal(o.opt_tsd, "yes")) writeOption = "tsd";
 
             if (G.equal(o.opt_csv, "yes") || G.equal(o.opt_prn, "yes"))
             {
+                //2D
                 EdataFormat format = EdataFormat.Csv;
                 if (G.equal(o.opt_csv, "yes")) format = EdataFormat.Csv;
-                else if (G.equal(o.opt_prn, "yes")) format = EdataFormat.Prn;
-                //else if (G.equal(o.opt_gnuplot, "yes")) format = EdataFormat.Gnuplot;
-                List<string> newList = FilterListForFrequency(list);
+                else if (G.equal(o.opt_prn, "yes")) format = EdataFormat.Prn;                                
                 return CsvPrnWrite(newList, fileName, tStart, tEnd, format);
             }
             else if (G.equal(o.opt_gnuplot, "yes"))
             {
-                List<string> newList = FilterListForFrequency(list);
+                //2D
                 return GnuplotWrite(newList, fileName, tStart, tEnd);
             }
             else if (G.equal(o.opt_tsp, "yes"))
-            {
-                //if tp == null, we will get the global time period
-                if (!hasTime)
-                {
-                    //if tp == null, we will not get the global time period. Instead:
-                    //we overrule ConvertToGekkoTime() to indicate we want all observations for each time series
-                    tStart = new GekkoTime(tStart.freq, -12345, 1);
-                    tEnd = new GekkoTime(tEnd.freq, -12345, 1);
-                }
+            {                
+                //RECORDS
                 return Tspwrite(list, fileName, tStart, tEnd, isCaps);
             }
             else if (G.equal(o.opt_xls, "yes") || G.equal(o.opt_xlsx, "yes"))
-            {
-                if (!hasTime)
-                {
-                    tStart = Globals.globalPeriodStart;  //default, if not explicitely set
-                    tEnd = Globals.globalPeriodEnd;    //default, if not explicitely set
-                }
+            {                
+                //2D
                 G.Writeln2("Writing Excel file for the period " + G.FromDateToString(tStart) + "-" + G.FromDateToString(tEnd));
-                //TODO: variables and time
-                List<string> newList = FilterListForFrequency(list);
+                //TODO: variables and time                
 
                 int counter = 0;
                 int numberOfCols = GekkoTime.Observations(tStart, tEnd);
@@ -16122,11 +16120,7 @@ public static bool IsLargeAware(Stream stream)
             }
             else if (o.opt_series != null)
             {
-                if (!hasTime)
-                {
-                    G.Writeln2("*** ERROR: Please indicate a time period for EXPORT<series>");
-                    throw new GekkoException();
-                }
+                //RECORDS
                 if (fileName == null || fileName.Trim() == "")
                 {
                     G.Writeln2("*** ERROR: Please indicate a file name for EXPORT<series>");
@@ -16137,19 +16131,17 @@ public static bool IsLargeAware(Stream stream)
             }
             else
             {
+                //RECORDS
                 //tsd or tsdx or gbk formats
                 if (!hasTime)
                 {
-                    //if tp == null, we will not get the global time period. Instead:
-                    //we overrule ConvertToGekkoTime() to indicate we want all observations for each time series
+                    //this indicates that only the exact span for each series is written, overrides dates from GetDatabankPeriodFilteredForFreq() above
                     tStart = new GekkoTime(tStart.freq, -12345, 1);
                     tEnd = new GekkoTime(tEnd.freq, -12345, 1);
                 }
                 return Write(primary, tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
             }
         }
-
-
 
         private static List<string> GetAllVariablesFromBank(List<string> list, Databank work)
         {
@@ -16168,6 +16160,7 @@ public static bool IsLargeAware(Stream stream)
 
         private static List<string> FilterListForFrequency(List<string> list)
         {
+            //Returns a list where %q, %m at the end of each item is removed
             List<string> newList = new List<string>();
             Dictionary<string, double> skipped = new Dictionary<string, double>();
             skipped.Add("a", 0d);
@@ -16941,19 +16934,8 @@ public static bool IsLargeAware(Stream stream)
         private static int CsvPrnWrite(List<string> vars, string filename, GekkoTime per1, GekkoTime per2, EdataFormat format)
         {
             int prnWidth = 18;
-            Databank work = Program.databanks.GetPrim();
-
-            if (per1.IsNull() && per2.IsNull())
-            {
-                if (work.yearStart == -12345 || work.yearEnd == -12345)
-                {
-                    G.Writeln2("*** ERROR: Could not obtain start and end year of primary databank");
-                    G.Writeln("           You may use explicit time or WRITE and READ the databank.");
-                    throw new GekkoException();
-                }
-                GetQuartersOrMonthsFromYears(ref per1, ref per2, work);
-            }
-
+            Databank prim = Program.databanks.GetPrim();
+            
             if (format == EdataFormat.Csv)
             {
                 G.Writeln2("Writing csv file for the period " + G.FromDateToString(per1) + "-" + G.FromDateToString(per2));
@@ -16963,12 +16945,7 @@ public static bool IsLargeAware(Stream stream)
             {
                 G.Writeln2("Writing prn file for the period " + G.FromDateToString(per1) + "-" + G.FromDateToString(per2));
                 filename = AddExtension(filename, ".prn");
-            }
-            //else if (format == EdataFormat.Gnuplot)
-            //{
-            //    G.Writeln2("Writing gnuplot file for the period " + G.FromDateToString(per1) + "-" + G.FromDateToString(per2));
-            //    filename = AddExtension(filename, ".data");
-            //}
+            }            
 
             string pathAndFilename = CreateFullPathAndFileName(filename);
             int counter = 0;
@@ -16989,7 +16966,7 @@ public static bool IsLargeAware(Stream stream)
                 {
                     string s3 = var;
 
-                    TimeSeries ts = work.GetVariable(s3);
+                    TimeSeries ts = prim.GetVariable(s3);
                     if (ts == null)
                     {
                         //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
@@ -17060,41 +17037,45 @@ public static bool IsLargeAware(Stream stream)
             return counter;
         }
 
-        private static void GetQuartersOrMonthsFromYears(ref GekkoTime per1, ref GekkoTime per2, Databank work)
+        private static void GetDatabankPeriodFilteredForFreq(List<string> vars, ref GekkoTime per1, ref GekkoTime per2, Databank work)
+        {
+            //vars: annual is fy, quarterly is fy%q, monthly is fy%m, undated is fy%u
+            int start = -12345;
+            int end = -12345;
+            foreach (string s in vars)
+            {
+                TimeSeries ts = work.GetVariable(s);  //gets it with the global frequency 
+                if (ts == null) continue;  //should not be possible
+                start = G.GekkoMin(start, ts.GetPeriodFirst().super);
+                end = G.GekkoMax(end, ts.GetPeriodLast().super);
+            }
+            GetQuartersOrMonthsFromYears(ref per1, ref per2, start, end);
+        }
+
+        private static void GetQuartersOrMonthsFromYears(ref GekkoTime per1, ref GekkoTime per2, int yearStart, int yearEnd)
         {
             //see also #980432
             if ((Program.options.freq == EFreq.Annual))
             {
-                per1 = new GekkoTime((Program.options.freq), work.yearStart, 1);
-                per2 = new GekkoTime((Program.options.freq), work.yearEnd, 1);
+                per1 = new GekkoTime((Program.options.freq), yearStart, 1);
+                per2 = new GekkoTime((Program.options.freq), yearEnd, 1);
             }
             else if ((Program.options.freq == EFreq.Quarterly))
             {
-                per1 = new GekkoTime((Program.options.freq), work.yearStart, 1);
-                per2 = new GekkoTime((Program.options.freq), work.yearEnd, 4);
+                per1 = new GekkoTime((Program.options.freq), yearStart, 1);
+                per2 = new GekkoTime((Program.options.freq), yearEnd, 4);
             }
             else if ((Program.options.freq == EFreq.Monthly))
             {
-                per1 = new GekkoTime((Program.options.freq), work.yearStart, 1);
-                per2 = new GekkoTime((Program.options.freq), work.yearEnd, 12);
+                per1 = new GekkoTime((Program.options.freq), yearStart, 1);
+                per2 = new GekkoTime((Program.options.freq), yearEnd, 12);
             }
         }
 
         private static int GnuplotWrite(List<string> vars, string filename, GekkoTime per1, GekkoTime per2)
         {
             int prnWidth = 18;
-            Databank work = Program.databanks.GetPrim();
-
-            if (per1.IsNull() && per2.IsNull())
-            {
-                if (work.yearStart == -12345 || work.yearEnd == -12345)
-                {
-                    G.Writeln2("*** ERROR: Could not obtain start and end year of primary databank");
-                    G.Writeln("           You may use explicit time or WRITE and READ the databank.");
-                    throw new GekkoException();
-                }
-                GetQuartersOrMonthsFromYears(ref per1, ref per2, work);
-            }
+            Databank prim = Program.databanks.GetPrim();
 
             G.Writeln2("Writing gnuplot file for the period " + G.FromDateToString(per1) + "-" + G.FromDateToString(per2));
             filename = AddExtension(filename, ".dat");
@@ -17110,7 +17091,7 @@ public static bool IsLargeAware(Stream stream)
                 foreach (string var in vars)
                 {
                     string s3 = var;
-                    TimeSeries ts = work.GetVariable(s3);
+                    TimeSeries ts = prim.GetVariable(s3);
                     if (ts == null)
                     {
                         G.Writeln2("*** ERROR: Writing gnuplot file: variable " + s3 + " with freq '" + Program.options.freq + "' does not exist");
@@ -17126,7 +17107,7 @@ public static bool IsLargeAware(Stream stream)
                     foreach (string var in vars)
                     {
                         string s3 = var;
-                        TimeSeries ts = work.GetVariable(s3);  //existence has been checked
+                        TimeSeries ts = prim.GetVariable(s3);  //existence has been checked
                         double data = ts.GetData(t);
                         if (G.isNumericalError(data))
                         {
@@ -17425,7 +17406,7 @@ public static bool IsLargeAware(Stream stream)
         }
 
         public static void WriteRemovedDatabank(Databank removed)
-        {
+        {            
             if (removed == null) return;  //See TKD mail 6/6 2016, this should not be possible, but just in case
             if (removed.fileNameWithPath == null) return; //See TKD mail 6/6 2016, this should not be possible, but just in case
             GekkoTime tStart = Globals.tNull;
