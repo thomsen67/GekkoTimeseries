@@ -2032,6 +2032,9 @@ namespace Gekko
                         readInfo.conversionMessage = true;
                     }
 
+                    // =========> NOT to be done when merging, either READ<merge> or IMPORT.
+                    //ok to do with OPEN or READ/IMPORT ... TO.
+                    //======> think this through
                     readInfo.databank.info1 = readInfo.info1;
                     readInfo.databank.date = readInfo.date;
                     readInfo.databank.fileNameWithPath = readInfo.fileName;
@@ -16001,8 +16004,12 @@ public static bool IsLargeAware(Stream stream)
                 throw new GekkoException();
             }
 
-            //string writeOption, GekkoParserTimePeriod tp, string fileName, string caps, List<string> list)
-            //ErrorIfDatabanksSwapped();
+            bool isDefault = false;
+            if (o.opt_tsd == null && o.opt_gbk == null && o.opt_csv == null && o.opt_prn == null && o.opt_tsp == null && o.opt_xls == null && o.opt_xlsx == null && o.opt_gnuplot == null && o.opt_series == null)
+            {
+                isDefault = true;  //implicitly GBK
+            }
+            
             string fileName = o.fileName;
             fileName = StripQuotes(fileName);
             bool isCaps = true; if (G.equal(o.opt_caps, "no")) isCaps = false;
@@ -16045,11 +16052,17 @@ public static bool IsLargeAware(Stream stream)
             bool hasTime = true;
             if (tStart.IsNull() && tEnd.IsNull())
             {
-                //TODO:
-                //This need not be done for RECORDS-type, for instance GBK and TSD
-                //But probably does not waste much time anyway, compared to file writing.
-                hasTime = false;
-                GetDatabankPeriodFilteredForFreq(newList, ref tStart, ref tEnd, primary);
+                if (isDefault || G.equal(o.opt_gbk, "yes") || G.equal(o.opt_tsd, "yes"))
+                {
+                    //do nothing
+                }
+                else
+                {
+                    //Not done for GBK or TSD, would just waste time. For these formats, a null period
+                    //is handled ok
+                    hasTime = false;
+                    GetDatabankPeriodFilteredForFreq(newList, ref tStart, ref tEnd, primary);
+                }
             }
 
             string writeOption = "" + Globals.extensionDatabank + "";  //default
@@ -16057,7 +16070,7 @@ public static bool IsLargeAware(Stream stream)
 
             if (G.equal(o.opt_csv, "yes") || G.equal(o.opt_prn, "yes"))
             {
-                //2D
+                //2D format
                 EdataFormat format = EdataFormat.Csv;
                 if (G.equal(o.opt_csv, "yes")) format = EdataFormat.Csv;
                 else if (G.equal(o.opt_prn, "yes")) format = EdataFormat.Prn;                                
@@ -16065,7 +16078,7 @@ public static bool IsLargeAware(Stream stream)
             }
             else if (G.equal(o.opt_gnuplot, "yes"))
             {
-                //2D
+                //2D format
                 return GnuplotWrite(newList, fileName, tStart, tEnd);
             }
             else if (G.equal(o.opt_tsp, "yes"))
@@ -16075,7 +16088,7 @@ public static bool IsLargeAware(Stream stream)
             }
             else if (G.equal(o.opt_xls, "yes") || G.equal(o.opt_xlsx, "yes"))
             {                
-                //2D
+                //2D format
                 G.Writeln2("Writing Excel file for the period " + G.FromDateToString(tStart) + "-" + G.FromDateToString(tEnd));
                 //TODO: variables and time                
 
@@ -16118,7 +16131,7 @@ public static bool IsLargeAware(Stream stream)
                 Program.CreateExcelWorkbook2(eo, null, false);
                 return 0;
             }
-            else if (o.opt_series != null)
+            else if (G.equal(o.opt_series, "yes"))
             {
                 //RECORDS
                 if (fileName == null || fileName.Trim() == "")
@@ -16129,17 +16142,22 @@ public static bool IsLargeAware(Stream stream)
                 Program.Updprt(list, tStart, tEnd, o.opt_series, fileName);
                 return 0;
             }
-            else
+            else if (isDefault || G.equal(o.opt_gbk, "yes") || G.equal(o.opt_tsd, "yes"))
             {
                 //RECORDS
-                //tsd or tsdx or gbk formats
-                if (!hasTime)
-                {
-                    //this indicates that only the exact span for each series is written, overrides dates from GetDatabankPeriodFilteredForFreq() above
-                    tStart = new GekkoTime(tStart.freq, -12345, 1);
-                    tEnd = new GekkoTime(tEnd.freq, -12345, 1);
-                }
+                //tsd or gbk or unspecified format
+                //if (!hasTime)
+                //{
+                //    //this indicates that only the exact span for each series is written, overrides dates from GetDatabankPeriodFilteredForFreq() above
+                //    tStart = new GekkoTime(tStart.freq, -12345, 1);
+                //    tEnd = new GekkoTime(tEnd.freq, -12345, 1);
+                //}
                 return Write(primary, tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Unknown databank format");
+                throw new GekkoException();
             }
         }
 
@@ -17413,6 +17431,13 @@ public static bool IsLargeAware(Stream stream)
             GekkoTime tEnd = Globals.tNull;            
             if (!removed.fileNameWithPath.EndsWith("." + Globals.extensionDatabank + ""))
             {
+                //===============> NOTE
+                // 1. IMPORT ... TO, hvad er det synonym for, og hvad med protect og save?
+                //    Samm med READ ... TO. Er det bare oversættelser?
+                // Det skal være sådan, at IMPORT ikke ændrer i fileNameWithPath, fordi det implicit er en READ<merge>
+                // Vær sikker på at READ<merge> heller ikke ændrer i fileNameWithPath
+                
+                
                 G.Writeln2("*** ERROR: The databank '" + removed.aliasName + "' was opened with the OPEN command.");
                 G.Writeln("           It has been altered, but the changes cannot be written back to the", Color.Red);
                 G.Writeln("           underlying databank file, since this file is not a ." + Globals.extensionDatabank + " file.", Color.Red);
