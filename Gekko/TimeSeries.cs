@@ -200,7 +200,7 @@ namespace Gekko
         /// </exception>
         public void Truncate(GekkoTime start, GekkoTime end)
         {
-            if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot truncate a timeseries residing in a non-editable databank, see OPEN<edit>");            
+            if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot truncate a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");            
             int indexStart = this.GetArrayIndex(start);
             int indexEnd = this.GetArrayIndex(end);
 
@@ -303,7 +303,7 @@ namespace Gekko
         public void SetData(GekkoTime t, double value)
         {            
             //TODO: Remove this at some point
-            if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit>");
+            if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             //Program.ErrorIfDatabanksSwapped(this);
             if (this.freqEnum != t.freq)
             {
@@ -416,7 +416,7 @@ namespace Gekko
         /// <exception cref="GekkoException">Exception if frequency of timeseries and periods differ.</exception>
         public void SetDataSequence(GekkoTime gt1, GekkoTime gt2, double[] input, int inputOffset)
         {
-            if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot change observations in a timeseries residing in a non-editable databank, see OPEN<edit>");
+            if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot change observations in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             //Program.ErrorIfDatabanksSwapped(this);
             if (this.freqEnum != gt1.freq || gt1.freq != gt2.freq)
             {

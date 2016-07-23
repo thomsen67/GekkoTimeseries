@@ -1786,21 +1786,24 @@ namespace Gekko
 
         public static void OpenOrRead(ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos)
         {
-            //open = true if called with OPEN command
-            //baseline = true if called with MULBK command
+            //open = true if called with OPEN command            
 
             int n = 1;
             if (open)
             {
-                CheckOpenSyntax(oRead);
+                CheckOpenSyntax(oRead);  //checks for * etc.
                 n = oRead.openFileNames.Count;
+                if (n > 1 && oRead.openType == EOpenType.Normal)
+                {
+                    //NOTE: Could be made ok with first and last!
+                    G.Writeln2("*** ERROR: You cannot open several banks using first/last/ref/edit designators inside the <>-field");
+                    throw new GekkoException();
+                }
             }
 
             for (int i = n - 1; i >= 0; i--)
             {
-                ReadInfo readInfo = new ReadInfo();
-                //bool hasExplicitTsdTsdxType = false;
-                //if (Globals.hasBeenTsdTsdxOptionChangeSinceLastClear || (oRead.Type == EDataFormat.Tsd) || (oRead.Type == EDataFormat.Tsdx)) hasExplicitTsdTsdxType = true;  //this logic can be removed in maybe two years, perhaps in 2015
+                ReadInfo readInfo = new ReadInfo();               
 
                 string file = null;
                 string as2 = null;
@@ -1874,7 +1877,7 @@ namespace Gekko
 
                 bool cancel = false;
                 bool createNewOpenFile = false;
-                ReadHelper(ref file, ref cancel, ref createNewOpenFile, extension, oRead.openType == EOpenType.Sec, open);
+                ReadHelper(ref file, ref cancel, ref createNewOpenFile, extension, oRead.openType == EOpenType.Ref, open);
                 if (cancel)
                 {
                     readInfo.abortedStar = true;
@@ -1910,7 +1913,7 @@ namespace Gekko
                 {
                     //READ or MULBK
                     databank = Program.databanks.GetPrim();
-                    if (oRead.openType == EOpenType.Sec) databank = Program.databanks.GetSec();
+                    if (oRead.openType == EOpenType.Ref) databank = Program.databanks.GetSec();
                     readInfo.type = EReadInfoTypes.Normal;
                 }
 
@@ -1948,7 +1951,7 @@ namespace Gekko
 
                     if (oRead.Type == EDataFormat.Pcim)
                     {
-                        Program.ReadPCIM(oRead.FileName, open, as2, oRead.openType == EOpenType.Sec, oRead.Merge, readInfo, file);
+                        Program.ReadPCIM(oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
                     }
                     else if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn || oRead.Type == EDataFormat.Xls || oRead.Type == EDataFormat.Xlsx)
                     {
@@ -1973,7 +1976,7 @@ namespace Gekko
 
                     if (Program.options.solve_data_create_auto == true)
                     {
-                        if (!open && (oRead.openType == EOpenType.Prim || oRead.openType == EOpenType.Normal))
+                        if (!open && (oRead.openType == EOpenType.First || oRead.openType == EOpenType.Normal))
                         {
                             IVariable all2 = null; Program.scalars.TryGetValue(Globals.symbolList + "all", out all2);
                             if (all2 == null) all2 = new MetaList(new List<string>());
@@ -2048,13 +2051,6 @@ namespace Gekko
                 }
                 //databank.Trim();  //This way, the bank is not too bulky in RAM. The operation takes almost no time, and if it is a .tsdx file, the timeseries are already trimmed and trimming is hence skipped.
                 databank.readInfo = readInfo;  //Not really used at the moment, but practical to have a pointer to this information!
-
-                //if (G.equal(databank.aliasName, Globals.Work) || G.equal(databank.aliasName, Globals.Base))
-                //{
-                //    //A hack since sometimes when reading, Work gets protected
-                //    //Any databank called 'work' or 'ref' will be set editable:
-                //    databank.protect = false;
-                //}
             }
 
             return;
@@ -2062,20 +2058,6 @@ namespace Gekko
 
         private static void CheckOpenSyntax(ReadOpenMulbkHelper oRead)
         {
-            if (oRead.openFileNames.Count > 1)
-            {
-                if (oRead.openType == EOpenType.Prim)
-                {
-                    G.Writeln2("*** ERROR: You can only open one databank as primary");
-                    throw new GekkoException();
-                }
-                else if (oRead.openType == EOpenType.Sec)
-                {
-                    G.Writeln2("*** ERROR: You can only open one databank as reference");
-                    throw new GekkoException();
-                }
-            }
-
             int counter = 0;
             foreach (List<string> ss in oRead.openFileNames)
             {
@@ -17292,9 +17274,9 @@ public static bool IsLargeAware(Stream stream)
 
         public static void Clear(O.Clear o, P p)
         {
-            if (o.name != null && (o.opt_prim != null || o.opt_sec != null))
+            if (o.name != null && (o.opt_first != null || o.opt_ref != null))
             {
-                G.Writeln2("*** ERROR: You should use 'CLEAR<prim>;' or  'CLEAR<ref>;'");
+                G.Writeln2("*** ERROR: You should use 'CLEAR<first>;' or  'CLEAR<ref>;'");
                 throw new GekkoException();
             }
 
@@ -17308,21 +17290,22 @@ public static bool IsLargeAware(Stream stream)
                 Program.databanks.GetDatabank(o.name).Clear();
                 G.Writeln2("Cleared databank: " + o.name);
             }
-            if (G.equal(o.opt_prim, "yes"))
+            if (G.equal(o.opt_first, "yes"))
             {
                 Program.databanks.GetPrim().Clear();
-                G.Writeln2("Cleared primary databank ('" + Program.databanks.GetPrim().aliasName + "')");
+                G.Writeln2("Cleared first databank ('" + Program.databanks.GetPrim().aliasName + "')");
             }
-            if (G.equal(o.opt_sec, "yes"))
+            if (G.equal(o.opt_ref, "yes"))
             {
                 Program.databanks.GetSec().Clear();
-                G.Writeln2("Cleared reference databank ('" + Program.databanks.GetSec().aliasName + "')");
+                G.Writeln2("Cleared ref databank ('" + Program.databanks.GetSec().aliasName + "')");
             }
-            if (o.name == null && !G.equal(o.opt_prim, "yes") && !G.equal(o.opt_sec, "yes"))
+            if (o.name == null && !G.equal(o.opt_first, "yes") && !G.equal(o.opt_ref, "yes"))
             {
-                Program.databanks.GetDatabank(Globals.Work).Clear();
-                Program.databanks.GetDatabank(Globals.Base).Clear();
-                G.Writeln2("Cleared " + Globals.Work + " and " + Globals.Base + " databanks");
+                //Before: Cleared 'Work' and 'Ref' regardless of position
+                Program.databanks.GetPrim().Clear();
+                Program.databanks.GetSec().Clear();
+                G.Writeln2("Cleared first and ref databanks ('" + Program.databanks.GetPrim().aliasName + "' and '" + Program.databanks.GetSec().aliasName + "')");
             }
         }
 
@@ -28002,8 +27985,10 @@ public static bool IsLargeAware(Stream stream)
     public enum EOpenType
     {
         Normal,
-        Prim,
-        Sec
+        Edit, //OPEN<edit>, not used elsewhere
+        First, //READ<first>, CLEAR<first>, etc.   
+        Last,
+        Ref //READ<ref>, CLEAR<ref>, etc.
     }
 
     public class ReadOpenMulbkHelper: O_OLD

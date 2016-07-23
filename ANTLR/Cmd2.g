@@ -331,6 +331,7 @@ tokens {
     ASTOPT_STRING_DATES;
     ASTOPT_STRING_DIRECT;
 	ASTOPT_STRING_EDIT;
+	ASTOPT_STRING_FIRST;
     ASTOPT_STRING_FIX;
     ASTOPT_STRING_FROM;
     ASTOPT_STRING_GBK;
@@ -368,7 +369,7 @@ tokens {
     ASTOPT_STRING_ROWS;
     ASTOPT_STRING_S;
 	ASTOPT_STRING_SAVE;
-    ASTOPT_STRING_SEC;
+    ASTOPT_STRING_REF;
     ASTOPT_STRING_SERIES;
     ASTOPT_STRING_SHEET;
     ASTOPT_STRING_SOURCE;
@@ -1523,8 +1524,9 @@ checkoff				  : CHECKOFF listItems -> ^({token("ASTCHECKOFF", ASTCHECKOFF, $CHEC
 
 clear                     : CLEAR clearOpt1? ident? -> ^({token("ASTCLEAR", ASTCLEAR, $CLEAR.Line)} ^(ASTPLACEHOLDER ident?) clearOpt1?);
 clearOpt1                 : leftAngle clearOpt1h* RIGHTANGLE -> ^(ASTOPT1 clearOpt1h*);
-clearOpt1h				  : PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)
-						  |	REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_SEC yesNo?)
+clearOpt1h				  : PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)  //obsolete
+						  | FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)
+						  |	REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_REF yesNo?)
 						  ;
 						  
 clone                     : CLONE -> ^({token("ASTCLONE", ASTCLONE, $CLONE.Line)});
@@ -1791,8 +1793,9 @@ read                      : read2 readOpt1? fileNameStar (TO identOrStar)? -> ^(
 read2                     : READ | IMPORT;
 readOpt1                  : leftAngle readOpt1h* RIGHTANGLE -> readOpt1h*;
 readOpt1h                 : MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?)
-						  | PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)
-						  | REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_SEC yesNo?)												  
+						  | PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)  //obsolete
+						  | FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)
+						  | REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_REF yesNo?)												  
 						  | TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
 						  | GBK (EQUAL yesNo)? -> ^(ASTOPT_STRING_GBK yesNo?)
@@ -2044,8 +2047,10 @@ openOpt1h                 : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
   						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)						
-						  | PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)						
-						  | REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_SEC yesNo?)						
+						  | PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)  //obsolete						
+						  | FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)						
+						  | EDIT (EQUAL yesNo)? -> ^(ASTOPT_STRING_EDIT yesNo?)						
+						  | REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_REF yesNo?)						
 						  | PROT (EQUAL yesNo)? -> ^(ASTOPT_STRING_PROT yesNo?)	
 						  | EDIT (EQUAL yesNo)? -> ^(ASTOPT_STRING_EDIT yesNo?)	
 						  | SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)	

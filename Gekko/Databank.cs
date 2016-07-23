@@ -80,6 +80,11 @@ namespace Gekko
         private string fileNameWithPath = null;  //will be constructed when reading: do not protobuf it        
         public string FileNameWithPath
         {
+            //?????????
+            //?????????
+            //????????? Could this be avoided by means of testing boolean open == true/false, in Program.OpenOrRead()?
+            //?????????
+            //?????????
             get
             {
                 return this.fileNameWithPath;
@@ -129,7 +134,7 @@ namespace Gekko
         }     
         
         public void Clear() {
-            if (this.protect) Program.ProtectError("You cannot clear a non-editable databank, see OPEN<edit>");
+            if (this.protect) Program.ProtectError("You cannot clear a non-editable databank, see OPEN<edit> or UNLOCK");
             //aliasName = null; --> keep that name when clearing
             //fileNameWithPath = null;  --> keep that name when clearing
             yearStart = -12345;
@@ -158,7 +163,7 @@ namespace Gekko
 
         public void RemoveVariable(EFreq eFreq, string variable)
         {
-            if (this.protect) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit>");
+            if (this.protect) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
             variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);            
             if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
             {
@@ -170,7 +175,7 @@ namespace Gekko
 
         public void RemoveVariable(bool freqAddToName, string variable)
         {
-            if (this.protect) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit>");
+            if (this.protect) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
             if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
             if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
             {
@@ -183,7 +188,7 @@ namespace Gekko
         //Generic method, not for outside use!
         private void RemoveVariable(bool freqAddToName, string freq, string variable)
         {
-            if (this.protect) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit>");
+            if (this.protect) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
             if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable, freq);
             if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
             {
@@ -217,7 +222,7 @@ namespace Gekko
         //generic method, not for outside use
         private void AddVariable(bool freqAddToName, string frequency, TimeSeries ts)
         {
-            if (this.protect) Program.ProtectError("You cannot add a timeseries to a non-editable databank, see OPEN<edit>");
+            if (this.protect) Program.ProtectError("You cannot add a timeseries to a non-editable databank, see OPEN<edit> or UNLOCK");
             string variable = ts.variableName;
             if (!G.IsSimpleToken(variable))  //also checks for null and ""
             {

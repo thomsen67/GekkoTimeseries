@@ -1535,29 +1535,44 @@ namespace Gekko
             public string opt_xlsx = null;
             public string opt_merge = null;
             public string opt_cols = null;
-            public string opt_prim = null;
-            public string opt_sec = null;
+            public string opt_prim = null;  //obsolete
+            public string opt_first = null;
+            public string opt_ref = null;
             public string type = null;  //read or import
             public P p = null;
             public void Exe()
             {
                 ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
                 bool isRead = false; if (G.equal(this.type, "read")) isRead = true;
+
+                if (this.opt_prim != null)
+                {
+                    if (isRead == false)
+                    {   //import
+                        G.Writeln2("*** ERROR: IMPORT<prim> is obsolete, use IMPORT.");
+                        throw new GekkoException();
+                    }
+                    else 
+                    {   //read
+                        G.Writeln2("*** ERROR: READ<prim> is obsolete, use READ<first>.");
+                        throw new GekkoException();
+                    }
+                }                           
                 
                 if (isRead == false)  //import
                 {
-                    if (this.opt_prim != null)
+                    if (this.opt_first != null)
                     {
-                        G.Writeln2("*** ERROR: IMPORT<prim> is not legal syntax");
+                        G.Writeln2("*** ERROR: IMPORT<first> is not legal syntax, just use IMPORT.");
                         throw new GekkoException();
                     }
                     if (this.opt_merge != null)
                     {
-                        G.Writeln2("*** ERROR: IMPORT<merge> is not legal syntax");
+                        G.Writeln2("*** ERROR: IMPORT<merge> is not legal syntax, IMPORT merges already.");
                         throw new GekkoException();
                     }
                     hlp.Merge = true;               //this is so for IMPORT
-                    hlp.openType = EOpenType.Prim;  //this is so for IMPORT                    
+                    hlp.openType = EOpenType.First;  //this is so for IMPORT                    
                 }
                 
                 bool isTo = false; if (this.readTo != null) isTo = true;                
@@ -1581,11 +1596,11 @@ namespace Gekko
                     {
                         G.Writeln2("*** ERROR: you cannot mix <merge> with TO keyword");
                     }
-                    if (this.opt_prim != null)
+                    if (this.opt_first != null)
                     {
-                        G.Writeln2("*** ERROR: you cannot mix <prim> with TO keyword");
+                        G.Writeln2("*** ERROR: you cannot mix <first> with TO keyword");
                     }
-                    if (this.opt_sec != null)
+                    if (this.opt_ref != null)
                     {
                         G.Writeln2("*** ERROR: you cannot mix <ref> with TO keyword");
                     }
@@ -1593,8 +1608,8 @@ namespace Gekko
                 else
                 {
                     if (G.equal(this.opt_merge, "yes")) hlp.Merge = true;
-                    if (G.equal(this.opt_prim, "yes")) hlp.openType = EOpenType.Prim;
-                    if (G.equal(this.opt_sec, "yes")) hlp.openType = EOpenType.Sec;
+                    if (G.equal(this.opt_first, "yes")) hlp.openType = EOpenType.First;
+                    if (G.equal(this.opt_ref, "yes")) hlp.openType = EOpenType.Ref;
                     if (hlp.openType == EOpenType.Normal) isSimple = true;
                 }                
 
@@ -1603,12 +1618,12 @@ namespace Gekko
                     if (isRead && isSimple)
                     {
                         G.Writeln2("+++ WARNING: General READ is not intended for data-mode.");
-                        G.Writeln("             Please use IMPORT, or consider READ<prim>", Color.Red);                        
+                        G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);                        
                     }
-                    if (isRead && !isTo && hlp.openType == EOpenType.Sec)
+                    if (isRead && !isTo && hlp.openType == EOpenType.Ref)
                     {
                         G.Writeln2("+++ WARNING: READ<ref> is not intended for data-mode.");
-                        G.Writeln("             Please use IMPORT, or consider READ<prim>", Color.Red);
+                        G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);
                         throw new GekkoException();
                     }
                 }                                                              
@@ -1637,7 +1652,7 @@ namespace Gekko
 
                 if (readInfo.abortedStar) return;  //an aborted READ *
 
-                if (G.equal(opt_sec, "yes"))
+                if (G.equal(opt_ref, "yes"))
                 {
                     readInfo.dbName = Program.databanks.GetSec().aliasName;
                 }
@@ -1658,7 +1673,7 @@ namespace Gekko
 
                 if (isRead && isSimple)
                 {
-                    //Do not do this with READ<prim> or READ<sec>, only with READ.
+                    //Do not do this with READ<first> or READ<sec>, only with READ.
                     //Do not do this with IMPORT or IMPORT ... TO
                     //And not with READ ... TO ... !!!
                     Program.MulbkClone();
@@ -1752,7 +1767,7 @@ namespace Gekko
             public string opt_xls = null;
             public string opt_xlsx = null;            
             public string opt_cols = null;
-            public string opt_sec = null;   
+            public string opt_ref = null;   
             public P p = null;
             public void Exe()
             {
@@ -1773,8 +1788,8 @@ namespace Gekko
                 if (!isImportOpen)
                 {
                     hlp.Merge = true;  //this is so for IMPORT                    
-                    hlp.openType = EOpenType.Prim;  //this is so for IMPORT
-                    if (G.equal(opt_sec, "yes")) hlp.openType = EOpenType.Sec;  // <sec> can override
+                    hlp.openType = EOpenType.First;  //this is so for IMPORT
+                    if (G.equal(opt_ref, "yes")) hlp.openType = EOpenType.Ref;  // <sec> can override
                 }
                                                 
                 List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
@@ -1783,7 +1798,7 @@ namespace Gekko
                 if (isImportOpen)
                 {
                     //is in reality an OPEN
-                    if (hlp.openType == EOpenType.Prim || hlp.openType == EOpenType.Sec)
+                    if (hlp.openType == EOpenType.First || hlp.openType == EOpenType.Ref)
                     {
                         G.Writeln2("*** ERROR: You cannot use READ ... TO ... together with <prim> or <ref>");
                         throw new GekkoException();
@@ -1806,7 +1821,7 @@ namespace Gekko
                 Program.ReadInfo readInfo = readInfos[0];
                 readInfo.shouldMerge = hlp.Merge;
                 if (readInfo.abortedStar) return;  //an aborted READ *
-                if (G.equal(opt_sec, "yes"))
+                if (G.equal(opt_ref, "yes"))
                 {
                     readInfo.dbName = Program.databanks.GetSec().aliasName;
                 }
@@ -1881,6 +1896,7 @@ namespace Gekko
 
         public class Mulbk
         {
+            //Is this used anymore?????
             public string fileName = null;
             public string opt_tsd = null;
             public string opt_tsdx = null;
@@ -1903,7 +1919,7 @@ namespace Gekko
                 if (this.opt_xls == "yes") hlp.Type = EDataFormat.Xls;
                 if (this.opt_xlsx == "yes") hlp.Type = EDataFormat.Xlsx;                
                 if (this.opt_cols == "yes") hlp.Orientation = "cols";
-                hlp.openType = EOpenType.Sec;
+                hlp.openType = EOpenType.Ref;
                 
                 if (hlp.FileName == null)
                 {
@@ -1935,8 +1951,8 @@ namespace Gekko
         {
             public string name = null;
             public P p = null;
-            public string opt_prim = null;
-            public string opt_sec = null;
+            public string opt_first = null;
+            public string opt_ref = null;
             public void Exe()
             {
                 Program.Clear(this, p);
@@ -2398,8 +2414,10 @@ namespace Gekko
             public string opt_xlsx = null;            
             public string opt_cols = null;
             //public string as2 = null;
-            public string opt_prim = null;
-            public string opt_sec = null;
+            public string opt_prim = null;  //obsolete but gives warning
+            public string opt_first = null;
+            public string opt_last = null;  
+            public string opt_ref = null;
             public string opt_prot = null;  //obsolete but gives warning
             public string opt_edit = null;
             public string opt_save = null;
@@ -2408,10 +2426,16 @@ namespace Gekko
                 if (G.equal(opt_prot, "yes"))
                 {
                     G.Writeln2("*** ERROR: OPEN<prot> is obsolete. In Gekko 2.1.1 and onwards, databanks");
-                    G.Writeln("           are always opened as 'protected' by default. To open a databank", Color.Red);
-                    G.Writeln("           non-protected (editable), you should use 'edit', for instance", Color.Red);
-                    G.Writeln("           OPEN<edit> or OPEN<prim edit>. (Note that Work and Ref are always", Color.Red);
-                    G.Writeln("           editable).", Color.Red);
+                    G.Writeln("           are always opened as 'protected' by default, unless you use", Color.Red);
+                    G.Writeln("           OPEN<edit>, or unless you afterwards use the UNLOCK command", Color.Red);
+                    G.Writeln("           to make the databank editable.", Color.Red);                    
+                    throw new GekkoException();
+                }
+
+                if (G.equal(opt_prim, "yes"))
+                {
+                    G.Writeln2("*** ERROR: OPEN<prim> is obsolete. In Gekko 2.1.1 and onwards, you should");
+                    G.Writeln("           use OPEN<edit> (or OPEN<first>) instead of OPEN<prim>.", Color.Red);                    
                     throw new GekkoException();
                 }
 
@@ -2427,30 +2451,38 @@ namespace Gekko
                 if (this.opt_xlsx == "yes") hlp.Type = EDataFormat.Xlsx;            
                 if (this.opt_cols == "yes") hlp.Orientation = "cols";
                 //if (this.as2 != null) hlp.As = this.as2;
-                if (G.equal(opt_prim, "yes") && G.equal(opt_sec, "yes"))
+
+                int posCounter = 0;
+                if (G.equal(opt_first, "yes")) posCounter++;
+                if (G.equal(opt_ref, "yes")) posCounter++;
+                if (G.equal(opt_last, "yes")) posCounter++;                               
+                
+                if (posCounter > 1)
                 {
-                    G.Writeln2("*** ERROR: You cannot use OPEN command with both PRIM and REF inside <>-field");
+                    G.Writeln2("*** ERROR: You are using > 1 of first/last/ref designations inside <>-field");
                     throw new GekkoException();
                 }
-                if (G.equal(opt_prim, "yes"))
+                if (G.equal(opt_edit, "yes") && posCounter > 0)
                 {
-                    hlp.openType = EOpenType.Prim;
+                    G.Writeln2("*** ERROR: You cannot mix 'edit' with first/last/ref designations inside <>-field");
+                    throw new GekkoException();
                 }
-                if (G.equal(opt_sec, "yes"))
+                if (G.equal(opt_first, "yes"))
                 {
-                    hlp.openType = EOpenType.Sec;
+                    hlp.openType = EOpenType.First;
                 }
-                //if (G.equal(opt_prot, "yes"))
-                //{
-                //    hlp.protect = true;
-                //}
                 if (G.equal(opt_edit, "yes"))
                 {
+                    hlp.openType = EOpenType.Edit;
                     hlp.protect = false;  //will override the born true value of the field
                 }
+                if (G.equal(opt_ref, "yes"))
+                {
+                    hlp.openType = EOpenType.Ref;
+                }                                
                 
                 List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
-                Program.OpenOrRead(hlp, true, readInfos);
+                Program.OpenOrRead(hlp, true, readInfos);                
 
                 foreach (Program.ReadInfo readInfo in readInfos)
                 {                    
@@ -2464,22 +2496,11 @@ namespace Gekko
 
                     readInfo.Print();
                 }
-                
+
                 if (G.equal(Program.options.interface_mode, "sim"))
-                {                    
-                    if (hlp.openType == EOpenType.Prim)
-                    {
-                        G.Writeln2("+++ WARNING: In sim-mode, OPEN<prim> is not recommended (cf. MODE).");
-                    }
-                    else if (hlp.openType == EOpenType.Sec)
-                    {
-                        G.Writeln2("+++ WARNING: In sim-mode, OPEN<ref> is not recommended (cf. MODE).");
-                    }
-                    else
-                    {
-                        G.Writeln2("+++ WARNING: READ ... TO ... is recommended instead of OPEN in sim-mode (cf. MODE).");
-                        G.Writeln("             For instance, 'READ databk TO *;' instead of 'OPEN databk;'", Globals.warningColor);
-                    }
+                {
+                    G.Writeln2("+++ WARNING: READ ... TO ... is recommended instead of OPEN in sim-mode (cf. MODE).");
+                    G.Writeln("             For instance, 'READ databk TO *;' instead of 'OPEN databk;'", Globals.warningColor);
                 }
             }            
         }
