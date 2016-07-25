@@ -132,7 +132,7 @@ namespace UnitTests
 
             Program.databanks.storage = new List<Databank>();
             Program.databanks.storage.Add(new Databank(Globals.Work));
-            Program.databanks.storage.Add(new Databank(Globals.Base));
+            Program.databanks.storage.Add(new Databank(Globals.Ref));
 
             Program.CreateTempFilesFolder();
 
@@ -274,7 +274,7 @@ namespace UnitTests
             Databank work = Prim();
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-            I("CLEAR<prim>; IMPORT<tsd>jul05; CLONE;");
+            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
             I("prt fy.1, fy[-1];");
             I("TIME 2010 2010;;");
             I("CREATE xx; SERIES xx = fy.1 - fy[-1];");
@@ -402,7 +402,7 @@ namespace UnitTests
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-            I("CLEAR<prim>; IMPORT<tsd>jul05; CLONE;");
+            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
             I("index [f*] mylist;                                      //finds all series in Work and puts them in #mylist");
             I("VAL n = #mylist[0];"); AssertHelperScalarVal("n", 631);
             I("index f* mylist;                                      //finds all series in Work and puts them in #mylist");
@@ -747,7 +747,7 @@ namespace UnitTests
         public void Test__Indexers()
         {
             Databank work = Prim();
-            Databank base2 = Program.databanks.GetSec();
+            Databank base2 = Program.databanks.GetRef();
             I("RESET;");
             I("CREATE fy;");
             I("TIME 2000 2002;");
@@ -820,11 +820,11 @@ namespace UnitTests
             AssertHelper(Prim(), "gdp", 2011, 1000d, sharedDelta);
             AssertHelper(Prim(), "gdp", 2012, 102d, sharedDelta);
             AssertHelper(Prim(), "gdp", 2013, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2009, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2010, 100d, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2011, 101d, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2012, 102d, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2013, double.NaN, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2009, double.NaN, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2010, 100d, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2011, 101d, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2012, 102d, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2013, double.NaN, sharedDelta);
 
             //With SERIES bank:series[...] = ...
             I("RESET;");
@@ -838,11 +838,11 @@ namespace UnitTests
             AssertHelper(Prim(), "gdp", 2011, 101d, sharedDelta);
             AssertHelper(Prim(), "gdp", 2012, 102d, sharedDelta);
             AssertHelper(Prim(), "gdp", 2013, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2009, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2010, 100d, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2011, 1000d, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2012, 102d, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2013, double.NaN, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2009, double.NaN, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2010, 100d, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2011, 1000d, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2012, 102d, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2013, double.NaN, sharedDelta);
 
             //With SERIES #m[1] = ...
             I("RESET;");
@@ -1039,7 +1039,7 @@ namespace UnitTests
             //See also Test__Indexer
 
             Databank work = Prim();
-            Databank base2 = Program.databanks.GetSec();
+            Databank base2 = Program.databanks.GetRef();
 
             I("RESET;");
             I("TIME 2010 2012;");
@@ -1053,11 +1053,11 @@ namespace UnitTests
             AssertHelper(Prim(), "gdp", 2011, 1000d, sharedDelta);
             AssertHelper(Prim(), "gdp", 2012, 1000d, sharedDelta);
             AssertHelper(Prim(), "gdp", 2013, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2009, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2010, 100d, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2011, 101d, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2012, 102d, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2013, double.NaN, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2009, double.NaN, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2010, 100d, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2011, 101d, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2012, 102d, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2013, double.NaN, sharedDelta);
 
             //Testing SERIES bank:series = ...
             I("RESET;");
@@ -1071,11 +1071,11 @@ namespace UnitTests
             AssertHelper(Prim(), "gdp", 2011, 101d, sharedDelta);
             AssertHelper(Prim(), "gdp", 2012, 102d, sharedDelta);
             AssertHelper(Prim(), "gdp", 2013, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2009, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2010, 1000d, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2011, 1000d, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2012, 1000d, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(),  "gdp", 2013, double.NaN, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2009, double.NaN, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2010, 1000d, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2011, 1000d, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2012, 1000d, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(),  "gdp", 2013, double.NaN, sharedDelta);
         }
 
         [TestMethod]
@@ -1141,9 +1141,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -101, sharedDelta);
                 AssertHelper(Prim(), "a2", 2010, -102, sharedDelta);
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
                 AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
                 AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
                 AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
@@ -1167,9 +1167,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -101, sharedDelta);
                 AssertHelper(Prim(), "a2", 2010, -102, sharedDelta);
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
                 AssertHelper(bank1, "a1", 2010, 101, sharedDelta);  //from here
                 AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
                 AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
@@ -1189,9 +1189,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -101, sharedDelta);
                 AssertHelper(Prim(), "a2", 2010, -102, sharedDelta);
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
                 AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
                 AssertHelper(bank1, "a2", 2010, 201, sharedDelta); //to here
                 AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
@@ -1212,9 +1212,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -101, sharedDelta);
                 AssertHelper(Prim(), "a2", 2010, -102, sharedDelta);
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
                 AssertHelper(bank1, "a1", 2010, 201, sharedDelta); //to here
                 AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
                 AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
@@ -1235,9 +1235,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -101, sharedDelta);
                 AssertHelper(Prim(), "a2", 2010, -102, sharedDelta);
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
                 AssertHelper(bank1, "a1", 2010, 201, sharedDelta); //to here
                 AssertHelper(bank1, "a2", 2010, 202, sharedDelta); //to here
                 AssertHelper(bank1, "a3", 2010, 203, sharedDelta); //to here
@@ -1258,9 +1258,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -101, sharedDelta);
                 AssertHelper(Prim(), "a2", 2010, -102, sharedDelta);
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
                 AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
                 AssertHelper(bank1, "a2", 2010, 202, sharedDelta); //to here
                 AssertHelper(bank1, "a3", 2010, 203, sharedDelta); //to here
@@ -1281,9 +1281,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -101, sharedDelta);
                 AssertHelper(Prim(), "a2", 2010, -102, sharedDelta);
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
                 AssertHelper(bank1, "a1", 2010, 201, sharedDelta); //to here
                 AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
                 AssertHelper(bank1, "a3", 2010, 203, sharedDelta); //to here
@@ -1308,9 +1308,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -101, sharedDelta);  //from here
                 AssertHelper(Prim(), "a2", 2010, -101, sharedDelta);  //to here
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
                 AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
                 AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
                 AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
@@ -1330,9 +1330,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -101, sharedDelta);
                 AssertHelper(Prim(), "a2", 2010, -102, sharedDelta);
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
                 AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
                 AssertHelper(bank1, "a2", 2010, 201, sharedDelta); //to here
                 AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
@@ -1352,9 +1352,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -101, sharedDelta);
                 AssertHelper(Prim(), "a2", 2010, -102, sharedDelta);
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
                 AssertHelper(bank1, "a1", 2010, 201, sharedDelta); //to here
                 AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
                 AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
@@ -1374,9 +1374,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -101, sharedDelta);
                 AssertHelper(Prim(), "a2", 2010, -102, sharedDelta);
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
                 AssertHelper(bank1, "a1", 2010, 201, sharedDelta); //to here
                 AssertHelper(bank1, "a2", 2010, 202, sharedDelta); //to here
                 AssertHelper(bank1, "a3", 2010, 203, sharedDelta); //to here
@@ -1396,9 +1396,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -101, sharedDelta);
                 AssertHelper(Prim(), "a2", 2010, -102, sharedDelta);
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
                 AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
                 AssertHelper(bank1, "a2", 2010, 202, sharedDelta); //to here
                 AssertHelper(bank1, "a3", 2010, 203, sharedDelta); //to here
@@ -1418,9 +1418,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -101, sharedDelta);
                 AssertHelper(Prim(), "a2", 2010, -102, sharedDelta);
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
                 AssertHelper(bank1, "a1", 2010, 201, sharedDelta); //to here
                 AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
                 AssertHelper(bank1, "a3", 2010, 203, sharedDelta); //to here
@@ -1445,9 +1445,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -101, sharedDelta);
                 AssertHelper(Prim(), "a2", 2010, -102, sharedDelta);
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, -201, sharedDelta); //from here
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -201, sharedDelta); //to here
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta); //from here
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -201, sharedDelta); //to here
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
                 AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
                 AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
                 AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
@@ -1467,9 +1467,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -101, sharedDelta);
                 AssertHelper(Prim(), "a2", 2010, -102, sharedDelta);
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, -201, sharedDelta);  //from here
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);  //from here
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
                 AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
                 AssertHelper(bank1, "a2", 2010, -201, sharedDelta); //to here
                 AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
@@ -1489,9 +1489,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -101, sharedDelta);
                 AssertHelper(Prim(), "a2", 2010, -102, sharedDelta);
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, 201, sharedDelta); //to here
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, 201, sharedDelta); //to here
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
                 AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
                 AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
                 AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
@@ -1511,9 +1511,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -101, sharedDelta);
                 AssertHelper(Prim(), "a2", 2010, -102, sharedDelta);
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, -201, sharedDelta); //from here
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta); //from here
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta); //from here
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta); //from here
                 AssertHelper(bank1, "a1", 2010, -201, sharedDelta); //to here
                 AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
                 AssertHelper(bank1, "a3", 2010, -203, sharedDelta); //to here
@@ -1541,9 +1541,9 @@ namespace UnitTests
                 AssertHelper(Prim(), "a1", 2010, -201, sharedDelta);
                 AssertHelper(Prim(), "a2", 2010, -102, sharedDelta);
                 AssertHelper(Prim(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetSec(),  "a3", 2010, -203, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
                 AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
                 AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
                 AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
@@ -1872,14 +1872,14 @@ namespace UnitTests
             I("RESET;");
 
             I("TIME 2010 2010;");
-            I("OPEN<prim>bank1;");
+            I("OPEN<edit>bank1;");
             I("CLEAR bank1;");
             I("CREATE a1, a2, a3;");
             I("SERIES a1 = 101;");
             I("SERIES a2 = 102;");
             I("SERIES a3 = 103;");
             I("CLOSE bank1;");
-            I("OPEN<prim>bank2;");
+            I("OPEN<edit>bank2;");
             I("CLEAR bank2;");
             I("CREATE a1, a2, a3;");
             I("SERIES a1 = 201;");
@@ -1903,7 +1903,7 @@ namespace UnitTests
             bank1 = Program.databanks.GetDatabank("bank1");
             bank2 = Program.databanks.GetDatabank("bank2");
             work = Program.databanks.GetDatabank(Globals.Work);
-            base2 = Program.databanks.GetDatabank(Globals.Base);
+            base2 = Program.databanks.GetDatabank(Globals.Ref);
         }
 
 
@@ -2544,7 +2544,7 @@ namespace UnitTests
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-            I("CLEAR<prim>; IMPORT<tsd>jul05; CLONE;");
+            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
             I("LIST a = fxa, fxb, pcp, tg, pxqz;");
             I("LIST a1 = #a[fX*];              //pattern in #a list");
             I("LIST a2 = #a[f?nz];             //pattern in #a list");
@@ -3108,7 +3108,7 @@ namespace UnitTests
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("MODEL jul05;");
-            I("CLEAR<prim>; IMPORT<tsd>jul05; CLONE;");
+            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
             I("DISP<2010 2010 info>fy;");
             FAIL("DISP<2010 2011 info>fy;");
         }
@@ -3121,7 +3121,7 @@ namespace UnitTests
             I("OPTION solve gauss dump = yes;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("MODEL jul05;");
-            I("CLEAR<prim>; IMPORT<tsd>jul05; CLONE;");
+            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
             I("SIM<2006 2006>;");
             I("ITERSHOW <2010 2010>fy;");
         }
@@ -3395,7 +3395,7 @@ namespace UnitTests
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-            I("CLEAR<prim>; IMPORT<tsd>jul05; CLONE;");
+            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
             I("TABLE <2010 2014> tablesmall;");
         }
 
@@ -3428,7 +3428,7 @@ namespace UnitTests
             //Does not test the result of a simulation, only the commands
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");  //needs "'" since it contains a "-"
-            I("CLEAR<prim>; IMPORT<tsd>jul05; CLONE;");
+            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
             I("HDG 'abe' + 'kat';");
             Assert.AreEqual(Prim().info1, "abekat");
         }
@@ -3504,7 +3504,7 @@ namespace UnitTests
             I("RESET;");
             I("TIME 2005 2010;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-            I("CLEAR<prim>; IMPORT<tsd>jul05; CLONE;");
+            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
             I("SYS'del exportseries." + Globals.extensionCommand + "';");
             I("EXPORT<2005 2010 series='='> fy, fe file=exportseries;");
         }
@@ -3547,7 +3547,7 @@ namespace UnitTests
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");  //needs "'" since it contains a "-"
             I("MODEL jul05;");
-            I("CLEAR<prim>; IMPORT<tsd>jul05; CLONE;");
+            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
             I("FINDMISSINGDATA<2012 2015>fy,enl,pcp,iwbz;");
             I("FINDMISSINGDATA;");
 
@@ -3617,11 +3617,11 @@ namespace UnitTests
         {
             I("RESET;");
             I("TIME 2000 2000;");
-            I("OPEN<prim>sletmig1;");
+            I("OPEN<edit>sletmig1;");
             I("CREATE a, b, c;");
             I("SERIES a, b, c = 100;");
             I("CLOSE *;");
-            I("OPEN<prim>sletmig2;");
+            I("OPEN<edit>sletmig2;");
             I("CREATE a, b;");
             I("SERIES a, b = 777;");
             I("CLOSE *;");
@@ -3675,10 +3675,10 @@ namespace UnitTests
             //3. sletmig2      a = b = 777
             //4. sletmig1      a = b = c = 100
 
-            Assert.AreEqual(Program.databanks.GetSec().storage.Count, 3);     //   <------ NEW
-            AssertHelper(Program.databanks.GetSec(), "a", 2000, 100d, 100d);  //   <------ NEW
-            AssertHelper(Program.databanks.GetSec(), "b", 2000, 100d, 100d);  //   <------ NEW
-            AssertHelper(Program.databanks.GetSec(), "c", 2000, 100d, 100d);  //   <------ NEW
+            Assert.AreEqual(Program.databanks.GetRef().storage.Count, 3);     //   <------ NEW
+            AssertHelper(Program.databanks.GetRef(), "a", 2000, 100d, 100d);  //   <------ NEW
+            AssertHelper(Program.databanks.GetRef(), "b", 2000, 100d, 100d);  //   <------ NEW
+            AssertHelper(Program.databanks.GetRef(), "c", 2000, 100d, 100d);  //   <------ NEW
             //below there is no impact from the values in the reference bank
             AssertHelper(Prim(), "xa", 2000, 888d, 0d);
             AssertHelper(Prim(), "xb", 2000, 777d, 0d);
@@ -3781,7 +3781,7 @@ namespace UnitTests
         public void Test__OpenClose()
         {
             // ----------------------------------------------------------
-            //          - OPEN command, also OPEN<prim>, <ref>, <prot>, etc., also non-existing files.
+            //          - OPEN command, also OPEN<edit>, <first>, <last>, <ref>, etc., also non-existing files.
             //          - CLOSE command
             //          uses a \temp folder that is deleted first
             // ----------------------------------------------------------
@@ -3792,7 +3792,7 @@ namespace UnitTests
             Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
-            I("CLEAR<prim>; IMPORT<tsd>small; CLONE;");
+            I("CLEAR<first>; IMPORT<tsd>small; CLONE;");
             I("OPEN <tsd> small;");
             I("SERIES <1999 2004> fy1 = 100;");
             I("SERIES <1999 2004> xx1 = small:fy1-fy1;");
@@ -3816,19 +3816,15 @@ namespace UnitTests
             Assert.AreEqual(Program.databanks.storage.Count, 2);
 
             //============ more advanced tests =============================
-            // test OPEN<prim>
+            // test OPEN<edit>
             // test OPEN<ref>
-            // test OPEN<prot>
+            // test LOCK
             // test that data is written back
             //---------------------------------
 
             Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
             Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
-
-            //I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
-            //I("READ <tsd> small;");
-            //I("WRITE <tsdx> temp\\small_old;");
-
+            
             // ------------ open normal bank
 
             I("RESET;");
@@ -3845,65 +3841,65 @@ namespace UnitTests
             I("OPEN temp\\bank1;");
             Assert.AreEqual(Program.databanks.storage.Count, 3);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
             Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank1");
             I("CLOSE bank1;");
             Assert.AreEqual(Program.databanks.storage.Count, 2);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
             I("RESET;");
             I("OPEN temp\\bank1;");
             I("OPEN temp\\bank2;");
             Assert.AreEqual(Program.databanks.storage.Count, 4);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
             Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
             Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank1");
             I("CLOSE *;");
             Assert.AreEqual(Program.databanks.storage.Count, 2);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
             I("RESET;");
             I("OPEN temp\\bank1, temp\\bank2 as bank3;");
             Assert.AreEqual(Program.databanks.storage.Count, 4);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
             Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank1");
             Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank3");
             I("CLOSE *;");
             Assert.AreEqual(Program.databanks.storage.Count, 2);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
-            // ---- PRIM and SEC, also with test of PRT<m>, PRT @a, etc.
+            // ---- EDIT and REF, also with test of PRT<m>, PRT @a, etc.
 
             I("RESET;");
             I("OPEN temp\\bank2;");
-            I("OPEN<prim>temp\\bank1;");
+            I("OPEN<first>temp\\bank1;");
             Assert.AreEqual(Program.databanks.storage.Count, 4);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank1");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
             Assert.AreEqual(Program.databanks.storage[2].aliasName, "Work");
             Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
             I("CLOSE *;");
             Assert.AreEqual(Program.databanks.storage.Count, 2);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
             I("RESET;");
             I("OPEN temp\\bank2;");
-            I("OPEN<prim>temp\\bank1;");
+            I("OPEN<first>temp\\bank1;");
             Assert.AreEqual(Program.databanks.storage.Count, 4);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank1");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
             Assert.AreEqual(Program.databanks.storage[2].aliasName, "Work");
             Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
             I("CLOSE bank1;");
             Assert.AreEqual(Program.databanks.storage.Count, 3);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
             Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
 
             I("RESET;");
@@ -3912,12 +3908,12 @@ namespace UnitTests
             Assert.AreEqual(Program.databanks.storage.Count, 4);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
             Assert.AreEqual(Program.databanks.storage[1].aliasName, "bank1");
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[2].aliasName, Globals.Ref);
             Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
             I("CLOSE *;");
             Assert.AreEqual(Program.databanks.storage.Count, 2);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
             I("RESET;");
             I("OPEN temp\\bank2;");
@@ -3925,40 +3921,40 @@ namespace UnitTests
             Assert.AreEqual(Program.databanks.storage.Count, 4);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
             Assert.AreEqual(Program.databanks.storage[1].aliasName, "bank1");
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[2].aliasName, Globals.Ref);
             Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
             I("CLOSE bank1;");
             Assert.AreEqual(Program.databanks.storage.Count, 3);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
             Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
 
             //An unswap test
             I("RESET;");
             I("READ temp\\bank1;");
-            I("OPEN<prim>temp\\bank2;");
+            I("OPEN<first>temp\\bank2;");
             I("OPEN<ref>temp\\bank3;");
             Assert.AreEqual(Program.databanks.storage.Count, 4);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank2");
             Assert.AreEqual(Program.databanks.storage[1].aliasName, "bank3");
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, Globals.Base); //bank1
+            Assert.AreEqual(Program.databanks.storage[2].aliasName, Globals.Ref); //bank1
             Assert.AreEqual(Program.databanks.storage[3].aliasName, "Work"); //bank1
             I("UNSWAP;");
             Assert.AreEqual(Program.databanks.storage.Count, 4);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work"); //bank1
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Base); //bank1
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref); //bank1
             Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
             Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank3");
 
             //also with tests of PRT etc
             I("RESET;");
             I("READ temp\\bank1;");
-            I("OPEN<prim>temp\\bank2;");
+            I("OPEN<first>temp\\bank2;");
             I("OPEN<ref>temp\\bank3;");
             Assert.AreEqual(Program.databanks.storage.Count, 4);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank2");
             Assert.AreEqual(Program.databanks.storage[1].aliasName, "bank3");
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, Globals.Base); //bank1
+            Assert.AreEqual(Program.databanks.storage[2].aliasName, Globals.Ref); //bank1
             Assert.AreEqual(Program.databanks.storage[3].aliasName, "Work"); //bank1
             I("PRT<2010 2010> a;");
             Table table = Globals.lastPrtOrMulprtTable;
@@ -3997,21 +3993,69 @@ namespace UnitTests
             I("OPEN \\temp\\bank1;");
             Assert.AreEqual(Program.databanks.storage.Count, 3);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
             Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank1");
             I("OPEN \\temp\\bank2;");
             Assert.AreEqual(Program.databanks.storage.Count, 4);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
             Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
             Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank1");
-            I("OPEN<prim> \\temp\\bank1;");
+            I("OPEN<first> \\temp\\bank1;");
             Assert.AreEqual(Program.databanks.storage.Count, 4);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank1");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
             Assert.AreEqual(Program.databanks.storage[2].aliasName, "Work");
             Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
 
+            // ------- <first>, <>, <last>
+
+            I("RESET;");
+            I("OPEN temp\\bank3;");
+            I("OPEN<first>temp\\bank1, temp\\bank2;");
+            Assert.AreEqual(Program.databanks.storage.Count, 5);
+            Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank1");
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+            Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
+            Assert.AreEqual(Program.databanks.storage[3].aliasName, Globals.Work);
+            Assert.AreEqual(Program.databanks.storage[4].aliasName, "bank3");            
+            I("CLOSE *;");
+            Assert.AreEqual(Program.databanks.storage.Count, 2);
+            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+
+            I("RESET;");
+            I("OPEN temp\\bank3;");
+            I("OPEN temp\\bank1, temp\\bank2;");
+            Assert.AreEqual(Program.databanks.storage.Count, 5);
+            Assert.AreEqual(Program.databanks.storage[0].aliasName, Globals.Work);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+            Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank1");            
+            Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");            
+            Assert.AreEqual(Program.databanks.storage[4].aliasName, "bank3");
+            I("CLOSE *;");
+            Assert.AreEqual(Program.databanks.storage.Count, 2);
+            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+
+            I("RESET;");
+            I("OPEN temp\\bank3;");
+            I("OPEN<last> temp\\bank1, temp\\bank2;");
+            Assert.AreEqual(Program.databanks.storage.Count, 5);
+            Assert.AreEqual(Program.databanks.storage[0].aliasName, Globals.Work);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+            Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank3");
+            Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank1");
+            Assert.AreEqual(Program.databanks.storage[4].aliasName, "bank2");
+            I("CLOSE *;");
+            Assert.AreEqual(Program.databanks.storage.Count, 2);
+            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+
+            // ------- <pos=n>
+
+            
+            
             // --------- changing stuff ----------------
 
             //changing PRIM stuff
@@ -4019,7 +4063,7 @@ namespace UnitTests
             I("READ \\temp\\bank1;");
             I("WRITE temp\\bankTemp;");
             I("RESET;");
-            I("OPEN <prim> temp\\bankTemp;");
+            I("OPEN <edit> temp\\bankTemp;");
             I("TIME 2010 2010;");
             I("SERIES a = 100;");
             I("CLOSE bankTemp;");
@@ -4030,13 +4074,15 @@ namespace UnitTests
             AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
             AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
 
-            //changing SEC stuff
+            //changing REF stuff
             I("RESET;");
             I("READ \\temp\\bank1;");
             I("WRITE temp\\bankTemp;");
             I("RESET;");
             I("OPEN <ref> temp\\bankTemp;");
             I("TIME 2010 2010;");
+            FAIL("SERIES @a = 100;");
+            I("UNLOCK bankTemp;");
             I("SERIES @a = 100;");
             I("CLOSE bankTemp;");
             I("RESET;");
@@ -4053,6 +4099,8 @@ namespace UnitTests
             I("RESET;");
             I("OPEN temp\\bankTemp;");
             I("TIME 2010 2010;");
+            FAIL("SERIES bankTemp:a = 100;");
+            I("UNLOCK bankTemp;");
             I("SERIES bankTemp:a = 100;");
             I("CLOSE bankTemp;");
             I("RESET;");
@@ -4062,47 +4110,53 @@ namespace UnitTests
             AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
             AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
 
-            // --------- PROT ----------------
+            // --------- LOCK/UNLOCK ----------------
 
-            //changing PRIM stuff
+            //changing first stuff
             I("RESET;");
             I("READ \\temp\\bank1;");
             I("WRITE temp\\bankTemp;");
             I("RESET;");
-            I("OPEN <prim prot> temp\\bankTemp;");
+            I("OPEN <first> temp\\bankTemp;");
             I("TIME 2010 2010;");
             FAIL("SERIES a = 100;");
+            I("UNLOCK bankTemp;");
+            I("SERIES a = 100;");
 
-            //changing SEC stuff
+            //changing ref stuff
             I("RESET;");
             I("READ \\temp\\bank1;");
             I("WRITE temp\\bankTemp;");
             I("RESET;");
-            I("OPEN <ref prot> temp\\bankTemp;");
+            I("OPEN <ref> temp\\bankTemp;");
             I("TIME 2010 2010;");
             FAIL("SERIES @a = 100;");
+            I("UNLOCK bankTemp;");
+            I("SERIES @a = 100;");
 
             //changing normal open bank
             I("RESET;");
             I("READ \\temp\\bank1;");
             I("WRITE temp\\bankTemp;");
             I("RESET;");
-            I("OPEN <prot> temp\\bankTemp;");
+            I("OPEN temp\\bankTemp;");
             I("TIME 2010 2010;");
             FAIL("SERIES bankTemp:a = 100;");
+            I("UNLOCK bankTemp;");
+            I("SERIES bankTemp:a = 100;");
 
-            // --------- implicit PROT via non .tsdx formats ----------------
+            // --------- non .gbk formats ----------------
 
-            //changing PRIM stuff
+            //changing FIRST stuff
             I("RESET;");
             I("READ \\temp\\bank1;");
             I("EXPORT <tsd> temp\\bankTsd;");
             I("RESET;");
-            I("OPEN <prim tsd> temp\\bankTsd;");
+            I("OPEN <edit tsd> temp\\bankTsd;");
             I("TIME 2010 2010;");
             FAIL("SERIES a = 100;");
 
-            //changing SEC stuff
+            //changing REF stuff
             I("RESET;");
             I("READ \\temp\\bank1;");
             I("EXPORT <tsd> temp\\bankTsd;");
@@ -4123,10 +4177,10 @@ namespace UnitTests
             // --------- constructing a bank ----------------
 
             I("RESET;");
-            I("OPEN <prim> temp\\bankNew;");
+            I("OPEN <edit> temp\\bankNew;");
             Assert.AreEqual(Program.databanks.storage.Count, 3);
             Assert.AreEqual(Program.databanks.storage[0].aliasName, "bankNew");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Base);
+            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
             Assert.AreEqual(Program.databanks.storage[2].aliasName, "Work");
             I("CREATE tsNew;");
             I("SERIES <2010 2010> tsNew = 12345;");
@@ -4142,7 +4196,7 @@ namespace UnitTests
             I("RESET;");
             FAIL("CLOSE work;");
             FAIL("CLOSE ref;");
-            FAIL("OPEN<prim>a, b;");
+            FAIL("OPEN<edit>a, b;");
             FAIL("OPEN<ref>a, b;");
             FAIL("OPEN *, b;");
             FAIL("OPEN a, *;");
@@ -4167,7 +4221,7 @@ namespace UnitTests
             I("CREATE x3;");
             I("CLEAR<prim>;");
             Assert.AreEqual(Prim().storage.Count, 0);
-            Assert.AreEqual(Program.databanks.GetSec().storage.Count, 2);
+            Assert.AreEqual(Program.databanks.GetRef().storage.Count, 2);
 
             I("RESET;");
             I("CREATE x1, x2;");
@@ -4175,7 +4229,7 @@ namespace UnitTests
             I("CREATE x3;");
             I("CLEAR<ref>;");
             Assert.AreEqual(Prim().storage.Count, 3);
-            Assert.AreEqual(Program.databanks.GetSec().storage.Count, 0);
+            Assert.AreEqual(Program.databanks.GetRef().storage.Count, 0);
 
             I("RESET;");
             I("CREATE x1, x2;");
@@ -4183,7 +4237,7 @@ namespace UnitTests
             I("CREATE x3;");
             I("CLEAR;");
             Assert.AreEqual(Prim().storage.Count, 0);
-            Assert.AreEqual(Program.databanks.GetSec().storage.Count, 0);
+            Assert.AreEqual(Program.databanks.GetRef().storage.Count, 0);
 
 
 
@@ -5576,8 +5630,8 @@ namespace UnitTests
             {
                 double v1 = Prim().GetVariable("tsA1").GetData(new GekkoTime(EFreq.Annual, i, 1));
                 double v2 = Prim().GetVariable("tsA2").GetData(new GekkoTime(EFreq.Annual, i, 1));
-                double b1 = Program.databanks.GetSec().GetVariable("tsA1").GetData(new GekkoTime(EFreq.Annual, i, 1));
-                double b2 = Program.databanks.GetSec().GetVariable("tsA2").GetData(new GekkoTime(EFreq.Annual, i, 1));
+                double b1 = Program.databanks.GetRef().GetVariable("tsA1").GetData(new GekkoTime(EFreq.Annual, i, 1));
+                double b2 = Program.databanks.GetRef().GetVariable("tsA2").GetData(new GekkoTime(EFreq.Annual, i, 1));
                 if (i < start | i > end)
                 {
                     Assert.IsTrue(double.IsNaN(v1));
@@ -6035,7 +6089,7 @@ namespace UnitTests
                 if (i == 1) Prim().Trim();
                 I("CLEAR<prim>; IMPORT<tsd>temp\\subset; CLONE;");
                 Assert.AreEqual(Prim().storage.Count, 2);
-                Assert.AreEqual(Program.databanks.GetSec().storage.Count, 2);
+                Assert.AreEqual(Program.databanks.GetRef().storage.Count, 2);
 
                 //TSDX
                 I("RESET;");
@@ -6075,7 +6129,7 @@ namespace UnitTests
                 I("READ temp\\subset_new;");
                 if (i == 1) Prim().Trim();
                 Assert.AreEqual(Prim().storage.Count, 2);
-                Assert.AreEqual(Program.databanks.GetSec().storage.Count, 2);
+                Assert.AreEqual(Program.databanks.GetRef().storage.Count, 2);
 
                 //TSD
                 //tsd: only part of period written
@@ -7992,8 +8046,8 @@ namespace UnitTests
             I("SERIES<2005 2005> ref:xx1, work:xx2 = 100;");
             AssertHelper(Prim(), "xx1", 2005, double.NaN, sharedDelta);
             AssertHelper(Prim(), "xx2", 2005, 100, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(), "xx1", 2005, 100, sharedDelta);
-            AssertHelper(Program.databanks.GetSec(), "xx2", 2005, double.NaN, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(), "xx1", 2005, 100, sharedDelta);
+            AssertHelper(Program.databanks.GetRef(), "xx2", 2005, double.NaN, sharedDelta);
 
             // ===================================================================================
             // =============== testing REP n, and REP * ==========================================
@@ -8775,7 +8829,7 @@ namespace UnitTests
             MetaHelperLabel();
             MetaHelperSourceStamp(stamp2);
 
-            Databank w = Program.databanks.GetPrim();
+            Databank w = Program.databanks.GetFirst();
             Assert.AreEqual(w.info1, "A databank for unit testing purposes!");
             //TODO: Assert.AreEqual(w.date, "---todo---");
             Assert.AreEqual(w.readInfo.modelName, "meta.frm");
@@ -10557,10 +10611,10 @@ namespace UnitTests
             //hack: false used 4 places in GetVariable() and Contains()
             double valWork = Prim().GetVariable(false, s).GetData(new GekkoTime(eFreq, year, sub));
             double valBase = double.NaN;
-            if (Program.databanks.GetSec().ContainsVariable(false, s)) valBase = Program.databanks.GetSec().GetVariable(s).GetData(new GekkoTime(eFreq, year, sub));
+            if (Program.databanks.GetRef().ContainsVariable(false, s)) valBase = Program.databanks.GetRef().GetVariable(s).GetData(new GekkoTime(eFreq, year, sub));
             double valWorkLag = Prim().GetVariable(false, s).GetData(new GekkoTime(eFreq, year, sub).Add(-1));
             double valBaseLag = double.NaN;
-            if (Program.databanks.GetSec().ContainsVariable(false, s)) valBaseLag = Program.databanks.GetSec().GetVariable(s).GetData(new GekkoTime(eFreq, year, sub).Add(-1));
+            if (Program.databanks.GetRef().ContainsVariable(false, s)) valBaseLag = Program.databanks.GetRef().GetVariable(s).GetData(new GekkoTime(eFreq, year, sub).Add(-1));
             //end hack
 
             UData u = new UData();
@@ -10583,9 +10637,9 @@ namespace UnitTests
             TimeSeries xx_enl = null;
             if (useBank)
             {
-                xx_fy = Program.databanks.GetSec().GetVariable("fy");
-                xx_cp = Program.databanks.GetSec().GetVariable("cp");
-                xx_enl = Program.databanks.GetSec().GetVariable("enl");
+                xx_fy = Program.databanks.GetRef().GetVariable("fy");
+                xx_cp = Program.databanks.GetRef().GetVariable("cp");
+                xx_enl = Program.databanks.GetRef().GetVariable("enl");
             }
             else
             {
@@ -10617,7 +10671,7 @@ namespace UnitTests
 
         private static Databank Prim()
         {
-            return Program.databanks.GetPrim();
+            return Program.databanks.GetFirst();
         }
 
         private static void CheckFullDatabank(double deltaAbs, double deltaRel, int t1, int t2, List<string> ignore)
@@ -10630,7 +10684,7 @@ namespace UnitTests
                     if (G.equal(s, ss)) goto Flag;
                 }
                 TimeSeries tsW = Prim().GetVariable(s);
-                TimeSeries tsB = Program.databanks.GetSec().GetVariable(s);
+                TimeSeries tsB = Program.databanks.GetRef().GetVariable(s);
 
                 if (tsW == null || tsB == null)
                 {

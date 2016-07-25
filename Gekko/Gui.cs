@@ -692,7 +692,7 @@ namespace Gekko
             if (track) MessageBox.Show("17");
             Databank work = new Databank(Globals.Work);
             if (track) MessageBox.Show("18");
-            Databank base2 = new Databank(Globals.Base);
+            Databank base2 = new Databank(Globals.Ref);
             if (track) MessageBox.Show("20");
             Program.databanks.storage.Clear();  //just in case
             Program.databanks.storage.Add(work);
@@ -1519,7 +1519,7 @@ namespace Gekko
                     }
                     else
                     {
-                        Program.FromAToDatabank(Globals.undoSim.tStart, Globals.undoSim.tEnd, false, Program.databanks.GetPrim(), Globals.undoSim.obsWithLags, Globals.undoSim.obsSimPeriod, Globals.undoSim.a, null, null);
+                        Program.FromAToDatabank(Globals.undoSim.tStart, Globals.undoSim.tEnd, false, Program.databanks.GetFirst(), Globals.undoSim.obsWithLags, Globals.undoSim.obsSimPeriod, Globals.undoSim.a, null, null);
                         G.Writeln();
                         G.Writeln("Restored pre-simulation values for the period " + Globals.undoSim.tStart.ToString() + "-" + Globals.undoSim.tEnd.ToString());
                     }
@@ -1537,10 +1537,10 @@ namespace Gekko
                         G.Writeln();
                         G.Writeln("Starting to pack zip file...");
 
-                        Program.FromAToDatabank(Globals.packSim.tStart, Globals.packSim.tEnd, false, Program.databanks.GetPrim(), Globals.packSim.obsWithLags, Globals.packSim.obsSimPeriod, Globals.packSim.a, null, null);
+                        Program.FromAToDatabank(Globals.packSim.tStart, Globals.packSim.tEnd, false, Program.databanks.GetFirst(), Globals.packSim.obsWithLags, Globals.packSim.obsSimPeriod, Globals.packSim.a, null, null);
                         Zipper zipper = new Zipper("gekko_sim_error.zip");
 
-                        Program.Write(Program.databanks.GetPrim(), Globals.packSim.tStart0, Globals.packSim.tEnd, zipper.tempFolder + "\\bank", false, new List<string>(), "" + Globals.extensionDatabank + "", true, false);
+                        Program.Write(Program.databanks.GetFirst(), Globals.packSim.tStart0, Globals.packSim.tEnd, zipper.tempFolder + "\\bank", false, new List<string>(), "" + Globals.extensionDatabank + "", true, false);
                         Program.WaitForFileCopy(Globals.modelPathAndFileName, zipper.tempFolder + "\\model.frm"); ;
                         Program.Pipe(zipper.tempFolder + "\\simerror.txt", null);
                         G.Writeln(Globals.packSim.tStart.ToString() + " " + Globals.packSim.tEnd.ToString());

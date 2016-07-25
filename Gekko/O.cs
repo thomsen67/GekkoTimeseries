@@ -544,7 +544,7 @@ namespace Gekko
                 if (a.Type() == EVariableType.String)
                 {
                     //GENR y = %s; <-- %s is a STRING
-                    TimeSeries ts = Program.databanks.GetPrim().GetVariable(((ScalarString)a)._string2);
+                    TimeSeries ts = Program.databanks.GetFirst().GetVariable(((ScalarString)a)._string2);
                     //a = new MetaTimeSeries(ts, null, null);
                     a = new MetaTimeSeries(ts);
                 }
@@ -1002,12 +1002,12 @@ namespace Gekko
         {            
             ExtractBankAndRestHelper h = Program.ExtractBankAndRest(originalName, EExtrackBankAndRest.OnlyStrings);
 
-            if (h.bank == Globals.primaryCheatString)
+            if (h.bank == Globals.firstCheatString)
             {
-                h.bank = Program.databanks.GetPrim().aliasName;
+                h.bank = Program.databanks.GetFirst().aliasName;
             }            
             
-            if (bankNumber == 2) h.bank = Program.databanks.GetSec().aliasName;  //overrides the bank name given
+            if (bankNumber == 2) h.bank = Program.databanks.GetRef().aliasName;  //overrides the bank name given
             TimeSeries ts = Program.FindOrCreateTimeseries(h.bank, h.name, canAutoCreate, h.hasColon, false);
             MetaTimeSeries ats = new MetaTimeSeries(ts);
             return ats;
@@ -1032,7 +1032,7 @@ namespace Gekko
             {
                 //VAL y = %s[2000]; <-- %s is a STRING
                 //GENR y = %s[2000]; <-- %s is a STRING
-                TimeSeries ts = Program.databanks.GetPrim().GetVariable(((ScalarString)a)._string2);
+                TimeSeries ts = Program.databanks.GetFirst().GetVariable(((ScalarString)a)._string2);
                 //a = new MetaTimeSeries(ts, null, null);
                 a = new MetaTimeSeries(ts);
             }
@@ -1172,7 +1172,7 @@ namespace Gekko
         {
             string s = O.GetString(a);
             List<string> l = new List<string>();
-            l = Program.MatchWildcardInDatabank(s, Program.databanks.GetPrim());            
+            l = Program.MatchWildcardInDatabank(s, Program.databanks.GetFirst());            
             return l;
         }
 
@@ -1654,11 +1654,11 @@ namespace Gekko
 
                 if (G.equal(opt_ref, "yes"))
                 {
-                    readInfo.dbName = Program.databanks.GetSec().aliasName;
+                    readInfo.dbName = Program.databanks.GetRef().aliasName;
                 }
                 else
                 {
-                    readInfo.dbName = Program.databanks.GetPrim().aliasName;
+                    readInfo.dbName = Program.databanks.GetFirst().aliasName;
                 }                
 
                 if (isTo)
@@ -1699,7 +1699,7 @@ namespace Gekko
             {
                 List<string> onlyDatabankNotModel = new List<string>();
                 List<string> onlyModelNotDatabank = new List<string>();
-                foreach (string s in Program.databanks.GetPrim().storage.Keys)
+                foreach (string s in Program.databanks.GetFirst().storage.Keys)
                 {
                     if (G.GetFreqFromKey(s) != Program.options.freq) continue;
                     string s2 = G.RemoveFreqFromKey(s);
@@ -1707,7 +1707,7 @@ namespace Gekko
                 }
                 foreach (string s in Program.model.varsAType.Keys)
                 {                    
-                    if (!Program.databanks.GetPrim().ContainsVariable(s)) onlyModelNotDatabank.Add(s);
+                    if (!Program.databanks.GetFirst().ContainsVariable(s)) onlyModelNotDatabank.Add(s);
                 }
                 if (G.equal(Program.options.interface_mode, "sim"))
                 {
@@ -1798,9 +1798,14 @@ namespace Gekko
                 if (isImportOpen)
                 {
                     //is in reality an OPEN
-                    if (hlp.openType == EOpenType.First || hlp.openType == EOpenType.Ref)
+                    if (hlp.openType == EOpenType.First)
                     {
-                        G.Writeln2("*** ERROR: You cannot use READ ... TO ... together with <prim> or <ref>");
+                        G.Writeln2("*** ERROR: You cannot use IMPORT ... TO ... together with <first>");
+                        throw new GekkoException();
+                    }
+                    if (hlp.openType == EOpenType.Ref)
+                    {
+                        G.Writeln2("*** ERROR: You cannot use IMPORT ... TO ... together with <ref>");
                         throw new GekkoException();
                     }
                     open = true;
@@ -1823,11 +1828,11 @@ namespace Gekko
                 if (readInfo.abortedStar) return;  //an aborted READ *
                 if (G.equal(opt_ref, "yes"))
                 {
-                    readInfo.dbName = Program.databanks.GetSec().aliasName;
+                    readInfo.dbName = Program.databanks.GetRef().aliasName;
                 }
                 else
                 {
-                    readInfo.dbName = Program.databanks.GetPrim().aliasName;
+                    readInfo.dbName = Program.databanks.GetFirst().aliasName;
                 }
                 
                 if (isImportOpen)
@@ -1883,10 +1888,10 @@ namespace Gekko
             public void Exe()
             {                
                 Program.MulbkClone();
-                Databank primary = Program.databanks.GetPrim();
-                int number = primary.storage.Count;
+                Databank first = Program.databanks.GetFirst();
+                int number = first.storage.Count;
                 G.Writeln();
-                G.Writeln("Cleared reference databank ('" + Program.databanks.GetSec().aliasName + "') and copied " + number + " variables from primary ('" + Program.databanks.GetPrim().aliasName + "') to reference ('" + Program.databanks.GetSec().aliasName + "') databank");
+                G.Writeln("Cleared reference databank ('" + Program.databanks.GetRef().aliasName + "') and copied " + number + " variables from first-position ('" + Program.databanks.GetFirst().aliasName + "') to reference ('" + Program.databanks.GetRef().aliasName + "') databank");
                 if (G.equal(Program.options.interface_mode, "data"))
                 {
                     G.Writeln2("+++ WARNING: CLONE is not intended for data-mode (cf. MODE)");
@@ -1924,10 +1929,10 @@ namespace Gekko
                 if (hlp.FileName == null)
                 {
                     Program.MulbkClone();
-                    Databank work = Program.databanks.GetPrim();
+                    Databank work = Program.databanks.GetFirst();
                     int number = work.storage.Count;
                     G.Writeln();
-                    G.Writeln("Cleared " + Globals.Base + " databank and copied " + number + " variables from Work databank into " + Globals.Base + " databank");
+                    G.Writeln("Cleared " + Globals.Ref + " databank and copied " + number + " variables from Work databank into " + Globals.Ref + " databank");
                 }
                 else
                 {
@@ -1940,9 +1945,9 @@ namespace Gekko
                     //Globals.originalDataFileBaseline = helper.fileName;
                     DateTime dt2 = DateTime.Now;
                     double time = (dt2 - dt1).TotalMilliseconds;
-                    readInfo.dbName = Program.databanks.GetSec().aliasName;
+                    readInfo.dbName = Program.databanks.GetRef().aliasName;
                     readInfo.Print();
-                    G.Writeln("+++ NOTE: You may use 'MULBK' without an argument to create a " + Globals.Base + " databank.");
+                    G.Writeln("+++ NOTE: You may use 'MULBK' without an argument to create a " + Globals.Ref + " databank.");
                 }
             }
         }
@@ -2331,6 +2336,62 @@ namespace Gekko
             }
         }
 
+        public class Lock
+        {
+            public string bank = null;
+            public void Exe()
+            {
+                if (G.equal(bank, Globals.Work))
+                {
+                    G.Writeln2("*** ERROR: Work databank cannot be set non-editable");
+                    throw new GekkoException();
+                }
+                if (G.equal(bank, Globals.Ref))
+                {
+                    G.Writeln2("*** ERROR: Ref databank cannot be set non-editable");
+                    throw new GekkoException();
+                }
+                Databank db = Program.databanks.GetDatabank(this.bank);
+                if (db == null)
+                {
+                    G.Writeln2("*** ERROR: Databank '" + this.bank + "' is not open, cf. OPEN command");
+                    throw new GekkoException();
+                }
+                if (db.protect == true)
+                {
+                    G.Writeln2("Databank '" + this.bank + "' is already non-editable");
+                }
+                else
+                {
+                    db.protect = true;
+                    G.Writeln2("Databank '" + this.bank + "' set non-editable");
+                }
+            }
+        }
+
+        public class Unlock
+        {
+            public string bank = null;
+            public void Exe()
+            {
+                Databank db = Program.databanks.GetDatabank(this.bank);
+                if (db == null)
+                {
+                    G.Writeln2("*** ERROR: Databank '" + this.bank + "' is not open, cf. OPEN command");
+                    throw new GekkoException();
+                }
+                if (db.protect == false)
+                {
+                    G.Writeln2("Databank '" + this.bank + "' is already editable");
+                }
+                else
+                {
+                    db.protect = false;
+                    G.Writeln2("Databank '" + this.bank + "' set editable");
+                }
+            }
+        }
+
         public class Close
         {
             public string name = null;
@@ -2343,7 +2404,7 @@ namespace Gekko
                 {
                     foreach (Databank db in Program.databanks.storage)
                     {
-                        if (G.equal(db.aliasName, Globals.Work) || G.equal(db.aliasName, Globals.Base))
+                        if (G.equal(db.aliasName, Globals.Work) || G.equal(db.aliasName, Globals.Ref))
                         {
                         }
                         else databanks.Add(db.aliasName);
@@ -2351,9 +2412,9 @@ namespace Gekko
                 }
                 else
                 {
-                    if (G.equal(this.name, Globals.Work) || G.equal(this.name, Globals.Base))
+                    if (G.equal(this.name, Globals.Work) || G.equal(this.name, Globals.Ref))
                     {
-                        G.Writeln2("*** ERROR: Databanks '" + Globals.Work + "' or '" + Globals.Base + "' cannot be closed (see CLEAR command)");
+                        G.Writeln2("*** ERROR: Databanks '" + Globals.Work + "' or '" + Globals.Ref + "' cannot be closed (see CLEAR command)");
                         throw new GekkoException();
                     }
                     databanks.Add(this.name);
@@ -2393,7 +2454,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("There were no open databanks to close (Work and " + Globals.Base + " cannot be closed)");
+                    G.Writeln2("There were no open databanks to close (Work and " + Globals.Ref + " cannot be closed)");
                 }
             }
 
@@ -2435,7 +2496,8 @@ namespace Gekko
                 if (G.equal(opt_prim, "yes"))
                 {
                     G.Writeln2("*** ERROR: OPEN<prim> is obsolete. In Gekko 2.1.1 and onwards, you should");
-                    G.Writeln("           use OPEN<edit> (or OPEN<first>) instead of OPEN<prim>.", Color.Red);                    
+                    G.Writeln("           use OPEN<edit> instead of OPEN<prim>, if you intend to change", Color.Red);
+                    G.Writeln("           data in the databank.", Color.Red);                    
                     throw new GekkoException();
                 }
 
@@ -2470,6 +2532,10 @@ namespace Gekko
                 if (G.equal(opt_first, "yes"))
                 {
                     hlp.openType = EOpenType.First;
+                }
+                if (G.equal(opt_last, "yes"))
+                {
+                    hlp.openType = EOpenType.Last;
                 }
                 if (G.equal(opt_edit, "yes"))
                 {
@@ -2767,9 +2833,9 @@ namespace Gekko
 
                     if (listItems1 == null)
                     {
-                        //Stuff like "COPY adbk:fx*;"  (copies to primary)
+                        //Stuff like "COPY adbk:fx*;"  (copies to first)
                         //Hmmm: gets run for each item to the left of TO, but the following line runs fast anyway.
-                        if (toBank == null) toBank = Program.databanks.GetPrim();
+                        if (toBank == null) toBank = Program.databanks.GetFirst();
                     }
                     else
                     {
@@ -2801,7 +2867,7 @@ namespace Gekko
 
                     if (tss.Count == 0)
                     {
-                        string s = listItems0[i].Replace(Globals.primaryCheatString, "");
+                        string s = listItems0[i].Replace(Globals.firstCheatString, "");
 
                         if (s.Contains("*") || s.Contains("?") || s.Contains(".."))
                         {
@@ -2821,7 +2887,7 @@ namespace Gekko
                         string newName = null;
                         if (listItems1 == null)
                         {                            
-                            //Stuff like "COPY adbk:fx*;"  (copies to primary)                            
+                            //Stuff like "COPY adbk:fx*;"  (copies to first)                            
                             newName = ts.variableName;  //same name is used
                         }
                         else
@@ -2997,7 +3063,7 @@ namespace Gekko
             public void Exe()
             {
                 //listItems = null;  //just for safety, should not be used.
-                Databank work = Program.databanks.GetPrim();
+                Databank work = Program.databanks.GetFirst();
                 if (true)
                 {
                     if (listItems0.Count != listItems1.Count)
@@ -3875,7 +3941,7 @@ namespace Gekko
                     G.Writeln("");
                     G.Writeln("Please note that this mode is more flexible, but also has more room for errors, if care ", Globals.warningColor);
                     G.Writeln("is not taken (for instance whether a variable is a model variable, or whether a variable ", Globals.warningColor);
-                    G.Writeln("is from the primary databank or stems from some other open databank).", Globals.warningColor);
+                    G.Writeln("is from the first-position databank or stems from some other open databank).", Globals.warningColor);
                 }
                 else
                 {

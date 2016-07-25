@@ -91,7 +91,7 @@ namespace Gekko
             }
             set
             {
-                if (G.equal(this.aliasName, Globals.Work) || G.equal(this.aliasName, Globals.Base))
+                if (G.equal(this.aliasName, Globals.Work) || G.equal(this.aliasName, Globals.Ref))
                 {
                     this.fileNameWithPath = value;  //overwrite filename with latest bank read or merged into Work/Ref
                 }
@@ -99,7 +99,7 @@ namespace Gekko
                 {
                     //If the bank is not Work or Ref, it must have been opened with OPEN
                     //If there is no filename, put it in. But if there is a filename already, always keep it.
-                    //  This may happen in the IMPORT here: OPEN<prim edit>bank; IMPORT<xlsx>data;
+                    //  This may happen in the IMPORT here: OPEN<edit>bank; IMPORT<xlsx>data;
                     //  An IMPORT or READ statement should not alter the filename.
                     if (this.fileNameWithPath == null) this.fileNameWithPath = value;
                     else
@@ -142,7 +142,7 @@ namespace Gekko
             info1 = null;
             date = null;
             this.storage.Clear();
-            //this.fileNameWithPath = null;  --> NO! This would be ok regarding READ, but not regarding OPEN<prim> for instance --> we need a bank to write back to!
+            //this.fileNameWithPath = null;  --> NO! This would be ok regarding READ, but not regarding OPEN<edit/first> for instance --> we need a bank to write back to!
             //this.readInfo = null;  //must be ok to remove, just contains stuff for printing --> but let us keep it for ultra safety for now
             this.isDirty = true;
         }        

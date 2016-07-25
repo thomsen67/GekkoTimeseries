@@ -267,6 +267,8 @@ tokens {
     ASTLISTSUFFIX;
     ASTLISTUNION;
     ASTLISTWITHBANK;
+	ASTLOCK;
+	ASTUNLOCK;
     ASTM;
     ASTMACRO;
     ASTMACROPLUS;
@@ -332,6 +334,7 @@ tokens {
     ASTOPT_STRING_DIRECT;
 	ASTOPT_STRING_EDIT;
 	ASTOPT_STRING_FIRST;
+	ASTOPT_STRING_LAST;
     ASTOPT_STRING_FIX;
     ASTOPT_STRING_FROM;
     ASTOPT_STRING_GBK;
@@ -739,6 +742,8 @@ tokens {
     LIST             = 'LIST'            ;
     LISTFILE='LISTFILE';
     LOG              = 'LOG';
+	LOCK_             = 'LOCK';
+	UNLOCK_           = 'UNLOCK';
     LU               = 'LU';
     M= 'M'               ;
     MACRO2           = 'MACRO2'          ;
@@ -1180,6 +1185,8 @@ tokens {
                                         d.Add("list"    , LIST      );
                                         d.Add("listfile",LISTFILE);
                                         d.Add("log"  , LOG      );
+										d.Add("lock"  , LOCK_      );
+										d.Add("unlock"  , UNLOCK_      );
                                         d.Add("lu"    , LU      );
                                         d.Add("m"       , M    );
                                         d.Add("macro"   , MACRO2     );
@@ -1457,6 +1464,7 @@ expr2                     :
 						  | itershow       SEMICOLON!
 						  | download       SEMICOLON!
                           | list           SEMICOLON!
+						  | lock_          SEMICOLON!
 						  | matrix         SEMICOLON!						  
                           | mem            SEMICOLON!
 						  | mode           SEMICOLON!
@@ -1498,6 +1506,7 @@ expr2                     :
 						  | tuple          SEMICOLON!   //for instance (VAL y, VAL z) = f(%x);
 						  | udvalg         SEMICOLON!
 						  | unfix          SEMICOLON!
+						  | unlock_        SEMICOLON!
 						  | unswap         SEMICOLON!                          
                           | val            SEMICOLON!
 						  | vers           SEMICOLON!
@@ -1714,6 +1723,9 @@ listOpt1                  : leftAngle listOpt1h* RIGHTANGLE -> listOpt1h*
 						  ;
 listOpt1h                 : DIRECT -> ASTDIRECT
 						  ;
+
+lock_                     : LOCK_ ident -> ^({token("ASTLOCK", ASTLOCK, $LOCK_.Line)} ident);
+unlock_                   : UNLOCK_ ident -> ^({token("ASTUNLOCK", ASTUNLOCK, $UNLOCK_.Line)} ident);
 
 matrix                    : matrixHelper name leftBracketGlue expression ',' expression RIGHTBRACKET EQUAL expression -> ^({token("ASTMATRIXINDEXER", ASTMATRIXINDEXER, $EQUAL.Line)} name expression expression expression)
                           | matrixHelper name EQUAL expression -> ^({token("ASTMATRIX", ASTMATRIX, $EQUAL.Line)} name expression)
@@ -2049,6 +2061,7 @@ openOpt1h                 : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)						
 						  | PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)  //obsolete						
 						  | FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)						
+						  | LAST (EQUAL yesNo)? -> ^(ASTOPT_STRING_LAST yesNo?)						
 						  | EDIT (EQUAL yesNo)? -> ^(ASTOPT_STRING_EDIT yesNo?)						
 						  | REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_REF yesNo?)						
 						  | PROT (EQUAL yesNo)? -> ^(ASTOPT_STRING_PROT yesNo?)	
@@ -2922,6 +2935,8 @@ ident                     : Ident|
                             LISTFILE|
                             LIST|
                             LOG|
+							LOCK_|
+							UNLOCK_|
                             LU|
                             MACRO2|
                             MAIN|

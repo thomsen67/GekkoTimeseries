@@ -33,12 +33,12 @@ namespace Gekko
             this.storage = new List<Databank>();
         }
 
-        public Databank GetPrim()
+        public Databank GetFirst()
         {
             return this.storage[0];
         }
 
-        public Databank GetSec()
+        public Databank GetRef()
         {
             return this.storage[1];
         }
@@ -46,7 +46,7 @@ namespace Gekko
         public Databank GetDatabank(string databank) {            
             if (databank == "@")
             {
-                return this.GetSec();
+                return this.GetRef();
             }
             else
             {
@@ -62,18 +62,18 @@ namespace Gekko
         {
             if (openType == EOpenType.Ref)
             {
-                G.Writeln2("+++ WARNING: OPEN<ref> is for advanced users, and will put the existing " + Globals.Base + " in the list of 'normal' databanks", Globals.warningColor);
+                G.Writeln2("+++ WARNING: OPEN<ref> is for advanced users, and will put the existing " + Globals.Ref + " in the list of 'normal' databanks", Globals.warningColor);
             }
             bool readFromFile = false;
             //Does not read the actual bank, but just arranges for the bank to be read into the right 'slot'
-            //If <prim> or <sec>, the bank in the [0] or [1] slot is pushed down to [2].
+            //If <first/edit> or <ref>, the bank in the [0] or [1] slot is pushed down to [2].
             if (G.equal(databank.aliasName, Globals.Work))
             {
-                if (openType == EOpenType.Normal)
+                if (openType == EOpenType.Normal || openType == EOpenType.Last)
                 {
                     G.Writeln2("*** ERROR: The 'Work' databank cannot be opened or closed (it is always open).");
                     throw new GekkoException();
-                }
+                }                
                 else if (openType == EOpenType.First)
                 {
                     G.Writeln2("*** ERROR: You cannot use OPEN<first> with the 'Work' databank.");
@@ -98,26 +98,31 @@ namespace Gekko
                     throw new GekkoException();
                 }     
             }
-            else if (G.equal(databank.aliasName, Globals.Base))  //Ref
+            else if (G.equal(databank.aliasName, Globals.Ref))  //Ref
             {
                 if (openType == EOpenType.Normal)
                 {
-                    G.Writeln2("*** ERROR: The '" + Globals.Base + "' databank cannot be opened or closed (it is always open).");                    
+                    G.Writeln2("*** ERROR: The '" + Globals.Ref + "' databank cannot be opened or closed (it is always open).");                    
                     throw new GekkoException();
                 }
                 else if (openType == EOpenType.First)
                 {
-                    G.Writeln2("*** ERROR: You cannot use OPEN<first> with the '" + Globals.Base + "' databank.");                    
+                    G.Writeln2("*** ERROR: You cannot use OPEN<first> with the '" + Globals.Ref + "' databank.");                    
                     throw new GekkoException();                    
+                }
+                else if (openType == EOpenType.Last)
+                {
+                    G.Writeln2("*** ERROR: You cannot use OPEN<last> with the '" + Globals.Ref + "' databank.");
+                    throw new GekkoException();
                 }
                 else if (openType == EOpenType.Edit)
                 {
-                    G.Writeln2("*** ERROR: You cannot use OPEN<edit> with the '" + Globals.Base + "' databank.");
+                    G.Writeln2("*** ERROR: You cannot use OPEN<edit> with the '" + Globals.Ref + "' databank.");
                     throw new GekkoException();
                 }
                 else if (openType == EOpenType.Ref)
                 {
-                    G.Writeln2("*** ERROR: You cannot use OPEN<ref> with the '" + Globals.Base + "' databank.");                    
+                    G.Writeln2("*** ERROR: You cannot use OPEN<ref> with the '" + Globals.Ref + "' databank.");                    
                     throw new GekkoException();
                 }     
             }
@@ -128,37 +133,35 @@ namespace Gekko
             if (existI != -12345)  //the databank name already exists. No actual file reading, just rearrange the banks
             {                
                 databank = this.storage[existI];  //now points to the existing databank, and no longer the empty databank the method was called with
-                readFromFile = false;                
-                if (openType == EOpenType.Normal)
+                readFromFile = false;
+                if (openType == EOpenType.Normal || openType == EOpenType.Last)
                 {
                     G.Writeln2("*** ERROR: Databank '" + databank.aliasName + "' is already open. Use CLOSE to close it first.");
                     throw new GekkoException();
                 }
-                else if (openType == EOpenType.First || openType == EOpenType.Edit)
-                {
-                    bool edit = false;
-                    if (openType == EOpenType.Edit) edit = true;
+                else if (openType == EOpenType.Edit || openType == EOpenType.First)
+                {                    
                     if (existI == 0) 
                     {
                         //Note: OPEN<edit> could be used to unlock an OPEN<first>...
-                        G.Writeln2("*** ERROR: Databank '" + databank.aliasName + "' is already open in first position.");
-                        throw new GekkoException();
+                        //this.storage[0].protect = false;  //this is set elsewhere
+                        G.Writeln2("Databank '" + databank.aliasName + "' set editable.");                        
                     }
-                    else if (existI == 1)  //Trying an OPEN<first/edit>db on a db that is already ref (opened with OPEN<ref>db).
+                    else if (existI == 1)  //Trying an OPEN<edit>db on a db that is already ref (opened with OPEN<ref>db).
                     {                        
-                        m.Add(this.storage[existI]);    //prim, = former sec
-                        m.Add(this.storage[BaseI]);     //sec, = Base databank, to aviod empty slot
-                        m.Add(this.storage[0]);         //former prim ends here
+                        m.Add(this.storage[existI]);    //first, = former sec
+                        m.Add(this.storage[BaseI]);     //ref, = Ref databank, to aviod empty slot
+                        m.Add(this.storage[0]);         //former first ends here
                         for (int i = 2; i < this.storage.Count; i++)
                         {                            
                             if (i == BaseI) continue;
                             m.Add(this.storage[i]);
                         }                        
                     }
-                    else  //Trying an OPEN<first/edit>db on a db that is already there in slot [2] or below
+                    else  //Trying an OPEN<edit>db on a db that is already there in slot [2] or below
                     {                        
-                        m.Add(this.storage[existI]);         //prim
-                        m.Add(this.storage[1]);              //sec, same
+                        m.Add(this.storage[existI]);         //first
+                        m.Add(this.storage[1]);              //ref, same
                         m.Add(this.storage[0]);
                         for (int i = 2; i < this.storage.Count; i++)
                         {
@@ -166,16 +169,15 @@ namespace Gekko
                             m.Add(this.storage[i]);
                         }                                        
                     }
-                    if (edit) G.Writeln2("Databank '" + name + "' set as editable databank");
-                    else G.Writeln2("Databank '" + name + "' set as first databank");
-                }
+                    G.Writeln2("Databank '" + name + "' set as editable databank, in first position.");                    
+                }                
                 else if (openType == EOpenType.Ref)
                 {
-                    if (existI == 0) //Trying an OPEN<sec>db on a db that is already primary (opened with OPEN<prim>db).
+                    if (existI == 0) //Trying an OPEN<sec>db on a db that is already first/editable (opened with OPEN<first> or OPEN<edit>)
                     {
-                        m.Add(this.storage[WorkI]);    //prim, = Work databank, to aviod empty slot
-                        m.Add(this.storage[existI]);   //sec, = former prim
-                        m.Add(this.storage[1]);        //former sec ends here
+                        m.Add(this.storage[WorkI]);    //first, = Work databank, to aviod empty slot
+                        m.Add(this.storage[existI]);   //ref, = former first
+                        m.Add(this.storage[1]);        //former ref ends here
                         for (int i = 2; i < this.storage.Count; i++)
                         {
                             if (i == WorkI) continue;
@@ -187,10 +189,10 @@ namespace Gekko
                         G.Writeln2("*** ERROR: Databank '" + databank.aliasName + "' is already open as ref bank");
                         throw new GekkoException();
                     }
-                    else  //Trying an OPEN<prim>db on a db that is already there in slot [2] or below
+                    else  //Trying an OPEN<edit/first>db on a db that is already there in slot [2] or below
                     {
-                        m.Add(this.storage[0]);         //prim, same
-                        m.Add(this.storage[existI]);    //sec
+                        m.Add(this.storage[0]);         //first, same
+                        m.Add(this.storage[existI]);    //ref
                         m.Add(this.storage[1]);
                         for (int i = 2; i < this.storage.Count; i++)
                         {
@@ -206,8 +208,8 @@ namespace Gekko
                 readFromFile = true;
                 if (openType == EOpenType.Normal)
                 {                    
-                    m.Add(this.storage[0]);  //prim
-                    m.Add(this.storage[1]);  //sec
+                    m.Add(this.storage[0]);  //first
+                    m.Add(this.storage[1]);  //ref
                     m.Add(databank);
                     for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
                     G.Writeln2("Databank '" + name + "' opened");                
@@ -216,8 +218,8 @@ namespace Gekko
                 {
                     bool edit = false;
                     if (openType == EOpenType.Edit) edit = true;
-                    m.Add(databank);         //prim
-                    m.Add(this.storage[1]);  //sec
+                    m.Add(databank);         //first
+                    m.Add(this.storage[1]);  //ref
                     m.Add(this.storage[0]);
                     for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
                     if (edit) G.Writeln2("Databank '" + name + "' opened as first");
@@ -225,11 +227,19 @@ namespace Gekko
                 }
                 else if (openType == EOpenType.Ref)
                 {
-                    m.Add(this.storage[0]);         //prim
-                    m.Add(databank);                //sec
+                    m.Add(this.storage[0]);         //first
+                    m.Add(databank);                //ref
                     m.Add(this.storage[1]);
                     for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
                     G.Writeln2("Databank '" + name + "' opened as ref");
+                }
+                else if (openType == EOpenType.Last)
+                {
+                    m.Add(this.storage[0]);  //first
+                    m.Add(this.storage[1]);  //ref                
+                    for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
+                    m.Add(databank);
+                    G.Writeln2("Databank '" + name + "' opened");
                 }
             }
             this.storage = m;
@@ -251,7 +261,7 @@ namespace Gekko
                 {
                     WorkI = i;
                 }
-                if (G.equal(Program.databanks.storage[i].aliasName, Globals.Base))
+                if (G.equal(Program.databanks.storage[i].aliasName, Globals.Ref))
                 {
                     BaseI = i;
                 }
@@ -282,9 +292,9 @@ namespace Gekko
                 G.Writeln2("*** ERROR: " + Globals.Work + " databank cannot be closed");
                 throw new GekkoException();
             }
-            if (G.equal(name, Globals.Base))
+            if (G.equal(name, Globals.Ref))
             {
-                G.Writeln2("*** ERROR: " + Globals.Base + " databank cannot be closed");
+                G.Writeln2("*** ERROR: " + Globals.Ref + " databank cannot be closed");
                 throw new GekkoException();
             }
 
@@ -298,7 +308,7 @@ namespace Gekko
             Databank databankToRemove = Program.databanks.storage[existI];
 
             List<Databank> m = new List<Databank>(this.storage.Count - 1);
-            if (existI == 0) //found as primary
+            if (existI == 0) //found as first
             {
                 m.Add(this.storage[WorkI]);  //[0]: Work is put back
                 m.Add(this.storage[1]);  //[1]: not touched
@@ -353,12 +363,12 @@ namespace Gekko
             }
             foreach (Databank databank in Program.databanks.storage)
             {
-                if (G.equal(databank.aliasName, Globals.Base)) dbList.Add(databank);
+                if (G.equal(databank.aliasName, Globals.Ref)) dbList.Add(databank);
             }
             foreach (Databank databank in Program.databanks.storage)
             {
                 if (G.equal(databank.aliasName, Globals.Work)) continue;
-                if (G.equal(databank.aliasName, Globals.Base)) continue;
+                if (G.equal(databank.aliasName, Globals.Ref)) continue;
                 dbList.Add(databank);
             }
             Program.databanks.storage = dbList;            

@@ -40,7 +40,7 @@ namespace Gekko.Parser.Gek
                 compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
             }
 
-            
+                        
             compilerParams.GenerateExecutable = false;
             CSharpCodeProvider csCompiler = new CSharpCodeProvider();
                         

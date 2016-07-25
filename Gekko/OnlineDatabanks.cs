@@ -174,11 +174,11 @@ namespace Gekko
                                 if (gt.StrictlyLargerThan(gt1)) gt1 = gt;
                             }
 
-                            if (Program.databanks.GetPrim().GetVariable(G.GetFreq(freq), ts.variableName) != null)
+                            if (Program.databanks.GetFirst().GetVariable(G.GetFreq(freq), ts.variableName) != null)
                             {
-                                Program.databanks.GetPrim().RemoveVariable(G.GetFreq(freq), ts.variableName);
+                                Program.databanks.GetFirst().RemoveVariable(G.GetFreq(freq), ts.variableName);
                             }
-                            Program.databanks.GetPrim().AddVariable(freq, ts);
+                            Program.databanks.GetFirst().AddVariable(freq, ts);
                             //if (j == 0) G.Writeln();
                             G.Writeln(ts.variableName + ", with freq " + freq.ToUpper() + ", " + G.FromDateToString(gt0) + "-" + G.FromDateToString(gt1));
                             //counter++;                        

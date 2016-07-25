@@ -106,7 +106,7 @@ namespace Gekko
     {
         Normal,
         OpenedNewNonExistingFile,
-        OpenedPrimOrSecAlreadyOpenBank
+        OpenedFirstOrRefAlreadyOpenBank
     }
 
     public enum EdataFormat
@@ -1719,17 +1719,17 @@ namespace Gekko
 
         public static void Index(string listName, string wildCard)
         {
-            string bank = Program.databanks.GetPrim().aliasName;
+            string bank = Program.databanks.GetFirst().aliasName;
             if (wildCard.StartsWith(Globals.Work.ToLower() + ":", StringComparison.OrdinalIgnoreCase))
             {
                 bank = Globals.Work;
                 wildCard = wildCard.Substring(Globals.Work.Length + 1);
                 wildCard = wildCard.Trim();
             }
-            if (wildCard.StartsWith(Globals.Base.ToLower() + ":", StringComparison.OrdinalIgnoreCase))
+            if (wildCard.StartsWith(Globals.Ref.ToLower() + ":", StringComparison.OrdinalIgnoreCase))
             {
-                bank = Globals.Base;
-                wildCard = wildCard.Substring(Globals.Base.Length + 1);
+                bank = Globals.Ref;
+                wildCard = wildCard.Substring(Globals.Ref.Length + 1);
                 wildCard = wildCard.Trim();
             }
 
@@ -1789,19 +1789,46 @@ namespace Gekko
             //open = true if called with OPEN command            
 
             int n = 1;
+            List<int> list = new List<int>();
             if (open)
             {
                 CheckOpenSyntax(oRead);  //checks for * etc.
                 n = oRead.openFileNames.Count;
-                if (n > 1 && oRead.openType == EOpenType.Normal)
+                if (n > 1)
                 {
-                    //NOTE: Could be made ok with first and last!
-                    G.Writeln2("*** ERROR: You cannot open several banks using first/last/ref/edit designators inside the <>-field");
-                    throw new GekkoException();
+                    if (oRead.openType == EOpenType.Edit)
+                    {
+                        G.Writeln2("*** ERROR: OPEN<edit> must be used with 1 databank");
+                        throw new GekkoException();
+                    }
+                    else if (oRead.openType == EOpenType.Ref)
+                    {
+                        G.Writeln2("*** ERROR: OPEN<ref> must be used with 1 databank");
+                        throw new GekkoException();
+                    }
+                }
+                if (oRead.openType == EOpenType.Last)
+                {
+                    for (int i = 0; i < n; i++)
+                    {
+                        list.Add(i);
+                    }
+                }
+                else
+                {
+                    for (int i = n - 1; i >= 0; i--)
+                    {
+                        list.Add(i);
+                    }
                 }
             }
+            else
+            {
+                //READ or IMPORT has only 1 bank
+                list.Add(1);
+            }
 
-            for (int i = n - 1; i >= 0; i--)
+            foreach(int i in list)
             {
                 ReadInfo readInfo = new ReadInfo();               
 
@@ -1904,16 +1931,16 @@ namespace Gekko
                 if (open)
                 {
                     //if new databank (read from disk), the newly created 'databank' is put into the right slot (and other databanks are moved around)
-                    //if existing databank, isReadFromFile = false, 'databank' will point to the found databank (that may be moved, for instance with OPEN<prim> of existing bank)
+                    //if existing databank, isReadFromFile = false, 'databank' will point to the found databank (that may be moved, for instance with OPEN<editm> of existing bank)
                     isReadFromFile = Program.databanks.OpenDatabank(ref databank, oRead.openType); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file
                     if (createNewOpenFile) readInfo.type = EReadInfoTypes.OpenedNewNonExistingFile;
-                    else if (!isReadFromFile) readInfo.type = EReadInfoTypes.OpenedPrimOrSecAlreadyOpenBank;
+                    else if (!isReadFromFile) readInfo.type = EReadInfoTypes.OpenedFirstOrRefAlreadyOpenBank;
                 }
                 else
                 {
                     //READ or MULBK
-                    databank = Program.databanks.GetPrim();
-                    if (oRead.openType == EOpenType.Ref) databank = Program.databanks.GetSec();
+                    databank = Program.databanks.GetFirst();
+                    if (oRead.openType == EOpenType.Ref) databank = Program.databanks.GetRef();
                     readInfo.type = EReadInfoTypes.Normal;
                 }
 
@@ -1933,7 +1960,7 @@ namespace Gekko
                 if (readInfo.type != EReadInfoTypes.Normal)
                 {
                     //When creating a new file with "OPEN xyz" (where xyz does not exist), of
-                    //  "OPEN<prim>abc" where abc is already open, nothing should be read from file.
+                    //  "OPEN<edit>abc" where abc is already open, nothing should be read from file.
                     readInfo.databank = databank;
                     readInfo.databank.FileNameWithPath = readInfo.fileName;
                     readInfos.Add(readInfo);
@@ -2178,7 +2205,7 @@ namespace Gekko
             string fileName = o.fileName;
             fileName = AddExtension(fileName, ".xlsx");
             fileName =  Program.CreateFullPathAndFileNameFromFolder(fileName, null);
-            TableLight matrix = ReadExcelWorkbook(fileName, Program.databanks.GetPrim());
+            TableLight matrix = ReadExcelWorkbook(fileName, Program.databanks.GetFirst());
 
             int obs = GekkoTime.Observations(o.t1, o.t2);
             int n = o.listItems.Count;
@@ -4980,12 +5007,12 @@ namespace Gekko
             string banks = "";
             if (s1.Equals(""))
             {
-                int wCount = Program.databanks.GetPrim().storage.Count;
-                int rCount = Program.databanks.GetSec().storage.Count;
+                int wCount = Program.databanks.GetFirst().storage.Count;
+                int rCount = Program.databanks.GetRef().storage.Count;
                 string originalDataFileWork = "[empty]";
                 string originalDataFileBaseline = "[empty]";
-                string w = GetDatabankFileNameWithPath(Program.databanks.GetPrim().aliasName);
-                string b = GetDatabankFileNameWithPath(Program.databanks.GetSec().aliasName);
+                string w = GetDatabankFileNameWithPath(Program.databanks.GetFirst().aliasName);
+                string b = GetDatabankFileNameWithPath(Program.databanks.GetRef().aliasName);
                 if (w != null) originalDataFileWork = w;
                 if (b != null) originalDataFileBaseline = b;
                 string banks1 = "";
@@ -5032,18 +5059,18 @@ namespace Gekko
                 }
                 else if (banks2 == "[empty]")
                 {
-                    banks = "    |    Prim: " + banks1;
+                    banks = "    |    First: " + banks1;
                 }
                 else
                 {
-                    banks = "    |    Prim: " + banks1 + "    |    " + Globals.Base + ": " + banks2;
+                    banks = "    |    First: " + banks1 + "    |    " + "Ref" + ": " + banks2;
                 }
 
                 workingFolder = Program.options.folder_working;
 
             }
 
-            Gui.gui.toolStripStatusLabel1.ToolTipText = "Period: " + f + " " + start + "-" + end + G.NL + "Prim: " + GetDatabankFileNameWithPath(Program.databanks.GetPrim().aliasName) + G.NL + "" + Globals.Base + ": " + GetDatabankFileNameWithPath(Program.databanks.GetSec().aliasName) + G.NL + "Working folder: " + Program.options.folder_working + G.NL + "Mode: " + Program.options.interface_mode;
+            Gui.gui.toolStripStatusLabel1.ToolTipText = "Period: " + f + " " + start + "-" + end + G.NL + "First: " + GetDatabankFileNameWithPath(Program.databanks.GetFirst().aliasName) + G.NL + "" + Globals.Ref + ": " + GetDatabankFileNameWithPath(Program.databanks.GetRef().aliasName) + G.NL + "Working folder: " + Program.options.folder_working + G.NL + "Mode: " + Program.options.interface_mode;
 
             if (Globals.workerThread != null)
             {
@@ -5279,7 +5306,7 @@ namespace Gekko
 
         public static void ClearTmpTmpVariables()
         {
-            //Program.databanks.GetPrim().ClearTmpTmpVars();
+            //Program.databanks.Getfirst().ClearTmpTmpVars();
             //Program.databanks.GetSec().ClearTmpTmpVars();
         }
 
@@ -5425,7 +5452,7 @@ namespace Gekko
             int t0 = 2013;
 
             Table table = new Table();
-            //Program.databanks.GetPrim().Clear();
+            //Program.databanks.Getfirst().Clear();
 
             //Variable LMax
             //dim 0 --> DA IX IW
@@ -6597,11 +6624,11 @@ namespace Gekko
                                     throw new GekkoException();
                                 }
                             }
-                            if (Program.databanks.GetPrim().ContainsVariable(varName))
+                            if (Program.databanks.GetFirst().ContainsVariable(varName))
                             {
-                                Program.databanks.GetPrim().RemoveVariable(varName);
+                                Program.databanks.GetFirst().RemoveVariable(varName);
                             }
-                            Program.databanks.GetPrim().AddVariable(ts);
+                            Program.databanks.GetFirst().AddVariable(ts);
                             if (first) G.Writeln();
                             G.Writeln("Adjusted timeseries: " + varName);
                             first = false;
@@ -6807,7 +6834,7 @@ public static bool IsLargeAware(Stream stream)
             }
             try
             {
-                TimeSeries ts = Program.databanks.GetPrim().GetVariable(variableNameWithoutLag);
+                TimeSeries ts = Program.databanks.GetFirst().GetVariable(variableNameWithoutLag);
                 if (ts != null)
                 {
                     string label = ts.label;
@@ -6942,8 +6969,8 @@ public static bool IsLargeAware(Stream stream)
             double relCritNormal = 0.01d;  //1%
 
             List<string> both = new List<string>();
-            Databank work = Program.databanks.GetPrim();
-            Databank base2 = Program.databanks.GetSec();
+            Databank work = Program.databanks.GetFirst();
+            Databank base2 = Program.databanks.GetRef();
             foreach (string tsString in work.storage.Keys)
             {
                 TimeSeries tsGrund = base2.GetVariable(tsString);
@@ -7009,7 +7036,7 @@ public static bool IsLargeAware(Stream stream)
 
         public static void Randommodelcheck()
         {
-            TimeSeries ts = Program.databanks.GetPrim().GetVariable("sum");
+            TimeSeries ts = Program.databanks.GetFirst().GetVariable("sum");
             foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime((Program.options.freq), 2002, 1), new GekkoTime((Program.options.freq), 2100, 1)))
             {
                 if (Math.Abs(ts.GetData(t)) > 3 * 1.0e-4)  //hmmm seems error can be a little > 0.0001
@@ -7980,7 +8007,7 @@ public static bool IsLargeAware(Stream stream)
                     }
                     else if (s.Contains("@"))
                     {
-                        G.Writeln2("*** ERROR: You cannot decompose with '@' (" + Globals.Base + " bank indicator)");
+                        G.Writeln2("*** ERROR: You cannot decompose with '@' (" + Globals.Ref + " bank indicator)");
                         throw new GekkoException();
                     }
                 }
@@ -8162,8 +8189,8 @@ public static bool IsLargeAware(Stream stream)
 
                 List<Databank> banks = new List<Databank>();
 
-                Databank work = Program.databanks.GetPrim();
-                Databank base2 = Program.databanks.GetSec();
+                Databank work = Program.databanks.GetFirst();
+                Databank base2 = Program.databanks.GetRef();
                 banks.Add(work);
                 banks.Add(base2);
                 List<string> allVariables = GetAllVariablesForDecompose(leftSideVariable, p2);
@@ -8227,7 +8254,7 @@ public static bool IsLargeAware(Stream stream)
 
                         //factors.Add(t + ": explanation = " + G.pchFormat(alpha * 100, 10) + "%");
                         //G.Writeln(t + "  " + "sum " + sum + "   truth " + truth + "  alpha " + alpha);
-                        string key = "PRIM";
+                        string key = "FIRST";
                         if (counter == 1) key = "REF";
 
                         decompHelpers.Add(key + "," + t.ToString(), decompContributions);  //key for instance "Work,2010"
@@ -8262,7 +8289,7 @@ public static bool IsLargeAware(Stream stream)
                     j++;
                     if (j == 0)
                     {
-                        List<DecompHelper> dhList2 = decompHelpers["PRIM," + t.ToString()];
+                        List<DecompHelper> dhList2 = decompHelpers["FIRST," + t.ToString()];
                         int i = -1;
                         foreach (DecompHelper dh in dhList2)
                         {
@@ -8281,9 +8308,9 @@ public static bool IsLargeAware(Stream stream)
                     }
                     table.SetDate(1, j + 2, t.ToString());
 
-                    List<DecompHelper> data = null; decompHelpers.TryGetValue("PRIM," + t.ToString(), out data);
-                    List<DecompHelper> data_lag = null; decompHelpers.TryGetValue("PRIM," + t.Add(-1).ToString(), out data_lag);
-                    List<DecompHelper> data_lag2 = null; decompHelpers.TryGetValue("PRIM," + t.Add(-2).ToString(), out data_lag2);
+                    List<DecompHelper> data = null; decompHelpers.TryGetValue("FIRST," + t.ToString(), out data);
+                    List<DecompHelper> data_lag = null; decompHelpers.TryGetValue("FIRST," + t.Add(-1).ToString(), out data_lag);
+                    List<DecompHelper> data_lag2 = null; decompHelpers.TryGetValue("FIRST," + t.Add(-2).ToString(), out data_lag2);
                     List<DecompHelper> data_base = null; decompHelpers.TryGetValue("REF," + t.ToString(), out data_base);
                     List<DecompHelper> data_base_lag = null; decompHelpers.TryGetValue("REF," + t.Add(-1).ToString(), out data_base_lag);
                     List<DecompHelper> data_base_lag2 = null; decompHelpers.TryGetValue("REF," + t.Add(-2).ToString(), out data_base_lag2);
@@ -9142,19 +9169,19 @@ public static bool IsLargeAware(Stream stream)
             string[] split = input.Split(':');
             if (split.Length == 1)
             {
-                h.bank = Program.databanks.GetPrim().aliasName;
+                h.bank = Program.databanks.GetFirst().aliasName;
                 h.name = split[0].Trim();
             }
             else if (split.Length == 2)
             {
                 h.bank = split[0].Trim();
-                if (h.bank == Globals.primaryCheatString)
+                if (h.bank == Globals.firstCheatString)
                 {
-                    h.bank = Program.databanks.GetPrim().aliasName;
+                    h.bank = Program.databanks.GetFirst().aliasName;
                 }
                 else if (h.bank == "@")
                 {
-                    h.bank = Program.databanks.GetSec().aliasName;
+                    h.bank = Program.databanks.GetRef().aliasName;
                     h.hasColon = true;
                 }
                 else
@@ -10794,17 +10821,7 @@ public static bool IsLargeAware(Stream stream)
             return 1;
 
         }
-
-        private static void PrintMacroError()
-        {
-            G.Writeln("           In Gekko, macros are read-only and are intended");
-            G.Writeln("           to be put at the top of you master/primary");
-            G.Writeln("           command file. The only way to clear macros is");
-            G.Writeln("           by means of CLEAR, or closing and opening Gekko.");
-            G.Writeln("           Macro's will be phased out of Gekko, and are replaced");
-            G.Writeln("           by memory variables (see STRING, DATE, VAL etc.).");
-        }
-
+        
         public static string GetTextFromFileWithWait(string filename)
         {
             //Encoding encoding = Encoding.Default;
@@ -11164,7 +11181,7 @@ public static bool IsLargeAware(Stream stream)
                 MetaTimeSeries ats = O.GetTimeSeries(var, 0, O.ECreatePossibilities.None);
                 TimeSeries ts = ats.ts;
 
-                //Databank db = Program.databanks.GetPrim();
+                //Databank db = Program.databanks.Getfirst();
                 //TimeSeries ts = db.GetVariable(var);
 
                 if (ts == null)
@@ -11497,8 +11514,8 @@ public static bool IsLargeAware(Stream stream)
         public static void Hdg(string text)
         {
             if (text.EndsWith(";")) text = text.Substring(0, text.Length - 1);  //Should be HDG 'text'; fixing it here
-            Program.databanks.GetPrim().info1 = text;
-            G.Writeln2("Databank heading for '" + Program.databanks.GetPrim().aliasName + "' databank set to: '" + text + "'");
+            Program.databanks.GetFirst().info1 = text;
+            G.Writeln2("Databank heading for '" + Program.databanks.GetFirst().aliasName + "' databank set to: '" + text + "'");
         }
 
         public static void Checkoff(List<string> vars2, string type)
@@ -12658,7 +12675,7 @@ public static bool IsLargeAware(Stream stream)
                 throw new GekkoException();
             }
 
-            List<Databank> banks = new List<Databank> { Program.databanks.GetPrim(), Program.databanks.GetSec() };
+            List<Databank> banks = new List<Databank> { Program.databanks.GetFirst(), Program.databanks.GetRef() };
 
             G.Writeln();
             foreach (Databank bank in banks)
@@ -12701,7 +12718,7 @@ public static bool IsLargeAware(Stream stream)
             bool hasFilter = false;
             bool hasModel = false;
 
-            Databank work = Program.databanks.GetPrim();
+            Databank work = Program.databanks.GetFirst();
 
             Dictionary<string, string> exod = null;
             Dictionary<string, string> exoj = null;
@@ -13291,7 +13308,7 @@ public static bool IsLargeAware(Stream stream)
             if (CheckYesNoNullLogic(so.isStatic, Program.options.solve_static))
             {
                 Globals.undoBank = new Databank("UndoBank");
-                G.CloneDatabank(Globals.undoBank, Program.databanks.GetPrim());
+                G.CloneDatabank(Globals.undoBank, Program.databanks.GetFirst());
             }
 
             if (Program.options.solve_gauss_dump)
@@ -13303,7 +13320,7 @@ public static bool IsLargeAware(Stream stream)
 
             Program.model.simulateResults = new double[10];  //fix
 
-            Databank work = Program.databanks.GetPrim();
+            Databank work = Program.databanks.GetFirst();
             TimeSeries[] timeSeriesPointers = new TimeSeries[Program.model.varsBType.Count];
             int[] extraWritebackPointers = new int[Program.model.varsBType.Count]; //will probably become obsolete at some point
             int[] revertedPointers = new int[Program.model.varsBType.Count];
@@ -14134,10 +14151,10 @@ public static bool IsLargeAware(Stream stream)
                 if (Program.options.solve_forward_dump)
                 {
                     //G.writeln();
-                    if (Program.databanks.GetPrim().ContainsVariable(ts.variableName)) Program.databanks.GetPrim().RemoveVariable(ts.variableName);
-                    if (Program.databanks.GetPrim().ContainsVariable(tsrel.variableName)) Program.databanks.GetPrim().RemoveVariable(tsrel.variableName);
-                    Program.databanks.GetPrim().AddVariable(ts);
-                    Program.databanks.GetPrim().AddVariable(tsrel);
+                    if (Program.databanks.GetFirst().ContainsVariable(ts.variableName)) Program.databanks.GetFirst().RemoveVariable(ts.variableName);
+                    if (Program.databanks.GetFirst().ContainsVariable(tsrel.variableName)) Program.databanks.GetFirst().RemoveVariable(tsrel.variableName);
+                    Program.databanks.GetFirst().AddVariable(ts);
+                    Program.databanks.GetFirst().AddVariable(tsrel);
                 }
 
             }
@@ -14278,10 +14295,10 @@ public static bool IsLargeAware(Stream stream)
                     if (Program.options.solve_forward_dump)
                     {
                         //G.writeln();
-                        if (Program.databanks.GetPrim().ContainsVariable(ts.variableName)) Program.databanks.GetPrim().RemoveVariable(ts.variableName);
-                        if (Program.databanks.GetPrim().ContainsVariable(tsrel.variableName)) Program.databanks.GetPrim().RemoveVariable(tsrel.variableName);
-                        Program.databanks.GetPrim().AddVariable(ts);
-                        Program.databanks.GetPrim().AddVariable(tsrel);
+                        if (Program.databanks.GetFirst().ContainsVariable(ts.variableName)) Program.databanks.GetFirst().RemoveVariable(ts.variableName);
+                        if (Program.databanks.GetFirst().ContainsVariable(tsrel.variableName)) Program.databanks.GetFirst().RemoveVariable(tsrel.variableName);
+                        Program.databanks.GetFirst().AddVariable(ts);
+                        Program.databanks.GetFirst().AddVariable(tsrel);
                     }
                 }
             }
@@ -14813,7 +14830,7 @@ public static bool IsLargeAware(Stream stream)
                 //NB: This check is here, to avoid having to do it for each timeseries later on.
                 //    The data is written in a special (fast) way that does not get checked automatically regarding
                 //    dirty and protect, cf. //#98726527
-                G.Writeln2("*** ERROR: You are trying to simulate with a primary databank ('" + work.aliasName + "') that is non-editable");
+                G.Writeln2("*** ERROR: You are trying to simulate with a first-position databank ('" + work.aliasName + "') that is non-editable");
                 throw new GekkoException();
             }
             DateTime dt4 = DateTime.Now;
@@ -14863,7 +14880,7 @@ public static bool IsLargeAware(Stream stream)
             {
                 GekkoTime t = tStart.Add(0);
                 //Fail-fast check of what data is missing in order to simulate
-                if (Program.databanks.GetPrim().storage.Count == 0)
+                if (Program.databanks.GetFirst().storage.Count == 0)
                 {
                     G.Writeln2("*** ERROR: There were no variables in the databank. Did you forget to load a databank?");
                     G.Writeln("           Simulation is aborted");
@@ -15404,7 +15421,7 @@ public static bool IsLargeAware(Stream stream)
             }
             else
             {
-                Databank work = Program.databanks.GetPrim();
+                Databank work = Program.databanks.GetFirst();
                 work.Clear();
                 G.CloneDatabank(work, Globals.undoBank);
                 if (!Globals.setPrintMute) G.Writeln("Old databank re-established");
@@ -15433,8 +15450,8 @@ public static bool IsLargeAware(Stream stream)
                 throw new GekkoException();
             }
 
-            Databank work = Program.databanks.GetPrim();
-            Databank base2 = Program.databanks.GetSec();
+            Databank work = Program.databanks.GetFirst();
+            Databank base2 = Program.databanks.GetRef();
 
             file = AddExtension(file, "." + Globals.extensionCommand);
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, Program.options.folder_working);
@@ -15558,7 +15575,7 @@ public static bool IsLargeAware(Stream stream)
             //GekkoTime tStart, tEnd; ConvertToGekkoTime(tp, out tStart, out tEnd);
             //GekkoTime indexYear = G.FromStringToDate(date);
 
-            Databank work = Program.databanks.GetPrim();
+            Databank work = Program.databanks.GetFirst();
 
             //if (!list1.StartsWith("#"))
             //{
@@ -15851,7 +15868,7 @@ public static bool IsLargeAware(Stream stream)
             if (enlarge) o.data = UpdEnlargeDataArray(expectedNumberOfObservations, o.data);
 
             //ErrorIfDatabanksSwapped();
-            Databank primary = Program.databanks.GetPrim();
+            Databank first = Program.databanks.GetFirst();
 
             string op = o.op;
 
@@ -15873,7 +15890,7 @@ public static bool IsLargeAware(Stream stream)
                             //only vars beginning with "xx", and only "="-operator
                             //G.Writeln("+++ NOTE: upd: variable " + var + " not found in databank -- is created");
                             ts = new TimeSeries(Program.options.freq, var);
-                            primary.AddVariable(ts);
+                            first.AddVariable(ts);
                         }
                         else
                         {
@@ -16010,10 +16027,10 @@ public static bool IsLargeAware(Stream stream)
             bool writeAllVariables = false;
             if (list == null) writeAllVariables = true;
 
-            Databank primary = Program.databanks.GetPrim();
+            Databank first = Program.databanks.GetFirst();
             if (writeAllVariables)  //writing the whole databank
             {
-                list = GetAllVariablesFromBank(list, primary);
+                list = GetAllVariablesFromBank(list, first);
             }
             else
             {
@@ -16049,7 +16066,7 @@ public static bool IsLargeAware(Stream stream)
                 }
                 else
                 {                                    
-                    GetDatabankPeriodFilteredForFreq(newList, ref tStart, ref tEnd, primary);
+                    GetDatabankPeriodFilteredForFreq(newList, ref tStart, ref tEnd, first);
                 }
             }
 
@@ -16093,7 +16110,7 @@ public static bool IsLargeAware(Stream stream)
                     string var = (string)newList[i];
                     string varLabel = (string)newList[i];
                     eo.excelRowLabels[i, 0] = varLabel;
-                    TimeSeries ts = primary.GetVariable(var);
+                    TimeSeries ts = first.GetVariable(var);
                     //TimeSeries tsGrund = base2.GetVariable(var);
                     if (ts == null)
                     {
@@ -16140,7 +16157,7 @@ public static bool IsLargeAware(Stream stream)
                 //    tStart = new GekkoTime(tStart.freq, -12345, 1);
                 //    tEnd = new GekkoTime(tEnd.freq, -12345, 1);
                 //}
-                return Write(primary, tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
+                return Write(first, tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
             }
             else
             {
@@ -16454,7 +16471,7 @@ public static bool IsLargeAware(Stream stream)
             doc.AppendChild(root);
 
             XmlElement comment = doc.CreateElement("Info1");  //HDG
-            comment.InnerText = Program.databanks.GetPrim().info1;
+            comment.InnerText = Program.databanks.GetFirst().info1;
             root.AppendChild(comment);
 
             XmlElement date = doc.CreateElement("Date");
@@ -16465,12 +16482,12 @@ public static bool IsLargeAware(Stream stream)
             if (Program.model != null && !isCloseCommand)
             {
                 //We do not want to put model info into XML if it is a CLOSE command triggering the bank write, for
-                //instance after a OPEN<prim>, etc. This is mode=data and something else.
+                //instance after a OPEN<edit>, etc. This is mode=data and something else.
                 //(Would probably happen very rarely anyhow, since model endogenous and databank variables must match)
                 bool ok = true;
                 foreach (string s in Program.model.endogenousOriginallyInModel.Keys)
                 {
-                    if (!Program.databanks.GetPrim().ContainsVariable(s))
+                    if (!Program.databanks.GetFirst().ContainsVariable(s))
                     {
                         ok = false;
                         break;
@@ -16940,7 +16957,7 @@ public static bool IsLargeAware(Stream stream)
         private static int CsvPrnWrite(List<string> vars, string filename, GekkoTime per1, GekkoTime per2, EdataFormat format)
         {
             int prnWidth = 18;
-            Databank prim = Program.databanks.GetPrim();
+            Databank first = Program.databanks.GetFirst();
             
             if (format == EdataFormat.Csv)
             {
@@ -16972,7 +16989,7 @@ public static bool IsLargeAware(Stream stream)
                 {
                     string s3 = var;
 
-                    TimeSeries ts = prim.GetVariable(s3);
+                    TimeSeries ts = first.GetVariable(s3);
                     if (ts == null)
                     {
                         //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
@@ -17081,7 +17098,7 @@ public static bool IsLargeAware(Stream stream)
         private static int GnuplotWrite(List<string> vars, string filename, GekkoTime per1, GekkoTime per2)
         {
             int prnWidth = 18;
-            Databank prim = Program.databanks.GetPrim();
+            Databank first = Program.databanks.GetFirst();
 
             G.Writeln2("Writing gnuplot file for the period " + G.FromDateToString(per1) + "-" + G.FromDateToString(per2));
             filename = AddExtension(filename, ".dat");
@@ -17097,7 +17114,7 @@ public static bool IsLargeAware(Stream stream)
                 foreach (string var in vars)
                 {
                     string s3 = var;
-                    TimeSeries ts = prim.GetVariable(s3);
+                    TimeSeries ts = first.GetVariable(s3);
                     if (ts == null)
                     {
                         G.Writeln2("*** ERROR: Writing gnuplot file: variable " + s3 + " with freq '" + Program.options.freq + "' does not exist");
@@ -17113,7 +17130,7 @@ public static bool IsLargeAware(Stream stream)
                     foreach (string var in vars)
                     {
                         string s3 = var;
-                        TimeSeries ts = prim.GetVariable(s3);  //existence has been checked
+                        TimeSeries ts = first.GetVariable(s3);  //existence has been checked
                         double data = ts.GetData(t);
                         if (G.isNumericalError(data))
                         {
@@ -17159,7 +17176,7 @@ public static bool IsLargeAware(Stream stream)
 
         private static int Tspwrite(List<string> vars, string filename, GekkoTime per1, GekkoTime per2, bool isCaps)
         {
-            Databank work = Program.databanks.GetPrim();
+            Databank work = Program.databanks.GetFirst();
             filename = filename;
             filename = AddExtension(filename, ".tsp");
             string pathAndFilename = CreateFullPathAndFileName(filename);
@@ -17292,20 +17309,20 @@ public static bool IsLargeAware(Stream stream)
             }
             if (G.equal(o.opt_first, "yes"))
             {
-                Program.databanks.GetPrim().Clear();
-                G.Writeln2("Cleared first databank ('" + Program.databanks.GetPrim().aliasName + "')");
+                Program.databanks.GetFirst().Clear();
+                G.Writeln2("Cleared first databank ('" + Program.databanks.GetFirst().aliasName + "')");
             }
             if (G.equal(o.opt_ref, "yes"))
             {
-                Program.databanks.GetSec().Clear();
-                G.Writeln2("Cleared ref databank ('" + Program.databanks.GetSec().aliasName + "')");
+                Program.databanks.GetRef().Clear();
+                G.Writeln2("Cleared ref databank ('" + Program.databanks.GetRef().aliasName + "')");
             }
             if (o.name == null && !G.equal(o.opt_first, "yes") && !G.equal(o.opt_ref, "yes"))
             {
                 //Before: Cleared 'Work' and 'Ref' regardless of position
-                Program.databanks.GetPrim().Clear();
-                Program.databanks.GetSec().Clear();
-                G.Writeln2("Cleared first and ref databanks ('" + Program.databanks.GetPrim().aliasName + "' and '" + Program.databanks.GetSec().aliasName + "')");
+                Program.databanks.GetFirst().Clear();
+                Program.databanks.GetRef().Clear();
+                G.Writeln2("Cleared first and ref databanks ('" + Program.databanks.GetFirst().aliasName + "' and '" + Program.databanks.GetRef().aliasName + "')");
             }
         }
 
@@ -17408,7 +17425,7 @@ public static bool IsLargeAware(Stream stream)
             {
                 //The avoids creating new databanks, better to keep the original ones and switch their places.
                 if (G.equal(Program.databanks.storage[i].aliasName, Globals.Work)) w = i;
-                else if (G.equal(Program.databanks.storage[i].aliasName, Globals.Base)) b = i;
+                else if (G.equal(Program.databanks.storage[i].aliasName, Globals.Ref)) b = i;
                 else
                 {
                     MaybeWriteOpenDatabank(Program.databanks.storage[i]);
@@ -17427,6 +17444,8 @@ public static bool IsLargeAware(Stream stream)
                 G.Writeln2("*** ERROR: The databank '" + removed.aliasName + "' was opened with the OPEN command.");
                 G.Writeln("           It has been altered, but the changes cannot be written back to the", Color.Red);
                 G.Writeln("           underlying databank file, since this file is not a ." + Globals.extensionDatabank + " file.", Color.Red);
+                G.Writeln("           (If the databank was opened with OPEN<edit>, you may use WRITE to write the ", Color.Red);
+                G.Writeln("           databank to file).", Color.Red);
                 G.Writeln();
                 throw new GekkoException();
             }
@@ -18344,36 +18363,30 @@ public static bool IsLargeAware(Stream stream)
                         s5 += pTag + "<a href=\"#\"   onclick=\"document.getElementById('hiddenText').style.display='block'; return false;\">Transform options</a> " + "</p>";
 
                         s5 += "<div style=\"display: none;\" id=\"hiddenText\">" + G.NL;
-                        string s = "style = \"margin:0; padding:0; opacity : 0.5;\"";
-                        //s5 += "<form " + s + ">";
-                        //foreach (string code in new string[] { "n", "d", "p", "m", "q", "r", "rd", "rp" })
-                        //{
-                        //    s5 += "<label CLASS=\"gfsize gfont\" title=\"Some long tool-tip text goes here\">  <input  CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#" + code + "';\"/>" + code + " &nbsp; &nbsp; </label>";
-                        //}
-                        //s5 += "</form>";
+                        string s = "style = \"margin:0; padding:0; opacity : 0.5;\"";                        
 
                         s5 += "<table CLASS=\"gfsize gfont\"  style=\"color:gray\" >";
                         s5 += " <tr>";
                         s5 += "   <td></td>";
-                        s5 += "   <td>Primary &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </td>";
+                        s5 += "   <td>First &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </td>";
                         s5 += "   <td>Reference &nbsp; &nbsp; &nbsp; &nbsp; </td>";
                         s5 += "   <td>Multiplier</td>";
                         s5 += " </tr>";
                         s5 += " <tr>";
                         s5 += "   <td>Levels &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  </td>";
-                        s5 += "   <td><input title=\"Levels as they are in primary databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#n" + "';\"/>n</td>";
+                        s5 += "   <td><input title=\"Levels as they are in first databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#n" + "';\"/>n</td>";
                         s5 += "   <td><input title=\"Levels as they are in reference databank\"  CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#rn" + "';\"/>r&thinsp;n</td>";
                         s5 += "   <td></td>";
                         s5 += " </tr>";
                         s5 += " <tr>";
                         s5 += "   <td>Abs. diff.</td>";
-                        s5 += "   <td><input title=\"Absolute time-change (difference) in primary databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#d" + "';\"/>d</td>";
+                        s5 += "   <td><input title=\"Absolute time-change (difference) in first databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#d" + "';\"/>d</td>";
                         s5 += "   <td><input title=\"Absolute time-change (difference) in reference databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#rd" + "';\"/>r&thinsp;d</td>";
                         s5 += "   <td><input title=\"Absolute multiplier difference\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#m" + "';\"/>m</td>";
                         s5 += " </tr>";
                         s5 += " <tr>";
                         s5 += "   <td>Rel. diff.</td>";
-                        s5 += "   <td><input title=\"Percentage time growth rate in primary databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#p" + "';\"/>p</td>";
+                        s5 += "   <td><input title=\"Percentage time growth rate in first databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#p" + "';\"/>p</td>";
                         s5 += "   <td><input title=\"Percentage time growth rate in reference databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#rp" + "';\"/>r&thinsp;p</td>";
                         s5 += "   <td><input title=\"Percentage multiplier difference\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#q" + "';\"/>q</td>";
                         s5 += " </tr>";
@@ -18442,8 +18455,8 @@ public static bool IsLargeAware(Stream stream)
 
         private static List<string> GetDatabankInfo(StampTypes type)
         {
-            Databank work = Program.databanks.GetPrim();
-            Databank base2 = Program.databanks.GetSec();
+            Databank work = Program.databanks.GetFirst();
+            Databank base2 = Program.databanks.GetRef();
             string workInfo = "";
             if (work != null && work.info1 != null) workInfo = work.info1;
             string base2Info = "";
@@ -18497,7 +18510,7 @@ public static bool IsLargeAware(Stream stream)
         //Used for tables, don't use for other stuff!
         public static double MulLevel(string s, GekkoTime t)
         {
-            if (!Program.databanks.GetPrim().ContainsVariable(s))
+            if (!Program.databanks.GetFirst().ContainsVariable(s))
             {
                 if (Program.options.table_ignoremissingvars)
                 {
@@ -18508,7 +18521,7 @@ public static bool IsLargeAware(Stream stream)
                     G.Writeln2("*** ERROR: could not find variable " + s + " in Work databank");
                 }
             }
-            if (!Program.databanks.GetSec().ContainsVariable(s))
+            if (!Program.databanks.GetRef().ContainsVariable(s))
             {
                 if (Program.options.table_ignoremissingvars)
                 {
@@ -18516,10 +18529,10 @@ public static bool IsLargeAware(Stream stream)
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Base + " databank");
+                    G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
-            return Program.databanks.GetPrim().GetVariable(s).GetData(t) - Program.databanks.GetSec().GetVariable(s).GetData(t);
+            return Program.databanks.GetFirst().GetVariable(s).GetData(t) - Program.databanks.GetRef().GetVariable(s).GetData(t);
         }
 
         //Used for tables, don't use for other stuff!
@@ -18543,7 +18556,7 @@ public static bool IsLargeAware(Stream stream)
         //Used for tables, don't use for other stuff!
         public static double MulPch(string s, GekkoTime t)
         {
-            if (!Program.databanks.GetPrim().ContainsVariable(s))
+            if (!Program.databanks.GetFirst().ContainsVariable(s))
             {
                 if (Program.options.table_ignoremissingvars)
                 {
@@ -18554,7 +18567,7 @@ public static bool IsLargeAware(Stream stream)
                     G.Writeln2("*** ERROR: could not find variable " + s + " in Work databank");
                 }
             }
-            if (!Program.databanks.GetSec().ContainsVariable(s))
+            if (!Program.databanks.GetRef().ContainsVariable(s))
             {
                 if (Program.options.table_ignoremissingvars)
                 {
@@ -18562,11 +18575,11 @@ public static bool IsLargeAware(Stream stream)
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Base + " databank");
+                    G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
-            double pch_base = (Program.databanks.GetSec().GetVariable(s).GetData(t) / Program.databanks.GetSec().GetVariable(s).GetData(t.Add(-1)) - 1) * 100;
-            double pch_work = (Program.databanks.GetPrim().GetVariable(s).GetData(t) / Program.databanks.GetPrim().GetVariable(s).GetData(t.Add(-1)) - 1) * 100;
+            double pch_base = (Program.databanks.GetRef().GetVariable(s).GetData(t) / Program.databanks.GetRef().GetVariable(s).GetData(t.Add(-1)) - 1) * 100;
+            double pch_work = (Program.databanks.GetFirst().GetVariable(s).GetData(t) / Program.databanks.GetFirst().GetVariable(s).GetData(t.Add(-1)) - 1) * 100;
             return pch_work - pch_base;
         }
 
@@ -18598,8 +18611,8 @@ public static bool IsLargeAware(Stream stream)
             GekkoTime tStart = o.t1;
             GekkoTime tEnd = o.t2;
 
-            Databank base2 = Program.databanks.GetSec();
-            Databank work = Program.databanks.GetPrim();
+            Databank base2 = Program.databanks.GetRef();
+            Databank work = Program.databanks.GetFirst();
 
             List<string> both = variables;  //may be null
             List<string> listOfDifferentVars = new List<string>();
@@ -18643,9 +18656,9 @@ public static bool IsLargeAware(Stream stream)
                         onlyWork.Sort(StringComparer.InvariantCulture);
                         onlyGrund.Sort(StringComparer.InvariantCulture);
 
-                        G.Writeln("Comparing " + both.Count + " common variables in Work (" + GetDatabankFileNameWithPath(Globals.Work) + ") and " + Globals.Base + " (" + GetDatabankFileNameWithPath(Globals.Base) + ") databanks");
-                        if (onlyWork.Count > 0) G.Writeln("There are " + onlyWork.Count + " variables in Work but not in " + Globals.Base + " databank");
-                        if (onlyGrund.Count > 0) G.Writeln("There are " + onlyGrund.Count + " variables in " + Globals.Base + " but not in Work databank");
+                        G.Writeln("Comparing " + both.Count + " common variables in Work (" + GetDatabankFileNameWithPath(Globals.Work) + ") and " + Globals.Ref + " (" + GetDatabankFileNameWithPath(Globals.Ref) + ") databanks");
+                        if (onlyWork.Count > 0) G.Writeln("There are " + onlyWork.Count + " variables in Work but not in " + Globals.Ref + " databank");
+                        if (onlyGrund.Count > 0) G.Writeln("There are " + onlyGrund.Count + " variables in " + Globals.Ref + " but not in Work databank");
                         G.Writeln();
                     }
                     else
@@ -18799,7 +18812,7 @@ public static bool IsLargeAware(Stream stream)
         //Used for tables, don't use for other stuff!
         public static double MulDif(string s, GekkoTime t)
         {
-            if (!Program.databanks.GetPrim().ContainsVariable(s))
+            if (!Program.databanks.GetFirst().ContainsVariable(s))
             {
                 if (Program.options.table_ignoremissingvars)
                 {
@@ -18810,7 +18823,7 @@ public static bool IsLargeAware(Stream stream)
                     G.Writeln2("*** ERROR: could not find variable " + s + " in Work databank");
                 }
             }
-            if (!Program.databanks.GetSec().ContainsVariable(s))
+            if (!Program.databanks.GetRef().ContainsVariable(s))
             {
                 if (Program.options.table_ignoremissingvars)
                 {
@@ -18818,11 +18831,11 @@ public static bool IsLargeAware(Stream stream)
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Base + " databank");
+                    G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
-            double dif_base = Program.databanks.GetSec().GetVariable(s).GetData(t) - Program.databanks.GetSec().GetVariable(s).GetData(t.Add(-1));
-            double dif_work = Program.databanks.GetPrim().GetVariable(s).GetData(t) - Program.databanks.GetPrim().GetVariable(s).GetData(t.Add(-1));
+            double dif_base = Program.databanks.GetRef().GetVariable(s).GetData(t) - Program.databanks.GetRef().GetVariable(s).GetData(t.Add(-1));
+            double dif_work = Program.databanks.GetFirst().GetVariable(s).GetData(t) - Program.databanks.GetFirst().GetVariable(s).GetData(t.Add(-1));
             return dif_work - dif_base;
         }
 
@@ -18883,7 +18896,7 @@ public static bool IsLargeAware(Stream stream)
 
         public static int CreateVariables(List<string> vars, bool usedInCreateCommand)
         {
-            Databank work = Program.databanks.GetPrim();
+            Databank work = Program.databanks.GetFirst();
             int counter = 0;
             foreach (string name in vars)
             {
@@ -18909,7 +18922,7 @@ public static bool IsLargeAware(Stream stream)
                     }
 
                     //We know the timeseries does not already exist
-                    Program.databanks.GetPrim().AddVariable(ts);
+                    Program.databanks.GetFirst().AddVariable(ts);
 
                     if (usedInCreateCommand == true)
                     {
@@ -18930,8 +18943,8 @@ public static bool IsLargeAware(Stream stream)
         {
             //ErrorIfDatabanksSwapped();
 
-            Databank databank1 = Program.databanks.GetPrim();
-            Databank databank0 = Program.databanks.GetPrim();
+            Databank databank1 = Program.databanks.GetFirst();
+            Databank databank0 = Program.databanks.GetFirst();
 
             if (method == null) method = "total";
 
@@ -19440,7 +19453,7 @@ public static bool IsLargeAware(Stream stream)
                 throw new GekkoException();
             }
             tsData = new double[n, k];
-            Databank work = Program.databanks.GetPrim();
+            Databank work = Program.databanks.GetFirst();
             int countT = -1;
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
@@ -19616,8 +19629,8 @@ public static bool IsLargeAware(Stream stream)
             Databank work = null;
             Databank base2 = null;
             {
-                work = databanks.GetPrim();
-                base2 = databanks.GetSec();
+                work = databanks.GetFirst();
+                base2 = databanks.GetRef();
             }
 
             List<string> masterSpaceErrors = new List<string>();
@@ -20701,7 +20714,7 @@ public static bool IsLargeAware(Stream stream)
             else if (printCode == Globals.printCode_s || printCode == Globals.printCode_sn)
             {
                 printCodeLabel = "@lev";
-                if (isVerbose) printCodeLabel = Globals.Base + " bank";
+                if (isVerbose) printCodeLabel = Globals.Ref + " bank";
             }
             else if (printCode == "d") printCodeLabel = "dif";  //PRT<dif>
             else if (printCode == Globals.printCode_sd) printCodeLabel = "@dif";
@@ -21192,7 +21205,7 @@ public static bool IsLargeAware(Stream stream)
         public static void CreateLeftSideVariableIfNeeded(List<Dictionary<string, string>> precedentsWithLagIndicator, string variable)
         {
             //variable = SubstituteAssignVars(variable);
-            if (Program.databanks.GetPrim().GetVariable(variable) == null)
+            if (Program.databanks.GetFirst().GetVariable(variable) == null)
             {
                 if (!variable.ToLower().StartsWith("xx"))
                 {
@@ -21200,7 +21213,7 @@ public static bool IsLargeAware(Stream stream)
                 }
                 G.Writeln("+++ NOTE: Variable " + variable + " not found in databank -- is created");
                 TimeSeries tempTs = new TimeSeries(Program.options.freq, variable);
-                Program.databanks.GetPrim().AddVariable(tempTs);
+                Program.databanks.GetFirst().AddVariable(tempTs);
 
                 for (int i = 0; i < precedentsWithLagIndicator.Count; i++)
                 {
@@ -21250,9 +21263,9 @@ public static bool IsLargeAware(Stream stream)
 
         public static EMissingType CheckVariableExistence(List<string> variablesLabelsForPrtCommand, List<Dictionary<string, string>> precedents, bool isMultiplier, bool isCalledFromGenr, bool isBaseline, bool isCalledFromTable)
         {
-            if (!(G.equal(Program.databanks.GetPrim().aliasName, Globals.Work) && G.equal(Program.databanks.GetSec().aliasName, Globals.Base)))
+            if (!(G.equal(Program.databanks.GetFirst().aliasName, Globals.Work) && G.equal(Program.databanks.GetRef().aliasName, Globals.Ref)))
             {
-                G.Writeln2("*** ERROR: Please use Work and " + Globals.Base + " as primary and reference banks");
+                G.Writeln2("*** ERROR: Please use Work and " + Globals.Ref + " as first and reference databanks");
                 throw new GekkoException();
             }
             //In the method below, any memory vars of VAL type will be removed
@@ -21283,7 +21296,7 @@ public static bool IsLargeAware(Stream stream)
                             if (varWithBaseBankIndicator.StartsWith("@"))
                             {
                                 //p<m>@fy                --------- this is not really meaningful
-                                banks.Add(Globals.Base);
+                                banks.Add(Globals.Ref);
                                 if (!hasIssuedWarning) G.Writeln("+++ WARNING: Note that you are using @-variables in combination with the <m> (multiplier) option");
                                 hasIssuedWarning = true;
                             }
@@ -21291,7 +21304,7 @@ public static bool IsLargeAware(Stream stream)
                             {
                                 //p<m>fy
                                 banks.Add(Globals.Work);
-                                banks.Add(Globals.Base);
+                                banks.Add(Globals.Ref);
                             }
                         }
                         else
@@ -21301,14 +21314,14 @@ public static bool IsLargeAware(Stream stream)
                                 if (varWithBaseBankIndicator.StartsWith("@"))
                                 {
                                     //p<b>@fy                --------- this is not really meaningful
-                                    banks.Add(Globals.Base);
+                                    banks.Add(Globals.Ref);
                                     if (!hasIssuedWarning) G.Writeln("+++ WARNING: Note that you are using @-variables in combination with the <r> (reference) option");
                                     hasIssuedWarning = true;
                                 }
                                 else
                                 {
                                     //p<b>fy
-                                    banks.Add(Globals.Base);
+                                    banks.Add(Globals.Ref);
                                 }
                             }
                             else
@@ -21316,7 +21329,7 @@ public static bool IsLargeAware(Stream stream)
                                 if (varWithBaseBankIndicator.StartsWith("@"))
                                 {
                                     //p @fy
-                                    banks.Add(Globals.Base);
+                                    banks.Add(Globals.Ref);
                                 }
                                 else
                                 {
@@ -26083,7 +26096,7 @@ public static bool IsLargeAware(Stream stream)
 
         public static void MakeFlatOrZero(GekkoTime tStart, GekkoTime tEnd, List<string> list, bool zero)
         {
-            Databank db = Program.databanks.GetPrim();
+            Databank db = Program.databanks.GetFirst();
             List<string> unfoldedList = list;
 
             List<string> listUsedHere = new List<string>();
@@ -26173,7 +26186,7 @@ public static bool IsLargeAware(Stream stream)
             List<string> onlyDatabankNotVarlist = new List<string>();
             List<string> onlyVarlistNotDatabank = new List<string>();
 
-            foreach (string ss in Program.databanks.GetPrim().storage.Keys)
+            foreach (string ss in Program.databanks.GetFirst().storage.Keys)
             {
                 if (G.GetFreqFromKey(ss) != Program.options.freq) continue;  //filter other freqs
                 string s = G.RemoveFreqFromKey(ss);
@@ -26200,7 +26213,7 @@ public static bool IsLargeAware(Stream stream)
             foreach (string s in Program.model.varsAType.Keys)
             {
                 if (Program.model.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.varsZTypeAutoGenerated.ContainsKey(s)) continue;
-                if (Program.databanks.GetPrim().ContainsVariable(s))
+                if (Program.databanks.GetFirst().ContainsVariable(s))
                 {
                 }
                 else
@@ -26220,7 +26233,7 @@ public static bool IsLargeAware(Stream stream)
 
             foreach (string s in varlist.Keys)
             {
-                if (Program.databanks.GetPrim().ContainsVariable(s))
+                if (Program.databanks.GetFirst().ContainsVariable(s))
                 {
                 }
                 else
@@ -26349,7 +26362,7 @@ public static bool IsLargeAware(Stream stream)
             List<string> onlyModelNotDatabank = new List<string>();
             List<string> onlyDatabankNotModel = new List<string>();
 
-            foreach (string s in Program.databanks.GetPrim().storage.Keys)
+            foreach (string s in Program.databanks.GetFirst().storage.Keys)
             {
                 if (Program.model.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.varsZTypeAutoGenerated.ContainsKey(s)) continue;
                 if (Program.model.varsAType.ContainsKey(s))
@@ -26365,7 +26378,7 @@ public static bool IsLargeAware(Stream stream)
             foreach (string s in Program.model.varsAType.Keys)
             {
                 if (Program.model.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.varsZTypeAutoGenerated.ContainsKey(s)) continue;
-                if (Program.databanks.GetPrim().storage.ContainsKey(s))
+                if (Program.databanks.GetFirst().storage.ContainsKey(s))
                 {
                 }
                 else
@@ -26380,7 +26393,7 @@ public static bool IsLargeAware(Stream stream)
 
             List<string> varsWithMissingValues = new List<string>();
 
-            Databank work = Program.databanks.GetPrim();
+            Databank work = Program.databanks.GetFirst();
             foreach (string s in bothModelAndDatabank)
             {
                 foreach (GekkoTime t in new GekkoTimeIterator( tStart, tEnd))
@@ -26472,7 +26485,7 @@ public static bool IsLargeAware(Stream stream)
 
         private static void ResidualCheckHelper(string checkType, bool dlog, string block, string path)
         {
-            Databank work = Program.databanks.GetPrim();
+            Databank work = Program.databanks.GetFirst();
             List<string> d_type = new List<string>();
             List<string> g_type = new List<string>();
             List<string> i_type = new List<string>();
@@ -26574,13 +26587,13 @@ public static bool IsLargeAware(Stream stream)
             GekkoTime gt1 = new GekkoTime((Program.options.freq), t1, 1);
             GekkoTime gt2 = new GekkoTime((Program.options.freq), t2, 1);
 
-            Sam(gt1, gt2, Program.databanks.GetSec(), Program.databanks.GetPrim(), type2, order, d_type, "_d", dlog, block, path);
-            Sam(gt1, gt2, Program.databanks.GetSec(), Program.databanks.GetPrim(), type2, order, g_type, "_g", dlog, block, path);
-            Sam(gt1, gt2, Program.databanks.GetSec(), Program.databanks.GetPrim(), type2, order, i_type, "_i", dlog, block, path);
-            Sam(gt1, gt2, Program.databanks.GetSec(), Program.databanks.GetPrim(), type2, order, k_type, "_k", dlog, block, path);
-            Sam(gt1, gt2, Program.databanks.GetSec(), Program.databanks.GetPrim(), type2, order, s_type, "_s", dlog, block, path);
-            Sam(gt1, gt2, Program.databanks.GetSec(), Program.databanks.GetPrim(), type2, order, after_i_type, "_after_i", dlog, block, path);
-            Sam(gt1, gt2, Program.databanks.GetSec(), Program.databanks.GetPrim(), type2, order, after_d_type, "_after_d", dlog, block, path);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, d_type, "_d", dlog, block, path);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, g_type, "_g", dlog, block, path);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, i_type, "_i", dlog, block, path);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, k_type, "_k", dlog, block, path);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, s_type, "_s", dlog, block, path);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, after_i_type, "_after_i", dlog, block, path);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, after_d_type, "_after_d", dlog, block, path);
         }
 
         public static string GetModelInfoPath()
@@ -26662,15 +26675,15 @@ public static bool IsLargeAware(Stream stream)
 
         public static void Sam1()
         {
-            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetSec(), Program.databanks.GetPrim(), "", false);
+            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "", false);
         }
         public static void Sam2()
         {
-            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetSec(), Program.databanks.GetPrim(), "absolute", true);
+            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "absolute", true);
         }
         public static void Sam3()
         {
-            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetSec(), Program.databanks.GetPrim(), "relative", true);
+            Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "relative", true);
         }
         public static void SamE1(bool dlog, bool split)
         {
@@ -26767,18 +26780,18 @@ public static bool IsLargeAware(Stream stream)
                     onlyWork.Sort(StringComparer.InvariantCulture);
                     onlyGrund.Sort(StringComparer.InvariantCulture);
 
-                    samFile.WriteLine("Comparing primary (" + GetDatabankFileNameWithPath(Program.databanks.GetPrim().aliasName) + ") and reference (" + GetDatabankFileNameWithPath(Program.databanks.GetSec().aliasName) + ") databanks");
+                    samFile.WriteLine("Comparing first-position (" + GetDatabankFileNameWithPath(Program.databanks.GetFirst().aliasName) + ") and reference (" + GetDatabankFileNameWithPath(Program.databanks.GetRef().aliasName) + ") databanks");
                     samFile.WriteLine();
                     samFile.WriteLine("There are the following " + both.Count + " variables in both banks:");
                     G.PrintListWithCommasToFile(samFile, both);
                     samFile.WriteLine();
                     samFile.WriteLine();
-                    samFile.WriteLine("There are the following " + onlyWork.Count + " variables in Work but not in " + Globals.Base + " databank:");
+                    samFile.WriteLine("There are the following " + onlyWork.Count + " variables in Work but not in " + Globals.Ref + " databank:");
                     G.PrintListWithCommasToFile(samFile, onlyWork);
                     if (onlyWork.Count == 0) samFile.WriteLine("[none]");
                     samFile.WriteLine();
                     samFile.WriteLine();
-                    samFile.WriteLine("There are the following " + onlyGrund.Count + " variables in " + Globals.Base + " but not in Work databank:");
+                    samFile.WriteLine("There are the following " + onlyGrund.Count + " variables in " + Globals.Ref + " but not in Work databank:");
                     G.PrintListWithCommasToFile(samFile, onlyGrund);
                     if (onlyGrund.Count == 0) samFile.WriteLine("[none]");
                     samFile.WriteLine();
@@ -26814,7 +26827,7 @@ public static bool IsLargeAware(Stream stream)
                     {
                         //Should not happen if SIM/RES autocreates variables
                         if (ts == null) G.Writeln("+++ WARNING: Variable '" + tsString + "' was not found in Work databank");
-                        if (tsGrund == null) G.Writeln("+++ WARNING: Variable '" + tsString + "' was not found in " + Globals.Base + " databank");
+                        if (tsGrund == null) G.Writeln("+++ WARNING: Variable '" + tsString + "' was not found in " + Globals.Ref + " databank");
                         pcounter++;
                         continue;
                     }
@@ -27002,7 +27015,7 @@ public static bool IsLargeAware(Stream stream)
             else
             {
                 G.Writeln("Residual check on " + both.Count + " equations of type " + variablesType + ", result put in file '" + samFileName + "'");
-                if (pcounter > 0) G.Writeln("+++ WARNING: " + pcounter + " variables were missing in either Work or " + Globals.Base + " databank");
+                if (pcounter > 0) G.Writeln("+++ WARNING: " + pcounter + " variables were missing in either Work or " + Globals.Ref + " databank");
             }
         }
 
@@ -27092,12 +27105,12 @@ public static bool IsLargeAware(Stream stream)
 
         public static void MulbkClone()
         {
-            Databank primary = Program.databanks.GetPrim();
+            Databank first = Program.databanks.GetFirst();
             //DateTime dt3 = DateTime.Now;
-            Databank secondary = Program.databanks.GetSec();
+            Databank secondary = Program.databanks.GetRef();
             secondary.Clear();
-            G.CloneDatabank(secondary, primary);
-            secondary.FileNameWithPath = primary.FileNameWithPath;
+            G.CloneDatabank(secondary, first);
+            secondary.FileNameWithPath = first.FileNameWithPath;
         }
 
         public static void CreateEndoNoLagBNumbers(int[] endoNoLagPointers)
@@ -27161,7 +27174,7 @@ public static bool IsLargeAware(Stream stream)
             Dictionary<string, string> precedents = eh.precedentsWithLagIndicator;
             string period = t.ToString();
 
-            TimeSeries tsls = Program.databanks.GetPrim().GetVariable(lhs);
+            TimeSeries tsls = Program.databanks.GetFirst().GetVariable(lhs);
 
             if (tsls == null)
             {
@@ -27197,7 +27210,7 @@ public static bool IsLargeAware(Stream stream)
                     var2 = variable;
                 }
                 G.Write(var2 + G.Blanks(14 - var2.Length));
-                TimeSeries ts = Program.databanks.GetPrim().GetVariable(variable);
+                TimeSeries ts = Program.databanks.GetFirst().GetVariable(variable);
 
                 if (variable == null)
                 {
@@ -27223,8 +27236,8 @@ public static bool IsLargeAware(Stream stream)
         {
             //         0        1        2      3
             //      updprt <operator> <var1> <var2>
-            Databank work = Program.databanks.GetPrim();
-            Databank base2 = Program.databanks.GetSec();
+            Databank work = Program.databanks.GetFirst();
+            Databank base2 = Program.databanks.GetRef();
             string op = (string)al[1];
 
             GekkoTime tStart = Globals.globalPeriodStart;
@@ -28001,8 +28014,7 @@ public static bool IsLargeAware(Stream stream)
         private string orientation = null;  //rows or cols
         public EOpenType openType = EOpenType.Normal;
         public bool protect = true;
-        //public bool openPrim = false;
-        //public bool openSec = false;
+        
 
         public string FileName
         {

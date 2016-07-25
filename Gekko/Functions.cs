@@ -1325,7 +1325,7 @@ namespace Gekko
             //TODO TODO
             //TODO TODO
 
-            string bank = Program.databanks.GetPrim().aliasName;
+            string bank = Program.databanks.GetFirst().aliasName;
             string name = null;
             string[] split = s1.Split(':');
             if (split.Length > 2)

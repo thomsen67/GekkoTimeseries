@@ -343,7 +343,7 @@ namespace Gekko.Parser.Gek
                         {                            
                             if (node.ChildrenCount() == 0)
                             {
-                                node.Code.CA("new ScalarString(`" + Globals.primaryCheatString + "`)");
+                                node.Code.CA("new ScalarString(`" + Globals.firstCheatString + "`)");
                             }
                             else node.Code.CA(node[0].Code.ToString());
                         }
@@ -377,6 +377,22 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("o" + Num(node) + ".name = `" + node[0][0].Text + "`;" + G.NL);
                             }
                             GetCodeFromAllChildren(node);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
+                    case "ASTLOCK":
+                        {
+                            node.Code.A("O.Lock o" + Num(node) + " = new O.Lock();" + G.NL);
+                            //node.Code.A("o" + Num(node) + ".p = p;");
+                            node.Code.A("o" + Num(node) + ".bank = `" + node[0].Text + "`;" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
+                    case "ASTUNLOCK":
+                        {
+                            node.Code.A("O.Unlock o" + Num(node) + " = new O.Unlock();" + G.NL);
+                            //node.Code.A("o" + Num(node) + ".p = p;");
+                            node.Code.A("o" + Num(node) + ".bank = `" + node[0].Text + "`;" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;

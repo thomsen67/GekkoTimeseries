@@ -90,7 +90,7 @@ namespace Gekko
         public static bool testing = true;  //just provides a pointer to remove temporary testing stuff  
 
         public static string Work = "Work";
-        public static string Base = "Ref";
+        public static string Ref = "Ref";
 
         public const string printCode_s = "r";
         public const string printCode_sn = "rn";
@@ -127,7 +127,7 @@ namespace Gekko
         
         public const string indexerAloneCheatString = "[<{THIS IS AN IndexerAlone CALL}>]";
         
-        public const string primaryCheatString = "[PRIMARY]";        
+        public const string firstCheatString = "[FIRST]";        
         
         public static bool fixReturnProblem = true;
 

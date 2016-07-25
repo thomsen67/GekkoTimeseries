@@ -1202,7 +1202,7 @@ namespace Gekko
                 throw new GekkoException();
             }
             string db = Globals.Work;
-            if (G.equal(Globals.tableOption, Globals.printCode_s)) db = Globals.Base;
+            if (G.equal(Globals.tableOption, Globals.printCode_s)) db = Globals.Ref;
             int counter = 0;
             foreach (GekkoTime t in new GekkoTimeIterator( tStart, tEnd))
             {
