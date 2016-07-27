@@ -40,6 +40,7 @@ namespace Gekko
     /// </summary>
     public class Globals        
     {
+        public static bool testFileChange = true;
 
         public static string extensionCommand = "gcm";
         public const string defaultCommandFileExtension = "gcm";  //merge this with the above...

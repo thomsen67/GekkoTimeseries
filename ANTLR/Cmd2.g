@@ -391,6 +391,7 @@ tokens {
     ASTOPT_VAL_REPLACE;
     ASTOPT_VAL_YMAX;
     ASTOPT_VAL_YMIN;
+	ASTOPT_VAL_POS;
     ASTOPTION;
     ASTP;
     ASTPAUSE;
@@ -818,6 +819,7 @@ tokens {
     PLOT            = 'PLOT'           ;
     PLOTCODE = 'PLOTCODE';
     POINTS           = 'POINTS';
+	POS           = 'POS';
     PREFIX = 'PREFIX';
     PRETTY = 'PRETTY';
     PRI              = 'PRI'             ;
@@ -1258,6 +1260,7 @@ tokens {
                                         d.Add("plot"   , PLOT     );
                                         d.Add("PLOTCODE" ,PLOTCODE);
                                         d.Add("points"    , POINTS   );
+										d.Add("pos"    , POS   );
                                         d.Add("prefix"    , PREFIX   );
                                         d.Add("PRETTY" ,PRETTY);
                                         d.Add("pri"     , PRI     );
@@ -2066,7 +2069,8 @@ openOpt1h                 : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_REF yesNo?)						
 						  | PROT (EQUAL yesNo)? -> ^(ASTOPT_STRING_PROT yesNo?)	
 						  | EDIT (EQUAL yesNo)? -> ^(ASTOPT_STRING_EDIT yesNo?)	
-						  | SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)	
+						  | SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)
+						  | POS EQUAL expression -> ^(ASTOPT_VAL_POS expression)
 						  ;
 
 olsOpt1                   : leftAngle olsOpt1h? RIGHTANGLE -> olsOpt1h?;
@@ -3006,6 +3010,7 @@ ident                     : Ident|
                             PLOTCODE|
                             PLOT|
                             POINTS|
+							POS|
                             PREFIX|
                             PRETTY|
                             PRIM|

@@ -1917,6 +1917,16 @@ namespace Gekko
                     throw new GekkoException();
                 }
 
+                string fileHash = null;
+                if (Globals.testFileChange)
+                {
+                    if (open)
+                    {
+                        if (createNewOpenFile) fileHash = "brand new file"; //signifies that the bank is brand new
+                        else fileHash = Program.GetMD5Hash(GetTextFromFileWithWait(file));  //MD5 hash of file                
+                    }
+                }
+
                 //At this point, we know that the file to be opened/read actually exists (or createOpenFile is true)
 
                 readInfo.dbName = Path.GetFileNameWithoutExtension(file);  //may be overridden later on (Work for READ, and Base for MULBK)
@@ -1931,8 +1941,8 @@ namespace Gekko
                 if (open)
                 {
                     //if new databank (read from disk), the newly created 'databank' is put into the right slot (and other databanks are moved around)
-                    //if existing databank, isReadFromFile = false, 'databank' will point to the found databank (that may be moved, for instance with OPEN<editm> of existing bank)
-                    isReadFromFile = Program.databanks.OpenDatabank(ref databank, oRead.openType); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file
+                    //if existing databank, isReadFromFile = false, 'databank' will point to the found databank (that may be moved, for instance with OPEN<first> of existing bank)
+                    isReadFromFile = Program.databanks.OpenDatabank(ref databank, oRead.openType, oRead.openTypePosition); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file
                     if (createNewOpenFile) readInfo.type = EReadInfoTypes.OpenedNewNonExistingFile;
                     else if (!isReadFromFile) readInfo.type = EReadInfoTypes.OpenedFirstOrRefAlreadyOpenBank;
                 }
@@ -2078,6 +2088,7 @@ namespace Gekko
                 }
                 //databank.Trim();  //This way, the bank is not too bulky in RAM. The operation takes almost no time, and if it is a .tsdx file, the timeseries are already trimmed and trimming is hence skipped.
                 databank.readInfo = readInfo;  //Not really used at the moment, but practical to have a pointer to this information!
+                databank.fileHash = fileHash;  //MD5 hash of file contents
             }
 
             return;
@@ -17437,6 +17448,7 @@ public static bool IsLargeAware(Stream stream)
         {            
             if (removed == null) return;  //See TKD mail 6/6 2016, this should not be possible, but just in case
             if (removed.FileNameWithPath == null) return; //See TKD mail 6/6 2016, this should not be possible, but just in case
+            bool skipWrite = false;
             GekkoTime tStart = Globals.tNull;
             GekkoTime tEnd = Globals.tNull;            
             if (!removed.FileNameWithPath.EndsWith("." + Globals.extensionDatabank + ""))
@@ -17449,7 +17461,32 @@ public static bool IsLargeAware(Stream stream)
                 G.Writeln();
                 throw new GekkoException();
             }
-            int n = Write(removed, tStart, tEnd, removed.FileNameWithPath, false, null, "" + Globals.extensionDatabank + "", true, true);
+            if (Globals.testFileChange)
+            {
+                if (removed.fileHash == null)
+                {
+                    //do nothing, fileHashing is probably not active
+                }
+                else if (removed.fileHash == "brand new file")
+                {
+                    if (File.Exists(removed.FileNameWithPath))
+                    {
+                        MessageBox.Show("*** ERROR: The databank '" + removed.aliasName + "' did not exist when opening it,\nbut seems to exist as a file now. \nHence, Gekko cannot write the databank to file -- \nplease consider to run your code again.");
+                        skipWrite = true;
+                    }
+                }
+                else
+                {
+                    string trueFileHash = Program.GetMD5Hash(GetTextFromFileWithWait(removed.FileNameWithPath));
+                    if (!(trueFileHash == removed.fileHash))
+                    {
+                        MessageBox.Show("*** ERROR: The databank '" + removed.aliasName + "' seems to have been altered since opening it. \nHence, Gekko cannot write the databank to file -- \nplease consider to run your code again.");
+                        skipWrite = true;
+                    }
+                }
+            }
+            int n = 0;
+            if (!skipWrite) n = Write(removed, tStart, tEnd, removed.FileNameWithPath, false, null, "" + Globals.extensionDatabank + "", true, true);
         }
 
         public static void Ini(P p)
@@ -28001,6 +28038,7 @@ public static bool IsLargeAware(Stream stream)
         Edit, //OPEN<edit>, not used elsewhere
         First, //READ<first>, CLEAR<first>, etc.   
         Last,
+        Pos,
         Ref //READ<ref>, CLEAR<ref>, etc.
     }
 
@@ -28013,6 +28051,7 @@ public static bool IsLargeAware(Stream stream)
         private string as2 = null; //for OPEN AS.
         private string orientation = null;  //rows or cols
         public EOpenType openType = EOpenType.Normal;
+        public int openTypePosition = -12345;
         public bool protect = true;
         
 

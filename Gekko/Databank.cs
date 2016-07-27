@@ -119,6 +119,7 @@ namespace Gekko
         public bool protect = false;  //used to set an OPEN databank as protected. Don't use protobuffer on this field.
         //public GekkoDictionary<string, string> tmptmpVars;
         public Program.ReadInfo readInfo = null; //contains info from reading the file, among other things info from the XML file. NOTE: do not store it in protobuf!
+        public string fileHash = null; //do not store this in protobuf
 
         private Databank()
         {

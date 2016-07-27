@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 T2.g 2016-07-21 17:41:43
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 T2.g 2016-07-26 01:25:27
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -834,7 +834,7 @@ public partial class T2Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          commandOptions, commandName, commandRest
+            	// elements:          commandOptions, commandRest, commandName
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -2287,7 +2287,7 @@ public partial class T2Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          expression, n, RIGHTPAREN, LEFTPAREN, n
+            	// elements:          n, RIGHTPAREN, n, LEFTPAREN, expression
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -2507,7 +2507,7 @@ public partial class T2Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          n, n, RIGHTANGLE, LEFTANGLE, expression
+            	// elements:          n, expression, RIGHTANGLE, n, LEFTANGLE
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -2727,7 +2727,7 @@ public partial class T2Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          n, RIGHTBRACKET, LEFTBRACKET, expression, n
+            	// elements:          RIGHTBRACKET, expression, n, n, LEFTBRACKET
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -2947,7 +2947,7 @@ public partial class T2Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          RIGHTCURLY, expression, n, LEFTCURLY, n
+            	// elements:          n, RIGHTCURLY, n, expression, LEFTCURLY
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
