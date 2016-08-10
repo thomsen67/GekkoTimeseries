@@ -7,48 +7,56 @@ using System.Net;
 
 namespace Gekko
 {
-    
+
     public static class OnlineDatabanks
     {
         public static void Walk(string table, List<string> codesHeader, List<List<string>> codes, List<string> codesCombi, List<List<string>> values, List<string> valuesCombi, int depth, string sCodes, string sValues)
         {
             if (depth > codes.Count - 1)
-            {                
+            {
                 if (sCodes.EndsWith("_")) sCodes = sCodes.Substring(0, sCodes.Length - 1);
                 if (sValues.StartsWith(", ")) sValues = sValues.Substring(2);
-                codesCombi.Add(table + sCodes);
+                string name2 = table + sCodes;
+                name2 = name2.Replace("Æ", "AE");
+                name2 = name2.Replace("Ø", "OE");
+                name2 = name2.Replace("Å", "AA");
+                name2 = name2.Replace("æ", "ae");
+                name2 = name2.Replace("ø", "oe");
+                name2 = name2.Replace("å", "aa");
+                name2 = name2.Replace("-", "h");  //h like hyphen
+                codesCombi.Add(name2);
                 valuesCombi.Add(sValues);
-                return;                
-            }                        
+                return;
+            }
 
             for (int i = 0; i < codes[depth].Count; i++)
-            {                
+            {
                 string sCodesTemp = sCodes + "_" + codesHeader[depth] + "_" + codes[depth][i];
                 string sValuesTemp = sValues + ", " + values[depth][i];
 
                 Walk(table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodesTemp, sValuesTemp);
             }
-            
-        }        
-        
-        public static void Test(string url, string jsonName)
-        {            
+
+        }
+
+        public static void Download(string url, string jsonName)
+        {
             string input = Program.options.folder_working + "\\" + jsonName;
-            string jsonCode = Program.GetTextFromFileWithWait(input);            
+            string jsonCode = Program.GetTextFromFileWithWait(input);
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
             httpWebRequest.ContentType = "text/json";
             httpWebRequest.Method = "POST";
             System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-            Dictionary<string, object> jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);            
+            Dictionary<string, object> jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
             string table = (string)jsonTree["table"];
             List<string> codesHeaderJson = new List<string>();
-            
+
             object[] o = (object[])jsonTree["variables"];
             foreach (Dictionary<string, object> oo in o)
             {
                 //G.Writeln("" + oo["code"]);
-                codesHeaderJson.Add((string)oo["code"]);                
-            }         
+                codesHeaderJson.Add((string)oo["code"]);
+            }
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
@@ -57,31 +65,46 @@ namespace Gekko
                 streamWriter.Close();
                 string result = null;
 
-                bool write = true;
-                if (write)
+                string path = Globals.localTempFilesLocation + "\\pc-axis-data.px";
+                DateTime t0 = DateTime.Now;
+                using (FileStream fs = Program.WaitForFileStream(path, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = new StreamWriter(fs, Encoding.UTF8))
                 {
-                    //using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\pc-axis-data.px", Program.GekkoFileReadOrWrite.Write))
-                    using (FileStream fs = Program.WaitForFileStream(Globals.localTempFilesLocation + "\\pc-axis-data.px", Program.GekkoFileReadOrWrite.Write))
-                    //using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                    using (StreamWriter sw = new StreamWriter(fs, Encoding.UTF8))
+                    httpWebRequest.Timeout = 24 * 60 * 60 * 1000; //24 hours max                                            
+                    G.Writeln2("--> Download of data file start...");
+                    HttpWebResponse httpResponse = null;
+                    try
                     {
-                        G.Writeln2("--> Download start...");
-                        HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                        //It seems the px file is in ANSI/win 1252: the file also reports this at the top: CHARSET="ANSI"; CODEPAGE = "Windows-1252";
-                        //Setting UTF8 here will fail!
-                        Encoding encoding = System.Text.Encoding.GetEncoding("Windows-1252");                        
-                        using (var streamReader = new StreamReader(httpResponse.GetResponseStream(), encoding))
-                        {
-                            result = streamReader.ReadToEnd();
-                            sw.Write(result);
-                            sw.Flush();
-                        }
+                        httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                    }
+                    catch (Exception e)
+                    {
+                        G.Writeln2("*** ERROR: Download failed with the following error:");
+                        G.Writeln("           " + e.Message);
+                        throw;
+                    }
+                    //It seems the px file is in ANSI/win 1252: the file also reports this at the top: CHARSET="ANSI"; CODEPAGE = "Windows-1252";
+                    //Setting UTF8 here will fail!
+                    Encoding encoding = System.Text.Encoding.GetEncoding("Windows-1252");
+                    using (var streamReader = new StreamReader(httpResponse.GetResponseStream(), encoding))
+                    {
+                        result = streamReader.ReadToEnd();
+                        sw.Write(result);
+                        sw.Flush();
                     }
                 }
-                                
-                string freq = "a";
+                string size = null;
+                if (File.Exists(path))
+                {
+                    double length = Math.Round((double)new System.IO.FileInfo(path).Length / 1000000d, 1);
+                    size = "size " + length + " MB, ";
+                }
+
+                G.Writeln("--> Download of data file ended (" + size + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ")");
                 
-                List<string> dates = new List<string>();                
+                string freq = "a";
+
+                List<string> dates = new List<string>();
                 bool start = false;
                 List<string> lines2 = G.ExtractLinesFromText(result);
                 string temp = null;
@@ -99,7 +122,7 @@ namespace Gekko
                 List<string> codesHeader = new List<string>();
 
                 List<List<string>> codes = new List<List<string>>();
-                List<List<string>> values = new List<List<string>>();                
+                List<List<string>> values = new List<List<string>>();
 
                 //int counter = 0;
                 string codeTimeString = "CODES(\"tid\")=";
@@ -110,15 +133,15 @@ namespace Gekko
                 {
                     string line = line2.Trim();
                     if (line.StartsWith("DATA="))
-                    {                        
+                    {
                         List<string> codesCombi = new List<string>();
                         List<string> valuesCombi = new List<string>();
-                        
+
                         //we are using codesHeaderJson instead of codesHeader (these are more verbose)
                         Walk(table, codesHeaderJson, codes, codesCombi, values, valuesCombi, 0, "", "");
                         string s = line;
                         s = s.Substring(5);
-                        if (s.EndsWith(";")) s = s.Substring(0, s.Length - 1);                        
+                        if (s.EndsWith(";")) s = s.Substring(0, s.Length - 1);
                         //read the data
                         string[] ss = s.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                         if (ss.Length != codesCombi.Count * dates.Count)
@@ -126,17 +149,28 @@ namespace Gekko
                             G.Writeln2("*** ERROR: Gekko expected " + codesCombi.Count + " * " + dates.Count + " = " + (codesCombi.Count * dates.Count) + " values, but got " + ss.Length);
                             throw new GekkoException();
                         }
-                        
+
+                        List<int> fractions = new List<int>();
+                        List<double> fractions2 = new List<double>();
+                        for (double dd = 0.1; dd <= 1.0; dd = dd + 0.1)
+                        {
+                            fractions.Add((int)(dd * (double)codesCombi.Count));
+                            fractions2.Add(dd);
+                        }
+
                         for (int j = 0; j < codesCombi.Count; j++)
                         {
-                            string name2 = codesCombi[j];
-                            name2 = name2.Replace("Æ", "AE");
-                            name2 = name2.Replace("Ø", "OE");
-                            name2 = name2.Replace("Å", "AA");
-                            name2 = name2.Replace("æ", "ae");
-                            name2 = name2.Replace("ø", "oe");
-                            name2 = name2.Replace("å", "aa");
-                            name2 = name2.Replace("-", "h");  //h like hyphen
+                            if (codesCombi.Count >= 10)
+                            {
+                                for (int i = 0; i < fractions.Count; i++)
+                                {
+                                    if (fractions[i] == j)
+                                    {
+                                        G.Writeln("    Progress: " + (int)(Math.Round(100 * fractions2[i])) + "% of " + codesCombi.Count + " timeseries");
+                                    }
+                                }
+                            }                            
+                            string name2 = codesCombi[j];                                                                                    
                             TimeSeries ts = new TimeSeries(G.GetFreq(freq), name2);
                             ts.label = valuesCombi[j];
                             ts.source = url + ", " + jsonName;
@@ -180,11 +214,13 @@ namespace Gekko
                             }
                             Program.databanks.GetFirst().AddVariable(freq, ts);
                             //if (j == 0) G.Writeln();
-                            G.Writeln(ts.variableName + ", with freq " + freq.ToUpper() + ", " + G.FromDateToString(gt0) + "-" + G.FromDateToString(gt1));
+                            //G.Writeln(ts.variableName + ", with freq " + freq.ToUpper() + ", " + G.FromDateToString(gt0) + "-" + G.FromDateToString(gt1));
                             //counter++;                        
                         }
-                        G.Writeln("--> Downloaded " + codesCombi.Count + " timeseries in total");
-                      
+                        G.Writeln("--> Downloaded " + codesCombi.Count + " timeseries in total, frequency: " + freq + ", " + dates[0] + "-" + dates[dates.Count - 1]);
+                        G.Writeln("    Name of first timeseries: " + codesCombi[0]);
+                        G.Writeln("    Name of last timeseries: " + codesCombi[codesCombi.Count - 1]);
+
                     }
                     else if (line.StartsWith(codeTimeString))
                     {
@@ -221,7 +257,7 @@ namespace Gekko
                             G.Writeln2("*** ERROR: Expected a '=' in this line: " + line);
                             throw new GekkoException();
                         }
-                        
+
                         string s3 = line.Substring(0, i); s3 = s3.Substring(7); s3 = s3.Substring(0, s3.Length - 2);
                         codesHeader.Add(s3);
 
@@ -241,11 +277,11 @@ namespace Gekko
                         codes.Add(names2);
                     }
                     else if (line.StartsWith(valueTimeString))
-                    { 
+                    {
                         //ignore
                     }
                     else if (line.StartsWith(valueString))
-                    {                        
+                    {
                         int i = line.IndexOf("=");
                         if (i < 0)
                         {
@@ -269,6 +305,6 @@ namespace Gekko
                     }
                 }
             }
-        }        
+        }
     }
 }

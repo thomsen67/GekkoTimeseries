@@ -1699,7 +1699,7 @@ namespace Gekko.Parser.Gek
                     //    break;
                     case "ASTDOWNLOAD":
                         {
-                            node.Code.A("O.Link o" + Num(node) + " = new O.Link();" + G.NL);
+                            node.Code.A("O.Download o" + Num(node) + " = new O.Download();" + G.NL);
                             string s = null;
                             if (node[0].Text != null) s = "http://";
                             node.Code.A("o" + Num(node) + ".dbUrl = `" + s + "` + O.GetString(" + node[1].Code + ");" + G.NL);

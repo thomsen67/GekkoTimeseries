@@ -1915,17 +1915,7 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: OPEN: The databank '" + file + "' could not be found");
                     throw new GekkoException();
-                }
-
-                string fileHash = null;
-                if (Globals.testFileChange)
-                {
-                    if (open)
-                    {
-                        if (createNewOpenFile) fileHash = "brand new file"; //signifies that the bank is brand new
-                        else fileHash = Program.GetMD5Hash(GetTextFromFileWithWait(file));  //MD5 hash of file                
-                    }
-                }
+                }                
 
                 //At this point, we know that the file to be opened/read actually exists (or createOpenFile is true)
 
@@ -2087,9 +2077,17 @@ namespace Gekko
                     readInfos.Add(readInfo);
                 }
                 //databank.Trim();  //This way, the bank is not too bulky in RAM. The operation takes almost no time, and if it is a .tsdx file, the timeseries are already trimmed and trimming is hence skipped.
-                databank.readInfo = readInfo;  //Not really used at the moment, but practical to have a pointer to this information!
-                databank.fileHash = fileHash;  //MD5 hash of file contents
-            }
+                databank.readInfo = readInfo;  //Not really used at the moment, but practical to have a pointer to this information!                
+                                
+                if (Globals.testFileChange)
+                {
+                    if (open)
+                    {
+                        if (createNewOpenFile) databank.fileHash = "brand new file"; //signifies that the bank is brand new
+                        else databank.fileHash = Program.GetMD5Hash(GetTextFromFileWithWait(databank.FileNameWithPath));  //MD5 hash of file                
+                    }
+                }
+            }  //for each bank in list
 
             return;
         }

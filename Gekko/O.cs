@@ -1783,13 +1783,13 @@ namespace Gekko
             }
         }
 
-        public class Link
+        public class Download
         {
             public string dbUrl = null;
             public string fileName = null;
             public void Exe()
             {
-                OnlineDatabanks.Test(dbUrl, fileName);
+                OnlineDatabanks.Download(dbUrl, fileName);
             }
         }
 
