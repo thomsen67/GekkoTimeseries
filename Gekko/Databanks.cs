@@ -180,7 +180,8 @@ namespace Gekko
                             m.Add(this.storage[i]);
                         }
                     }
-                    G.Writeln2("Databank '" + name + "' set as editable databank, in first position.");
+                    if (openType == EOpenType.Edit) G.Writeln2("Databank '" + name + "' set as editable databank, put first position.");
+                    else G.Writeln2("Databank '" + name + "' put in first position.");
                 }
                 else if (openType == EOpenType.Ref)
                 {
@@ -232,9 +233,9 @@ namespace Gekko
                     m.Add(databank);         //first
                     m.Add(this.storage[1]);  //ref
                     m.Add(this.storage[0]);
-                    for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
-                    if (edit) G.Writeln2("Databank '" + name + "' opened in first position");
-                    else G.Writeln2("Databank '" + name + "' opened as editable in first position");
+                    for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);                    
+                    if (openType == EOpenType.Edit) G.Writeln2("Databank '" + name + "' opened as editable in first position");
+                    else G.Writeln2("Databank '" + name + "' opened in first position");
                 }
                 else if (openType == EOpenType.Ref)
                 {

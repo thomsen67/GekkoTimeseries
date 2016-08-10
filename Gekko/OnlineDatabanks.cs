@@ -217,7 +217,7 @@ namespace Gekko
                             //G.Writeln(ts.variableName + ", with freq " + freq.ToUpper() + ", " + G.FromDateToString(gt0) + "-" + G.FromDateToString(gt1));
                             //counter++;                        
                         }
-                        G.Writeln("--> Downloaded " + codesCombi.Count + " timeseries in total, frequency: " + freq + ", " + dates[0] + "-" + dates[dates.Count - 1]);
+                        G.Writeln("--> Downloaded " + codesCombi.Count + " timeseries in total, frequency " + freq + ", " + dates[0] + "-" + dates[dates.Count - 1]);
                         G.Writeln("    Name of first timeseries: " + codesCombi[0]);
                         G.Writeln("    Name of last timeseries: " + codesCombi[codesCombi.Count - 1]);
 
