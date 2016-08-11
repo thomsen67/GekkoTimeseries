@@ -58,7 +58,20 @@ namespace Gekko
                 codesHeaderJson.Add((string)oo["code"]);
             }
 
-            using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+            StreamWriter streamWriter = null;
+            try
+            {
+                streamWriter = new StreamWriter(httpWebRequest.GetRequestStream());
+            }
+            catch (Exception e)
+            {
+                //May get something like this: System.Net.WebException: Der kunne ikke oprettes forbindelse til fjernserveren ---> System.Net.Sockets.SocketException: Det blev forsøgt at få adgang til en socket på en måde, der er forbudt af den pågældende sockets adgangstilladelser 91.208.143.3:80
+                G.Writeln2("*** ERROR: Connection failed with the following error:");
+                G.Writeln("           " + e.Message);
+                throw;
+            }
+
+            using (streamWriter)
             {
                 streamWriter.Write(jsonCode);
                 streamWriter.Flush();
@@ -79,6 +92,7 @@ namespace Gekko
                     }
                     catch (Exception e)
                     {
+                        //timeout errors and the like
                         G.Writeln2("*** ERROR: Download failed with the following error:");
                         G.Writeln("           " + e.Message);
                         throw;
