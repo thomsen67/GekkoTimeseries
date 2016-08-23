@@ -2155,14 +2155,14 @@ namespace Gekko
                 readDatesHelper.t1Quarterly = oRead.t1;
                 readDatesHelper.t2Quarterly = oRead.t2;
                 readDatesHelper.t1Monthly = new GekkoTime(EFreq.Monthly, oRead.t1.super, GekkoTime.FromQuarterToMonthStart(oRead.t1.sub));  //first m
-                readDatesHelper.t2Monthly = new GekkoTime(EFreq.Monthly, oRead.t2.super, GekkoTime.FromQuarterToMonthEnd(oRead.t2.sub));  //first m                            
+                readDatesHelper.t2Monthly = new GekkoTime(EFreq.Monthly, oRead.t2.super, GekkoTime.FromQuarterToMonthEnd(oRead.t2.sub));  //last m                            
             }
             else if (oRead.t1.freq == EFreq.Monthly)
             {
                 readDatesHelper.t1Annual = new GekkoTime(EFreq.Annual, oRead.t1.super, 1);
                 readDatesHelper.t2Annual = new GekkoTime(EFreq.Annual, oRead.t2.super, 1);
-                readDatesHelper.t1Quarterly = new GekkoTime(EFreq.Quarterly, oRead.t1.super, GekkoTime.FromQuarterToMonthStart(oRead.t1.sub));  //first m
-                readDatesHelper.t1Quarterly = new GekkoTime(EFreq.Quarterly, oRead.t2.super, GekkoTime.FromQuarterToMonthEnd(oRead.t2.sub));  //first m                            
+                readDatesHelper.t1Quarterly = new GekkoTime(EFreq.Quarterly, oRead.t1.super, GekkoTime.FromMonthToQuarter(oRead.t1.sub));
+                readDatesHelper.t2Quarterly = new GekkoTime(EFreq.Quarterly, oRead.t2.super, GekkoTime.FromMonthToQuarter(oRead.t2.sub));
                 readDatesHelper.t1Monthly = oRead.t1;
                 readDatesHelper.t2Monthly = oRead.t2;
             }

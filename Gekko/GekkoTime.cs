@@ -249,7 +249,7 @@ namespace Gekko
 
         public static int FromMonthToQuarter(int m)
         {
-            return (m - 1) % (GekkoTimeStuff.numberOfMonths / GekkoTimeStuff.numberOfQuarters) + 1;
+            return (m - 1) / (GekkoTimeStuff.numberOfMonths / GekkoTimeStuff.numberOfQuarters) + 1;
         }
     }
 

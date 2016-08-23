@@ -6451,6 +6451,43 @@ namespace UnitTests
                     FAIL("IMPORT<2011u1 2011u1>mixed;");
                     FAIL("IMPORT<2011 2011q1>mixed;");
                     FAIL("IMPORT<2011q1 2011m12>mixed;");
+
+                    // ----------------------------------------------------------------------------
+                    //Testing a scrolling 'window' of READ/IMPORT time limit, on quarters
+                    I("RESET;");
+                    I("OPTION freq q;");
+                    I("SER<2000q1 2001q4> xx1 = 1,2,3,4,5,6,7,8;");
+                    I("WRITE temp;");
+                    int count1 = 0;
+                    GekkoTime t0 = new GekkoTime(EFreq.Quarterly, 2000, 1);
+                    foreach (GekkoTime t1 in new GekkoTimeIterator(new GekkoTime(EFreq.Quarterly, 2000, 1), new GekkoTime(EFreq.Quarterly, 2001, 4)))
+                    {
+                        int count2 = 0;
+                        foreach (GekkoTime t2 in new GekkoTimeIterator(new GekkoTime(EFreq.Quarterly, 2000, 1), new GekkoTime(EFreq.Quarterly, 2001, 4)))
+                        {
+                            I("SER<2000q1 2001q4> xx1 = 100,200,300,400,500,600,700,800;");
+                            I("IMPORT<" + t1.ToString() + " " + t2.ToString() + "> temp;");
+                            for (int ii = 0; ii < count1; ii++)
+                            {
+                                //original                                
+                                GekkoTime ttemp = t0.Add(ii);
+                                AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Quarterly, ttemp.super, ttemp.sub, (ii + 1) * 100, sharedDelta);
+                            }
+                            for (int ii = count1; ii <= count2; ii++)
+                            {
+                                GekkoTime ttemp = t0.Add(ii);
+                                AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Quarterly, ttemp.super, ttemp.sub, (ii + 1) * 1, sharedDelta);
+                            }
+                            for (int ii = count2 + 1; ii < 8; ii++)
+                            {
+                                //original                                
+                                GekkoTime ttemp = t0.Add(ii);
+                                AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Quarterly, ttemp.super, ttemp.sub, (ii + 1) * 100, sharedDelta);
+                            }
+                            count2++;
+                        }
+                        count1++;
+                    }
                 }
 
                 Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
