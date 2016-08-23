@@ -156,7 +156,19 @@ namespace Gekko
                     {
                         //Note: OPEN<edit> could be used to unlock an OPEN<first>...
                         //this.storage[0].protect = false;  //this is set elsewhere
-                        if (openType == EOpenType.Edit) G.Writeln2("Databank '" + databank.aliasName + "' set editable.");
+                        if (openType == EOpenType.Edit)
+                        {
+                            if (databank.protect == false)
+                            {
+                                G.Writeln2("Databank '" + databank.aliasName + "' is already editable in first position.");
+                            }
+                            else
+                            {
+                                databank.protect = false;
+                                G.Writeln2("Databank '" + databank.aliasName + "' set editable.");
+                            }
+                        }
+                        m.AddRange(this.storage);  //just copied, and put back again later on
                     }
                     else if (existI == 1)  //Trying an OPEN<edit>db on a db that is already ref (opened with OPEN<ref>db).
                     {

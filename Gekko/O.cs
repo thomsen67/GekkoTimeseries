@@ -1522,6 +1522,9 @@ namespace Gekko
 
         public class Read
         {
+            //also covers IMPORT
+            public GekkoTime t1 = Globals.tNull;
+            public GekkoTime t2 = Globals.tNull;
             public string fileName = null;
             public string readTo = null;
             public string opt_tsd = null;
@@ -1543,6 +1546,9 @@ namespace Gekko
             public void Exe()
             {
                 ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
+                hlp.t1 = this.t1;
+                hlp.t2 = this.t2;
+                
                 bool isRead = false; if (G.equal(this.type, "read")) isRead = true;
 
                 if (this.opt_prim != null)

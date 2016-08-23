@@ -3364,6 +3364,10 @@ namespace UnitTests
             {
                 Assert.Fail("Missing: should be " + x.ToString() + ", but is " + y.ToString());
             }
+            else if (G.isNumericalError(x) && G.isNumericalError(y))
+            {
+                //both are NaN which is ok
+            }
             else
             {
                 Assert.AreEqual(y, x, delta);
@@ -6399,6 +6403,58 @@ namespace UnitTests
                 Test_Databanks_Helper();
                 Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
 
+                if (true)
+                {
+
+                    // Testing READ and IMPORT with periods
+
+                    Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                    Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
+                    I("RESET;");
+                    I("OPTION freq a;");
+                    I("SER <2010 2013> xx1 = 1;");
+                    I("OPTION freq q;");
+                    I("SER <2010q1 2013q2> xx2 = 2;");
+                    I("OPTION freq m;");
+                    I("SER <2010m1 2013m2> xx3 = 3;");
+                    I("WRITE mixed;");
+                    I("RESET; IMPORT<2011 2011>mixed;");
+                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2010, 1, double.NaN, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2011, 1, 1d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2012, 1, double.NaN, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2010, 4, double.NaN, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 1, 2011, 4, 2d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2012, 1, double.NaN, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2010, 12, double.NaN, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 1, 2011, 12, 3d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2012, 1, double.NaN, sharedDelta);
+                    I("RESET; IMPORT<2011q2 2011q3>mixed;");
+                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2010, 1, double.NaN, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2011, 1, 1d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2012, 1, double.NaN, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 1, double.NaN, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 2, 2011, 3, 2d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 4, double.NaN, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 3, double.NaN, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 4, 2011, 9, 3d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 10, double.NaN, sharedDelta);
+                    I("RESET; IMPORT<2011m2 2011m4>mixed;");
+                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2010, 1, double.NaN, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2011, 1, 1d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2012, 1, double.NaN, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2010, 4, double.NaN, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 1, 2011, 2, 2d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 3, double.NaN, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 1, double.NaN, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 2, 2011, 4, 3d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 5, double.NaN, sharedDelta);
+                    FAIL("IMPORT<2011u1 2011u1>mixed;");
+                    FAIL("IMPORT<2011 2011q1>mixed;");
+                    FAIL("IMPORT<2011q1 2011m12>mixed;");
+                }
+
+                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+
             }
         }
 
@@ -7417,6 +7473,8 @@ namespace UnitTests
         [TestMethod]
         public void Test__DataFormatsInOut()
         {
+          
+
             //tsdx
             //tsd
             //csv
@@ -8876,7 +8934,7 @@ namespace UnitTests
 
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void Test__EnsJJUST()
         {
 

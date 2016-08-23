@@ -11,7 +11,13 @@ namespace Gekko
         Quarterly,
         Monthly,
         Undated      //also called 'u' in Eviews, called 'n' in TSP, but undated has no name in AREMOS (uses 'periodic')        
-    }
+    }  
+    
+    public class GekkoTimeStuff
+    {
+        public static readonly int numberOfQuarters = 4;
+        public static readonly int numberOfMonths = 12;
+    }  
     
     //GekkoTime is an immutable struct for fast looping. Structs should be < 16 bytes to be effective (we have 3 x 4 = 12 bytes here)
     public struct GekkoTime
@@ -120,6 +126,7 @@ namespace Gekko
 
         public bool StrictlyLargerThan(GekkoTime gt2)
         {
+            CheckSameFreq(gt2);
             if (this.super > gt2.super) return true;
             else if (this.super == gt2.super)
             {
@@ -128,8 +135,18 @@ namespace Gekko
             return false;
         }
 
+        private void CheckSameFreq(GekkoTime gt2)
+        {
+            if (this.freq != gt2.freq)
+            {
+                G.Writeln2("*** ERROR: Comparing two different frequencies");
+                throw new GekkoException();
+            }
+        }
+
         public bool LargerThanOrEqual(GekkoTime gt2)
         {
+            CheckSameFreq(gt2);
             if (this.super == gt2.super && this.sub == gt2.sub) return true;
             if (StrictlyLargerThan(gt2)) return true;
             return false;
@@ -137,6 +154,7 @@ namespace Gekko
 
         public bool SmallerThanOrEqual(GekkoTime gt2)
         {
+            CheckSameFreq(gt2);
             if (this.super == gt2.super && this.sub == gt2.sub) return true;
             if (StrictlySmallerThan(gt2)) return true;
             return false;
@@ -144,6 +162,7 @@ namespace Gekko
 
         public bool StrictlySmallerThan(GekkoTime gt2)
         {
+            CheckSameFreq(gt2);
             if (this.super < gt2.super) return true;
             else if (this.super == gt2.super)
             {
@@ -154,6 +173,7 @@ namespace Gekko
 
         public bool IsSamePeriod(GekkoTime gt2)
         {
+            CheckSameFreq(gt2);
             if (this.super == gt2.super)
                 if (this.sub == gt2.sub)
                     return true;
@@ -216,6 +236,21 @@ namespace Gekko
                 throw new GekkoException();
             }
         }
+
+        public static int FromQuarterToMonthStart(int q)
+        {
+            return (GekkoTimeStuff.numberOfMonths / GekkoTimeStuff.numberOfQuarters) * q - 2;          
+        }
+
+        public static int FromQuarterToMonthEnd(int q)
+        {
+            return (GekkoTimeStuff.numberOfMonths / GekkoTimeStuff.numberOfQuarters) * q;
+        }
+
+        public static int FromMonthToQuarter(int m)
+        {
+            return (m - 1) % (GekkoTimeStuff.numberOfMonths / GekkoTimeStuff.numberOfQuarters) + 1;
+        }
     }
 
     public class GekkoTimeIterator : IEnumerable<GekkoTime>
@@ -252,6 +287,16 @@ namespace Gekko
             G.Writeln("*** ERROR: iterator problem");
             throw new GekkoException();
         }
+    }
+
+    public class ReadDatesHelper
+    {
+        public GekkoTime t1Annual;
+        public GekkoTime t2Annual;
+        public GekkoTime t1Quarterly;
+        public GekkoTime t2Quarterly;
+        public GekkoTime t1Monthly;
+        public GekkoTime t2Monthly;
     }
 
     public class GekkoTimeIteratorBackwards : IEnumerable<GekkoTime>

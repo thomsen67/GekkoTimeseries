@@ -1106,10 +1106,11 @@ namespace Gekko
             return matrix;
         }
 
-        private static void GetTimeseriesFromWorkbookMatrix(ReadOpenMulbkHelper oRead, Databank databank, TableLight matrix2, ReadInfo readInfo)
+        private static void GetTimeseriesFromWorkbookMatrix(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, Databank databank, TableLight matrix2, ReadInfo readInfo)
         {
-            //TODO: gaps, READ<gap>
             
+            //TODO: gaps, READ<gap>
+
             //We could 'taste' the file, but how to distinguish A and U for instance?
             //Perhaps augment READ/IMPORT with freq indication for such files?
             EFreq freqHere = Program.options.freq;
@@ -1175,7 +1176,7 @@ namespace Gekko
                             start[1] = GetExcelCell(row, col, transpose);
                         }
 
-                        if(true)  //made for each date
+                        if (true)  //made for each date
                         {
                             end[0] = cellText;
                             end[1] = GetExcelCell(row, col, transpose);
@@ -1185,7 +1186,7 @@ namespace Gekko
                         date = date.Trim();  //removes blanks at start and end
                         date = date.ToLower();  //if q or m (or y)
 
-                        if ((freqHere== EFreq.Annual))
+                        if ((freqHere == EFreq.Annual))
                         {
                             if (date.EndsWith(annualIndicator1, true, null))
                             {
@@ -1204,7 +1205,7 @@ namespace Gekko
 
                         string perTemp = "";
                         string subPerTemp = "";
-                        if ((freqHere==EFreq.Annual) || (freqHere== EFreq.Undated))  //ttfreq
+                        if ((freqHere == EFreq.Annual) || (freqHere == EFreq.Undated))  //ttfreq
                         {
                             perTemp = date;
                             subPerTemp = "1";
@@ -1360,8 +1361,29 @@ namespace Gekko
                                 {
                                     ss = double.NaN;
                                 }
-                                GekkoTime gt2 = per1.Add((col - colOffset) - 2);  //col 2 is the start col for data                                
-                                ts.SetData(gt2, ss);
+                                GekkoTime gt2 = per1.Add((col - colOffset) - 2);  //col 2 is the start col for data   
+                                bool good = true;
+                                if (dates != null)
+                                {
+                                    good = true;
+                                    if (gt2.freq == EFreq.Annual)
+                                    {
+                                        if (gt2.LargerThanOrEqual(dates.t1Annual) && gt2.SmallerThanOrEqual(dates.t2Annual)) good = true;                                        
+                                    }
+                                    else if (gt2.freq == EFreq.Quarterly)
+                                    {
+                                        if (gt2.LargerThanOrEqual(dates.t1Quarterly) && gt2.SmallerThanOrEqual(dates.t2Quarterly)) good = true;
+                                    }
+                                    else if (gt2.freq == EFreq.Monthly)
+                                    {
+                                        if (gt2.LargerThanOrEqual(dates.t1Monthly) && gt2.SmallerThanOrEqual(dates.t2Monthly)) good = true;
+                                    }
+                                }
+                                
+                                if(good == true)
+                                {
+                                    ts.SetData(gt2, ss);
+                                }
                             }
                         }
                     }
@@ -1384,6 +1406,8 @@ namespace Gekko
             currentBank.yearStart = readInfo.startPerResultingBank;
             currentBank.yearEnd = readInfo.endPerResultingBank;
         }
+
+       
 
         private static bool IsNonAvailableText(string text)
         {
@@ -1786,7 +1810,7 @@ namespace Gekko
 
         public static void OpenOrRead(ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos)
         {
-            //open = true if called with OPEN command            
+            //open = true if called with OPEN command                      
 
             int n = 1;
             List<int> list = new List<int>();
@@ -1938,7 +1962,7 @@ namespace Gekko
                 }
                 else
                 {
-                    //READ or MULBK
+                    //READ or READ<first>
                     databank = Program.databanks.GetFirst();
                     if (oRead.openType == EOpenType.Ref) databank = Program.databanks.GetRef();
                     readInfo.type = EReadInfoTypes.Normal;
@@ -1959,7 +1983,7 @@ namespace Gekko
 
                 if (readInfo.type != EReadInfoTypes.Normal)
                 {
-                    //When creating a new file with "OPEN xyz" (where xyz does not exist), of
+                    //When creating a new file with "OPEN xyz" (where xyz does not exist), or
                     //  "OPEN<edit>abc" where abc is already open, nothing should be read from file.
                     readInfo.databank = databank;
                     readInfo.databank.FileNameWithPath = readInfo.fileName;
@@ -1976,20 +2000,27 @@ namespace Gekko
                         file = tempPath;
                     }
 
+                    ReadDatesHelper dates = GetReadDatesHelper(oRead);
+
                     if (oRead.Type == EDataFormat.Pcim)
                     {
-                        Program.ReadPCIM(oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
+                        Program.ReadPCIM(dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
                     }
                     else if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn || oRead.Type == EDataFormat.Xls || oRead.Type == EDataFormat.Xlsx)
                     {
-                        ReadSheet(oRead, readInfo, file, databank, originalFilePath);
+                        ReadSheet(dates, oRead, readInfo, file, databank, originalFilePath);
                     }
                     else if (oRead.Type == EDataFormat.Tsd || oRead.Type == EDataFormat.Tsdx || oRead.Type == EDataFormat.Gbk || oRead.Type == EDataFormat.None)
                     {
-                        ReadTsdOrTsdx(oRead, readInfo, ref file, isTsdx, ref isProtobuf, ref databank, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+                        ReadTsdOrTsdx(dates, oRead, readInfo, ref file, isTsdx, ref isProtobuf, ref databank, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
                     }
                     else if (oRead.Type == EDataFormat.Tsp)
                     {
+                        if(dates != null)
+                        {
+                            G.Writeln2("*** ERROR: You cannot use period truncation in TSP data import");
+                            throw new GekkoException();
+                        }
                         TspUtilities.tspDataUtility(file, databank, oRead, readInfo, open);
                     }
                     else
@@ -2092,6 +2123,53 @@ namespace Gekko
             return;
         }
 
+        private static ReadDatesHelper GetReadDatesHelper(ReadOpenMulbkHelper oRead)
+        {
+            if (oRead.t1.IsNull()) return null;
+            ReadDatesHelper readDatesHelper = new Gekko.ReadDatesHelper();
+            if (oRead.t1.freq != oRead.t2.freq)
+            {
+                G.Writeln2("*** ERROR: The two date frequencies do not match");
+                throw new GekkoException();
+            }
+
+            if (oRead.t1.freq == EFreq.Undated)
+            {
+                G.Writeln2("*** ERROR: Undated frequency does not work for READ/IMPORT");
+                throw new GekkoException();
+            }
+
+            if (oRead.t1.freq == EFreq.Annual)
+            {
+                readDatesHelper.t1Annual = oRead.t1;
+                readDatesHelper.t2Annual = oRead.t2;
+                readDatesHelper.t1Quarterly = new GekkoTime(EFreq.Quarterly, oRead.t1.super, 1);  //first q
+                readDatesHelper.t2Quarterly = new GekkoTime(EFreq.Quarterly, oRead.t2.super, GekkoTimeStuff.numberOfQuarters);  //last q
+                readDatesHelper.t1Monthly = new GekkoTime(EFreq.Monthly, oRead.t1.super, 1);  //first m
+                readDatesHelper.t2Monthly = new GekkoTime(EFreq.Monthly, oRead.t2.super, GekkoTimeStuff.numberOfMonths);  //last m
+            }
+            else if (oRead.t1.freq == EFreq.Quarterly)
+            {
+                readDatesHelper.t1Annual = new GekkoTime(EFreq.Annual, oRead.t1.super, 1);
+                readDatesHelper.t2Annual = new GekkoTime(EFreq.Annual, oRead.t2.super, 1);
+                readDatesHelper.t1Quarterly = oRead.t1;
+                readDatesHelper.t2Quarterly = oRead.t2;
+                readDatesHelper.t1Monthly = new GekkoTime(EFreq.Monthly, oRead.t1.super, GekkoTime.FromQuarterToMonthStart(oRead.t1.sub));  //first m
+                readDatesHelper.t2Monthly = new GekkoTime(EFreq.Monthly, oRead.t2.super, GekkoTime.FromQuarterToMonthEnd(oRead.t2.sub));  //first m                            
+            }
+            else if (oRead.t1.freq == EFreq.Monthly)
+            {
+                readDatesHelper.t1Annual = new GekkoTime(EFreq.Annual, oRead.t1.super, 1);
+                readDatesHelper.t2Annual = new GekkoTime(EFreq.Annual, oRead.t2.super, 1);
+                readDatesHelper.t1Quarterly = new GekkoTime(EFreq.Quarterly, oRead.t1.super, GekkoTime.FromQuarterToMonthStart(oRead.t1.sub));  //first m
+                readDatesHelper.t1Quarterly = new GekkoTime(EFreq.Quarterly, oRead.t2.super, GekkoTime.FromQuarterToMonthEnd(oRead.t2.sub));  //first m                            
+                readDatesHelper.t1Monthly = oRead.t1;
+                readDatesHelper.t2Monthly = oRead.t2;
+            }
+
+            return readDatesHelper;
+        }
+
         private static void CheckOpenSyntax(ReadOpenMulbkHelper oRead)
         {
             int counter = 0;
@@ -2155,7 +2233,7 @@ namespace Gekko
             }
         }
 
-        private static void ReadSheet(ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, Databank databank, string originalFilePath)
+        private static void ReadSheet(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, Databank databank, string originalFilePath)
         {
             //TODO:
             //For speedup:
@@ -2176,7 +2254,7 @@ namespace Gekko
             {
                 matrix = ReadExcelWorkbook(file, databank);
             }
-            GetTimeseriesFromWorkbookMatrix(oRead, databank, matrix, readInfo);
+            GetTimeseriesFromWorkbookMatrix(dates, oRead, databank, matrix, readInfo);
         }
 
         public static int ExcelColumnNameToNumber(string columnName)
@@ -2263,8 +2341,10 @@ namespace Gekko
             }
         }
 
-        private static void ReadTsdOrTsdx(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, bool isTsdx, ref bool isProtobuf, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
+        private static void ReadTsdOrTsdx(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, bool isTsdx, ref bool isProtobuf, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
         {
+            bool mergeOrTimeLimit = oRead.Merge || dates != null;
+
             if (isTsdx)
             {
                 readInfo.databankVersion = "";
@@ -2329,8 +2409,8 @@ namespace Gekko
                         readInfo.info1 = description.InnerText;
                     }
 
-                    XmlNodeList dates = doc.GetElementsByTagName("Date");
-                    foreach (XmlNode date in dates) //should be only 1 in this loop
+                    XmlNodeList dates5 = doc.GetElementsByTagName("Date");
+                    foreach (XmlNode date in dates5) //should be only 1 in this loop
                     {
                         readInfo.date = date.InnerText;
                     }
@@ -2416,6 +2496,8 @@ namespace Gekko
                         throw new GekkoException();
                     }
 
+                    
+
                     int maxYearInProtobufFile = int.MinValue;
                     int minYearInProtobufFile = int.MaxValue;
                     int emptyWarnings = 0;
@@ -2432,35 +2514,37 @@ namespace Gekko
                         GekkoTime first = tsTemp.GetPeriodFirst();
                         GekkoTime last = tsTemp.GetPeriodLast();
 
-                        if (oRead.Merge)  //doing tsdx-protobuf merge, get data into Work from deserialized temp databank
+                        if (mergeOrTimeLimit)  //doing tsdx-protobuf merge (or time limits), get data into Work from deserialized temp databank
                         {
-                            TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, tsTemp.variableName, tsTemp.freqEnum);
-                            int index1;
-                            int index2;
-                            try
+                            if (dates != null)
                             {
-                                ts.SetDataSequence(first, last, tsTemp.GetDataSequence(out index1, out index2, first, last, true));
-                            }
-                            catch (Exception e)
-                            {
-                                G.Writeln2("*** ERROR: Unexpected technical error while merging databanks");
-                                throw new GekkoException();
+                                GetFirstLastDates(dates, ref first, ref last);
                             }
 
+                            int nob = GekkoTime.Observations(first, last);
+                            if (nob > 0)
+                            {
+                                //ignore if nob < 1. This means that the time limit window is outside the data window 
+                                TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, tsTemp.variableName, tsTemp.freqEnum);
+                                int index1;
+                                int index2;
+                                try
+                                {
+                                    double[] data = tsTemp.GetDataSequence(out index1, out index2, first, last, true);
+                                    ts.SetDataSequence(first, last, data, index1);
+                                }
+                                catch (Exception e)
+                                {
+                                    G.Writeln2("*** ERROR: Unexpected technical error while merging databanks");
+                                    throw new GekkoException();
+                                }
 
-                            GekkoTime firstX = ts.GetPeriodFirst();
-                            GekkoTime lastX = ts.GetPeriodLast();
-
-                            //This is a WRONG test, not working if merging into a timeseries that is there already.
-                            //Test is ony valid if merging into newly created timesreies.
-                            //if (firstSuper != firstSuper2 || firstSub != firstSub2 || lastSuper != lastSuper2 || lastSub != lastSub2)
-                            //{
-                            //    G.Writeln2("*** ERROR: Reading gave internal Gekko error #734735 (sorry)");
-                            //    throw new GekkoException();
-                            //}
-
-                            maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, lastX.super);
-                            minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, firstX.super);
+                                GekkoTime firstX = ts.GetPeriodFirst();
+                                GekkoTime lastX = ts.GetPeriodLast();
+                                
+                                maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, lastX.super);
+                                minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, firstX.super);
+                            }
                         }
                         else
                         {
@@ -2470,7 +2554,7 @@ namespace Gekko
                     }
                     if (emptyWarnings > 0) G.Writeln("+++ WARNING: " + emptyWarnings + " variables with empty string as name in ." + Globals.extensionDatabank + " file (skipped)");
 
-                    if (!oRead.Merge)
+                    if (!mergeOrTimeLimit)
                     {
                         try
                         {
@@ -2488,7 +2572,7 @@ namespace Gekko
                     }
 
                     //See almost identical code below, and in readCsv()
-                    if (oRead.Merge)
+                    if (mergeOrTimeLimit)
                     {
                         readInfo.startPerInFile = minYearInProtobufFile;
                         readInfo.endPerInFile = maxYearInProtobufFile;
@@ -2513,13 +2597,12 @@ namespace Gekko
             {
                 //also deals with merging (not clearing the databank first if merging)
 
-                if (Globals.newTsd) ReadAllTsdRecords(file, oRead.Merge, isTsdx, databank, ref NaNCounter, readInfo);
-                else ReadAllTsdRecordsOld(file, oRead.Merge, isTsdx, databank, ref NaNCounter, readInfo);
+                ReadAllTsdRecords(dates, file, oRead.Merge, isTsdx, databank, ref NaNCounter, readInfo);                
 
                 readInfo.nanCounter = NaNCounter;
 
                 //See almost identical code above and in readCsv()
-                if (oRead.Merge)
+                if (mergeOrTimeLimit)
                 {
                     readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
                     readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
@@ -2535,7 +2618,49 @@ namespace Gekko
             }
         }
 
-        private static void ReadAllTsdRecords(string file, bool merge, bool isTsdx, Databank databank, ref int NaNCounter, ReadInfo readInfo)
+        private static int GetFirstLastDates(ReadDatesHelper dates, ref GekkoTime first, ref GekkoTime last)
+        {
+            int offset = 0;
+            if (first.freq == EFreq.Annual)
+            {
+                if (first.SmallerThanOrEqual(dates.t1Annual))
+                {
+                    offset = GekkoTime.Observations(first, dates.t1Annual) - 1;
+                    first = dates.t1Annual;                    
+                }
+                if (last.LargerThanOrEqual(dates.t2Annual))
+                {
+                    last = dates.t2Annual;
+                }
+            }
+            else if (first.freq == EFreq.Quarterly)
+            {
+                if (first.SmallerThanOrEqual(dates.t1Quarterly))
+                {
+                    first = dates.t1Quarterly;
+                    offset = GekkoTime.Observations(first, dates.t1Quarterly) - 1;
+                }
+                if (last.LargerThanOrEqual(dates.t2Quarterly))
+                {
+                    last = dates.t2Quarterly;
+                }
+            }
+            else if (first.freq == EFreq.Monthly)
+            {
+                if (first.SmallerThanOrEqual(dates.t1Monthly))
+                {
+                    first = dates.t1Monthly;
+                    offset = GekkoTime.Observations(first, dates.t1Monthly) - 1;
+                }
+                if (last.LargerThanOrEqual(dates.t2Monthly))
+                {
+                    last = dates.t2Monthly;
+                }
+            }
+            return offset;
+        }
+
+        private static void ReadAllTsdRecords(ReadDatesHelper dates, string file, bool merge, bool isTsdx, Databank databank, ref int NaNCounter, ReadInfo readInfo)
         {
             int smallWarnings = 0;
             int emptyWarnings = 0;
@@ -2766,10 +2891,21 @@ namespace Gekko
                         {
                             GekkoTime gt1 = new GekkoTime(freq, d1, d1sub);
                             GekkoTime gt2 = new GekkoTime(freq, d2, d2sub);
-                            ts.SetDataSequence(gt1, gt2, tempArray);
-                            ts.Trim(); //to save ram
+
+                            int offset = 0;
+
+                            if (dates != null)
+                            {
+                                offset = GetFirstLastDates(dates, ref gt1, ref gt2);
+                            }
+
+                            int nob = GekkoTime.Observations(gt1, gt2);
+                            if (nob > 0)
+                            {
+                                ts.SetDataSequence(gt1, gt2, tempArray, offset);
+                                ts.Trim(); //to save ram                                                             
+                            }
                             counter++;
-                            //datalines++;
                             nextState = 1;
                         }
                     }
@@ -2783,225 +2919,10 @@ namespace Gekko
             }
         }
 
-        //obsolete soon
-        private static void ReadAllTsdRecordsOld(string file, bool merge, bool isTsdx, Databank databank, ref int NaNCounter, ReadInfo readInfo)
+        
+        public static void ReadPCIM(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
         {
-            int emptyWarnings = 0;
-            if (!merge)
-            {
-                databank.Clear();
-            }
-
-        retry: ;
-
-            if (Globals.threadIsInProcessOfAborting) throw new GekkoException();
-            char[] c = null;
-            using (FileStream fs = WaitForFileStream(file, GekkoFileReadOrWrite.Read))
-            using (StreamReader sr = new StreamReader(fs))
-            {
-                //file should not contain זרו, so no need to use GetTextFromFileWithWait()
-                GC.Collect();
-                string xx = sr.ReadToEnd();
-                c = xx.ToCharArray();
-            }
-
-            //This is an arbitrary size for this example.
-            double[] tempArray = new double[100000]; //we don't expect series with more than 100000 obs.
-            String var;
-            String date1;
-            String date1sub;
-            String date2;
-            String date2sub;
-            string frequency;
-            int counter = 0;
-            {
-                DateTime t0 = DateTime.Now;
-                DateTime t1 = DateTime.Now;
-                DateTime t2 = DateTime.Now;
-                int ii = 0;
-                int d1min = int.MaxValue;
-                int d2max = int.MinValue;
-                for (counter = 0; counter < int.MaxValue; counter++)
-                {
-                    //read var name
-                    ii = skipSpaces(c, ii);
-                    if (ii == -12345)
-                    {
-                        G.Writeln2("*** ERROR: Parsing tsd file -- var name");
-                        //sr.Close();
-                        throw new GekkoException();
-                    }
-                    int i;
-                    for (i = ii; i < int.MaxValue; i++)
-                    {
-                        if (!(Char.IsLetter(c[i]) || c[i] == '_'
-                            || Char.IsDigit(c[i])))  //as in StringTokenizer2
-                            break;
-                    }
-                    var = new String(c, ii, i - ii);
-                    ii = i;
-                    ii = skipPastNewLine(c, ii);
-                    if (ii == -12345)
-                    {
-                        G.Writeln2("*** ERROR: Parsing tsd file -- missing newline");
-                        throw new GekkoException();
-                    }
-
-                    //read date
-                    int iiStart = ii + 44 - 7;
-                    date1 = new String(c, iiStart + 7, 4);
-                    date1sub = new String(c, iiStart + 11, 2);
-                    date2 = new String(c, iiStart + 15, 4);
-                    date2sub = new String(c, iiStart + 19, 2);
-                    int d1, d1sub, d2, d2sub;
-                    try
-                    {
-                        d1 = int.Parse(date1);
-                    }
-                    catch
-                    {
-                        G.Writeln2("*** ERROR: " + var + ": could not parse '" + date1 + "' as an int (start year)");
-                        throw new GekkoException();
-                    }
-                    try
-                    {
-                        d1sub = int.Parse(date1sub);
-                    }
-                    catch
-                    {
-                        G.Writeln2("*** ERROR: " + var + ": could not parse '" + date1sub + "' as an int (start sub-period)");
-                        throw new GekkoException();
-                    }
-                    try
-                    {
-                        d2 = int.Parse(date2);
-                    }
-                    catch
-                    {
-                        G.Writeln2("*** ERROR: " + var + ": could not parse '" + date2 + "' as an int (end year)");
-                        throw new GekkoException();
-                    }
-                    try
-                    {
-                        d2sub = int.Parse(date2sub);
-                    }
-                    catch
-                    {
-                        G.Writeln2("*** ERROR: " + var + ": could not parse '" + date2sub + "' as an int (end sub-period)");
-                        throw new GekkoException();
-                    }
-                    frequency = new String(c, iiStart + 23, 1).ToLower(); //a or q or m
-
-                    d1min = G.GekkoMin(d1, d1min);  //TODO: quarters and months also
-                    d2max = G.GekkoMax(d2, d2max);
-
-                    ii = ii + 15 + 4 - 1;  //-1 for safety
-                    ii = skipPastNewLine(c, ii);
-                    if (ii == -12345)
-                    {
-                        G.Writeln2("*** ERROR: Parsing tsd file -- newline problem");
-                        //sr.Close();
-                        throw new GekkoException();
-                    }
-
-                    //read data
-                    int countdata = 0;
-
-                    TimeSeries ts = null;
-
-                    if (IsNonsenseVariableName(var))
-                    {
-                        emptyWarnings++;
-                        ts = new TimeSeries(G.GetFreq(frequency), var);  //completely phoney, will not live after exit of this method: just so that we can continue skipping chars in the .tsd file
-                    }
-                    else
-                    {
-                        ts = FindOrCreateTimeSeriesInDataBank(databank, var, G.GetFreq(frequency));
-                    }
-
-                    int obs = GekkoTime.Observations(new GekkoTime(ts.freqEnum, d1, d1sub), new GekkoTime(ts.freqEnum, d2, d2sub));
-
-                    while (true)
-                    {
-                        //for each period
-                        for (int i5 = 0; i5 < 5; i5++)
-                        {
-                            string toParse = null;
-                            if (isTsdx) toParse = new string(c, ii + i5 * 21, 21);
-                            else toParse = new string(c, ii + i5 * 15, 15);
-                            double ss = double.NaN;
-                            string toParse2 = toParse.Trim();
-
-                            bool success = double.TryParse(toParse, NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out ss);
-
-                            if (!success)
-                            {
-                                string toParse3 = toParse2;
-                                int nl = toParse2.IndexOf("\r\n");
-                                if (nl != -1)
-                                {
-                                    //if it is for instance //if it is "-NaN\r\n-NaN" it is probably from PCIM, in the right-most column. Gekko actually reads the delimiter and part of the next line. Probably kind of a PCIM bug. We truncate at the delimiter
-                                    toParse3 = toParse2.Substring(0, nl);
-                                }
-
-                                if (G.equal(toParse3, "NaN") || G.equal(toParse3, "-NaN"))
-                                {
-                                    ss = 1e+15;  //signals missing value
-                                    NaNCounter++;
-                                }
-                                else
-                                {
-                                    G.Writeln2("*** ERROR: " + var + ": could not parse '" + toParse3 + "' as a number");
-                                    //sr.Close();
-                                    throw new GekkoException();
-                                }
-                            }
-
-                            if (ss == 1e+15)
-                            {
-                                ss = double.NaN;
-                            }
-                            tempArray[countdata] = ss;
-                            countdata++;
-                            if (countdata >= obs)
-                                goto stop;
-                        }
-                        ii = skipPastNewLine(c, ii + 1); //read new line
-                    }
-                stop: ;
-
-                    EFreq freq = G.GetFreq(frequency);
-                    GekkoTime gt1 = new GekkoTime(freq, d1, d1sub);
-                    GekkoTime gt2 = new GekkoTime(freq, d2, d2sub);
-                    ts.SetDataSequence(gt1, gt2, tempArray);
-                    ts.Trim(); //to save ram
-
-
-                    ii = skipPastNewLine(c, ii);
-                    if (ii == -12345)
-                    {
-                        G.Writeln2("*** ERROR: Parsing tsd file -- skip newline problem");
-                        //sr.Close();
-                        throw new GekkoException();
-                    }
-                    if (ii >= c.Length)
-                    {
-                        //sr.Close();
-                        readInfo.startPerInFile = d1min;
-                        readInfo.endPerInFile = d2max;
-                        readInfo.variables = counter + 1;
-                        if (emptyWarnings > 0) G.Writeln("+++ WARNING: " + emptyWarnings + " variables with empty string as name in .tsd file (skipped)");
-                        return;
-                    }
-                }
-            }
-            c = null;
-            G.Writeln2("*** ERROR: Problem reading tsd file");
-            throw new Exception();
-        }
-
-        public static void ReadPCIM(string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
-        {
+            
             //try
             {
                 Databank databank = readInfo.databank;
@@ -3142,20 +3063,38 @@ namespace Gekko
                             continue;
                         }
 
-                        TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, varName, EFreq.Annual);
-                        for (int per = 0; per < antalper; per++)
+                        TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, varName, EFreq.Annual);                      
+                        
+                        if (oRead.t1.IsNull())
                         {
-                            short year = fid[per];
-                            float ss = gigant[var, per + 1];  //<==== because gigant[] is 1-based, not 0-based
-                            tempArray[per] = ss;
+                            //faster
+                            for (int per = 0; per < antalper; per++)
+                            {
+                                short year = fid[per];
+                                float ss = gigant[var, per + 1];  //<==== because gigant[] is 1-based, not 0-based
+                                tempArray[per] = ss;
+                            }
+                            GekkoTime gt1 = new GekkoTime(EFreq.Annual, year1, 1);
+                            GekkoTime gt2 = new GekkoTime(EFreq.Annual, year2, 1);
+                            ts.SetDataSequence(gt1, gt2, tempArray);
+                            ts.Trim();  //to save RAM
+                            variableCounter++;
+                            //G.Writeln(varName + " var# " + var);
                         }
-
-                        GekkoTime gt1 = new GekkoTime(EFreq.Annual, year1, 1);
-                        GekkoTime gt2 = new GekkoTime(EFreq.Annual, year2, 1);
-                        ts.SetDataSequence(gt1, gt2, tempArray);
-                        ts.Trim();  //to save RAM
-                        variableCounter++;
-                        //G.Writeln(varName + " var# " + var);
+                        else
+                        {
+                            
+                            for (int per = 0; per < antalper; per++)
+                            {
+                                short year = fid[per];                                
+                                GekkoTime t = new GekkoTime(EFreq.Annual, year, 1);
+                                if(t.LargerThanOrEqual(dates.t1Annual) && t.SmallerThanOrEqual(dates.t2Annual))
+                                {
+                                    float ss = gigant[var, per + 1];  //<==== because gigant[] is 1-based, not 0-based
+                                    ts.SetData(t, ss);
+                                }
+                            }                            
+                        }
                     }
 
                     readInfo.startPerInFile = year1;
@@ -9510,18 +9449,7 @@ public static bool IsLargeAware(Stream stream)
                     }
                 }
 
-                if (s2.Length == 6)
-                {
-
-                    if (G.equal(s2, "newtsd"))
-                    {
-                        Globals.newTsd = !Globals.newTsd;
-                        G.Writeln2("newtsd = " + Globals.newTsd.ToString());
-                        return "";
-                    }
-
-                }
-
+               
                 if (s2.Length == 5)
                 {
                     string sub = s2;
@@ -16087,7 +16015,7 @@ public static bool IsLargeAware(Stream stream)
                 //2D format
                 EdataFormat format = EdataFormat.Csv;
                 if (G.equal(o.opt_csv, "yes")) format = EdataFormat.Csv;
-                else if (G.equal(o.opt_prn, "yes")) format = EdataFormat.Prn;                                
+                else if (G.equal(o.opt_prn, "yes")) format = EdataFormat.Prn;
                 return CsvPrnWrite(newList, fileName, tStart, tEnd, format);
             }
             else if (G.equal(o.opt_gnuplot, "yes"))
@@ -16096,12 +16024,12 @@ public static bool IsLargeAware(Stream stream)
                 return GnuplotWrite(newList, fileName, tStart, tEnd);
             }
             else if (G.equal(o.opt_tsp, "yes"))
-            {                
+            {
                 //RECORDS
                 return Tspwrite(list, fileName, tStart, tEnd, isCaps);
             }
             else if (G.equal(o.opt_xls, "yes") || G.equal(o.opt_xlsx, "yes"))
-            {                
+            {
                 //2D format
                 G.Writeln2("Writing Excel file for the period " + G.FromDateToString(tStart) + "-" + G.FromDateToString(tEnd));
                 //TODO: variables and time                
@@ -16145,7 +16073,7 @@ public static bool IsLargeAware(Stream stream)
                 Program.CreateExcelWorkbook2(eo, null, false);
                 return 0;
             }
-            else if (G.equal(o.opt_series, "yes"))
+            else if (o.opt_series != null)
             {
                 //RECORDS
                 if (fileName == null || fileName.Trim() == "")
@@ -25007,10 +24935,27 @@ public static bool IsLargeAware(Stream stream)
                             else if (temp.GetType() == typeof(int))
                             {
                                 int iData = (int)temp;
+
+                                //-2146826281 = #Div/0!
+                                //-2146826246 - #N/A
+                                //-2146826259 = #Name?
+                                //-2146826288 = #Null!
+                                //-2146826252 = #Num!
+                                //-2146826265 = #Ref!  
+                                //-2146826273 = #Value!
+
                                 if (iData == -2146826246)
                                 {
                                     //just like it is in a csv file. The -2146826246 is really a hexadecimal error code from Excel, stating that the number is N/A.
                                     cell = new CellLight("#N/A");
+                                }
+                                else if (iData == -2146826259)
+                                {                                    
+                                    cell = new CellLight("#Name?");
+                                }
+                                else if (iData == -2146826281)
+                                {
+                                    cell = new CellLight("#Div/0");
                                 }
                                 else
                                 {
@@ -25904,6 +25849,8 @@ public static bool IsLargeAware(Stream stream)
             if (input == eOfficeVersion.eOfficeVersion_2007) return "2007";
             if (input == eOfficeVersion.eOfficeVersion_2010) return "2010";
             if (input == eOfficeVersion.eOfficeVersion_2013) return "2013";
+            if (input == eOfficeVersion.eOfficeVersion_2016) return "2016";
+            if (input == eOfficeVersion.eOfficeVersion_2019) return "2019?";
             if (input == eOfficeVersion.eOfficeVersion_Unrecognized) return "[Unrecognized version]";
             return "[Unrecognized version]";
         }
@@ -25918,7 +25865,9 @@ public static bool IsLargeAware(Stream stream)
             eOfficeVersion_2003,
             eOfficeVersion_2007,
             eOfficeVersion_2010,
-            eOfficeVersion_2013
+            eOfficeVersion_2013,
+            eOfficeVersion_2016,
+            eOfficeVersion_2019  //???
         };
 
         public enum GekkoFileReadOrWrite
@@ -26035,6 +25984,14 @@ public static bool IsLargeAware(Stream stream)
             else if ("15" == versionString)  //this seems to be 2013 internal number
             {
                 return eOfficeVersion.eOfficeVersion_2013;
+            }
+            else if ("16" == versionString) 
+            {
+                return eOfficeVersion.eOfficeVersion_2016;
+            }
+            else if ("17" == versionString)
+            {
+                return eOfficeVersion.eOfficeVersion_2019;
             }
             else
             {
@@ -27519,6 +27476,8 @@ public static bool IsLargeAware(Stream stream)
         [ProtoContract]
         public class ReadInfo
         {
+            public static GekkoTime tStart = Globals.tNull;
+            public static GekkoTime tEnd = Globals.tNull;
             public EReadInfoTypes type = EReadInfoTypes.Normal;
             public string fileName = null;
             //public bool copiedIntoBaseMessage = false;
@@ -28042,6 +28001,8 @@ public static bool IsLargeAware(Stream stream)
 
     public class ReadOpenMulbkHelper: O_OLD
     {
+        public GekkoTime t1 = Globals.tNull;
+        public GekkoTime t2 = Globals.tNull;
         public List<List<string>> openFileNames = null;
         private string fileName = null;
         private EDataFormat type = EDataFormat.None;  //type of data(bank)

@@ -1,4 +1,4 @@
-/* 
+/*
     Gekko Timeseries Software (www.t-t.dk/gekko).
     Copyright (C) 2016, Thomas Thomsen, T-T Analyse.
 
@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program (see the file COPYING in the root folder).
-    Else, see <http://www.gnu.org/licenses/>.        
+    Else, see <http://www.gnu.org/licenses/>.
 */
 
 //
@@ -1437,7 +1437,7 @@ expr2                     :
                           | analyze        SEMICOLON!
 						  | accept         SEMICOLON!
 						  | checkoff       SEMICOLON!
-						  | clear          SEMICOLON!						  
+						  | clear          SEMICOLON!						
 						  | close          SEMICOLON!
 						  | clone          SEMICOLON!
 						  | cls            SEMICOLON!
@@ -1448,27 +1448,27 @@ expr2                     :
                           | create         SEMICOLON!
                           | date           SEMICOLON!
 						  | delete         SEMICOLON!
-						  | disp           SEMICOLON!						  
-						  | doc            SEMICOLON!						  
+						  | disp           SEMICOLON!						
+						  | doc            SEMICOLON!						
 						  | edit           SEMICOLON!
 						  | endo           SEMICOLON!
 						  | exo            SEMICOLON!
 						  | exit           SEMICOLON!
 						  | findmissingdata SEMICOLON!
                           | for2
-						  | functiondef    SEMICOLON!						  
+						  | functiondef    SEMICOLON!						
                           | genr           SEMICOLON   ->    ^({token("ASTMETA¤"+($genr.text), ASTMETA, 0)} genr)
 						  | goto2          SEMICOLON!
 						  | hdg            SEMICOLON!
 						  | help           SEMICOLON!
-						  | if2						  
+						  | if2						
                           | index          SEMICOLON!
 						  | ini            SEMICOLON!
 						  | itershow       SEMICOLON!
 						  | download       SEMICOLON!
                           | list           SEMICOLON!
 						  | lock_          SEMICOLON!
-						  | matrix         SEMICOLON!						  
+						  | matrix         SEMICOLON!						
                           | mem            SEMICOLON!
 						  | mode           SEMICOLON!
 						  | model          SEMICOLON!						
@@ -1485,7 +1485,7 @@ expr2                     :
 						  | r_export       SEMICOLON!
 						  | r_run          SEMICOLON!
                           | read           SEMICOLON!
-                          | rename         SEMICOLON!						  
+                          | rename         SEMICOLON!						
 						  | restart        SEMICOLON!
 						  | reset          SEMICOLON!
 						  | return2        SEMICOLON!
@@ -1504,27 +1504,27 @@ expr2                     :
                           | test           SEMICOLON!
 						  | tell           SEMICOLON!
                           | time           SEMICOLON!
-						  | timefilter     SEMICOLON!						  
+						  | timefilter     SEMICOLON!						
 						  | truncate       SEMICOLON!
 						  | tuple          SEMICOLON!   //for instance (VAL y, VAL z) = f(%x);
 						  | udvalg         SEMICOLON!
 						  | unfix          SEMICOLON!
 						  | unlock_        SEMICOLON!
-						  | unswap         SEMICOLON!                          
+						  | unswap         SEMICOLON!
                           | val            SEMICOLON!
 						  | vers           SEMICOLON!
 						  | write          SEMICOLON!
-						  | x12a           SEMICOLON!                          
+						  | x12a           SEMICOLON!
                           ;						
 
 // --------------------------------------------------------------------------------------------------
 
-analyze                   : ANALYZE analyzeOpt1? analyzeElements -> ^({token("ASTANALYZE", ASTANALYZE, $ANALYZE.Line)} analyzeOpt1? analyzeElements ); 
+analyze                   : ANALYZE analyzeOpt1? analyzeElements -> ^({token("ASTANALYZE", ASTANALYZE, $ANALYZE.Line)} analyzeOpt1? analyzeElements );
 analyzeOpt1               : leftAngle2          analyzeOpt1h* RIGHTANGLE -> ^(ASTOPT1 analyzeOpt1h*)							
 						  | leftAngleNo2 dates? analyzeOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) analyzeOpt1h*)
 						  ;
 analyzeOpt1h              : LAG EQUAL expression -> ^(ASTOPT_VAL_LAG expression)
-						  ;						  
+						  ;						
 analyzeElements           : olsElement (COMMA2 olsElement)* -> ^(ASTOLSELEMENTS olsElement+);
 
 accept                    : ACCEPT acceptType name expression -> ^({token("ASTACCEPT", ASTACCEPT, $ACCEPT.Line)} acceptType name expression);
@@ -1540,15 +1540,15 @@ clearOpt1h				  : PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)  //obsolet
 						  | FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)
 						  |	REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_REF yesNo?)
 						  ;
-						  
+						
 clone                     : CLONE -> ^({token("ASTCLONE", ASTCLONE, $CLONE.Line)});
 
 close					  : CLOSE closeOpt1? ident -> ^({token("ASTCLOSE", ASTCLOSE, $CLOSE.Line)} ident closeOpt1?)
 						  | CLOSE closeOpt1? star -> ^({token("ASTCLOSESTAR", ASTCLOSESTAR, $CLOSE.Line)} closeOpt1?)
 						  ;
 closeOpt1                 : leftAngle closeOpt1h* RIGHTANGLE -> ^(ASTOPT1 closeOpt1h*);
-closeOpt1h				  : SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)							  
-						  ;						  
+closeOpt1h				  : SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)							
+						  ;						
 
 cls						  : CLS -> ^({token("ASTCLS", ASTCLS, $CLS.Line)});
 
@@ -1559,7 +1559,7 @@ doc                       : DOC listItemsWildRange0 docOpt2 -> ^({token("ASTDOC"
 docOpt2                   : docOpt2h*;
 docOpt2h                  : LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expression)
 						  | SOURCE EQUAL expression -> ^(ASTOPT_STRING_SOURCE expression)
-						  | STAMP EQUAL expression -> ^(ASTOPT_STRING_STAMP expression)					  
+						  | STAMP EQUAL expression -> ^(ASTOPT_STRING_STAMP expression)					
 						  ;
 
 collapse				  : COLLAPSE nameWithDot '=' nameWithDot collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, $COLLAPSE.Line)} nameWithDot nameWithDot collapseMethod?);
@@ -1592,7 +1592,7 @@ deleteOpt1h               : NONMODEL (EQUAL yesNo)? -> ^(ASTOPT_STRING_NONMODEL 
 
 disp					  : DISP StringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, $DISP.Line)} StringInQuotes)
 						  | DISP dispOpt1? listItems -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) listItems)
-						  ; 						  
+						  ; 						
 dispOpt1                  : leftAngle2          dispOpt1h* RIGHTANGLE -> ^(ASTOPT1 dispOpt1h*)							
 						  | leftAngleNo2 dates? dispOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) dispOpt1h*)
                           ;
@@ -1627,7 +1627,7 @@ for2                      : forValHelper
 
 functiondef               : FUNCTION functionDefLhsH1 ident leftParen functiondefRhsH1 rightParen SEMICOLON expressions? END -> ^({token("ASTFUNCTIONDEF", ASTFUNCTIONDEF, $FUNCTION.Line)} ^(ASTFUNCTIONDEFTYPE functionDefLhsH1) ^(ASTFUNCTIONDEFNAME ident) functiondefRhsH1 ^(ASTFUNCTIONDEFCODE expressions?));
 
-genr                      : 						    				        
+genr                      : 						    				
 							//------------------------- UPD with equal ------------------------------------------------------
                             // UPD: y1, y2 = 5; //at least 2 on lhs, and 1 or more on rhs
 						  | genr2 seriesOpt1? listItemsUpd2 EQUAL updDataComplicated -> ^(ASTUPD listItemsUpd2 ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataComplicated )
@@ -1636,25 +1636,25 @@ genr                      :
 						    // UPD: y1, y2 = 5; //1 or more on lhs, and at least 2 on rhs
 					      | genr2 seriesOpt1? listItemsUpd EQUAL updDataComplicated2 -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataComplicated2)
 						    // UPD: y1 = 1 2; //must have > 1 on rhs
-						  | genr2 seriesOpt1? listItemsUpd EQUAL updDataSimple2 -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataSimple2)			  						  
+						  | genr2 seriesOpt1? listItemsUpd EQUAL updDataSimple2 -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataSimple2)			  						
 
 						    // UPD: #m = 5; // #m = ... ------> gets special treatment
 					      | genr3 seriesOpt1? listItemsUpd EQUAL updDataComplicated -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataComplicated)
 						    // UPD: y1 = 1 2; //must have > 1 on rhs
-						  | genr3 seriesOpt1? listItemsUpd EQUAL updDataSimple -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataSimple)			  						  
+						  | genr3 seriesOpt1? listItemsUpd EQUAL updDataSimple -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataSimple)			  						
 
 						    // This is cheating, so we can handle these printcodes here, and not in the GENR section
 							// UPD: SERIES <p> y1 = 5; //cheat, catches with mandatory <p> or others
-					      | genr2 seriesOpt1Cheat listItemsUpd EQUAL updDataComplicated -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1Cheat) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataComplicated)						  
-						  | genr2 seriesOpt1Cheat listItemsUpd EQUAL updDataSimple -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1Cheat) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataSimple)			  						  
+					      | genr2 seriesOpt1Cheat listItemsUpd EQUAL updDataComplicated -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1Cheat) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataComplicated)						
+						  | genr2 seriesOpt1Cheat listItemsUpd EQUAL updDataSimple -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1Cheat) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataSimple)			  						
 
 						    //------------------------- UPD with non-equal ------------------------------------------------------
 							// UPD: y1, y2 % 2; //operator is not =, handles anyting
 						  | genr2 seriesOpt1? listItemsUpd updOperatorDollar updDataComplicated -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR updOperatorDollar) updDataComplicated)
-						    // UPD: w:x1, w:x2 % 						  
-						  | genr2 seriesOpt1? listItemsUpd updOperatorDollar updDataSimple -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR updOperatorDollar) updDataSimple)						  
+						    // UPD: w:x1, w:x2 % 						
+						  | genr2 seriesOpt1? listItemsUpd updOperatorDollar updDataSimple -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR updOperatorDollar) updDataSimple)						
 					
-						  						    
+						  						
 							//-------------------------------------------------------------------------------
 							//-------------------------------------------------------------------------------
 						    // For all the following, any "rep *2 is silently ignored
@@ -1667,11 +1667,11 @@ genr                      :
 						    // GENR: pch(w:%n) = x1 + x2
 						  | genr2 (leftAngle dates? RIGHTANGLE)? ident leftParenGlue scalarWithBank RIGHTPAREN EQUAL expression (REP star)* -> ^({token("ASTGENRLHSFUNCTION", ASTGENRLHSFUNCTION, $EQUAL.Line)}  ^(ASTDATES dates?) scalarWithBank expression)
 						    // GENR: w:%n[2020] = x1 + x2
-						  | genr2 scalarWithBank leftBracketGlue expression RIGHTBRACKET EQUAL expression (REP star)* -> ^({token("ASTGENRINDEXER", ASTGENRINDEXER, $EQUAL.Line)}  scalarWithBank expression expression)												  
+						  | genr2 scalarWithBank leftBracketGlue expression RIGHTBRACKET EQUAL expression (REP star)* -> ^({token("ASTGENRINDEXER", ASTGENRINDEXER, $EQUAL.Line)}  scalarWithBank expression expression)												
 						    // GENR: w:y = x1 + x2
-						  | genr2 (leftAngle dates? RIGHTANGLE)? nameWithBank EQUAL expression  (REP star)* -> ^({token("ASTGENR", ASTGENR, $EQUAL.Line)}  ^(ASTDATES dates?) nameWithBank expression)												  						  						  
+						  | genr2 (leftAngle dates? RIGHTANGLE)? nameWithBank EQUAL expression  (REP star)* -> ^({token("ASTGENR", ASTGENR, $EQUAL.Line)}  ^(ASTDATES dates?) nameWithBank expression)												  						  						
 						    // GENR: pch(w:y) = x1 + x2
-						  | genr2 (leftAngle dates? RIGHTANGLE)? ident leftParenGlue nameWithBank RIGHTPAREN EQUAL expression  (REP star)* -> ^({token("ASTGENRLHSFUNCTION", ASTGENRLHSFUNCTION, $EQUAL.Line)}  ^(ASTDATES dates?) nameWithBank expression ident)												  
+						  | genr2 (leftAngle dates? RIGHTANGLE)? ident leftParenGlue nameWithBank RIGHTPAREN EQUAL expression  (REP star)* -> ^({token("ASTGENRLHSFUNCTION", ASTGENRLHSFUNCTION, $EQUAL.Line)}  ^(ASTDATES dates?) nameWithBank expression ident)												
 						    // GENR: w:y[2020] = x1 + x2
 						  | genr2 nameWithBank leftBracketGlue expression RIGHTBRACKET EQUAL expression  (REP star)* -> ^({token("ASTGENRINDEXER", ASTGENRINDEXER, $EQUAL.Line)}  nameWithBank expression expression)						
 
@@ -1695,8 +1695,8 @@ seriesOpt1h               : D (EQUAL yesNo)? -> ^(ASTOPT_STRING_D yesNo?)
 						  | P (EQUAL yesNo)? -> ^(ASTOPT_STRING_P yesNo?)
 						  | M (EQUAL yesNo)? -> ^(ASTOPT_STRING_M yesNo?)
 						  | Q (EQUAL yesNo)? -> ^(ASTOPT_STRING_Q yesNo?)
-						  | MP (EQUAL yesNo)? -> ^(ASTOPT_STRING_MP yesNo?)						  
-						  | N (EQUAL yesNo)? -> ^(ASTOPT_STRING_N yesNo?)						  
+						  | MP (EQUAL yesNo)? -> ^(ASTOPT_STRING_MP yesNo?)						
+						  | N (EQUAL yesNo)? -> ^(ASTOPT_STRING_N yesNo?)						
 						  | KEEP EQUAL exportType -> ^(ASTOPT_STRING_KEEP exportType)
 						  ;
 
@@ -1706,7 +1706,7 @@ hdg						  : HDG expression -> ^(ASTHDG expression);
 
 help					  : HELP ident? -> ^(ASTHELP ident?);
 
-if2						  : IF leftParen logicalOr rightParen expressions (ELSE expressions)? END SEMICOLON -> ^({token("ASTIF", ASTIF, $IF.Line)} logicalOr ^(ASTIFSTATEMENTS expressions) ^(ASTELSESTATEMENTS expressions?))  ;
+if2						  : IF leftParen logicalOr rightParen expressions (ELSE expressions)? END SEMICOLON -> ^({token("ASTIF", ASTIF, $IF.Line)} logicalOr ^(ASTIFSTATEMENTS expressions) ^(ASTELSESTATEMENTS expressions?));
 
 download                  : DOWNLOAD HTTP? url fileName -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, $DOWNLOAD.Line)} ^(ASTHTTP HTTP?) url ^(ASTHANDLEFILENAME fileName));
 
@@ -1720,7 +1720,7 @@ itershow				  : ITERSHOW  (leftAngle dates? RIGHTANGLE)? listItems -> ^({token("
 
 list					  :	LIST listOpt1? listNameHelper EQUAL listItems prefix? suffix? strip? sort? -> ^({token("ASTLIST¤"+($listItems.text)+"¤",  ASTLIST, $LIST.Line)} listNameHelper listItems listOpt1? prefix? suffix? strip? sort? )
 		                  | LIST question hashNoGlue GLUE ident -> ^({token("ASTLIST",  ASTLIST, $LIST.Line)} question ident)
-						  | LIST question -> ^({token("ASTLIST",  ASTLIST, $LIST.Line)} question)						  
+						  | LIST question -> ^({token("ASTLIST",  ASTLIST, $LIST.Line)} question)						
 						  ;
 listOpt1                  : leftAngle listOpt1h* RIGHTANGLE -> listOpt1h*
 						  ;
@@ -1733,7 +1733,7 @@ unlock_                   : UNLOCK_ ident -> ^({token("ASTUNLOCK", ASTUNLOCK, $U
 matrix                    : matrixHelper name leftBracketGlue expression ',' expression RIGHTBRACKET EQUAL expression -> ^({token("ASTMATRIXINDEXER", ASTMATRIXINDEXER, $EQUAL.Line)} name expression expression expression)
                           | matrixHelper name EQUAL expression -> ^({token("ASTMATRIX", ASTMATRIX, $EQUAL.Line)} name expression)
 						  | matrixHelper question hashNoGlue GLUE ident -> ^(ASTMATRIX question ident)
-						  | matrixHelper question -> ^(ASTMATRIX question)						  						  
+						  | matrixHelper question -> ^(ASTMATRIX question)						  						
 						  ;
 matrixHelper              : MAT | MATRIX;
 
@@ -1764,8 +1764,8 @@ sheetImport               : SHEET sheetImportOpt1 listItems FILE '=' fileName ->
 sheetImportOpt1           : leftAngle        IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER  sheetImportOpt1h*  //error here if the placeholder is not here
 						  | leftAngle dates? IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER ^(ASTDATES dates?) sheetImportOpt1h*
 						  ;
-sheetImportOpt1h          : CELL '=' expression -> ^(ASTOPT_STRING_CELL expression)						 
-						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)						  
+sheetImportOpt1h          : CELL '=' expression -> ^(ASTOPT_STRING_CELL expression)						
+						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)						
 						  | ROWS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ROWS yesNo?)
 						  | SHEET '=' expression -> ^(ASTOPT_STRING_SHEET expression)
 						  ;
@@ -1776,8 +1776,8 @@ prtHelper                 : P | PRT | PRI | PRINT | MULPRT | GMULPRT | SHEET | C
 prtOpt1                   : leftAngle2          prtOpt1Helper* RIGHTANGLE -> ^(ASTOPT1 prtOpt1Helper*)							
 						  | leftAngleNo2 dates? prtOpt1Helper* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) prtOpt1Helper*)
                           ;
-prtOpt1Helper             : filter						  
-						  | prtOptionField4Helper						  												  
+prtOpt1Helper             : filter						
+						  | prtOptionField4Helper						  												
 						  | APPEND (EQUAL yesNo)? -> ^(ASTOPT_STRING_APPEND yesNo?)
 						  | CELL '=' expression -> ^(ASTOPT_STRING_CELL expression)
 						  | COLLAPSE (EQUAL prtOptCollapseHelper)? -> ^(ASTOPT_STRING_COLLAPSE prtOptCollapseHelper?)
@@ -1789,7 +1789,7 @@ prtOpt1Helper             : filter
 						  | PLOTCODE '=' expression -> ^(ASTOPT_STRING_PLOTCODE expression)
 						  | ROWS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ROWS yesNo?)
 						  | SHEET '=' expression -> ^(ASTOPT_STRING_SHEET expression)
-						  | STAMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STAMP yesNo?)						  
+						  | STAMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STAMP yesNo?)						
 						  | YMAX EQUAL expression -> ^(ASTOPT_VAL_YMAX expression)
 						  | YMIN EQUAL expression -> ^(ASTOPT_VAL_YMIN expression)
 						  ;
@@ -1797,20 +1797,25 @@ prtOpt2                   : prtOpt2Helper+ -> ^(ASTOPT2 prtOpt2Helper);
 prtOpt2Helper             : FILE '=' fileName -> ^(ASTHANDLEFILENAME fileName);
 prtOptCollapseHelper      : AVG -> ASTAVG
                           | TOTAL -> ASTTOTAL
-						  | expression -> expression						  
+						  | expression -> expression						
 						  ;
 
 splice                    : SPLICE listItems0 EQUAL listItems1 expression listItems2 -> ^({token("ASTSPLICE", ASTSPLICE, $SPLICE.Line)} listItems0 listItems1 listItems2 expression)
                           | SPLICE listItems0 EQUAL listItems1 listItems2 -> ^({token("ASTSPLICE", ASTSPLICE, $SPLICE.Line)} listItems0 listItems1 listItems2)  //no date
 						  ;
 
+
+
+
 read                      : read2 readOpt1? fileNameStar (TO identOrStar)? -> ^(ASTREAD read2 readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?));
 read2                     : READ | IMPORT;
-readOpt1                  : leftAngle readOpt1h* RIGHTANGLE -> readOpt1h*;
+readOpt1                  : leftAngle        readOpt1h* RIGHTANGLE -> readOpt1h*						
+						  | leftAngle dates? readOpt1h* RIGHTANGLE -> ^(ASTDATES dates?) readOpt1h*
+                          ;
 readOpt1h                 : MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?)
 						  | PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)  //obsolete
 						  | FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)
-						  | REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_REF yesNo?)												  
+						  | REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_REF yesNo?)												
 						  | TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
 						  | GBK (EQUAL yesNo)? -> ^(ASTOPT_STRING_GBK yesNo?)
@@ -1917,7 +1922,7 @@ tableOpt1                 : leftAngle2          tableOpt1h* RIGHTANGLE -> ^(ASTO
 
 tableOpt1h                : HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
 						  | WINDOW (EQUAL yesNo)? -> ^(ASTOPT_STRING_WINDOW yesNo?)						
-  						  | optOld  //printcodes						  
+  						  | optOld  //printcodes						
 						  ;
 
 tableCurrow: TABLE name GLUEDOT DOT CURROW GLUEDOT DOT  -> name;
@@ -1937,10 +1942,10 @@ timefilterperiods		  : (timefilterperiod (',' timefilterperiod)*)?  -> ^(ASTTIME
 timefilterperiod          : expression ((doubleDot | TO) expression (BY expression)?)? -> ^(ASTTIMEFILTERPERIOD expression (expression expression?)?);
 
 translate    			  : TRANSLATE translateOpt1? fileName -> ^({token("ASTTRANSLATE", ASTTRANSLATE, $TRANSLATE.Line)} translateOpt1?  ^(ASTHANDLEFILENAME fileName?));
-translateOpt1             : leftAngle        translateOpt1h* RIGHTANGLE -> translateOpt1h*;						  
+translateOpt1             : leftAngle        translateOpt1h* RIGHTANGLE -> translateOpt1h*;						
 translateOpt1h            : GEKKO18 (EQUAL yesNo)? -> ^(ASTOPT_STRING_GEKKO18 yesNo?)
 						  | AREMOS (EQUAL yesNo)? -> ^(ASTOPT_STRING_AREMOS yesNo?)
-						  ;						  
+						  ;						
 
 truncate                  : TRUNCATE truncateOpt1? listItems -> ^({token("ASTTRUNCATE", ASTTRUNCATE, $TRUNCATE.Line)} ^(ASTOPT_ truncateOpt1?) listItems);
 
@@ -1988,16 +1993,16 @@ writeOpt1h                : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
   						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)						
 						  | CAPS (EQUAL yesNo)? -> ^(ASTOPT_STRING_CAPS yesNo?)		
 						  | GNUPLOT (EQUAL yesNo)? -> ^(ASTOPT_STRING_GNUPLOT yesNo?)
-						  | SERIES EQUAL exportType -> ^(ASTOPT_STRING_SERIES exportType)												  
+						  | SERIES EQUAL exportType -> ^(ASTOPT_STRING_SERIES exportType)												
 						  | SERIES -> ^(ASTOPT_STRING_SERIES ASTOPN)												  				
 						  ;
 
-exportType                : D -> ASTOPD 
-						  | P  -> ASTOPP 
-						  | M  -> ASTOPM 
-						  | Q  -> ASTOPQ 
-						  | MP -> ASTOPMP 
-						  | N -> ASTOPN 
+exportType                : D -> ASTOPD
+						  | P  -> ASTOPP
+						  | M  -> ASTOPM
+						  | Q  -> ASTOPQ
+						  | MP -> ASTOPMP
+						  | N -> ASTOPN
 						  | expression  //will handle quotes etc.
 						  ;
 
@@ -2160,13 +2165,13 @@ listItemsUpd2             : listItemUpd (COMMA2 listItemUpd)+             -> ^(A
                           //expression catches a, b:a, %s, 'a', 'b:a', the first two as nameWithBank, but cannot catch for instance 'b':'a' or %b:%a
 						  //not much sense in allowing @ here
 listItem                  : expression ->							   expression						
-						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)            //accepts stuff like 0e. Integers are caught via expression.												  
+						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)            //accepts stuff like 0e. Integers are caught via expression.												
 						  ;
 						  //generalizes listItem
 listItemWildRange         : wildcardWithBank ->                        wildcardWithBank
 						  | rangeWithBank ->                           rangeWithBank					
 						  | expression ->						       expression
-						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)   //accepts stuff like 0e. Integers are caught via expression.												  
+						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)   //accepts stuff like 0e. Integers are caught via expression.												
 						  ;
 listItemUpd               : value ->                                   value
 						  ;
@@ -2438,7 +2443,7 @@ value                     :
 						  | double2 -> double2						
 						  | date2 -> ^(ASTDATE2 date2) //a date like: 2001q3 (luckily we do not have 'e' freq, then what about 2012e3 (in principle, = 2012000))
 						  | StringInQuotes -> ^(ASTSTRINGINQUOTES StringInQuotes)
-						  | listFile						  
+						  | listFile						
 						  | matrixCol
 						  | (leftBracketNoGlue|leftBracketNoGlueWild) indexerExpressionHelper RIGHTBRACKET -> ^(ASTINDEXERALONE indexerExpressionHelper) //also see rule indexerExpression							  						  					
 						  ;
@@ -2562,8 +2567,8 @@ fileNameStar              : fileName
 optionType :
                question -> question
              | CALC question -> CALC question
-             | CALC IGNOREMISSINGVARS  '='? yesNoSimple -> CALC IGNOREMISSINGVARS ^(ASTBOOL yesNoSimple)  //addresses both UPD and GENR             
-			 
+             | CALC IGNOREMISSINGVARS  '='? yesNoSimple -> CALC IGNOREMISSINGVARS ^(ASTBOOL yesNoSimple)  //addresses both UPD and GENR
+			
 			 | DATABANK question -> DATABANK question
              | DATABANK COMPARE TABS '='? numberIntegerOrDouble -> DATABANK COMPARE TABS numberIntegerOrDouble
              | DATABANK COMPARE TREL '='? numberIntegerOrDouble  -> DATABANK COMPARE TREL numberIntegerOrDouble
@@ -2572,11 +2577,11 @@ optionType :
              | DATABANK FILE GBK COMPRESS '='? yesNoSimple -> DATABANK FILE GBK COMPRESS ^(ASTBOOL yesNoSimple)
              | DATABANK FILE GBK VERSION '='? numberIntegerOrDouble ->  DATABANK FILE GBK VERSION ^(ASTSTRINGSIMPLE numberIntegerOrDouble)  //NOTE: number converted to string
 			 | DATABANK CREATE AUTO '='? yesNoSimple -> DATABANK CREATE AUTO ^(ASTBOOL yesNoSimple )
-			 | DATABANK CREATE MESSAGE '='? yesNoSimple -> DATABANK CREATE MESSAGE ^(ASTBOOL yesNoSimple )			 
-			 | DATABANK SEARCH '='? yesNoSimple -> DATABANK SEARCH ^(ASTBOOL yesNoSimple )			             
+			 | DATABANK CREATE MESSAGE '='? yesNoSimple -> DATABANK CREATE MESSAGE ^(ASTBOOL yesNoSimple )			
+			 | DATABANK SEARCH '='? yesNoSimple -> DATABANK SEARCH ^(ASTBOOL yesNoSimple )			
 
 			 | FOLDER question -> FOLDER question
-             | FOLDER '='? yesNoSimple -> FOLDER ^(ASTBOOL yesNoSimple)             
+             | FOLDER '='? yesNoSimple -> FOLDER ^(ASTBOOL yesNoSimple)
              | FOLDER BANK    '='? fileName ->  FOLDER BANK ^(ASTSTRINGSIMPLE fileName)
              | FOLDER BANK1    '='? fileName ->  FOLDER BANK1 ^(ASTSTRINGSIMPLE fileName)
              | FOLDER BANK2    '='? fileName ->  FOLDER BANK2 ^(ASTSTRINGSIMPLE fileName)
@@ -2586,20 +2591,20 @@ optionType :
              | FOLDER HELP   '='? fileName ->  FOLDER HELP ^(ASTSTRINGSIMPLE fileName)
              | FOLDER MENU     '='? fileName ->  FOLDER MENU ^(ASTSTRINGSIMPLE fileName)
              | FOLDER MODEL   '='? fileName ->  FOLDER MODEL ^(ASTSTRINGSIMPLE fileName)
-             | FOLDER PIPE '='? fileName ->  FOLDER PIPE ^(ASTSTRINGSIMPLE fileName)			 
+             | FOLDER PIPE '='? fileName ->  FOLDER PIPE ^(ASTSTRINGSIMPLE fileName)			
              | FOLDER TABLE    '='? fileName ->  FOLDER TABLE ^(ASTSTRINGSIMPLE fileName)
              | FOLDER TABLE1   '='? fileName ->  FOLDER TABLE1 ^(ASTSTRINGSIMPLE fileName)
              | FOLDER TABLE2   '='? fileName ->  FOLDER TABLE2 ^(ASTSTRINGSIMPLE fileName)
              | FOLDER WORKING '='? fileName ->  FOLDER WORKING ^(ASTSTRINGSIMPLE fileName)
-             
+
 			 | FREQ question -> FREQ question
              | FREQ '='? optionFreq -> FREQ ^(ASTSTRINGSIMPLE optionFreq)
-             
+
 			 | INTERFACE question -> INTERFACE question
              | INTERFACE CLIPBOARD DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CLIPBOARD DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
-			 | INTERFACE CSV DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CSV DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)             
-			 | INTERFACE DATABANK SWAP '='? yesNoSimple -> INTERFACE DATABANK SWAP ^(ASTBOOL yesNoSimple)			 
-			 | INTERFACE DEBUG '='? optionInterfaceDebug -> INTERFACE DEBUG ^(ASTSTRINGSIMPLE optionInterfaceDebug)             
+			 | INTERFACE CSV DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CSV DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
+			 | INTERFACE DATABANK SWAP '='? yesNoSimple -> INTERFACE DATABANK SWAP ^(ASTBOOL yesNoSimple)			
+			 | INTERFACE DEBUG '='? optionInterfaceDebug -> INTERFACE DEBUG ^(ASTSTRINGSIMPLE optionInterfaceDebug)
              | INTERFACE MODE '='? mode2 -> INTERFACE MODE ^(ASTSTRINGSIMPLE mode2)
 			 | INTERFACE EXCEL LANGUAGE '='? optionInterfaceExcelLanguage -> INTERFACE EXCEL LANGUAGE ^(ASTSTRINGSIMPLE optionInterfaceExcelLanguage)
              | INTERFACE EXCEL MODERNLOOK '='? yesNoSimple -> INTERFACE EXCEL MODERNLOOK ^(ASTBOOL yesNoSimple)
@@ -2610,18 +2615,18 @@ optionType :
              | INTERFACE SUGGESTIONS '='? optionInterfaceSuggestions -> INTERFACE SUGGESTIONS ^(ASTSTRINGSIMPLE optionInterfaceSuggestions)             | MODEL question -> MODEL question
 			 | INTERFACE TABLE PRINTCODES '='? yesNoSimple ->  INTERFACE TABLE PRINTCODES  ^(ASTBOOL yesNoSimple)
 			 | INTERFACE ZOOM '='? Integer -> INTERFACE ZOOM ^(ASTINTEGER Integer)
-             
+
 			 | MENU question -> MENU question
 			 | MENU STARTFILE '='? fileName ->  MENU STARTFILE ^(ASTSTRINGSIMPLE fileName)
-             
+
 			 | MODEL question -> MODEL question
              | MODEL CACHE MAX '='? Integer -> MODEL CACHE MAX  ^(ASTINTEGER Integer)
              | MODEL CACHE '='? yesNoSimple -> MODEL CACHE ^(ASTBOOL yesNoSimple)
 			 | MODEL INFOFILE '='? optionModelInfoFile -> MODEL INFOFILE ^(ASTSTRINGSIMPLE optionModelInfoFile)
-                          
+
 			 | PLOT question -> PLOT question
-			 | PLOT LINES POINTS '='? yesNoSimple -> PLOT LINES POINTS ^(ASTBOOL yesNoSimple )			 
-			 
+			 | PLOT LINES POINTS '='? yesNoSimple -> PLOT LINES POINTS ^(ASTBOOL yesNoSimple )			
+			
 			 | PRINT question -> PRINT question
 			 | PRINT COLLAPSE '='? optionPrintCollapse ->  PRINT COLLAPSE ^(ASTSTRINGSIMPLE optionPrintCollapse)
 			 | PRINT FREQ '='? optionPrintFreq ->  PRINT FREQ ^(ASTSTRINGSIMPLE optionPrintFreq)
@@ -2630,7 +2635,7 @@ optionType :
              | PRINT FIELDS NWIDTH '='? Integer -> PRINT FIELDS NWIDTH ^(ASTINTEGER Integer)
              | PRINT FIELDS PDEC '='? Integer -> PRINT FIELDS PDEC ^(ASTINTEGER Integer)
              | PRINT FIELDS PWIDTH '='? Integer -> PRINT FIELDS PWIDTH ^(ASTINTEGER Integer)
-             | PRINT FILEWIDTH '='? Integer -> PRINT FILEWIDTH ^(ASTINTEGER Integer)             
+             | PRINT FILEWIDTH '='? Integer -> PRINT FILEWIDTH ^(ASTINTEGER Integer)
 			 | PRINT MULPRT (GDIF|GDIFF) '='? yesNoSimple -> PRINT MULPRT GDIF ^(ASTBOOL yesNoSimple)
              | PRINT MULPRT ABS '='? yesNoSimple -> PRINT MULPRT ABS ^(ASTBOOL yesNoSimple)
              | PRINT MULPRT LEV '='? yesNoSimple -> PRINT MULPRT LEV ^(ASTBOOL yesNoSimple)
@@ -2656,13 +2661,13 @@ optionType :
              | SHEET PRT PCH '='? yesNoSimple -> SHEET PRT PCH ^(ASTBOOL yesNoSimple)
 			 | SHEET PRT PCH '='? yesNoSimple -> SHEET PRT PCH ^(ASTBOOL yesNoSimple)
 			 | SHEET ROWS  '='? yesNoSimple -> SHEET ROWS ^(ASTBOOL yesNoSimple)
-			 | SHEET COLS  '='? yesNoSimple -> SHEET COLS ^(ASTBOOL yesNoSimple)			 
-             
+			 | SHEET COLS  '='? yesNoSimple -> SHEET COLS ^(ASTBOOL yesNoSimple)			
+
              | SOLVE question -> SOLVE question
              | SOLVE DATA CREATE AUTO '='? yesNoSimple -> SOLVE DATA CREATE AUTO ^(ASTBOOL yesNoSimple)
              | SOLVE DATA IGNOREMISSING '='? yesNoSimple -> SOLVE DATA IGNOREMISSING ^(ASTBOOL yesNoSimple)
              | SOLVE DATA INIT '='? yesNoSimple -> SOLVE DATA INIT ^(ASTBOOL yesNoSimple)
-             | SOLVE DATA INIT GROWTH '='? yesNoSimple -> SOLVE DATA INIT GROWTH ^(ASTBOOL yesNoSimple)			 
+             | SOLVE DATA INIT GROWTH '='? yesNoSimple -> SOLVE DATA INIT GROWTH ^(ASTBOOL yesNoSimple)			
 			 //should handle negative numbers:
 			 | SOLVE DATA INIT GROWTH MAX '='? numberIntegerOrDouble -> SOLVE DATA INIT GROWTH MAX numberIntegerOrDouble
              | SOLVE DATA INIT GROWTH MIN '='? numberIntegerOrDouble -> SOLVE DATA INIT GROWTH MIN numberIntegerOrDouble
@@ -2674,7 +2679,7 @@ optionType :
              | SOLVE FORWARD FAIR CONV1 REL '='? numberIntegerOrDouble -> SOLVE FORWARD FAIR CONV1 REL numberIntegerOrDouble
              | SOLVE FORWARD FAIR CONV2 TABS '='? numberIntegerOrDouble -> SOLVE FORWARD FAIR CONV2 TABS numberIntegerOrDouble
              | SOLVE FORWARD FAIR CONV2 TREL '='? numberIntegerOrDouble -> SOLVE FORWARD FAIR CONV2 TREL numberIntegerOrDouble
-             | SOLVE FORWARD FAIR DAMP '='? numberIntegerOrDouble  -> SOLVE FORWARD FAIR DAMP numberIntegerOrDouble			 
+             | SOLVE FORWARD FAIR DAMP '='? numberIntegerOrDouble  -> SOLVE FORWARD FAIR DAMP numberIntegerOrDouble			
              | SOLVE FORWARD FAIR ITERMAX '='? Integer -> SOLVE FORWARD FAIR ITERMAX ^(ASTINTEGER Integer)
              | SOLVE FORWARD FAIR ITERMIN '='? Integer -> SOLVE FORWARD FAIR ITERMIN ^(ASTINTEGER Integer)			
 			 | SOLVE FORWARD NFAIR CONV '='? optionSolveGaussConv -> SOLVE FORWARD NFAIR CONV ^(ASTSTRINGSIMPLE optionSolveGaussConv )
@@ -2682,7 +2687,7 @@ optionType :
              | SOLVE FORWARD NFAIR CONV1 REL '='? numberIntegerOrDouble -> SOLVE FORWARD NFAIR CONV1 REL numberIntegerOrDouble
              | SOLVE FORWARD NFAIR CONV2 TABS '='? numberIntegerOrDouble -> SOLVE FORWARD NFAIR CONV2 TABS numberIntegerOrDouble
              | SOLVE FORWARD NFAIR CONV2 TREL '='? numberIntegerOrDouble -> SOLVE FORWARD NFAIR CONV2 TREL numberIntegerOrDouble
-             | SOLVE FORWARD NFAIR DAMP '='? numberIntegerOrDouble  -> SOLVE FORWARD NFAIR DAMP numberIntegerOrDouble						 
+             | SOLVE FORWARD NFAIR DAMP '='? numberIntegerOrDouble  -> SOLVE FORWARD NFAIR DAMP numberIntegerOrDouble						
              | SOLVE FORWARD NFAIR ITERMAX '='? Integer -> SOLVE FORWARD NFAIR ITERMAX ^(ASTINTEGER Integer)
              | SOLVE FORWARD NFAIR ITERMIN '='? Integer -> SOLVE FORWARD NFAIR ITERMIN ^(ASTINTEGER Integer)			
 			 | SOLVE FORWARD NFAIR UPDATEFREQ '='? Integer -> SOLVE FORWARD NFAIR UPDATEFREQ ^(ASTINTEGER Integer)						
@@ -2714,9 +2719,9 @@ optionType :
              | SOLVE PRINT ITER '='? yesNoSimple -> SOLVE PRINT ITER ^(ASTBOOL yesNoSimple)
              | SOLVE STATIC '='? yesNoSimple -> SOLVE STATIC ^(ASTBOOL yesNoSimple)
              | SOLVE UNDO '='? yesNoSimple -> SOLVE UNDO ^(ASTBOOL yesNoSimple)
-			 
-			 | SYSTEM CODE SPLIT '='? Integer -> SYSTEM CODE SPLIT ^(ASTINTEGER Integer)             
-			 
+			
+			 | SYSTEM CODE SPLIT '='? Integer -> SYSTEM CODE SPLIT ^(ASTINTEGER Integer)
+			
 			 | TABLE question -> TABLE question
              | TABLE HTML DATAWIDTH '='? numberIntegerOrDouble ->  TABLE HTML DATAWIDTH numberIntegerOrDouble
 			 | TABLE HTML FIRSTCOLWIDTH '='? numberIntegerOrDouble ->  TABLE HTML FIRSTCOLWIDTH numberIntegerOrDouble
@@ -2724,9 +2729,9 @@ optionType :
              | TABLE HTML FONTSIZE '='? numberIntegerOrDouble ->  TABLE HTML FONTSIZE numberIntegerOrDouble		
 			 | TABLE HTML SECONDCOLWIDTH '='? numberIntegerOrDouble ->  TABLE HTML SECONDCOLWIDTH numberIntegerOrDouble
 			 | TABLE HTML SPECIALMINUS '='? yesNoSimple ->  TABLE HTML SPECIALMINUS ^(ASTBOOL yesNoSimple)
-             | TABLE IGNOREMISSINGVARS '='? yesNoSimple ->  TABLE IGNOREMISSINGVARS ^(ASTBOOL yesNoSimple)			 
-             | TABLE TYPE '='? tableType ->  TABLE TYPE ^(ASTSTRINGSIMPLE tableType)             
-			 
+             | TABLE IGNOREMISSINGVARS '='? yesNoSimple ->  TABLE IGNOREMISSINGVARS ^(ASTBOOL yesNoSimple)			
+             | TABLE TYPE '='? tableType ->  TABLE TYPE ^(ASTSTRINGSIMPLE tableType)
+			
 			 | TIMEFILTER question -> TIMEFILTER question
              | TIMEFILTER '='? yesNoSimple -> TIMEFILTER ^(ASTBOOL yesNoSimple)
              | TIMEFILTER TYPE '='? timefilterType -> TIMEFILTER TYPE ^(ASTSTRINGSIMPLE timefilterType)
@@ -3156,7 +3161,7 @@ ident                     : Ident|
                             YMIN|
                             ZERO|
                             ZOOM|
-                            ZVAR                            
+                            ZVAR
 ;
 
 

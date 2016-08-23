@@ -106,8 +106,6 @@ namespace Gekko
 
         public static bool smart1 = true;
 
-        public static bool newTsd = true;
-
         public static string functionT1Cs = "t";
         public static string functionT2Cs = "GekkoTime t";
 

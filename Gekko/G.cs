@@ -1505,7 +1505,7 @@ namespace Gekko
 
         public static bool IsUnitTesting()
         {
-            if ((Application.ExecutablePath.Contains("vstesthost.exe") || Application.ExecutablePath.Contains("QTAgent32.exe"))) return true;
+            if ((Application.ExecutablePath.Contains("vstesthost.exe") || Application.ExecutablePath.Contains("QTAgent32.exe") || Application.ExecutablePath.Contains("vstest.executionengine.x86.exe"))) return true;
             else return false;
         }
 
