@@ -2139,6 +2139,12 @@ namespace Gekko
                 throw new GekkoException();
             }
 
+            if (GekkoTime.Observations(oRead.t1, oRead.t2) < 1)
+            {
+                G.Writeln2("*** ERROR: Start period must be <= end period");
+                throw new GekkoException();
+            }
+
             if (oRead.t1.freq == EFreq.Annual)
             {
                 readDatesHelper.t1Annual = oRead.t1;
@@ -4781,15 +4787,15 @@ namespace Gekko
                     {
                         //See also similar code regarding CREATE
                         ts = new TimeSeries(Program.options.freq, variable);
-                        if (!Globals.globalPeriodStart.IsNull())
-                        {
-                            //WHY is this done. For efficiency afterwards??
-                            //TO get start/end date??
-                            foreach (GekkoTime gt in new GekkoTimeIterator(Globals.globalPeriodStart, Globals.globalPeriodEnd))
-                            {
-                                ts.SetData(gt, double.NaN);
-                            }
-                        }
+                        //if (!Globals.globalPeriodStart.IsNull())
+                        //{
+                        //    //WHY is this done. For efficiency afterwards??
+                        //    //TO get start/end date??
+                        //    foreach (GekkoTime gt in new GekkoTimeIterator(Globals.globalPeriodStart, Globals.globalPeriodEnd))
+                        //    {
+                        //        ts.SetData(gt, double.NaN);
+                        //    }
+                        //}
                         //We know the timeseries does not already exist
                         db.AddVariable(ts);
                     }
