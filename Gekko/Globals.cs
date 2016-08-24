@@ -83,6 +83,9 @@ namespace Gekko
 
         public static string restartSnippet = "restart; mode data;";
 
+        public static int firstPeriodPositionInArrayNull = int.MaxValue;
+        public static int lastPeriodPositionInArrayNull = int.MinValue;
+
         public static bool isAlphaVersion = false;
         public static bool isBetaVersion = false; 
         public static bool isGammaVersion = false; 

@@ -3593,7 +3593,7 @@ namespace Gekko
             public GekkoTime t2 = Globals.tNull;            
             public void Exe()
             {                
-                Program.Time(t1, t2);
+                Program.Time(t1, t2);                
             }
             public static void Q()
             {

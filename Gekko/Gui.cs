@@ -461,7 +461,8 @@ namespace Gekko
                 this.StartThread(Globals.gekkoExeParameters, true);
             }
 
-            CrossThreadStuff.Mode();
+            CrossThreadStuff.Mode();           
+            
         }        
 
         private void RunGekkoTabToTextStuff(string folder)

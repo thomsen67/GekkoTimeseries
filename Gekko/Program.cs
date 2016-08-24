@@ -11161,6 +11161,8 @@ public static bool IsLargeAware(Stream stream)
                     {
                         freq = "Undated";
                     }
+                                        
+                    bool noData = ts.IsNullPeriod(); //We are opening up to this possibility of 'empty' data                    
 
                     GekkoTime first = ts.GetPeriodFirst();
                     GekkoTime last = ts.GetPeriodLast();
@@ -11169,13 +11171,28 @@ public static bool IsLargeAware(Stream stream)
                     if (ts.stamp != null && ts.stamp != "") stamp = " (updated: " + ts.stamp + ")";
                     if (ts.frequency == "a" || ts.frequency == "u")
                     {
-                        //we don't want 1995a1 to 2005a1, instead 1995 to 2005
-                        G.Writeln(freq + " data from " + first.super + " to " + last.super + stamp);
+                        if (noData)
+                        {
+                            G.Writeln(freq + ", not data, no period");
+                        }
+                        else
+                        {
+                            //we don't want 1995a1 to 2005a1, instead 1995 to 2005
+                            G.Writeln(freq + " data from " + first.super + " to " + last.super + stamp);
+                        }
                     }
                     else
                     {
-                        G.Writeln(freq + " data from " + first.super + ts.frequency + first.sub + " to " + last.super + ts.frequency + last.sub + stamp);
+                        if (noData)
+                        {
+                            G.Writeln(freq + ", not data, no period");
+                        }
+                        else
+                        {
+                            G.Writeln(freq + " data from " + first.super + ts.frequency + first.sub + " to " + last.super + ts.frequency + last.sub + stamp);
+                        }
                     }
+
                 }
 
                 List<string> varExpl = Program.GetVariableExplanation(var);
@@ -11356,6 +11373,7 @@ public static bool IsLargeAware(Stream stream)
                 G.Writeln();
             }
         }
+        
 
         public static List<string> SplitStringAndKeepDelimiters(string strSplit, char[] arrDelimiters)
         {
@@ -15961,13 +15979,13 @@ public static bool IsLargeAware(Stream stream)
             {
                 isDefault = true;  //implicitly GBK
             }
-            
+
             string fileName = o.fileName;
             fileName = StripQuotes(fileName);
             bool isCaps = true; if (G.equal(o.opt_caps, "no")) isCaps = false;
             GekkoTime tStart = o.t1;
-            GekkoTime tEnd = o.t2;           
-            
+            GekkoTime tEnd = o.t2;
+
             List<string> list = o.listItems;
             bool writeAllVariables = false;
             if (list == null) writeAllVariables = true;
@@ -15994,12 +16012,11 @@ public static bool IsLargeAware(Stream stream)
                 }
             }
 
-            if (list.Count == 0)
-            {
-                G.Writeln2("*** ERROR: There are 0 variables -- nothing to write/export.");
-                throw new GekkoException();
-            }
-            List<string> newList = FilterListForFrequency(list);
+            bool skipping = RemoveNullTimeseries(first, list);
+            
+            if (skipping) writeAllVariables = false;  //signals to gbk format that it can not just clone existing bank
+
+            List<string> listFilteredForCurrentFreq = FilterListForFrequency(list);  //not actually used in gbk if the list is not truncated
             
             if (tStart.IsNull() && tEnd.IsNull())
             {
@@ -16010,8 +16027,8 @@ public static bool IsLargeAware(Stream stream)
                     //is handled ok    
                 }
                 else
-                {                                    
-                    GetDatabankPeriodFilteredForFreq(newList, ref tStart, ref tEnd, first);
+                {
+                    GetDatabankPeriodFilteredForFreq(listFilteredForCurrentFreq, ref tStart, ref tEnd, first);
                 }
             }
 
@@ -16024,61 +16041,26 @@ public static bool IsLargeAware(Stream stream)
                 EdataFormat format = EdataFormat.Csv;
                 if (G.equal(o.opt_csv, "yes")) format = EdataFormat.Csv;
                 else if (G.equal(o.opt_prn, "yes")) format = EdataFormat.Prn;
-                return CsvPrnWrite(newList, fileName, tStart, tEnd, format);
+                CheckSomethingToWrite(listFilteredForCurrentFreq);
+                return CsvPrnWrite(listFilteredForCurrentFreq, fileName, tStart, tEnd, format);
             }
             else if (G.equal(o.opt_gnuplot, "yes"))
             {
                 //2D format
-                return GnuplotWrite(newList, fileName, tStart, tEnd);
+                CheckSomethingToWrite(listFilteredForCurrentFreq);
+                return GnuplotWrite(listFilteredForCurrentFreq, fileName, tStart, tEnd);
             }
             else if (G.equal(o.opt_tsp, "yes"))
             {
                 //RECORDS
-                return Tspwrite(list, fileName, tStart, tEnd, isCaps);
+                CheckSomethingToWrite(listFilteredForCurrentFreq);
+                return Tspwrite(listFilteredForCurrentFreq, fileName, tStart, tEnd, isCaps);
             }
             else if (G.equal(o.opt_xls, "yes") || G.equal(o.opt_xlsx, "yes"))
             {
                 //2D format
-                G.Writeln2("Writing Excel file for the period " + G.FromDateToString(tStart) + "-" + G.FromDateToString(tEnd));
-                //TODO: variables and time                
-
-                int counter = 0;
-                int numberOfCols = GekkoTime.Observations(tStart, tEnd);
-                int numberOfRows = newList.Count;
-                ExcelOptions eo = new ExcelOptions();
-                eo.excelData = new double[numberOfRows, numberOfCols];
-                eo.excelRowLabels = new string[numberOfRows, 1];
-                eo.excelColumnLabels = new string[1, numberOfCols];
-
-                for (int i = 0; i < newList.Count; i++)
-                {
-                    string var = (string)newList[i];
-                    string varLabel = (string)newList[i];
-                    eo.excelRowLabels[i, 0] = varLabel;
-                    TimeSeries ts = first.GetVariable(var);
-                    //TimeSeries tsGrund = base2.GetVariable(var);
-                    if (ts == null)
-                    {
-                        //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
-                        G.Writeln("+++ WARNING: variable '" + var + "' does not exist -- skipped");
-                        continue;
-                    }
-                    counter++;
-                    int periodCounter = 0;
-                    //file.Write(varLabel);
-                    foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
-                    {
-                        eo.excelColumnLabels[0, periodCounter] = gt.ToString();
-                        double var1 = ts.GetData(gt);
-                        if (G.isNumericalError(var1)) var1 = 9.99999e+99;
-                        eo.excelData[i, periodCounter] = var1;
-                        periodCounter++;
-                    }
-                }
-
-                eo.fileName = fileName;
-
-                Program.CreateExcelWorkbook2(eo, null, false);
+                CheckSomethingToWrite(listFilteredForCurrentFreq);
+                WriteToExcel(fileName, tStart, tEnd, first, listFilteredForCurrentFreq);
                 return 0;
             }
             else if (o.opt_series != null)
@@ -16089,19 +16071,15 @@ public static bool IsLargeAware(Stream stream)
                     G.Writeln2("*** ERROR: Please indicate a file name for EXPORT<series>");
                     throw new GekkoException();
                 }
-                Program.Updprt(list, tStart, tEnd, o.opt_series, fileName);
+                CheckSomethingToWrite(listFilteredForCurrentFreq);
+                Program.Updprt(listFilteredForCurrentFreq, tStart, tEnd, o.opt_series, fileName);
                 return 0;
             }
             else if (isDefault || G.equal(o.opt_gbk, "yes") || G.equal(o.opt_tsd, "yes"))
             {
                 //RECORDS
-                //tsd or gbk or unspecified format
-                //if (!hasTime)
-                //{
-                //    //this indicates that only the exact span for each series is written, overrides dates from GetDatabankPeriodFilteredForFreq() above
-                //    tStart = new GekkoTime(tStart.freq, -12345, 1);
-                //    tEnd = new GekkoTime(tEnd.freq, -12345, 1);
-                //}
+                //tsd or gbk or unspecified format                
+                CheckSomethingToWrite(list);
                 return Write(first, tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
             }
             else
@@ -16109,6 +16087,81 @@ public static bool IsLargeAware(Stream stream)
                 G.Writeln2("*** ERROR: Unknown databank format");
                 throw new GekkoException();
             }
+        }
+
+        private static void CheckSomethingToWrite(List<string> listFilteredForCurrentFreq)
+        {
+            if (listFilteredForCurrentFreq.Count == 0)
+            {
+                G.Writeln2("No variables to write");
+                throw new GekkoException();
+            }
+        }
+
+        private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, Databank first, List<string> newList)
+        {
+            G.Writeln2("Writing Excel file for the period " + G.FromDateToString(tStart) + "-" + G.FromDateToString(tEnd));
+            //TODO: variables and time                
+
+            int counter = 0;
+            int numberOfCols = GekkoTime.Observations(tStart, tEnd);
+            int numberOfRows = newList.Count;
+            ExcelOptions eo = new ExcelOptions();
+            eo.excelData = new double[numberOfRows, numberOfCols];
+            eo.excelRowLabels = new string[numberOfRows, 1];
+            eo.excelColumnLabels = new string[1, numberOfCols];
+
+            for (int i = 0; i < newList.Count; i++)
+            {
+                string var = (string)newList[i];
+                string varLabel = (string)newList[i];
+                eo.excelRowLabels[i, 0] = varLabel;
+                TimeSeries ts = first.GetVariable(var);
+                //TimeSeries tsGrund = base2.GetVariable(var);
+                if (ts == null)
+                {
+                    //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
+                    G.Writeln("+++ WARNING: variable '" + var + "' does not exist -- skipped");
+                    continue;
+                }
+                counter++;
+                int periodCounter = 0;
+                //file.Write(varLabel);
+                foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
+                {
+                    eo.excelColumnLabels[0, periodCounter] = gt.ToString();
+                    double var1 = ts.GetData(gt);
+                    if (G.isNumericalError(var1)) var1 = 9.99999e+99;
+                    eo.excelData[i, periodCounter] = var1;
+                    periodCounter++;
+                }
+            }
+
+            eo.fileName = fileName;
+
+            Program.CreateExcelWorkbook2(eo, null, false);
+        }
+
+        private static bool RemoveNullTimeseries(Databank first, List<string> newList)
+        {
+            //The list must be with freq indicator
+            bool skipping = false;
+            List<string> remove = new List<string>();
+            foreach (string s in newList)
+            {
+                TimeSeries ts = first.GetVariable(false, s);
+                if (ts.IsNullPeriod()) remove.Add(s);
+            }
+            if (remove.Count > 0)
+            {
+                foreach (string s in remove)
+                {
+                    newList.Remove(s);
+                }
+                G.Writeln2("+++ NOTE: Skipped " + remove.Count + " timeseries with no data and no period");
+                skipping = true;
+            }
+            return skipping;
         }
 
         private static List<string> GetAllVariablesFromBank(List<string> list, Databank work)

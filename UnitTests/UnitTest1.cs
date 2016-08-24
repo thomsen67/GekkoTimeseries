@@ -6143,13 +6143,14 @@ namespace UnitTests
             ------------------------------------------------
 
              */
+                   
 
             for (int i = 0; i < 2; i++)
             {
                 Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
                 Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
                 I("RESET;");
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
                 Globals.databanksAsProtobuffers = false;
                 I("CLEAR<first>; IMPORT<tsd>small; CLONE;");
                 if (i == 1) First().Trim();
@@ -6410,6 +6411,43 @@ namespace UnitTests
                 I("OPTION freq a;");
                 Test_Databanks_Helper();
                 Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+
+                if (true)
+                {
+                    //Test that completely empty series are not written to bank
+
+                    List<string> freqs2 = new List<string>() { "a", "q", "m" };
+                    List<string> types = new List<string>() { "gbk", "tsd", "prn", "csv", "xlsx" };
+                    foreach (string freq in freqs2)
+                    {
+                        foreach (string type in types)
+                        {
+                            Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                            Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
+                            I("RESET;");
+                            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                            I("OPTION freq " + freq + ";");
+                            if (freq == "a") I("TIME 2010 2012;");
+                            else if (freq == "q") I("TIME 2010q1 2010q4;");
+                            else if (freq == "m") I("TIME 2010m1 2010m4;");
+                            I("SERIES xx1 = 1;");
+                            I("SERIES xx2 = 2;");
+                            if (freq == "a") I("TRUNCATE <2014 2016> xx2;");
+                            else if (freq == "q") I("TRUNCATE <2011q1 2011q1> xx2;");
+                            else if (freq == "m") I("TRUNCATE <2009m1 2009m12> xx2;");
+                            I("WRITE <" + type + "> truncate;");
+                            I("RESET;");
+                            I("OPTION freq " + freq + ";");
+                            I("READ <" + type + "> truncate;");
+                            int number = Program.databanks.GetFirst().storage.Count;
+                            Assert.AreEqual(1, number);
+                            //just testing the first
+                            if (freq == "a") AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2010, 1, 1d, sharedDelta);
+                            if (freq == "q") AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Quarterly, 2010, 1, 1d, sharedDelta);
+                            if (freq == "m") AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Monthly, 2010, 1, 1d, sharedDelta);
+                        }
+                    }
+                }
 
                 if (true)
                 {
@@ -9010,9 +9048,11 @@ namespace UnitTests
 
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void Test__EnsJJUST()
         {
+            Assert.Inconclusive(Globals.unitTestIntegrationMessage);
+            return;
 
             //-----------------------------------------------------------
             //----------------- testing JJUST juli ----------------------

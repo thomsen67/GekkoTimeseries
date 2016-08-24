@@ -199,34 +199,64 @@ namespace Gekko
         /// <exception cref="GekkoException">
         /// </exception>
         public void Truncate(GekkoTime start, GekkoTime end)
-        {
+        {          
+
             if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot truncate a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");            
             int indexStart = this.GetArrayIndex(start);
             int indexEnd = this.GetArrayIndex(end);
 
-            this.firstPeriodPositionInArray = Math.Max(this.firstPeriodPositionInArray, indexStart);
-            this.lastPeriodPositionInArray = Math.Min(this.lastPeriodPositionInArray, indexEnd);
+            int newFirst = Math.Max(this.firstPeriodPositionInArray, indexStart);
+            int newLast = Math.Min(this.lastPeriodPositionInArray, indexEnd);
 
-            //NOTE: after this, the anchor position may be outside first/lastPeriodPositionInArray. 
-            //But this should not be a problem: it is only a hook
-            //that translates a date into an index and vice versa.
-
-            //When Truncate() is used for writing databanks, the timeseries
-            //will be Trim()'ed anyway, so these missings will disappear. But since the method
-            //could be used for other purposes later on, we set the values to missings explicitly
-            //The time loss is very small, and usually WRITE is not time-truncated anyway.
-
-            for (int i = 0; i < this.firstPeriodPositionInArray; i++)
+            if (newFirst > newLast)
             {
-                this.dataArray[i] = double.NaN;
+                //the truncate window is completely before or after the data window
+                //wipe all the data, and set the sample to 1 length
+                for (int i = 0; i < this.dataArray.Length; i++)
+                {
+                    this.dataArray[i] = double.NaN;
+                }
+
+                SetNullPeriod();
             }
-            for (int i = this.lastPeriodPositionInArray + 1; i < this.dataArray.Length; i++)
+            else
             {
-                this.dataArray[i] = double.NaN;
+                //the following two must be inside existing timeseries array
+                this.firstPeriodPositionInArray = newFirst;
+                this.lastPeriodPositionInArray = newLast;
+
+                //NOTE: after this, the anchor position may be outside first/lastPeriodPositionInArray. 
+                //But this should not be a problem: it is only a hook
+                //that translates a date into an index and vice versa.
+
+                //When Truncate() is used for writing databanks, the timeseries
+                //will be Trim()'ed anyway, so these missings will disappear. But since the method
+                //could be used for other purposes later on, we set the values to missings explicitly
+                //The time loss is very small, and usually WRITE is not time-truncated anyway.
+
+                for (int i = 0; i < this.firstPeriodPositionInArray; i++)
+                {                    
+                    this.dataArray[i] = double.NaN;
+                }
+                for (int i = this.lastPeriodPositionInArray + 1; i < this.dataArray.Length; i++)
+                {
+                    this.dataArray[i] = double.NaN;
+                }
             }
 
             this.isDirty = true;
 
+        }
+
+        private void SetNullPeriod()
+        {
+            this.firstPeriodPositionInArray = Globals.firstPeriodPositionInArrayNull;
+            this.lastPeriodPositionInArray = Globals.lastPeriodPositionInArrayNull;
+        }
+
+        public bool IsNullPeriod()
+        {
+            return this.firstPeriodPositionInArray == Globals.firstPeriodPositionInArrayNull && this.lastPeriodPositionInArray == Globals.lastPeriodPositionInArrayNull;
         }
 
         /// <summary>
@@ -245,6 +275,7 @@ namespace Gekko
         public void Trim()
         {
             if (this.dataArray == null) return;
+            if (this.IsNullPeriod()) return;  //could actually trim this, but oh well
             if (!(this.firstPeriodPositionInArray == 0 && this.lastPeriodPositionInArray == this.dataArray.Length - 1))  //already trimmed                
             {
                 int size = this.lastPeriodPositionInArray - this.firstPeriodPositionInArray + 1;
@@ -622,11 +653,11 @@ namespace Gekko
                     this.anchorPeriodPositionInArray += diffSize;
                     if (adjustStartEndDates)  //only for setting data
                     {
-                        if (this.firstPeriodPositionInArray != int.MaxValue)
+                        if (this.firstPeriodPositionInArray != Globals.firstPeriodPositionInArrayNull)
                         {
                             this.firstPeriodPositionInArray += diffSize;
                         }
-                        if (this.lastPeriodPositionInArray != int.MinValue)
+                        if (this.lastPeriodPositionInArray != Globals.lastPeriodPositionInArrayNull)
                         {
                             this.lastPeriodPositionInArray += diffSize;
                         }
