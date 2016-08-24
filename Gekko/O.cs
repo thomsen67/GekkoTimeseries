@@ -1618,7 +1618,7 @@ namespace Gekko
                     if (G.equal(this.opt_merge, "yes")) hlp.Merge = true;
                     if (G.equal(this.opt_first, "yes")) hlp.openType = EOpenType.First;
                     if (G.equal(this.opt_ref, "yes")) hlp.openType = EOpenType.Ref;
-                    if (hlp.openType == EOpenType.Normal) isSimple = true;
+                    if (hlp.openType == EOpenType.Normal) isSimple = true;  //in that case, a CLONE is done afterwards
                     if (isRead)
                     {
                         if (hlp.openType == EOpenType.First)
@@ -1695,7 +1695,18 @@ namespace Gekko
                     hlp.openFileNames.Add(new List<string>() {hlp.FileName, readTo});                    
                 }
 
-                Program.OpenOrRead(hlp, open, readInfos);
+                bool wipeDatabankBeforeInsertingData = false;
+
+                if(isRead && !hlp.Merge && !isTo)
+                {
+                    //See #987432529835
+                    //READ, not IMPORT
+                    //No READ<merge>
+                    //No READ ... TO
+                    wipeDatabankBeforeInsertingData = true;
+                }
+
+                Program.OpenOrRead(wipeDatabankBeforeInsertingData, hlp, open, readInfos);
                 Program.ReadInfo readInfo = readInfos[0];
                 readInfo.shouldMerge = hlp.Merge;                
 
@@ -1720,11 +1731,11 @@ namespace Gekko
                 G.Writeln();
                 readInfo.Print();                
 
-                if (isRead && isSimple)
+                 if (isRead && isSimple)
                 {
-                    //Do not do this with READ<first> or READ<sec>, only with READ.
-                    //Do not do this with IMPORT or IMPORT ... TO
-                    //And not with READ ... TO ... !!!
+                    //See #987432529835
+                    //isSimple can never be true with READ ... TO ...
+                    //Do not do this with READ<first> or READ<ref>, only with READ.                    
                     Program.MulbkClone();
                     if (Program.model != null && (G.equal(Program.options.interface_mode, "sim") || G.equal(Program.options.interface_mode, "mixed")))
                     {
@@ -1948,58 +1959,58 @@ namespace Gekko
             }
         }
 
-        public class Mulbk
-        {
-            //Is this used anymore?????
-            public string fileName = null;
-            public string opt_tsd = null;
-            public string opt_tsdx = null;
-            public string opt_csv = null;
-            public string opt_prn = null;
-            public string opt_pcim = null;
-            public string opt_xls = null;
-            public string opt_xlsx = null;            
-            public string opt_cols = null;
-            public string opt_merge = null;
-            public void Exe()
-            {
-                ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
-                hlp.FileName = this.fileName;  //if null, it is a MULBK command without argument.
-                if (this.opt_csv == "yes") hlp.Type = EDataFormat.Csv;
-                if (this.opt_prn == "yes") hlp.Type = EDataFormat.Prn;
-                if (this.opt_pcim == "yes") hlp.Type = EDataFormat.Pcim;
-                if (this.opt_tsd == "yes") hlp.Type = EDataFormat.Tsd;
-                if (this.opt_tsdx == "yes") hlp.Type = EDataFormat.Tsdx;
-                if (this.opt_xls == "yes") hlp.Type = EDataFormat.Xls;
-                if (this.opt_xlsx == "yes") hlp.Type = EDataFormat.Xlsx;                
-                if (this.opt_cols == "yes") hlp.Orientation = "cols";
-                hlp.openType = EOpenType.Ref;
+        //public class Mulbk
+        //{
+        //    //Is this used anymore?????
+        //    public string fileName = null;
+        //    public string opt_tsd = null;
+        //    public string opt_tsdx = null;
+        //    public string opt_csv = null;
+        //    public string opt_prn = null;
+        //    public string opt_pcim = null;
+        //    public string opt_xls = null;
+        //    public string opt_xlsx = null;            
+        //    public string opt_cols = null;
+        //    public string opt_merge = null;
+        //    public void Exe()
+        //    {
+        //        ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
+        //        hlp.FileName = this.fileName;  //if null, it is a MULBK command without argument.
+        //        if (this.opt_csv == "yes") hlp.Type = EDataFormat.Csv;
+        //        if (this.opt_prn == "yes") hlp.Type = EDataFormat.Prn;
+        //        if (this.opt_pcim == "yes") hlp.Type = EDataFormat.Pcim;
+        //        if (this.opt_tsd == "yes") hlp.Type = EDataFormat.Tsd;
+        //        if (this.opt_tsdx == "yes") hlp.Type = EDataFormat.Tsdx;
+        //        if (this.opt_xls == "yes") hlp.Type = EDataFormat.Xls;
+        //        if (this.opt_xlsx == "yes") hlp.Type = EDataFormat.Xlsx;                
+        //        if (this.opt_cols == "yes") hlp.Orientation = "cols";
+        //        hlp.openType = EOpenType.Ref;
                 
-                if (hlp.FileName == null)
-                {
-                    Program.MulbkClone();
-                    Databank work = Program.databanks.GetFirst();
-                    int number = work.storage.Count;
-                    G.Writeln();
-                    G.Writeln("Cleared " + Globals.Ref + " databank and copied " + number + " variables from Work databank into " + Globals.Ref + " databank");
-                }
-                else
-                {
-                    DateTime dt1 = DateTime.Now;
-                    List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
-                    Program.OpenOrRead(hlp, false, readInfos);
-                    Program.ReadInfo readInfo = readInfos[0];
-                    readInfo.shouldMerge = hlp.Merge;
+        //        if (hlp.FileName == null)
+        //        {
+        //            Program.MulbkClone();
+        //            Databank work = Program.databanks.GetFirst();
+        //            int number = work.storage.Count;
+        //            G.Writeln();
+        //            G.Writeln("Cleared " + Globals.Ref + " databank and copied " + number + " variables from Work databank into " + Globals.Ref + " databank");
+        //        }
+        //        else
+        //        {
+        //            DateTime dt1 = DateTime.Now;
+        //            List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
+        //            Program.OpenOrRead(hlp, false, readInfos);
+        //            Program.ReadInfo readInfo = readInfos[0];
+        //            readInfo.shouldMerge = hlp.Merge;
 
-                    //Globals.originalDataFileBaseline = helper.fileName;
-                    DateTime dt2 = DateTime.Now;
-                    double time = (dt2 - dt1).TotalMilliseconds;
-                    readInfo.dbName = Program.databanks.GetRef().aliasName;
-                    readInfo.Print();
-                    G.Writeln("+++ NOTE: You may use 'MULBK' without an argument to create a " + Globals.Ref + " databank.");
-                }
-            }
-        }
+        //            //Globals.originalDataFileBaseline = helper.fileName;
+        //            DateTime dt2 = DateTime.Now;
+        //            double time = (dt2 - dt1).TotalMilliseconds;
+        //            readInfo.dbName = Program.databanks.GetRef().aliasName;
+        //            readInfo.Print();
+        //            G.Writeln("+++ NOTE: You may use 'MULBK' without an argument to create a " + Globals.Ref + " databank.");
+        //        }
+        //    }
+        //}
 
         public class Clear
         {
@@ -2608,7 +2619,7 @@ namespace Gekko
                 }                                
                 
                 List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
-                Program.OpenOrRead(hlp, true, readInfos);                
+                Program.OpenOrRead(false, hlp, true, readInfos);                
 
                 foreach (Program.ReadInfo readInfo in readInfos)
                 {                    

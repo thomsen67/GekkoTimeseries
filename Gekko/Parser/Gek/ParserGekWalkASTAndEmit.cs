@@ -204,7 +204,7 @@ namespace Gekko.Parser.Gek
             }
             
             foreach (ASTNode child in node.ChildrenIterator())
-            {
+            {               
                 WalkASTAndEmit(child, absoluteDepth + 1, relativeDepth + 1, textInput, w, p);
                 //return; Globals.testing = true;
             }            
@@ -2061,14 +2061,14 @@ namespace Gekko.Parser.Gek
                             node.Code.A(AddPrintCode("mp", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
-                    case "ASTMULBK":
-                        {
-                            node.Code.A(Globals.clearTsCsCode + G.NL);
-                            node.Code.A("O.Mulbk o" + Num(node) + " = new O.Mulbk();" + G.NL);
-                            GetCodeFromAllChildren(node);
-                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
-                        }
-                        break;
+                    //case "ASTMULBK":
+                    //    {
+                    //        node.Code.A(Globals.clearTsCsCode + G.NL);
+                    //        node.Code.A("O.Mulbk o" + Num(node) + " = new O.Mulbk();" + G.NL);
+                    //        GetCodeFromAllChildren(node);
+                    //        node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                    //    }
+                    //    break;
                     case "ASTN":
                         {
                             node.Code.A(AddPrintCode("n", node[0].Code.ToString(), node.Parent.Parent.Text, node));

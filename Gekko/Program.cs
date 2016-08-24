@@ -1365,7 +1365,7 @@ namespace Gekko
                                 bool good = true;
                                 if (dates != null)
                                 {
-                                    good = true;
+                                    good = false;
                                     if (gt2.freq == EFreq.Annual)
                                     {
                                         if (gt2.LargerThanOrEqual(dates.t1Annual) && gt2.SmallerThanOrEqual(dates.t2Annual)) good = true;                                        
@@ -1808,7 +1808,7 @@ namespace Gekko
             return found;
         }
 
-        public static void OpenOrRead(ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos)
+        public static void OpenOrRead(bool wipeDatabankBeforeInsertingData, ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos)
         {
             //open = true if called with OPEN command                      
 
@@ -2002,9 +2002,11 @@ namespace Gekko
 
                     ReadDatesHelper dates = GetReadDatesHelper(oRead);
 
+                    if (wipeDatabankBeforeInsertingData) databank.Clear();  //Reading gbk may point to a whole new databank, this is ok. Wipe will only be for READ, no READ<merge> or READ ... TO ... . IMPORT is never wiped.
+
                     if (oRead.Type == EDataFormat.Pcim)
-                    {
-                        Program.ReadPCIM(dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
+                    {                        
+                        Program.ReadPCIM(databank, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
                     }
                     else if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn || oRead.Type == EDataFormat.Xls || oRead.Type == EDataFormat.Xlsx)
                     {
@@ -2926,12 +2928,12 @@ namespace Gekko
         }
 
         
-        public static void ReadPCIM(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
+        public static void ReadPCIM(Databank databank, ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
         {
             
             //try
             {
-                Databank databank = readInfo.databank;
+                //Databank databank = readInfo.databank;
 
                 int emptyWarnings = 0;
                 int firstYearWarnings = 0;
