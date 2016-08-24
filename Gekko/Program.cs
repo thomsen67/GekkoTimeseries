@@ -9443,19 +9443,7 @@ public static bool IsLargeAware(Stream stream)
                         }
                         return "";  //no need for the parser to chew on this afterwards!
                     }
-                }
-
-                if (s2.Length == "killexcel".Length)
-                {
-                    string sub = s2;
-                    if (G.equal(sub, "killexcel"))
-                    {
-                        Process[] procs = Process.GetProcessesByName("excel");
-                        foreach (Process proc in procs)
-                            proc.Kill();
-                        return "";  //no need for the parser to chew on this afterwards!
-                    }
-                }
+                }              
 
                
                 if (s2.Length == 5)
@@ -9608,6 +9596,33 @@ public static bool IsLargeAware(Stream stream)
                         Globals.useTestParser = true;
                         G.Writeln("AST tree will be printed...");
                         G.Writeln("Testparser is used...");
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }
+
+                if (s2.Length == "killexcel".Length)
+                {                    
+                    if (G.equal(s2, "killexcel"))
+                    {
+                        DialogResult result = MessageBox.Show("Delete all processes with 'excel' in their names? CLOSE EXCEL SHEETS BEFOREHAND!!", "Gekko helper", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);
+                        if (result == DialogResult.Yes)
+                        {
+                            G.Writeln("");
+                            int counter = 0;
+                            Process[] ps = Process.GetProcesses();
+                            foreach (var process in ps)
+                            {                                                             
+                                string name = process.ProcessName;
+                                if (name.ToLower().Contains("excel"))
+                                {
+                                    process.Kill();
+                                    G.Writeln("Killed '" + name + "'");
+                                    counter++;
+                                }                                
+                            }
+                            G.Writeln("Killed " + counter + " Excel processes");
+                        }
+                        else G.Writeln2("Cancelled");
                         return "";  //no need for the parser to chew on this afterwards!
                     }
                 }
