@@ -120,9 +120,7 @@ namespace Gekko.Parser.Gek
             s2.AppendLine("{");
 
             s2.AppendLine("public static GekkoTime globalGekkoTimeIterator = Globals.tNull;");
-            s2.Append(wh2.headerCs);
-
-            s2.Append(wh2.uFunctionsCs);
+            s2.Append(wh2.headerCs);            
 
             s2.AppendLine("public static void ClearTS(P p) {");
             s2.Append(wh2.headerMethodTsCs);
@@ -146,10 +144,34 @@ namespace Gekko.Parser.Gek
             s2.AppendLine("}");  //namespace Gekko            
 
             ch2.code = s2.ToString().Replace("`", Globals.QT);
-            ch2.errors = errors;
+            ch2.errors = errors;  //not used?
+            
+            if(wh2.uFunctionsCs.Length != 0)
+            {
+                StringBuilder s3 = new StringBuilder();                
+                s3.AppendLine("using System;");
+                s3.AppendLine("using System.Collections.Generic;");
+                s3.AppendLine("using System.Text;");
+                s3.AppendLine("using System.Windows.Forms;");
+                s3.AppendLine("using System.Drawing;");  //to use Color.Red in G.Writeln()
+                s3.AppendLine("using Gekko.Parser;"); //all the AST_Xxx() methods are found in Gekko.Parser.AST.cs
+                s3.AppendLine("namespace Gekko");
+                s3.AppendLine("{");
+                s3.AppendLine("public class UProc");
+                s3.AppendLine("{");
+                s3.AppendLine("public static GekkoTime globalGekkoTimeIterator = Globals.tNull;");
+                s3.Append(wh2.uFunctionsCs);                
+                s3.AppendLine("}");  //class UProc
+                s3.AppendLine("}");  //namespace Gekko
+                ch2.codeUFunctions = s3.ToString().Replace("`", Globals.QT);
+            }
 
             if (Globals.printAST)
             {
+                G.Writeln(ch2.codeUFunctions);
+                G.Writeln("===============================");
+                G.Writeln("===============================");
+                G.Writeln("===============================");
                 G.Writeln(ch2.code);
             }
 
