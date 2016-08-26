@@ -1625,7 +1625,7 @@ for2                      : forValHelper
 						  | forDateHelper
 						  ;
 
-functiondef               : FUNCTION functionDefLhsH1 ident leftParen functiondefRhsH1 rightParen SEMICOLON expressions? END -> ^({token("ASTFUNCTIONDEF", ASTFUNCTIONDEF, $FUNCTION.Line)} ^(ASTFUNCTIONDEFTYPE functionDefLhsH1) ^(ASTFUNCTIONDEFNAME ident) functiondefRhsH1 ^(ASTFUNCTIONDEFCODE expressions?));
+functiondef               : FUNCTION functionDefLhsH1 uDotIdent leftParen functiondefRhsH1 rightParen SEMICOLON expressions? END -> ^({token("ASTFUNCTIONDEF", ASTFUNCTIONDEF, $FUNCTION.Line)} ^(ASTFUNCTIONDEFTYPE functionDefLhsH1) ^(ASTFUNCTIONDEFNAME uDotIdent) functiondefRhsH1 ^(ASTFUNCTIONDEFCODE expressions?));
 
 genr                      : 						    				
 							//------------------------- UPD with equal ------------------------------------------------------
@@ -2326,7 +2326,7 @@ dates                     : expression expression; // -> ^(ASTDATES expression e
 //This kind of name can NOT be %a for instance, has to be "a{...}b{...}c" or "{...}a{...}b"
 //-----------------------------------------------------------------------------------------
 
-nameWithDot               : name GLUEDOT DOT name -> ^(ASTNAMEWITHDOT name name)                        //aa.bb
+nameWithDot               : name GLUEDOT DOT name -> ^(ASTNAMEWITHDOT name name)                          //aa.bb
 						  | name GLUEDOT DOT Integer -> ^(ASTNAMEWITHDOT name ^(ASTINTEGER Integer))      //aa2.1 (for lags)
 						  | name -> ^(ASTNAMEWITHDOT name)                                                //aa (name with no dot)
 						  ;
@@ -2498,7 +2498,11 @@ wildSymbolMiddle          : starGlueBoth -> ASTWILDSTAR
                           | questionGlueBoth -> ASTWILDQUESTION
 						  ;
 
-function                  : ident leftParenGlue (functionH1 (',' functionH1)*)? RIGHTPAREN -> ^(ASTFUNCTION ident functionH1*);
+function                  : uDotIdent leftParenGlue (functionH1 (',' functionH1)*)? RIGHTPAREN -> ^(ASTFUNCTION uDotIdent functionH1*);
+
+uDotIdent                 : ident -> ident 
+						  | U GLUEDOT DOT ident -> ident
+						  ;
 
 functionH1                : expression
 						  | leftParenNoGlue expression (COMMA2 expression)* RIGHTPAREN -> ^(ASTEXPRESSIONTUPLE expression+)  //a tuple argument, like f(%a1, (%x1, %x2), %a2);

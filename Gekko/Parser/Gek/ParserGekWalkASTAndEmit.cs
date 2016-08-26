@@ -154,7 +154,6 @@ namespace Gekko.Parser.Gek
                     s = "_tuple_" + node.Number;  //a (VAL x, GENR y) = ... tuple is kind of like two separate commands.
                 }
                 node.commandLinesCounter = node.Parent.commandLinesCounter + s;  //default, may be overridden if new command is encountered.               
-
             }
 
             //See also #890752345
@@ -1240,7 +1239,7 @@ namespace Gekko.Parser.Gek
                             {
                                 //Create the classe corresponding to the return tuple (lhs)
                                 string tupleClassName = G.GetVariableType(w.functionHelper.lhsTypes.Count);
-                                CreateTupleClass(w.headerCs, w.functionHelper.lhsTypes.Count, tupleClassName, w.tupleClasses);
+                                CreateTupleClass(w.uFunctionsCs, w.functionHelper.lhsTypes.Count, tupleClassName, w.tupleClasses);
                             }
 
                             string method = Globals.splitSTOP;
@@ -1253,9 +1252,9 @@ namespace Gekko.Parser.Gek
                                 //TODO type checks...
                                 if (fah.tupleCount > 1)
                                 {
-                                    //Create the classe corresponding to the input tuple (in rhs params)
+                                    //Create the class corresponding to the input tuple (in rhs params)
                                     string tupleClassName = G.GetVariableType(fah.tupleCount);
-                                    CreateTupleClass(w.headerCs, fah.tupleCount, tupleClassName, w.tupleClasses);
+                                    CreateTupleClass(w.uFunctionsCs, fah.tupleCount, tupleClassName, w.tupleClasses);
                                     //this is a tuple
                                     method += tupleClassName + " " + fah.tupleNameCode;
                                     i = i + (fah.tupleCount - 1);  //we skip the rest of these tuples here!
@@ -1272,7 +1271,7 @@ namespace Gekko.Parser.Gek
                             method += node[3].Code + G.NL;  //expressions, should always be subnode #4                            
                             
                             method += "}" + G.NL;
-                            w.headerCs.AppendLine(method);
+                            w.uFunctionsCs.AppendLine(method);
                             w.functionHelper = null;  //do not remove this line: important!                            
                         }
                         break;
@@ -2702,7 +2701,7 @@ namespace Gekko.Parser.Gek
                             List<string> types = new List<string>();
 
                             string classCs = G.GetVariableType(node.ChildrenCount());
-                            CreateTupleClass(w.headerCs, node.ChildrenCount(), classCs, w.tupleClasses);
+                            CreateTupleClass(w.uFunctionsCs, node.ChildrenCount(), classCs, w.tupleClasses);
 
                             string tempCs = "temp" + ++Globals.counter;                            
                                                         
@@ -4424,6 +4423,7 @@ namespace Gekko.Parser.Gek
         public GekkoDictionary<string, string> scalarCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public GekkoDictionary<string, string> listCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public GekkoDictionary<string, string> tsCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public StringBuilder uFunctionsCs = new StringBuilder(); //stuff to be put at the very start.
         public StringBuilder headerCs = new StringBuilder(); //stuff to be put at the very start.
         public StringBuilder headerMethodTsCs = new StringBuilder(); //stuff to clear TimeSeries pointers
         public StringBuilder headerMethodScalarCs = new StringBuilder(); //stuff to clear scalar pointers   
