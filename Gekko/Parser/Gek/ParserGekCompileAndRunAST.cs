@@ -39,7 +39,6 @@ namespace Gekko.Parser.Gek
                 compilerParams.ReferencedAssemblies.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "ANTLR.dll"));
                 compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
             }
-
                         
             compilerParams.GenerateExecutable = false;
             CSharpCodeProvider csCompiler = new CSharpCodeProvider();
@@ -128,16 +127,14 @@ namespace Gekko.Parser.Gek
                 if (p.lastFileSentToANTLR == "") text = "*** ERROR: Internal Gekko error regarding user input";
                 WriteCompileErrorMessage(text, p.lastFileSentToANTLR);
                 throw new GekkoException();
-            }
-            Assembly asm = cr.CompiledAssembly;
+            }           
 
             // Load the generated assembly into the ApplicationDomain    
             Object[] args = new Object[1];
             args[0] = p;
 
             try
-            {
-                Type assembly = asm.GetType("Gekko.TranslatedCode");
+            {                
                 if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Running dll start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
                 p.Deeper();
                 DateTime t0 = DateTime.Now;
@@ -164,9 +161,13 @@ namespace Gekko.Parser.Gek
                 //The solution is code splitting, forcing C# NOT to try to optimize.                
                 //Splitting it into 
                 //for instance 200 methods each with 5 GENRs speeds the JIT up to about 4 sec.
-                //So splitting large cmd files seems to help a lot.                                                
+                //So splitting large cmd files seems to help a lot.
+
+                code = code;  //just so it is easy to see here                                                
                 if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RUN START");
-                assembly.InvokeMember("CodeLines", BindingFlags.InvokeMethod, null, null, args);
+                Assembly assembly2 = cr.CompiledAssembly;
+                Type assembly = assembly2.GetType("Gekko.TranslatedCode");  //the class
+                assembly.InvokeMember("CodeLines", BindingFlags.InvokeMethod, null, null, args);  //the method
                 if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RUN END");
             }
             catch (Exception e)

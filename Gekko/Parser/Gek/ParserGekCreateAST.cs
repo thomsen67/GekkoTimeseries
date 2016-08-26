@@ -376,14 +376,14 @@ namespace Gekko.Parser.Gek
 
                 string errorMessage = ss[3];
 
-                if (!Globals.useTestParser)
-                {
-                    errorMessage = errorMessage.Replace(" RPGLUE", " ')'");
-                    errorMessage = errorMessage.Replace(" LPGLUE", " '('");
-                    errorMessage = errorMessage.Replace(" RP", " ')'");
-                    errorMessage = errorMessage.Replace(" LP", " '('");
-                    //errorMessage = errorMessage.Replace("expecting set", "");  //remove this, is confusing
-                }
+                //if (!Globals.useTestParser)
+                //{
+                //    errorMessage = errorMessage.Replace(" RPGLUE", " ')'");
+                //    errorMessage = errorMessage.Replace(" LPGLUE", " '('");
+                //    errorMessage = errorMessage.Replace(" RP", " ')'");
+                //    errorMessage = errorMessage.Replace(" LP", " '('");
+                //    //errorMessage = errorMessage.Replace("expecting set", "");  //remove this, is confusing
+                //}
 
                 errorMessage = errorMessage.Replace(@"'\\r\\n'", "<newline>");  //easier to understand
 

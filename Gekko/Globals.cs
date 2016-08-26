@@ -115,7 +115,7 @@ namespace Gekko
         public static string functionP1Cs = "p";
         public static string functionP2Cs = "P p";
                 
-        public static bool useTestParser = true;  //for debugging, use trial parser        
+        //public static bool useTestParser = true;  //for debugging, use trial parser        
         public static bool substituteAssignVars = false;
 
         public static string clearTsCsCode = "ClearTS(p);";  //so it is easier to track the location of these

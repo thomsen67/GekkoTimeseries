@@ -2445,7 +2445,7 @@ value                     :
 						  | StringInQuotes -> ^(ASTSTRINGINQUOTES StringInQuotes)
 						  | listFile						
 						  | matrixCol
-						  | (leftBracketNoGlue|leftBracketNoGlueWild) indexerExpressionHelper RIGHTBRACKET -> ^(ASTINDEXERALONE indexerExpressionHelper) //also see rule indexerExpression							  						  					
+						  | (leftBracketNoGlue|leftBracketNoGlueWild) indexerExpressionHelper RIGHTBRACKET -> ^(ASTINDEXERALONE indexerExpressionHelper) //also see rule indexerExpression
 						  ;
 
 matrixCol                 : leftBracketNoGlue matrixRow (doubleVerticalBar matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
@@ -2453,6 +2453,7 @@ matrixRow                 :  expression (',' expression)*  -> ^(ASTMATRIXROW exp
 
 doubleVerticalBar         : GLUE? (DOUBLEVERTICALBAR1 | DOUBLEVERTICALBAR2);
 
+//using rangeWithBank and wildcardWithBank in the last of value rule gives problems with PRT [pxa..pxb] etc.
 indexerExpressionHelper   : range -> ^(ASTINDEXERELEMENT ^(ASTINDEXERELEMENTBANK) range)                             //fm1..fm5
                           | wildcard -> ^(ASTINDEXERELEMENT ^(ASTINDEXERELEMENTBANK) ^(ASTWILDCARD wildcard))                          //fm*
                           | expressionOrNothing doubleDot expressionOrNothing -> ^(ASTINDEXERELEMENT ^(ASTINDEXERELEMENTBANK) expressionOrNothing expressionOrNothing)     //'fm1'..'fm5'

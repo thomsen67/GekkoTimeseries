@@ -6509,17 +6509,17 @@ namespace UnitTests
                         {
                             I("RESET;");
                             I("OPTION freq q;");
-                            I("SER<2000q1 2000q4> xx1 = 1,2,3,4;");
+                            I("SER<2000q1 2000q3> xx1 = 1,2,3;");
                             I("WRITE <" + s + "> temp;");
                             int count1 = 0;
                             GekkoTime t0 = new GekkoTime(EFreq.Quarterly, 2000, 1);
-                            foreach (GekkoTime t1 in new GekkoTimeIterator(new GekkoTime(EFreq.Quarterly, 2000, 1), new GekkoTime(EFreq.Quarterly, 2000, 4)))
+                            foreach (GekkoTime t1 in new GekkoTimeIterator(new GekkoTime(EFreq.Quarterly, 2000, 1), new GekkoTime(EFreq.Quarterly, 2000, 3)))
                             {
                                 int count2 = 0;
-                                foreach (GekkoTime t2 in new GekkoTimeIterator(new GekkoTime(EFreq.Quarterly, 2000, 1), new GekkoTime(EFreq.Quarterly, 2000, 4)))
+                                foreach (GekkoTime t2 in new GekkoTimeIterator(new GekkoTime(EFreq.Quarterly, 2000, 1), new GekkoTime(EFreq.Quarterly, 2000, 3)))
                                 {
                                     if (count1 > count2) continue;
-                                    I("SER<2000q1 2000q4> xx1 = 100,200,300,400;");
+                                    I("SER<2000q1 2000q3> xx1 = 100,200,300;");
                                     if (jj == 0)
                                     {
                                         I("IMPORT<" + t1.ToString() + " " + t2.ToString() + " " + s + "> temp;");
@@ -6546,7 +6546,7 @@ namespace UnitTests
                                         GekkoTime ttemp = t0.Add(ii);
                                         AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Quarterly, ttemp.super, ttemp.sub, (ii + 1) * 1, sharedDelta);
                                     }
-                                    for (int ii = count2 + 1; ii < 4; ii++)
+                                    for (int ii = count2 + 1; ii < 3; ii++)
                                     {
                                         //original                                
                                         GekkoTime ttemp = t0.Add(ii);

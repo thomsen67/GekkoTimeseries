@@ -890,20 +890,20 @@ namespace Gekko
                     errorMessage = G.ReplaceGlueNew(errorMessage);
                 }
 
-                if (!Globals.useTestParser)
-                {
-                    errorMessage = errorMessage.Replace(" RPARGLUE", " ')'");
-                    errorMessage = errorMessage.Replace(" LPARGLUE", " '('");
-                    errorMessage = errorMessage.Replace(" RPAR", " ')'");
-                    errorMessage = errorMessage.Replace(" LPAR", " '('");
-                    errorMessage = errorMessage.Replace(" RP", " ')'");
-                    errorMessage = errorMessage.Replace(" LP", " '('");
-                    errorMessage = errorMessage.Replace("EOF", "[End of input]");
-                    errorMessage = errorMessage.Replace(@"'\\r\\n'", "[Newline]");  //easier to understand
-                    errorMessage = errorMessage.Replace("expecting set", "");  //not meningful
-                    errorMessage = errorMessage.Replace("required (...)+ loop did not match anything at input", "unexpected input");  //different phrase in order to distinguish these two
-                    errorMessage = errorMessage.Replace("no viable alternative at input", "did not expect input");  //different phrase in order to distinguish these two
-                }
+                //if (!Globals.useTestParser)
+                //{
+                //    errorMessage = errorMessage.Replace(" RPARGLUE", " ')'");
+                //    errorMessage = errorMessage.Replace(" LPARGLUE", " '('");
+                //    errorMessage = errorMessage.Replace(" RPAR", " ')'");
+                //    errorMessage = errorMessage.Replace(" LPAR", " '('");
+                //    errorMessage = errorMessage.Replace(" RP", " ')'");
+                //    errorMessage = errorMessage.Replace(" LP", " '('");
+                //    errorMessage = errorMessage.Replace("EOF", "[End of input]");
+                //    errorMessage = errorMessage.Replace(@"'\\r\\n'", "[Newline]");  //easier to understand
+                //    errorMessage = errorMessage.Replace("expecting set", "");  //not meningful
+                //    errorMessage = errorMessage.Replace("required (...)+ loop did not match anything at input", "unexpected input");  //different phrase in order to distinguish these two
+                //    errorMessage = errorMessage.Replace("no viable alternative at input", "did not expect input");  //different phrase in order to distinguish these two
+                //}
 
 
                 if (lineNo > inputFileLines.Count)
@@ -1027,14 +1027,14 @@ namespace Gekko
 
                 string errorMessage = ss[3];
 
-                if (!Globals.useTestParser)
-                {
-                    errorMessage = errorMessage.Replace(" RPGLUE", " ')'");
-                    errorMessage = errorMessage.Replace(" LPGLUE", " '('");
-                    errorMessage = errorMessage.Replace(" RP", " ')'");
-                    errorMessage = errorMessage.Replace(" LP", " '('");
-                    //errorMessage = errorMessage.Replace("expecting set", "");  //remove this, is confusing
-                }
+                //if (!Globals.useTestParser)
+                //{
+                //    errorMessage = errorMessage.Replace(" RPGLUE", " ')'");
+                //    errorMessage = errorMessage.Replace(" LPGLUE", " '('");
+                //    errorMessage = errorMessage.Replace(" RP", " ')'");
+                //    errorMessage = errorMessage.Replace(" LP", " '('");
+                //    //errorMessage = errorMessage.Replace("expecting set", "");  //remove this, is confusing
+                //}
 
                 errorMessage = errorMessage.Replace(@"'\\r\\n'", "<newline>");  //easier to understand
 

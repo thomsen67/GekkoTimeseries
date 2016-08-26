@@ -2598,6 +2598,27 @@ namespace Gekko
                     e.Cancel = true;
                 }
             }
+            else if (c == null && (e.Url.AbsoluteUri.ToLower().EndsWith("." + Globals.extensionCommand)))
+            {
+                //Command file (gcm)
+                //cancel Navigation
+                string file = e.Url.AbsoluteUri;
+                if (file.ToLower().StartsWith("http://") || file.ToLower().StartsWith("https://"))
+                {
+                    //This is an external link
+                    MessageBox.Show("*** ERROR: Expected command file to be on local file system");
+                    e.Cancel = true;
+                }
+                else
+                {
+                    file = file.Substring(8);
+                    file = file.Replace("/", "\\");
+                    string inputFileName = Path.GetFileName(file);
+                    Gui.gui.StartThread("RUN " + file + ";", true);  //to get a worker thread started                    
+                    CrossThreadStuff.SetTab("main", true);
+                    e.Cancel = true;
+                }
+            }
             else if (c != null)
             {                
                 Gui.gui.StartThread("menutable <" + c + "> " + Globals.lastCalledMenuTable + ";", true);
