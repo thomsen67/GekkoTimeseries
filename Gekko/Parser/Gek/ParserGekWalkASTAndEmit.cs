@@ -748,7 +748,7 @@ namespace Gekko.Parser.Gek
                             string temp = node[0].Text.Replace(Globals.symbolGlueChar3, "") + "d";
                             if (temp.EndsWith(".d")) temp = temp.Substring(0, temp.Length - 2) + ".0d";
                             string s = "new ScalarVal(" + minus + temp + ")";
-                            w.headerCs.AppendLine("public static readonly ScalarVal " + doubleWithNumber + " = " + s + ";");
+                            GetHeaderCs(w).AppendLine("public static readonly ScalarVal " + doubleWithNumber + " = " + s + ";");
                             node.Code.CA(doubleWithNumber); //no need for checking if it exists                      
                         }
                         break;
@@ -998,7 +998,7 @@ namespace Gekko.Parser.Gek
                             //NOTE this will mean that the end and step are fixed when seeing the FOR. Should be ok. Alternative is crazy.                            
 
                             string loopVariable = null;
-                            string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, w.scalarCache, w.headerCs, EScalarRefType.Val, "double.NaN", false, true, false);
+                            string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, w.scalarCache, GetHeaderCs(w), EScalarRefType.Val, "double.NaN", false, true, false);
                                                         
                             node.Code.A(setLoopStringCs + G.NL);                            
                             node.Code.A("double " + stepName + " = " + codeStep + ".GetVal(t);" + G.NL);
@@ -1051,7 +1051,7 @@ namespace Gekko.Parser.Gek
                             //NOTE this will mean that the end and step are fixed when seeing the FOR. Should be ok. Alternative is crazy.                            
 
                             string loopVariable = null;
-                            string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, w.scalarCache, w.headerCs, EScalarRefType.Date, "Globals.tNull", false, true, false);                            
+                            string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, w.scalarCache, GetHeaderCs(w), EScalarRefType.Date, "Globals.tNull", false, true, false);                            
                             
                             node.Code.A(setLoopStringCs + G.NL);
                             node.Code.A("int " + stepName + " = O.GetInt(" + codeStep + ");" + G.NL);
@@ -1110,7 +1110,7 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("try {");
                                 node.Code.A("foreach(string " + tempName + " in o" + Num(node) + ".listItems) {" + G.NL);
                                 string loopVariable = null; //The line below emits "O.SetValFromCache(..., tempName)", same as a "STRING x = ..." statement
-                                string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, w.scalarCache, w.headerCs, EScalarRefType.String, tempName, x, true, false);                                
+                                string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, w.scalarCache, GetHeaderCs(w), EScalarRefType.String, tempName, x, true, false);                                
                                 node.Code.A(setLoopStringCs + G.NL);
 
                                 node.Code.A(Globals.splitSTART);
@@ -1164,7 +1164,7 @@ namespace Gekko.Parser.Gek
                                 for (int i = 0; i < n0; i++)
                                 {
                                     string loopVariable = null; //The line below emits "O.SetValFromCache(..., tempName)", same as a "STRING x = ..." statement
-                                    string setLoopStringCs = CacheRefScalarCs(out loopVariable, node[0][i].nameSimpleIdent, w.scalarCache, w.headerCs, EScalarRefType.String, "x" + Num(node) + "_" + i + "[i]", true, true, false);
+                                    string setLoopStringCs = CacheRefScalarCs(out loopVariable, node[0][i].nameSimpleIdent, w.scalarCache, GetHeaderCs(w), EScalarRefType.String, "x" + Num(node) + "_" + i + "[i]", true, true, false);
                                     node.Code.A(setLoopStringCs + G.NL);
                                 }
 
@@ -1271,6 +1271,9 @@ namespace Gekko.Parser.Gek
                             method += node[3].Code + G.NL;  //expressions, should always be subnode #4                            
                             
                             method += "}" + G.NL;
+
+                            w.uFunctionsCs.AppendLine(w.functionHelper.headerCs.ToString());
+
                             w.uFunctionsCs.AppendLine(method);
                             w.functionHelper = null;  //do not remove this line: important!                            
                         }
@@ -1790,7 +1793,7 @@ namespace Gekko.Parser.Gek
                             string minus = HandleNegate(node);
                             string intWithNumber = "i" + ++Globals.counter;
                             string s = "new ScalarVal(" + minus + node[0].Text + "d)";
-                            w.headerCs.AppendLine("public static readonly ScalarVal " + intWithNumber + " = " + s + ";");
+                            GetHeaderCs(w).AppendLine("public static readonly ScalarVal " + intWithNumber + " = " + s + ";");
                             node.Code.CA(intWithNumber);  //no need for checking if it exists
                         }
                         break;
@@ -1808,7 +1811,7 @@ namespace Gekko.Parser.Gek
                             //TODO                             
                             string intWithNumber = "d" + ++Globals.counter;
                             string s = "new ScalarVal(double.NaN)";
-                            w.headerCs.AppendLine("public static readonly ScalarVal " + intWithNumber + " = " + s + ";");
+                            GetHeaderCs(w).AppendLine("public static readonly ScalarVal " + intWithNumber + " = " + s + ";");
                             node.Code.CA(intWithNumber);  //no need for checking if it exists
                         }
                         break;
@@ -3421,6 +3424,14 @@ namespace Gekko.Parser.Gek
             }
         }
 
+        private static StringBuilder GetHeaderCs(W w)
+        {
+            StringBuilder destination = null;
+            if (w.functionHelper != null) destination = w.functionHelper.headerCs;
+            else destination = w.headerCs;
+            return destination;
+        }
+
         //private static void AddSplitMarkers(ASTNode node)
         //{
         //    if (Globals.newSplit)
@@ -3440,7 +3451,7 @@ namespace Gekko.Parser.Gek
                 //has not been seen before
                 string listWithNumber = "list" + ++Globals.counter;
                 w.listCache.Add(simpleIdent, listWithNumber);
-                w.headerCs.AppendLine("public static IVariable " + listWithNumber + " = null;");  //cannot set it to ScalarVal since it may change type...
+                GetHeaderCs(w).AppendLine("public static IVariable " + listWithNumber + " = null;");  //cannot set it to ScalarVal since it may change type...
                 node.Code.A("O.GetScalarFromCache(ref " + listWithNumber + ", `" + Globals.symbolList + simpleIdent + "`, false, " + stringifyString + ")");
             }
             else
@@ -3525,7 +3536,7 @@ namespace Gekko.Parser.Gek
                     string tempDoubleCs = "tempDouble" + ++Globals.counter;
                     nodeCodeTemp += "double " + tempDoubleCs + " = (" + childCode + ").GetVal(t);" + G.NL;
                     string notUsed = null;
-                    string leftSideCs = CacheRefScalarCs(out notUsed, node0.nameSimpleIdent, w.scalarCache, w.headerCs, EScalarRefType.Val, tempDoubleCs, false, true, false);
+                    string leftSideCs = CacheRefScalarCs(out notUsed, node0.nameSimpleIdent, w.scalarCache, GetHeaderCs(w), EScalarRefType.Val, tempDoubleCs, false, true, false);
                     nodeCodeTemp += leftSideCs + G.NL;
                 }
                 else
@@ -3723,7 +3734,7 @@ namespace Gekko.Parser.Gek
                     else
                     {
                         string notUsed = null;
-                        node.Code.A(CacheRefScalarCs(out notUsed, scalarSimpleIdent, w.scalarCache, w.headerCs, EScalarRefType.OnRightHandSide, null, false, transformationAllowed, stringify));
+                        node.Code.A(CacheRefScalarCs(out notUsed, scalarSimpleIdent, w.scalarCache, GetHeaderCs(w), EScalarRefType.OnRightHandSide, null, false, transformationAllowed, stringify));
                     }
                 }
             }
@@ -3913,7 +3924,7 @@ namespace Gekko.Parser.Gek
                     //has not been seen before
                     string ivWithNumber = "iv" + ++Globals.counter;
                     wh2.tsCache.Add(simpleHash, ivWithNumber);
-                    wh2.headerCs.AppendLine("public static IVariable " + ivWithNumber + " = null;");  //cannot set it to ScalarVal since it may change type...                    
+                    GetHeaderCs(wh2).AppendLine("public static IVariable " + ivWithNumber + " = null;");  //cannot set it to ScalarVal since it may change type...                    
                     node.Code.A("O.GetTimeSeriesFromCache(ref " + ivWithNumber + ", `" + simpleHash + "`, " + bankNumberCode + isLhsSoCanAutoCreate + ")");
                 }
                 else
@@ -4447,6 +4458,7 @@ namespace Gekko.Parser.Gek
         public List<string> lhsTypes = new List<string>();
         public string functionName;
         public List<FunctionArgumentsHelperElements> storage = new List<FunctionArgumentsHelperElements>();
+        public StringBuilder headerCs = new StringBuilder();
     }
 
     public class WalkHelper
