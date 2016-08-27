@@ -146,7 +146,7 @@ namespace Gekko.Parser.Gek
             ch2.code = s2.ToString().Replace("`", Globals.QT);
             ch2.errors = errors;  //not used?
             
-            if(wh2.uFunctionsCs.Length != 0)
+            if(wh2.uHeaderCs.Length != 0)
             {
                 StringBuilder s3 = new StringBuilder();                
                 s3.AppendLine("using System;");
@@ -160,7 +160,7 @@ namespace Gekko.Parser.Gek
                 s3.AppendLine("public class UProc");
                 s3.AppendLine("{");
                 s3.AppendLine("public static GekkoTime globalGekkoTimeIterator = Globals.tNull;");
-                s3.Append(wh2.uFunctionsCs);                
+                s3.Append(wh2.uHeaderCs);                
                 s3.AppendLine("}");  //class UProc
                 s3.AppendLine("}");  //namespace Gekko
                 ch2.codeUFunctions = s3.ToString().Replace("`", Globals.QT);

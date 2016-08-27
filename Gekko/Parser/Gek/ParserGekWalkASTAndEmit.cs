@@ -187,7 +187,7 @@ namespace Gekko.Parser.Gek
             {                
                 case "ASTFUNCTIONDEF":
                     {
-                        if (w.functionHelper != null)
+                        if (w.uFunctionsHelper != null)
                         {
                             G.Writeln2("*** ERROR: Function definition inside function definition not allowed");
                             throw new GekkoException();
@@ -197,7 +197,7 @@ namespace Gekko.Parser.Gek
                             G.Writeln2("*** ERROR: Function definition cannot be inside loop, IF-statement etc. Place at top or end of file.");
                             throw new GekkoException();
                         }
-                        w.functionHelper = new FunctionArgumentsHelper();
+                        w.uFunctionsHelper = new FunctionArgumentsHelper();
                     }
                     break;
             }
@@ -740,7 +740,7 @@ namespace Gekko.Parser.Gek
                             //TODO TODO TODO
                             //TODO TODO TODO
                             //TODO TODO TODO use the cache to avoid repetitions of numbers
-                            //TODO TODO TODO
+                            //TODO TODO TODO Maybe not: this simplifies user defined functions
                             //TODO TODO TODO
 
                             string minus = HandleNegate(node);
@@ -860,7 +860,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A(Globals.splitSTOP);                            
                             
-                            if (w.functionHelper == null)
+                            if (w.uFunctionsHelper == null)
                             {
                                 if (!node[0].Code.IsNull())
                                 {
@@ -870,14 +870,14 @@ namespace Gekko.Parser.Gek
                             }
                             else
                             {
-                                if (w.functionHelper.lhsTypes.Count != node.ChildrenCount())
+                                if (w.uFunctionsHelper.lhsTypes.Count != node.ChildrenCount())
                                 {
-                                    G.Writeln2("*** ERROR: Return with " + node.ChildrenCount() + " items instead of " + w.functionHelper.lhsTypes.Count);
+                                    G.Writeln2("*** ERROR: Return with " + node.ChildrenCount() + " items instead of " + w.uFunctionsHelper.lhsTypes.Count);
                                     throw new GekkoException();
                                 }
 
                                 string tempCs = "temp" + ++Globals.counter;
-                                string classCs = G.GetVariableType(w.functionHelper.lhsTypes.Count);
+                                string classCs = G.GetVariableType(w.uFunctionsHelper.lhsTypes.Count);
 
                                 string s = null;
                                 string s2 = null;
@@ -887,7 +887,7 @@ namespace Gekko.Parser.Gek
                                     counter++;
                                     string tn = "temp" + ++Globals.counter;
 
-                                    if (w.functionHelper.lhsTypes[counter] == "series")
+                                    if (w.uFunctionsHelper.lhsTypes[counter] == "series")
                                     {
                                         string tempName = "temp" + ++Globals.counter;
                                         s += "TimeSeries " + tempName + " = new TimeSeries(Program.options.freq, null);" + G.NL;
@@ -911,9 +911,9 @@ namespace Gekko.Parser.Gek
 
                                 node.Code.A(s + classCs + " " + tempCs + " = new " + classCs + "(" + s2 + ");" + G.NL);
 
-                                if (node.ChildrenCount() != w.functionHelper.lhsTypes.Count)
+                                if (node.ChildrenCount() != w.uFunctionsHelper.lhsTypes.Count)
                                 {
-                                    G.Writeln2("*** ERROR: RETURN with " + node.ChildrenCount() + " values encountered in '" + w.functionHelper.functionName + "' function");
+                                    G.Writeln2("*** ERROR: RETURN with " + node.ChildrenCount() + " values encountered in '" + w.uFunctionsHelper.functionName + "' function");
                                     throw new GekkoException();
                                 }
 
@@ -928,7 +928,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A(Globals.splitSTOP);
 
-                            if (w.functionHelper == null)
+                            if (w.uFunctionsHelper == null)
                             {
                                 if (node.ChildrenCount() > 0)
                                 {
@@ -943,7 +943,7 @@ namespace Gekko.Parser.Gek
                             }
                             else
                             {
-                                node.Code.A("return (" + G.GetVariableType(w.functionHelper.lhsTypes.Count) + ")(" + node[0].Code + ");" + G.NL);
+                                node.Code.A("return (" + G.GetVariableType(w.uFunctionsHelper.lhsTypes.Count) + ")(" + node[0].Code + ");" + G.NL);
                             }
                             
                             node.Code.A(Globals.splitSTART);
@@ -998,7 +998,7 @@ namespace Gekko.Parser.Gek
                             //NOTE this will mean that the end and step are fixed when seeing the FOR. Should be ok. Alternative is crazy.                            
 
                             string loopVariable = null;
-                            string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, w.scalarCache, GetHeaderCs(w), EScalarRefType.Val, "double.NaN", false, true, false);
+                            string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.Val, "double.NaN", false, true, false);
                                                         
                             node.Code.A(setLoopStringCs + G.NL);                            
                             node.Code.A("double " + stepName + " = " + codeStep + ".GetVal(t);" + G.NL);
@@ -1051,7 +1051,7 @@ namespace Gekko.Parser.Gek
                             //NOTE this will mean that the end and step are fixed when seeing the FOR. Should be ok. Alternative is crazy.                            
 
                             string loopVariable = null;
-                            string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, w.scalarCache, GetHeaderCs(w), EScalarRefType.Date, "Globals.tNull", false, true, false);                            
+                            string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.Date, "Globals.tNull", false, true, false);                            
                             
                             node.Code.A(setLoopStringCs + G.NL);
                             node.Code.A("int " + stepName + " = O.GetInt(" + codeStep + ");" + G.NL);
@@ -1110,7 +1110,7 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("try {");
                                 node.Code.A("foreach(string " + tempName + " in o" + Num(node) + ".listItems) {" + G.NL);
                                 string loopVariable = null; //The line below emits "O.SetValFromCache(..., tempName)", same as a "STRING x = ..." statement
-                                string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, w.scalarCache, GetHeaderCs(w), EScalarRefType.String, tempName, x, true, false);                                
+                                string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.String, tempName, x, true, false);                                
                                 node.Code.A(setLoopStringCs + G.NL);
 
                                 node.Code.A(Globals.splitSTART);
@@ -1164,7 +1164,7 @@ namespace Gekko.Parser.Gek
                                 for (int i = 0; i < n0; i++)
                                 {
                                     string loopVariable = null; //The line below emits "O.SetValFromCache(..., tempName)", same as a "STRING x = ..." statement
-                                    string setLoopStringCs = CacheRefScalarCs(out loopVariable, node[0][i].nameSimpleIdent, w.scalarCache, GetHeaderCs(w), EScalarRefType.String, "x" + Num(node) + "_" + i + "[i]", true, true, false);
+                                    string setLoopStringCs = CacheRefScalarCs(out loopVariable, node[0][i].nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.String, "x" + Num(node) + "_" + i + "[i]", true, true, false);
                                     node.Code.A(setLoopStringCs + G.NL);
                                 }
 
@@ -1224,37 +1224,37 @@ namespace Gekko.Parser.Gek
                             //      Ci-blocks. If so, we would have to add markers to headerCs, put headerCs
                             //      through the splitting machine, and beware of "params_" lines (these should not
                             //      be put into Ci-methods).
-                            
+
                             //TODO: allow overloads
-                            if (w.functionUserDefined.ContainsKey(w.functionHelper.functionName))
+                            if (w.functionUserDefined.ContainsKey(w.uFunctionsHelper.functionName))
                             {
-                                G.Writeln2("*** ERROR: User function with name '" + w.functionHelper.functionName + "' has already been defined");
+                                G.Writeln2("*** ERROR: User function with name '" + w.uFunctionsHelper.functionName + "' has already been defined");
                                 throw new GekkoException();
                             }
-                            w.functionUserDefined.Add(w.functionHelper.functionName, true);
+                            w.functionUserDefined.Add(w.uFunctionsHelper.functionName, true);
                             //We use ToLower(), since user functions are not distinguished by means of capitalization
-                            string lhsClassNameCode = G.GetVariableType(w.functionHelper.lhsTypes.Count);
+                            string lhsClassNameCode = G.GetVariableType(w.uFunctionsHelper.lhsTypes.Count);
 
-                            if (w.functionHelper.lhsTypes.Count > 1)
+                            if (w.uFunctionsHelper.lhsTypes.Count > 1)
                             {
                                 //Create the classe corresponding to the return tuple (lhs)
-                                string tupleClassName = G.GetVariableType(w.functionHelper.lhsTypes.Count);
-                                CreateTupleClass(w.uFunctionsCs, w.functionHelper.lhsTypes.Count, tupleClassName, w.tupleClasses);
+                                string tupleClassName = G.GetVariableType(w.uFunctionsHelper.lhsTypes.Count);
+                                CreateTupleClass(w.uHeaderCs, w.uFunctionsHelper.lhsTypes.Count, tupleClassName, w.tupleClasses);
                             }
 
                             string method = Globals.splitSTOP;
-                            method += "public static " + lhsClassNameCode + " " + w.functionHelper.functionName.ToLower() + "(" + Globals.functionP2Cs + ", " + Globals.functionT2Cs + ", ";
+                            method += "public static " + lhsClassNameCode + " " + w.uFunctionsHelper.functionName.ToLower() + "(" + Globals.functionP2Cs + ", " + Globals.functionT2Cs + ", ";
 
-                            for (int i = 0; i < w.functionHelper.storage.Count; i++)
+                            for (int i = 0; i < w.uFunctionsHelper.storage.Count; i++)
                             {
-                                FunctionArgumentsHelperElements fah = w.functionHelper.storage[i];
+                                FunctionArgumentsHelperElements fah = w.uFunctionsHelper.storage[i];
                                 //method += G.GetVariableType(fah.type) + " " + fah.parameterCode;                                
                                 //TODO type checks...
                                 if (fah.tupleCount > 1)
                                 {
                                     //Create the class corresponding to the input tuple (in rhs params)
                                     string tupleClassName = G.GetVariableType(fah.tupleCount);
-                                    CreateTupleClass(w.uFunctionsCs, fah.tupleCount, tupleClassName, w.tupleClasses);
+                                    CreateTupleClass(w.uHeaderCs, fah.tupleCount, tupleClassName, w.tupleClasses);
                                     //this is a tuple
                                     method += tupleClassName + " " + fah.tupleNameCode;
                                     i = i + (fah.tupleCount - 1);  //we skip the rest of these tuples here!
@@ -1267,15 +1267,17 @@ namespace Gekko.Parser.Gek
                             }
                             if (method.EndsWith(", ")) method = method.Substring(0, method.Length - 2);  //we remove the last ", "
                             method += ") {" + G.NL;
-                                                        
+
                             method += node[3].Code + G.NL;  //expressions, should always be subnode #4                            
-                            
+
                             method += "}" + G.NL;
 
-                            w.uFunctionsCs.AppendLine(w.functionHelper.headerCs.ToString());
+                            w.uHeaderCs.AppendLine(w.uFunctionsHelper.headerCs.ToString());
 
-                            w.uFunctionsCs.AppendLine(method);
-                            w.functionHelper = null;  //do not remove this line: important!                            
+                            w.uHeaderCs.AppendLine(method);
+
+                            ResetUFunctionHelpers(w);
+
                         }
                         break;
 
@@ -1427,7 +1429,7 @@ namespace Gekko.Parser.Gek
                             {
                                 if (w.functionUserDefined.ContainsKey(functionName))  //case-insensitive anyway
                                 {
-                                    node.Code.A(functionName + "(" + Globals.functionP1Cs + ", " + Globals.functionT1Cs + ", ");
+                                    node.Code.A(Globals.uProc).A(".").A(functionName).A("(").A(Globals.functionP1Cs).A(", ").A(Globals.functionT1Cs).A(", ");
                                 }
                                 else
                                 {
@@ -1467,14 +1469,14 @@ namespace Gekko.Parser.Gek
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 counter++;
-                                if (counter == 1) paramCount = w.functionHelper.storage.Count;
+                                if (counter == 1) paramCount = w.uFunctionsHelper.storage.Count;
                                 FunctionArgumentsHelperElements fah = new FunctionArgumentsHelperElements();                                
                                 fah.parameterName = child[1].Text;
                                 fah.type = child[0].Text;
                                 fah.tupleNameCode = Globals.functionParameterCode + fah.type + "_" + paramCount;
                                 fah.parameterCode = Globals.functionParameterCode + fah.type + "_" + paramCount + ".tuple" + (counter - 1);
                                 fah.tupleCount = node.ChildrenCount();
-                                w.functionHelper.storage.Add(fah);
+                                w.uFunctionsHelper.storage.Add(fah);
                             }                            
                         }
                         break;
@@ -1485,8 +1487,8 @@ namespace Gekko.Parser.Gek
                             FunctionArgumentsHelperElements fah = new FunctionArgumentsHelperElements();
                             fah.parameterName = child[1].Text;
                             fah.type = child[0].Text;
-                            fah.parameterCode = Globals.functionParameterCode + fah.type + "_" + fah.parameterName + w.functionHelper.storage.Count;
-                            w.functionHelper.storage.Add(fah);
+                            fah.parameterCode = Globals.functionParameterCode + fah.type + "_" + fah.parameterName + w.uFunctionsHelper.storage.Count;
+                            w.uFunctionsHelper.storage.Add(fah);
                         }
                         break;                                        
                     case "ASTFUNCTIONDEFLHSTUPLE":
@@ -1500,19 +1502,19 @@ namespace Gekko.Parser.Gek
                                 {                                    
                                     foreach (ASTNode child in node[0].ChildrenIterator())
                                     {
-                                        w.functionHelper.lhsTypes.Add(child.Text);
+                                        w.uFunctionsHelper.lhsTypes.Add(child.Text);
                                     }                                    
                                 }
                                 else
                                 {
-                                    w.functionHelper.lhsTypes.Add(node[0].Text);
+                                    w.uFunctionsHelper.lhsTypes.Add(node[0].Text);
                                 }
 
                             }
                             break;
                     case "ASTFUNCTIONDEFNAME":
                         {
-                            w.functionHelper.functionName = node[0].Text;
+                            w.uFunctionsHelper.functionName = node[0].Text;
                         }
                         break;
                     case "ASTGENERIC1":
@@ -1788,7 +1790,7 @@ namespace Gekko.Parser.Gek
                             //TODO 
                             //TODO 
                             //TODO use cache to avoid dublets
-                            //TODO 
+                            //TODO Maybe not: this simplifies user defined functions
                             //TODO 
                             string minus = HandleNegate(node);
                             string intWithNumber = "i" + ++Globals.counter;
@@ -1807,7 +1809,7 @@ namespace Gekko.Parser.Gek
                             //TODO 
                             //TODO 
                             //TODO use cache to avoid dublets
-                            //TODO 
+                            //TODO Maybe not: this simplifies user defined functions
                             //TODO                             
                             string intWithNumber = "d" + ++Globals.counter;
                             string s = "new ScalarVal(double.NaN)";
@@ -2704,7 +2706,7 @@ namespace Gekko.Parser.Gek
                             List<string> types = new List<string>();
 
                             string classCs = G.GetVariableType(node.ChildrenCount());
-                            CreateTupleClass(w.uFunctionsCs, node.ChildrenCount(), classCs, w.tupleClasses);
+                            CreateTupleClass(w.uHeaderCs, node.ChildrenCount(), classCs, w.tupleClasses);
 
                             string tempCs = "temp" + ++Globals.counter;                            
                                                         
@@ -3424,10 +3426,18 @@ namespace Gekko.Parser.Gek
             }
         }
 
+        private static void ResetUFunctionHelpers(W w)
+        {
+            w.uFunctionsHelper = null;  //do not remove this line: important!      
+            w.uListCache = new Gekko.GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            w.uScalarCache = new Gekko.GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            w.uTsCache = new Gekko.GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        }
+
         private static StringBuilder GetHeaderCs(W w)
         {
             StringBuilder destination = null;
-            if (w.functionHelper != null) destination = w.functionHelper.headerCs;
+            if (w.uFunctionsHelper != null) destination = w.uFunctionsHelper.headerCs;
             else destination = w.headerCs;
             return destination;
         }
@@ -3445,12 +3455,15 @@ namespace Gekko.Parser.Gek
         {
             node.Code.CA(""); //clearing
             string stringifyString = "false"; if (stringify) stringifyString = "true";
-            string s = null; w.listCache.TryGetValue(simpleIdent, out s);
+
+            GekkoDictionary<string, string> listCache = GetListCache(w);
+
+            string s = null; listCache.TryGetValue(simpleIdent, out s);
             if (s == null)
             {
                 //has not been seen before
                 string listWithNumber = "list" + ++Globals.counter;
-                w.listCache.Add(simpleIdent, listWithNumber);
+                listCache.Add(simpleIdent, listWithNumber);
                 GetHeaderCs(w).AppendLine("public static IVariable " + listWithNumber + " = null;");  //cannot set it to ScalarVal since it may change type...
                 node.Code.A("O.GetScalarFromCache(ref " + listWithNumber + ", `" + Globals.symbolList + simpleIdent + "`, false, " + stringifyString + ")");
             }
@@ -3458,6 +3471,30 @@ namespace Gekko.Parser.Gek
             {
                 node.Code.A("O.GetScalarFromCache(ref " + s + ", `" + Globals.symbolList + simpleIdent + "`, false, " + stringifyString + ")");
             }
+        }
+
+        private static GekkoDictionary<string, string> GetListCache(W w)
+        {
+            GekkoDictionary<string, string> listCache = null;
+            if (w.uFunctionsHelper != null) listCache = w.listCache;
+            else listCache = w.uListCache;
+            return listCache;
+        }
+
+        private static GekkoDictionary<string, string> GetScalarCache(W w)
+        {
+            GekkoDictionary<string, string> scalarCache = null;
+            if (w.uFunctionsHelper != null) scalarCache = w.scalarCache;
+            else scalarCache = w.uScalarCache;
+            return scalarCache;
+        }
+
+        private static GekkoDictionary<string, string> GetTsCache(W w)
+        {
+            GekkoDictionary<string, string> tsCache = null;
+            if (w.uFunctionsHelper != null) tsCache = w.tsCache;
+            else tsCache = w.uTsCache;
+            return tsCache;
         }
 
         private static void ClearLocalStatementCache(W w)
@@ -3536,7 +3573,7 @@ namespace Gekko.Parser.Gek
                     string tempDoubleCs = "tempDouble" + ++Globals.counter;
                     nodeCodeTemp += "double " + tempDoubleCs + " = (" + childCode + ").GetVal(t);" + G.NL;
                     string notUsed = null;
-                    string leftSideCs = CacheRefScalarCs(out notUsed, node0.nameSimpleIdent, w.scalarCache, GetHeaderCs(w), EScalarRefType.Val, tempDoubleCs, false, true, false);
+                    string leftSideCs = CacheRefScalarCs(out notUsed, node0.nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.Val, tempDoubleCs, false, true, false);
                     nodeCodeTemp += leftSideCs + G.NL;
                 }
                 else
@@ -3734,7 +3771,7 @@ namespace Gekko.Parser.Gek
                     else
                     {
                         string notUsed = null;
-                        node.Code.A(CacheRefScalarCs(out notUsed, scalarSimpleIdent, w.scalarCache, GetHeaderCs(w), EScalarRefType.OnRightHandSide, null, false, transformationAllowed, stringify));
+                        node.Code.A(CacheRefScalarCs(out notUsed, scalarSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.OnRightHandSide, null, false, transformationAllowed, stringify));
                     }
                 }
             }
@@ -3791,9 +3828,9 @@ namespace Gekko.Parser.Gek
 
         private static string FindFunctionArguments(ASTNode node, W wh2, string simpleIdent)
         {            
-            if (wh2.functionHelper != null)
+            if (wh2.uFunctionsHelper != null)
             {
-                foreach (FunctionArgumentsHelperElements fah in wh2.functionHelper.storage)
+                foreach (FunctionArgumentsHelperElements fah in wh2.uFunctionsHelper.storage)
                 {
                     if (G.equal(fah.parameterName, simpleIdent))
                     {
@@ -3918,12 +3955,15 @@ namespace Gekko.Parser.Gek
             {
                 //isSimple means that the name is simple like a or b:a.
                 //Then we look for it in the global cache
-                string s = null; wh2.tsCache.TryGetValue(simpleHash, out s);
+
+                GekkoDictionary<string, string> tsCache = GetTsCache(wh2);
+
+                string s = null; tsCache.TryGetValue(simpleHash, out s);
                 if (s == null)
                 {
                     //has not been seen before
                     string ivWithNumber = "iv" + ++Globals.counter;
-                    wh2.tsCache.Add(simpleHash, ivWithNumber);
+                    tsCache.Add(simpleHash, ivWithNumber);
                     GetHeaderCs(wh2).AppendLine("public static IVariable " + ivWithNumber + " = null;");  //cannot set it to ScalarVal since it may change type...                    
                     node.Code.A("O.GetTimeSeriesFromCache(ref " + ivWithNumber + ", `" + simpleHash + "`, " + bankNumberCode + isLhsSoCanAutoCreate + ")");
                 }
@@ -4431,17 +4471,22 @@ namespace Gekko.Parser.Gek
         public string fileNameContainingParsedCode = null;
         public int commandLinesCounter = -1;
         public int expressionCounter = -1;
+
         public GekkoDictionary<string, string> scalarCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public GekkoDictionary<string, string> listCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public GekkoDictionary<string, string> tsCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        public StringBuilder uFunctionsCs = new StringBuilder(); //stuff to be put at the very start.
         public StringBuilder headerCs = new StringBuilder(); //stuff to be put at the very start.
         public StringBuilder headerMethodTsCs = new StringBuilder(); //stuff to clear TimeSeries pointers
         public StringBuilder headerMethodScalarCs = new StringBuilder(); //stuff to clear scalar pointers   
+
         public GekkoDictionary<string, bool> functionUserDefined = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
         public GekkoDictionary<string, bool> tupleClasses = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-        public FunctionArgumentsHelper functionHelper = null; //important that it starts out as null here
-        //public Dictionary<string, EOptionType> opt = null;
+
+        public StringBuilder uHeaderCs = new StringBuilder(); //stuff to be put at the very start.
+        public FunctionArgumentsHelper uFunctionsHelper = null; //important that it starts out as null here
+        public GekkoDictionary<string, string> uScalarCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public GekkoDictionary<string, string> uListCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public GekkoDictionary<string, string> uTsCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);        
     }
 
     public class FunctionArgumentsHelperElements
