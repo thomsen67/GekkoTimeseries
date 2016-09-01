@@ -195,7 +195,8 @@ namespace Gekko
                 {
                     //double r = 191; double g = 221; double b = 162; double alpha = 0.00d;
                     //a little more fresh color
-                    double r = 191; double g = 231; double b = 157; double alpha = 0.00d;
+                    //double r = 191; double g = 231; double b = 157; double alpha = 0.00d;
+                    double r = 191; double g = 236; double b = 152; double alpha = 0.00d;
                     Gui.gui.statusStrip1.BackColor = System.Drawing.Color.FromArgb((int)(r * (1d - alpha) + 255d * alpha), (int)(g * (1d - alpha) + 255d * alpha), (int)(b * (1d - alpha) + 255d * alpha));
                 }
                 else if (G.equal(Program.options.interface_mode, "data"))
