@@ -91,7 +91,7 @@ namespace Gekko.Parser.Gek
 
             CompilerParameters compilerParams = new CompilerParameters();
             compilerParams.CompilerOptions = Globals.compilerOptions;  //has no effect it seems
-            compilerParams.GenerateInMemory = false;
+            compilerParams.GenerateInMemory = false;  //cannot be set true, since the .gcm dll needs to refer to the user defined functions dll. But this should not be a problem.
             compilerParams.IncludeDebugInformation = false; //CHanged, maybe change back
             compilerParams.ReferencedAssemblies.Add("system.dll");
             compilerParams.ReferencedAssemblies.Add("system.windows.forms.dll");

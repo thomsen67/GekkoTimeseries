@@ -49,7 +49,7 @@ namespace Gekko
             }
             else
             {
-                yellow.Text = "Databank dragging/swapping deactivated, cf. 'OPTION interface databank swap = '. You may use OPEN<prim> or OPEN<ref> instead.";
+                yellow.Text = "Databank dragging/swapping deactivated, cf. 'OPTION interface databank swap = '. You may use OPEN<edit> or OPEN<ref> instead.";
             }
 		}
 
