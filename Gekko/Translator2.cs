@@ -55,7 +55,7 @@ namespace Gekko
                 {
                     HandleCommand1(node, listMemory, matrixMemory, scalarMemory);
                 }
-                else if (node.Parent.Text == "ASTCOMMAND2")
+                else if ((node.Parent.Parent != null && node.Parent.Parent.Text == "ASTCOMMAND2") && node.Parent.Text == "ASTANGLE")
                 {
                     HandleCommand2(node);
                 }
@@ -569,15 +569,15 @@ namespace Gekko
                 }
                 node.Text = "%";
             }
-
-            if (G.equal(node.Text, "primary"))
+            
+            if(G.Equal(node.Text, FromTo("prim", "primary")) != null)
             {
-                node.Text = Cap("prim", node.Text);
+                node.Text = Cap("edit", node.Text);
             }
 
-            if (G.equal(node.Text, "protect"))
+            if (G.Equal(node.Text, FromTo("prot", "protect")) != null)
             {
-                node.Text = Cap("prot", node.Text);
+                node.Text = ""; //<prot> is dead
             }
         }
 
