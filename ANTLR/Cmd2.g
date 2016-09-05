@@ -1520,7 +1520,8 @@ expr2                     :
 // --------------------------------------------------------------------------------------------------
 
 analyze                   : ANALYZE analyzeOpt1? analyzeElements -> ^({token("ASTANALYZE", ASTANALYZE, $ANALYZE.Line)} analyzeOpt1? analyzeElements );
-analyzeOpt1               : leftAngle2          analyzeOpt1h* RIGHTANGLE -> ^(ASTOPT1 analyzeOpt1h*)							
+analyzeOpt1               : ISNOTQUAL 
+						  | leftAngle2          analyzeOpt1h* RIGHTANGLE -> ^(ASTOPT1 analyzeOpt1h*)							
 						  | leftAngleNo2 dates? analyzeOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) analyzeOpt1h*)
 						  ;
 analyzeOpt1h              : LAG EQUAL expression -> ^(ASTOPT_VAL_LAG expression)
@@ -1535,7 +1536,7 @@ checkoff				  : CHECKOFF listItems -> ^({token("ASTCHECKOFF", ASTCHECKOFF, $CHEC
 						  | CHECKOFF -> ^({token("ASTCHECKOFF", ASTCHECKOFF, $CHECKOFF.Line)});
 
 clear                     : CLEAR clearOpt1? ident? -> ^({token("ASTCLEAR", ASTCLEAR, $CLEAR.Line)} ^(ASTPLACEHOLDER ident?) clearOpt1?);
-clearOpt1                 : leftAngle clearOpt1h* RIGHTANGLE -> ^(ASTOPT1 clearOpt1h*);
+clearOpt1                 : ISNOTQUAL | leftAngle clearOpt1h* RIGHTANGLE -> ^(ASTOPT1 clearOpt1h*);
 clearOpt1h				  : PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)  //obsolete
 						  | FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)
 						  |	REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_REF yesNo?)
@@ -1546,7 +1547,7 @@ clone                     : CLONE -> ^({token("ASTCLONE", ASTCLONE, $CLONE.Line)
 close					  : CLOSE closeOpt1? ident -> ^({token("ASTCLOSE", ASTCLOSE, $CLOSE.Line)} ident closeOpt1?)
 						  | CLOSE closeOpt1? star -> ^({token("ASTCLOSESTAR", ASTCLOSESTAR, $CLOSE.Line)} closeOpt1?)
 						  ;
-closeOpt1                 : leftAngle closeOpt1h* RIGHTANGLE -> ^(ASTOPT1 closeOpt1h*);
+closeOpt1                 : ISNOTQUAL | leftAngle closeOpt1h* RIGHTANGLE -> ^(ASTOPT1 closeOpt1h*);
 closeOpt1h				  : SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)							
 						  ;						
 
@@ -1566,7 +1567,8 @@ collapse				  : COLLAPSE nameWithDot '=' nameWithDot collapseMethod? -> ^({token
 collapseMethod			  : FIRST|LAST|AVG|TOTAL;
 
 compare                   : COMPARE compareOpt1? listItems? (FILE '=' fileName)?-> ^({token("ASTCOMPARECOMMAND", ASTCOMPARECOMMAND, $COMPARE.Line)} listItems? ^(ASTOPT_ compareOpt1?) ^(ASTHANDLEFILENAME fileName?));
-compareOpt1               : leftAngle2          compareOpt1h* RIGHTANGLE -> ^(ASTOPT1 compareOpt1h*)							
+compareOpt1               : ISNOTQUAL 
+						  | leftAngle2          compareOpt1h* RIGHTANGLE -> ^(ASTOPT1 compareOpt1h*)							
 						  | leftAngleNo2 dates? compareOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) compareOpt1h*)
                           ;
 compareOpt1h              : ABS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ABS yesNo?);
@@ -1587,13 +1589,14 @@ date                      : DATE nameWithDot EQUAL expression -> ^({token("ASTDA
 delete					  : DELETE listItems -> ^({token("ASTDELETE", ASTDELETE, $DELETE.Line)} listItems)
         				  | DELETE deleteOpt1? -> ^({token("ASTDELETE", ASTDELETE, $DELETE.Line)} deleteOpt1?)
 						  ;
-deleteOpt1                : leftAngle deleteOpt1h* RIGHTANGLE -> deleteOpt1h*;
+deleteOpt1                : ISNOTQUAL | leftAngle deleteOpt1h* RIGHTANGLE -> deleteOpt1h*;
 deleteOpt1h               : NONMODEL (EQUAL yesNo)? -> ^(ASTOPT_STRING_NONMODEL yesNo?);
 
 disp					  : DISP StringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, $DISP.Line)} StringInQuotes)
 						  | DISP dispOpt1? listItems -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) listItems)
 						  ; 						
-dispOpt1                  : leftAngle2          dispOpt1h* RIGHTANGLE -> ^(ASTOPT1 dispOpt1h*)							
+dispOpt1                  : ISNOTQUAL 
+						  | leftAngle2          dispOpt1h* RIGHTANGLE -> ^(ASTOPT1 dispOpt1h*)							
 						  | leftAngleNo2 dates? dispOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) dispOpt1h*)
                           ;
 dispOpt1h                 : INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
@@ -1613,7 +1616,7 @@ exo 					  : EXO listItems -> ^({token("ASTEXO", ASTEXO, $EXO.Line)} listItems)
 exit					  : EXIT -> ^({token("ASTEXIT", ASTEXIT, $EXIT.Line)});
 
 findmissingdata			  : FINDMISSINGDATA findmissingdataOpt1? listItems? -> ^({token("ASTFINDMISSINGDATA", ASTFINDMISSINGDATA, $FINDMISSINGDATA.Line)} findmissingdataOpt1? listItems?);
-findmissingdataOpt1       : leftAngle2          findmissingdataOpt1h* RIGHTANGLE -> ^(ASTOPT1 findmissingdataOpt1h*)							
+findmissingdataOpt1       : ISNOTQUAL | leftAngle2          findmissingdataOpt1h* RIGHTANGLE -> ^(ASTOPT1 findmissingdataOpt1h*)							
 						  | leftAngleNo2 dates? findmissingdataOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) findmissingdataOpt1h*)
                           ;
 findmissingdataOpt1h      : REPLACE EQUAL expression -> ^(ASTOPT_VAL_REPLACE expression)
@@ -1683,11 +1686,13 @@ genr2                     : SER | SERIES;
 
 genr3                     : SER2 | SERIES2;
 
-seriesOpt1                : leftAngle2          seriesOpt1h* RIGHTANGLE -> ^(ASTOPT1 seriesOpt1h*)
+seriesOpt1                : ISNOTQUAL 
+						  | leftAngle2          seriesOpt1h* RIGHTANGLE -> ^(ASTOPT1 seriesOpt1h*)
 						  | leftAngleNo2 dates? seriesOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) seriesOpt1h*)
                           ;
 
-seriesOpt1Cheat           : leftAngle2          seriesOpt1h+ RIGHTANGLE -> ^(ASTOPT1 seriesOpt1h+)							
+seriesOpt1Cheat           : ISNOTQUAL 
+						  | leftAngle2          seriesOpt1h+ RIGHTANGLE -> ^(ASTOPT1 seriesOpt1h+)							
 						  | leftAngleNo2 dates? seriesOpt1h+ RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) seriesOpt1h+)
                           ;
 
@@ -1711,7 +1716,7 @@ if2						  : IF leftParen logicalOr rightParen expressions (ELSE expressions)? E
 download                  : DOWNLOAD HTTP? url fileName -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, $DOWNLOAD.Line)} ^(ASTHTTP HTTP?) url ^(ASTHANDLEFILENAME fileName));
 
 index                     : INDEX indexOpt1? SERIES? indexerAlone nameWithDot? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} ^(ASTINDEXERALONE indexerAlone) ^(ASTPLACEHOLDER nameWithDot?) indexOpt1?);
-indexOpt1                 : leftAngle indexOpt1h* RIGHTANGLE -> ^(ASTOPT1 indexOpt1h*);							
+indexOpt1                 : ISNOTQUAL | leftAngle indexOpt1h* RIGHTANGLE -> ^(ASTOPT1 indexOpt1h*);							
 indexOpt1h                : MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)	;
 
 ini						  : INI -> ^({token("ASTINI", ASTINI, $INI.Line)});
@@ -1722,7 +1727,7 @@ list					  :	LIST listOpt1? listNameHelper EQUAL listItems prefix? suffix? strip
 		                  | LIST question hashNoGlue GLUE ident -> ^({token("ASTLIST",  ASTLIST, $LIST.Line)} question ident)
 						  | LIST question -> ^({token("ASTLIST",  ASTLIST, $LIST.Line)} question)						
 						  ;
-listOpt1                  : leftAngle listOpt1h* RIGHTANGLE -> listOpt1h*
+listOpt1                  : ISNOTQUAL | leftAngle listOpt1h* RIGHTANGLE -> listOpt1h*
 						  ;
 listOpt1h                 : DIRECT -> ASTDIRECT
 						  ;
@@ -1761,7 +1766,8 @@ pipe					  : PIPE pipeOpt1? fileName ->^({token("ASTPIPE", ASTPIPE, $PIPE.Line)}
 						  // The rule stipulates that import must be before other settings, and there must be file=, and there must be an option field.
 						  // We also have a SHEET without import, see the prt rule
 sheetImport               : SHEET sheetImportOpt1 listItems FILE '=' fileName -> ^(ASTSHEETIMPORT sheetImportOpt1 ^(ASTHANDLEFILENAME fileName?) listItems);
-sheetImportOpt1           : leftAngle        IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER  sheetImportOpt1h*  //error here if the placeholder is not here
+sheetImportOpt1           : ISNOTQUAL 
+						  | leftAngle        IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER  sheetImportOpt1h*  //error here if the placeholder is not here
 						  | leftAngle dates? IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER ^(ASTDATES dates?) sheetImportOpt1h*
 						  ;
 sheetImportOpt1h          : CELL '=' expression -> ^(ASTOPT_STRING_CELL expression)						
@@ -1773,7 +1779,8 @@ sheetImportOpt1h          : CELL '=' expression -> ^(ASTOPT_STRING_CELL expressi
 							//Hmmm, not possible to use {token()} here unless we make 9 identical lines
 prt                       : prtHelper prtOpt1? prtElements prtOpt2? -> ^(ASTPRT ^(ASTPRTTYPE prtHelper) prtOpt1? prtOpt2? prtElements);
 prtHelper                 : P | PRT | PRI | PRINT | MULPRT | GMULPRT | SHEET | CLIP | PLOT;
-prtOpt1                   : leftAngle2          prtOpt1Helper* RIGHTANGLE -> ^(ASTOPT1 prtOpt1Helper*)							
+prtOpt1                   : ISNOTQUAL 
+						  | leftAngle2          prtOpt1Helper* RIGHTANGLE -> ^(ASTOPT1 prtOpt1Helper*)							
 						  | leftAngleNo2 dates? prtOpt1Helper* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) prtOpt1Helper*)
                           ;
 prtOpt1Helper             : filter						
@@ -1809,7 +1816,8 @@ splice                    : SPLICE listItems0 EQUAL listItems1 expression listIt
 
 read                      : read2 readOpt1? fileNameStar (TO identOrStar)? -> ^(ASTREAD read2 readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?));
 read2                     : READ | IMPORT;
-readOpt1                  : leftAngle        readOpt1h* RIGHTANGLE -> readOpt1h*						
+readOpt1                  : ISNOTQUAL 
+						  | leftAngle        readOpt1h* RIGHTANGLE -> readOpt1h*						
 						  | leftAngle dates? readOpt1h* RIGHTANGLE -> ^(ASTDATES dates?) readOpt1h*
                           ;
 readOpt1h                 : MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?)
@@ -1834,13 +1842,13 @@ identOrStar               : ident -> ident
 r_file   				  : R_FILE fileName -> ^({token("ASTR_FILE", ASTR_FILE, $R_FILE.Line)} ^(ASTHANDLEFILENAME fileName?));
 
 r_export  				  : R_EXPORT r_exportOpt1? r_exportItems -> ^({token("ASTR_EXPORT", ASTR_EXPORT, $R_EXPORT.Line)}  r_exportOpt1?  ^(ASTR_EXPORTITEMS r_exportItems ));
-r_exportOpt1			  : leftAngle r_exportOpt1h* RIGHTANGLE -> r_exportOpt1h*;
+r_exportOpt1			  : ISNOTQUAL | leftAngle r_exportOpt1h* RIGHTANGLE -> r_exportOpt1h*;
 r_exportOpt1h             : TARGET EQUAL expression -> ^(ASTOPT_STRING_TARGET expression);
 r_exportItems             : r_exportItem (COMMA2 r_exportItem)* -> r_exportItem+;
 r_exportItem              : hashNoGlue GLUE ident -> ident;
 
 r_run  				      : R_RUN r_runOpt1? -> ^({token("ASTR_RUN", ASTR_RUN, $R_RUN.Line)}  r_runOpt1? );
-r_runOpt1			      : leftAngle r_runOpt1h* RIGHTANGLE -> r_runOpt1h*;
+r_runOpt1			      : ISNOTQUAL | leftAngle r_runOpt1h* RIGHTANGLE -> r_runOpt1h*;
 r_runOpt1h                : MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);
 
 rename                    : RENAME listItems0 AS listItems1 -> ^({token("ASTRENAME", ASTRENAME, $RENAME.Line)} listItems0 listItems1);
@@ -1862,7 +1870,8 @@ show					  : SHOW expression gekkoLabel? -> ^({token("ASTSHOW¤"+($expression.tex
 sign					  : SIGN -> ^({token("ASTSIGN", ASTSIGN, $SIGN.Line)});
 
 sim                       : SIM simOpt1? -> ^({token("ASTSIM", ASTSIM, $SIM.Line)} simOpt1?);
-simOpt1                   : leftAngle2          simOpt1h* RIGHTANGLE -> ^(ASTOPT1 simOpt1h*)							
+simOpt1                   : ISNOTQUAL 
+						  | leftAngle2          simOpt1h* RIGHTANGLE -> ^(ASTOPT1 simOpt1h*)							
 						  | leftAngleNo2 dates? simOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) simOpt1h*)
                           ;
 simOpt1h                  : FIX (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIX yesNo?)
@@ -1916,7 +1925,8 @@ table					  :	TABLE name EQUAL NEW TABLE leftParenGlue ')'  -> ^(ASTNEWTABLE nam
 						  | MENUTABLE tableOpt1? fileName -> ^(ASTMENUTABLE tableOpt1? ^(ASTHANDLEFILENAME fileName)) //!beware line above
 						  ;
 
-tableOpt1                 : leftAngle2          tableOpt1h* RIGHTANGLE -> ^(ASTOPT1 tableOpt1h*)							
+tableOpt1                 : ISNOTQUAL 
+						  | leftAngle2          tableOpt1h* RIGHTANGLE -> ^(ASTOPT1 tableOpt1h*)							
 						  | leftAngleNo2 dates? tableOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) tableOpt1h*)
                           ;
 
@@ -1942,7 +1952,7 @@ timefilterperiods		  : (timefilterperiod (',' timefilterperiod)*)?  -> ^(ASTTIME
 timefilterperiod          : expression ((doubleDot | TO) expression (BY expression)?)? -> ^(ASTTIMEFILTERPERIOD expression (expression expression?)?);
 
 translate    			  : TRANSLATE translateOpt1? fileName -> ^({token("ASTTRANSLATE", ASTTRANSLATE, $TRANSLATE.Line)} translateOpt1?  ^(ASTHANDLEFILENAME fileName?));
-translateOpt1             : leftAngle        translateOpt1h* RIGHTANGLE -> translateOpt1h*;						
+translateOpt1             : ISNOTQUAL | leftAngle        translateOpt1h* RIGHTANGLE -> translateOpt1h*;						
 translateOpt1h            : GEKKO18 (EQUAL yesNo)? -> ^(ASTOPT_STRING_GEKKO18 yesNo?)
 						  | AREMOS (EQUAL yesNo)? -> ^(ASTOPT_STRING_AREMOS yesNo?)
 						  ;						
@@ -1980,7 +1990,8 @@ write					  : write2 writeOpt1? listItems? FILE '=' fileName -> ^(ASTWRITE write
 						  | write2 writeOpt1? fileName -> ^(ASTWRITE writeOpt1?  ^(ASTHANDLEFILENAME fileName))
 						  ;
 write2                    : WRITE | EXPORT;
-writeOpt1                 : leftAngle        writeOpt1h* RIGHTANGLE -> writeOpt1h*
+writeOpt1                 : ISNOTQUAL 
+						  | leftAngle        writeOpt1h* RIGHTANGLE -> writeOpt1h*
 						  | leftAngle dates? writeOpt1h* RIGHTANGLE ->  ^(ASTDATES dates?) writeOpt1h*
 						  ;
 writeOpt1h                : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  //all these will fail, just to provide better error messages for WRITE<csv> etc.
@@ -2008,7 +2019,8 @@ exportType                : D -> ASTOPD
 
 
 x12a					  : X12A x12aOpt1? listItems -> ^({token("ASTX12A", ASTX12A, $X12A.Line)} x12aOpt1? listItems?);
-x12aOpt1                  : leftAngle2          x12aOpt1h* RIGHTANGLE -> x12aOpt1h*
+x12aOpt1                  : ISNOTQUAL 
+						  | leftAngle2          x12aOpt1h* RIGHTANGLE -> x12aOpt1h*
 						  | leftAngleNo2 dates? x12aOpt1h* RIGHTANGLE ->  ^(ASTDATES dates?) x12aOpt1h*
 						  ;
 x12aOpt1h                 : PARAM EQUAL expression -> ^(ASTOPT_STRING_PARAM expression)
@@ -2029,15 +2041,15 @@ logicalAtom				  :  expression ifOperator expression -> ^(ASTCOMPARE ifOperator 
 						  |  leftParen! logicalOr rightParen!           // omit both '(' and ')'
 						  ;
 
-ifOperator		          :  '==' -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
-						  |  '<>' -> ^(ASTIFOPERATOR ASTIFOPERATOR2)
+ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
+						  |  ISNOTQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR2)
 						  |  RIGHTANGLE -> ^(ASTIFOPERATOR ASTIFOPERATOR3)
 						  |  leftAngle -> ^(ASTIFOPERATOR ASTIFOPERATOR4)
-			              |  '>=' -> ^(ASTIFOPERATOR ASTIFOPERATOR5)
-						  |  '<=' -> ^(ASTIFOPERATOR ASTIFOPERATOR6)
-			              ;						
+			              |  ISLARGEROREQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR5)
+						  |  ISSMALLEROREQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR6)
+			              ;
 
-truncateOpt1              : leftAngle truncateOpt1h? RIGHTANGLE -> truncateOpt1h?;
+truncateOpt1              : ISNOTQUAL | leftAngle truncateOpt1h? RIGHTANGLE -> truncateOpt1h?;
 truncateOpt1h             : dates -> ^(ASTDATES dates);
 
 smoothOpt2                : smoothOpt2h;  //can only choose 1
@@ -2047,17 +2059,17 @@ smoothOpt2h               : SPLINE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SPLINE yesN
 						  | LINEAR (EQUAL yesNo)? -> ^(ASTOPT_STRING_LINEAR yesNo?)
 						  ;
 
-pipeOpt1                  : leftAngle pipeOpt1h* RIGHTANGLE -> pipeOpt1h*;
+pipeOpt1                  : ISNOTQUAL | leftAngle pipeOpt1h* RIGHTANGLE -> pipeOpt1h*;
 pipeOpt1h                 : HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
 						  | APPEND (EQUAL yesNo)? -> ^(ASTOPT_STRING_APPEND yesNo?)						
 						  ;
 
-modelOpt1                 : leftAngle modelOpt1h* RIGHTANGLE -> modelOpt1h*;
+modelOpt1                 : ISNOTQUAL | leftAngle modelOpt1h* RIGHTANGLE -> modelOpt1h*;
 modelOpt1h                : INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?)
 						  ;
 
 
-openOpt1                  : leftAngle openOpt1h* RIGHTANGLE -> openOpt1h*;
+openOpt1                  : ISNOTQUAL | leftAngle openOpt1h* RIGHTANGLE -> openOpt1h*;
 openOpt1h                 : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
 						  | GBK (EQUAL yesNo)? -> ^(ASTOPT_STRING_GBK yesNo?)
@@ -2078,10 +2090,10 @@ openOpt1h                 : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | POS EQUAL expression -> ^(ASTOPT_VAL_POS expression)
 						  ;
 
-olsOpt1                   : leftAngle olsOpt1h? RIGHTANGLE -> olsOpt1h?;
+olsOpt1                   : ISNOTQUAL | leftAngle olsOpt1h? RIGHTANGLE -> olsOpt1h?;
 olsOpt1h                  : dates -> ^(ASTDATES dates);
 
-mulbkOpt1                 : leftAngle mulbkOpt1h* RIGHTANGLE -> mulbkOpt1h*;
+mulbkOpt1                 : ISNOTQUAL | leftAngle mulbkOpt1h* RIGHTANGLE -> mulbkOpt1h*;
 mulbkOpt1h                : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
 						  | GBK (EQUAL yesNo)? -> ^(ASTOPT_STRING_GBK yesNo?)
@@ -2105,7 +2117,7 @@ functionDefLhsH1          : type  //for instance "VAL"
 
 type                      : VAL | DATE | STRING2 | NAME | LIST | SERIES | MATRIX;
 
-copyOpt1                  : leftAngle copyOpt1h* RIGHTANGLE -> copyOpt1h*;
+copyOpt1                  : ISNOTQUAL | leftAngle copyOpt1h* RIGHTANGLE -> copyOpt1h*;
 copyOpt1h                 : dates -> ^(ASTDATES dates)
 						  | RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT yesNo?)
 						  | FROM EQUAL name -> ^(ASTOPT_STRING_FROM name)
@@ -3337,6 +3349,11 @@ LEFTANGLESPECIAL          : '<=<';  //indicates that there are two idents follow
 MOD                       : '¤';  //does not work with '%¨%' ================> NOT DONE YET!!
 GLUEBACKSLASH             : '¨\\';
 // -----------------------------------------------------------------------------------------------
+
+ISEQUAL                   : '==';
+ISNOTQUAL                 : '<>';
+ISLARGEROREQUAL			  : '>=';			 
+ISSMALLEROREQUAL          : '<=';
 
 AT                        : '@';
 HAT                       : '^';
