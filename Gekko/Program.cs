@@ -1832,7 +1832,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                 }
-                if (oRead.openType == EOpenType.Last)
+                if ((G.equal(options.databank_logic, "aremos") && Program.databanks.ShouldPutBankLastAREMOS(oRead.openType, oRead.openTypePosition)) || (G.equal(options.databank_logic, "default") && Program.databanks.ShouldPutBankLast(oRead.openType, oRead.openTypePosition)))
                 {
                     for (int i = 0; i < n; i++)
                     {
@@ -28182,7 +28182,8 @@ public static bool IsLargeAware(Stream stream)
     {
         Normal,
         Edit, //OPEN<edit>, not used elsewhere
-        First, //READ<first>, CLEAR<first>, etc.   
+        First, //READ<first>, CLEAR<first>, etc. 
+        Sec,  
         Last,
         Pos,
         Ref //READ<ref>, CLEAR<ref>, etc.

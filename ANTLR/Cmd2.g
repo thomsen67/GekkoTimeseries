@@ -372,6 +372,7 @@ tokens {
     ASTOPT_STRING_ROWS;
     ASTOPT_STRING_S;
 	ASTOPT_STRING_SAVE;
+	ASTOPT_STRING_SEC;
     ASTOPT_STRING_REF;
     ASTOPT_STRING_SERIES;
     ASTOPT_STRING_SHEET;
@@ -565,6 +566,8 @@ tokens {
     ASTZERO;
 
     A= 'A'               ;
+	DEFAULT = 'DEFAULT';
+	LOGIC = 'LOGIC';
     ABS              = 'ABS';
     ABSOLUTE = 'absolute';  //used to indicate fixed date, eg. fY(2005) or tg(2001q3)
     ACCEPT = 'ACCEPT';
@@ -858,7 +861,8 @@ tokens {
     RP= 'RP'       ;
     RUN              = 'RUN'             ;
     SEARCH = 'SEARCH';
-    SECONDCOLWIDTH = 'SECONDCOLWIDTH';
+    SEC = 'SEC';
+	SECONDCOLWIDTH = 'SECONDCOLWIDTH';
     SER2 = 'S___ER';
     SER='SER';
     SERIES2 = 'S___ERIES';
@@ -1011,6 +1015,8 @@ tokens {
                                         d.Add("_LEV"    ,   ULEV     );
                                         d.Add("_PCH"    ,   UPCH     );
                                         d.Add("a"       , A       );
+										d.Add("DEFAULT"       , DEFAULT       );
+										d.Add("LOGIC"       , LOGIC       );
                                         d.Add("abs"     , ABS       );
                                         d.Add("ACCEPT" ,ACCEPT);
                                         d.Add("add"     , ADD       );
@@ -1302,6 +1308,7 @@ tokens {
                                         d.Add("S___ERIES" ,SERIES2);
                                         d.Add("SEARCH", SEARCH);
                                         d.Add("SECONDCOLWIDTH" ,SECONDCOLWIDTH);
+										d.Add("SEC" ,SEC);
                                         d.Add("ser",SER);
                                         d.Add("series",SERIES);
                                         d.Add("set"     , SET       );
@@ -2081,6 +2088,7 @@ openOpt1h                 : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)						
 						  | PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)  //obsolete						
 						  | FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)						
+						  | SEC (EQUAL yesNo)? -> ^(ASTOPT_STRING_SEC yesNo?)						
 						  | LAST (EQUAL yesNo)? -> ^(ASTOPT_STRING_LAST yesNo?)						
 						  | EDIT (EQUAL yesNo)? -> ^(ASTOPT_STRING_EDIT yesNo?)						
 						  | REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_REF yesNo?)						
@@ -2596,6 +2604,7 @@ optionType :
 			 | DATABANK CREATE AUTO '='? yesNoSimple -> DATABANK CREATE AUTO ^(ASTBOOL yesNoSimple )
 			 | DATABANK CREATE MESSAGE '='? yesNoSimple -> DATABANK CREATE MESSAGE ^(ASTBOOL yesNoSimple )			
 			 | DATABANK SEARCH '='? yesNoSimple -> DATABANK SEARCH ^(ASTBOOL yesNoSimple )			
+			 | DATABANK LOGIC '='? optionDatabankLogic -> DATABANK LOGIC ^(ASTSTRINGSIMPLE optionDatabankLogic )		
 
 			 | FOLDER question -> FOLDER question
              | FOLDER '='? yesNoSimple -> FOLDER ^(ASTBOOL yesNoSimple)
@@ -2762,6 +2771,7 @@ optionType :
 			 optionSolveMethodOptions : NEWTON | GAUSS ;
 			 optionSolveGaussConv : CONV1 | CONV2;
 			 optionDatabankFileFormatOptions : TSD | TSDX | GBK;
+			 optionDatabankLogic : DEFAULT | AREMOS;
 			 optionInterfaceDebug: NONE | DIALOG;
 			 optionInterfaceSound: BOWL | DING | NOTIFY  | RING;
 			 optionInterfaceSuggestions: NONE | OPTION; // | SOME | ALL;
@@ -2787,6 +2797,8 @@ doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 
 ident                     : Ident|
                             ABS|
+							DEFAULT|
+							LOGIC|
                             ACCEPT|
                             ADD|
                             AFTER2|
@@ -3072,6 +3084,7 @@ ident                     : Ident|
                             R|
                             SEARCH|
                             SECONDCOLWIDTH|
+							SEC|
                             SER2|
                             SERIES2|
                             SERIES|

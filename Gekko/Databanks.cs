@@ -142,158 +142,258 @@ namespace Gekko
 
             List<Databank> m = new List<Databank>(this.storage.Count);
             if (existI != -12345)  //the databank name already exists. No actual file reading, just rearrange the banks
-            {                
-                databank = this.storage[existI];  //now points to the existing databank, and no longer the empty databank the method was called with
-                readFromFile = false;
-                if (openType == EOpenType.Normal || openType == EOpenType.Last || (openType == EOpenType.Pos && openPosition != 1))
-                {
-                    G.Writeln2("*** ERROR: Databank '" + databank.aliasName + "' is already open. Use CLOSE to close it first.");
-                    throw new GekkoException();
-                }
-                else if (openType == EOpenType.Edit || openType == EOpenType.First || (openType == EOpenType.Pos && openPosition == 1))
-                {
-                    if (existI == 0)
-                    {
-                        //Note: OPEN<edit> could be used to unlock an OPEN<first>...
-                        //this.storage[0].protect = false;  //this is set elsewhere
-                        if (openType == EOpenType.Edit)
-                        {
-                            if (databank.protect == false)
-                            {
-                                G.Writeln2("Databank '" + databank.aliasName + "' is already editable in first position.");
-                            }
-                            else
-                            {
-                                databank.protect = false;
-                                G.Writeln2("Databank '" + databank.aliasName + "' set editable.");
-                            }
-                        }
-                        m.AddRange(this.storage);  //just copied, and put back again later on
-                    }
-                    else if (existI == 1)  //Trying an OPEN<edit>db on a db that is already ref (opened with OPEN<ref>db).
-                    {
-                        m.Add(this.storage[existI]);    //first, = former sec
-                        m.Add(this.storage[BaseI]);     //ref, = Ref databank, to aviod empty slot
-                        m.Add(this.storage[0]);         //former first ends here
-                        for (int i = 2; i < this.storage.Count; i++)
-                        {
-                            if (i == BaseI) continue;
-                            m.Add(this.storage[i]);
-                        }
-                    }
-                    else  //Trying an OPEN<edit>db on a db that is already there in slot [2] or below
-                    {
-                        m.Add(this.storage[existI]);         //first
-                        m.Add(this.storage[1]);              //ref, same
-                        m.Add(this.storage[0]);
-                        for (int i = 2; i < this.storage.Count; i++)
-                        {
-                            if (i == existI) continue;
-                            m.Add(this.storage[i]);
-                        }
-                    }
-                    if (openType == EOpenType.Edit) G.Writeln2("Databank '" + name + "' set as editable databank, put first position.");
-                    else G.Writeln2("Databank '" + name + "' put in first position.");
-                }
-                else if (openType == EOpenType.Ref)
-                {
-                    if (existI == 0) //Trying an OPEN<sec>db on a db that is already first/editable (opened with OPEN<first> or OPEN<edit>)
-                    {
-                        m.Add(this.storage[WorkI]);    //first, = Work databank, to aviod empty slot
-                        m.Add(this.storage[existI]);   //ref, = former first
-                        m.Add(this.storage[1]);        //former ref ends here
-                        for (int i = 2; i < this.storage.Count; i++)
-                        {
-                            if (i == WorkI) continue;
-                            m.Add(this.storage[i]);
-                        }
-                    }
-                    else if (existI == 1)
-                    {
-                        G.Writeln2("*** ERROR: Databank '" + databank.aliasName + "' is already open as ref bank");
-                        throw new GekkoException();
-                    }
-                    else  //Trying an OPEN<edit/first>db on a db that is already there in slot [2] or below
-                    {
-                        m.Add(this.storage[0]);         //first, same
-                        m.Add(this.storage[existI]);    //ref
-                        m.Add(this.storage[1]);
-                        for (int i = 2; i < this.storage.Count; i++)
-                        {
-                            if (i == existI) continue;
-                            m.Add(this.storage[i]);
-                        }
-                    }
-                    G.Writeln2("Databank '" + name + "' set as ref bank");
-                }
+            {
+                DatabankLogicExistingBank(out databank, openType, openPosition, out readFromFile, name, existI, WorkI, BaseI, m);
             }
             else  //the databank name does not exist, so it is new and will be read from file later on
             {
                 readFromFile = true;
-                if (openType == EOpenType.Normal || (openType == EOpenType.Pos && openPosition == 2))
-                {                    
-                    m.Add(this.storage[0]);  //first
-                    m.Add(this.storage[1]);  //ref
-                    m.Add(databank);
-                    for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
-                    G.Writeln2("Databank '" + name + "' opened");                
-                }
-                else if (openType == EOpenType.First || openType == EOpenType.Edit || (openType == EOpenType.Pos && openPosition == 1))
+                if (G.equal(Program.options.databank_logic, "aremos"))
                 {
-                    bool edit = false;
-                    if (openType == EOpenType.Edit) edit = true;
-                    m.Add(databank);         //first
-                    m.Add(this.storage[1]);  //ref
-                    m.Add(this.storage[0]);
-                    for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);                    
-                    if (openType == EOpenType.Edit) G.Writeln2("Databank '" + name + "' opened as editable in first position");
-                    else G.Writeln2("Databank '" + name + "' opened in first position");
-                }
-                else if (openType == EOpenType.Ref)
-                {
-                    m.Add(this.storage[0]);         //first
-                    m.Add(databank);                //ref
-                    m.Add(this.storage[1]);
-                    for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
-                    G.Writeln2("Databank '" + name + "' opened as ref");
-                }
-                else if (openType == EOpenType.Last || (openType == EOpenType.Pos && openPosition == this.storage.Count + 1))
-                {
-                    m.Add(this.storage[0]);  //first
-                    m.Add(this.storage[1]);  //ref                
-                    for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
-                    m.Add(databank);
-                    G.Writeln2("Databank '" + name + "' opened");
-                }
-                else if (openType == EOpenType.Pos)
-                {
-                    //pos is not 1., 2. or count+1 ===> so 3, 4, ..., up to count.
-                    if (openPosition < 1)
-                    {
-                        G.Writeln2("*** ERROR: OPEN<pos=...> cannot be 0 or negative");
-                        throw new GekkoException();
-                    }
-                    m.Add(this.storage[0]);  //first
-                    m.Add(this.storage[1]);  //ref
-                    for (int i = 2; i < openPosition; i++)
-                    {
-                        m.Add(this.storage[i]);
-                    }
-                    m.Add(databank);
-                    for (int i = openPosition; i < this.storage.Count; i++)
-                    {
-                        m.Add(this.storage[i]);
-                    }
-                    G.Writeln2("Databank '" + name + "' opened in position " + openPosition);
+                    DatabankLogicAREMOS(databank, openType, openPosition, name, m);
                 }
                 else
                 {
-                    G.Writeln("*** ERROR: Internal error ¤89435734");
-                    throw new GekkoException();
+                    DatabankLogicDefault(databank, openType, openPosition, name, m);
                 }
             }
             this.storage = m;
             return readFromFile;
+        }
+
+        private void DatabankLogicExistingBank(out Databank databank, EOpenType openType, int openPosition, out bool readFromFile, string name, int existI, int WorkI, int BaseI, List<Databank> m)
+        {
+            databank = this.storage[existI];  //now points to the existing databank, and no longer the empty databank the method was called with
+            readFromFile = false;
+            if (openType == EOpenType.Normal || openType == EOpenType.Last || (openType == EOpenType.Pos && openPosition != 1))
+            {
+                G.Writeln2("*** ERROR: Databank '" + databank.aliasName + "' is already open. Use CLOSE to close it first.");
+                throw new GekkoException();
+            }
+            else if (openType == EOpenType.Edit || openType == EOpenType.First || (openType == EOpenType.Pos && openPosition == 1))
+            {
+                if (existI == 0)
+                {
+                    //Note: OPEN<edit> could be used to unlock an OPEN<first>...
+                    //this.storage[0].protect = false;  //this is set elsewhere
+                    if (openType == EOpenType.Edit)
+                    {
+                        if (databank.protect == false)
+                        {
+                            G.Writeln2("Databank '" + databank.aliasName + "' is already editable in first position.");
+                        }
+                        else
+                        {
+                            databank.protect = false;
+                            G.Writeln2("Databank '" + databank.aliasName + "' set editable.");
+                        }
+                    }
+                    m.AddRange(this.storage);  //just copied, and put back again later on
+                }
+                else if (existI == 1)  //Trying an OPEN<edit>db on a db that is already ref (opened with OPEN<ref>db).
+                {
+                    m.Add(this.storage[existI]);    //first, = former sec
+                    m.Add(this.storage[BaseI]);     //ref, = Ref databank, to aviod empty slot
+                    m.Add(this.storage[0]);         //former first ends here
+                    for (int i = 2; i < this.storage.Count; i++)
+                    {
+                        if (i == BaseI) continue;
+                        m.Add(this.storage[i]);
+                    }
+                }
+                else  //Trying an OPEN<edit>db on a db that is already there in slot [2] or below
+                {
+                    m.Add(this.storage[existI]);         //first
+                    m.Add(this.storage[1]);              //ref, same
+                    m.Add(this.storage[0]);
+                    for (int i = 2; i < this.storage.Count; i++)
+                    {
+                        if (i == existI) continue;
+                        m.Add(this.storage[i]);
+                    }
+                }
+                if (openType == EOpenType.Edit) G.Writeln2("Databank '" + name + "' set as editable databank, put first position.");
+                else G.Writeln2("Databank '" + name + "' put in first position.");
+            }
+            else if (openType == EOpenType.Ref)
+            {
+                if (existI == 0) //Trying an OPEN<sec>db on a db that is already first/editable (opened with OPEN<first> or OPEN<edit>)
+                {
+                    m.Add(this.storage[WorkI]);    //first, = Work databank, to aviod empty slot
+                    m.Add(this.storage[existI]);   //ref, = former first
+                    m.Add(this.storage[1]);        //former ref ends here
+                    for (int i = 2; i < this.storage.Count; i++)
+                    {
+                        if (i == WorkI) continue;
+                        m.Add(this.storage[i]);
+                    }
+                }
+                else if (existI == 1)
+                {
+                    G.Writeln2("*** ERROR: Databank '" + databank.aliasName + "' is already open as ref bank");
+                    throw new GekkoException();
+                }
+                else  //Trying an OPEN<edit/first>db on a db that is already there in slot [2] or below
+                {
+                    m.Add(this.storage[0]);         //first, same
+                    m.Add(this.storage[existI]);    //ref
+                    m.Add(this.storage[1]);
+                    for (int i = 2; i < this.storage.Count; i++)
+                    {
+                        if (i == existI) continue;
+                        m.Add(this.storage[i]);
+                    }
+                }
+                G.Writeln2("Databank '" + name + "' set as ref bank");
+            }
+        }
+
+        private void DatabankLogicDefault(Databank databank, EOpenType openType, int openPosition, string name, List<Databank> m)
+        {
+            //default logic                                
+            if (openType == EOpenType.Sec || (openType == EOpenType.Pos && openPosition == 2))
+            {
+                //OPEN<sec> or <pos=2>
+                m.Add(this.storage[0]);  //first
+                m.Add(this.storage[1]);  //ref
+                m.Add(databank);
+                for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
+                G.Writeln2("Databank '" + name + "' opened");
+            }
+            else if (openType == EOpenType.First || openType == EOpenType.Edit || (openType == EOpenType.Pos && openPosition == 1))
+            {
+                bool edit = false;
+                if (openType == EOpenType.Edit) edit = true;
+                m.Add(databank);         //first
+                m.Add(this.storage[1]);  //ref
+                m.Add(this.storage[0]);
+                for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
+                if (openType == EOpenType.Edit) G.Writeln2("Databank '" + name + "' opened as editable in first position");
+                else G.Writeln2("Databank '" + name + "' opened in first position");
+            }
+            else if (openType == EOpenType.Ref)
+            {
+                m.Add(this.storage[0]);         //first
+                m.Add(databank);                //ref
+                m.Add(this.storage[1]);
+                for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
+                G.Writeln2("Databank '" + name + "' opened as ref");
+            }
+            else if (ShouldPutBankLast(openType, openPosition))
+            {
+                m.Add(this.storage[0]);  //first
+                m.Add(this.storage[1]);  //ref                
+                for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
+                m.Add(databank);
+                G.Writeln2("Databank '" + name + "' opened");
+            }
+            else if (openType == EOpenType.Pos)
+            {
+                //pos is not 1., 2. or count+1 ===> so 3, 4, ..., up to count.
+                if (openPosition < 1)
+                {
+                    G.Writeln2("*** ERROR: OPEN<pos=...> cannot be 0 or negative");
+                    throw new GekkoException();
+                }
+                m.Add(this.storage[0]);  //first
+                m.Add(this.storage[1]);  //ref
+                for (int i = 2; i < openPosition; i++)
+                {
+                    m.Add(this.storage[i]);
+                }
+                m.Add(databank);
+                for (int i = openPosition; i < this.storage.Count; i++)
+                {
+                    m.Add(this.storage[i]);
+                }
+                G.Writeln2("Databank '" + name + "' opened in position " + openPosition);
+            }
+            else
+            {
+                G.Writeln("*** ERROR: Internal error ¤89435735");
+                throw new GekkoException();
+            }
+
+            return;
+        }
+
+        
+        private void DatabankLogicAREMOS(Databank databank, EOpenType openType, int openPosition, string name, List<Databank> m)
+        {
+            //AREMOS logic            
+            if (openType == EOpenType.Normal || openType == EOpenType.Sec || (openType == EOpenType.Pos && openPosition == 2))
+            {
+                m.Add(this.storage[0]);  //first
+                m.Add(this.storage[1]);  //ref
+                m.Add(databank);
+                for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
+                G.Writeln2("Databank '" + name + "' opened");
+            }
+            else if (openType == EOpenType.First || openType == EOpenType.Edit || (openType == EOpenType.Pos && openPosition == 1))
+            {
+                bool edit = false;
+                if (openType == EOpenType.Edit) edit = true;
+                m.Add(databank);         //first
+                m.Add(this.storage[1]);  //ref
+                m.Add(this.storage[0]);
+                for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
+                if (openType == EOpenType.Edit) G.Writeln2("Databank '" + name + "' opened as editable in first position");
+                else G.Writeln2("Databank '" + name + "' opened in first position");
+            }
+            else if (openType == EOpenType.Ref)
+            {
+                m.Add(this.storage[0]);         //first
+                m.Add(databank);                //ref
+                m.Add(this.storage[1]);
+                for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
+                G.Writeln2("Databank '" + name + "' opened as ref");
+            }
+            else if (ShouldPutBankLastAREMOS(openType, openPosition))
+            {
+                m.Add(this.storage[0]);  //first
+                m.Add(this.storage[1]);  //ref                
+                for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
+                m.Add(databank);
+                G.Writeln2("Databank '" + name + "' opened");
+            }
+            else if (openType == EOpenType.Pos)
+            {
+                //pos is not 1., 2. or count+1 ===> so 3, 4, ..., up to count.
+                if (openPosition < 1)
+                {
+                    G.Writeln2("*** ERROR: OPEN<pos=...> cannot be 0 or negative");
+                    throw new GekkoException();
+                }
+                m.Add(this.storage[0]);  //first
+                m.Add(this.storage[1]);  //ref
+                for (int i = 2; i < openPosition; i++)
+                {
+                    m.Add(this.storage[i]);
+                }
+                m.Add(databank);
+                for (int i = openPosition; i < this.storage.Count; i++)
+                {
+                    m.Add(this.storage[i]);
+                }
+                G.Writeln2("Databank '" + name + "' opened in position " + openPosition);
+            }
+            else
+            {
+                G.Writeln("*** ERROR: Internal error ¤89435734");
+                throw new GekkoException();
+            }
+
+            return;
+        }
+
+        public bool ShouldPutBankLast(EOpenType openType, int openPosition)
+        {
+            return openType == EOpenType.Normal || openType == EOpenType.Last || (openType == EOpenType.Pos && openPosition == this.storage.Count + 1);
+        }
+
+        public bool ShouldPutBankLastAREMOS(EOpenType openType, int openPosition)
+        {
+            return openType == EOpenType.Last || (openType == EOpenType.Pos && openPosition == this.storage.Count + 1);
         }
 
         private static void FindBanksI(string name, out int existI, out int WorkI, out int BaseI)
@@ -360,15 +460,31 @@ namespace Gekko
             List<Databank> m = new List<Databank>(this.storage.Count - 1);
             if (existI == 0) //found as first
             {
-                m.Add(this.storage[WorkI]);  //[0]: Work is put back
-                m.Add(this.storage[1]);  //[1]: not touched
-                for (int i = 2; i < this.storage.Count; i++)
+                if (G.equal(Program.options.databank_logic, "aremos"))
                 {
-                    if (i == WorkI) continue;
-                    m.Add(this.storage[i]);
+                    //AREMOS jumping
+                    m.Add(this.storage[WorkI]);  //[0]: Work is put back
+                    m.Add(this.storage[1]);  //[1]: not touched
+                    for (int i = 2; i < this.storage.Count; i++)
+                    {
+                        if (i == WorkI) continue;
+                        m.Add(this.storage[i]);
+                    }
+                }
+                else
+                {
+                    //Default
+                    //Closing a bank in first position (not Work)
+                    m.Add(this.storage[2]);  //[0]: gets #2 that is, number 2 on the non-ref databank list. 
+                    m.Add(this.storage[1]);  //[1]: ref is not touched
+                    for (int i = 3; i < this.storage.Count; i++)
+                    {
+                        //add the rest
+                        m.Add(this.storage[i]);
+                    }
                 }
             }
-            else if (existI == 1) //found as secondary
+            else if (existI == 1) //found as ref
             {
                 m.Add(this.storage[0]);  //[0]: not touched
                 m.Add(this.storage[BaseI]);  //[1]: Base is put back

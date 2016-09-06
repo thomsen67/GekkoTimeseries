@@ -3660,13 +3660,13 @@ namespace UnitTests
             I("OPTION databank search = yes;");
             I("TIME 2000 2000;;");
             I("CREATE a; SERIES a = 888;");
-            I("OPEN sletmig1;");
             I("OPEN sletmig2;");
+            I("OPEN sletmig1;");
             I("CREATE xa, xb, xc;");
             I("SER xa = a;");
             I("SER xb = b;");
             I("SER xc = c;");
-
+            
             //1. work          a = 888
             //2. ref
             //3. sletmig2      a = b = 777
@@ -3692,8 +3692,8 @@ namespace UnitTests
             I("OPTION databank search = yes;");
             I("TIME 2000 2000;");
             I("CREATE a; SERIES a = 888;");
-            I("OPEN sletmig1;");
             I("OPEN sletmig2;");
+            I("OPEN sletmig1;");
             I("CREATE xa, xb, xc;");
             I("SER xa = a;");
             I("SER xb = b;");
@@ -3851,508 +3851,619 @@ namespace UnitTests
 
             }
 
-            //Basic test first
+            for (int i = 1; i >= 0; i--)
+            {               
+                
+                //Basic test first
 
-            Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
-            Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
-            I("CLEAR<first>; IMPORT<tsd>small; CLONE;");
-            I("OPEN <tsd> small;");
-            I("SERIES <1999 2004> fy1 = 100;");
-            I("SERIES <1999 2004> xx1 = small:fy1-fy1;");
-            I("SERIES <1999 2004> xx2 = @fy1-fy1;");
-            I("SERIES <1999 2004> xx3 = work:fy1-fy1;");
-            I("SERIES <1999 2004> xx4 = ref:fy1-fy1;");
-            UData u;
-            u = Data("xx1", 2000, "a"); Assert.AreEqual(u.w, 1.23454321E+02d - 100d);
-            u = Data("xx2", 2000, "a"); Assert.AreEqual(u.w, 1.23454321E+02d - 100d);
-            u = Data("xx3", 2000, "a"); Assert.AreEqual(u.w, 0d);
-            u = Data("xx4", 2000, "a"); Assert.AreEqual(u.w, 1.23454321E+02d - 100d);        
-            
-            //test CLOSE
-            I("OPEN <tsd> small as test1;");
-            Assert.AreEqual(Program.databanks.storage.Count, 4);
-            I("CLOSE test1;");
-            Assert.AreEqual(Program.databanks.storage.Count, 3);
-            I("OPEN <tsd> small as test1;");
-            Assert.AreEqual(Program.databanks.storage.Count, 4);
-            I("CLOSE *;");
-            Assert.AreEqual(Program.databanks.storage.Count, 2);
+                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                I("CLEAR<first>; IMPORT<tsd>small; CLONE;");
+                I("OPEN <tsd> small;");
+                I("SERIES <1999 2004> fy1 = 100;");
+                I("SERIES <1999 2004> xx1 = small:fy1-fy1;");
+                I("SERIES <1999 2004> xx2 = @fy1-fy1;");
+                I("SERIES <1999 2004> xx3 = work:fy1-fy1;");
+                I("SERIES <1999 2004> xx4 = ref:fy1-fy1;");
+                UData u;
+                u = Data("xx1", 2000, "a"); Assert.AreEqual(u.w, 1.23454321E+02d - 100d);
+                u = Data("xx2", 2000, "a"); Assert.AreEqual(u.w, 1.23454321E+02d - 100d);
+                u = Data("xx3", 2000, "a"); Assert.AreEqual(u.w, 0d);
+                u = Data("xx4", 2000, "a"); Assert.AreEqual(u.w, 1.23454321E+02d - 100d);
 
-            //============ more advanced tests =============================
-            // test OPEN<edit>
-            // test OPEN<ref>
-            // test LOCK
-            // test that data is written back
-            //---------------------------------
+                //test CLOSE
+                I("OPEN <tsd> small as test1;");
+                Assert.AreEqual(Program.databanks.storage.Count, 4);
+                I("CLOSE test1;");
+                Assert.AreEqual(Program.databanks.storage.Count, 3);
+                I("OPEN <tsd> small as test1;");
+                Assert.AreEqual(Program.databanks.storage.Count, 4);
+                I("CLOSE *;");
+                Assert.AreEqual(Program.databanks.storage.Count, 2);
 
-            Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
-            Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
-            
-            // ------------ open normal bank
+                //============ more advanced tests =============================
+                // test OPEN<edit>
+                // test OPEN<ref>
+                // test LOCK
+                // test that data is written back
+                //---------------------------------
 
-            I("RESET;");
-            I("TIME 2010 2011;");
-            I("CREATE a;");
-            I("SERIES a = 10, 11;");
-            I("WRITE temp\\bank1;"); //<----
-            I("SERIES a = 20, 21;");
-            I("WRITE temp\\bank2;"); //<----
-            I("SERIES a = 50, 51;");
-            I("WRITE temp\\bank3;"); //<----
+                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
 
-            I("RESET;");
-            I("OPEN temp\\bank1;");
-            Assert.AreEqual(Program.databanks.storage.Count, 3);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank1");
-            I("CLOSE bank1;");
-            Assert.AreEqual(Program.databanks.storage.Count, 2);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                // ------------ open normal bank
 
-            I("RESET;");
-            I("OPEN temp\\bank1;");
-            I("OPEN temp\\bank2;");
-            Assert.AreEqual(Program.databanks.storage.Count, 4);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
-            Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank1");
-            I("CLOSE *;");
-            Assert.AreEqual(Program.databanks.storage.Count, 2);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("TIME 2010 2011;");
+                I("CREATE a;");
+                I("SERIES a = 10, 11;");
+                I("WRITE temp\\bank1;"); //<----
+                I("SERIES a = 20, 21;");
+                I("WRITE temp\\bank2;"); //<----
+                I("SERIES a = 50, 51;");
+                I("WRITE temp\\bank3;"); //<----
 
-            I("RESET;");
-            I("OPEN temp\\bank1, temp\\bank2 as bank3;");
-            Assert.AreEqual(Program.databanks.storage.Count, 4);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank1");
-            Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank3");
-            I("CLOSE *;");
-            Assert.AreEqual(Program.databanks.storage.Count, 2);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bank1;");
+                Assert.AreEqual(Program.databanks.storage.Count, 3);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank1");
+                I("CLOSE bank1;");
+                Assert.AreEqual(Program.databanks.storage.Count, 2);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
-            // ---- EDIT and REF, also with test of PRT<m>, PRT @a, etc.
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bank1;");
+                I("OPEN temp\\bank2;");
+                Assert.AreEqual(Program.databanks.storage.Count, 4);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                if (i == 0)
+                {
+                    Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
+                    Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank1");
+                }
+                else
+                {
+                    Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank1");
+                    Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
+                }
 
-            I("RESET;");
-            I("OPEN temp\\bank2;");
-            I("OPEN<first>temp\\bank1;");
-            Assert.AreEqual(Program.databanks.storage.Count, 4);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank1");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
-            I("CLOSE *;");
-            Assert.AreEqual(Program.databanks.storage.Count, 2);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                I("CLOSE *;");
+                Assert.AreEqual(Program.databanks.storage.Count, 2);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
-            I("RESET;");
-            I("OPEN temp\\bank2;");
-            I("OPEN<first>temp\\bank1;");
-            Assert.AreEqual(Program.databanks.storage.Count, 4);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank1");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
-            I("CLOSE bank1;");
-            Assert.AreEqual(Program.databanks.storage.Count, 3);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bank1, temp\\bank2 as bank3;");
+                Assert.AreEqual(Program.databanks.storage.Count, 4);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank1");
+                Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank3");
+                I("CLOSE *;");
+                Assert.AreEqual(Program.databanks.storage.Count, 2);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
-            I("RESET;");
-            I("OPEN temp\\bank2;");
-            I("OPEN<ref>temp\\bank1;");
-            Assert.AreEqual(Program.databanks.storage.Count, 4);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, "bank1");
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
-            I("CLOSE *;");
-            Assert.AreEqual(Program.databanks.storage.Count, 2);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                // ---- EDIT and REF, also with test of PRT<m>, PRT @a, etc.
 
-            I("RESET;");
-            I("OPEN temp\\bank2;");
-            I("OPEN<ref>temp\\bank1;");
-            Assert.AreEqual(Program.databanks.storage.Count, 4);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, "bank1");
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
-            I("CLOSE bank1;");
-            Assert.AreEqual(Program.databanks.storage.Count, 3);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bank2;");
+                I("OPEN<first>temp\\bank1;");
+                Assert.AreEqual(Program.databanks.storage.Count, 4);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank1");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
+                I("CLOSE *;");
+                Assert.AreEqual(Program.databanks.storage.Count, 2);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
-            //An unswap test
-            I("RESET;");
-            I("READ temp\\bank1;");
-            I("OPEN<first>temp\\bank2;");
-            I("OPEN<ref>temp\\bank3;");
-            Assert.AreEqual(Program.databanks.storage.Count, 4);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank2");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, "bank3");
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, Globals.Ref); //bank1
-            Assert.AreEqual(Program.databanks.storage[3].aliasName, "Work"); //bank1
-            I("UNSWAP;");
-            Assert.AreEqual(Program.databanks.storage.Count, 4);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work"); //bank1
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref); //bank1
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
-            Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank3");
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bank2;");
+                I("OPEN<first>temp\\bank1;");
+                Assert.AreEqual(Program.databanks.storage.Count, 4);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank1");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
+                I("CLOSE bank1;");
+                Assert.AreEqual(Program.databanks.storage.Count, 3);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
 
-            //also with tests of PRT etc
-            I("RESET;");
-            I("READ temp\\bank1;");
-            I("OPEN<first>temp\\bank2;");
-            I("OPEN<ref>temp\\bank3;");
-            Assert.AreEqual(Program.databanks.storage.Count, 4);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank2");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, "bank3");
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, Globals.Ref); //bank1
-            Assert.AreEqual(Program.databanks.storage[3].aliasName, "Work"); //bank1
-            I("PRT<2010 2010> a;");
-            Table table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
-            AssertHelperTwoDoubles(table.Get(2, 2).number, 20d, sharedDelta);
-            I("PRT<2010 2010> @a;");
-            table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
-            AssertHelperTwoDoubles(table.Get(2, 2).number, 50d, sharedDelta);
-            I("PRT<2010 2010 m> a;");
-            table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
-            AssertHelperTwoDoubles(table.Get(2, 2).number, -30d, sharedDelta);
-            // -----------------
-            I("PRT<2010 2010> bank2:a;");
-            table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
-            AssertHelperTwoDoubles(table.Get(2, 2).number, 20d, sharedDelta);
-            I("PRT<2010 2010> bank3:a;");
-            table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
-            AssertHelperTwoDoubles(table.Get(2, 2).number, 50d, sharedDelta);
-            I("PRT<2010 2010> work:a;");
-            table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
-            AssertHelperTwoDoubles(table.Get(2, 2).number, 10d, sharedDelta);
-            I("PRT<2010 2010> ref:a;");
-            table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
-            AssertHelperTwoDoubles(table.Get(2, 2).number, 10d, sharedDelta);
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bank2;");
+                I("OPEN<ref>temp\\bank1;");
+                Assert.AreEqual(Program.databanks.storage.Count, 4);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, "bank1");
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, Globals.Ref);
+                Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
+                I("CLOSE *;");
+                Assert.AreEqual(Program.databanks.storage.Count, 2);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bank2;");
+                I("OPEN<ref>temp\\bank1;");
+                Assert.AreEqual(Program.databanks.storage.Count, 4);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, "bank1");
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, Globals.Ref);
+                Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
+                I("CLOSE bank1;");
+                Assert.AreEqual(Program.databanks.storage.Count, 3);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
 
-            // ---- succession
+                //An unswap test
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("READ temp\\bank1;");
+                I("OPEN<first>temp\\bank2;");
+                I("OPEN<ref>temp\\bank3;");
+                Assert.AreEqual(Program.databanks.storage.Count, 4);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank2");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, "bank3");
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, Globals.Ref); //bank1
+                Assert.AreEqual(Program.databanks.storage[3].aliasName, "Work"); //bank1
+                I("UNSWAP;");
+                Assert.AreEqual(Program.databanks.storage.Count, 4);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work"); //bank1
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref); //bank1
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
+                Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank3");
 
-            I("RESET;");
-            I("OPEN \\temp\\bank1;");
-            Assert.AreEqual(Program.databanks.storage.Count, 3);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank1");
-            I("OPEN \\temp\\bank2;");
-            Assert.AreEqual(Program.databanks.storage.Count, 4);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
-            Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank1");
-            I("OPEN<first> \\temp\\bank1;");
-            Assert.AreEqual(Program.databanks.storage.Count, 4);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank1");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
-
-            // ------- <first>, <>, <last>
-
-            I("RESET;");
-            I("OPEN temp\\bank3;");
-            I("OPEN<first>temp\\bank1, temp\\bank2;");
-            Assert.AreEqual(Program.databanks.storage.Count, 5);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank1");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
-            Assert.AreEqual(Program.databanks.storage[3].aliasName, Globals.Work);
-            Assert.AreEqual(Program.databanks.storage[4].aliasName, "bank3");            
-            I("CLOSE *;");
-            Assert.AreEqual(Program.databanks.storage.Count, 2);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-
-            I("RESET;");
-            I("OPEN temp\\bank3;");
-            I("OPEN temp\\bank1, temp\\bank2;");
-            Assert.AreEqual(Program.databanks.storage.Count, 5);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, Globals.Work);
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank1");            
-            Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");            
-            Assert.AreEqual(Program.databanks.storage[4].aliasName, "bank3");
-            I("CLOSE *;");
-            Assert.AreEqual(Program.databanks.storage.Count, 2);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-
-            I("RESET;");
-            I("OPEN temp\\bank3;");
-            I("OPEN<last> temp\\bank1, temp\\bank2;");
-            Assert.AreEqual(Program.databanks.storage.Count, 5);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, Globals.Work);
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank3");
-            Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank1");
-            Assert.AreEqual(Program.databanks.storage[4].aliasName, "bank2");
-            I("CLOSE *;");
-            Assert.AreEqual(Program.databanks.storage.Count, 2);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-
-            // ------- <pos=n>
-
-            I("RESET;");
-            I("OPEN temp\\bank3;");
-            I("OPEN<pos=1>temp\\bank1, temp\\bank2;");
-            Assert.AreEqual(Program.databanks.storage.Count, 5);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank1");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
-            Assert.AreEqual(Program.databanks.storage[3].aliasName, Globals.Work);
-            Assert.AreEqual(Program.databanks.storage[4].aliasName, "bank3");
-            I("CLOSE *;");
-            Assert.AreEqual(Program.databanks.storage.Count, 2);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-
-            I("RESET;");
-            I("OPEN temp\\bank3;");
-            I("OPEN <pos=2> temp\\bank1, temp\\bank2;");
-            Assert.AreEqual(Program.databanks.storage.Count, 5);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, Globals.Work);
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank1");
-            Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
-            Assert.AreEqual(Program.databanks.storage[4].aliasName, "bank3");
-            I("CLOSE *;");
-            Assert.AreEqual(Program.databanks.storage.Count, 2);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-
-            I("RESET;");
-            I("OPEN temp\\bank3;");
-            I("OPEN<pos=3> temp\\bank1, temp\\bank2;");
-            Assert.AreEqual(Program.databanks.storage.Count, 5);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, Globals.Work);
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank3");
-            Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank1");
-            Assert.AreEqual(Program.databanks.storage[4].aliasName, "bank2");
-            I("CLOSE *;");
-            Assert.AreEqual(Program.databanks.storage.Count, 2);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-
-            I("RESET;");
-            I("OPEN temp\\bank3;");
-            FAIL("OPEN<pos=4> temp\\bank1, temp\\bank2;");            
-            
-            // --------- changing stuff ----------------
-
-            //changing first stuff
-            I("RESET;");
-            I("READ \\temp\\bank1;");
-            I("WRITE temp\\bankTemp;");
-            I("RESET;");
-            I("OPEN <edit> temp\\bankTemp;");
-            I("TIME 2010 2010;");
-            I("SERIES a = 100;");
-            I("CLOSE bankTemp;");
-            I("RESET;");
-            I("OPEN temp\\bankTemp;");
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
-
-            //changing REF stuff
-            I("RESET;");
-            I("READ \\temp\\bank1;");
-            I("WRITE temp\\bankTemp;");
-            I("RESET;");
-            I("OPEN <ref> temp\\bankTemp;");
-            I("TIME 2010 2010;");
-            FAIL("SERIES @a = 100;");
-            I("UNLOCK bankTemp;");
-            I("SERIES @a = 100;");
-            I("CLOSE bankTemp;");
-            I("RESET;");
-            I("OPEN temp\\bankTemp;");
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
-
-            //changing normal open bank
-            I("RESET;");
-            I("READ \\temp\\bank1;");
-            I("WRITE temp\\bankTemp;");
-            I("RESET;");
-            I("OPEN temp\\bankTemp;");
-            I("TIME 2010 2010;");
-            FAIL("SERIES bankTemp:a = 100;");
-            I("UNLOCK bankTemp;");
-            I("SERIES bankTemp:a = 100;");
-            I("CLOSE bankTemp;");
-            I("RESET;");
-            I("OPEN temp\\bankTemp;");
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
-
-            // ------------ <save=no> ----------------
-                        
-            I("RESET;");
-            I("READ \\temp\\bank1;");
-            I("WRITE temp\\bankTemp;");
-            I("RESET;");
-            I("OPEN <edit save=no> temp\\bankTemp;");
-            I("TIME 2010 2010;");
-            I("SERIES a = 100;");
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);  //changed
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
-            I("CLOSE bankTemp;");
-            I("RESET;");
-            I("OPEN temp\\bankTemp;");
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 10, sharedDelta);  //original
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
+                //also with tests of PRT etc
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("READ temp\\bank1;");
+                I("OPEN<first>temp\\bank2;");
+                I("OPEN<ref>temp\\bank3;");
+                Assert.AreEqual(Program.databanks.storage.Count, 4);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank2");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, "bank3");
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, Globals.Ref); //bank1
+                Assert.AreEqual(Program.databanks.storage[3].aliasName, "Work"); //bank1
+                I("PRT<2010 2010> a;");
+                Table table = Globals.lastPrtOrMulprtTable;
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
+                AssertHelperTwoDoubles(table.Get(2, 2).number, 20d, sharedDelta);
+                I("PRT<2010 2010> @a;");
+                table = Globals.lastPrtOrMulprtTable;
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
+                AssertHelperTwoDoubles(table.Get(2, 2).number, 50d, sharedDelta);
+                I("PRT<2010 2010 m> a;");
+                table = Globals.lastPrtOrMulprtTable;
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
+                AssertHelperTwoDoubles(table.Get(2, 2).number, -30d, sharedDelta);
+                // -----------------
+                I("PRT<2010 2010> bank2:a;");
+                table = Globals.lastPrtOrMulprtTable;
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
+                AssertHelperTwoDoubles(table.Get(2, 2).number, 20d, sharedDelta);
+                I("PRT<2010 2010> bank3:a;");
+                table = Globals.lastPrtOrMulprtTable;
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
+                AssertHelperTwoDoubles(table.Get(2, 2).number, 50d, sharedDelta);
+                I("PRT<2010 2010> work:a;");
+                table = Globals.lastPrtOrMulprtTable;
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
+                AssertHelperTwoDoubles(table.Get(2, 2).number, 10d, sharedDelta);
+                I("PRT<2010 2010> ref:a;");
+                table = Globals.lastPrtOrMulprtTable;
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
+                AssertHelperTwoDoubles(table.Get(2, 2).number, 10d, sharedDelta);
 
 
-            I("RESET;");
-            I("READ \\temp\\bank1;");
-            I("WRITE temp\\bankTemp;");
-            I("RESET;");
-            I("OPEN <edit> temp\\bankTemp;");
-            I("TIME 2010 2010;");
-            I("SERIES a = 100;");
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);  //changed
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
-            I("CLOSE <save=no> bankTemp;");
-            I("RESET;");
-            I("OPEN temp\\bankTemp;");
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 10, sharedDelta);  //original
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
+                // ---- succession
 
-            
-            // --------- LOCK/UNLOCK ----------------
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN \\temp\\bank1;");
+                Assert.AreEqual(Program.databanks.storage.Count, 3);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank1");
+                I("OPEN \\temp\\bank2;");
+                Assert.AreEqual(Program.databanks.storage.Count, 4);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                if (i == 0)
+                {
+                    Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
+                    Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank1");
+                }
+                else
+                {
+                    Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank1");
+                    Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
+                }
+                I("OPEN<first> \\temp\\bank1;");
+                Assert.AreEqual(Program.databanks.storage.Count, 4);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank1");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
 
-            //changing first stuff
-            I("RESET;");
-            I("READ \\temp\\bank1;");
-            I("WRITE temp\\bankTemp;");
-            I("RESET;");
-            I("OPEN <first> temp\\bankTemp;");
-            I("TIME 2010 2010;");
-            FAIL("SERIES a = 100;");
-            I("UNLOCK bankTemp;");
-            I("SERIES a = 100;");
+                // ------- <first>, <>, <last>
 
-            //changing ref stuff
-            I("RESET;");
-            I("READ \\temp\\bank1;");
-            I("WRITE temp\\bankTemp;");
-            I("RESET;");
-            I("OPEN <ref> temp\\bankTemp;");
-            I("TIME 2010 2010;");
-            FAIL("SERIES @a = 100;");
-            I("UNLOCK bankTemp;");
-            I("SERIES @a = 100;");
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bank3;");
+                I("OPEN<first>temp\\bank1, temp\\bank2;");
+                Assert.AreEqual(Program.databanks.storage.Count, 5);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank1");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
+                Assert.AreEqual(Program.databanks.storage[3].aliasName, Globals.Work);
+                Assert.AreEqual(Program.databanks.storage[4].aliasName, "bank3");
+                I("CLOSE *;");
+                Assert.AreEqual(Program.databanks.storage.Count, 2);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
-            //changing normal open bank
-            I("RESET;");
-            I("READ \\temp\\bank1;");
-            I("WRITE temp\\bankTemp;");
-            I("RESET;");
-            I("OPEN temp\\bankTemp;");
-            I("TIME 2010 2010;");
-            FAIL("SERIES bankTemp:a = 100;");
-            I("UNLOCK bankTemp;");
-            I("SERIES bankTemp:a = 100;");
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bank3;");
+                I("OPEN temp\\bank1, temp\\bank2;");
+                Assert.AreEqual(Program.databanks.storage.Count, 5);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, Globals.Work);
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                if (i == 0)
+                {
+                    Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank1");
+                    Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
+                    Assert.AreEqual(Program.databanks.storage[4].aliasName, "bank3");
+                }
+                else
+                {
+                    Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank3");
+                    Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank1");
+                    Assert.AreEqual(Program.databanks.storage[4].aliasName, "bank2");
+                }
+                I("CLOSE *;");
+                Assert.AreEqual(Program.databanks.storage.Count, 2);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
-            // --------- non .gbk formats ----------------
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bank3;");
+                I("OPEN<last> temp\\bank1, temp\\bank2;");
+                Assert.AreEqual(Program.databanks.storage.Count, 5);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, Globals.Work);
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank3");
+                Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank1");
+                Assert.AreEqual(Program.databanks.storage[4].aliasName, "bank2");
+                I("CLOSE *;");
+                Assert.AreEqual(Program.databanks.storage.Count, 2);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
-            //changing FIRST stuff
-            I("RESET;");
-            I("READ \\temp\\bank1;");
-            I("EXPORT <tsd> temp\\bankTsd;");
-            I("RESET;");
-            I("OPEN <edit tsd> temp\\bankTsd;");
-            I("TIME 2010 2010;");
-            FAIL("SERIES a = 100;");
+                // ------- <sec>
 
-            //changing REF stuff
-            I("RESET;");
-            I("READ \\temp\\bank1;");
-            I("EXPORT <tsd> temp\\bankTsd;");
-            I("RESET;");
-            I("OPEN <ref tsd> temp\\bankTsd;");
-            I("TIME 2010 2010;");
-            FAIL("SERIES @a = 100;");
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bank3;");
+                I("OPEN<sec>temp\\bank1, temp\\bank2;");
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, Globals.Work);                
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank1");
+                Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
+                Assert.AreEqual(Program.databanks.storage[4].aliasName, "bank3");
+                I("CLOSE *;");
+                Assert.AreEqual(Program.databanks.storage.Count, 2);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
-            //changing normal open bank
-            I("RESET;");
-            I("READ \\temp\\bank1;");
-            I("WRITE temp\\bankTsd;");
-            I("RESET;");
-            I("OPEN <tsd> temp\\bankTsd;");
-            I("TIME 2010 2010;");
-            FAIL("SERIES bankTsd:a = 100;");
+                // ------- <pos=n>
 
-            // --------- constructing a bank ----------------
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bank3;");
+                I("OPEN<pos=1>temp\\bank1, temp\\bank2;");
+                Assert.AreEqual(Program.databanks.storage.Count, 5);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "bank1");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank2");
+                Assert.AreEqual(Program.databanks.storage[3].aliasName, Globals.Work);
+                Assert.AreEqual(Program.databanks.storage[4].aliasName, "bank3");
+                I("CLOSE *;");
+                Assert.AreEqual(Program.databanks.storage.Count, 2);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
-            I("RESET;");
-            I("OPEN <edit> temp\\bankNew;");
-            Assert.AreEqual(Program.databanks.storage.Count, 3);
-            Assert.AreEqual(Program.databanks.storage[0].aliasName, "bankNew");
-            Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
-            Assert.AreEqual(Program.databanks.storage[2].aliasName, "Work");
-            I("CREATE tsNew;");
-            I("SERIES <2010 2010> tsNew = 12345;");
-            I("CLOSE bankNew;");
-            I("RESET;");
-            I("OPEN temp\\bankNew;");
-            AssertHelper(Program.databanks.GetDatabank("bankNew"), "tsNew", 2009, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankNew"), "tsNew", 2010, 12345, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("bankNew"), "tsNew", 2011, double.NaN, sharedDelta);
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bank3;");
+                I("OPEN <pos=2> temp\\bank1, temp\\bank2;");
+                Assert.AreEqual(Program.databanks.storage.Count, 5);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, Globals.Work);
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank1");
+                Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank2");
+                Assert.AreEqual(Program.databanks.storage[4].aliasName, "bank3");
+                I("CLOSE *;");
+                Assert.AreEqual(Program.databanks.storage.Count, 2);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
-            // --------- illegals ----------------
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bank3;");
+                I("OPEN<pos=3> temp\\bank1, temp\\bank2;");
+                Assert.AreEqual(Program.databanks.storage.Count, 5);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, Globals.Work);
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, "bank3");
+                Assert.AreEqual(Program.databanks.storage[3].aliasName, "bank1");
+                Assert.AreEqual(Program.databanks.storage[4].aliasName, "bank2");
+                I("CLOSE *;");
+                Assert.AreEqual(Program.databanks.storage.Count, 2);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
-            I("RESET;");
-            FAIL("CLOSE work;");
-            FAIL("CLOSE ref;");
-            FAIL("OPEN<edit>a, b;");
-            FAIL("OPEN<ref>a, b;");
-            FAIL("OPEN *, b;");
-            FAIL("OPEN a, *;");
-            FAIL("OPEN *, *;");
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bank3;");
+                FAIL("OPEN<pos=4> temp\\bank1, temp\\bank2;");
 
+                // --------- changing stuff ----------------
+
+                //changing first stuff
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("READ \\temp\\bank1;");
+                I("WRITE temp\\bankTemp;");
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN <edit> temp\\bankTemp;");
+                I("TIME 2010 2010;");
+                I("SERIES a = 100;");
+                I("CLOSE bankTemp;");
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bankTemp;");
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
+
+                //changing REF stuff
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("READ \\temp\\bank1;");
+                I("WRITE temp\\bankTemp;");
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN <ref> temp\\bankTemp;");
+                I("TIME 2010 2010;");
+                FAIL("SERIES @a = 100;");
+                I("UNLOCK bankTemp;");
+                I("SERIES @a = 100;");
+                I("CLOSE bankTemp;");
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bankTemp;");
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
+
+                //changing normal open bank
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("READ \\temp\\bank1;");
+                I("WRITE temp\\bankTemp;");
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bankTemp;");
+                I("TIME 2010 2010;");
+                FAIL("SERIES bankTemp:a = 100;");
+                I("UNLOCK bankTemp;");
+                I("SERIES bankTemp:a = 100;");
+                I("CLOSE bankTemp;");
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bankTemp;");
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
+
+                // ------------ <save=no> ----------------
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("READ \\temp\\bank1;");
+                I("WRITE temp\\bankTemp;");
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN <edit save=no> temp\\bankTemp;");
+                I("TIME 2010 2010;");
+                I("SERIES a = 100;");
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);  //changed
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
+                I("CLOSE bankTemp;");
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bankTemp;");
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 10, sharedDelta);  //original
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
+
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("READ \\temp\\bank1;");
+                I("WRITE temp\\bankTemp;");
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN <edit> temp\\bankTemp;");
+                I("TIME 2010 2010;");
+                I("SERIES a = 100;");
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);  //changed
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
+                I("CLOSE <save=no> bankTemp;");
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bankTemp;");
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 10, sharedDelta);  //original
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
+
+
+                // --------- LOCK/UNLOCK ----------------
+
+                //changing first stuff
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("READ \\temp\\bank1;");
+                I("WRITE temp\\bankTemp;");
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN <first> temp\\bankTemp;");
+                I("TIME 2010 2010;");
+                FAIL("SERIES a = 100;");
+                I("UNLOCK bankTemp;");
+                I("SERIES a = 100;");
+
+                //changing ref stuff
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("READ \\temp\\bank1;");
+                I("WRITE temp\\bankTemp;");
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN <ref> temp\\bankTemp;");
+                I("TIME 2010 2010;");
+                FAIL("SERIES @a = 100;");
+                I("UNLOCK bankTemp;");
+                I("SERIES @a = 100;");
+
+                //changing normal open bank
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("READ \\temp\\bank1;");
+                I("WRITE temp\\bankTemp;");
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bankTemp;");
+                I("TIME 2010 2010;");
+                FAIL("SERIES bankTemp:a = 100;");
+                I("UNLOCK bankTemp;");
+                I("SERIES bankTemp:a = 100;");
+
+                // --------- non .gbk formats ----------------
+
+                //changing FIRST stuff
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("READ \\temp\\bank1;");
+                I("EXPORT <tsd> temp\\bankTsd;");
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN <edit tsd> temp\\bankTsd;");
+                I("TIME 2010 2010;");
+                FAIL("SERIES a = 100;");
+
+                //changing REF stuff
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("READ \\temp\\bank1;");
+                I("EXPORT <tsd> temp\\bankTsd;");
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN <ref tsd> temp\\bankTsd;");
+                I("TIME 2010 2010;");
+                FAIL("SERIES @a = 100;");
+
+                //changing normal open bank
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("READ \\temp\\bank1;");
+                I("WRITE temp\\bankTsd;");
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN <tsd> temp\\bankTsd;");
+                I("TIME 2010 2010;");
+                FAIL("SERIES bankTsd:a = 100;");
+
+                // --------- constructing a bank ----------------
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN <edit> temp\\bankNew;");
+                Assert.AreEqual(Program.databanks.storage.Count, 3);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "bankNew");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+                Assert.AreEqual(Program.databanks.storage[2].aliasName, "Work");
+                I("CREATE tsNew;");
+                I("SERIES <2010 2010> tsNew = 12345;");
+                I("CLOSE bankNew;");
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bankNew;");
+                AssertHelper(Program.databanks.GetDatabank("bankNew"), "tsNew", 2009, double.NaN, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankNew"), "tsNew", 2010, 12345, sharedDelta);
+                AssertHelper(Program.databanks.GetDatabank("bankNew"), "tsNew", 2011, double.NaN, sharedDelta);
+
+                // --------- illegals ----------------
+
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                FAIL("CLOSE work;");
+                FAIL("CLOSE ref;");
+                FAIL("OPEN<edit>a, b;");
+                FAIL("OPEN<ref>a, b;");
+                FAIL("OPEN *, b;");
+                FAIL("OPEN a, *;");
+                FAIL("OPEN *, *;");
+            }
         }
 
         [TestMethod]

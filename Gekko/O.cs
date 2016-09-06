@@ -2537,6 +2537,7 @@ namespace Gekko
             //public string as2 = null;
             public string opt_prim = null;  //obsolete but gives warning
             public string opt_first = null;
+            public string opt_sec = null;
             public string opt_last = null;  
             public string opt_ref = null;
             public string opt_prot = null;  //obsolete but gives warning
@@ -2607,6 +2608,10 @@ namespace Gekko
                 if (G.equal(opt_ref, "yes"))
                 {
                     hlp.openType = EOpenType.Ref;
+                }
+                if (G.equal(opt_sec, "yes"))
+                {
+                    hlp.openType = EOpenType.Sec;
                 }
                 if (!G.isNumericalError(this.opt_pos))
                 {
