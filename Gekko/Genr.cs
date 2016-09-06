@@ -62,7 +62,7 @@ namespace Gekko
         public static void CodeLines(P p)
         {
             GekkoTime t =
-             Globals.tNull;
+             Globals.tNull; 
 
             C0(p);
 
