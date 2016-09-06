@@ -3712,7 +3712,7 @@ namespace UnitTests
             //below there is no impact from the values in the reference bank
             AssertHelper(First(), "xa", 2000, 888d, 0d);
             AssertHelper(First(), "xb", 2000, 777d, 0d);
-            AssertHelper(First(), "xc", 2000, 100d, 0d);
+            AssertHelper(First(), "xc", 2000, 100d, 0d); 
             
         }
 
