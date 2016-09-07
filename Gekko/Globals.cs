@@ -116,7 +116,8 @@ namespace Gekko
         public static string functionP2Cs = "P p";
 
         public static string uProc = "UProc";
-                
+        public static Dictionary<string, string> uFunctionStorageCs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
         //public static bool useTestParser = true;  //for debugging, use trial parser        
         public static bool substituteAssignVars = false;
 

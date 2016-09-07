@@ -1225,13 +1225,24 @@ namespace Gekko.Parser.Gek
                             //      through the splitting machine, and beware of "params_" lines (these should not
                             //      be put into Ci-methods).
 
-                            //TODO: allow overloads
-                            if (w.functionUserDefined.ContainsKey(w.uFunctionsHelper.functionName))
+                            w.uHeaderCs = new StringBuilder();
+
+                            if (Globals.uFunctionStorageCs.ContainsKey(w.uFunctionsHelper.functionName))
                             {
-                                G.Writeln2("*** ERROR: User function with name '" + w.uFunctionsHelper.functionName + "' has already been defined");
-                                throw new GekkoException();
+                                //For now, we just overwrite the function, even if it has different overload signature
+                                Globals.uFunctionStorageCs.Remove(w.uFunctionsHelper.functionName);
+                                ////TODO: allow overloads
+                                //G.Writeln2("*** ERROR: User function with name '" + w.uFunctionsHelper.functionName + "' has already been defined");
+                                //throw new GekkoException();
                             }
-                            w.functionUserDefined.Add(w.uFunctionsHelper.functionName, true);
+                                                        
+                            //if (w.functionUserDefined.ContainsKey(w.uFunctionsHelper.functionName))
+                            //{
+                            //    G.Writeln2("*** ERROR: User function with name '" + w.uFunctionsHelper.functionName + "' has already been defined");
+                            //    throw new GekkoException();
+                            //}
+                            //w.functionUserDefined.Add(w.uFunctionsHelper.functionName, true);
+
                             //We use ToLower(), since user functions are not distinguished by means of capitalization
                             string lhsClassNameCode = G.GetVariableType(w.uFunctionsHelper.lhsTypes.Count);
 
@@ -1239,7 +1250,7 @@ namespace Gekko.Parser.Gek
                             {
                                 //Create the class corresponding to the return tuple (lhs)
                                 string tupleClassName = G.GetVariableType(w.uFunctionsHelper.lhsTypes.Count);
-                                CreateTupleClass(w.uHeaderCs, w.uFunctionsHelper.lhsTypes.Count, tupleClassName, w.tupleClasses);
+                                //CreateTupleClass(w.uHeaderCs, w.uFunctionsHelper.lhsTypes.Count, tupleClassName, w.tupleClasses);
                             }
 
                             string method = Globals.splitSTOP;
@@ -1254,7 +1265,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     //Create the class corresponding to the input tuple (in rhs params)
                                     string tupleClassName = G.GetVariableType(fah.tupleCount);
-                                    CreateTupleClass(w.uHeaderCs, fah.tupleCount, tupleClassName, w.tupleClasses);
+                                    //CreateTupleClass(w.uHeaderCs, fah.tupleCount, tupleClassName, w.tupleClasses);
                                     //this is a tuple
                                     method += tupleClassName + " " + fah.tupleNameCode;
                                     i = i + (fah.tupleCount - 1);  //we skip the rest of these tuples here!
@@ -1275,6 +1286,8 @@ namespace Gekko.Parser.Gek
                             w.uHeaderCs.AppendLine(w.uFunctionsHelper.headerCs.ToString());
 
                             w.uHeaderCs.AppendLine(method);
+
+                            Globals.uFunctionStorageCs.Add(w.uFunctionsHelper.functionName, w.uHeaderCs.ToString());
 
                             ResetUFunctionHelpers(w);
 
@@ -1427,7 +1440,7 @@ namespace Gekko.Parser.Gek
                             }
                             else
                             {
-                                if (w.functionUserDefined.ContainsKey(functionName))  //case-insensitive anyway
+                                if (Globals.uFunctionStorageCs.ContainsKey(functionName))  //case-insensitive anyway
                                 {
                                     node.Code.A(Globals.uProc).A(".").A(functionName).A("(").A(Globals.functionP1Cs).A(", ").A(Globals.functionT1Cs).A(", ");
                                 }
@@ -2706,7 +2719,7 @@ namespace Gekko.Parser.Gek
                             List<string> types = new List<string>();
 
                             string classCs = G.GetVariableType(node.ChildrenCount());
-                            CreateTupleClass(w.uHeaderCs, node.ChildrenCount(), classCs, w.tupleClasses);
+                            //CreateTupleClass(w.uHeaderCs, node.ChildrenCount(), classCs, w.tupleClasses);
 
                             string tempCs = "temp" + ++Globals.counter;                            
                                                         
@@ -3635,27 +3648,27 @@ namespace Gekko.Parser.Gek
             return nodeCode;
         }
 
-        private static void CreateTupleClass(StringBuilder headerCs, int number, string className, GekkoDictionary<string, bool> tupleClasses)
-        {
-            //Tuples 2-10 are now predefined.
+        //private static void CreateTupleClass(StringBuilder headerCs, int number, string className, GekkoDictionary<string, bool> tupleClasses)
+        //{
+        //    //Tuples 2-10 are now predefined.
 
-            //if(tupleClasses.ContainsKey(className)) return;  //do not duplicate, has been encountered before/elsewhere            
-            ////a bit inefficient, but oh well
-            //string ss = null;
-            //string uu = null;
-            //string vv = null;
-            //int count = 0;
-            //for (int i = 0; i < number; i++)
-            //{
-            //    count++;
-            //    ss += "public IVariable tuple" + (count - 1) + ";" + G.NL;
-            //    uu += "tuple" + (count - 1) + " = ptuble" + (count - 1) + ";" + G.NL;
-            //    vv += "IVariable ptuble" + (count - 1) + ", ";
-            //}
-            //if (vv.EndsWith(", ")) vv = vv.Substring(0, vv.Length - 2);
-            //headerCs.AppendLine("public class " + className + " { " + ss + G.NL + "public " + className + "(" + vv + ") {" + G.NL + uu + "} }");
-            //tupleClasses.Add(className, true);
-        }        
+        //    //if(tupleClasses.ContainsKey(className)) return;  //do not duplicate, has been encountered before/elsewhere            
+        //    ////a bit inefficient, but oh well
+        //    //string ss = null;
+        //    //string uu = null;
+        //    //string vv = null;
+        //    //int count = 0;
+        //    //for (int i = 0; i < number; i++)
+        //    //{
+        //    //    count++;
+        //    //    ss += "public IVariable tuple" + (count - 1) + ";" + G.NL;
+        //    //    uu += "tuple" + (count - 1) + " = ptuble" + (count - 1) + ";" + G.NL;
+        //    //    vv += "IVariable ptuble" + (count - 1) + ", ";
+        //    //}
+        //    //if (vv.EndsWith(", ")) vv = vv.Substring(0, vv.Length - 2);
+        //    //headerCs.AppendLine("public class " + className + " { " + ss + G.NL + "public " + className + "(" + vv + ") {" + G.NL + uu + "} }");
+        //    //tupleClasses.Add(className, true);
+        //}        
         
         private static string Num(ASTNode node)
         {
@@ -4479,10 +4492,10 @@ namespace Gekko.Parser.Gek
         public StringBuilder headerMethodTsCs = new StringBuilder(); //stuff to clear TimeSeries pointers
         public StringBuilder headerMethodScalarCs = new StringBuilder(); //stuff to clear scalar pointers   
 
-        public GekkoDictionary<string, bool> functionUserDefined = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        //public GekkoDictionary<string, bool> functionUserDefined = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
         public GekkoDictionary<string, bool> tupleClasses = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
-        public StringBuilder uHeaderCs = new StringBuilder(); //stuff to be put at the very start.
+        public StringBuilder uHeaderCs = new StringBuilder(); //stuff to be put at the very start.        
         public FunctionArgumentsHelper uFunctionsHelper = null; //important that it starts out as null here
         public GekkoDictionary<string, string> uScalarCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public GekkoDictionary<string, string> uListCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);

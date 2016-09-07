@@ -17497,6 +17497,8 @@ public static bool IsLargeAware(Stream stream)
             Globals.prtCsSnippets.Clear();  //just to save ram
             Globals.prtCsSnippetsHeaders.Clear(); //just to save ram
 
+            Globals.uFunctionStorageCs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);  //resetting user functions
+
             Program.model = null; Program.unfoldedVariableList = null;
             Globals.modelFileName = "";
             GuiSetModelName();

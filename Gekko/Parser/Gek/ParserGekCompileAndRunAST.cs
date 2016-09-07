@@ -20,8 +20,25 @@ namespace Gekko.Parser.Gek
         {
             Assembly a = null;
             if (ch.codeUFunctions != null && ch.codeUFunctions.Length > 0)
-            {                
-                CompilerResults compilerResultsU = CompileAST(ch.codeUFunctions, p, null);
+            {
+                StringBuilder s3 = new StringBuilder();
+                s3.AppendLine("using System;");
+                s3.AppendLine("using System.Collections.Generic;");
+                s3.AppendLine("using System.Text;");
+                s3.AppendLine("using System.Windows.Forms;");
+                s3.AppendLine("using System.Drawing;");  //to use Color.Red in G.Writeln()
+                s3.AppendLine("using Gekko.Parser;"); //all the AST_Xxx() methods are found in Gekko.Parser.AST.cs
+                s3.AppendLine("namespace Gekko");
+                s3.AppendLine("{");
+                s3.AppendLine("public class UProc");
+                s3.AppendLine("{");
+                s3.AppendLine("public static GekkoTime globalGekkoTimeIterator = Globals.tNull;");
+                s3.Append(ch.codeUFunctions);
+                s3.AppendLine("}");  //class UProc
+                s3.AppendLine("}");  //namespace Gekko
+                string s = s3.ToString().Replace("`", Globals.QT);
+                
+                CompilerResults compilerResultsU = CompileAST(s, p, null);
                 if (compilerResultsU.Errors.HasErrors) return;
                 a = compilerResultsU.CompiledAssembly;
             }
