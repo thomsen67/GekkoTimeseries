@@ -2123,7 +2123,7 @@ functionDefLhsH1          : type  //for instance "VAL"
 						  | leftParenNoGlue (type (COMMA2 type)*) RIGHTPAREN -> ^(ASTFUNCTIONDEFLHSTUPLE type+) //for instance "(VAL, DATE)", but we allow "(VAL)" too.
 						  ;
 
-type                      : VAL | DATE | STRING2 | NAME | LIST | SERIES | MATRIX;
+type                      : VAL | DATE | STRING2 | NAME | LIST | SERIES | SER | MATRIX | MAT;
 
 copyOpt1                  : ISNOTQUAL | leftAngle copyOpt1h* RIGHTANGLE -> copyOpt1h*;
 copyOpt1h                 : dates -> ^(ASTDATES dates)

@@ -2844,20 +2844,20 @@ namespace UnitTests
             Databank work = First();
             //simplest possible
             I("RESET;");
-            I("function val f(val x); return %x*%x; end; val y = f(4);");
+            I("function val f(val x); return %x*%x; end; val y = f(3+1);");
             //val y = f(4);
             AssertHelperScalarVal("y", 16);
 
             //simplest possible, with same-name x
             I("RESET;");
-            I("function val f(val x); return %x*%x; end; val x = 5; val y = f(4);");
+            I("function val f(val x); return %x*%x; end; val x = 5; val y = f(3+1);");
             //val y = f(4);
             AssertHelperScalarVal("x", 5);
             AssertHelperScalarVal("y", 16);
 
             //normal and nested calls with two params
             I("RESET;");
-            I("function val f(val x, val y); return %x*%y; end; val q1 = 3; val q2 = 4; val q3 = f(%q1, %q2); val q4 = f(f(%q1, %q2), f(%q1, %q2));");
+            I("function val f(val x, val y); return %x*%y; end; val q1 = 3; val q2 = 4; val q3 = f(%q1, %q2); val q4 = f(f(%q1, %q2)+0, f(%q1, %q2));");
             //val q3 = f(%q1, %q2); val q4 = f(f(%q1, %q2), f(%q1, %q2));
             AssertHelperScalarVal("q3", 12);
             AssertHelperScalarVal("q4", 144);
@@ -2932,21 +2932,21 @@ namespace UnitTests
 
             //testing access of global variable (%z)
             I("RESET;");
-            I("function val f(val x, val y); return %x*%y + %z; end; val z = 100; val q = f(3, 4);");
+            I("function val f(val x, val y); return %x*%y + %z; end; val z = 100; val q = f(3, 4+0);");
             //val q = f(3, 4);
             AssertHelperScalarVal("q", 112);
             AssertHelperScalarVal("z", 100);
 
             //local param shadows/hides global variable (%z)
             I("RESET;");
-            I("function val f(val x, val y, val z); return %x*%y + %z; end; val z = 100; val q = f(3, 4, 1000);");
+            I("function val f(val x, val y, val z); return %x*%y + %z; end; val z = 100; val q = f(3, 4, 1000+0);");
             //val q = f(3, 4, 1000);
             AssertHelperScalarVal("q", 1012);
             AssertHelperScalarVal("z", 100);  //is not changed, since %z is a parameter
 
             //local param shadows/hides global variable (%z)
             I("RESET;");
-            I("function val f(val x, val y); val z = 1000; return %x*%y + %z; end; val z = 100; val q = f(3, 4);");
+            I("function val f(val x, val y); val z = 1000; return %x*%y + %z; end; val z = 100; val q = f(3, 4+0);");
             //val q = f(3, 4);
             AssertHelperScalarVal("q", 1012);
             //-----------------------------------------
@@ -2959,7 +2959,7 @@ namespace UnitTests
             // -----------------------------------------------------------
 
             I("RESET;");
-            I("function date f(date x); return %x+3; end; date y = f(2000a1);");
+            I("function date f(date x); return %x+3; end; date y = f(2000a1+0);");
             //date y = f(2000a1);
             AssertHelperScalarDate("y", EFreq.Annual, 2003, 1);
 
@@ -2993,7 +2993,7 @@ namespace UnitTests
             // -----------------------------------------------------------
 
             I("RESET;");
-            I("function matrix multiply(matrix x, matrix y); return #x * #y; end; matrix a = [1, 2 || 3, 4]; matrix b = [9, 8 || 7, 6]; matrix c = multiply(#a, #b);");
+            I("function matrix multiply(matrix x, matrix y); return #x * #y; end; matrix a = [1, 2 || 3, 4]; matrix b = [9, 8 || 7, 6]; matrix z = [0, 0 || 0, 0]; matrix c = multiply(#a, #b+#z);");
             AssertHelperMatrix("c", "rows", 2);
             AssertHelperMatrix("c", "cols", 2);
             AssertHelperMatrix("c", 1, 1, 23d, 0d);
@@ -3012,7 +3012,7 @@ namespace UnitTests
 
             I("RESET;");
             I("TIME 2000 2001;");
-            I("function series f(series x, series y); return x*y; end; create xx, yy, zz; SERIES xx= 2; SERIES yy = 3; SERIES zz = f(xx, yy);");
+            I("function series f(series x, series y); return x*y; end; VAL v = 0; create xx, yy, zz; SERIES xx= 2; SERIES yy = 3; SERIES zz = f(xx, yy+%v);");
             //SERIES zz = f(xx, yy);
             UData u;
             u = Data("xx", 2000, "a"); Assert.AreEqual(u.w, 2);
@@ -3024,7 +3024,7 @@ namespace UnitTests
 
             I("RESET;");
             I("TIME 2000 2001;");
-            I("function series f(series x, series y); return x*y; end; create xx, yy, zz; SERIES xx= 2; SERIES yy = 3; SERIES zz = f(f(xx, yy), yy);");
+            I("function series f(series x, series y); return x*y; end; VAL v = 0; create xx, yy, zz; SERIES xx= 2; SERIES yy = 3; SERIES zz = f(f(xx+%v, yy+%v), yy+%v);");
             //nested use of series function
             //SERIES zz = f(f(xx, yy) yy);
             u = Data("xx", 2000, "a"); Assert.AreEqual(u.w, 2);

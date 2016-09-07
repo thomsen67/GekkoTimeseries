@@ -1237,7 +1237,7 @@ namespace Gekko.Parser.Gek
 
                             if (w.uFunctionsHelper.lhsTypes.Count > 1)
                             {
-                                //Create the classe corresponding to the return tuple (lhs)
+                                //Create the class corresponding to the return tuple (lhs)
                                 string tupleClassName = G.GetVariableType(w.uFunctionsHelper.lhsTypes.Count);
                                 CreateTupleClass(w.uHeaderCs, w.uFunctionsHelper.lhsTypes.Count, tupleClassName, w.tupleClasses);
                             }
