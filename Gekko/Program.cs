@@ -2485,7 +2485,7 @@ namespace Gekko
 
             if (isTsdx && isProtobuf)
             {
-                using (FileStream fs = WaitForFileStream(tempTsdxPath + "\\" + "databank.bin", GekkoFileReadOrWrite.Read))
+                using (FileStream fs = WaitForFileStream(tempTsdxPath + "\\" + Globals.protobufFileName, GekkoFileReadOrWrite.Read))
                 {
 
                     Databank temp = null;
@@ -16431,7 +16431,7 @@ public static bool IsLargeAware(Stream stream)
                 //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
                 RuntimeTypeModel serializer = TypeModel.Create();
                 serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-                string pathAndFilename2 = tempTsdxPath + "\\" + "databank.bin";
+                string pathAndFilename2 = tempTsdxPath + "\\" + Globals.protobufFileName;
                 databank.Trim();  //to make it smaller, slack removed from each TimeSeries
 
                 //Note that if writeAllVariables=true, we don't make any list of the variables, the databank
@@ -16801,7 +16801,7 @@ public static bool IsLargeAware(Stream stream)
                         {
                             string fileName2 = tmp2.ArchiveFileNames[i];
 
-                            if (G.equal(fileName2, "databank.bin"))
+                            if (G.equal(fileName2, Globals.protobufFileName))
                             {
                                 isProtobuf = true;
                             }

@@ -69,6 +69,8 @@ namespace Gekko
         public static string stackedTimeSeparator = "___";
         public static bool stackedPrintTimings = false;
 
+        public static string protobufFileName = "databank.bin";  //In Gekko 2.2 it might be wise to change to for instance databank.dat or something innocent. Perhaps even future-proof it with possibility of using .gda as extension.
+
         public static bool useRfFr = false;
 
         public static bool fixIndexerMaybeTransform = false;
