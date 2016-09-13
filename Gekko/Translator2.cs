@@ -61,7 +61,7 @@ namespace Gekko
                 }
                 else //not ASTCOMMAND1 or 2, often ASTCOMMAND3, but could be ASTLEFTPAREN etc.
                 {
-                    HandleCommand3(node, listMemory, matrixMemory, scalarMemory);
+                    HandleCommand3(node, listMemory, matrixMemory, scalarMemory);                    
                 }                
             }            
 
@@ -238,8 +238,9 @@ namespace Gekko
                         }
                     }
                 }
-            }
-            
+            }           
+
+
             if (G.equal(node.Text, "#"))
             {
                 // #
@@ -476,6 +477,8 @@ namespace Gekko
                     }
                 }
             }
+                       
+
 
             //finds FOR ... TO ... and replaces with "FOR date ..." or "FOR val ..."
             if (node.Text == "ASTCOMMAND3" && node.Parent.commandTypeAremosLower == "for")
@@ -622,6 +625,12 @@ namespace Gekko
             if (G.Equal(node.Text, FromTo("col", "collapse")) != null)
             {
                 SetCommandType(node, "collapse");
+                SetCommandText(node, "collapse");
+            }
+
+            if (G.Equal(node.Text, FromTo("convert", "convert")) != null)  //CONVERT is a procedure from AREMOS that seems to do the same as COLLAPSE.
+            {
+                SetCommandType(node, "convert");
                 SetCommandText(node, "collapse");
             }
 
