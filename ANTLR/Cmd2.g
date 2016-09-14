@@ -54,7 +54,10 @@ options {
 
 //Token definitions I
 tokens {
-    ASTABS;
+    ASTOR;
+	ASTAND;
+	ASTNOT;
+	ASTABS;
     ASTACCEPT;
     ASTADD;
     ASTANALYZE;
@@ -2036,11 +2039,17 @@ x12aOpt1h                 : PARAM EQUAL expression -> ^(ASTOPT_STRING_PARAM expr
 
 //--------------------------------------------------------------------------------------
 
-logicalOr			      :  logicalAnd (OR^ logicalAnd)*;       // make OR the root
+logicalOr
+  :  (logicalAnd        -> logicalAnd)
+     (OR? lbla=logicalAnd -> ^(ASTOR $logicalOr $lbla))* 
+  ;
 
-logicalAnd				  :  logicalNot (AND^ logicalNot)*;      // make AND the root
+logicalAnd
+  :  (logicalNot        -> logicalNot)
+     (AND? lbla=logicalNot -> ^(ASTAND $logicalAnd $lbla))* 
+  ;
 
-logicalNot				  :  NOT^ logicalAtom                    // make NOT the root
+logicalNot				  :  NOT logicalAtom     -> ^(ASTNOT logicalAtom)
 						  |  logicalAtom
 						  ;
 

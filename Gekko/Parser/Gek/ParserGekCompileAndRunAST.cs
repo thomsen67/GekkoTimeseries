@@ -95,6 +95,7 @@ namespace Gekko.Parser.Gek
             finally
             {
                 //always remove any _tmptmp-variables in banks if present
+                //G.Writeln("returned " + p.GetDepth() + " " + p.lastFileSentToANTLR);
                 p.RemoveLast();
             }
 

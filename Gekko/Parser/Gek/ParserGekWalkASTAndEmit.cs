@@ -752,11 +752,7 @@ namespace Gekko.Parser.Gek
                             node.Code.CA(doubleWithNumber); //no need for checking if it exists                      
                         }
                         break;
-                    
-                    case "or": //casing unknown for OR
-                    case "oR":
-                    case "Or":
-                    case "OR":
+                    case "ASTOR":
                         {                            
                             node.Code.A("((");
                             node.Code.A(node[0].Code);
@@ -764,15 +760,8 @@ namespace Gekko.Parser.Gek
                             node.Code.A(node[1].Code);
                             node.Code.A("))");
                         }
-                        break;
-                    case "and": //casing unknown for AND
-                    case "anD":
-                    case "aNd":
-                    case "aND":
-                    case "And":
-                    case "AnD":
-                    case "ANd":
-                    case "AND":                    
+                        break;                    
+                    case "ASTAND":                    
                         {
                             node.Code.A("((");
                             node.Code.A(node[0].Code);
@@ -780,15 +769,8 @@ namespace Gekko.Parser.Gek
                             node.Code.A(node[1].Code);
                             node.Code.A("))");
                         }
-                        break;
-                    case "not": //casing unknown for NOT
-                    case "noT":
-                    case "nOt":
-                    case "nOT":
-                    case "Not":
-                    case "NoT":
-                    case "NOt":
-                    case "NOT":
+                        break;                    
+                    case "ASTNOT":
                         {
                             node.Code.A("!(");
                             node.Code.A(node[0].Code);                            
