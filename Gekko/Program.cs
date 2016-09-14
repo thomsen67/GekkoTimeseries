@@ -4502,7 +4502,7 @@ namespace Gekko
             }
         }
 
-        public static void EmitCodeFromANTLR(string text, string fileName, P p)
+        public static void EmitCodeFromANTLR(string text, string fileName, bool isLibrary, P p)
         {
             int max = 1;
             if (G.equal(Program.options.interface_debug, "dialog")) max = int.MaxValue;  //should suffice as tries :-)
@@ -4595,8 +4595,15 @@ namespace Gekko
 
                 ch.commandsText = commandLinesFlat;
                 if (fileName == "") Globals.commandMemory.storage.AppendLine(text); //is syntax-ok, but may run-time fail
-                
-                Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);                
+
+                if (isLibrary)
+                {
+                    //skip it, there will be no code, since code outside functions is not allowed in gcm files storing user functions (called with LIBRARY)
+                }
+                else
+                {
+                    Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+                }
 
                 break;  //if we get to here, everything is ok so break the file-trying loop
             }
@@ -10966,7 +10973,7 @@ public static bool IsLargeAware(Stream stream)
             Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
             Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
 
-            Program.EmitCodeFromANTLR("", fileName2, p);
+            Program.EmitCodeFromANTLR("", fileName2, isLibrary, p);
 
             if (G.equal(s, Globals.autoExecCmdFileName))
             {
@@ -19010,7 +19017,7 @@ public static bool IsLargeAware(Stream stream)
         public static void obeyCommandCalledFromGUI(string s, P p)
         {
             //Globals.prtCsSnippets.Clear();  //to save RAM for long sessions, should be ok to delete it here (otherwise we will just get an exception)
-            Program.EmitCodeFromANTLR(s, "", p);
+            Program.EmitCodeFromANTLR(s, "", false, p);
             if (!G.IsUnitTesting()) ShowPeriodInStatusField("");
         }
 
