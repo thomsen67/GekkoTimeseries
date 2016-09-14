@@ -3001,6 +3001,15 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
+                    case "ASTLIBRARY":
+                        {
+                            string libName = node[0].Text;  //simple ident name
+                            O.Library o = new O.Library();
+                            o.fileName = libName;
+                            o.p = p;
+                            o.Exe();                            
+                        }
+                        break;
                     case "ASTSCALAR":
                         {
                             HandleScalar(node, false, w);                            

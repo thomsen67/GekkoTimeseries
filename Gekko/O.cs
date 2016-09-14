@@ -2657,6 +2657,16 @@ namespace Gekko
             }
         }
 
+        public class Library
+        {
+            public string fileName = null;
+            public P p = null;
+            public void Exe()
+            {
+                Program.Library(this.fileName, this.p);
+            }
+        }
+
         public class Doc
         {
             public string opt_label = null;

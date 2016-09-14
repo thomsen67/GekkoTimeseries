@@ -54,7 +54,8 @@ options {
 
 //Token definitions I
 tokens {
-    ASTOR;
+    ASTLIBRARY;
+	ASTOR;
 	ASTAND;
 	ASTNOT;
 	ASTABS;
@@ -863,6 +864,7 @@ tokens {
     ROWS             = 'ROWS';
     RP= 'RP'       ;
     RUN              = 'RUN'             ;
+	LIBRARY = 'LIBRARY';
     SEARCH = 'SEARCH';
     SEC = 'SEC';
 	SECONDCOLWIDTH = 'SECONDCOLWIDTH';
@@ -1307,6 +1309,7 @@ tokens {
                                         d.Add("rows"    , ROWS    );
                                         d.Add("rp"               , RP );
                                         d.Add("run"     , RUN       );
+										d.Add("library"     , LIBRARY       );
                                         d.Add("S___ER" ,SER2);
                                         d.Add("S___ERIES" ,SERIES2);
                                         d.Add("SEARCH", SEARCH);
@@ -1476,6 +1479,7 @@ expr2                     :
 						  | ini            SEMICOLON!
 						  | itershow       SEMICOLON!
 						  | download       SEMICOLON!
+						  | library        SEMICOLON!
                           | list           SEMICOLON!
 						  | lock_          SEMICOLON!
 						  | matrix         SEMICOLON!						
@@ -1732,6 +1736,8 @@ indexOpt1h                : MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)	
 ini						  : INI -> ^({token("ASTINI", ASTINI, $INI.Line)});
 
 itershow				  : ITERSHOW  (leftAngle dates? RIGHTANGLE)? listItems -> ^({token("ASTITERSHOW", ASTITERSHOW, $ITERSHOW.Line)} ^(ASTDATES dates?) listItems);
+
+library                   : LIBRARY ident -> ^({token("ASTLIBRARY", ASTLIBRARY, $LIBRARY.Line)} ident);  //must keep the name simple, since the file is grabbed at parse time, in contrast to the RUN command
 
 list					  :	LIST listOpt1? listNameHelper EQUAL listItems prefix? suffix? strip? sort? -> ^({token("ASTLIST¤"+($listItems.text)+"¤",  ASTLIST, $LIST.Line)} listNameHelper listItems listOpt1? prefix? suffix? strip? sort? )
 		                  | LIST question hashNoGlue GLUE ident -> ^({token("ASTLIST",  ASTLIST, $LIST.Line)} question ident)

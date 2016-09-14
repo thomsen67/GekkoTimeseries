@@ -10894,10 +10894,20 @@ public static bool IsLargeAware(Stream stream)
                 Program.SelectFile(Globals.extensionCommand, ref fileName, ref cancel);
             }
             if (cancel) return;
-            AddAbstract(fileName, true, p);
+            AddAbstract(fileName, true, false, p);
         }
 
-        public static void AddAbstract(string s, bool run, P p)
+        public static void Library(string fileName, P p)
+        {            
+            if (fileName == "*")
+            {
+                G.Writeln2("*** ERROR: You cannot use LIBRARY *;");
+                throw new GekkoException();
+            }            
+            AddAbstract(fileName, true, true, p);
+        }
+
+        public static void AddAbstract(string s, bool run, bool isLibrary, P p)
         {
             s = StripQuotes(s);
             if (run)
