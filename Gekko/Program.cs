@@ -28370,7 +28370,8 @@ public static bool IsLargeAware(Stream stream)
         public void SetText(string s)
         {
             //This method is called in translated code, for each line (that is not "simple", ie. FOR, IF etc.)
-            this.stack[counter] = s;
+
+            this.stack[counter] = this.lastFileSentToANTLR + s;
             ReportToRunStatus(false);
         }
 
