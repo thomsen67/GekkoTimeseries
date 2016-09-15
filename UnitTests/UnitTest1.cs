@@ -2839,6 +2839,26 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void Test__FunctionsUserDefinedLibrary()
+        {
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\UFunctions';");
+            I("RESET;");
+            I("RUN u1;");
+            AssertHelperScalarVal("v", 11d);
+            I("RESET;");
+            I("RUN u2;");
+            AssertHelperScalarVal("v", 12d);  //library u2a is loaded last, therefore 10+2
+            I("RESET;");
+            I("RUN u3;");
+            AssertHelperScalarVal("v", 11d);  //library u1a is loaded last, therefore 10+1
+            I("RESET;");
+            I("RUN u4;");
+            AssertHelperScalarVal("v", 114d);  //The function inside u4 trumps the library
+        }
+
+
+
+        [TestMethod]
         public void Test__FunctionsUserDefined()
         {
             Databank work = First();
