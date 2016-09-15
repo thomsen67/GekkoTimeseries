@@ -109,9 +109,13 @@ namespace Gekko
             TextWriter writer = null;
             try
             {
-                var serializer = new XmlSerializer(typeof(T));
-                writer = new StreamWriter(filePath, append);
-                serializer.Serialize(writer, objectToWrite);
+                using (FileStream fs = Program.WaitForFileStream(filePath, Program.GekkoFileReadOrWrite.Write))
+                using (writer = G.GekkoStreamWriter(fs))
+                {
+                    var serializer = new XmlSerializer(typeof(T));
+                    writer = new StreamWriter(filePath, append);
+                    serializer.Serialize(writer, objectToWrite);
+                }
             }
             finally
             {
@@ -132,9 +136,12 @@ namespace Gekko
             TextReader reader = null;
             try
             {
-                var serializer = new XmlSerializer(typeof(T));
-                reader = new StreamReader(filePath);
-                return (T)serializer.Deserialize(reader);
+                using (FileStream fs = Program.WaitForFileStream(filePath, Program.GekkoFileReadOrWrite.Read))
+                using (reader = new StreamReader(fs))
+                {
+                    var serializer = new XmlSerializer(typeof(T));
+                    return (T)serializer.Deserialize(reader);
+                }
             }
             finally
             {

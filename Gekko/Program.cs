@@ -2384,7 +2384,8 @@ namespace Gekko
                 XmlDocument doc = new XmlDocument();
                 //We can presume that DatabankInfo.xml is in UTF-8, since it is typically written by Gekko
                 //So no need to use GetTextFromFile()
-                using (FileStream fs = WaitForFileStream(tempTsdxPath + "\\" + "DatabankInfo.xml", GekkoFileReadOrWrite.Read))
+                string fileXml = tempTsdxPath + "\\" + "DatabankInfo.xml";
+                using (FileStream fs = WaitForFileStream(fileXml, GekkoFileReadOrWrite.Read))
                 {
                     try
                     {
@@ -2393,7 +2394,7 @@ namespace Gekko
                     catch (Exception e)
                     {
                         G.Writeln2("*** ERROR: XML file 'DatabankInfo.xml' inside " + Globals.extensionDatabank + " file.");
-                        WriteXmlError(e);
+                        WriteXmlError(e, fileXml);
                         throw new GekkoException();
                     }
 
@@ -17915,7 +17916,7 @@ public static bool IsLargeAware(Stream stream)
             {
                 G.Writeln();
                 G.Writeln("*** ERROR: Table file: '" + filename + "'");
-                WriteXmlError(e);
+                WriteXmlError(e, filename);
                 throw new GekkoException();
             }
 
@@ -17974,10 +17975,11 @@ public static bool IsLargeAware(Stream stream)
             //}
         }
 
-        public static void WriteXmlError(Exception e)
+        public static void WriteXmlError(Exception e, string file)
         {
             G.Writeln2("*** ERROR: The file seems to be invalid as regards XML syntax:");
-            G.Writeln("           " + e.Message);
+            if (e.InnerException != null) G.Writeln("           " + e.InnerException.Message, Color.Red);
+            else G.Writeln("           " + e.Message, Color.Red);
         }
 
         private static void HandleXmlRow(XmlHelper xh, XmlNode row)
@@ -21814,6 +21816,32 @@ public static bool IsLargeAware(Stream stream)
             string heading = "";
             string pplotType = "emf";
 
+            PlotTemplate gpt = null;
+            if (o.opt_using != null)
+            {
+                string fileName = o.opt_using;
+                bool cancel = false;
+                if (fileName == "*")
+                {
+                    SelectFile("gpt", ref fileName, ref cancel);                    
+                }
+                if (cancel) return;
+                
+                try
+                {                    
+                    fileName = AddExtension(fileName, ".gpt");
+                    gpt = GraphXml.ReadFromXmlFile<PlotTemplate>(fileName);                    
+                }
+                catch (Exception e)
+                {
+                    //G.Writeln2("*** ERROR: XML file 'DatabankInfo.xml' inside " + Globals.extensionDatabank + " file.");
+                    WriteXmlError(e, "");
+                    throw new GekkoException();
+                }
+
+            }
+
+
             if (o.fileName != null)
             {
                 pplotType = Path.GetExtension(o.fileName);
@@ -21903,18 +21931,8 @@ public static bool IsLargeAware(Stream stream)
                 //tw.WriteLine("set xlabel \"År\"");
                 //tw.WriteLine("set ylabel \"Var1\"");
 
-                if (!double.IsNaN(o.opt_ymin) && double.IsNaN(o.opt_ymax))
-                {
-                    tw.WriteLine("set yrange [" + o.opt_ymin + ":]");
-                }
-                else if (double.IsNaN(o.opt_ymin) && !double.IsNaN(o.opt_ymax))
-                {
-                    tw.WriteLine("set yrange [:" + o.opt_ymax + "]");
-                }
-                else if (!double.IsNaN(o.opt_ymin) && !double.IsNaN(o.opt_ymax))
-                {
-                    tw.WriteLine("set yrange [" + o.opt_ymin + ":" + o.opt_ymax + "]");
-                }
+                string set_yrange = GnuplotYrange(o, gpt);
+                if (set_yrange != null) tw.WriteLine("set yrange " + set_yrange + "");
 
                 if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
                 {
@@ -22236,6 +22254,47 @@ public static bool IsLargeAware(Stream stream)
             {
                 o.guiGraphRefreshingFilename = emfName;
             }
+        }
+
+        private static string GnuplotYrange(O.Prt o, PlotTemplate gpt)
+        {
+            string set_yrange = null;
+            double ymin = double.NaN;
+            double ymax = double.NaN;
+            //load from xml
+            string _ymin = null; try { _ymin = gpt.plotYAxis.plotRange.plotRangeMin; } catch (NullReferenceException) { };
+            ymin = ParseIntoDouble(_ymin);
+            string _ymax = null; try { _ymax = gpt.plotYAxis.plotRange.plotRangeMax; } catch (NullReferenceException) { };
+            ymax = ParseIntoDouble(_ymax);
+            //options in PLOT command override
+            if (!double.IsNaN(o.opt_ymin)) ymin = o.opt_ymin;
+            if (!double.IsNaN(o.opt_ymax)) ymax = o.opt_ymax;
+            if (!double.IsNaN(ymin) && double.IsNaN(ymax))
+            {
+                set_yrange = "[" + ymin + ":]";
+            }
+            else if (double.IsNaN(ymin) && !double.IsNaN(ymax))
+            {
+                set_yrange = "[:" + ymax + "]";
+            }
+            else if (!double.IsNaN(ymin) && !double.IsNaN(ymax))
+            {
+                set_yrange = "[" + ymin + ":" + ymax + "]";
+            }
+            return set_yrange;
+        }
+
+        private static double ParseIntoDouble(string x)
+        {
+            double y = double.NaN;
+            if (x != null)
+            {
+                if (!double.TryParse(x, out y))
+                {
+                    G.Writeln2("*** ERROR: Could not parse '" + x + "' as a number");
+                }
+            }
+            return y;
         }
 
         private static string GetDateStringSuitableForGnuplot(string d)

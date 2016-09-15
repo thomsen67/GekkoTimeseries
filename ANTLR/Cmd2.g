@@ -55,6 +55,7 @@ options {
 //Token definitions I
 tokens {
     ASTLIBRARY;
+	ASTPRTUSING;
 	ASTOR;
 	ASTAND;
 	ASTNOT;
@@ -323,6 +324,7 @@ tokens {
     ASTOPT1;
     ASTOPT2;
     ASTOPT_;
+	ASTOPT_STRING_USING;
     ASTOPT_STRING_ABS ;
     ASTOPT_STRING_AFTER;
     ASTOPT_STRING_APPEND;
@@ -569,7 +571,8 @@ tokens {
     ASTYMIN;
     ASTZERO;
 
-    A= 'A'               ;
+    USING = 'USING';
+	A= 'A'               ;
 	DEFAULT = 'DEFAULT';
 	LOGIC = 'LOGIC';
     ABS              = 'ABS';
@@ -1012,6 +1015,7 @@ tokens {
                                 public static System.Collections.Generic.Dictionary<string, int> GetKw()
                                 {
                                         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+										d.Add("USING"    ,   USING     );
 										d.Add("_ABS"    ,   UABS     );
                                         d.Add("_DIF"    ,   UDIF     );
                                         d.Add("_DIFF"   ,   UDIFF     );
@@ -1795,6 +1799,7 @@ sheetImportOpt1h          : CELL '=' expression -> ^(ASTOPT_STRING_CELL expressi
 							//Hmmm, not possible to use {token()} here unless we make 9 identical lines
 prt                       : prtHelper prtOpt1? prtElements prtOpt2? -> ^(ASTPRT ^(ASTPRTTYPE prtHelper) prtOpt1? prtOpt2? prtElements);
 prtHelper                 : P | PRT | PRI | PRINT | MULPRT | GMULPRT | SHEET | CLIP | PLOT;
+//prtUsing                  : USING fileNameStar -> ^(ASTPRTUSING fileNameStar);
 prtOpt1                   : ISNOTQUAL 
 						  | leftAngle2          prtOpt1Helper* RIGHTANGLE -> ^(ASTOPT1 prtOpt1Helper*)							
 						  | leftAngleNo2 dates? prtOpt1Helper* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) prtOpt1Helper*)
@@ -1812,7 +1817,8 @@ prtOpt1Helper             : filter
 						  | PLOTCODE '=' expression -> ^(ASTOPT_STRING_PLOTCODE expression)
 						  | ROWS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ROWS yesNo?)
 						  | SHEET '=' expression -> ^(ASTOPT_STRING_SHEET expression)
-						  | STAMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STAMP yesNo?)						
+						  | STAMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STAMP yesNo?)							  
+						  | USING EQUAL fileNameStar -> ^(ASTOPT_STRING_USING fileNameStar)							  
 						  | YMAX EQUAL expression -> ^(ASTOPT_VAL_YMAX expression)
 						  | YMIN EQUAL expression -> ^(ASTOPT_VAL_YMIN expression)
 						  ;
@@ -2811,6 +2817,7 @@ integerNegative           : MINUS integer -> ^(ASTINTEGERNEGATIVE integer);
 doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 
 ident                     : Ident|
+							USING|
                             ABS|
 							DEFAULT|
 							LOGIC|

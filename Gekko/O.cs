@@ -3790,7 +3790,8 @@ namespace Gekko
             public string opt_cols = null;
             public string opt_append = null;
             public string opt_collapse = null;
-            public string opt_plotcode = null;  //only for PLOT
+            public string opt_plotcode = null; //only for PLOT
+            public string opt_using = null; //only for PLOT
 
             public long counter = -12345;
 
