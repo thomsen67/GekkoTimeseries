@@ -21803,6 +21803,9 @@ public static bool IsLargeAware(Stream stream)
 
         private static void CallGnuplotNew(Table data, O.Prt o, int count, int maxLabelsLinesFound, List<string> labelsNonBroken)
         {
+            bool dump = true;
+            bool gnuplot51 = true;
+
             if (count == 0)
             {
                 G.Writeln2("*** ERROR: PLOT called with 0 variables");
@@ -21876,7 +21879,9 @@ public static bool IsLargeAware(Stream stream)
             List<string> labels1 = new List<string>();
             List<string> labels2 = new List<string>();
 
-            using (FileStream fs = WaitForFileStream(path + "\\" + file1, GekkoFileReadOrWrite.Write))
+            string fileData = path + "\\" + file1;
+
+            using (FileStream fs = WaitForFileStream(fileData, GekkoFileReadOrWrite.Write))
             using (StreamWriter tw = G.GekkoStreamWriter(fs))
             {
                 for (int t = 0; t < numberOfObs; t++)
@@ -21909,7 +21914,8 @@ public static bool IsLargeAware(Stream stream)
                 }
             }
 
-            using (FileStream fs = WaitForFileStream(path + "\\" + file3, GekkoFileReadOrWrite.Write))
+            string fileGp = path + "\\" + file3;
+            using (FileStream fs = WaitForFileStream(fileGp, GekkoFileReadOrWrite.Write))
             using (StreamWriter tw = G.GekkoStreamWriter(fs))
             {
                 if (o.opt_plotcode != null && o.opt_plotcode.Contains("[histo]"))
@@ -21919,20 +21925,22 @@ public static bool IsLargeAware(Stream stream)
                 }
 
                 tw.WriteLine("set encoding iso_8859_1");
-
-                heading = EncodeDanish(heading);
-
-                tw.WriteLine("set title \"" + heading + "\"");
+                tw.WriteLine("set format y " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
+                                
                 tw.WriteLine("set datafile missing \"NaN\"");
-                tw.WriteLine("set terminal " + pplotType);
-                tw.WriteLine("set output \"" + file2 + "\"");
-                //tw.WriteLine("set data style linespoints"); //probably superfluous
-                //tw.WriteLine("set title \"Graph\"");
-                //tw.WriteLine("set xlabel \"År\"");
-                //tw.WriteLine("set ylabel \"Var1\"");
+                string font = null;
+                if (gnuplot51) font = "'Verdana, 12'";
+                tw.WriteLine("set terminal " + pplotType + " enhanced "+font);                
+                tw.WriteLine("set output \"" + file2 + "\"");                
 
+                //local PLOT<> overrides
                 string set_yrange = GnuplotYrange(o, gpt);
                 if (set_yrange != null) tw.WriteLine("set yrange " + set_yrange + "");
+
+                //local PLOT<> overrides
+                string set_title = GnuplotHeading(o, gpt);
+                if (set_title != null) tw.WriteLine("set title " + Globals.QT + EncodeDanish(set_title) + Globals.QT);
+
 
                 if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
                 {
@@ -21954,135 +21962,28 @@ public static bool IsLargeAware(Stream stream)
                     }
                 }
 
-                tw.WriteLine("set ticscale 1.4 0.7");
-                //tw.WriteLine("set key outside top");
-                //tw.WriteLine("set key 100, 100");
+                if (gnuplot51) tw.WriteLine("set tic scale 1.4, 0.7");
+                else tw.WriteLine("set ticscale 1.4 0.7");
+                
                 tw.WriteLine("set border 3");
                 tw.WriteLine("set xtics nomirror");
                 tw.WriteLine("set ytics nomirror");
                 tw.WriteLine("set xzeroaxis lt -1");
                 tw.WriteLine("set yzeroaxis");
-                //tw.WriteLine("set grid");
-                //tw.WriteLine("set size 0.5,0.5");
-                //tw.WriteLine("set size ratio 0.2"); does not work
+                
+                //tw.WriteLine("set grid");                
 
                 int mxtics = -12345;
 
                 if (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)
                 {
+                    //do nothing
                 }
                 else
                 {
-                    List<int> subperiods = new List<int>();
-                    int onlyYears = -12345;
-                    if (Program.options.freq == EFreq.Quarterly)
-                    {
-                        if (labels1.Count <= 12)  //for quarterly, 12 corresponds to 3 years with 4 subpers each
-                        {
-                            subperiods.Add(1);  //q1
-                            subperiods.Add(4);  //q2
-                            subperiods.Add(7);  //q3
-                            subperiods.Add(10);  //q4
-                        }
-                        else if (labels1.Count <= 24)
-                        {
-                            subperiods.Add(1);  //q1
-                            subperiods.Add(7);  //q3
-                            mxtics = 2;
-                        }
-                        else if (labels1.Count <= 48)
-                        {
-                            subperiods.Add(1);  //q1
-                            mxtics = 4;
-                        }
-                        else if (labels1.Count <= 5 * 48)
-                        {
-                            onlyYears = 5;
-                            subperiods.Add(1);  //q1
-                            mxtics = 5;
-                        }
-                        else if (labels1.Count <= 10 * 48)
-                        {
-                            onlyYears = 10;
-                            subperiods.Add(1);  //q1
-                            mxtics = 10;
-                        }
-                        else
-                        {
-                            onlyYears = 20;
-                            subperiods.Add(1);  //q1
-                        }
-                    }
-                    else  //monthly
-                    {
-                        if (labels1.Count <= 12)  //for monthly, 12 corresponds to 1 year with 12 subpers
-                        {
-                            subperiods.Add(1);  //m1
-                            subperiods.Add(2);  //m2
-                            subperiods.Add(3);  //m3
-                            subperiods.Add(4);  //m4
-                            subperiods.Add(5);  //m5
-                            subperiods.Add(6);  //m6
-                            subperiods.Add(7);  //m7
-                            subperiods.Add(8);  //m8
-                            subperiods.Add(9);  //m9
-                            subperiods.Add(10);  //m10
-                            subperiods.Add(11);  //m11
-                            subperiods.Add(12);  //m12
-                        }
-                        else if (labels1.Count <= 24)
-                        {
-                            subperiods.Add(1);  //m1
-                            subperiods.Add(3);  //m3
-                            subperiods.Add(5);  //m5
-                            subperiods.Add(7);  //m7
-                            subperiods.Add(9);  //m9
-                            subperiods.Add(11);  //m11
-                            mxtics = 2;
-                        }
-                        else if (labels1.Count <= 36)
-                        {
-                            subperiods.Add(1);  //m1
-                            subperiods.Add(4);  //m4
-                            subperiods.Add(7);  //m7
-                            subperiods.Add(10);  //m10
-                            mxtics = 3;
-                        }
-                        else if (labels1.Count <= 48)
-                        {
-                            subperiods.Add(1);  //m1
-                            subperiods.Add(5);  //m5
-                            subperiods.Add(9);  //m9
-                            mxtics = 4;
-                        }
-                        else if (labels1.Count <= 72)
-                        {
-                            subperiods.Add(1);  //m1
-                            subperiods.Add(7);  //m7
-                            mxtics = 6;
-                        }
-                        else if (labels1.Count <= 144)
-                        {
-                            subperiods.Add(1);  //m1
-                        }
-                        else if (labels1.Count <= 15 * 48)
-                        {
-                            onlyYears = 5;
-                            subperiods.Add(1);  //m1
-                            mxtics = 5;
-                        }
-                        else if (labels1.Count <= 30 * 48)
-                        {
-                            onlyYears = 10;
-                            subperiods.Add(1);  //m1
-                            mxtics = 10;
-                        }
-                        else
-                        {
-                            onlyYears = 20;
-                            subperiods.Add(1);  //m1
-                        }
-                    }
+                    List<int> subperiods;
+                    int onlyYears;
+                    mxtics = GnuplotHandleXAxisLabels(labels1, mxtics, out subperiods, out onlyYears);
 
                     string s3 = null;
                     int c = -1;
@@ -22102,33 +22003,22 @@ public static bool IsLargeAware(Stream stream)
                     tw.WriteLine("set xtics (" + s3 + ")");
                 }
 
-                if (mxtics != -12345)
-                {
-                    //for quarterly and monthly
-                    if (false)
-                    {
-                        //TODO: why does this not work??
-                        tw.WriteLine("set mxtics " + mxtics);
-                    }
-                }
-
                 if (histo)
                 {
+                    G.Writeln2("*** ERROR: Instead of [histo], please use a .gpt file");
+                    throw new GekkoException();
+                    
                     if (false)  //not really working (labels)
                     {
                         tw.WriteLine("set size ratio 0.5");
                         tw.WriteLine("set key outside top");
                     }
-
                     tw.WriteLine("set style fill solid 1.000000 border -1");
                     tw.WriteLine("set boxwidth 0.3");
-
-
                     //tw.WriteLine("set style line 1 lt 1 lw 3 lc rgb \"black\" ");
                     tw.WriteLine("set style line 1 lt 1 lw 4.0");
                     tw.WriteLine("set style line 2 lt 2 lw 2.0");
                     tw.WriteLine("set style line 3 lt 3 lw 2.0");
-
                 }
 
                 if (o.opt_plotcode != null)
@@ -22142,7 +22032,6 @@ public static bool IsLargeAware(Stream stream)
                 for (int i = 0; i < count; i++)
                 {
                     string label = EncodeDanish(labelsNonBroken[i]);
-
                     if (!histo)
                     {
                         string lineType = "with lines ";
@@ -22154,14 +22043,17 @@ public static bool IsLargeAware(Stream stream)
                     }
                     else
                     {
+                        //not used anymore
+                        //not used anymore
+                        //not used anymore
+                        //not used anymore
+                        //not used anymore
                         if (i == 0) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 1 " + " title \"  " + label + "\" ");  //obs
                         else if (i == 1) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 2 " + " title \"  " + label + "\" ");  //fitted
                         else if (i == 2) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 3 " + " title \"  " + label + "\" ");  //wanted
                         else if (i == 3) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with boxes lw 2.0 " + " title \"  " + label + "\" ");  //residual
                         else tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints lw 2.0 " + " title \"  " + label + "\" ");
                     }
-
-
 
                     if (i < count - 1) tw.Write(",");
                 }
@@ -22170,11 +22062,32 @@ public static bool IsLargeAware(Stream stream)
                 tw.Close();
             }
 
+            if(dump)
+            {
+                File.Copy(fileGp, Program.options.folder_working + "\\" + "gekkoplot.gp", true);
+                File.Copy(fileData, Program.options.folder_working + "\\" + "gekkoplot.dat", true);
+
+                string text;
+
+                text = File.ReadAllText(Program.options.folder_working + "\\" + "gekkoplot.gp");
+                text = text.Replace("temp" + rr + ".dat", "gekkoplot.dat");
+                text = text.Replace("temp" + rr + ".emf", "gekkoplot.emf");
+                text = text.Replace("temp" + rr + ".gp", "gekkoplot.gp");
+                File.WriteAllText(Program.options.folder_working + "\\" + "gekkoplot.gp", text);
+
+                text = File.ReadAllText(Program.options.folder_working + "\\" + "gekkoplot.dat");
+                text = text.Replace("temp" + rr + ".dat", "gekkoplot.dat");
+                text = text.Replace("temp" + rr + ".emf", "gekkoplot.emf");
+                text = text.Replace("temp" + rr + ".gp", "gekkoplot.gp");
+                File.WriteAllText(Program.options.folder_working + "\\" + "gekkoplot.dat", text);
+            }
+
             string emfName = path + "\\" + file2;
 
             Process p = new Process();
             //p.MainWindowTitle = title;
-            p.StartInfo.FileName = Application.StartupPath + "\\gnuplot\\wgnuplot.exe";
+            if (gnuplot51) p.StartInfo.FileName = Application.StartupPath + "\\gnuplot\\wgnuplot51.exe";
+            else p.StartInfo.FileName = Application.StartupPath + "\\gnuplot\\wgnuplot.exe";
             //p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             //NOTE: quotes added because this path may contain blanks
             p.StartInfo.Arguments = Globals.QT + path + "\\" + file3 + Globals.QT;
@@ -22256,6 +22169,122 @@ public static bool IsLargeAware(Stream stream)
             }
         }
 
+        private static int GnuplotHandleXAxisLabels(List<string> labels1, int mxtics, out List<int> subperiods, out int onlyYears)
+        {
+            subperiods = new List<int>();
+            onlyYears = -12345;
+            if (Program.options.freq == EFreq.Quarterly)
+            {
+                if (labels1.Count <= 12)  //for quarterly, 12 corresponds to 3 years with 4 subpers each
+                {
+                    subperiods.Add(1);  //q1
+                    subperiods.Add(4);  //q2
+                    subperiods.Add(7);  //q3
+                    subperiods.Add(10);  //q4
+                }
+                else if (labels1.Count <= 24)
+                {
+                    subperiods.Add(1);  //q1
+                    subperiods.Add(7);  //q3
+                    mxtics = 2;
+                }
+                else if (labels1.Count <= 48)
+                {
+                    subperiods.Add(1);  //q1
+                    mxtics = 4;
+                }
+                else if (labels1.Count <= 5 * 48)
+                {
+                    onlyYears = 5;
+                    subperiods.Add(1);  //q1
+                    mxtics = 5;
+                }
+                else if (labels1.Count <= 10 * 48)
+                {
+                    onlyYears = 10;
+                    subperiods.Add(1);  //q1
+                    mxtics = 10;
+                }
+                else
+                {
+                    onlyYears = 20;
+                    subperiods.Add(1);  //q1
+                }
+            }
+            else  //monthly
+            {
+                if (labels1.Count <= 12)  //for monthly, 12 corresponds to 1 year with 12 subpers
+                {
+                    subperiods.Add(1);  //m1
+                    subperiods.Add(2);  //m2
+                    subperiods.Add(3);  //m3
+                    subperiods.Add(4);  //m4
+                    subperiods.Add(5);  //m5
+                    subperiods.Add(6);  //m6
+                    subperiods.Add(7);  //m7
+                    subperiods.Add(8);  //m8
+                    subperiods.Add(9);  //m9
+                    subperiods.Add(10);  //m10
+                    subperiods.Add(11);  //m11
+                    subperiods.Add(12);  //m12
+                }
+                else if (labels1.Count <= 24)
+                {
+                    subperiods.Add(1);  //m1
+                    subperiods.Add(3);  //m3
+                    subperiods.Add(5);  //m5
+                    subperiods.Add(7);  //m7
+                    subperiods.Add(9);  //m9
+                    subperiods.Add(11);  //m11
+                    mxtics = 2;
+                }
+                else if (labels1.Count <= 36)
+                {
+                    subperiods.Add(1);  //m1
+                    subperiods.Add(4);  //m4
+                    subperiods.Add(7);  //m7
+                    subperiods.Add(10);  //m10
+                    mxtics = 3;
+                }
+                else if (labels1.Count <= 48)
+                {
+                    subperiods.Add(1);  //m1
+                    subperiods.Add(5);  //m5
+                    subperiods.Add(9);  //m9
+                    mxtics = 4;
+                }
+                else if (labels1.Count <= 72)
+                {
+                    subperiods.Add(1);  //m1
+                    subperiods.Add(7);  //m7
+                    mxtics = 6;
+                }
+                else if (labels1.Count <= 144)
+                {
+                    subperiods.Add(1);  //m1
+                }
+                else if (labels1.Count <= 15 * 48)
+                {
+                    onlyYears = 5;
+                    subperiods.Add(1);  //m1
+                    mxtics = 5;
+                }
+                else if (labels1.Count <= 30 * 48)
+                {
+                    onlyYears = 10;
+                    subperiods.Add(1);  //m1
+                    mxtics = 10;
+                }
+                else
+                {
+                    onlyYears = 20;
+                    subperiods.Add(1);  //m1
+                }
+            }
+
+            return mxtics;
+        }
+
         private static string GnuplotYrange(O.Prt o, PlotTemplate gpt)
         {
             string set_yrange = null;
@@ -22282,6 +22311,14 @@ public static bool IsLargeAware(Stream stream)
                 set_yrange = "[" + ymin + ":" + ymax + "]";
             }
             return set_yrange;
+        }
+
+        private static string GnuplotHeading(O.Prt o, PlotTemplate gpt)
+        {
+            string heading = null;            
+            try { heading = gpt.plotMain.title; } catch (NullReferenceException) { };
+            if (o.opt_heading != null) heading = o.opt_heading;
+            return heading;
         }
 
         private static double ParseIntoDouble(string x)

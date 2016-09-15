@@ -27,23 +27,13 @@ namespace Gekko
     public class PlotMain
     {
         [XmlElement(ElementName = "title")]
-        public PlotTitle title;
-    }
-
-    public class PlotTitle
-    {
-        //[XmlText]
-        [XmlElement(ElementName = "text")]
-        public string text;
-        //[XmlAttribute(AttributeName = "position")]
-        [XmlElement(ElementName = "position")]
-        public string position;
-    }
+        public string title;
+    }   
 
     public class PlotXAxis
     {
         [XmlElement(ElementName = "title")]
-        public PlotTitle title;
+        public string title;
     }
 
     public class PlotRange
@@ -57,7 +47,7 @@ namespace Gekko
     public class PlotYAxis
     {
         [XmlElement(ElementName = "title")]
-        public PlotTitle title;
+        public string title;
         [XmlElement(ElementName = "range")]
         public PlotRange plotRange;
     }
@@ -65,7 +55,7 @@ namespace Gekko
     public class PlotYAxis2
     {
         [XmlElement(ElementName = "title")]
-        public PlotTitle title;
+        public string title;
         [XmlElement(ElementName = "range")]
         public PlotRange plotRange;
     }
