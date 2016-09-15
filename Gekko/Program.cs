@@ -22003,23 +22003,17 @@ public static bool IsLargeAware(Stream stream)
                     tw.WriteLine("set xtics (" + s3 + ")");
                 }
 
-                if (histo)
-                {
-                    G.Writeln2("*** ERROR: Instead of [histo], please use a .gpt file");
-                    throw new GekkoException();
+                //if (histo)
+                //{
+                //    G.Writeln2("*** ERROR: Instead of [histo], please use a .gpt file");
+                //    throw new GekkoException();
                     
-                    if (false)  //not really working (labels)
-                    {
-                        tw.WriteLine("set size ratio 0.5");
-                        tw.WriteLine("set key outside top");
-                    }
-                    tw.WriteLine("set style fill solid 1.000000 border -1");
-                    tw.WriteLine("set boxwidth 0.3");
-                    //tw.WriteLine("set style line 1 lt 1 lw 3 lc rgb \"black\" ");
-                    tw.WriteLine("set style line 1 lt 1 lw 4.0");
-                    tw.WriteLine("set style line 2 lt 2 lw 2.0");
-                    tw.WriteLine("set style line 3 lt 3 lw 2.0");
-                }
+                //    tw.WriteLine("set style fill solid 1.000000 border -1");
+                //    tw.WriteLine("set boxwidth 0.3");                    
+                //    tw.WriteLine("set style line 1 lt 1 lw 4.0");
+                //    tw.WriteLine("set style line 2 lt 2 lw 2.0");
+                //    tw.WriteLine("set style line 3 lt 3 lw 2.0");
+                //}
 
                 if (o.opt_plotcode != null)
                 {
@@ -22028,35 +22022,63 @@ public static bool IsLargeAware(Stream stream)
                     tw.WriteLine("");
                 }
 
-                tw.Write("plot ");
-                for (int i = 0; i < count; i++)
-                {
-                    string label = EncodeDanish(labelsNonBroken[i]);
-                    if (!histo)
-                    {
-                        string lineType = "with lines ";
-                        if (Program.options.plot_lines_points)
-                        {
-                            lineType = "with linespoints ";
-                        }
-                        tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " " + lineType + "lw 2.0 " + " title \"  " + label + "\" ");
-                    }
-                    else
-                    {
-                        //not used anymore
-                        //not used anymore
-                        //not used anymore
-                        //not used anymore
-                        //not used anymore
-                        if (i == 0) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 1 " + " title \"  " + label + "\" ");  //obs
-                        else if (i == 1) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 2 " + " title \"  " + label + "\" ");  //fitted
-                        else if (i == 2) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 3 " + " title \"  " + label + "\" ");  //wanted
-                        else if (i == 3) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with boxes lw 2.0 " + " title \"  " + label + "\" ");  //residual
-                        else tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints lw 2.0 " + " title \"  " + label + "\" ");
-                    }
+                //tw.WriteLine("show style line");
+                tw.WriteLine("set style data linespoints");
 
-                    if (i < count - 1) tw.Write(",");
+                List <PlotLine> lines = null;
+                                
+                try { lines = gpt.plotLines.plotLine; } catch (NullReferenceException) { };
+
+                StringBuilder sb1 = new StringBuilder();
+                StringBuilder sb2 = new StringBuilder();
+
+                sb2.Append("plot ");
+                for (int i = 0; i < count; i++)
+                {                    
+                    string legend = null;
+                    string type = null;
+                    string width = null;
+                    string color = null;
+                    string point = null;
+                    string size = null;
+                    string yAxis = null;
+                    string dashtype = null;
+                    PlotLine line = null;
+                    if (lines != null && i < lines.Count) line = lines[i];
+                    if (line!=null)
+                    {
+                        legend = line.legend;
+                        type = line.type;
+                        width = line.width;
+                        color = line.color;
+                        point = line.point;
+                        size = line.size;
+                        yAxis = line.yAxis;
+                        dashtype = line.dashtype;
+                    }                   
+
+                    string label = EncodeDanish(labelsNonBroken[i]);
+                    if (legend != null) label = EncodeDanish(legend);  //actually overrides, it should be PRT fy 'GDP' that overrides (the 'GDP').
+
+                    string _dashtype = null;
+                    if (dashtype != null) _dashtype = " lt " + dashtype;
+
+                    string _width = null;
+                    if (width != null) _width = " lw " + width;
+
+                    string _color = null;
+                    if (color != null) _color = " lc rgb " + Globals.QT + color + Globals.QT;
+
+                    //sb1.AppendLine("set style line "+ (i + 1) + _dashtype + _width);
+                    //sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + " ls " + (i + 1) + " title \"  " + label + "\" ");
+                    sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _dashtype + _width + _color + " title \"  " + label + "\" ");
+
+                    if (i < count - 1) sb2.Append(",");
                 }
+                sb2.AppendLine();
+                tw.WriteLine(sb1);
+                tw.WriteLine();
+                tw.WriteLine(sb2);
                 tw.WriteLine();
                 tw.Flush();
                 tw.Close();

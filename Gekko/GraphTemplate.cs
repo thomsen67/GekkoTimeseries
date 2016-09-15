@@ -77,7 +77,8 @@ namespace Gekko
         public string scale; //number
         [XmlElement(ElementName = "y-axis")]
         public string yAxis;  //left, right
-        
+        public string dashtype;  //1, 2, ...
+
     }
 
 
