@@ -170,6 +170,7 @@
     <Compile Include="Functions.cs" />
     <Compile Include="GekkoTime.cs" />
     <Compile Include="GekkoTuple.cs" />
+    <Compile Include="GraphTemplate.cs" />
     <Compile Include="GuiDialogMakeShortcut.cs">
       <SubType>Form</SubType>
     </Compile>

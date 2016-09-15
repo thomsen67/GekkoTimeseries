@@ -3609,6 +3609,63 @@ namespace Gekko
             public void Exe()
             {                
                 Program.Time(t1, t2);
+
+                if (false)
+                {
+
+                    PlotTemplate p = new PlotTemplate();
+
+                    p.plotMain = new PlotMain();
+                    p.plotMain.title = new PlotTitle();
+                    p.plotMain.title.text = "Flot";
+                    p.plotMain.title.position = "top";
+
+                    p.plotXAxis = new PlotXAxis();
+                    p.plotXAxis.title = new PlotTitle();
+                    p.plotXAxis.title.text = "Flot";
+
+                    p.plotYAxis = new PlotYAxis();
+                    p.plotYAxis.title = new PlotTitle();
+                    p.plotYAxis.title.text = "Flot";
+                    p.plotYAxis.plotRange = new Gekko.PlotRange();
+                    p.plotYAxis.plotRange.plotRangeMin = "10";
+                    p.plotYAxis.plotRange.plotRangeMax = "20";
+
+                    p.plotYAxis2 = new PlotYAxis2();
+                    p.plotYAxis.title = new PlotTitle();
+                    p.plotYAxis.title.text = "Flot";
+
+                    p.plotLines = new PlotLines();
+                    p.plotLines.plotLine = new List<PlotLine>();
+
+                    PlotLine pl = new PlotLine();
+                    pl.legend = "GDP";
+                    pl.type = "linespoints";
+                    pl.width = "3";
+                    pl.color = "red";
+                    pl.point = "star";
+                    pl.size = "1.0";
+                    pl.scale = "1.0";
+                    pl.yAxis = "left";
+                    p.plotLines.plotLine.Add(pl);
+
+                    pl = new PlotLine();
+                    pl.legend = "VAT";
+                    pl.type = "linespoints";
+                    pl.width = "3";
+                    pl.color = "red";
+                    pl.point = "star";
+                    pl.size = "1.0";
+                    pl.scale = "1.0";
+                    pl.yAxis = "left";
+                    p.plotLines.plotLine.Add(pl);
+
+
+                    GraphXml.WriteToXmlFile<PlotTemplate>("c:\\thomas\\test.xml", p, false);
+                    PlotTemplate yy = GraphXml.ReadFromXmlFile<PlotTemplate>("c:\\thomas\\test.xml");
+                }
+                
+
             }
             public static void Q()
             {
