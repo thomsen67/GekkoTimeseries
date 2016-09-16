@@ -501,7 +501,8 @@ namespace Gekko.Parser.Gek
                     case "ASTDELETE":
                         {
                             node.Code.A("O.Delete o" + Num(node) + " = new O.Delete();" + G.NL);
-                            node.Code.A(node[0].Code);
+                            GetCodeFromAllChildren(node);
+                            //node.Code.A(node[0].Code);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                             break;
                         }
@@ -3003,6 +3004,11 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTLIBRARY":
                         {
+                            if(node.Number != 0)
+                            {
+                                G.Writeln2("*** ERROR: The LIBRARY command must be the first command in a command file");
+                                throw new GekkoException();
+                            }
                             string libName = node[0].Text;  //simple ident name
                             O.Library o = new O.Library();
                             o.fileName = libName;

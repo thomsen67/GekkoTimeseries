@@ -17,7 +17,8 @@ namespace Gekko.Parser.Gek
     public class ParserGekCompileAndRunAST
     {
         public static void CompileAndRunAST(ConvertHelper ch, P p)
-        {
+        {            
+
             Assembly a = null;
             if (ch.codeUFunctions != null && ch.codeUFunctions.Length > 0)
             {
@@ -256,8 +257,7 @@ namespace Gekko.Parser.Gek
                     }
                 }
                 else if (G.equal(ce.ErrorNumber, "CS0117"))
-                {
-                    G.Writeln2("*** ERROR: A function could not be found");
+                {                    
                     //Se also #09835742345                        
                     List<string> q = new List<string>();
                     foreach (Match match in Regex.Matches(ce.ErrorText, "'([^']*)'"))
@@ -275,8 +275,16 @@ namespace Gekko.Parser.Gek
                         //    if (line.Contains(s)) hit = s;
                         //}
                         //we use the last single quote match
-                        G.Writeln("*** The function " + q[q.Count - 1] + " does not seem to exist", Color.Red);
+                        G.Writeln("*** ERROR: The function " + q[q.Count - 1] + " does not seem to exist locally.", Color.Red);
+                        G.Writeln("           You may use use FUNCTION to define a function in your gcm file,", Color.Red);
+                        G.Writeln("           or the LIBRARY command to load user defined functions from file.", Color.Red);
+                        G.Writeln("           Please note that you must use the relevant FUNCTION or LIBRARY command inside", Color.Red);
+                        G.Writeln("           all gcm files using them. ", Color.Red);
                         //if (hit != null) G.Writeln("*** Note: a timeseries lag like " + hit + " should be " + hit.Replace("(", "[").Replace(")", "]") + " in Gekko 2.0", Color.Red);
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: A function could not be found");
                     }
                 }
                 else if (G.equal(ce.ErrorNumber, "CS0161"))

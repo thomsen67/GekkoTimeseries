@@ -2841,6 +2841,11 @@ namespace UnitTests
         [TestMethod]
         public void Test__FunctionsUserDefinedLibrary()
         {
+            //At the moment, a user defined function must reside either in the .gcm itself, and/or in an
+            //LIBRARY statement that must be the first in the .gcm file.
+            //The file that is referenced to can only contain FUNCTIONS.
+            
+
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\UFunctions';");
             I("RESET;");
             I("RUN u1;");
@@ -3454,22 +3459,29 @@ namespace UnitTests
         {
             //just testing that it parses
             I("RESET;");
-            I("CREATE a, b, c, d;");
-            //Assert.AreEqual(Globals.createdVariables.Count, 4);
+            I("CREATE a, b, c, d;");            
             Assert.AreEqual(First().storage.Count, 4);
             I("DELETE b, c;");
-            //Assert.AreEqual(Globals.createdVariables.Count, 2);
             Assert.AreEqual(First().storage.Count, 2);
             I("CREATE x1, x2;");
-            //Assert.AreEqual(Globals.createdVariables.Count, 4);
             Assert.AreEqual(First().storage.Count, 4);
             I("DELETE [*];");
-            //Assert.AreEqual(Globals.createdVariables.Count, 0);
             Assert.AreEqual(First().storage.Count, 0);
             I("CREATE x1, x2, x3;");
-            //Assert.AreEqual(Globals.createdVariables.Count, 3);
             Assert.AreEqual(First().storage.Count, 3);            
             I("DELETE all;");  //will just warn that all is not existing            
+
+            I("RESET;");
+            I("CREATE a, b, c, d;");
+            Assert.AreEqual(First().storage.Count, 4);
+            I("DELETE <series> b, c;");
+            Assert.AreEqual(First().storage.Count, 2);
+            I("CREATE x1, x2;");
+            Assert.AreEqual(First().storage.Count, 4);
+            I("DELETE <ser> [*];");
+            Assert.AreEqual(First().storage.Count, 0);
+            I("CREATE x1, x2, x3;");
+            Assert.AreEqual(First().storage.Count, 3);                      
         }
 
         [TestMethod]
@@ -6008,6 +6020,50 @@ namespace UnitTests
                 }
             }
 
+        }
+
+        [TestMethod]
+        public void Test__Time()
+        {
+            //
+            // Testing TIME            
+            I("RESET;");
+            I("TIME 2000 2016;");
+            Assert.AreEqual(Globals.globalPeriodStart.freq, EFreq.Annual);
+            Assert.AreEqual(Globals.globalPeriodStart.super, 2000);
+            Assert.AreEqual(Globals.globalPeriodStart.sub, 1);
+            Assert.AreEqual(Globals.globalPeriodEnd.freq, EFreq.Annual);
+            Assert.AreEqual(Globals.globalPeriodEnd.super, 2016);
+            Assert.AreEqual(Globals.globalPeriodEnd.sub, 1);
+            I("TIME 2010;");
+            Assert.AreEqual(Globals.globalPeriodStart.freq, EFreq.Annual);
+            Assert.AreEqual(Globals.globalPeriodStart.super, 2010);
+            Assert.AreEqual(Globals.globalPeriodStart.sub, 1);
+            Assert.AreEqual(Globals.globalPeriodEnd.freq, EFreq.Annual);
+            Assert.AreEqual(Globals.globalPeriodEnd.super, 2010);
+            Assert.AreEqual(Globals.globalPeriodEnd.sub, 1);
+            I("OPTION freq m;");
+            I("TIME 2000 2016;");
+            Assert.AreEqual(Globals.globalPeriodStart.freq, EFreq.Monthly);
+            Assert.AreEqual(Globals.globalPeriodStart.super, 2000);
+            Assert.AreEqual(Globals.globalPeriodStart.sub, 1);
+            Assert.AreEqual(Globals.globalPeriodEnd.freq, EFreq.Monthly);
+            Assert.AreEqual(Globals.globalPeriodEnd.super, 2016);
+            Assert.AreEqual(Globals.globalPeriodEnd.sub, 12);
+            I("TIME 2010;");
+            Assert.AreEqual(Globals.globalPeriodStart.freq, EFreq.Monthly);
+            Assert.AreEqual(Globals.globalPeriodStart.super, 2010);
+            Assert.AreEqual(Globals.globalPeriodStart.sub, 1);
+            Assert.AreEqual(Globals.globalPeriodEnd.freq, EFreq.Monthly);
+            Assert.AreEqual(Globals.globalPeriodEnd.super, 2010);
+            Assert.AreEqual(Globals.globalPeriodEnd.sub, 12);
+            I("TIME 2010m5;");
+            Assert.AreEqual(Globals.globalPeriodStart.freq, EFreq.Monthly);
+            Assert.AreEqual(Globals.globalPeriodStart.super, 2010);
+            Assert.AreEqual(Globals.globalPeriodStart.sub, 5);
+            Assert.AreEqual(Globals.globalPeriodEnd.freq, EFreq.Monthly);
+            Assert.AreEqual(Globals.globalPeriodEnd.super, 2010);
+            Assert.AreEqual(Globals.globalPeriodEnd.sub, 5);
         }
 
         [TestMethod]

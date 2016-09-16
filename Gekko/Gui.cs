@@ -1946,9 +1946,12 @@ namespace Gekko
             {
                 if (!(G.Contains(p.lastFileSentToANTLR, Globals.autoExecCmdFileName)))
                 {
-                    G.Writeln();
-                    G.Writeln("Total elapsed time: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds));
-                    G.Writeln();
+                    double ms = (DateTime.Now - p.startingTime).TotalMilliseconds;
+                    if (ms > 1000) {  //to avoid UFunctions being shown here. Fix better when #980324532985 is done
+                        G.Writeln();
+                        G.Writeln("Total elapsed time: " + G.SecondsFormat(ms));
+                        G.Writeln();
+                    }
                 }
             }
         }

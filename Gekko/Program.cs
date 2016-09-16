@@ -4505,6 +4505,12 @@ namespace Gekko
 
         public static void EmitCodeFromANTLR(string text, string fileName, bool isLibrary, P p)
         {
+            //#98073245298345
+            //Here, we are translating (1) a gui oneliner, (2) a gui command block, or a gcm file (that might be .ini or called with LIBRARY).
+            //So we wipe out the uFunctions, to have a clean desk.
+            //We do not wipe it if it is a library, since it has already been wiped just before (LIBRARY must be the first command).
+            if (!isLibrary) Globals.uFunctionStorageCs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
             int max = 1;
             if (G.equal(Program.options.interface_debug, "dialog")) max = int.MaxValue;  //should suffice as tries :-)
 
@@ -17515,7 +17521,7 @@ public static bool IsLargeAware(Stream stream)
             Globals.prtCsSnippets.Clear();  //just to save ram
             Globals.prtCsSnippetsHeaders.Clear(); //just to save ram
 
-            Globals.uFunctionStorageCs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);  //resetting user functions
+            //Globals.uFunctionStorageCs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);  //resetting user functions
 
             Program.model = null; Program.unfoldedVariableList = null;
             Globals.modelFileName = "";
@@ -22071,7 +22077,7 @@ public static bool IsLargeAware(Stream stream)
 
                     //sb1.AppendLine("set style line "+ (i + 1) + _dashtype + _width);
                     //sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + " ls " + (i + 1) + " title \"  " + label + "\" ");
-                    sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _dashtype + _width + _color + " title \"  " + label + "\" ");
+                    sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + " pi -1 pt 7 ps 0.5" + _dashtype + _width + _color + " title \"  " + label + "\" ");
 
                     if (i < count - 1) sb2.Append(",");
                 }

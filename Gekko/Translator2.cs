@@ -197,7 +197,14 @@ namespace Gekko
         }
 
         private static void HandleCommand3(ASTNode2 node, GekkoDictionary<string, string> listMemory, GekkoDictionary<string, string> matrixMemory, GekkoDictionary<string, string> scalarMemory)
-        {            
+        {
+            if (GetCommandType(node) == "delete" && G.equal(node.Text, "series"))
+            {
+                ASTNode2 xx = node.GetCommand2();
+                node.GetCommand2().AddOptionAfterVisitor("series");
+                node.Text = "";         
+            }
+
             //Handle '123.' etc.
             if (node.Text.Length > 1 && node.Text.EndsWith("."))
             {
@@ -251,7 +258,8 @@ namespace Gekko
                 //    {
                 //        isLeftHandSideOfEquals = true;
                 //    }
-                //}                 
+                //}                  
+                             
 
                 if (!isLeftHandSideOfEquals) // not the left-hand side 
                 {
@@ -687,7 +695,7 @@ namespace Gekko
             {
                 SetCommandType(node, "excelimport");
                 SetCommandText(node, "sheet");
-                node.GetCommand2().AddOption("import");
+                node.GetCommand2().AddOptionBeforeVisitor("import");
             }
 
             if (G.Equal(node.Text, FromTo("expo", "export")) != null)
@@ -1282,7 +1290,27 @@ namespace Gekko
             this.children.RemoveAt(this.children.Count - 1);
         }
 
-        public void AddOption(string s)
+        public void AddOptionAfterVisitor(string s)
+        {
+            string code = this.Code;
+            if (code == null) code = "";
+            code = code.Trim();
+            if (code == "")
+            {
+                code = "<" + s + ">";
+            }
+            else
+            {
+                if (code.EndsWith(">"))
+                {
+                    code = code.Substring(0, code.Length - 1) + " " + s + ">";
+                }
+                else { };  //ignore, should not be possible  
+            }
+            this.Code = code;         
+        }
+
+        public void AddOptionBeforeVisitor(string s)
         {
             ASTNode2 child = this[0];                        
             if (child == null)

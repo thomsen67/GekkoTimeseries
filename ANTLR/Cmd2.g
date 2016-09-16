@@ -1604,11 +1604,14 @@ date                      : DATE nameWithDot EQUAL expression -> ^({token("ASTDA
 						  | DATE question -> ^(ASTDATE question)
 						  ;
 
-delete					  : DELETE listItems -> ^({token("ASTDELETE", ASTDELETE, $DELETE.Line)} listItems)
-        				  | DELETE deleteOpt1? -> ^({token("ASTDELETE", ASTDELETE, $DELETE.Line)} deleteOpt1?)
+delete					  : DELETE deleteOpt1? listItems? -> ^({token("ASTDELETE", ASTDELETE, $DELETE.Line)} listItems? deleteOpt1?)
+        				  //| DELETE deleteOpt1? -> ^({token("ASTDELETE", ASTDELETE, $DELETE.Line)} deleteOpt1?)
 						  ;
 deleteOpt1                : ISNOTQUAL | leftAngle deleteOpt1h* RIGHTANGLE -> deleteOpt1h*;
-deleteOpt1h               : NONMODEL (EQUAL yesNo)? -> ^(ASTOPT_STRING_NONMODEL yesNo?);
+deleteOpt1h               : NONMODEL (EQUAL yesNo)? -> ^(ASTOPT_STRING_NONMODEL yesNo?)
+						  | SER -> //ignored for now
+						  | SERIES ->  //ignored for now 
+						  ;
 
 disp					  : DISP StringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, $DISP.Line)} StringInQuotes)
 						  | DISP dispOpt1? listItems -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) listItems)
@@ -1967,7 +1970,9 @@ test                      : TEST ident ->  ^(ASTTEST ident);
 
 time					  : TIME dates -> ^({token("ASTTIME", ASTTIME, $TIME.Line)} ^(ASTDATES dates))
 						  | TIME question -> ^({token("ASTTIMEQUESTION", ASTTIMEQUESTION, $TIME.Line)})		
+						  | TIME oneDate -> ^({token("ASTTIME", ASTTIME, $TIME.Line)} ^(ASTDATES oneDate oneDate))  //duplicating, TIME 2015 ==> TIME 2015 2015
 						  ;
+oneDate                   : expression;
 
 timefilter				  : TIMEFILTER timefilterperiods -> ^({token("ASTTIMEFILTER", ASTTIMEFILTER, $TIMEFILTER.Line)} timefilterperiods);
 timefilterperiods		  : (timefilterperiod (',' timefilterperiod)*)?  -> ^(ASTTIMEFILTERPERIODS timefilterperiod+);
@@ -2359,7 +2364,7 @@ updDataComplicatedHelper3 : REP expression -> expression
 						  | -> ASTEMPTY
 						  ;
 
-dates                     : expression expression; // -> ^(ASTDATES expression expression);						
+dates                     : expression expression; // -> ^(ASTDATES expression expression);			
 
 //-----------------------------------------------------------------------------------------
 //Name with {} and %, possibly nested
