@@ -2364,7 +2364,9 @@ updDataComplicatedHelper3 : REP expression -> expression
 						  | -> ASTEMPTY
 						  ;
 
-dates                     : expression expression; // -> ^(ASTDATES expression expression);			
+dates                     : expression expression
+					      //| expression -> expression expression
+						  ;
 
 //-----------------------------------------------------------------------------------------
 //Name with {} and %, possibly nested

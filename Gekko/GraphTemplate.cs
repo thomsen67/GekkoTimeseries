@@ -70,9 +70,11 @@ namespace Gekko
     {
         public string legend;  //text
         public string type;  //lines, points, linespoints, impulses, dots, steps, boxes
-        public string width; //number
-        public string color;
-        public string point;  //plus, kryds, ...
+        public string linewidth; //number
+        public string linecolor;
+        public string pointtype;  //none, plus, kryds, ...
+        public string pointsize; //size of points
+        public string pointinterval; //1 plots all points, 2 every second etc. Minus makes the line go through points
         public string size; //number
         public string scale; //number
         [XmlElement(ElementName = "y-axis")]

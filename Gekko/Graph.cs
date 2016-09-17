@@ -325,7 +325,7 @@ namespace Gekko
 
             Graphics g = e.Graphics;
 
-            LinearGradientBrush gradientBrush = new LinearGradientBrush(new Point(0, 0), new Point(Width, Width), Color.FromArgb(221, 221, 221), Color.FromArgb(221, 221, 221));
+            LinearGradientBrush gradientBrush = new LinearGradientBrush(new Point(0, 0), new Point(Width, Width), Color.FromArgb(Globals.graphBackground, Globals.graphBackground, Globals.graphBackground), Color.FromArgb(Globals.graphBackground, Globals.graphBackground, Globals.graphBackground));
 
             g.FillRectangle(gradientBrush, ClientRectangle);
 

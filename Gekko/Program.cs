@@ -22041,43 +22041,65 @@ public static bool IsLargeAware(Stream stream)
                 sb2.Append("plot ");
                 for (int i = 0; i < count; i++)
                 {                    
-                    string legend = null;
-                    string type = null;
-                    string width = null;
-                    string color = null;
-                    string point = null;
+                    string legend = null;                    
+                    string linewidth = null;
+                    string linecolor = null;
+                    string pointtype = null;
+                    string pointinterval = null;
+                    string pointsize = null;
                     string size = null;
                     string yAxis = null;
                     string dashtype = null;
                     PlotLine line = null;
                     if (lines != null && i < lines.Count) line = lines[i];
-                    if (line!=null)
+                    if (line != null)
                     {
+                        
+                        dashtype = line.dashtype;                        
+                        linewidth = line.linewidth;
+                        linecolor = line.linecolor;
+                        pointtype = line.pointtype;
+                        pointinterval = line.pointinterval;
+                        pointsize = line.pointsize;
+
                         legend = line.legend;
-                        type = line.type;
-                        width = line.width;
-                        color = line.color;
-                        point = line.point;
                         size = line.size;
                         yAxis = line.yAxis;
-                        dashtype = line.dashtype;
+                        
                     }                   
 
-                    string label = EncodeDanish(labelsNonBroken[i]);
-                    if (legend != null) label = EncodeDanish(legend);  //actually overrides, it should be PRT fy 'GDP' that overrides (the 'GDP').
-
+                    
                     string _dashtype = null;
-                    if (dashtype != null) _dashtype = " lt " + dashtype;
+                    if (dashtype != null) _dashtype = " dt " + dashtype;
 
-                    string _width = null;
-                    if (width != null) _width = " lw " + width;
+                    string _linewidth = null;
+                    if (linewidth != null) _linewidth = " lw " + linewidth;
 
-                    string _color = null;
-                    if (color != null) _color = " lc rgb " + Globals.QT + color + Globals.QT;
+                    string _linecolor = null;
+                    if (linecolor != null) _linecolor = " lc rgb " + Globals.QT + linecolor + Globals.QT;
 
-                    //sb1.AppendLine("set style line "+ (i + 1) + _dashtype + _width);
-                    //sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + " ls " + (i + 1) + " title \"  " + label + "\" ");
-                    sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + " pi -1 pt 7 ps 0.5" + _dashtype + _width + _color + " title \"  " + label + "\" ");
+                    string _pointtype = null;
+                    if (pointtype != null) _pointtype = " pt " + pointtype;
+
+                    string _pointinterval = null;
+                    if (pointinterval != null) _pointinterval = " pi " + pointinterval;
+
+                    string _pointsize = null;
+                    if (pointsize != null) _pointsize = " ps " + pointsize;
+
+
+                    string _legend = EncodeDanish(labelsNonBroken[i]);
+                    if (legend != null) _legend = EncodeDanish(legend);  //actually overrides, it should be PRT fy 'GDP' that overrides (the 'GDP').
+
+
+                    //size?
+
+                    //yaxis?
+
+                    //linestyle is an association of linecolor, linewidth, dashtype, pointtype
+                    //linetype is the same, just permanent 
+
+                    sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _pointinterval + _pointtype + _pointsize + _dashtype + _linewidth + _linecolor + " title \"  " + _legend + "\" ");
 
                     if (i < count - 1) sb2.Append(",");
                 }

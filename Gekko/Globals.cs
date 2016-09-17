@@ -59,6 +59,8 @@ namespace Gekko
         public static string splitSTART = G.NL + splitSTART2 + G.NL;        
         public static string splitSTOP = G.NL + splitSTOP2 + G.NL;
         public static string functionParameterCode = "param_";
+
+        public static int graphBackground = 255; //221 before
         
         public static string splitCommandBlockStart = "//[[commandStart]]";
         public static string splitCommandBlockEnd = "//[[commandEnd]]";        
