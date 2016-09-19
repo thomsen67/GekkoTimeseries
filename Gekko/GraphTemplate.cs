@@ -73,14 +73,13 @@ namespace Gekko
         public string linewidth; //number
         public string linecolor;
         public string pointtype;  //none, plus, kryds, ...
-        public string pointsize; //size of points
-        public string pointinterval; //1 plots all points, 2 every second etc. Minus makes the line go through points
+        //public string pointsize; //size of points
+        //public string pointinterval; //1 plots all points, 2 every second etc. Minus makes the line go through points
         public string size; //number
         public string scale; //number
         [XmlElement(ElementName = "y-axis")]
         public string yAxis;  //left, right
         public string dashtype;  //1, 2, ...
-
     }
 
 
