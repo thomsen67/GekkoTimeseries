@@ -1408,14 +1408,12 @@ namespace Gekko
             currentBank.yearEnd = readInfo.endPerResultingBank;
         }
 
-
-
         private static bool IsNonAvailableText(string text)
         {
             //the last ones are the Danish codes
             //the M is Gekko standard for missing value
             bool isNonAvailableText = false;
-            if (G.equal(text, "M") || G.equal(text, "#N/A") || G.equal(text, "#NAME?") || G.equal(text, "#I/T") || G.equal(text, "#NAVN?")) isNonAvailableText = true;
+            if (G.equal(text, "M") || G.equal(text, "NA") || G.equal(text, "#N/A") || G.equal(text, "#NAME?") || G.equal(text, "#I/T") || G.equal(text, "#NAVN?")) isNonAvailableText = true;
             return isNonAvailableText;
         }
 
@@ -25710,7 +25708,17 @@ namespace Gekko
             try
             {
                 //Seems this startup always takes 1 second. Maybe put it in Global and reuse from there.
-                excel = new Excel.Application();
+                if (Globals.excelFix)
+                {
+                    //THIS DOES NOT WORK: COM object that has been separated from its underlying RCW cannot be used.
+                    if (Globals.objApp == null) Globals.objApp = new Excel.Application();
+                    excel = Globals.objApp;                    
+                }
+                else
+                {
+                    excel = new Excel.Application();
+                }
+
                 wkb = OpenBook(excel, file, true, false, false);
 
                 Excel.Worksheet sheet = null;
@@ -25815,12 +25823,12 @@ namespace Gekko
                     //G.Writeln("loop excel " + G.Seconds(t0));
                 }
             }
-            //catch (Exception ex)
-            //{
-            //    //if you need to handle stuff
-            //    G.Writeln2("*** ERROR: Import from Excel failed");
-            //    G.Writeln(ex.Message, Color.Red);
-            //}
+            catch (Exception ex)
+            {
+                //if you need to handle stuff
+                G.Writeln2("*** ERROR: Get data from Excel failed with the following message:");
+                G.Writeln(ex.Message, Color.Red);
+            }
             finally
             {
                 if (wkb != null)
@@ -26300,55 +26308,7 @@ namespace Gekko
                         }
                     }
 
-                    objBook.Close(false, Missing.Value, Missing.Value);
-
-                    Globals.objApp.DisplayAlerts = true;
-
-                    if (newSheet != null)
-                    {
-                        System.Runtime.InteropServices.Marshal.FinalReleaseComObject(newSheet);
-                        newSheet = null;
-                    }
-                    if (range != null)
-                    {
-                        System.Runtime.InteropServices.Marshal.FinalReleaseComObject(range);
-                        range = null;
-                    }
-                    if (range0 != null)
-                    {
-                        System.Runtime.InteropServices.Marshal.FinalReleaseComObject(range0);
-                        range0 = null;
-                    }
-                    if (objSheet != null)
-                    {
-                        System.Runtime.InteropServices.Marshal.FinalReleaseComObject(objSheet);
-                        objSheet = null;
-                    }
-                    if (objSheets != null)
-                    {
-                        System.Runtime.InteropServices.Marshal.FinalReleaseComObject(objSheets);
-                        objSheets = null;
-                    }
-                    if (objBook != null)
-                    {
-                        System.Runtime.InteropServices.Marshal.FinalReleaseComObject(objBook);
-                        objBook = null;
-                    }
-                    if (objBooks != null)
-                    {
-                        System.Runtime.InteropServices.Marshal.FinalReleaseComObject(objBooks);
-                        objBooks = null;
-                    }
-                    //see also id7372367
-                    //Globals.objApp = null;  --> dealt with when Gekko exits.
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                    // GC needs to be called twice in order to get the Finalizers called
-                    // - the first time in, it simply makes a list of what is to be
-                    // finalized, the second time in, it actually is finalizing. Only
-                    // then will the object do its automatic ReleaseComObject.
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
+                    ExcelCleanup(ref objBook, ref objBooks, ref objSheets, ref objSheet, ref range, ref newSheet, ref range0);
                     if (!Globals.setPrintMute) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameOriginalFile);
                 }
                 return null;
@@ -26369,6 +26329,59 @@ namespace Gekko
 
             //see MS bug 320369
             System.Threading.Thread.CurrentThread.CurrentCulture = oldCI;
+        }
+
+        private static void ExcelCleanup(ref Excel.Workbook objBook, ref Excel.Workbooks objBooks, ref Excel.Sheets objSheets, ref Excel.Worksheet objSheet, ref Excel.Range range, ref Excel.Worksheet newSheet, ref Excel.Range range0)
+        {
+            objBook.Close(false, Missing.Value, Missing.Value);
+
+            Globals.objApp.DisplayAlerts = true;
+
+            if (newSheet != null)
+            {
+                System.Runtime.InteropServices.Marshal.FinalReleaseComObject(newSheet);
+                newSheet = null;
+            }
+            if (range != null)
+            {
+                System.Runtime.InteropServices.Marshal.FinalReleaseComObject(range);
+                range = null;
+            }
+            if (range0 != null)
+            {
+                System.Runtime.InteropServices.Marshal.FinalReleaseComObject(range0);
+                range0 = null;
+            }
+            if (objSheet != null)
+            {
+                System.Runtime.InteropServices.Marshal.FinalReleaseComObject(objSheet);
+                objSheet = null;
+            }
+            if (objSheets != null)
+            {
+                System.Runtime.InteropServices.Marshal.FinalReleaseComObject(objSheets);
+                objSheets = null;
+            }
+            if (objBook != null)
+            {
+                System.Runtime.InteropServices.Marshal.FinalReleaseComObject(objBook);
+                objBook = null;
+            }
+            if (objBooks != null)
+            {
+                System.Runtime.InteropServices.Marshal.FinalReleaseComObject(objBooks);
+                objBooks = null;
+            }
+            //see also id7372367
+            //Globals.objApp = null;  --> dealt with when Gekko exits.
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            // GC needs to be called twice in order to get the Finalizers called
+            // - the first time in, it simply makes a list of what is to be
+            // finalized, the second time in, it actually is finalizing. Only
+            // then will the object do its automatic ReleaseComObject.
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         private static Excel.Worksheet ExcelSheetTryGetSheet(Excel.Sheets objSheets, string sheet)
