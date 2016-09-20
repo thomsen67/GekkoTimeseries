@@ -324,6 +324,7 @@ tokens {
     ASTOPT1;
     ASTOPT2;
     ASTOPT_;
+	ASTOPT_STRING_ERROR;
 	ASTOPT_STRING_USING;
     ASTOPT_STRING_ABS ;
     ASTOPT_STRING_AFTER;
@@ -670,6 +671,7 @@ tokens {
     END              = 'END'             ;
     ENDO             = 'ENDO'            ;
     ENGLISH          = 'ENGLISH';
+	ERROR            = 'ERROR';
     EXCEL            = 'EXCEL'           ;
 	EXE            = 'EXE'           ;
     EXIT             = 'EXIT';
@@ -1016,6 +1018,7 @@ tokens {
                                 {
                                         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 										d.Add("USING"    ,   USING     );
+										d.Add("ERROR"    ,   ERROR     );
 										d.Add("_ABS"    ,   UABS     );
                                         d.Add("_DIF"    ,   UDIF     );
                                         d.Add("_DIFF"   ,   UDIFF     );
@@ -2154,6 +2157,7 @@ type                      : VAL | DATE | STRING2 | NAME | LIST | SERIES | SER | 
 copyOpt1                  : ISNOTQUAL | leftAngle copyOpt1h* RIGHTANGLE -> copyOpt1h*;
 copyOpt1h                 : dates -> ^(ASTDATES dates)
 						  | RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT yesNo?)
+						  | ERROR (EQUAL yesNo)? -> ^(ASTOPT_STRING_ERROR yesNo?)
 						  | FROM EQUAL name -> ^(ASTOPT_STRING_FROM name)
 						  | FROM EQUAL AT GLUE? -> ^(ASTOPT_STRING_FROM ASTAT)
 						  | TO EQUAL name -> ^(ASTOPT_STRING_TO name)
@@ -2825,6 +2829,7 @@ doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 
 ident                     : Ident|
 							USING|
+							ERROR|
                             ABS|
 							DEFAULT|
 							LOGIC|

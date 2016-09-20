@@ -2833,6 +2833,7 @@ namespace Gekko
             public List<string> listItems1 = null;  //right side
             public string opt_from = null;
             public string opt_to = null;
+            public string opt_error = null;
             public void Exe()
             {                
                 //------------ Types -----------------------------------------------------------------------------------------------
@@ -2855,6 +2856,8 @@ namespace Gekko
                 Databank localOptionFromBank = null; //is != null if <FROM = ...>
                 Databank localOptionToBank = null; //is != null if <TO  = ...>
                 GetFromAndToDatabanks(this.opt_from, this.opt_to, ref localOptionFromBank, ref localOptionToBank);
+
+                int errorCounter = 0;
 
                 bool wild0 = false;
                 foreach (string s in listItems0)
@@ -2972,14 +2975,23 @@ namespace Gekko
                         string s = listItems0[i].Replace(Globals.firstCheatString, "");
 
                         if (s.Contains("*") || s.Contains("?") || s.Contains(".."))
-                        {
-                            G.Writeln2("*** ERROR: COPY: The item '" + s + "' did not match any timeseries");
+                        {                            
+                            G.Writeln2("+++ ERROR: COPY: The following item was not found: " + s);
                             throw new GekkoException();                            
                         }
                         else
                         {
-                            G.Writeln2("*** ERROR: COPY: Could not find this timeseries: '" + s + "'");
-                            throw new GekkoException();
+                            if (G.equal(opt_error, "no"))
+                            {
+                                errorCounter++;                                
+                                G.Writeln("Note: the following item was not found: " + s);
+                                continue;
+                            }
+                            else
+                            {
+                                G.Writeln2("*** ERROR: COPY: Could not find this timeseries: '" + s + "'");
+                                throw new GekkoException();
+                            }
                         }                        
                     }
 
@@ -3104,6 +3116,10 @@ namespace Gekko
                 if (type4 > 0)
                 {
                     G.Writeln("Put data for all periods into " + type4 + " new timeseries");
+                }
+                if(errorCounter > 0)
+                {
+                    G.Writeln2("+++ WARNING: COPY: Note that " + errorCounter + " variables were not copied");
                 }
             }
 
