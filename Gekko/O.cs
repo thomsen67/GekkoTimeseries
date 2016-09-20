@@ -470,8 +470,25 @@ namespace Gekko
             int counter = 0;
             foreach (string ss in input)
             {
-                string s = ss.Trim();  //will also remove any newline characters!
                 counter++;
+                string s = ss.Trim();  //will also remove any newline characters!
+
+                if (fileName != null && s == "")
+                {
+                    G.Writeln2("*** ERROR in listfile '" + fileName + "': empty line [" + counter + "]");
+                    G.Writeln("    Note: you may use comments (//), but not completely empty lines. This is to");
+                    G.Writeln("    keep the list files reasonably tidy.");
+                    throw new GekkoException();
+                }
+
+                //if (s.StartsWith("//")) continue;  //allow comments, /* ... */ not supported though
+                int idx = s.IndexOf("//");
+                if (idx >= 0)
+                {
+                    s = s.Substring(0, idx);
+                    s = s.Trim();
+                }
+                
                 if (s == null || s == "")
                 {
                     if (fileName == null)
@@ -481,8 +498,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR in listfile '" + fileName + "': empty line [" + counter + "]");
-                        throw new GekkoException();
+                        continue;  //ignore a comment
                     }
                 }
 
