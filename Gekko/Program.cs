@@ -2292,14 +2292,24 @@ namespace Gekko
         }
 
         public static void SheetImport(O.SheetImport o)
-        {
-            //find working folder
-            //add stuff regarding xlsx/xls if extension is missing, autodetect
+        {                        
             //do copylocal
             string fileName = o.fileName;
             fileName = AddExtension(fileName, ".xlsx");
             fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
             TableLight matrix = ReadExcelWorkbook(fileName, Program.databanks.GetFirst(), o.opt_sheet);
+
+            bool transpose = false;  //corresponding to row-wise reading
+            if (G.equal(o.opt_cols, "yes"))
+            {
+                transpose = true;                
+            }
+
+            if(transpose)
+            {
+                //reading downwards by cols
+                matrix = matrix.Transpose();
+            }
 
             int obs = GekkoTime.Observations(o.t1, o.t2);
             int n = o.listItems.Count;
@@ -2312,6 +2322,13 @@ namespace Gekko
 
             int rowOffset = num - 1;
             int colOffset = ExcelColumnNameToNumber(chars) - 1;
+            if (transpose)
+            {
+                //switch them
+                int temp = rowOffset;
+                rowOffset = colOffset;
+                colOffset = temp;
+            }
 
             //check between 1... large number
 
@@ -2330,11 +2347,10 @@ namespace Gekko
                             //keep NaN
                         }
                         else
-                        {
-                            //REPORT ERROR!!!!!!
+                        {                            
                             string s1 = row.ToString();
                             string s2 = ExcelColumnNumberToName(col);
-                            G.Writeln2("*** ERROR: Could not understand cell " + (s2 + s1).ToUpper() + ", content: '" + cell.text + "'");
+                            G.Writeln2("*** ERROR in spreadsheet cell " + GetExcelCell(row, col, transpose) + ", content: '" + cell.text + "'");                            
                             throw new GekkoException();
                         }
                     }
