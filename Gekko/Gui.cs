@@ -447,19 +447,16 @@ namespace Gekko
                 //Program.Pause("This is an untested BETA VERSION" + G.NL + "Please do not use it for serious purposes");                
             }
 
-            if (Globals.noini == false) RunGekkoIniFile();
-
             Program.CreateLocalCopyHelpChm();
-
             CrossThreadStuff.Zoom();
-
-            //Seems logical that this one comes after a possible ini (gekko.ini) file. So that gekko.exe
-            //parameters overwrite/build upon stuff from ini file.
+            
+            //gekko.exe parameters are read first, and then afterwards any gekko.ini local file
             if (Globals.gekkoExeParameters != null)
             {
                 //works as if it was an inputted command line from the GUI
                 this.StartThread(Globals.gekkoExeParameters, true);
             }
+            if (Globals.noini == false) RunGekkoIniFile();
 
             CrossThreadStuff.Mode();           
             
