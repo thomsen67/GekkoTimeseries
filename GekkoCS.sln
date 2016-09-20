@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{53940FA8-B349-4126-A38A-7681A1111A58}"
 	ProjectSection(SolutionItems) = preProject
 		GekkoCS.vsmdi = GekkoCS.vsmdi
@@ -30,9 +32,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trekant", "Trekant\Trekant.csproj", "{BA726393-B1BE-48A6-AA5B-4759931FE222}"
 EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = GekkoCS.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86
@@ -98,6 +97,7 @@ Global
 		{52254553-EF42-469A-BB19-700C9065338A}.Release32bit|Any CPU.Build.0 = Release32bit|Any CPU
 		{52254553-EF42-469A-BB19-700C9065338A}.Release32bit|x86.ActiveCfg = Release32bit|x86
 		{52254553-EF42-469A-BB19-700C9065338A}.Release32bit|x86.Build.0 = Release32bit|x86
+		{52254553-EF42-469A-BB19-700C9065338A}.Release32bit|x86.Deploy.0 = Release32bit|x86
 		{52254553-EF42-469A-BB19-700C9065338A}.Release-Mono|Any CPU.ActiveCfg = Release|Any CPU
 		{52254553-EF42-469A-BB19-700C9065338A}.Release-Mono|Any CPU.Build.0 = Release|Any CPU
 		{52254553-EF42-469A-BB19-700C9065338A}.Release-Mono|x86.ActiveCfg = Release32bit|x86
@@ -196,5 +196,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = GekkoCS.vsmdi
 	EndGlobalSection
 EndGlobal

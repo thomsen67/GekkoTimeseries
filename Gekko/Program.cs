@@ -1109,7 +1109,7 @@ namespace Gekko
 
         private static void GetTimeseriesFromWorkbookMatrix(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, Databank databank, TableLight matrix2, ReadInfo readInfo)
         {
-            
+
             //TODO: gaps, READ<gap>
 
             //We could 'taste' the file, but how to distinguish A and U for instance?
@@ -1369,7 +1369,7 @@ namespace Gekko
                                     good = false;
                                     if (gt2.freq == EFreq.Annual)
                                     {
-                                        if (gt2.LargerThanOrEqual(dates.t1Annual) && gt2.SmallerThanOrEqual(dates.t2Annual)) good = true;                                        
+                                        if (gt2.LargerThanOrEqual(dates.t1Annual) && gt2.SmallerThanOrEqual(dates.t2Annual)) good = true;
                                     }
                                     else if (gt2.freq == EFreq.Quarterly)
                                     {
@@ -1380,8 +1380,8 @@ namespace Gekko
                                         if (gt2.LargerThanOrEqual(dates.t1Monthly) && gt2.SmallerThanOrEqual(dates.t2Monthly)) good = true;
                                     }
                                 }
-                                
-                                if(good == true)
+
+                                if (good == true)
                                 {
                                     ts.SetData(gt2, ss);
                                 }
@@ -1408,7 +1408,7 @@ namespace Gekko
             currentBank.yearEnd = readInfo.endPerResultingBank;
         }
 
-       
+
 
         private static bool IsNonAvailableText(string text)
         {
@@ -1853,9 +1853,9 @@ namespace Gekko
                 list.Add(1);
             }
 
-            foreach(int i in list)
+            foreach (int i in list)
             {
-                ReadInfo readInfo = new ReadInfo();               
+                ReadInfo readInfo = new ReadInfo();
 
                 string file = null;
                 string as2 = null;
@@ -1940,7 +1940,7 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: OPEN: The databank '" + file + "' could not be found");
                     throw new GekkoException();
-                }                
+                }
 
                 //At this point, we know that the file to be opened/read actually exists (or createOpenFile is true)
 
@@ -2006,7 +2006,7 @@ namespace Gekko
                     if (wipeDatabankBeforeInsertingData) databank.Clear();  //Reading gbk may point to a whole new databank, this is ok. Wipe will only be for READ, no READ<merge> or READ ... TO ... . IMPORT is never wiped.
 
                     if (oRead.Type == EDataFormat.Pcim)
-                    {                        
+                    {
                         Program.ReadPCIM(databank, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
                     }
                     else if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn || oRead.Type == EDataFormat.Xls || oRead.Type == EDataFormat.Xlsx)
@@ -2019,7 +2019,7 @@ namespace Gekko
                     }
                     else if (oRead.Type == EDataFormat.Tsp)
                     {
-                        if(dates != null)
+                        if (dates != null)
                         {
                             G.Writeln2("*** ERROR: You cannot use period truncation in TSP data import");
                             throw new GekkoException();
@@ -2095,7 +2095,7 @@ namespace Gekko
                     {
                         readInfo.conversionMessage = true;
                     }
-                    
+
                     readInfo.databank.info1 = readInfo.info1;
                     readInfo.databank.date = readInfo.date;
                     readInfo.databank.FileNameWithPath = readInfo.fileName;
@@ -2112,7 +2112,7 @@ namespace Gekko
                 }
                 //databank.Trim();  //This way, the bank is not too bulky in RAM. The operation takes almost no time, and if it is a .tsdx file, the timeseries are already trimmed and trimming is hence skipped.
                 databank.readInfo = readInfo;  //Not really used at the moment, but practical to have a pointer to this information!                
-                                
+
                 if (Globals.testFileChange)
                 {
                     if (open)
@@ -2261,7 +2261,7 @@ namespace Gekko
             }
             else
             {
-                matrix = ReadExcelWorkbook(file, databank);
+                matrix = ReadExcelWorkbook(file, databank, null);
             }
             GetTimeseriesFromWorkbookMatrix(dates, oRead, databank, matrix, readInfo);
         }
@@ -2300,8 +2300,8 @@ namespace Gekko
             //do copylocal
             string fileName = o.fileName;
             fileName = AddExtension(fileName, ".xlsx");
-            fileName =  Program.CreateFullPathAndFileNameFromFolder(fileName, null);
-            TableLight matrix = ReadExcelWorkbook(fileName, Program.databanks.GetFirst());
+            fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
+            TableLight matrix = ReadExcelWorkbook(fileName, Program.databanks.GetFirst(), o.opt_sheet);
 
             int obs = GekkoTime.Observations(o.t1, o.t2);
             int n = o.listItems.Count;
@@ -2319,7 +2319,7 @@ namespace Gekko
 
             for (int row = 1 + rowOffset; row < 1 + rowOffset + n; row++)
             {
-                TimeSeries ts = Program.GetTimeSeriesFromString(o.listItems[row - 1 - rowOffset], O.ECreatePossibilities.Must); //OR MUST????
+                TimeSeries ts = Program.GetTimeSeriesFromString(o.listItems[row - 1 - rowOffset], O.ECreatePossibilities.Must); //O
                 for (int col = 1 + colOffset; col < 1 + colOffset + obs; col++)
                 {
                     double v = double.NaN;
@@ -2506,7 +2506,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
 
-                    
+
 
                     int maxYearInProtobufFile = int.MinValue;
                     int minYearInProtobufFile = int.MaxValue;
@@ -2551,7 +2551,7 @@ namespace Gekko
 
                                 GekkoTime firstX = ts.GetPeriodFirst();
                                 GekkoTime lastX = ts.GetPeriodLast();
-                                
+
                                 maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, lastX.super);
                                 minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, firstX.super);
                             }
@@ -2607,7 +2607,7 @@ namespace Gekko
             {
                 //also deals with merging (not clearing the databank first if merging)
 
-                ReadAllTsdRecords(dates, file, oRead.Merge, isTsdx, databank, ref NaNCounter, readInfo);                
+                ReadAllTsdRecords(dates, file, oRead.Merge, isTsdx, databank, ref NaNCounter, readInfo);
 
                 readInfo.nanCounter = NaNCounter;
 
@@ -2636,7 +2636,7 @@ namespace Gekko
                 if (first.SmallerThanOrEqual(dates.t1Annual))
                 {
                     offset = GekkoTime.Observations(first, dates.t1Annual) - 1;
-                    first = dates.t1Annual;                    
+                    first = dates.t1Annual;
                 }
                 if (last.LargerThanOrEqual(dates.t2Annual))
                 {
@@ -2708,7 +2708,7 @@ namespace Gekko
 
                 while ((line = sr.ReadLine()) != null)
                 {
-                    line=line.Replace("\0", " ");
+                    line = line.Replace("\0", " ");
                     string lineTrim = line.Trim();
                     if (lineTrim == "") continue;
 
@@ -2929,10 +2929,10 @@ namespace Gekko
             }
         }
 
-        
+
         public static void ReadPCIM(Databank databank, ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
         {
-            
+
             //try
             {
                 //Databank databank = readInfo.databank;
@@ -3073,8 +3073,8 @@ namespace Gekko
                             continue;
                         }
 
-                        TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, varName, EFreq.Annual);                      
-                        
+                        TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, varName, EFreq.Annual);
+
                         if (oRead.t1.IsNull())
                         {
                             //faster
@@ -3093,17 +3093,17 @@ namespace Gekko
                         }
                         else
                         {
-                            
+
                             for (int per = 0; per < antalper; per++)
                             {
-                                short year = fid[per];                                
+                                short year = fid[per];
                                 GekkoTime t = new GekkoTime(EFreq.Annual, year, 1);
-                                if(t.LargerThanOrEqual(dates.t1Annual) && t.SmallerThanOrEqual(dates.t2Annual))
+                                if (t.LargerThanOrEqual(dates.t1Annual) && t.SmallerThanOrEqual(dates.t2Annual))
                                 {
                                     float ss = gigant[var, per + 1];  //<==== because gigant[] is 1-based, not 0-based
                                     ts.SetData(t, ss);
                                 }
-                            }                            
+                            }
                         }
                     }
 
@@ -3798,7 +3798,7 @@ namespace Gekko
                 }
             }
 
-            if(Globals.stackedPrintTimings) G.Writeln2("Ordering...");
+            if (Globals.stackedPrintTimings) G.Writeln2("Ordering...");
             //=================================
             //=================================
             //======== Ordering start =========
@@ -4484,7 +4484,7 @@ namespace Gekko
             {
                 ts.SetData(per, ts.GetData(per) + inputVal);
             }
-            else if (op == "^" || updType== ESeriesUpdTypes.d)
+            else if (op == "^" || updType == ESeriesUpdTypes.d)
             {
                 ts.SetData(per, ts.GetData(PerMinusOne) + inputVal);
             }
@@ -4539,8 +4539,8 @@ namespace Gekko
                     if (!fileName.Contains("tablecode." + Globals.defaultCommandFileExtension))  //don't count an autogenerated table as a cmd file
                     {
                         p.hasBeenCmdFile = true;
-                    }                    
-                    string input = GetTextFromFileWithWait(fileName);                    
+                    }
+                    string input = GetTextFromFileWithWait(fileName);
                     commandLinesFlat = HandleObeyFiles2(input);
                     ph.isOneLinerFromGui = false;
                 }
@@ -5090,7 +5090,7 @@ namespace Gekko
 
         //    string code = ch.code;
         //    string code2 = code + " ";
-                        
+
         //    CodeDomProvider provider = CodeDomProvider.CreateProvider("CSharp");
         //    if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Compile start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
         //    CompilerResults compilerResults = provider.CompileAssemblyFromSource(compilerParams, code2);
@@ -5105,7 +5105,7 @@ namespace Gekko
         //        WriteCompileErrorMessage(text, p.lastFileSentToANTLR);
         //        throw new GekkoException();
         //    }
-            
+
         //    // Load the generated assembly into the ApplicationDomain
 
         //    Object[] args = new Object[1];
@@ -5113,7 +5113,7 @@ namespace Gekko
 
         //    try
         //    {
-                
+
         //        if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Running dll start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
         //        p.Deeper();
 
@@ -5532,22 +5532,22 @@ namespace Gekko
             GAMSWorkspace ws = new GAMSWorkspace(workingDirectory: "c:\\tools\\decomp");
             GAMSDatabase db = ws.AddDatabaseFromGDX("c:\\tools\\decomp\\calib_d.gdx");
 
-            double[, , ,] LMax = new double[3, 2, 85, 116];
+            double[,,,] LMax = new double[3, 2, 85, 116];
             db.GetVariable("LMax").CopyToArray(LMax, 0);
 
-            double[, , ,] J_LMax = new double[5, 2, 85, 116];
+            double[,,,] J_LMax = new double[5, 2, 85, 116];
             db.GetVariable("J_LMax").CopyToArray(J_LMax, 0);
 
-            double[, , ,] eta = new double[5, 2, 85, 116];
+            double[,,,] eta = new double[5, 2, 85, 116];
             db.GetVariable("eta").CopyToArray(eta, 0);
 
-            double[, , ,] tmargWork = new double[3, 2, 85, 116];
+            double[,,,] tmargWork = new double[3, 2, 85, 116];
             db.GetVariable("tmargWork").CopyToArray(tmargWork, 0);
 
             double[] adjrho = new double[116];
             db.GetVariable("adjrho").CopyToArray(adjrho, 0);
 
-            double[, , ,] rho = new double[5, 2, 85, 116];
+            double[,,,] rho = new double[5, 2, 85, 116];
             db.GetVariable("rho").CopyToArray(rho, 0);
 
             double[] W = new double[116];
@@ -5559,7 +5559,7 @@ namespace Gekko
             double[] gamma = new double[2];
             db.GetVariable("gamma").CopyToArray(gamma, 0);
 
-            double[, , ,] adjLmax = new double[5, 2, 85, 116];
+            double[,,,] adjLmax = new double[5, 2, 85, 116];
             db.GetVariable("adjLmax").CopyToArray(adjLmax, 0);
 
             GAMSParameter p2 = db.GetParameter("NInd");
@@ -5581,7 +5581,7 @@ namespace Gekko
             p2.AddRecord(new string[] { "IW", "m", "85", "t2" });
             p2.AddRecord(new string[] { "IW", "m", "85", "t5" });
             p2.AddRecord(new string[] { "IW", "m", "85", "t6" });
-            double[, , ,] NInd = new double[3, 2, 86, 116];  //a is 0-based here, 1-based in the others!
+            double[,,,] NInd = new double[3, 2, 86, 116];  //a is 0-based here, 1-based in the others!
             p2.CopyToArray(NInd, 0);
 
             G.Writeln("Loading DREAM data end");
@@ -5600,9 +5600,9 @@ namespace Gekko
             int V = 9;
             int T = 116;
 
-            double[, , , ,] result = new double[V, S, A, O, T];  //9 variabler
-            double[, , ,] resultSum = new double[S, A, O, T];
-            double[, , ,] resultLevelLag = new double[S, A, O, T];
+            double[,,,,] result = new double[V, S, A, O, T];  //9 variabler
+            double[,,,] resultSum = new double[S, A, O, T];
+            double[,,,] resultLevelLag = new double[S, A, O, T];
 
             for (int t = 0; t < T; t++)
             {
@@ -5993,7 +5993,7 @@ namespace Gekko
                 }
 
                 string[] vars = new string[] { "J_LMax", "eta", "tmargWork", "adjrho", "rho", "W", "PCH", "adjLmax", "NInd" };
-                string[] origins = new string[] { "DA", "IX", "IW"};
+                string[] origins = new string[] { "DA", "IX", "IW" };
                 string[] sexs = new string[] { "M", "K" };
 
                 double[] colSum = new double[tab.GetLength(1)];
@@ -6174,7 +6174,7 @@ namespace Gekko
                 }
             }
             //doLogSetEnvVarInfo(string.Format("InstallPath value of key " + rCoreKey.ToString() + ": {0}",
-              // installPath == null ? "null" : installPath), logger);
+            // installPath == null ? "null" : installPath), logger);
             return installPath;
         }
 
@@ -6263,7 +6263,7 @@ namespace Gekko
                 sw.Close();
             }
 
-            
+
 
             //Make r2gekko.txt file that R later on fills into
             using (FileStream fs = WaitForFileStream(RExportFileName, GekkoFileReadOrWrite.Write))
@@ -6284,7 +6284,7 @@ namespace Gekko
                     //do not do this every time R is called!
                     string RPath = GetRhomeWin32NT(null);
                     if (RPath == null || RPath.Trim() == "") Globals.detectedRPath = "[[RDetectFailed]]";
-                    else Globals.detectedRPath = RPath + "\\bin\\R.exe";                 
+                    else Globals.detectedRPath = RPath + "\\bin\\R.exe";
                 }
                 else
                 {
@@ -6297,13 +6297,13 @@ namespace Gekko
                 //overrides
                 if (Program.options.r_exe_path.ToLower().EndsWith("\\r.exe"))
                 {
-                    RPathUsedHere = Program.options.r_exe_path;                    
+                    RPathUsedHere = Program.options.r_exe_path;
                 }
                 else
                 {
                     if (Program.options.r_exe_path.EndsWith("\\")) RPathUsedHere = Program.options.r_exe_path + "R.exe";
                     else RPathUsedHere = Program.options.r_exe_path + "\\R.exe";
-                }                
+                }
             }
 
             //Now RPathUsedHere should be either
@@ -6322,7 +6322,7 @@ namespace Gekko
             Process r = new Process();
 
             //It seems that \bin\R.exe calls \i386\R.exe or \x64\R.exe depending on R settings on the user's computer.
-            r.StartInfo.FileName = RPathUsedHere;                        
+            r.StartInfo.FileName = RPathUsedHere;
             r.StartInfo.Arguments = " CMD BATCH --no-save " + Globals.QT + RFileName + Globals.QT + " " + Globals.QT + RFileName + ".txt" + Globals.QT;
             r.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
@@ -6363,8 +6363,8 @@ namespace Gekko
                 else
                 {
                     G.Writeln2("*** ERROR: Error message: " + e.Message);
-                    G.Writeln("*** ERROR: The file " + RPathUsedHere + " exists, but R fails");                    
-                }                
+                    G.Writeln("*** ERROR: The file " + RPathUsedHere + " exists, but R fails");
+                }
                 throw new GekkoException();
             }
 
@@ -6380,7 +6380,7 @@ namespace Gekko
                 {
                     //if (s2.Contains(def1)) skip = true;                    
                     if (!skip) G.Writeln(s2);
-                    if (s2.Contains(def2)) skip = false;                                        
+                    if (s2.Contains(def2)) skip = false;
                 }
                 G.Writeln();
             }
@@ -6692,45 +6692,45 @@ namespace Gekko
             CrossThreadStuff.CopyButtonEnabled(true);
         }
 
-        
 
-public static bool IsLargeAware(string file)
-{
-    using (var fs = File.OpenRead(file))
-    {
-        return IsLargeAware(fs);
-    }
-}
+
+        public static bool IsLargeAware(string file)
+        {
+            using (var fs = File.OpenRead(file))
+            {
+                return IsLargeAware(fs);
+            }
+        }
 
         /// <summary>
-/// Checks if the stream is a MZ header and if it is large address aware
-/// </summary>
-/// <param name="stream">Stream to check, make sure its at the start of the MZ header</param>
-/// <exception cref=""></exception>
-/// <returns></returns>
-public static bool IsLargeAware(Stream stream)
-{
-    const int IMAGE_FILE_LARGE_ADDRESS_AWARE = 0x20;
+        /// Checks if the stream is a MZ header and if it is large address aware
+        /// </summary>
+        /// <param name="stream">Stream to check, make sure its at the start of the MZ header</param>
+        /// <exception cref=""></exception>
+        /// <returns></returns>
+        public static bool IsLargeAware(Stream stream)
+        {
+            const int IMAGE_FILE_LARGE_ADDRESS_AWARE = 0x20;
 
-    var br = new BinaryReader(stream);
+            var br = new BinaryReader(stream);
 
-    if (br.ReadInt16() != 0x5A4D)       //No MZ Header
-        return false;
+            if (br.ReadInt16() != 0x5A4D)       //No MZ Header
+                return false;
 
-    br.BaseStream.Position = 0x3C;
-    var peloc = br.ReadInt32();         //Get the PE header location.
+            br.BaseStream.Position = 0x3C;
+            var peloc = br.ReadInt32();         //Get the PE header location.
 
-    br.BaseStream.Position = peloc;
-    if (br.ReadInt32() != 0x4550)       //No PE header
-        return false;
+            br.BaseStream.Position = peloc;
+            if (br.ReadInt32() != 0x4550)       //No PE header
+                return false;
 
-    br.BaseStream.Position += 0x12;
-    return (br.ReadInt16() & IMAGE_FILE_LARGE_ADDRESS_AWARE) == IMAGE_FILE_LARGE_ADDRESS_AWARE;
-}
+            br.BaseStream.Position += 0x12;
+            return (br.ReadInt16() & IMAGE_FILE_LARGE_ADDRESS_AWARE) == IMAGE_FILE_LARGE_ADDRESS_AWARE;
+        }
 
         public static void Stamp()
-        {            
-            
+        {
+
             if (!Globals.runningOnTTComputer)
             {
                 G.Writeln2("*** ERROR: Please use: TELL currentDateTime();");
@@ -6738,7 +6738,7 @@ public static bool IsLargeAware(Stream stream)
             }
             else
             {
-                G.Writeln2("*** ERROR: Please use: TELL currentDateTime();");                
+                G.Writeln2("*** ERROR: Please use: TELL currentDateTime();");
             }
         }
 
@@ -7196,7 +7196,7 @@ public static bool IsLargeAware(Stream stream)
             {
                 //report, and remove dublets, in method + throw
             }
-            foreach (GekkoTime t in new GekkoTimeIterator( tStart, tEnd))
+            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
             {
                 //Corresponds to genr100000.cmd and ggenr100000.cmd
                 double rhs = W(tg, t) * W(tg, t) / W(tg, t) + W(fy, t) * W(fy, t) / W(fy, t) - W(fy, t) * W(fy, t) / W(fy, t) + Math.Exp(W(fy, t) - W(fy, t));
@@ -8103,7 +8103,7 @@ public static bool IsLargeAware(Stream stream)
 
             string var2 = decompOptions.variable;
 
-            if(true)
+            if (true)
             {
 
                 string leftSideVariable = G.GetUpperLowerCase(var2);
@@ -8163,7 +8163,7 @@ public static bool IsLargeAware(Stream stream)
                     counter++;
                     Databank databank = bank;
 
-                    foreach (GekkoTime t in new GekkoTimeIterator( tStart.Add(-2), tEnd))  //-2 to deal with dp option
+                    foreach (GekkoTime t in new GekkoTimeIterator(tStart.Add(-2), tEnd))  //-2 to deal with dp option
                     {
                         List<DecompHelper> decompContributions = new List<DecompHelper>();
 
@@ -8246,7 +8246,7 @@ public static bool IsLargeAware(Stream stream)
                 if (decompOptions.showErrors) o = 2;
 
                 int j = -1;
-                foreach (GekkoTime t in new GekkoTimeIterator( tStart, tEnd))
+                foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
                 {
                     j++;
                     if (j == 0)
@@ -8298,7 +8298,7 @@ public static bool IsLargeAware(Stream stream)
                             case "xm":
                                 {
                                     line0 = data[0].z - data_base[0].z;
-                                    table.SetNumber(0 + offset_i, j + offset_j, line0 , format);  //What should format be?
+                                    table.SetNumber(0 + offset_i, j + offset_j, line0, format);  //What should format be?
                                     if (decompOptions.showErrors)
                                     {
                                         line2 = data[0].y0 - data_base[0].y0;
@@ -8460,7 +8460,7 @@ public static bool IsLargeAware(Stream stream)
                                 break;
 
 
-                            //======================================================================================
+                                //======================================================================================
 
                         }  //end of switch
 
@@ -9344,9 +9344,9 @@ public static bool IsLargeAware(Stream stream)
                 {
                     string sub = s2;
                     if (G.equal(sub, "cge"))
-                    {                        
+                    {
                         CGE.Run();
-                        CGE.GamsReader();                        
+                        CGE.GamsReader();
                         return "";   //no need for the parser to chew on this afterwards!
                     }
                 }
@@ -9449,9 +9449,9 @@ public static bool IsLargeAware(Stream stream)
                         }
                         return "";  //no need for the parser to chew on this afterwards!
                     }
-                }              
+                }
 
-               
+
                 if (s2.Length == 5)
                 {
                     string sub = s2;
@@ -9607,7 +9607,7 @@ public static bool IsLargeAware(Stream stream)
                 //}
 
                 if (s2.Length == "killexcel".Length)
-                {                    
+                {
                     if (G.equal(s2, "killexcel"))
                     {
                         DialogResult result = MessageBox.Show("Delete all processes with 'excel' in their names? CLOSE EXCEL SHEETS BEFOREHAND!!", "Gekko helper", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);
@@ -9617,14 +9617,14 @@ public static bool IsLargeAware(Stream stream)
                             int counter = 0;
                             Process[] ps = Process.GetProcesses();
                             foreach (var process in ps)
-                            {                                                             
+                            {
                                 string name = process.ProcessName;
                                 if (name.ToLower().Contains("excel"))
                                 {
                                     process.Kill();
                                     G.Writeln("Killed '" + name + "'");
                                     counter++;
-                                }                                
+                                }
                             }
                             G.Writeln("Killed " + counter + " Excel processes");
                         }
@@ -9655,7 +9655,7 @@ public static bool IsLargeAware(Stream stream)
                         }
                         return "";  //no need for the parser to chew on this afterwards!
                     }
-                }                
+                }
             }
             return text;
         }
@@ -10288,7 +10288,7 @@ public static bool IsLargeAware(Stream stream)
                         {
                             //now we have stuff like .1, and we need to check the chars before the '.'
                             bool good = false;
-                            for (int ii = i-1; ii >= 0; ii--)
+                            for (int ii = i - 1; ii >= 0; ii--)
                             {
                                 //it may be for instance y.1 or y12345.1, so we run it backwards looking for
                                 //digits only. When there are no more digits, it MUST be a letter or underscore
@@ -10632,7 +10632,7 @@ public static bool IsLargeAware(Stream stream)
                                             for (int ii = i - 1 - 1; ii >= 0; ii--)
                                             {
                                                 //.... +123.45 loops through pure digits until + is met. Here number would be true.
-                                                if (glued3a.Contains(lineNewVersion[ii]))break;  //for instance a "," or "+" to delimit the number ('token')
+                                                if (glued3a.Contains(lineNewVersion[ii])) break;  //for instance a "," or "+" to delimit the number ('token')
                                                 if (!char.IsDigit(lineNewVersion[ii]))
                                                 {
                                                     number = false;
@@ -10787,7 +10787,7 @@ public static bool IsLargeAware(Stream stream)
             return 1;
 
         }
-        
+
         public static string GetTextFromFileWithWait(string filename)
         {
             //Encoding encoding = Encoding.Default;
@@ -10912,12 +10912,12 @@ public static bool IsLargeAware(Stream stream)
         }
 
         public static void Library(string fileName, P p)
-        {            
+        {
             if (fileName == "*")
             {
                 G.Writeln2("*** ERROR: You cannot use LIBRARY *;");
                 throw new GekkoException();
-            }            
+            }
             AddAbstract(fileName, true, true, p);
         }
 
@@ -10958,9 +10958,9 @@ public static bool IsLargeAware(Stream stream)
                     //fileName2 = SearchForFile(oldName, folders);  //also calls CreateFullPathAndFileName()
                     //if (fileName2 == null)  //if no isstart.cmd is found either
                     //{
-                        //no serious error because of this
-                        G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in working folder");
-                        return;  //used for gekko.ini file
+                    //no serious error because of this
+                    G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in working folder");
+                    return;  //used for gekko.ini file
                     //}
                     //else
                     //{
@@ -11192,7 +11192,7 @@ public static bool IsLargeAware(Stream stream)
                     {
                         freq = "Undated";
                     }
-                                        
+
                     bool noData = ts.IsNullPeriod(); //We are opening up to this possibility of 'empty' data                    
 
                     GekkoTime first = ts.GetPeriodFirst();
@@ -11404,7 +11404,7 @@ public static bool IsLargeAware(Stream stream)
                 G.Writeln();
             }
         }
-        
+
 
         public static List<string> SplitStringAndKeepDelimiters(string strSplit, char[] arrDelimiters)
         {
@@ -11691,7 +11691,10 @@ public static bool IsLargeAware(Stream stream)
 
             try
             {
-                System.Windows.Forms.Help.ShowHelp(null, path, s2);
+
+                System.Windows.Forms.Help.ShowHelp(null, path, s2);  //seems to give the same
+                //System.Windows.Forms.Help.ShowHelp(Globals.mFrmDummyHost, path, s2);  //problem if F1 and then HELP tell
+
             }
             catch (Exception e)
             {
@@ -25688,8 +25691,9 @@ public static bool IsLargeAware(Stream stream)
         }
 
 
-        public static TableLight ReadExcelWorkbook(string file, Databank databank)
+        public static TableLight ReadExcelWorkbook(string file, Databank databank, string sheetName)
         {
+            
             if (!File.Exists(file))
             {
                 G.Writeln2("*** ERROR: File " + file + " does not seem to exist");
@@ -25708,7 +25712,29 @@ public static bool IsLargeAware(Stream stream)
                 //Seems this startup always takes 1 second. Maybe put it in Global and reuse from there.
                 excel = new Excel.Application();
                 wkb = OpenBook(excel, file, true, false, false);
-                Excel.Worksheet sheet = wkb.Sheets[1] as Excel.Worksheet;
+
+                Excel.Worksheet sheet = null;
+
+                Excel.Sheets objSheets = wkb.Worksheets;
+                
+                if (sheetName == null)
+                {
+                    //do nothing, [1] is al
+                    sheet = wkb.Sheets[1] as Excel.Worksheet;
+                }
+                else
+                {
+                    bool match = ExcelSheetCheckMatch(objSheets, sheetName);
+                    if (match)
+                    {
+                        sheet = ExcelSheetTryGetSheet(objSheets, sheetName);
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: The sheet '" + sheetName + "' does not seem to exist");
+                    }
+                }
+
                 Excel.Range range = null;
                 //G.Writeln("open excel " + G.Seconds(d3));
 
@@ -25805,16 +25831,16 @@ public static bool IsLargeAware(Stream stream)
             }
             //G.Writeln("full excel " + G.Seconds(t00));
             return matrix;
-        }
-
-        public static Excel._Workbook objBook;
+        }        
 
         public static ExcelDataForCplot CreateExcelWorkbook2(ExcelOptions eo, O.Prt oPrt, bool isMulprt)
         {
-            //TODO: #89073253245
-            //this method transposes the input-table itself, which is a bit stupid since the table
-            //is easy to transpose when it is constructed (with option rows/cols)
+            Excel.Workbook objBook = null;
 
+        //TODO: #89073253245
+        //this method transposes the input-table itself, which is a bit stupid since the table
+        //is easy to transpose when it is constructed (with option rows/cols)
+ 
             string stampText = null;
             //TODO: think about extensions. If no extension given, it seems append=yes does not work properly.
             ExcelDataForCplot cplotData = new ExcelDataForCplot();  //only used if called from CSHEET, data are fetched and returned, but not used for normal WPLOT use.
@@ -25833,9 +25859,9 @@ public static bool IsLargeAware(Stream stream)
 
             Excel.Workbooks objBooks = null;
             Excel.Sheets objSheets = null;
-            Excel._Worksheet objSheet = null;
+            Excel.Worksheet objSheet = null;
             Excel.Range range = null;
-            Excel._Worksheet newSheet = null;
+            Excel.Worksheet newSheet = null;
 
             bool isStamp = false; if (oPrt != null && G.equal(oPrt.opt_stamp, "yes")) isStamp = true;
             bool isDates = true; if (oPrt != null && G.equal(oPrt.opt_dates, "no")) isDates = false;
@@ -25949,36 +25975,20 @@ public static bool IsLargeAware(Stream stream)
                         objSheets = objBook.Worksheets;
                         if (sheet == null)
                         {
-                            objSheet = (Excel._Worksheet)objSheets.get_Item(1);
+                            objSheet = (Excel.Worksheet)objSheets.get_Item(1);
                         }
                         else
                         {
-                            bool match = false;
-                            foreach (Excel.Worksheet xx in objSheets)
-                            {
-                                if (G.equal(xx.Name.Trim(), sheet.Trim()))
-                                {
-                                    match = true;
-                                }
-                            }
-
+                            bool match = ExcelSheetCheckMatch(objSheets, sheet);
                             if (match)
                             {
-                                try
-                                {
-                                    objSheet = (Excel.Worksheet)objSheets[sheet];  //seems it is not case sensitive
-                                }
-                                catch (Exception e)
-                                {
-                                    G.Writeln2("*** ERROR: problem while trying to write to existing sheet");
-                                    throw new GekkoException();
-                                }
+                                objSheet = ExcelSheetTryGetSheet(objSheets, sheet);
 
                             }
                             else
                             {
                                 //creating a new one
-                                objSheet = (Excel._Worksheet)objSheets.Add(objSheets[1], Type.Missing, Type.Missing, Type.Missing);
+                                objSheet = (Excel.Worksheet)objSheets.Add(objSheets[1], Type.Missing, Type.Missing, Type.Missing);
                                 objSheet.Name = sheet;
                             }
                             // The first argument below inserts the new worksheet as the first one
@@ -25991,7 +26001,7 @@ public static bool IsLargeAware(Stream stream)
                         objBooks = Globals.objApp.Workbooks;
                         objBook = objBooks.Add(Missing.Value);
                         objSheets = objBook.Worksheets;
-                        objSheet = (Excel._Worksheet)objSheets.get_Item(1);
+                        objSheet = (Excel.Worksheet)objSheets.get_Item(1);
                         if (sheet != null)
                         {
                             objSheet.Name = sheet;
@@ -26359,6 +26369,36 @@ public static bool IsLargeAware(Stream stream)
 
             //see MS bug 320369
             System.Threading.Thread.CurrentThread.CurrentCulture = oldCI;
+        }
+
+        private static Excel.Worksheet ExcelSheetTryGetSheet(Excel.Sheets objSheets, string sheet)
+        {
+            Excel.Worksheet objSheet;
+            try
+            {
+                objSheet = (Excel.Worksheet)objSheets[sheet];  //seems it is not case sensitive
+            }
+            catch (Exception e)
+            {
+                G.Writeln2("*** ERROR: problem while trying to access to existing sheet '" + sheet + "'");
+                throw new GekkoException();
+            }
+
+            return objSheet;
+        }
+
+        private static bool ExcelSheetCheckMatch(Excel.Sheets objSheets, string sheet)
+        {
+            bool match = false;
+            foreach (Excel.Worksheet xx in objSheets)
+            {
+                if (G.equal(xx.Name.Trim(), sheet.Trim()))
+                {
+                    match = true;
+                }
+            }
+
+            return match;
         }
 
         private static void HandleRowsCols(O.Prt oPrt, out bool isRows, out bool isCols)

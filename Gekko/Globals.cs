@@ -60,6 +60,8 @@ namespace Gekko
         public static string splitSTOP = G.NL + splitSTOP2 + G.NL;
         public static string functionParameterCode = "param_";
 
+        public static System.Windows.Forms.Form mFrmDummyHost = new System.Windows.Forms.Form();
+
         public static int graphBackground = 255; //221 before
         
         public static string splitCommandBlockStart = "//[[commandStart]]";
