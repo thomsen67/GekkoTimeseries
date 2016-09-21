@@ -1166,7 +1166,7 @@ namespace Gekko
 
                         if (cellText == null)
                         {
-                            G.Writeln2("*** ERROR in spreadsheet cell " + GetExcelCell(row, col, transpose) + ".");
+                            G.Writeln2("*** ERROR in cell " + GetExcelCell(row, col, transpose) + ".");
                             G.Writeln2("    This cell should contain a date and not be empty.", Color.Red);
                             throw new GekkoException();
                         }
@@ -1213,15 +1213,30 @@ namespace Gekko
                         }
                         else
                         {
+                            bool success = false;
                             string[] temp = date.Split(new string[] { G.GetFreq(freqHere) }, StringSplitOptions.None);
                             if (temp.Length != 2)
                             {
-                                G.Writeln2("*** ERROR: Cell " + GetExcelCell(row, col, transpose) + ". Could not find freq '" + freqHere + "' in this date: '" + date + "'");
+                                if (date.Length == 6 && G.IsInteger(date))
+                                {
+                                    //It might be a date like 199503, that is, 1995q3 or 1995m3
+                                    perTemp = date.Substring(0, 2);
+                                    subPerTemp = date.Substring(2, 4);
+                                    success = true;
+                                }
+                            }
+                            else
+                            {
+                                perTemp = temp[0];
+                                subPerTemp = temp[1];
+                                success = true;
+                            }
+                            if (!success)
+                            {
+                                G.Writeln2("*** ERROR: Cell " + GetExcelCell(row, col, transpose) + ". Could not find frequency data in this date: '" + date + "'");
                                 G.Writeln("           You may want to change the frequency: OPTION freq = ...", Color.Red);
                                 throw new GekkoException();
                             }
-                            perTemp = temp[0];
-                            subPerTemp = temp[1];
                         }
 
                         try
