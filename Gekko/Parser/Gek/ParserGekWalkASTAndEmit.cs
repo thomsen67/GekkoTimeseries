@@ -2764,9 +2764,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.Splice o" + Num(node) + " = new O.Splice();" + G.NL);
                             node.Code.A(node[0].Code);
                             node.Code.A(node[1].Code);
-                            node.Code.A(node[2].Code);
-                            //node.Code.A("o" + Num(node) + ".rhs1 = (" + node[1].Code + ");" + G.NL;
-                            //node.Code.A("o" + Num(node) + ".rhs2 = (" + node[2].Code + ");" + G.NL;
+                            node.Code.A(node[2].Code);                       
                             if (node.ChildrenCount() > 3)
                             {
                                 node.Code.A("o" + Num(node) + ".date = O.GetDate(" + node[3].Code + ");" + G.NL);

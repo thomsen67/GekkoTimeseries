@@ -440,25 +440,93 @@ namespace UnitTests
             Databank work = First();
             //==================== SPLICE ===========================================
 
-            I("RESET;");
-            I("create ts1, ts2, ts0a, ts0b;");
-            I("SERIES <2002 2006> ts1 = 2 3 4 5 6;");
-            I("SERIES <2004 2010> ts2 = 41 42 43 44 45 46 47;");
-            I("splice ts0a = ts1 ts2;                                    //splicing two series by means of three common observations");
-            I("prt <2000 2012> ts0a, ts1, ts2;");
-            double delta = 0.0001d;
-            AssertHelper(First(), "ts0a", 2006, 6d, delta);
-            AssertHelper(First(), "ts0a", 2007, 5.2381d, delta);
-            AssertHelper(First(), "ts0a", 2008, 5.3571d, delta);
-            AssertHelper(First(), "ts0a", 2009, 5.4762d, delta);
-            AssertHelper(First(), "ts0a", 2010, 5.5952d, delta);
-            I("splice ts0b = ts1 2006 ts2;                               //splicing on one observation instead, follows ts2 growth from 2007 and on.");
-            I("prt <2000 2012> ts0b, ts1, ts2;");
-            AssertHelper(First(), "ts0b", 2006, 6d, delta);
-            AssertHelper(First(), "ts0b", 2007, 6.1395d, delta);
-            AssertHelper(First(), "ts0b", 2008, 6.2791d, delta);
-            AssertHelper(First(), "ts0b", 2009, 6.4186d, delta);
-            AssertHelper(First(), "ts0b", 2010, 6.5581d, delta);
+            if (false)
+            {
+                I("RESET;");
+                I("create ts1, ts2, ts0a, ts0b;");
+                I("SERIES <2002 2006> ts1 = 2 3 4 5 6;");
+                I("SERIES <2004 2010> ts2 = 41 42 43 44 45 46 46;");
+                I("splice ts0a = ts1 ts2;                                    //splicing two series by means of three common observations");
+                I("prt <2000 2012> ts0a, ts1, ts2;");
+                double delta = 0.0001d;
+                AssertHelper(First(), "ts0a", 2006, 6d, delta);
+                AssertHelper(First(), "ts0a", 2007, 5.2381d, delta);
+                AssertHelper(First(), "ts0a", 2008, 5.3571d, delta);
+                AssertHelper(First(), "ts0a", 2009, 5.4762d, delta);
+                AssertHelper(First(), "ts0a", 2010, 5.5952d, delta);
+                I("splice ts0b = ts1 2006 ts2;                               //splicing on one observation instead, follows ts2 growth from 2007 and on.");
+                I("prt <2000 2012> ts0b, ts1, ts2;");
+                AssertHelper(First(), "ts0b", 2006, 6d, delta);
+                AssertHelper(First(), "ts0b", 2007, 6.1395d, delta);
+                AssertHelper(First(), "ts0b", 2008, 6.2791d, delta);
+                AssertHelper(First(), "ts0b", 2009, 6.4186d, delta);
+                AssertHelper(First(), "ts0b", 2010, 6.5581d, delta);
+            }
+
+
+            // AREMOS RESULTS:
+
+            //ser < 2002 2006 > ts1 = 2,3,4,5,6;
+            //ser < 2004 2010 > ts2 = 41,42,43,44,45,46,46;  //fail, last one should be 47... never mind
+            //set per 2000 2020;
+            //splice ts0a = ts1 ts2;
+            //splice ts0b = ts1 2006 ts2;
+            //print ts1, ts2, ts0a, ts0b;
+
+            //2002      2.000000               16.800000   14.333333
+            //2003      3.000000               25.200000   21.500000
+            //2004      4.000000   41.000000   41.000000   28.666667
+            //2005      5.000000   42.000000   42.000000   35.833333
+            //2006      6.000000   43.000000   43.000000   43.000000
+            //2007                 44.000000   44.000000   44.000000
+            //2008                 45.000000   45.000000   45.000000
+            //2009                 46.000000   46.000000   46.000000
+            //2010                 46.000000   46.000000   46.000000
+
+            //          pch(ts1)    pch(ts2)   pch(ts0a)   pch(ts0b)
+            //2003     50.000000               50.000000   50.000000
+            //2004     33.333333               62.698413   33.333333
+            //2005     25.000000    2.439024    2.439024   25.000000
+            //2006     20.000000    2.380952    2.380952   20.000000
+            //2007                  2.325581    2.325581    2.325581
+            //2008                  2.272727    2.272727    2.272727
+            //2009                  2.222222    2.222222    2.222222
+            //2010                  0.000000    0.000000    0.000000
+
+            if (true)
+            {
+                I("RESET;");
+                I("create ts1, ts2, ts0a, ts0b;");
+                I("SERIES <2002 2006> ts1 = 2 3 4 5 6;");
+                I("SERIES <2004 2010> ts2 = 41 42 43 44 45 46 46;");
+                I("splice ts0a = ts1 ts2;                                    //splicing two series by means of three common observations");
+                double delta = 0.0001d;
+                AssertHelper(First(), "ts0a", 2001, double.NaN, delta);
+                AssertHelper(First(), "ts0a", 2002, 16.8d, delta);
+                AssertHelper(First(), "ts0a", 2003, 25.2d, delta);
+                AssertHelper(First(), "ts0a", 2004, 41d, delta);
+                AssertHelper(First(), "ts0a", 2005, 42d, delta);
+                AssertHelper(First(), "ts0a", 2006, 43d, delta);
+                AssertHelper(First(), "ts0a", 2007, 44d, delta);
+                AssertHelper(First(), "ts0a", 2008, 45d, delta);
+                AssertHelper(First(), "ts0a", 2009, 46d, delta);
+                AssertHelper(First(), "ts0a", 2010, 46d, delta);
+                AssertHelper(First(), "ts0a", 2011, double.NaN, delta);
+                I("splice ts0b = ts1 2006 ts2;                               //splicing on one observation instead, follows ts2 growth from 2007 and on.");
+                AssertHelper(First(), "ts0b", 2001, double.NaN, delta);
+                AssertHelper(First(), "ts0b", 2002, 14.3333333d, delta);
+                AssertHelper(First(), "ts0b", 2003, 21.5d, delta);
+                AssertHelper(First(), "ts0b", 2004, 28.6666667d, delta);
+                AssertHelper(First(), "ts0b", 2005, 35.8333333d, delta);
+                AssertHelper(First(), "ts0b", 2006, 43d, delta);
+                AssertHelper(First(), "ts0b", 2007, 44d, delta);
+                AssertHelper(First(), "ts0b", 2008, 45d, delta);
+                AssertHelper(First(), "ts0b", 2009, 46d, delta);
+                AssertHelper(First(), "ts0b", 2010, 46d, delta);
+                AssertHelper(First(), "ts0b", 2011, double.NaN, delta);
+                AssertHelper(First(), "ts0b", 2011, double.NaN, delta);
+            }
+
         }
 
         [TestMethod]

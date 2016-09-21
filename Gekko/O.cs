@@ -2328,6 +2328,8 @@ namespace Gekko
             public GekkoTime date = Globals.tNull;
             public void Exe()
             {
+                bool useSecondPartLevels = true;  //like aremos
+
                 if (listItems0.Count != 1 || listItems1.Count != 1 || listItems2.Count != 1)
                 {
                     G.Writeln2("*** ERROR: SPLICE only supports one variable at a time, not lists (for now)");
@@ -2377,6 +2379,20 @@ namespace Gekko
                     G.Writeln2("*** ERROR: No overlapping periods for SPLICE");
                     throw new GekkoException();
                 }
+
+
+                //          ts1        ts2
+                //2002      2.000000                 t1a = 2002
+                //2003      3.000000              
+                //2004      4.000000   41.000000     t2a = 2004
+                //2005      5.000000   42.000000  
+                //2006      6.000000   43.000000     t1b = 2006
+                //2007                 44.000000  
+                //2008                 45.000000  
+                //2009                 46.000000  
+                //2010                 46.000000     t2b = 2010
+
+
                 double count = 0d;
                 double sum1 = 0d;
                 double sum2 = 0d;
@@ -2388,26 +2404,54 @@ namespace Gekko
                 }
                 double avg1 = sum1 / count;
                 double avg2 = sum2 / count;
-                if (avg2 == 0d)
+
+                if (useSecondPartLevels)
                 {
-                    G.Writeln2("*** ERROR: Avg = 0 for second timeseries over common period " + t2a + "-" + t1b);
-                    throw new GekkoException();
+                    
+                    if (avg2 == 0d)
+                    {
+                        G.Writeln2("*** ERROR: Avg = 0 for second timeseries over common period " + t2a + "-" + t1b);
+                        throw new GekkoException();
+                    }
+                    double relative = avg1 / avg2;
+                    if (G.isNumericalError(relative))
+                    {
+                        G.Writeln2("*** ERROR: Seems there are missing data for common period " + t2a + "-" + t1b);
+                        throw new GekkoException();
+                    }
+                    foreach (GekkoTime gt in new GekkoTimeIterator(t1a, t2a.Add(-1)))
+                    {
+                        ts3.SetData(gt, ts1.GetData(gt) / relative);
+                    }
+                    foreach (GekkoTime gt in new GekkoTimeIterator(t2a, t2b))
+                    {
+                        ts3.SetData(gt, ts2.GetData(gt));
+                    }
                 }
-                double relative = avg1 / avg2;
-                if (G.isNumericalError(relative))
+                else
                 {
-                    G.Writeln2("*** ERROR: Seems there are missing data for common period " + t2a + "-" + t1b);
-                    throw new GekkoException();
-                }                
-                foreach (GekkoTime gt in new GekkoTimeIterator(t1a, t1b))
-                {
-                    ts3.SetData(gt, ts1.GetData(gt));
+                  
+                    if (avg2 == 0d)
+                    {
+                        G.Writeln2("*** ERROR: Avg = 0 for second timeseries over common period " + t2a + "-" + t1b);
+                        throw new GekkoException();
+                    }
+                    double relative = avg1 / avg2;
+                    if (G.isNumericalError(relative))
+                    {
+                        G.Writeln2("*** ERROR: Seems there are missing data for common period " + t2a + "-" + t1b);
+                        throw new GekkoException();
+                    }
+                    foreach (GekkoTime gt in new GekkoTimeIterator(t1a, t1b))
+                    {
+                        ts3.SetData(gt, ts1.GetData(gt));
+                    }
+                    foreach (GekkoTime gt in new GekkoTimeIterator(t1b.Add(1), t2b))
+                    {
+                        ts3.SetData(gt, ts2.GetData(gt) * relative);
+                    }                    
                 }
-                foreach (GekkoTime gt in new GekkoTimeIterator(t1b.Add(1), t2b))
-                {
-                    ts3.SetData(gt, ts2.GetData(gt) * relative);
-                }
-                ts3.Stamp();            
+                ts3.Stamp();
                 G.Writeln2("Spliced '" + ts3.variableName + "' by means of " + obs + " common observations");
             }
         }

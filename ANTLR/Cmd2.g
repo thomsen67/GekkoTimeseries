@@ -1835,9 +1835,14 @@ prtOptCollapseHelper      : AVG -> ASTAVG
 						  | expression -> expression						
 						  ;
 
-splice                    : SPLICE listItems0 EQUAL listItems1 expression listItems2 -> ^({token("ASTSPLICE", ASTSPLICE, $SPLICE.Line)} listItems0 listItems1 listItems2 expression)
-                          | SPLICE listItems0 EQUAL listItems1 listItems2 -> ^({token("ASTSPLICE", ASTSPLICE, $SPLICE.Line)} listItems0 listItems1 listItems2)  //no date
+splice                    : SPLICE listItems0 EQUAL listItems1 expression listItems2 -> ^({token("ASTSPLICE", ASTSPLICE, $SPLICE.Line)} listItems0 listItems1 listItems2 expression     )
+                          | SPLICE listItems0 EQUAL listItems1 listItems2            -> ^({token("ASTSPLICE", ASTSPLICE, $SPLICE.Line)} listItems0 listItems1 listItems2 )  //no date
 						  ;
+spliceOpt1                : ISNOTQUAL 
+						  | leftAngle        spliceOpt1h* RIGHTANGLE -> spliceOpt1h*												  
+                          ;
+spliceOpt1h               : KEEP EQUAL spliceOptions -> ^(ASTOPT_STRING_KEEP spliceOptions);
+spliceOptions             : FIRST | LAST;
 
 read                      : read2 readOpt1? fileNameStar (TO identOrStar)? -> ^(ASTREAD read2 readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?));
 read2                     : READ | IMPORT;
