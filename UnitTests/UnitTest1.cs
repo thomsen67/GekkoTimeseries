@@ -4829,6 +4829,11 @@ namespace UnitTests
             I("STRING s = '';");
             I("FOR i=#m1 j=#m2 k=#m3; STRING s = %s + '[$i,$j,$k]'; END;");
             AssertHelperScalarString("s", "[a1,a2,a3][b1,b2,b3]");
+
+            I("STRING s = '';");
+            I("FOR i=#m1 j=#m2; FOR ii=#m1 jj=#m2; STRING s = %s + '[$i,$j,$ii,$jj]'; END; END;");
+            AssertHelperScalarString("s", "[a1,a2,a1,a2][a1,a2,b1,b2][b1,b2,a1,a2][b1,b2,b1,b2]");
+
             FAIL("FOR i=#m1 i=#m2; END;");
             FAIL("FOR i=#m1 j=#m2 i=#m3; END;");
             I("LIST m3 = a3, b3, c3;");

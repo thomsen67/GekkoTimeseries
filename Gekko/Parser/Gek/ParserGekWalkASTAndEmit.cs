@@ -1143,11 +1143,13 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("int " + nme3 + "= O.ForListMax(" + nme + ");" + G.NL);
                                 node.Code.A("O.ForListCheck(" + nme2 + ");" + G.NL);
 
-                                node.Code.A("for (int i = 0; i < " + nme3 + "; i++) {" + G.NL);                                
+                                //node.Code.A("for (int i = 0; i < " + nme3 + "; i++) {" + G.NL);
+                                node.Code.A("for (int i").A(Num(node)).A(" = 0; i").A(Num(node)).A(" < ").A(nme3).A("; i").A(Num(node)).A("++) {").A(G.NL);
+
                                 for (int i = 0; i < n0; i++)
                                 {
                                     string loopVariable = null; //The line below emits "O.SetValFromCache(..., tempName)", same as a "STRING x = ..." statement
-                                    string setLoopStringCs = CacheRefScalarCs(out loopVariable, node[0][i].nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.String, "x" + Num(node) + "_" + i + "[i]", true, true, false);
+                                    string setLoopStringCs = CacheRefScalarCs(out loopVariable, node[0][i].nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.String, "x" + Num(node) + "_" + i + "[i" + Num(node) + "]", true, true, false);
                                     node.Code.A(setLoopStringCs + G.NL);
                                 }
 
