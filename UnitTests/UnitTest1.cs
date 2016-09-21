@@ -199,7 +199,7 @@ namespace UnitTests
         public void MyTestInitialize()
         {
             Globals.threadIsInProcessOfAborting = false;
-            Globals.applicationIsInProcessOfAborting = false;
+            Globals.applicationIsInProcessOfAborting = false; 
         }
 
         //
