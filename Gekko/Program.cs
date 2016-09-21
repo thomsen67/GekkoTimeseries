@@ -1339,6 +1339,10 @@ namespace Gekko
                                         {
                                             G.Writeln2("*** ERROR: Cell " + GetExcelCell(row, col, transpose) + ". Could not parse '" + s3 + "' as a number");
                                             G.Writeln("+++ NOTE:  You may change separator: OPTION interface csv decimalseparator");
+                                            if(s3.Trim() == ".")
+                                            {
+                                                G.Writeln("+++ NOTE:  You cannot use dot ('.') to indicate missing value, use M or NA instead");
+                                            }
                                             throw new GekkoException();
                                         }
                                     }
@@ -1411,9 +1415,9 @@ namespace Gekko
         private static bool IsNonAvailableText(string text)
         {
             //the last ones are the Danish codes
-            //the M is Gekko standard for missing value
+            //the M is Gekko standard for missing value, NA is also allowed, both also with "".
             bool isNonAvailableText = false;
-            if (G.equal(text, "M") || G.equal(text, "NA") || G.equal(text, "#N/A") || G.equal(text, "#NAME?") || G.equal(text, "#I/T") || G.equal(text, "#NAVN?")) isNonAvailableText = true;
+            if (G.equal(text, "M") || G.equal(text, "\"M\"") || G.equal(text, "NA") || G.equal(text, "\"NA\"") || G.equal(text, "#N/A") || G.equal(text, "#NAME?") || G.equal(text, "#I/T") || G.equal(text, "#NAVN?")) isNonAvailableText = true;
             return isNonAvailableText;
         }
 
@@ -2809,7 +2813,7 @@ namespace Gekko
                             string label = null;
                             if (!ok)
                             {
-                                if (varName.Length >= 17 && varName[16] != ' ' && varName[15] == ' ')
+                                if (varName.Length >= 17)
                                 {
                                     //Of this type, where the first 16 chars is the name, and the rest is the label
                                     //gdp2            GDP in version 2, mia. DKK
@@ -4825,7 +4829,9 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: Timeseries '" + variable + "' could not be auto-created in '" + bank + "' databank");
+                        G.Writeln2("*** ERROR: Timeseries '" + variable + "' could not be auto-created in '" + bank + "' databank");                        
+                        G.Writeln("           You should use CREATE to create the timeseries first, or alternatively use");
+                        G.Writeln("           'MODE data', or set 'OPTION databank create auto = yes'");
                         throw new GekkoException();
                     }
                 }

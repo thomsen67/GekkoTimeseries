@@ -2853,6 +2853,7 @@ namespace Gekko
 
                 //These <FROM = ...> and <TO = ...> can be overridden by individual bank names like "COPY <FROM = adbk> a, b, simbk:c, d;". In that case, 'c' is taken from simbk.
                 //Note that <FROM/TO = @> is legal!
+
                 Databank localOptionFromBank = null; //is != null if <FROM = ...>
                 Databank localOptionToBank = null; //is != null if <TO  = ...>
                 GetFromAndToDatabanks(this.opt_from, this.opt_to, ref localOptionFromBank, ref localOptionToBank);
