@@ -12251,8 +12251,7 @@ namespace Gekko
 
             fileName = StripQuotes(fileName);
             //NOTE: If there is an error, Globals.pipeFile will be closed and disposed somewhere else in the
-            //      code. So no need to think about using an "using" statement here.
-            //fileName = SubstituteAssignVarsInExpression(fileName);
+            //      code. So no need to think about using an "using" statement here.            
 
             if (G.equal(fileName, "con"))
             {
@@ -12275,46 +12274,46 @@ namespace Gekko
             else
             {
                 //piping to a file
-                if (true)
-                {
-                    try
-                    {
-                        fileName = CreateFullPathAndFileNameFromFolder(fileName, Program.options.folder_pipe);
 
-                        if (Globals.pipe == true)
+                try
+                {
+                    fileName = CreateFullPathAndFileNameFromFolder(fileName, Program.options.folder_pipe);
+
+                    if (Globals.pipe == true)
+                    {
+                        if (G.equal(Globals.pipeFileHelper.pipeFileFileWithPath, fileName))
                         {
-                            if (G.equal(Globals.pipeFileHelper.pipeFileFileWithPath, fileName))
-                            {
-                                if (!mute) G.Writeln("+++ WARNING: you are already piping output to the file '" + fileName + "'. Command ignored.");
-                            }
-                            else
-                            {
-                                if (Globals.pipeFileHelper.pipeFile != null)
-                                {
-                                    Globals.pipeFileHelper.CloseFile();
-                                }
-                                StartPipingToFile(fileName, append, html, mute);
-                            }
+                            //already pipe to present pipefile
+                            //just ignore it with no message: the message will end up in the pipefile                            
                         }
                         else
                         {
+                            if (Globals.pipeFileHelper.pipeFile != null)
+                            {
+                                Globals.pipeFileHelper.CloseFile();
+                            }
                             StartPipingToFile(fileName, append, html, mute);
                         }
                     }
-                    catch (Exception e)
+                    else
                     {
-                        Globals.pipe = false;
-                        G.Writeln2("*** ERROR: Could not write to file '" + fileName + "'");
-                        throw new GekkoException();
+                        StartPipingToFile(fileName, append, html, mute);
                     }
-                    Globals.pipe = true;
                 }
+                catch (Exception e)
+                {
+                    Globals.pipe = false;
+                    MessageBox.Show("*** ERROR: Could not write to file '" + fileName + "'");
+                    throw new GekkoException();
+                }
+                Globals.pipe = true;
+
             }
         }
 
         private static void StartPipingToFile(string fileName, bool append, bool html, bool mute)
         {
-            if (!mute) G.Writeln("Directing output to file: '" + fileName + "'");
+            if (!mute && !Globals.pipe) G.Writeln("Directing output to file: '" + fileName + "'");
             Globals.pipe = true;
             GekkoFileReadOrWrite option = GekkoFileReadOrWrite.Write;
             if (append) option = GekkoFileReadOrWrite.WriteAppend;  //will be ok if the file does not exist, then it is just created with no warning issued

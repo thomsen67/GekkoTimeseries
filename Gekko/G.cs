@@ -1558,7 +1558,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    G.Writeln2("*** ERROR: Could not PIPE to file: " + Globals.pipeFileHelper.pipeFileFileWithPath);
+                    MessageBox.Show("*** ERROR: Could not PIPE to file: " + Globals.pipeFileHelper.pipeFileFileWithPath);                    
                     throw new GekkoException();
                 }
             }
