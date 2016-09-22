@@ -384,9 +384,27 @@ namespace Gekko.Parser.Gek
                 else G.Writeln();
 
                 string[] ss = s.Split(Globals.parserErrorSeparator);
-                int lineNumber = int.Parse(ss[0]) - 1;  //seems 1-based before subtract 1
+                int lineNumber = -12345;
+                try
+                {
+                    lineNumber = int.Parse(ss[0]) - 1;  //seems 1-based before subtract 1
+                }
+                catch (Exception e)
+                {
+                    G.Writeln2("*** ERROR: The parser stumbled unexpectedly with the message: " + s);
+                    throw new GekkoException();
+                }
                 int lineNo = lineNumber + 1;  //1-based
-                int positionNo = int.Parse(ss[1]) + 1;  //1-based
+                int positionNo = -12345;
+                try
+                {
+                    positionNo = int.Parse(ss[1]) + 1;  //1-based
+                }
+                catch (Exception e)
+                {
+                    G.Writeln2("*** ERROR: The parser stumbled unexpectedly with the message: " + s);
+                    throw new GekkoException();
+                }
 
                 string errorMessage = ss[3];
 

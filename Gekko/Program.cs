@@ -16870,8 +16870,19 @@ namespace Gekko
                     }
 
                     SevenZipExtractor.SetLibraryPath(sevenzPath);
-
-                    using (SevenZipExtractor tmp2 = new SevenZipExtractor(zipFileName))
+                    SevenZipExtractor tmp2 = null;
+                    try
+                    {
+                        tmp2 = new SevenZipExtractor(zipFileName);
+                    }
+                    catch (Exception e)
+                    {
+                        //It seems this happens if the file is not a 'real' zip file
+                        G.Writeln2("*** ERROR: It seems the .gbk file is not in the right format");
+                        throw new GekkoException();
+                    }
+                    
+                    using (tmp2)
                     {
                         string xmlFile = "";
                         int tsdfilecounter = 0;
