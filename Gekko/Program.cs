@@ -4601,6 +4601,8 @@ namespace Gekko
                 {
                     if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Parse start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
                     p.lastFileSentToANTLR = fileName;
+                    p.SetLastFileSentToANTLR(fileName);
+                    
                     ch = Gekko.Parser.Gek.ParserGekCreateAST.CreateAST(ph, p);
                     if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Parse end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
                 }
@@ -29038,13 +29040,15 @@ namespace Gekko
         }
     }
 
-    public class P
+        public class P
     {
+        public bool hasWrittenRunTimeErrorOnce = false;  //bit hacky
         public EHasShownErrorHandling hasShownErrorHandling = EHasShownErrorHandling.False;
         private int counter = 0;  //1 gets added soon enough
-        private Q[] stackQ = new Q[200]; //contains arguments to different methods, new object put in here every time a new .cmd file is run.
+        //private Q[] stackQ = new Q[200]; //contains arguments to different methods, new object put in here every time a new .cmd file is run.
         private string[] stack = new string[200];  //2000 nested cmd files -- should be enough
         private string[] stackCommandFileText = new string[200];
+        private string[] stackFileSentToAntlr = new string[200];
         public string lastFileSentToANTLR = null;
         public bool isOneLinerFromGui = false;
         public bool hasBeenCmdFile = false;
@@ -29081,32 +29085,19 @@ namespace Gekko
             return counter;
         }
 
-        public O_OLD GetO(int i)
+        public void SetLastFileSentToANTLR(string s)
         {
-            return this.stackQ[counter - 1][i];
-        }
-
-        public Q GetQ()
-        {
-            Q q = stackQ[counter];
-            //if (q == null)
-            //{
-            //    //this code will not happen that often, so ok if not too efficient
-            //    stackQ[counter] = new Q();
-            //    q = stackQ[counter];
-            //}
-            return q;
-        }
-
-        public void SetQ(Q q)
-        {
-            stackQ[counter] = q;
-        }
+            //This method is called in translated code, for each line (that is not "simple", ie. FOR, IF etc.)
+            this.stackFileSentToAntlr[counter] = s;            
+        }        
 
         public void SetText(string s)
         {
             //This method is called in translated code, for each line (that is not "simple", ie. FOR, IF etc.)
-            this.stack[counter] = this.lastFileSentToANTLR + s;
+
+            string file = "";
+            if (counter > 0) file = this.stackFileSentToAntlr[counter - 1];  //counter will probably always be 1 or larger when this method is called
+            this.stack[counter] =  file + s;
             ReportToRunStatus(false);
         }
 
@@ -29117,7 +29108,7 @@ namespace Gekko
 
         public void Deeper()
         {
-            this.counter++;
+             this.counter++;            
         }
 
         public void RemoveLast()
@@ -29152,6 +29143,8 @@ namespace Gekko
                 }
                 this.stack[counter] = null;
                 this.stackCommandFileText[counter - 1] = null;
+                this.stackFileSentToAntlr[counter - 1] = null;
+
             }
             this.counter--;
         }

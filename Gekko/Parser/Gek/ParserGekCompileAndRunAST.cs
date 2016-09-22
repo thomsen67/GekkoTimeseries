@@ -133,7 +133,7 @@ namespace Gekko.Parser.Gek
             CSharpCodeProvider csCompiler = new CSharpCodeProvider();
 
             //code = ch.code + " ";
-            Globals.lastDynamicCsCode = code;  //would be nicer to have this in the P object.
+            Globals.lastDynamicCsCode = code;  //would be nicer to have this in the P object.        
 
             CodeDomProvider provider = CodeDomProvider.CreateProvider("CSharp");
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Compile start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
@@ -155,76 +155,81 @@ namespace Gekko.Parser.Gek
             {
                 throw e;
             }
+
+            if (p.hasWrittenRunTimeErrorOnce) return;  //We now write a stack first time an error is encountered
+            p.hasWrittenRunTimeErrorOnce = true;
+
             string exception = "";
             if (e.InnerException != null) exception = e.InnerException.Message;
             if (exception.Length > 0)
             {
+                string originalFileName;
+                int lineNumber;
+                string problemLine;
+                List<string> commandLines;
+
+                Program.GetErrorLineAndText(p, p.GetDepth(), out lineNumber, out originalFileName, out commandLines);
+
+                if (lineNumber <= 0)
                 {
-                    string originalFileName;
-                    int lineNumber;
-                    string problemLine;
-                    List<string> commandLines;
+                    problemLine = "";
+                }
+                else
+                {
+                    problemLine = commandLines[lineNumber - 1];
+                }
 
-                    Program.GetErrorLineAndText(p, p.GetDepth(), out lineNumber, out originalFileName, out commandLines);
+                bool lexer = false;
 
-                    if (lineNumber <= 0)
+                if (p.hasShownErrorHandling == EHasShownErrorHandling.False)
+                {
+                    if (exception.Contains("¤Model lexer error:"))
                     {
-                        problemLine = "";
+                        lexer = true;
+                        List<string> temp = new List<string>();
+                        temp.Add(exception);
+                        ParserOLD.PrintModelLexerErrors(temp, Globals.modelFileLines, new ParseHelper());
+                    }
+                    if (exception.Contains("¤Cmd lexer error:"))
+                    {
+                        lexer = true;
+                        List<string> temp = new List<string>();
+                        temp.Add(exception);
+                        ParserOLD.PrintModelLexerErrors(temp, Globals.cmdFileLines, new ParseHelper());
+                    }
+
+                    if (originalFileName == "" && commandLines.Count == 1)  //more-liners get file-type error messages
+                    {
+                        if (lexer == true) G.Writeln("*** ERROR: Problem parsing/lexing command line:");
+                        else G.Writeln("*** ERROR: Running user input line:");
+                        G.Writeln("              " + G.ReplaceGlueNew(problemLine), Color.Blue);
                     }
                     else
                     {
-                        problemLine = commandLines[lineNumber - 1];
-                    }
+                        //file or text block user input (>1 line)
+                        string xx = "Running";
+                        if (lexer == true) xx = "Problem parsing/lexing";
+                        string text = null;
+                        string lineNumber3 = "" + lineNumber;
+                        if (lineNumber == 0) lineNumber3 = "[unknown]";
 
-                    bool lexer = false;
-
-                    if (p.hasShownErrorHandling == EHasShownErrorHandling.False)
-                    {
-                        if (exception.Contains("¤Model lexer error:"))
+                        if (originalFileName == null || originalFileName == "")
                         {
-                            lexer = true;
-                            List<string> temp = new List<string>();
-                            temp.Add(exception);
-                            ParserOLD.PrintModelLexerErrors(temp, Globals.modelFileLines, new ParseHelper());
-                        }
-                        if (exception.Contains("¤Cmd lexer error:"))
-                        {
-                            lexer = true;
-                            List<string> temp = new List<string>();
-                            temp.Add(exception);
-                            ParserOLD.PrintModelLexerErrors(temp, Globals.cmdFileLines, new ParseHelper());
-                        }
-
-                        if (originalFileName == "" && commandLines.Count == 1)  //more-liners get file-type error messages
-                        {
-                            if (lexer == true) G.Writeln("*** ERROR: Problem parsing/lexing command line:");
-                            else G.Writeln("*** ERROR: Running user input line:");
-                            G.Writeln("              " + G.ReplaceGlueNew(problemLine), Color.Blue);
+                            //text block user input
+                            text = "*** ERROR: User input block, line " + lineNumber3 + ":";
                         }
                         else
                         {
-                            //file or text block user input (>1 line)
-                            string xx = "Running";
-                            if (lexer == true) xx = "Problem parsing/lexing";
-                            string text = null;
-                            string lineNumber3 = "" + lineNumber;
-                            if (lineNumber == 0) lineNumber3 = "[unknown]";
-
-                            if (originalFileName == null || originalFileName == "")
-                            {
-                                //text block user input
-                                text = "*** ERROR: User input block, line " + lineNumber3 + ":";
-                            }
-                            else
-                            {
-                                //file
-                                text = "*** ERROR: " + xx + " file: " + originalFileName + " line " + lineNumber3;
-                            }
-                            Program.WriteErrorMessage(lineNumber, problemLine, text, originalFileName);
+                            //file
+                            text = "*** ERROR: " + xx + " file: " + originalFileName + " line " + lineNumber3;
                         }
+
+                        Program.WriteErrorMessage(lineNumber, problemLine, text, originalFileName);
+                        
                     }
                 }
             }
+            Program.WriteCallStack(false, p);  //will only be performed once
             throw e;
         }
 

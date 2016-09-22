@@ -108,7 +108,7 @@ namespace Gekko
         public const string printCode_sn = "rn";
         public const string printCode_sp = "rp";
         public const string printCode_sd = "rd";
-        public const string printCode_sdp = "rdp";
+        public const string printCode_sdp = "rdp";      
                 
         public List<Databank> bankOpen = new List<Databank>();
         

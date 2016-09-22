@@ -20,8 +20,8 @@ namespace Gekko.Parser.Gek
 
         public static ConvertHelper CreateAST(ParseHelper ph, P p)
         {
-            Q q = new Q();  //make a fresh container for method argument helpers
-            p.SetQ(q);
+            //Q q = new Q();  //make a fresh container for method argument helpers
+            //p.SetQ(q);
 
             ConvertHelper ch2 = new ConvertHelper();
 
