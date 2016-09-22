@@ -16203,11 +16203,27 @@ namespace Gekko
             }
 
             bool skipping = RemoveNullTimeseries(first, list);
-            
+
             if (skipping) writeAllVariables = false;  //signals to gbk format that it can not just clone existing bank
 
-            List<string> listFilteredForCurrentFreq = FilterListForFrequency(list);  //not actually used in gbk if the list is not truncated
+            bool isRecordsFormat = isDefault || G.equal(o.opt_gbk, "yes") || G.equal(o.opt_tsd, "yes");
+
+            //TODO TODO TODO
+            //TODO TODO TODO
+            //TODO TODO TODO Not sure is this filter stuff works ok for quarters and months...?
+            //TODO TODO TODO
+            //TODO TODO TODO
+            List<string> listFilteredForCurrentFreq = null;
+            if (isRecordsFormat)
+            {
+                listFilteredForCurrentFreq = list;
+            }
+            else
+            {
+                listFilteredForCurrentFreq = FilterListForFrequency(list); 
+            }
             
+
             if (tStart.IsNull() && tEnd.IsNull())
             {
                 if (isDefault || G.equal(o.opt_gbk, "yes") || G.equal(o.opt_tsd, "yes"))
@@ -16265,7 +16281,7 @@ namespace Gekko
                 Program.Updprt(listFilteredForCurrentFreq, tStart, tEnd, o.opt_series, fileName);
                 return 0;
             }
-            else if (isDefault || G.equal(o.opt_gbk, "yes") || G.equal(o.opt_tsd, "yes"))
+            else if (isRecordsFormat)
             {
                 //RECORDS
                 //tsd or gbk or unspecified format                
@@ -16340,6 +16356,7 @@ namespace Gekko
             foreach (string s in newList)
             {
                 TimeSeries ts = first.GetVariable(false, s);
+                if (ts == null) continue;
                 if (ts.IsNullPeriod()) remove.Add(s);
             }
             if (remove.Count > 0)
