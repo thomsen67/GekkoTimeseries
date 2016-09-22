@@ -1220,8 +1220,8 @@ namespace Gekko
                                 if (date.Length == 6 && G.IsInteger(date))
                                 {
                                     //It might be a date like 199503, that is, 1995q3 or 1995m3
-                                    perTemp = date.Substring(0, 2);
-                                    subPerTemp = date.Substring(2, 4);
+                                    perTemp = date.Substring(0, 4);
+                                    subPerTemp = date.Substring(4, 2);
                                     success = true;
                                 }
                             }
