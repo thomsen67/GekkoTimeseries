@@ -1603,8 +1603,8 @@ create                    : CREATE nameWithBank '=' expression -> ^({token("ASTC
 						  ;
 
 date                      : DATE nameWithDot EQUAL expression -> ^({token("ASTDATE", ASTDATE, $DATE.Line)} nameWithDot expression)
-						  | DATE question percentNoGlue GLUE ident -> ^(ASTDATE question ident)
-						  | DATE question -> ^(ASTDATE question)
+						  | DATE question percentNoGlue GLUE ident -> ^({token("ASTDATE", ASTDATE, $DATE.Line)} question ident)
+						  | DATE question -> ^({token("ASTDATE", ASTDATE, $DATE.Line)} question)
 						  ;
 
 delete					  : DELETE deleteOpt1? listItems? -> ^({token("ASTDELETE", ASTDELETE, $DELETE.Line)} listItems? deleteOpt1?)
@@ -1729,11 +1729,11 @@ seriesOpt1h               : D (EQUAL yesNo)? -> ^(ASTOPT_STRING_D yesNo?)
 						  | KEEP EQUAL exportType -> ^(ASTOPT_STRING_KEEP exportType)
 						  ;
 
-goto2                     : GOTO ident -> ^(ASTGOTO ident);
+goto2                     : GOTO ident -> ^({token("ASTGOTO", ASTGOTO, $GOTO.Line)} ident);
 
-hdg						  : HDG expression -> ^(ASTHDG expression);
+hdg						  : HDG expression -> ^({token("ASTHDG", ASTHDG, $HDG.Line)} expression);
 
-help					  : HELP ident? -> ^(ASTHELP ident?);
+help					  : HELP ident? -> ^({token("ASTHELP", ASTHELP, $HELP.Line)} ident?);
 
 if2						  : IF leftParen logicalOr rightParen expressions (ELSE expressions)? END SEMICOLON -> ^({token("ASTIF", ASTIF, $IF.Line)} logicalOr ^(ASTIFSTATEMENTS expressions) ^(ASTELSESTATEMENTS expressions?));
 
@@ -1844,8 +1844,11 @@ spliceOpt1                : ISNOTQUAL
 spliceOpt1h               : KEEP EQUAL spliceOptions -> ^(ASTOPT_STRING_KEEP spliceOptions);
 spliceOptions             : FIRST | LAST;
 
-read                      : read2 readOpt1? fileNameStar (TO identOrStar)? -> ^(ASTREAD read2 readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?));
-read2                     : READ | IMPORT;
+						  //!!!Two identical lines ONLY because of token stuff
+read                      : READ   readOpt1? fileNameStar (TO identOrStar)? -> ^({token("ASTREAD", ASTREAD, $READ.Line)}   READ   readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?))
+                          | IMPORT readOpt1? fileNameStar (TO identOrStar)? -> ^({token("ASTREAD", ASTREAD, $IMPORT.Line)} IMPORT readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?))
+						  ;
+
 readOpt1                  : ISNOTQUAL 
 						  | leftAngle        readOpt1h* RIGHTANGLE -> readOpt1h*						
 						  | leftAngle dates? readOpt1h* RIGHTANGLE -> ^(ASTDATES dates?) readOpt1h*
@@ -2018,10 +2021,13 @@ tupleH2                   : VAL nameWithDot -> ^(ASTTUPLEITEM VAL nameWithDot)
 						  | SERIES (leftAngle dates? RIGHTANGLE)?  nameWithBank -> ^(ASTTUPLEITEM SERIES ^(ASTDATES dates?) nameWithBank)
 						  ;
 
-write					  : write2 writeOpt1? listItems? FILE '=' fileName -> ^(ASTWRITE write2 writeOpt1?  ^(ASTHANDLEFILENAME fileName?) listItems?)
-						  | write2 writeOpt1? fileName -> ^(ASTWRITE writeOpt1?  ^(ASTHANDLEFILENAME fileName))
+						  //!!!2x2 identical lines ONLY because of token stuff
+write					  : WRITE  writeOpt1? listItems? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE  writeOpt1?  ^(ASTHANDLEFILENAME fileName?) listItems?)
+						  | EXPORT writeOpt1? listItems? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT writeOpt1?  ^(ASTHANDLEFILENAME fileName?) listItems?)
+						  | WRITE  writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE  writeOpt1?  ^(ASTHANDLEFILENAME fileName))
+						  | EXPORT writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT writeOpt1?  ^(ASTHANDLEFILENAME fileName))
 						  ;
-write2                    : WRITE | EXPORT;
+
 writeOpt1                 : ISNOTQUAL 
 						  | leftAngle        writeOpt1h* RIGHTANGLE -> writeOpt1h*
 						  | leftAngle dates? writeOpt1h* RIGHTANGLE ->  ^(ASTDATES dates?) writeOpt1h*
