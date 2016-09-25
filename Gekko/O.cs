@@ -3690,15 +3690,15 @@ namespace Gekko
             {                
                 Program.Time(t1, t2);
 
-                GekkoList x = new GekkoList();
+                GekkoList<string> x = new GekkoList<string>();
                 x.Add("a").Add("b");
-                GekkoList y = new GekkoList();
+                GekkoList<string> y = new GekkoList<string>();
                 y.Add("c").Add("d");
-                GekkoList z = new GekkoList();
+                GekkoList<string> z = new GekkoList<string>();
                 z.AddRange(x).AddRange(y);
                 Console.WriteLine("d");
 
-                GekkoList zz = GekkoList.Construct().Add("a").Add("b").AddRange(x);
+                GekkoList<string> zz = GekkoList<string>.Construct().Add("a").Add("b").AddRange(x);
 
 
 

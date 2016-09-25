@@ -62,47 +62,47 @@ using System.Linq;
 namespace Gekko
 {
 
-    public class GekkoList
+    public class GekkoList<T>
     {
-        private List<string> container = new List<string>();
+        private List<T> container = new List<T>();
 
-        public GekkoList Construct()
+        public static GekkoList<T> Construct()
         {
-            return new GekkoList();
+            return new GekkoList<T>();
         }
         public GekkoList()
         {
             //default constructor
         }
 
-        public GekkoList(string s)
+        public GekkoList(T s)
         {
             this.container.Add(s);
         }
 
-        public GekkoList(GekkoList x)
+        public GekkoList(GekkoList<T> x)
         {
             this.container.AddRange(x.container);
         }
 
-        public GekkoList(List<string>x)
+        public GekkoList(List<T>x)
         {
             this.container.AddRange(x);
         }
                 
-        public GekkoList AddRange(GekkoList x)
+        public GekkoList<T> AddRange(GekkoList<T> x)
         {
             this.container.AddRange(x.container);
             return this;
         }
 
-        public GekkoList AddRange(List<string> x)
+        public GekkoList<T> AddRange(List<T> x)
         {
             this.container.AddRange(x);
             return this;
         }
 
-        public GekkoList Add(string x)
+        public GekkoList<T> Add(T x)
         {
             this.container.Add(x);
             return this;
