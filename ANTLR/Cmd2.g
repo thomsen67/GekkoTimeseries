@@ -2216,7 +2216,7 @@ listItemsWildRange0       : listItemWildRange (COMMA2 listItemWildRange)* -> ^(A
 listItemsWildRange1       : listItemWildRange (COMMA2 listItemWildRange)* -> ^(ASTLISTITEMS1 (^(ASTLISTITEM listItemWildRange))+);  //puts in o.listItems1
 listItemsWildRange2       : listItemWildRange (COMMA2 listItemWildRange)* -> ^(ASTLISTITEMS2 (^(ASTLISTITEM listItemWildRange))+);  //puts in o.listItems2
 
-listItemsUpd             : listItemUpd (COMMA2 listItemUpd)*             -> ^(ASTLISTITEMS (^(ASTLISTITEM listItemUpd))+);  //one or more
+listItemsUpd              : listItemUpd (COMMA2 listItemUpd)*             -> ^(ASTLISTITEMS (^(ASTLISTITEM listItemUpd))+);  //one or more
 listItemsUpd2             : listItemUpd (COMMA2 listItemUpd)+             -> ^(ASTLISTITEMS (^(ASTLISTITEM listItemUpd))+);  //more than one
 
 

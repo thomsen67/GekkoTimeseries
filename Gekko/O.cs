@@ -14,6 +14,8 @@ namespace Gekko
     /// For instance, changing the name of "Prt()" here would entail searching for all "O.Prt" strings
     /// in the code.    
     /// </summary>
+
+  
     public static class O
     {        
         //Common methods start
@@ -3461,6 +3463,7 @@ namespace Gekko
         {
             public List<string> listItems = null;
         }
+             
 
         public class List
         {
@@ -3686,6 +3689,19 @@ namespace Gekko
             public void Exe()
             {                
                 Program.Time(t1, t2);
+
+                GekkoList x = new GekkoList();
+                x.Add("a").Add("b");
+                GekkoList y = new GekkoList();
+                y.Add("c").Add("d");
+                GekkoList z = new GekkoList();
+                z.AddRange(x).AddRange(y);
+                Console.WriteLine("d");
+
+                GekkoList zz = GekkoList.Construct().Add("a").Add("b").AddRange(x);
+
+
+
             }
             public static void Q()
             {

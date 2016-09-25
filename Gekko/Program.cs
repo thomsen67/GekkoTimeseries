@@ -62,6 +62,53 @@ using System.Linq;
 namespace Gekko
 {
 
+    public class GekkoList
+    {
+        private List<string> container = new List<string>();
+
+        public GekkoList Construct()
+        {
+            return new GekkoList();
+        }
+        public GekkoList()
+        {
+            //default constructor
+        }
+
+        public GekkoList(string s)
+        {
+            this.container.Add(s);
+        }
+
+        public GekkoList(GekkoList x)
+        {
+            this.container.AddRange(x.container);
+        }
+
+        public GekkoList(List<string>x)
+        {
+            this.container.AddRange(x);
+        }
+                
+        public GekkoList AddRange(GekkoList x)
+        {
+            this.container.AddRange(x.container);
+            return this;
+        }
+
+        public GekkoList AddRange(List<string> x)
+        {
+            this.container.AddRange(x);
+            return this;
+        }
+
+        public GekkoList Add(string x)
+        {
+            this.container.Add(x);
+            return this;
+        }
+    }
+
     public class DateTimeHelper
     {
         public DateTime dt;

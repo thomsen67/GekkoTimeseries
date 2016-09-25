@@ -1880,37 +1880,43 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTLISTITEM":
-                        {
+                        {                           
+
                             List<string> ss = new List<string>();
-                            int variableIndex = 0;  //0 or 1
                             string number = "";
                             if (node.Parent.Text == "ASTLISTITEMS0") number = "0";
                             else if (node.Parent.Text == "ASTLISTITEMS1") number = "1";
                             else if (node.Parent.Text == "ASTLISTITEMS2") number = "2";
-                            if (node.ChildrenCount() > 1) variableIndex = 1;
-                            
-                            ASTNode child = node[variableIndex];  //child is the variable, not the bank
+                            if (node.ChildrenCount() > 1)
+                            {
+                                G.Writeln2("*** ERROR: Unexpexted error #78963456");
+                                throw new GekkoException();
+                            }
+
+                            ASTNode child = node[0];  //child is the variable, not the bank
+
+                            string listNameCs = "o" + Num(child) + ".listItems" + number;
 
                             if (child.Text == "ASTNAMEWITHBANK")
                             {
                                 //a
                                 //b:a
-                                node.Code.CA("o" + Num(child) + ".listItems" + number + ".AddRange(O.GetList(" + AstBankHelper(child, w, 1) + "));" + G.NL);
+                                node.Code.CA(listNameCs + ".AddRange(O.GetList(" + AstBankHelper(child, w, 1) + "));" + G.NL);
                             }
                             else if (child.Text == "ASTLISTITEMWILDRANGE")
                             {
                                 //f*nz
-                                node.Code.CA("o" + Num(child) + ".listItems" + number + ".Add(O.GetString(" + child.Code + "));" + G.NL);
+                                node.Code.CA(listNameCs + ".Add(O.GetString(" + child.Code + "));" + G.NL);
                             }
                             else if ((child.Text == "NEGATE" && child.ChildrenCount() > 0 && child[0].Text == "ASTNAMEWITHBANK"))
                             {
                                 //-a
-                                node.Code.CA("o" + Num(child) + ".listItems" + number + ".AddRange(O.GetList(" + AstBankHelper(child, w, 2) + "));" + G.NL);
+                                node.Code.CA(listNameCs + ".AddRange(O.GetList(" + AstBankHelper(child, w, 2) + "));" + G.NL);
                             }
                             else if (child.Text == "ASTLISTWITHBANK")
                             {
                                 //bank2:#m, interpreted as bank2:m1, bank2:m2, bank2:m3, ...
-                                node.Code.CA("o" + Num(child) + ".listItems" + number + ".AddRange(O.GetList(" + AstBankHelperList(child, w) + "));" + G.NL);
+                                node.Code.CA(listNameCs + ".AddRange(O.GetList(" + AstBankHelperList(child, w) + "));" + G.NL);
                             }
                             else
                             {
@@ -1918,31 +1924,21 @@ namespace Gekko.Parser.Gek
                                 //'a'
                                 //'b:a'
                                 //#m[2]
-                                node.Code.CA("o" + Num(child) + ".listItems" + number + ".AddRange(O.GetList(" + child.Code + "));" + G.NL);
+                                node.Code.CA(listNameCs + ".AddRange(O.GetList(" + child.Code + "));" + G.NL);
                             }
 
-
-                            if (variableIndex == 0)
+                            //node.Code.A(node[1].Code;
+                            string cs = null;
+                            if (node[0].Text == "ASTNAMEWITHBANK")
                             {
-                                //normal
-                                //node.Code.A(node[0].Code;
+                                cs = AstBankHelper(node[0], w, 1);
                             }
-                            else if (variableIndex == 1)
+                            else
                             {
-                                //node.Code.A(node[1].Code;
-                                string cs = null;
-                                if (node[0].Text == "ASTNAMEWITHBANK")
-                                {
-                                    cs = AstBankHelper(node[0], w, 1);
-                                }
-                                else
-                                {
-                                    cs = node[0].Code.ToString();
-                                }
-                                node.Code.A("o" + Num(node) + ".listItems" + number + " = O.AddBankToListItems(o" + Num(node) + ".listItems" + number + ", O.GetString(" + cs + "));" + G.NL);
+                                cs = node[0].Code.ToString();
                             }
-                            else throw new GekkoException();
-
+                            node.Code.A("o" + Num(node) + ".listItems" + number + " = O.AddBankToListItems(o" + Num(node) + ".listItems" + number + ", O.GetString(" + cs + "));" + G.NL);
+                            
                         }
                         break;
                     case "ASTLISTITEMS":
