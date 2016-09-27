@@ -2229,8 +2229,8 @@ listItem                  : expression ->							   expression
 						  //generalizes listItem
 listItemWildRange         : wildcardWithBank ->                        wildcardWithBank
 						  | rangeWithBank ->                           rangeWithBank	
-						  | (LEFTBRACKET|LEFTBRACKETWILD) wildcardWithBank RIGHTBRACKET -> wildcardWithBank
-						  | (LEFTBRACKET|LEFTBRACKETWILD) rangeWithBank RIGHTBRACKET -> rangeWithBank	
+						 // | (LEFTBRACKET|LEFTBRACKETWILD) wildcardWithBank RIGHTBRACKET -> wildcardWithBank
+						 // | (LEFTBRACKET|LEFTBRACKETWILD) rangeWithBank RIGHTBRACKET -> rangeWithBank	
 						  | expression ->						       expression
 						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)   //accepts stuff like 0e. Integers are caught via expression.												
 						  ;
