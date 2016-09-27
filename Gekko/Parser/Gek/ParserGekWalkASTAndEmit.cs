@@ -1725,8 +1725,9 @@ namespace Gekko.Parser.Gek
                             else
                             {
                                 node.Code.A("o" + Num(node) + ".name = null;");  //just show the result
-                            }                            
-                            node.Code.A("o" + Num(node) + ".listItems = O.GetList(" + node[0].Code + ");" + G.NL);
+                            }
+                            //node.Code.A("o" + Num(node) + ".listItems = O.GetList(" + node[0].Code + ");" + G.NL);
+                            node.Code.A(node[0].Code);
                             if (node[2] != null) node.Code.A(node[2].Code);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }

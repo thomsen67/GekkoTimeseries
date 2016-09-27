@@ -115,7 +115,13 @@ namespace Gekko
         public string s;
         public long size;
     }
-    
+
+    public class BankNameVersion
+    {
+        public string bank = null;
+        public string name = null;
+        public string version = null; //not used 
+    }
 
     public class Zipper
     {
@@ -4775,14 +4781,106 @@ namespace Gekko
         //Can be "adambk:fX*2"
         //May return 0 items if wildcard does not exist
         //May be used without wildcard: "adambk:fy", then it is similar to GetTimeSeriesFromString() -> will return empty list if variable does not exist.
-        public static List<TimeSeries> GetTimeSeriesFromStringWildcard(string s, Databank defaultBank)
+        public static List<TimeSeries> GetTimeSeriesFromStringWildcard(string s, string defaultBank)
         {
+            List<TimeSeries> listTs = new List<TimeSeries>();
+            List<BankNameVersion> list = GetInfoFromStringWildcard(s, defaultBank);
+
+            foreach (BankNameVersion bnv in list)
+            {
+                //TimeSeries ts = null;
+                //Databank db = null;
+                //if (defaultBank == null) db = Program.databanks.GetFirst();
+                //else db = Program.databanks.GetDatabank(d
+                Databank db = null;
+                if (bnv.bank == null) db = Program.databanks.GetFirst();
+                else
+                {
+                    db = Program.databanks.GetDatabank(bnv.bank);
+                    if (db == null)
+                    {
+                        G.Writeln2("*** ERROR: Could not find databank '" + bnv.bank + "'");
+                        throw new GekkoException();
+                    }
+                }
+                TimeSeries ts = db.GetVariable(bnv.name);
+                if (ts == null)
+                {
+                    G.Writeln2("*** ERROR: Could not find timeseries '" + bnv.name + "' in databank '" + bnv.bank + "'");
+                    throw new GekkoException();
+                }
+                listTs.Add(ts);
+            }
+
+            //rework this so that it uses a list of strings
+
+            //ExtractBankAndRestHelper h = Program.ExtractBankAndRest(s, EExtrackBankAndRest.OnlyStrings);
+            //string varName = h.name;
+            //string bank = h.bank;
+            //bank = PerhapsOverrideWithDefaultBankName(defaultBank, h.hasColon, bank);
+
+            //List<TimeSeries> list = new List<TimeSeries>();
+            //if (varName.Contains("*") || varName.Contains("?"))
+            //{
+            //    Databank db = Program.databanks.GetDatabank(bank);
+            //    if (db == null)
+            //    {
+            //        G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found");
+            //        throw new GekkoException();
+            //    }
+            //    //This could be sped up if we returned List<TimeSeries> from MatchWildcardInDatabank().
+            //    //We do too many lookups here, but never mind...
+            //    List<string> names = Program.MatchWildcardInDatabank(varName, db);
+            //    foreach (string s2 in names)
+            //    {
+            //        TimeSeries ts = db.GetVariable(s2);
+            //        list.Add(ts);
+            //    }
+            //}
+            //else if (varName.Contains(".."))
+            //{
+            //    string[] ss2 = varName.Split(new string[] { ".." }, StringSplitOptions.None);
+            //    ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);
+            //    IVariable xx = ss.Indexer(new IVariablesFilterRange(new ScalarString(bank + ":" + ss2[0]), new ScalarString(ss2[1])), Globals.tNull);
+            //    Databank db = Program.databanks.GetDatabank(bank);
+            //    if (db == null)
+            //    {
+            //        G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found");
+            //        throw new GekkoException();
+            //    }
+            //    List<string> names = xx.GetList();
+            //    foreach (string s2 in names)
+            //    {
+            //        TimeSeries ts = db.GetVariable(s2);
+            //        list.Add(ts);
+            //    }
+            //}
+            //else
+            //{
+            //    Databank db = Program.databanks.GetDatabank(bank);
+            //    if (db == null)
+            //    {
+            //        G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found");
+            //        throw new GekkoException();
+            //    }
+            //    TimeSeries temp = db.GetVariable(varName);
+            //    if (temp != null) list.Add(temp);  //returns 0-item list, not null list.
+            //}
+
+            return listTs;
+        }
+
+        public static List<BankNameVersion> GetInfoFromStringWildcard(string s, string defaultBank)
+        {
+            //rework this so that it uses a list of strings
+
             ExtractBankAndRestHelper h = Program.ExtractBankAndRest(s, EExtrackBankAndRest.OnlyStrings);
             string varName = h.name;
             string bank = h.bank;
             bank = PerhapsOverrideWithDefaultBankName(defaultBank, h.hasColon, bank);
 
-            List<TimeSeries> list = new List<TimeSeries>();
+            List<BankNameVersion> list = new List<Gekko.BankNameVersion>();
+                        
             if (varName.Contains("*") || varName.Contains("?"))
             {
                 Databank db = Program.databanks.GetDatabank(bank);
@@ -4796,8 +4894,10 @@ namespace Gekko
                 List<string> names = Program.MatchWildcardInDatabank(varName, db);
                 foreach (string s2 in names)
                 {
-                    TimeSeries ts = db.GetVariable(s2);
-                    list.Add(ts);
+                    BankNameVersion bnv = new BankNameVersion();
+                    bnv.bank = bank;
+                    bnv.name = s2;
+                    list.Add(bnv);
                 }
             }
             else if (varName.Contains(".."))
@@ -4814,33 +4914,40 @@ namespace Gekko
                 List<string> names = xx.GetList();
                 foreach (string s2 in names)
                 {
-                    TimeSeries ts = db.GetVariable(s2);
-                    list.Add(ts);
+                    BankNameVersion bnv = new BankNameVersion();
+                    bnv.bank = bank;
+                    bnv.name = s2;
+                    list.Add(bnv);
                 }
             }
             else
             {
-                Databank db = Program.databanks.GetDatabank(bank);
-                if (db == null)
-                {
-                    G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found");
-                    throw new GekkoException();
-                }
-                TimeSeries temp = db.GetVariable(varName);
-                if (temp != null) list.Add(temp);  //returns 0-item list, not null list.
+                //Databank db = Program.databanks.GetDatabank(bank);
+                //if (db == null)
+                //{
+                //    G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found");
+                //    throw new GekkoException();
+                //}
+                //TimeSeries temp = db.GetVariable(varName);
+                //if (temp != null) list.Add(temp);  //returns 0-item list, not null list.
+
+                BankNameVersion bnv = new BankNameVersion();
+                bnv.bank = bank;
+                bnv.name = varName;
+                list.Add(bnv);
             }
 
             return list;
         }
 
-        public static string PerhapsOverrideWithDefaultBankName(Databank defaultBank, bool hasColon, string bank)
+        public static string PerhapsOverrideWithDefaultBankName(string defaultBank, bool hasColon, string bank)
         {
 
             if (!hasColon)
             {
                 if (defaultBank != null)
                 {
-                    bank = defaultBank.aliasName;  //hmmm, not pretty, will call Program.databanks.GetDatabank(bank) on that name...
+                    bank = defaultBank;
                 }
             }
             return bank;

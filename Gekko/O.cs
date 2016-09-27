@@ -3004,7 +3004,10 @@ namespace Gekko
                             ss = listItems1[i];
                         }                        
                         ExtractBankAndRestHelper h = Program.ExtractBankAndRest(ss, EExtrackBankAndRest.GetDatabank);
-                        string toBankName = Program.PerhapsOverrideWithDefaultBankName(localOptionToBank, h.hasColon, h.bank);
+
+                        string bankName2 = null;
+                        if (localOptionToBank != null) bankName2 = localOptionToBank.aliasName;
+                        string toBankName = Program.PerhapsOverrideWithDefaultBankName(bankName2, h.hasColon, h.bank);
                         toBank = Program.databanks.GetDatabank(toBankName);
                         if (toBank == null)
                         {
@@ -3015,7 +3018,12 @@ namespace Gekko
 
                     //listItems0[i] may be with or without wildcards ('*' or '?') or ranges ('..'), and with or without bank (bank:varname)
                     //but lists are unfolded to names here.
-                    List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(listItems0[i], localOptionFromBank);  //gets these from the 'fromBank', so ExtractBankAndRest() gets called two time, but never mind
+                    //We use the .aliasName here. Actually could use h.bank from above
+
+                    string bankName = null;
+                    if (localOptionFromBank != null) bankName = localOptionFromBank.aliasName;
+
+                    List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(listItems0[i], bankName);  //gets these from the 'fromBank', so ExtractBankAndRest() gets called two time, but never mind
 
                     if (tss.Count == 0)
                     {
@@ -3606,33 +3614,33 @@ namespace Gekko
             //public string listFile = null; //make it work
             public string wildCard1 = null; //--> delete??
             public string wildCard2 = null;  //only active if range   //--> delete??
-            public List<string> listItems = null;
+            public List<string> listItems0 = null;
             public void Exe()
             {
-                if (name == null)  //take care here if listFile is introduced...
-                {                    
-                    if (!G.equal(this.opt_mute, "yes"))
+                List<string> names = new List<string>();               
+
+                foreach(string s in this.listItems0)
+                {
+                    List<BankNameVersion> xx = Program.GetInfoFromStringWildcard(s, null);  //could use .from or .bank here!!!!
+                    foreach(BankNameVersion bnv in xx)
                     {
-                        G.Writeln();
-                        if (this.listItems.Count > 0)
-                        {
-                            G.Writeln(G.GetListWithCommas(this.listItems));
-                        }
+                        if (bnv.name != null) names.Add(bnv.name);  //probably would never be null. Culd have option to keep banknames!!!!!!
                     }
-                    G.Writeln2("Found " + this.listItems.Count + " matching items");
+                }                
+
+                if (!G.equal(this.opt_mute, "yes"))
+                {
+                    G.Writeln();
+                    if (names.Count > 0)
+                    {
+                        G.Writeln(G.GetListWithCommas(names));
+                    }
                 }
+                if (name == null) G.Writeln2("Found " + names.Count + " matching items");
                 else
                 {
-                    if (!G.equal(this.opt_mute, "yes"))
-                    {
-                        G.Writeln();
-                        if (this.listItems.Count > 0)
-                        {
-                            G.Writeln(G.GetListWithCommas(this.listItems));
-                        }
-                        G.Writeln2("Put " + this.listItems.Count + " matching items into list #" + name);                        
-                    }
-                    Program.CreateNewList(this.listItems, this.name);                    
+                    Program.CreateNewList(names, this.name);
+                    G.Writeln2("Put " + names.Count + " matching items into list #" + name);                    
                 }
             }
         }
@@ -3685,21 +3693,23 @@ namespace Gekko
         public class Time
         {
             public GekkoTime t1 = Globals.tNull;
-            public GekkoTime t2 = Globals.tNull;            
+            public GekkoTime t2 = Globals.tNull;
             public void Exe()
-            {                
+            {
                 Program.Time(t1, t2);
 
-                GekkoList<string> x = new GekkoList<string>();
-                x.Add("a").Add("b");
-                GekkoList<string> y = new GekkoList<string>();
-                y.Add("c").Add("d");
-                GekkoList<string> z = new GekkoList<string>();
-                z.AddRange(x).AddRange(y);
-                Console.WriteLine("d");
-
-                GekkoList<string> zz = GekkoList<string>.Construct().Add("a").Add("b").AddRange(x);
-
+                if (false)
+                {
+                    //to be used later on for list(...) function
+                    GekkoList<string> x = new GekkoList<string>();
+                    x.Add("a").Add("b");
+                    GekkoList<string> y = new GekkoList<string>();
+                    y.Add("c").Add("d");
+                    GekkoList<string> z = new GekkoList<string>();
+                    z.AddRange(x).AddRange(y);
+                    Console.WriteLine("d");
+                    GekkoList<string> zz = GekkoList<string>.Construct().Add("a").Add("b").AddRange(x);
+                }
 
 
             }

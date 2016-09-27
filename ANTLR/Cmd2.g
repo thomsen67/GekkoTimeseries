@@ -1739,7 +1739,8 @@ if2						  : IF leftParen logicalOr rightParen expressions (ELSE expressions)? E
 
 download                  : DOWNLOAD HTTP? url fileName -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, $DOWNLOAD.Line)} ^(ASTHTTP HTTP?) url ^(ASTHANDLEFILENAME fileName));
 
-index                     : INDEX indexOpt1? SERIES? indexerAlone nameWithDot? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} ^(ASTINDEXERALONE indexerAlone) ^(ASTPLACEHOLDER nameWithDot?) indexOpt1?);
+index                     : INDEX indexOpt1? SERIES? listItemsWildRange0 nameWithDot? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} listItemsWildRange0 ^(ASTPLACEHOLDER nameWithDot?) indexOpt1?);
+//index                     : INDEX indexOpt1? SERIES? indexerAlone nameWithDot? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} ^(ASTINDEXERALONE indexerAlone) ^(ASTPLACEHOLDER nameWithDot?) indexOpt1?);
 indexOpt1                 : ISNOTQUAL | leftAngle indexOpt1h* RIGHTANGLE -> ^(ASTOPT1 indexOpt1h*);							
 indexOpt1h                : MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)	;
 
@@ -2227,7 +2228,9 @@ listItem                  : expression ->							   expression
 						  ;
 						  //generalizes listItem
 listItemWildRange         : wildcardWithBank ->                        wildcardWithBank
-						  | rangeWithBank ->                           rangeWithBank					
+						  | rangeWithBank ->                           rangeWithBank	
+						  | (LEFTBRACKET|LEFTBRACKETWILD) wildcardWithBank RIGHTBRACKET -> wildcardWithBank
+						  | (LEFTBRACKET|LEFTBRACKETWILD) rangeWithBank RIGHTBRACKET -> rangeWithBank	
 						  | expression ->						       expression
 						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)   //accepts stuff like 0e. Integers are caught via expression.												
 						  ;
