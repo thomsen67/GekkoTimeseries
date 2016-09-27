@@ -1926,18 +1926,18 @@ namespace Gekko.Parser.Gek
                                 //#m[2]
                                 node.Code.CA(listNameCs + ".AddRange(O.GetList(" + child.Code + "));" + G.NL);
                             }
-
-                            //node.Code.A(node[1].Code;
-                            string cs = null;
-                            if (node[0].Text == "ASTNAMEWITHBANK")
-                            {
-                                cs = AstBankHelper(node[0], w, 1);
-                            }
-                            else
-                            {
-                                cs = node[0].Code.ToString();
-                            }
-                            node.Code.A("o" + Num(node) + ".listItems" + number + " = O.AddBankToListItems(o" + Num(node) + ".listItems" + number + ", O.GetString(" + cs + "));" + G.NL);
+                                                        
+                            //Node always has one child here, so this is not used anymore
+                            //string cs = null;
+                            //if (node[0].Text == "ASTNAMEWITHBANK")
+                            //{
+                            //    cs = AstBankHelper(node[0], w, 1);
+                            //}
+                            //else
+                            //{
+                            //    cs = node[0].Code.ToString();
+                            //}
+                            //node.Code.A("o" + Num(node) + ".listItems" + number + " = O.AddBankToListItems(o" + Num(node) + ".listItems" + number + ", O.GetString(" + cs + "));" + G.NL);
                             
                         }
                         break;
