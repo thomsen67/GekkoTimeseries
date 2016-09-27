@@ -3614,12 +3614,12 @@ namespace Gekko
             //public string listFile = null; //make it work
             public string wildCard1 = null; //--> delete??
             public string wildCard2 = null;  //only active if range   //--> delete??
-            public List<string> listItems0 = null;
+            public List<string> listItems = null;
             public void Exe()
             {
                 List<string> names = new List<string>();               
 
-                foreach(string s in this.listItems0)
+                foreach(string s in this.listItems)
                 {
                     List<BankNameVersion> xx = Program.GetInfoFromStringWildcard(s, null);  //could use .from or .bank here!!!!
                     foreach(BankNameVersion bnv in xx)

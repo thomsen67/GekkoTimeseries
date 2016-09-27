@@ -1739,7 +1739,7 @@ if2						  : IF leftParen logicalOr rightParen expressions (ELSE expressions)? E
 
 download                  : DOWNLOAD HTTP? url fileName -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, $DOWNLOAD.Line)} ^(ASTHTTP HTTP?) url ^(ASTHANDLEFILENAME fileName));
 
-index                     : INDEX indexOpt1? SERIES? listItemsWildRange0 nameWithDot? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} listItemsWildRange0 ^(ASTPLACEHOLDER nameWithDot?) indexOpt1?);
+index                     : INDEX indexOpt1? SERIES? listItemsWildRange nameWithDot? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} listItemsWildRange ^(ASTPLACEHOLDER nameWithDot?) indexOpt1?);
 //index                     : INDEX indexOpt1? SERIES? indexerAlone nameWithDot? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} ^(ASTINDEXERALONE indexerAlone) ^(ASTPLACEHOLDER nameWithDot?) indexOpt1?);
 indexOpt1                 : ISNOTQUAL | leftAngle indexOpt1h* RIGHTANGLE -> ^(ASTOPT1 indexOpt1h*);							
 indexOpt1h                : MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)	;
@@ -2023,8 +2023,8 @@ tupleH2                   : VAL nameWithDot -> ^(ASTTUPLEITEM VAL nameWithDot)
 						  ;
 
 						  //!!!2x2 identical lines ONLY because of token stuff
-write					  : WRITE  writeOpt1? listItems? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE  writeOpt1?  ^(ASTHANDLEFILENAME fileName?) listItems?)
-						  | EXPORT writeOpt1? listItems? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT writeOpt1?  ^(ASTHANDLEFILENAME fileName?) listItems?)
+write					  : WRITE  writeOpt1? listItemsWildRange? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE  writeOpt1?  ^(ASTHANDLEFILENAME fileName?) listItemsWildRange?)
+						  | EXPORT writeOpt1? listItemsWildRange? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT writeOpt1?  ^(ASTHANDLEFILENAME fileName?) listItemsWildRange?)
 						  | WRITE  writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE  writeOpt1?  ^(ASTHANDLEFILENAME fileName))
 						  | EXPORT writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT writeOpt1?  ^(ASTHANDLEFILENAME fileName))
 						  ;
