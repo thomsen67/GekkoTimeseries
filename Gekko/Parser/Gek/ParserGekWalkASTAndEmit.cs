@@ -448,7 +448,9 @@ namespace Gekko.Parser.Gek
                         {
                             string type = "null";
                             if (node.ChildrenCount() >= 3) type = "`" + node[2].Text + "`";
-                            node.Code.A("Program.Collapse(O.GetString(" + node[0].Code + "), O.GetString(" + node[1].Code + "), " + type + ");" + G.NL);
+                            string b1 = node[0][0].Code.ToString(); if (b1 == null) b1 = "``";
+                            string b0 = node[1][0].Code.ToString(); if (b0 == null) b0 = "``";
+                            node.Code.A("Program.Collapse(O.GetString(" + b1 + "), O.GetString(" + node[0][1].Code + "), O.GetString(" + b0 + "), O.GetString(" + node[1][1].Code + "), " + type + ");" + G.NL);
                         }
                         break;
                     //case "ASTCOPY":

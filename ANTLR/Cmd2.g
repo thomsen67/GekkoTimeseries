@@ -1584,8 +1584,12 @@ docOpt2h                  : LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expr
 						  | STAMP EQUAL expression -> ^(ASTOPT_STRING_STAMP expression)					
 						  ;
 
-collapse				  : COLLAPSE nameWithDot '=' nameWithDot collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, $COLLAPSE.Line)} nameWithDot nameWithDot collapseMethod?);
+collapse				  : COLLAPSE collapseHelper '=' collapseHelper collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, $COLLAPSE.Line)} collapseHelper collapseHelper collapseMethod?);
 collapseMethod			  : FIRST|LAST|AVG|TOTAL;
+collapseHelper 			  : name bankColon nameWithDot -> ^(ASTPLACEHOLDER name nameWithDot)
+						  | AT GLUE nameWithDot ->  ^(ASTPLACEHOLDER ASTAT nameWithDot)
+						  | nameWithDot -> ^(ASTPLACEHOLDER ASTPLACEHOLDER nameWithDot)
+						  ;
 
 compare                   : COMPARE compareOpt1? listItems? (FILE '=' fileName)?-> ^({token("ASTCOMPARECOMMAND", ASTCOMPARECOMMAND, $COMPARE.Line)} listItems? ^(ASTOPT_ compareOpt1?) ^(ASTHANDLEFILENAME fileName?));
 compareOpt1               : ISNOTQUAL 

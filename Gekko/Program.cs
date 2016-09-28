@@ -19314,12 +19314,27 @@ namespace Gekko
         }
 
 
-        public static void Collapse(string ss1, string ss0, string method)
+        public static void Collapse(string b1, string ss1, string b0, string ss0, string method)
         {
-            //ErrorIfDatabanksSwapped();
+            //ErrorIfDatabanksSwapped();            
 
             Databank databank1 = Program.databanks.GetFirst();
+            if (b1 == "@") databank1 = Program.databanks.GetRef();
+            else if (b1 != "") databank1 = Program.databanks.GetDatabank(b1);
+            if (databank1 == null)
+            {
+                G.Writeln2("*** ERROR: Databank '" + b1 + "' not found");
+                throw new GekkoException();
+            }
+
             Databank databank0 = Program.databanks.GetFirst();
+            if (b0 == "@") databank0 = Program.databanks.GetRef();
+            else if (b0 != "") databank0 = Program.databanks.GetDatabank(b0);
+            if (databank0 == null)
+            {
+                G.Writeln2("*** ERROR: Databank '" + b0 + "' not found");
+                throw new GekkoException();
+            }
 
             if (method == null) method = "total";
 
