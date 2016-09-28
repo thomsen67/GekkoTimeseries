@@ -7856,6 +7856,8 @@ namespace UnitTests
             //gnplot (only writing)
             //tsp... hmmm not done...
 
+            //The testing includes tests where data is put in a separate bank named 'other'
+
             // testing on annual
             // testing on annual
             // testing on annual
@@ -7864,192 +7866,304 @@ namespace UnitTests
             // testing on annual
             // testing on annual
 
-            I("RESET;");
-            Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");            
-            // ------ tsdx
-            I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<" + Globals.extensionDatabank + ">temp;");
-            I("RESET;");
-            I("READ<" + Globals.extensionDatabank + ">temp;");
-            ReadFormatsHelper("a");
-            // ------ tsdx, selection
-            I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<" + Globals.extensionDatabank + ">xx1, xx3 file=temp;");
-            I("RESET;");
-            I("READ<" + Globals.extensionDatabank + ">temp;");
-            ReadFormatsHelper("a");
-            // ------ tsd
-            I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");            
-            I("WRITE<tsd>temp;");
-            I("RESET;");
-            I("READ<tsd>temp;");
-            ReadFormatsHelper("a");
-            // ------ tsd, selection
-            I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<tsd>xx1, xx3 file=temp;");
-            I("RESET;");
-            I("READ<tsd>temp;");
-            ReadFormatsHelper("a");
-            // ------ csv
-            I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");            
-            I("WRITE<2001 2002 csv>temp;");
-            I("RESET;");
-            I("READ<csv>temp;");
-            ReadFormatsHelper("a");
-            // ------ csv, selection
-            I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<2001 2002 csv>xx1, xx3 file=temp;");
-            I("RESET;");
-            I("READ<csv>temp;");
-            ReadFormatsHelper("a");
-            // ------ prn
-            I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");            
-            I("WRITE<2001 2002 prn>temp;");
-            I("RESET;");
-            I("READ<prn>temp;");
-            ReadFormatsHelper("a");
-            // ------ prn, selection
-            I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<2001 2002 prn>xx1, xx3 file=temp;");
-            I("RESET;");
-            I("READ<prn>temp;");
-            ReadFormatsHelper("a");
-            // ------ xlsx
-            I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");            
-            I("WRITE<xlsx>temp;");
-            I("RESET;");
-            I("READ<xlsx>temp;");
-            ReadFormatsHelper("a");
-            // ------ xlsx, selection
-            I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<xlsx>xx1, xx3 file=temp;");
-            I("RESET;");
-            I("READ<xlsx>temp;");
-            ReadFormatsHelper("a");
-            // ------ xlsx cells with SHEET
-            I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");            
-            I("SHEET <2001 2002 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, xx3 file=temp;");  //export
-            I("RESET;");
-            I("SHEET <2001 2002 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
-            ReadFormatsHelper("a");
-            // ------ gnuplot (not actually testing the file)
-            I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<2001 2002 gnuplot>temp;");
-            // ------ gnuplot, selection  (not actually testing the file)
-            I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<2001 2002 gnuplot>xx1, xx3 file=temp;");            
+            List<string> other = new List<string>(); other.Add(null); other.Add("other:");
+            foreach (string bank in other)
+            {
 
-            // ---------- Testing on quarters
-            // ---------- Testing on quarters
-            // ---------- Testing on quarters
-            // ---------- Testing on quarters
-            // ---------- Testing on quarters
+                I("RESET;");
+                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                // ------ tsdx
+                if (bank == null)
+                {
+                    I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    I("WRITE<" + Globals.extensionDatabank + ">temp;");
+                    I("RESET;");
+                    I("READ<" + Globals.extensionDatabank + ">temp;");
+                    ReadFormatsHelper("a", bank);
+                }
+                // ------ tsdx, selection
+                {
+                    I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                    I("WRITE<" + Globals.extensionDatabank + ">xx1, " + bank + "xx3 file=temp;");
+                    I("RESET;");
+                    I("READ<" + Globals.extensionDatabank + ">temp;");
+                    ReadFormatsHelper("a", bank);
+                }
+                // ------ tsd
+                if (bank == null)
+                {
+                    I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    I("WRITE<tsd>temp;");
+                    I("RESET;");
+                    I("READ<tsd>temp;");
+                    ReadFormatsHelper("a", bank);
+                }
+                // ------ tsd, selection
+                {
+                    I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                    I("WRITE<tsd>xx1, " + bank + "xx3 file=temp;");
+                    I("RESET;");
+                    I("READ<tsd>temp;");
+                    ReadFormatsHelper("a", bank);
+                }
+                // ------ csv
+                if (bank == null)
+                {
+                    I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    I("WRITE<2001 2002 csv>temp;");
+                    I("RESET;");
+                    I("READ<csv>temp;");
+                    ReadFormatsHelper("a", bank);
+                }
+                // ------ csv, selection
+                {
+                    I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                    I("WRITE<2001 2002 csv>xx1, " + bank + "xx3 file=temp;");
+                    I("RESET;");
+                    I("READ<csv>temp;");
+                    ReadFormatsHelper("a", bank);
+                }
+                // ------ prn
+                if (bank == null)
+                {
+                    I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    I("WRITE<2001 2002 prn>temp;");
+                    I("RESET;");
+                    I("READ<prn>temp;");
+                    ReadFormatsHelper("a", bank);
+                }
+                // ------ prn, selection
+                {
+                    I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                    I("WRITE<2001 2002 prn>xx1, " + bank + "xx3 file=temp;");
+                    I("RESET;");
+                    I("READ<prn>temp;");
+                    ReadFormatsHelper("a", bank);
+                }
+                // ------ xlsx
+                if (bank == null)
+                {
+                    I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    I("WRITE<xlsx>temp;");
+                    I("RESET;");
+                    I("READ<xlsx>temp;");
+                    ReadFormatsHelper("a", bank);
+                }
+                // ------ xlsx, selection
+                {
+                    I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                    I("WRITE<xlsx>xx1, " + bank + "xx3 file=temp;");
+                    I("RESET;");
+                    I("READ<xlsx>temp;");
+                    ReadFormatsHelper("a", bank);
+                }
+                // ------ xlsx cells with SHEET                
+                {
+                    I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                    I("SHEET <2001 2002 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, " + bank + "xx3 file=temp;");  //export
+                    I("RESET;");
+                    I("SHEET <2001 2002 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
+                    ReadFormatsHelper("a", bank);
+                }
+                // ------ gnuplot (not actually testing the file)     
+                if (bank == null)
+                {
+                    I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    I("WRITE<2001 2002 gnuplot>temp;");
+                }
+                // ------ gnuplot, selection  (not actually testing the file)                
+                {
+                    I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                    I("WRITE<2001 2002 gnuplot>xx1, " + bank + "xx3 file=temp;");
+                }
 
-            I("RESET;");
-            Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-            I("OPTION freq q;");            
-            // ------ tsdx
-            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<" + Globals.extensionDatabank + ">temp;");
-            I("RESET;");
-            I("READ<" + Globals.extensionDatabank + ">temp;");
-            ReadFormatsHelper("q");
-            // ------ tsdx, selection
-            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<" + Globals.extensionDatabank + ">xx1, xx3 file=temp;");
-            I("RESET;");
-            I("READ<" + Globals.extensionDatabank + ">temp;");
-            ReadFormatsHelper("q");
-            // ------ tsd
-            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<tsd>temp;");
-            I("RESET;");
-            I("READ<tsd>temp;");
-            ReadFormatsHelper("q");
-            // ------ tsd, selection
-            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<tsd>xx1, xx3 file=temp;");
-            I("RESET;");
-            I("READ<tsd>temp;");
-            ReadFormatsHelper("q");
-            // ------ csv
-            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<2001q1 2001q2 csv>temp;");
-            I("RESET; OPTION freq q;");  //must tell Gekko what freq
-            I("READ<csv>temp;");
-            ReadFormatsHelper("q");
-            // ------ csv, selection
-            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<2001q1 2001q2 csv>xx1, xx3 file=temp;");
-            I("RESET; OPTION freq q;");  //must tell Gekko what freq
-            I("READ<csv>temp;");
-            ReadFormatsHelper("q");
-            // ------ prn
-            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<2001q1 2001q2 prn>temp;");
-            I("RESET; OPTION freq q;");  //must tell Gekko what freq
-            I("READ<prn>temp;");
-            ReadFormatsHelper("q");
-            // ------ prn, selection
-            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<2001q1 2001q2 prn>xx1, xx3 file=temp;");
-            I("RESET; OPTION freq q;");  //must tell Gekko what freq
-            I("READ<prn>temp;");
-            ReadFormatsHelper("q");
-            // ------ xlsx
-            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<xlsx>temp;");
-            I("RESET; OPTION freq q;");  //must tell Gekko what freq
-            I("READ<xlsx>temp;");
-            ReadFormatsHelper("q");
-            // ------ xlsx, selection
-            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<xlsx>xx1, xx3 file=temp;");
-            I("RESET; OPTION freq q;");  //must tell Gekko what freq
-            I("READ<xlsx>temp;");
-            ReadFormatsHelper("q");
-            // ------ xlsx cells with SHEET
-            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("SHEET <2001q1 2001q2 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, xx3 file=temp;");  //export
-            I("RESET; OPTION freq q;");  //must tell Gekko what freq
-            I("SHEET <2001q1 2001q2 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
-            ReadFormatsHelper("q");
-            // ------ gnuplot (not actually testing the file)
-            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<2001q1 2001q2 gnuplot>temp;");
-            // ------ gnuplot, selection  (not actually testing the file)
-            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
-            I("WRITE<2001q1 2001q2 gnuplot>xx1, xx3 file=temp;");
+                // ---------- Testing on quarters
+                // ---------- Testing on quarters
+                // ---------- Testing on quarters
+                // ---------- Testing on quarters
+                // ---------- Testing on quarters
+
+                I("RESET;");
+                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                I("OPTION freq q;");
+                // ------ tsdx
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    I("WRITE<" + Globals.extensionDatabank + ">temp;");
+                    I("RESET;");
+                    I("READ<" + Globals.extensionDatabank + ">temp;");
+                    ReadFormatsHelper("q", bank);
+                }
+                // ------ tsdx, selection
+                {
+                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                    I("WRITE<" + Globals.extensionDatabank + ">xx1, " + bank + "xx3 file=temp;");
+                    I("RESET;");
+                    I("READ<" + Globals.extensionDatabank + ">temp;");
+                    ReadFormatsHelper("q", bank);
+                }
+                // ------ tsd
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    I("WRITE<tsd>temp;");
+                    I("RESET;");
+                    I("READ<tsd>temp;");
+                    ReadFormatsHelper("q", bank);
+                }
+                // ------ tsd, selection
+                {
+                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                    I("WRITE<tsd>xx1, " + bank + "xx3 file=temp;");
+                    I("RESET;");
+                    I("READ<tsd>temp;");
+                    ReadFormatsHelper("q", bank);
+                }
+                // ------ csv
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    I("WRITE<2001q1 2001q2 csv>temp;");
+                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                    I("READ<csv>temp;");
+                    ReadFormatsHelper("q", bank);
+                }
+                // ------ csv, selection
+                {
+                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                    I("WRITE<2001q1 2001q2 csv>xx1, " + bank + "xx3 file=temp;");
+                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                    I("READ<csv>temp;");
+                    ReadFormatsHelper("q", bank);
+                }
+                // ------ prn
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    I("WRITE<2001q1 2001q2 prn>temp;");
+                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                    I("READ<prn>temp;");
+                    ReadFormatsHelper("q", bank);
+                }
+                // ------ prn, selection
+                {
+                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                    I("WRITE<2001q1 2001q2 prn>xx1, " + bank + "xx3 file=temp;");
+                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                    I("READ<prn>temp;");
+                    ReadFormatsHelper("q", bank);
+                }
+                // ------ xlsx
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    I("WRITE<xlsx>temp;");
+                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                    I("READ<xlsx>temp;");
+                    ReadFormatsHelper("q", bank);
+                }
+                // ------ xlsx, selection
+                {
+                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                    I("WRITE<xlsx>xx1, " + bank + "xx3 file=temp;");
+                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                    I("READ<xlsx>temp;");
+                    ReadFormatsHelper("q", bank);
+                }
+                // ------ xlsx cells with SHEET
+                {
+                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                    I("SHEET <2001q1 2001q2 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, " + bank + "xx3 file=temp;");  //export
+                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                    I("SHEET <2001q1 2001q2 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
+                    ReadFormatsHelper("q", bank);
+                }
+                // ------ gnuplot (not actually testing the file)
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    I("WRITE<2001q1 2001q2 gnuplot>temp;");
+                }
+                // ------ gnuplot, selection  (not actually testing the file)
+                {
+                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                    I("WRITE<2001q1 2001q2 gnuplot>xx1, " + bank + "xx3 file=temp;");
+                }
+            }
 
         }
 
-        private static void ReadFormatsHelper(string freq)
+        private static void ReadFormatsHelper(string freq, string bank)
         {
-            if (freq == "a")
+            if (bank == null)
             {
-                AssertHelper(First(), "xx1", 2000, double.NaN, sharedDelta);
-                AssertHelper(First(), "xx1", 2001, 1001, sharedDelta);
-                AssertHelper(First(), "xx1", 2002, 1002, sharedDelta);
-                AssertHelper(First(), "xx1", 2003, double.NaN, sharedDelta);
-                AssertHelper(First(), "xx3", 2000, double.NaN, sharedDelta);
-                AssertHelper(First(), "xx3", 2001, 3001, sharedDelta);
-                AssertHelper(First(), "xx3", 2002, 3002, sharedDelta);
-                AssertHelper(First(), "xx3", 2003, double.NaN, sharedDelta);
+                if (freq == "a")
+                {
+                    AssertHelper(First(), "xx1", 2000, double.NaN, sharedDelta);
+                    AssertHelper(First(), "xx1", 2001, 1001, sharedDelta);
+                    AssertHelper(First(), "xx1", 2002, 1002, sharedDelta);
+                    AssertHelper(First(), "xx1", 2003, double.NaN, sharedDelta);
+                    AssertHelper(First(), "xx3", 2000, double.NaN, sharedDelta);
+                    AssertHelper(First(), "xx3", 2001, 3001, sharedDelta);
+                    AssertHelper(First(), "xx3", 2002, 3002, sharedDelta);
+                    AssertHelper(First(), "xx3", 2003, double.NaN, sharedDelta);
+                }
+                else if (freq == "q")
+                {
+                    AssertHelper(First(), "xx1", EFreq.Quarterly, 1999, 4, double.NaN, sharedDelta);
+                    AssertHelper(First(), "xx1", EFreq.Quarterly, 2001, 1, 1001, sharedDelta);
+                    AssertHelper(First(), "xx1", EFreq.Quarterly, 2001, 2, 1002, sharedDelta);
+                    AssertHelper(First(), "xx1", EFreq.Quarterly, 2001, 3, double.NaN, sharedDelta);
+                    AssertHelper(First(), "xx3", EFreq.Quarterly, 1999, 4, double.NaN, sharedDelta);
+                    AssertHelper(First(), "xx3", EFreq.Quarterly, 2001, 1, 3001, sharedDelta);
+                    AssertHelper(First(), "xx3", EFreq.Quarterly, 2001, 2, 3002, sharedDelta);
+                    AssertHelper(First(), "xx3", EFreq.Quarterly, 2001, 3, double.NaN, sharedDelta);
+                }
+                else throw new GekkoException();
             }
-            else if (freq == "q")
+            else
             {
-                AssertHelper(First(), "xx1", EFreq.Quarterly, 1999, 4, double.NaN, sharedDelta);
-                AssertHelper(First(), "xx1", EFreq.Quarterly, 2001, 1, 1001, sharedDelta);
-                AssertHelper(First(), "xx1", EFreq.Quarterly, 2001, 2, 1002, sharedDelta);
-                AssertHelper(First(), "xx1", EFreq.Quarterly, 2001, 3, double.NaN, sharedDelta);
-                AssertHelper(First(), "xx3", EFreq.Quarterly, 1999, 4, double.NaN, sharedDelta);
-                AssertHelper(First(), "xx3", EFreq.Quarterly, 2001, 1, 3001, sharedDelta);
-                AssertHelper(First(), "xx3", EFreq.Quarterly, 2001, 2, 3002, sharedDelta);
-                AssertHelper(First(), "xx3", EFreq.Quarterly, 2001, 3, double.NaN, sharedDelta);
+                if (freq == "a")
+                {
+                    AssertHelper(First(), "xx1", 2000, double.NaN, sharedDelta);
+                    AssertHelper(First(), "xx1", 2001, 1001, sharedDelta);
+                    AssertHelper(First(), "xx1", 2002, 1002, sharedDelta);
+                    AssertHelper(First(), "xx1", 2003, double.NaN, sharedDelta);
+                    AssertHelper(First(), "xx3", 2000, double.NaN, sharedDelta);
+                    AssertHelper(First(), "xx3", 2001, 4001, sharedDelta);
+                    AssertHelper(First(), "xx3", 2002, 4002, sharedDelta);
+                    AssertHelper(First(), "xx3", 2003, double.NaN, sharedDelta);
+                }
+                else if (freq == "q")
+                {
+                    AssertHelper(First(), "xx1", EFreq.Quarterly, 1999, 4, double.NaN, sharedDelta);
+                    AssertHelper(First(), "xx1", EFreq.Quarterly, 2001, 1, 1001, sharedDelta);
+                    AssertHelper(First(), "xx1", EFreq.Quarterly, 2001, 2, 1002, sharedDelta);
+                    AssertHelper(First(), "xx1", EFreq.Quarterly, 2001, 3, double.NaN, sharedDelta);
+                    AssertHelper(First(), "xx3", EFreq.Quarterly, 1999, 4, double.NaN, sharedDelta);
+                    AssertHelper(First(), "xx3", EFreq.Quarterly, 2001, 1, 4001, sharedDelta);
+                    AssertHelper(First(), "xx3", EFreq.Quarterly, 2001, 2, 4002, sharedDelta);
+                    AssertHelper(First(), "xx3", EFreq.Quarterly, 2001, 3, double.NaN, sharedDelta);
+                }
+                else throw new GekkoException();
             }
-            else throw new GekkoException();
 
         }
 
