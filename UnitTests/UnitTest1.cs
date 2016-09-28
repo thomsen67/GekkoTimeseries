@@ -7847,16 +7847,23 @@ namespace UnitTests
         [TestMethod]
         public void Test__DataFormatsInOut()
         {
-          
 
             //tsdx
             //tsd
             //csv
             //prn
-            //xls(x), also via SHEET
-            //tsp
-            //-------------> TODO: pcim and gnuplot not tested here
-            // annual series here
+            //xls(x), also via SHEET            
+            //gnplot (only writing)
+            //tsp... hmmm not done...
+
+            // testing on annual
+            // testing on annual
+            // testing on annual
+            // testing on annual
+            // testing on annual
+            // testing on annual
+            // testing on annual
+
             I("RESET;");
             Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");            
@@ -7889,6 +7896,7 @@ namespace UnitTests
             I("WRITE<2001 2002 csv>temp;");
             I("RESET;");
             I("READ<csv>temp;");
+            ReadFormatsHelper("a");
             // ------ csv, selection
             I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
             I("WRITE<2001 2002 csv>xx1, xx3 file=temp;");
@@ -7900,6 +7908,7 @@ namespace UnitTests
             I("WRITE<2001 2002 prn>temp;");
             I("RESET;");
             I("READ<prn>temp;");
+            ReadFormatsHelper("a");
             // ------ prn, selection
             I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
             I("WRITE<2001 2002 prn>xx1, xx3 file=temp;");
@@ -7911,6 +7920,7 @@ namespace UnitTests
             I("WRITE<xlsx>temp;");
             I("RESET;");
             I("READ<xlsx>temp;");
+            ReadFormatsHelper("a");
             // ------ xlsx, selection
             I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
             I("WRITE<xlsx>xx1, xx3 file=temp;");
@@ -7923,6 +7933,12 @@ namespace UnitTests
             I("RESET;");
             I("SHEET <2001 2002 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
             ReadFormatsHelper("a");
+            // ------ gnuplot (not actually testing the file)
+            I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+            I("WRITE<2001 2002 gnuplot>temp;");
+            // ------ gnuplot, selection  (not actually testing the file)
+            I("RESET; TIME 2001 2002; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+            I("WRITE<2001 2002 gnuplot>xx1, xx3 file=temp;");            
 
             // ---------- Testing on quarters
             // ---------- Testing on quarters
@@ -7939,6 +7955,7 @@ namespace UnitTests
             I("WRITE<" + Globals.extensionDatabank + ">temp;");
             I("RESET;");
             I("READ<" + Globals.extensionDatabank + ">temp;");
+            ReadFormatsHelper("q");
             // ------ tsdx, selection
             I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
             I("WRITE<" + Globals.extensionDatabank + ">xx1, xx3 file=temp;");
@@ -7974,6 +7991,7 @@ namespace UnitTests
             I("WRITE<2001q1 2001q2 prn>temp;");
             I("RESET; OPTION freq q;");  //must tell Gekko what freq
             I("READ<prn>temp;");
+            ReadFormatsHelper("q");
             // ------ prn, selection
             I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
             I("WRITE<2001q1 2001q2 prn>xx1, xx3 file=temp;");
@@ -7985,6 +8003,7 @@ namespace UnitTests
             I("WRITE<xlsx>temp;");
             I("RESET; OPTION freq q;");  //must tell Gekko what freq
             I("READ<xlsx>temp;");
+            ReadFormatsHelper("q");
             // ------ xlsx, selection
             I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
             I("WRITE<xlsx>xx1, xx3 file=temp;");
@@ -7997,6 +8016,12 @@ namespace UnitTests
             I("RESET; OPTION freq q;");  //must tell Gekko what freq
             I("SHEET <2001q1 2001q2 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
             ReadFormatsHelper("q");
+            // ------ gnuplot (not actually testing the file)
+            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+            I("WRITE<2001q1 2001q2 gnuplot>temp;");
+            // ------ gnuplot, selection  (not actually testing the file)
+            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+            I("WRITE<2001q1 2001q2 gnuplot>xx1, xx3 file=temp;");
 
         }
 
