@@ -15697,7 +15697,7 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            Databank work = Program.databanks.GetFirst();
+            //Databank work = Program.databanks.GetFirst();
             Databank base2 = Program.databanks.GetRef();
 
             file = AddExtension(file, "." + Globals.extensionCommand);
@@ -15714,18 +15714,16 @@ namespace Gekko
             {
                 string var;
                 for (int j = 0; j < vars.Count; j++)
-                {
-                    if(vars[j].bank != null)
-                    {
-                        G.Writeln2("*** ERROR: EXPORT<series> cannot be used with bank names ('" + vars[j].bank + "')");
-                        throw new GekkoException();
-                    }
+                {                    
                     var = vars[j].name;
+
+                    Databank db = GetBankFromBankNameVersion(vars[j].bank);
+
                     var = G.GetUpperLowerCase(var);
 
-                    if (!work.ContainsVariable(var))
+                    if (!db.ContainsVariable(var))
                     {
-                        G.Writeln2("*** ERROR: UPDPRT: Variable '" + var + "' not found in Work databank");
+                        G.Writeln2("*** ERROR: UPDPRT: Variable '" + var + "' not found in '" + db.aliasName + "' databank");
                         throw new GekkoException();
                     }
 
@@ -15738,7 +15736,7 @@ namespace Gekko
                         }
                     }
 
-                    TimeSeries ts = work.GetVariable(var);
+                    TimeSeries ts = db.GetVariable(var);
 
                     TimeSeries tsBase = null;
                     if (op == "*" || op == "+" || G.equal(op, "q") || G.equal(op, "m"))
@@ -17552,12 +17550,8 @@ namespace Gekko
                 file.WriteLine();
                 foreach (BankNameVersion var in vars)
                 {
-                    if (var.bank != null)
-                    {
-                        G.Writeln2("*** ERROR: EXPORT<tsd> does not accept bank names");
-                        throw new GekkoException();
-                    }
-                    TimeSeries ts = Program.databanks.GetFirst().GetVariable(var.name);
+                    Databank db = GetBankFromBankNameVersion(var.bank);                    
+                    TimeSeries ts = db.GetVariable(var.name);
                     if (ts == null)
                     {
                         //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
