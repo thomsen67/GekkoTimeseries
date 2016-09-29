@@ -5380,6 +5380,23 @@ namespace UnitTests
             I("list bc2 = #(listfile bc);");
             AssertHelperList("bc2", new List<string>() { "b1", "b2", "b3", "b4", "c1", "c2", "c3", "c4" });
 
+            //dublets
+            I("list x1 = a1, a2, a3, a4, a1;");
+            I("list x2 = a2, a3, a5, a6, a2;");
+            I("list x3 = #x1, #x2;                                      //concatenation");
+            AssertHelperList("x3", new List<string>() { "a1", "a2", "a3", "a4", "a1", "a2", "a3", "a5", "a6", "a2" });
+            I("list x4 = union(#x1, #x2);                                     //union");
+            AssertHelperList("x4", new List<string>() { "a1", "a2", "a3", "a4", "a1", "a5", "a6" });
+            I("list x5 = difference(#x1, #x2);                                     //difference");
+            AssertHelperList("x5", new List<string>() { "a1", "a4", "a1" });
+            I("list x6 = intersect(#x1, #x2);                                     //intersection");
+            AssertHelperList("x6", new List<string>() { "a2", "a3" });
+            I("list x7 = #x1 trim;");
+            AssertHelperList("x7", new List<string>() { "a1", "a2", "a3", "a4" });
+            I("list x8 = #x1 sort trim;");
+            AssertHelperList("x8", new List<string>() { "a1", "a2", "a3", "a4" });
+
+
 
         }
 
