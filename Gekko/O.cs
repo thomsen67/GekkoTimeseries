@@ -3605,8 +3605,7 @@ namespace Gekko
                 {
                     List<BankNameVersion> xx = Program.GetInfoFromStringWildcard(s, null);  //could use .from or .bank here!!!!
                     foreach (BankNameVersion bnv in xx)
-                    {
-                        if (bnv.name == null || bnv.name == "") continue;  //probably would never happen
+                    {                        
                         if (bank)
                         {
                             names.Add(bnv.bank + Globals.symbolBankColon + bnv.name);

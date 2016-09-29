@@ -4836,7 +4836,7 @@ namespace Gekko
                     BankNameVersion bnv = new BankNameVersion();
                     bnv.bank = bank;
                     bnv.name = s2;
-                    list.Add(bnv);
+                    if (bnv.name != null && bnv.name != "") list.Add(bnv);
                 }
             }
             else if (varName.Contains(".."))
@@ -4856,7 +4856,7 @@ namespace Gekko
                     BankNameVersion bnv = new BankNameVersion();
                     bnv.bank = bank;
                     bnv.name = s2;
-                    list.Add(bnv);
+                    if (bnv.name != null && bnv.name != "") list.Add(bnv);
                 }
             }
             else
@@ -4873,7 +4873,7 @@ namespace Gekko
                 BankNameVersion bnv = new BankNameVersion();
                 bnv.bank = bank;
                 bnv.name = varName;
-                list.Add(bnv);
+                if (bnv.name != null && bnv.name != "") list.Add(bnv);
             }
 
             return list;
@@ -11333,259 +11333,268 @@ namespace Gekko
             Globals.dispLastDispStart = tStart; //kept if user chooses to click a link -- in that case we want to use same time settings
             Globals.dispLastDispEnd = tEnd; //kept if user chooses to click a link
 
-            List<string> unfoldedList = list;
-            foreach (string var2 in unfoldedList)
+
+            foreach (string listItem in list)
             {
-                if (Globals.threadIsInProcessOfAborting) throw new GekkoException();
-                string var = G.GetUpperLowerCase(var2);
-                MetaTimeSeries ats = O.GetTimeSeries(var, 0, O.ECreatePossibilities.None);
-                TimeSeries ts = ats.ts;
-
-                //Databank db = Program.databanks.Getfirst();
-                //TimeSeries ts = db.GetVariable(var);
-
-                if (ts == null)
+                List<BankNameVersion> xx = Program.GetInfoFromStringWildcard(listItem, null);  //could use .from or .bank here!!!!
+                foreach (BankNameVersion bnv in xx)
                 {
-                    G.Writeln2("*** ERROR in DISP, cannot find " + var);
-                    throw new GekkoException();
-                }
-                G.Writeln();
-                G.Writeln("==========================================================================================");
-                G.Writeln("SERIES " + var);
-                if (true)
-                {
-                    EEndoOrExo type1 = VariableTypeEndoExo(var);
-                    string type = "";
-                    if (type1 == EEndoOrExo.Exo) type = "Exogenous, ";
-                    else if (type1 == EEndoOrExo.Endo) type = "Endogenous, ";
+                    string var2 = bnv.name;
+                    if (Globals.threadIsInProcessOfAborting) throw new GekkoException();
+                    string var = G.GetUpperLowerCase(var2);
+                    MetaTimeSeries ats = O.GetTimeSeries(var, 0, O.ECreatePossibilities.None);
+                    TimeSeries ts = ats.ts;
 
-                    string freq = "[unknown frequency]";
-                    if (ts.frequency == "a")
-                    {
-                        freq = "Annual";
-                    }
-                    else if (ts.frequency == "q")
-                    {
-                        freq = "Quarterly";
-                    }
-                    else if (ts.frequency == "m")
-                    {
-                        freq = "Monthly";
-                    }
-                    else if (ts.frequency == "u")
-                    {
-                        freq = "Undated";
-                    }
+                    //Databank db = Program.databanks.Getfirst();
+                    //TimeSeries ts = db.GetVariable(var);
 
-                    bool noData = ts.IsNullPeriod(); //We are opening up to this possibility of 'empty' data                    
-
-                    GekkoTime first = ts.GetPeriodFirst();
-                    GekkoTime last = ts.GetPeriodLast();
-                    G.Write(type);
-                    string stamp = null;
-                    if (ts.stamp != null && ts.stamp != "") stamp = " (updated: " + ts.stamp + ")";
-                    if (ts.frequency == "a" || ts.frequency == "u")
+                    if (ts == null)
                     {
-                        if (noData)
+                        G.Writeln2("*** ERROR in DISP, cannot find " + var);
+                        throw new GekkoException();
+                    }
+                    G.Writeln();
+                    G.Writeln("==========================================================================================");
+                    G.Writeln("SERIES " + var);
+                    if (true)
+                    {
+                        EEndoOrExo type1 = VariableTypeEndoExo(var);
+                        string type = "";
+                        if (type1 == EEndoOrExo.Exo) type = "Exogenous, ";
+                        else if (type1 == EEndoOrExo.Endo) type = "Endogenous, ";
+
+                        string freq = "[unknown frequency]";
+                        if (ts.frequency == "a")
                         {
-                            G.Writeln(freq + ", not data, no period");
+                            freq = "Annual";
                         }
-                        else
+                        else if (ts.frequency == "q")
                         {
-                            //we don't want 1995a1 to 2005a1, instead 1995 to 2005
-                            G.Writeln(freq + " data from " + first.super + " to " + last.super + stamp);
+                            freq = "Quarterly";
                         }
-                    }
-                    else
-                    {
-                        if (noData)
+                        else if (ts.frequency == "m")
                         {
-                            G.Writeln(freq + ", not data, no period");
+                            freq = "Monthly";
                         }
-                        else
+                        else if (ts.frequency == "u")
                         {
-                            G.Writeln(freq + " data from " + first.super + ts.frequency + first.sub + " to " + last.super + ts.frequency + last.sub + stamp);
+                            freq = "Undated";
                         }
-                    }
 
-                }
+                        bool noData = ts.IsNullPeriod(); //We are opening up to this possibility of 'empty' data                    
 
-                List<string> varExpl = Program.GetVariableExplanation(var);
-                foreach (string line in varExpl)
-                {
-                    if (line != "")
-                    {
-                        G.Writeln(line);
-                    }
-                }
+                        //GekkoTime first = ts.GetPeriodFirst();
+                        //GekkoTime last = ts.GetPeriodLast();
 
-                //ts.label = "BNP i faste priser";
-                //ts.expression = "SERIES y = c + i + g;";
-                //ts.stamp = "20-1-2016 10:34";
+                        GekkoTime first = ts.GetRealDataPeriodFirst();
+                        GekkoTime last = ts.GetRealDataPeriodLast();
 
-                if (ts.label != null) G.Writeln("Series label: " + ts.label);
-
-                if (ts.source != null)
-                {
-                    //We keep the SERIES (or SER), there may be options etc. But we capitalize it.
-                    string src2 = ts.source.Trim();
-                    if (src2 != "")
-                    {
-                        G.Writeln("Series source: " + src2);
-                    }
-                }
-
-                if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(var, clickedLink, 0);
-
-                if (Program.model != null)
-                {
-                    List<string> d4 = new List<string>();
-                    if (Program.model.dependents.ContainsKey(var))
-                    {
-                        Dictionary<string, string> d2 = Program.model.dependents[var].storage;
-                        if (d2 != null)
+                        G.Write(type);
+                        string stamp = null;
+                        if (ts.stamp != null && ts.stamp != "") stamp = " (updated: " + ts.stamp + ")";
+                        if (ts.frequency == "a" || ts.frequency == "u")
                         {
-                            foreach (string d3 in d2.Keys)
+                            if (noData || first.super == -12345 || last.super == -12345)
                             {
-                                d4.Add(d3);
+                                G.Writeln(freq + ", no data period");
+                            }
+                            else
+                            {
+                                //we don't want 1995a1 to 2005a1, instead 1995 to 2005
+                                G.Writeln(freq + " data from " + first.super + " to " + last.super + stamp);
                             }
                         }
-                        d4.Sort(StringComparer.InvariantCulture);
-                    }
-
-                    EquationHelper found = Program.FindEquationByMeansOfVariableName(var);
-
-                    if (found != null && found.modelBlock != null && found.modelBlock != "" && found.modelBlock != "Unnamed")
-                    {
-                        G.Writeln("Modelblock: " + found.modelBlock);
-                    }
-
-                    G.Write("Influences: ");
-                    if (d4.Count == 0) G.Writeln("<none>");
-                    else
-                    {
-                        G.PrintListWithCommas(d4, true);
-                    }
-
-                    G.Writeln("------------------------------------------------------------------------------------------");
-
-                    if (found != null)
-                    {
-                        int widthRemember = Program.options.print_width;
-                        int fileWidthRemember = Program.options.print_filewidth;
-                        Program.options.print_width = int.MaxValue;
-                        Program.options.print_filewidth = int.MaxValue;
-                        try
+                        else
                         {
-                            //check for endo (but really not necessary, exo just does not exist)
-                            //G.Writeln(found.equationFormula);
-                            string strSplit = found.equationText;
-                            strSplit = strSplit.Replace("\r\n", "£");  //hack: £ unlikely to be used much
-                            char[] arrDelimiters = new char[] { ' ', '(', ')', '=', '+', '-', '*', '/', ';', '$', '£' };  //last one is part of new line (\r\n)
-                            List<string> alWork = Program.SplitStringAndKeepDelimiters(strSplit, arrDelimiters);
-                            foreach (string s in alWork)
+                            if (noData || first.super == -12345 || last.super == -12345)                            
                             {
-                                if (s == "£") G.Writeln();
-                                else
+                                G.Writeln(freq + ", no data period");
+                            }
+                            else
+                            {
+                                G.Writeln(freq + " data from " + first.super + ts.frequency + first.sub + " to " + last.super + ts.frequency + last.sub + stamp);
+                            }
+                        }
+
+                    }
+
+                    List<string> varExpl = Program.GetVariableExplanation(var);
+                    foreach (string line in varExpl)
+                    {
+                        if (line != "")
+                        {
+                            G.Writeln(line);
+                        }
+                    }
+
+                    //ts.label = "BNP i faste priser";
+                    //ts.expression = "SERIES y = c + i + g;";
+                    //ts.stamp = "20-1-2016 10:34";
+
+                    if (ts.label != null) G.Writeln("Series label: " + ts.label);
+
+                    if (ts.source != null)
+                    {
+                        //We keep the SERIES (or SER), there may be options etc. But we capitalize it.
+                        string src2 = ts.source.Trim();
+                        if (src2 != "")
+                        {
+                            G.Writeln("Series source: " + src2);
+                        }
+                    }
+
+                    if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(var, clickedLink, 0);
+
+                    if (Program.model != null)
+                    {
+                        List<string> d4 = new List<string>();
+                        if (Program.model.dependents.ContainsKey(var))
+                        {
+                            Dictionary<string, string> d2 = Program.model.dependents[var].storage;
+                            if (d2 != null)
+                            {
+                                foreach (string d3 in d2.Keys)
                                 {
-                                    if (Program.model.varsAType.ContainsKey(s))
-                                    {
-                                        //seems the word exists as variable
-                                        G.WriteLink(s, "disp:" + s);
-                                    }
-                                    else
-                                    {
-                                        G.Write(s);
-                                    }
+                                    d4.Add(d3);
                                 }
                             }
-                            G.Writeln();
+                            d4.Sort(StringComparer.InvariantCulture);
                         }
-                        finally
+
+                        EquationHelper found = Program.FindEquationByMeansOfVariableName(var);
+
+                        if (found != null && found.modelBlock != null && found.modelBlock != "" && found.modelBlock != "Unnamed")
                         {
-                            //resetting, also if there is an error
-                            Program.options.print_width = widthRemember;
-                            Program.options.print_filewidth = fileWidthRemember;
+                            G.Writeln("Modelblock: " + found.modelBlock);
+                        }
+
+                        G.Write("Influences: ");
+                        if (d4.Count == 0) G.Writeln("<none>");
+                        else
+                        {
+                            G.PrintListWithCommas(d4, true);
                         }
 
                         G.Writeln("------------------------------------------------------------------------------------------");
-                        string rhs = found.csCodeRhsHumanVersion;
-                        rhs = rhs.Replace("\r\n", "");
-                        //rhs = rhs.Replace("[", "(");
-                        //rhs = rhs.Replace("]", ")");
-                        rhs = rhs.Replace("[0]", "");
 
-                        if (showFrnEquation)
+                        if (found != null)
                         {
-                            G.Writeln(found.csCodeLhsHuman + " = " + rhs + " " + ";");
-                        }
-                        else
-                        {
-                            G.WriteLink("Show detailed equation", "disp2:" + var);
-                            G.Writeln();
-                        }
-                    }
-                }
-
-                bool hasFilter = false; if (Program.options.timefilter && Globals.globalPeriodTimeFilters2.Count > 0) hasFilter = true;
-
-                int max = Program.options.print_disp_maxlines;
-                if (hasFilter || Program.options.print_disp_maxlines == -1) max = int.MaxValue;
-
-                if (max > 0)
-                {
-
-                    G.Writeln("------------------------------------------------------------------------------------------");
-                    G.Writeln("Period        value        %");
-
-                    int counter = 0;
-                    foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
-                    {
-                        counter++;
-                        if (hasFilter)  //some periods are set via TIMEFILTER
-                        {
-                            //if some filter is set, we never truncate output to 3 or 5 lines (showAllPeriods)
-                            if (ShouldFilterPeriod(gt)) continue;
-                        }
-                        else
-                        {
-                            if (!showAllPeriods && counter > max)
+                            int widthRemember = Program.options.print_width;
+                            int fileWidthRemember = Program.options.print_filewidth;
+                            Program.options.print_width = int.MaxValue;
+                            Program.options.print_filewidth = int.MaxValue;
+                            try
                             {
-                                continue;
+                                //check for endo (but really not necessary, exo just does not exist)
+                                //G.Writeln(found.equationFormula);
+                                string strSplit = found.equationText;
+                                strSplit = strSplit.Replace("\r\n", "£");  //hack: £ unlikely to be used much
+                                char[] arrDelimiters = new char[] { ' ', '(', ')', '=', '+', '-', '*', '/', ';', '$', '£' };  //last one is part of new line (\r\n)
+                                List<string> alWork = Program.SplitStringAndKeepDelimiters(strSplit, arrDelimiters);
+                                foreach (string s in alWork)
+                                {
+                                    if (s == "£") G.Writeln();
+                                    else
+                                    {
+                                        if (Program.model.varsAType.ContainsKey(s))
+                                        {
+                                            //seems the word exists as variable
+                                            G.WriteLink(s, "disp:" + s);
+                                        }
+                                        else
+                                        {
+                                            G.Write(s);
+                                        }
+                                    }
+                                }
+                                G.Writeln();
+                            }
+                            finally
+                            {
+                                //resetting, also if there is an error
+                                Program.options.print_width = widthRemember;
+                                Program.options.print_filewidth = fileWidthRemember;
+                            }
+
+                            G.Writeln("------------------------------------------------------------------------------------------");
+                            string rhs = found.csCodeRhsHumanVersion;
+                            rhs = rhs.Replace("\r\n", "");
+                            //rhs = rhs.Replace("[", "(");
+                            //rhs = rhs.Replace("]", ")");
+                            rhs = rhs.Replace("[0]", "");
+
+                            if (showFrnEquation)
+                            {
+                                G.Writeln(found.csCodeLhsHuman + " = " + rhs + " " + ";");
+                            }
+                            else
+                            {
+                                G.WriteLink("Show detailed equation", "disp2:" + var);
+                                G.Writeln();
                             }
                         }
-
-                        if (Program.options.freq == EFreq.Annual) G.Write((gt.super) + " ");
-                        else G.Write(gt.super + ts.frequency + gt.sub + " ");
-
-                        double n1 = ts.GetData(gt);
-                        double n0 = ts.GetData(gt.Add(-1));
-
-                        double level1 = n1;
-                        double pch1 = ((n1 / n0 - 1) * 100d);
-
-                        if (n1 == n0) pch1 = 0d;
-
-                        string levelFormatted;
-                        string pchFormatted;
-                        Program.ConvertToPrintFormat(level1, pch1, out levelFormatted, out pchFormatted);
-
-                        G.Write(levelFormatted + " " + pchFormatted + " ");
-                        G.Writeln();
                     }
-                    int surplus = counter - max;
-                    if (!showAllPeriods && surplus > 0)
+
+                    bool hasFilter = false; if (Program.options.timefilter && Globals.globalPeriodTimeFilters2.Count > 0) hasFilter = true;
+
+                    int max = Program.options.print_disp_maxlines;
+                    if (hasFilter || Program.options.print_disp_maxlines == -1) max = int.MaxValue;
+
+                    if (max > 0)
                     {
+
                         G.Writeln("------------------------------------------------------------------------------------------");
-                        string ps = "period";
-                        if (surplus > 1) ps = "periods";
-                        G.Write(surplus + " " + ps + " hidden (");
-                        G.WriteLink("show", "disp3:" + var);
-                        G.Writeln(")");
+                        G.Writeln("Period        value        %");
+
+                        int counter = 0;
+                        foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
+                        {
+                            counter++;
+                            if (hasFilter)  //some periods are set via TIMEFILTER
+                            {
+                                //if some filter is set, we never truncate output to 3 or 5 lines (showAllPeriods)
+                                if (ShouldFilterPeriod(gt)) continue;
+                            }
+                            else
+                            {
+                                if (!showAllPeriods && counter > max)
+                                {
+                                    continue;
+                                }
+                            }
+
+                            if (Program.options.freq == EFreq.Annual) G.Write((gt.super) + " ");
+                            else G.Write(gt.super + ts.frequency + gt.sub + " ");
+
+                            double n1 = ts.GetData(gt);
+                            double n0 = ts.GetData(gt.Add(-1));
+
+                            double level1 = n1;
+                            double pch1 = ((n1 / n0 - 1) * 100d);
+
+                            if (n1 == n0) pch1 = 0d;
+
+                            string levelFormatted;
+                            string pchFormatted;
+                            Program.ConvertToPrintFormat(level1, pch1, out levelFormatted, out pchFormatted);
+
+                            G.Write(levelFormatted + " " + pchFormatted + " ");
+                            G.Writeln();
+                        }
+                        int surplus = counter - max;
+                        if (!showAllPeriods && surplus > 0)
+                        {
+                            G.Writeln("------------------------------------------------------------------------------------------");
+                            string ps = "period";
+                            if (surplus > 1) ps = "periods";
+                            G.Write(surplus + " " + ps + " hidden (");
+                            G.WriteLink("show", "disp3:" + var);
+                            G.Writeln(")");
+                        }
                     }
+                    G.Writeln("==========================================================================================");
+                    G.Writeln();
                 }
-                G.Writeln("==========================================================================================");
-                G.Writeln();
             }
         }
 

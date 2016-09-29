@@ -1622,7 +1622,7 @@ deleteOpt1h               : NONMODEL (EQUAL yesNo)? -> ^(ASTOPT_STRING_NONMODEL 
 						  ;
 
 disp					  : DISP StringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, $DISP.Line)} StringInQuotes)
-						  | DISP dispOpt1? listItems -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) listItems)
+						  | DISP dispOpt1? listItemsWildRange -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) listItemsWildRange)
 						  ; 						
 dispOpt1                  : ISNOTQUAL 
 						  | leftAngle2          dispOpt1h* RIGHTANGLE -> ^(ASTOPT1 dispOpt1h*)							
