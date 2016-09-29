@@ -324,6 +324,7 @@ tokens {
     ASTOPT1;
     ASTOPT2;
     ASTOPT_;
+	ASTOPT_STRING_BANK;
 	ASTOPT_STRING_ERROR;
 	ASTOPT_STRING_USING;
     ASTOPT_STRING_ABS ;
@@ -1746,7 +1747,9 @@ download                  : DOWNLOAD HTTP? url fileName -> ^({token("ASTDOWNLOAD
 index                     : INDEX indexOpt1? SERIES? listItemsWildRange nameWithDot? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} listItemsWildRange ^(ASTPLACEHOLDER nameWithDot?) indexOpt1?);
 //index                     : INDEX indexOpt1? SERIES? indexerAlone nameWithDot? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} ^(ASTINDEXERALONE indexerAlone) ^(ASTPLACEHOLDER nameWithDot?) indexOpt1?);
 indexOpt1                 : ISNOTQUAL | leftAngle indexOpt1h* RIGHTANGLE -> ^(ASTOPT1 indexOpt1h*);							
-indexOpt1h                : MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)	;
+indexOpt1h                : MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)	
+						  |	BANK (EQUAL yesNo)? -> ^(ASTOPT_STRING_BANK yesNo?)	
+						  ;
 
 ini						  : INI -> ^({token("ASTINI", ASTINI, $INI.Line)});
 

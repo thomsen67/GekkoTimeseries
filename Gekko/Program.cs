@@ -9284,7 +9284,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Did not expect more than 1 colon (':')");
+                G.Writeln2("*** ERROR: Did not expect more than 1 colon in '" + input + "'");
                 throw new GekkoException();
             }
             if (h.bank.Contains("*") || h.bank.Contains("?"))

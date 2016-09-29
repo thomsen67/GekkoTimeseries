@@ -3615,22 +3615,32 @@ namespace Gekko
         {
             public string name = null;
             public string opt_mute = null;
+            public string opt_bank = null;
             //public string listFile = null; //make it work
             public string wildCard1 = null; //--> delete??
             public string wildCard2 = null;  //only active if range   //--> delete??
             public List<string> listItems = null;
             public void Exe()
             {
-                List<string> names = new List<string>();               
+                bool bank = false; if (G.equal(this.opt_bank, "yes")) bank = true;
+                List<string> names = new List<string>();
 
-                foreach(string s in this.listItems)
+                foreach (string s in this.listItems)
                 {
                     List<BankNameVersion> xx = Program.GetInfoFromStringWildcard(s, null);  //could use .from or .bank here!!!!
-                    foreach(BankNameVersion bnv in xx)
+                    foreach (BankNameVersion bnv in xx)
                     {
-                        if (bnv.name != null) names.Add(bnv.name);  //probably would never be null. Culd have option to keep banknames!!!!!!
+                        if (bnv.name == null || bnv.name == "") continue;  //probably would never happen
+                        if (bank)
+                        {
+                            names.Add(bnv.bank + Globals.symbolBankColon + bnv.name);
+                        }
+                        else
+                        {
+                            names.Add(bnv.name);  //probably would never be null. Culd have option to keep banknames!!!!!!
+                        }
                     }
-                }                
+                }             
 
                 if (!G.equal(this.opt_mute, "yes"))
                 {

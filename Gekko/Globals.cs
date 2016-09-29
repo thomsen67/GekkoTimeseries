@@ -163,6 +163,7 @@ namespace Gekko
 
         public static bool patch_zvar = true;
 
+        public const string symbolBankColon = ":";
         public const char symbolTilde = '~';
         public const char symbolList = '#';
         public const char symbolMemvar = '%';
