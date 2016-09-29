@@ -1023,9 +1023,13 @@ namespace Gekko
             if (h.bank == Globals.firstCheatString)
             {
                 h.bank = Program.databanks.GetFirst().aliasName;
-            }            
-            
-            if (bankNumber == 2) h.bank = Program.databanks.GetRef().aliasName;  //overrides the bank name given
+            }
+
+            if (bankNumber == 2)
+            {
+                h.bank = Program.databanks.GetRef().aliasName;  //overrides the bank name given
+                h.hasColon = true;  //signals later on that this bank is explicitely given, so we cannot search for the timeseries
+            }
             TimeSeries ts = Program.FindOrCreateTimeseries(h.bank, h.name, canAutoCreate, h.hasColon, false);
             MetaTimeSeries ats = new MetaTimeSeries(ts);
             return ats;
