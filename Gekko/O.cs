@@ -504,6 +504,7 @@ namespace Gekko
                     }
                 }
 
+                int colonCounter = 0;
                 for (int i = 0; i < s.Length; i++)
                 {
                     char c = s[i];
@@ -517,18 +518,28 @@ namespace Gekko
                         {
                             //ok
                         }
+                        else if(c.ToString() == Globals.symbolBankColon)
+                        {
+                            colonCounter++;
+                            if (colonCounter > 1)
+                            {
+                                //probably very rare, but we check here
+                                G.Writeln2("*** ERROR in list: at most 1 colon allowed: '" + s + "'");                                
+                                throw new GekkoException();
+                            }
+                        }
                         else
                         {
                             if (fileName == null)
                             {
                                 G.Writeln2("*** ERROR in <direct> list, item = '" + s + "'");
-                                G.Writeln("    Items should only contain numbers, digits, '_' (or start with '-').", Color.Red);
+                                G.Writeln("    Items should only contain numbers, digits, '_', ':' (or start with '-').", Color.Red);
                                 throw new GekkoException();
                             }
                             else
                             {
                                 G.Writeln2("*** ERROR in listfile '" + fileName + "', line [" + counter + "], item = '" + s + "'");
-                                G.Writeln("    Items should only contain numbers, digits, '_' (or start with '-').", Color.Red);
+                                G.Writeln("    Items should only contain numbers, digits, '_', ':' (or start with '-').", Color.Red);
                                 throw new GekkoException();
                             }
                         }
