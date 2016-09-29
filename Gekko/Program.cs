@@ -6816,7 +6816,7 @@ namespace Gekko
             G.Writeln();
 
             string label2 = G.ReplaceGlueNew(label);
-            label2 = ScalarString.SubstituteScalarsInString(label2, false);
+            label2 = ScalarString.SubstituteScalarsInString(label2, false, true);
             G.Writeln(label2);
             foreach (string s in xx)
             {
@@ -20624,7 +20624,7 @@ namespace Gekko
                 label = pe.subElements[subElementCounter].label;
             }
             label = G.ReplaceGlueNew(label);
-            label = ScalarString.SubstituteScalarsInString(label, false);
+            label = ScalarString.SubstituteScalarsInString(label, false, true);
             return label;
         }
 

@@ -3497,6 +3497,7 @@ namespace Gekko
             public string listSuffix = null;
             public string listStrip = null;
             public string listSort = null;
+            public string listTrim = null;
             public bool direct = false;
             public string rawfood = null;
             public P p = null;
@@ -3537,12 +3538,33 @@ namespace Gekko
                         //Case-insensitive replacing
                         this.listItems[i] = G.ReplaceString(this.listItems[i], listStrip, "", false);
                     }
-                }
+                }                
+
                 if (G.equal(listSort, "yes"))  //listSort = null is okay in G.equal()
                 {
                     //TODO: What about strings starting with "-"?
                     //TODO: What about æøå strings, what happens??
                     this.listItems.Sort(StringComparer.OrdinalIgnoreCase);
+                }
+
+                if (G.equal(listTrim, "yes"))  //listTrim = null is okay in G.equal()
+                {
+                    //Todo: if it has just been sorted, trimming is easy. But we do it the general way here.
+                    GekkoDictionary<string, bool> xx = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                    List<string> newList = new List<string>();
+                    foreach(string s in this.listItems)
+                    {
+                        if(xx.ContainsKey(s))
+                        {
+                            //ignore
+                        }
+                        else
+                        {
+                            newList.Add(s);
+                            xx.Add(s, true);
+                        }
+                    }
+                    this.listItems = newList;
                 }
 
                 Program.PutListIntoListOrListfile(this.listItems, this.name, this.listFile);

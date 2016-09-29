@@ -2013,6 +2013,11 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".listSort = O.GetString(" + node[0].Code + ");" + G.NL);
                         }
                         break;
+                    case "ASTLISTTRIM":
+                        {
+                            node.Code.A("o" + Num(node) + ".listTrim = O.GetString(" + node[0].Code + ");" + G.NL);
+                        }
+                        break;
                     case "ASTM":
                         {
                             node.Code.A(AddPrintCode("m", node[0].Code.ToString(), node.Parent.Parent.Text, node));

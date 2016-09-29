@@ -1466,7 +1466,13 @@ namespace Gekko
         private static void ListMultiplyHelper(List<string> x1, List<string> x2, List<string> intersection)
         {
             GekkoDictionary<string, bool> temp = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            foreach (string s in x1) temp.Add(s, true);
+            foreach (string s in x1)
+            {
+                if (!temp.ContainsKey(s))  //there can be dublets
+                {
+                    temp.Add(s, true);
+                }
+            }
             GekkoDictionary<string, bool> result = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             foreach (string s in x2)
             {

@@ -30,17 +30,12 @@ namespace Gekko
         {
             //for instance, for a #x variable that returns a string because of an implicit list loop. This string is indicated as being a name, not a string.
             if (s == null) s = "";  //for instance, a label or source from a timeseries that is null. If later search() or similar is used, it is better to use "" than null.
-            if (substitute) s = SubstituteScalarsInString(s);
+            if (substitute) s = SubstituteScalarsInString(s, true, false);
             _string2 = s;
             _isName = isName;
         }
 
-        public static string SubstituteScalarsInString(string s)
-        {
-            return SubstituteScalarsInString(s, true);
-        }
-
-        public static string SubstituteScalarsInString(string s, bool reportError)
+        public static string SubstituteScalarsInString(string s, bool reportError, bool avoidVal)
         {
             //UPDATE: also replaces $ and $%, for instance $n or $%n.
             //Will look for '%' and find alphanumeric + underscore after that, to construct a scalar name.
@@ -105,6 +100,7 @@ namespace Gekko
                                         }
                                     }
                                 }
+                                if (!avoidVal) valfail = false;  //overriding
                                 if (!valfail)
                                 {
                                     IVariable b = new ScalarString("");

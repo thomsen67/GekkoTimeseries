@@ -55,6 +55,7 @@ options {
 //Token definitions I
 tokens {
     ASTLIBRARY;
+	ASTLISTTRIM;
 	ASTPRTUSING;
 	ASTOR;
 	ASTAND;
@@ -573,6 +574,7 @@ tokens {
     ASTYMIN;
     ASTZERO;
 
+	TRIM = 'TRIM';
     USING = 'USING';
 	A= 'A'               ;
 	DEFAULT = 'DEFAULT';
@@ -1018,6 +1020,7 @@ tokens {
                                 public static System.Collections.Generic.Dictionary<string, int> GetKw()
                                 {
                                         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+										d.Add("TRIM"    ,   TRIM     );
 										d.Add("USING"    ,   USING     );
 										d.Add("ERROR"    ,   ERROR     );
 										d.Add("_ABS"    ,   UABS     );
@@ -1757,7 +1760,7 @@ itershow				  : ITERSHOW  (leftAngle dates? RIGHTANGLE)? listItems -> ^({token("
 
 library                   : LIBRARY ident -> ^({token("ASTLIBRARY", ASTLIBRARY, $LIBRARY.Line)} ident);  //must keep the name simple, since the file is grabbed at parse time, in contrast to the RUN command
 
-list					  :	LIST listOpt1? listNameHelper EQUAL listItems prefix? suffix? strip? sort? -> ^({token("ASTLIST¤"+($listItems.text)+"¤",  ASTLIST, $LIST.Line)} listNameHelper listItems listOpt1? prefix? suffix? strip? sort? )
+list					  :	LIST listOpt1? listNameHelper EQUAL listItems prefix? suffix? strip? sort? trim? -> ^({token("ASTLIST¤"+($listItems.text)+"¤",  ASTLIST, $LIST.Line)} listNameHelper listItems listOpt1? prefix? suffix? strip? sort? trim? )
 		                  | LIST question hashNoGlue GLUE ident -> ^({token("ASTLIST",  ASTLIST, $LIST.Line)} question ident)
 						  | LIST question -> ^({token("ASTLIST",  ASTLIST, $LIST.Line)} question)						
 						  ;
@@ -2213,6 +2216,10 @@ strip					  : STRIP '=' listItem -> ^(ASTLISTSTRIP listItem);
 
 sort					  : SORT '=' expression -> ^(ASTLISTSORT expression)
 						  | SORT -> ^(ASTLISTSORT ^(ASTSTRINGINQUOTES 'yes'))
+						  ;
+
+trim 					  : TRIM '=' expression -> ^(ASTLISTTRIM expression)
+						  | TRIM -> ^(ASTLISTTRIM ^(ASTSTRINGINQUOTES 'yes'))
 						  ;
 
 listItems                 : listItem (COMMA2 listItem)*                   -> ^(ASTLISTITEMS (^(ASTLISTITEM listItem))+);   //puts in o.listItems
@@ -2847,6 +2854,7 @@ doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 
 ident                     : Ident|
 							USING|
+							TRIM|
 							ERROR|
                             ABS|
 							DEFAULT|
