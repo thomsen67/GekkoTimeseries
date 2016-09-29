@@ -3503,18 +3503,18 @@ namespace Gekko
             public void Exe()
             {
                 if (this.direct)
-                {                    
+                {
                     //Here, we get the elements from the raw text ('rawfood'), and handle them a bit like
                     //listfiles, #(listfile ...).
                     //If needed, LIST<direct> could be made more general, allowing all sorts of characters.
                     List<string> input = new List<string>();
                     string[] ss = rawfood.Split(',');
-                    input.AddRange(ss);                    
+                    input.AddRange(ss);
                     List<string> result = new List<string>();
                     GetRawListElements(null, input, result);
                     this.listItems = result;
                 }
-                
+
                 if (listPrefix != null)
                 {
                     for (int i = 0; i < this.listItems.Count; i++)
@@ -3545,51 +3545,15 @@ namespace Gekko
                     this.listItems.Sort(StringComparer.OrdinalIgnoreCase);
                 }
 
-                List<string> newList = new List<string>();
+                Program.PutListIntoListOrListfile(this.listItems, this.name, this.listFile);
 
-                if (this.name != null && this.listFile == null)
-                {                    
-                    newList = Program.CreateNewList(this.listItems, this.name);
-                }
-                else if (this.name == null && this.listFile != null)
-                {
-                    string file = this.listFile;
-                    file = Program.AddExtension(file, "." + "lst");
-                    string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(file, null);
-                    using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
-                    using (StreamWriter res = G.GekkoStreamWriter(fs))
-                    {
-                        foreach (string s in this.listItems)
-                        {
-                            res.WriteLine(s);
-                        }
-                        res.Flush();
-                        res.Close();
-                    }
-                }
-                else throw new GekkoException();
-
-                //Remove null element, if only one (used for "LIST xx = null")                
-                for (int i = 0; i < newList.Count; i++)
-                {
-                    if (G.equal(newList[i], "null"))
-                    {
-                        if (newList.Count == 1)
-                        {
-                            newList.Clear();  //remove the null element
-                        }
-                        else
-                        {
-                            G.Writeln2("*** ERROR: Null element is only allowed if it is the first and only list element");
-                            throw new GekkoException();
-                        }
-                    }
-                }
                 if (this.p.IsSimple())
                 {
                     G.Write2("Created 1 list from " + this.listItems.Count + " elements "); G.ServiceMessage();
                 }
-            }            
+            }
+
+            
 
             public static void Q(string s)
             {
@@ -3631,6 +3595,7 @@ namespace Gekko
             public string wildCard1 = null; //--> delete??
             public string wildCard2 = null;  //only active if range   //--> delete??
             public List<string> listItems = null;
+            public string listFile = null;
             public void Exe()
             {
                 bool bank = false; if (G.equal(this.opt_bank, "yes")) bank = true;
@@ -3651,7 +3616,7 @@ namespace Gekko
                             names.Add(bnv.name);  //probably would never be null. Culd have option to keep banknames!!!!!!
                         }
                     }
-                }             
+                }
 
                 if (!G.equal(this.opt_mute, "yes"))
                 {
@@ -3661,12 +3626,22 @@ namespace Gekko
                         G.Writeln(G.GetListWithCommas(names));
                     }
                 }
-                if (name == null) G.Writeln2("Found " + names.Count + " matching items");
+
+                if (name != null)
+                {
+                    Program.PutListIntoListOrListfile(names, this.name, this.listFile);
+                    G.Writeln2("Put " + names.Count + " matching items into list #" + name);
+                }
+                else if (listFile != null)
+                {
+                    Program.PutListIntoListOrListfile(names, this.name, this.listFile);
+                    G.Writeln2("Put " + names.Count + " matching items into external file " + Program.AddExtension(listFile, "." + "lst"));
+                }
                 else
                 {
-                    Program.CreateNewList(names, this.name);
-                    G.Writeln2("Put " + names.Count + " matching items into list #" + name);                    
-                }
+                    G.Writeln2("Found " + names.Count + " matching items");
+                }              
+                
             }
         }
 

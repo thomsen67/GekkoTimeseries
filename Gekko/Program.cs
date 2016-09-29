@@ -9323,6 +9323,60 @@ namespace Gekko
             return h;
         }
 
+        public static void PutListIntoListOrListfile(List<string> listItems, string name, string listFile)
+        {
+            List<string> newList = new List<string>();
+
+            if (name != null && listFile == null)
+            {
+                newList = Program.CreateNewList(listItems, name);
+            }
+            else if (name == null && listFile != null)
+            {
+                string file = listFile;
+                Program.WriteExternalListFile(file, listItems);
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Unexpected error #87230944 related to list name/listfile");
+                throw new GekkoException();
+            }
+
+            //Remove null element, if only one (used for "LIST xx = null")                
+            for (int i = 0; i < newList.Count; i++)
+            {
+                if (G.equal(newList[i], "null"))
+                {
+                    if (newList.Count == 1)
+                    {
+                        newList.Clear();  //remove the null element
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Null element is only allowed if it is the first and only list element");
+                        throw new GekkoException();
+                    }
+                }
+            }
+        }
+
+        public static void WriteExternalListFile(string file, List<string> listItems)
+        {
+
+            file = Program.AddExtension(file, "." + "lst");
+            string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(file, null);
+            using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter res = G.GekkoStreamWriter(fs))
+            {
+                foreach (string s in listItems)
+                {
+                    res.WriteLine(s);
+                }
+                res.Flush();
+                res.Close();
+            }
+        }
+
 
         public static string HandleOneLiners(string text)
         {

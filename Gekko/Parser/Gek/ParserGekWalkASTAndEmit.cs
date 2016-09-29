@@ -1717,17 +1717,21 @@ namespace Gekko.Parser.Gek
                         }
                         break;                        
                     case "ASTINDEX":  //the INDEX command
-                        {
-                            //TODO: handle listfile                        
+                        {                                               
                             node.Code.A("O.Index o" + Num(node) + " = new O.Index();" + G.NL);
-                            if (node[1].ChildrenCount() > 0)  //we have a name given
-                            {
-                                node.Code.A("o" + Num(node) + ".name = O.GetString(" + node[1][0].Code + ");" + G.NL);
-                            }
-                            else
-                            {
-                                node.Code.A("o" + Num(node) + ".name = null;");  //just show the result
-                            }
+
+                            string nodeCode = "";
+                            if (node[1][0] != null) nodeCode = HandleListFile(node[1], nodeCode);
+                            node.Code.A(nodeCode);
+
+                            //if (node[1].ChildrenCount() > 0)  //we have a name given
+                            //{
+                            //    node.Code.A("o" + Num(node) + ".name = O.GetString(" + node[1][0].Code + ");" + G.NL);
+                            //}
+                            //else
+                            //{
+                            //    node.Code.A("o" + Num(node) + ".name = null;");  //just show the result
+                            //}
                             //node.Code.A("o" + Num(node) + ".listItems = O.GetList(" + node[0].Code + ");" + G.NL);
                             node.Code.A(node[0].Code);
                             if (node[2] != null) node.Code.A(node[2].Code);
@@ -3515,14 +3519,7 @@ namespace Gekko.Parser.Gek
         {
             string nodeCode = null;
             nodeCode += "O.List o" + Num(node) + " = new O.List();" + G.NL;
-            if (node[0].Text == "ASTLISTFILE")
-            {
-                nodeCode += "o" + Num(node) + ".listFile = O.GetString(" + node[0].Code + ");" + G.NL;
-            }
-            else
-            {
-                nodeCode += "o" + Num(node) + ".name = O.GetString(" + node[0].Code + ");" + G.NL;
-            }
+            nodeCode = HandleListFile(node, nodeCode);
             nodeCode += "o" + Num(node) + ".listItems = new List<string>();" + G.NL;
             nodeCode += "o" + Num(node) + ".p = p;" + G.NL;
 
@@ -3546,8 +3543,22 @@ namespace Gekko.Parser.Gek
                 nodeCode += childCode;
             }
             nodeCode += extraCode;
-            
+
             nodeCode += "o" + Num(node) + ".Exe();" + G.NL;
+            return nodeCode;
+        }
+
+        private static string HandleListFile(ASTNode node, string nodeCode)
+        {
+            if (node[0].Text == "ASTLISTFILE")
+            {
+                nodeCode += "o" + Num(node) + ".listFile = O.GetString(" + node[0].Code + ");" + G.NL;
+            }
+            else
+            {
+                nodeCode += "o" + Num(node) + ".name = O.GetString(" + node[0].Code + ");" + G.NL;
+            }
+
             return nodeCode;
         }
 
