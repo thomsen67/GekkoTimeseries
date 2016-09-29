@@ -507,7 +507,7 @@ namespace Gekko
                 int colonCounter = 0;
                 for (int i = 0; i < s.Length; i++)
                 {
-                    char c = s[i];
+                    char c = s[i]; 
                     if (i == 0 && (c == '-'))  //starting with # not considered ok, only simple elements (perhaps with minus) allowed
                     {
                         //ok
