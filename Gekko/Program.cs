@@ -11349,9 +11349,13 @@ namespace Gekko
 
             foreach (string listItem in list)
             {
+                //one listitem could be obk:fx*, fy, #m, obk:#m, @fy
                 List<BankNameVersion> xx = Program.GetInfoFromStringWildcard(listItem, null, false);  //could use .from or .bank here!!!!
                 foreach (BankNameVersion bnv in xx)
                 {
+                    //any wildcards are folded out, so obk:fx*
+                    //could become obk:fxa, obk:fxb, obk:fxnz
+                    //If option databank search = yes, a variable like fy could become work:fy, obk:fy, adbk:fy, ...
                     if (Globals.threadIsInProcessOfAborting) throw new GekkoException();
                     string var2 = bnv.name;
                     string var = G.GetUpperLowerCase(var2);

@@ -1185,6 +1185,9 @@ namespace Gekko
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+
+            //MessageBox.Show(e.CloseReason.ToString() + " " + Globals.applicationIsInProcessOfAborting.ToString());
+
             if (e.CloseReason == CloseReason.UserClosing || (e.CloseReason == CloseReason.ApplicationExitCall && !Globals.applicationIsInProcessOfAborting))  //Globals.applicationIsInProcessOfAborting is issued with an EXIT command
             {
                 
