@@ -18218,7 +18218,7 @@ namespace Gekko
             CrossThreadStuff.Cls(tab);
         }
 
-        public static void XmlTable(string filename, string type, string window, P p)
+        public static void XmlTable(string filename, string html, string window, P p)
         {
 
             string tempfile = Globals.localTempFilesLocation + "\\" + "tablecode." + Globals.defaultCommandFileExtension;
@@ -18270,18 +18270,22 @@ namespace Gekko
                 HandleXmlRow(xh, row);
             }
 
+            bool isHtml = false;
+            if (G.equal(Program.options.table_type, "html")) isHtml = true;
+            if (G.equal(html, "yes")) isHtml = true;  //overrides if 'yes'
+
             StringBuilder s3 = new StringBuilder();
-            if (G.equal(type, "html") && !G.equal(window,"main"))
+            if (isHtml && !G.equal(window, "main"))
             {
                 s3.AppendLine("TABLE tab.Print('html');");
             }
-            else if (G.equal(type, "html") && G.equal(window,"main"))
+            else if (isHtml && G.equal(window, "main"))
             {
                 s3.AppendLine("TABLE tab.Print('html_main');");
             }
             else
             {
-                //This will catch '' or 'txt' or 'txt_main' (or even '_main')
+                //This will catch other cases, that is, txt
                 s3.AppendLine("TABLE tab.Print();");
             }
 

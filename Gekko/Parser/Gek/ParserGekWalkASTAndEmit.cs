@@ -2467,7 +2467,7 @@ namespace Gekko.Parser.Gek
                         {
                             if (node.ChildrenCount() > 1)
                             {
-                                node.Code.A("Program.PrintTable(Program.GetTable(O.GetString(" + node[0].Code + ")), O.GetString(" + node[1].Code + ");" + G.NL);
+                                node.Code.A("Program.PrintTable(Program.GetTable(O.GetString(" + node[0].Code + ")), O.GetString(" + node[1].Code + "));" + G.NL);
                             }
                             else
                             {
@@ -3319,6 +3319,11 @@ namespace Gekko.Parser.Gek
                     case "ASTTOTAL":
                         {
                             node.Code.A("new ScalarString(`total`)");
+                        }
+                        break;
+                    case "ASTTABLEMAIN":
+                        {
+                            node.Code.A("new ScalarString(`main`)");
                         }
                         break;
                     case "ASTWILDCARD":

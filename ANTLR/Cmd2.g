@@ -55,6 +55,7 @@ options {
 //Token definitions I
 tokens {
     ASTLIBRARY;
+	ASTTABLEMAIN;
 	ASTLISTTRIM;
 	ASTPRTUSING;
 	ASTOR;
@@ -1975,7 +1976,7 @@ tableOpt1                 : ISNOTQUAL
                           ;
 
 tableOpt1h                : HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
-						  | WINDOW (EQUAL yesNo)? -> ^(ASTOPT_STRING_WINDOW yesNo?)						
+						  | WINDOW EQUAL MAIN -> ^(ASTOPT_STRING_WINDOW ASTTABLEMAIN)						
   						  | optOld  //printcodes						
 						  ;
 
