@@ -1560,19 +1560,7 @@ namespace Gekko.Parser.Gek
                     case "ASTMATRIXINDEXER":
                         {
                             //MATRIX a[3, 5] = ...
-                            ASTNode nodeLeftSide = node[0];
-                            if (nodeLeftSide.nameSimpleIdent != null)
-                            {
-                                AstListHelper(nodeLeftSide, w, nodeLeftSide.nameSimpleIdent, false);
-                            }
-                            else throw new GekkoException();
-
-                            node.Code.A("O.GetMatrix(" + nodeLeftSide.Code + ").SetData(" + node[1].Code + ", " + node[2].Code + ", " + node[3].Code + ");" + G.NL);
-
-                            //node.Code.A("O.GetMatrix(new ScalarString(`" + nodeLeftSide.nameSimpleIdent + "`)).SetData(" + node[1].Code + ", " + node[2].Code + ", " + node[3].Code + ");" + G.NL;
-
-                            //node.Code.A("O.SetMatrixData(new ScalarString(`" + nodeLeftSide.nameSimpleIdent + "`), " + node[1].Code + ");" + G.NL;
-
+                            node.Code.A("O.GetMatrixFromString(" + node[0].Code + ").SetData(" + node[1].Code + ", " + node[2].Code + ", " + node[3].Code + ");" + G.NL);
                         }
                         break;
                     case "ASTMATRIX":
@@ -1594,13 +1582,8 @@ namespace Gekko.Parser.Gek
                             }
                             else
                             {
-                                ASTNode nodeLeftSide = node[0];
-                                if (nodeLeftSide.nameSimpleIdent != null)
-                                {
-                                    AstListHelper(nodeLeftSide, w, nodeLeftSide.nameSimpleIdent, false);
-                                }
-                                else throw new GekkoException();                                
-                                node.Code.A("O.SetMatrixData(new ScalarString(`" + nodeLeftSide.nameSimpleIdent + "`), " + node[1].Code + ");" + G.NL);
+                                //could use node[0].simpleIdent to speed up...?
+                                node.Code.A("O.SetMatrixData(" + node[0].Code + ", " + node[1].Code + ");" + G.NL);
                             }
                         }
                         break;

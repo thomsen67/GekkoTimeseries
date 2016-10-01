@@ -1773,8 +1773,8 @@ listOpt1h                 : DIRECT -> ASTDIRECT
 lock_                     : LOCK_ ident -> ^({token("ASTLOCK", ASTLOCK, $LOCK_.Line)} ident);
 unlock_                   : UNLOCK_ ident -> ^({token("ASTUNLOCK", ASTUNLOCK, $UNLOCK_.Line)} ident);
 
-matrix                    : matrixHelper name leftBracketGlue expression ',' expression RIGHTBRACKET EQUAL expression -> ^({token("ASTMATRIXINDEXER", ASTMATRIXINDEXER, $EQUAL.Line)} name expression expression expression)
-                          | matrixHelper name EQUAL expression -> ^({token("ASTMATRIX", ASTMATRIX, $EQUAL.Line)} name expression)
+matrix                    : matrixHelper nameWithDot leftBracketGlue expression ',' expression RIGHTBRACKET EQUAL expression -> ^({token("ASTMATRIXINDEXER", ASTMATRIXINDEXER, $EQUAL.Line)} nameWithDot expression expression expression)
+                          | matrixHelper nameWithDot EQUAL expression -> ^({token("ASTMATRIX", ASTMATRIX, $EQUAL.Line)} nameWithDot expression)
 						  | matrixHelper question hashNoGlue GLUE ident -> ^(ASTMATRIX question ident)
 						  | matrixHelper question -> ^(ASTMATRIX question)						  						
 						  ;

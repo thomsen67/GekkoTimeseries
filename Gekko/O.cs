@@ -261,12 +261,12 @@ namespace Gekko
 
         public static Matrix SetMatrixData(IVariable name, IVariable rhs)
         {
-            //????????? search for O.SetMatrixFromCache(), should this be used
-
             //Returns the IVariable it finds here (or creates)
-            string name2 = name.GetString();
+            
             Matrix value = O.GetMatrix(rhs);
             IVariable lhs = null;
+
+            string name2 = name.GetString();
             if (Program.scalars.TryGetValue(Globals.symbolList + name2, out lhs))
             {
                 //Scalar is already existing                
@@ -1269,6 +1269,32 @@ namespace Gekko
             return a.GetList();
         }
 
+        public static Matrix GetMatrixFromString(IVariable name)
+        {
+            string name2 = name.GetString();
+            IVariable lhs = null;            
+            if (Program.scalars.TryGetValue(Globals.symbolList + name2, out lhs))
+            {
+                //Scalar is already existing                
+                if (lhs.Type() == EVariableType.Matrix)
+                {
+                    //fine
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: " + Globals.symbolList + name2 + " is not a matrix");
+                    throw new GekkoException();
+                }
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: " + Globals.symbolList + name2 + " could not be found");
+                throw new GekkoException();
+            }
+            return (Matrix)lhs;
+        }
+
+
         public static Matrix GetMatrix(IVariable a)
         {
             //O.GetListFromCache(
@@ -1279,8 +1305,8 @@ namespace Gekko
             }
             Matrix m = (Matrix)a;
             return m;            
-        }        
-
+        }
+        
         public static double[,] MultiplyMatrixScalar(double[,] a, double b, int m, int k)
         {
             double[,] c = new double[m, k];

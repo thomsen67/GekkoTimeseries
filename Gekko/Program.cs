@@ -12003,15 +12003,24 @@ namespace Gekko
         {
             if (type.StartsWith("?"))
             {
-
+                if (type != "?" && type != "?_show_all_lists")
                 {
-                    if (type != "?" && type != "?_show_all_lists")
+                    //is a click on a system list: show it in output tab
+                    try
                     {
-                        //is a click on a system list: show it in output tab
-                        try
+                        string m = type.Substring(2);
+                        List<string> a1 = O.GetMetaList(Program.scalars[Globals.symbolList + m]).list;
+                        bool showList = true;
+                        if (a1.Count > 5000)
                         {
-                            string m = type.Substring(2);
-                            List<string> a1 = O.GetMetaList(Program.scalars[Globals.symbolList + m]).list;
+                            DialogResult result = MessageBox.Show("Note: showing lists with more than 5000 items tends to freeze the \noutput tab. You may use \"list listfile " + m + " = #" + m + ";\" to put the list into an\nexternal file " + m + ".lst. \nProceed anyway?", "Show list", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);
+                            if (result != DialogResult.Yes)
+                            {
+                                showList = false;
+                            }
+                        }
+                        if (showList)
+                        {
                             Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
                             Program.Cls("output");
                             //run in thread ideally
@@ -12020,95 +12029,91 @@ namespace Gekko
                                 G.Writeln(s, ETabs.Output);
                             }
                         }
-                        catch
-                        {
-                            G.Writeln2("*** ERROR: Failed to show list");
-                            throw new GekkoException();
-                        }
-
                     }
-                    else
+                    catch
                     {
-
-                        bool hasLargeModel = IsLargeModel();
-
-                        List<string> a4 = new List<string>();
-
-                        foreach (KeyValuePair<string, IVariable> kvp in Program.scalars)
+                        G.Writeln2("*** ERROR: Failed to show list");
+                        throw new GekkoException();
+                    }
+                }
+                else
+                {
+                    bool hasLargeModel = IsLargeModel();
+                    List<string> a4 = new List<string>();
+                    foreach (KeyValuePair<string, IVariable> kvp in Program.scalars)
+                    {
+                        if (kvp.Value.Type() == EVariableType.List)
                         {
-                            if (kvp.Value.Type() == EVariableType.List)
+                            string s = kvp.Key.Substring(1);
+                            a4.Add(s);
+                        }
+                    }
+
+                    a4.Sort(StringComparer.InvariantCultureIgnoreCase);  //invariant is better for sorting than ordinal
+
+                    List<string> user = new List<string>();
+                    List<string> system = new List<string>();
+                    foreach (string m in a4)
+                    {
+                        if (
+                        G.equal(m, "exod") ||
+                        G.equal(m, "exoj") ||
+                        G.equal(m, "exoz") ||
+                        G.equal(m, "exodjz") ||
+                        G.equal(m, "exo") ||
+                        G.equal(m, "exotrue") ||
+                        G.equal(m, "endo") ||
+                        G.equal(m, "all"))
+                        {
+                            system.Add(m);
+                        }
+                        else
+                        {
+                            user.Add(m);
+                        }
+                    }
+
+                    int count = a4.Count;
+
+                    if (type == "?")
+                    {
+                        G.Writeln();
+                        G.Write("There are " + user.Count + " user lists and " + system.Count + " model lists.");                        
+                        if (system.Count > 0)
+                        {
+                            G.Write(" Click ");
+                            G.WriteLink("here", "list:?_show_all_lists");
+                            G.Write(" to see model lists.");
+                        }
+                        G.Writeln();
+                        if (user.Count > 0)
+                        {
+                            foreach (string m in user)
                             {
-                                string s = kvp.Key.Substring(1);
-                                a4.Add(s);
+                                WriteListItems(m);
                             }
                         }
-
-                        a4.Sort(StringComparer.InvariantCultureIgnoreCase);  //invariant is better for sorting than ordinal
-
-                        List<string> user = new List<string>();
-                        List<string> system = new List<string>();
-                        foreach (string m in a4)
+                    }
+                    else //must be ?_show_all_lists, because ?_mylist returns above.
+                    {
+                        if (hasLargeModel) G.Writeln();
+                        foreach (string m in system)
                         {
-                            if (
-                            G.equal(m, "exod") ||
-                            G.equal(m, "exoj") ||
-                            G.equal(m, "exoz") ||
-                            G.equal(m, "exodjz") ||
-                            G.equal(m, "exo") ||
-                            G.equal(m, "exotrue") ||
-                            G.equal(m, "endo") ||
-                            G.equal(m, "all"))
+                            if (hasLargeModel)
                             {
-                                system.Add(m);
+                                List<string> a1 = O.GetMetaList(Program.scalars[Globals.symbolList + m]).list;
+                                //G.Write("#" + m + " (" + a1.Count + ") = ["); G.WriteLink("more", "list:?_" + m); G.Writeln("]");
+                                G.Write("list #" + m + " = ["); G.WriteLink("show", "list:?_" + m); G.Writeln("]  (" + a1.Count + " elements from '" + a1[0] + "' to '" + a1[a1.Count - 1] + "')");
+                                G.Writeln();
                             }
                             else
                             {
-                                user.Add(m);
-                            }
-                        }
-
-                        int count = a4.Count;
-
-                        if (type == "?")
-                        {
-                            G.Writeln();
-                            G.Write("There are " + user.Count + " user lists and " + system.Count + " model lists.");
-                            //if (user.Count > 0) G.Write("User lists are shown below. ");
-                            if (system.Count > 0)
-                            {
-                                G.Write(" Click ");
-                                G.WriteLink("here", "list:?_show_all_lists");
-                                G.Write(" to see model lists.");
-                            }
-                            G.Writeln();
-                            if (user.Count > 0)
-                            {
-                                foreach (string m in user)
-                                {
-                                    WriteListItems(m);
-                                }
-                            }
-                        }
-                        else //must be ?_show_all_lists, because ?_mylist returns above.
-                        {
-                            if (hasLargeModel) G.Writeln();
-                            foreach (string m in system)
-                            {
-                                if (hasLargeModel)
-                                {
-
-                                    List<string> a1 = O.GetMetaList(Program.scalars[Globals.symbolList + m]).list;
-                                    G.Write("#" + m + " (" + a1.Count + ") = ["); G.WriteLink("more", "list:?_" + m); G.Writeln("]");
-                                    G.Writeln();
-                                }
-                                else
-                                {
-                                    WriteListItems(m);
-                                }
+                                WriteListItems(m);
                             }
                         }
                     }
                 }
+
             }  //end of if startswith("?")
             else
             {
@@ -12139,7 +12144,7 @@ namespace Gekko
                     else
                     {
 
-                        if (Program.scalars.ContainsKey(Globals.symbolList+leftSide))
+                        if (Program.scalars.ContainsKey(Globals.symbolList + leftSide))
                         {
                             Program.scalars.Remove(Globals.symbolList + leftSide);
                         }
@@ -12148,7 +12153,7 @@ namespace Gekko
                 }
                 else if (type == "-")
                 {
-                    if (Program.scalars.ContainsKey(Globals.symbolList+leftSide))
+                    if (Program.scalars.ContainsKey(Globals.symbolList + leftSide))
                     {
                         Program.scalars.Remove(Globals.symbolList + leftSide);
                         G.Writeln("List #" + leftSide + " removed");
@@ -12182,14 +12187,19 @@ namespace Gekko
                 throw new GekkoException();
             }
             List<string> a1 = O.GetMetaList(iv).list;
+
             if (a1.Count == 0)
             {
                 G.Writeln2("list #" + m + " = [null]");
             }
-            else
+            else if(a1.Count < 100)
             {
                 G.Writeln2("list #" + m + " = " + G.GetListWithCommas(a1) + "  (" + a1.Count + " elements)");
             }
+            else
+            {
+                G.Write2("list #" + m + " = ["); G.WriteLink("show", "list:?_" + m); G.Writeln("]  (" + a1.Count + " elements from '" + a1[0] + "' to '" + a1[a1.Count - 1] + "')");
+            }            
         }
 
         public static void GuiSetModelName()
