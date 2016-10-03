@@ -206,8 +206,15 @@ namespace Gekko
 
         public double GetVal(GekkoTime t)
         {
-            G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a matrix.");
-            G.Writeln("           Maybe you need an [x, y]-indexer on the matrix, for instance #a[2, 3]?");
+            if (this.data.GetLength(0) == 1 && this.data.GetLength(1) == 1)
+            {
+                return this.data[0, 0];
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a matrix.");
+                G.Writeln("           Maybe you need an [x, y]-indexer on the matrix, for instance #a[2, 3]?");
+            }
             throw new GekkoException();
         }        
 
@@ -441,6 +448,102 @@ namespace Gekko
             catch (IndexOutOfRangeException e)
             {
                 HandleIndexOutOfRange(x1, x2);
+                throw new GekkoException();
+            }
+        }
+
+        public IVariable SetData(IVariable x1, IVariablesFilterRange indexRange2, IVariable x3)
+        {
+            //Does not need to be so fast, so we use this trick
+            IVariablesFilterRange range = new Gekko.IVariablesFilterRange(x1, x1);
+            return this.SetData(range, indexRange2, x3);            
+        }
+
+        public IVariable SetData(IVariablesFilterRange indexRange1, IVariable x2, IVariable x3)
+        {
+            //Does not need to be so fast, so we use this trick
+            IVariablesFilterRange range = new Gekko.IVariablesFilterRange(x2, x2);
+            return this.SetData(indexRange1, range, x3);
+        }
+
+        public IVariable SetData(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, IVariable x3)
+        {
+            int i1 = 1;
+            int i2 = this.data.GetLength(0);
+            int j1 = 1;
+            int j2 = this.data.GetLength(1);
+            if (indexRange1.first != null) i1 = O.GetInt(indexRange1.first);
+            if (indexRange1.last != null) i2 = O.GetInt(indexRange1.last);
+            if (indexRange2.first != null) j1 = O.GetInt(indexRange2.first);
+            if (indexRange2.last != null) j2 = O.GetInt(indexRange2.last);
+            if (i1 > i2)
+            {
+                G.Writeln2("*** ERROR: Range " + i1 + ".." + i2 + " is descending");
+                throw new GekkoException();
+            }
+            if (j1 > j2)
+            {
+                G.Writeln2("*** ERROR: Range " + j1 + ".." + j2 + " is descending");
+                throw new GekkoException();
+            }
+
+            if (x3.Type() == EVariableType.Matrix)
+            {
+                Matrix m = (Matrix)x3;
+                int dimI = i2 - i1 + 1;
+                int dimJ = j2 - j1 + 1;
+                if(dimI != m.data.GetLength(0) || dimJ != m.data.GetLength(1))
+                {
+                    G.Writeln2("*** ERROR: Left-hand side selection is " + dimI + "x" + dimJ + ", but right-hand matrix is " + m.data.GetLength(0) + "x" + m.data.GetLength(1));
+                    throw new GekkoException();
+                }
+
+                try
+                {
+                    int ii1 = i1 - 1;
+                    int jj1 = j1 - 1;
+                    for (int i = i1 - 1; i <= i2 - 1; i++)
+                    {
+                        for (int j = j1 - 1; j <= j2 - 1; j++)
+                        {
+                            this.data[i, j] = m.data[i - ii1, j - jj1];
+                        }
+                    }
+                    return this;
+                }
+                catch (System.IndexOutOfRangeException e)  // CS0168
+                {
+                    G.Writeln("*** ERROR: Left-side index out of range: [" + i1 + " .. " + i2 + ", " + j1 + " .. " + j2 + " ]");
+                    if (i1 == 0 || i2 == 0 || j1 == 0 || j2 == 0) G.Writeln("           Please note that indicies are 1-based");
+                    throw new GekkoException();
+                }
+            }
+            else if(x3.Type() == EVariableType.Val)
+            {
+                ScalarVal v = (ScalarVal)x3;
+                try
+                {
+                    int ii1 = i1 - 1;
+                    int jj1 = j1 - 1;
+                    for (int i = i1 - 1; i <= i2 - 1; i++)
+                    {
+                        for (int j = j1 - 1; j <= j2 - 1; j++)
+                        {
+                            this.data[i, j] = v.val;
+                        }
+                    }
+                    return this;
+                }
+                catch (System.IndexOutOfRangeException e)  // CS0168
+                {
+                    G.Writeln("*** ERROR: Left-side index out of range: [" + i1 + " .. " + i2 + ", " + j1 + " .. " + j2 + " ]");
+                    if (i1 == 0 || i2 == 0 || j1 == 0 || j2 == 0) G.Writeln("           Please note that indicies are 1-based");
+                    throw new GekkoException();
+                }
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Expected right-hand side to be a matrix or a scalar");
                 throw new GekkoException();
             }
         }

@@ -12101,8 +12101,7 @@ namespace Gekko
                         {
                             if (hasLargeModel)
                             {
-                                List<string> a1 = O.GetMetaList(Program.scalars[Globals.symbolList + m]).list;
-                                //G.Write("#" + m + " (" + a1.Count + ") = ["); G.WriteLink("more", "list:?_" + m); G.Writeln("]");
+                                List<string> a1 = O.GetMetaList(Program.scalars[Globals.symbolList + m]).list;                                
                                 G.Write("list #" + m + " = ["); G.WriteLink("show", "list:?_" + m); G.Writeln("]  (" + a1.Count + " elements from '" + a1[0] + "' to '" + a1[a1.Count - 1] + "')");
                                 G.Writeln();
                             }

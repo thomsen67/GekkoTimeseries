@@ -419,6 +419,14 @@ namespace Gekko
         public static IVariable miss(GekkoTime t)
         {
             return new ScalarVal(double.NaN);
+        }       
+
+        public static IVariable miss(GekkoTime t, IVariable x1, IVariable x2)
+        {
+            int n1 = O.GetInt(x1);
+            int n2 = O.GetInt(x2);
+            Matrix m = new Matrix(n1, n2, double.NaN);
+            return m;
         }
 
         public static IVariable maxc(GekkoTime t, IVariable x)
