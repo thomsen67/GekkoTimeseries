@@ -7029,195 +7029,7 @@ namespace UnitTests
 
         [TestMethod]
         public void Test__Matrix()
-        {
-
-            // --- leftside indexer
-            I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[1..2, 1..2] = [10, 20 || 30, 40];");
-            AssertHelperMatrix("a", "rows", 3);
-            AssertHelperMatrix("a", "cols", 3);
-            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 20d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 30d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 40d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
-
-            I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[..2, ..2] = [10, 20 || 30, 40];");
-            AssertHelperMatrix("a", "rows", 3);
-            AssertHelperMatrix("a", "cols", 3);
-            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 20d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 30d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 40d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
-
-            I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[2..3, 1..2] = [10, 20 || 30, 40];");
-            AssertHelperMatrix("a", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 10d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 20d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 30d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 40d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
-
-            I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[1..2, 2..3] = [10, 20 || 30, 40];");
-            AssertHelperMatrix("a", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 10d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 20d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 30d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 40d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
-
-            I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[2..3, 2..3] = [10, 20 || 30, 40];");
-            AssertHelperMatrix("a", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 10d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 20d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 30d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 40d, sharedDelta);
-
-            I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[2.., 2..] = [10, 20 || 30, 40];");
-            AssertHelperMatrix("a", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 10d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 20d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 30d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 40d, sharedDelta);
-
-            I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[1..2, 1..2] = 100;");
-            AssertHelperMatrix("a", 1, 1, 100d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 100d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 100d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 100d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
-
-            I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[1..2, 1] = [10 || 30];");
-            AssertHelperMatrix("a", "rows", 3);
-            AssertHelperMatrix("a", "cols", 3);
-            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 30d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 5d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
-
-            I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[1, 1..2] = [10, 20];");
-            AssertHelperMatrix("a", "rows", 3);
-            AssertHelperMatrix("a", "cols", 3);
-            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 20d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 5d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
-
-            I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[1, 1] = [10];");
-            AssertHelperMatrix("a", "rows", 3);
-            AssertHelperMatrix("a", "cols", 3);
-            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 5d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
-
-            I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[1, 1] = 10;");
-            AssertHelperMatrix("a", "rows", 3);
-            AssertHelperMatrix("a", "cols", 3);
-            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 5d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
-
-            I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            FAIL("MATRIX a[1..2, 2..2] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[2..2, 1..2] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[2..1, 1..2] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[1..2, 2..1] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[0..1, 1..2] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[1..2, 0..1] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[3..4, 1..2] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[1..2, 3..4] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[1, 1..2] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[1..2, 1] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[1, 1] = [10, 20 || 30, 40];");
-
-
-
-            if (false)
-            {
-                AssertHelperMatrix("a", 1, 1, 1d, sharedDelta);
-                AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
-                AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-                AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
-                AssertHelperMatrix("a", 2, 2, 5d, sharedDelta);
-                AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
-                AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-                AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
-                AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
-
-            }
-
-
+        {                        
             I("RESET;");
             I("MATRIX a = miss(2,3);");
             I("MATRIX a[1, 1] = 1;");
@@ -7747,8 +7559,167 @@ namespace UnitTests
             AssertHelperMatrix("b", 2, 1, 1.6d, sharedDelta);
             AssertHelperMatrix("b", 2, 2, 7.8d, sharedDelta);
 
-            
-
+            // ---------------------------------------------
+            // --------- left-side indexer -----------------
+            // ---------------------------------------------
+                        
+            I("RESET;");
+            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
+            I("MATRIX a[1..2, 1..2] = [10, 20 || 30, 40];");
+            AssertHelperMatrix("a", "rows", 3);
+            AssertHelperMatrix("a", "cols", 3);
+            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
+            AssertHelperMatrix("a", 1, 2, 20d, sharedDelta);
+            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
+            AssertHelperMatrix("a", 2, 1, 30d, sharedDelta);
+            AssertHelperMatrix("a", 2, 2, 40d, sharedDelta);
+            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
+            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
+            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
+            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("RESET;");
+            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
+            I("MATRIX a[..2, ..2] = [10, 20 || 30, 40];");
+            AssertHelperMatrix("a", "rows", 3);
+            AssertHelperMatrix("a", "cols", 3);
+            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
+            AssertHelperMatrix("a", 1, 2, 20d, sharedDelta);
+            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
+            AssertHelperMatrix("a", 2, 1, 30d, sharedDelta);
+            AssertHelperMatrix("a", 2, 2, 40d, sharedDelta);
+            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
+            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
+            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
+            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("RESET;");
+            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
+            I("MATRIX a[2..3, 1..2] = [10, 20 || 30, 40];");
+            AssertHelperMatrix("a", 1, 1, 1d, sharedDelta);
+            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
+            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
+            AssertHelperMatrix("a", 2, 1, 10d, sharedDelta);
+            AssertHelperMatrix("a", 2, 2, 20d, sharedDelta);
+            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
+            AssertHelperMatrix("a", 3, 1, 30d, sharedDelta);
+            AssertHelperMatrix("a", 3, 2, 40d, sharedDelta);
+            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("RESET;");
+            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
+            I("MATRIX a[1..2, 2..3] = [10, 20 || 30, 40];");
+            AssertHelperMatrix("a", 1, 1, 1d, sharedDelta);
+            AssertHelperMatrix("a", 1, 2, 10d, sharedDelta);
+            AssertHelperMatrix("a", 1, 3, 20d, sharedDelta);
+            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
+            AssertHelperMatrix("a", 2, 2, 30d, sharedDelta);
+            AssertHelperMatrix("a", 2, 3, 40d, sharedDelta);
+            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
+            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
+            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("RESET;");
+            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
+            I("MATRIX a[2..3, 2..3] = [10, 20 || 30, 40];");
+            AssertHelperMatrix("a", 1, 1, 1d, sharedDelta);
+            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
+            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
+            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
+            AssertHelperMatrix("a", 2, 2, 10d, sharedDelta);
+            AssertHelperMatrix("a", 2, 3, 20d, sharedDelta);
+            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
+            AssertHelperMatrix("a", 3, 2, 30d, sharedDelta);
+            AssertHelperMatrix("a", 3, 3, 40d, sharedDelta);
+            I("RESET;");
+            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
+            I("MATRIX a[2.., 2..] = [10, 20 || 30, 40];");
+            AssertHelperMatrix("a", 1, 1, 1d, sharedDelta);
+            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
+            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
+            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
+            AssertHelperMatrix("a", 2, 2, 10d, sharedDelta);
+            AssertHelperMatrix("a", 2, 3, 20d, sharedDelta);
+            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
+            AssertHelperMatrix("a", 3, 2, 30d, sharedDelta);
+            AssertHelperMatrix("a", 3, 3, 40d, sharedDelta);
+            I("RESET;");
+            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
+            I("MATRIX a[1..2, 1..2] = 100;");
+            AssertHelperMatrix("a", 1, 1, 100d, sharedDelta);
+            AssertHelperMatrix("a", 1, 2, 100d, sharedDelta);
+            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
+            AssertHelperMatrix("a", 2, 1, 100d, sharedDelta);
+            AssertHelperMatrix("a", 2, 2, 100d, sharedDelta);
+            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
+            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
+            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
+            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("RESET;");
+            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
+            I("MATRIX a[1..2, 1] = [10 || 30];");
+            AssertHelperMatrix("a", "rows", 3);
+            AssertHelperMatrix("a", "cols", 3);
+            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
+            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
+            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
+            AssertHelperMatrix("a", 2, 1, 30d, sharedDelta);
+            AssertHelperMatrix("a", 2, 2, 5d, sharedDelta);
+            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
+            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
+            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
+            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("RESET;");
+            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
+            I("MATRIX a[1, 1..2] = [10, 20];");
+            AssertHelperMatrix("a", "rows", 3);
+            AssertHelperMatrix("a", "cols", 3);
+            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
+            AssertHelperMatrix("a", 1, 2, 20d, sharedDelta);
+            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
+            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
+            AssertHelperMatrix("a", 2, 2, 5d, sharedDelta);
+            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
+            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
+            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
+            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("RESET;");
+            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
+            I("MATRIX a[1, 1] = [10];");
+            AssertHelperMatrix("a", "rows", 3);
+            AssertHelperMatrix("a", "cols", 3);
+            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
+            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
+            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
+            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
+            AssertHelperMatrix("a", 2, 2, 5d, sharedDelta);
+            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
+            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
+            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
+            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("RESET;");
+            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
+            I("MATRIX a[1, 1] = 10;");
+            AssertHelperMatrix("a", "rows", 3);
+            AssertHelperMatrix("a", "cols", 3);
+            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
+            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
+            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
+            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
+            AssertHelperMatrix("a", 2, 2, 5d, sharedDelta);
+            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
+            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
+            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
+            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("RESET;");
+            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
+            FAIL("MATRIX a[1..2, 2..2] = [10, 20 || 30, 40];");
+            FAIL("MATRIX a[2..2, 1..2] = [10, 20 || 30, 40];");
+            FAIL("MATRIX a[2..1, 1..2] = [10, 20 || 30, 40];");
+            FAIL("MATRIX a[1..2, 2..1] = [10, 20 || 30, 40];");
+            FAIL("MATRIX a[0..1, 1..2] = [10, 20 || 30, 40];");
+            FAIL("MATRIX a[1..2, 0..1] = [10, 20 || 30, 40];");
+            FAIL("MATRIX a[3..4, 1..2] = [10, 20 || 30, 40];");
+            FAIL("MATRIX a[1..2, 3..4] = [10, 20 || 30, 40];");
+            FAIL("MATRIX a[1, 1..2] = [10, 20 || 30, 40];");
+            FAIL("MATRIX a[1..2, 1] = [10, 20 || 30, 40];");
+            FAIL("MATRIX a[1, 1] = [10, 20 || 30, 40];");
 
 
         }
