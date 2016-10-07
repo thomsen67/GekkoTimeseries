@@ -4121,6 +4121,32 @@ namespace Gekko
             }
         }
 
+        public class Collapse
+        {
+            public string b0 = null;
+            public string b1 = null;
+            public string v0 = null;
+            public string v1 = null;
+            public string type = null;            
+            public void Exe()
+            {
+                Program.Collapse(this.b1,this.v1, this.b0, this.v0, type);                
+            }
+        }
+
+        public class Interpolate
+        {
+            public string b0 = null;
+            public string b1 = null;
+            public string v0 = null;
+            public string v1 = null;
+            public string type = null;
+            public void Exe()
+            {
+                Program.Interpolate(this.b1, this.v1, this.b0, this.v0, type);
+            }
+        }
+
         public class Edit
         {
             public string fileName = null;

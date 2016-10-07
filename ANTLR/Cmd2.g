@@ -55,6 +55,7 @@ options {
 //Token definitions I
 tokens {
     ASTLIBRARY;
+	ASTINTERPOLATE;
 	ASTTABLEMAIN;
 	ASTLISTTRIM;
 	ASTPRTUSING;
@@ -575,6 +576,8 @@ tokens {
     ASTYMIN;
     ASTZERO;
 
+	INTERPOLATE = 'INTERPOLATE';
+	PRORATE = 'PRORATE';
 	TRIM = 'TRIM';
     USING = 'USING';
 	A= 'A'               ;
@@ -1021,6 +1024,8 @@ tokens {
                                 public static System.Collections.Generic.Dictionary<string, int> GetKw()
                                 {
                                         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+										d.Add("INTERPOLATE"    ,   INTERPOLATE     );
+										d.Add("PRORATE"    ,   PRORATE     );
 										d.Add("TRIM"    ,   TRIM     );
 										d.Add("USING"    ,   USING     );
 										d.Add("ERROR"    ,   ERROR     );
@@ -1489,6 +1494,7 @@ expr2                     :
 						  | if2						
                           | index          SEMICOLON!
 						  | ini            SEMICOLON!
+						  | interpolate    SEMICOLON!
 						  | itershow       SEMICOLON!
 						  | download       SEMICOLON!
 						  | library        SEMICOLON!
@@ -1589,9 +1595,13 @@ docOpt2h                  : LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expr
 						  | STAMP EQUAL expression -> ^(ASTOPT_STRING_STAMP expression)					
 						  ;
 
-collapse				  : COLLAPSE collapseHelper '=' collapseHelper collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, $COLLAPSE.Line)} collapseHelper collapseHelper collapseMethod?);
+collapse				  : COLLAPSE nameBankHelper '=' nameBankHelper collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, $COLLAPSE.Line)} nameBankHelper nameBankHelper collapseMethod?);
 collapseMethod			  : FIRST|LAST|AVG|TOTAL;
-collapseHelper 			  : name bankColon nameWithDot -> ^(ASTPLACEHOLDER name nameWithDot)
+
+interpolate				  : INTERPOLATE nameBankHelper '=' nameBankHelper interpolateMethod? -> ^({token("ASTINTERPOLATE", ASTINTERPOLATE, $INTERPOLATE.Line)} nameBankHelper nameBankHelper interpolateMethod?);
+interpolateMethod		  : REPEAT | PRORATE;
+
+nameBankHelper 			  : name bankColon nameWithDot -> ^(ASTPLACEHOLDER name nameWithDot)
 						  | AT GLUE nameWithDot ->  ^(ASTPLACEHOLDER ASTAT nameWithDot)
 						  | nameWithDot -> ^(ASTPLACEHOLDER ASTPLACEHOLDER nameWithDot)
 						  ;
@@ -2858,6 +2868,8 @@ doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 
 ident                     : Ident|
 							USING|
+							INTERPOLATE|
+							PRORATE|
 							TRIM|
 							ERROR|
                             ABS|

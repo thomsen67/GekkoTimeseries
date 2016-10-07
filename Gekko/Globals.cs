@@ -140,8 +140,12 @@ namespace Gekko
         
         public const string indexerAloneCheatString = "[<{THIS IS AN IndexerAlone CALL}>]";
         
-        public const string firstCheatString = "[FIRST]";        
-        
+        public const string firstCheatString = "[FIRST]";
+
+        public static int freqASubperiods = 1;
+        public static int freqQSubperiods = 4;
+        public static int freqMSubperiods = 12;
+
         public static bool fixReturnProblem = true;
 
         public static bool databanksAsProtobuffers = true;

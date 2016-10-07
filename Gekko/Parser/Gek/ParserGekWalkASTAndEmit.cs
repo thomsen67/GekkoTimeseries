@@ -446,30 +446,36 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTCOLLAPSE":
                         {
+                            node.Code.A("O.Collapse o" + Num(node) + " = new O.Collapse();" + G.NL);
                             string type = "null";
                             if (node.ChildrenCount() >= 3) type = "`" + node[2].Text + "`";
                             string b1 = node[0][0].Code.ToString(); if (b1 == null) b1 = "``";
                             string b0 = node[1][0].Code.ToString(); if (b0 == null) b0 = "``";
-                            node.Code.A("Program.Collapse(O.GetString(" + b1 + "), O.GetString(" + node[0][1].Code + "), O.GetString(" + b0 + "), O.GetString(" + node[1][1].Code + "), " + type + ");" + G.NL);
+
+                            node.Code.A("o" + Num(node) + ".b1 = O.GetString(" + b1 + ");" + G.NL);
+                            node.Code.A("o" + Num(node) + ".b0 = O.GetString(" + b0 + ");" + G.NL);
+                            node.Code.A("o" + Num(node) + ".v1 =  O.GetString(" + node[0][1].Code + ");" + G.NL);
+                            node.Code.A("o" + Num(node) + ".v0 =  O.GetString(" + node[1][1].Code + ");" + G.NL);
+                            node.Code.A("o" + Num(node) + ".type = " + type + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
                         break;
-                    //case "ASTCOPY":
-                    //    {
-                    //        node.Code.A("O.Copy o" + Num(node) + " = new O.Copy();" + G.NL;                                                        
-                    //        node.Code.A(node[0].Code;  //options
-                    //        node.Code.A("o" + Num(node) + ".listItems = new List<string>();" + G.NL;
-                    //        node.Code.A(node[1].Code;  //list1
-                    //        node.Code.A("o" + Num(node) + ".listItems1 = o" + Num(node) + ".listItems;" + G.NL;
-                    //        if (node.ChildrenCount() > 2)
-                    //        {
-                    //            node.Code.A("o" + Num(node) + ".listItems = new List<string>();" + G.NL;
-                    //            node.Code.A(node[2].Code;  //list2
-                    //            node.Code.A("o" + Num(node) + ".listItems2 = o" + Num(node) + ".listItems;" + G.NL;
-                    //        }
-                    //        node.Code.A("o" + Num(node) + ".Exe();" + G.NL;
-                    //    }
-                    //    break;
+                    case "ASTINTERPOLATE":
+                        {
+                            node.Code.A("O.Interpolate o" + Num(node) + " = new O.Interpolate();" + G.NL);
+                            string type = "null";
+                            if (node.ChildrenCount() >= 3) type = "`" + node[2].Text + "`";
+                            string b1 = node[0][0].Code.ToString(); if (b1 == null) b1 = "``";
+                            string b0 = node[1][0].Code.ToString(); if (b0 == null) b0 = "``";
 
+                            node.Code.A("o" + Num(node) + ".b1 = O.GetString(" + b1 + ");" + G.NL);
+                            node.Code.A("o" + Num(node) + ".b0 = O.GetString(" + b0 + ");" + G.NL);
+                            node.Code.A("o" + Num(node) + ".v1 =  O.GetString(" + node[0][1].Code + ");" + G.NL);
+                            node.Code.A("o" + Num(node) + ".v0 =  O.GetString(" + node[1][1].Code + ");" + G.NL);
+                            node.Code.A("o" + Num(node) + ".type = " + type + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
                     case "ASTDOC":
                         {
                             node.Code.A("O.Doc o" + Num(node) + " = new O.Doc();" + G.NL);

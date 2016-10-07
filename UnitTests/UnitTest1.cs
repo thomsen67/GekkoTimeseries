@@ -992,7 +992,7 @@ namespace UnitTests
             I("PRT [a*1];");
             I("PRT [*1];");
             I("PRT [1*];");  //seems it parses ok as a wildcard
-            FAIL("PRT [1*1];");  //should not be ok as a wildcard
+            I("PRT [1*1];");  //This is seen as a 1x1 matrix, which is auto-converted to VAL 1, so it prints 1!
             I("PRT [a*b*c];");
             I("PRT [*a*b*c];");
             I("PRT [a*b*c*];");
@@ -2911,8 +2911,7 @@ namespace UnitTests
         {
             //At the moment, a user defined function must reside either in the .gcm itself, and/or in an
             //LIBRARY statement that must be the first in the .gcm file.
-            //The file that is referenced to can only contain FUNCTIONS.
-            
+            //The file that is referenced to can only contain FUNCTIONS.            
 
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\UFunctions';");
             I("RESET;");
@@ -4644,10 +4643,130 @@ namespace UnitTests
         // ------------------------- older ----------------------
 
         [TestMethod]
-        public void Test__Collapse()
+        public void Test__Interpolate()
         {
-            Databank work = First();
-            I("RESET;");
+            // ================================
+            //        A to Q
+            // ================================
+
+            //also testing bank on rhs, implicitely also tests this for COLLAPSE
+            I("RESET; MODE data;");
+            I("OPTION freq a;");
+            I("TIME 2001 2005;");
+            I("SERIES @x = 1 5 3 m 10;");
+            I("INTERPOLATE x1.q = ref:x.a repeat;");
+            AssertHelper(First(), "x1", EFreq.Quarterly, 2000, 4, double.NaN, sharedDelta);
+            for (int i = 1; i <= 4; i++)
+            {
+                AssertHelper(First(), "x1", EFreq.Quarterly, 2001, i, 1d, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Quarterly, 2002, i, 5d, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Quarterly, 2003, i, 3d, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Quarterly, 2004, i, double.NaN, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Quarterly, 2005, i, 10d, sharedDelta);
+            }
+            AssertHelper(First(), "x1", EFreq.Quarterly, 2006, 1, double.NaN, sharedDelta);
+
+            //
+
+            //also testing bank on lhs, implicitely also tests this for COLLAPSE
+            I("RESET; MODE data;");
+            I("OPTION freq a;");
+            I("TIME 2001 2005;");
+            I("SERIES x = 1 5 3 m 10;");
+            I("INTERPOLATE ref:x1.q = x.a prorate;");
+            AssertHelper(Ref(), "x1", EFreq.Quarterly, 2000, 4, double.NaN, sharedDelta);
+            for (int i = 1; i <= 4; i++)
+            {
+                AssertHelper(Ref(), "x1", EFreq.Quarterly, 2001, i, 1d / 4d, sharedDelta);
+                AssertHelper(Ref(), "x1", EFreq.Quarterly, 2002, i, 5d / 4d, sharedDelta);
+                AssertHelper(Ref(), "x1", EFreq.Quarterly, 2003, i, 3d / 4d, sharedDelta);
+                AssertHelper(Ref(), "x1", EFreq.Quarterly, 2004, i, double.NaN, sharedDelta);
+                AssertHelper(Ref(), "x1", EFreq.Quarterly, 2005, i, 10d / 4d, sharedDelta);
+            }
+            AssertHelper(Ref(), "x1", EFreq.Quarterly, 2006, 1, double.NaN, sharedDelta);
+
+            // ================================
+            //        A to M
+            // ================================
+
+            I("RESET; MODE data;");
+            I("TIME 2001 2005;");
+            I("SERIES x = 1 5 3 m 10;");
+            I("OPTION freq m;");
+            I("INTERPOLATE x1 = x.a repeat;");  //the .m is removed on lhs
+            AssertHelper(First(), "x1", EFreq.Monthly, 2000, 4, double.NaN, sharedDelta);
+            for (int i = 1; i <= 12; i++)
+            {
+                AssertHelper(First(), "x1", EFreq.Monthly, 2001, i, 1d, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Monthly, 2002, i, 5d, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Monthly, 2003, i, 3d, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Monthly, 2004, i, double.NaN, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Monthly, 2005, i, 10d, sharedDelta);
+            }
+            AssertHelper(First(), "x1", EFreq.Monthly, 2006, 1, double.NaN, sharedDelta);
+
+            //
+
+            I("RESET; MODE data;");
+            I("OPTION freq a;");
+            I("TIME 2001 2005;");
+            I("SERIES x = 1 5 3 m 10;");
+            I("INTERPOLATE x1.m = x prorate;");  //the .a is removed on rhs
+            AssertHelper(First(), "x1", EFreq.Monthly, 2000, 4, double.NaN, sharedDelta);
+            for (int i = 1; i <= 12; i++)
+            {
+                AssertHelper(First(), "x1", EFreq.Monthly, 2001, i, 1d / 12d, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Monthly, 2002, i, 5d / 12d, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Monthly, 2003, i, 3d / 12d, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Monthly, 2004, i, double.NaN, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Monthly, 2005, i, 10d / 12d, sharedDelta);
+            }
+            AssertHelper(First(), "x1", EFreq.Monthly, 2006, 1, double.NaN, sharedDelta);
+
+
+            // ================================
+            //        Q to M
+            // ================================
+
+            I("RESET; MODE data;");
+            I("TIME 2001 2005;");
+            I("OPTION freq q;");
+            I("SERIES <2001q1 2002q1> x = 1 5 3 m 10;");
+            I("INTERPOLATE x1.m = x.q repeat;");
+            AssertHelper(First(), "x1", EFreq.Monthly, 2000, 12, double.NaN, sharedDelta);
+            for (int i = 1; i <= 3; i++)
+            {
+                AssertHelper(First(), "x1", EFreq.Monthly, 2001, 0 + i, 1d, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Monthly, 2001, 3 + i, 5d, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Monthly, 2001, 6 + i, 3d, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Monthly, 2001, 9 + i, double.NaN, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Monthly, 2002, 0 + i, 10d, sharedDelta);
+            }
+            AssertHelper(First(), "x1", EFreq.Monthly, 2002, 4, double.NaN, sharedDelta);
+
+            I("RESET; MODE data;");
+            I("TIME 2001 2005;");
+            I("OPTION freq q;");
+            I("SERIES <2001q1 2002q1> x = 1 5 3 m 10;");
+            I("INTERPOLATE x1.m = x.q prorate;");
+            AssertHelper(First(), "x1", EFreq.Monthly, 2000, 12, double.NaN, sharedDelta);
+            for (int i = 1; i <= 3; i++)
+            {
+                AssertHelper(First(), "x1", EFreq.Monthly, 2001, 0 + i, 1d / 3d, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Monthly, 2001, 3 + i, 5d / 3d, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Monthly, 2001, 6 + i, 3d / 3d, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Monthly, 2001, 9 + i, double.NaN, sharedDelta);
+                AssertHelper(First(), "x1", EFreq.Monthly, 2002, 0 + i, 10d / 3d, sharedDelta);
+            }
+            AssertHelper(First(), "x1", EFreq.Monthly, 2002, 4, double.NaN, sharedDelta);
+
+        }
+
+
+        [TestMethod]
+        public void Test__Collapse()
+        {            
+            I("RESET; MODE data;");
             I("TIME 2000 2003;");
             I("OPTION freq q;");
             I("CREATE x;");
@@ -4657,43 +4776,43 @@ namespace UnitTests
             I("COLLAPSE x2 = x.q; ");
             I("OPTION freq q;");
             I("COLLAPSE x3.a = x.q avg; ");
-            I("COLLAPSE x4.a = x.q first; ");
-            I("COLLAPSE x5.a = x.q last; ");
+            I("COLLAPSE x4.a = work:x.q first; ");  //testing bank also
+            I("COLLAPSE work:x5.a = x.q last; ");   //testing bank also
             I("OPTION freq a;");  //otherwise GetVariable() goes wrong: badly needs a fix for all this frequency stuff
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 10d);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 26d);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 2002, 1)), 16d);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 2003, 1)), 10d);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 10d);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 26d);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 2002, 1)), 16d);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 2003, 1)), 10d);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
             //
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 10d);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 26d);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2002, 1)), 16d);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2003, 1)), 10d);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 10d);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 26d);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2002, 1)), 16d);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2003, 1)), 10d);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
             //
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 10d / 4d);
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 26d / 4d);
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 2002, 1)), 16d / 4d);
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 2003, 1)), 10d / 4d);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 10d / 4d);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 26d / 4d);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 2002, 1)), 16d / 4d);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 2003, 1)), 10d / 4d);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
             //
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 1d);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 5d);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 2002, 1)), 9d);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 2003, 1)), -3d);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 1d);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 5d);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 2002, 1)), 9d);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 2003, 1)), -3d);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
             //
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 4d);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 8d);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 2002, 1)), -2d);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 2003, 1)), 7d);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 4d);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 8d);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 2002, 1)), -2d);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 2003, 1)), 7d);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
 
 
             I("RESET;");
@@ -4709,30 +4828,30 @@ namespace UnitTests
             I("COLLAPSE x4.a = x.m first; ");
             I("COLLAPSE x5.a = x.m last; ");
             I("OPTION freq a;");  //otherwise GetVariable() goes wrong: badly needs a fix for all this frequency stuff
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 78d);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 222d);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 78d);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 222d);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
             //
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 78d);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 222d);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 78d);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 222d);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
             //
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 78d/12d);
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 222d/12d);
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 78d/12d);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 222d/12d);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
             //
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 1d);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 13d);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 1d);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 13d);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
             //
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 12d);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 24d);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 1999, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 2000, 1)), 12d);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 2001, 1)), 24d);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Annual, 2004, 1)), double.NaN);
             //
             I("RESET;");
             I("TIME 2000 2000;");
@@ -4747,40 +4866,40 @@ namespace UnitTests
             I("COLLAPSE x4.q = x.m first; ");
             I("COLLAPSE x5.q = x.m last; ");
             I("OPTION freq q;");  //otherwise GetVariable() goes wrong: badly needs a fix for all this frequency stuff
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), 6d);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 15d);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), 24d);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), 33d);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), 6d);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 15d);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), 24d);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), 33d);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
             //
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), 6d);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 15d);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), 24d);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), 33d);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), 6d);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 15d);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), 24d);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), 33d);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
             //
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), 6d/3d);
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 15d/3d);
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), 24d/3d);
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), 33d/3d);
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), 6d/3d);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 15d/3d);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), 24d/3d);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), 33d/3d);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
             //
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), 1d);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 4d);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), 7d);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), 10d);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), 1d);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 4d);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), 7d);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), 10d);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
             //
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), 3d);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 6d);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), 9d);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), 12d);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), 3d);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 6d);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), 9d);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), 12d);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
             //Testing series with holes (M/NaN) inside
             I("RESET;");
             I("TIME 2000 2000;");
@@ -4795,40 +4914,40 @@ namespace UnitTests
             I("COLLAPSE x4.q = x.m first; ");
             I("COLLAPSE x5.q = x.m last; ");
             I("OPTION freq q;");  //otherwise GetVariable() goes wrong: badly needs a fix for all this frequency stuff
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 15d);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 15d);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x1").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
             //
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 15d);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 15d);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x2").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
             //
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 15d / 3d);
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 15d / 3d);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x3").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
             //
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 4d);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), 7d);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), 10d);
-            Assert.AreEqual(work.GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 4d);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), 7d);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), 10d);
+            Assert.AreEqual(First().GetVariable("x4").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
             //
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), 3d);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 6d);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), 9d);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), double.NaN);
-            Assert.AreEqual(work.GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 1999, 4)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 1)), 3d);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 2)), 6d);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), 9d);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), double.NaN);
+            Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
         }
 
         [TestMethod]
@@ -7707,6 +7826,20 @@ namespace UnitTests
             AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
             AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
             AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("RESET;");
+            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
+            I("MATRIX a[.., ..] = 10;");
+            AssertHelperMatrix("a", "rows", 3);
+            AssertHelperMatrix("a", "cols", 3);
+            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
+            AssertHelperMatrix("a", 1, 2, 10d, sharedDelta);
+            AssertHelperMatrix("a", 1, 3, 10d, sharedDelta);
+            AssertHelperMatrix("a", 2, 1, 10d, sharedDelta);
+            AssertHelperMatrix("a", 2, 2, 10d, sharedDelta);
+            AssertHelperMatrix("a", 2, 3, 10d, sharedDelta);
+            AssertHelperMatrix("a", 3, 1, 10d, sharedDelta);
+            AssertHelperMatrix("a", 3, 2, 10d, sharedDelta);
+            AssertHelperMatrix("a", 3, 3, 10d, sharedDelta);
             I("RESET;");
             I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
             FAIL("MATRIX a[1..2, 2..2] = [10, 20 || 30, 40];");
@@ -11556,6 +11689,11 @@ namespace UnitTests
         private static Databank First()
         {
             return Program.databanks.GetFirst();
+        }
+
+        private static Databank Ref()
+        {
+            return Program.databanks.GetRef();
         }
 
         private static void CheckFullDatabank(double deltaAbs, double deltaRel, int t1, int t2, List<string> ignore)

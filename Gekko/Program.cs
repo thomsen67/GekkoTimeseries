@@ -19463,52 +19463,23 @@ namespace Gekko
             return counter;
         }
 
-
         public static void Collapse(string b1, string ss1, string b0, string ss0, string method)
         {
-            //ErrorIfDatabanksSwapped();            
+            //ErrorIfDatabanksSwapped(); 
 
-            Databank databank1 = Program.databanks.GetFirst();
-            if (b1 == "@") databank1 = Program.databanks.GetRef();
-            else if (b1 != "") databank1 = Program.databanks.GetDatabank(b1);
-            if (databank1 == null)
-            {
-                G.Writeln2("*** ERROR: Databank '" + b1 + "' not found");
-                throw new GekkoException();
-            }
-
-            Databank databank0 = Program.databanks.GetFirst();
-            if (b0 == "@") databank0 = Program.databanks.GetRef();
-            else if (b0 != "") databank0 = Program.databanks.GetDatabank(b0);
-            if (databank0 == null)
-            {
-                G.Writeln2("*** ERROR: Databank '" + b0 + "' not found");
-                throw new GekkoException();
-            }
-
+            Databank databank1 = GetDatabank(b1);
+            Databank databank0 = GetDatabank(b0);
+                        
             if (method == null) method = "total";
+        
+            string name1;
+            EFreq eFreq1;
+            GetFreq(ss1, out name1, out eFreq1);
 
-            //TODO: should be possible to indicate databank here
-
-            List<string> s1 = new List<string>(ss1.Split('.'));
-            List<string> s0 = new List<string>(ss0.Split('.'));
-
-            string name1 = s1[0];
-            string extension1 = "";
-            if (s1.Count == 2) extension1 = s1[1];
-            if (extension1 == "")
-            {
-                extension1 = G.GetFreq(Program.options.freq);
-            }
-            EFreq eFreq1 = G.GetFreq(extension1);
-            string name0 = s0[0];
-            string extension0 = "";
-            if (s0.Count == 2) extension0 = s0[1];
-            if (extension0 == "")
-            {
-                extension0 = G.GetFreq(Program.options.freq);
-            }
-            EFreq eFreq0 = G.GetFreq(extension0);
+            string name0;
+            EFreq eFreq0;
+            GetFreq(ss0, out name0, out eFreq0);
+                        
             if (eFreq0 == EFreq.Undated || eFreq1 == EFreq.Undated)
             {
                 G.Writeln2("*** ERROR: COLLAPSE cannot involve undated timeseries");
@@ -19550,12 +19521,12 @@ namespace Gekko
                     if (G.equal(method, "total"))
                     {
                         vsum += value;
-                        if (t.sub == 4) ts1.SetData(ttemp, vsum);
+                        if (t.sub == Globals.freqQSubperiods) ts1.SetData(ttemp, vsum);
                     }
                     else if (G.equal(method, "avg"))
                     {
                         vsum += value;
-                        if (t.sub == 4) ts1.SetData(ttemp, vsum / 4d);
+                        if (t.sub == Globals.freqQSubperiods) ts1.SetData(ttemp, vsum / (double)Globals.freqQSubperiods);
                     }
                     else if (G.equal(method, "first"))
                     {
@@ -19563,7 +19534,7 @@ namespace Gekko
                     }
                     else if (G.equal(method, "last"))
                     {
-                        if (t.sub == 4) ts1.SetData(ttemp, value);
+                        if (t.sub == Globals.freqQSubperiods) ts1.SetData(ttemp, value);
                     }
                     else
                     {
@@ -19579,12 +19550,12 @@ namespace Gekko
                     if (G.equal(method, "total"))
                     {
                         vsum += value;
-                        if (t.sub == 12) ts1.SetData(ttemp, vsum);
+                        if (t.sub == Globals.freqMSubperiods) ts1.SetData(ttemp, vsum);
                     }
                     else if (G.equal(method, "avg"))
                     {
                         vsum += value;
-                        if (t.sub == 12) ts1.SetData(ttemp, vsum / 12d);
+                        if (t.sub == Globals.freqMSubperiods) ts1.SetData(ttemp, vsum / (double)Globals.freqMSubperiods);
                     }
                     else if (G.equal(method, "first"))
                     {
@@ -19592,7 +19563,7 @@ namespace Gekko
                     }
                     else if (G.equal(method, "last"))
                     {
-                        if (t.sub == 12) ts1.SetData(ttemp, value);
+                        if (t.sub == Globals.freqMSubperiods) ts1.SetData(ttemp, value);
                     }
                     else
                     {
@@ -19603,26 +19574,27 @@ namespace Gekko
                 else if (eFreq1 == EFreq.Quarterly && eFreq0 == EFreq.Monthly)
                 {
                     //Conversion from M to Q
-                    int quarter = (t.sub - 1) / 3 + 1;
-                    if (t.sub % 3 == 1) vsum = 0d;
+                    int mPerQ = Globals.freqMSubperiods / Globals.freqQSubperiods;  //3
+                    int quarter = (t.sub - 1) / mPerQ + 1;
+                    if (t.sub % mPerQ == 1) vsum = 0d;
                     GekkoTime ttemp = new GekkoTime(eFreq1, t.super, quarter);
                     if (G.equal(method, "total"))
                     {
                         vsum += value;
-                        if (t.sub % 3 == 0) ts1.SetData(ttemp, vsum);
+                        if (t.sub % mPerQ == 0) ts1.SetData(ttemp, vsum);
                     }
                     else if (G.equal(method, "avg"))
                     {
                         vsum += value;
-                        if (t.sub % 3 == 0) ts1.SetData(ttemp, vsum / 3d);
+                        if (t.sub % mPerQ == 0) ts1.SetData(ttemp, vsum / (double)mPerQ);
                     }
                     else if (G.equal(method, "first"))
                     {
-                        if (t.sub % 3 == 1) ts1.SetData(ttemp, value);
+                        if (t.sub % mPerQ == 1) ts1.SetData(ttemp, value);
                     }
                     else if (G.equal(method, "last"))
                     {
-                        if (t.sub % 3 == 0) ts1.SetData(ttemp, value);
+                        if (t.sub % mPerQ == 0) ts1.SetData(ttemp, value);
                     }
                 }
                 else
@@ -19635,7 +19607,171 @@ namespace Gekko
             return;
         }
 
+        public static void Interpolate(string b1, string ss1, string b0, string ss0, string method)
+        {
+            //ErrorIfDatabanksSwapped();            
 
+            Databank databank1 = GetDatabank(b1);
+            Databank databank0 = GetDatabank(b0);
+
+            if (method == null) method = "repeat";
+                        
+            string name1;
+            EFreq eFreq1;
+            GetFreq(ss1, out name1, out eFreq1);
+
+            string name0;
+            EFreq eFreq0;
+            GetFreq(ss0, out name0, out eFreq0);
+                        
+            if (eFreq0 == EFreq.Undated || eFreq1 == EFreq.Undated)
+            {
+                G.Writeln2("*** ERROR: COLLAPSE cannot involve undated timeseries");
+                throw new GekkoException();
+            }
+
+            TimeSeries ts0 = databank0.GetVariable(eFreq0, name0);
+            if (ts0 == null)
+            {
+                G.Writeln2("*** ERROR: Could not find variable '" + name0 + "' with frequency '" + eFreq0 + "' in '" + databank0.aliasName + "' databank");
+                throw new GekkoException();
+            }
+
+            TimeSeries ts1 = databank1.GetVariable(eFreq1, name1);
+            if (ts1 == null)
+            {
+                G.Writeln("+++ NOTE: Created new variable '" + name1 + "' with frequency '" + G.GetFreq(eFreq1) + "'");
+            }
+            else
+            {
+                //We wipe it completely out if it already exists!
+                databank1.RemoveVariable(eFreq1, name1);
+            }
+            ts1 = new TimeSeries(eFreq1, name1);
+            databank1.AddVariable(G.GetFreq(eFreq1), ts1);  //hmmm a mess with all this freq stuff!
+
+            GekkoTime first = ts0.GetPeriodFirst(); //start of low-freq timeseries
+            GekkoTime last = ts0.GetPeriodLast(); //end of low-freq timeseries
+
+            double vsum = double.NaN;
+            foreach (GekkoTime t in new GekkoTimeIterator(first, last))
+            {
+                double value = ts0.GetData(t);
+                if (value == double.NaN) continue;
+                if (eFreq1 == EFreq.Quarterly && eFreq0 == EFreq.Annual)
+                {
+                    //Conversion from A to Q                                        
+                    if (G.equal(method, "repeat"))
+                    {
+                        for (int i = 1; i < Globals.freqQSubperiods + 1; i++)
+                        {
+                            GekkoTime gt = new GekkoTime(EFreq.Quarterly, t.super, i);
+                            ts1.SetData(gt, value);
+                        }
+                    }
+                    else if (G.equal(method, "prorate"))
+                    {
+                        for (int i = 1; i < Globals.freqQSubperiods + 1; i++)
+                        {
+                            GekkoTime gt = new GekkoTime(EFreq.Quarterly, t.super, i);
+                            ts1.SetData(gt, value / (double)Globals.freqQSubperiods);
+                        }
+                    }                    
+                    else
+                    {
+                        G.Writeln2("*** ERROR: wrong method in INTERPOLATE: " + method + "'");
+                        throw new GekkoException();
+                    }
+                }
+                else if (eFreq1 == EFreq.Monthly && eFreq0 == EFreq.Annual)
+                {
+                    //Conversion from A to M
+                    if (G.equal(method, "repeat"))
+                    {
+                        for (int i = 1; i < Globals.freqMSubperiods + 1; i++)
+                        {
+                            GekkoTime gt = new GekkoTime(EFreq.Monthly, t.super, i);
+                            ts1.SetData(gt, value);
+                        }
+                    }
+                    else if (G.equal(method, "prorate"))
+                    {
+                        for (int i = 1; i < Globals.freqMSubperiods + 1; i++)
+                        {
+                            GekkoTime gt = new GekkoTime(EFreq.Monthly, t.super, i);
+                            ts1.SetData(gt, value / (double)Globals.freqMSubperiods);
+                        }
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: wrong method in INTERPOLATE: " + method + "'");
+                        throw new GekkoException();
+                    }
+                }
+                else if (eFreq1 == EFreq.Monthly && eFreq0 == EFreq.Quarterly)
+                {
+                    //Conversion from Q to M
+                    int mInQ = Globals.freqMSubperiods / Globals.freqQSubperiods; //3
+                    int startSub = (t.sub - 1) * mInQ + 1;  //1->1, 2->4, 3->7, 4->10
+                    if (G.equal(method, "repeat"))
+                    {
+                        for (int i = startSub; i < startSub + mInQ; i++)
+                        {
+                            GekkoTime gt = new GekkoTime(EFreq.Monthly, t.super, i);
+                            ts1.SetData(gt, value);
+                        }
+                    }
+                    else if (G.equal(method, "prorate"))
+                    {
+                        for (int i = startSub; i < startSub + mInQ; i++)
+                        {
+                            GekkoTime gt = new GekkoTime(EFreq.Monthly, t.super, i);
+                            ts1.SetData(gt, value / (double)mInQ);
+                        }
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: wrong method in INTERPOLATE: " + method + "'");
+                        throw new GekkoException();
+                    }
+
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Cannot INTERPOLATE frequency '" + eFreq0 + "' to frequency '" + eFreq1 + "'");
+                    throw new GekkoException();
+                }
+            }
+            G.Writeln("Collapsed '" + name1 + "' (" + eFreq1.ToString() + ") from '" + name0 + "' (" + eFreq0.ToString() + ")");
+            return;
+        }
+
+        private static void GetFreq(string ss1, out string name1, out EFreq eFreq1)
+        {
+            List<string> s1 = new List<string>(ss1.Split('.'));            
+            name1 = s1[0];
+            string extension1 = "";
+            if (s1.Count == 2) extension1 = s1[1];
+            if (extension1 == "")
+            {
+                extension1 = G.GetFreq(Program.options.freq);
+            }
+            eFreq1 = G.GetFreq(extension1);
+        }
+
+        private static Databank GetDatabank(string b1)
+        {
+            Databank databank1 = Program.databanks.GetFirst();
+            if (b1 == "@") databank1 = Program.databanks.GetRef();
+            else if (b1 != "") databank1 = Program.databanks.GetDatabank(b1);
+            if (databank1 == null)
+            {
+                G.Writeln2("*** ERROR: Databank '" + b1 + "' not found");
+                throw new GekkoException();
+            }
+
+            return databank1;
+        }
 
         public static void Delete(List<string> vars)
         {
