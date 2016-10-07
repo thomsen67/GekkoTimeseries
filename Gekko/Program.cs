@@ -19626,7 +19626,7 @@ namespace Gekko
                         
             if (eFreq0 == EFreq.Undated || eFreq1 == EFreq.Undated)
             {
-                G.Writeln2("*** ERROR: COLLAPSE cannot involve undated timeseries");
+                G.Writeln2("*** ERROR: INTERPOLATE cannot involve undated timeseries");
                 throw new GekkoException();
             }
 
@@ -19742,7 +19742,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            G.Writeln("Collapsed '" + name1 + "' (" + eFreq1.ToString() + ") from '" + name0 + "' (" + eFreq0.ToString() + ")");
+            G.Writeln("Interpolated '" + name1 + "' (" + eFreq1.ToString() + ") from '" + name0 + "' (" + eFreq0.ToString() + ")");
             return;
         }
 
