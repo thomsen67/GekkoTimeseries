@@ -218,7 +218,7 @@ namespace Gekko
             //Code to handle unexpected crashes, for instance after hibernation
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.UnhandledException += new UnhandledExceptionEventHandler(CrashHandler);
-            
+                        
             //args can be tested in VS, see Gekko project options, debug.
             string noini = null;
             string folder = null;
@@ -361,7 +361,7 @@ namespace Gekko
                 G.Writeln("                                             ", Color.Red);
                 G.Writeln("NOTE: This gamma version has some new code", Color.Red);
                 G.Writeln("      to handle long non-looping command files.", Color.Red);
-                G.Writeln("      If this poses problems, try setting", Color.Red);                
+                G.Writeln("      If this poses problems, try setting", Color.Red);
                 G.Writeln("      OPTION system code split = 0.", Color.Red);
                 G.Writeln();
                 G.Writeln("NOTE: See the TRANSLATE command regarding", Color.Red);
@@ -425,7 +425,7 @@ namespace Gekko
                     G.Writeln("ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ", Color.Red);
                     G.Writeln("ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ", Color.Red);
                     G.Writeln("ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ", Color.Red);
-                    G.Writeln("ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ", Color.Red);                    
+                    G.Writeln("ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ", Color.Red);
                     G.Writeln();
                 }
                 else
@@ -449,18 +449,21 @@ namespace Gekko
 
             Program.CreateLocalCopyHelpChm();
             CrossThreadStuff.Zoom();
-            
+
             //gekko.exe parameters are read first, and then afterwards any gekko.ini local file
+            StartupExeAndIniStuff();
+            CrossThreadStuff.Mode();
+        }
+
+        private void StartupExeAndIniStuff()
+        {
             if (Globals.gekkoExeParameters != null)
             {
-                //works as if it was an inputted command line from the GUI
+                //works as if it was an inputted command line from the GUI                
                 this.StartThread(Globals.gekkoExeParameters, true);
             }
             if (Globals.noini == false) RunGekkoIniFile();
-
-            CrossThreadStuff.Mode();           
-            
-        }        
+        }
 
         private void RunGekkoTabToTextStuff(string folder)
         {
@@ -728,6 +731,9 @@ namespace Gekko
             {
                 Globals.noini = true;  //has to be put in here, to be fetched later on by GuiAutoExecStuff
             }
+
+            //Running in silent mode is probably done here.
+            //We probably need to call this.StartThread(" ", true), but problem is that 'this' does not exist.            
 
             try
             {
@@ -1798,15 +1804,18 @@ namespace Gekko
 
                         try
                         {
-                            longProcess.Run(p);                            
+                            longProcess.Run(p);
                         }
                         catch (Exception e2)
                         {
                             Program.PrintExceptionAndFinishThread(e2, p);
-                            Globals.aTimer.Stop();  //otherwise it will blink on
-                            Gui.gui.toolStripStatusLabel3a.Text = " ";
-                            toolStripStatusLabel3.Image = red;
-                            toolStripButton3.Enabled = false;
+                            if (!Globals.applicationIsInProcessOfAborting)
+                            {
+                                Globals.aTimer.Stop();  //otherwise it will blink on
+                                Gui.gui.toolStripStatusLabel3a.Text = " ";
+                                toolStripStatusLabel3.Image = red;
+                                toolStripButton3.Enabled = false;
+                            }
                             Program.GekkoExceptionCleanup(p);
                         }
                     }
@@ -1873,6 +1882,8 @@ namespace Gekko
         // Called from worker thread using delegate and Control.Invoke
         public void ThreadFinished()
         {
+            if (Globals.applicationIsInProcessOfAborting) return;  //do not start up anything new now!
+
             Program.MaybePlaySound(p);
 
             Globals.btnStartThread = true;
