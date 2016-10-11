@@ -26228,23 +26228,7 @@ namespace Gekko
                 Type.Missing, editable, Type.Missing, Type.Missing, Type.Missing,
                 Type.Missing, Type.Missing);
             return book;
-        }
-
-        public static void ReleaseRCM(object o)
-        {
-            try
-            {
-                //System.Runtime.InteropServices.Marshal.ReleaseComObject(o);
-                System.Runtime.InteropServices.Marshal.FinalReleaseComObject(o);  //TT changed this, see http://stackoverflow.com/questions/1827059/why-use-finalreleasecomobject-instead-of-releasecomobject
-            }
-            catch
-            {
-            }
-            finally
-            {
-                o = null;
-            }
-        }
+        }        
 
         public static string GetExcelColumnName(int columnNumber)
         {
@@ -26293,6 +26277,7 @@ namespace Gekko
                 if (Globals.excelFix)
                 {
                     //THIS DOES NOT WORK: COM object that has been separated from its underlying RCW cannot be used.
+                    //Can this fix it?: #5298375235
                     if (Globals.objApp == null) Globals.objApp = new Excel.Application();
                     excel = Globals.objApp;
                 }
@@ -26303,7 +26288,7 @@ namespace Gekko
 
                 workbooks = excel.Workbooks;
 
-                wkb = OpenBook(workbooks, file, true, false, false);                
+                wkb = OpenBook(workbooks, file, true, false, false);
 
                 objSheets = wkb.Worksheets;
 
@@ -26324,7 +26309,7 @@ namespace Gekko
                         G.Writeln2("*** ERROR: The sheet '" + sheetName + "' does not seem to exist");
                     }
                 }
-                                
+
                 //G.Writeln("open excel " + G.Seconds(d3));
 
                 if (sheet != null)
@@ -26414,57 +26399,25 @@ namespace Gekko
             }
             finally
             {
-                if (true)
-                {
-                    for (int i = 0; i < 2; i++)
-                    {
-                        //see https://coderwall.com/p/app3ya/read-excel-file-in-c
-                       
-                        GC.Collect();
-                        GC.WaitForPendingFinalizers();
-                        GC.Collect();
-                        GC.WaitForPendingFinalizers();                        
-                        value2 = null;
-                        input = null;
-                        Marshal.ReleaseComObject(range);
-                        Marshal.ReleaseComObject(temprange);
-                        Marshal.ReleaseComObject(last);
-                        Marshal.ReleaseComObject(sheet);
-                        Marshal.ReleaseComObject(objSheets);
-                        if (i == 0) wkb.Close(false);
-                        Marshal.ReleaseComObject(wkb);
-                        if (i == 0) workbooks.Close();
-                        Marshal.ReleaseComObject(workbooks);
-                        if (i == 0) excel.Quit();
-                        Marshal.ReleaseComObject(excel);
-                    }
-                }
-                if (false)
-                {
-                    //see https://coderwall.com/p/app3ya/read-excel-file-in-c
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                    ReleaseRCM(range);
-                    ReleaseRCM(temprange);
-                    ReleaseRCM(last);
-                    ReleaseRCM(sheet);
-                    ReleaseRCM(objSheets);                    
-                    //wkb.Close();
-                    ReleaseRCM(wkb);
-                    //workbooks.Close();
-                    ReleaseRCM(workbooks);
-                    excel.Quit();
-                    ReleaseRCM(excel);
-                }
-                if(false)
-                {
-                    if (wkb != null)
-                        ReleaseRCM(wkb);
-
-                    if (excel != null)
-                        ReleaseRCM(excel);
-                }
-            
+                //not sure how much of this is absolutely necessary
+                //see //#5298375235 and fusion it
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                value2 = null;
+                input = null;
+                Marshal.ReleaseComObject(range);
+                Marshal.ReleaseComObject(temprange);
+                Marshal.ReleaseComObject(last);
+                Marshal.ReleaseComObject(sheet);
+                Marshal.ReleaseComObject(objSheets);
+                wkb.Close(false);
+                Marshal.ReleaseComObject(wkb);
+                workbooks.Close();
+                Marshal.ReleaseComObject(workbooks);
+                excel.Quit();
+                Marshal.ReleaseComObject(excel);
             }
             //G.Writeln("full excel " + G.Seconds(t00));
             return matrix;
@@ -26589,6 +26542,7 @@ namespace Gekko
                         }
                         else if (Globals.excelLastThreadID != threadID)
                         {
+                            //#5298375235
                             Globals.excelLastThreadID = threadID;
                             System.Runtime.InteropServices.Marshal.FinalReleaseComObject(Globals.objApp);
                             Globals.objApp = null;
