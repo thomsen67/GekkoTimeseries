@@ -20009,8 +20009,8 @@ namespace Gekko
                 Program.databanks.GetFirst().AddVariable(name_residual);
                 if (Program.scalars.ContainsKey(Globals.symbolList + name + "_stats")) Program.scalars.Remove(Globals.symbolList + name + "_stats");
                 Program.scalars.Add(Globals.symbolList + name + "_stats", name_stats);
-                if (Program.scalars.ContainsKey(Globals.symbolList + name + "_coeff")) Program.scalars.Remove(Globals.symbolList + name + "_coeff");
-                Program.scalars.Add(Globals.symbolList + name + "_coeff", name_coeff);
+                if (Program.scalars.ContainsKey(Globals.symbolList + name + "_param")) Program.scalars.Remove(Globals.symbolList + name + "_param");
+                Program.scalars.Add(Globals.symbolList + name + "_param", name_coeff);
                 if (Program.scalars.ContainsKey(Globals.symbolList + name + "_t")) Program.scalars.Remove(Globals.symbolList + name + "_t");
                 Program.scalars.Add(Globals.symbolList + name + "_t", name_t);
                 if (Program.scalars.ContainsKey(Globals.symbolList + name + "_se")) Program.scalars.Remove(Globals.symbolList + name + "_se");
