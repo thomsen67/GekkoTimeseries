@@ -55,6 +55,7 @@ options {
 //Token definitions I
 tokens {
     ASTLIBRARY;
+	ASTNAMEHELPER;
 	ASTINTERPOLATE;
 	ASTTABLEMAIN;
 	ASTLISTTRIM;
@@ -1802,7 +1803,10 @@ mode2                     : MIXED | SIM | DATA;
 
 model                     : MODEL modelOpt1? fileNameStar -> ^({token("ASTMODEL", ASTMODEL, $MODEL.Line)} ^(ASTHANDLEFILENAME fileNameStar) modelOpt1?);
 
-ols                       : OLS olsOpt1? olsElements -> ^({token("ASTOLS", ASTOLS, $OLS.Line)} ^(ASTOPT_ olsOpt1?) olsElements);
+						  //necessay to split it in two instead of using nameWithDot? Else, "OLS dlog(pcp) = ..." will get name=dlog and lhs=(pcp)
+ols                       : OLS olsOpt1? olsElements -> ^({token("ASTOLS", ASTOLS, $OLS.Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER) olsElements)
+						  | OLS olsOpt1? nameWithDot olsElements -> ^({token("ASTOLS", ASTOLS, $OLS.Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER nameWithDot) olsElements)
+						  ;
 
 open                      : OPEN openOpt1? openHelper (COMMA2 openHelper)* -> ^({token("ASTOPEN", ASTOPEN, $OPEN.Line)} openOpt1? openHelper+);
 openHelper                : fileNameStar (AS ident)? -> ^(ASTOPENHELPER ^(ASTFILENAME fileNameStar) ^(ASTAS ident?));

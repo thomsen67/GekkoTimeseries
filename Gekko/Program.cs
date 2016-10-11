@@ -19833,8 +19833,9 @@ namespace Gekko
 
             GekkoTime t1 = o.t1;
             GekkoTime t2 = o.t2;
-
-
+            string name = o.name;
+            if (name == null) name = "ols";
+            
             List<string> labels = new List<string>();
             double[,] tsData2 = null;
             int k2 = 0;
@@ -19842,6 +19843,20 @@ namespace Gekko
             List<O.Prt.Element> elements = o.prtElements;
             UnfoldVarsAndLabels(ref k2, ref tsData2, t1, t2, labels, n, elements);
             int k = k2 - 1;
+
+            if (n <= k)
+            {
+                G.Writeln2("*** ERROR: There are " + k + " variables with only " + n + " observations");
+                throw new GekkoException();
+            }
+
+            Matrix name_coeff = new Matrix(k, 1, double.NaN);
+            Matrix name_t = new Matrix(k, 1, double.NaN);
+            Matrix name_se = new Matrix(k, 1, double.NaN);
+            Matrix name_stats = new Matrix(9, 1, double.NaN);
+            Matrix name_covar = new Matrix(k, k, double.NaN);
+            TimeSeries name_predict = new TimeSeries(t1.freq, name + "_predict");
+            TimeSeries name_residual = new TimeSeries(t1.freq, name + "_residual");            
 
             double[] resultData = new double[n];
             double[,] tsData = new double[n, k];
@@ -19853,7 +19868,6 @@ namespace Gekko
                     tsData[i, j] = tsData2[i, j + 1];
                 }
             }
-
 
             double[] weights = null;
             int fitResult = 0;
@@ -19890,6 +19904,9 @@ namespace Gekko
 
             double dw1 = 0d;
             double dw2 = 0d;
+            double rss = 0d;
+            double resMean = 0d;
+            double lhsMean = 0d;
             for (int i = 0; i < n; i++)
             {
                 predict[i] = 0d;
@@ -19898,25 +19915,35 @@ namespace Gekko
                     predict[i] += weights[ik] / scaling[ik] * tsData[i, ik];
                 }
                 residual[i] = resultData[i] - predict[i];
+                resMean += residual[i];
+                lhsMean += resultData[i];
+                rss += residual[i] * residual[i];
                 if (i > 0) dw1 += (residual[i] - residual[i - 1]) * (residual[i] - residual[i - 1]);
                 dw2 += residual[i] * residual[i];
+
+                name_predict.SetData(t1.Add(i), predict[i]);
+                name_residual.SetData(t1.Add(i), residual[i]);
+
             }
+            resMean = resMean / (double)n;
+            lhsMean = lhsMean / (double)n;
             double dw = dw1 / dw2;
             double see = Math.Sqrt(dw2 / (n - k));
 
             Table tab = new Table();
 
-            //G.Writeln("iter " + rep.iterationscount);
-            //G.Writeln("RMSE " + rep.rmserror);
-            tab.Set(1, 1, "Coeff");
-            tab.Set(2, 1, "Estimate");
-            tab.Set(3, 1, "Std error");
-            tab.Set(4, 1, "T-stat");
+
+            tab.Set(1, 1, "Variable");            
+            tab.Set(1, 2, "Estimate");
+            tab.Set(1, 3, "Std error");
+            tab.Set(1, 4, "T-stat");
+            tab.SetAlign(1, 1, 1, 4, Align.Right);
             for (int i = 0; i < k; i++)
             {
-                //G.Writeln("c" + i + ":  " + weights[i] + " " + rep.errpar[i] + " " + weights[i] / rep.errpar[i]);
-                tab.Set(1, i + 2, "c" + (i + 1));
-                tab.SetAlign(1, i + 2, Align.Right);
+                string s = TruncateTextWithDots(25, labels[i + 1]);
+                tab.Set(i + 2, 1, s);
+                //tab.Set(i + 2, 1, "c" + (i + 1));
+                tab.SetAlign(i + 2, 1, Align.Left);
 
                 //FIXME: Use interior of RoundToSignificantDigits
                 string dec = "0";
@@ -19927,31 +19954,75 @@ namespace Gekko
                 z2 = Math.Max(0, z2);
                 dec = "" + z2;
 
-                tab.SetNumber(2, i + 2, 1d / scaling[i] * weights[i], "f14." + dec);
-                tab.SetNumber(3, i + 2, 1d / scaling[i] * rep.errpar[i], "f14." + dec);
-                tab.SetNumber(4, i + 2, Math.Abs(weights[i] / rep.errpar[i]), "f14.2");
-            }
-            tab.SetBorder(1, 1, 1, k + 1, BorderType.Top);
-            tab.SetBorder(1, 1, 1, k + 1, BorderType.Bottom);
-            tab.SetBorder(4, 1, 4, k + 1, BorderType.Bottom);
+                double coeff = 1d / scaling[i] * weights[i];
+                double se = 1d / scaling[i] * rep.errpar[i];
+                double t = Math.Abs(weights[i] / rep.errpar[i]);
+
+                tab.SetNumber(i + 2, 2, coeff, "f14." + dec);
+                tab.SetNumber(i + 2, 3, se, "f14." + dec);
+                tab.SetNumber(i + 2, 4, t, "f14.2");
+
+                name_coeff.data[i, 0] = coeff;
+                name_se.data[i, 0] = se;
+                name_t.data[i, 0] = t;
+
+            }            
+
+            tab.SetBorder(1, 1, 1, 4, BorderType.Top);
+            tab.SetBorder(1, 1, 1, 4, BorderType.Bottom);
+            tab.SetBorder(k + 1, 1, k + 1, 4, BorderType.Bottom);
             List<string> temp = tab.Print();
+
+            double r2 = rep.r2;
+            double r2cor = 1 - (1 - r2) * (n - 1) / (n - (k - 1) - 1);  //google r2 adjusted formula. Our k includes the constant, usually regressors do not count the constant -> therefore (k-1)
+            if (rep.r2 == 0d)
+            {
+                r2 = double.NaN;
+                r2cor = double.NaN;  //typically when there is no constant term
+            }
 
             int widthRemember = Program.options.print_width;
             int fileWidthRemember = Program.options.print_filewidth;
             Program.options.print_width = int.MaxValue;
             Program.options.print_filewidth = int.MaxValue;
             G.Writeln2("OLS estimation " + t1 + "-" + t2 + " (n = " + n + ")");
-            G.Writeln("lhs : " + labels[0]);  //labels contain the LHS and all the RHS!
-            //TODO: Unfold labels!
-            for (int i = 1; i < k + 1; i++)
-            {
-                G.Writeln("c" + i + "  : " + labels[i]);
-            }
+            G.Writeln(labels[0]);  //labels contain the LHS and all the RHS!            
             foreach (string s in temp) G.Writeln(s);
-            G.Writeln("R2: " + Math.Round(rep.r2, 6) + "    " + "SEE: " + RoundToSignificantDigits(see, 6) + "    " + "DW: " + Math.Round(dw, 4));
+            G.Writeln("R2: " + Math.Round(r2, 6) + "    " + "SEE: " + RoundToSignificantDigits(see, 6) + "    " + "DW: " + Math.Round(dw, 4));
+                       
+
+            name_stats.data[1 - 1, 0] = rss;
+            name_stats.data[2 - 1, 0] = see;
+            name_stats.data[3 - 1, 0] = resMean;
+            name_stats.data[4 - 1, 0] = rep.rmserror;
+            name_stats.data[5 - 1, 0] = rep.r2;
+            name_stats.data[6 - 1, 0] = r2cor;  
+            name_stats.data[8 - 1, 0] = lhsMean;
+            name_stats.data[9 - 1, 0] = dw;
+            name_covar.data = rep.covpar;
+
+            if(true)
+            {
+                if (Program.databanks.GetFirst().ContainsVariable(name + "_predict")) Program.databanks.GetFirst().RemoveVariable(name + "_predict");
+                Program.databanks.GetFirst().AddVariable(name_predict);
+                if (Program.databanks.GetFirst().ContainsVariable(name + "_residual")) Program.databanks.GetFirst().RemoveVariable(name + "_residual");
+                Program.databanks.GetFirst().AddVariable(name_residual);
+                if (Program.scalars.ContainsKey(Globals.symbolList + name + "_stats")) Program.scalars.Remove(Globals.symbolList + name + "_stats");
+                Program.scalars.Add(Globals.symbolList + name + "_stats", name_stats);
+                if (Program.scalars.ContainsKey(Globals.symbolList + name + "_coeff")) Program.scalars.Remove(Globals.symbolList + name + "_coeff");
+                Program.scalars.Add(Globals.symbolList + name + "_coeff", name_coeff);
+                if (Program.scalars.ContainsKey(Globals.symbolList + name + "_t")) Program.scalars.Remove(Globals.symbolList + name + "_t");
+                Program.scalars.Add(Globals.symbolList + name + "_t", name_t);
+                if (Program.scalars.ContainsKey(Globals.symbolList + name + "_se")) Program.scalars.Remove(Globals.symbolList + name + "_se");
+                Program.scalars.Add(Globals.symbolList + name + "_se", name_se);
+                if (Program.scalars.ContainsKey(Globals.symbolList + name + "_covar")) Program.scalars.Remove(Globals.symbolList + name + "_covar");
+                Program.scalars.Add(Globals.symbolList + name + "_covar", name_covar);
+
+            }
+
+
             Program.options.print_width = widthRemember;
-            Program.options.print_filewidth = fileWidthRemember;
-            //G.Writeln("+++ NOTE: If the ingoing variables have very different scale, the output may become imprecise. This will be fixed.", Color.Gray);
+            Program.options.print_filewidth = fileWidthRemember;            
         }
 
         public static double StandardDeviation(List<double> valueList)
@@ -22221,15 +22292,7 @@ namespace Gekko
 
             //string label = graphVarsLabels[j];
             string ss = label;
-            if (ss.Length > maxLength)
-            {
-                if (maxLength >= 3)
-                {
-                    ss = ss.Substring(0, maxLength - 3);
-                    ss += "...";
-                }
-                else ss = ss.Substring(0, maxLength);   //almost absurd... maxlength should always be >= 3 (typically 100)
-            }
+            ss = TruncateTextWithDots(maxLength, ss);
 
             if (numberOfLabelsRowsMax == 1)  //for some reason, this case must be treated specially... (not sure why)
             {
@@ -22262,6 +22325,21 @@ namespace Gekko
             }
 
             return numberOfLabelsRows;
+        }
+
+        private static string TruncateTextWithDots(int maxLength, string ss)
+        {
+            if (ss.Length > maxLength)
+            {
+                if (maxLength >= 3)
+                {
+                    ss = ss.Substring(0, maxLength - 3);
+                    ss += "...";
+                }
+                else ss = ss.Substring(0, maxLength);   //almost absurd... maxlength should always be >= 3 (typically 100)
+            }
+
+            return ss;
         }
 
         private static int PrintCreateLabelsArray(List<string> graphVarsLabels, PrintHelper ph, int numberOfLabelsRowsMax, int numberOfLabelsRows, int maxLength, string[,] labelsArray)
@@ -26141,10 +26219,10 @@ namespace Gekko
 
 
 
-        public static Excel.Workbook OpenBook(Excel.Application excelInstance, string fileName, bool readOnly, bool editable,
+        public static Excel.Workbook OpenBook(Excel.Workbooks workbooks, string fileName, bool readOnly, bool editable,
         bool updateLinks)
         {
-            Excel.Workbook book = excelInstance.Workbooks.Open(
+            Excel.Workbook book = workbooks.Open(
                 fileName, updateLinks, readOnly,
                 Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
                 Type.Missing, editable, Type.Missing, Type.Missing, Type.Missing,
@@ -26199,7 +26277,15 @@ namespace Gekko
             //using file: this may be a copied file is copylocal is active. Else it is identical to oRead.fileName.
 
             Excel.Application excel = null;
+            Excel.Workbooks workbooks = null;
             Excel.Workbook wkb = null;
+            Excel.Sheets objSheets = null;
+            Excel.Worksheet sheet = null;            
+            Excel.Range range = null;
+            Excel.Range temprange = null;
+            Excel.Range last = null;
+            Object value2 = null;
+            Object[,] input = null;
 
             try
             {
@@ -26208,19 +26294,19 @@ namespace Gekko
                 {
                     //THIS DOES NOT WORK: COM object that has been separated from its underlying RCW cannot be used.
                     if (Globals.objApp == null) Globals.objApp = new Excel.Application();
-                    excel = Globals.objApp;                    
+                    excel = Globals.objApp;
                 }
                 else
                 {
                     excel = new Excel.Application();
                 }
 
-                wkb = OpenBook(excel, file, true, false, false);
+                workbooks = excel.Workbooks;
 
-                Excel.Worksheet sheet = null;
+                wkb = OpenBook(workbooks, file, true, false, false);                
 
-                Excel.Sheets objSheets = wkb.Worksheets;
-                
+                objSheets = wkb.Worksheets;
+
                 if (sheetName == null)
                 {
                     //do nothing, [1] is al
@@ -26238,16 +26324,17 @@ namespace Gekko
                         G.Writeln2("*** ERROR: The sheet '" + sheetName + "' does not seem to exist");
                     }
                 }
-
-                Excel.Range range = null;
+                                
                 //G.Writeln("open excel " + G.Seconds(d3));
 
                 if (sheet != null)
                 {
-                    Excel.Range last = sheet.Cells.SpecialCells(Excel.XlCellType.xlCellTypeLastCell, Type.Missing);
+                    temprange = sheet.Cells;
+                    last = temprange.SpecialCells(Excel.XlCellType.xlCellTypeLastCell, Type.Missing);
                     range = sheet.get_Range("A1", last);
                     //DateTime t2 = DateTime.Now;
-                    Object[,] input = (Object[,])range.Value2;
+                    value2 = range.Value2;
+                    input = (Object[,])value2;
                     //G.Writeln("interop " + G.Seconds(t2));
 
                     //This is faster regarding the data, but problem is we will not get an error
@@ -26277,7 +26364,7 @@ namespace Gekko
                                 int iData = (int)temp;
 
                                 //-2146826281 = #Div/0!
-                                //-2146826246 - #N/A
+                                //-2146826246 = #N/A
                                 //-2146826259 = #Name?
                                 //-2146826288 = #Null!
                                 //-2146826252 = #Num!
@@ -26290,7 +26377,7 @@ namespace Gekko
                                     cell = new CellLight("#N/A");
                                 }
                                 else if (iData == -2146826259)
-                                {                                    
+                                {
                                     cell = new CellLight("#Name?");
                                 }
                                 else if (iData == -2146826281)
@@ -26327,11 +26414,57 @@ namespace Gekko
             }
             finally
             {
-                if (wkb != null)
+                if (true)
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+                        //see https://coderwall.com/p/app3ya/read-excel-file-in-c
+                       
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();                        
+                        value2 = null;
+                        input = null;
+                        Marshal.ReleaseComObject(range);
+                        Marshal.ReleaseComObject(temprange);
+                        Marshal.ReleaseComObject(last);
+                        Marshal.ReleaseComObject(sheet);
+                        Marshal.ReleaseComObject(objSheets);
+                        if (i == 0) wkb.Close(false);
+                        Marshal.ReleaseComObject(wkb);
+                        if (i == 0) workbooks.Close();
+                        Marshal.ReleaseComObject(workbooks);
+                        if (i == 0) excel.Quit();
+                        Marshal.ReleaseComObject(excel);
+                    }
+                }
+                if (false)
+                {
+                    //see https://coderwall.com/p/app3ya/read-excel-file-in-c
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    ReleaseRCM(range);
+                    ReleaseRCM(temprange);
+                    ReleaseRCM(last);
+                    ReleaseRCM(sheet);
+                    ReleaseRCM(objSheets);                    
+                    //wkb.Close();
                     ReleaseRCM(wkb);
-
-                if (excel != null)
+                    //workbooks.Close();
+                    ReleaseRCM(workbooks);
+                    excel.Quit();
                     ReleaseRCM(excel);
+                }
+                if(false)
+                {
+                    if (wkb != null)
+                        ReleaseRCM(wkb);
+
+                    if (excel != null)
+                        ReleaseRCM(excel);
+                }
+            
             }
             //G.Writeln("full excel " + G.Seconds(t00));
             return matrix;

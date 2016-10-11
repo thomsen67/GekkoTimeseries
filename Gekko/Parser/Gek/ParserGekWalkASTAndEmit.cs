@@ -2389,6 +2389,14 @@ namespace Gekko.Parser.Gek
                             node.Code.CA("O.GetString(" + node[0].Code + ")");
                         }
                         break;
+                    case "ASTNAMEHELPER":
+                        {
+                            if (node[0] != null)
+                            {
+                                node.Code.CA("o" + Num(node) + ".name = O.GetString(" + node[0].Code + ");" + G.NL);
+                            }
+                        }
+                        break;                    
                     case "ASTOLS":
                     case "ASTPRT":
                         {
@@ -2400,10 +2408,8 @@ namespace Gekko.Parser.Gek
                             {
                                 //PRT
                                 node.Code.A("O.Prt o" + Num(node) + " = new O.Prt();" + G.NL);
-                            }
-                            //node.Code.A("o" + Num(node) + ".t1 = G.GetStartDate(o" + Num(node) + ".t1);" + G.NL;
-                            //node.Code.A("o" + Num(node) + ".t2 = G.GetEndDate(o" + Num(node) + ".t2);" + G.NL;
-                            GetCodeFromAllChildren(node);                            
+                            }                            
+                            GetCodeFromAllChildren(node);
 
                             if (node.Text == "ASTPRT")
                             {
@@ -2412,12 +2418,10 @@ namespace Gekko.Parser.Gek
                                 //Globals.lastPrtCsSnippetHeader = w.headerCs.ToString();  //may contain a lot of unnecessary IVariables, but never mind (not a problem when used interactively)
 
                                 Globals.prtCsSnippetsCounter++;
-                                node.Code.A("o" + Num(node) + ".counter = " + Globals.prtCsSnippetsCounter + ";" + G.NL);                                                                
+                                node.Code.A("o" + Num(node) + ".counter = " + Globals.prtCsSnippetsCounter + ";" + G.NL);
                                 Globals.prtCsSnippets.Add(Globals.prtCsSnippetsCounter, node.Code.ToString() + "return o" + Num(node) + ";" + G.NL);
                                 Globals.prtCsSnippetsHeaders.Add(Globals.prtCsSnippetsCounter, w.headerCs.ToString());
-                            }
-
-                            
+                            }                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
 
                         }
