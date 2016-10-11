@@ -26249,7 +26249,7 @@ namespace Gekko
 
         public static TableLight ReadExcelWorkbook(string file, Databank databank, string sheetName)
         {
-            
+            int threadID = (int)AppDomain.GetCurrentThreadId();  //should be ok, just not for "fibre" threads (on SQL server)... never mind
             if (!File.Exists(file))
             {
                 G.Writeln2("*** ERROR: File " + file + " does not seem to exist");
@@ -26276,9 +26276,27 @@ namespace Gekko
                 //Seems this startup always takes 1 second. Maybe put it in Global and reuse from there.
                 if (Globals.excelFix)
                 {
-                    //THIS DOES NOT WORK: COM object that has been separated from its underlying RCW cannot be used.
-                    //Can this fix it?: #5298375235
-                    if (Globals.objApp == null) Globals.objApp = new Excel.Application();
+                    //THIS SEEMS TO WORK, cf also #5298375235                    
+                    if (Globals.objApp == null)
+                    {
+                        Globals.objApp = new Excel.Application();
+                    }
+                    else if (Globals.excelLastThreadID != threadID)
+                    {
+                        //#5298375235
+                        Globals.excelLastThreadID = threadID;
+                        System.Runtime.InteropServices.Marshal.FinalReleaseComObject(Globals.objApp);
+                        Globals.objApp = null;
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        // GC needs to be called twice in order to get the Finalizers called
+                        // - the first time in, it simply makes a list of what is to be
+                        // finalized, the second time in, it actually is finalizing. Only
+                        // then will the object do its automatic ReleaseComObject.
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        Globals.objApp = new Excel.Application();
+                    }
                     excel = Globals.objApp;
                 }
                 else
@@ -26417,7 +26435,7 @@ namespace Gekko
                 workbooks.Close();
                 Marshal.ReleaseComObject(workbooks);
                 excel.Quit();
-                Marshal.ReleaseComObject(excel);
+                if (!Globals.excelFix) Marshal.ReleaseComObject(excel);
             }
             //G.Writeln("full excel " + G.Seconds(t00));
             return matrix;

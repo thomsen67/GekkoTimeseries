@@ -53,7 +53,7 @@ namespace Gekko
         
         public static bool readImportFilter = false;
 
-        public static bool excelFix = false;
+        public static bool excelFix = true;
 
         public static bool newSplit = true;
         public static string splitSTART2 = "//[[splitSTART]]";
