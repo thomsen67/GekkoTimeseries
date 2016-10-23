@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 T2.g 2016-07-26 01:25:28
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 T2.g 2016-10-23 22:35:04
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -88,8 +88,8 @@ public partial class T2Lexer : Lexer {
     public const int ASTCOMMAND2 = 14;
     public const int DOT = 55;
     public const int ASTCOMMAND1 = 13;
-    public const int P_ = 91;
     public const int ASTCOMMAND3 = 15;
+    public const int P_ = 91;
     public const int ASTMULTIPLY = 11;
     public const int PERCENT = 57;
     public const int ASTCOMMAND = 12;

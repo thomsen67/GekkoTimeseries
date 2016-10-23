@@ -1074,6 +1074,11 @@ namespace Gekko
             // Create a lexer attached to that input
             T2Parser parser2 = null;
             T2Lexer lexer2 = new T2Lexer(input);
+            if (false)
+            {
+                Gekko.Parser.ParserCommon.DebugTokens(lexer2);
+            }
+
             //usually debugTokens=false, and this is stepped into manually (otherwise the tokens are consumed and preliminary steps cannot be run)
             // Create a stream of tokens pulled from the lexer
             CommonTokenStream tokens = new CommonTokenStream(lexer2);

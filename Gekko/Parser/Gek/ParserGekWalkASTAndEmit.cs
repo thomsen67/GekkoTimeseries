@@ -2396,7 +2396,12 @@ namespace Gekko.Parser.Gek
                                 node.Code.CA("o" + Num(node) + ".name = O.GetString(" + node[0].Code + ");" + G.NL);
                             }
                         }
-                        break;                    
+                        break;
+                    case "ASTIMPOSE":  //"impose = " in OLS
+                        {
+                            node.Code.A("o" + Num(node) + ".impose = " + node[0].Code + ";" + G.NL);                           
+                        }
+                        break;
                     case "ASTOLS":
                     case "ASTPRT":
                         {

@@ -356,22 +356,10 @@ namespace Gekko
             Matrix m = O.GetMatrix(x);
             int n = CheckSquare(m);
             Matrix clone = m.Clone();
-            int success = 0;
-            alglib.matinvreport report = new alglib.matinvreport();            
-            alglib.rmatrixinverse(ref clone.data, out success, out report);
-            if (success == 3)
-            {
-                G.Writeln2("*** ERROR: Inv(): It seems the matrix is singular");
-                throw new GekkoException();
-            }
-            else if (success != 1)
-            {
-                G.Writeln2("*** ERROR: Inv(): Could not invert matrix");
-                throw new GekkoException();
-            }
+            clone.data = Program.InvertMatrix(clone.data);
             return clone;
         }
-
+        
         public static IVariable zeros(GekkoTime t, IVariable x1, IVariable x2)
         {
             int n1 = O.GetInt(x1);
@@ -925,12 +913,12 @@ namespace Gekko
             else if (x.Type() == EVariableType.Matrix)
             {
                 Matrix m = O.GetMatrix(x);
-                Matrix m2 = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
+                rv = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
                 for (int i = 0; i < m.data.GetLength(0); i++)
                 {
                     for (int j = 0; j < m.data.GetLength(1); j++)
                     {
-                        m2.data[i, j] = Math.Sqrt(m.data[i, j]);
+                        ((Matrix)rv).data[i, j] = Math.Sqrt(m.data[i, j]);
                     }
                 }
             }

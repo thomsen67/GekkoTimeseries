@@ -4072,7 +4072,9 @@ namespace Gekko
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set    
             public string name = null;        
-            public List<O.Prt.Element> prtElements = new List<O.Prt.Element>();                        
+            public List<O.Prt.Element> prtElements = new List<O.Prt.Element>();
+            public IVariable impose = null;
+            public string opt_constant = null;                
             public void Exe()
             {
                 Program.Ols(this);

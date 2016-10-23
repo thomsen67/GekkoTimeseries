@@ -55,6 +55,7 @@ options {
 //Token definitions I
 tokens {
     ASTLIBRARY;
+	ASTIMPOSE;
 	ASTNAMEHELPER;
 	ASTINTERPOLATE;
 	ASTTABLEMAIN;
@@ -577,6 +578,8 @@ tokens {
     ASTYMIN;
     ASTZERO;
 
+	IMPOSE = 'IMPOSE';
+	CONSTANT = 'CONSTANT';
 	INTERPOLATE = 'INTERPOLATE';
 	PRORATE = 'PRORATE';
 	TRIM = 'TRIM';
@@ -1026,6 +1029,8 @@ tokens {
                                 {
                                         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 										d.Add("INTERPOLATE"    ,   INTERPOLATE     );
+										d.Add("CONSTANT", CONSTANT);
+										d.Add("IMPOSE", IMPOSE);
 										d.Add("PRORATE"    ,   PRORATE     );
 										d.Add("TRIM"    ,   TRIM     );
 										d.Add("USING"    ,   USING     );
@@ -1804,9 +1809,10 @@ mode2                     : MIXED | SIM | DATA;
 model                     : MODEL modelOpt1? fileNameStar -> ^({token("ASTMODEL", ASTMODEL, $MODEL.Line)} ^(ASTHANDLEFILENAME fileNameStar) modelOpt1?);
 
 						  //necessay to split it in two instead of using nameWithDot? Else, "OLS dlog(pcp) = ..." will get name=dlog and lhs=(pcp)
-ols                       : OLS olsOpt1? olsElements -> ^({token("ASTOLS", ASTOLS, $OLS.Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER) olsElements)
-						  | OLS olsOpt1? nameWithDot olsElements -> ^({token("ASTOLS", ASTOLS, $OLS.Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER nameWithDot) olsElements)
+ols                       : OLS olsOpt1? olsElements olsImpose? -> ^({token("ASTOLS", ASTOLS, $OLS.Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER) olsImpose? olsElements)
+						  | OLS olsOpt1? nameWithDot olsElements olsImpose? -> ^({token("ASTOLS", ASTOLS, $OLS.Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER nameWithDot?) olsImpose? olsElements)
 						  ;
+olsImpose                 : IMPOSE EQUAL expression -> ^(ASTIMPOSE expression?);
 
 open                      : OPEN openOpt1? openHelper (COMMA2 openHelper)* -> ^({token("ASTOPEN", ASTOPEN, $OPEN.Line)} openOpt1? openHelper+);
 openHelper                : fileNameStar (AS ident)? -> ^(ASTOPENHELPER ^(ASTFILENAME fileNameStar) ^(ASTAS ident?));
@@ -2165,7 +2171,9 @@ openOpt1h                 : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  ;
 
 olsOpt1                   : ISNOTQUAL | leftAngle olsOpt1h? RIGHTANGLE -> olsOpt1h?;
-olsOpt1h                  : dates -> ^(ASTDATES dates);
+olsOpt1h                  : dates -> ^(ASTDATES dates)
+						  | CONSTANT (EQUAL yesNo)? -> ^(ASTOPT_STRING_CONSTANT yesNo?)
+						  ;
 
 mulbkOpt1                 : ISNOTQUAL | leftAngle mulbkOpt1h* RIGHTANGLE -> mulbkOpt1h*;
 mulbkOpt1h                : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
@@ -2872,6 +2880,8 @@ doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 
 ident                     : Ident|
 							USING|
+							IMPOSE|
+							CONSTANT|
 							INTERPOLATE|
 							PRORATE|
 							TRIM|

@@ -358,8 +358,18 @@ namespace Gekko
                         G.Writeln2("*** ERROR: The two matrices are not compatible for multiplication");
                         G.Writeln2("           " + m + "x" + k + " and " + b.GetLength(0) + "x" + b.GetLength(1) + " do not match");
                     }
-                    double[,] c = new double[m, n];
-                    alglib.rmatrixgemm(m, n, k, 1, a, 0, 0, 0, b, 0, 0, 0, 0, ref c, 0, 0);
+                    double[,] c = null;
+
+                    if (false)
+                    {
+                        c = new double[m, n];
+                        alglib.rmatrixgemm(m, n, k, 1, a, 0, 0, 0, b, 0, 0, 0, 0, ref c, 0, 0);
+                    }
+                    else
+                    {
+                        c = Program.MultiplyMatrices(a, b);
+                    }
+
                     Matrix z = new Matrix();
                     z.data = c;
                     return z;

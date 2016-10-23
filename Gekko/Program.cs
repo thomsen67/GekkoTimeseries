@@ -19795,7 +19795,51 @@ namespace Gekko
             else G.Writeln("Deleted " + counter + " variables");
         }
 
-
+        public static double[,] InvertMatrix(double[,] matrix)
+        {
+            int success = 0;
+            alglib.matinvreport report = new alglib.matinvreport();
+            alglib.rmatrixinverse(ref matrix, out success, out report);
+            if (success == 3)
+            {
+                G.Writeln2("*** ERROR: Inv(): It seems the matrix is singular");
+                throw new GekkoException();
+            }
+            else if (success != 1)
+            {
+                G.Writeln2("*** ERROR: Inv(): Could not invert matrix");
+                throw new GekkoException();
+            }
+            return matrix;
+        }
+               
+        public static double[,] XTransposeX(double[,] x)
+        {
+            //  1 2
+            //  3 4     5 6 7 8       -->   3x2 * 2x4 = 3x4
+            //  5 6     8 9 8 5
+            //
+            int xRows = x.GetLength(1);
+            int xCols = x.GetLength(0);
+            //int yRows = x.GetLength(0);
+            //int yCols = x.GetLength(1);
+                        
+            double[,] z = new double[xRows, xRows];
+            for (int i = 0; i < xRows; i++)
+            {
+                for (int j = 0; j < xRows; j++)
+                {
+                    double sum = 0d;
+                    for (int k = 0; k < xCols; k++)
+                    {
+                        sum += x[k, i] * x[k, j];
+                    }
+                    z[i, j] = sum;
+                }
+            }
+            return z;
+            
+        }
 
         public static void Ols(O.Ols o)
         {
@@ -19831,156 +19875,253 @@ namespace Gekko
             //What about: http://christoph.ruegg.name/blog/linear-regression-mathnet-numerics.html ?
             //Also see: http://christoph.ruegg.name/blog/towards-mathnet-numerics-v3.html
 
+
+            bool useScale = false; //usually true
+
             GekkoTime t1 = o.t1;
             GekkoTime t2 = o.t2;
             string name = o.name;
             if (name == null) name = "ols";
-            
+
             List<string> labels = new List<string>();
             double[,] tsData2 = null;
-            int k2 = 0;
+            int m2 = 0;
             int n = GekkoTime.Observations(t1, t2);
             List<O.Prt.Element> elements = o.prtElements;
-            UnfoldVarsAndLabels(ref k2, ref tsData2, t1, t2, labels, n, elements);
-            int k = k2 - 1;
+            int constant = 1;
+            if (G.equal(o.opt_constant, "no")) constant = 0;
+            UnfoldVarsAndLabels(ref m2, ref tsData2, t1, t2, labels, n, elements, constant);
 
-            if (n <= k)
+            int m = m2 - 1;  //explanatory vars including constant
+
+            if (n <= m)
             {
-                G.Writeln2("*** ERROR: There are " + k + " variables with only " + n + " observations");
+                G.Writeln2("*** ERROR: There are " + m + " variables with only " + n + " observations");
                 throw new GekkoException();
             }
 
-            Matrix name_coeff = new Matrix(k, 1, double.NaN);
-            Matrix name_t = new Matrix(k, 1, double.NaN);
-            Matrix name_se = new Matrix(k, 1, double.NaN);
+            Matrix name_coeff = new Matrix(m, 1, double.NaN);
+            Matrix name_t = new Matrix(m, 1, double.NaN);
+            Matrix name_se = new Matrix(m, 1, double.NaN);
             Matrix name_stats = new Matrix(9, 1, double.NaN);
-            Matrix name_covar = new Matrix(k, k, double.NaN);
+            Matrix name_covar = new Matrix(m, m, double.NaN);
+            Matrix name_corr = new Matrix(m, m, double.NaN);
             TimeSeries name_predict = new TimeSeries(t1.freq, name + "_predict");
-            TimeSeries name_residual = new TimeSeries(t1.freq, name + "_residual");            
+            TimeSeries name_residual = new TimeSeries(t1.freq, name + "_residual");
 
-            double[] resultData = new double[n];
-            double[,] tsData = new double[n, k];
+            double[] y = new double[n];
+            double[,] x = new double[n, m];
             for (int i = 0; i < n; i++)
             {
-                resultData[i] = tsData2[i, 0];
-                for (int j = 0; j < k; j++)
+                y[i] = tsData2[i, 0];
+                for (int j = 0; j < m; j++)
                 {
-                    tsData[i, j] = tsData2[i, j + 1];
+                    x[i, j] = tsData2[i, j + 1];
                 }
             }
 
-            double[] weights = null;
-            int fitResult = 0;
+            double[] beta = null;
+            int info = 0;
 
-            double[] scaling = new double[tsData.GetLength(1)];
-            for (int kk = 0; kk < tsData.GetLength(1); kk++)
+            double[] scaling = new double[x.GetLength(1)];
+            for (int kk = 0; kk < x.GetLength(1); kk++)
             {
                 double sum = 0d;
-                for (int tt = 0; tt < tsData.GetLength(0); tt++)
+                for (int tt = 0; tt < x.GetLength(0); tt++)
                 {
-                    sum += Math.Abs(tsData[tt, kk]);  //with abs we avoid stupid averages = 0 like -2, -1, 0, 1, 2 etc.
+                    sum += Math.Abs(x[tt, kk]);  //with abs we avoid stupid averages = 0 like -2, -1, 0, 1, 2 etc.
                 }
-                scaling[kk] = sum / tsData.GetLength(0);
+                scaling[kk] = sum / x.GetLength(0);
                 if (scaling[kk] == 0d) scaling[kk] = 1d;
-                for (int tt = 0; tt < tsData.GetLength(0); tt++)
+
+                //scaling[kk] = 1d;
+                //if (kk == 0) scaling[kk] = 1d / 1000d;
+                //if (kk == 1) scaling[kk] = 1d / .01d;
+
+                for (int tt = 0; tt < x.GetLength(0); tt++)
                 {
-                    tsData[tt, kk] = tsData[tt, kk] / scaling[kk];
+                    x[tt, kk] = x[tt, kk] / scaling[kk];
                 }
             }
 
             alglib.lsfit.lsfitreport rep = new alglib.lsfit.lsfitreport();
-            alglib.lsfit.lsfitlinear(resultData, tsData, n, k, ref fitResult, ref weights, rep);
 
-            for (int kk = 0; kk < tsData.GetLength(1); kk++)
+            int info2 = -12345;
+            double[,] restrict = new double[0, m + 1];  //array[k, m+1]  c[i,0]*beta[0] + ... + c[i,m-1]*beta[m-1] = c[i,m]            
+
+            int k = 0;
+            double[,] r = null;
+
+            if (o.impose != null)
             {
-                for (int tt = 0; tt < tsData.GetLength(0); tt++)
+                Matrix rr = O.GetMatrix(o.impose);
+                k = rr.data.GetLength(0);
+                restrict = new double[rr.data.GetLength(0), rr.data.GetLength(1)];  //needs to be cloned, otherwise the IMPOSE matrix will be changed with scaling
+                for (int i = 0; i < rr.data.GetLength(0); i++)
                 {
-                    tsData[tt, kk] = tsData[tt, kk] * scaling[kk];
+                    for (int j = 0; j < rr.data.GetLength(1) - 1; j++)
+                    {
+                        restrict[i, j] = rr.data[i, j] / scaling[j];
+                    }
+                    restrict[i, rr.data.GetLength(1) - 1] = rr.data[i, rr.data.GetLength(1) - 1];
+                }                
+            }
+
+            r = new double[restrict.GetLength(0), restrict.GetLength(1) - 1];
+            for (int i = 0; i < restrict.GetLength(0); i++)
+            {
+                for (int j = 0; j < restrict.GetLength(1) - 1; j++)
+                {
+                    r[i, j] = restrict[i, j];
                 }
             }
 
-            double[] predict = new double[n];
+            //http://www.alglib.net/translator/man/manual.csharp.html#sub_lsfitlinearc
+            //if it detects k = 0, it just calls same procedure as alglib.lsfit.lsfitlinear()
+            try
+            {
+                alglib.lsfit.lsfitlinearc(y, x, restrict, n, m, k, ref info2, ref beta, rep);
+            }
+            catch (Exception e)
+            {
+                if (e.Message != null && e.Message != "")
+                    G.Writeln2("*** ERROR: " + e.Message);
+                if (e.InnerException != null && e.InnerException.Message != null && e.InnerException.Message != "")
+                    G.Writeln2("*** ERROR: " + e.InnerException.Message);
+                throw;
+            }
+
+            //for (int kk = 0; kk < x.GetLength(1); kk++)
+            //{
+            //    for (int tt = 0; tt < x.GetLength(0); tt++)
+            //    {
+            //        x[tt, kk] = x[tt, kk] * scaling[kk];
+            //    }
+            //}
+
+            double[] ypredict = new double[n];
             double[] residual = new double[n];
 
             double dw1 = 0d;
-            double dw2 = 0d;
             double rss = 0d;
+            
             double resMean = 0d;
+            
             double lhsMean = 0d;
+
+            double ySum = 0d;
+            for (int i = 0; i < n; i++)
+            {                
+                ySum += y[i];                
+            }
+            double yAvg = ySum / (double)n;
+
+            double ssTot = 0d;
+
             for (int i = 0; i < n; i++)
             {
-                predict[i] = 0d;
-                for (int ik = 0; ik < k; ik++)
+                ypredict[i] = 0d;
+                for (int ik = 0; ik < m; ik++)
                 {
-                    predict[i] += weights[ik] / scaling[ik] * tsData[i, ik];
+                    ypredict[i] += beta[ik] * x[i, ik];
                 }
-                residual[i] = resultData[i] - predict[i];
+                residual[i] = y[i] - ypredict[i];
                 resMean += residual[i];
-                lhsMean += resultData[i];
+                
+                lhsMean += y[i];
                 rss += residual[i] * residual[i];
+                ssTot += (y[i] - yAvg) * (y[i] - yAvg);
                 if (i > 0) dw1 += (residual[i] - residual[i - 1]) * (residual[i] - residual[i - 1]);
-                dw2 += residual[i] * residual[i];
 
-                name_predict.SetData(t1.Add(i), predict[i]);
+                name_predict.SetData(t1.Add(i), ypredict[i]);
                 name_residual.SetData(t1.Add(i), residual[i]);
-
             }
             resMean = resMean / (double)n;
             lhsMean = lhsMean / (double)n;
-            double dw = dw1 / dw2;
-            double see = Math.Sqrt(dw2 / (n - k));
+            
+            double dw = dw1 / rss;
+            double rmse = Math.Sqrt(rss / (double)(n));
+            double see = Math.Sqrt(rss / (double)(n - m + k));
 
+            double[,] usedCovar = null;
+
+            double[,] ixtx = InvertMatrix(XTransposeX(x));
+            if (r.GetLength(0) == 0)
+            {
+                //covar = sigma^2 * inv(X'X)
+                usedCovar = O.MultiplyMatrixScalar(ixtx, see * see, ixtx.GetLength(0), ixtx.GetLength(1));
+            }
+            else
+            {
+                //covar = sigma^2 *( inv(X'X)  -   inv(X'X) * R' inv( R  inv(X'X) R' ) R  inv(X'X) )
+                double[,] mat1 = ixtx;
+                double[,] inside = InvertMatrix(MultiplyMatrices(MultiplyMatrices(r, ixtx), Transpose(r)));
+                double[,] zz = MultiplyMatrices(MultiplyMatrices(MultiplyMatrices(MultiplyMatrices(ixtx, Transpose(r)), inside), r), ixtx);
+                double[,] zzz = O.SubtractMatrixMatrix(ixtx, zz, ixtx.GetLength(0), ixtx.GetLength(1));
+                usedCovar = O.MultiplyMatrixScalar(zzz, see * see, zzz.GetLength(0), zzz.GetLength(1));
+            }
+
+            //usedCovar = rep.covpar; --> this yields the same (without restrictions), also in the case without constant
+
+            
+            for (int i = 0; i < usedCovar.GetLength(0); i++)
+            {
+                for (int j = 0; j < usedCovar.GetLength(1); j++)
+                {
+                    usedCovar[i, j] = usedCovar[i, j] / scaling[i] / scaling[j];                    
+                }
+            }
+
+            double[,] usedCorr = new double[usedCovar.GetLength(0), usedCovar.GetLength(1)];
+            for (int i = 0; i < usedCovar.GetLength(0); i++)
+            {
+                for (int j = 0; j < usedCovar.GetLength(1); j++)
+                {
+                    usedCorr[i, j] = usedCovar[i, j] / Math.Sqrt(usedCovar[i, i]) / Math.Sqrt(usedCovar[j, j]);
+                }
+            }
+            
             Table tab = new Table();
 
-
-            tab.Set(1, 1, "Variable");            
+            tab.Set(1, 1, "Variable");
             tab.Set(1, 2, "Estimate");
             tab.Set(1, 3, "Std error");
             tab.Set(1, 4, "T-stat");
             tab.SetAlign(1, 1, 1, 4, Align.Right);
-            for (int i = 0; i < k; i++)
+            for (int i = 0; i < m; i++)
             {
+                double coeff = 1d / scaling[i] * beta[i];
+
                 string s = TruncateTextWithDots(25, labels[i + 1]);
-                tab.Set(i + 2, 1, s);
-                //tab.Set(i + 2, 1, "c" + (i + 1));
+                tab.Set(i + 2, 1, s);                
                 tab.SetAlign(i + 2, 1, Align.Left);
-
-                //FIXME: Use interior of RoundToSignificantDigits
-                string dec = "0";
-                double x = Math.Abs(weights[i]);
-                double y = 1d / x;
-                double z = Math.Log10(y) + 6;
-                int z2 = (int)z;
-                z2 = Math.Max(0, z2);
-                dec = "" + z2;
-
-                double coeff = 1d / scaling[i] * weights[i];
-                double se = 1d / scaling[i] * rep.errpar[i];
-                double t = Math.Abs(weights[i] / rep.errpar[i]);
-
-                tab.SetNumber(i + 2, 2, coeff, "f14." + dec);
-                tab.SetNumber(i + 2, 3, se, "f14." + dec);
-                tab.SetNumber(i + 2, 4, t, "f14.2");
+                
+                int digits = -(int)RoundDecimals1(coeff) + 6;  //can be negative
+                if (digits < 0) digits = 0;
+                
+                double se = double.NaN;
+                double t = double.NaN;
+                
+                se = Math.Sqrt(usedCovar[i, i]);
+                t = Math.Abs(coeff / Math.Sqrt(usedCovar[i, i]));
+                
+                tab.SetNumber(i + 2, 2, coeff, "f16." + digits);
+                tab.SetNumber(i + 2, 3, se, "f16." + digits);
+                tab.SetNumber(i + 2, 4, t, "f12.2");
 
                 name_coeff.data[i, 0] = coeff;
                 name_se.data[i, 0] = se;
                 name_t.data[i, 0] = t;
-
-            }            
+            }
 
             tab.SetBorder(1, 1, 1, 4, BorderType.Top);
             tab.SetBorder(1, 1, 1, 4, BorderType.Bottom);
-            tab.SetBorder(k + 1, 1, k + 1, 4, BorderType.Bottom);
+            tab.SetBorder(m + 1, 1, m + 1, 4, BorderType.Bottom);
             List<string> temp = tab.Print();
 
-            double r2 = rep.r2;
-            double r2cor = 1 - (1 - r2) * (n - 1) / (n - (k - 1) - 1);  //google r2 adjusted formula. Our k includes the constant, usually regressors do not count the constant -> therefore (k-1)
-            if (rep.r2 == 0d)
-            {
-                r2 = double.NaN;
-                r2cor = double.NaN;  //typically when there is no constant term
-            }
-
+            double r2 = 1 - rss / ssTot;
+            double r2cor = 1 - (1 - r2) * (n - 1) / (n - (m - 1) - 1 + k);  //google r2 adjusted formula. Our m includes the constant, usually regressors do not count the constant -> therefore (m-1). TT added k, must be so.
+        
             int widthRemember = Program.options.print_width;
             int fileWidthRemember = Program.options.print_filewidth;
             Program.options.print_width = int.MaxValue;
@@ -19989,19 +20130,25 @@ namespace Gekko
             G.Writeln(labels[0]);  //labels contain the LHS and all the RHS!            
             foreach (string s in temp) G.Writeln(s);
             G.Writeln("R2: " + Math.Round(r2, 6) + "    " + "SEE: " + RoundToSignificantDigits(see, 6) + "    " + "DW: " + Math.Round(dw, 4));
-                       
+
+            if(Math.Abs(resMean) > 0.000001d*see)
+            {
+                G.Writeln2("+++ NOTE: The residuals do not seem to sum to zero. Did you omit a constant term?");
+                G.Writeln("          Note that R2 and other statistics may be misleading in this case.");
+            }
 
             name_stats.data[1 - 1, 0] = rss;
             name_stats.data[2 - 1, 0] = see;
             name_stats.data[3 - 1, 0] = resMean;
-            name_stats.data[4 - 1, 0] = rep.rmserror;
-            name_stats.data[5 - 1, 0] = rep.r2;
-            name_stats.data[6 - 1, 0] = r2cor;  
+            name_stats.data[4 - 1, 0] = rmse; // rep.rmserror;
+            name_stats.data[5 - 1, 0] = r2;
+            name_stats.data[6 - 1, 0] = r2cor;
             name_stats.data[8 - 1, 0] = lhsMean;
             name_stats.data[9 - 1, 0] = dw;
-            name_covar.data = rep.covpar;
+            name_covar.data = usedCovar;
+            name_corr.data = usedCorr;
 
-            if(true)
+            if (true)
             {
                 if (Program.databanks.GetFirst().ContainsVariable(name + "_predict")) Program.databanks.GetFirst().RemoveVariable(name + "_predict");
                 Program.databanks.GetFirst().AddVariable(name_predict);
@@ -20017,12 +20164,13 @@ namespace Gekko
                 Program.scalars.Add(Globals.symbolList + name + "_se", name_se);
                 if (Program.scalars.ContainsKey(Globals.symbolList + name + "_covar")) Program.scalars.Remove(Globals.symbolList + name + "_covar");
                 Program.scalars.Add(Globals.symbolList + name + "_covar", name_covar);
-
+                if (Program.scalars.ContainsKey(Globals.symbolList + name + "_corr")) Program.scalars.Remove(Globals.symbolList + name + "_corr");
+                Program.scalars.Add(Globals.symbolList + name + "_corr", name_corr);
             }
 
 
             Program.options.print_width = widthRemember;
-            Program.options.print_filewidth = fileWidthRemember;            
+            Program.options.print_filewidth = fileWidthRemember;
         }
 
         public static double StandardDeviation(List<double> valueList)
@@ -20136,8 +20284,7 @@ namespace Gekko
             int k = 0;
             int n = GekkoTime.Observations(t1, t2);
             List<O.Prt.Element> elements = o.prtElements;
-            UnfoldVarsAndLabels(ref k, ref tsData, t1, t2, labels, n, elements);
-
+            UnfoldVarsAndLabels(ref k, ref tsData, t1, t2, labels, n, elements, 0);
 
             G.Writeln();
             int counter = -1;
@@ -20185,20 +20332,28 @@ namespace Gekko
             }
         }
 
-        private static void UnfoldVarsAndLabels(ref int k, ref double[,] tsData, GekkoTime t1, GekkoTime t2, List<string> labels, int n, List<O.Prt.Element> elements)
-        {
+        private static void UnfoldVarsAndLabels(ref int k, ref double[,] tsData, GekkoTime t1, GekkoTime t2, List<string> labels, int n, List<O.Prt.Element> elements, int constant)
+        {           
             foreach (O.Prt.Element e in elements)
+            {
                 foreach (O.Prt.SubElement se in e.subElements)
                 {
                     k += 1;
                     if (se.label != null) labels.Add(G.ReplaceGlueNew(se.label));
                     else labels.Add(G.ReplaceGlueNew(e.label));
                 }
+            }
+            if(constant == 1)
+            {
+                labels.Add("CONSTANT");
+            }
             if (k == 0)
             {
-                G.Writeln2("*** ERROR: Number of variables = 0");
+                G.Writeln2("*** ERROR: Number of explanatory variables = 0");  //probably not possible unless empty list
                 throw new GekkoException();
             }
+            k += constant;
+
             tsData = new double[n, k];
             Databank work = Program.databanks.GetFirst();
             int countT = -1;
@@ -20220,6 +20375,11 @@ namespace Gekko
                         }
                         tsData[countT, countK] = v;
                     }
+                }
+                if (constant == 1)
+                {
+                    countK++;
+                    tsData[countT, countK] = 1d;
                 }
             }
         }
@@ -20269,10 +20429,20 @@ namespace Gekko
         public static double RoundToSignificantDigits(this double d, int digits)
         {
             if (d == 0)
-                return 0;
+                return 0;            
+            return RoundDecimals2(d, digits);
+        }
 
-            double scale = Math.Pow(10, Math.Floor(Math.Log10(Math.Abs(d))) + 1);
-            return scale * Math.Round(d / scale, digits);
+        private static double RoundDecimals2(double d, int digits)
+        {
+            double scale = Math.Pow(10, RoundDecimals1(d));
+            double scale2 = scale * Math.Round(d / scale, digits);
+            return scale2;
+        }
+
+        private static double RoundDecimals1(double d)
+        {
+            return Math.Floor(Math.Log10(Math.Abs(d))) + 1;
         }
 
         public static void PrtNew(O.Prt o)
@@ -22830,7 +23000,6 @@ namespace Gekko
             //how to link xsd, use color-picker etc.
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
 
-
             bool dump = true;
             bool gnuplot51 = true;
 
@@ -22969,7 +23138,6 @@ namespace Gekko
                 string set_title = GnuplotHeading(o, gpt);
                 if (set_title != null) tw.WriteLine("set title " + Globals.QT + EncodeDanish(set_title) + Globals.QT);
 
-
                 if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
                 {
                     tw.WriteLine("set xdata time");
@@ -23045,9 +23213,6 @@ namespace Gekko
                 tw.WriteLine("set pointinterval -1");
                 tw.WriteLine("set pointsize 0.5");
 
-
-
-
                 if (o.opt_plotcode != null)
                 {
                     tw.WriteLine("");
@@ -23083,8 +23248,7 @@ namespace Gekko
                         dashtype = line.dashtype;                        
                         linewidth = line.linewidth;
                         linecolor = line.linecolor;
-                        pointtype = line.pointtype;
-                       
+                        pointtype = line.pointtype;                      
 
                         legend = line.legend;
                         size = line.size;
@@ -25785,29 +25949,60 @@ namespace Gekko
             }
         }
 
-        public static double[,] MultiplyMatrix(double[,]a, double[,]b)
+        public static double[,] MultiplyMatrices(double[,] x, double[,] y)
         {
-            double[,] c = null;
-            if (a.GetLength(1) == b.GetLength(0))
+            //  1 2
+            //  3 4     5 6 7 8       -->   3x2 * 2x4 = 3x4
+            //  5 6     8 9 8 5
+            //
+            int xRows = x.GetLength(0);
+            int xCols = x.GetLength(1);
+            int yRows = y.GetLength(0);
+            int yCols = y.GetLength(1);
+            if (xCols != yRows)
             {
-                c = new double[a.GetLength(0), b.GetLength(1)];
-                for (int i = 0; i < c.GetLength(0); i++)
-                {
-                    for (int j = 0; j < c.GetLength(1); j++)
-                    {
-                        c[i, j] = 0;
-                        for (int k = 0; k < a.GetLength(1); k++) // OR k<b.GetLength(0)
-                            c[i, j] = c[i, j] + a[i, k] * b[k, j];
-                    }
-                }
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: Number of columns in First Matrix should be equal to Number of rows in Second Matrix.");
+                G.Writeln2("*** ERROR: Matrices do not conform for multiplication");
                 throw new GekkoException();
             }
-            return c;
+            double[,] z = new double[xRows, yCols];
+            for (int i = 0; i < xRows; i++)
+            {
+                for (int j = 0; j < yCols; j++)
+                {
+                    double sum = 0d;
+                    for (int k = 0; k < xCols; k++)
+                    {
+                        sum += x[i, k] * y[k, j];
+                    }
+                    z[i, j] = sum;
+                }
+            }
+            return z;
         }
+
+        //public static double[,] MultiplyMatrix(double[,]a, double[,]b)
+        //{
+        //    double[,] c = null;
+        //    if (a.GetLength(1) == b.GetLength(0))
+        //    {
+        //        c = new double[a.GetLength(0), b.GetLength(1)];
+        //        for (int i = 0; i < c.GetLength(0); i++)
+        //        {
+        //            for (int j = 0; j < c.GetLength(1); j++)
+        //            {
+        //                c[i, j] = 0;
+        //                for (int k = 0; k < a.GetLength(1); k++) // OR k<b.GetLength(0)
+        //                    c[i, j] = c[i, j] + a[i, k] * b[k, j];
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        G.Writeln2("*** ERROR: Number of columns in First Matrix should be equal to Number of rows in Second Matrix.");
+        //        throw new GekkoException();
+        //    }
+        //    return c;
+        //}
 
 
         private static void EigenValues()

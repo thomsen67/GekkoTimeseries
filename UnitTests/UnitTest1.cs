@@ -2147,7 +2147,7 @@ namespace UnitTests
             I("SERIES <1998 2010> lna1 =  166.223000  173.221000  179.571000  187.343000  194.888000  202.959000  209.426000  215.134000  222.716000  230.520000  238.518000  246.654000  254.991000 ;");
             I("SERIES <1998 2010> pcp  =  0.9502030   0.9699920   1.0000000   1.0235000   1.0401100   1.0605400   1.0754700   1.0977800   1.1121200   1.1314800   1.1513000   1.1717600   1.1871600  ;");
             I("SERIES <1998 2010> bul1 =  0.0684791   0.0591698   0.0560344   0.0535439   0.0535003   0.0631703   0.0649875   0.0578112   0.0473207   0.0404508   0.0467488   0.0472923   0.0475191  ;");
-            I("OLS <2000 2010> dlog(lna1) = dlog(pcp), dlog(pcp.1), bul1, bul1.1, 1;");
+            I("OLS <2000 2010> dlog(lna1) = dlog(pcp), dlog(pcp.1), bul1, bul1.1;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("0.144517"));  //stupid test, must be done better...
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("0.613875"));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("0.186740"));
