@@ -61,6 +61,7 @@ tokens {
   SKIP = 'SKIP';
   UPD = 'UPD';
   TIME = 'TIME';
+  IF = 'IF';
   ASTSERIES;
   AST1;
 }
@@ -105,6 +106,7 @@ tokens {
 										d.Add("SKIP", SKIP);
 										d.Add("UPD", UPD);
 										d.Add("TIME", TIME);
+										d.Add("IF", IF);
                                         return d;
                                 }
 
@@ -212,6 +214,7 @@ ident                     : Ident |
 							GENR|
 							UPD|
 							TIME|
+							IF|
 							SKIP
 ;
 

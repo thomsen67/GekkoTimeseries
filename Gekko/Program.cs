@@ -20087,7 +20087,8 @@ namespace Gekko
             tab.Set(1, 2, "Estimate");
             tab.Set(1, 3, "Std error");
             tab.Set(1, 4, "T-stat");
-            tab.SetAlign(1, 1, 1, 4, Align.Right);
+            tab.SetAlign(1, 1, 1, 1, Align.Left);
+            tab.SetAlign(1, 2, 1, 4, Align.Right);
             for (int i = 0; i < m; i++)
             {
                 double coeff = 1d / scaling[i] * beta[i];
@@ -20118,6 +20119,8 @@ namespace Gekko
             tab.SetBorder(1, 1, 1, 4, BorderType.Bottom);
             tab.SetBorder(m + 1, 1, m + 1, 4, BorderType.Bottom);
             List<string> temp = tab.Print();
+            Globals.lastPrtOrMulprtTable = tab;
+            CrossThreadStuff.CopyButtonEnabled(true);
 
             double r2 = 1 - rss / ssTot;
             double r2cor = 1 - (1 - r2) * (n - 1) / (n - (m - 1) - 1 + k);  //google r2 adjusted formula. Our m includes the constant, usually regressors do not count the constant -> therefore (m-1). TT added k, must be so.
@@ -20130,13 +20133,13 @@ namespace Gekko
             G.Writeln(labels[0]);  //labels contain the LHS and all the RHS!            
             foreach (string s in temp) G.Writeln(s);
             G.Writeln("R2: " + Math.Round(r2, 6) + "    " + "SEE: " + RoundToSignificantDigits(see, 6) + "    " + "DW: " + Math.Round(dw, 4));
-
-            if(Math.Abs(resMean) > 0.000001d*see)
+            
+            if (Math.Abs(resMean) > 0.000001d*see)
             {
                 G.Writeln2("+++ NOTE: The residuals do not seem to sum to zero. Did you omit a constant term?");
                 G.Writeln("          Note that R2 and other statistics may be misleading in this case.");
             }
-
+                        
             name_stats.data[1 - 1, 0] = rss;
             name_stats.data[2 - 1, 0] = see;
             name_stats.data[3 - 1, 0] = resMean;

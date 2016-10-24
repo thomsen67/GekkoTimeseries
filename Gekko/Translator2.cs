@@ -205,6 +205,14 @@ namespace Gekko
                 node.Text = "";         
             }
 
+            if (GetCommandType(node) == "delete" && G.equal(node.Text, "*"))
+            {
+                if (node.Parent.ChildrenCount() == 1)
+                {
+                    node.Text = "[*]";
+                }
+            }
+
             //Handle '123.' etc.
             if (node.Text.Length > 1 && node.Text.EndsWith("."))
             {
@@ -214,6 +222,16 @@ namespace Gekko
                     node.Text += "0";
                     //transforms '12345.' into '12345.0'
                     //Gekko does not like these end dots, they interfere with range (..) indicator.
+                }
+            }
+
+            //Handle '123.' etc.
+            if (node.Text == "#")
+            {
+                ASTNode2 temp = node.GetNext();
+                if (temp.Text == "#")
+                {
+                    node.GetCommand3().AddComment("Please note that ##x in Gekko is either %(%x) or #(%x)");
                 }
             }
 
@@ -278,6 +296,11 @@ namespace Gekko
                             {
                                 //do nothing, we presume it is a list when it is not a scalar
                             }
+                        }
+                        else if (GetCommandType(node) == "for" && (node.GetPrevious() != null && node.GetPrevious().Text == "=") && node.GetNext().GetNext() == null)
+                        {
+                            //FOR i = #m;, not FOR i = #x to #y;
+                            //do nothing, it must be a list.                       
                         }
                         else
                         {
@@ -450,7 +473,7 @@ namespace Gekko
                         temp2.AddToRightTextExtra(")");                        
                     }
                 }                
-            }
+            }                      
 
             //finds SERIES with if-then-else
             if (node.Text == "ASTCOMMAND3" && node.Parent.commandTypeAremosLower == "series")
@@ -601,6 +624,8 @@ namespace Gekko
             {
                 SetCommandType(node, "accept");
                 SetCommandText(node, "accept");
+                 node.GetCommand3().AddComment("Note that ACCEPT in Gekko is \"ACCEPT type variable 'message';\"");
+                
             }
 
             if (G.Equal(node.Text, FromTo("as", "assign")) != null)
@@ -627,6 +652,7 @@ namespace Gekko
             {
                 SetCommandType(node, "closeall");
                 SetCommandText(node, Globals.restartSnippet);
+                node.GetCommand3().AddComment("Note that in some cases, CLOSEALL is better replaced with \"CLOSE *; CLEAR;\" if scalars are to survive");
                 hasCloseall = true;
             }
 
@@ -689,6 +715,7 @@ namespace Gekko
             {
                 SetCommandType(node, "excelexport");
                 SetCommandText(node, "sheet");
+                node.GetCommand3().AddComment("Note that the SHEET syntax is quite different, please see the Gekko help file");
             }
 
             if (G.Equal(node.Text, FromTo("excelimport", "excelimport")) != null)
@@ -696,6 +723,13 @@ namespace Gekko
                 SetCommandType(node, "excelimport");
                 SetCommandText(node, "sheet");
                 node.GetCommand2().AddOptionBeforeVisitor("import");
+                node.GetCommand3().AddComment("Note that the SHEET<import> syntax is quite different, please see the Gekko help file");
+            }
+
+            if (G.Equal(node.Text, FromTo("vis", "vis")) != null)
+            {
+                SetCommandType(node, "vis");
+                SetCommandText(node, "plot");                
             }
 
             if (G.Equal(node.Text, FromTo("expo", "export")) != null)
@@ -846,6 +880,37 @@ namespace Gekko
                     xx.Text = "";
                     ASTNode2 yy = xx.GetNext();
                     if (yy != null) yy.leftBlanks = "";
+                }
+                else if (xx != null && G.Equal(xx.Text, FromTo("freq", "frequency")) != null)
+                {
+                    SetCommandType(node, "set");
+                    SetCommandText(node, "option");
+                    xx.Text = "freq";                    
+                }
+                else if (xx != null && G.Equal(xx.Text, FromTo("savefile", "savefile")) != null)
+                {
+                    SetCommandType(node, "set");
+                    SetCommandText(node, "option");
+                    node.GetCommand3().AddComment("'set savefile ...': use 'PIPE' and 'PIPE con' instead.");
+                }
+                else if (xx != null && G.Equal(xx.Text, FromTo("rep", "report")) != null)
+                {
+                    SetCommandType(node, "set");
+                    SetCommandText(node, "option");
+                    ASTNode2 yy = xx.GetNext();
+                    if (yy != null)
+                    {
+                        if(G.Equal(yy.Text, FromTo("dec", "decimals")) != null)
+                        {
+                            xx.Text = "print fields";
+                            yy.Text = "ndec";
+                        }
+                        else if (G.Equal(yy.Text, FromTo("col", "columns")) != null)
+                        {
+                            xx.Text = "print fields";
+                            yy.Text = "nwidth";
+                        }
+                    }                    
                 }
                 else
                 {
@@ -1067,9 +1132,19 @@ namespace Gekko
         public static string Translate2(bool file, List<string> inputFileLines)
         {
             string textInput = null;
-            textInput = G.ExtractTextFromLines(inputFileLines).ToString();           
+            textInput = G.ExtractTextFromLines(inputFileLines).ToString();
 
-            ANTLRStringStream input = new ANTLRStringStream(textInput);
+            List<string> xx = G.ExtractLinesFromText(textInput);
+            for (int i = 0; i < xx.Count; i++)
+            {
+                if (xx[i].Trim().ToLower().StartsWith("if ") || xx[i].Trim().ToLower().StartsWith("if("))
+                {
+                    xx[i] = xx[i].Replace("<", "-smaller-").Replace(">", "-larger-");  //IF with < or > does not work well, so we make a hack here. Will handle many cases.
+                }
+            }
+            string textInput2 = G.ExtractTextFromLines(xx).ToString();
+
+            ANTLRStringStream input = new ANTLRStringStream(textInput2);
             CommonTree t = null;
             // Create a lexer attached to that input
             T2Parser parser2 = null;
@@ -1148,6 +1223,7 @@ namespace Gekko
                 if (s2 == ";") s2 = "";
                 s2 = s2.Replace(";;", ";");
                 s2 = s2.Replace("; ;", ";");
+                s2 = s2.Replace("-smaller-", "<").Replace("-larger-", ">");
                 string alphabet = "abcdefghijklmnopqrstuvwxyz";
                 foreach (char c in alphabet)
                 {
