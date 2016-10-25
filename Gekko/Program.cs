@@ -20862,7 +20862,14 @@ namespace Gekko
                     if (G.equal(o.prtType, "plot"))
                     {
                         //tab.PrintCellsForDebug();
-                        CallGnuplotNew(tab, o, subElementCounterTotal + 1, maxLabelsLinesFound, labelsNonBroken);  //make sure there are no percent shown for levels (use <n> option, not <n p>)
+                        if (false)
+                        {
+                            CallGnuplotNew(tab, o, subElementCounterTotal + 1, maxLabelsLinesFound, labelsNonBroken);  //make sure there are no percent shown for levels (use <n> option, not <n p>)
+                        }
+                        else
+                        {
+                            CallGnuplotNew2(tab, o, subElementCounterTotal + 1, maxLabelsLinesFound, labelsNonBroken);  //make sure there are no percent shown for levels (use <n> option, not <n p>)
+                        }
 
                         //Alternatively: store all transformations, maybe also for UDVALG
                         //TODO.......
@@ -23124,110 +23131,118 @@ namespace Gekko
                     o.opt_plotcode = o.opt_plotcode.Replace("[histo]", "");
                 }
 
-                tw.WriteLine("set encoding iso_8859_1");
-                tw.WriteLine("set format y " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
-                                
-                tw.WriteLine("set datafile missing \"NaN\"");
                 string font = null;
                 if (gnuplot51) font = "'Verdana, 12'";
-                tw.WriteLine("set terminal " + pplotType + " enhanced "+font);                
-                tw.WriteLine("set output \"" + file2 + "\"");                
-
-                //local PLOT<> overrides
-                string set_yrange = GnuplotYrange(o, gpt);
-                if (set_yrange != null) tw.WriteLine("set yrange " + set_yrange + "");
-
-                //local PLOT<> overrides
-                string set_title = GnuplotHeading(o, gpt);
-                if (set_title != null) tw.WriteLine("set title " + Globals.QT + EncodeDanish(set_title) + Globals.QT);
-
-                if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
+                
+if (true)
                 {
-                    tw.WriteLine("set xdata time");
-                    tw.WriteLine(@"set timefmt ""%Y/%m/%d""");
-                    tw.WriteLine(@"set format x ""%Y/%m""");
-                }
-                else
-                {
-                    if (numberOfObs > 70)
+
+                    tw.WriteLine("set encoding iso_8859_1");
+                    tw.WriteLine("set format y " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
+
+                    tw.WriteLine("set datafile missing \"NaN\"");
+                    
+                    tw.WriteLine("set terminal " + pplotType + " enhanced " + font);
+                    tw.WriteLine("set output \"" + file2 + "\"");
+
+                    //local PLOT<> overrides
+                    string set_yrange = GnuplotYrange(o, gpt);
+                    if (set_yrange != null) tw.WriteLine("set yrange " + set_yrange + "");
+
+                    //local PLOT<> overrides
+                    string set_title = GnuplotHeading(o, gpt);
+                    if (set_title != null) tw.WriteLine("set title " + Globals.QT + EncodeDanish(set_title) + Globals.QT);
+
+                    if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
                     {
-                        tw.WriteLine("set xtics 10");
-                        tw.WriteLine("set mxtics 10");
+                        tw.WriteLine("set xdata time");
+                        tw.WriteLine(@"set timefmt ""%Y/%m/%d""");
+                        tw.WriteLine(@"set format x ""%Y/%m""");
                     }
                     else
                     {
-                        tw.WriteLine("set xtics 5");
-                        tw.WriteLine("set mxtics 5");
-                    }
-                }
-
-                if (gnuplot51) tw.WriteLine("set tic scale 1.4, 0.7");
-                else tw.WriteLine("set ticscale 1.4 0.7");
-                
-                tw.WriteLine("set border 3");
-                tw.WriteLine("set xtics nomirror");
-                tw.WriteLine("set ytics nomirror");                
-                tw.WriteLine("set xzeroaxis lt -1");
-
-                //with right axis: needs to set this:
-                //and maybe a (right) or (højre)..., should be an option to set this txt
-                tw.WriteLine("set border 11");
-                tw.WriteLine("set y2tics");
-                tw.WriteLine("set yzeroaxis");
-                
-                //tw.WriteLine("set grid");
-                tw.WriteLine("set grid ytics lc rgb \"#bbbbbb\" lw 1 dt 2");
-                tw.WriteLine("set grid xtics lc rgb \"#bbbbbb\" lw 1 dt 2");
-
-                int mxtics = -12345;
-
-                if (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)
-                {
-                    //do nothing
-                }
-                else
-                {
-                    List<int> subperiods;
-                    int onlyYears;
-                    mxtics = GnuplotHandleXAxisLabels(labels1, mxtics, out subperiods, out onlyYears);
-
-                    string s3 = null;
-                    int c = -1;
-                    for (int i = 0; i < labels1.Count; i++)
-                    {
-                        c++;
-                        //int subper=labels2[i]
-                        //if (labels1.Count > 20 && c %  != 0) continue;
-                        string[] split = labels2[i].Split(new char[] { '/' });
-                        if (onlyYears != -12345 && int.Parse(split[0]) % onlyYears != 0) continue;
-                        if (subperiods.Contains(int.Parse(split[1])))
+                        if (numberOfObs > 70)
                         {
-                            s3 += "\"" + labels1[i] + "\" \"" + labels2[i] + "\", ";
+                            tw.WriteLine("set xtics 10");
+                            tw.WriteLine("set mxtics 10");
+                        }
+                        else
+                        {
+                            tw.WriteLine("set xtics 5");
+                            tw.WriteLine("set mxtics 5");
                         }
                     }
-                    if (s3.EndsWith(", ")) s3 = s3.Substring(0, s3.Length - 2);
-                    tw.WriteLine("set xtics (" + s3 + ")");
-                }
-      
-                tw.WriteLine("set style fill border");  //for the boxes/histograms
-                tw.WriteLine("set boxwidth 0.3 relative");
-                tw.WriteLine("set pointintervalbox 0.5");
 
-                tw.WriteLine("set pointinterval -1");
-                tw.WriteLine("set pointsize 0.5");
+                    if (gnuplot51) tw.WriteLine("set tic scale 1.4, 0.7");
+                    else tw.WriteLine("set ticscale 1.4 0.7");
 
-                if (o.opt_plotcode != null)
-                {
-                    tw.WriteLine("");
-                    tw.WriteLine(o.opt_plotcode);  //user code
-                    tw.WriteLine("");
+                    tw.WriteLine("set border 3");
+                    tw.WriteLine("set xtics nomirror");
+                    tw.WriteLine("set ytics nomirror");
+                    tw.WriteLine("set xzeroaxis lt -1");
+
+                    //with right axis: needs to set this:
+                    //and maybe a (right) or (højre)..., should be an option to set this txt
+                    tw.WriteLine("set border 11");
+                    tw.WriteLine("set y2tics");
+                    tw.WriteLine("set yzeroaxis");
+
+                    //tw.WriteLine("set grid");
+                    tw.WriteLine("set grid ytics lc rgb \"#bbbbbb\" lw 1 dt 2");
+                    tw.WriteLine("set grid xtics lc rgb \"#bbbbbb\" lw 1 dt 2");
+
+                    int mxtics = -12345;
+
+                    if (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        List<int> subperiods;
+                        int onlyYears;
+                        mxtics = GnuplotHandleXAxisLabels(labels1, mxtics, out subperiods, out onlyYears);
+
+                        string s3 = null;
+                        int c = -1;
+                        for (int i = 0; i < labels1.Count; i++)
+                        {
+                            c++;
+                            //int subper=labels2[i]
+                            //if (labels1.Count > 20 && c %  != 0) continue;
+                            string[] split = labels2[i].Split(new char[] { '/' });
+                            if (onlyYears != -12345 && int.Parse(split[0]) % onlyYears != 0) continue;
+                            if (subperiods.Contains(int.Parse(split[1])))
+                            {
+                                s3 += "\"" + labels1[i] + "\" \"" + labels2[i] + "\", ";
+                            }
+                        }
+                        if (s3.EndsWith(", ")) s3 = s3.Substring(0, s3.Length - 2);
+                        tw.WriteLine("set xtics (" + s3 + ")");
+                    }
+
+                    tw.WriteLine("set style fill border");  //for the boxes/histograms
+                    tw.WriteLine("set boxwidth 0.3 relative");
+                    tw.WriteLine("set pointintervalbox 0.5");
+
+                    tw.WriteLine("set pointinterval -1");
+                    tw.WriteLine("set pointsize 0.5");
+                    tw.WriteLine("set style data histogram");
+                    tw.WriteLine("set style histogram cluster gap 2");
+
+                    if (o.opt_plotcode != null)
+                    {
+                        tw.WriteLine("");
+                        tw.WriteLine(o.opt_plotcode);  //user code
+                        tw.WriteLine("");
+                    }
                 }
 
                 List <PlotLine> lines = null;
                                 
                 try { lines = gpt.plotLines.plotLine; } catch (NullReferenceException) { };
 
-                StringBuilder sb1 = new StringBuilder();
+                //StringBuilder sb1 = new StringBuilder();
                 StringBuilder sb2 = new StringBuilder();
 
                 sb2.Append("plot ");
@@ -23237,7 +23252,9 @@ namespace Gekko
                     string linewidth = null;
                     string linecolor = null;
                     string pointtype = null;
-        
+                    string pointsize = null;
+                    string pointinterval = null;
+                    string fillstyle = null;
                     string size = null;
                     string yAxis = null;
                     string dashtype = null;
@@ -23251,7 +23268,10 @@ namespace Gekko
                         dashtype = line.dashtype;                        
                         linewidth = line.linewidth;
                         linecolor = line.linecolor;
-                        pointtype = line.pointtype;                      
+                        pointtype = line.pointtype;
+                        pointsize = line.pointsize;
+                        pointinterval = line.pointinterval;
+                        fillstyle = line.fillstyle;              
 
                         legend = line.legend;
                         size = line.size;
@@ -23260,8 +23280,8 @@ namespace Gekko
                     }                   
 
                     string _type = null;
-                    if (type != null) _type = " with " + type;
-
+                    //if (type != null) _type = " with " + type;
+                    
                     string _dashtype = null;
                     if (dashtype != null) _dashtype = " dt " + dashtype;
                             
@@ -23273,6 +23293,16 @@ namespace Gekko
 
                     string _pointtype = null;
                     if (pointtype != null) _pointtype = " pt " + pointtype;
+
+                    string _pointsize = null;
+                    if (pointsize != null) _pointsize = " ps " + pointsize;
+
+                    string _pointinterval = null;
+                    if (pointinterval != null) _pointinterval = " pi " + pointinterval;
+
+                    string _fillstyle = null;
+                    if (fillstyle != null) _fillstyle = " fs " + fillstyle;
+
 
                     string _yAxis = null;
                     if (yAxis != null && G.equal(yAxis, "right"))
@@ -23297,15 +23327,45 @@ namespace Gekko
 
                     //box: fillstyle empty|solid|pattern, border|noborder
 
-                    sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _type + _pointtype + _dashtype + _linewidth + _linecolor + _yAxis + " title \"  " + _legend + "\" ");
+                    sb2.Append("\"" + file1 + "\" using " + (i + 2) + _type + _pointtype + _pointsize + _pointinterval + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");
                     
                     if (i < count - 1) sb2.Append(", ");
                 }
                 sb2.AppendLine();
-                tw.WriteLine(sb1);
-                tw.WriteLine();
-                tw.WriteLine(sb2);
-                tw.WriteLine();
+
+                if (false)
+                {
+
+                    tw.WriteLine("set terminal " + pplotType + " enhanced " + font);
+                    tw.WriteLine("set output \"" + file2 + "\"");
+
+                    if (false)
+                    {
+                        tw.WriteLine("set boxwidth 0.9 absolute");
+                        tw.WriteLine("set style fill   solid 1.00 border lt -1");
+                        tw.WriteLine("set key inside right top vertical Right noreverse noenhanced autotitle nobox");
+                        //tw.WriteLine("set style histogram clustered gap 1 title textcolor lt - 1");
+                        //tw.WriteLine("set datafile missing '-'");
+                        tw.WriteLine("set style data histograms");
+                        //tw.WriteLine("set xtics border in scale 0,0 nomirror rotate by - 45  autojustify");
+                        //tw.WriteLine("set xtics norangelimit");
+                        //tw.WriteLine("set xtics   ()");
+                    }
+
+                    tw.WriteLine("set boxwidth 0.9 relative");
+                    tw.WriteLine("set style data histograms");
+                    tw.WriteLine("set style fill solid 1.0 border - 1");
+                    //tw.WriteLine("plot 'file.dat' using 2, '' using 4, '' using 6");
+
+                    tw.WriteLine("plot \"gekkoplot.dat\" using 2, \"gekkoplot.dat\" using 3, \"gekkoplot.dat\" using 4");
+                }
+                else
+                {
+                    //tw.WriteLine(sb1);
+                    //tw.WriteLine();
+                    tw.WriteLine(sb2);
+                    tw.WriteLine();
+                }
                 tw.Flush();
                 tw.Close();
             }

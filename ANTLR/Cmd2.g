@@ -338,6 +338,7 @@ tokens {
     ASTOPT_STRING_AREMOS;
     ASTOPT_STRING_CAPS;
     ASTOPT_STRING_CELL;
+	ASTOPT_STRING_CONSTANT;
     ASTOPT_STRING_COLLAPSE;
     ASTOPT_STRING_COLORS;
     ASTOPT_STRING_COLS;
@@ -1590,9 +1591,19 @@ closeOpt1h				  : SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)
 						  ;						
 
 cls						  : CLS -> ^({token("ASTCLS", ASTCLS, $CLS.Line)});
-
-						  //this seems the right way to do it, via an ASTOPT_ node, fix for read/open/mulbk...
-copy                      : COPY copyOpt1? listItemsWildRange0 (TO listItemsWildRange1)? -> ^({token("ASTCOPY", ASTCOPY, $COPY.Line)} ^(ASTOPT_ copyOpt1?) listItemsWildRange0 listItemsWildRange1?);
+						  
+copy                      : COPY copyOpt1? listItemsWildRange0 (TO listItemsWildRange1)? -> ^({token("ASTCOPY", ASTCOPY, $COPY.Line)} copyOpt1? listItemsWildRange0 listItemsWildRange1?);
+copyOpt1                  : ISNOTQUAL 
+						  | leftAngle2          copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 copyOpt1h*)		
+						  | leftAngleNo2 dates? copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) copyOpt1h*)
+						  ;
+copyOpt1h                 : RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT yesNo?)
+						  | ERROR (EQUAL yesNo)? -> ^(ASTOPT_STRING_ERROR yesNo?)
+						  | FROM EQUAL name -> ^(ASTOPT_STRING_FROM name)
+						  | FROM EQUAL AT GLUE? -> ^(ASTOPT_STRING_FROM ASTAT)
+						  | TO EQUAL name -> ^(ASTOPT_STRING_TO name)
+						  | TO EQUAL AT GLUE? -> ^(ASTOPT_STRING_TO ASTAT)
+						  ;
 
 doc                       : DOC listItemsWildRange0 docOpt2 -> ^({token("ASTDOC", ASTDOC, $DOC.Line)} listItemsWildRange0 ^(ASTOPT_ docOpt2?));
 docOpt2                   : docOpt2h*;
@@ -2198,16 +2209,6 @@ functionDefLhsH1          : type  //for instance "VAL"
 						  ;
 
 type                      : VAL | DATE | STRING2 | NAME | LIST | SERIES | SER | MATRIX | MAT;
-
-copyOpt1                  : ISNOTQUAL | leftAngle copyOpt1h* RIGHTANGLE -> copyOpt1h*;
-copyOpt1h                 : dates -> ^(ASTDATES dates)
-						  | RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT yesNo?)
-						  | ERROR (EQUAL yesNo)? -> ^(ASTOPT_STRING_ERROR yesNo?)
-						  | FROM EQUAL name -> ^(ASTOPT_STRING_FROM name)
-						  | FROM EQUAL AT GLUE? -> ^(ASTOPT_STRING_FROM ASTAT)
-						  | TO EQUAL name -> ^(ASTOPT_STRING_TO name)
-						  | TO EQUAL AT GLUE? -> ^(ASTOPT_STRING_TO ASTAT)
-						  ;
 
 indexerAlone              : (leftBracketNoGlue|leftBracketNoGlueWild) wildcard RIGHTBRACKET            -> ^(ASTINDEXERELEMENT ^(ASTINDEXERELEMENTBANK) ^(ASTWILDCARD wildcard))             //wildcard
                           | (name COLON)? wildcard                             -> ^(ASTINDEXERELEMENT ^(ASTINDEXERELEMENTBANK name?) ^(ASTWILDCARD wildcard))             //wildcard						
