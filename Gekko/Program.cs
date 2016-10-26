@@ -23123,7 +23123,7 @@ namespace Gekko
 
             double fontsize = 12;
             double zoom = 1;
-            bool histo = true;
+            bool histo = false;
 
             string fileGp = path + "\\" + file3;
             using (FileStream fs = WaitForFileStream(fileGp, GekkoFileReadOrWrite.Write))
@@ -23331,16 +23331,19 @@ namespace Gekko
                     //box: fillstyle empty|solid|pattern, border|noborder
 
                     //sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _type + _pointtype + _pointsize + _pointinterval + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");
-
-                    if (histo)
-                    {
-                        sb2.Append("\"" + file1 + "\" using " + (i + 2) + _type + _pointtype + _pointsize + _pointinterval + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");
-                    }
-                    else
-                    {
-                        sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _type + " title \"  " + _legend + "\" ");
-                    }
+                                        
                     
+                    if(!(G.equal(type, "boxes")))
+                    {
+                        _fillstyle = null;  //if type is not boxes, this option interferes badly with the plot!
+                    }
+                    //sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _type + _pointtype + _pointsize + _pointinterval + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");
+                    sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _type + _pointtype + _pointsize + _pointinterval + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");
+                    
+                    //{
+                    //    sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _type + " title \"  " + _legend + "\" ");
+                    //}
+
                     //sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + " " + _type + " lw 2.0 ");
 
                     if (i < count - 1) sb2.Append(", ");
