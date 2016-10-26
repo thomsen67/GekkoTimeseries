@@ -23067,7 +23067,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            bool histo = false;
+            
             string currentDir = Directory.GetCurrentDirectory();  //remembered in order to switch back
             string path = System.Windows.Forms.Application.LocalUserAppDataPath + "\\gnuplot\\tempfiles";
 
@@ -23121,28 +23121,33 @@ namespace Gekko
                 }
             }
 
+            double fontsize = 12;
+            double zoom = 1;
+            bool histo = true;
+
             string fileGp = path + "\\" + file3;
             using (FileStream fs = WaitForFileStream(fileGp, GekkoFileReadOrWrite.Write))
             using (StreamWriter tw = G.GekkoStreamWriter(fs))
-            {
-                if (o.opt_plotcode != null && o.opt_plotcode.Contains("[histo]"))
-                {
-                    histo = true;
-                    o.opt_plotcode = o.opt_plotcode.Replace("[histo]", "");
-                }
+            {               
+
+                //if (o.opt_plotcode != null && o.opt_plotcode.Contains("[histo]"))
+                //{
+                //    histo = true;
+                //    o.opt_plotcode = o.opt_plotcode.Replace("[histo]", "");
+                //}                
 
                 string font = null;
-                if (gnuplot51) font = "'Verdana, 12'";
-                
-if (true)
-                {
+                if (gnuplot51) font = "Verdana";
 
+
+                {
+                    tw.WriteLine("set size " + zoom + "," + zoom + "");
                     tw.WriteLine("set encoding iso_8859_1");
                     tw.WriteLine("set format y " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
 
                     tw.WriteLine("set datafile missing \"NaN\"");
-                    
-                    tw.WriteLine("set terminal " + pplotType + " enhanced " + font);
+
+                    tw.WriteLine("set terminal " + pplotType + " enhanced " + "'" + font + "," + (zoom * fontsize) + "'");
                     tw.WriteLine("set output \"" + file2 + "\"");
 
                     //local PLOT<> overrides
@@ -23227,8 +23232,11 @@ if (true)
 
                     tw.WriteLine("set pointinterval -1");
                     tw.WriteLine("set pointsize 0.5");
-                    tw.WriteLine("set style data histogram");
-                    tw.WriteLine("set style histogram cluster gap 2");
+                    if (histo)
+                    {
+                        tw.WriteLine("set style data histogram");
+                        tw.WriteLine("set style histogram cluster gap 2");
+                    }
 
                     if (o.opt_plotcode != null)
                     {
@@ -23238,11 +23246,9 @@ if (true)
                     }
                 }
 
-                List <PlotLine> lines = null;
-                                
+                List <PlotLine> lines = null;                                
                 try { lines = gpt.plotLines.plotLine; } catch (NullReferenceException) { };
-
-                //StringBuilder sb1 = new StringBuilder();
+                                
                 StringBuilder sb2 = new StringBuilder();
 
                 sb2.Append("plot ");
@@ -23280,7 +23286,7 @@ if (true)
                     }                   
 
                     string _type = null;
-                    //if (type != null) _type = " with " + type;
+                    if (!histo && type != null) _type = " with " + type;
                     
                     string _dashtype = null;
                     if (dashtype != null) _dashtype = " dt " + dashtype;
@@ -23303,7 +23309,6 @@ if (true)
                     string _fillstyle = null;
                     if (fillstyle != null) _fillstyle = " fs " + fillstyle;
 
-
                     string _yAxis = null;
                     if (yAxis != null && G.equal(yAxis, "right"))
                     {
@@ -23313,22 +23318,31 @@ if (true)
                     string _legend = EncodeDanish(labelsNonBroken[i]);
                     if (legend != null) _legend = EncodeDanish(legend);  //actually overrides, it should be PRT fy 'GDP' that overrides (the 'GDP').
 
-
                     //size?
 
                     //yaxis?
 
                     //linestyle is an association of linecolor, linewidth, dashtype, pointtype
-                    //linetype is the same, just permanent 
-
+                    //linetype is the same, just permanent
 
                     //if (i % 2 == 0) xx = " w boxes fill pattern 0 ";
                     //if (i % 2 == 0) xx = " w boxes fill empty ";
 
                     //box: fillstyle empty|solid|pattern, border|noborder
 
-                    sb2.Append("\"" + file1 + "\" using " + (i + 2) + _type + _pointtype + _pointsize + _pointinterval + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");
+                    //sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _type + _pointtype + _pointsize + _pointinterval + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");
+
+                    if (histo)
+                    {
+                        sb2.Append("\"" + file1 + "\" using " + (i + 2) + _type + _pointtype + _pointsize + _pointinterval + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");
+                    }
+                    else
+                    {
+                        sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _type + " title \"  " + _legend + "\" ");
+                    }
                     
+                    //sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + " " + _type + " lw 2.0 ");
+
                     if (i < count - 1) sb2.Append(", ");
                 }
                 sb2.AppendLine();
