@@ -23317,34 +23317,28 @@ namespace Gekko
 
                     string _legend = EncodeDanish(labelsNonBroken[i]);
                     if (legend != null) _legend = EncodeDanish(legend);  //actually overrides, it should be PRT fy 'GDP' that overrides (the 'GDP').
-
-                    //size?
-
-                    //yaxis?
-
+                    
                     //linestyle is an association of linecolor, linewidth, dashtype, pointtype
                     //linetype is the same, just permanent
-
-                    //if (i % 2 == 0) xx = " w boxes fill pattern 0 ";
-                    //if (i % 2 == 0) xx = " w boxes fill empty ";
-
+                    
                     //box: fillstyle empty|solid|pattern, border|noborder
 
-                    //sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _type + _pointtype + _pointsize + _pointinterval + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");
-                                        
+                    //sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _type + _pointtype + _pointsize + _pointinterval + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");                                        
                     
                     if(!(G.equal(type, "boxes")))
                     {
                         _fillstyle = null;  //if type is not boxes, this option interferes badly with the plot!
                     }
-                    //sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _type + _pointtype + _pointsize + _pointinterval + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");
-                    sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _type + _pointtype + _pointsize + _pointinterval + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");
-                    
-                    //{
-                    //    sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _type + " title \"  " + _legend + "\" ");
-                    //}
+                    //string xx = "1:" + (i + 2) + ":xtic(1)";
+                    //if (i == 2) xx = "($1 + 0.5):" + (i + 2) + ":xtic(1)";
 
-                    //sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + " " + _type + " lw 2.0 ");
+                    string xx = "1:" + (i + 2);
+                    if (i == 2) xx = "($1 + 0.5):" + (i + 2);
+
+
+                    sb2.Append("\"" + file1 + "\" using " + xx + _type + _pointtype + _pointsize + _pointinterval + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");
+
+                    
 
                     if (i < count - 1) sb2.Append(", ");
                 }
