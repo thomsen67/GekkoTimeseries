@@ -1984,7 +1984,9 @@ namespace Gekko
             public string opt_sheet = null;
             public string opt_cell = null;            
             public string opt_rows = null;
-            public string opt_cols = null;            
+            public string opt_cols = null;
+            public string opt_matrix = null;
+            public string opt_missing = null;  //used for matrix   
             public void Exe()
             {
                 Program.SheetImport(this);

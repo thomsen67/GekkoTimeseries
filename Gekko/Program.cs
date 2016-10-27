@@ -2364,7 +2364,24 @@ namespace Gekko
         }
 
         public static void SheetImport(O.SheetImport o)
-        {                        
+        {
+            string matrixName = null;
+            if (G.equal(o.opt_matrix, "yes"))
+            {
+                if(o.listItems.Count==0 || o.listItems.Count > 1)
+                {
+                    G.Writeln2("*** ERROR: For SHEET<import matrix>, only 1 matrix name must be provided");
+                    throw new GekkoException();
+                }
+                matrixName = o.listItems[0];
+            }
+
+            bool isMissing = false;
+            if(G.equal(o.opt_missing,"yes"))
+            {
+                isMissing = true;
+            }                       
+
             //do copylocal
             string fileName = o.fileName;
             fileName = AddExtension(fileName, ".xlsx");
@@ -2374,7 +2391,8 @@ namespace Gekko
             bool transpose = false;  //corresponding to row-wise reading
             if (G.equal(o.opt_cols, "yes"))
             {
-                transpose = true;                
+                transpose = true;
+                if (matrixName != null) G.Writeln2("+++ NOTE: Because of <rows> option, the matrix #" + matrixName + " is transposed");
             }
 
             if(transpose)
@@ -2391,9 +2409,9 @@ namespace Gekko
             int index = s.IndexOfAny(new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' });
             string chars = s.Substring(0, index);
             int num = Int32.Parse(s.Substring(index));
-
             int rowOffset = num - 1;
             int colOffset = ExcelColumnNameToNumber(chars) - 1;
+
             if (transpose)
             {
                 //switch them
@@ -2404,36 +2422,78 @@ namespace Gekko
 
             //check between 1... large number
 
-            for (int row = 1 + rowOffset; row < 1 + rowOffset + n; row++)
+            if (matrixName == null)
             {
-                TimeSeries ts = Program.GetTimeSeriesFromString(o.listItems[row - 1 - rowOffset], O.ECreatePossibilities.Must); //O
-                for (int col = 1 + colOffset; col < 1 + colOffset + obs; col++)
+                for (int row = 1 + rowOffset; row < 1 + rowOffset + n; row++)
                 {
-                    double v = double.NaN;
-                    CellLight cell = matrix.Get(row, col);
-                    if (cell.type == ECellLightType.None) continue;
-                    else if (cell.type == ECellLightType.String)
+                    TimeSeries ts = Program.GetTimeSeriesFromString(o.listItems[row - 1 - rowOffset], O.ECreatePossibilities.Must); //O
+                    for (int col = 1 + colOffset; col < 1 + colOffset + obs; col++)
                     {
-                        if (IsNonAvailableText(cell.text))
-                        {
-                            //keep NaN
-                        }
-                        else
-                        {                            
-                            string s1 = row.ToString();
-                            string s2 = ExcelColumnNumberToName(col);
-                            G.Writeln2("*** ERROR in spreadsheet cell " + GetExcelCell(row, col, transpose) + ", content: '" + cell.text + "'");                            
-                            throw new GekkoException();
-                        }
+                        double v = double.NaN;
+                        CellLight cell = matrix.Get(row, col);
+                        if (cell.type == ECellLightType.None) continue;
+                        v = GetValueFromSpreadsheetCell(transpose, row, col, v, cell);
+                        ts.SetData(o.t1.Add(col - 1 - colOffset), v);
                     }
-                    else if (cell.type == ECellLightType.Double)
-                    {
-                        v = cell.data;
-                    }
-                    else throw new GekkoException();
-                    ts.SetData(o.t1.Add(col - 1 - colOffset), v);
                 }
             }
+            else
+            {
+
+                Matrix mm = null;
+
+                int rr = matrix.GetRowMaxNumber() - rowOffset;
+                int cc = matrix.GetColMaxNumber() - colOffset;
+
+                if (rr <= 0 || cc <= 0)
+                {
+                    G.Writeln2("*** ERROR: Matrix has no data");
+                    throw new GekkoException();
+                }
+
+                if (isMissing) mm = new Matrix(rr, cc, double.NaN);
+                else mm = new Matrix(rr, cc);
+                
+                for (int row = 1 + rowOffset; row < 1 + rowOffset + matrix.GetRowMaxNumber(); row++)
+                {                    
+                    for (int col = 1 + colOffset; col < 1 + colOffset + matrix.GetColMaxNumber(); col++)
+                    {
+                        double v = double.NaN;
+                        CellLight cell = matrix.Get(row, col);
+                        if (cell.type == ECellLightType.None) continue;
+                        v = GetValueFromSpreadsheetCell(transpose, row, col, v, cell);
+                        mm.data[row - 1 - rowOffset, col - 1 - colOffset] = v;                        
+                    }
+                }
+                if (Program.scalars.ContainsKey(Globals.symbolList + matrixName))
+                {
+                    Program.scalars.Remove(Globals.symbolList + matrixName);
+                }                                
+                Program.scalars.Add(Globals.symbolList + matrixName, mm);
+                G.Writeln2("Matrix #" + matrixName + " imported (" + rr + "x" + cc + ")");
+            }
+        }
+
+        private static double GetValueFromSpreadsheetCell(bool transpose, int row, int col, double v, CellLight cell)
+        {
+            if (cell.type == ECellLightType.String)
+            {
+                if (IsNonAvailableText(cell.text))
+                {
+                    //keep NaN
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR in spreadsheet cell " + GetExcelCell(row, col, transpose) + ", content: '" + cell.text + "'");
+                    throw new GekkoException();
+                }
+            }
+            else if (cell.type == ECellLightType.Double)
+            {
+                v = cell.data;
+            }
+            else throw new GekkoException();
+            return v;
         }
 
         private static void ReadTsdOrTsdx(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, bool isTsdx, ref bool isProtobuf, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
@@ -6777,6 +6837,11 @@ namespace Gekko
 
         public static void ShowMatrix(Matrix a, string label)
         {
+            if(a.data.GetLength(0)<1 || a.data.GetLength(1) < 1)
+            {
+                G.Writeln2("The matrix has dimensions " + a.data.GetLength(0) + "x" + a.data.GetLength(1) + " so cannot be printed");
+                throw new GekkoException();
+            }
             Gekko.Table tab = new Gekko.Table();
             for (int i = 0; i < a.data.GetLength(0); i++)
             {
@@ -23010,6 +23075,9 @@ namespace Gekko
             //how to link xsd, use color-picker etc.
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
 
+            bool quarterFix = false;
+            if (Program.options.freq == EFreq.Quarterly || Program.options.freq == EFreq.Monthly) quarterFix = true;
+
             bool dump = true;
             bool gnuplot51 = true;
 
@@ -23105,6 +23173,12 @@ namespace Gekko
                             labels1.Add(dOrig);
                             labels2.Add(d);
                             s += d + " ";
+                            if (quarterFix)
+                            {
+                                string[] split = d.Split(new char[] { '/' });
+                                string x = FromGnuplotDatoToFloatingValue(split);
+                                s += x + " ";
+                            }
                         }
                         else if (i > 0 && c.cellType == CellType.Number)
                         {
@@ -23128,7 +23202,7 @@ namespace Gekko
             string fileGp = path + "\\" + file3;
             using (FileStream fs = WaitForFileStream(fileGp, GekkoFileReadOrWrite.Write))
             using (StreamWriter tw = G.GekkoStreamWriter(fs))
-            {               
+            {
 
                 //if (o.opt_plotcode != null && o.opt_plotcode.Contains("[histo]"))
                 //{
@@ -23160,9 +23234,12 @@ namespace Gekko
 
                     if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
                     {
-                        tw.WriteLine("set xdata time");
-                        tw.WriteLine(@"set timefmt ""%Y/%m/%d""");
-                        tw.WriteLine(@"set format x ""%Y/%m""");
+                        if (!quarterFix)
+                        {
+                            tw.WriteLine("set xdata time");
+                            tw.WriteLine(@"set timefmt ""%Y/%m/%d""");
+                            tw.WriteLine(@"set format x ""%Y/%m""");
+                        }
                     }
                     else
                     {
@@ -23185,6 +23262,11 @@ namespace Gekko
                     tw.WriteLine("set xtics nomirror");
                     tw.WriteLine("set ytics nomirror");
                     tw.WriteLine("set xzeroaxis lt -1");
+
+                    if (false)
+                    {
+                        tw.WriteLine("set arrow from 2010,graph 0 to 2010,graph 1 nohead");
+                    }
 
                     //with right axis: needs to set this:
                     //and maybe a (right) or (højre)..., should be an option to set this txt
@@ -23221,7 +23303,15 @@ namespace Gekko
                             if (onlyYears != -12345 && int.Parse(split[0]) % onlyYears != 0) continue;
                             if (subperiods.Contains(int.Parse(split[1])))
                             {
-                                s3 += "\"" + labels1[i] + "\" \"" + labels2[i] + "\", ";
+                                string xx = labels2[i];
+                                if (quarterFix)
+                                {
+                                    if (Program.options.freq == EFreq.Quarterly || Program.options.freq == EFreq.Monthly)
+                                    {
+                                        xx = FromGnuplotDatoToFloatingValue(split);
+                                    }
+                                }
+                                s3 += "\"" + labels1[i] + "\" \"" + xx + "\", ";
                             }
                         }
                         if (s3.EndsWith(", ")) s3 = s3.Substring(0, s3.Length - 2);
@@ -23234,7 +23324,7 @@ namespace Gekko
 
                     //tw.WriteLine("set pointinterval -1");
                     //tw.WriteLine("set pointsize 0.5");
-                    
+
                     if (o.opt_plotcode != null)
                     {
                         tw.WriteLine("");
@@ -23243,9 +23333,9 @@ namespace Gekko
                     }
                 }
 
-                List <PlotLine> lines = null;                                
+                List<PlotLine> lines = null;
                 try { lines = gpt.plotLines.plotLine; } catch (NullReferenceException) { };
-                                
+
                 StringBuilder sb2 = new StringBuilder();
 
                 int numberOfBoxes = 0;
@@ -23260,26 +23350,34 @@ namespace Gekko
                         }
                     }
                 }
-                
-                double dx = 0.25;                
+
+                double dx = 1d;
+                if (Program.options.freq == EFreq.Quarterly)
+                {
+                    dx = 1d / 4d;
+                }
+                else if (Program.options.freq == EFreq.Monthly)
+                {
+                    dx = 1d / 12d;
+                }
                 double total_box_width_relative = 0.75;
-                double gap_width_relative = 0.1;                
+                double gap_width_relative = 0.1;
                 int luft = 2;
                 if (numberOfBoxes == 1) luft = 0;
                 double d_width = dx / (double)(numberOfBoxes + luft);
-                double d_width2 = 0.85 * d_width;                
+                double d_width2 = 0.85 * d_width;
                 double left = d_width * (double)(numberOfBoxes - 1) / 2d;
-                    
+
 
                 sb2.Append("plot ");
                 int boxesCounter = 0;
                 for (int i = 0; i < count; i++)
-                {                    
-                    string legend = null;                    
+                {
+                    string legend = null;
                     string linewidth = null;
                     string linecolor = null;
                     string pointtype = null;
-                    string pointsize = null;                    
+                    string pointsize = null;
                     string fillstyle = null;
                     string size = null;
                     string yAxis = null;
@@ -23291,26 +23389,26 @@ namespace Gekko
                     {
                         type = line.type;
 
-                        dashtype = line.dashtype;                        
+                        dashtype = line.dashtype;
                         linewidth = line.linewidth;
                         linecolor = line.linecolor;
                         pointtype = line.pointtype;
-                        pointsize = line.pointsize;                        
+                        pointsize = line.pointsize;
                         fillstyle = line.fillstyle;
                         legend = line.legend;
                         size = line.size;
                         yAxis = line.yAxis;
-                        
-                    }                   
+
+                    }
 
                     string _type = null;
                     if (type != null) _type = " with " + type;
                     else _type = " with linespoints";
-                    
+
                     string _dashtype = null;
                     if (dashtype != null) _dashtype = " dt " + dashtype;
                     else _dashtype = " dt 1";
-                            
+
                     string _linewidth = null;
                     if (linewidth != null) _linewidth = " lw " + linewidth;
                     else _linewidth = " lw 3";
@@ -23325,7 +23423,7 @@ namespace Gekko
                     string _pointsize = null;
                     if (pointsize != null) _pointsize = " ps " + pointsize;
                     else _pointsize = " ps 0.8";
-                    
+
                     string _fillstyle = null;
                     if (fillstyle != null) _fillstyle = " fs " + fillstyle;
 
@@ -23343,67 +23441,49 @@ namespace Gekko
 
                     //box: fillstyle empty|solid|pattern, border|noborder
 
-                    //sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _type + _pointtype + _pointsize + _pointinterval + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");                                        
+                    string xx = null;
 
-                    string xx = "1:" + (i + 2);
-                    if (false && G.equal(type, "boxes"))
-                    {                        
+                    if (G.equal(type, "boxes"))
+                    {
                         boxesCounter++;
                         double d = (boxesCounter - 1) * d_width - left;
                         string minus = "+"; ;
-                        if (d < 0) {
+                        if (d < 0)
+                        {
                             d = Math.Abs(d);
                             minus = "-";
                         }
-                        xx = "($1 " + minus + d + "):" + (i + 2) + ":(" + d_width2 + ")";
-                        //xx = "($1 + " + ((boxesCounter - 1) * d_width) + "):" + (i + 2);
+                        if (quarterFix)
+                        {
+                            xx = "($2 " + minus + d + "):" + (i + 3) + ":(" + d_width2 + ")";
+                        }
+                        else
+                        {
+                            xx = "($1 " + minus + d + "):" + (i + 2) + ":(" + d_width2 + ")";
+                        }
                     }
                     else
                     {
                         _fillstyle = null;  //if type is not boxes, this option interferes badly with the plot!
+                        if (quarterFix)
+                        {
+                            xx = "2:" + (i + 3);
+                        }
+                        else
+                        {
+                            xx = "1:" + (i + 2);
+                        }
                     }
-                    //string xx = "1:" + (i + 2) + ":xtic(1)";
-                    //if (i == 2) xx = "($1 + 0.5):" + (i + 2) + ":xtic(1)";
-                    
+
                     sb2.Append("\"" + file1 + "\" using " + xx + _type + _pointtype + _pointsize + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");
-                    
+
                     if (i < count - 1) sb2.Append(", ");
                 }
                 sb2.AppendLine();
+                                
+                tw.WriteLine(sb2);
+                tw.WriteLine();
 
-                if (false)
-                {
-
-                    tw.WriteLine("set terminal " + pplotType + " enhanced " + font);
-                    tw.WriteLine("set output \"" + file2 + "\"");
-
-                    if (false)
-                    {
-                        tw.WriteLine("set boxwidth 0.9 absolute");
-                        tw.WriteLine("set style fill   solid 1.00 border lt -1");
-                        tw.WriteLine("set key inside right top vertical Right noreverse noenhanced autotitle nobox");
-                        //tw.WriteLine("set style histogram clustered gap 1 title textcolor lt - 1");
-                        //tw.WriteLine("set datafile missing '-'");
-                        tw.WriteLine("set style data histograms");
-                        //tw.WriteLine("set xtics border in scale 0,0 nomirror rotate by - 45  autojustify");
-                        //tw.WriteLine("set xtics norangelimit");
-                        //tw.WriteLine("set xtics   ()");
-                    }
-
-                    tw.WriteLine("set boxwidth 0.9 relative");
-                    tw.WriteLine("set style data histograms");
-                    tw.WriteLine("set style fill solid 1.0 border - 1");
-                    //tw.WriteLine("plot 'file.dat' using 2, '' using 4, '' using 6");
-
-                    tw.WriteLine("plot \"gekkoplot.dat\" using 2, \"gekkoplot.dat\" using 3, \"gekkoplot.dat\" using 4");
-                }
-                else
-                {
-                    //tw.WriteLine(sb1);
-                    //tw.WriteLine();
-                    tw.WriteLine(sb2);
-                    tw.WriteLine();
-                }
                 tw.Flush();
                 tw.Close();
             }
@@ -23513,6 +23593,11 @@ namespace Gekko
             {
                 o.guiGraphRefreshingFilename = emfName;
             }
+        }
+
+        private static string FromGnuplotDatoToFloatingValue(string[] split)
+        {
+            return ((double)int.Parse(split[0]) + ((double)int.Parse(split[1]) - 1d) / 12d).ToString();
         }
 
         private static int GnuplotHandleXAxisLabels(List<string> labels1, int mxtics, out List<int> subperiods, out int onlyYears)

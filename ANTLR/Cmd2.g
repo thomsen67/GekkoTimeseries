@@ -376,8 +376,10 @@ tokens {
     ASTOPT_STRING_PCIM;
     ASTOPT_STRING_PLOTCODE;
     ASTOPT_STRING_PRESERVE;
+	ASTOPT_STRING_MISSING;
     ASTOPT_STRING_PRIM;
     ASTOPT_STRING_PRN;
+	ASTOPT_STRING_MATRIX;
     ASTOPT_STRING_PROT;
     ASTOPT_STRING_Q;
     ASTOPT_STRING_REPEAT;
@@ -786,6 +788,7 @@ tokens {
     METHOD           = 'METHOD'          ;
     MIN              = 'MIN'               ;
     MIXED = 'MIXED';
+	MISSING = 'MISSING';
     MODE = 'MODE';
     MODEL            = 'MODEL'           ;
     MODERNLOOK       = 'MODERNLOOK'      ;
@@ -1030,6 +1033,7 @@ tokens {
                                 {
                                         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 										d.Add("INTERPOLATE"    ,   INTERPOLATE     );
+										d.Add("MISSING"    ,   MISSING     );
 										d.Add("CONSTANT", CONSTANT);
 										d.Add("IMPOSE", IMPOSE);
 										d.Add("PRORATE"    ,   PRORATE     );
@@ -1846,6 +1850,8 @@ sheetImportOpt1h          : CELL '=' expression -> ^(ASTOPT_STRING_CELL expressi
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)						
 						  | ROWS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ROWS yesNo?)
 						  | SHEET '=' expression -> ^(ASTOPT_STRING_SHEET expression)
+						  | MATRIX (EQUAL yesNo)? -> ^(ASTOPT_STRING_MATRIX yesNo?)		
+						  | MISSING (EQUAL yesNo)? -> ^(ASTOPT_STRING_MISSING yesNo?)		
 						  ;
 
 							//Hmmm, not possible to use {token()} here unless we make 9 identical lines
@@ -2881,6 +2887,7 @@ doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 
 ident                     : Ident|
 							USING|
+							MISSING|
 							IMPOSE|
 							CONSTANT|
 							INTERPOLATE|
