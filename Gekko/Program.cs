@@ -23192,9 +23192,11 @@ namespace Gekko
                     tw.WriteLine("set y2tics");
                     tw.WriteLine("set yzeroaxis");
 
-                    //tw.WriteLine("set grid");
-                    tw.WriteLine("set grid ytics lc rgb \"#bbbbbb\" lw 1 dt 2");
-                    tw.WriteLine("set grid xtics lc rgb \"#bbbbbb\" lw 1 dt 2");
+                    if (gpt.plotMain != null && gpt.plotMain.grid != null)  //it can be an empty <grid/>
+                    {
+                        tw.WriteLine("set grid ytics lc rgb \"#bbbbbb\" lw 1 dt 2");
+                        tw.WriteLine("set grid xtics lc rgb \"#bbbbbb\" lw 1 dt 2");
+                    }
 
                     int mxtics = -12345;
 
@@ -23226,18 +23228,13 @@ namespace Gekko
                         tw.WriteLine("set xtics (" + s3 + ")");
                     }
 
-                    tw.WriteLine("set style fill border");  //for the boxes/histograms
-                    tw.WriteLine("set boxwidth 0.3 relative");
-                    tw.WriteLine("set pointintervalbox 0.5");
+                    //tw.WriteLine("set style fill border");  //for the boxes/histograms
+                    //tw.WriteLine("set boxwidth 0.3 relative");
+                    //tw.WriteLine("set pointintervalbox 0.5");
 
-                    tw.WriteLine("set pointinterval -1");
-                    tw.WriteLine("set pointsize 0.5");
-                    if (histo)
-                    {
-                        tw.WriteLine("set style data histogram");
-                        tw.WriteLine("set style histogram cluster gap 2");
-                    }
-
+                    //tw.WriteLine("set pointinterval -1");
+                    //tw.WriteLine("set pointsize 0.5");
+                    
                     if (o.opt_plotcode != null)
                     {
                         tw.WriteLine("");
@@ -23251,15 +23248,38 @@ namespace Gekko
                                 
                 StringBuilder sb2 = new StringBuilder();
 
+                int numberOfBoxes = 0;
+                {
+                    for (int i = 0; i < count; i++)
+                    {
+                        PlotLine line = null;
+                        if (lines != null && i < lines.Count) line = lines[i];
+                        if (line != null)
+                        {
+                            if (G.equal(line.type, "boxes")) numberOfBoxes++;
+                        }
+                    }
+                }
+                
+                double dx = 0.25;                
+                double total_box_width_relative = 0.75;
+                double gap_width_relative = 0.1;                
+                int luft = 2;
+                if (numberOfBoxes == 1) luft = 0;
+                double d_width = dx / (double)(numberOfBoxes + luft);
+                double d_width2 = 0.85 * d_width;                
+                double left = d_width * (double)(numberOfBoxes - 1) / 2d;
+                    
+
                 sb2.Append("plot ");
+                int boxesCounter = 0;
                 for (int i = 0; i < count; i++)
                 {                    
                     string legend = null;                    
                     string linewidth = null;
                     string linecolor = null;
                     string pointtype = null;
-                    string pointsize = null;
-                    string pointinterval = null;
+                    string pointsize = null;                    
                     string fillstyle = null;
                     string size = null;
                     string yAxis = null;
@@ -23275,10 +23295,8 @@ namespace Gekko
                         linewidth = line.linewidth;
                         linecolor = line.linecolor;
                         pointtype = line.pointtype;
-                        pointsize = line.pointsize;
-                        pointinterval = line.pointinterval;
-                        fillstyle = line.fillstyle;              
-
+                        pointsize = line.pointsize;                        
+                        fillstyle = line.fillstyle;
                         legend = line.legend;
                         size = line.size;
                         yAxis = line.yAxis;
@@ -23286,26 +23304,28 @@ namespace Gekko
                     }                   
 
                     string _type = null;
-                    if (!histo && type != null) _type = " with " + type;
+                    if (type != null) _type = " with " + type;
+                    else _type = " with linespoints";
                     
                     string _dashtype = null;
                     if (dashtype != null) _dashtype = " dt " + dashtype;
+                    else _dashtype = " dt 1";
                             
                     string _linewidth = null;
                     if (linewidth != null) _linewidth = " lw " + linewidth;
+                    else _linewidth = " lw 3";
 
                     string _linecolor = null;
                     if (linecolor != null) _linecolor = " lc rgb " + Globals.QT + linecolor + Globals.QT;
 
                     string _pointtype = null;
                     if (pointtype != null) _pointtype = " pt " + pointtype;
+                    else _pointtype = " pt 13";
 
                     string _pointsize = null;
                     if (pointsize != null) _pointsize = " ps " + pointsize;
-
-                    string _pointinterval = null;
-                    if (pointinterval != null) _pointinterval = " pi " + pointinterval;
-
+                    else _pointsize = " ps 0.8";
+                    
                     string _fillstyle = null;
                     if (fillstyle != null) _fillstyle = " fs " + fillstyle;
 
@@ -23317,29 +23337,36 @@ namespace Gekko
 
                     string _legend = EncodeDanish(labelsNonBroken[i]);
                     if (legend != null) _legend = EncodeDanish(legend);  //actually overrides, it should be PRT fy 'GDP' that overrides (the 'GDP').
-                    
+
                     //linestyle is an association of linecolor, linewidth, dashtype, pointtype
                     //linetype is the same, just permanent
-                    
+
                     //box: fillstyle empty|solid|pattern, border|noborder
 
                     //sb2.Append("\"" + file1 + "\" using 1:" + (i + 2) + _type + _pointtype + _pointsize + _pointinterval + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");                                        
-                    
-                    if(!(G.equal(type, "boxes")))
+
+                    string xx = "1:" + (i + 2);
+                    if (false && G.equal(type, "boxes"))
+                    {                        
+                        boxesCounter++;
+                        double d = (boxesCounter - 1) * d_width - left;
+                        string minus = "+"; ;
+                        if (d < 0) {
+                            d = Math.Abs(d);
+                            minus = "-";
+                        }
+                        xx = "($1 " + minus + d + "):" + (i + 2) + ":(" + d_width2 + ")";
+                        //xx = "($1 + " + ((boxesCounter - 1) * d_width) + "):" + (i + 2);
+                    }
+                    else
                     {
                         _fillstyle = null;  //if type is not boxes, this option interferes badly with the plot!
                     }
                     //string xx = "1:" + (i + 2) + ":xtic(1)";
                     //if (i == 2) xx = "($1 + 0.5):" + (i + 2) + ":xtic(1)";
-
-                    string xx = "1:" + (i + 2);
-                    if (i == 2) xx = "($1 + 0.5):" + (i + 2);
-
-
-                    sb2.Append("\"" + file1 + "\" using " + xx + _type + _pointtype + _pointsize + _pointinterval + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");
-
                     
-
+                    sb2.Append("\"" + file1 + "\" using " + xx + _type + _pointtype + _pointsize + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");
+                    
                     if (i < count - 1) sb2.Append(", ");
                 }
                 sb2.AppendLine();

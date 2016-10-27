@@ -28,6 +28,8 @@ namespace Gekko
     {
         [XmlElement(ElementName = "title")]
         public string title;
+        [XmlElement(ElementName = "grid")]
+        public string grid;
     }   
 
     public class PlotXAxis
