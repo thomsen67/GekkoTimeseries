@@ -3873,6 +3873,8 @@ namespace Gekko
             public int pdec = -12345;
             public double opt_ymax = double.NaN;
             public double opt_ymin = double.NaN;
+            public double opt_y2max = double.NaN;
+            public double opt_y2min = double.NaN;
 
             public string opt_heading = null;
             public string opt_stamp = null;

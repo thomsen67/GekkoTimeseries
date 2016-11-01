@@ -408,6 +408,8 @@ tokens {
     ASTOPT_VAL_REPLACE;
     ASTOPT_VAL_YMAX;
     ASTOPT_VAL_YMIN;
+	ASTOPT_VAL_Y2MAX;
+    ASTOPT_VAL_Y2MIN;
 	ASTOPT_VAL_POS;
     ASTOPTION;
     ASTP;
@@ -994,6 +996,8 @@ tokens {
     YES              = 'yes'             ;
     YMAX = 'YMAX';
     YMIN = 'YMIN';
+	Y2MAX = 'Y2MAX';
+    Y2MIN = 'Y2MIN';
     ZERO             = 'ZERO'            ;
     ZOOM = 'ZOOM';
     ZVAR             = 'ZVAR'            ;
@@ -1439,6 +1443,8 @@ tokens {
                                         d.Add("yes"     , YES       );
                                         d.Add("ymax",YMAX);
                                         d.Add("ymin",YMIN);
+										d.Add("y2max",Y2MAX);
+                                        d.Add("y2min",Y2MIN);
                                         d.Add("zero"    , ZERO      );
                                         d.Add("ZOOM", ZOOM);
                                         d.Add("ZVAR"    , ZVAR     );
@@ -1879,6 +1885,8 @@ prtOpt1Helper             : filter
 						  | USING EQUAL fileNameStar -> ^(ASTOPT_STRING_USING fileNameStar)							  
 						  | YMAX EQUAL expression -> ^(ASTOPT_VAL_YMAX expression)
 						  | YMIN EQUAL expression -> ^(ASTOPT_VAL_YMIN expression)
+						  | Y2MAX EQUAL expression -> ^(ASTOPT_VAL_Y2MAX expression)
+						  | Y2MIN EQUAL expression -> ^(ASTOPT_VAL_Y2MIN expression)
 						  ;
 prtOpt2                   : prtOpt2Helper+ -> ^(ASTOPT2 prtOpt2Helper);
 prtOpt2Helper             : FILE '=' fileName -> ^(ASTHANDLEFILENAME fileName);
@@ -2742,6 +2750,7 @@ optionType :
 
 			 | PLOT question -> PLOT question
 			 | PLOT LINES POINTS '='? yesNoSimple -> PLOT LINES POINTS ^(ASTBOOL yesNoSimple )			
+			 | PLOT NEW '='? yesNoSimple -> PLOT NEW ^(ASTBOOL yesNoSimple )		
 			
 			 | PRINT question -> PRINT question
 			 | PRINT COLLAPSE '='? optionPrintCollapse ->  PRINT COLLAPSE ^(ASTSTRINGSIMPLE optionPrintCollapse)
@@ -3287,6 +3296,8 @@ ident                     : Ident|
                             YES|
                             YMAX|
                             YMIN|
+							Y2MAX|
+                            Y2MIN|
                             ZERO|
                             ZOOM|
                             ZVAR

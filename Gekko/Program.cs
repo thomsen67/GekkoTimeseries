@@ -6837,9 +6837,9 @@ namespace Gekko
 
         public static void ShowMatrix(Matrix a, string label)
         {
-            if(a.data.GetLength(0)<1 || a.data.GetLength(1) < 1)
+            if (a.data.GetLength(0) < 1 || a.data.GetLength(1) < 1)
             {
-                G.Writeln2("The matrix has dimensions " + a.data.GetLength(0) + "x" + a.data.GetLength(1) + " so cannot be printed");
+                G.Writeln2("The matrix has dimensions " + a.data.GetLength(0) + "x" + a.data.GetLength(1) + ", and cannot be printed");
                 throw new GekkoException();
             }
             Gekko.Table tab = new Gekko.Table();
@@ -20542,6 +20542,10 @@ namespace Gekko
             {
                 Program.PrtNew2(o);
             }
+            catch
+            {
+                throw;
+            }
             finally
             {
                 bool message = false;
@@ -20927,13 +20931,13 @@ namespace Gekko
                     if (G.equal(o.prtType, "plot"))
                     {
                         //tab.PrintCellsForDebug();
-                        if (false)
+                        if (Program.options.plot_new)
                         {
-                            CallGnuplotNew(tab, o, subElementCounterTotal + 1, maxLabelsLinesFound, labelsNonBroken);  //make sure there are no percent shown for levels (use <n> option, not <n p>)
+                            CallGnuplotNew2(tab, o, subElementCounterTotal + 1, maxLabelsLinesFound, labelsNonBroken);  //make sure there are no percent shown for levels (use <n> option, not <n p>)                            
                         }
                         else
                         {
-                            CallGnuplotNew2(tab, o, subElementCounterTotal + 1, maxLabelsLinesFound, labelsNonBroken);  //make sure there are no percent shown for levels (use <n> option, not <n p>)
+                            CallGnuplotNew(tab, o, subElementCounterTotal + 1, maxLabelsLinesFound, labelsNonBroken);  //make sure there are no percent shown for levels (use <n> option, not <n p>)
                         }
 
                         //Alternatively: store all transformations, maybe also for UDVALG
@@ -21049,6 +21053,10 @@ namespace Gekko
                         //----------------- actually printing the stuff end -------------------------------
                     }
                 }
+            }
+            catch
+            {
+                throw;
             }
             finally
             {
@@ -23068,19 +23076,22 @@ namespace Gekko
 
         private static void CallGnuplotNew2(Table data, O.Prt o, int count, int maxLabelsLinesFound, List<string> labelsNonBroken)
         {
-            //Option to mirror y2 axis, with or without labels (unless yright is used)
-            //If yright is used, set y2 axis (nomirror)
-            //possible solid histograms, also with pattern?
-            //front-back...
-            //how to link xsd, use color-picker etc.
+            double fontsize = 12;
+            double zoom = 1;            
+            int mirrorY = 0;  //0:none, 1:tics no labels, 2:tics and labels, 3 tics and labels and axis label
+            int histoGap = 2;
+            double histoWidth = 0.85;
+            string ylabel = "Pct.";
+            string y2label = "Pct.";
+            string key = "out horiz bot center Left reverse";
+            bool dump = true;
+            bool gnuplot51 = true;
+
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
 
             bool quarterFix = false;
             if (Program.options.freq == EFreq.Quarterly || Program.options.freq == EFreq.Monthly) quarterFix = true;
-
-            bool dump = true;
-            bool gnuplot51 = true;
-
+            
             if (count == 0)
             {
                 G.Writeln2("*** ERROR: PLOT called with 0 variables");
@@ -23194,11 +23205,7 @@ namespace Gekko
                     tw.WriteLine(s);
                 }
             }
-
-            double fontsize = 12;
-            double zoom = 1;
-            bool histo = false;
-
+            
             string fileGp = path + "\\" + file3;
             using (FileStream fs = WaitForFileStream(fileGp, GekkoFileReadOrWrite.Write))
             using (StreamWriter tw = G.GekkoStreamWriter(fs))
@@ -23214,127 +23221,116 @@ namespace Gekko
                 if (gnuplot51) font = "Verdana";
 
 
+
+                tw.WriteLine("set size " + zoom + "," + zoom + "");
+                tw.WriteLine("set encoding iso_8859_1");
+                tw.WriteLine("set format y " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
+                tw.WriteLine("set format y2 " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
+
+                tw.WriteLine("set datafile missing \"NaN\"");
+
+                string enhanced = null;
+                if (G.equal(pplotType, "emf")) enhanced = " enhanced";
+
+                tw.WriteLine("set terminal " + pplotType + enhanced + " font '" + font + "," + (zoom * fontsize) + "'");
+                tw.WriteLine("set output \"" + file2 + "\"");
+                tw.WriteLine("set key " + key);
+
+                //local PLOT<> overrides
+                string set_yrange = GnuplotYrange(o, gpt, false);
+                if (set_yrange != null) tw.WriteLine("set yrange " + set_yrange + "");
+                string set_y2range = GnuplotYrange(o, gpt, true);
+                if (set_y2range != null) tw.WriteLine("set y2range " + set_y2range + "");
+
+                //local PLOT<> overrides
+                string set_title = GnuplotHeading(o, gpt);
+                if (set_title != null) tw.WriteLine("set title " + Globals.QT + EncodeDanish(set_title) + Globals.QT);
+
+                if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
                 {
-                    tw.WriteLine("set size " + zoom + "," + zoom + "");
-                    tw.WriteLine("set encoding iso_8859_1");
-                    tw.WriteLine("set format y " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
-
-                    tw.WriteLine("set datafile missing \"NaN\"");
-
-                    tw.WriteLine("set terminal " + pplotType + " enhanced " + "'" + font + "," + (zoom * fontsize) + "'");
-                    tw.WriteLine("set output \"" + file2 + "\"");
-
-                    //local PLOT<> overrides
-                    string set_yrange = GnuplotYrange(o, gpt);
-                    if (set_yrange != null) tw.WriteLine("set yrange " + set_yrange + "");
-
-                    //local PLOT<> overrides
-                    string set_title = GnuplotHeading(o, gpt);
-                    if (set_title != null) tw.WriteLine("set title " + Globals.QT + EncodeDanish(set_title) + Globals.QT);
-
-                    if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
+                    if (!quarterFix)
                     {
-                        if (!quarterFix)
-                        {
-                            tw.WriteLine("set xdata time");
-                            tw.WriteLine(@"set timefmt ""%Y/%m/%d""");
-                            tw.WriteLine(@"set format x ""%Y/%m""");
-                        }
+                        tw.WriteLine("set xdata time");
+                        tw.WriteLine(@"set timefmt ""%Y/%m/%d""");
+                        tw.WriteLine(@"set format x ""%Y/%m""");
+                    }
+                }
+                else
+                {
+                    if (numberOfObs > 70)
+                    {
+                        tw.WriteLine("set xtics 10");
+                        tw.WriteLine("set mxtics 10");
                     }
                     else
                     {
-                        if (numberOfObs > 70)
-                        {
-                            tw.WriteLine("set xtics 10");
-                            tw.WriteLine("set mxtics 10");
-                        }
-                        else
-                        {
-                            tw.WriteLine("set xtics 5");
-                            tw.WriteLine("set mxtics 5");
-                        }
-                    }
-
-                    if (gnuplot51) tw.WriteLine("set tic scale 1.4, 0.7");
-                    else tw.WriteLine("set ticscale 1.4 0.7");
-
-                    tw.WriteLine("set border 3");
-                    tw.WriteLine("set xtics nomirror");
-                    tw.WriteLine("set ytics nomirror");
-                    tw.WriteLine("set xzeroaxis lt -1");
-
-                    if (false)
-                    {
-                        tw.WriteLine("set arrow from 2010,graph 0 to 2010,graph 1 nohead");
-                    }
-
-                    //with right axis: needs to set this:
-                    //and maybe a (right) or (højre)..., should be an option to set this txt
-                    tw.WriteLine("set border 11");
-                    tw.WriteLine("set y2tics");
-                    tw.WriteLine("set yzeroaxis");
-
-                    if (gpt.plotMain != null && gpt.plotMain.grid != null)  //it can be an empty <grid/>
-                    {
-                        tw.WriteLine("set grid ytics lc rgb \"#bbbbbb\" lw 1 dt 2");
-                        tw.WriteLine("set grid xtics lc rgb \"#bbbbbb\" lw 1 dt 2");
-                    }
-
-                    int mxtics = -12345;
-
-                    if (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)
-                    {
-                        //do nothing
-                    }
-                    else
-                    {
-                        List<int> subperiods;
-                        int onlyYears;
-                        mxtics = GnuplotHandleXAxisLabels(labels1, mxtics, out subperiods, out onlyYears);
-
-                        string s3 = null;
-                        int c = -1;
-                        for (int i = 0; i < labels1.Count; i++)
-                        {
-                            c++;
-                            //int subper=labels2[i]
-                            //if (labels1.Count > 20 && c %  != 0) continue;
-                            string[] split = labels2[i].Split(new char[] { '/' });
-                            if (onlyYears != -12345 && int.Parse(split[0]) % onlyYears != 0) continue;
-                            if (subperiods.Contains(int.Parse(split[1])))
-                            {
-                                string xx = labels2[i];
-                                if (quarterFix)
-                                {
-                                    if (Program.options.freq == EFreq.Quarterly || Program.options.freq == EFreq.Monthly)
-                                    {
-                                        xx = FromGnuplotDatoToFloatingValue(split);
-                                    }
-                                }
-                                s3 += "\"" + labels1[i] + "\" \"" + xx + "\", ";
-                            }
-                        }
-                        if (s3.EndsWith(", ")) s3 = s3.Substring(0, s3.Length - 2);
-                        tw.WriteLine("set xtics (" + s3 + ")");
-                    }
-
-                    //tw.WriteLine("set style fill border");  //for the boxes/histograms
-                    //tw.WriteLine("set boxwidth 0.3 relative");
-                    //tw.WriteLine("set pointintervalbox 0.5");
-
-                    //tw.WriteLine("set pointinterval -1");
-                    //tw.WriteLine("set pointsize 0.5");
-
-                    if (o.opt_plotcode != null)
-                    {
-                        tw.WriteLine("");
-                        tw.WriteLine(o.opt_plotcode);  //user code
-                        tw.WriteLine("");
+                        tw.WriteLine("set xtics 5");
+                        tw.WriteLine("set mxtics 5");
                     }
                 }
 
-                List<PlotLine> lines = null;
-                try { lines = gpt.plotLines.plotLine; } catch (NullReferenceException) { };
+                if (gnuplot51) tw.WriteLine("set tic scale 1.4, 0.7");
+                else tw.WriteLine("set ticscale 1.4 0.7");
+
+                tw.WriteLine("set xtics nomirror");
+
+                if (mirrorY == 0)
+                {
+                    tw.WriteLine("set ytics nomirror");
+                    tw.WriteLine("set border 3");
+                    tw.WriteLine("set ylabel \"" + ylabel + "\"");                    
+
+                }
+                else if (mirrorY == 1)
+                {
+                    tw.WriteLine("set ytics");
+                    tw.WriteLine("set border 11");
+                    tw.WriteLine("set ylabel \"" + ylabel + "\"");
+
+                }
+                else if(mirrorY == 2)
+                {
+                    tw.WriteLine("set ytics");
+                    tw.WriteLine("set y2tics");
+                    tw.WriteLine("set border 11");
+                    tw.WriteLine("set ylabel \"" + ylabel + "\"");                    
+                }
+                else
+                {
+                    tw.WriteLine("set ytics");
+                    tw.WriteLine("set y2tics");
+                    tw.WriteLine("set border 11");
+                    tw.WriteLine("set ylabel \"" + ylabel + "\"");
+                    tw.WriteLine("set y2label \"" + y2label + "\"");
+                }
+
+                if (false)
+                {
+                    tw.WriteLine("set arrow from 2010,graph 0 to 2010,graph 1 nohead");
+                }
+
+                tw.WriteLine("set xzeroaxis lt -1");
+                tw.WriteLine("set yzeroaxis");  //draws x axis
+                                                //tw.WriteLine("set y2zeroaxis");  //no, not pretty
+
+                if (true || gpt != null && gpt.plotMain != null && gpt.plotMain.grid != null)  //it can be an empty <grid/>
+                {
+                    tw.WriteLine("set style line 102 lc rgb '#f0f0f0' lt 1 lw 1");  //lt 0 or dt 3 gives ugly lines when viewed in Gekko
+                    tw.WriteLine("set grid back ls 102");
+                }
+
+                int mxtics = -12345;
+                mxtics = HandleXTics(quarterFix, labels1, labels2, tw, mxtics);
+
+                if (o.opt_plotcode != null)
+                {
+                    tw.WriteLine("");
+                    tw.WriteLine(o.opt_plotcode);  //user code
+                    tw.WriteLine("");
+                }
+
+
+                List<PlotLine> lines = null; try { lines = gpt.plotLines.plotLine; } catch (NullReferenceException) { };
 
                 StringBuilder sb2 = new StringBuilder();
 
@@ -23359,15 +23355,12 @@ namespace Gekko
                 else if (Program.options.freq == EFreq.Monthly)
                 {
                     dx = 1d / 12d;
-                }
-                double total_box_width_relative = 0.75;
-                double gap_width_relative = 0.1;
-                int luft = 2;
-                if (numberOfBoxes == 1) luft = 0;
-                double d_width = dx / (double)(numberOfBoxes + luft);
-                double d_width2 = 0.85 * d_width;
+                }                
+                
+                if (numberOfBoxes == 1) histoGap = 0;
+                double d_width = dx / (double)(numberOfBoxes + histoGap);
+                double d_width2 = histoWidth * d_width;
                 double left = d_width * (double)(numberOfBoxes - 1) / 2d;
-
 
                 sb2.Append("plot ");
                 int boxesCounter = 0;
@@ -23403,7 +23396,17 @@ namespace Gekko
 
                     string _type = null;
                     if (type != null) _type = " with " + type;
-                    else _type = " with linespoints";
+                    else
+                    {
+                        if (Program.options.plot_lines_points)
+                        {
+                            _type = " with linespoints";
+                        }
+                        else
+                        {
+                            _type = " with lines";
+                        }
+                    }
 
                     string _dashtype = null;
                     if (dashtype != null) _dashtype = " dt " + dashtype;
@@ -23411,10 +23414,30 @@ namespace Gekko
 
                     string _linewidth = null;
                     if (linewidth != null) _linewidth = " lw " + linewidth;
-                    else _linewidth = " lw 3";
+                    else _linewidth = " lw 2";
 
                     string _linecolor = null;
                     if (linecolor != null) _linecolor = " lc rgb " + Globals.QT + linecolor + Globals.QT;
+                    else
+                    {
+                        if (i % 10 == 0) _linecolor = " lc rgb " + Globals.QT + "red" + Globals.QT;
+                        else if (i % 10 == 1) _linecolor = " lc rgb " + Globals.QT + "web-green" + Globals.QT;
+                        else if (i % 10 == 2) _linecolor = " lc rgb " + Globals.QT + "web-blue" + Globals.QT;
+                        else if (i % 10 == 3) _linecolor = " lc rgb " + Globals.QT + "magenta" + Globals.QT;
+                        else if (i % 10 == 4) _linecolor = " lc rgb " + Globals.QT + "dark-blue" + Globals.QT;
+                        else if (i % 10 == 5) _linecolor = " lc rgb " + Globals.QT + "orange" + Globals.QT;
+                        else if (i % 10 == 6) _linecolor = " lc rgb " + Globals.QT + "brown4" + Globals.QT;
+                        else if (i % 10 == 7) _linecolor = " lc rgb " + Globals.QT + "dark-violet" + Globals.QT;
+                        else if (i % 10 == 8) _linecolor = " lc rgb " + Globals.QT + "grey50" + Globals.QT;
+                        else if (i % 10 == 9) _linecolor = " lc rgb " + Globals.QT + "black" + Globals.QT;
+
+
+                        /*
+                         *   http://www.ss.scphys.kyoto-u.ac.jp/person/yonezawa/contents/program/gnuplot/img/colorname-list2.png
+                         * 
+                     
+                     */
+                    }
 
                     string _pointtype = null;
                     if (pointtype != null) _pointtype = " pt " + pointtype;
@@ -23422,7 +23445,7 @@ namespace Gekko
 
                     string _pointsize = null;
                     if (pointsize != null) _pointsize = " ps " + pointsize;
-                    else _pointsize = " ps 0.8";
+                    else _pointsize = " ps 0.5";
 
                     string _fillstyle = null;
                     if (fillstyle != null) _fillstyle = " fs " + fillstyle;
@@ -23475,12 +23498,12 @@ namespace Gekko
                         }
                     }
 
-                    sb2.Append("\"" + file1 + "\" using " + xx + _type + _pointtype + _pointsize + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"  " + _legend + "\" ");
+                    sb2.Append("\"" + file1 + "\" using " + xx + _type + _pointtype + _pointsize + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"" + _legend + "\" ");
 
                     if (i < count - 1) sb2.Append(", ");
                 }
                 sb2.AppendLine();
-                                
+
                 tw.WriteLine(sb2);
                 tw.WriteLine();
 
@@ -23593,6 +23616,47 @@ namespace Gekko
             {
                 o.guiGraphRefreshingFilename = emfName;
             }
+        }
+
+        private static int HandleXTics(bool quarterFix, List<string> labels1, List<string> labels2, StreamWriter tw, int mxtics)
+        {
+            if (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)
+            {
+                //do nothing
+            }
+            else
+            {
+                List<int> subperiods;
+                int onlyYears;
+                mxtics = GnuplotHandleXAxisLabels(labels1, mxtics, out subperiods, out onlyYears);
+
+                string s3 = null;
+                int c = -1;
+                for (int i = 0; i < labels1.Count; i++)
+                {
+                    c++;
+                    //int subper=labels2[i]
+                    //if (labels1.Count > 20 && c %  != 0) continue;
+                    string[] split = labels2[i].Split(new char[] { '/' });
+                    if (onlyYears != -12345 && int.Parse(split[0]) % onlyYears != 0) continue;
+                    if (subperiods.Contains(int.Parse(split[1])))
+                    {
+                        string xx = labels2[i];
+                        if (quarterFix)
+                        {
+                            if (Program.options.freq == EFreq.Quarterly || Program.options.freq == EFreq.Monthly)
+                            {
+                                xx = FromGnuplotDatoToFloatingValue(split);
+                            }
+                        }
+                        s3 += "\"" + labels1[i] + "\" \"" + xx + "\", ";
+                    }
+                }
+                if (s3.EndsWith(", ")) s3 = s3.Substring(0, s3.Length - 2);
+                tw.WriteLine("set xtics (" + s3 + ")");
+            }
+
+            return mxtics;
         }
 
         private static string FromGnuplotDatoToFloatingValue(string[] split)
@@ -23716,33 +23780,49 @@ namespace Gekko
             return mxtics;
         }
 
-        private static string GnuplotYrange(O.Prt o, PlotTemplate gpt)
+        private static string GnuplotYrange(O.Prt o, PlotTemplate gpt, bool y2)
         {
             string set_yrange = null;
             double ymin = double.NaN;
             double ymax = double.NaN;
             //load from xml
-            string _ymin = null; try { _ymin = gpt.plotYAxis.plotRange.plotRangeMin; } catch (NullReferenceException) { };
+            string _ymin = null;
+            if (y2)
+            {
+                try { _ymin = gpt.plotYAxis.plotRange.plotRangeMin2; } catch (NullReferenceException) { };
+            }
+            else
+            {
+                try { _ymin = gpt.plotYAxis.plotRange.plotRangeMin; } catch (NullReferenceException) { };
+            }
             ymin = ParseIntoDouble(_ymin);
-            string _ymax = null; try { _ymax = gpt.plotYAxis.plotRange.plotRangeMax; } catch (NullReferenceException) { };
+            string _ymax = null;
+            if (y2)
+            {
+                try { _ymax = gpt.plotYAxis.plotRange.plotRangeMax2; } catch (NullReferenceException) { };
+            }
+            else
+            {
+                try { _ymax = gpt.plotYAxis.plotRange.plotRangeMax; } catch (NullReferenceException) { };
+            }
             ymax = ParseIntoDouble(_ymax);
             //options in PLOT command override
-            if (!double.IsNaN(o.opt_ymin)) ymin = o.opt_ymin;
-            if (!double.IsNaN(o.opt_ymax)) ymax = o.opt_ymax;
-            if (!double.IsNaN(ymin) && double.IsNaN(ymax))
+            if (y2)
             {
-                set_yrange = "[" + ymin + ":]";
+                if (!double.IsNaN(o.opt_y2min)) ymin = o.opt_y2min;
+                if (!double.IsNaN(o.opt_y2max)) ymax = o.opt_y2max;
             }
-            else if (double.IsNaN(ymin) && !double.IsNaN(ymax))
+            else
             {
-                set_yrange = "[:" + ymax + "]";
+                if (!double.IsNaN(o.opt_ymin)) ymin = o.opt_ymin;
+                if (!double.IsNaN(o.opt_ymax)) ymax = o.opt_ymax;
             }
-            else if (!double.IsNaN(ymin) && !double.IsNaN(ymax))
-            {
-                set_yrange = "[" + ymin + ":" + ymax + "]";
-            }
+            if (!double.IsNaN(ymin) && double.IsNaN(ymax)) set_yrange = "[" + ymin + ":]";
+            else if (double.IsNaN(ymin) && !double.IsNaN(ymax)) set_yrange = "[:" + ymax + "]";
+            else if (!double.IsNaN(ymin) && !double.IsNaN(ymax)) set_yrange = "[" + ymin + ":" + ymax + "]";
             return set_yrange;
         }
+            
 
         private static string GnuplotHeading(O.Prt o, PlotTemplate gpt)
         {

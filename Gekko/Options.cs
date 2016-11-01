@@ -88,6 +88,7 @@ Additionally, there are model, solve, equation options.
         public int model_cache_max = 20;  //model options are non-solving options. How many fixed models are kept in RAM        
         public string model_infofile = "yes";  //yes/no/temp
         public bool plot_lines_points = true;
+        public bool plot_new = false;
         public int print_disp_maxlines = 3; //-1 means infinite, 0 means no data shown
         public int print_fields_ndec = 4;
         public int print_fields_nwidth = 13;

@@ -44,6 +44,10 @@ namespace Gekko
         public string plotRangeMin;
         [XmlElement(ElementName = "max")]
         public string plotRangeMax;
+        [XmlElement(ElementName = "min2")]
+        public string plotRangeMin2;
+        [XmlElement(ElementName = "max2")]
+        public string plotRangeMax2;
     }
 
     public class PlotYAxis
