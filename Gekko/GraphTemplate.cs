@@ -46,24 +46,38 @@ namespace Gekko
         [XmlElement(ElementName = "y2")]
         public Y y2;
         [XmlElement(ElementName = "labels")]
-        public List<Label> labels;
+        public Labels labels;        
+
         [XmlElement(ElementName = "arrows")]
-        public List<Arrow> arrows;
-        [XmlElement(ElementName = "lines")]        
-        public List<Line> plotLines;      
+        public Arrows arrows;
+        [XmlElement(ElementName = "lines")]
+        public Lines lines;
+
     }
 
-    public class Label
+    public class Lines
     {
-        [XmlElement(ElementName = "label")]
-        public string label;
+        [XmlElement(ElementName = "line")]
+        public List<Line> lines;
     }
 
-    public class Arrow
+    public class Arrows
     {
         [XmlElement(ElementName = "arrow")]
-        public string arrow;
+        public List<string> arrows;
     }
+
+    public class Labels
+    {
+        [XmlElement(ElementName = "label")]
+        public List<string> label;
+    }
+
+    //public class Arrow
+    //{
+    //    [XmlElement(ElementName = "arrow")]
+    //    public string arrow;
+    //}
 
     public class X
     {
@@ -101,12 +115,18 @@ namespace Gekko
         public string maxsoft;
         [XmlElement(ElementName = "maxhard")]
         public string maxhard;
-    }    
+    }
+
+    //public class Line
+    //{
+    //    [XmlElement(ElementName = "line")]
+    //    public LineContent line;
+    //}
 
     public class Line
     {
-        [XmlElement(ElementName = "type")]
-        public string type;  //lines, points, linespoints, impulses, dots, steps, boxes
+        [XmlElement(ElementName = "linetype")]
+        public string linetype;  //lines, points, linespoints, impulses, dots, steps, boxes
         [XmlElement(ElementName = "dashtype")]
         public string dashtype;  //1, 2, ...    
         [XmlElement(ElementName = "linewidth")]

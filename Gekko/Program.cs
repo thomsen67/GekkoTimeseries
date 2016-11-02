@@ -23346,7 +23346,7 @@ namespace Gekko
                     tw.WriteLine("");
                 }
 
-                List<Line> lines = null; try { lines = gpt.plotLines; } catch (NullReferenceException) { };
+                List<Line> lines = null; try { lines = gpt.lines.lines; } catch (NullReferenceException) { };
 
                 StringBuilder sb2 = new StringBuilder();
 
@@ -23358,7 +23358,7 @@ namespace Gekko
                         if (lines != null && i < lines.Count) line = lines[i];
                         if (line != null)
                         {
-                            if (G.equal(line.type, "boxes")) numberOfBoxes++;
+                            if (G.equal(line.linetype, "boxes")) numberOfBoxes++;
                         }
                     }
                 }
@@ -23397,7 +23397,7 @@ namespace Gekko
                     if (lines != null && i < lines.Count) line = lines[i];
                     if (line != null)
                     {
-                        type = line.type;
+                        type = line.linetype;
 
                         dashtype = line.dashtype;
                         linewidth = line.linewidth;
