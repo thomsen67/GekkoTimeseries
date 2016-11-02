@@ -63,7 +63,7 @@ namespace Gekko
         private Button button1;
         private Button button2;
         private Button button3;
-        private Label label1;
+        private System.Windows.Forms.Label label1;
         private Button button4;
         //public GekkoTime tEnd;
         //public int tSubEnd;

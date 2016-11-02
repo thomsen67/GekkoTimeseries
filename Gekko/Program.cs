@@ -23080,10 +23080,14 @@ namespace Gekko
             double zoom = 1;            
             int mirrorY = 0;  //0:none, 1:tics no labels, 2:tics and labels, 3 tics and labels and axis label
             int histoGap = 2;
-            double histoWidth = 0.85;
-            string ylabel = "Pct.";
-            string y2label = "Pct.";
-            string key = "out horiz bot center Left reverse";
+            bool yzeroaxis = true;
+            double histoWidth = 0.60;
+            string xTicsInOut = "out";  //in, out
+            string yTicsInOut = "out";  //in, out
+            string ylabel = "Y-label";
+            string y2label = "Y-label";
+            string key = "out horiz bot center Left reverse";  //invert because we print the last one first
+            bool yzeroazxis = true;
             bool dump = true;
             bool gnuplot51 = true;
 
@@ -23105,7 +23109,7 @@ namespace Gekko
             string heading = "";
             string pplotType = "emf";
 
-            PlotTemplate gpt = null;
+            Gpt gpt = null;
             if (o.opt_using != null)
             {
                 string fileName = o.opt_using;
@@ -23119,7 +23123,8 @@ namespace Gekko
                 try
                 {                    
                     fileName = AddExtension(fileName, ".gpt");
-                    gpt = GraphXml.ReadFromXmlFile<PlotTemplate>(fileName);                    
+                    fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
+                    gpt = GraphXml.ReadFromXmlFile<Gpt>(fileName);                    
                 }
                 catch (Exception e)
                 {
@@ -23230,11 +23235,20 @@ namespace Gekko
                 tw.WriteLine("set datafile missing \"NaN\"");
 
                 string enhanced = null;
-                if (G.equal(pplotType, "emf")) enhanced = " enhanced";
+                if (G.equal(pplotType, "emf"))
+                {
+                    enhanced = " enhanced";
+                    fontsize = 0.95 * fontsize;
+                }
+                else
+                {
+                    fontsize = 0.75 * fontsize;
+                }                
 
                 tw.WriteLine("set terminal " + pplotType + enhanced + " font '" + font + "," + (zoom * fontsize) + "'");
                 tw.WriteLine("set output \"" + file2 + "\"");
                 tw.WriteLine("set key " + key);
+                //tw.WriteLine("set key invert");
 
                 //local PLOT<> overrides
                 string set_yrange = GnuplotYrange(o, gpt, false);
@@ -23242,9 +23256,12 @@ namespace Gekko
                 string set_y2range = GnuplotYrange(o, gpt, true);
                 if (set_y2range != null) tw.WriteLine("set y2range " + set_y2range + "");
 
+                tw.WriteLine("set xtics " + xTicsInOut);
+                tw.WriteLine("set ytics "+ yTicsInOut);
+
                 //local PLOT<> overrides
                 string set_title = GnuplotHeading(o, gpt);
-                if (set_title != null) tw.WriteLine("set title " + Globals.QT + EncodeDanish(set_title) + Globals.QT);
+                if (set_title != null) tw.WriteLine("set title " + Globals.QT + EncodeDanish(GnuplotText(set_title)) + Globals.QT + " font '" + font + "," + (2d * zoom * fontsize) + "'");
 
                 if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
                 {
@@ -23278,14 +23295,14 @@ namespace Gekko
                 {
                     tw.WriteLine("set ytics nomirror");
                     tw.WriteLine("set border 3");
-                    tw.WriteLine("set ylabel \"" + ylabel + "\"");                    
+                    tw.WriteLine("set ylabel \"" + GnuplotText(ylabel) + "\"");                    
 
                 }
                 else if (mirrorY == 1)
                 {
                     tw.WriteLine("set ytics");
                     tw.WriteLine("set border 11");
-                    tw.WriteLine("set ylabel \"" + ylabel + "\"");
+                    tw.WriteLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
 
                 }
                 else if(mirrorY == 2)
@@ -23293,15 +23310,15 @@ namespace Gekko
                     tw.WriteLine("set ytics");
                     tw.WriteLine("set y2tics");
                     tw.WriteLine("set border 11");
-                    tw.WriteLine("set ylabel \"" + ylabel + "\"");                    
+                    tw.WriteLine("set ylabel \"" + GnuplotText(ylabel) + "\"");                    
                 }
                 else
                 {
                     tw.WriteLine("set ytics");
                     tw.WriteLine("set y2tics");
                     tw.WriteLine("set border 11");
-                    tw.WriteLine("set ylabel \"" + ylabel + "\"");
-                    tw.WriteLine("set y2label \"" + y2label + "\"");
+                    tw.WriteLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
+                    tw.WriteLine("set y2label \"" + GnuplotText(y2label) + "\"");
                 }
 
                 if (false)
@@ -23310,10 +23327,10 @@ namespace Gekko
                 }
 
                 tw.WriteLine("set xzeroaxis lt -1");
-                tw.WriteLine("set yzeroaxis");  //draws x axis
+                if(yzeroaxis) tw.WriteLine("set yzeroaxis");  //draws x axis
                                                 //tw.WriteLine("set y2zeroaxis");  //no, not pretty
 
-                if (true || gpt != null && gpt.plotMain != null && gpt.plotMain.grid != null)  //it can be an empty <grid/>
+                if (true || gpt != null && gpt.grid != null)  //it can be an empty <grid/>
                 {
                     tw.WriteLine("set style line 102 lc rgb '#f0f0f0' lt 1 lw 1");  //lt 0 or dt 3 gives ugly lines when viewed in Gekko
                     tw.WriteLine("set grid back ls 102");
@@ -23329,8 +23346,7 @@ namespace Gekko
                     tw.WriteLine("");
                 }
 
-
-                List<PlotLine> lines = null; try { lines = gpt.plotLines.plotLine; } catch (NullReferenceException) { };
+                List<Line> lines = null; try { lines = gpt.plotLines; } catch (NullReferenceException) { };
 
                 StringBuilder sb2 = new StringBuilder();
 
@@ -23338,7 +23354,7 @@ namespace Gekko
                 {
                     for (int i = 0; i < count; i++)
                     {
-                        PlotLine line = null;
+                        Line line = null;
                         if (lines != null && i < lines.Count) line = lines[i];
                         if (line != null)
                         {
@@ -23364,9 +23380,10 @@ namespace Gekko
 
                 sb2.Append("plot ");
                 int boxesCounter = 0;
-                for (int i = 0; i < count; i++)
+                //for (int i = count-1; i >=0; i--)
+                for (int i = 0; i<count;i++)
                 {
-                    string legend = null;
+                    string label = null;
                     string linewidth = null;
                     string linecolor = null;
                     string pointtype = null;
@@ -23376,7 +23393,7 @@ namespace Gekko
                     string yAxis = null;
                     string dashtype = null;
                     string type = null;
-                    PlotLine line = null;
+                    Line line = null;
                     if (lines != null && i < lines.Count) line = lines[i];
                     if (line != null)
                     {
@@ -23388,9 +23405,8 @@ namespace Gekko
                         pointtype = line.pointtype;
                         pointsize = line.pointsize;
                         fillstyle = line.fillstyle;
-                        legend = line.legend;
-                        size = line.size;
-                        yAxis = line.yAxis;
+                        label = line.label;                        
+                        yAxis = line.y2;
 
                     }
 
@@ -23423,14 +23439,13 @@ namespace Gekko
                         if (i % 10 == 0) _linecolor = " lc rgb " + Globals.QT + "red" + Globals.QT;
                         else if (i % 10 == 1) _linecolor = " lc rgb " + Globals.QT + "web-green" + Globals.QT;
                         else if (i % 10 == 2) _linecolor = " lc rgb " + Globals.QT + "web-blue" + Globals.QT;
-                        else if (i % 10 == 3) _linecolor = " lc rgb " + Globals.QT + "magenta" + Globals.QT;
+                        else if (i % 10 == 3) _linecolor = " lc rgb " + Globals.QT + "orange" + Globals.QT;                        
                         else if (i % 10 == 4) _linecolor = " lc rgb " + Globals.QT + "dark-blue" + Globals.QT;
-                        else if (i % 10 == 5) _linecolor = " lc rgb " + Globals.QT + "orange" + Globals.QT;
+                        else if (i % 10 == 5) _linecolor = " lc rgb " + Globals.QT + "magenta" + Globals.QT;
                         else if (i % 10 == 6) _linecolor = " lc rgb " + Globals.QT + "brown4" + Globals.QT;
                         else if (i % 10 == 7) _linecolor = " lc rgb " + Globals.QT + "dark-violet" + Globals.QT;
                         else if (i % 10 == 8) _linecolor = " lc rgb " + Globals.QT + "grey50" + Globals.QT;
                         else if (i % 10 == 9) _linecolor = " lc rgb " + Globals.QT + "black" + Globals.QT;
-
 
                         /*
                          *   http://www.ss.scphys.kyoto-u.ac.jp/person/yonezawa/contents/program/gnuplot/img/colorname-list2.png
@@ -23449,6 +23464,10 @@ namespace Gekko
 
                     string _fillstyle = null;
                     if (fillstyle != null) _fillstyle = " fs " + fillstyle;
+                    else
+                    {
+                        _fillstyle = " fs " + "solid";
+                    }
 
                     string _yAxis = null;
                     if (yAxis != null && G.equal(yAxis, "right"))
@@ -23457,7 +23476,7 @@ namespace Gekko
                     }
 
                     string _legend = EncodeDanish(labelsNonBroken[i]);
-                    if (legend != null) _legend = EncodeDanish(legend);  //actually overrides, it should be PRT fy 'GDP' that overrides (the 'GDP').
+                    if (label != null) _legend = EncodeDanish(label);  //actually overrides, it should be PRT fy 'GDP' that overrides (the 'GDP').
 
                     //linestyle is an association of linecolor, linewidth, dashtype, pointtype
                     //linetype is the same, just permanent
@@ -23498,9 +23517,11 @@ namespace Gekko
                         }
                     }
 
-                    sb2.Append("\"" + file1 + "\" using " + xx + _type + _pointtype + _pointsize + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"" + _legend + "\" ");
+                    sb2.Append("\"" + file1 + "\" using " + xx + _type + _pointtype + _pointsize + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"" + GnuplotText(_legend) + " \" ");  //note: space added after legend text
 
                     if (i < count - 1) sb2.Append(", ");
+                    //if (i > 0) sb2.Append(", ");
+
                 }
                 sb2.AppendLine();
 
@@ -23616,6 +23637,11 @@ namespace Gekko
             {
                 o.guiGraphRefreshingFilename = emfName;
             }
+        }
+
+        private static string GnuplotText(string s)
+        {
+            return s.Replace(@"_", @"\\_");
         }
 
         private static int HandleXTics(bool quarterFix, List<string> labels1, List<string> labels2, StreamWriter tw, int mxtics)
@@ -23780,7 +23806,7 @@ namespace Gekko
             return mxtics;
         }
 
-        private static string GnuplotYrange(O.Prt o, PlotTemplate gpt, bool y2)
+        private static string GnuplotYrange(O.Prt o, Gpt gpt, bool y2)
         {
             string set_yrange = null;
             double ymin = double.NaN;
@@ -23789,21 +23815,21 @@ namespace Gekko
             string _ymin = null;
             if (y2)
             {
-                try { _ymin = gpt.plotYAxis.plotRange.plotRangeMin2; } catch (NullReferenceException) { };
+                try { _ymin = gpt.y2.min; } catch (NullReferenceException) { };
             }
             else
             {
-                try { _ymin = gpt.plotYAxis.plotRange.plotRangeMin; } catch (NullReferenceException) { };
+                try { _ymin = gpt.y.min; } catch (NullReferenceException) { };
             }
             ymin = ParseIntoDouble(_ymin);
             string _ymax = null;
             if (y2)
             {
-                try { _ymax = gpt.plotYAxis.plotRange.plotRangeMax2; } catch (NullReferenceException) { };
+                try { _ymax = gpt.y2.max; } catch (NullReferenceException) { };
             }
             else
             {
-                try { _ymax = gpt.plotYAxis.plotRange.plotRangeMax; } catch (NullReferenceException) { };
+                try { _ymax = gpt.y.max; } catch (NullReferenceException) { };
             }
             ymax = ParseIntoDouble(_ymax);
             //options in PLOT command override
@@ -23824,10 +23850,10 @@ namespace Gekko
         }
             
 
-        private static string GnuplotHeading(O.Prt o, PlotTemplate gpt)
+        private static string GnuplotHeading(O.Prt o, Gpt gpt)
         {
             string heading = null;            
-            try { heading = gpt.plotMain.title; } catch (NullReferenceException) { };
+            try { heading = gpt.title; } catch (NullReferenceException) { };
             if (o.opt_heading != null) heading = o.opt_heading;
             return heading;
         }
@@ -23840,6 +23866,7 @@ namespace Gekko
                 if (!double.TryParse(x, out y))
                 {
                     G.Writeln2("*** ERROR: Could not parse '" + x + "' as a number");
+                    throw new GekkoException();
                 }
             }
             return y;

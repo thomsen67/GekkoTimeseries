@@ -10,83 +10,119 @@ using System.IO;
 namespace Gekko
 {
     [XmlRoot(ElementName = "gekkoplot")]    
-    public class PlotTemplate
-    {
-        [XmlElement(ElementName = "main")]
-        public PlotMain plotMain;
-        [XmlElement(ElementName = "x-axis")]
-        public PlotXAxis plotXAxis;
-        [XmlElement(ElementName = "y-axis")]
-        public PlotYAxis plotYAxis;
-        [XmlElement(ElementName = "y-axis2")]
-        public PlotYAxis2 plotYAxis2;
-        [XmlElement(ElementName = "lines")]        
-        public PlotLines plotLines;      
-    }
-
-    public class PlotMain
-    {
+    public class Gpt
+    {        
         [XmlElement(ElementName = "title")]
         public string title;
+        [XmlElement(ElementName = "subtitle")]
+        public string subtitle;
+        [XmlElement(ElementName = "font")]
+        public string font;
+        [XmlElement(ElementName = "fontsize")]
+        public string fontsize;
         [XmlElement(ElementName = "grid")]
         public string grid;
-    }   
-
-    public class PlotXAxis
-    {
-        [XmlElement(ElementName = "title")]
-        public string title;
+        [XmlElement(ElementName = "border")]
+        public string border;
+        //--------------------------------------
+        [XmlElement(ElementName = "boxgap")]
+        public string boxgap;
+        [XmlElement(ElementName = "boxwidth")]
+        public string boxwidth;
+        [XmlElement(ElementName = "boxstack")]
+        public string boxstack;
+        //--------------------------------------
+        [XmlElement(ElementName = "size")]
+        public string size;
+        [XmlElement(ElementName = "key")]
+        public string key;
+        [XmlElement(ElementName = "palette")]
+        public string palette;
+        //--------------------------------------
+        [XmlElement(ElementName = "x")]
+        public X x;
+        [XmlElement(ElementName = "y")]
+        public Y y;
+        [XmlElement(ElementName = "y2")]
+        public Y y2;
+        [XmlElement(ElementName = "labels")]
+        public List<Label> labels;
+        [XmlElement(ElementName = "arrows")]
+        public List<Arrow> arrows;
+        [XmlElement(ElementName = "lines")]        
+        public List<Line> plotLines;      
     }
 
-    public class PlotRange
+    public class Label
     {
-        [XmlElement(ElementName = "min")]
-        public string plotRangeMin;
-        [XmlElement(ElementName = "max")]
-        public string plotRangeMax;
-        [XmlElement(ElementName = "min2")]
-        public string plotRangeMin2;
-        [XmlElement(ElementName = "max2")]
-        public string plotRangeMax2;
+        [XmlElement(ElementName = "label")]
+        public string label;
     }
 
-    public class PlotYAxis
+    public class Arrow
     {
-        [XmlElement(ElementName = "title")]
-        public string title;
-        [XmlElement(ElementName = "range")]
-        public PlotRange plotRange;
+        [XmlElement(ElementName = "arrow")]
+        public string arrow;
     }
 
-    public class PlotYAxis2
+    public class X
     {
-        [XmlElement(ElementName = "title")]
-        public string title;
-        [XmlElement(ElementName = "range")]
-        public PlotRange plotRange;
-    }
-
-    public class PlotLines
-    {
+        [XmlElement(ElementName = "label")]
+        public string label;        
         [XmlElement(ElementName = "line")]
-        public List<PlotLine> plotLine;
+        public string line;
+        [XmlElement(ElementName = "lineafter")]
+        public string lineafter;
+        [XmlElement(ElementName = "linebefore")]
+        public string linebefore;
+        [XmlElement(ElementName = "tics")]
+        public string tics;        
+    }
+
+    public class Y
+    {
+        [XmlElement(ElementName = "label")]
+        public string label;
+        [XmlElement(ElementName = "zeroaxis")]
+        public string zeroaxis;
+        [XmlElement(ElementName = "line")]
+        public string line;
+        [XmlElement(ElementName = "tics")]
+        public string tics;
+        [XmlElement(ElementName = "min")]
+        public string min;
+        [XmlElement(ElementName = "minsoft")]
+        public string minsoft;
+        [XmlElement(ElementName = "minhard")]
+        public string minhard;
+        [XmlElement(ElementName = "max")]
+        public string max;
+        [XmlElement(ElementName = "maxsoft")]
+        public string maxsoft;
+        [XmlElement(ElementName = "maxhard")]
+        public string maxhard;
     }    
 
-    public class PlotLine
+    public class Line
     {
-        public string legend;  //text
+        [XmlElement(ElementName = "type")]
         public string type;  //lines, points, linespoints, impulses, dots, steps, boxes
+        [XmlElement(ElementName = "dashtype")]
+        public string dashtype;  //1, 2, ...    
+        [XmlElement(ElementName = "linewidth")]
         public string linewidth; //number
+        [XmlElement(ElementName = "linecolor")]
         public string linecolor;
+        [XmlElement(ElementName = "pointtype")]
         public string pointtype;  //none, plus, kryds, ...
-        public string pointsize; //size of points
-        public string pointinterval; //1 plots all points, 2 every second etc. Minus makes the line go through points
-        public string fillstyle;     //empty, solid
-        public string size; //number
-        public string scale; //number
-        [XmlElement(ElementName = "y-axis")]
-        public string yAxis;  //left, right
-        public string dashtype;  //1, 2, ...
+        [XmlElement(ElementName = "pointsize")]
+        public string pointsize;
+        [XmlElement(ElementName = "fillstyle")]
+        public string fillstyle;     //empty, solid       
+        [XmlElement(ElementName = "y2")]
+        public string y2;  //left, right   
+        [XmlElement(ElementName = "label")]
+        public string label;  //text
     }
 
 
