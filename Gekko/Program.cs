@@ -23406,29 +23406,49 @@ namespace Gekko
                 {
                     XmlNode line3 = lines3[i];
 
+                    string xlinetype = null;
+                    string xdashtype = null;
+                    string xlinewidth = null;
+                    string defaultColor = null;
+                    string xlinecolor = null;
+                    string xpointtype = null;
+                    string xpointsize = null;
+                    string xfillstyle = null;
+                    string xlabel = null;
+                    string xy2 = null;
 
                     if (line3 != null)
                     {
                         string zzz = "lines";
                         if (Program.options.plot_lines_points) zzz = "linespoints";                        
-                        string xlinetype = GetText(line3.SelectSingleNode("linetype"), zzz);
-                       
-                        string xdashtype = GetText(line3.SelectSingleNode("dashtype"), "1");
-                        string xlinewidth = GetText(line3.SelectSingleNode("linewidth"), "2");
-                        string defaultColor = palette2[i % palette2.Count];  //rotating
-                        string xlinecolor = GetText(line3.SelectSingleNode("linecolor"), defaultColor);
+                        xlinetype = GetText(line3.SelectSingleNode("linetype"), zzz);                       
+                        xdashtype = GetText(line3.SelectSingleNode("dashtype"), "1");
+                        xlinewidth = GetText(line3.SelectSingleNode("linewidth"), "3");
+                        defaultColor = palette2[i % palette2.Count];  //rotating
+                        xlinecolor = GetText(line3.SelectSingleNode("linecolor"), defaultColor);
+                        xpointtype = GetText(line3.SelectSingleNode("pointtype"), "7");
+                        xpointsize = GetText(line3.SelectSingleNode("pointsize"), "0.5");
+                        if (G.equal(xlinetype, "boxes"))
+                        {
+                            xfillstyle = GetText(line3.SelectSingleNode("fillstyle"), "solid");
+                        }
 
-                        string xpointtype = GetText(line3.SelectSingleNode("pointtype"), "2");
-                        string xpointsize = GetText(line3.SelectSingleNode("pointsize"), "2");
-                        string xfillstyle = GetText(line3.SelectSingleNode("fillstyle"), "2");
-                        string xlabel = GetText(line3.SelectSingleNode("label"), "2");
-                        string xyAxis = GetText(line3.SelectSingleNode("yAxis"), "2");
-
-
+                        xlabel = GetText(line3.SelectSingleNode("label"));
+                        xy2 = GetText(line3.SelectSingleNode("y2"));  //must be 
 
                     }
 
-
+                    string s = null;
+                    if (!NullOrEmpty(xlinetype)) s += " with " + xlinetype;
+                    if (!NullOrEmpty(xdashtype)) s += " dashtype " + xdashtype;
+                    if (!NullOrEmpty(xlinewidth)) s += " linewidth " + xlinewidth;
+                    if (!NullOrEmpty(xlinecolor)) s += " linecolor rgb \"" + xlinecolor + "\"";
+                    if (!NullOrEmpty(xpointtype)) s += " pointtype " + xpointtype;
+                    if (!NullOrEmpty(xpointtype)) s += " pointsize " + xpointsize;
+                    if (!NullOrEmpty(xfillstyle)) s += " fillstyle " + xfillstyle;
+                    if (!NullOrEmpty(xlabel)) s += " label " + xlabel;
+                    if (!NullOrEmpty(xy2)) s += " axes x1y2";
+                    
                     string label = null;
                     string linewidth = null;
                     string linecolor = null;
@@ -23563,7 +23583,7 @@ namespace Gekko
                         }
                     }
 
-                    sb2.Append("\"" + file1 + "\" using " + xx + _type + _pointtype + _pointsize + _dashtype + _linewidth + _linecolor + _yAxis + _fillstyle + " title \"" + GnuplotText(_legend) + " \" ");  //note: space added after legend text
+                    sb2.Append("\"" + file1 + "\" using " + xx + s + " title \"" + GnuplotText(_legend) + " \" ");  //note: space added after legend text
 
                     if (i < count - 1) sb2.Append(", ");
                     //if (i > 0) sb2.Append(", ");
