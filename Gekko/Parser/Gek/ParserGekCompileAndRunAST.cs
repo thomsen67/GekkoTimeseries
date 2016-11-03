@@ -91,7 +91,8 @@ namespace Gekko.Parser.Gek
             catch (Exception e)
             {
                 HandleRunErrors(p, e);
-                return;
+                throw;  //changed from return til throw here. This provides a 'more' link with C# line, also if the error occurs in a gcm file. The question is: does this break something??
+                //return;
             }
             finally
             {
