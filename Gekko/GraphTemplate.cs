@@ -16,10 +16,10 @@ namespace Gekko
         public string title;
         [XmlElement(ElementName = "subtitle")]
         public string subtitle;
-        [XmlElement(ElementName = "font")]
-        public string font;
-        [XmlElement(ElementName = "fontsize")]
-        public string fontsize;
+        [XmlElement(ElementName = "font")]  
+        public string font;  //Verdana, Arial, ... . ==> set terminal emf enhanced font 'Verdana, 12'
+        [XmlElement(ElementName = "fontsize")]  
+        public string fontsize;  //Verdana, Arial, ... . ==> set terminal emf enhanced font 'Verdana, 12'
         [XmlElement(ElementName = "grid")]
         public string grid;
         [XmlElement(ElementName = "border")]
@@ -55,36 +55,12 @@ namespace Gekko
 
     }
 
-    public class Lines
-    {
-        [XmlElement(ElementName = "line")]
-        public List<Line> lines;
-    }
-
-    public class Arrows
-    {
-        [XmlElement(ElementName = "arrow")]
-        public List<string> arrows;
-    }
-
-    public class Labels
-    {
-        [XmlElement(ElementName = "label")]
-        public List<string> label;
-    }
-
-    //public class Arrow
-    //{
-    //    [XmlElement(ElementName = "arrow")]
-    //    public string arrow;
-    //}
-
     public class X
     {
         [XmlElement(ElementName = "label")]
         public string label;        
         [XmlElement(ElementName = "line")]
-        public string line;
+        public LinesSimple line;
         [XmlElement(ElementName = "lineafter")]
         public string lineafter;
         [XmlElement(ElementName = "linebefore")]
@@ -117,11 +93,11 @@ namespace Gekko
         public string maxhard;
     }
 
-    //public class Line
-    //{
-    //    [XmlElement(ElementName = "line")]
-    //    public LineContent line;
-    //}
+    public class Y2 : Y
+    {
+        [XmlElement(ElementName = "mirror")]  
+        public string mirror;  //0, 1, 2, 3. Ignored if y2 is used by a line. ==> set ytics, set y2tics, set border
+    }       
 
     public class Line
     {
@@ -145,6 +121,28 @@ namespace Gekko
         public string label;  //text
     }
 
+    public class Lines
+    {
+        [XmlElement(ElementName = "line")]
+        public List<Line> lines;
+    }
+
+    public class Arrows
+    {
+        [XmlElement(ElementName = "arrow")]
+        public List<string> arrows;
+    }
+
+    public class LinesSimple
+    {
+        [XmlElement(ElementName = "line")]
+        public List<string> lines;
+    }
+    public class Labels
+    {
+        [XmlElement(ElementName = "label")]
+        public List<string> label;
+    }
 
     class GraphXml
     {   
