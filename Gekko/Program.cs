@@ -23096,6 +23096,8 @@ namespace Gekko
             string heading = "";
             string pplotType = "emf";
 
+            XmlDocument doc = new XmlDocument();
+
             Gpt gpt = null;
             if (o.opt_using != null)
             {
@@ -23123,7 +23125,7 @@ namespace Gekko
 
                 if (true)
                 {
-                    XmlDocument doc = new XmlDocument();
+                    doc = new XmlDocument();
                     string xmlText = GetTextFromFileWithWait(fileName);
                     
                     try
@@ -23137,27 +23139,30 @@ namespace Gekko
                         WriteXmlError(e, fileName);
                         throw new GekkoException();
                     }
-
-
-                    XmlNode node = doc.SelectSingleNode("gekkoplot/title");
-                    
-
-
                 }
             }
+                        
+            string title = GetText(doc.SelectSingleNode("gekkoplot/title"));
+            string subtitle = GetText(doc.SelectSingleNode("gekkoplot/subtitle"));
+            string font = GetText(doc.SelectSingleNode("gekkoplot/font"), "Verdana");
+            double fontsize = ParseIntoDouble(GetText(doc.SelectSingleNode("gekkoplot/fontsize"), "12"));
+            string grid = GetText(doc.SelectSingleNode("gekkoplot/grid"));
+            string border = GetText(doc.SelectSingleNode("gekkoplot/border"), "3");
+            string boxgap = GetText(doc.SelectSingleNode("gekkoplot/boxgap"), "2");
+            double boxwidth = ParseIntoDouble(GetText(doc.SelectSingleNode("gekkoplot/boxwidth"), "0.60"));
+            string boxstack = GetText(doc.SelectSingleNode("gekkoplot/boxstack"));
+            string size2 = GetText(doc.SelectSingleNode("gekkoplot/size"));
+            string key = GetText(doc.SelectSingleNode("gekkoplot/key"), "out horiz bot center Left reverse");
+            string palette = GetText(doc.SelectSingleNode("gekkoplot/palette"), "red,web-green,web-blue,orange,dark-blue,magenta,brown4,dark-violet,grey50,black");
 
-            string title = gpt.title;
-            string subtitle = gpt.subtitle;
-            string font = "Verdana"; if (!NullOrEmpty(gpt.font)) font = gpt.font;
-            double fontsize = 12d; if (!NullOrEmpty(gpt.fontsize)) fontsize = ParseIntoDouble(gpt.fontsize);
-            string grid = ""; if (!NullOrEmpty(gpt.grid)) grid = gpt.grid;
-            string border = "3"; if (!NullOrEmpty(gpt.border)) border = gpt.border;
-            string boxgap = "2"; if (!NullOrEmpty(gpt.boxgap)) boxgap = gpt.boxgap;
-            double boxwidth = 0.60; if (!NullOrEmpty(gpt.boxwidth)) boxwidth = ParseIntoDouble(gpt.boxwidth);
-            string boxstack = null; if (!NullOrEmpty(gpt.boxstack)) boxstack = gpt.boxstack;
-            string size2 = null; if (!NullOrEmpty(gpt.size)) size2 = gpt.size;
-            string key = "out horiz bot center Left reverse"; if (!NullOrEmpty(gpt.key)) key = gpt.key;
-            string palette = null; if (gpt.palette != null) palette = gpt.palette;
+            List<string> palette2 = null;
+            if (palette != null) palette2 = new List<string>(palette.Split(','));
+            if (palette2 == null || palette2.Count == 0)
+            {
+                //this should not be possible, but in any case...
+                G.Writeln2("*** ERROR: PLOT gpt palette is empty");
+                throw new GekkoException();
+            }
             
             if (o.fileName != null)
             {
@@ -23394,8 +23399,36 @@ namespace Gekko
                 sb2.Append("plot ");
                 int boxesCounter = 0;
                 //for (int i = count-1; i >=0; i--)
+
+                XmlNodeList lines3 = doc.SelectNodes("gekkoplot/lines/line");
+
                 for (int i = 0; i < count; i++)
                 {
+                    XmlNode line3 = lines3[i];
+
+
+                    if (line3 != null)
+                    {
+                        string zzz = "lines";
+                        if (Program.options.plot_lines_points) zzz = "linespoints";                        
+                        string xlinetype = GetText(line3.SelectSingleNode("linetype"), zzz);
+                       
+                        string xdashtype = GetText(line3.SelectSingleNode("dashtype"), "1");
+                        string xlinewidth = GetText(line3.SelectSingleNode("linewidth"), "2");
+                        string defaultColor = palette2[i % palette2.Count];  //rotating
+                        string xlinecolor = GetText(line3.SelectSingleNode("linecolor"), defaultColor);
+
+                        string xpointtype = GetText(line3.SelectSingleNode("pointtype"), "2");
+                        string xpointsize = GetText(line3.SelectSingleNode("pointsize"), "2");
+                        string xfillstyle = GetText(line3.SelectSingleNode("fillstyle"), "2");
+                        string xlabel = GetText(line3.SelectSingleNode("label"), "2");
+                        string xyAxis = GetText(line3.SelectSingleNode("yAxis"), "2");
+
+
+
+                    }
+
+
                     string label = null;
                     string linewidth = null;
                     string linecolor = null;
@@ -23659,6 +23692,22 @@ namespace Gekko
             {
                 o.guiGraphRefreshingFilename = emfName;
             }
+        }
+
+        private static string GetText(XmlNode x, string def)
+        {
+            if (x == null) //the <tag>...</tag> does not exist at all
+            {
+                if (def == null) return null;
+                else return def;  
+            }
+            if (x.InnerText == null) return "";  //the <tag>...</tag> exists, but is empty
+            return x.InnerText.Trim();           
+        }
+
+        private static string GetText(XmlNode x)
+        {
+            return GetText(x, null);
         }
 
         private static bool NullOrEmpty(string x)
