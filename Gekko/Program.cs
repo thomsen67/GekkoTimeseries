@@ -23072,6 +23072,8 @@ namespace Gekko
             string y2TicsInOut = "out";  //in, out
             string ylabel = "Y-label";
             string y2label = "Y-label";
+
+            bool arrow = false;
             
             bool yzeroazxis = true;
             
@@ -23139,7 +23141,18 @@ namespace Gekko
             string size2 = GetText(doc.SelectSingleNode("gekkoplot/size"));
             string key = GetText(doc.SelectSingleNode("gekkoplot/key"), "out horiz bot center Left reverse");
             string palette = GetText(doc.SelectSingleNode("gekkoplot/palette"), "red,web-green,web-blue,orange,dark-blue,magenta,brown4,dark-violet,grey50,black");
-                        
+            string ymin = GetText(doc.SelectSingleNode("gekkoplot/y/min"));
+            string yminsoft = GetText(doc.SelectSingleNode("gekkoplot/y/minsoft"));
+            string yminhard = GetText(doc.SelectSingleNode("gekkoplot/y/minhard"));
+            string ymax = GetText(doc.SelectSingleNode("gekkoplot/y/max"));
+            string ymaxsoft = GetText(doc.SelectSingleNode("gekkoplot/y/maxsoft"));
+            string ymaxhard = GetText(doc.SelectSingleNode("gekkoplot/y/maxhard"));
+            string y2min = GetText(doc.SelectSingleNode("gekkoplot/y2/min"));
+            string y2minsoft = GetText(doc.SelectSingleNode("gekkoplot/y2/minsoft"));
+            string y2minhard = GetText(doc.SelectSingleNode("gekkoplot/y2/minhard"));
+            string y2max = GetText(doc.SelectSingleNode("gekkoplot/y2/max"));
+            string y2maxsoft = GetText(doc.SelectSingleNode("gekkoplot/y2/maxsoft"));
+            string y2maxhard = GetText(doc.SelectSingleNode("gekkoplot/y2/maxhard"));
 
             //y2 mirror could be either no (0), tics (1), tics+labels (2), tics+labels+axislabel (3)
 
@@ -23283,14 +23296,12 @@ namespace Gekko
                 if (!NullOrEmpty(title)) title2 = title;
                 if (!NullOrEmpty(o.opt_title)) title2 = o.opt_title;  //is actually PLOT<title=...>
                 if (!NullOrEmpty(title2)) tw.WriteLine("set title " + Globals.QT + EncodeDanish(GnuplotText(title2)) + Globals.QT + " font '" + font + "," + (2d * zoom * fontsize) + "'");
+                              
+                string set_yrange = GnuplotYrange(ymin, yminsoft, yminhard, ymax, ymaxsoft, ymaxhard);
+                string set_y2range = GnuplotYrange(y2min, y2minsoft, y2minhard, y2max, y2maxsoft, y2maxhard);
 
-                //TT1:
-                //string set_yrange = GnuplotYrange(o, gpt, false);
-                //if (set_yrange != null) tw.WriteLine("set yrange " + set_yrange + "");
-                //string set_y2range = GnuplotYrange(o, gpt, true);
-                //if (set_y2range != null) tw.WriteLine("set y2range " + set_y2range + "");
-
-
+                if (set_yrange.Trim() != ":") tw.WriteLine("set yrange [" + set_yrange + "]");
+                if (set_y2range.Trim() != ":") tw.WriteLine("set y2range [" + set_y2range + "]");
 
                 if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
                 {
@@ -23346,7 +23357,7 @@ namespace Gekko
                     tw.WriteLine("set y2label \"" + GnuplotText(y2label) + "\"");
                 }
 
-                if (false)
+                if (arrow)
                 {
                     tw.WriteLine("set arrow from 2010,graph 0 to 2010,graph 1 nohead");
                 }
@@ -23373,7 +23384,7 @@ namespace Gekko
 
                 //List<Line> lines = null; try { lines = gpt.lines.lines; } catch (NullReferenceException) { };
 
-                StringBuilder sb2 = new StringBuilder();
+                string plotline = null;
                 XmlNodeList lines3 = doc.SelectNodes("gekkoplot/lines/line");
 
                 int numberOfBoxes = 0;
@@ -23403,7 +23414,7 @@ namespace Gekko
                 double d_width2 = boxwidth * d_width;
                 double left = d_width * (double)(numberOfBoxes - 1) / 2d;
 
-                sb2.Append("plot ");
+                plotline += "plot ";
                 int boxesCounter = 0;
                 //for (int i = count-1; i >=0; i--)                
 
@@ -23467,7 +23478,7 @@ namespace Gekko
                     if (!NullOrEmpty(pointtype)) s += " pointtype " + pointtype;
                     if (!NullOrEmpty(pointtype)) s += " pointsize " + pointsize;
                     if (!NullOrEmpty(fillstyle)) s += " fillstyle " + fillstyle;
-                    if (!NullOrEmpty(label)) s += " title " + Globals.QT + label + Globals.QT;
+                    if (!NullOrEmpty(label)) s += " title " + Globals.QT + label + "   " + Globals.QT;  //blanks added to separate items in the legend
                     if (!NullOrEmpty(y2_) && !G.equal(y2_, "no")) s += " axes x1y2";
                                         
                     //linestyle is an association of linecolor, linewidth, dashtype, pointtype
@@ -23508,12 +23519,12 @@ namespace Gekko
 
                     //string xlabel = GnuplotText(label);
 
-                    sb2.Append("\"" + file1 + "\" using " + xAdjustment + s);
+                    plotline += "\"" + file1 + "\" using " + xAdjustment + s;
 
-                    if (i < count - 1) sb2.Append(", ");                    
+                    if (i < count - 1) plotline += ", ";                    
                 }
-                sb2.AppendLine();
-                tw.WriteLine(sb2);
+                plotline += G.NL;
+                tw.WriteLine(plotline);
                 tw.WriteLine();
                 tw.Flush();
                 tw.Close();
@@ -23820,7 +23831,63 @@ namespace Gekko
             return mxtics;
         }
 
-        private static string GnuplotYrange(O.Prt o, Gpt gpt, bool y2)
+        private static string GnuplotYrange(string ymin, string yminsoft, string yminhard, string ymax, string ymaxsoft, string ymaxhard)
+        {
+            // [  yminhard < * < yminsoft  : ymaxsoft < * < ymaxhard ] 
+            string left = null;
+            string right = null;
+            if (!NullOrEmpty(ymin))
+            {                
+                left = ymin;
+            }
+            else
+            {                
+                if (!NullOrEmpty(yminhard) && !NullOrEmpty(yminsoft))
+                {
+                    left = yminhard + " < * < " + yminsoft;
+                }
+                else if (!NullOrEmpty(yminhard) && NullOrEmpty(yminsoft))
+                {
+                    left = yminhard + " < * ";
+                }
+                else if (NullOrEmpty(yminhard) && !NullOrEmpty(yminsoft))
+                {
+                    left = " * < " + yminsoft;
+                }
+                else
+                {
+                    left = "";
+                }
+            }
+
+            if (!NullOrEmpty(ymax))
+            {
+                double xx = ParseIntoDouble(ymax);  //just testing
+                right = ymax;
+            }
+            else
+            {
+                if (!NullOrEmpty(ymaxhard) && !NullOrEmpty(ymaxsoft))
+                {
+                    right = ymaxsoft + " < * < " + ymaxhard;
+                }
+                else if (!NullOrEmpty(ymaxhard) && NullOrEmpty(ymaxsoft))
+                {
+                    right = " * < " + ymaxhard;
+                }
+                else if (NullOrEmpty(ymaxhard) && !NullOrEmpty(ymaxsoft))
+                {
+                    right = ymaxsoft + " < * ";
+                }
+                else
+                {
+                    right = "";
+                }
+            }
+            return left + ":" + right;
+        }
+
+        private static string GnuplotYrangeOLD_DELETE(O.Prt o, Gpt gpt, bool y2)
         {
             string set_yrange = null;
             double ymin = double.NaN;
