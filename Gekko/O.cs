@@ -3864,7 +3864,7 @@ namespace Gekko
             public List<OptString> printCodes = new List<OptString>();            
             public string timefilter = null;
             //public string heading = null;
-            public string fileName = null;            
+                      
             public int width = -12345;
             public int dec = -12345;
             public int nwidth = -12345;
@@ -3876,11 +3876,12 @@ namespace Gekko
             public double opt_y2max = double.NaN;
             public double opt_y2min = double.NaN;
 
-            public string opt_heading = null;
+            public string opt_title = null;
             public string opt_stamp = null;
             public string opt_sheet = null;
             public string opt_cell = null;
             public string opt_dates = null;
+            public string opt_dump = null;
             public string opt_names = null;
             public string opt_colors = null;
             public string opt_rows = null;
@@ -3889,6 +3890,7 @@ namespace Gekko
             public string opt_collapse = null;
             public string opt_plotcode = null; //only for PLOT
             public string opt_using = null; //only for PLOT
+            public string opt_filename = null;
 
             public long counter = -12345;
 

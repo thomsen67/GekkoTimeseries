@@ -20519,7 +20519,7 @@ namespace Gekko
             //precedentsInput may contain #var, @var, var¤-1, @var¤-1, and also also fy#i or fy{i} (or var¤¤2010m7)
 
             LocalBanks localBanks = new LocalBanks();
-            o.fileName = StripQuotes(o.fileName);  //necessary???
+            o.opt_filename = StripQuotes(o.opt_filename);  //necessary???
 
             if (o.prtElements.Count == 0)
             {
@@ -20536,7 +20536,7 @@ namespace Gekko
             }
             else
             {
-                MaybeStartPipe2(o.fileName);
+                MaybeStartPipe2(o.opt_filename);
             }
             try
             {
@@ -20551,7 +20551,7 @@ namespace Gekko
                 bool message = false;
                 if (Globals.pipe2) message = true;
                 ReleasePipe2();  //no harm if it is not active
-                if (message) G.Writeln2("Data written to file '" + o.fileName + "'");
+                if (message) G.Writeln2("Data written to file '" + o.opt_filename + "'");
             }
         }
 
@@ -21029,9 +21029,9 @@ namespace Gekko
                     Program.options.print_width = int.MaxValue;
                     Program.options.print_filewidth = int.MaxValue;
                     G.Writeln();
-                    if (o.opt_heading != null && o.opt_heading != "")
+                    if (o.opt_title != null && o.opt_title != "")
                     {
-                        G.Writeln(o.opt_heading);
+                        G.Writeln(o.opt_title);
                     }
                     try
                     {
@@ -22634,13 +22634,13 @@ namespace Gekko
             string heading = "";
             string pplotType = "emf";
 
-            if (o.fileName != null)
+            if (o.opt_filename != null)
             {
-                pplotType = Path.GetExtension(o.fileName);
+                pplotType = Path.GetExtension(o.opt_filename);
                 if (pplotType.StartsWith(".")) pplotType = pplotType.Substring(1);
                 if (pplotType == "")
                 {
-                    o.fileName = AddExtension(o.fileName, ".emf");
+                    o.opt_filename = AddExtension(o.opt_filename, ".emf");
                     pplotType = "emf";
                 }
                 if (pplotType != "emf" && pplotType != "png" && pplotType != "svg")
@@ -23005,9 +23005,9 @@ namespace Gekko
             //resets current dir to previous location
             Directory.SetCurrentDirectory(currentDir);
 
-            if (o.fileName != null && o.fileName != "")
+            if (o.opt_filename != null && o.opt_filename != "")
             {
-                string fileNameWithPath = CreateFullPathAndFileName(o.fileName);
+                string fileNameWithPath = CreateFullPathAndFileName(o.opt_filename);
                 WaitForFileCopy(emfName, fileNameWithPath);
                 G.Writeln2("PLOT created file " + fileNameWithPath);
                 return;
@@ -23066,16 +23066,15 @@ namespace Gekko
             double zoom = 1;
             int mirrorY = 0;  //0:none, 1:tics no labels, 2:tics and labels, 3 tics and labels and axis label
 
-            bool yzeroaxis = true;
-            double histoWidth = 0.60;
+            bool yzeroaxis = true;            
             string xTicsInOut = "out";  //in, out
             string yTicsInOut = "out";  //in, out
             string y2TicsInOut = "out";  //in, out
             string ylabel = "Y-label";
             string y2label = "Y-label";
-            //string key = "out horiz bot center Left reverse";  //invert because we print the last one first
+            
             bool yzeroazxis = true;
-            bool dump = true;
+            
             bool gnuplot51 = true;
 
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
@@ -23140,6 +23139,9 @@ namespace Gekko
             string size2 = GetText(doc.SelectSingleNode("gekkoplot/size"));
             string key = GetText(doc.SelectSingleNode("gekkoplot/key"), "out horiz bot center Left reverse");
             string palette = GetText(doc.SelectSingleNode("gekkoplot/palette"), "red,web-green,web-blue,orange,dark-blue,magenta,brown4,dark-violet,grey50,black");
+                        
+
+            //y2 mirror could be either no (0), tics (1), tics+labels (2), tics+labels+axislabel (3)
 
             List<string> palette2 = null;
             if (palette != null) palette2 = new List<string>(palette.Split(','));
@@ -23151,13 +23153,13 @@ namespace Gekko
             }
             
 
-            if (o.fileName != null)
+            if (o.opt_filename != null)
             {
-                pplotType = Path.GetExtension(o.fileName);
+                pplotType = Path.GetExtension(o.opt_filename);
                 if (pplotType.StartsWith(".")) pplotType = pplotType.Substring(1);
                 if (pplotType == "")
                 {
-                    o.fileName = AddExtension(o.fileName, ".emf");
+                    o.opt_filename = AddExtension(o.opt_filename, ".emf");
                     pplotType = "emf";
                 }
                 if (pplotType != "emf" && pplotType != "png" && pplotType != "svg")
@@ -23277,18 +23279,18 @@ namespace Gekko
                 tw.WriteLine("set output \"" + file2 + "\"");
                 tw.WriteLine("set key " + key);
 
+                string title2 = null;
+                if (!NullOrEmpty(title)) title2 = title;
+                if (!NullOrEmpty(o.opt_title)) title2 = o.opt_title;  //is actually PLOT<title=...>
+                if (!NullOrEmpty(title2)) tw.WriteLine("set title " + Globals.QT + EncodeDanish(GnuplotText(title2)) + Globals.QT + " font '" + font + "," + (2d * zoom * fontsize) + "'");
+
                 //TT1:
                 //string set_yrange = GnuplotYrange(o, gpt, false);
                 //if (set_yrange != null) tw.WriteLine("set yrange " + set_yrange + "");
                 //string set_y2range = GnuplotYrange(o, gpt, true);
                 //if (set_y2range != null) tw.WriteLine("set y2range " + set_y2range + "");
 
-       
 
-                //tt3:
-                //string set_title = GnuplotHeading(o, gpt);
-                //try { set_title = gpt.title; } catch (NullReferenceException) { };
-                //if (set_title != null) tw.WriteLine("set title " + Globals.QT + EncodeDanish(GnuplotText(set_title)) + Globals.QT + " font '" + font + "," + (2d * zoom * fontsize) + "'");
 
                 if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
                 {
@@ -23398,7 +23400,7 @@ namespace Gekko
                 double histoGap = (int)ParseIntoDouble(boxgap);
                 if (numberOfBoxes == 1) histoGap = 0;
                 double d_width = dx / (double)(numberOfBoxes + histoGap);
-                double d_width2 = histoWidth * d_width;
+                double d_width2 = boxwidth * d_width;
                 double left = d_width * (double)(numberOfBoxes - 1) / 2d;
 
                 sb2.Append("plot ");
@@ -23409,6 +23411,17 @@ namespace Gekko
                 {
                     XmlNode line3 = lines3[i];
 
+                    //defaults
+                    string dlinetype = "lines";
+                    if (Program.options.plot_lines_points) dlinetype = "linespoints";                    
+                    string ddashtype = "1";
+                    string dlinewidth = "3";
+                    string dlinecolor = palette2[i % palette2.Count];
+                    string dpointtype = "7";
+                    string dpointsize = "0.5";
+                    string dfillstyle = "solid";
+                    string dy2_ = "no";
+
                     string linetype = null;
                     string dashtype = null;
                     string linewidth = null;                    
@@ -23417,22 +23430,34 @@ namespace Gekko
                     string pointsize = null;
                     string fillstyle = null;
                     string label = null;
-                    string y2 = null;
+                    string y2_ = null;
 
                     if (line3 != null)
-                    {
-                        string lt = "lines";
-                        if (Program.options.plot_lines_points) lt = "linespoints";                        
-                        linetype = GetText(line3.SelectSingleNode("linetype"), lt);                       
-                        dashtype = GetText(line3.SelectSingleNode("dashtype"), "1");
-                        linewidth = GetText(line3.SelectSingleNode("linewidth"), "3");                        
-                        linecolor = GetText(line3.SelectSingleNode("linecolor"), palette2[i % palette2.Count]);
-                        pointtype = GetText(line3.SelectSingleNode("pointtype"), "7");
-                        pointsize = GetText(line3.SelectSingleNode("pointsize"), "0.5");
-                        if (G.equal(linetype, "boxes")) fillstyle = GetText(line3.SelectSingleNode("fillstyle"), "solid");                        
+                    {                                                                     
+                        linetype = GetText(line3.SelectSingleNode("linetype"), dlinetype);                       
+                        dashtype = GetText(line3.SelectSingleNode("dashtype"), ddashtype);
+                        linewidth = GetText(line3.SelectSingleNode("linewidth"), dlinewidth);                        
+                        linecolor = GetText(line3.SelectSingleNode("linecolor"), dlinecolor);
+                        pointtype = GetText(line3.SelectSingleNode("pointtype"), dpointtype);
+                        pointsize = GetText(line3.SelectSingleNode("pointsize"), dpointsize);
+                        if (G.equal(linetype, "boxes")) fillstyle = GetText(line3.SelectSingleNode("fillstyle"), dfillstyle);                        
                         label = GetText(line3.SelectSingleNode("label"));
-                        y2 = GetText(line3.SelectSingleNode("y2"));
+                        if (!NullOrEmpty(labelsNonBroken[i])) label = labelsNonBroken[i];  //overwrites                        
+                        y2_ = GetText(line3.SelectSingleNode("y2"), dy2_);
                     }
+                    else
+                    {                      
+                        linetype = dlinetype;
+                        dashtype = ddashtype;
+                        linewidth = dlinewidth;
+                        linecolor = dlinecolor;
+                        pointtype = dpointtype;
+                        pointsize = dpointsize;
+                        label = labelsNonBroken[i];
+                        y2_ = dy2_;                   
+                    }
+
+                    label = GnuplotText(label);
 
                     string s = null;
                     if (!NullOrEmpty(linetype)) s += " with " + linetype;
@@ -23442,9 +23467,9 @@ namespace Gekko
                     if (!NullOrEmpty(pointtype)) s += " pointtype " + pointtype;
                     if (!NullOrEmpty(pointtype)) s += " pointsize " + pointsize;
                     if (!NullOrEmpty(fillstyle)) s += " fillstyle " + fillstyle;
-                    if (!NullOrEmpty(label)) s += " label " + label;
-                    if (!NullOrEmpty(y2)) s += " axes x1y2";
-                    
+                    if (!NullOrEmpty(label)) s += " title " + Globals.QT + label + Globals.QT;
+                    if (!NullOrEmpty(y2_) && !G.equal(y2_, "no")) s += " axes x1y2";
+                                        
                     //linestyle is an association of linecolor, linewidth, dashtype, pointtype
                     //linetype is the same, just permanent
                     //box: fillstyle empty|solid|pattern, border|noborder
@@ -23481,10 +23506,9 @@ namespace Gekko
                         }
                     }
 
-                    string xlabel = GnuplotText(label);
+                    //string xlabel = GnuplotText(label);
 
-
-                    sb2.Append("\"" + file1 + "\" using " + xAdjustment + s + " title \"" + xlabel + " \" ");  //note: space added after legend text
+                    sb2.Append("\"" + file1 + "\" using " + xAdjustment + s);
 
                     if (i < count - 1) sb2.Append(", ");                    
                 }
@@ -23495,24 +23519,25 @@ namespace Gekko
                 tw.Close();
             }
 
-            if (dump)
+            if (G.equal(o.opt_dump, "yes"))
             {
-                File.Copy(fileGp, Program.options.folder_working + "\\" + "gekkoplot.gp", true);
-                File.Copy(fileData, Program.options.folder_working + "\\" + "gekkoplot.dat", true);
-
-                string text;
-
-                text = File.ReadAllText(Program.options.folder_working + "\\" + "gekkoplot.gp");
-                text = text.Replace("temp" + rr + ".dat", "gekkoplot.dat");
-                text = text.Replace("temp" + rr + ".emf", "gekkoplot.emf");
-                text = text.Replace("temp" + rr + ".gp", "gekkoplot.gp");
-                File.WriteAllText(Program.options.folder_working + "\\" + "gekkoplot.gp", text);
-
-                text = File.ReadAllText(Program.options.folder_working + "\\" + "gekkoplot.dat");
-                text = text.Replace("temp" + rr + ".dat", "gekkoplot.dat");
-                text = text.Replace("temp" + rr + ".emf", "gekkoplot.emf");
-                text = text.Replace("temp" + rr + ".gp", "gekkoplot.gp");
-                File.WriteAllText(Program.options.folder_working + "\\" + "gekkoplot.dat", text);
+                try
+                {
+                    File.Copy(fileGp, Program.options.folder_working + "\\" + "gekkoplot.gp", true);
+                    File.Copy(fileData, Program.options.folder_working + "\\" + "gekkoplot.dat", true);
+                    string text = null;
+                    text = File.ReadAllText(Program.options.folder_working + "\\" + "gekkoplot.gp");
+                    text = text.Replace("temp" + rr, "gekkoplot");
+                    File.WriteAllText(Program.options.folder_working + "\\" + "gekkoplot.gp", text);
+                    text = File.ReadAllText(Program.options.folder_working + "\\" + "gekkoplot.dat");
+                    text = text.Replace("temp" + rr, "gekkoplot");
+                    File.WriteAllText(Program.options.folder_working + "\\" + "gekkoplot.dat", text);
+                    G.Writeln2("Dumped gnuplot files gekkoplot.gp (script) and gekkoplot.dat (data) in the working folder");
+                }
+                catch
+                {
+                    G.Writeln2("+++ WARNING: PLOT<dump> failed: are gekkoplot.gp or gekkoplot.dat blocked?");
+                }
             }
 
             string emfName = path + "\\" + file2;
@@ -23553,9 +23578,9 @@ namespace Gekko
             //resets current dir to previous location
             Directory.SetCurrentDirectory(currentDir);
 
-            if (o.fileName != null && o.fileName != "")
+            if (o.opt_filename != null && o.opt_filename != "")
             {
-                string fileNameWithPath = CreateFullPathAndFileName(o.fileName);
+                string fileNameWithPath = CreateFullPathAndFileName(o.opt_filename);
                 WaitForFileCopy(emfName, fileNameWithPath);
                 G.Writeln2("PLOT created file " + fileNameWithPath);
                 return;
@@ -23843,7 +23868,7 @@ namespace Gekko
         {
             string heading = null;            
             try { heading = gpt.title; } catch (NullReferenceException) { };
-            if (o.opt_heading != null) heading = o.opt_heading;
+            if (o.opt_title != null) heading = o.opt_title;
             return heading;
         }
 
@@ -26976,7 +27001,7 @@ namespace Gekko
             string ext = null;
 
             string fileName = null;
-            if (oPrt != null && oPrt.fileName != null) fileName = oPrt.fileName;
+            if (oPrt != null && oPrt.opt_filename != null) fileName = oPrt.opt_filename;
             else if (eo.fileName != null) fileName = eo.fileName;
 
             if (fileName != null)
@@ -27117,9 +27142,9 @@ namespace Gekko
                     if (!eo.isCplot) range0 = range0.get_Offset(1, 0);
                 }
 
-                if (oPrt != null && oPrt.opt_heading != null)
+                if (oPrt != null && oPrt.opt_title != null)
                 {
-                    cplotData.heading = oPrt.opt_heading;
+                    cplotData.heading = oPrt.opt_title;
                     if (!eo.isCplot) if (isColors) range0.Font.Bold = true;
                     if (!eo.isCplot) range0.set_Value(Missing.Value, cplotData.heading);
                     if (!eo.isCplot) range0 = range0.get_Offset(1, 0);
