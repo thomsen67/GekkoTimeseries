@@ -22755,7 +22755,7 @@ namespace Gekko
                         tw.WriteLine("set mxtics 5");
                     }
                 }
-
+                
                 tw.WriteLine("set ticscale 1.4 0.7");
                 //tw.WriteLine("set key outside top");
                 //tw.WriteLine("set key 100, 100");
@@ -23062,6 +23062,8 @@ namespace Gekko
         {
             //Måske en SYS gnuplot til at starte et vindue op.
             
+                       
+            
             //double fontsize = 12;
             double zoom = 1;
             int mirrorY = 0;  //0:none, 1:tics no labels, 2:tics and labels, 3 tics and labels and axis label
@@ -23070,8 +23072,7 @@ namespace Gekko
             string xTicsInOut = "out";  //in, out
             string yTicsInOut = "out";  //in, out
             string y2TicsInOut = "out";  //in, out
-            string ylabel = "Y-label";
-            string y2label = "Y-label";
+            
 
             bool arrow = false;
             
@@ -23126,9 +23127,17 @@ namespace Gekko
                     WriteXmlError(e, fileName);
                     throw new GekkoException();
                 }
-
             }
-                        
+
+            //?????????????????
+            //?????????????????
+            //?????????????????
+            //?????????????????     do we need .Trim() on these???
+            //?????????????????
+            //?????????????????
+            //?????????????????
+
+
             string title = GetText(doc.SelectSingleNode("gekkoplot/title"));
             string subtitle = GetText(doc.SelectSingleNode("gekkoplot/subtitle"));
             string font = GetText(doc.SelectSingleNode("gekkoplot/font"), "Verdana");
@@ -23141,6 +23150,11 @@ namespace Gekko
             string size2 = GetText(doc.SelectSingleNode("gekkoplot/size"));
             string key = GetText(doc.SelectSingleNode("gekkoplot/key"), "out horiz bot center Left reverse");
             string palette = GetText(doc.SelectSingleNode("gekkoplot/palette"), "red,web-green,web-blue,orange,dark-blue,magenta,brown4,dark-violet,grey50,black");
+            string tics = GetText(doc.SelectSingleNode("gekkoplot/tics"), "out");
+            string ymirror = GetText(doc.SelectSingleNode("gekkoplot/ymirror"), "0"); //y2 mirror could be either no (0), tics (1), tics+labels (2), tics+labels+axislabel (3)
+            string ylabel = GetText(doc.SelectSingleNode("gekkoplot/y/label"));
+            string y2label = GetText(doc.SelectSingleNode("gekkoplot/y2/label"));
+
             string ymin = GetText(doc.SelectSingleNode("gekkoplot/y/min"));
             string yminsoft = GetText(doc.SelectSingleNode("gekkoplot/y/minsoft"));
             string yminhard = GetText(doc.SelectSingleNode("gekkoplot/y/minhard"));
@@ -23152,9 +23166,7 @@ namespace Gekko
             string y2minhard = GetText(doc.SelectSingleNode("gekkoplot/y2/minhard"));
             string y2max = GetText(doc.SelectSingleNode("gekkoplot/y2/max"));
             string y2maxsoft = GetText(doc.SelectSingleNode("gekkoplot/y2/maxsoft"));
-            string y2maxhard = GetText(doc.SelectSingleNode("gekkoplot/y2/maxhard"));
-
-            //y2 mirror could be either no (0), tics (1), tics+labels (2), tics+labels+axislabel (3)
+            string y2maxhard = GetText(doc.SelectSingleNode("gekkoplot/y2/maxhard"));            
 
             List<string> palette2 = null;
             if (palette != null) palette2 = new List<string>(palette.Split(','));
@@ -23249,6 +23261,8 @@ namespace Gekko
                 tw.WriteLine("set format y2 " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
                 tw.WriteLine("set datafile missing \"NaN\"");
 
+                
+
                 string enhanced = null;
                 if (G.equal(pplotType, "emf"))
                 {
@@ -23259,7 +23273,11 @@ namespace Gekko
                 {
                     fontsize = 0.75 * fontsize;
                 }
-
+                
+                tw.WriteLine("set xtics " + tics);
+                tw.WriteLine("set ytics " + tics);
+                tw.WriteLine("set y2tics " + tics);
+                  
                 XmlNode x = doc.SelectSingleNode("gekkoplot/x");
                 if (x != null)
                 {
@@ -23270,22 +23288,21 @@ namespace Gekko
                         //also do linebefore and lineafter
                     }
 
-                    string tics = GetText(x.SelectSingleNode("/tics"), "out");
-                    if (!NullOrEmpty(tics)) tw.WriteLine("set xtics " + tics);
+                    
                 }
 
                 XmlNode y = doc.SelectSingleNode("gekkoplot/y");
                 if (y != null)
                 {
-                    string tics = GetText(y.SelectSingleNode("/tics"), "out");
-                    if (!NullOrEmpty(tics)) tw.WriteLine("set ytics " + tics);
+                    //string tics = GetText(y.SelectSingleNode("/tics"), "out");
+                    //if (!NullOrEmpty(tics)) tw.WriteLine("set ytics " + tics);
                 }
 
                 XmlNode y2 = doc.SelectSingleNode("gekkoplot/y2");
                 if (y2 != null)
                 {
-                    string tics = GetText(y2.SelectSingleNode("/tics"), "out");
-                    if (!NullOrEmpty(tics)) tw.WriteLine("set y2tics " + tics);
+                    //string tics = GetText(y2.SelectSingleNode("/tics"), "out");
+                    //if (!NullOrEmpty(tics)) tw.WriteLine("set y2tics " + tics);
                 }
 
                 tw.WriteLine("set terminal " + pplotType + enhanced + " font '" + font + "," + (zoom * fontsize) + "'");
@@ -23329,32 +23346,33 @@ namespace Gekko
                 tw.WriteLine("set tic scale 1.4, 0.7");                
                 tw.WriteLine("set xtics nomirror");
 
-                if (mirrorY == 0)  //nothing
+                if (ymirror == "0")  //nothing
                 {
                     tw.WriteLine("set ytics nomirror");
                     tw.WriteLine("set border 3");
-                    tw.WriteLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
+                    if (!NullOrEmpty(ylabel))  tw.WriteLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
                 }
-                else if (mirrorY == 1)  //y2 axis
+                else if (ymirror == "1")  //y2 axis
                 {
                     tw.WriteLine("set ytics");
                     tw.WriteLine("set border 11");
-                    tw.WriteLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
+                    if (!NullOrEmpty(ylabel)) tw.WriteLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
                 }
-                else if (mirrorY == 2)  //y2 axis and y2 tics
+                else if (ymirror == "2")  //y2 axis and y2 tics
                 {
                     tw.WriteLine("set ytics");
                     tw.WriteLine("set y2tics");
+                    //tw.WriteLine("set y2tics mirror");
                     tw.WriteLine("set border 11");
-                    tw.WriteLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
+                    if (!NullOrEmpty(ylabel)) tw.WriteLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
                 }
-                else  //3
+                else if (ymirror == "3")
                 {
                     tw.WriteLine("set ytics");  //y2 axis and y2 tics and y2 label
                     tw.WriteLine("set y2tics");
                     tw.WriteLine("set border 11");
-                    tw.WriteLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
-                    tw.WriteLine("set y2label \"" + GnuplotText(y2label) + "\"");
+                    if (!NullOrEmpty(ylabel)) tw.WriteLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
+                    if (!NullOrEmpty(y2label)) tw.WriteLine("set y2label \"" + GnuplotText(y2label) + "\"");
                 }
 
                 if (arrow)
@@ -23834,6 +23852,7 @@ namespace Gekko
         private static string GnuplotYrange(string ymin, string yminsoft, string yminhard, string ymax, string ymaxsoft, string ymaxhard)
         {
             // [  yminhard < * < yminsoft  : ymaxsoft < * < ymaxhard ] 
+            // TODO: it would be nice to test the inequalities above, because if they are violated, they have no effect --> free borders, even if ymin/ymax is set.
             string left = null;
             string right = null;
             if (!NullOrEmpty(ymin))
@@ -23885,51 +23904,7 @@ namespace Gekko
                 }
             }
             return left + ":" + right;
-        }
-
-        private static string GnuplotYrangeOLD_DELETE(O.Prt o, Gpt gpt, bool y2)
-        {
-            string set_yrange = null;
-            double ymin = double.NaN;
-            double ymax = double.NaN;
-            //load from xml
-            string _ymin = null;
-            if (y2)
-            {
-                try { _ymin = gpt.y2.min; } catch (NullReferenceException) { };
-            }
-            else
-            {
-                try { _ymin = gpt.y.min; } catch (NullReferenceException) { };
-            }
-            ymin = ParseIntoDouble(_ymin);
-            string _ymax = null;
-            if (y2)
-            {
-                try { _ymax = gpt.y2.max; } catch (NullReferenceException) { };
-            }
-            else
-            {
-                try { _ymax = gpt.y.max; } catch (NullReferenceException) { };
-            }
-            ymax = ParseIntoDouble(_ymax);
-            //options in PLOT command override
-            if (y2)
-            {
-                if (!double.IsNaN(o.opt_y2min)) ymin = o.opt_y2min;
-                if (!double.IsNaN(o.opt_y2max)) ymax = o.opt_y2max;
-            }
-            else
-            {
-                if (!double.IsNaN(o.opt_ymin)) ymin = o.opt_ymin;
-                if (!double.IsNaN(o.opt_ymax)) ymax = o.opt_ymax;
-            }
-            if (!double.IsNaN(ymin) && double.IsNaN(ymax)) set_yrange = "[" + ymin + ":]";
-            else if (double.IsNaN(ymin) && !double.IsNaN(ymax)) set_yrange = "[:" + ymax + "]";
-            else if (!double.IsNaN(ymin) && !double.IsNaN(ymax)) set_yrange = "[" + ymin + ":" + ymax + "]";
-            return set_yrange;
-        }
-            
+        }            
 
         private static string GnuplotHeading(O.Prt o, Gpt gpt)
         {
