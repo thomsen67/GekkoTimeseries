@@ -3877,6 +3877,7 @@ namespace Gekko
             public double opt_y2min = double.NaN;
 
             public string opt_title = null;
+            public string opt_subtitle = null;
             public string opt_stamp = null;
             public string opt_sheet = null;
             public string opt_cell = null;
@@ -4051,6 +4052,7 @@ namespace Gekko
                 public List<SubElement> subElements = null;
             
                 public string label = null;
+                //public string originalLabel = null;
                 public string endoExoIndicator = null;
                 //-- layout
                 public List<OptString> printCodes = new List<OptString>();

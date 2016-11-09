@@ -328,6 +328,7 @@ tokens {
     ASTOPT1;
     ASTOPT2;
     ASTOPT_;
+	ASTOPT_STRING_DUMP;
 	ASTOPT_STRING_BANK;
 	ASTOPT_STRING_ERROR;
 	ASTOPT_STRING_USING;
@@ -1874,6 +1875,7 @@ prtOpt1Helper             : filter
 						  | COLORS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLORS yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)
 						  | DATES (EQUAL yesNo)? -> ^(ASTOPT_STRING_DATES yesNo?)
+						  | DUMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_DUMP yesNo?)
 						  | HEADING '=' expression -> ^(ASTOPT_STRING_TITLE expression)
 						  | TITLE '=' expression -> ^(ASTOPT_STRING_TITLE expression)
 						  | NAMES (EQUAL yesNo)? -> ^(ASTOPT_STRING_NAMES yesNo?)

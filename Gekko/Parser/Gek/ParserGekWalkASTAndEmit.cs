@@ -2659,6 +2659,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     givenLabel = node.specialExpressionAndLabelInfo[2];
                                     givenLabel = Program.StripQuotes(givenLabel);
+                                    givenLabel = Globals.labelCheatString + givenLabel;
                                 }
                                 else givenLabel = node.specialExpressionAndLabelInfo[1];                                
                             }                            

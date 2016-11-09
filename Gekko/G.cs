@@ -702,8 +702,13 @@ namespace Gekko
                 return true;
             else return false;
         }
-        
+
         public static GekkoTime FromStringToDate(string s)
+        {
+            return FromStringToDate(s, false);
+        }
+
+        public static GekkoTime FromStringToDate(string s, bool allowKForQuarters)
         {
             //To do the reverse: see G.FromDateToString()            
 
@@ -739,6 +744,26 @@ namespace Gekko
                 try
                 {
                     string[] temp1 = s.Split(new char[] { 'q', 'Q' });
+                    int y1 = G.findYear(int.Parse(temp1[0]));
+                    int q1 = int.Parse(temp1[1]);
+                    if (q1 < 1 || q1 > 4)
+                    {
+                        G.Writeln("*** ERROR: should have quarters from 1 to and including 4");
+                        throw new GekkoException();
+                    }
+                    t = new GekkoTime(EFreq.Quarterly, y1, q1);
+                }
+                catch (Exception e)
+                {
+                    G.Writeln("*** ERROR: timeperiod " + s + " not valid");
+                    throw new GekkoException();
+                }
+            }
+            else if (allowKForQuarters && (s.Contains("k") || s.Contains("K")))
+            {
+                try
+                {
+                    string[] temp1 = s.Split(new char[] { 'k', 'K' });
                     int y1 = G.findYear(int.Parse(temp1[0]));
                     int q1 = int.Parse(temp1[1]);
                     if (q1 < 1 || q1 > 4)
@@ -791,7 +816,11 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            else throw new GekkoException();
+            else
+            {
+                G.Writeln2("*** ERROR: Could not understand the timeperiod: " + s);
+                throw new GekkoException();
+            }
             return t;
         }
 

@@ -47,7 +47,19 @@ namespace Gekko
             httpWebRequest.ContentType = "text/json";
             httpWebRequest.Method = "POST";
             System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-            Dictionary<string, object> jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
+
+            Dictionary<string, object> jsonTree = null;
+            try
+            {
+                jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
+            }
+            catch(Exception e)
+            {
+                G.Writeln2("*** ERROR: The .json file does not seem correctly formatted.");
+                G.Writeln("           Message: " + e.Message);
+                throw;
+            }
+
             string table = (string)jsonTree["table"];
             List<string> codesHeaderJson = new List<string>();
 
@@ -164,6 +176,9 @@ namespace Gekko
                 int lineCounter = 0;
 
                 G.Writeln("    Starting to read " + lines2.Count + " data lines from data file");
+
+                GekkoTime gt0 = Globals.tNull;
+                GekkoTime gt1 = Globals.tNull;
 
                 foreach (string line2 in lines2)
                 {
@@ -313,13 +328,9 @@ namespace Gekko
                         }                        
                     }
                     else if (state == 2)
-                    {
-                        //state=2
-                        //string s = line.Substring(codeTimeString.Length);                        
+                    {                        
                         string s = lineHelper.ToString();
                         s = s.Substring(codeTimeString.Length);
-                        //if (s.EndsWith(";")) s = s.Substring(0, s.Length - 1);
-
                         string[] ss = s.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                         foreach (string s2 in ss)
                         {
@@ -410,27 +421,17 @@ namespace Gekko
 
                 for (int j = 0; j < codesCombi.Count; j++)
                 {
-                    //if (codesCombi.Count >= 10)
-                    //{
-                    //    for (int i = 0; i < fractions.Count; i++)
-                    //    {
-                    //        if (fractions[i] == j)
-                    //        {
-                    //            G.Writeln("    Progress: " + (int)(Math.Round(100 * fractions2[i])) + "% of " + codesCombi.Count + " timeseries");
-                    //        }
-                    //    }
-                    //}
+                    
                     string name2 = codesCombi[j];
                     TimeSeries ts = new TimeSeries(G.GetFreq(freq), name2);
                     ts.label = valuesCombi[j];
                     ts.source = url + ", " + jsonName;
                     ts.stamp = Globals.dateStamp;
                     ts.isDirty = true; //for safety
-                    GekkoTime gt0 = Globals.tNull;
-                    GekkoTime gt1 = Globals.tNull;
+                    
                     for (int i = 0; i < dates.Count; i++)  //periods
                     {
-                        GekkoTime gt = G.FromStringToDate(dates[i]);
+                        GekkoTime gt = G.FromStringToDate(dates[i], true);
                         ts.SetData(gt, data[i + j * dates.Count]);                        
                         if (gt0.IsNull()) gt0 = gt;
                         if (gt1.IsNull()) gt1 = gt;
@@ -447,7 +448,7 @@ namespace Gekko
                     //G.Writeln(ts.variableName + ", with freq " + freq.ToUpper() + ", " + G.FromDateToString(gt0) + "-" + G.FromDateToString(gt1));
                     //counter++;                        
                 }
-                G.Writeln("--> Downloaded " + codesCombi.Count + " timeseries in total, frequency " + freq + ", " + dates[0] + "-" + dates[dates.Count - 1]);
+                G.Writeln("--> Downloaded " + codesCombi.Count + " timeseries in total, frequency " + freq + ", " + G.FromDateToString(gt0) + "-" + G.FromDateToString(gt1));                
                 G.Writeln("    Name of first timeseries: " + codesCombi[0]);
                 G.Writeln("    Name of last timeseries: " + codesCombi[codesCombi.Count - 1]);
 

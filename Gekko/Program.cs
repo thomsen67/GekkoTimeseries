@@ -20563,6 +20563,15 @@ namespace Gekko
             //do timeseries with lags if <p> is present etc (two lags for mp etc.)
             //List<string> endoExoIndicators = null;
 
+            //foreach(O.Prt.Element e in o.prtElements)
+            //{
+            //    e.originalLabel = e.label;
+            //    if(e.label.StartsWith(Globals.labelCheatString))
+            //    {
+            //        e.label = e.label.Substring(Globals.labelCheatString.Length);
+            //    }
+            //}
+
             bool hasV = false;
             foreach (OptString ts in o.printCodes)
             {
@@ -20695,6 +20704,8 @@ namespace Gekko
             int subElementCounterTotal = -1;  //total number of variables/expressions (with unfolded lists) in a print.
 
             List<string> labelsNonBroken = new List<string>();
+            List<string> originalLabelsNonBroken = new List<string>();
+
 
             foreach (O.Prt.Element pe in o.prtElements)  //varI 0-based
             {
@@ -20765,6 +20776,8 @@ namespace Gekko
                         if (printCodesCounter == 0)  //first item
                         {
                             string label = GetLabelInPrt(pe, subElementCounter);
+                            string originalLabel = label;
+                            if (label.StartsWith(Globals.labelCheatString)) label = label.Substring(Globals.labelCheatString.Length);                            
 
                             if (identicalCodes || printCode == "n" || printCode == Globals.printCode_sn || printCode == Globals.printCode_s || (IsMulprt(o) && printCode == "m"))
                             {
@@ -20779,7 +20792,7 @@ namespace Gekko
                             if (G.equal(o.prtType, "sheet") || G.equal(o.prtType, "clip")) width2 = int.MaxValue;
                             int numberOfLabelsLines = PrintCreateLabelsArrayNew(label, width2, numberOfLabelsLinesMax, maxLength, labelsArray);
                             maxLabelsLinesFound = Math.Max(maxLabelsLinesFound, numberOfLabelsLines);
-                            labelsNonBroken.Add(label);
+                            labelsNonBroken.Add(originalLabel);
                         }
                         else
                         {
@@ -23057,26 +23070,21 @@ namespace Gekko
                 o.guiGraphRefreshingFilename = emfName;
             }
         }
+        
 
         private static void CallGnuplotNew2(Table data, O.Prt o, int count, int maxLabelsLinesFound, List<string> labelsNonBroken)
         {
             //Måske en SYS gnuplot til at starte et vindue op.
-            
-                       
-            
+
             //double fontsize = 12;
             double zoom = 1;
             int mirrorY = 0;  //0:none, 1:tics no labels, 2:tics and labels, 3 tics and labels and axis label
-
-            bool yzeroaxis = true;            
+                        
             string xTicsInOut = "out";  //in, out
             string yTicsInOut = "out";  //in, out
             string y2TicsInOut = "out";  //in, out
-            
 
             bool arrow = false;
-            
-            bool yzeroazxis = true;
             
             bool gnuplot51 = true;
 
@@ -23129,74 +23137,8 @@ namespace Gekko
                 }
             }
 
-            //?????????????????
-            //?????????????????
-            //?????????????????
-            //?????????????????     do we need .Trim() on these???
-            //?????????????????
-            //?????????????????
-            //?????????????????
-
-
-            string title = GetText(doc.SelectSingleNode("gekkoplot/title"));
-            string subtitle = GetText(doc.SelectSingleNode("gekkoplot/subtitle"));
-            string font = GetText(doc.SelectSingleNode("gekkoplot/font"), "Verdana");
-            double fontsize = ParseIntoDouble(GetText(doc.SelectSingleNode("gekkoplot/fontsize"), "12"));
-            string grid = GetText(doc.SelectSingleNode("gekkoplot/grid"));  //normally null or "" --> grid. Switch off with <grid>no</grid>            
-            string border = GetText(doc.SelectSingleNode("gekkoplot/border"), "3");
-            string boxgap = GetText(doc.SelectSingleNode("gekkoplot/boxgap"), "2");
-            double boxwidth = ParseIntoDouble(GetText(doc.SelectSingleNode("gekkoplot/boxwidth"), "0.60"));
-            string boxstack = GetText(doc.SelectSingleNode("gekkoplot/boxstack"));
-            string size2 = GetText(doc.SelectSingleNode("gekkoplot/size"));
-            string key = GetText(doc.SelectSingleNode("gekkoplot/key"), "out horiz bot center Left reverse");
-            string palette = GetText(doc.SelectSingleNode("gekkoplot/palette"), "red,web-green,web-blue,orange,dark-blue,magenta,brown4,dark-violet,grey50,black");
-            string tics = GetText(doc.SelectSingleNode("gekkoplot/tics"), "out");
-            string ymirror = GetText(doc.SelectSingleNode("gekkoplot/ymirror"), "0"); //y2 mirror could be either no (0), tics (1), tics+labels (2), tics+labels+axislabel (3)
-            string ylabel = GetText(doc.SelectSingleNode("gekkoplot/y/label"));
-            string y2label = GetText(doc.SelectSingleNode("gekkoplot/y2/label"));
-
-            string ymin = GetText(doc.SelectSingleNode("gekkoplot/y/min"));
-            string yminsoft = GetText(doc.SelectSingleNode("gekkoplot/y/minsoft"));
-            string yminhard = GetText(doc.SelectSingleNode("gekkoplot/y/minhard"));
-            string ymax = GetText(doc.SelectSingleNode("gekkoplot/y/max"));
-            string ymaxsoft = GetText(doc.SelectSingleNode("gekkoplot/y/maxsoft"));
-            string ymaxhard = GetText(doc.SelectSingleNode("gekkoplot/y/maxhard"));
-            string y2min = GetText(doc.SelectSingleNode("gekkoplot/y2/min"));
-            string y2minsoft = GetText(doc.SelectSingleNode("gekkoplot/y2/minsoft"));
-            string y2minhard = GetText(doc.SelectSingleNode("gekkoplot/y2/minhard"));
-            string y2max = GetText(doc.SelectSingleNode("gekkoplot/y2/max"));
-            string y2maxsoft = GetText(doc.SelectSingleNode("gekkoplot/y2/maxsoft"));
-            string y2maxhard = GetText(doc.SelectSingleNode("gekkoplot/y2/maxhard"));            
-
-            List<string> palette2 = null;
-            if (palette != null) palette2 = new List<string>(palette.Split(','));
-            if (palette2 == null || palette2.Count == 0)
-            {
-                //this should not be possible, but in any case...
-                G.Writeln2("*** ERROR: PLOT gpt palette is empty");
-                throw new GekkoException();
-            }
-            
-
-            if (o.opt_filename != null)
-            {
-                pplotType = Path.GetExtension(o.opt_filename);
-                if (pplotType.StartsWith(".")) pplotType = pplotType.Substring(1);
-                if (pplotType == "")
-                {
-                    o.opt_filename = AddExtension(o.opt_filename, ".emf");
-                    pplotType = "emf";
-                }
-                if (pplotType != "emf" && pplotType != "png" && pplotType != "svg")
-                {
-                    G.Writeln2("*** ERROR: In PLOT, expected file type is emf, png or svg");
-                    throw new GekkoException();
-                }
-            }
-
             string currentDir = Directory.GetCurrentDirectory();  //remembered in order to switch back
             string path = System.Windows.Forms.Application.LocalUserAppDataPath + "\\gnuplot\\tempfiles";
-
             // Determine whether the directory exists.
             if (!Directory.Exists(path))
             {
@@ -23206,9 +23148,11 @@ namespace Gekko
 
             List<string> labels1 = new List<string>();
             List<string> labels2 = new List<string>();
+            string fileGp = path + "\\" + file3;
 
             string fileData = path + "\\" + file1;
-
+            double[] dataMax = new double[count]; for (int i = 0; i < count; i++) dataMax[i] = double.MinValue;
+            double[] dataMin = new double[count]; for (int i = 0; i < count; i++) dataMin[i] = double.MaxValue;
             using (FileStream fs = WaitForFileStream(fileData, GekkoFileReadOrWrite.Write))
             using (StreamWriter tw = G.GekkoStreamWriter(fs))
             {
@@ -23229,18 +23173,22 @@ namespace Gekko
                             if (quarterFix)
                             {
                                 string[] split = d.Split(new char[] { '/' });
-                                string x = FromGnuplotDatoToFloatingValue(split);
-                                s += x + " ";
+                                s += FromGnuplotDatoToFloatingValue(split) + " ";
                             }
                         }
                         else if (i > 0 && c.cellType == CellType.Number)
                         {
                             double d = c.number;
                             s += d + " ";
+                            if (!G.isNumericalError(d))
+                            {
+                                if (d < dataMin[i - 1]) dataMin[i] = d;  //so the indices become 0-based
+                                if (d > dataMax[i - 1]) dataMax[i] = d;
+                            }
                         }
                         else
                         {
-                            G.Writeln2("*** ERROR: Graph error");
+                            G.Writeln2("*** ERROR: PLOT error");
                             throw new GekkoException();
                         }
                     }
@@ -23248,305 +23196,436 @@ namespace Gekko
                 }
             }
 
-            string fileGp = path + "\\" + file3;
-            using (FileStream fs = WaitForFileStream(fileGp, GekkoFileReadOrWrite.Write))
-            using (StreamWriter tw = G.GekkoStreamWriter(fs))
+            double lineMin = double.MaxValue;
+            double lineMax = double.MinValue;
+            double boxesMin = double.MaxValue;
+            double boxesMax = double.MinValue;
+
+            XmlNodeList lines3 = doc.SelectNodes("gekkoplot/lines/line");
+            int numberOfBoxes = 0;
+            int numberOfY2s = 0;
+            for (int i = 0; i < count; i++)
             {
-                //string font = null;
-                //if (gnuplot51) font = "Verdana";
-
-                tw.WriteLine("set size " + zoom + "," + zoom + "");
-                tw.WriteLine("set encoding iso_8859_1");
-                tw.WriteLine("set format y " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
-                tw.WriteLine("set format y2 " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
-                tw.WriteLine("set datafile missing \"NaN\"");
-
-                
-
-                string enhanced = null;
-                if (G.equal(pplotType, "emf"))
+                XmlNode line3 = lines3[i];
+                if (line3 != null)
                 {
-                    enhanced = " enhanced";
-                    fontsize = 0.95 * fontsize;
+                    string linetype = GetText(line3.SelectSingleNode("linetype"));
+                    if (G.equal(linetype, "boxes"))
+                    {
+                        numberOfBoxes++;
+                        boxesMin = Math.Min(boxesMin, 0);
+                    }
+                    string lineY2 = GetText(line3.SelectSingleNode("y2"));
+                    if (lineY2 != null) numberOfY2s++;
+                }
+            }
+
+            string title = GetText(doc.SelectSingleNode("gekkoplot/title"));
+            string subtitle = GetText(doc.SelectSingleNode("gekkoplot/subtitle"));
+            string font = GetText(doc.SelectSingleNode("gekkoplot/font"), "Verdana");
+            double fontsize = ParseIntoDouble(GetText(doc.SelectSingleNode("gekkoplot/fontsize"), "12"));
+            string grid = GetText(doc.SelectSingleNode("gekkoplot/grid"));  //normally null or "" --> grid. Switch off with <grid>no</grid>            
+            //string border = GetText(doc.SelectSingleNode("gekkoplot/border"), "3");
+            string boxgap = GetText(doc.SelectSingleNode("gekkoplot/boxgap"), "2");
+            double boxwidth = ParseIntoDouble(GetText(doc.SelectSingleNode("gekkoplot/boxwidth"), "0.75"));
+            string boxstack = GetText(doc.SelectSingleNode("gekkoplot/boxstack"));
+            string size2 = GetText(doc.SelectSingleNode("gekkoplot/size"));
+            string key = GetText(doc.SelectSingleNode("gekkoplot/key"), "out horiz bot center Left reverse");
+            string palette = GetText(doc.SelectSingleNode("gekkoplot/palette"), "red,web-green,web-blue,orange,dark-blue,magenta,brown4,dark-violet,grey50,black");
+            string ticsInOut = GetText(doc.SelectSingleNode("gekkoplot/tics"), "out");
+            string ymirror = GetText(doc.SelectSingleNode("gekkoplot/ymirror"), "0"); //y2 mirror could be either no (0), tics (1), tics+labels (2), tics+labels+axislabel (3). With grid set, the mirror is not so important.
+            string ylabel = GetText(doc.SelectSingleNode("gekkoplot/ylabel"));
+            string y2label = GetText(doc.SelectSingleNode("gekkoplot/y2label"));
+            string xzeroaxis = GetText(doc.SelectSingleNode("gekkoplot/xzeroaxis"));
+            string x2zeroaxis = GetText(doc.SelectSingleNode("gekkoplot/x2zeroaxis"));
+
+            string ymin = GetText(doc.SelectSingleNode("gekkoplot/ymin"));
+            string yminsoft = GetText(doc.SelectSingleNode("gekkoplot/yminsoft"));
+            string yminhard = GetText(doc.SelectSingleNode("gekkoplot/yminhard"));
+            string ymax = GetText(doc.SelectSingleNode("gekkoplot/ymax"));
+            string ymaxsoft = GetText(doc.SelectSingleNode("gekkoplot/ymaxsoft"));
+            string ymaxhard = GetText(doc.SelectSingleNode("gekkoplot/ymaxhard"));
+            string y2min = GetText(doc.SelectSingleNode("gekkoplot/y2min"));
+            string y2minsoft = GetText(doc.SelectSingleNode("gekkoplot/y2minsoft"));
+            string y2minhard = GetText(doc.SelectSingleNode("gekkoplot/y2minhard"));
+            string y2max = GetText(doc.SelectSingleNode("gekkoplot/y2max"));
+            string y2maxsoft = GetText(doc.SelectSingleNode("gekkoplot/y2maxsoft"));
+            string y2maxhard = GetText(doc.SelectSingleNode("gekkoplot/y2maxhard"));
+
+            List<string> labels = new List<string>();
+            XmlNodeList nodes = doc.SelectNodes("gekkoplot/label");
+            if (nodes != null)
+            {
+                foreach (XmlNode node in nodes)
+                {
+                    string s = GetText(node);
+                    if (s != null) labels.Add(s);
+                }
+            }
+
+            List<string> arrows = new List<string>();
+            nodes = doc.SelectNodes("gekkoplot/arrow");
+            if (nodes != null)
+            {
+                foreach (XmlNode node in nodes)
+                {
+                    string s = GetText(node);
+                    if (s != null) arrows.Add(s);
+                }
+            }
+
+            List<string> palette2 = null;
+            if (palette != null) palette2 = new List<string>(palette.Split(','));
+            if (palette2 == null || palette2.Count == 0)
+            {
+                //this should not be possible, but in any case...
+                G.Writeln2("*** ERROR: PLOT gpt palette is empty");
+                throw new GekkoException();
+            }
+
+
+            if (o.opt_filename != null)
+            {
+                pplotType = Path.GetExtension(o.opt_filename);
+                if (pplotType.StartsWith(".")) pplotType = pplotType.Substring(1);
+                if (pplotType == "")
+                {
+                    o.opt_filename = AddExtension(o.opt_filename, ".emf");
+                    pplotType = "emf";
+                }
+                if (pplotType != "emf" && pplotType != "png" && pplotType != "svg")
+                {
+                    G.Writeln2("*** ERROR: In PLOT, expected file type is emf, png or svg");
+                    throw new GekkoException();
+                }
+            }
+
+            
+            StringBuilder txt = new StringBuilder();
+            
+
+            //string font = null;
+            //if (gnuplot51) font = "Verdana";
+
+            txt.AppendLine("set size " + zoom + "," + zoom + "");
+            txt.AppendLine("set encoding iso_8859_1");
+            txt.AppendLine("set format y " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
+            txt.AppendLine("set format y2 " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
+            txt.AppendLine("set datafile missing \"NaN\"");
+
+            int ii = 0;
+            foreach (string s in key.ToLower().Split(' '))
+            {
+                if (s.StartsWith("out")) ii++;
+                if (s.StartsWith("bot")) ii++;
+            }
+            if (ii >= 2)
+            {
+                txt.AppendLine("set bmargin 4");  //nicer gap
+            }
+
+            string enhanced = null;
+            if (G.equal(pplotType, "emf"))
+            {
+                enhanced = " enhanced";
+                fontsize = 0.95 * fontsize;
+            }
+            else
+            {
+                fontsize = 0.75 * fontsize;
+            }                    
+
+            XmlNode x = doc.SelectSingleNode("gekkoplot/x");
+            if (x != null)
+            {
+                XmlNodeList list = x.SelectNodes("/line");
+                foreach (XmlNode node in list)
+                {
+                    //handle line
+                    //also do linebefore and lineafter
+                }
+            }
+
+            XmlNode y = doc.SelectSingleNode("gekkoplot/y");
+            if (y != null)
+            {
+                //string tics = GetText(y.SelectSingleNode("/tics"), "out");
+                //if (!NullOrEmpty(tics)) tw.WriteLine("set ytics " + tics);
+            }
+
+            XmlNode y2 = doc.SelectSingleNode("gekkoplot/y2");
+            if (y2 != null)
+            {
+                //string tics = GetText(y2.SelectSingleNode("/tics"), "out");
+                //if (!NullOrEmpty(tics)) tw.WriteLine("set y2tics " + tics);
+            }
+
+            txt.AppendLine("set terminal " + pplotType + enhanced + " font '" + font + "," + (zoom * fontsize) + "'");;
+            txt.AppendLine("set output \"" + file2 + "\"");
+            txt.AppendLine("set key " + key);
+
+            string subtitle2 = null;
+            if (!NullOrEmpty(subtitle)) subtitle2 = subtitle;
+            if (!NullOrEmpty(o.opt_subtitle)) subtitle2 = o.opt_subtitle;
+            if (!NullOrEmpty(subtitle2)) subtitle2 = "\\n{/*0.80 " + subtitle2 + "}";
+
+            string title2 = null;
+            if (!NullOrEmpty(title)) title2 = title;
+            if (!NullOrEmpty(o.opt_title)) title2 = o.opt_title;
+            if (!NullOrEmpty(title2)) txt.AppendLine("set title " + Globals.QT + EncodeDanish(GnuplotText(title2 + subtitle2)) + Globals.QT + " font '" + font + "," + (1.5d * zoom * fontsize) + "'");
+
+            string set_yrange = GnuplotYrange(ymin, yminsoft, yminhard, ymax, ymaxsoft, ymaxhard);
+            string set_y2range = GnuplotYrange(y2min, y2minsoft, y2minhard, y2max, y2maxsoft, y2maxhard);
+
+            if (set_yrange.Trim() != ":") txt.AppendLine("set yrange [" + set_yrange + "]");
+            if (set_y2range.Trim() != ":") txt.AppendLine("set y2range [" + set_y2range + "]");
+
+            if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
+            {
+                if (!quarterFix)
+                {
+                    txt.AppendLine("set xdata time");
+                    txt.AppendLine(@"set timefmt ""%Y/%m/%d""");
+                    txt.AppendLine(@"set format x ""%Y/%m""");
+                }
+            }
+            else
+            {
+                if (numberOfObs > 70)
+                {
+                    txt.AppendLine("set xtics 10");
+                    txt.AppendLine("set mxtics 10");
                 }
                 else
                 {
-                    fontsize = 0.75 * fontsize;
+                    txt.AppendLine("set xtics 5");
+                    txt.AppendLine("set mxtics 5");
                 }
-                
-                tw.WriteLine("set xtics " + tics);
-                tw.WriteLine("set ytics " + tics);
-                tw.WriteLine("set y2tics " + tics);
-                  
-                XmlNode x = doc.SelectSingleNode("gekkoplot/x");
-                if (x != null)
-                {
-                    XmlNodeList list = x.SelectNodes("/line");
-                    foreach (XmlNode node in list)
-                    {
-                        //handle line
-                        //also do linebefore and lineafter
-                    }
+            }
 
-                    
-                }
+            txt.AppendLine("set tic scale 1.4, 0.7");
+            txt.AppendLine("set xtics nomirror");
 
-                XmlNode y = doc.SelectSingleNode("gekkoplot/y");
-                if (y != null)
-                {
-                    //string tics = GetText(y.SelectSingleNode("/tics"), "out");
-                    //if (!NullOrEmpty(tics)) tw.WriteLine("set ytics " + tics);
-                }
+            if (xzeroaxis != null) txt.AppendLine("set xzeroaxis lt -1");  //draws x axis
 
-                XmlNode y2 = doc.SelectSingleNode("gekkoplot/y2");
-                if (y2 != null)
-                {
-                    //string tics = GetText(y2.SelectSingleNode("/tics"), "out");
-                    //if (!NullOrEmpty(tics)) tw.WriteLine("set y2tics " + tics);
-                }
-
-                tw.WriteLine("set terminal " + pplotType + enhanced + " font '" + font + "," + (zoom * fontsize) + "'");
-                tw.WriteLine("set output \"" + file2 + "\"");
-                tw.WriteLine("set key " + key);
-
-                string title2 = null;
-                if (!NullOrEmpty(title)) title2 = title;
-                if (!NullOrEmpty(o.opt_title)) title2 = o.opt_title;  //is actually PLOT<title=...>
-                if (!NullOrEmpty(title2)) tw.WriteLine("set title " + Globals.QT + EncodeDanish(GnuplotText(title2)) + Globals.QT + " font '" + font + "," + (2d * zoom * fontsize) + "'");
-                              
-                string set_yrange = GnuplotYrange(ymin, yminsoft, yminhard, ymax, ymaxsoft, ymaxhard);
-                string set_y2range = GnuplotYrange(y2min, y2minsoft, y2minhard, y2max, y2maxsoft, y2maxhard);
-
-                if (set_yrange.Trim() != ":") tw.WriteLine("set yrange [" + set_yrange + "]");
-                if (set_y2range.Trim() != ":") tw.WriteLine("set y2range [" + set_y2range + "]");
-
-                if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
-                {
-                    if (!quarterFix)
-                    {
-                        tw.WriteLine("set xdata time");
-                        tw.WriteLine(@"set timefmt ""%Y/%m/%d""");
-                        tw.WriteLine(@"set format x ""%Y/%m""");
-                    }
-                }
-                else
-                {
-                    if (numberOfObs > 70)
-                    {
-                        tw.WriteLine("set xtics 10");
-                        tw.WriteLine("set mxtics 10");
-                    }
-                    else
-                    {
-                        tw.WriteLine("set xtics 5");
-                        tw.WriteLine("set mxtics 5");
-                    }
-                }
-
-                tw.WriteLine("set tic scale 1.4, 0.7");                
-                tw.WriteLine("set xtics nomirror");
-
+            if (numberOfY2s == 0)
+            {
+                //the y2 axis is just mirrored
                 if (ymirror == "0")  //nothing
                 {
-                    tw.WriteLine("set ytics nomirror");
-                    tw.WriteLine("set border 3");
-                    if (!NullOrEmpty(ylabel))  tw.WriteLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
+                    txt.AppendLine("set ytics nomirror " + ticsInOut);
+                    txt.AppendLine("set border 3");
+                    if (!NullOrEmpty(ylabel)) txt.AppendLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
                 }
                 else if (ymirror == "1")  //y2 axis
                 {
-                    tw.WriteLine("set ytics");
-                    tw.WriteLine("set border 11");
-                    if (!NullOrEmpty(ylabel)) tw.WriteLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
+                    txt.AppendLine("set ytics " + ticsInOut);
+                    txt.AppendLine("set border 11");
+                    if (!NullOrEmpty(ylabel)) txt.AppendLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
                 }
                 else if (ymirror == "2")  //y2 axis and y2 tics
                 {
-                    tw.WriteLine("set ytics");
-                    tw.WriteLine("set y2tics");
-                    //tw.WriteLine("set y2tics mirror");
-                    tw.WriteLine("set border 11");
-                    if (!NullOrEmpty(ylabel)) tw.WriteLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
+                    txt.AppendLine("set ytics " + ticsInOut);
+                    txt.AppendLine("set y2tics " + ticsInOut);
+                    txt.AppendLine("set border 11");
+                    if (!NullOrEmpty(ylabel)) txt.AppendLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
                 }
                 else if (ymirror == "3")
                 {
-                    tw.WriteLine("set ytics");  //y2 axis and y2 tics and y2 label
-                    tw.WriteLine("set y2tics");
-                    tw.WriteLine("set border 11");
-                    if (!NullOrEmpty(ylabel)) tw.WriteLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
-                    if (!NullOrEmpty(y2label)) tw.WriteLine("set y2label \"" + GnuplotText(y2label) + "\"");
+                    txt.AppendLine("set ytics " + ticsInOut);  //y2 axis and y2 tics and y2 label
+                    txt.AppendLine("set y2tics " + ticsInOut);
+                    txt.AppendLine("set border 11");
+                    if (!NullOrEmpty(ylabel)) txt.AppendLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
+                    if (!NullOrEmpty(y2label)) txt.AppendLine("set y2label \"" + GnuplotText(ylabel) + "\"");
                 }
-
-                if (arrow)
-                {
-                    tw.WriteLine("set arrow from 2010,graph 0 to 2010,graph 1 nohead");
-                }
-
-                tw.WriteLine("set xzeroaxis lt -1");
-                if (yzeroaxis) tw.WriteLine("set yzeroaxis");  //draws x axis
-                                                               //tw.WriteLine("set y2zeroaxis");  //no, not pretty
-
-                if (!G.equal(grid, "no"))  //it can be an empty <grid/>
-                {
-                    tw.WriteLine("set style line 102 lc rgb '#f0f0f0' lt 1 lw 1");  //lt 0 or dt 3 gives ugly lines when viewed in Gekko
-                    tw.WriteLine("set grid back ls 102");
-                }
-
-                int mxtics = -12345;
-                mxtics = HandleXTics(quarterFix, labels1, labels2, tw, mxtics);
-
-                if (o.opt_plotcode != null)
-                {
-                    tw.WriteLine("");
-                    tw.WriteLine(o.opt_plotcode);  //user code
-                    tw.WriteLine("");
-                }
-
-                //List<Line> lines = null; try { lines = gpt.lines.lines; } catch (NullReferenceException) { };
-
-                string plotline = null;
-                XmlNodeList lines3 = doc.SelectNodes("gekkoplot/lines/line");
-
-                int numberOfBoxes = 0;
-                for (int i = 0; i < count; i++)
-                {
-                    XmlNode line3 = lines3[i];                    
-                    if (line3 != null)
-                    {                        
-                        string linetype = GetText(line3.SelectSingleNode("linetype"));
-                        if (G.equal(linetype, "boxes")) numberOfBoxes++;
-                    }
-                }
-
-                double dx = 1d;
-                if (Program.options.freq == EFreq.Quarterly)
-                {
-                    dx = 1d / 4d;
-                }
-                else if (Program.options.freq == EFreq.Monthly)
-                {
-                    dx = 1d / 12d;
-                }
-
-                double histoGap = (int)ParseIntoDouble(boxgap);
-                if (numberOfBoxes == 1) histoGap = 0;
-                double d_width = dx / (double)(numberOfBoxes + histoGap);
-                double d_width2 = boxwidth * d_width;
-                double left = d_width * (double)(numberOfBoxes - 1) / 2d;
-
-                plotline += "plot ";
-                int boxesCounter = 0;
-                //for (int i = count-1; i >=0; i--)                
-
-                for (int i = 0; i < count; i++)
-                {
-                    XmlNode line3 = lines3[i];
-
-                    //defaults
-                    string dlinetype = "lines";
-                    if (Program.options.plot_lines_points) dlinetype = "linespoints";                    
-                    string ddashtype = "1";
-                    string dlinewidth = "3";
-                    string dlinecolor = palette2[i % palette2.Count];
-                    string dpointtype = "7";
-                    string dpointsize = "0.5";
-                    string dfillstyle = "solid";
-                    string dy2_ = "no";
-
-                    string linetype = null;
-                    string dashtype = null;
-                    string linewidth = null;                    
-                    string linecolor = null;
-                    string pointtype = null;
-                    string pointsize = null;
-                    string fillstyle = null;
-                    string label = null;
-                    string y2_ = null;
-
-                    if (line3 != null)
-                    {                                                                     
-                        linetype = GetText(line3.SelectSingleNode("linetype"), dlinetype);                       
-                        dashtype = GetText(line3.SelectSingleNode("dashtype"), ddashtype);
-                        linewidth = GetText(line3.SelectSingleNode("linewidth"), dlinewidth);                        
-                        linecolor = GetText(line3.SelectSingleNode("linecolor"), dlinecolor);
-                        pointtype = GetText(line3.SelectSingleNode("pointtype"), dpointtype);
-                        pointsize = GetText(line3.SelectSingleNode("pointsize"), dpointsize);
-                        if (G.equal(linetype, "boxes")) fillstyle = GetText(line3.SelectSingleNode("fillstyle"), dfillstyle);                        
-                        label = GetText(line3.SelectSingleNode("label"));
-                        if (!NullOrEmpty(labelsNonBroken[i])) label = labelsNonBroken[i];  //overwrites                        
-                        y2_ = GetText(line3.SelectSingleNode("y2"), dy2_);
-                    }
-                    else
-                    {                      
-                        linetype = dlinetype;
-                        dashtype = ddashtype;
-                        linewidth = dlinewidth;
-                        linecolor = dlinecolor;
-                        pointtype = dpointtype;
-                        pointsize = dpointsize;
-                        label = labelsNonBroken[i];
-                        y2_ = dy2_;                   
-                    }
-
-                    label = GnuplotText(label);
-
-                    string s = null;
-                    if (!NullOrEmpty(linetype)) s += " with " + linetype;
-                    if (!NullOrEmpty(dashtype)) s += " dashtype " + dashtype;
-                    if (!NullOrEmpty(linewidth)) s += " linewidth " + linewidth;
-                    if (!NullOrEmpty(linecolor)) s += " linecolor rgb \"" + linecolor + "\"";
-                    if (!NullOrEmpty(pointtype)) s += " pointtype " + pointtype;
-                    if (!NullOrEmpty(pointtype)) s += " pointsize " + pointsize;
-                    if (!NullOrEmpty(fillstyle)) s += " fillstyle " + fillstyle;
-                    if (!NullOrEmpty(label)) s += " title " + Globals.QT + label + "   " + Globals.QT;  //blanks added to separate items in the legend
-                    if (!NullOrEmpty(y2_) && !G.equal(y2_, "no")) s += " axes x1y2";
-                                        
-                    //linestyle is an association of linecolor, linewidth, dashtype, pointtype
-                    //linetype is the same, just permanent
-                    //box: fillstyle empty|solid|pattern, border|noborder
-
-                    string xAdjustment = null;
-                    if (G.equal(linetype, "boxes"))
-                    {
-                        boxesCounter++;
-                        double d = (boxesCounter - 1) * d_width - left;
-                        string minus = "+"; ;
-                        if (d < 0)
-                        {
-                            d = Math.Abs(d);
-                            minus = "-";
-                        }
-                        if (quarterFix)
-                        {
-                            xAdjustment = "($2 " + minus + d + "):" + (i + 3) + ":(" + d_width2 + ")";
-                        }
-                        else
-                        {
-                            xAdjustment = "($1 " + minus + d + "):" + (i + 2) + ":(" + d_width2 + ")";
-                        }
-                    }
-                    else
-                    {                        
-                        if (quarterFix)
-                        {
-                            xAdjustment = "2:" + (i + 3);
-                        }
-                        else
-                        {
-                            xAdjustment = "1:" + (i + 2);
-                        }
-                    }
-
-                    //string xlabel = GnuplotText(label);
-
-                    plotline += "\"" + file1 + "\" using " + xAdjustment + s;
-
-                    if (i < count - 1) plotline += ", ";                    
-                }
-                plotline += G.NL;
-                tw.WriteLine(plotline);
-                tw.WriteLine();
-                tw.Flush();
-                tw.Close();
             }
+            else
+            {
+                //there is a series being shown at the y2 axis
+                txt.AppendLine("set ytics nomirror " + ticsInOut);
+                txt.AppendLine("set y2tics " + ticsInOut);
+                txt.AppendLine("set border 11");
+                if (!NullOrEmpty(ylabel)) txt.AppendLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
+                if (!NullOrEmpty(y2label)) txt.AppendLine("set y2label \"" + GnuplotText(y2label) + "\"");
+                if (x2zeroaxis != null) txt.AppendLine("set x2zeroaxis lt -1");  //draws x axis for y2=0
+            }
+
+            if (arrow)
+            {
+                txt.AppendLine("set arrow from 2010,graph 0 to 2010,graph 1 nohead");
+            }
+                        
+              
+
+            if (!G.equal(grid, "no"))  //it can be an empty <grid/>
+            {
+                txt.AppendLine("set style line 102 lc rgb '#f0f0f0' lt 1 lw 1");  //lt 0 or dt 3 gives ugly lines when viewed in Gekko
+                txt.AppendLine("set grid back ls 102");
+            }
+
+            int mxtics = -12345;
+            string ticsTxt = null;
+            mxtics = HandleXTics(quarterFix, labels1, labels2, ref ticsTxt, mxtics);
+            if (ticsTxt != null) txt.AppendLine(ticsTxt);
+
+
+            if (o.opt_plotcode != null)
+            {
+                txt.AppendLine("");
+                txt.AppendLine(o.opt_plotcode);  //user code
+                txt.AppendLine("");
+            }
+
+            string plotline = null;            
+
+            double dx = 1d;
+            if (Program.options.freq == EFreq.Quarterly)
+            {
+                dx = 1d / 4d;
+            }
+            else if (Program.options.freq == EFreq.Monthly)
+            {
+                dx = 1d / 12d;
+            }
+
+            double histoGap = (int)ParseIntoDouble(boxgap);
+            if (numberOfBoxes == 1) histoGap = 0;
+            double d_width = dx / (double)(numberOfBoxes + histoGap);
+            double d_width2 = boxwidth * d_width;
+            double left = d_width * (double)(numberOfBoxes - 1) / 2d;
+
+            plotline += "plot ";
+            int boxesCounter = 0;                         
+
+            for ( int i = 0; i < count; i++)
+            {
+                XmlNode line3 = lines3[i];
+
+                //defaults
+                string dlinetype = "lines";
+                if (Program.options.plot_lines_points) dlinetype = "linespoints";
+                string ddashtype = "1";
+                string dlinewidth = "3";
+                string dlinecolor = palette2[i % palette2.Count];
+                string dpointtype = "7";
+                string dpointsize = "0.5";
+                string dfillstyle = "solid";
+                string dy2_ = "no";
+
+                string linetype = null;
+                string dashtype = null;
+                string linewidth = null;
+                string linecolor = null;
+                string pointtype = null;
+                string pointsize = null;
+                string fillstyle = null;
+                string label = null;
+                string y2_ = null;
+
+                bool isExplicit = false;
+                string labelCleaned = labelsNonBroken[i];
+                if (labelCleaned.StartsWith(Globals.labelCheatString))
+                {
+                    isExplicit = true;
+                    labelCleaned = labelCleaned.Substring(Globals.labelCheatString.Length);
+                }
+
+                if (line3 != null)
+                {
+                    linetype = GetText(line3.SelectSingleNode("linetype"), dlinetype);                    
+                    dashtype = GetText(line3.SelectSingleNode("dashtype"), ddashtype);
+                    linewidth = GetText(line3.SelectSingleNode("linewidth"), dlinewidth);
+                    linecolor = GetText(line3.SelectSingleNode("linecolor"), dlinecolor);
+                    pointtype = GetText(line3.SelectSingleNode("pointtype"), dpointtype);
+                    pointsize = GetText(line3.SelectSingleNode("pointsize"), dpointsize);
+                    if (G.equal(linetype, "boxes")) fillstyle = GetText(line3.SelectSingleNode("fillstyle"), dfillstyle);
+                    label = HandleLabel(line3, isExplicit, labelCleaned);
+                    if (line3.SelectSingleNode("y2") != null) y2_ = "yes";
+                }
+                else
+                {
+                    linetype = dlinetype;
+                    dashtype = ddashtype;
+                    linewidth = dlinewidth;
+                    linecolor = dlinecolor;
+                    pointtype = dpointtype;
+                    pointsize = dpointsize;
+                    label = labelCleaned;
+                    y2_ = dy2_;
+                }
+
+                if (G.equal(linetype, "boxes") && fillstyle.Contains("solid"))
+                {
+                    linewidth = "1";  //otherwise the borders of these get blurred
+                }
+
+                label = GnuplotText(label);
+
+                string s = null;
+                if (!NullOrEmpty(linetype)) s += " with " + linetype;
+                if (y2_ != null) s += " axes x1y2";
+                if (!NullOrEmpty(dashtype)) s += " dashtype " + dashtype;
+                if (!NullOrEmpty(linewidth)) s += " linewidth " + linewidth;
+                if (!NullOrEmpty(linecolor)) s += " linecolor rgb \"" + linecolor + "\"";
+                if (!NullOrEmpty(pointtype)) s += " pointtype " + pointtype;
+                if (!NullOrEmpty(pointtype)) s += " pointsize " + pointsize;
+                if (!NullOrEmpty(fillstyle)) s += " fillstyle " + fillstyle;
+                if (!NullOrEmpty(label)) s += " title " + Globals.QT + label + "   " + Globals.QT;  //blanks added to separate items in the legend                    
+
+                //linestyle is an association of linecolor, linewidth, dashtype, pointtype
+                //linetype is the same, just permanent
+                //box: fillstyle empty|solid|pattern, border|noborder
+
+                string xAdjustment = null;
+                if (G.equal(linetype, "boxes"))
+                {
+                    boxesCounter++;
+                    double d = (boxesCounter - 1) * d_width - left;
+                    string minus = "+"; ;
+                    if (d < 0)
+                    {
+                        d = Math.Abs(d);
+                        minus = "-";
+                    }
+                    if (quarterFix)
+                    {
+                        xAdjustment = "($2 " + minus + d + "):" + (i + 3) + ":(" + d_width2 + ")";
+                    }
+                    else
+                    {
+                        xAdjustment = "($1 " + minus + d + "):" + (i + 2) + ":(" + d_width2 + ")";
+                    }
+                }
+                else
+                {
+                    if (quarterFix)
+                    {
+                        xAdjustment = "2:" + (i + 3);
+                    }
+                    else
+                    {
+                        xAdjustment = "1:" + (i + 2);
+                    }
+                }
+
+                //string xlabel = GnuplotText(label);
+
+                plotline += "\"" + file1 + "\" using " + xAdjustment + s;
+
+                if (i < count - 1) plotline += ", ";
+            }
+
+            txt.AppendLine(plotline);
+
+
+            using (FileStream fs = WaitForFileStream(fileGp, GekkoFileReadOrWrite.Write))
+            using (StreamWriter tw = G.GekkoStreamWriter(fs))
+            {
+                tw.WriteLine(txt);
+                tw.Flush(); //probably not necessary
+                tw.Close(); //probably not necessary
+            }
+
 
             if (G.equal(o.opt_dump, "yes"))
             {
@@ -23571,8 +23650,8 @@ namespace Gekko
 
             string emfName = path + "\\" + file2;
 
-            Process p = new Process();            
-            p.StartInfo.FileName = Application.StartupPath + "\\gnuplot\\wgnuplot51.exe";            
+            Process p = new Process();
+            p.StartInfo.FileName = Application.StartupPath + "\\gnuplot\\wgnuplot51.exe";
             //NOTE: quotes added because this path may contain blanks
             p.StartInfo.Arguments = Globals.QT + path + "\\" + file3 + Globals.QT;
             bool msg = false;
@@ -23660,14 +23739,35 @@ namespace Gekko
             }
         }
 
+        private static string HandleLabel(XmlNode line3, bool isExplicit, string labelCleaned)
+        {
+            string label;
+            string labelGpt = GetText(line3.SelectSingleNode("label"));
+            if (isExplicit)  //for instance: PLOT x*y 'product';
+            {
+                label = labelCleaned;  //overrides any xml label                        
+            }
+            else  //for instance: PLOT x*y;
+            {
+                label = labelCleaned;
+                if (!NullOrEmpty(labelGpt)) label = labelGpt;  //xml label overrides variables
+            }
+
+            return label;
+        }
+
         private static string GetText(XmlNode x, string def)
         {
-            if (x == null) //the <tag>...</tag> does not exist at all
+            if (x == null || x.InnerText.Trim().StartsWith("//")) //the <tag>...</tag> does not exist at all, or it is commented out
             {
                 if (def == null) return null;
                 else return def;  
             }
-            if (x.InnerText == null) return "";  //the <tag>...</tag> exists, but is empty
+            if (x.InnerText == null || x.InnerText.Trim() == "")
+            {
+                if (def == null) return ""; //the <tag>...</tag> exists, but is empty
+                else return def;
+            }
             return x.InnerText.Trim();           
         }
 
@@ -23687,11 +23787,12 @@ namespace Gekko
             return s.Replace(@"_", @"\\_");
         }
 
-        private static int HandleXTics(bool quarterFix, List<string> labels1, List<string> labels2, StreamWriter tw, int mxtics)
+        private static int HandleXTics(bool quarterFix, List<string> labels1, List<string> labels2, ref string ticsTxt, int mxtics)
         {
             if (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)
             {
                 //do nothing
+                ticsTxt = null;
             }
             else
             {
@@ -23722,7 +23823,7 @@ namespace Gekko
                     }
                 }
                 if (s3.EndsWith(", ")) s3 = s3.Substring(0, s3.Length - 2);
-                tw.WriteLine("set xtics (" + s3 + ")");
+                ticsTxt = "set xtics (" + s3 + ")" + G.NL;
             }
 
             return mxtics;

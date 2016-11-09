@@ -139,7 +139,8 @@ namespace Gekko
         public static string endGekkoTimeIteratorCode = "}" + G.NL + "t = Globals.tNull; " + G.NL;
         
         public const string indexerAloneCheatString = "[<{THIS IS AN IndexerAlone CALL}>]";
-        
+        public const string labelCheatString = "[<{THIS IS A LABEL}>]";
+
         public const string firstCheatString = "[FIRST]";
 
         public static int freqASubperiods = 1;
