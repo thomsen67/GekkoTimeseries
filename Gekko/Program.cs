@@ -23182,8 +23182,8 @@ namespace Gekko
                             s += d + " ";
                             if (!G.isNumericalError(d))
                             {
-                                if (d < dataMin[i - 1]) dataMin[i] = d;  //so the indices become 0-based
-                                if (d > dataMax[i - 1]) dataMax[i] = d;
+                                dataMin[i - 1] = Math.Min(dataMin[i - 1], d);
+                                dataMax[i - 1] = Math.Max(dataMax[i - 1], d);                                
                             }
                         }
                         else
@@ -23196,8 +23196,8 @@ namespace Gekko
                 }
             }
 
-            double lineMin = double.MaxValue;
-            double lineMax = double.MinValue;
+            double linesMin = double.MaxValue;
+            double linesMax = double.MinValue;
             double boxesMin = double.MaxValue;
             double boxesMax = double.MinValue;
 
@@ -23213,13 +23213,20 @@ namespace Gekko
                     if (G.equal(linetype, "boxes"))
                     {
                         numberOfBoxes++;
-                        boxesMin = Math.Min(boxesMin, 0);
+                        boxesMin = Math.Min(boxesMin, dataMin[i]);
+                        boxesMax = Math.Max(boxesMax, dataMax[i]);
+                    }
+                    else
+                    {
+                        linesMin = Math.Min(linesMin, dataMin[i]);
+                        linesMax = Math.Max(linesMax, dataMax[i]);
                     }
                     string lineY2 = GetText(line3.SelectSingleNode("y2"));
                     if (lineY2 != null) numberOfY2s++;
                 }
             }
 
+            string residuals = GetText(doc.SelectSingleNode("gekkoplot/residuals"));
             string title = GetText(doc.SelectSingleNode("gekkoplot/title"));
             string subtitle = GetText(doc.SelectSingleNode("gekkoplot/subtitle"));
             string font = GetText(doc.SelectSingleNode("gekkoplot/font"), "Verdana");
@@ -23236,8 +23243,8 @@ namespace Gekko
             string ymirror = GetText(doc.SelectSingleNode("gekkoplot/ymirror"), "0"); //y2 mirror could be either no (0), tics (1), tics+labels (2), tics+labels+axislabel (3). With grid set, the mirror is not so important.
             string ylabel = GetText(doc.SelectSingleNode("gekkoplot/ylabel"));
             string y2label = GetText(doc.SelectSingleNode("gekkoplot/y2label"));
-            string xzeroaxis = GetText(doc.SelectSingleNode("gekkoplot/xzeroaxis"));
-            string x2zeroaxis = GetText(doc.SelectSingleNode("gekkoplot/x2zeroaxis"));
+            string xzeroaxis = GetText(doc.SelectSingleNode("gekkoplot/xzeroaxis"), "yes");
+            string x2zeroaxis = GetText(doc.SelectSingleNode("gekkoplot/x2zeroaxis"), "no");
 
             string ymin = GetText(doc.SelectSingleNode("gekkoplot/ymin"));
             string yminsoft = GetText(doc.SelectSingleNode("gekkoplot/yminsoft"));
@@ -23374,8 +23381,22 @@ namespace Gekko
             if (!NullOrEmpty(o.opt_title)) title2 = o.opt_title;
             if (!NullOrEmpty(title2)) txt.AppendLine("set title " + Globals.QT + EncodeDanish(GnuplotText(title2 + subtitle2)) + Globals.QT + " font '" + font + "," + (1.5d * zoom * fontsize) + "'");
 
-            string set_yrange = GnuplotYrange(ymin, yminsoft, yminhard, ymax, ymaxsoft, ymaxhard);
-            string set_y2range = GnuplotYrange(y2min, y2minsoft, y2minhard, y2max, y2maxsoft, y2maxhard);
+            bool isResiduals = residuals != null && !G.equal(residuals, "no");
+
+            string set_yrange = null;
+            string set_y2range = null;
+            if (isResiduals)
+            {
+                double rangeLeft = linesMax - linesMin;
+                double rangeRight = boxesMax - boxesMin;
+                set_yrange = (linesMin - rangeRight) + ":" + linesMax;
+                set_y2range = boxesMin + ":" + (boxesMax + rangeLeft);
+            }
+            else
+            {
+                set_yrange = GnuplotYrange(ymin, yminsoft, yminhard, ymax, ymaxsoft, ymaxhard);
+                set_y2range = GnuplotYrange(y2min, y2minsoft, y2minhard, y2max, y2maxsoft, y2maxhard);
+            }
 
             if (set_yrange.Trim() != ":") txt.AppendLine("set yrange [" + set_yrange + "]");
             if (set_y2range.Trim() != ":") txt.AppendLine("set y2range [" + set_y2range + "]");
@@ -23406,9 +23427,9 @@ namespace Gekko
             txt.AppendLine("set tic scale 1.4, 0.7");
             txt.AppendLine("set xtics nomirror");
 
-            if (xzeroaxis != null) txt.AppendLine("set xzeroaxis lt -1");  //draws x axis
+            if (xzeroaxis != null && !isResiduals) txt.AppendLine("set xzeroaxis lt -1");  //draws x axis. May get ugly if residuals are present.
 
-            if (numberOfY2s == 0)
+            if (numberOfY2s == 0 && !isResiduals)
             {
                 //the y2 axis is just mirrored
                 if (ymirror == "0")  //nothing
@@ -23447,7 +23468,7 @@ namespace Gekko
                 txt.AppendLine("set border 11");
                 if (!NullOrEmpty(ylabel)) txt.AppendLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
                 if (!NullOrEmpty(y2label)) txt.AppendLine("set y2label \"" + GnuplotText(y2label) + "\"");
-                if (x2zeroaxis != null) txt.AppendLine("set x2zeroaxis lt -1");  //draws x axis for y2=0
+                if (x2zeroaxis != null || isResiduals) txt.AppendLine("set x2zeroaxis lt -1");  //draws x axis for y2=0
             }
 
             if (arrow)
@@ -23537,10 +23558,18 @@ namespace Gekko
                     linewidth = GetText(line3.SelectSingleNode("linewidth"), dlinewidth);
                     linecolor = GetText(line3.SelectSingleNode("linecolor"), dlinecolor);
                     pointtype = GetText(line3.SelectSingleNode("pointtype"), dpointtype);
-                    pointsize = GetText(line3.SelectSingleNode("pointsize"), dpointsize);
-                    if (G.equal(linetype, "boxes")) fillstyle = GetText(line3.SelectSingleNode("fillstyle"), dfillstyle);
+                    pointsize = GetText(line3.SelectSingleNode("pointsize"), dpointsize);                    
                     label = HandleLabel(line3, isExplicit, labelCleaned);
                     if (line3.SelectSingleNode("y2") != null) y2_ = "yes";
+                    if (G.equal(linetype, "boxes"))
+                    {
+                        fillstyle = GetText(line3.SelectSingleNode("fillstyle"), dfillstyle);
+                        if (isResiduals) y2_ = "yes";  //set this for all boxes
+                    }
+                    else
+                    {
+                        if (isResiduals) y2_ = "no";
+                    }
                 }
                 else
                 {
@@ -23563,7 +23592,7 @@ namespace Gekko
 
                 string s = null;
                 if (!NullOrEmpty(linetype)) s += " with " + linetype;
-                if (y2_ != null) s += " axes x1y2";
+                if (y2_ != null && !G.equal(y2_, "no")) s += " axes x1y2";
                 if (!NullOrEmpty(dashtype)) s += " dashtype " + dashtype;
                 if (!NullOrEmpty(linewidth)) s += " linewidth " + linewidth;
                 if (!NullOrEmpty(linecolor)) s += " linecolor rgb \"" + linecolor + "\"";
