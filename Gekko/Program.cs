@@ -23076,6 +23076,10 @@ namespace Gekko
         {
             //Måske en SYS gnuplot til at starte et vindue op.
 
+            bool stacked = true;
+
+            //https://groups.google.com/forum/#!topic/comp.graphics.apps.gnuplot/csbgSFAbIv4
+
             //double fontsize = 12;
             double zoom = 1;
             int mirrorY = 0;  //0:none, 1:tics no labels, 2:tics and labels, 3 tics and labels and axis label
@@ -23090,8 +23094,8 @@ namespace Gekko
 
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
 
-            bool quarterFix = false;
-            if (Program.options.freq == EFreq.Quarterly || Program.options.freq == EFreq.Monthly) quarterFix = true;
+            int quarterFix = 0;
+            if (Program.options.freq == EFreq.Quarterly || Program.options.freq == EFreq.Monthly) quarterFix = 1;
 
             if (count == 0)
             {
@@ -23170,7 +23174,7 @@ namespace Gekko
                             labels1.Add(dOrig);
                             labels2.Add(d);
                             s += d + " ";
-                            if (quarterFix)
+                            if (quarterFix == 1)
                             {
                                 string[] split = d.Split(new char[] { '/' });
                                 s += FromGnuplotDatoToFloatingValue(split) + " ";
@@ -23202,7 +23206,8 @@ namespace Gekko
             double boxesMax = double.MinValue;
 
             XmlNodeList lines3 = doc.SelectNodes("gekkoplot/lines/line");
-            int numberOfBoxes = 0;
+            List<int> boxesY = new List<int>();  //hmmmm.... what if the are boxes referring both to y and y2???             
+            List<int> boxesY2 = new List<int>();
             int numberOfY2s = 0;
             for (int i = 0; i < count; i++)
             {
@@ -23212,7 +23217,15 @@ namespace Gekko
                     string linetype = GetText(line3.SelectSingleNode("linetype"));
                     if (G.equal(linetype, "boxes"))
                     {
-                        numberOfBoxes++;
+                        if (line3.SelectSingleNode("y2") != null)
+                        {
+                            boxesY2.Add(i);
+                        }
+                        else
+                        {
+                            boxesY.Add(i);
+                        }
+
                         boxesMin = Math.Min(boxesMin, dataMin[i]);
                         boxesMax = Math.Max(boxesMax, dataMax[i]);
                     }
@@ -23403,7 +23416,7 @@ namespace Gekko
 
             if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
             {
-                if (!quarterFix)
+                if (quarterFix == 0)
                 {
                     txt.AppendLine("set xdata time");
                     txt.AppendLine(@"set timefmt ""%Y/%m/%d""");
@@ -23510,14 +23523,22 @@ namespace Gekko
             }
 
             double histoGap = (int)ParseIntoDouble(boxgap);
-            if (numberOfBoxes == 1) histoGap = 0;
-            double d_width = dx / (double)(numberOfBoxes + histoGap);
+            if (boxesY.Count + boxesY2.Count == 1) histoGap = 0;
+            double d_width = dx / (double)(boxesY.Count + boxesY2.Count + histoGap);
             double d_width2 = boxwidth * d_width;
-            double left = d_width * (double)(numberOfBoxes - 1) / 2d;
+            double d_width3 = boxwidth * dx;
+            double left = d_width * (double)(boxesY.Count + boxesY2.Count - 1) / 2d;
+
+            if(boxesY.Count+boxesY2.Count > 0)
+            {
+                txt.AppendLine("f(x) = (sgn(x+1.2345e-30) + 1)/2");  //1 if x > 0, else 0. 1.2345e-30 added to avoid 0 becoming 0.5
+            }
 
             plotline += "plot ";
-            int boxesCounter = 0;                         
+            //int boxesCounter = 0;                         
 
+            int boxesYCounter = 0;
+            int boxesY2Counter = 0;
             for ( int i = 0; i < count; i++)
             {
                 XmlNode line3 = lines3[i];
@@ -23608,33 +23629,51 @@ namespace Gekko
                 string xAdjustment = null;
                 if (G.equal(linetype, "boxes"))
                 {
-                    boxesCounter++;
-                    double d = (boxesCounter - 1) * d_width - left;
-                    string minus = "+"; ;
-                    if (d < 0)
+                    if (line3.SelectSingleNode("y2") == null) boxesYCounter++;
+                    else boxesY2Counter++;
+
+                    if (stacked)
                     {
-                        d = Math.Abs(d);
-                        minus = "-";
-                    }
-                    if (quarterFix)
-                    {
-                        xAdjustment = "($2 " + minus + d + "):" + (i + 3) + ":(" + d_width2 + ")";
+                        string ss = null;
+                        if (line3.SelectSingleNode("y2") == null)
+                        {
+                            //the boxes could be i = 0, 2, 4, 5. The first of these is $1+$3+$5+$6 (note 1 added), the second is $3+$5+$6, etc.                            
+                            //the f(x) funcion return 1 if positive, else 0.
+                            //with the f function, we get: f($1*$6)*$1 + f($3*$6)*$3 + f($5*$6)*$5 + f($6*$6)*$6 --> the last f($6*$6) could be omitted since it will alway return 1
+                            for (int k = boxesYCounter - 1; k < boxesY.Count; k++)
+                            {
+                                //see similar code below
+                                ss += "f($" + (boxesY[k] + quarterFix + 2) + "*$" + (boxesY[boxesYCounter - 1] + quarterFix + 2) + ")*$" + (boxesY[k] + quarterFix + 2) + "+";
+                            }
+                        }
+                        else
+                        {
+                            //the boxes could be i = 0, 2, 4, 5. The first of these is $1+$3+$5+$6 (note 1 added), the second is $3+$5+$6, etc.
+                            for (int k = boxesY2Counter - 1; k < boxesY2.Count; k++)
+                            {                                
+                                //see similar code above
+                                ss += "f($" + (boxesY2[k] + quarterFix + 2) + "*$" + (boxesY2[boxesYCounter - 1] + quarterFix + 2) + ")*$" + (boxesY2[k] + quarterFix + 2) + "+";
+                            }
+                        }
+                        ss = ss.Substring(0, ss.Length - 1);  //remove last '+'                       
+                        xAdjustment = "" + (quarterFix + 1) + ":(" + ss + ")" + ":(" + d_width3 + ")";
                     }
                     else
                     {
-                        xAdjustment = "($1 " + minus + d + "):" + (i + 2) + ":(" + d_width2 + ")";
+                        //adjusting horizontal position for clustered boxes
+                        double d = (boxesYCounter + boxesY2Counter - 1) * d_width - left;
+                        string minus = "+"; ;
+                        if (d < 0)
+                        {
+                            d = Math.Abs(d);
+                            minus = "-";
+                        }
+                        xAdjustment = "($" + (quarterFix + 1) + " " + minus + d + "):" + (quarterFix + 2) + ":(" + d_width2 + ")";
                     }
                 }
                 else
                 {
-                    if (quarterFix)
-                    {
-                        xAdjustment = "2:" + (i + 3);
-                    }
-                    else
-                    {
-                        xAdjustment = "1:" + (i + 2);
-                    }
+                    xAdjustment = "" + (quarterFix + 1) + ":" + (quarterFix + 2);
                 }
 
                 //string xlabel = GnuplotText(label);
@@ -23816,7 +23855,7 @@ namespace Gekko
             return s.Replace(@"_", @"\\_");
         }
 
-        private static int HandleXTics(bool quarterFix, List<string> labels1, List<string> labels2, ref string ticsTxt, int mxtics)
+        private static int HandleXTics(int quarterFix, List<string> labels1, List<string> labels2, ref string ticsTxt, int mxtics)
         {
             if (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)
             {
@@ -23841,7 +23880,7 @@ namespace Gekko
                     if (subperiods.Contains(int.Parse(split[1])))
                     {
                         string xx = labels2[i];
-                        if (quarterFix)
+                        if (quarterFix == 1)
                         {
                             if (Program.options.freq == EFreq.Quarterly || Program.options.freq == EFreq.Monthly)
                             {
