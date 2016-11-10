@@ -23075,14 +23075,13 @@ namespace Gekko
         private static void CallGnuplotNew2(Table data, O.Prt o, int count, int maxLabelsLinesFound, List<string> labelsNonBroken)
         {
             //Måske en SYS gnuplot til at starte et vindue op.
-
-            bool stacked = true;
+                      
 
             //https://groups.google.com/forum/#!topic/comp.graphics.apps.gnuplot/csbgSFAbIv4
 
             //double fontsize = 12;
             double zoom = 1;
-            int mirrorY = 0;  //0:none, 1:tics no labels, 2:tics and labels, 3 tics and labels and axis label
+            //int mirrorY = 0;  //0:none, 1:tics no labels, 2:tics and labels, 3 tics and labels and axis label
                         
             string xTicsInOut = "out";  //in, out
             string yTicsInOut = "out";  //in, out
@@ -23090,7 +23089,7 @@ namespace Gekko
 
             bool arrow = false;
             
-            bool gnuplot51 = true;
+            //bool gnuplot51 = true;
 
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
 
@@ -23157,6 +23156,7 @@ namespace Gekko
             string fileData = path + "\\" + file1;
             double[] dataMax = new double[count]; for (int i = 0; i < count; i++) dataMax[i] = double.MinValue;
             double[] dataMin = new double[count]; for (int i = 0; i < count; i++) dataMin[i] = double.MaxValue;
+
             using (FileStream fs = WaitForFileStream(fileData, GekkoFileReadOrWrite.Write))
             using (StreamWriter tw = G.GekkoStreamWriter(fs))
             {
@@ -23239,7 +23239,7 @@ namespace Gekko
                 }
             }
 
-            string residuals = GetText(doc.SelectSingleNode("gekkoplot/residuals"));
+            string residuals = GetText(doc.SelectSingleNode("gekkoplot/separate"));
             string title = GetText(doc.SelectSingleNode("gekkoplot/title"));
             string subtitle = GetText(doc.SelectSingleNode("gekkoplot/subtitle"));
             string font = GetText(doc.SelectSingleNode("gekkoplot/font"), "Verdana");
@@ -23271,6 +23271,9 @@ namespace Gekko
             string y2max = GetText(doc.SelectSingleNode("gekkoplot/y2max"));
             string y2maxsoft = GetText(doc.SelectSingleNode("gekkoplot/y2maxsoft"));
             string y2maxhard = GetText(doc.SelectSingleNode("gekkoplot/y2maxhard"));
+
+            bool stacked = false;
+            if (boxstack != null && !G.equal(boxstack, "no")) stacked = true;
 
             List<string> labels = new List<string>();
             XmlNodeList nodes = doc.SelectNodes("gekkoplot/label");
@@ -23400,10 +23403,16 @@ namespace Gekko
             string set_y2range = null;
             if (isResiduals)
             {
-                double rangeLeft = linesMax - linesMin;
-                double rangeRight = boxesMax - boxesMin;
-                set_yrange = (linesMin - rangeRight) + ":" + linesMax;
-                set_y2range = boxesMin + ":" + (boxesMax + rangeLeft);
+                //double alpha = 1d;  //default:1
+                //double add = 0d;  //default:0  --> if 1, 100% of the span boxesMax-boxesMin is added to boxesMax, so that there is more separation between boxes and lines.           
+                //double boxesMax2 = add * (boxesMax - boxesMin) + boxesMax;
+                //set_yrange = (linesMin - (boxesMax2 - boxesMin)) + ":" + linesMax;
+                //set_y2range = alpha * boxesMin + ":" + (alpha * boxesMax2 + alpha * linesMax - alpha * linesMin);
+                double alpha1 = 0.05d;
+                double alpha2 = 0.05;
+                double beta = 0.30d;
+                set_yrange = (linesMin - (alpha1 + alpha2 + beta) * (linesMax - linesMin)) + ":" + linesMax;
+                set_y2range = (boxesMin - alpha2 / beta * (boxesMax - boxesMin)) + ":" + (boxesMax + (1 + alpha1) / beta * (boxesMax - boxesMin));
             }
             else
             {
@@ -23668,12 +23677,12 @@ namespace Gekko
                             d = Math.Abs(d);
                             minus = "-";
                         }
-                        xAdjustment = "($" + (quarterFix + 1) + " " + minus + d + "):" + (quarterFix + 2) + ":(" + d_width2 + ")";
+                        xAdjustment = "($" + (quarterFix + 1) + " " + minus + d + "):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
                     }
                 }
                 else
                 {
-                    xAdjustment = "" + (quarterFix + 1) + ":" + (quarterFix + 2);
+                    xAdjustment = "" + (quarterFix + 1) + ":" + (i + quarterFix + 2);
                 }
 
                 //string xlabel = GnuplotText(label);

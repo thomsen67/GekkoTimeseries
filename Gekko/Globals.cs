@@ -42,6 +42,7 @@ namespace Gekko
     {
         public static bool testFileChange = true;
 
+        public static string extensionPlot = "gpt";
         public static string extensionCommand = "gcm";
         public const string defaultCommandFileExtension = "gcm";  //merge this with the above...
         public static string extensionDatabank = "gbk";

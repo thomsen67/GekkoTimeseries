@@ -581,7 +581,9 @@ tokens {
     ASTYMAX;
     ASTYMIN;
     ASTZERO;
+	ASTXEDIT;
 
+	XEDIT = 'XEDIT';
 	IMPOSE = 'IMPOSE';
 	CONSTANT = 'CONSTANT';
 	INTERPOLATE = 'INTERPOLATE';
@@ -1036,6 +1038,7 @@ tokens {
                                 {
                                         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 										d.Add("INTERPOLATE"    ,   INTERPOLATE     );
+										d.Add("XEDIT"    ,   XEDIT     );
 										d.Add("MISSING"    ,   MISSING     );
 										d.Add("CONSTANT", CONSTANT);
 										d.Add("IMPOSE", IMPOSE);
@@ -1497,6 +1500,7 @@ expr2                     :
 						  | disp           SEMICOLON!						
 						  | doc            SEMICOLON!						
 						  | edit           SEMICOLON!
+						  | xedit          SEMICOLON!
 						  | endo           SEMICOLON!
 						  | exo            SEMICOLON!
 						  | exit           SEMICOLON!
@@ -1671,6 +1675,8 @@ dispOpt1                  : ISNOTQUAL
 dispOpt1h                 : INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
 
 edit                      : EDIT fileNameStar -> ^({token("ASTEDIT", ASTEDIT, $EDIT.Line)} ^(ASTHANDLEFILENAME fileNameStar));
+
+xedit                     : XEDIT fileNameStar -> ^({token("ASTXEDIT", ASTXEDIT, $XEDIT.Line)} ^(ASTHANDLEFILENAME fileNameStar));
 
 endo					  : ENDO listItems -> ^({token("ASTENDO", ASTENDO, $ENDO.Line)} listItems)
 						  | ENDO -> ^({token("ASTENDO", ASTENDO, $ENDO.Line)})
@@ -3303,6 +3309,7 @@ ident                     : Ident|
                             Y2MIN|
                             ZERO|
                             ZOOM|
+							XEDIT|	
                             ZVAR
 ;
 

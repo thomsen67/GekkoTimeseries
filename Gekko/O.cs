@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -4172,6 +4173,39 @@ namespace Gekko
                 if (cancel) return;
                 string zfilename = Program.CreateFullPathAndFileName(Program.AddExtension(this.fileName, "." + Globals.extensionCommand));
                 System.Diagnostics.Process.Start("notepad.exe", zfilename);
+            }
+        }
+
+        public class XEdit
+        {
+            public string fileName = null;
+            public P p = null;
+            public void Exe()
+            {
+                bool cancel = false;
+                if (this.fileName == "*")
+                {
+                    Program.SelectFile(Globals.extensionPlot, ref this.fileName, ref cancel);
+                }
+                if (cancel) return;
+                string zfilename = Program.CreateFullPathAndFileName(Program.AddExtension(this.fileName, "." + Globals.extensionPlot));
+                
+                Process p = new Process();
+                p.StartInfo.FileName = Application.StartupPath + "\\XmlNotepad\\XmlNotepad.exe";
+                //NOTE: quotes added because this path may contain blanks                
+                p.StartInfo.Arguments = Globals.QT + zfilename + Globals.QT;
+                bool msg = false;
+                bool exited = false;
+                try
+                {
+                    p.Start();                    
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("*** ERROR: There was a internal problem calling XmlNotepad." + G.NL + "ERROR: " + e.Message);
+                    throw;
+                }
+                p.Close();
             }
         }
 

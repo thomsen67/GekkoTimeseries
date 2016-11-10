@@ -2038,6 +2038,14 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
+                    case "ASTXEDIT":
+                        {
+                            node.Code.A("O.XEdit o" + Num(node) + " = new O.XEdit();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".p = p;");
+                            GetCodeFromAllChildren(node); //gets filename
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
                     case "ASTMODE":
                         {
                             node.Code.A("O.Mode o" + Num(node) + " = new O.Mode();" + G.NL);
