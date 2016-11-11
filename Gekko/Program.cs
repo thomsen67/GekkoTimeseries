@@ -23239,13 +23239,16 @@ namespace Gekko
                 }
             }
 
-            string residuals = GetText(doc.SelectSingleNode("gekkoplot/separate"));
+            // ---------------------------------------------
+            // --------- loading main section start
+            // ---------------------------------------------
+
+            string separate = GetText(doc.SelectSingleNode("gekkoplot/separate"));
             string title = GetText(doc.SelectSingleNode("gekkoplot/title"));
             string subtitle = GetText(doc.SelectSingleNode("gekkoplot/subtitle"));
             string font = GetText(doc.SelectSingleNode("gekkoplot/font"), "Verdana");
             double fontsize = ParseIntoDouble(GetText(doc.SelectSingleNode("gekkoplot/fontsize"), "12"));
-            string grid = GetText(doc.SelectSingleNode("gekkoplot/grid"));  //normally null or "" --> grid. Switch off with <grid>no</grid>            
-            //string border = GetText(doc.SelectSingleNode("gekkoplot/border"), "3");
+            string grid = GetText(doc.SelectSingleNode("gekkoplot/grid"));  //normally null or "" --> grid. Switch off with <grid>no</grid>                        
             string boxgap = GetText(doc.SelectSingleNode("gekkoplot/boxgap"), "2");
             double boxwidth = ParseIntoDouble(GetText(doc.SelectSingleNode("gekkoplot/boxwidth"), "0.75"));
             string boxstack = GetText(doc.SelectSingleNode("gekkoplot/boxstack"));
@@ -23271,6 +23274,19 @@ namespace Gekko
             string y2max = GetText(doc.SelectSingleNode("gekkoplot/y2max"));
             string y2maxsoft = GetText(doc.SelectSingleNode("gekkoplot/y2maxsoft"));
             string y2maxhard = GetText(doc.SelectSingleNode("gekkoplot/y2maxhard"));
+
+            //the options in <lines> may override this.
+            XmlNode linetypeMain = doc.SelectSingleNode("gekkoplot/linetype");
+            XmlNode dashtypeMain = doc.SelectSingleNode("gekkoplot/dashtype");
+            XmlNode linewidthMain = doc.SelectSingleNode("gekkoplot/linewidth");
+            XmlNode linecolorMain = doc.SelectSingleNode("gekkoplot/linecolor");
+            XmlNode pointtypeMain = doc.SelectSingleNode("gekkoplot/pointtype");
+            XmlNode pointsizeMain = doc.SelectSingleNode("gekkoplot/pointsize");
+            XmlNode fillstyleMain = doc.SelectSingleNode("gekkoplot/fillstyle");
+
+            // ---------------------------------------------
+            // --------- loading main section end
+            // ---------------------------------------------
 
             bool stacked = false;
             if (boxstack != null && !G.equal(boxstack, "no")) stacked = true;
@@ -23397,7 +23413,7 @@ namespace Gekko
             if (!NullOrEmpty(o.opt_title)) title2 = o.opt_title;
             if (!NullOrEmpty(title2)) txt.AppendLine("set title " + Globals.QT + EncodeDanish(GnuplotText(title2 + subtitle2)) + Globals.QT + " font '" + font + "," + (1.5d * zoom * fontsize) + "'");
 
-            bool isResiduals = residuals != null && !G.equal(residuals, "no");
+            bool isResiduals = separate != null && !G.equal(separate, "no");
 
             string set_yrange = null;
             string set_y2range = null;
@@ -23581,24 +23597,28 @@ namespace Gekko
                     labelCleaned = labelCleaned.Substring(Globals.labelCheatString.Length);
                 }
 
+                // ---------------------------------------------
+                // --------- loading lines section start
+                // ---------------------------------------------
+
                 if (line3 != null)
                 {
-                    linetype = GetText(line3.SelectSingleNode("linetype"), dlinetype);                    
-                    dashtype = GetText(line3.SelectSingleNode("dashtype"), ddashtype);
-                    linewidth = GetText(line3.SelectSingleNode("linewidth"), dlinewidth);
-                    linecolor = GetText(line3.SelectSingleNode("linecolor"), dlinecolor);
-                    pointtype = GetText(line3.SelectSingleNode("pointtype"), dpointtype);
-                    pointsize = GetText(line3.SelectSingleNode("pointsize"), dpointsize);                    
+                    linetype = GetText(line3.SelectSingleNode("linetype"), linetypeMain, dlinetype);                    
+                    dashtype = GetText(line3.SelectSingleNode("dashtype"), dashtypeMain, ddashtype);
+                    linewidth = GetText(line3.SelectSingleNode("linewidth"), linewidthMain, dlinewidth);
+                    linecolor = GetText(line3.SelectSingleNode("linecolor"), linecolorMain, dlinecolor);
+                    pointtype = GetText(line3.SelectSingleNode("pointtype"), pointtypeMain, dpointtype);
+                    pointsize = GetText(line3.SelectSingleNode("pointsize"), pointsizeMain, dpointsize);                    
                     label = HandleLabel(line3, isExplicit, labelCleaned);
-                    if (line3.SelectSingleNode("y2") != null) y2_ = "yes";
+                    if (line3.SelectSingleNode("y2") != null) y2_ = "yes";  // <-------------- 
                     if (G.equal(linetype, "boxes"))
                     {
-                        fillstyle = GetText(line3.SelectSingleNode("fillstyle"), dfillstyle);
-                        if (isResiduals) y2_ = "yes";  //set this for all boxes
+                        fillstyle = GetText(line3.SelectSingleNode("fillstyle"), fillstyleMain, dfillstyle);
+                        if (isResiduals) y2_ = "yes";  //set y for all lines, and y2 for all boxes --> this overrides other settings
                     }
                     else
                     {
-                        if (isResiduals) y2_ = "no";
+                        if (isResiduals) y2_ = "no";  //set y for all lines, and y2 for all boxes --> this overrides other settings
                     }
                 }
                 else
@@ -23612,6 +23632,11 @@ namespace Gekko
                     label = labelCleaned;
                     y2_ = dy2_;
                 }
+
+                // ---------------------------------------------
+                // --------- loading lines section end
+                // ---------------------------------------------
+
 
                 if (G.equal(linetype, "boxes") && fillstyle.Contains("solid"))
                 {
@@ -23835,17 +23860,16 @@ namespace Gekko
 
         private static string GetText(XmlNode x, string def)
         {
-            if (x == null || x.InnerText.Trim().StartsWith("//")) //the <tag>...</tag> does not exist at all, or it is commented out
-            {
-                if (def == null) return null;
-                else return def;  
-            }
-            if (x.InnerText == null || x.InnerText.Trim() == "")
-            {
-                if (def == null) return ""; //the <tag>...</tag> exists, but is empty
-                else return def;
-            }
-            return x.InnerText.Trim();           
+            return GetText(null, x, def);           
+        }
+
+        private static string GetText(XmlNode x1, XmlNode x2, string x3)
+        {
+            //it seems the xml reader auto-trims the strings
+            string s = x3;
+            if (x2 != null && !NullOrEmpty(x2.InnerText) && x2.InnerText.Trim().StartsWith("//")) s = x2.InnerText;
+            if (x1 != null && !NullOrEmpty(x1.InnerText) && x1.InnerText.StartsWith("//")) s = x1.InnerText;
+            return s;
         }
 
         private static string GetText(XmlNode x)
