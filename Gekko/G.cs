@@ -703,6 +703,24 @@ namespace Gekko
             else return false;
         }
 
+        public static double FromDateToFloating(GekkoTime gt)
+        {
+            double d = double.NaN;
+            if (gt.freq == EFreq.Annual || gt.freq == EFreq.Undated)
+            {
+                d = gt.super;
+            }
+            else if (gt.freq == EFreq.Quarterly)
+            {
+                d = (double)gt.super + (double)gt.sub / 4d;
+            }
+            else if (gt.freq == EFreq.Monthly)
+            {
+                d = (double)gt.super + (double)gt.sub / 12d;
+            }
+            return d;
+        }
+        
         public static GekkoTime FromStringToDate(string s)
         {
             return FromStringToDate(s, false);

@@ -23075,21 +23075,17 @@ namespace Gekko
         private static void CallGnuplotNew2(Table data, O.Prt o, int count, int maxLabelsLinesFound, List<string> labelsNonBroken)
         {
             //Måske en SYS gnuplot til at starte et vindue op.
-                      
+            //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
 
             //https://groups.google.com/forum/#!topic/comp.graphics.apps.gnuplot/csbgSFAbIv4
 
-            //double fontsize = 12;
             double zoom = 1;
-            //int mirrorY = 0;  //0:none, 1:tics no labels, 2:tics and labels, 3 tics and labels and axis label
-                        
+
             string xTicsInOut = "out";  //in, out
             string yTicsInOut = "out";  //in, out
             string y2TicsInOut = "out";  //in, out
 
-            bool arrow = false;
-            
-            //bool gnuplot51 = true;
+            bool arrow = true;
 
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
 
@@ -23177,7 +23173,7 @@ namespace Gekko
                             if (quarterFix == 1)
                             {
                                 string[] split = d.Split(new char[] { '/' });
-                                s += FromGnuplotDatoToFloatingValue(split) + " ";
+                                s += FromGnuplotDateToFloatingValue(split) + " ";  //why use gnuplot dates at all, we could have dates with q and m.
                             }
                         }
                         else if (i > 0 && c.cellType == CellType.Number)
@@ -23187,7 +23183,7 @@ namespace Gekko
                             if (!G.isNumericalError(d))
                             {
                                 dataMin[i - 1] = Math.Min(dataMin[i - 1], d);
-                                dataMax[i - 1] = Math.Max(dataMax[i - 1], d);                                
+                                dataMax[i - 1] = Math.Max(dataMax[i - 1], d);
                             }
                         }
                         else
@@ -23243,37 +23239,47 @@ namespace Gekko
             // --------- loading main section start
             // ---------------------------------------------
 
-            string separate = GetText(doc.SelectSingleNode("gekkoplot/separate"));
+            string size2 = GetText(doc.SelectSingleNode("gekkoplot/size"));            
             string title = GetText(doc.SelectSingleNode("gekkoplot/title"));
             string subtitle = GetText(doc.SelectSingleNode("gekkoplot/subtitle"));
             string font = GetText(doc.SelectSingleNode("gekkoplot/font"), "Verdana");
             double fontsize = ParseIntoDouble(GetText(doc.SelectSingleNode("gekkoplot/fontsize"), "12"));
+            string ticsInOut = GetText(doc.SelectSingleNode("gekkoplot/tics"), "out");
             string grid = GetText(doc.SelectSingleNode("gekkoplot/grid"));  //normally null or "" --> grid. Switch off with <grid>no</grid>                        
-            string boxgap = GetText(doc.SelectSingleNode("gekkoplot/boxgap"), "2");
-            double boxwidth = ParseIntoDouble(GetText(doc.SelectSingleNode("gekkoplot/boxwidth"), "0.75"));
-            string boxstack = GetText(doc.SelectSingleNode("gekkoplot/boxstack"));
-            string size2 = GetText(doc.SelectSingleNode("gekkoplot/size"));
             string key = GetText(doc.SelectSingleNode("gekkoplot/key"), "out horiz bot center Left reverse");
             string palette = GetText(doc.SelectSingleNode("gekkoplot/palette"), "red,web-green,web-blue,orange,dark-blue,magenta,brown4,dark-violet,grey50,black");
-            string ticsInOut = GetText(doc.SelectSingleNode("gekkoplot/tics"), "out");
+
+            string boxstack = GetText(doc.SelectSingleNode("gekkoplot/boxstack"), "no");  //default: no, #23475432985    
+            double boxwidth = ParseIntoDouble(GetText(doc.SelectSingleNode("gekkoplot/boxwidth"), "0.75"));
+            string boxgap = GetText(doc.SelectSingleNode("gekkoplot/boxgap"), "2");
+            string separate = GetText(doc.SelectSingleNode("gekkoplot/separate"), "no"); //default: no, #23475432985                        
+
+            List<string> xlines = GetText(doc.SelectNodes("gekkoplot/xline"));
+            List<string> xlinebefores = GetText(doc.SelectNodes("gekkoplot/xlinebefore"));
+            List<string> xlineafters = GetText(doc.SelectNodes("gekkoplot/xlineafter"));
+            
             string ymirror = GetText(doc.SelectSingleNode("gekkoplot/ymirror"), "0"); //y2 mirror could be either no (0), tics (1), tics+labels (2), tics+labels+axislabel (3). With grid set, the mirror is not so important.
-            string ylabel = GetText(doc.SelectSingleNode("gekkoplot/ylabel"));
-            string y2label = GetText(doc.SelectSingleNode("gekkoplot/y2label"));
-            string xzeroaxis = GetText(doc.SelectSingleNode("gekkoplot/xzeroaxis"), "yes");
-            string x2zeroaxis = GetText(doc.SelectSingleNode("gekkoplot/x2zeroaxis"), "no");
+            string ytitle = GetText(doc.SelectSingleNode("gekkoplot/ytitle"));
+            string y2title = GetText(doc.SelectSingleNode("gekkoplot/y2title"));
+            List<string> ylines = GetText(doc.SelectNodes("gekkoplot/yline"));
+            List<string> y2lines = GetText(doc.SelectNodes("gekkoplot/y2line"));
+
+            string ymax = GetText(doc.SelectSingleNode("gekkoplot/ymax"));
+            string ymaxsoft = GetText(doc.SelectSingleNode("gekkoplot/ymaxsoft"));
+            string ymaxhard = GetText(doc.SelectSingleNode("gekkoplot/ymaxhard"));
+            string y2max = GetText(doc.SelectSingleNode("gekkoplot/y2max"));
+            string y2maxsoft = GetText(doc.SelectSingleNode("gekkoplot/y2maxsoft"));
+            string y2maxhard = GetText(doc.SelectSingleNode("gekkoplot/y2maxhard"));
 
             string ymin = GetText(doc.SelectSingleNode("gekkoplot/ymin"));
             string yminsoft = GetText(doc.SelectSingleNode("gekkoplot/yminsoft"));
             string yminhard = GetText(doc.SelectSingleNode("gekkoplot/yminhard"));
-            string ymax = GetText(doc.SelectSingleNode("gekkoplot/ymax"));
-            string ymaxsoft = GetText(doc.SelectSingleNode("gekkoplot/ymaxsoft"));
-            string ymaxhard = GetText(doc.SelectSingleNode("gekkoplot/ymaxhard"));
             string y2min = GetText(doc.SelectSingleNode("gekkoplot/y2min"));
             string y2minsoft = GetText(doc.SelectSingleNode("gekkoplot/y2minsoft"));
             string y2minhard = GetText(doc.SelectSingleNode("gekkoplot/y2minhard"));
-            string y2max = GetText(doc.SelectSingleNode("gekkoplot/y2max"));
-            string y2maxsoft = GetText(doc.SelectSingleNode("gekkoplot/y2maxsoft"));
-            string y2maxhard = GetText(doc.SelectSingleNode("gekkoplot/y2maxhard"));
+            
+            string yzeroaxis = GetText(doc.SelectSingleNode("gekkoplot/yzeroaxis"), "yes");
+            string y2zeroaxis = GetText(doc.SelectSingleNode("gekkoplot/y2zeroaxis"), "no"); //default: no, #23475432985 
 
             //the options in <lines> may override this.
             XmlNode linetypeMain = doc.SelectSingleNode("gekkoplot/linetype");
@@ -23284,35 +23290,18 @@ namespace Gekko
             XmlNode pointsizeMain = doc.SelectSingleNode("gekkoplot/pointsize");
             XmlNode fillstyleMain = doc.SelectSingleNode("gekkoplot/fillstyle");
 
+            List<string> labels = GetText(doc.SelectNodes("gekkoplot/label"));
+            List<string> arrows = GetText(doc.SelectNodes("gekkoplot/arrows"));
+
             // ---------------------------------------------
             // --------- loading main section end
             // ---------------------------------------------
 
             bool stacked = false;
-            if (boxstack != null && !G.equal(boxstack, "no")) stacked = true;
 
-            List<string> labels = new List<string>();
-            XmlNodeList nodes = doc.SelectNodes("gekkoplot/label");
-            if (nodes != null)
-            {
-                foreach (XmlNode node in nodes)
-                {
-                    string s = GetText(node);
-                    if (s != null) labels.Add(s);
-                }
-            }
+            if (NotNullAndNotNo(boxstack)) stacked = true; //#23475432985
 
-            List<string> arrows = new List<string>();
-            nodes = doc.SelectNodes("gekkoplot/arrow");
-            if (nodes != null)
-            {
-                foreach (XmlNode node in nodes)
-                {
-                    string s = GetText(node);
-                    if (s != null) arrows.Add(s);
-                }
-            }
-
+            
             List<string> palette2 = null;
             if (palette != null) palette2 = new List<string>(palette.Split(','));
             if (palette2 == null || palette2.Count == 0)
@@ -23339,9 +23328,9 @@ namespace Gekko
                 }
             }
 
-            
+
             StringBuilder txt = new StringBuilder();
-            
+
 
             //string font = null;
             //if (gnuplot51) font = "Verdana";
@@ -23372,7 +23361,7 @@ namespace Gekko
             else
             {
                 fontsize = 0.75 * fontsize;
-            }                    
+            }
 
             XmlNode x = doc.SelectSingleNode("gekkoplot/x");
             if (x != null)
@@ -23385,21 +23374,7 @@ namespace Gekko
                 }
             }
 
-            XmlNode y = doc.SelectSingleNode("gekkoplot/y");
-            if (y != null)
-            {
-                //string tics = GetText(y.SelectSingleNode("/tics"), "out");
-                //if (!NullOrEmpty(tics)) tw.WriteLine("set ytics " + tics);
-            }
-
-            XmlNode y2 = doc.SelectSingleNode("gekkoplot/y2");
-            if (y2 != null)
-            {
-                //string tics = GetText(y2.SelectSingleNode("/tics"), "out");
-                //if (!NullOrEmpty(tics)) tw.WriteLine("set y2tics " + tics);
-            }
-
-            txt.AppendLine("set terminal " + pplotType + enhanced + " font '" + font + "," + (zoom * fontsize) + "'");;
+            txt.AppendLine("set terminal " + pplotType + enhanced + " font '" + font + "," + (zoom * fontsize) + "'"); ;
             txt.AppendLine("set output \"" + file2 + "\"");
             txt.AppendLine("set key " + key);
 
@@ -23413,17 +23388,12 @@ namespace Gekko
             if (!NullOrEmpty(o.opt_title)) title2 = o.opt_title;
             if (!NullOrEmpty(title2)) txt.AppendLine("set title " + Globals.QT + EncodeDanish(GnuplotText(title2 + subtitle2)) + Globals.QT + " font '" + font + "," + (1.5d * zoom * fontsize) + "'");
 
-            bool isResiduals = separate != null && !G.equal(separate, "no");
+            bool isSeparated = NotNullAndNotNo(separate);  //#23475432985
 
             string set_yrange = null;
             string set_y2range = null;
-            if (isResiduals)
-            {
-                //double alpha = 1d;  //default:1
-                //double add = 0d;  //default:0  --> if 1, 100% of the span boxesMax-boxesMin is added to boxesMax, so that there is more separation between boxes and lines.           
-                //double boxesMax2 = add * (boxesMax - boxesMin) + boxesMax;
-                //set_yrange = (linesMin - (boxesMax2 - boxesMin)) + ":" + linesMax;
-                //set_y2range = alpha * boxesMin + ":" + (alpha * boxesMax2 + alpha * linesMax - alpha * linesMin);
+            if (isSeparated)
+            {                
                 double alpha1 = 0.05d;
                 double alpha2 = 0.05;
                 double beta = 0.30d;
@@ -23465,37 +23435,37 @@ namespace Gekko
             txt.AppendLine("set tic scale 1.4, 0.7");
             txt.AppendLine("set xtics nomirror");
 
-            if (xzeroaxis != null && !isResiduals) txt.AppendLine("set xzeroaxis lt -1");  //draws x axis. May get ugly if residuals are present.
+            if (yzeroaxis != null && !isSeparated) txt.AppendLine("set xzeroaxis lt -1");  //draws x axis. May get ugly if residuals are present.
 
-            if (numberOfY2s == 0 && !isResiduals)
+            if (numberOfY2s == 0 && !isSeparated)
             {
                 //the y2 axis is just mirrored
                 if (ymirror == "0")  //nothing
                 {
                     txt.AppendLine("set ytics nomirror " + ticsInOut);
                     txt.AppendLine("set border 3");
-                    if (!NullOrEmpty(ylabel)) txt.AppendLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
+                    if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
                 }
                 else if (ymirror == "1")  //y2 axis
                 {
                     txt.AppendLine("set ytics " + ticsInOut);
                     txt.AppendLine("set border 11");
-                    if (!NullOrEmpty(ylabel)) txt.AppendLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
+                    if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
                 }
                 else if (ymirror == "2")  //y2 axis and y2 tics
                 {
                     txt.AppendLine("set ytics " + ticsInOut);
                     txt.AppendLine("set y2tics " + ticsInOut);
                     txt.AppendLine("set border 11");
-                    if (!NullOrEmpty(ylabel)) txt.AppendLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
+                    if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
                 }
                 else if (ymirror == "3")
                 {
                     txt.AppendLine("set ytics " + ticsInOut);  //y2 axis and y2 tics and y2 label
                     txt.AppendLine("set y2tics " + ticsInOut);
                     txt.AppendLine("set border 11");
-                    if (!NullOrEmpty(ylabel)) txt.AppendLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
-                    if (!NullOrEmpty(y2label)) txt.AppendLine("set y2label \"" + GnuplotText(ylabel) + "\"");
+                    if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
+                    if (!NullOrEmpty(y2title)) txt.AppendLine("set y2label \"" + GnuplotText(ytitle) + "\"");
                 }
             }
             else
@@ -23504,17 +23474,48 @@ namespace Gekko
                 txt.AppendLine("set ytics nomirror " + ticsInOut);
                 txt.AppendLine("set y2tics " + ticsInOut);
                 txt.AppendLine("set border 11");
-                if (!NullOrEmpty(ylabel)) txt.AppendLine("set ylabel \"" + GnuplotText(ylabel) + "\"");
-                if (!NullOrEmpty(y2label)) txt.AppendLine("set y2label \"" + GnuplotText(y2label) + "\"");
-                if (x2zeroaxis != null || isResiduals) txt.AppendLine("set x2zeroaxis lt -1");  //draws x axis for y2=0
+                if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
+                if (!NullOrEmpty(y2title)) txt.AppendLine("set y2label \"" + GnuplotText(y2title) + "\"");
+                if (NotNullAndNotNo(y2zeroaxis) || isSeparated) txt.AppendLine("set x2zeroaxis lt -1");  //draws x axis for y2=0, #23475432985 
+            }
+            
+            foreach(string s in xlines)
+            {                
+                GekkoTime gt = G.FromStringToDate(s);
+                double d = G.FromDateToFloating(gt);
+                txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
-            if (arrow)
+            foreach (string s in xlinebefores)
             {
-                txt.AppendLine("set arrow from 2010,graph 0 to 2010,graph 1 nohead");
+                GekkoTime gt = G.FromStringToDate(s);
+                double d = (G.FromDateToFloating(gt) + G.FromDateToFloating(gt.Add(-1))) / 2d;
+                txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
-                        
-              
+
+            foreach (string s in xlineafters)
+            {
+                GekkoTime gt = G.FromStringToDate(s);
+                double d = (G.FromDateToFloating(gt) + G.FromDateToFloating(gt.Add(1))) / 2d;
+                txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
+            }
+
+            foreach (string s in ylines)
+            {
+                GekkoTime gt = G.FromStringToDate(s);
+                double d = ParseIntoDouble(s);
+                txt.AppendLine("set arrow from graph 0, first " + d + " to graph 1, first " + d + " nohead");
+            }
+
+            foreach (string s in y2lines)
+            {
+                if (numberOfY2s > 0)  //theses lines are ignored if there is no y2 axis shown
+                {
+                    GekkoTime gt = G.FromStringToDate(s);
+                    double d = ParseIntoDouble(s);
+                    txt.AppendLine("set arrow from graph 0, second " + d + " to graph 1, second " + d + " nohead");
+                }
+            }
 
             if (!G.equal(grid, "no"))  //it can be an empty <grid/>
             {
@@ -23535,7 +23536,7 @@ namespace Gekko
                 txt.AppendLine("");
             }
 
-            string plotline = null;            
+            string plotline = null;
 
             double dx = 1d;
             if (Program.options.freq == EFreq.Quarterly)
@@ -23554,7 +23555,7 @@ namespace Gekko
             double d_width3 = boxwidth * dx;
             double left = d_width * (double)(boxesY.Count + boxesY2.Count - 1) / 2d;
 
-            if(boxesY.Count+boxesY2.Count > 0)
+            if (boxesY.Count + boxesY2.Count > 0)
             {
                 txt.AppendLine("f(x) = (sgn(x+1.2345e-30) + 1)/2");  //1 if x > 0, else 0. 1.2345e-30 added to avoid 0 becoming 0.5
             }
@@ -23564,7 +23565,7 @@ namespace Gekko
 
             int boxesYCounter = 0;
             int boxesY2Counter = 0;
-            for ( int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 XmlNode line3 = lines3[i];
 
@@ -23587,7 +23588,7 @@ namespace Gekko
                 string pointsize = null;
                 string fillstyle = null;
                 string label = null;
-                string y2_ = null;
+                string y2 = null;
 
                 bool isExplicit = false;
                 string labelCleaned = labelsNonBroken[i];
@@ -23603,22 +23604,24 @@ namespace Gekko
 
                 if (line3 != null)
                 {
-                    linetype = GetText(line3.SelectSingleNode("linetype"), linetypeMain, dlinetype);                    
+                    linetype = GetText(line3.SelectSingleNode("linetype"), linetypeMain, dlinetype);
                     dashtype = GetText(line3.SelectSingleNode("dashtype"), dashtypeMain, ddashtype);
                     linewidth = GetText(line3.SelectSingleNode("linewidth"), linewidthMain, dlinewidth);
                     linecolor = GetText(line3.SelectSingleNode("linecolor"), linecolorMain, dlinecolor);
                     pointtype = GetText(line3.SelectSingleNode("pointtype"), pointtypeMain, dpointtype);
-                    pointsize = GetText(line3.SelectSingleNode("pointsize"), pointsizeMain, dpointsize);                    
+                    pointsize = GetText(line3.SelectSingleNode("pointsize"), pointsizeMain, dpointsize);
+                    fillstyle = GetText(line3.SelectSingleNode("fillstyle"), fillstyleMain, dfillstyle);
                     label = HandleLabel(line3, isExplicit, labelCleaned);
-                    if (line3.SelectSingleNode("y2") != null) y2_ = "yes";  // <-------------- 
+                    y2 = GetText(line3.SelectSingleNode("y2"), "no"); //default: no, #23475432985
+                    
                     if (G.equal(linetype, "boxes"))
                     {
-                        fillstyle = GetText(line3.SelectSingleNode("fillstyle"), fillstyleMain, dfillstyle);
-                        if (isResiduals) y2_ = "yes";  //set y for all lines, and y2 for all boxes --> this overrides other settings
+                        if (isSeparated) y2 = "yes";  //set y for all lines, and y2 for all boxes --> this overrides other settings
                     }
                     else
                     {
-                        if (isResiduals) y2_ = "no";  //set y for all lines, and y2 for all boxes --> this overrides other settings
+                        fillstyle = null;  //fillstyle will fail if combined with other line types.
+                        if (isSeparated) y2 = "no";  //set y for all lines, and y2 for all boxes --> this overrides other settings
                     }
                 }
                 else
@@ -23630,7 +23633,7 @@ namespace Gekko
                     pointtype = dpointtype;
                     pointsize = dpointsize;
                     label = labelCleaned;
-                    y2_ = dy2_;
+                    y2 = dy2_;
                 }
 
                 // ---------------------------------------------
@@ -23646,8 +23649,18 @@ namespace Gekko
                 label = GnuplotText(label);
 
                 string s = null;
-                if (!NullOrEmpty(linetype)) s += " with " + linetype;
-                if (y2_ != null && !G.equal(y2_, "no")) s += " axes x1y2";
+                if (!NullOrEmpty(linetype))
+                {
+                    if (G.equal(linetype, "filledcurve") || G.equal(linetype, "filledcurves"))
+                    {
+                        s += " with " + linetype + " y1=0";  //so the area is towards the x-axis
+                    }
+                    else
+                    {
+                        s += " with " + linetype;
+                    }
+                }
+                if (NotNullAndNotNo(y2)) s += " axes x1y2";  //#23475432985
                 if (!NullOrEmpty(dashtype)) s += " dashtype " + dashtype;
                 if (!NullOrEmpty(linewidth)) s += " linewidth " + linewidth;
                 if (!NullOrEmpty(linecolor)) s += " linecolor rgb \"" + linecolor + "\"";
@@ -23684,7 +23697,7 @@ namespace Gekko
                         {
                             //the boxes could be i = 0, 2, 4, 5. The first of these is $1+$3+$5+$6 (note 1 added), the second is $3+$5+$6, etc.
                             for (int k = boxesY2Counter - 1; k < boxesY2.Count; k++)
-                            {                                
+                            {
                                 //see similar code above
                                 ss += "f($" + (boxesY2[k] + quarterFix + 2) + "*$" + (boxesY2[boxesYCounter - 1] + quarterFix + 2) + ")*$" + (boxesY2[k] + quarterFix + 2) + "+";
                             }
@@ -23841,6 +23854,12 @@ namespace Gekko
             }
         }
 
+        private static bool NotNullAndNotNo(string s)
+        {
+            //#23475432985
+            return s != null && !G.equal(s, "no");
+        }
+
         private static string HandleLabel(XmlNode line3, bool isExplicit, string labelCleaned)
         {
             string label;
@@ -23866,10 +23885,51 @@ namespace Gekko
         private static string GetText(XmlNode x1, XmlNode x2, string x3)
         {
             //it seems the xml reader auto-trims the strings
-            string s = x3;
-            if (x2 != null && !NullOrEmpty(x2.InnerText) && x2.InnerText.Trim().StartsWith("//")) s = x2.InnerText;
-            if (x1 != null && !NullOrEmpty(x1.InnerText) && x1.InnerText.StartsWith("//")) s = x1.InnerText;
+            string s = x3; //maybe null, "", or a real string
+
+            if(x2 != null)
+            {
+                if (x2.InnerText.StartsWith("//"))
+                {
+                    //do nothing, as if the tag does not even exist
+                }
+                else 
+                {
+                    s = x2.InnerText;  //if <tag></tag> or <tag/>, s will be = "". We say that this overrides prior settings.                
+                }
+            }
+            else
+            {
+                //do nothing: the tag does not exist
+            }
+
+            if (x1 != null)
+            {
+                if (x1.InnerText.StartsWith("//"))
+                {
+                    //do nothing, as if the tag does not even exist
+                }
+                else
+                {
+                    s = x1.InnerText;  //if <tag></tag> or <tag/>, s will be = "". We say that this overrides prior settings.                
+                }
+            }
+            else
+            {
+                //do nothing: the tag does not exist
+            }
+
             return s;
+        }
+
+        private static List<string> GetText(XmlNodeList x)
+        {
+            List<string> ss = new List<string>();
+            foreach(XmlNode y in x)
+            {
+                ss.Add(GetText(y));
+            }
+            return ss;
         }
 
         private static string GetText(XmlNode x)
@@ -23917,7 +23977,7 @@ namespace Gekko
                         {
                             if (Program.options.freq == EFreq.Quarterly || Program.options.freq == EFreq.Monthly)
                             {
-                                xx = FromGnuplotDatoToFloatingValue(split);
+                                xx = FromGnuplotDateToFloatingValue(split);
                             }
                         }
                         s3 += "\"" + labels1[i] + "\" \"" + xx + "\", ";
@@ -23930,7 +23990,7 @@ namespace Gekko
             return mxtics;
         }
 
-        private static string FromGnuplotDatoToFloatingValue(string[] split)
+        private static string FromGnuplotDateToFloatingValue(string[] split)
         {
             return ((double)int.Parse(split[0]) + ((double)int.Parse(split[1]) - 1d) / 12d).ToString();
         }
