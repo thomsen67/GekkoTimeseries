@@ -307,6 +307,50 @@ namespace Gekko.Parser.Gek
                             }                            
                         }
                         break;
+
+
+                    case "ASTLINESPOINTS":
+                        {
+                            node.Code.CA("new ScalarString(`linespoints`)");
+                        }
+                        break;
+                    case "ASTBOXES":
+                        {
+                            node.Code.CA("new ScalarString(`boxes`)");
+                        }
+                        break;
+                    case "ASTLINES":
+                        {
+                            node.Code.CA("new ScalarString(`lines`)");
+                        }
+                        break;
+                    case "ASTFILLEDCURVES":
+                        {
+                            node.Code.CA("new ScalarString(`filledcurves`)");
+                        }
+                        break;
+                    case "ASTSTEPS":
+                        {
+                            node.Code.CA("new ScalarString(`steps`)");
+                        }
+                        break;
+                    case "ASTPOINTS":
+                        {
+                            node.Code.CA("new ScalarString(`points`)");
+                        }
+                        break;
+                    case "ASTDOTS":
+                        {
+                            node.Code.CA("new ScalarString(`dots`)");
+                        }
+                        break;
+                    case "ASTIMPULSES":
+                        {
+                            node.Code.CA("new ScalarString(`impulses`)");
+                        }
+                        break;
+
+
                     case "ASTAPPEND":
                         {
                             node.Code.CA("new ScalarString(`append`)");

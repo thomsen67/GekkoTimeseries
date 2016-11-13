@@ -23271,11 +23271,11 @@ namespace Gekko
             string separate = GetText(null, o.opt_separate, null, doc.SelectSingleNode("gekkoplot/separate"), "no"); //default: no, #23475432985                        
 
             List<string> xlines = GetText(doc.SelectNodes("gekkoplot/xline"));
-            if (!NullOrEmpty(o.opt_xline)) xlines.Add(o.opt_xline);
+            if (!o.opt_xline.IsNull()) xlines.Add(o.opt_xline.ToString());
             List<string> xlinebefores = GetText(doc.SelectNodes("gekkoplot/xlinebefore"));
-            if (!NullOrEmpty(o.opt_xlinebefore)) xlinebefores.Add(o.opt_xlinebefore);
+            if (!o.opt_xlinebefore.IsNull()) xlinebefores.Add(o.opt_xlinebefore.ToString());
             List<string> xlineafters = GetText(doc.SelectNodes("gekkoplot/xlineafter"));
-            if (!NullOrEmpty(o.opt_xlineafter)) xlineafters.Add(o.opt_xlineafter);
+            if (!o.opt_xlineafter.IsNull()) xlineafters.Add(o.opt_xlineafter.ToString());
 
             string ymirror = GetText(null, o.opt_ymirror, null, doc.SelectSingleNode("gekkoplot/ymirror"), "0"); //y2 mirror could be either no (0), tics (1), tics+labels (2), tics+labels+axislabel (3). With grid set, the mirror is not so important.
             string ytitle = GetText(null, o.opt_ytitle, null, doc.SelectSingleNode("gekkoplot/ytitle"), null);
@@ -23642,10 +23642,10 @@ namespace Gekko
 
                 linetype = GetText(linetypes[i], o.opt_linetype, line3 == null ? null : line3.SelectSingleNode("linetype"), linetypeMain, dlinetype);
                 dashtype = GetText(dashtypes[i], o.opt_dashtype, line3 == null ? null : line3.SelectSingleNode("dashtype"), dashtypeMain, ddashtype);
-                linewidth = GetText(linewidths[i], o.opt_linewidth, line3 == null ? null : line3.SelectSingleNode("linewidth"), linewidthMain, dlinewidth);
+                linewidth = GetText(linewidths[i], G.isNumericalError(o.opt_linewidth) ? null : o.opt_linewidth.ToString(), line3 == null ? null : line3.SelectSingleNode("linewidth"), linewidthMain, dlinewidth);
                 linecolor = GetText(linecolors[i], o.opt_linecolor, line3 == null ? null : line3.SelectSingleNode("linecolor"), linecolorMain, dlinecolor);
                 pointtype = GetText(pointtypes[i], o.opt_pointtype, line3 == null ? null : line3.SelectSingleNode("pointtype"), pointtypeMain, dpointtype);
-                pointsize = GetText(pointsizes[i], o.opt_pointsize, line3 == null ? null : line3.SelectSingleNode("pointsize"), pointsizeMain, dpointsize);
+                pointsize = GetText(pointsizes[i], G.isNumericalError(o.opt_pointsize) ? null : o.opt_pointsize.ToString(), line3 == null ? null : line3.SelectSingleNode("pointsize"), pointsizeMain, dpointsize);
                 fillstyle = GetText(fillstyles[i], o.opt_fillstyle, line3 == null ? null : line3.SelectSingleNode("fillstyle"), fillstyleMain, dfillstyle);
                 y2 = GetText(y2s[i], null, line3 == null ? null : line3.SelectSingleNode("y2"), null, "no"); //default: no, #23475432985
                 label = HandleLabel(line3, isExplicit, labelCleaned);

@@ -54,6 +54,14 @@ options {
 
 //Token definitions I
 tokens {
+    ASTLINESPOINTS;
+	ASTLINES;
+	ASTBOXES;
+	ASTFILLEDCURVES;
+	ASTSTEPS;
+	ASTPOINTS;
+	ASTDOTS;
+	ASTIMPULSES;
     ASTLIBRARY;
 	ASTIMPOSE;
 	ASTNAMEHELPER;
@@ -341,9 +349,9 @@ ASTOPT_STRING_STACK;
 ASTOPT_STRING_BOXWIDTH;
 ASTOPT_STRING_BOXGAP;
 ASTOPT_STRING_SEPARATE;
-ASTOPT_STRING_XLINE;
-ASTOPT_STRING_XLINEBEFORE;
-ASTOPT_STRING_XLINEAFTER;
+ASTOPT_DATE_XLINE;
+ASTOPT_DATE_XLINEBEFORE;
+ASTOPT_DATE_XLINEAFTER;
 ASTOPT_STRING_YMIRROR;
 ASTOPT_STRING_YTITLE;
 ASTOPT_VAL_YLINE;
@@ -367,10 +375,10 @@ ASTOPT_STRING_LABEL;
 ASTOPT_STRING_ARROW;
 ASTOPT_STRING_LINETYPE;
 ASTOPT_STRING_DASHTYPE;
-ASTOPT_STRING_LINEWIDTH;
+ASTOPT_VAL_LINEWIDTH;
 ASTOPT_STRING_LINECOLOR;
 ASTOPT_STRING_POINTTYPE;
-ASTOPT_STRING_POINTSIZE;
+ASTOPT_VAL_POINTSIZE;
 ASTOPT_STRING_FILLSTYLE;
 ASTOPT_STRING_LABEL;
 ASTOPT_STRING_Y2;
@@ -646,6 +654,14 @@ ASTOPT_STRING_Y2;
     ASTZERO;
 	ASTXEDIT;
 
+	LINESPOINTS = 'LINESPOINTS';
+//LINES = 'LINES';
+			BOXES = 'BOXES';
+		FILLEDCURVES = 'FILLEDCURVES';
+		STEPS = 'STEPS';
+		//POINTS = 'POINTS';
+		DOTS = 'DOTS';
+		IMPULSES = 'IMPULSES';
 SIZE                  = 'SIZE'                     ;
 //TITLE                 = 'TITLE'                    ;
 SUBTITLE              = 'SUBTITLE'                 ;
@@ -1149,6 +1165,14 @@ Y2                    = 'Y2'                       ;
                                 {
                                         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 										
+		d.Add("LINESPOINTS" ,LINESPOINTS);
+//d.Add("LINES" , LINES);
+			d.Add("BOXES" , BOXES);
+		d.Add("FILLEDCURVES" , FILLEDCURVES);
+		d.Add("STEPS" , STEPS);
+		//d.Add("POINTS" , POINTS);
+		d.Add("DOTS" , DOTS);
+		d.Add("IMPULSES" , IMPULSES);
 										d.Add("SIZE",SIZE);
 										//d.Add("TITLE",TITLE);
 										d.Add("SUBTITLE",SUBTITLE);
@@ -2052,28 +2076,29 @@ prtOpt1Helper             : filter
 						  | DATES (EQUAL yesNo)? -> ^(ASTOPT_STRING_DATES yesNo?)						  
 						  | DUMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_DUMP yesNo?)
 						  | FONT '=' expression -> ^(ASTOPT_STRING_FONT expression)  //PLOT
-						  | FONTSIZE '=' expression -> ^(ASTOPT_STRING_FONTSIZE expression)  //PLOT
-						  | GRID '=' expression -> ^(ASTOPT_STRING_GRID expression)  //PLOT
+						  | FONTSIZE '=' expression -> ^(ASTOPT_STRING_FONTSIZE expression)  //PLOT						  
+						  | GRID (EQUAL yesNo)? -> ^(ASTOPT_STRING_GRID yesNo?)
 						  | HEADING '=' expression -> ^(ASTOPT_STRING_TITLE expression)
 						  | KEY '=' expression -> ^(ASTOPT_STRING_KEY expression)  //PLOT
 						  | TITLE '=' expression -> ^(ASTOPT_STRING_TITLE expression)
 						  | NAMES (EQUAL yesNo)? -> ^(ASTOPT_STRING_NAMES yesNo?)	
 						  | PALETTE '=' expression -> ^(ASTOPT_STRING_PALETTE expression)  //PLOT					  
 						  | PLOTCODE '=' expression -> ^(ASTOPT_STRING_PLOTCODE expression)
-						  | ROWS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ROWS yesNo?)
-						  | SEPARATE '=' expression -> ^(ASTOPT_STRING_SEPARATE expression)  //PLOT
+						  | ROWS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ROWS yesNo?)						  
+						  | SEPARATE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SEPARATE yesNo?)  //PLOT
 						  | SHEET '=' expression -> ^(ASTOPT_STRING_SHEET expression)
 						  | SIZE '=' expression -> ^(ASTOPT_STRING_SIZE expression)  //PLOT
-						  | STACK '=' expression -> ^(ASTOPT_STRING_STACK expression)  //PLOT
+						  
+						  | STACK (EQUAL yesNo)? -> ^(ASTOPT_STRING_STACK yesNo?)  //PLOT
 						  | STAMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STAMP yesNo?)	
 						  | SUBTITLE '=' expression -> ^(ASTOPT_STRING_SUBTITLE expression)	  //PLOT	
 						  | TICS '=' expression -> ^(ASTOPT_STRING_TICS expression)  //PLOT			  
 						  | USING EQUAL fileNameStar -> ^(ASTOPT_STRING_USING fileNameStar)		
-						  | XLINE '=' expression -> ^(ASTOPT_STRING_XLINE expression)  //PLOT	
-						  | XLINEBEFORE '=' expression -> ^(ASTOPT_STRING_XLINEBEFORE expression)  //PLOT	
-						  | XLINEAFTER '=' expression -> ^(ASTOPT_STRING_XLINEAFTER expression)  //PLOT	
+						  | XLINE '=' expression -> ^(ASTOPT_DATE_XLINE expression)  //PLOT	
+						  | XLINEBEFORE '=' expression -> ^(ASTOPT_DATE_XLINEBEFORE expression)  //PLOT	
+						  | XLINEAFTER '=' expression -> ^(ASTOPT_DATE_XLINEAFTER expression)  //PLOT							  						  
+						  | Y2ZEROAXIS (EQUAL yesNo)? -> ^(ASTOPT_STRING_Y2ZEROAXIS yesNo?)
 
-						  | Y2ZEROAXIS EQUAL expression -> ^(ASTOPT_STRING_Y2ZEROAXIS expression)  //PLOT
 						  | Y2LINE EQUAL expression -> ^(ASTOPT_VAL_Y2LINE expression)  //PLOT						  
 						  | Y2MAX EQUAL expression -> ^(ASTOPT_VAL_Y2MAX expression)  //PLOT	
 						  | Y2MIN EQUAL expression -> ^(ASTOPT_VAL_Y2MIN expression)  //PLOT	
@@ -2082,7 +2107,7 @@ prtOpt1Helper             : filter
 						  | Y2MAXSOFT EQUAL expression -> ^(ASTOPT_VAL_Y2MAXSOFT expression)  //PLOT	
 						  | Y2MINSOFT EQUAL expression -> ^(ASTOPT_VAL_Y2MINSOFT expression)  //PLOT	
 
-						  | YZEROAXIS EQUAL expression -> ^(ASTOPT_STRING_YZEROAXIS expression)  //PLOT						  						  				
+						  | YZEROAXIS (EQUAL yesNo)? -> ^(ASTOPT_STRING_YZEROAXIS yesNo?)		  						  				
 						  | YLINE EQUAL expression -> ^(ASTOPT_VAL_YLINE expression)  //PLOT
 						  | YMAX EQUAL expression -> ^(ASTOPT_VAL_YMAX expression)  //PLOT	
 						  | YMIN EQUAL expression -> ^(ASTOPT_VAL_YMIN expression)  //PLOT	
@@ -2094,15 +2119,24 @@ prtOpt1Helper             : filter
 						  | YTITLE EQUAL expression -> ^(ASTOPT_STRING_YTITLE expression)  //PLOT
 						  | Y2TITLE EQUAL expression -> ^(ASTOPT_STRING_Y2TITLE expression)  //PLOT
 						  
-						  | LINETYPE '=' expression -> ^(ASTOPT_STRING_LINETYPE expression)
+						  | LINETYPE '=' linetypeHelper -> ^(ASTOPT_STRING_LINETYPE linetypeHelper)
 						  | DASHTYPE '=' expression -> ^(ASTOPT_STRING_DASHTYPE expression)
-						  | LINEWIDTH '=' expression -> ^(ASTOPT_STRING_LINEWIDTH expression)
+						  | LINEWIDTH '=' expression -> ^(ASTOPT_VAL_LINEWIDTH expression)
 						  | LINECOLOR '=' expression -> ^(ASTOPT_STRING_LINECOLOR expression)
 						  | POINTTYPE '=' expression -> ^(ASTOPT_STRING_POINTTYPE expression)
-						  | POINTSIZE '=' expression -> ^(ASTOPT_STRING_POINTSIZE expression)
-						  | FILLSTYLE '=' expression -> ^(ASTOPT_STRING_FILLSTYLE expression)
-						  | Y2 '=' expression -> ^(ASTOPT_STRING_Y2 expression)
-
+						  | POINTSIZE '=' expression -> ^(ASTOPT_VAL_POINTSIZE expression)
+						  | FILLSTYLE '=' expression -> ^(ASTOPT_STRING_FILLSTYLE expression)						  
+						  | Y2 (EQUAL yesNo)? -> ^(ASTOPT_STRING_Y2 yesNo?)
+						  ;
+linetypeHelper            : LINESPOINTS -> ASTLINESPOINTS
+						  | LINES -> ASTLINES
+						  | BOXES -> ASTBOXES
+						  | FILLEDCURVES -> ASTFILLEDCURVES
+						  | STEPS -> ASTSTEPS
+						  | POINTS -> ASTPOINTS
+						  | DOTS -> ASTDOTS
+						  | IMPULSES -> ASTIMPULSES
+						  | expression
 						  ;
 prtOpt2                   : prtOpt2Helper+ -> ^(ASTOPT2 prtOpt2Helper+);
 prtOpt2Helper             : FILE '=' fileName -> ^(ASTOPT_STRING_FILENAME fileName)
@@ -3122,6 +3156,14 @@ integerNegative           : MINUS integer -> ^(ASTINTEGERNEGATIVE integer);
 doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 
 ident                     : Ident|
+                            LINESPOINTS|
+							//LINES|
+							BOXES|
+							FILLEDCURVES|
+							STEPS|
+							//POINTS|
+							DOTS|
+							IMPULSES|
 							SIZE|
 							//TITLE|
 							SUBTITLE|

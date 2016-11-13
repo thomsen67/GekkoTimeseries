@@ -3897,7 +3897,7 @@ namespace Gekko
 
             public string opt_size = null;
             public string opt_font = null;
-            public string opt_fontsize = null;
+            public string opt_fontsize = null;   //========> double
             public string opt_tics = null;
             public string opt_grid = null;
             public string opt_key = null;
@@ -3906,9 +3906,9 @@ namespace Gekko
             public string opt_boxwidth = null;
             public string opt_boxgap = null;
             public string opt_separate = null;
-            public string opt_xline = null;
-            public string opt_xlinebefore = null;
-            public string opt_xlineafter = null;
+            public GekkoTime opt_xline = Globals.tNull;
+            public GekkoTime opt_xlinebefore = Globals.tNull;
+            public GekkoTime opt_xlineafter = Globals.tNull;
             public string opt_ymirror = null;
             public string opt_ytitle = null;
             public string opt_y2title = null;
@@ -3929,10 +3929,10 @@ namespace Gekko
 
             public string opt_linetype = null;
             public string opt_dashtype = null;
-            public string opt_linewidth = null;
+            public double opt_linewidth = double.NaN;
             public string opt_linecolor = null;
             public string opt_pointtype = null;
-            public string opt_pointsize = null;
+            public double opt_pointsize = double.NaN;
             public string opt_fillstyle = null;
             
             
