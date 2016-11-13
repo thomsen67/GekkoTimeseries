@@ -23196,67 +23196,67 @@ namespace Gekko
                 }
             }
 
-            double linesMin = double.MaxValue;
-            double linesMax = double.MinValue;
-            double boxesMin = double.MaxValue;
-            double boxesMax = double.MinValue;
-            double areasMin = double.MaxValue;
-            double areasMax = double.MinValue;
+            //double linesMin = double.MaxValue;
+            //double linesMax = double.MinValue;
+            //double boxesMin = double.MaxValue;
+            //double boxesMax = double.MinValue;
+            //double areasMin = double.MaxValue;
+            //double areasMax = double.MinValue;
 
             XmlNodeList lines3 = doc.SelectNodes("gekkoplot/lines/line");
-            List<int> boxesY = new List<int>();
-            List<int> boxesY2 = new List<int>();
-            List<int> areasY = new List<int>();
-            List<int> areasY2 = new List<int>();
-            int numberOfY2s = 0;
-            for (int i = 0; i < count; i++)
-            {
-                XmlNode line3 = lines3[i];
-                if (line3 != null)
-                {
-                    string linetype = GetText(line3.SelectSingleNode("linetype"));
-                    if (G.equal(linetype, "boxes"))
-                    {
-                        if (line3.SelectSingleNode("y2") != null)
-                        {
-                            boxesY2.Add(i);
-                        }
-                        else
-                        {
-                            boxesY.Add(i);
-                        }
+        
 
-                        boxesMin = Math.Min(boxesMin, dataMin[i]);
-                        boxesMax = Math.Max(boxesMax, dataMax[i]);
-                    }
-                    if (G.equal(linetype, "filledcurve") || G.equal(linetype, "filledcurves"))
-                    {
-                        if (line3.SelectSingleNode("y2") != null)
-                        {
-                            areasY2.Add(i);
-                        }
-                        else
-                        {
-                            areasY.Add(i);
-                        }
-                        areasMin = Math.Min(areasMin, dataMin[i]);
-                        areasMax = Math.Max(areasMax, dataMax[i]);
-                    }
-                    else
-                    {
-                        linesMin = Math.Min(linesMin, dataMin[i]);
-                        linesMax = Math.Max(linesMax, dataMax[i]);
-                    }
-                    string lineY2 = GetText(line3.SelectSingleNode("y2"));
-                    if (lineY2 != null) numberOfY2s++;
-                }
-            }
+            //for (int i = 0; i < count; i++)
+            //{
+            //    XmlNode line3 = lines3[i];
+            //    string linetype = "linespoints";
+            //    if (!NullOrEmpty(o.opt_linetype)) linetype = o.opt_linetype;
+            //    string s = GetText(line3.SelectSingleNode("linetype"));
+            //    if (!NullOrEmpty(s)) linetype = s;
+
+
+            //    if (G.equal(linetype, "boxes"))
+            //    {
+            //        if (line3.SelectSingleNode("y2") != null)
+            //        {
+            //            boxesY2.Add(i);
+            //        }
+            //        else
+            //        {
+            //            boxesY.Add(i);
+            //        }
+
+            //        boxesMin = Math.Min(boxesMin, dataMin[i]);
+            //        boxesMax = Math.Max(boxesMax, dataMax[i]);
+            //    }
+            //    if (G.equal(linetype, "filledcurve") || G.equal(linetype, "filledcurves"))
+            //    {
+            //        if (line3.SelectSingleNode("y2") != null)
+            //        {
+            //            areasY2.Add(i);
+            //        }
+            //        else
+            //        {
+            //            areasY.Add(i);
+            //        }
+            //        areasMin = Math.Min(areasMin, dataMin[i]);
+            //        areasMax = Math.Max(areasMax, dataMax[i]);
+            //    }
+            //    else
+            //    {
+            //        linesMin = Math.Min(linesMin, dataMin[i]);
+            //        linesMax = Math.Max(linesMax, dataMax[i]);
+            //    }
+            //    string lineY2 = GetText(line3.SelectSingleNode("y2"));
+            //    if (lineY2 != null) numberOfY2s++;
+
+            //}
 
             // ---------------------------------------------
             // --------- loading main section start
             // ---------------------------------------------
 
-            string size2 = GetText(null, o.opt_size, null, doc.SelectSingleNode("gekkoplot/size"), null);           
+            string size2 = GetText(null, o.opt_size, null, doc.SelectSingleNode("gekkoplot/size"), null);
             string title = GetText(null, o.opt_title, null, doc.SelectSingleNode("gekkoplot/title"), null);
             string subtitle = GetText(null, o.opt_subtitle, null, doc.SelectSingleNode("gekkoplot/subtitle"), null);
             string font = GetText(null, o.opt_font, null, doc.SelectSingleNode("gekkoplot/font"), "Verdana");
@@ -23298,7 +23298,7 @@ namespace Gekko
             string y2min = GetText(null, o.opt_y2min.ToString(), null, doc.SelectSingleNode("gekkoplot/y2min"), null);
             string y2minsoft = GetText(null, o.opt_y2minsoft.ToString(), null, doc.SelectSingleNode("gekkoplot/y2minsoft"), null);
             string y2minhard = GetText(null, o.opt_y2minhard.ToString(), null, doc.SelectSingleNode("gekkoplot/y2minhard"), null);
-                        
+
             string yzeroaxis = GetText(null, o.opt_yzeroaxis, null, doc.SelectSingleNode("gekkoplot/yzeroaxis"), "yes");
             string y2zeroaxis = GetText(null, o.opt_y2zeroaxis, null, doc.SelectSingleNode("gekkoplot/y2zeroaxis"), "no"); //default: no, #23475432985 
 
@@ -23320,7 +23320,7 @@ namespace Gekko
 
             bool stacked = false;
             if (NotNullAndNotNo(stack)) stacked = true; //#23475432985
-            
+
             List<string> palette2 = null;
             if (palette != null) palette2 = new List<string>(palette.Split(','));
             if (palette2 == null || palette2.Count == 0)
@@ -23346,8 +23346,57 @@ namespace Gekko
                 }
             }
 
-            StringBuilder txt = new StringBuilder();
+            bool isSeparated = NotNullAndNotNo(separate);  //#23475432985
+
+            List<string> linetypes = new List<string>();
+            List<string> dashtypes = new List<string>();
+            List<string> linewidths = new List<string>();
+            List<string> linecolors = new List<string>();
+            List<string> pointtypes = new List<string>();
+            List<string> pointsizes = new List<string>();
+            List<string> fillstyles = new List<string>();
+            List<string> y2s = new List<string>();
+            foreach (O.Prt.Element pe in o.prtElements)  //varI 0-based
+            {
+                foreach (O.Prt.SubElement subPe in pe.subElements)
+                {
+                    linetypes.Add(pe.linetype);
+                    dashtypes.Add(pe.dashtype);
+                    linewidths.Add(pe.linewidth);
+                    linecolors.Add(pe.linecolor);
+                    pointtypes.Add(pe.pointtype);
+                    pointsizes.Add(pe.pointsize);
+                    fillstyles.Add(pe.fillstyle);
+                    y2s.Add(pe.y2);
+                }
+            }
+
+
+            List<int> boxesY = new List<int>();
+            List<int> boxesY2 = new List<int>();
+            List<int> areasY = new List<int>();
+            List<int> areasY2 = new List<int>();
+
+            int numberOfY2s = 0; //not used in first pass, but gathered
+            double histoGap = double.NaN;  //not used in first pass
+            double d_width = double.NaN;  //not used in first pass
+            double d_width2 = double.NaN;  //not used in first pass
+            double d_width3 = double.NaN;  //not used in first pass
+            double left = double.NaN;  //not used in first pass
+            double[] minMax = new double[6]; minMax[0] = double.MaxValue; minMax[1] = double.MinValue; minMax[2] = double.MaxValue; minMax[3] = double.MinValue; minMax[4] = double.MaxValue; minMax[5] = double.MinValue;
+            // ---------------------------------------
+            // ---------------------------------------
+            //          FIRST PASS
+            //       first pass just counts
+            //       boxes, filledcurves, and
+            //       a few other things.
+            // ---------------------------------------
+            // ---------------------------------------
             
+            string discard = PlotHandleLines(true, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, quarterFix, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, linetypes, dashtypes, linewidths, linecolors, pointtypes, pointsizes, fillstyles, y2s);
+            
+            StringBuilder txt = new StringBuilder();
+
             txt.AppendLine("set size " + zoom + "," + zoom + "");
             txt.AppendLine("set encoding iso_8859_1");
             txt.AppendLine("set format y " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
@@ -23402,17 +23451,17 @@ namespace Gekko
             if (!NullOrEmpty(o.opt_title)) title2 = o.opt_title;
             if (!NullOrEmpty(title2)) txt.AppendLine("set title " + Globals.QT + EncodeDanish(GnuplotText(title2 + subtitle2)) + Globals.QT + " font '" + font + "," + (1.5d * zoom * fontsize) + "'");
 
-            bool isSeparated = NotNullAndNotNo(separate);  //#23475432985
-
             string set_yrange = null;
             string set_y2range = null;
             if (isSeparated)
-            {                
+            {
                 double alpha1 = 0.05d;
                 double alpha2 = 0.05;
                 double beta = 0.30d;
-                set_yrange = (linesMin - (alpha1 + alpha2 + beta) * (linesMax - linesMin)) + ":" + linesMax;
-                set_y2range = (boxesMin - alpha2 / beta * (boxesMax - boxesMin)) + ":" + (boxesMax + (1 + alpha1) / beta * (boxesMax - boxesMin));
+                //linesMin=4, linesmMax=5
+                //boxesMin=0, boxesMax=1
+                set_yrange = (minMax[4] - (alpha1 + alpha2 + beta) * (minMax[5] - minMax[4])) + ":" + minMax[5];
+                set_y2range = (minMax[0] - alpha2 / beta * (minMax[1] - minMax[0])) + ":" + (minMax[1] + (1 + alpha1) / beta * (minMax[1] - minMax[0]));
             }
             else
             {
@@ -23492,9 +23541,9 @@ namespace Gekko
                 if (!NullOrEmpty(y2title)) txt.AppendLine("set y2label \"" + GnuplotText(y2title) + "\"");
                 if (NotNullAndNotNo(y2zeroaxis) || isSeparated) txt.AppendLine("set x2zeroaxis lt -1");  //draws x axis for y2=0, #23475432985 
             }
-            
-            foreach(string s in xlines)
-            {                
+
+            foreach (string s in xlines)
+            {
                 GekkoTime gt = G.FromStringToDate(s);
                 double d = G.FromDateToFloating(gt);
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
@@ -23515,7 +23564,7 @@ namespace Gekko
             }
 
             foreach (string s in ylines)
-            {                
+            {
                 double d = ParseIntoDouble(s);
                 if (!G.isNumericalError(d)) txt.AppendLine("set arrow from graph 0, first " + d + " to graph 1, first " + d + " nohead");
             }
@@ -23523,7 +23572,7 @@ namespace Gekko
             foreach (string s in y2lines)
             {
                 if (numberOfY2s > 0)  //theses lines are ignored if there is no y2 axis shown
-                {                    
+                {
                     double d = ParseIntoDouble(s);
                     if (!G.isNumericalError(d)) txt.AppendLine("set arrow from graph 0, second " + d + " to graph 1, second " + d + " nohead");
                 }
@@ -23548,7 +23597,7 @@ namespace Gekko
                 txt.AppendLine("");
             }
 
-            string plotline = null;
+            //string plotline = null;
 
             double dx = 1d;
             if (Program.options.freq == EFreq.Quarterly)
@@ -23560,235 +23609,31 @@ namespace Gekko
                 dx = 1d / 12d;
             }
 
-            double histoGap = (int)ParseIntoDouble(boxgap);
+            histoGap = (int)ParseIntoDouble(boxgap);
             if (boxesY.Count + boxesY2.Count == 1) histoGap = 0;
-            double d_width = dx / (double)(boxesY.Count + boxesY2.Count + histoGap);
-            double d_width2 = boxwidth * d_width;
-            double d_width3 = boxwidth * dx;
-            double left = d_width * (double)(boxesY.Count + boxesY2.Count - 1) / 2d;
+            d_width = dx / (double)(boxesY.Count + boxesY2.Count + histoGap);
+            d_width2 = boxwidth * d_width;
+            d_width3 = boxwidth * dx;
+            left = d_width * (double)(boxesY.Count + boxesY2.Count - 1) / 2d;
 
             if (boxesY.Count + boxesY2.Count + areasY.Count + areasY2.Count > 0)
             {
                 txt.AppendLine("f(x) = (sgn(x+1.2345e-30) + 1)/2");  //1 if x > 0, else 0. 1.2345e-30 added to avoid 0 becoming 0.5
             }
+            
+            //int boxesCounter = 0;    
 
-            List<string> linetypes = new List<string>();
-            List<string> dashtypes = new List<string>();
-            List<string> linewidths = new List<string>();
-            List<string> linecolors = new List<string>();
-            List<string> pointtypes = new List<string>();
-            List<string> pointsizes = new List<string>();
-            List<string> fillstyles = new List<string>();
-            List<string> y2s = new List<string>();            
-            foreach (O.Prt.Element pe in o.prtElements)  //varI 0-based
-            {
-                foreach (O.Prt.SubElement subPe in pe.subElements)
-                {
-                    linetypes.Add(pe.linetype);
-                    dashtypes.Add(pe.dashtype);
-                    linewidths.Add(pe.linewidth);
-                    linecolors.Add(pe.linecolor);
-                    pointtypes.Add(pe.pointtype);
-                    pointsizes.Add(pe.pointsize);
-                    fillstyles.Add(pe.fillstyle);
-                    y2s.Add(pe.y2);                    
-                }
-            }
-
-            plotline += "plot ";
-            //int boxesCounter = 0;                         
-
-            int boxesYCounter = 0;
-            int boxesY2Counter = 0;
-            int areasYCounter = 0;
-            int areasY2Counter = 0;
-            for (int i = 0; i < count; i++)
-            {
-                XmlNode line3 = lines3[i];
-
-                //defaults
-                string dlinetype = "lines";
-                if (Program.options.plot_lines_points) dlinetype = "linespoints";
-                string ddashtype = "1";
-                string dlinewidth = "3";
-                string dlinecolor = palette2[i % palette2.Count];
-                string dpointtype = "7";
-                string dpointsize = "0.5";
-                string dfillstyle = "solid";
-                string dy2_ = "no";
-
-                string linetype = null;
-                string dashtype = null;
-                string linewidth = null;
-                string linecolor = null;
-                string pointtype = null;
-                string pointsize = null;
-                string fillstyle = null;
-                string label = null;
-                string y2 = null;
-
-                bool isExplicit = false;
-                string labelCleaned = labelsNonBroken[i];
-                if (labelCleaned.StartsWith(Globals.labelCheatString))
-                {
-                    isExplicit = true;
-                    labelCleaned = labelCleaned.Substring(Globals.labelCheatString.Length);
-                }
-
-                // ---------------------------------------------
-                // --------- loading lines section start
-                // ---------------------------------------------
-
-
-                linetype = GetText(linetypes[i], o.opt_linetype, line3 == null ? null : line3.SelectSingleNode("linetype"), linetypeMain, dlinetype);
-                dashtype = GetText(dashtypes[i], o.opt_dashtype, line3 == null ? null : line3.SelectSingleNode("dashtype"), dashtypeMain, ddashtype);
-                linewidth = GetText(linewidths[i], G.isNumericalError(o.opt_linewidth) ? null : o.opt_linewidth.ToString(), line3 == null ? null : line3.SelectSingleNode("linewidth"), linewidthMain, dlinewidth);
-                linecolor = GetText(linecolors[i], o.opt_linecolor, line3 == null ? null : line3.SelectSingleNode("linecolor"), linecolorMain, dlinecolor);
-                pointtype = GetText(pointtypes[i], o.opt_pointtype, line3 == null ? null : line3.SelectSingleNode("pointtype"), pointtypeMain, dpointtype);
-                pointsize = GetText(pointsizes[i], G.isNumericalError(o.opt_pointsize) ? null : o.opt_pointsize.ToString(), line3 == null ? null : line3.SelectSingleNode("pointsize"), pointsizeMain, dpointsize);
-                fillstyle = GetText(fillstyles[i], o.opt_fillstyle, line3 == null ? null : line3.SelectSingleNode("fillstyle"), fillstyleMain, dfillstyle);
-                y2 = GetText(y2s[i], null, line3 == null ? null : line3.SelectSingleNode("y2"), null, "no"); //default: no, #23475432985
-                label = HandleLabel(line3, isExplicit, labelCleaned);
-                
-                if (G.equal(linetype, "boxes"))
-                {
-                    if (isSeparated) y2 = "yes";  //set y for all lines, and y2 for all boxes --> this overrides other settings
-                }
-                else
-                {
-                    fillstyle = null;  //fillstyle will fail if combined with other line types.
-                    if (isSeparated) y2 = "no";  //set y for all lines, and y2 for all boxes --> this overrides other settings
-                }
-
-
-
-                // ---------------------------------------------
-                // --------- loading lines section end
-                // ---------------------------------------------
-
-
-                if (G.equal(linetype, "boxes") && fillstyle.Contains("solid"))
-                {
-                    linewidth = "1";  //otherwise the borders of these get blurred
-                }
-
-                label = GnuplotText(label);
-
-                string s = null;
-                if (!NullOrEmpty(linetype))
-                {
-                    if (G.equal(linetype, "filledcurve") || G.equal(linetype, "filledcurves"))
-                    {
-                        s += " with " + linetype + " y1=0";  //so the area is towards the x-axis
-                    }
-                    else
-                    {
-                        s += " with " + linetype;
-                    }
-                }
-                if (NotNullAndNotNo(y2)) s += " axes x1y2";  //#23475432985
-                if (!NullOrEmpty(dashtype)) s += " dashtype " + dashtype;
-                if (!NullOrEmpty(linewidth)) s += " linewidth " + linewidth;
-                if (!NullOrEmpty(linecolor)) s += " linecolor rgb \"" + linecolor + "\"";
-                if (!NullOrEmpty(pointtype)) s += " pointtype " + pointtype;
-                if (!NullOrEmpty(pointtype)) s += " pointsize " + pointsize;
-                if (!NullOrEmpty(fillstyle)) s += " fillstyle " + fillstyle;
-                if (!NullOrEmpty(label)) s += " title " + Globals.QT + label + "   " + Globals.QT;  //blanks added to separate items in the legend                    
-
-                //linestyle is an association of linecolor, linewidth, dashtype, pointtype
-                //linetype is the same, just permanent
-                //box: fillstyle empty|solid|pattern, border|noborder
-
-                string xAdjustment = null;
-                if (G.equal(linetype, "boxes"))
-                {
-                    if (line3 == null || line3.SelectSingleNode("y2") == null) boxesYCounter++;
-                    else boxesY2Counter++;
-
-                    if (stacked)
-                    {
-                        //see also #34252435
-                        string ss = null;
-                        if (line3 == null || line3.SelectSingleNode("y2") == null)
-                        {
-                            //the boxes could be i = 0, 2, 4, 5. The first of these is $1+$3+$5+$6 (note 1 added), the second is $3+$5+$6, etc.                            
-                            //the f(x) funcion return 1 if positive, else 0.
-                            //with the f function, we get: f($1*$6)*$1 + f($3*$6)*$3 + f($5*$6)*$5 + f($6*$6)*$6 --> the last f($6*$6) could be omitted since it will alway return 1
-                            for (int k = boxesYCounter - 1; k < boxesY.Count; k++)
-                            {
-                                //see similar code below
-                                ss += "f($" + (boxesY[k] + quarterFix + 2) + "*$" + (boxesY[boxesYCounter - 1] + quarterFix + 2) + ")*$" + (boxesY[k] + quarterFix + 2) + "+";
-                            }
-                        }
-                        else
-                        {
-                            //the boxes could be i = 0, 2, 4, 5. The first of these is $1+$3+$5+$6 (note 1 added), the second is $3+$5+$6, etc.
-                            for (int k = boxesY2Counter - 1; k < boxesY2.Count; k++)
-                            {
-                                //see similar code above
-                                ss += "f($" + (boxesY2[k] + quarterFix + 2) + "*$" + (boxesY2[boxesYCounter - 1] + quarterFix + 2) + ")*$" + (boxesY2[k] + quarterFix + 2) + "+";
-                            }
-                        }
-                        ss = ss.Substring(0, ss.Length - 1);  //remove last '+'                       
-                        xAdjustment = "" + (quarterFix + 1) + ":(" + ss + ")" + ":(" + d_width3 + ")";
-                    }
-                    else
-                    {
-                        //adjusting horizontal position for clustered boxes
-                        double d = (boxesYCounter + boxesY2Counter - 1) * d_width - left;
-                        string minus = "+"; ;
-                        if (d < 0)
-                        {
-                            d = Math.Abs(d);
-                            minus = "-";
-                        }
-                        xAdjustment = "($" + (quarterFix + 1) + " " + minus + d + "):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
-                    }
-                }
-                else if (G.equal(linetype, "filledcurve") || G.equal(linetype, "filledcurves"))
-                {
-                    if (line3 == null || line3.SelectSingleNode("y2") == null) areasYCounter++;
-                    else areasY2Counter++;
-
-                    if (stacked)
-                    {
-                        //see comments under #34252435
-                        string ss = null;
-                        if (line3 == null || line3.SelectSingleNode("y2") == null)
-                        {
-                            for (int k = areasYCounter - 1; k < areasY.Count; k++)
-                            {
-                                //see similar code below
-                                ss += "f($" + (areasY[k] + quarterFix + 2) + "*$" + (areasY[areasYCounter - 1] + quarterFix + 2) + ")*$" + (areasY[k] + quarterFix + 2) + "+";
-                            }
-                        }
-                        else
-                        {
-                            for (int k = areasY2Counter - 1; k < areasY2.Count; k++)
-                            {
-                                //see similar code above
-                                ss += "f($" + (areasY2[k] + quarterFix + 2) + "*$" + (areasY2[areasYCounter - 1] + quarterFix + 2) + ")*$" + (areasY2[k] + quarterFix + 2) + "+";
-                            }
-                        }
-                        ss = ss.Substring(0, ss.Length - 1);  //remove last '+'                       
-                        xAdjustment = "" + (quarterFix + 1) + ":(" + ss + ")";
-                    }
-                    else
-                    {
-                        xAdjustment = "" + (quarterFix + 1) + ":" + (i + quarterFix + 2);  //just normal positioning
-                    }
-                }
-                else
-                {
-                    xAdjustment = "" + (quarterFix + 1) + ":" + (i + quarterFix + 2);
-                }
-
-                //string xlabel = GnuplotText(label);
-
-                plotline += "\"" + file1 + "\" using " + xAdjustment + s;
-
-                if (i < count - 1) plotline += ", ";
-            }
+            boxesY = new List<int>();
+            boxesY2 = new List<int>();
+            areasY = new List<int>();
+            areasY2 = new List<int>();
+            numberOfY2s = 0;
+            // ---------------------------------------
+            // ---------------------------------------
+            //          SECOND PASS
+            // ---------------------------------------
+            // ---------------------------------------
+            string plotline = PlotHandleLines(false, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, quarterFix, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, linetypes, dashtypes, linewidths, linecolors, pointtypes, pointsizes, fillstyles, y2s);
 
             txt.AppendLine(plotline);
 
@@ -23912,6 +23757,241 @@ namespace Gekko
             {
                 o.guiGraphRefreshingFilename = emfName;
             }
+        }
+
+        private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, int quarterFix, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<string> linetypes, List<string> dashtypes, List<string> linewidths, List<string> linecolors, List<string> pointtypes, List<string> pointsizes, List<string> fillstyles, List<string> y2s)
+        {
+            string plotline = "plot ";
+
+            int boxesYCounter = 0;
+            int boxesY2Counter = 0;
+            int areasYCounter = 0;
+            int areasY2Counter = 0;
+            for (int i = 0; i < count; i++)
+            {
+                XmlNode line3 = lines3[i];
+
+                //defaults
+                string dlinetype = "lines";
+                if (Program.options.plot_lines_points) dlinetype = "linespoints";
+                string ddashtype = "1";
+                string dlinewidth = "3";
+                string dlinecolor = palette2[i % palette2.Count];
+                string dpointtype = "7";
+                string dpointsize = "0.5";
+                string dfillstyle = "solid";
+                string dy2_ = "no";
+
+                string linetype = null;
+                string dashtype = null;
+                string linewidth = null;
+                string linecolor = null;
+                string pointtype = null;
+                string pointsize = null;
+                string fillstyle = null;
+                string label = null;
+                string y2 = null;
+
+                bool isExplicit = false;
+                string labelCleaned = labelsNonBroken[i];
+                if (labelCleaned.StartsWith(Globals.labelCheatString))
+                {
+                    isExplicit = true;
+                    labelCleaned = labelCleaned.Substring(Globals.labelCheatString.Length);
+                }
+
+                // ---------------------------------------------
+                // --------- loading lines section start
+                // ---------------------------------------------
+
+
+                linetype = GetText(linetypes[i], o.opt_linetype, line3 == null ? null : line3.SelectSingleNode("linetype"), linetypeMain, dlinetype);
+                dashtype = GetText(dashtypes[i], o.opt_dashtype, line3 == null ? null : line3.SelectSingleNode("dashtype"), dashtypeMain, ddashtype);
+                linewidth = GetText(linewidths[i], G.isNumericalError(o.opt_linewidth) ? null : o.opt_linewidth.ToString(), line3 == null ? null : line3.SelectSingleNode("linewidth"), linewidthMain, dlinewidth);
+                linecolor = GetText(linecolors[i], o.opt_linecolor, line3 == null ? null : line3.SelectSingleNode("linecolor"), linecolorMain, dlinecolor);
+                pointtype = GetText(pointtypes[i], o.opt_pointtype, line3 == null ? null : line3.SelectSingleNode("pointtype"), pointtypeMain, dpointtype);
+                pointsize = GetText(pointsizes[i], G.isNumericalError(o.opt_pointsize) ? null : o.opt_pointsize.ToString(), line3 == null ? null : line3.SelectSingleNode("pointsize"), pointsizeMain, dpointsize);
+                fillstyle = GetText(fillstyles[i], o.opt_fillstyle, line3 == null ? null : line3.SelectSingleNode("fillstyle"), fillstyleMain, dfillstyle);
+                y2 = GetText(y2s[i], null, line3 == null ? null : line3.SelectSingleNode("y2"), null, "no"); //default: no, #23475432985
+                label = HandleLabel(line3, isExplicit, labelCleaned);
+
+                if (G.equal(linetype, "boxes"))
+                {
+                    if (isSeparated) y2 = "yes";  //set y for all lines, and y2 for all boxes --> this overrides other settings
+                }
+                else
+                {
+                    fillstyle = null;  //fillstyle will fail if combined with other line types.
+                    if (isSeparated) y2 = "no";  //set y for all lines, and y2 for all boxes --> this overrides other settings
+                }
+
+
+
+                // ---------------------------------------------
+                // --------- loading lines section end
+                // ---------------------------------------------
+
+
+                if (G.equal(linetype, "boxes") && fillstyle.Contains("solid"))
+                {
+                    linewidth = "1";  //otherwise the borders of these get blurred
+                }
+
+                label = GnuplotText(label);
+
+                string s = null;
+                if (!NullOrEmpty(linetype))
+                {
+                    if (G.equal(linetype, "filledcurve") || G.equal(linetype, "filledcurves"))
+                    {
+                        s += " with " + linetype + " y1=0";  //so the area is towards the x-axis
+                    }
+                    else
+                    {
+                        s += " with " + linetype;
+                    }
+                }
+                if (NotNullAndNotNo(y2))
+                {
+                    if (firstPass) numberOfY2s++;
+                    s += " axes x1y2";  //#23475432985
+                }
+                if (!NullOrEmpty(dashtype)) s += " dashtype " + dashtype;
+                if (!NullOrEmpty(linewidth)) s += " linewidth " + linewidth;
+                if (!NullOrEmpty(linecolor)) s += " linecolor rgb \"" + linecolor + "\"";
+                if (!NullOrEmpty(pointtype)) s += " pointtype " + pointtype;
+                if (!NullOrEmpty(pointtype)) s += " pointsize " + pointsize;
+                if (!NullOrEmpty(fillstyle)) s += " fillstyle " + fillstyle;
+                if (!NullOrEmpty(label)) s += " title " + Globals.QT + label + "   " + Globals.QT;  //blanks added to separate items in the legend                    
+
+                //linestyle is an association of linecolor, linewidth, dashtype, pointtype
+                //linetype is the same, just permanent
+                //box: fillstyle empty|solid|pattern, border|noborder
+
+                string xAdjustment = null;
+                if (G.equal(linetype, "boxes"))
+                {
+                    if (firstPass)
+                    {
+                        minMax[0] = Math.Min(minMax[0], dataMin[i]);
+                        minMax[1] = Math.Max(minMax[1], dataMax[i]);
+                    }
+
+                    if (line3 == null || line3.SelectSingleNode("y2") == null)
+                    {
+                        boxesYCounter++;
+                        if (firstPass) boxesY.Add(i);
+                    }
+                    else
+                    {
+                        boxesY2Counter++;
+                        if (firstPass) boxesY2.Add(i);
+                    }
+
+                    if (stacked)
+                    {
+                        //see also #34252435
+                        string ss = null;
+                        if (line3 == null || line3.SelectSingleNode("y2") == null)
+                        {
+                            //the boxes could be i = 0, 2, 4, 5. The first of these is $1+$3+$5+$6 (note 1 added), the second is $3+$5+$6, etc.                            
+                            //the f(x) funcion return 1 if positive, else 0.
+                            //with the f function, we get: f($1*$6)*$1 + f($3*$6)*$3 + f($5*$6)*$5 + f($6*$6)*$6 --> the last f($6*$6) could be omitted since it will alway return 1
+                            for (int k = boxesYCounter - 1; k < boxesY.Count; k++)
+                            {
+                                //see similar code below
+                                ss += "f($" + (boxesY[k] + quarterFix + 2) + "*$" + (boxesY[boxesYCounter - 1] + quarterFix + 2) + ")*$" + (boxesY[k] + quarterFix + 2) + "+";
+                            }
+                        }
+                        else
+                        {
+                            //the boxes could be i = 0, 2, 4, 5. The first of these is $1+$3+$5+$6 (note 1 added), the second is $3+$5+$6, etc.
+                            for (int k = boxesY2Counter - 1; k < boxesY2.Count; k++)
+                            {
+                                //see similar code above
+                                ss += "f($" + (boxesY2[k] + quarterFix + 2) + "*$" + (boxesY2[boxesYCounter - 1] + quarterFix + 2) + ")*$" + (boxesY2[k] + quarterFix + 2) + "+";
+                            }
+                        }
+                        ss = ss.Substring(0, ss.Length - 1);  //remove last '+'                       
+                        xAdjustment = "" + (quarterFix + 1) + ":(" + ss + ")" + ":(" + d_width3 + ")";
+                    }
+                    else
+                    {
+                        //adjusting horizontal position for clustered boxes
+                        double d = (boxesYCounter + boxesY2Counter - 1) * d_width - left;
+                        string minus = "+"; ;
+                        if (d < 0)
+                        {
+                            d = Math.Abs(d);
+                            minus = "-";
+                        }
+                        xAdjustment = "($" + (quarterFix + 1) + " " + minus + d + "):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
+                    }
+                }
+                else if (G.equal(linetype, "filledcurve") || G.equal(linetype, "filledcurves"))
+                {
+                    if (firstPass)
+                    {
+                        minMax[2] = Math.Min(minMax[2], dataMin[i]);
+                        minMax[3] = Math.Max(minMax[3], dataMax[i]);
+                    }
+                    if (line3 == null || line3.SelectSingleNode("y2") == null)
+                    {
+                        areasYCounter++;
+                        areasY.Add(i);
+                    }
+                    else
+                    {
+                        areasY2Counter++;
+                        areasY2.Add(i);
+                    }
+
+                    if (stacked)
+                    {
+                        //see comments under #34252435
+                        string ss = null;
+                        if (line3 == null || line3.SelectSingleNode("y2") == null)
+                        {
+                            for (int k = areasYCounter - 1; k < areasY.Count; k++)
+                            {
+                                //see similar code below
+                                ss += "f($" + (areasY[k] + quarterFix + 2) + "*$" + (areasY[areasYCounter - 1] + quarterFix + 2) + ")*$" + (areasY[k] + quarterFix + 2) + "+";
+                            }
+                        }
+                        else
+                        {
+                            for (int k = areasY2Counter - 1; k < areasY2.Count; k++)
+                            {
+                                //see similar code above
+                                ss += "f($" + (areasY2[k] + quarterFix + 2) + "*$" + (areasY2[areasYCounter - 1] + quarterFix + 2) + ")*$" + (areasY2[k] + quarterFix + 2) + "+";
+                            }
+                        }
+                        ss = ss.Substring(0, ss.Length - 1);  //remove last '+'                       
+                        xAdjustment = "" + (quarterFix + 1) + ":(" + ss + ")";
+                    }
+                    else
+                    {
+                        if (firstPass)
+                        {
+                            minMax[4] = Math.Min(minMax[4], dataMin[i]);
+                            minMax[5] = Math.Max(minMax[5], dataMax[i]);
+                        }
+                        xAdjustment = "" + (quarterFix + 1) + ":" + (i + quarterFix + 2);  //just normal positioning
+                    }
+                }
+                else
+                {
+                    xAdjustment = "" + (quarterFix + 1) + ":" + (i + quarterFix + 2);
+                }
+
+                //string xlabel = GnuplotText(label);
+
+                plotline += "\"" + file1 + "\" using " + xAdjustment + s;
+
+                if (i < count - 1) plotline += ", ";
+            }
+
+            return plotline;
         }
 
         private static bool NotNullAndNotNo(string s)
