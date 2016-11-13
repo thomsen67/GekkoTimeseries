@@ -4108,10 +4108,10 @@ namespace Gekko
                 //--- plot
                 public string linetype = null;
                 public string dashtype = null;
-                public string linewidth = null;
+                public double linewidth = double.NaN;
                 public string linecolor = null;
                 public string pointtype = null;
-                public string pointsize = null;
+                public double pointsize = double.NaN;
                 public string fillstyle = null;
                 public string y2 = null;
                 //--- errors

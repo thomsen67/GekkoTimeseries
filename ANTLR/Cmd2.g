@@ -699,7 +699,7 @@ Y2MINSOFT             = 'Y2MINSOFT'                ;
 Y2ZEROAXIS            = 'Y2ZEROAXIS'               ;
 //LABEL                 = 'LABEL'                    ;
 ARROW                 = 'ARROW'                    ;
-LINETYPE              = 'LINETYPE'                 ;
+//LINETYPE              = 'LINETYPE'                 ;
 DASHTYPE              = 'DASHTYPE'                 ;
 LINEWIDTH             = 'LINEWIDTH'                ;
 LINECOLOR             = 'LINECOLOR'                ;
@@ -1210,7 +1210,7 @@ Y2                    = 'Y2'                       ;
 										d.Add("Y2ZEROAXIS",Y2ZEROAXIS);
 										//d.Add("LABEL",LABEL);
 										d.Add("ARROW",ARROW);
-										d.Add("LINETYPE",LINETYPE);
+										//d.Add("LINETYPE",LINETYPE);
 										d.Add("DASHTYPE",DASHTYPE);
 										d.Add("LINEWIDTH",LINEWIDTH);
 										d.Add("LINECOLOR",LINECOLOR);
@@ -2119,7 +2119,7 @@ prtOpt1Helper             : filter
 						  | YTITLE EQUAL expression -> ^(ASTOPT_STRING_YTITLE expression)  //PLOT
 						  | Y2TITLE EQUAL expression -> ^(ASTOPT_STRING_Y2TITLE expression)  //PLOT
 						  
-						  | LINETYPE '=' linetypeHelper -> ^(ASTOPT_STRING_LINETYPE linetypeHelper)
+						  | TYPE '=' linetypeHelper -> ^(ASTOPT_STRING_LINETYPE linetypeHelper)
 						  | DASHTYPE '=' expression -> ^(ASTOPT_STRING_DASHTYPE expression)
 						  | LINEWIDTH '=' expression -> ^(ASTOPT_VAL_LINEWIDTH expression)
 						  | LINECOLOR '=' expression -> ^(ASTOPT_STRING_LINECOLOR expression)
@@ -2578,7 +2578,7 @@ prtOptionField4Helper     : width
 						  | ndec
 						  | pdec
 						  | opt2 -> ^(ASTPRTOPTION opt2)
-						  | LINETYPE '=' expression -> ^(ASTPRTELEMENTLINETYPE expression)
+						  | TYPE '=' linetypeHelper -> ^(ASTPRTELEMENTLINETYPE linetypeHelper)
 						  | DASHTYPE '=' expression -> ^(ASTPRTELEMENTDASHTYPE expression)
 						  | LINEWIDTH '=' expression -> ^(ASTPRTELEMENTLINEWIDTH expression)
 						  | LINECOLOR '=' expression -> ^(ASTPRTELEMENTLINECOLOR expression)
@@ -3201,7 +3201,7 @@ ident                     : Ident|
 							Y2ZEROAXIS|
 							//LABEL|
 							ARROW|
-							LINETYPE|
+							//LINETYPE|
 							DASHTYPE|
 							LINEWIDTH|
 							LINECOLOR|

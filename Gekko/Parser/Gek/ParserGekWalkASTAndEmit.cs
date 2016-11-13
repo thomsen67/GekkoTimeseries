@@ -2644,7 +2644,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTPRTELEMENTLINEWIDTH":
                         {
-                            node.Code.A("ope" + Num(node) + ".linewidth = O.GetString(" + node[0].Code + ");" + G.NL);
+                            node.Code.A("ope" + Num(node) + ".linewidth = O.GetVal(" + node[0].Code + ");" + G.NL);
                         }
                         break;
                     case "ASTPRTELEMENTLINECOLOR":
@@ -2659,7 +2659,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTPRTELEMENTPOINTSIZE":
                         {
-                            node.Code.A("ope" + Num(node) + ".pointsize = O.GetString(" + node[0].Code + ");" + G.NL);
+                            node.Code.A("ope" + Num(node) + ".pointsize = O.GetVal(" + node[0].Code + ");" + G.NL);
                         }
                         break;
                     case "ASTPRTELEMENTFILLSTYLE":

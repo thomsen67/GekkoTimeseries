@@ -23350,10 +23350,10 @@ namespace Gekko
 
             List<string> linetypes = new List<string>();
             List<string> dashtypes = new List<string>();
-            List<string> linewidths = new List<string>();
+            List<double> linewidths = new List<double>();
             List<string> linecolors = new List<string>();
             List<string> pointtypes = new List<string>();
-            List<string> pointsizes = new List<string>();
+            List<double> pointsizes = new List<double>();
             List<string> fillstyles = new List<string>();
             List<string> y2s = new List<string>();
             foreach (O.Prt.Element pe in o.prtElements)  //varI 0-based
@@ -23622,12 +23622,11 @@ namespace Gekko
             }
             
             //int boxesCounter = 0;    
-
-            boxesY = new List<int>();
-            boxesY2 = new List<int>();
-            areasY = new List<int>();
-            areasY2 = new List<int>();
-            numberOfY2s = 0;
+            //boxesY = new List<int>();
+            //boxesY2 = new List<int>();
+            //areasY = new List<int>();
+            //areasY2 = new List<int>();
+            //numberOfY2s = 0;
             // ---------------------------------------
             // ---------------------------------------
             //          SECOND PASS
@@ -23759,7 +23758,7 @@ namespace Gekko
             }
         }
 
-        private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, int quarterFix, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<string> linetypes, List<string> dashtypes, List<string> linewidths, List<string> linecolors, List<string> pointtypes, List<string> pointsizes, List<string> fillstyles, List<string> y2s)
+        private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, int quarterFix, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<string> linetypes, List<string> dashtypes, List<double> linewidths, List<string> linecolors, List<string> pointtypes, List<double> pointsizes, List<string> fillstyles, List<string> y2s)
         {
             string plotline = "plot ";
 
@@ -23804,13 +23803,12 @@ namespace Gekko
                 // --------- loading lines section start
                 // ---------------------------------------------
 
-
                 linetype = GetText(linetypes[i], o.opt_linetype, line3 == null ? null : line3.SelectSingleNode("linetype"), linetypeMain, dlinetype);
                 dashtype = GetText(dashtypes[i], o.opt_dashtype, line3 == null ? null : line3.SelectSingleNode("dashtype"), dashtypeMain, ddashtype);
-                linewidth = GetText(linewidths[i], G.isNumericalError(o.opt_linewidth) ? null : o.opt_linewidth.ToString(), line3 == null ? null : line3.SelectSingleNode("linewidth"), linewidthMain, dlinewidth);
+                linewidth = GetText(G.isNumericalError(linewidths[i]) ? null : linewidths[i].ToString(), G.isNumericalError(o.opt_linewidth) ? null : o.opt_linewidth.ToString(), line3 == null ? null : line3.SelectSingleNode("linewidth"), linewidthMain, dlinewidth);
                 linecolor = GetText(linecolors[i], o.opt_linecolor, line3 == null ? null : line3.SelectSingleNode("linecolor"), linecolorMain, dlinecolor);
                 pointtype = GetText(pointtypes[i], o.opt_pointtype, line3 == null ? null : line3.SelectSingleNode("pointtype"), pointtypeMain, dpointtype);
-                pointsize = GetText(pointsizes[i], G.isNumericalError(o.opt_pointsize) ? null : o.opt_pointsize.ToString(), line3 == null ? null : line3.SelectSingleNode("pointsize"), pointsizeMain, dpointsize);
+                pointsize = GetText(G.isNumericalError(pointsizes[i]) ? null : pointsizes[i].ToString(), G.isNumericalError(o.opt_pointsize) ? null : o.opt_pointsize.ToString(), line3 == null ? null : line3.SelectSingleNode("pointsize"), pointsizeMain, dpointsize);
                 fillstyle = GetText(fillstyles[i], o.opt_fillstyle, line3 == null ? null : line3.SelectSingleNode("fillstyle"), fillstyleMain, dfillstyle);
                 y2 = GetText(y2s[i], null, line3 == null ? null : line3.SelectSingleNode("y2"), null, "no"); //default: no, #23475432985
                 label = HandleLabel(line3, isExplicit, labelCleaned);
@@ -23912,7 +23910,7 @@ namespace Gekko
                                 ss += "f($" + (boxesY2[k] + quarterFix + 2) + "*$" + (boxesY2[boxesYCounter - 1] + quarterFix + 2) + ")*$" + (boxesY2[k] + quarterFix + 2) + "+";
                             }
                         }
-                        ss = ss.Substring(0, ss.Length - 1);  //remove last '+'                       
+                        if (ss != null && ss.EndsWith("+")) ss = ss.Substring(0, ss.Length - 1); //remove last '+'                       
                         xAdjustment = "" + (quarterFix + 1) + ":(" + ss + ")" + ":(" + d_width3 + ")";
                     }
                     else
@@ -23966,7 +23964,7 @@ namespace Gekko
                                 ss += "f($" + (areasY2[k] + quarterFix + 2) + "*$" + (areasY2[areasYCounter - 1] + quarterFix + 2) + ")*$" + (areasY2[k] + quarterFix + 2) + "+";
                             }
                         }
-                        ss = ss.Substring(0, ss.Length - 1);  //remove last '+'                       
+                        if (ss != null && ss.EndsWith("+")) ss = ss.Substring(0, ss.Length - 1);  //remove last '+'                       
                         xAdjustment = "" + (quarterFix + 1) + ":(" + ss + ")";
                     }
                     else
