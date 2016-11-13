@@ -2588,49 +2588,78 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                           
                         }
                         break;
-
-                    //node.Code.A("o" + Num(node) + ".name = O.GetString(" + node[0].Code + ");" + G.NL;
-                    //        node.Code.A("o" + Num(node) + ".col = O.GetInt(" + node[1].Code + ");" + G.NL;
-                    //        node.Code.A("o" + Num(node) + ".t1 = O.GetDate(" + node[2].Code + ");" + G.NL;
-                    //        node.Code.A("o" + Num(node) + ".t2 = O.GetDate(" + node[3].Code + ");" + G.NL;
-                    //        node.Code.A(node[4].Code;
-                    //        node.Code.A("o" + Num(node) + ".printcode = O.GetString(" + node[5].Code + ");" + G.NL;
-                    //        node.Code.A("o" + Num(node) + ".scale = O.GetVal(" + node[6].Code + ");" + G.NL;
-                    //        node.Code.A("o" + Num(node) + ".format = O.GetString(" + node[7].Code + ");" + G.NL;
-
-                    case "ASTPRTELEMENTDEC":
+                    case "ASTPRTELEMENTLINETYPE":
                         {
-                            node.Code.A("o" + Num(node) + ".dec = O.GetInt(" + node[0].Code + ");" + G.NL);
+                            node.Code.A("ope" + Num(node) + ".linetype = O.GetString(" + node[0].Code + ");" + G.NL);
                         }
                         break;
-
+                    case "ASTPRTELEMENTDASHTYPE":
+                        {
+                            node.Code.A("ope" + Num(node) + ".dashtype = O.GetString(" + node[0].Code + ");" + G.NL);
+                        }
+                        break;
+                    case "ASTPRTELEMENTLINEWIDTH":
+                        {
+                            node.Code.A("ope" + Num(node) + ".linewidth = O.GetString(" + node[0].Code + ");" + G.NL);
+                        }
+                        break;
+                    case "ASTPRTELEMENTLINECOLOR":
+                        {
+                            node.Code.A("ope" + Num(node) + ".linecolor = O.GetString(" + node[0].Code + ");" + G.NL);
+                        }
+                        break;
+                    case "ASTPRTELEMENTPOINTTYPE":
+                        {
+                            node.Code.A("ope" + Num(node) + ".pointtype = O.GetString(" + node[0].Code + ");" + G.NL);
+                        }
+                        break;
+                    case "ASTPRTELEMENTPOINTSIZE":
+                        {
+                            node.Code.A("ope" + Num(node) + ".pointsize = O.GetString(" + node[0].Code + ");" + G.NL);
+                        }
+                        break;
+                    case "ASTPRTELEMENTFILLSTYLE":
+                        {
+                            node.Code.A("ope" + Num(node) + ".fillstyle = O.GetString(" + node[0].Code + ");" + G.NL);
+                        }
+                        break;
+                    case "ASTPRTELEMENTY2":
+                        {
+                            node.Code.A("ope" + Num(node) + ".y2 = O.GetString(" + node[0].Code + ");" + G.NL);
+                        }
+                        break;
+                    case "ASTPRTELEMENTDEC":
+                        {
+                            node.Code.A("ope" + Num(node) + ".dec = O.GetInt(" + node[0].Code + ");" + G.NL);
+                        }
+                        break;
                     case "ASTPRTELEMENTWIDTH":
                         {
-                            node.Code.A("o" + Num(node) + ".width = O.GetInt(" + node[0].Code + ");" + G.NL);
+                            node.Code.A("ope" + Num(node) + ".width = O.GetInt(" + node[0].Code + ");" + G.NL);
                         }
                         break;
 
                     case "ASTPRTELEMENTNDEC":
                         {
-                            node.Code.A("o" + Num(node) + ".ndec = O.GetInt(" + node[0].Code + ");" + G.NL);
+                            node.Code.A("ope" + Num(node) + ".ndec = O.GetInt(" + node[0].Code + ");" + G.NL);
                         }
                         break;
 
                     case "ASTPRTELEMENTNWIDTH":
                         {
-                            node.Code.A("o" + Num(node) + ".nwidth = O.GetInt(" + node[0].Code + ");" + G.NL);
+                            node.Code.A("ope" + Num(node) + ".nwidth = O.GetInt(" + node[0].Code + ");" + G.NL);
                         }
                         break;
 
                     case "ASTPRTELEMENTPDEC":
                         {
-                            node.Code.A("o" + Num(node) + ".pdec = O.GetInt(" + node[0].Code + ");" + G.NL);
+                            node.Code.A("ope" + Num(node) + ".pdec = O.GetInt(" + node[0].Code + ");" + G.NL);
                         }
                         break;
 
                     case "ASTPRTELEMENTPWIDTH":
                         {
-                            node.Code.A("o" + Num(node) + ".pwidth = O.GetInt(" + node[0].Code + ");" + G.NL);
+                            node.Code.A("ope" + Num(node) + ".pwidth = O.GetInt(" + node[0].Code + ");" + G.NL);
                         }
                         break;
 

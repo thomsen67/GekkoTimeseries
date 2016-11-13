@@ -3866,12 +3866,13 @@ namespace Gekko
             public string timefilter = null;
             //public string heading = null;
                       
-            public int width = -12345;
-            public int dec = -12345;
-            public int nwidth = -12345;
-            public int ndec = -12345;
-            public int pwidth = -12345;
-            public int pdec = -12345;
+            public double opt_width = -12345;
+            public double opt_dec = -12345;
+            public double opt_nwidth = -12345;
+            public double opt_ndec = -12345;
+            public double opt_pwidth = -12345;
+            public double opt_pdec = -12345;
+
             public double opt_ymax = double.NaN;
             public double opt_ymin = double.NaN;
             public double opt_y2max = double.NaN;
@@ -3894,6 +3895,47 @@ namespace Gekko
             public string opt_using = null; //only for PLOT
             public string opt_filename = null;
 
+            public string opt_size = null;
+            public string opt_font = null;
+            public string opt_fontsize = null;
+            public string opt_tics = null;
+            public string opt_grid = null;
+            public string opt_key = null;
+            public string opt_palette = null;
+            public string opt_stack = null;
+            public string opt_boxwidth = null;
+            public string opt_boxgap = null;
+            public string opt_separate = null;
+            public string opt_xline = null;
+            public string opt_xlinebefore = null;
+            public string opt_xlineafter = null;
+            public string opt_ymirror = null;
+            public string opt_ytitle = null;
+            public string opt_y2title = null;
+            public double opt_yline = double.NaN;
+            public double opt_y2line = double.NaN;
+            public string opt_yzeroaxis = null;
+            public string opt_y2zeroaxis = null;
+            
+            
+            public double opt_ymaxhard = double.NaN;
+            public double opt_y2maxhard = double.NaN;
+            public double opt_ymaxsoft = double.NaN;
+            public double opt_y2maxsoft = double.NaN;
+            public double opt_yminhard = double.NaN;
+            public double opt_y2minhard = double.NaN;
+            public double opt_yminsoft = double.NaN;
+            public double opt_y2minsoft = double.NaN;
+
+            public string opt_linetype = null;
+            public string opt_dashtype = null;
+            public string opt_linewidth = null;
+            public string opt_linecolor = null;
+            public string opt_pointtype = null;
+            public string opt_pointsize = null;
+            public string opt_fillstyle = null;
+            
+            
             public long counter = -12345;
 
             public void Exe()
@@ -4063,6 +4105,15 @@ namespace Gekko
                 public int ndec = -12345;
                 public int pwidth = -12345;
                 public int pdec = -12345;
+                //--- plot
+                public string linetype = null;
+                public string dashtype = null;
+                public string linewidth = null;
+                public string linecolor = null;
+                public string pointtype = null;
+                public string pointsize = null;
+                public string fillstyle = null;
+                public string y2 = null;
                 //--- errors
                 public List<string> errors = new List<string>();
             }

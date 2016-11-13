@@ -328,6 +328,53 @@ tokens {
     ASTOPT1;
     ASTOPT2;
     ASTOPT_;
+	ASTOPT_STRING_SIZE;
+ASTOPT_STRING_TITLE;
+ASTOPT_STRING_SUBTITLE;
+ASTOPT_STRING_FONT;
+ASTOPT_STRING_FONTSIZE;
+ASTOPT_STRING_TICS;
+ASTOPT_STRING_GRID;
+ASTOPT_STRING_KEY;
+ASTOPT_STRING_PALETTE;
+ASTOPT_STRING_STACK;
+ASTOPT_STRING_BOXWIDTH;
+ASTOPT_STRING_BOXGAP;
+ASTOPT_STRING_SEPARATE;
+ASTOPT_STRING_XLINE;
+ASTOPT_STRING_XLINEBEFORE;
+ASTOPT_STRING_XLINEAFTER;
+ASTOPT_STRING_YMIRROR;
+ASTOPT_STRING_YTITLE;
+ASTOPT_VAL_YLINE;
+ASTOPT_VAL_YMAX;
+ASTOPT_VAL_YMAXHARD;
+ASTOPT_VAL_YMAXSOFT;
+ASTOPT_VAL_YMIN;
+ASTOPT_VAL_YMINHARD;
+ASTOPT_VAL_YMINSOFT;
+ASTOPT_STRING_YZEROAXIS;
+ASTOPT_STRING_Y2TITLE;
+ASTOPT_VAL_Y2LINE;
+ASTOPT_VAL_Y2MAX;
+ASTOPT_VAL_Y2MAXHARD;
+ASTOPT_VAL_Y2MAXSOFT;
+ASTOPT_VAL_Y2MIN;
+ASTOPT_VAL_Y2MINHARD;
+ASTOPT_VAL_Y2MINSOFT;
+ASTOPT_STRING_Y2ZEROAXIS;
+ASTOPT_STRING_LABEL;
+ASTOPT_STRING_ARROW;
+ASTOPT_STRING_LINETYPE;
+ASTOPT_STRING_DASHTYPE;
+ASTOPT_STRING_LINEWIDTH;
+ASTOPT_STRING_LINECOLOR;
+ASTOPT_STRING_POINTTYPE;
+ASTOPT_STRING_POINTSIZE;
+ASTOPT_STRING_FILLSTYLE;
+ASTOPT_STRING_LABEL;
+ASTOPT_STRING_Y2;
+
 	ASTOPT_STRING_DUMP;
 	ASTOPT_STRING_BANK;
 	ASTOPT_STRING_ERROR;
@@ -405,6 +452,14 @@ tokens {
     ASTOPT_STRING_WINDOW;
     ASTOPT_STRING_XLS;
     ASTOPT_STRING_XLSX;
+	
+	ASTOPT_VAL_WIDTH;
+	ASTOPT_VAL_DEC;
+	ASTOPT_VAL_NWIDTH;
+	ASTOPT_VAL_PWIDTH;
+	ASTOPT_VAL_NDEC;
+	ASTOPT_VAL_PDEC;
+
     ASTOPT_VAL_LAG;
     ASTOPT_VAL_REPLACE;
     ASTOPT_VAL_YMAX;
@@ -434,6 +489,14 @@ tokens {
     ASTPRTELEMENTPWIDTH;
     ASTPRTELEMENTS;
     ASTPRTELEMENTWIDTH;
+	ASTPRTELEMENTLINETYPE;
+	ASTPRTELEMENTDASHTYPE;
+	ASTPRTELEMENTLINEWIDTH;
+	ASTPRTELEMENTLINECOLOR;
+	ASTPRTELEMENTPOINTTYPE;
+	ASTPRTELEMENTPOINTSIZE;
+	ASTPRTELEMENTFILLSTYLE;
+	ASTPRTELEMENTY2;
     ASTPRTITEMS;
     ASTPRTOPTION;
     ASTPRTOPTIONFIELD2;
@@ -582,6 +645,54 @@ tokens {
     ASTYMIN;
     ASTZERO;
 	ASTXEDIT;
+
+SIZE                  = 'SIZE'                     ;
+//TITLE                 = 'TITLE'                    ;
+SUBTITLE              = 'SUBTITLE'                 ;
+//FONT                  = 'FONT'                     ;
+//FONTSIZE              = 'FONTSIZE'                 ;
+TICS                  = 'TICS'                     ;
+GRID                  = 'GRID'                     ;
+KEY                   = 'KEY'                      ;
+PALETTE               = 'PALETTE'                  ;
+STACK                 = 'STACK'                    ;
+BOXWIDTH              = 'BOXWIDTH'                 ;
+BOXGAP                = 'BOXGAP'                   ;
+SEPARATE              = 'SEPARATE'                 ;
+XLINE                 = 'XLINE'                    ;
+XLINEBEFORE           = 'XLINEBEFORE'              ;
+XLINEAFTER            = 'XLINEAFTER'               ;
+YMIRROR               = 'YMIRROR'                  ;
+YTITLE                = 'YTITLE'                   ;
+YLINE                 = 'YLINE'                    ;
+//YMAX                  = 'YMAX'                     ;
+YMAXHARD              = 'YMAXHARD'                 ;
+YMAXSOFT              = 'YMAXSOFT'                 ;
+//YMIN                  = 'YMIN'                     ;
+YMINHARD              = 'YMINHARD'                 ;
+YMINSOFT              = 'YMINSOFT'                 ;
+YZEROAXIS             = 'YZEROAXIS'                ;
+Y2TITLE               = 'Y2TITLE'                  ;
+Y2LINE                = 'Y2LINE'                   ;
+//Y2MAX                 = 'Y2MAX'                    ;
+Y2MAXHARD             = 'Y2MAXHARD'                ;
+Y2MAXSOFT             = 'Y2MAXSOFT'                ;
+//Y2MIN                 = 'Y2MIN'                    ;
+Y2MINHARD             = 'Y2MINHARD'                ;
+Y2MINSOFT             = 'Y2MINSOFT'                ;
+Y2ZEROAXIS            = 'Y2ZEROAXIS'               ;
+//LABEL                 = 'LABEL'                    ;
+ARROW                 = 'ARROW'                    ;
+LINETYPE              = 'LINETYPE'                 ;
+DASHTYPE              = 'DASHTYPE'                 ;
+LINEWIDTH             = 'LINEWIDTH'                ;
+LINECOLOR             = 'LINECOLOR'                ;
+POINTTYPE             = 'POINTTYPE'                ;
+POINTSIZE             = 'POINTSIZE'                ;
+FILLSTYLE             = 'FILLSTYLE'                ;
+LABEL                 = 'LABEL'                    ;
+Y2                    = 'Y2'                       ;
+
 
 	XEDIT = 'XEDIT';
 	IMPOSE = 'IMPOSE';
@@ -1037,6 +1148,54 @@ tokens {
                                 public static System.Collections.Generic.Dictionary<string, int> GetKw()
                                 {
                                         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+										
+										d.Add("SIZE",SIZE);
+										//d.Add("TITLE",TITLE);
+										d.Add("SUBTITLE",SUBTITLE);
+										//d.Add("FONT",FONT);
+										//d.Add("FONTSIZE",FONTSIZE);
+										d.Add("TICS",TICS);
+										d.Add("GRID",GRID);
+										d.Add("KEY",KEY);
+										d.Add("PALETTE",PALETTE);
+										d.Add("STACK",STACK);
+										d.Add("BOXWIDTH",BOXWIDTH);
+										d.Add("BOXGAP",BOXGAP);
+										d.Add("SEPARATE",SEPARATE);
+										d.Add("XLINE",XLINE);
+										d.Add("XLINEBEFORE",XLINEBEFORE);
+										d.Add("XLINEAFTER",XLINEAFTER);
+										d.Add("YMIRROR",YMIRROR);
+										d.Add("YTITLE",YTITLE);
+										d.Add("YLINE",YLINE);
+										//d.Add("YMAX",YMAX);
+										d.Add("YMAXHARD",YMAXHARD);
+										d.Add("YMAXSOFT",YMAXSOFT);
+										//d.Add("YMIN",YMIN);
+										d.Add("YMINHARD",YMINHARD);
+										d.Add("YMINSOFT",YMINSOFT);
+										d.Add("YZEROAXIS",YZEROAXIS);
+										d.Add("Y2TITLE",Y2TITLE);
+										d.Add("Y2LINE",Y2LINE);
+										//d.Add("Y2MAX",Y2MAX);
+										d.Add("Y2MAXHARD",Y2MAXHARD);
+										d.Add("Y2MAXSOFT",Y2MAXSOFT);
+										//d.Add("Y2MIN",Y2MIN);
+										d.Add("Y2MINHARD",Y2MINHARD);
+										d.Add("Y2MINSOFT",Y2MINSOFT);
+										d.Add("Y2ZEROAXIS",Y2ZEROAXIS);
+										//d.Add("LABEL",LABEL);
+										d.Add("ARROW",ARROW);
+										d.Add("LINETYPE",LINETYPE);
+										d.Add("DASHTYPE",DASHTYPE);
+										d.Add("LINEWIDTH",LINEWIDTH);
+										d.Add("LINECOLOR",LINECOLOR);
+										d.Add("POINTTYPE",POINTTYPE);
+										d.Add("POINTSIZE",POINTSIZE);
+										d.Add("FILLSTYLE",FILLSTYLE);
+										//d.Add("LABEL",LABEL);
+										d.Add("Y2",Y2);
+																				
 										d.Add("INTERPOLATE"    ,   INTERPOLATE     );
 										d.Add("XEDIT"    ,   XEDIT     );
 										d.Add("MISSING"    ,   MISSING     );
@@ -1874,26 +2033,76 @@ prtOpt1                   : ISNOTQUAL
 						  | leftAngleNo2 dates? prtOpt1Helper* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) prtOpt1Helper*)
                           ;
 prtOpt1Helper             : filter						
-						  | prtOptionField4Helper						  												
+						  | opt2 -> ^(ASTPRTOPTION opt2)
+
+						  | WIDTH EQUAL expression -> ^(ASTOPT_VAL_WIDTH expression)
+						  | DEC EQUAL expression -> ^(ASTOPT_VAL_DEC expression)
+						  | NWIDTH EQUAL expression -> ^(ASTOPT_VAL_NWIDTH expression)
+						  | PWIDTH EQUAL expression -> ^(ASTOPT_VAL_PWIDTH expression)
+						  | NDEC EQUAL expression -> ^(ASTOPT_VAL_NDEC expression)
+						  | PDEC EQUAL expression -> ^(ASTOPT_VAL_PDEC expression)
+						  
 						  | APPEND (EQUAL yesNo)? -> ^(ASTOPT_STRING_APPEND yesNo?)
+						  | BOXWIDTH '=' expression -> ^(ASTOPT_STRING_BOXWIDTH expression)  //PLOT
+						  | BOXGAP '=' expression -> ^(ASTOPT_STRING_BOXGAP expression)  //PLOT
 						  | CELL '=' expression -> ^(ASTOPT_STRING_CELL expression)
 						  | COLLAPSE (EQUAL prtOptCollapseHelper)? -> ^(ASTOPT_STRING_COLLAPSE prtOptCollapseHelper?)
 						  | COLORS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLORS yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)
-						  | DATES (EQUAL yesNo)? -> ^(ASTOPT_STRING_DATES yesNo?)
+						  | DATES (EQUAL yesNo)? -> ^(ASTOPT_STRING_DATES yesNo?)						  
 						  | DUMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_DUMP yesNo?)
+						  | FONT '=' expression -> ^(ASTOPT_STRING_FONT expression)  //PLOT
+						  | FONTSIZE '=' expression -> ^(ASTOPT_STRING_FONTSIZE expression)  //PLOT
+						  | GRID '=' expression -> ^(ASTOPT_STRING_GRID expression)  //PLOT
 						  | HEADING '=' expression -> ^(ASTOPT_STRING_TITLE expression)
+						  | KEY '=' expression -> ^(ASTOPT_STRING_KEY expression)  //PLOT
 						  | TITLE '=' expression -> ^(ASTOPT_STRING_TITLE expression)
-						  | NAMES (EQUAL yesNo)? -> ^(ASTOPT_STRING_NAMES yesNo?)
+						  | NAMES (EQUAL yesNo)? -> ^(ASTOPT_STRING_NAMES yesNo?)	
+						  | PALETTE '=' expression -> ^(ASTOPT_STRING_PALETTE expression)  //PLOT					  
 						  | PLOTCODE '=' expression -> ^(ASTOPT_STRING_PLOTCODE expression)
 						  | ROWS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ROWS yesNo?)
+						  | SEPARATE '=' expression -> ^(ASTOPT_STRING_SEPARATE expression)  //PLOT
 						  | SHEET '=' expression -> ^(ASTOPT_STRING_SHEET expression)
-						  | STAMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STAMP yesNo?)							
-						  | USING EQUAL fileNameStar -> ^(ASTOPT_STRING_USING fileNameStar)							
-						  | YMAX EQUAL expression -> ^(ASTOPT_VAL_YMAX expression)
-						  | YMIN EQUAL expression -> ^(ASTOPT_VAL_YMIN expression)
-						  | Y2MAX EQUAL expression -> ^(ASTOPT_VAL_Y2MAX expression)
-						  | Y2MIN EQUAL expression -> ^(ASTOPT_VAL_Y2MIN expression)
+						  | SIZE '=' expression -> ^(ASTOPT_STRING_SIZE expression)  //PLOT
+						  | STACK '=' expression -> ^(ASTOPT_STRING_STACK expression)  //PLOT
+						  | STAMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STAMP yesNo?)	
+						  | SUBTITLE '=' expression -> ^(ASTOPT_STRING_SUBTITLE expression)	  //PLOT	
+						  | TICS '=' expression -> ^(ASTOPT_STRING_TICS expression)  //PLOT			  
+						  | USING EQUAL fileNameStar -> ^(ASTOPT_STRING_USING fileNameStar)		
+						  | XLINE '=' expression -> ^(ASTOPT_STRING_XLINE expression)  //PLOT	
+						  | XLINEBEFORE '=' expression -> ^(ASTOPT_STRING_XLINEBEFORE expression)  //PLOT	
+						  | XLINEAFTER '=' expression -> ^(ASTOPT_STRING_XLINEAFTER expression)  //PLOT	
+
+						  | Y2ZEROAXIS EQUAL expression -> ^(ASTOPT_STRING_Y2ZEROAXIS expression)  //PLOT
+						  | Y2LINE EQUAL expression -> ^(ASTOPT_VAL_Y2LINE expression)  //PLOT						  
+						  | Y2MAX EQUAL expression -> ^(ASTOPT_VAL_Y2MAX expression)  //PLOT	
+						  | Y2MIN EQUAL expression -> ^(ASTOPT_VAL_Y2MIN expression)  //PLOT	
+						  | Y2MAXHARD EQUAL expression -> ^(ASTOPT_VAL_Y2MAXHARD expression)  //PLOT	
+						  | Y2MINHARD EQUAL expression -> ^(ASTOPT_VAL_Y2MINHARD expression)  //PLOT	
+						  | Y2MAXSOFT EQUAL expression -> ^(ASTOPT_VAL_Y2MAXSOFT expression)  //PLOT	
+						  | Y2MINSOFT EQUAL expression -> ^(ASTOPT_VAL_Y2MINSOFT expression)  //PLOT	
+
+						  | YZEROAXIS EQUAL expression -> ^(ASTOPT_STRING_YZEROAXIS expression)  //PLOT						  						  				
+						  | YLINE EQUAL expression -> ^(ASTOPT_VAL_YLINE expression)  //PLOT
+						  | YMAX EQUAL expression -> ^(ASTOPT_VAL_YMAX expression)  //PLOT	
+						  | YMIN EQUAL expression -> ^(ASTOPT_VAL_YMIN expression)  //PLOT	
+						  | YMAXHARD EQUAL expression -> ^(ASTOPT_VAL_YMAXHARD expression)  //PLOT	
+						  | YMINHARD EQUAL expression -> ^(ASTOPT_VAL_YMINHARD expression)  //PLOT	
+						  | YMAXSOFT EQUAL expression -> ^(ASTOPT_VAL_YMAXSOFT expression)  //PLOT	
+						  | YMINSOFT EQUAL expression -> ^(ASTOPT_VAL_YMINSOFT expression)  //PLOT						  
+						  | YMIRROR '=' expression -> ^(ASTOPT_STRING_YMIRROR expression)  //PLOT
+						  | YTITLE EQUAL expression -> ^(ASTOPT_STRING_YTITLE expression)  //PLOT
+						  | Y2TITLE EQUAL expression -> ^(ASTOPT_STRING_Y2TITLE expression)  //PLOT
+						  
+						  | LINETYPE '=' expression -> ^(ASTOPT_STRING_LINETYPE expression)
+						  | DASHTYPE '=' expression -> ^(ASTOPT_STRING_DASHTYPE expression)
+						  | LINEWIDTH '=' expression -> ^(ASTOPT_STRING_LINEWIDTH expression)
+						  | LINECOLOR '=' expression -> ^(ASTOPT_STRING_LINECOLOR expression)
+						  | POINTTYPE '=' expression -> ^(ASTOPT_STRING_POINTTYPE expression)
+						  | POINTSIZE '=' expression -> ^(ASTOPT_STRING_POINTSIZE expression)
+						  | FILLSTYLE '=' expression -> ^(ASTOPT_STRING_FILLSTYLE expression)
+						  | Y2 '=' expression -> ^(ASTOPT_STRING_Y2 expression)
+
 						  ;
 prtOpt2                   : prtOpt2Helper+ -> ^(ASTOPT2 prtOpt2Helper+);
 prtOpt2Helper             : FILE '=' fileName -> ^(ASTOPT_STRING_FILENAME fileName)
@@ -2334,8 +2543,17 @@ prtOptionField4Helper     : width
 						  | pwidth
 						  | ndec
 						  | pdec
-						  | opt2 -> ^(ASTPRTOPTION opt2);
-
+						  | opt2 -> ^(ASTPRTOPTION opt2)
+						  | LINETYPE '=' expression -> ^(ASTPRTELEMENTLINETYPE expression)
+						  | DASHTYPE '=' expression -> ^(ASTPRTELEMENTDASHTYPE expression)
+						  | LINEWIDTH '=' expression -> ^(ASTPRTELEMENTLINEWIDTH expression)
+						  | LINECOLOR '=' expression -> ^(ASTPRTELEMENTLINECOLOR expression)
+						  | POINTTYPE '=' expression -> ^(ASTPRTELEMENTPOINTTYPE expression)
+						  | POINTSIZE '=' expression -> ^(ASTPRTELEMENTPOINTSIZE expression)
+						  | FILLSTYLE '=' expression -> ^(ASTPRTELEMENTFILLSTYLE expression)
+						  | Y2 '=' expression -> ^(ASTPRTELEMENTY2 expression)
+						  ;
+						  
 opt2                      : optNew | optOld;
 							
 optOld                    : N    ('=' yesNo -> ^(ASTN yesNo) | -> ^(ASTN ASTYES))
@@ -2904,6 +3122,52 @@ integerNegative           : MINUS integer -> ^(ASTINTEGERNEGATIVE integer);
 doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 
 ident                     : Ident|
+							SIZE|
+							//TITLE|
+							SUBTITLE|
+							//FONT|
+							//FONTSIZE|
+							TICS|
+							GRID|
+							KEY|
+							PALETTE|
+							STACK|
+							BOXWIDTH|
+							BOXGAP|
+							SEPARATE|
+							XLINE|
+							XLINEBEFORE|
+							XLINEAFTER|
+							YMIRROR|
+							YTITLE|
+							YLINE|
+							//YMAX|
+							YMAXHARD|
+							YMAXSOFT|
+							//YMIN|
+							YMINHARD|
+							YMINSOFT|
+							YZEROAXIS|
+							Y2TITLE|
+							Y2LINE|
+							//Y2MAX|
+							Y2MAXHARD|
+							Y2MAXSOFT|
+							//Y2MIN|
+							Y2MINHARD|
+							Y2MINSOFT|
+							Y2ZEROAXIS|
+							//LABEL|
+							ARROW|
+							LINETYPE|
+							DASHTYPE|
+							LINEWIDTH|
+							LINECOLOR|
+							POINTTYPE|
+							POINTSIZE|
+							FILLSTYLE|
+							//LABEL|
+							Y2|							
 							USING|
 							MISSING|
 							IMPOSE|
