@@ -3918,8 +3918,8 @@ namespace Gekko
             public string opt_y2title = null;
             public double opt_yline = double.NaN;
             public double opt_y2line = double.NaN;
-            public string opt_yzeroaxis = null;
-            public string opt_y2zeroaxis = null;
+            public string opt_xzeroaxis = null;
+            public string opt_x2zeroaxis = null;
             
             
             public double opt_ymaxhard = double.NaN;

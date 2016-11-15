@@ -364,7 +364,7 @@ ASTOPT_VAL_YMAXSOFT;
 ASTOPT_VAL_YMIN;
 ASTOPT_VAL_YMINHARD;
 ASTOPT_VAL_YMINSOFT;
-ASTOPT_STRING_YZEROAXIS;
+ASTOPT_STRING_XZEROAXIS;
 ASTOPT_STRING_Y2TITLE;
 ASTOPT_VAL_Y2LINE;
 ASTOPT_VAL_Y2MAX;
@@ -373,7 +373,7 @@ ASTOPT_VAL_Y2MAXSOFT;
 ASTOPT_VAL_Y2MIN;
 ASTOPT_VAL_Y2MINHARD;
 ASTOPT_VAL_Y2MINSOFT;
-ASTOPT_STRING_Y2ZEROAXIS;
+ASTOPT_STRING_X2ZEROAXIS;
 ASTOPT_STRING_LABEL;
 ASTOPT_STRING_ARROW;
 ASTOPT_STRING_LINETYPE;
@@ -691,7 +691,7 @@ YMAXSOFT              = 'YMAXSOFT'                 ;
 //YMIN                  = 'YMIN'                     ;
 YMINHARD              = 'YMINHARD'                 ;
 YMINSOFT              = 'YMINSOFT'                 ;
-YZEROAXIS             = 'YZEROAXIS'                ;
+XZEROAXIS             = 'XZEROAXIS'                ;
 Y2TITLE               = 'Y2TITLE'                  ;
 Y2LINE                = 'Y2LINE'                   ;
 //Y2MAX                 = 'Y2MAX'                    ;
@@ -700,7 +700,7 @@ Y2MAXSOFT             = 'Y2MAXSOFT'                ;
 //Y2MIN                 = 'Y2MIN'                    ;
 Y2MINHARD             = 'Y2MINHARD'                ;
 Y2MINSOFT             = 'Y2MINSOFT'                ;
-Y2ZEROAXIS            = 'Y2ZEROAXIS'               ;
+X2ZEROAXIS            = 'X2ZEROAXIS'               ;
 //LABEL                 = 'LABEL'                    ;
 ARROW                 = 'ARROW'                    ;
 //LINETYPE              = 'LINETYPE'                 ;
@@ -1203,7 +1203,7 @@ Y2                    = 'Y2'                       ;
 										//d.Add("YMIN",YMIN);
 										d.Add("YMINHARD",YMINHARD);
 										d.Add("YMINSOFT",YMINSOFT);
-										d.Add("YZEROAXIS",YZEROAXIS);
+										d.Add("XZEROAXIS",XZEROAXIS);
 										d.Add("Y2TITLE",Y2TITLE);
 										d.Add("Y2LINE",Y2LINE);
 										//d.Add("Y2MAX",Y2MAX);
@@ -1212,7 +1212,7 @@ Y2                    = 'Y2'                       ;
 										//d.Add("Y2MIN",Y2MIN);
 										d.Add("Y2MINHARD",Y2MINHARD);
 										d.Add("Y2MINSOFT",Y2MINSOFT);
-										d.Add("Y2ZEROAXIS",Y2ZEROAXIS);
+										d.Add("X2ZEROAXIS",X2ZEROAXIS);
 										//d.Add("LABEL",LABEL);
 										d.Add("ARROW",ARROW);
 										//d.Add("LINETYPE",LINETYPE);
@@ -2102,7 +2102,7 @@ prtOpt1Helper             : filter
 						  | XLINE '=' expression -> ^(ASTOPT_DATE_XLINE expression)  //PLOT	
 						  | XLINEBEFORE '=' expression -> ^(ASTOPT_DATE_XLINEBEFORE expression)  //PLOT	
 						  | XLINEAFTER '=' expression -> ^(ASTOPT_DATE_XLINEAFTER expression)  //PLOT							  						  
-						  | Y2ZEROAXIS (EQUAL yesNo)? -> ^(ASTOPT_STRING_Y2ZEROAXIS yesNo?)
+						  | X2ZEROAXIS (EQUAL yesNo)? -> ^(ASTOPT_STRING_X2ZEROAXIS yesNo?)
 
 						  | Y2LINE EQUAL expression -> ^(ASTOPT_VAL_Y2LINE expression)  //PLOT						  
 						  | Y2MAX EQUAL expression -> ^(ASTOPT_VAL_Y2MAX expression)  //PLOT	
@@ -2112,7 +2112,7 @@ prtOpt1Helper             : filter
 						  | Y2MAXSOFT EQUAL expression -> ^(ASTOPT_VAL_Y2MAXSOFT expression)  //PLOT	
 						  | Y2MINSOFT EQUAL expression -> ^(ASTOPT_VAL_Y2MINSOFT expression)  //PLOT	
 
-						  | YZEROAXIS (EQUAL yesNo)? -> ^(ASTOPT_STRING_YZEROAXIS yesNo?)		  						  				
+						  | XZEROAXIS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XZEROAXIS yesNo?)		  						  				
 						  | YLINE EQUAL expression -> ^(ASTOPT_VAL_YLINE expression)  //PLOT
 						  | YMAX EQUAL expression -> ^(ASTOPT_VAL_YMAX expression)  //PLOT	
 						  | YMIN EQUAL expression -> ^(ASTOPT_VAL_YMIN expression)  //PLOT	
@@ -3197,7 +3197,7 @@ ident                     : Ident|
 							//YMIN|
 							YMINHARD|
 							YMINSOFT|
-							YZEROAXIS|
+							XZEROAXIS|
 							Y2TITLE|
 							Y2LINE|
 							//Y2MAX|
@@ -3206,7 +3206,7 @@ ident                     : Ident|
 							//Y2MIN|
 							Y2MINHARD|
 							Y2MINSOFT|
-							Y2ZEROAXIS|
+							X2ZEROAXIS|
 							//LABEL|
 							ARROW|
 							//LINETYPE|

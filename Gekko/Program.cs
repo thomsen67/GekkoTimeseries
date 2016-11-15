@@ -23333,8 +23333,8 @@ namespace Gekko
             string y2minsoft = GetText(null, o.opt_y2minsoft.ToString(), null, doc.SelectSingleNode("gekkoplot/y2minsoft"), null);
             string y2minhard = GetText(null, o.opt_y2minhard.ToString(), null, doc.SelectSingleNode("gekkoplot/y2minhard"), null);
 
-            string yzeroaxis = GetText(null, o.opt_yzeroaxis, null, doc.SelectSingleNode("gekkoplot/yzeroaxis"), "yes");
-            string y2zeroaxis = GetText(null, o.opt_y2zeroaxis, null, doc.SelectSingleNode("gekkoplot/y2zeroaxis"), "no"); //default: no, #23475432985 
+            string xzeroaxis = GetText(null, o.opt_xzeroaxis, null, doc.SelectSingleNode("gekkoplot/xzeroaxis"), "yes");
+            string x2zeroaxis = GetText(null, o.opt_x2zeroaxis, null, doc.SelectSingleNode("gekkoplot/x2zeroaxis"), "no"); //default: no, #23475432985 
 
             //the options in <lines> may override this.
             XmlNode linetypeMain = doc.SelectSingleNode("gekkoplot/type");
@@ -23564,7 +23564,7 @@ namespace Gekko
             txt.AppendLine("set tic scale 1.4, 0.7");
             txt.AppendLine("set xtics nomirror " + ticsInOut);
 
-            if (NotNullAndNotNo(yzeroaxis)) txt.AppendLine("set yzeroaxis lt -1"); //draws x axis. May get ugly if residuals are present.
+            if (NotNullAndNotNo(xzeroaxis)) txt.AppendLine("set xzeroaxis lt -1"); //draws x axis. May get ugly if residuals are present.
 
             if (numberOfY2s == 0 && !isSeparated)
             {
@@ -23605,7 +23605,7 @@ namespace Gekko
                 txt.AppendLine("set border 11");
                 if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
                 if (!NullOrEmpty(y2title)) txt.AppendLine("set y2label \"" + GnuplotText(y2title) + "\"");
-                if (NotNullAndNotNo(y2zeroaxis) || isSeparated) txt.AppendLine("set y2zeroaxis lt -1");  //draws x axis for y2=0, #23475432985 
+                if (NotNullAndNotNo(x2zeroaxis) || isSeparated) txt.AppendLine("set x2zeroaxis lt -1");  //draws x axis for y2=0, #23475432985 
             }
 
             foreach (string s in xlines)
