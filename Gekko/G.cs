@@ -712,11 +712,11 @@ namespace Gekko
             }
             else if (gt.freq == EFreq.Quarterly)
             {
-                d = (double)gt.super + (double)gt.sub / 4d;
+                d = (double)gt.super + ((double)gt.sub - 1d) / 4d;
             }
             else if (gt.freq == EFreq.Monthly)
             {
-                d = (double)gt.super + (double)gt.sub / 12d;
+                d = (double)gt.super + ((double)gt.sub - 1d) / 12d;
             }
             return d;
         }
@@ -1598,10 +1598,13 @@ namespace Gekko
             {
                 try
                 {
-                    isPiping = true;
-                    if (newline) Globals.pipeFileHelper.pipeFile.WriteLine(s);
-                    else Globals.pipeFileHelper.pipeFile.Write(s);
-                    Globals.pipeFileHelper.pipeFile.Flush();
+                    //if (Globals.pipeFileHelper.isPiping = true)  //this can be false with PIPE<pause>, and set with PIPE<continue>
+                    {
+                        isPiping = true;
+                        if (newline) Globals.pipeFileHelper.pipeFile.WriteLine(s);
+                        else Globals.pipeFileHelper.pipeFile.Write(s);
+                        Globals.pipeFileHelper.pipeFile.Flush();
+                    }
                 }
                 catch (Exception e)
                 {

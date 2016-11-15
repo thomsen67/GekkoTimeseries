@@ -12531,8 +12531,11 @@ namespace Gekko
             //This is where we start when issuing a PIPE
             //We call the older version below, the PIPE interface mess should be cleaned up at some point...
             List<string> temp = new List<string>();
-            if (o.opt_append == "yes") temp.Add("append");
-            if (o.opt_html == "yes") temp.Add("html");
+            if (G.equal(o.opt_append, "yes")) temp.Add("append");
+            if (G.equal(o.opt_html, "yes")) temp.Add("html");
+            if (G.equal(o.opt_pause, "yes")) temp.Add("pause");
+            if (G.equal(o.opt_continue, "yes")) temp.Add("continue");
+            if (G.equal(o.opt_stop, "yes")) temp.Add("stop");
             Pipe(o.fileName, temp);
         }
 
@@ -12545,6 +12548,9 @@ namespace Gekko
         {
             bool append = false;
             bool html = false;
+            bool stop = false;
+            bool pause = false;
+            bool continue2 = false;
 
             if (args != null)
             {
@@ -12552,14 +12558,29 @@ namespace Gekko
                 {
                     if (G.equal(s, "append")) append = true;
                     else if (G.equal(s, "html")) html = true;
+                    else if (G.equal(s, "stop")) stop = true;
+                    else if (G.equal(s, "pause")) pause = true;
+                    else if (G.equal(s, "continue")) continue2 = true;
                 }
             }
 
             fileName = StripQuotes(fileName);
             //NOTE: If there is an error, Globals.pipeFile will be closed and disposed somewhere else in the
-            //      code. So no need to think about using an "using" statement here.            
+            //      code. So no need to think about using an "using" statement here.    
+            
+            if(pause && fileName!=null)
+            {
+                G.Writeln2("*** ERROR: You should use PIPE<pause> without a filename");
+                throw new GekkoException();
+            }
 
-            if (G.equal(fileName, "con"))
+            if (continue2 && fileName != null)
+            {
+                G.Writeln2("*** ERROR: You should use PIPE<continue> without a filename");
+                throw new GekkoException();
+            }
+
+            if (G.equal(fileName, "con") || stop)   //PIPE con, or PIPE<stop>
             {
                 if (Globals.pipe == false)
                 {
@@ -12574,8 +12595,26 @@ namespace Gekko
                     Globals.pipe = false;
                     Globals.pipeFileHelper.pipeFile = null;
                     Globals.pipeFileHelper.pipeFileFileWithPath = "";
-                    if (!mute) G.Writeln("Directing output to main window ('console')");
+                    if (!mute) G.Writeln("Directing output to main window");
                 }
+            }
+            else if(pause)
+            {
+                //try
+                //{
+                //    Globals.pipeFileHelper.isPiping = false;
+                //}
+                //catch { };  //not the end of the world if it fails, for instance if the pipeFileHelper is not there
+                Globals.pipe = false;
+            }
+            else if(continue2)
+            {
+                //try
+                //{
+                //    Globals.pipeFileHelper.isPiping = true;
+                //}
+                //catch { };  //not the end of the world if it fails, for instance if the pipeFileHelper is not there
+                Globals.pipe = true;
             }
             else
             {
@@ -23079,14 +23118,9 @@ namespace Gekko
 
             //https://groups.google.com/forum/#!topic/comp.graphics.apps.gnuplot/csbgSFAbIv4
 
-            double zoom = 1;
-
-            string xTicsInOut = "out";  //in, out
-            string yTicsInOut = "out";  //in, out
-            string y2TicsInOut = "out";  //in, out
-
-            bool arrow = true;
-
+            double zoom = 1d;
+            double fontfactor = 1d;
+            
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
 
             int quarterFix = 0;
@@ -23260,14 +23294,14 @@ namespace Gekko
             string title = GetText(null, o.opt_title, null, doc.SelectSingleNode("gekkoplot/title"), null);
             string subtitle = GetText(null, o.opt_subtitle, null, doc.SelectSingleNode("gekkoplot/subtitle"), null);
             string font = GetText(null, o.opt_font, null, doc.SelectSingleNode("gekkoplot/font"), "Verdana");
-            double fontsize = ParseIntoDouble(GetText(null, o.opt_fontsize, null, doc.SelectSingleNode("gekkoplot/fontsize"), "12"));
+            double fontsize = ParseIntoDouble(GetText(null, G.isNumericalError(o.opt_fontsize) ? null : o.opt_fontsize.ToString(), null, doc.SelectSingleNode("gekkoplot/fontsize"), "12"));
             string ticsInOut = GetText(null, o.opt_tics, null, doc.SelectSingleNode("gekkoplot/tics"), "out");
-            string grid = GetText(null, o.opt_grid, null, doc.SelectSingleNode("gekkoplot/grid"), "no");  //normally null or "" --> grid. Switch off with <grid>no</grid>                        
+            string grid = GetText(null, o.opt_grid, null, doc.SelectSingleNode("gekkoplot/grid"), "yes");  //normally null or "" --> grid. Switch off with <grid>no</grid>                        
             string key = GetText(null, o.opt_key, null, doc.SelectSingleNode("gekkoplot/key"), "out horiz bot center Left reverse");
             string palette = GetText(null, o.opt_palette, null, doc.SelectSingleNode("gekkoplot/palette"), "red,web-green,web-blue,orange,dark-blue,magenta,brown4,dark-violet,grey50,black");
             string stack = GetText(null, o.opt_stack, null, doc.SelectSingleNode("gekkoplot/stack"), "no");  //default: no, #23475432985    
-            double boxwidth = ParseIntoDouble(GetText(null, o.opt_boxwidth, null, doc.SelectSingleNode("gekkoplot/boxwidth"), "0.75"));
-            string boxgap = GetText(null, o.opt_boxgap, null, doc.SelectSingleNode("gekkoplot/boxgap"), "2");
+            double boxwidth = ParseIntoDouble(GetText(null, G.isNumericalError(o.opt_boxwidth) ? null : o.opt_boxwidth.ToString(), null, doc.SelectSingleNode("gekkoplot/boxwidth"), "0.75"));
+            string boxgap = GetText(null, G.isNumericalError(o.opt_boxgap) ? null : o.opt_boxgap.ToString(), null, doc.SelectSingleNode("gekkoplot/boxgap"), "2");
             string separate = GetText(null, o.opt_separate, null, doc.SelectSingleNode("gekkoplot/separate"), "no"); //default: no, #23475432985                        
 
             List<string> xlines = GetText(doc.SelectNodes("gekkoplot/xline"));
@@ -23303,7 +23337,7 @@ namespace Gekko
             string y2zeroaxis = GetText(null, o.opt_y2zeroaxis, null, doc.SelectSingleNode("gekkoplot/y2zeroaxis"), "no"); //default: no, #23475432985 
 
             //the options in <lines> may override this.
-            XmlNode linetypeMain = doc.SelectSingleNode("gekkoplot/linetype");
+            XmlNode linetypeMain = doc.SelectSingleNode("gekkoplot/type");
             XmlNode dashtypeMain = doc.SelectSingleNode("gekkoplot/dashtype");
             XmlNode linewidthMain = doc.SelectSingleNode("gekkoplot/linewidth");
             XmlNode linecolorMain = doc.SelectSingleNode("gekkoplot/linecolor");
@@ -23346,6 +23380,7 @@ namespace Gekko
                 }
             }
 
+            
             bool isSeparated = NotNullAndNotNo(separate);  //#23475432985
 
             List<string> linetypes = new List<string>();
@@ -23371,6 +23406,14 @@ namespace Gekko
                 }
             }
 
+            double linewidthCorrection = 1d;
+            double pointsizeCorrection = 1d;
+            if (G.equal(pplotType, "svg") || G.equal(pplotType, "png"))
+            {
+                linewidthCorrection = 2d / 3d;
+                pointsizeCorrection = 0.8d / 0.5d;
+            }
+
 
             List<int> boxesY = new List<int>();
             List<int> boxesY2 = new List<int>();
@@ -23393,7 +23436,7 @@ namespace Gekko
             // ---------------------------------------
             // ---------------------------------------
             
-            string discard = PlotHandleLines(true, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, quarterFix, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, linetypes, dashtypes, linewidths, linecolors, pointtypes, pointsizes, fillstyles, y2s);
+            string discard = PlotHandleLines(true, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, quarterFix, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, linetypes, dashtypes, linewidths, linecolors, pointtypes, pointsizes, fillstyles, y2s, linewidthCorrection, pointsizeCorrection);
             
             StringBuilder txt = new StringBuilder();
 
@@ -23412,7 +23455,7 @@ namespace Gekko
 
             if (ii >= 2)
             {
-                txt.AppendLine("set bmargin 4");  //larger padding to key (legend)
+                //txt.AppendLine("set bmargin 4");  //larger padding to key (legend)
             }
 
             string enhanced = null;
@@ -23436,7 +23479,7 @@ namespace Gekko
                     //also do linebefore and lineafter
                 }
             }
-
+            
             txt.AppendLine("set terminal " + pplotType + enhanced + " font '" + font + "," + (zoom * fontsize) + "'"); ;
             txt.AppendLine("set output \"" + file2 + "\"");
             txt.AppendLine("set key " + key);
@@ -23449,7 +23492,30 @@ namespace Gekko
             string title2 = null;
             if (!NullOrEmpty(title)) title2 = title;
             if (!NullOrEmpty(o.opt_title)) title2 = o.opt_title;
-            if (!NullOrEmpty(title2)) txt.AppendLine("set title " + Globals.QT + EncodeDanish(GnuplotText(title2 + subtitle2)) + Globals.QT + " font '" + font + "," + (1.5d * zoom * fontsize) + "'");
+            if (!NullOrEmpty(title2)) txt.AppendLine("set title " + Globals.QT + EncodeDanish(GnuplotText(title2 + subtitle2)) + Globals.QT);
+
+            
+            
+
+            if (G.equal(pplotType, "emf"))
+            {
+                fontfactor = 1.4d / 1.2d;
+            }
+            else if (G.equal(pplotType, "svg"))
+            {
+                fontfactor = 1.4d / 1.2d;
+            }
+            else if (G.equal(pplotType, "png"))
+            {
+                fontfactor = 1.0d / 1.2d;
+            }
+            txt.AppendLine("set title font '" + font + "," + (1.5d * zoom * fontsize * fontfactor) + "'");
+            txt.AppendLine("set ylabel font '" + font + "," + (zoom * fontsize * fontfactor) + "'");
+            txt.AppendLine("set y2label font '" + font + "," + (zoom * fontsize * fontfactor) + "'");
+            txt.AppendLine("set xtics font '" + font + "," + (zoom * fontsize * fontfactor) + "'");
+            txt.AppendLine("set ytics font '" + font + "," + (zoom * fontsize * fontfactor) + "'");
+            if (numberOfY2s > 0) txt.AppendLine("set y2tics font '" + font + "," + (zoom * fontsize * fontfactor) + "'");
+            txt.AppendLine("set key font '" + font + "," + (zoom * fontsize * fontfactor) + "'");
 
             string set_yrange = null;
             string set_y2range = null;
@@ -23496,9 +23562,9 @@ namespace Gekko
             }
 
             txt.AppendLine("set tic scale 1.4, 0.7");
-            txt.AppendLine("set xtics nomirror");
+            txt.AppendLine("set xtics nomirror " + ticsInOut);
 
-            if (yzeroaxis != null && !isSeparated) txt.AppendLine("set xzeroaxis lt -1");  //draws x axis. May get ugly if residuals are present.
+            if (NotNullAndNotNo(yzeroaxis)) txt.AppendLine("set yzeroaxis lt -1"); //draws x axis. May get ugly if residuals are present.
 
             if (numberOfY2s == 0 && !isSeparated)
             {
@@ -23528,7 +23594,7 @@ namespace Gekko
                     txt.AppendLine("set y2tics " + ticsInOut);
                     txt.AppendLine("set border 11");
                     if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
-                    if (!NullOrEmpty(y2title)) txt.AppendLine("set y2label \"" + GnuplotText(ytitle) + "\"");
+                    if (!NullOrEmpty(ytitle)) txt.AppendLine("set y2label \"" + GnuplotText(ytitle) + "\"");
                 }
             }
             else
@@ -23539,7 +23605,7 @@ namespace Gekko
                 txt.AppendLine("set border 11");
                 if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
                 if (!NullOrEmpty(y2title)) txt.AppendLine("set y2label \"" + GnuplotText(y2title) + "\"");
-                if (NotNullAndNotNo(y2zeroaxis) || isSeparated) txt.AppendLine("set x2zeroaxis lt -1");  //draws x axis for y2=0, #23475432985 
+                if (NotNullAndNotNo(y2zeroaxis) || isSeparated) txt.AppendLine("set y2zeroaxis lt -1");  //draws x axis for y2=0, #23475432985 
             }
 
             foreach (string s in xlines)
@@ -23632,7 +23698,7 @@ namespace Gekko
             //          SECOND PASS
             // ---------------------------------------
             // ---------------------------------------
-            string plotline = PlotHandleLines(false, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, quarterFix, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, linetypes, dashtypes, linewidths, linecolors, pointtypes, pointsizes, fillstyles, y2s);
+            string plotline = PlotHandleLines(false, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, quarterFix, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, linetypes, dashtypes, linewidths, linecolors, pointtypes, pointsizes, fillstyles, y2s, linewidthCorrection, pointsizeCorrection);
 
             txt.AppendLine(plotline);
 
@@ -23660,6 +23726,27 @@ namespace Gekko
                     text = text.Replace("temp" + rr, "gekkoplot");
                     File.WriteAllText(Program.options.folder_working + "\\" + "gekkoplot.dat", text);
                     G.Writeln2("Dumped gnuplot files gekkoplot.gp (script) and gekkoplot.dat (data) in the working folder");
+
+
+                    //Process p2 = new Process();
+                    //p2.StartInfo.FileName = Application.StartupPath + "\\gnuplot\\wgnuplot51.exe";
+                    ////NOTE: quotes added because this path may contain blanks                
+                    //p2.StartInfo.Arguments = Globals.QT + Program.options.folder_working + "\\" + "gekkoplot.gp" + Globals.QT;
+                    //p2.Start();
+
+                    //if (true)
+                    //{
+                    //    Process myProcess = Process.Start(Application.StartupPath + "\\gnuplot\\wgnuplot51.exe", Globals.QT + Program.options.folder_working + "\\" + "gekkoplot.gp" + Globals.QT);
+                    //}
+                    //else
+                    //{
+                    //    //s = Program.SubstituteAssignVarsInExpression(s);
+                    //    string outp = "";
+                    //    string err = "";
+                    //    ExecuteShellCommand("jlkj", ref outp, ref err);
+                    //}
+
+
                 }
                 catch
                 {
@@ -23758,7 +23845,7 @@ namespace Gekko
             }
         }
 
-        private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, int quarterFix, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<string> linetypes, List<string> dashtypes, List<double> linewidths, List<string> linecolors, List<string> pointtypes, List<double> pointsizes, List<string> fillstyles, List<string> y2s)
+        private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, int quarterFix, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<string> linetypes, List<string> dashtypes, List<double> linewidths, List<string> linecolors, List<string> pointtypes, List<double> pointsizes, List<string> fillstyles, List<string> y2s, double linewidthCorrection, double pointsizeCorrection)
         {
             string plotline = "plot ";
 
@@ -23775,7 +23862,7 @@ namespace Gekko
                 if (Program.options.plot_lines_points) dlinetype = "linespoints";
                 string ddashtype = "1";
                 string dlinewidth = "3";
-                string dlinecolor = palette2[i % palette2.Count];
+                string dlinecolor = palette2[i % palette2.Count].Trim();
                 string dpointtype = "7";
                 string dpointsize = "0.5";
                 string dfillstyle = "solid";
@@ -23803,7 +23890,7 @@ namespace Gekko
                 // --------- loading lines section start
                 // ---------------------------------------------
 
-                linetype = GetText(linetypes[i], o.opt_linetype, line3 == null ? null : line3.SelectSingleNode("linetype"), linetypeMain, dlinetype);
+                linetype = GetText(linetypes[i], o.opt_linetype, line3 == null ? null : line3.SelectSingleNode("type"), linetypeMain, dlinetype);
                 dashtype = GetText(dashtypes[i], o.opt_dashtype, line3 == null ? null : line3.SelectSingleNode("dashtype"), dashtypeMain, ddashtype);
                 linewidth = GetText(G.isNumericalError(linewidths[i]) ? null : linewidths[i].ToString(), G.isNumericalError(o.opt_linewidth) ? null : o.opt_linewidth.ToString(), line3 == null ? null : line3.SelectSingleNode("linewidth"), linewidthMain, dlinewidth);
                 linecolor = GetText(linecolors[i], o.opt_linecolor, line3 == null ? null : line3.SelectSingleNode("linecolor"), linecolorMain, dlinecolor);
@@ -23854,6 +23941,23 @@ namespace Gekko
                     if (firstPass) numberOfY2s++;
                     s += " axes x1y2";  //#23475432985
                 }
+
+                try
+                {
+                    if(linewidthCorrection!=1d)
+                    {
+                        double temp = double.Parse(linewidth);
+                        linewidth = (temp * linewidthCorrection).ToString();
+                    }
+                    if (pointsizeCorrection != 1d)
+                    {
+                        double temp = double.Parse(pointsize);
+                        pointsize = (temp * pointsizeCorrection).ToString();
+                    }
+                }
+                catch { };
+
+
                 if (!NullOrEmpty(dashtype)) s += " dashtype " + dashtype;
                 if (!NullOrEmpty(linewidth)) s += " linewidth " + linewidth;
                 if (!NullOrEmpty(linecolor)) s += " linecolor rgb \"" + linecolor + "\"";
@@ -23936,12 +24040,12 @@ namespace Gekko
                     if (line3 == null || line3.SelectSingleNode("y2") == null)
                     {
                         areasYCounter++;
-                        areasY.Add(i);
+                        if (firstPass) areasY.Add(i);
                     }
                     else
                     {
                         areasY2Counter++;
-                        areasY2.Add(i);
+                        if (firstPass) areasY2.Add(i);
                     }
 
                     if (stacked)
@@ -23968,17 +24072,17 @@ namespace Gekko
                         xAdjustment = "" + (quarterFix + 1) + ":(" + ss + ")";
                     }
                     else
-                    {
-                        if (firstPass)
-                        {
-                            minMax[4] = Math.Min(minMax[4], dataMin[i]);
-                            minMax[5] = Math.Max(minMax[5], dataMax[i]);
-                        }
+                    {                        
                         xAdjustment = "" + (quarterFix + 1) + ":" + (i + quarterFix + 2);  //just normal positioning
                     }
                 }
                 else
                 {
+                    if (firstPass)
+                    {
+                        minMax[4] = Math.Min(minMax[4], dataMin[i]);
+                        minMax[5] = Math.Max(minMax[5], dataMax[i]);
+                    }
                     xAdjustment = "" + (quarterFix + 1) + ":" + (i + quarterFix + 2);
                 }
 
@@ -28360,7 +28464,8 @@ namespace Gekko
                 case eOfficeApp.eOfficeApp_Outlook: { return "Outlook"; } break;
                 case eOfficeApp.eOfficeApp_Access: { return "Access"; } break;
                 case eOfficeApp.eOfficeApp_PowerPoint: { return "Powerpoint"; } break;
-                default: { /*ASSERT(false);*/ return string.Empty; } break; // added another ???
+                default: { /*ASSERT(false);*/
+                        return string.Empty; } break; // added another ???
             }
         }
 
@@ -31078,6 +31183,8 @@ namespace Gekko
         public StreamWriter pipeFile = null;
         public bool pipeFileTypeIsHtml = false;
         public string htmlEndingTagsStuff = "";  //this is going to be appended to a html file when the pipe stops.
+        //public bool isPiping = true;
+        
         public void CloseFile()
         {
             if (pipeFileTypeIsHtml)
@@ -31087,6 +31194,10 @@ namespace Gekko
             this.pipeFile.Flush();
             this.pipeFile.Close();
             this.pipeFile.Dispose();
+
+            //this.pipeFile.BaseStream.Flush();  --> does not work
+            //this.pipeFile.BaseStream.Close();
+            //this.pipeFile.BaseStream.Dispose();
         }
     }
 

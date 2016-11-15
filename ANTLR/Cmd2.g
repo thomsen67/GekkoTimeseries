@@ -337,17 +337,20 @@ tokens {
     ASTOPT2;
     ASTOPT_;
 	ASTOPT_STRING_SIZE;
+	ASTOPT_STRING_PAUSE;
+	ASTOPT_STRING_CONTINUE;
+	ASTOPT_STRING_STOP;
 ASTOPT_STRING_TITLE;
 ASTOPT_STRING_SUBTITLE;
 ASTOPT_STRING_FONT;
-ASTOPT_STRING_FONTSIZE;
+ASTOPT_VAL_FONTSIZE;
 ASTOPT_STRING_TICS;
 ASTOPT_STRING_GRID;
 ASTOPT_STRING_KEY;
 ASTOPT_STRING_PALETTE;
 ASTOPT_STRING_STACK;
-ASTOPT_STRING_BOXWIDTH;
-ASTOPT_STRING_BOXGAP;
+ASTOPT_VAL_BOXWIDTH;
+ASTOPT_VAL_BOXGAP;
 ASTOPT_STRING_SEPARATE;
 ASTOPT_DATE_XLINE;
 ASTOPT_DATE_XLINEBEFORE;
@@ -662,6 +665,7 @@ ASTOPT_STRING_Y2;
 		//POINTS = 'POINTS';
 		DOTS = 'DOTS';
 		IMPULSES = 'IMPULSES';
+CONTINUE              = 'CONTINUE';
 SIZE                  = 'SIZE'                     ;
 //TITLE                 = 'TITLE'                    ;
 SUBTITLE              = 'SUBTITLE'                 ;
@@ -1174,6 +1178,7 @@ Y2                    = 'Y2'                       ;
 		d.Add("DOTS" , DOTS);
 		d.Add("IMPULSES" , IMPULSES);
 										d.Add("SIZE",SIZE);
+										d.Add("CONTINUE",CONTINUE);
 										//d.Add("TITLE",TITLE);
 										d.Add("SUBTITLE",SUBTITLE);
 										//d.Add("FONT",FONT);
@@ -2030,7 +2035,7 @@ option                    : OPTION optionType -> ^({token("ASTOPTION", ASTOPTION
 
 pause					  : PAUSE expression? -> ^({token("ASTPAUSE", ASTPAUSE, $PAUSE.Line)} expression?);
 
-pipe					  : PIPE pipeOpt1? fileName ->^({token("ASTPIPE", ASTPIPE, $PIPE.Line)} pipeOpt1? ^(ASTHANDLEFILENAME fileName));
+pipe					  : PIPE pipeOpt1? fileName? ->^({token("ASTPIPE", ASTPIPE, $PIPE.Line)} pipeOpt1? ^(ASTHANDLEFILENAME fileName?));
 
                           // This is SHEET<import> or SHEET<2010 2015 import>.
 						  // The rule stipulates that import must be before other settings, and there must be file=, and there must be an option field.
@@ -2067,8 +2072,8 @@ prtOpt1Helper             : filter
 						  | PDEC EQUAL expression -> ^(ASTOPT_VAL_PDEC expression)
 						  
 						  | APPEND (EQUAL yesNo)? -> ^(ASTOPT_STRING_APPEND yesNo?)
-						  | BOXWIDTH '=' expression -> ^(ASTOPT_STRING_BOXWIDTH expression)  //PLOT
-						  | BOXGAP '=' expression -> ^(ASTOPT_STRING_BOXGAP expression)  //PLOT
+						  | BOXWIDTH '=' expression -> ^(ASTOPT_VAL_BOXWIDTH expression)  //PLOT
+						  | BOXGAP '=' expression -> ^(ASTOPT_VAL_BOXGAP expression)  //PLOT
 						  | CELL '=' expression -> ^(ASTOPT_STRING_CELL expression)
 						  | COLLAPSE (EQUAL prtOptCollapseHelper)? -> ^(ASTOPT_STRING_COLLAPSE prtOptCollapseHelper?)
 						  | COLORS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLORS yesNo?)
@@ -2076,7 +2081,7 @@ prtOpt1Helper             : filter
 						  | DATES (EQUAL yesNo)? -> ^(ASTOPT_STRING_DATES yesNo?)						  
 						  | DUMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_DUMP yesNo?)
 						  | FONT '=' expression -> ^(ASTOPT_STRING_FONT expression)  //PLOT
-						  | FONTSIZE '=' expression -> ^(ASTOPT_STRING_FONTSIZE expression)  //PLOT						  
+						  | FONTSIZE '=' expression -> ^(ASTOPT_VAL_FONTSIZE expression)  //PLOT						  
 						  | GRID (EQUAL yesNo)? -> ^(ASTOPT_STRING_GRID yesNo?)
 						  | HEADING '=' expression -> ^(ASTOPT_STRING_TITLE expression)
 						  | KEY '=' expression -> ^(ASTOPT_STRING_KEY expression)  //PLOT
@@ -2125,8 +2130,7 @@ prtOpt1Helper             : filter
 						  | LINECOLOR '=' expression -> ^(ASTOPT_STRING_LINECOLOR expression)
 						  | POINTTYPE '=' expression -> ^(ASTOPT_STRING_POINTTYPE expression)
 						  | POINTSIZE '=' expression -> ^(ASTOPT_VAL_POINTSIZE expression)
-						  | FILLSTYLE '=' expression -> ^(ASTOPT_STRING_FILLSTYLE expression)						  
-						  | Y2 (EQUAL yesNo)? -> ^(ASTOPT_STRING_Y2 yesNo?)
+						  | FILLSTYLE '=' expression -> ^(ASTOPT_STRING_FILLSTYLE expression)						  						  
 						  ;
 linetypeHelper            : LINESPOINTS -> ASTLINESPOINTS
 						  | LINES -> ASTLINES
@@ -2417,7 +2421,10 @@ smoothOpt2h               : SPLINE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SPLINE yesN
 
 pipeOpt1                  : ISNOTQUAL | leftAngle pipeOpt1h* RIGHTANGLE -> pipeOpt1h*;
 pipeOpt1h                 : HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
-						  | APPEND (EQUAL yesNo)? -> ^(ASTOPT_STRING_APPEND yesNo?)						
+						  | APPEND (EQUAL yesNo)? -> ^(ASTOPT_STRING_APPEND yesNo?)	
+						  | PAUSE (EQUAL yesNo)? -> ^(ASTOPT_STRING_PAUSE yesNo?)						
+						  | CONTINUE (EQUAL yesNo)? -> ^(ASTOPT_STRING_CONTINUE yesNo?)						
+						  | STOP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STOP yesNo?)											
 						  ;
 
 modelOpt1                 : ISNOTQUAL | leftAngle modelOpt1h* RIGHTANGLE -> modelOpt1h*;
@@ -2584,8 +2591,8 @@ prtOptionField4Helper     : width
 						  | LINECOLOR '=' expression -> ^(ASTPRTELEMENTLINECOLOR expression)
 						  | POINTTYPE '=' expression -> ^(ASTPRTELEMENTPOINTTYPE expression)
 						  | POINTSIZE '=' expression -> ^(ASTPRTELEMENTPOINTSIZE expression)
-						  | FILLSTYLE '=' expression -> ^(ASTPRTELEMENTFILLSTYLE expression)
-						  | Y2 '=' expression -> ^(ASTPRTELEMENTY2 expression)
+						  | FILLSTYLE '=' expression -> ^(ASTPRTELEMENTFILLSTYLE expression)						  
+						  | Y2 -> ^(ASTPRTELEMENTY2)
 						  ;
 						  
 opt2                      : optNew | optOld;
@@ -3157,6 +3164,7 @@ doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 
 ident                     : Ident|
                             LINESPOINTS|
+							CONTINUE|
 							//LINES|
 							BOXES|
 							FILLEDCURVES|

@@ -1998,7 +1998,11 @@ namespace Gekko
         {
             public string fileName = null;
             public string opt_html = null;
-            public string opt_append = null;            
+            public string opt_append = null;
+            public string opt_pause = null;
+            public string opt_continue = null;
+            public string opt_stop = null;
+
             public void Exe()
             {
                 Program.Pipe(this);
@@ -3897,14 +3901,14 @@ namespace Gekko
 
             public string opt_size = null;
             public string opt_font = null;
-            public string opt_fontsize = null;   //========> double
+            public double opt_fontsize = double.NaN; 
             public string opt_tics = null;
             public string opt_grid = null;
             public string opt_key = null;
             public string opt_palette = null;
             public string opt_stack = null;
-            public string opt_boxwidth = null;
-            public string opt_boxgap = null;
+            public double opt_boxwidth = double.NaN;
+            public double opt_boxgap = double.NaN;
             public string opt_separate = null;
             public GekkoTime opt_xline = Globals.tNull;
             public GekkoTime opt_xlinebefore = Globals.tNull;
