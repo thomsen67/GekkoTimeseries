@@ -454,7 +454,7 @@ namespace Gekko
         //[ProtoMember()] !!!!!!!! ignore this!
         public ASTNode equationsNodeRoot = null;
         [ProtoMember(25)]
-        public bool isAfterModel = false;  //if equation is after AFTER$
+        public bool isAfterModel = false;  //if equation is after 
         [ProtoMember(26)]
         public bool isAfter2Model = false; //if equation is after AFTER2$ Here, both isAfterModel and isAfter2Model are true at same time
         [ProtoMember(27)]
@@ -5548,8 +5548,8 @@ namespace Gekko
                 sb.AppendLine("altering the hash code, but changing or reordering the equations");
                 sb.AppendLine("in any way will result in a new hash code.");
                 sb.AppendLine();
-                sb.AppendLine("Any variable list after the VARLIST$ tag will also be ignored when");
-                sb.AppendLine("computing the hash code.");
+                sb.AppendLine("Any variable list after the VARLIST$ or VARLIST; tag will also be ignored");
+                sb.AppendLine("when computing the hash code.");
             }
             LinkContainer lc = new LinkContainer(sb.ToString());
             Globals.linkContainer.Add(lc.counter, lc);
@@ -9069,7 +9069,7 @@ namespace Gekko
             foreach (string line in input)
             {
                 string line2 = line.Trim();
-                if (line2.ToLower().StartsWith("varlist$"))
+                if (line2.ToLower().StartsWith("varlist$") || line2.ToLower().StartsWith("varlist;"))
                 {
                     varlistFlag = true;
                 }
@@ -27084,7 +27084,7 @@ namespace Gekko
                 if (file.Peek() < 0) break;
                 string line = file.ReadLine();
                 line = line.Trim();  //removes all blanks at start or end
-                if (G.equal(line, "varlist$"))
+                if (G.equal(line, "varlist$") || G.equal(line, "varlist;"))
                 {
                     varlistFound = true;
                     continue;

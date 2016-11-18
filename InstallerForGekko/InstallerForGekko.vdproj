@@ -69,6 +69,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_073E3B67803B4E2FAD636071A0C4C67A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_09E15A776B47BA7C58BED889A590BC71"
         "OwnerKey" = "8:_2783B4552908479CBF4A35F44C72831D"
         "MsmSig" = "8:_UNDEFINED"
@@ -147,6 +153,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_285AF5ED374B4FE983B7D5A6F4BE2D63"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_293BA7D40D70A42C90A959FC57A25FB0"
         "OwnerKey" = "8:_16E9541594B845D98979A0A29C5DB458"
         "MsmSig" = "8:_UNDEFINED"
@@ -166,6 +178,12 @@
         "Entry"
         {
         "MsmKey" = "8:_2E66FCA2ED814B1481B8B0A7F0B0D055"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_2ED37520A608409E81DFE2ACFF2509EF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -261,6 +279,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_52CA7339717F4C1D8BC62530C851C186"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_5680696C33AF418AAD37572BB071EAA7"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -292,6 +316,12 @@
         "Entry"
         {
         "MsmKey" = "8:_72D28368F7F445BF85AAEC28B469EA68"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_78911F0769424183B44C2D0A084A1E92"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -339,6 +369,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_8A026734DF4846D78033B19D7025391E"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_8A5DB8F9B8CB260AA145AC844116FED5"
         "OwnerKey" = "8:_16E9541594B845D98979A0A29C5DB458"
         "MsmSig" = "8:_UNDEFINED"
@@ -369,6 +405,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_95124EA22F0C498BACDDE61B6C9DD5FA"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_95F3A815197F4E888F866C1BBD71F51D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -381,6 +423,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_9DB0578A8B5A4CD5B9CBB4502D5074EB"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_9F9915AA83B546CBA5973480502E83CF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -388,6 +436,12 @@
         "Entry"
         {
         "MsmKey" = "8:_A1143FDC975C4C2FA34EC58CD779DEE5"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A412E9EA02A54F90A5D3885CE1D3271B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -447,6 +501,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_B14B49D37D344F29AC79077D3DF47AA8"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B99AB6F5837C4D658EA32F77864A85F4"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_BC33505B57B44AA59ED2A18E98888574"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -479,6 +545,12 @@
         {
         "MsmKey" = "8:_D78BA6CE7DA52EBC6F180F3176E257B9"
         "OwnerKey" = "8:_16E9541594B845D98979A0A29C5DB458"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_DA71115F0E9D4A978721CF2E7FC65017"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -948,6 +1020,26 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_073E3B67803B4E2FAD636071A0C4C67A"
+            {
+            "SourcePath" = "8:..\\Gekko\\bin\\Debug\\gnuplot\\intl.dll"
+            "TargetName" = "8:intl.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FDC4A0A552754FDA8191BCB7614FB40C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_09E15A776B47BA7C58BED889A590BC71"
             {
             "AssemblyRegister" = "3:1"
@@ -1192,6 +1284,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_285AF5ED374B4FE983B7D5A6F4BE2D63"
+            {
+            "SourcePath" = "8:..\\Gekko\\bin\\Debug\\gnuplot\\libcairo-2.dll"
+            "TargetName" = "8:libcairo-2.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FDC4A0A552754FDA8191BCB7614FB40C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_293BA7D40D70A42C90A959FC57A25FB0"
             {
             "AssemblyRegister" = "3:1"
@@ -1269,6 +1381,26 @@
             "TargetName" = "8:colors.jpg"
             "Tag" = "8:"
             "Folder" = "8:_B21B936A96D2439EA716B4398F785E61"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2ED37520A608409E81DFE2ACFF2509EF"
+            {
+            "SourcePath" = "8:..\\Gekko\\bin\\Debug\\gnuplot\\libpng14-14.dll"
+            "TargetName" = "8:libpng14-14.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FDC4A0A552754FDA8191BCB7614FB40C"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1556,6 +1688,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_52CA7339717F4C1D8BC62530C851C186"
+            {
+            "SourcePath" = "8:..\\Gekko\\bin\\Debug\\gnuplot\\libgmodule-2.0-0.dll"
+            "TargetName" = "8:libgmodule-2.0-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FDC4A0A552754FDA8191BCB7614FB40C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5680696C33AF418AAD37572BB071EAA7"
             {
             "SourcePath" = "8:..\\Gekko\\bin\\Debug\\XmlNotepad\\XmlNotepad.exe.manifest"
@@ -1673,6 +1825,26 @@
             "TargetName" = "8:schemas.png"
             "Tag" = "8:"
             "Folder" = "8:_B21B936A96D2439EA716B4398F785E61"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_78911F0769424183B44C2D0A084A1E92"
+            {
+            "SourcePath" = "8:..\\Gekko\\bin\\Debug\\gnuplot\\libpango-1.0-0.dll"
+            "TargetName" = "8:libpango-1.0-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FDC4A0A552754FDA8191BCB7614FB40C"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1838,6 +2010,26 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8A026734DF4846D78033B19D7025391E"
+            {
+            "SourcePath" = "8:..\\Gekko\\bin\\Debug\\gnuplot\\libgobject-2.0-0.dll"
+            "TargetName" = "8:libgobject-2.0-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FDC4A0A552754FDA8191BCB7614FB40C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_8A5DB8F9B8CB260AA145AC844116FED5"
             {
             "AssemblyRegister" = "3:1"
@@ -1951,6 +2143,26 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_95124EA22F0C498BACDDE61B6C9DD5FA"
+            {
+            "SourcePath" = "8:..\\Gekko\\bin\\Debug\\gnuplot\\libglib-2.0-0.dll"
+            "TargetName" = "8:libglib-2.0-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FDC4A0A552754FDA8191BCB7614FB40C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_95F3A815197F4E888F866C1BBD71F51D"
             {
             "AssemblyRegister" = "3:1"
@@ -2002,6 +2214,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9DB0578A8B5A4CD5B9CBB4502D5074EB"
+            {
+            "SourcePath" = "8:..\\Gekko\\bin\\Debug\\gnuplot\\libpangowin32-1.0-0.dll"
+            "TargetName" = "8:libpangowin32-1.0-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FDC4A0A552754FDA8191BCB7614FB40C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9F9915AA83B546CBA5973480502E83CF"
             {
             "SourcePath" = "8:..\\Gekko\\bin\\Debug\\XmlNotepad\\Help\\Contact.htm"
@@ -2028,6 +2260,26 @@
             "TargetName" = "8:ding.wav"
             "Tag" = "8:"
             "Folder" = "8:_7BCA428B89E44A5F8DDA0CF6F216DD22"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A412E9EA02A54F90A5D3885CE1D3271B"
+            {
+            "SourcePath" = "8:..\\Gekko\\bin\\Debug\\gnuplot\\zlib1.dll"
+            "TargetName" = "8:zlib1.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FDC4A0A552754FDA8191BCB7614FB40C"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -2235,6 +2487,46 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B14B49D37D344F29AC79077D3DF47AA8"
+            {
+            "SourcePath" = "8:..\\Gekko\\bin\\Debug\\gnuplot\\libffi-6.dll"
+            "TargetName" = "8:libffi-6.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FDC4A0A552754FDA8191BCB7614FB40C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B99AB6F5837C4D658EA32F77864A85F4"
+            {
+            "SourcePath" = "8:..\\Gekko\\bin\\Debug\\gnuplot\\libpangocairo-1.0-0.dll"
+            "TargetName" = "8:libpangocairo-1.0-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FDC4A0A552754FDA8191BCB7614FB40C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BC33505B57B44AA59ED2A18E98888574"
             {
             "SourcePath" = "8:..\\Gekko\\bin\\Debug\\XmlNotepad\\Help\\UI.htm"
@@ -2386,6 +2678,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DA71115F0E9D4A978721CF2E7FC65017"
+            {
+            "SourcePath" = "8:..\\Gekko\\bin\\Debug\\gnuplot\\libiconv-2.dll"
+            "TargetName" = "8:libiconv-2.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FDC4A0A552754FDA8191BCB7614FB40C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DBE3B794D23840B4A718BAB4FBA0F5C3"
@@ -2675,7 +2987,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Gekko"
         "ProductCode" = "8:{B13A1490-358B-45A1-89C4-CA78FC4C8D63}"
-        "PackageCode" = "8:{AB11C571-3B6A-4B5C-87CA-71A37A8777DB}"
+        "PackageCode" = "8:{A2ADC4EE-DECF-417F-8912-8064BBCE8728}"
         "UpgradeCode" = "8:{CB2B9DC1-2614-4C67-A157-6170CF5DE4D2}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
