@@ -49,7 +49,8 @@ Additionally, there are model, solve, equation options.
         public double databank_compare_trel = 0.0001d;
         public bool databank_file_copylocal = true;
         public bool databank_file_gbk_compress = true;
-        public string databank_file_gbk_version = "1.1";  //decides what kind of .gbk file is written       
+        public string databank_file_gbk_version = "1.1";  //decides what kind of .gbk file is written  
+        public string databank_file_gbk_internal = "databank.bin"; //change to "databank.data" in Gekko 2.2
         public string databank_logic = "default";  //default | aremos
         public bool databank_search = false;
         public bool folder = true;

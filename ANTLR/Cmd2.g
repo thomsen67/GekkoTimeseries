@@ -2967,6 +2967,7 @@ optionType :
              | DATABANK FILE FORMAT '='? optionDatabankFileFormatOptions ->  DATABANK FILE FORMAT ^(ASTSTRINGSIMPLE optionDatabankFileFormatOptions)
              | DATABANK FILE GBK COMPRESS '='? yesNoSimple -> DATABANK FILE GBK COMPRESS ^(ASTBOOL yesNoSimple)
              | DATABANK FILE GBK VERSION '='? numberIntegerOrDouble ->  DATABANK FILE GBK VERSION ^(ASTSTRINGSIMPLE numberIntegerOrDouble)  //NOTE: number converted to string
+			 | DATABANK FILE GBK INTERNAL '='? expression ->  DATABANK FILE GBK INTERNAL ^(ASTSTRINGSIMPLE expression)
 			 | DATABANK CREATE AUTO '='? yesNoSimple -> DATABANK CREATE AUTO ^(ASTBOOL yesNoSimple )
 			 | DATABANK CREATE MESSAGE '='? yesNoSimple -> DATABANK CREATE MESSAGE ^(ASTBOOL yesNoSimple )			
 			 | DATABANK SEARCH '='? yesNoSimple -> DATABANK SEARCH ^(ASTBOOL yesNoSimple )			

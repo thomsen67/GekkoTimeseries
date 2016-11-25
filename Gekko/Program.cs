@@ -2632,7 +2632,17 @@ namespace Gekko
 
             if (isTsdx && isProtobuf)
             {
-                using (FileStream fs = WaitForFileStream(tempTsdxPath + "\\" + Globals.protobufFileName, GekkoFileReadOrWrite.Read))
+                string name = null;
+                if (File.Exists(tempTsdxPath + "\\" + Globals.protobufFileName)) name = tempTsdxPath + "\\" + Globals.protobufFileName;  //legacy
+                else if (File.Exists(tempTsdxPath + "\\" + Globals.protobufFileName2)) name = tempTsdxPath + "\\" + Globals.protobufFileName2;  //usual name
+                else if (File.Exists(tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal)) name = tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal;  //IF the usual name is changed
+                else
+                {
+                    G.Writeln2("*** ERROR: Could not find data storage file inside zipped databank file");
+                    throw new GekkoException();
+                }
+
+                using (FileStream fs = WaitForFileStream(name, GekkoFileReadOrWrite.Read))
                 {
 
                     Databank temp = null;
@@ -2651,8 +2661,6 @@ namespace Gekko
                         G.Writeln2("*** ERROR: Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version 1.1 format (protobuffers)");
                         throw new GekkoException();
                     }
-
-
 
                     int maxYearInProtobufFile = int.MinValue;
                     int minYearInProtobufFile = int.MaxValue;
@@ -16884,8 +16892,8 @@ namespace Gekko
             {
                 //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
                 RuntimeTypeModel serializer = TypeModel.Create();
-                serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-                string pathAndFilename2 = tempTsdxPath + "\\" + Globals.protobufFileName;
+                serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+                string pathAndFilename2 = tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal; //changed from .bin to .data
                 databank.Trim();  //to make it smaller, slack removed from each TimeSeries
 
                 //Note that if writeAllVariables=true, we don't make any list of the variables, the databank
@@ -17253,7 +17261,7 @@ namespace Gekko
                         {
                             string fileName2 = tmp2.ArchiveFileNames[i];
 
-                            if (G.equal(fileName2, Globals.protobufFileName))
+                            if (G.equal(fileName2, Globals.protobufFileName) || G.equal(fileName2, Globals.protobufFileName2) || G.equal(fileName2, Program.options.databank_file_gbk_internal))
                             {
                                 isProtobuf = true;
                             }

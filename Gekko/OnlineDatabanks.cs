@@ -44,6 +44,7 @@ namespace Gekko
             string input = Program.options.folder_working + "\\" + jsonName;
             string jsonCode = Program.GetTextFromFileWithWait(input);
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+            httpWebRequest.Timeout = 24 * 60 * 60 * 1000; //24 hours max        
             httpWebRequest.ContentType = "text/json";
             httpWebRequest.Method = "POST";
             System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
@@ -94,8 +95,7 @@ namespace Gekko
                 DateTime t0 = DateTime.Now;
                 using (FileStream fs = Program.WaitForFileStream(path, Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = new StreamWriter(fs, Encoding.UTF8))
-                {
-                    httpWebRequest.Timeout = 24 * 60 * 60 * 1000; //24 hours max                                            
+                {                                                                    
                     G.Writeln2("--> Download of data file start...");
                     HttpWebResponse httpResponse = null;
                     try
