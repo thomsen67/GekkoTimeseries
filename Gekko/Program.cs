@@ -7372,6 +7372,9 @@ namespace Gekko
                 else
                 {
                     //Hmmm, Annual?? What about quarters/months??
+                    //#280935728439 should handle banknames, and should search if in data mode.
+                    //maybe look at COPY and fetch from there.
+                    //destination (lhs) should also allow banknames.
                     x = ts.GetDataSequence(out index1, out index2, tStart0, tEnd);  //implicit ", false" ending this method, no setting of start/end period of timeseries
                     length = index2 - index1 + 1;
                     if (negative)
@@ -10501,7 +10504,8 @@ namespace Gekko
 
                 if (lineNewVersion == Globals.iniFileSecretName)  //this strange name is made in GuiAutoExecStuff()
                 {
-                    lineNewVersion = "run '" + Globals.autoExecCmdFileName + "';";
+                    //lineNewVersion = "run '" + Globals.autoExecCmdFileName + "';";
+                    lineNewVersion = "ini;";
                 }
                 else if (lineNewVersion == "RunGekkoTabToTextStuff")
                 {
@@ -11190,6 +11194,26 @@ namespace Gekko
             AddAbstract(fileName, true, true, p);
         }
 
+        public static void Ini(P p)
+        {
+            string s = "gekko.ini";
+            List<string> folders = new List<string>();
+            folders.Add(Program.options.folder_command);
+            folders.Add(Program.options.folder_command1);
+            folders.Add(Program.options.folder_command2);
+            string fileName2 = SearchForFile(s, folders);  //also calls CreateFullPathAndFileName()
+            if (fileName2 == null)
+            {
+                G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in working folder");
+                return;  //used for gekko.ini file
+            }
+            Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
+            Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
+            Program.EmitCodeFromANTLR("", fileName2, false, p);            
+            G.Writeln();
+            G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from working folder");            
+        }
+
         public static void AddAbstract(string s, bool run, bool isLibrary, P p)
         {
             s = StripQuotes(s);
@@ -11218,32 +11242,9 @@ namespace Gekko
 
             if (fileName2 == null)
             {
-                if (s.ToLower().Contains(Globals.autoExecCmdFileName))  //gekko.ini
-                {
-                    //trying c:\.....\isstart.cmd instead of c:\.....\gekko.ini
-                    //this is for convenience and will issue a warning
-                    //remove at some point when isstart.cmd is completely dead.
-                    //string oldName = Regex.Replace(s, Globals.autoExecCmdFileName, Globals.autoExecCmdFileName2, RegexOptions.IgnoreCase);
-                    //fileName2 = SearchForFile(oldName, folders);  //also calls CreateFullPathAndFileName()
-                    //if (fileName2 == null)  //if no isstart.cmd is found either
-                    //{
-                    //no serious error because of this
-                    G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in working folder");
-                    return;  //used for gekko.ini file
-                    //}
-                    //else
-                    //{
-                    //    //isstart.cmd was found and will be used
-                    //    G.Writeln2("+++ WARNING: '" + Globals.autoExecCmdFileName2 + "' was used as INI file name. This name will be");
-                    //    G.Writeln("             obsolete at some point, so please rename the file to 'gekko.ini'.", Globals.warningColor);
-                    //}
-                }
-                else
-                {
-                    //calling RUN isstart.cmd manually will fail here if it does not exist. Then RUN gekko.ini will not be tried. That is ok, ini files should not be called manually anyway (use INI command).
-                    G.Writeln2("*** ERROR: Could not find file: " + s);
-                    throw new GekkoException();
-                }
+                //calling RUN gekko.ini here manually will fail if the file does not exist, which is fine
+                G.Writeln2("*** ERROR: Could not find file: " + s);
+                throw new GekkoException();
             }
 
             Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
@@ -18009,7 +18010,7 @@ namespace Gekko
             if (ini)
             {
                 G.Writeln();
-                Program.ReadIniFile(p);
+                Program.Ini(p);
             }
             try
             {
@@ -18083,17 +18084,7 @@ namespace Gekko
             int n = 0;
             if (!skipWrite) n = Write(removed, tStart, tEnd, removed.FileNameWithPath, false, null, "" + Globals.extensionDatabank + "", true, true);
         }
-
-        public static void Ini(P p)
-        {
-            ReadIniFile(p);
-        }
-
-        public static void ReadIniFile(P p)
-        {
-            Program.Run(Globals.autoExecCmdFileName, p);
-        }
-
+        
         public static string ErrorHandling(string s, P p, bool noWindowShown)
         {
             if (Globals.threadIsInProcessOfAborting)
