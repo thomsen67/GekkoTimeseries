@@ -222,7 +222,7 @@ namespace Gekko.Parser.Gek
                         else
                         {
                             //file
-                            text = "*** ERROR: " + xx + " file: " + originalFileName + " line " + lineNumber3;
+                            text = "*** ERROR: " + xx + " file '" + originalFileName + "', line " + lineNumber3;
                         }
 
                         Program.WriteErrorMessage(lineNumber, problemLine, text, originalFileName);

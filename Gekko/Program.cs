@@ -9268,7 +9268,7 @@ namespace Gekko
 
             List<string> linesNew = null;
             linesNew = HandleObeyFilesNew(lines);
-
+                        
             Globals.cmdFileLines = linesNew;  //used if there is a lexer error
             StringBuilder sb = new StringBuilder();
             foreach (string line in linesNew)
@@ -11091,17 +11091,27 @@ namespace Gekko
                 }
             }
 
+            string s = null;
+
             if (utf8checker)
             {
-                return original;
+                s = original;                
             }
             else
             {
                 //Convert bytes from ANSI to UTF8
                 byte[] encBytes = current.GetBytes(original);  //'current' will always be equal to 'encoding' I guess, but just for safety
                 byte[] utf8Bytes = Encoding.Convert(current, Encoding.UTF8, encBytes);
-                return Encoding.UTF8.GetString(utf8Bytes);
-            }
+                s = Encoding.UTF8.GetString(utf8Bytes);
+            }            
+
+            s = s.Replace(Convert.ToChar(160).ToString(), " ");  //non-breaking space
+            s = s.Replace(Convert.ToChar(173).ToString(), "");  //soft hyphen
+
+            //the code below is probably too dangerous: what about newlines etc.??
+            //s = Regex.Replace(s, @"[^\u0000-\u001F]+", string.Empty);  //see http://stackoverflow.com/questions/123336/how-can-you-strip-non-ascii-characters-from-a-string-in-c, here we use 0-1F, that is: 0-31
+            
+            return s;
         }
 
 
@@ -18128,12 +18138,12 @@ namespace Gekko
                         if (ln <= 0)
                         {
                             //this should not happen any more, after fix regarding token line numbers (2/9 2012)
-                            text = "*** ERROR: " + "Running file: " + fileCalled5 + " line [unknown]";
+                            text = "*** ERROR: " + "Running file '" + fileCalled5 + "', line [unknown]";
                             commandText5 = "";
                         }
                         else
                         {
-                            text = "*** ERROR: " + "Running file: " + fileCalled5 + " line " + ln;
+                            text = "*** ERROR: " + "Running file '" + fileCalled5 + "', line " + ln;
                             commandText5 = commandLines5[ln - 1];
                         }
                         WriteErrorMessage(ln, commandText5, text, fileCalled5);
