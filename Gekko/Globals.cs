@@ -326,7 +326,9 @@ namespace Gekko
         public static readonly Random random777 = new Random();
         public static readonly object randomSyncLock = new object();
         public static int tempVarIndexCounter = 0;
-        
+
+        public static Random random = new Random();  //for reuse in functions runif() and rnorm()
+
         public static string[] convergenceCheckVariables = new string[1];        
         public static bool initializeDataArrayWithNaN = true;
         public static bool simulationCheckThatAllDataGetsFromBArrayToTimeSeries = true;

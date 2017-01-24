@@ -641,6 +641,34 @@ namespace Gekko
             return new ScalarVal(s1.Length);
         }
 
+        public static IVariable rseed(GekkoTime t, IVariable seed)
+        {
+            double seed2 = O.GetVal(seed, t);
+            int i = (int)seed2;
+            Globals.random = new Random(i);            
+            return new ScalarVal(i);
+        }
+
+        public static IVariable rnorm(GekkoTime t, IVariable mean2, IVariable stdDev2)
+        {
+            double mean = O.GetVal(mean2, t);
+            double stdDev = O.GetVal(stdDev2, t);            
+            Random rand = new Random(); //reuse this if you are generating many
+            double u1 = Globals.random.NextDouble(); //these are uniform(0,1) random doubles
+            double u2 = Globals.random.NextDouble();
+            double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) *
+                         Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
+            double randNormal =
+                         mean + stdDev * randStdNormal; //random normal(mean,stdDev^2)
+            return new ScalarVal(randNormal);
+        }
+
+        public static IVariable runif(GekkoTime t)
+        {
+            double u2 = Globals.random.NextDouble();            
+            return new ScalarVal(u2);
+        }
+
         public static IVariable sum(GekkoTime t, params IVariable[] items)
         {
             if (items.Length == 0)
