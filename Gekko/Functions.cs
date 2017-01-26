@@ -1019,21 +1019,13 @@ namespace Gekko
         {
             double d = O.GetVal(x1, t);
             string format2 = O.GetString(x2);
-            string format = "{0:" + format2 + "}";
-            string x = null;
-            try
-            {
-                x = String.Format(format, d);
-            }
-            catch (Exception e)
-            {
-                G.Writeln2("*** ERROR: format() function failed. The internal error message is this:");
-                G.Writeln("           " + e.Message);
-                throw new GekkoException();
-            }
+            string x = Program.NumberFormat(d, format2);
             ScalarString ss = new ScalarString(x);
             return ss;
         }
+
+        
+        
 
         public static IVariable round(GekkoTime t, IVariable x1, IVariable x2)
         {            

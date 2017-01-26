@@ -170,13 +170,19 @@ Additionally, there are model, solve, equation options.
         public bool solve_print_iter = false;
         public bool solve_static = false;
         public int system_code_split = 10;
+
+        public string table_mdateformat = "danish-short";  //"danish-short" or "english-short" are possible. (could perhaps have a "-s" for small?)
+        public string table_decimalseparator = "comma";  //comma|period
+        public bool table_thousandsseparator = true;
+        public bool table_stamp = false;
+
         public double table_html_datawidth = 5.5;  //in 'em' units
         public double table_html_firstcolwidth = 5.5;  //in 'em' units
         public string table_html_font = "Arial";
         public double table_html_fontsize = 72;  //in %                        
         public double table_html_secondcolwidth = 5.5;  //in 'em' units
         public bool table_html_specialminus = false;        
-        public bool table_ignoremissingvars = true;
+        public bool table_ignoremissingvars = true;        
         public string table_type = "html";  //txt or html
         public bool timefilter = false;
         public string timefilter_type = "hide";  //"hide" or "avg"

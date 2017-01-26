@@ -24,6 +24,7 @@ using System.Text;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Globalization;
 
 namespace Gekko
 {
@@ -496,6 +497,111 @@ namespace Gekko
         private static string GetStringFromDate(Cell cell)
         {
             string s = cell.date.ToString();
+
+            string[] ss = s.Split('m');
+            if (ss.Length == 2 && G.IsInteger(ss[0]) && G.IsInteger(ss[1]))
+            {
+                int x1 = int.Parse(ss[0]);
+                int x2 = int.Parse(ss[1]);
+                if (Program.options.table_mdateformat != "")
+                {
+                    string format = Program.options.table_mdateformat;
+                    bool lower = false;
+                    if (format.ToLower().EndsWith("-lower"))
+                    {
+                        format = format.Substring(0, format.Length - "-lower".Length);
+                        lower = true;
+                    }
+                    if (G.equal(format, "danish-short"))
+                    {
+                        if (x2 == 1) s = "jan. " + x1;
+                        else if (x2 == 2) s = "feb. " + x1;
+                        else if (x2 == 3) s = "mar. " + x1;
+                        else if (x2 == 4) s = "apr. " + x1;
+                        else if (x2 == 5) s = "maj " + x1;
+                        else if (x2 == 6) s = "juni " + x1;
+                        else if (x2 == 7) s = "juli " + x1;
+                        else if (x2 == 8) s = "aug. " + x1;
+                        else if (x2 == 9) s = "sep. " + x1;
+                        else if (x2 == 10) s = "okt. " + x1;
+                        else if (x2 == 11) s = "nov. " + x1;
+                        else if (x2 == 12) s = "dec. " + x1;
+                        else
+                        {
+                            G.Writeln2("*** ERROR: Month number > 12 not allowed");
+                            throw new GekkoException();
+                        }
+                    }
+                    else if (G.equal(format, "danish-long"))
+                    {
+                        if (x2 == 1) s = "januar " + x1;
+                        else if (x2 == 2) s = "februar " + x1;
+                        else if (x2 == 3) s = "marts " + x1;
+                        else if (x2 == 4) s = "april " + x1;
+                        else if (x2 == 5) s = "maj " + x1;
+                        else if (x2 == 6) s = "juni " + x1;
+                        else if (x2 == 7) s = "juli " + x1;
+                        else if (x2 == 8) s = "august " + x1;
+                        else if (x2 == 9) s = "september " + x1;
+                        else if (x2 == 10) s = "oktober " + x1;
+                        else if (x2 == 11) s = "november " + x1;
+                        else if (x2 == 12) s = "december " + x1;
+                        else
+                        {
+                            G.Writeln2("*** ERROR: Month number > 12 not allowed");
+                            throw new GekkoException();
+                        }
+                    }
+                    else if (G.equal(format, "english-short"))
+                    {
+                        if (x2 == 1) s = "jan. " + x1;
+                        else if (x2 == 2) s = "feb. " + x1;
+                        else if (x2 == 3) s = "mar. " + x1;
+                        else if (x2 == 4) s = "apr. " + x1;
+                        else if (x2 == 5) s = "may " + x1;
+                        else if (x2 == 6) s = "june " + x1;
+                        else if (x2 == 7) s = "july " + x1;
+                        else if (x2 == 8) s = "aug. " + x1;
+                        else if (x2 == 9) s = "sep. " + x1;
+                        else if (x2 == 10) s = "oct. " + x1;
+                        else if (x2 == 11) s = "nov. " + x1;
+                        else if (x2 == 12) s = "dec. " + x1;
+                        else
+                        {
+                            G.Writeln2("*** ERROR: Month number > 12 not allowed");
+                            throw new GekkoException();
+                        }
+                    }
+                    else if (G.equal(format, "english-long"))
+                    {
+                        if (x2 == 1) s = "january " + x1;
+                        else if (x2 == 2) s = "february " + x1;
+                        else if (x2 == 3) s = "march " + x1;
+                        else if (x2 == 4) s = "april " + x1;
+                        else if (x2 == 5) s = "may " + x1;
+                        else if (x2 == 6) s = "june " + x1;
+                        else if (x2 == 7) s = "july " + x1;
+                        else if (x2 == 8) s = "august " + x1;
+                        else if (x2 == 9) s = "september " + x1;
+                        else if (x2 == 10) s = "october " + x1;
+                        else if (x2 == 11) s = "november " + x1;
+                        else if (x2 == 12) s = "december " + x1;
+                        else
+                        {
+                            G.Writeln2("*** ERROR: Month number > 12 not allowed");
+                            throw new GekkoException();
+                        }
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: OPTION table mdateformat = '" + Program.options.table_mdateformat + "' is not recognized");
+                        throw new GekkoException();
+                    }
+                    //Sets uppercase on first letter
+                    if (!lower) s = char.ToUpper(s[0]) + s.Substring(1);
+                }
+            }
+
             return s;
         }
 
@@ -548,10 +654,33 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            string code = "{0:0}";
-            if (decimals > 0) code = "{0:0." + new string('0', decimals) + "}";
+            
+            var nfi = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();
 
-            string s = String.Format(System.Globalization.CultureInfo.InvariantCulture, code, cell.number);
+            if (G.equal(Program.options.table_decimalseparator, "comma"))
+            {
+                nfi.NumberGroupSeparator = ".";
+                nfi.NumberDecimalSeparator = ",";
+            }
+            else
+            {
+                nfi.NumberGroupSeparator = ",";
+                nfi.NumberDecimalSeparator = ".";
+            }
+
+            string s = "";
+            if (Program.options.table_thousandsseparator)
+            {   if (decimals > 0) s = cell.number.ToString("#,0." + new string('0', decimals), nfi);
+                else if (decimals < 0) s = (Math.Round(cell.number / Math.Pow(10d, -decimals), 0, MidpointRounding.AwayFromZero) * Math.Pow(10d, -decimals)).ToString("#,0", nfi);
+                else s = cell.number.ToString("#,0", nfi);
+            }
+            else
+            {
+                if (decimals > 0) s = cell.number.ToString("0." + new string('0', decimals), nfi);
+                else if (decimals < 0) s = (Math.Round(cell.number / Math.Pow(10d, -decimals), 0, MidpointRounding.AwayFromZero) * Math.Pow(10d, -decimals)).ToString("0", nfi);
+                else s = cell.number.ToString("0", nfi);
+            }                        
+                        
             if (s.Length > maxLength) s = new string('*', maxLength);
             if (s.Length < maxLength) s = new string(' ', maxLength - s.Length) + s;
 
@@ -1451,7 +1580,7 @@ namespace Gekko
 
         //if one of these three it is a normal cell
         public Text CellText { get; set; }
-        public string date;  //FIXME: quarters etc.
+        public string date;  //FIXME: quarters etc. Really ought to be a GekkoTime object
         public double number;
         public string numberFormat = "F15.4";  //default, way too wide and precise in most cases
 

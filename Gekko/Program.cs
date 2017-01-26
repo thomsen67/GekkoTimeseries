@@ -3295,6 +3295,23 @@ namespace Gekko
             }
         }
 
+        public static string NumberFormat(double d, string format2)
+        {
+            string format = "{0:" + format2 + "}";  //0: is just that it is the first element in a list of numbers, perhaps even irrelevant here
+            string x = null;
+            try
+            {
+                x = String.Format(format, d);
+            }
+            catch (Exception e)
+            {
+                G.Writeln2("*** ERROR: format() function failed. The internal error message is this:");
+                G.Writeln("           " + e.Message);
+                throw new GekkoException();
+            }
+            return x;
+        }
+
         private static bool IsNonsenseVariableName(string varName)
         {
             bool nonsense = false;
@@ -18947,8 +18964,11 @@ namespace Gekko
             if (G.equal(Globals.tableOption, "m")) type = StampTypes.Multiplier;
             else if (G.equal(Globals.tableOption, Globals.printCode_s)) type = StampTypes.Base;
             List<string> lines = GetDatabankInfo(type);
-            string printed = "Table printed: " + GetDateTimeStamp();
-            lines.Add(printed);
+            if (Program.options.table_stamp)
+            {
+                string printed = "Table printed: " + GetDateTimeStamp();
+                lines.Add(printed);
+            }
 
             string pTag = "<p CLASS=\"gfsize gfont\" style=\"color: silver; margin: 2px;\">";
 
