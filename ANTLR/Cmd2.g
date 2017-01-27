@@ -713,7 +713,8 @@ FILLSTYLE             = 'FILLSTYLE'                ;
 LABEL                 = 'LABEL'                    ;
 Y2                    = 'Y2'                       ;
 
-
+    MDATEFORMAT = 'MDATEFORMAT';
+	THOUSANDSSEPARATOR = 'THOUSANDSSEPARATOR';
 	XEDIT = 'XEDIT';
 	IMPOSE = 'IMPOSE';
 	CONSTANT = 'CONSTANT';
@@ -1023,8 +1024,10 @@ Y2                    = 'Y2'                       ;
     SEC = 'SEC';
 	SECONDCOLWIDTH = 'SECONDCOLWIDTH';
     SER2 = 'S___ER';
+	SER3 = 'S____ER';
     SER='SER';
     SERIES2 = 'S___ERIES';
+	SERIES3 = 'S____ERIES';
     SERIES='SERIES';
     SET              = 'SET'             ;  //not used?
     SETBORDER        = 'SETBORDER';
@@ -1227,6 +1230,10 @@ Y2                    = 'Y2'                       ;
 																				
 										d.Add("INTERPOLATE"    ,   INTERPOLATE     );
 										d.Add("XEDIT"    ,   XEDIT     );
+
+										d.Add("MDATEFORMAT"    ,   MDATEFORMAT     );
+										d.Add("THOUSANDSSEPARATOR"    ,   THOUSANDSSEPARATOR     );
+											
 										d.Add("MISSING"    ,   MISSING     );
 										d.Add("CONSTANT", CONSTANT);
 										d.Add("IMPOSE", IMPOSE);
@@ -1534,6 +1541,8 @@ Y2                    = 'Y2'                       ;
 										d.Add("library"     , LIBRARY       );
                                         d.Add("S___ER" ,SER2);
                                         d.Add("S___ERIES" ,SERIES2);
+										d.Add("S____ER" ,SER3);
+                                        d.Add("S____ERIES" ,SERIES3);
                                         d.Add("SEARCH", SEARCH);
                                         d.Add("SECONDCOLWIDTH" ,SECONDCOLWIDTH);
 										d.Add("SEC" ,SEC);
@@ -1902,7 +1911,8 @@ genr                      :
 						    // UPD: y1, y2 = 5; //1 or more on lhs, and at least 2 on rhs
 					      | genr2 seriesOpt1? listItemsUpd EQUAL updDataComplicated2 -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataComplicated2)
 						    // UPD: y1 = 1 2; //must have > 1 on rhs
-						  | genr2 seriesOpt1? listItemsUpd EQUAL updDataSimple2 -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataSimple2)			  						
+							// !NOTE: the one below is the one that can get confused with a genr-type, for instance if y = 1 -2 -3 -2, or y = 1 -2 -3 -2*2 (the last one chokes)
+						  | genr4 seriesOpt1? listItemsUpd EQUAL updDataSimple2 -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataSimple2)			  						
 
 						    // UPD: #m = 5; // #m = ... ------> gets special treatment
 					      | genr3 seriesOpt1? listItemsUpd EQUAL updDataComplicated -> ^(ASTUPD listItemsUpd ^(ASTOPT_ seriesOpt1?) ^(ASTUPDOPERATOR ASTUPDOPERATOREQUAL) updDataComplicated)
@@ -1941,13 +1951,12 @@ genr                      :
 						    // GENR: w:y[2020] = x1 + x2
 						  | genr2 nameWithBank leftBracketGlue expression RIGHTBRACKET EQUAL expression  (REP star)* -> ^({token("ASTGENRINDEXER", ASTGENRINDEXER, $EQUAL.Line)}  nameWithBank expression expression)						
 
-						  | genr2 question -> ASTSERIESQUESTION                          					
-
+						  | genr2 question -> ASTSERIESQUESTION   
 						  ;
 
-genr2                     : SER | SERIES;		
-
-genr3                     : SER2 | SERIES2;
+genr2                     : SER | SERIES;
+genr3                     : SER2 | SERIES2; //has a special SERIES #m = ... pattern, see also //#098275432874
+genr4                     : SER3 | SERIES3; //has a special SERIES y = 1 -2 3 4 -3 -4 pattern, see also //#098275432874
 
 seriesOpt1                : ISNOTQUAL
 						  | leftAngle2          seriesOpt1h* RIGHTANGLE -> ^(ASTOPT1 seriesOpt1h*)
@@ -3125,6 +3134,11 @@ optionType :
 			 | TABLE HTML SPECIALMINUS '='? yesNoSimple ->  TABLE HTML SPECIALMINUS ^(ASTBOOL yesNoSimple)
              | TABLE IGNOREMISSINGVARS '='? yesNoSimple ->  TABLE IGNOREMISSINGVARS ^(ASTBOOL yesNoSimple)			
              | TABLE TYPE '='? tableType ->  TABLE TYPE ^(ASTSTRINGSIMPLE tableType)
+			 
+		     | TABLE MDATEFORMAT '='? StringInQuotes ->  TABLE MDATEFORMAT ^(ASTSTRINGSIMPLE StringInQuotes)
+			 | TABLE DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator ->  TABLE DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
+			 | TABLE THOUSANDSSEPARATOR '='? yesNoSimple ->  TABLE THOUSANDSSEPARATOR ^(ASTBOOL yesNoSimple)
+			 | TABLE STAMP '='? yesNoSimple ->  TABLE STAMP ^(ASTBOOL yesNoSimple)
 			
 			 | TIMEFILTER question -> TIMEFILTER question
              | TIMEFILTER '='? yesNoSimple -> TIMEFILTER ^(ASTBOOL yesNoSimple)
@@ -3164,6 +3178,8 @@ integerNegative           : MINUS integer -> ^(ASTINTEGERNEGATIVE integer);
 doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 
 ident                     : Ident|
+							THOUSANDSSEPARATOR|
+							MDATEFORMAT|
                             LINESPOINTS|
 							CONTINUE|
 							//LINES|
@@ -3518,6 +3534,8 @@ ident                     : Ident|
 							SEC|
                             SER2|
                             SERIES2|
+							SER3|
+                            SERIES3|
                             SERIES|
                             SER|
                             SETBORDER|

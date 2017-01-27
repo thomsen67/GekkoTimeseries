@@ -44,6 +44,7 @@ namespace Gekko
         private int _colMaxNumber = 0;
         public string tabFileName = null;
         public bool writeOnce = false;  //if true, an exception will be raised if trying to overwrite a cell with a new value (borders not counting)
+        public string type = "print";  //"print" or "table"
 
         public int GetRowMaxNumber()
         {
@@ -76,6 +77,7 @@ namespace Gekko
             //would like to keep the old table intact. Note that changing cells in the transposed table
             //will reflect into the old table and vice versa! (they point to same cell objects).
             Table ttable = new Table();
+            ttable.type = this.type;  //cloning this
             foreach (KeyValuePair<Coord, Cell> kvp in this._data)
             {
                 Coord c2 = new Coord(kvp.Key.Col, kvp.Key.Row);  //swap these
@@ -497,7 +499,7 @@ namespace Gekko
         private static string GetStringFromDate(Cell cell)
         {
             string s = cell.date.ToString();
-
+                        
             string[] ss = s.Split('m');
             if (ss.Length == 2 && G.IsInteger(ss[0]) && G.IsInteger(ss[1]))
             {
@@ -605,8 +607,10 @@ namespace Gekko
             return s;
         }
 
-        private static string GetStringFromNumber(Cell cell, string format)
+        private static string GetStringFromNumber(Cell cell, string format, Table table)
         {
+            bool isTable = G.equal(table.type, "table");
+
             int maxLength = 15; //default
             int decimals = 4; //default
 
@@ -657,19 +661,22 @@ namespace Gekko
             
             var nfi = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();
 
-            if (G.equal(Program.options.table_decimalseparator, "comma"))
+            if (isTable)
             {
-                nfi.NumberGroupSeparator = ".";
-                nfi.NumberDecimalSeparator = ",";
-            }
-            else
-            {
-                nfi.NumberGroupSeparator = ",";
-                nfi.NumberDecimalSeparator = ".";
+                if (G.equal(Program.options.table_decimalseparator, "comma"))
+                {
+                    nfi.NumberGroupSeparator = ".";
+                    nfi.NumberDecimalSeparator = ",";
+                }
+                else
+                {
+                    nfi.NumberGroupSeparator = ",";
+                    nfi.NumberDecimalSeparator = ".";
+                }
             }
 
             string s = "";
-            if (Program.options.table_thousandsseparator)
+            if (isTable && Program.options.table_thousandsseparator)
             {   if (decimals > 0) s = cell.number.ToString("#,0." + new string('0', decimals), nfi);
                 else if (decimals < 0) s = (Math.Round(cell.number / Math.Pow(10d, -decimals), 0, MidpointRounding.AwayFromZero) * Math.Pow(10d, -decimals)).ToString("#,0", nfi);
                 else s = cell.number.ToString("#,0", nfi);
@@ -679,7 +686,13 @@ namespace Gekko
                 if (decimals > 0) s = cell.number.ToString("0." + new string('0', decimals), nfi);
                 else if (decimals < 0) s = (Math.Round(cell.number / Math.Pow(10d, -decimals), 0, MidpointRounding.AwayFromZero) * Math.Pow(10d, -decimals)).ToString("0", nfi);
                 else s = cell.number.ToString("0", nfi);
-            }                        
+            }     
+            
+            
+            
+            
+            
+                               
                         
             if (s.Length > maxLength) s = new string('*', maxLength);
             if (s.Length < maxLength) s = new string(' ', maxLength - s.Length) + s;
@@ -864,7 +877,7 @@ namespace Gekko
 
                         if (cell2.cellType == CellType.Number)
                         {
-                            string s = GetStringFromNumber(cell2, cell2.numberFormat);
+                            string s = GetStringFromNumber(cell2, cell2.numberFormat, this);
                             if (s == "") s = "&nbsp;";
                             //seems IE webbrowser does not reac to <td width=...>
                             string number = s.Trim();
@@ -1023,7 +1036,7 @@ namespace Gekko
                     {
                         if (cell2.cellType == CellType.Number)
                         {
-                            string s = GetStringFromNumber(cell2, cell2.numberFormat);
+                            string s = GetStringFromNumber(cell2, cell2.numberFormat, table);
                             s = " " + s + " ";
                             cell2.CellText = new Text();
                             cell2.CellText.TextData = new List<string>();

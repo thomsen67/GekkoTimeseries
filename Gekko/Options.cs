@@ -50,7 +50,7 @@ Additionally, there are model, solve, equation options.
         public bool databank_file_copylocal = true;
         public bool databank_file_gbk_compress = true;
         public string databank_file_gbk_version = "1.1";  //decides what kind of .gbk file is written  
-        public string databank_file_gbk_internal = "databank.bin"; //change to "databank.data" in Gekko 2.2
+        public string databank_file_gbk_internal = "databank.data"; //change to "databank.data" in Gekko 2.2
         public string databank_logic = "default";  //default | aremos
         public bool databank_search = false;
         public bool folder = true;
@@ -171,10 +171,10 @@ Additionally, there are model, solve, equation options.
         public bool solve_static = false;
         public int system_code_split = 10;
 
-        public string table_mdateformat = "danish-short";  //"danish-short" or "english-short" are possible. (could perhaps have a "-s" for small?)
-        public string table_decimalseparator = "comma";  //comma|period
-        public bool table_thousandsseparator = true;
-        public bool table_stamp = false;
+        public string table_mdateformat = "";  //"danish-short" or "english-short" are possible. (could perhaps have a "-s" for small?)
+        public string table_decimalseparator = "period";  //comma|period
+        public bool table_thousandsseparator = false;
+        public bool table_stamp = true;
 
         public double table_html_datawidth = 5.5;  //in 'em' units
         public double table_html_firstcolwidth = 5.5;  //in 'em' units

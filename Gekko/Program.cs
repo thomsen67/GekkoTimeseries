@@ -10838,8 +10838,64 @@ namespace Gekko
                                     {
 
 
+                                        //==========================================
+                                        bool hasStarted = false;
+                                        for (int ii = j1; ii < lineNewVersion.Length; ii++)
+                                        {
+                                            if (lineNewVersion[ii] == ' ') continue;
+                                            if (lineNewVersion[ii] == '<')
+                                            {
+                                                hasStarted = true;
+                                                continue;
+                                            }
+                                            if (hasStarted && lineNewVersion[ii] == '>')
+                                            {
+                                                j1 = ii + 1;
+                                                break;
+                                            }
+                                        }
+                                        //==========================================
+                                       
 
+                                        int j2 = GetNextHash(lineNewVersion, j1);
+                                        if (j2 != -12345)
+                                        {
+                                            string ident3 = null;
+                                            int j3 = GetNextIdent(lineNewVersion, j2, out ident3);
+                                            if (j3 != -12345)
+                                            {
+                                                int j4 = GetNextEquals(lineNewVersion, j3);
+                                                if (j4 != -12345)
+                                                {
+                                                    success = true;
+                                                    sb.Append(c2);
+                                                    sb.Append("_");
+                                                    sb.Append("_");
+                                                    sb.Append("_");  //SER -> S___ER, SERIES -> S___ERIES, see also //#098275432874
+                                                    continue;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
+                        // -------------------------------------------------------------
+                        // Handle SERIES y = 1 -2 -2 -1 and SERIES y = 1 -2 -2 -1*2
+                        // Problem is that the second is genr type, but the parser starts treating it like upd type.
+                        // -------------------------------------------------------------
+                        if (true)
+                        {
+                            if (!char.IsLetter(c1) && (c2 == 's' || c2 == 'S') && (c3 == 'e' || c3 == 'E'))
+                            {
+                                bool success = false;
+                                string ident1 = null;
+                                int j1 = GetNextIdent(lineNewVersion, i, out ident1);
+                                if (j1 != -12345)
+                                {
+                                    if (ident1.ToLower() == "ser" || ident1.ToLower() == "series")
+                                    {
 
 
                                         //==========================================
@@ -10860,27 +10916,68 @@ namespace Gekko
                                         }
                                         //==========================================
 
-
-
-
-
-
-
-                                        int j2 = GetNextHash(lineNewVersion, j1);
+                                        string ident3 = null;
+                                        int j2 = GetNextIdent(lineNewVersion, j1, out ident3);
                                         if (j2 != -12345)
                                         {
-                                            string ident3 = null;
-                                            int j3 = GetNextIdent(lineNewVersion, j2, out ident3);
+                                            int j3 = GetNextEquals(lineNewVersion, j2);
                                             if (j3 != -12345)
                                             {
-                                                int j4 = GetNextEquals(lineNewVersion, j3);
-                                                if (j4 != -12345)
+                                                int j4 = GetNextComment(lineNewVersion, j3);
+                                                string rest = null;
+                                                if (j4 == -12345) rest = lineNewVersion.Substring(j3, lineNewVersion.Length - j3);
+                                                else rest = lineNewVersion.Substring(j3, j4 - j3);
+
+                                                int semi = rest.IndexOf(";");
+                                                if (semi != -1)
                                                 {
+                                                    rest = rest.Substring(0, semi);
+                                                }
+
+                                                                                                
+                                                StringTokenizer2 tok = new StringTokenizer2(rest, false, false);
+                                                tok.IgnoreWhiteSpace = false;
+                                                tok.SymbolChars = new char[] { '%', '&', '/', '(', ')', '=', '?', '@', '$', '{', '[', ']', '}', '+', '|', '^', '*', '<', '>', ';', ',', ':', '-' };
+                                                Token token;
+                                                int numberCounter = 0;
+                                                bool simpleBlankSeparatedUpd = true;
+                                                do
+                                                {
+                                                    token = tok.Next();
+                                                    string value = token.Value;
+                                                    string kind = token.Kind.ToString();
+                                                    if (kind == "EOF" || kind == "WhiteSpace" || kind == "Number" || (kind == "Word" && value.ToLower() == "m") || (kind == "Symbol" && value == "-"))
+                                                    {
+                                                        //continue
+                                                    }
+                                                    else
+                                                    {
+                                                        simpleBlankSeparatedUpd = false;
+                                                        break;
+                                                    }
+                                                    if (kind == "Number") numberCounter++;                                                                                                                                                         
+                                                } while (token.Kind != TokenKind.EOF);
+
+                                                //Must have at least two numbers to be activated
+                                                if (simpleBlankSeparatedUpd && numberCounter == 1)
+                                                {
+                                                    //number = 0: if the numbers are on the next line. That is typically upd type then.
+                                                    //it must be rather seldom that we have 1 number on the SERIES line, and the rest
+                                                    //on the next line, and that such a line is upd type.
+                                                    simpleBlankSeparatedUpd = false;
+                                                }
+                                                                                                
+                                                if (simpleBlankSeparatedUpd)
+                                                {
+                                                    //will be of the form "1 -1 -2 3 4 -5 1e6 5" (with at least 2 numbers)
+                                                    //if (Globals.runningOnTTComputer) G.Writeln("DETECTED simpleBlankSeparatedUpd!");
+                                                    //really ugly hack
                                                     success = true;
                                                     sb.Append(c2);
                                                     sb.Append("_");
                                                     sb.Append("_");
-                                                    sb.Append("_");  //SER -> S___ER, SERIES -> S___ERIES
+                                                    sb.Append("_");
+                                                    sb.Append("_");  //SER -> S____ER, SERIES -> S____ERIES, see also //#098275432874
                                                     continue;
                                                 }
                                             }
@@ -11041,7 +11138,7 @@ namespace Gekko
             }
             return rv;
         }
-
+        
         private static int GetNextEquals(string lineNewVersion, int i)
         {
             //-12345 if no hit, else the first position to read for next thing to read
@@ -11054,6 +11151,18 @@ namespace Gekko
                     return ii + 1;
                 }
                 return -12345;
+            }
+            return rv;
+        }
+
+        private static int GetNextComment(string lineNewVersion, int i)
+        {
+            //-12345 if no hit, else the last position without the comment
+            //dows not require spaces
+            int rv = -12345;
+            for (int ii = i; ii < lineNewVersion.Length - 1; ii++)
+            {
+                if (lineNewVersion[ii] == '/' && (lineNewVersion[ii + 1] == '/' || lineNewVersion[ii + 1] == '*')) return ii - 1;                
             }
             return rv;
         }
@@ -20731,8 +20840,8 @@ namespace Gekko
 
             int virtualCols = 0;
 
+            Table tab = new Table();            
 
-            Table tab = new Table();
             Globals.lastPrtOrMulprtTable = tab;  //this remembers the last PRT or MULPRT table, for possible putting on clipboard.
             CrossThreadStuff.CopyButtonEnabled(true);
 
@@ -27049,6 +27158,7 @@ namespace Gekko
                 Program.tables.Remove(name);
             }
             Table temp = new Table();
+            temp.type = "table"; //not a "print" type table -- relevant regarding formatting
             Program.tables.Add(name, temp);
         }
 
