@@ -488,7 +488,8 @@ namespace Gekko
 "UNSWAP",
 "VAL",
 "WRITE",
-"X12A"
+"X12A",
+"XEDIT"
 };
 
         public static bool showZero = true;
