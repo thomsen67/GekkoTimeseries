@@ -5921,31 +5921,81 @@ namespace UnitTests
 
         [TestMethod]
         public void Test__Rebase()
-        {
-            //REBASE <bank=ny> y1, temp:y2 2011 prefix=re;");
+        {            
             I("RESET;");
             I("TIME 2010 2012;");
             I("MODE data;");
-            I("SER y1 = 2, 3, 4;");
+            I("SER y1 = -7, 3, 4;");
             I("OPEN<edit>temp;");
-            I("SER y2 = -2, -3, -4;");
-            I("CLOSE temp; OPEN temp; UNLOCK temp;");
+            I("SER y2 = 7, -3, -4;");
+            I("CLOSE temp; OPEN temp;");
+            FAIL("REBASE <bank=work prefix=re index = 100> y1, temp:y2 2011;");
+            I("UNLOCK temp;");
             I("REBASE <bank=work prefix=re index = 100> y1, temp:y2 2011;");
-            AssertHelper(First(), "rey1", 2010, 2d / 3d * 100d, sharedDelta);
+            AssertHelper(First(), "rey1", 2010, -7d / 3d * 100d, sharedDelta);
             AssertHelper(First(), "rey1", 2011, 3d / 3d * 100d, sharedDelta);
-            AssertHelper(First(), "rey1", 2012, 4d / 3d * 100d, sharedDelta);
-            Databank temp = Program.databanks.GetDatabank("temp");
-            AssertHelper(temp, "rey2", 2010, -2d / (-3d) * 100d, sharedDelta);
-            AssertHelper(temp, "rey2", 2011, -3d / (-3d) * 100d, sharedDelta);
-            AssertHelper(temp, "rey2", 2012, -4d / (-3d) * 100d, sharedDelta);
+            AssertHelper(First(), "rey1", 2012, 4d / 3d * 100d, sharedDelta);            
+            AssertHelper(Program.databanks.GetDatabank("temp"), "rey2", 2010, 7d / (-3d) * 100d, sharedDelta);
+            AssertHelper(Program.databanks.GetDatabank("temp"), "rey2", 2011, -3d / (-3d) * 100d, sharedDelta);
+            AssertHelper(Program.databanks.GetDatabank("temp"), "rey2", 2012, -4d / (-3d) * 100d, sharedDelta);
+            I("REBASE <bank=work prefix=re index = 100> y1, temp:y2 2011 2012;");
+            AssertHelper(First(), "rey1", 2010, -7d / ((3d + 4d) / 2d) * 100d, sharedDelta);
+            AssertHelper(First(), "rey1", 2011, 3d / ((3d + 4d) / 2d) * 100d, sharedDelta);
+            AssertHelper(First(), "rey1", 2012, 4d / ((3d + 4d) / 2d) * 100d, sharedDelta);
+            AssertHelper(Program.databanks.GetDatabank("temp"), "rey2", 2010, 7d / ((-3d - 4d) / 2d) * 100d, sharedDelta);
+            AssertHelper(Program.databanks.GetDatabank("temp"), "rey2", 2011, -3d / ((-3d - 4d) / 2d) * 100d, sharedDelta);
+            AssertHelper(Program.databanks.GetDatabank("temp"), "rey2", 2012, -4d / ((-3d - 4d) / 2d) * 100d, sharedDelta);
+            FAIL("REBASE <bank=work prefix=re index = 100> y1, temp:y2 2011 2013;");
+            FAIL("REBASE <bank=work prefix=re index = 100> y1 2010 2012;");
+            FAIL("REBASE <bank=work prefix=re index = 100> temp:y2 2010 2012;");
+            FAIL("REBASE y1 2012 2011;");
+            FAIL("REBASE y1 2010q1 2012;");
+            FAIL("REBASE y1 2010m1 2012q4;");
+            I("LIST m = work:y1, y2;");
+            I("REBASE <bank=temp index = 1> #m 2010;");
+            AssertHelper(First(), "y1", 2010, -7d / (-7d) * 1d, sharedDelta);
+            AssertHelper(First(), "y1", 2011, 3d / (-7d) * 1d, sharedDelta);
+            AssertHelper(First(), "y1", 2012, 4d / (-7d) * 1d, sharedDelta);
+            AssertHelper(Program.databanks.GetDatabank("temp"), "y2", 2010, 7d / (7d) * 1d, sharedDelta);
+            AssertHelper(Program.databanks.GetDatabank("temp"), "y2", 2011, -3d / (7d) * 1d, sharedDelta);
+            AssertHelper(Program.databanks.GetDatabank("temp"), "y2", 2012, -4d / (7d) * 1d, sharedDelta);
 
+            //quarterly
+            I("OPTION freq q;");
+            I("TIME 2010q1 2010q3;");
+            I("SER z1 = -7, 3, 4;");
+            I("REBASE z1 2010q2 2010q3;");
+            AssertHelper(First(), "z1", EFreq.Quarterly, 2009, 4, double.NaN, sharedDelta);
+            AssertHelper(First(), "z1", EFreq.Quarterly, 2010, 1, -7d / ((3d + 4d) / 2d) * 100d, sharedDelta);
+            AssertHelper(First(), "z1", EFreq.Quarterly, 2010, 2, 3d / ((3d + 4d) / 2d) * 100d, sharedDelta);
+            AssertHelper(First(), "z1", EFreq.Quarterly, 2010, 3, 4d / ((3d + 4d) / 2d) * 100d, sharedDelta);
+            AssertHelper(First(), "z1", EFreq.Quarterly, 2010, 4, double.NaN, sharedDelta);
 
+            //using a whole year indicator for quarterly
+            I("TIME 2010q4 2012q1;");
+            I("SER z2 = 1, 2, 3, 4, 5, 6;");
+            I("REBASE z2 2011;");
+            AssertHelper(First(), "z2", EFreq.Quarterly, 2010, 3, double.NaN, sharedDelta);
+            AssertHelper(First(), "z2", EFreq.Quarterly, 2010, 4, 1d / (14d / 4d) * 100d, sharedDelta);
+            AssertHelper(First(), "z2", EFreq.Quarterly, 2011, 1, 2d / (14d / 4d) * 100d, sharedDelta);
+            AssertHelper(First(), "z2", EFreq.Quarterly, 2011, 2, 3d / (14d / 4d) * 100d, sharedDelta);
+            AssertHelper(First(), "z2", EFreq.Quarterly, 2011, 3, 4d / (14d / 4d) * 100d, sharedDelta);
+            AssertHelper(First(), "z2", EFreq.Quarterly, 2011, 4, 5d / (14d / 4d) * 100d, sharedDelta);
+            AssertHelper(First(), "z2", EFreq.Quarterly, 2012, 1, 6d / (14d / 4d) * 100d, sharedDelta);            
+            AssertHelper(First(), "z2", EFreq.Quarterly, 2012, 2, double.NaN, sharedDelta);
 
-
-
-
-
-
+            //Same as above
+            I("TIME 2010q4 2012q1;");
+            I("SER z3 = 1, 2, 3, 4, 5, 6;");
+            I("REBASE z3 2011q1 2011q4;");
+            AssertHelper(First(), "z3", EFreq.Quarterly, 2010, 3, double.NaN, sharedDelta);
+            AssertHelper(First(), "z3", EFreq.Quarterly, 2010, 4, 1d / (14d / 4d) * 100d, sharedDelta);
+            AssertHelper(First(), "z3", EFreq.Quarterly, 2011, 1, 2d / (14d / 4d) * 100d, sharedDelta);
+            AssertHelper(First(), "z3", EFreq.Quarterly, 2011, 2, 3d / (14d / 4d) * 100d, sharedDelta);
+            AssertHelper(First(), "z3", EFreq.Quarterly, 2011, 3, 4d / (14d / 4d) * 100d, sharedDelta);
+            AssertHelper(First(), "z3", EFreq.Quarterly, 2011, 4, 5d / (14d / 4d) * 100d, sharedDelta);
+            AssertHelper(First(), "z3", EFreq.Quarterly, 2012, 1, 6d / (14d / 4d) * 100d, sharedDelta);
+            AssertHelper(First(), "z3", EFreq.Quarterly, 2012, 2, double.NaN, sharedDelta);
 
         }
 

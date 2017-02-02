@@ -3740,20 +3740,52 @@ namespace Gekko
                             Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + ts.parentDatabank + ")");
                         }
 
+                        GekkoTime ddate1 = date1;
+                        GekkoTime ddate2 = date2;
+
+                        if (date1.freq == EFreq.Annual && (ts.freqEnum == EFreq.Quarterly || ts.freqEnum == EFreq.Monthly))
+                        {
+                            //if a year is used for a quarterly series, q1-q4 is used.
+                            ddate1 = new GekkoTime(ts.freqEnum, date1.super, 1);
+                            int end = -12345;
+                            if (ts.freqEnum == EFreq.Quarterly)
+                            {
+                                end = Globals.freqQSubperiods;
+                            }
+                            else if (ts.freqEnum == EFreq.Monthly)
+                            {
+                                end = Globals.freqMSubperiods;
+                            }
+                            else
+                            {
+                                G.Writeln2("*** ERROR: freq error #903853245");
+                                throw new GekkoException();
+                            }
+                            ddate2 = new GekkoTime(ts.freqEnum, date1.super, end);
+                        }
+
+                        if (ddate1.freq != ts.freqEnum || ddate2.freq != ts.freqEnum)
+                        {
+                            G.Writeln2("*** ERROR: frequency of timeseries and frequency of period(s) do not match");
+                            throw new GekkoException();
+                        }
+
                         double sum = 0d;
-                        foreach (GekkoTime t in new GekkoTimeIterator(date1, date2))
+                        double n = 0d;
+                        foreach (GekkoTime t in new GekkoTimeIterator(ddate1, ddate2))
                         {
                             sum += ts.GetData(t);
+                            n++;
                         }
 
                         if (G.isNumericalError(sum))
                         {
-                            G.Writeln2("*** ERROR: Series " + ts.parentDatabank + ":" + ts.variableName + " from " + date1.ToString() + "-" + date2.ToString() + " contains missing values");
+                            G.Writeln2("*** ERROR: Series " + ts.parentDatabank + ":" + ts.variableName + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " contains missing values");
                             throw new GekkoException();
                         }
                         if (sum == 0d)
                         {
-                            G.Writeln2("*** ERROR: Series " + ts.parentDatabank + ":" + ts.variableName + " from " + date1.ToString() + "-" + date2.ToString() + " sums to 0, cannot rebase");
+                            G.Writeln2("*** ERROR: Series " + ts.parentDatabank + ":" + ts.variableName + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " sums to 0, cannot rebase");
                             throw new GekkoException();
                         }                                               
 
@@ -3782,13 +3814,13 @@ namespace Gekko
                         for (int ii = 0; ii < data.Length; ii++)
                         {
                             //could use ts.firstPeriodPositionInArray etc., but better to do it for all since ts.ts.firstPeriodPositionInArray is not always correct
-                            data[ii] = data[ii] / sum * opt_index;
+                            data[ii] = data[ii] / (sum / n) * opt_index;
                         }
                         count++;
                     }
                 }
                 G.Writeln2("Rebased " + count + " variables");
-                if (counter > 0) G.Writeln("+++ NOTE: Prefix names replaced " + counter + " existing variables");
+                //if (counter > 0) G.Writeln("+++ NOTE: Prefix names replaced " + counter + " existing variables");
             }
         }
 
