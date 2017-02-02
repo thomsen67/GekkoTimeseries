@@ -94,7 +94,7 @@ namespace Gekko
         /// itself if necessary to store a particular observation.
         /// </summary>
         [ProtoMember(4, IsPacked = true)]  //a bit faster, and a bit smaller file (also when zipped)        
-        public double[] dataArray;
+        public double[] dataArray;  //BEWARE: if altering directly, make sure that .protect in the databank is not set!!
         /// <summary>
         /// The 'super' period (year) corresponding to the anchor date.
         /// </summary>
@@ -166,7 +166,7 @@ namespace Gekko
         /// </summary>
         /// <returns>The cloned TimeSeries object.</returns>
         public TimeSeries Clone()
-        {
+        {            
             //Always make sure new fields are remembered in the Clone() method
             TimeSeries tsCopy = new TimeSeries(this.freqEnum, this.variableName);            
             if (this.dataArray == null)

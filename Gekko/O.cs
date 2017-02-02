@@ -3700,19 +3700,96 @@ namespace Gekko
         }
 
         public class Rebase
-        {                      
+        {
             public List<string> listItems = null;
             public GekkoTime date1 = Globals.tNull;
             public GekkoTime date2 = Globals.tNull;
-            public string listPrefix = null;
+            public string opt_prefix = null;
             public string opt_bank = null;
+            public double opt_index = 100d;
             public void Exe()
             {
-                for(int i = 0;i<this.listItems.Count;i++)
+                if (date1.IsNull())
+                {
+                    G.Writeln2("*** ERROR: The index date does not seem to exist");  //probably cannot happen
+                    throw new GekkoException();
+                }
+                if (date2.IsNull())
+                {
+                    date2 = date1;
+                }
+                if (date1.freq != date2.freq)
+                {
+                    G.Writeln2("*** ERROR: The two index dates have different frequencies");
+                    throw new GekkoException();
+                }
+                if (date1.StrictlyLargerThan(date2))
+                {
+                    G.Writeln2("*** ERROR: The first date must not be later than the last date");  //probably cannot happen
+                    throw new GekkoException();
+                }
+                int counter = 0;
+                int count = 0;
+                for (int i = 0; i < this.listItems.Count; i++)
                 {
                     List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(this.listItems[i], opt_bank);
+                    foreach (TimeSeries ts in tss)
+                    {
+                        if (ts.parentDatabank.protect)
+                        {
+                            Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + ts.parentDatabank + ")");
+                        }
+
+                        double sum = 0d;
+                        foreach (GekkoTime t in new GekkoTimeIterator(date1, date2))
+                        {
+                            sum += ts.GetData(t);
+                        }
+
+                        if (G.isNumericalError(sum))
+                        {
+                            G.Writeln2("*** ERROR: Series " + ts.parentDatabank + ":" + ts.variableName + " from " + date1.ToString() + "-" + date2.ToString() + " contains missing values");
+                            throw new GekkoException();
+                        }
+                        if (sum == 0d)
+                        {
+                            G.Writeln2("*** ERROR: Series " + ts.parentDatabank + ":" + ts.variableName + " from " + date1.ToString() + "-" + date2.ToString() + " sums to 0, cannot rebase");
+                            throw new GekkoException();
+                        }                                               
+
+                        TimeSeries tsNew = null;
+                        if (opt_prefix != null)
+                        {
+                            tsNew = ts.Clone();
+                            tsNew.variableName = opt_prefix + ts.variableName;
+                            if (ts.parentDatabank == null)
+                            {
+                                G.Writeln2("*** ERROR: Internal error #8796357826435");
+                                throw new GekkoException();
+                            }
+
+
+                            if (ts.parentDatabank.ContainsVariable(tsNew.variableName))
+                            {
+                                ts.parentDatabank.RemoveVariable(tsNew.variableName);
+                                counter++;
+                            }
+                            ts.parentDatabank.AddVariable(tsNew);
+                        }
+                        else tsNew = ts;
+                        
+                        double[] data = tsNew.dataArray;
+                        for (int ii = 0; ii < data.Length; ii++)
+                        {
+                            //could use ts.firstPeriodPositionInArray etc., but better to do it for all since ts.ts.firstPeriodPositionInArray is not always correct
+                            data[ii] = data[ii] / sum * opt_index;
+                        }
+                        count++;
+                    }
                 }
-            }                
+                G.Writeln2("Rebased " + count + " variables");
+                if (counter > 0) G.Writeln("+++ NOTE: Prefix names replaced " + counter + " existing variables");
+            }
         }
 
         public class Count

@@ -1773,7 +1773,7 @@ namespace Gekko.Parser.Gek
                             {
                                 node.Code.A("o" + Num(node) + ".date2 = O.GetDate(" + node[1][1].Code + ");" + G.NL);
                             }
-                            if (node[2] != null) node.Code.A(node[2].Code);
+                            if (node[2] != null) node.Code.A(node[2].Code);  //options
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;

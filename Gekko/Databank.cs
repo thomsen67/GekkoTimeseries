@@ -160,7 +160,7 @@ namespace Gekko
         public void RemoveVariable(string variable)
         {
             RemoveVariable(true, variable);            
-        }        
+        }      
 
         public void RemoveVariable(EFreq eFreq, string variable)
         {
@@ -214,15 +214,17 @@ namespace Gekko
         public void AddVariable(TimeSeries ts)
         {             
             AddVariable(true, null, ts);            
-        }
+        }        
+
         public void AddVariable(string frequency, TimeSeries ts)
         {
             AddVariable(false, frequency, ts);
         }
 
+
         //generic method, not for outside use
         private void AddVariable(bool freqAddToName, string frequency, TimeSeries ts)
-        {
+        {            
             if (this.protect) Program.ProtectError("You cannot add a timeseries to a non-editable databank, see OPEN<edit> or UNLOCK");
             string variable = ts.variableName;
             if (!G.IsSimpleToken(variable))  //also checks for null and ""

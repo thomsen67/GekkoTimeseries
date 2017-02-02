@@ -5918,6 +5918,39 @@ namespace UnitTests
             }
         }
 
+
+        [TestMethod]
+        public void Test__Rebase()
+        {
+            //REBASE <bank=ny> y1, temp:y2 2011 prefix=re;");
+            I("RESET;");
+            I("TIME 2010 2012;");
+            I("MODE data;");
+            I("SER y1 = 2, 3, 4;");
+            I("OPEN<edit>temp;");
+            I("SER y2 = -2, -3, -4;");
+            I("CLOSE temp; OPEN temp; UNLOCK temp;");
+            I("REBASE <bank=work prefix=re index = 100> y1, temp:y2 2011;");
+            AssertHelper(First(), "rey1", 2010, 2d / 3d * 100d, sharedDelta);
+            AssertHelper(First(), "rey1", 2011, 3d / 3d * 100d, sharedDelta);
+            AssertHelper(First(), "rey1", 2012, 4d / 3d * 100d, sharedDelta);
+            Databank temp = Program.databanks.GetDatabank("temp");
+            AssertHelper(temp, "rey2", 2010, -2d / (-3d) * 100d, sharedDelta);
+            AssertHelper(temp, "rey2", 2011, -3d / (-3d) * 100d, sharedDelta);
+            AssertHelper(temp, "rey2", 2012, -4d / (-3d) * 100d, sharedDelta);
+
+
+
+
+
+
+
+
+
+        }
+
+
+
         [TestMethod]
         public void Test__UpdAndGenr()
         {

@@ -54,7 +54,9 @@ options {
 
 //Token definitions I
 tokens {
-    ASTREBASE;
+    ASTOPT_STRING_PREFIX;
+	ASTOPT_VAL_INDEX;
+	ASTREBASE;
     ASTLINESPOINTS;
 	ASTLINES;
 	ASTBOXES;
@@ -2050,11 +2052,13 @@ pause					  : PAUSE expression? -> ^({token("ASTPAUSE", ASTPAUSE, $PAUSE.Line)} 
 
 pipe					  : PIPE pipeOpt1? fileName? ->^({token("ASTPIPE", ASTPIPE, $PIPE.Line)} pipeOpt1? ^(ASTHANDLEFILENAME fileName?));
 
-rebase                    : REBASE rebaseOpt1? listItemsWildRange rebaseDate1? rebaseDate2? prefix? -> ^({token("ASTREBASE", ASTREBASE, $REBASE.Line)} listItemsWildRange ^(ASTPLACEHOLDER rebaseDate1? rebaseDate2?) prefix? rebaseOpt1?);
+rebase                    : REBASE rebaseOpt1? listItemsWildRange rebaseDate1? rebaseDate2? -> ^({token("ASTREBASE", ASTREBASE, $REBASE.Line)} listItemsWildRange ^(ASTPLACEHOLDER rebaseDate1? rebaseDate2?) rebaseOpt1?);
 rebaseDate1               : expression;
 rebaseDate2               : expression;
-rebaseOpt1                : ISNOTQUAL | leftAngle indexOpt1h* RIGHTANGLE -> ^(ASTOPT1 indexOpt1h*);							
-rebaseOpt1h               : BANK (EQUAL expression)? -> ^(ASTOPT_STRING_BANK expression?)
+rebaseOpt1                : ISNOTQUAL | leftAngle rebaseOpt1h* RIGHTANGLE -> ^(ASTOPT1 rebaseOpt1h*);							
+rebaseOpt1h               : BANK (EQUAL name)? -> ^(ASTOPT_STRING_BANK name?)  //name can be without quotes
+						  | PREFIX EQUAL name -> ^(ASTOPT_STRING_PREFIX name) //name can be without quotes
+						  | INDEX EQUAL expression -> ^(ASTOPT_VAL_INDEX expression)
 						  ;
 
                           // This is SHEET<import> or SHEET<2010 2015 import>.
