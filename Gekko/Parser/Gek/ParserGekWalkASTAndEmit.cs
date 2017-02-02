@@ -1752,21 +1752,27 @@ namespace Gekko.Parser.Gek
                     case "ASTINDEX":  //the INDEX command
                         {                                               
                             node.Code.A("O.Index o" + Num(node) + " = new O.Index();" + G.NL);
-
                             string nodeCode = "";
                             if (node[1][0] != null) nodeCode = HandleListFile(node[1], nodeCode);
-                            node.Code.A(nodeCode);
-
-                            //if (node[1].ChildrenCount() > 0)  //we have a name given
-                            //{
-                            //    node.Code.A("o" + Num(node) + ".name = O.GetString(" + node[1][0].Code + ");" + G.NL);
-                            //}
-                            //else
-                            //{
-                            //    node.Code.A("o" + Num(node) + ".name = null;");  //just show the result
-                            //}
-                            //node.Code.A("o" + Num(node) + ".listItems = O.GetList(" + node[0].Code + ");" + G.NL);
+                            node.Code.A(nodeCode);                            
                             node.Code.A(node[0].Code);
+                            if (node[2] != null) node.Code.A(node[2].Code);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
+                    case "ASTREBASE":  //the REBASE command
+                        {
+                            node.Code.A("O.Rebase o" + Num(node) + " = new O.Rebase();" + G.NL);                                                        
+                            node.Code.A(node[0].Code);
+
+                            if (node[1][0] != null)
+                            {
+                                node.Code.A("o" + Num(node) + ".date1 = O.GetDate(" + node[1][0].Code + ");" + G.NL);
+                            }
+                            if (node[1][1] != null)
+                            {
+                                node.Code.A("o" + Num(node) + ".date2 = O.GetDate(" + node[1][1].Code + ");" + G.NL);
+                            }
                             if (node[2] != null) node.Code.A(node[2].Code);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }

@@ -3071,7 +3071,7 @@ namespace Gekko
                     string bankName = null;
                     if (localOptionFromBank != null) bankName = localOptionFromBank.aliasName;
 
-                    List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(listItems0[i], bankName);  //gets these from the 'fromBank', so ExtractBankAndRest() gets called two time, but never mind
+                    List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(listItems0[i], bankName);  //gets these from the 'fromBank', so ExtractBankAndRest() gets called two times, but never mind
 
                     if (tss.Count == 0)
                     {
@@ -3697,6 +3697,22 @@ namespace Gekko
                 }              
                 
             }
+        }
+
+        public class Rebase
+        {                      
+            public List<string> listItems = null;
+            public GekkoTime date1 = Globals.tNull;
+            public GekkoTime date2 = Globals.tNull;
+            public string listPrefix = null;
+            public string opt_bank = null;
+            public void Exe()
+            {
+                for(int i = 0;i<this.listItems.Count;i++)
+                {
+                    List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(this.listItems[i], opt_bank);
+                }
+            }                
         }
 
         public class Count

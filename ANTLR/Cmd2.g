@@ -54,6 +54,7 @@ options {
 
 //Token definitions I
 tokens {
+    ASTREBASE;
     ASTLINESPOINTS;
 	ASTLINES;
 	ASTBOXES;
@@ -657,6 +658,7 @@ ASTOPT_STRING_Y2;
     ASTZERO;
 	ASTXEDIT;
 
+	REBASE = 'REBASE';
 	LINESPOINTS = 'LINESPOINTS';
 //LINES = 'LINES';
 			BOXES = 'BOXES';
@@ -1173,6 +1175,7 @@ Y2                    = 'Y2'                       ;
                                         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 										
 		d.Add("LINESPOINTS" ,LINESPOINTS);
+		d.Add("REBASE", REBASE);
 //d.Add("LINES" , LINES);
 			d.Add("BOXES" , BOXES);
 		d.Add("FILLEDCURVES" , FILLEDCURVES);
@@ -1727,13 +1730,14 @@ expr2                     :
 						  | option         SEMICOLON!
 						  | pause          SEMICOLON!
 						  | pipe           SEMICOLON!
-						  | sheetImport    SEMICOLON!
-                          | prt            SEMICOLON!
+						  | sheetImport    SEMICOLON!                          
+						  | prt            SEMICOLON!
 						  | splice         SEMICOLON!
 						  | r_file         SEMICOLON!
 						  | r_export       SEMICOLON!
 						  | r_run          SEMICOLON!
                           | read           SEMICOLON!
+						  | rebase         SEMICOLON!
                           | rename         SEMICOLON!						
 						  | restart        SEMICOLON!
 						  | reset          SEMICOLON!
@@ -2045,6 +2049,13 @@ option                    : OPTION optionType -> ^({token("ASTOPTION", ASTOPTION
 pause					  : PAUSE expression? -> ^({token("ASTPAUSE", ASTPAUSE, $PAUSE.Line)} expression?);
 
 pipe					  : PIPE pipeOpt1? fileName? ->^({token("ASTPIPE", ASTPIPE, $PIPE.Line)} pipeOpt1? ^(ASTHANDLEFILENAME fileName?));
+
+rebase                    : REBASE rebaseOpt1? listItemsWildRange rebaseDate1? rebaseDate2? prefix? -> ^({token("ASTREBASE", ASTREBASE, $REBASE.Line)} listItemsWildRange ^(ASTPLACEHOLDER rebaseDate1? rebaseDate2?) prefix? rebaseOpt1?);
+rebaseDate1               : expression;
+rebaseDate2               : expression;
+rebaseOpt1                : ISNOTQUAL | leftAngle indexOpt1h* RIGHTANGLE -> ^(ASTOPT1 indexOpt1h*);							
+rebaseOpt1h               : BANK (EQUAL expression)? -> ^(ASTOPT_STRING_BANK expression?)
+						  ;
 
                           // This is SHEET<import> or SHEET<2010 2015 import>.
 						  // The rule stipulates that import must be before other settings, and there must be file=, and there must be an option field.
@@ -3178,6 +3189,7 @@ integerNegative           : MINUS integer -> ^(ASTINTEGERNEGATIVE integer);
 doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 
 ident                     : Ident|
+							REBASE|
 							THOUSANDSSEPARATOR|
 							MDATEFORMAT|
                             LINESPOINTS|
