@@ -282,6 +282,37 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void Test__Movavg()
+        {
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
+            I("OPTION freq a;");
+            I("MODEL pchy;");
+            I("CREATE x; SER <2010 2013> x = 2, 3, 4, 5;");
+            I("FOR val i = 1 to 4; CREATE y{i}; END;");
+            I("SIM <2013 2013>;");
+            AssertHelper(First(), "y1", 2011, (4d + 5d) / 2d, sharedDelta);
+            AssertHelper(First(), "y2", 2011, (3d + 4d + 5d) / 3d, sharedDelta);
+            AssertHelper(First(), "y3", 2011, (3d + 4d) / 2d, sharedDelta);
+            AssertHelper(First(), "y4", 2011, (2d + 3d + 4d) / 3d, sharedDelta);
+
+            I("RESET; MODE data;");            
+            I("OPTION freq a;");            
+            I("CREATE x; SER <2010 2013> x = 2, 3, 4, 5;");
+            I("FOR val i = 1 to 4; CREATE y{i}; END;");
+            I("SERIES y1 = movavg(0.5 * x + 0.5 * x, 2);");
+            I("SERIES y1 = movavg(0.5 * x + 0.5 * x, 3);");
+            I("SERIES y1 = movavg(0.5 * x[-1] + 0.5 * x[-1], 2);");
+            I("SERIES y1 = movavg(0.5 * x[-1] + 0.5 * x[-1], 3);");
+            
+            AssertHelper(First(), "y1", 2011, (4d + 5d) / 2d, sharedDelta);
+            AssertHelper(First(), "y2", 2011, (3d + 4d + 5d) / 3d, sharedDelta);
+            AssertHelper(First(), "y3", 2011, (3d + 4d) / 2d, sharedDelta);
+            AssertHelper(First(), "y4", 2011, (2d + 3d + 4d) / 3d, sharedDelta);
+
+        }
+
+        [TestMethod]
         public void Test__Pchy()
         {
             for (int i = 0; i < 3; i++)  //3 times to test with or without caching (third time just for extra safety)
@@ -330,22 +361,6 @@ namespace UnitTests
             I("RESET; MODE data;");            
             I("OPTION freq q;");            
             I("CREATE x; SER <2010q1 2011q1> x = 200, 1, 2, 3, 202;");            
-            I("SERIES <2011q1 2011q1> y1 = 0.5 * pchy(x);");
-            I("SERIES <2011q1 2011q1> y2 = 0.5 * dify(x);");
-            I("SERIES <2011q1 2011q1> y3 = 0.5 * diffy(x);");
-            I("SERIES <2011q1 2011q1> y4 = 0.5 * dlogy(x);");
-            I("SERIES <2011q1 2011q1> y5 = 0.5 * pch(x);");
-            I("SERIES <2011q1 2011q1> y6 = 0.5 * dif(x);");
-            I("SERIES <2011q1 2011q1> y7 = 0.5 * diff(x);");
-            I("SERIES <2011q1 2011q1> y8 = 0.5 * dlog(x);");
-            AssertHelper(First(), "y1", EFreq.Quarterly, 2011, 1, 0.5d * (202d / 200d - 1d) * 100d, sharedDelta);
-            AssertHelper(First(), "y2", EFreq.Quarterly, 2011, 1, 0.5d * (202d - 200d), sharedDelta);
-            AssertHelper(First(), "y3", EFreq.Quarterly, 2011, 1, 0.5d * (202d - 200d), sharedDelta);
-            AssertHelper(First(), "y4", EFreq.Quarterly, 2011, 1, 0.5d * Math.Log(202d / 200d), sharedDelta);
-
-            I("RESET; MODE data;");
-            I("OPTION freq q;");
-            I("CREATE x; SER <2010q1 2011q1> x = 200, 1, 2, 3, 202;");
             I("SERIES <2011q1 2011q1> y1 = pchy(x);");
             I("SERIES <2011q1 2011q1> y2 = dify(x);");
             I("SERIES <2011q1 2011q1> y3 = diffy(x);");
@@ -354,6 +369,44 @@ namespace UnitTests
             I("SERIES <2011q1 2011q1> y6 = dif(x);");
             I("SERIES <2011q1 2011q1> y7 = diff(x);");
             I("SERIES <2011q1 2011q1> y8 = dlog(x);");
+            AssertHelper(First(), "y1", EFreq.Quarterly, 2011, 1,  (202d / 200d - 1d) * 100d, sharedDelta);
+            AssertHelper(First(), "y2", EFreq.Quarterly, 2011, 1,  (202d - 200d), sharedDelta);
+            AssertHelper(First(), "y3", EFreq.Quarterly, 2011, 1,  (202d - 200d), sharedDelta);
+            AssertHelper(First(), "y4", EFreq.Quarterly, 2011, 1,  Math.Log(202d / 200d), sharedDelta);
+
+            //same with expression inside
+            I("RESET; MODE data;");
+            I("OPTION freq q;");
+            I("CREATE x; SER <2010q1 2011q1> x = 200, 1, 2, 3, 202;");
+            I("SERIES <2011q1 2011q1> y1 = pchy(0.5 * x + 0.5 * x);");
+            I("SERIES <2011q1 2011q1> y2 = dify(0.5 * x + 0.5 * x);");
+            I("SERIES <2011q1 2011q1> y3 = diffy(0.5 * x + 0.5 * x);");
+            I("SERIES <2011q1 2011q1> y4 = dlogy(0.5 * x + 0.5 * x);");
+            I("SERIES <2011q1 2011q1> y5 = pch(0.5 * x + 0.5 * x);");
+            I("SERIES <2011q1 2011q1> y6 = dif(0.5 * x + 0.5 * x);");
+            I("SERIES <2011q1 2011q1> y7 = diff(0.5 * x + 0.5 * x);");
+            I("SERIES <2011q1 2011q1> y8 = dlog(0.5 * x + 0.5 * x);");
+            AssertHelper(First(), "y1", EFreq.Quarterly, 2011, 1, (202d / 200d - 1d) * 100d, sharedDelta);
+            AssertHelper(First(), "y2", EFreq.Quarterly, 2011, 1, (202d - 200d), sharedDelta);
+            AssertHelper(First(), "y3", EFreq.Quarterly, 2011, 1, (202d - 200d), sharedDelta);
+            AssertHelper(First(), "y4", EFreq.Quarterly, 2011, 1, Math.Log(202d / 200d), sharedDelta);
+            AssertHelper(First(), "y5", EFreq.Quarterly, 2011, 1, (202d / 3d - 1d) * 100d, sharedDelta);
+            AssertHelper(First(), "y6", EFreq.Quarterly, 2011, 1, (202d - 3d), sharedDelta);
+            AssertHelper(First(), "y7", EFreq.Quarterly, 2011, 1, (202d - 3d), sharedDelta);
+            AssertHelper(First(), "y8", EFreq.Quarterly, 2011, 1, Math.Log(202d / 3d), sharedDelta);
+
+            //same with expression inside, with lag
+            I("RESET; MODE data;");
+            I("OPTION freq q;");
+            I("CREATE x; SER <2009q4 2011q1> x = 200, 1, 2, 3, 202, 12345;");
+            I("SERIES <2011q1 2011q1> y1 = pchy(0.5 * x[-1] + 0.5 * x[-1]);");
+            I("SERIES <2011q1 2011q1> y2 = dify(0.5 * x[-1] + 0.5 * x[-1]);");
+            I("SERIES <2011q1 2011q1> y3 = diffy(0.5 * x[-1] + 0.5 * x[-1]);");
+            I("SERIES <2011q1 2011q1> y4 = dlogy(0.5 * x[-1] + 0.5 * x[-1]);");
+            I("SERIES <2011q1 2011q1> y5 = pch(0.5 * x[-1] + 0.5 * x[-1]);");
+            I("SERIES <2011q1 2011q1> y6 = dif(0.5 * x[-1] + 0.5 * x[-1]);");
+            I("SERIES <2011q1 2011q1> y7 = diff(0.5 * x[-1] + 0.5 * x[-1]);");
+            I("SERIES <2011q1 2011q1> y8 = dlog(0.5 * x[-1] + 0.5 * x[-1]);");
             AssertHelper(First(), "y1", EFreq.Quarterly, 2011, 1, (202d / 200d - 1d) * 100d, sharedDelta);
             AssertHelper(First(), "y2", EFreq.Quarterly, 2011, 1, (202d - 200d), sharedDelta);
             AssertHelper(First(), "y3", EFreq.Quarterly, 2011, 1, (202d - 200d), sharedDelta);
