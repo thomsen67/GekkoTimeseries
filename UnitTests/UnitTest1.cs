@@ -10098,12 +10098,12 @@ namespace UnitTests
             Assert.AreEqual(w.readInfo.modelInfo, "Adam Oktober 2012");
             Assert.AreEqual(w.readInfo.modelDate, "05-03-2013 22:54:00");
             Assert.AreEqual(w.readInfo.modelSignature, "ATuOTa263peolAocqEvrPA");
-            Assert.AreEqual(w.readInfo.modelHash, "g9aAHLD1jpL339paWwnpTQ");
+            Assert.AreEqual(w.readInfo.modelHash, "UZp0jFd11z6zvfS3MHPsaA");
             Assert.AreEqual(w.readInfo.modelLastSimPeriod, "2000-2001");
             //Assert.AreEqual(w.readInfo.modelLastSimStamp, "---todo---");
             Assert.AreEqual(w.readInfo.modelLargestLag, "0");
             Assert.AreEqual(w.readInfo.modelLargestLead, "0");
-            
+
         }
 
         [TestMethod]
@@ -10166,15 +10166,15 @@ namespace UnitTests
         {
             // endo simul
 
-            Assert.AreEqual(First().GetVariable("q").source, "2000-2001: SIM meta.frm (hash g9aAHLD1jpL339paWwnpTQ)");
+            Assert.AreEqual(First().GetVariable("q").source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
             Assert.AreEqual(First().GetVariable("q").stamp, stamp2);  //might fail around midnight!!
 
-            Assert.AreEqual(First().GetVariable("pxnk").source, "2000-2001: SIM meta.frm (hash g9aAHLD1jpL339paWwnpTQ)");
+            Assert.AreEqual(First().GetVariable("pxnk").source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
             Assert.AreEqual(First().GetVariable("pxnk").stamp, stamp2);  //might fail around midnight!!
 
             // endo tablevars
 
-            Assert.AreEqual(First().GetVariable("pxnk2").source, "2000-2001: SIM meta.frm (hash g9aAHLD1jpL339paWwnpTQ)");
+            Assert.AreEqual(First().GetVariable("pxnk2").source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
             Assert.AreEqual(First().GetVariable("pxnk2").stamp, stamp2);  //might fail around midnight!!
 
             // true exo
