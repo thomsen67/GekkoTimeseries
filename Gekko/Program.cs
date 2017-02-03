@@ -9189,6 +9189,9 @@ namespace Gekko
                 G.Writeln("          Note capital 'S' and the blank after ':'");
             }
 
+            //The statement below makes sure that -- if a cached model is to be used -- the MODEL statement that created the cached model and the current MODEL statement are done under the same frequency
+            sb.AppendLine("SubPeriods: " + Program.CurrentSubperiods().ToString());  //for instance: "Frequency: 4". Cf. Program.model.subPeriods
+
             string trueHash = Program.GetMD5Hash(sb.ToString());  //Pretty unlikely that two different .frm files could produce the same hash.
             trueHash = trueHash.Trim();  //probably not necessary
             G.WritelnGray("HASH: " + trueHash);
@@ -12480,16 +12483,13 @@ namespace Gekko
             string textInput = Program.HandleModelFiles(textInputRaw, modelCommentsHelper);
 
             string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + modelCommentsHelper.modelHashTrue + ".mdl";
-
-
+            
             if (Program.options.model_cache == true)
             {
                 if (File.Exists(mdlFileNameAndPath))
                 {
                     try
-                    {
-                        //string outputPath = Globals.localTempFilesLocation + "\\" + "tempmodelfiles";
-                        //string pathAndFilename = outputPath + "\\" + "model.bin";
+                    {                        
                         DateTime dt1 = DateTime.Now;
                         //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
                         //RuntimeTypeModel serializer = TypeModel.Create();
@@ -13461,8 +13461,8 @@ namespace Gekko
             if (Program.model != null && Program.model.subPeriods != -12345 && Program.model.subPeriods != CurrentSubperiods())
             {
                 G.Writeln2("*** ERROR: The model was not compiled/loaded with the current frequency");
-                G.Writeln("    This applies to the pchy() function. Remedy: put the MODEL statement");
-                G.Writeln("    after your 'OPTION freq ... ' statement.");
+                G.Writeln("    This applies to the pchy(), dify(), diffy(), dlogy() functions. Please put");
+                G.Writeln("    the MODEL statement after your 'OPTION freq ... ' statement.");
                 throw new GekkoException();
             }
 

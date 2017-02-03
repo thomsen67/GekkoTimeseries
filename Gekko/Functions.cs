@@ -1015,6 +1015,55 @@ namespace Gekko
             return new ScalarVal(d1 - d1Lag);
         }
 
+
+
+
+
+        public static IVariable pchy(GekkoTime t, IVariable x1)
+        {
+            if (x1.Type() != EVariableType.TimeSeries)
+            {
+                G.Writeln2("*** ERROR: pchy() function only valid for time series arguments");
+                throw new GekkoException();
+            }
+            MetaTimeSeries mts = (MetaTimeSeries)x1;
+            MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
+            mtsLag.offset = mts.offset - Program.CurrentSubperiods();
+            double d1 = O.GetVal(mts, t);
+            double d1Lag = O.GetVal(mtsLag, t);
+            return new ScalarVal((d1 / d1Lag - 1) * 100d);
+        }
+
+        public static IVariable dlogy(GekkoTime t, IVariable x1)
+        {
+            if (x1.Type() != EVariableType.TimeSeries)
+            {
+                G.Writeln2("*** ERROR: dlogy() function only valid for time series arguments");
+                throw new GekkoException();
+            }
+            MetaTimeSeries mts = (MetaTimeSeries)x1;
+            MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
+            mtsLag.offset = mts.offset - Program.CurrentSubperiods();
+            double d1 = O.GetVal(mts, t);
+            double d1Lag = O.GetVal(mtsLag, t);
+            return new ScalarVal(Math.Log(d1 / d1Lag));
+        }
+
+        public static IVariable dify(GekkoTime t, IVariable x1)
+        {
+            if (x1.Type() != EVariableType.TimeSeries)
+            {
+                G.Writeln2("*** ERROR: dify() function only valid for time series arguments");
+                throw new GekkoException();
+            }
+            MetaTimeSeries mts = (MetaTimeSeries)x1;
+            MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
+            mtsLag.offset = mts.offset - Program.CurrentSubperiods();
+            double d1 = O.GetVal(mts, t);
+            double d1Lag = O.GetVal(mtsLag, t);
+            return new ScalarVal(d1 - d1Lag);
+        }
+        
         public static IVariable format(GekkoTime t, IVariable x1, IVariable x2)
         {
             double d = O.GetVal(x1, t);

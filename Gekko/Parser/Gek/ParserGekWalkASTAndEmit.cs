@@ -1411,7 +1411,7 @@ namespace Gekko.Parser.Gek
                             
                             //TODO: Should these just override??? And what if inbuilt function does not exist??
 
-                            if (functionName == "dlog" || functionName == "dif" || functionName == "diff" || functionName == "pch")
+                            if (functionName == "dlog" || functionName == "dif" || functionName == "diff" || functionName == "pch" || functionName == "dlogy" || functionName == "dify" || functionName == "diffy" || functionName == "pchy")
                             {
                                 if (node.ChildrenCount() > 2)
                                 {
@@ -1440,10 +1440,17 @@ namespace Gekko.Parser.Gek
                                     //first one: ___(t,___ --> ___(t.Add(-1),___
                                     //next one: ___, t,___ --> ___, t.Add(-1),___
                                     //next one: ___, t)___ --> ___, t.Add(-1))___
-                                    string codeLag = code.Replace("(" + Globals.functionT1Cs + ")", "(" + Globals.functionT1Cs + ".Add(-1)" + ")");
-                                    codeLag = codeLag.Replace("(" + Globals.functionT1Cs + ",", "(" + Globals.functionT1Cs + ".Add(-1)" + ",");
-                                    codeLag = codeLag.Replace(", " + Globals.functionT1Cs + ",", ", " + Globals.functionT1Cs + ".Add(-1)" + ",");
-                                    codeLag = codeLag.Replace(", " + Globals.functionT1Cs + ")", ", " + Globals.functionT1Cs + ".Add(-1)" + ")");
+
+                                    int lag = 1;
+                                    if (G.equal(functionName, "dlogy") || G.equal(functionName, "dify") || G.equal(functionName, "diffy") || G.equal(functionName, "pchy"))
+                                    {
+                                        lag = Program.CurrentSubperiods();                                        
+                                    }
+
+                                    string codeLag = code.Replace("(" + Globals.functionT1Cs + ")", "(" + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ")");
+                                    codeLag = codeLag.Replace("(" + Globals.functionT1Cs + ",", "(" + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ",");
+                                    codeLag = codeLag.Replace(", " + Globals.functionT1Cs + ",", ", " + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ",");
+                                    codeLag = codeLag.Replace(", " + Globals.functionT1Cs + ")", ", " + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ")");
                                     
                                     if (functionName == "dlog")
                                     {
@@ -1472,6 +1479,18 @@ namespace Gekko.Parser.Gek
                                     else if (functionName == "pch")
                                     {
                                         node.Code.A("Functions.pch(" + Globals.functionT1Cs + ", " + code + ")");
+                                    }
+                                    else if (functionName == "dlogy")
+                                    {
+                                        node.Code.A("Functions.dlogy(" + Globals.functionT1Cs + ", " + code + ")");
+                                    }
+                                    else if (functionName == "dify" || functionName == "diffy")
+                                    {
+                                        node.Code.A("Functions.dify(" + Globals.functionT1Cs + ", " + code + ")");
+                                    }
+                                    else if (functionName == "pchy")
+                                    {
+                                        node.Code.A("Functions.pchy(" + Globals.functionT1Cs + ", " + code + ")");
                                     }
                                 }
                             }

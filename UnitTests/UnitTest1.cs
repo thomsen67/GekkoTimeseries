@@ -282,6 +282,89 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void Test__Pchy()
+        {
+            for (int i = 0; i < 3; i++)  //3 times to test with or without caching (third time just for extra safety)
+            {
+                if (i == 0) Program.Flush(); //wipes out existing cached models
+
+                I("RESET;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
+                I("OPTION freq a;");
+                I("MODEL pchy;");
+                I("CREATE x; SER <2010 2011> x = 200, 202;");
+                I("FOR val i = 1 to 8; CREATE y{i}; SER <2010 2010> y{i} = 100; END;");
+                I("SIM <2011 2011>;");
+
+                AssertHelper(First(), "y1", 2011, 100d * ((0.5d * (202d / 200d - 1d) * 100d + 1d) / 100d + 1d), sharedDelta);
+                AssertHelper(First(), "y2", 2011, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
+                AssertHelper(First(), "y3", 2011, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
+                AssertHelper(First(), "y4", 2011, Math.Exp(0.5d * Math.Log(202d / 200d) + 1d + Math.Log(100d)), sharedDelta);
+
+                AssertHelper(First(), "y5", 2011, 100d * ((0.5d * (202d / 200d - 1d) * 100d + 1d) / 100d + 1d), sharedDelta);
+                AssertHelper(First(), "y6", 2011, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
+                AssertHelper(First(), "y7", 2011, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
+                AssertHelper(First(), "y8", 2011, Math.Exp(0.5d * Math.Log(202d / 200d) + 1d + Math.Log(100d)), sharedDelta);
+
+                if (i == 0) Program.Flush(); //wipes out existing cached models
+
+                I("RESET;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
+                I("OPTION freq q;");
+                I("MODEL pchy;");
+                I("CREATE x; SER <2010q1 2011q1> x = 200, 1, 2, 3, 202;");
+                I("FOR val i = 1 to 8; CREATE y{i}; SER <2010q4 2010q4> y{i} = 7; SER <2010q1 2010q1> y{i} = 100; END;");
+                I("SIM <2011q1 2011q1>;");
+
+                AssertHelper(First(), "y1", EFreq.Quarterly, 2011, 1, 100d * ((0.5d * (202d / 200d - 1d) * 100d + 1d) / 100d + 1d), sharedDelta);
+                AssertHelper(First(), "y2", EFreq.Quarterly, 2011, 1, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
+                AssertHelper(First(), "y3", EFreq.Quarterly, 2011, 1, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
+                AssertHelper(First(), "y4", EFreq.Quarterly, 2011, 1, Math.Exp(0.5d * Math.Log(202d / 200d) + 1d + Math.Log(100d)), sharedDelta);
+
+                AssertHelper(First(), "y5", EFreq.Quarterly, 2011, 1, 7d * ((0.5d * (202d / 3d - 1d) * 100d + 1d) / 100d + 1d), sharedDelta);
+                AssertHelper(First(), "y6", EFreq.Quarterly, 2011, 1, 0.5d * (202d - 3d) + 1d + 7d, sharedDelta);
+                AssertHelper(First(), "y7", EFreq.Quarterly, 2011, 1, 0.5d * (202d - 3d) + 1d + 7d, sharedDelta);
+                AssertHelper(First(), "y8", EFreq.Quarterly, 2011, 1, Math.Exp(0.5d * Math.Log(202d / 3d) + 1d + Math.Log(7d)), sharedDelta);
+            }
+
+            I("RESET; MODE data;");            
+            I("OPTION freq q;");            
+            I("CREATE x; SER <2010q1 2011q1> x = 200, 1, 2, 3, 202;");            
+            I("SERIES <2011q1 2011q1> y1 = 0.5 * pchy(x);");
+            I("SERIES <2011q1 2011q1> y2 = 0.5 * dify(x);");
+            I("SERIES <2011q1 2011q1> y3 = 0.5 * diffy(x);");
+            I("SERIES <2011q1 2011q1> y4 = 0.5 * dlogy(x);");
+            I("SERIES <2011q1 2011q1> y5 = 0.5 * pch(x);");
+            I("SERIES <2011q1 2011q1> y6 = 0.5 * dif(x);");
+            I("SERIES <2011q1 2011q1> y7 = 0.5 * diff(x);");
+            I("SERIES <2011q1 2011q1> y8 = 0.5 * dlog(x);");
+            AssertHelper(First(), "y1", EFreq.Quarterly, 2011, 1, 0.5d * (202d / 200d - 1d) * 100d, sharedDelta);
+            AssertHelper(First(), "y2", EFreq.Quarterly, 2011, 1, 0.5d * (202d - 200d), sharedDelta);
+            AssertHelper(First(), "y3", EFreq.Quarterly, 2011, 1, 0.5d * (202d - 200d), sharedDelta);
+            AssertHelper(First(), "y4", EFreq.Quarterly, 2011, 1, 0.5d * Math.Log(202d / 200d), sharedDelta);
+
+            I("RESET; MODE data;");
+            I("OPTION freq q;");
+            I("CREATE x; SER <2010q1 2011q1> x = 200, 1, 2, 3, 202;");
+            I("SERIES <2011q1 2011q1> y1 = pchy(x);");
+            I("SERIES <2011q1 2011q1> y2 = dify(x);");
+            I("SERIES <2011q1 2011q1> y3 = diffy(x);");
+            I("SERIES <2011q1 2011q1> y4 = dlogy(x);");
+            I("SERIES <2011q1 2011q1> y5 = pch(x);");
+            I("SERIES <2011q1 2011q1> y6 = dif(x);");
+            I("SERIES <2011q1 2011q1> y7 = diff(x);");
+            I("SERIES <2011q1 2011q1> y8 = dlog(x);");
+            AssertHelper(First(), "y1", EFreq.Quarterly, 2011, 1, (202d / 200d - 1d) * 100d, sharedDelta);
+            AssertHelper(First(), "y2", EFreq.Quarterly, 2011, 1, (202d - 200d), sharedDelta);
+            AssertHelper(First(), "y3", EFreq.Quarterly, 2011, 1, (202d - 200d), sharedDelta);
+            AssertHelper(First(), "y4", EFreq.Quarterly, 2011, 1, Math.Log(202d / 200d), sharedDelta);
+            AssertHelper(First(), "y5", EFreq.Quarterly, 2011, 1, (202d / 3d - 1d) * 100d, sharedDelta);
+            AssertHelper(First(), "y6", EFreq.Quarterly, 2011, 1, (202d - 3d), sharedDelta);
+            AssertHelper(First(), "y7", EFreq.Quarterly, 2011, 1, (202d - 3d), sharedDelta);
+            AssertHelper(First(), "y8", EFreq.Quarterly, 2011, 1, Math.Log(202d / 3d), sharedDelta);
+        }
+
+        [TestMethod]
         public void Test__ModelStatic()
         {
             //also checking CheckYesNoNull() logic
@@ -9941,13 +10024,7 @@ namespace UnitTests
             //Assert.AreEqual(w.readInfo.modelLastSimStamp, "---todo---");
             Assert.AreEqual(w.readInfo.modelLargestLag, "0");
             Assert.AreEqual(w.readInfo.modelLargestLead, "0");
-
-
-
-
-
-
-
+            
         }
 
         [TestMethod]
