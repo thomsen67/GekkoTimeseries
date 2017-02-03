@@ -1451,7 +1451,7 @@ namespace Gekko.Parser.Gek
                                     codeLag = codeLag.Replace("(" + Globals.functionT1Cs + ",", "(" + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ",");
                                     codeLag = codeLag.Replace(", " + Globals.functionT1Cs + ",", ", " + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ",");
                                     codeLag = codeLag.Replace(", " + Globals.functionT1Cs + ")", ", " + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ")");
-                                    
+
                                     if (functionName == "dlog" || functionName == "dlogy")
                                     {
                                         node.Code.A("Functions.log(" + Globals.functionT1Cs + ", " + code + ").Subtract(Functions.log(" + Globals.functionT1Cs + ", " + codeLag + "), " + Globals.functionT1Cs + ")");
@@ -1463,7 +1463,7 @@ namespace Gekko.Parser.Gek
                                     else if (functionName == "pch" || functionName == "pchy")
                                     {
                                         node.Code.A("(" + code + ").Divide(" + codeLag + ", " + Globals.functionT1Cs + ").Subtract(new ScalarVal(1d), " + Globals.functionT1Cs + ").Multiply(new ScalarVal(100d), " + Globals.functionT1Cs + ")");
-                                    }
+                                    }                                    
                                     else throw new GekkoException();
                                 }
                                 else
@@ -1491,7 +1491,7 @@ namespace Gekko.Parser.Gek
                                     else if (functionName == "pchy")
                                     {
                                         node.Code.A("Functions.pchy(" + Globals.functionT1Cs + ", " + code + ")");
-                                    }
+                                    }                                    
                                 }
                             }
                             else

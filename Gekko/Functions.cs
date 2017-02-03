@@ -1015,26 +1015,53 @@ namespace Gekko
             return new ScalarVal(d1 - d1Lag);
         }
 
-
+        public static IVariable movsum(GekkoTime t, IVariable x, IVariable ilags)
+        {
+            double sum, n;
+            MovAvgSum(t, x, ilags, out sum, out n);
+            return new ScalarVal(sum);
+        }
 
         public static IVariable movavg(GekkoTime t, IVariable x, IVariable ilags)
         {
+            double sum, n;
+            MovAvgSum(t, x, ilags, out sum, out n);
+            return new ScalarVal(sum / n);
+        }
+
+        private static void MovAvgSum(GekkoTime t, IVariable x, IVariable ilags, out double sum, out double n)
+        {
             if (x.Type() != EVariableType.TimeSeries)
             {
-                G.Writeln2("*** ERROR: movavg() function only valid for time series arguments");
-                throw new GekkoException();
+                if (x.Type() == EVariableType.Val)
+                {
+                    //See the MEGA HACK and fix it there
+                    G.Writeln2("*** ERROR: At the moment, movavg() and movsum() only work on pure timeserires, not expressions.");
+                    G.Writeln("           So SERIES y = movavg(x1/x2, 2); will not work, whereas SERIES x = x1/x2; SERIES y = movavg(x, 2); is ok.");
+                    G.Writeln("           This limitation will be addressed.");
+                    throw new GekkoException();
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Function movavg() or movsum() expects a timeseries as first argument.");
+                    throw new GekkoException();
+                }
             }
             int lags = O.GetInt(ilags);
+            if (lags < 1)
+            {
+                G.Writeln("*** ERROR: Expected second argument of movavg/movsum() to be > 0");
+                throw new GekkoException();
+            }
             MetaTimeSeries mts = (MetaTimeSeries)x;
 
-            double sum = 0d;
-            double n = 0d;
+            sum = 0d;
+            n = 0d;
             for (int i = 0; i < lags; i++)
             {
-                sum += mts.ts.GetData(t.Add(-i));
+                sum += mts.ts.GetData(t.Add(-i + mts.offset));
                 n++;
             }
-            return new ScalarVal(sum / n);
         }
 
         public static IVariable pchy(GekkoTime t, IVariable x1)

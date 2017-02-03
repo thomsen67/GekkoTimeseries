@@ -1968,7 +1968,7 @@ namespace Gekko
                                 lag = Program.CurrentSubperiods();
                                 Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
-                            
+
                             if (arguments != 1)
                             {
                                 G.Writeln2("*** ERROR: Expected dlog() function with 1 argument");
@@ -2085,7 +2085,7 @@ namespace Gekko
                             c.Add(d);
                             c.Add(c1);
                             c.Add(c2);
-                        }                        
+                        }
                         else if (G.equal(function, "dif") || G.equal(function, "diff") || G.equal(function, "dify") || G.equal(function, "diffy"))
                         {
                             int lag = 1;
@@ -2141,6 +2141,127 @@ namespace Gekko
                             c.Add(subTree);
                             c.Add(c1);
                             c.Add(c2);
+                        }
+                        else if (G.equal(function, "movavg") || G.equal(function, "movsum"))
+                        {                           
+
+                            if (arguments != 2)
+                            {
+                                G.Writeln2("*** ERROR: Expected " + function + "() function with 2 arguments");
+                                throw new GekkoException();
+                            }
+                            recognized = true;
+
+                            ASTNode lags = equationNode.GetChild(2);
+
+
+                            int intLags = -12345;
+                            if (lags.Text == "ASTINTEGER")
+                            {
+                                intLags = int.Parse(lags.GetChild(0).Text);
+                            }
+                            else if (lags.Text == "ASTASSIGNVAR")
+                            {
+                                string value2 = HandleModelVal(lags, wh2);
+                                bool xx = int.TryParse(value2, out intLags);
+                                if (!xx)
+                                {
+                                    G.Writeln2("*** ERROR: The VAL " + value2 + " is not suitable as second argument of " + function + "()");
+                                    throw new GekkoException();
+                                }
+                            }
+                            else
+                            {
+                                G.Writeln2("*** ERROR: Expected the second argument of " + function + "() function to be a fixed value");
+                                throw new GekkoException();
+                            }
+
+                            if (intLags <= 0 || intLags >= 100)
+                            {
+                                G.Writeln2("*** ERROR: Expected lags in " + function + "() function to > 0 and < 100");
+                                throw new GekkoException();
+                            }
+
+                            /*
+                            *
+                            *                         x
+                            *                         |
+                            *                     ASTFUNCTION
+                            *                       /    \
+                            *                    dif     subtree
+                            *
+                            *                         x
+                            *                         |
+                            *                     "nothing" (equationNode)
+                            *                         |
+                            *                        "+" (b)
+                            *                       /   \                             *
+                            *                      /     +
+                            *                     /     / \
+                            *                    /     /   +
+                            *                             / \ 
+                            *                               ...
+                            *                   subtree
+                            *                   left brachnes have ASTLAG
+                            *
+                            *
+                            * */
+                            //wh2.s.Append("(");
+                            //numberOfRightParentheses++;
+                            // see "dlog" for explanation
+                            ASTNode subTree = equationNode.GetChild(1);
+                            equationNode.Text = "nothing";  //function that does nothing
+                            equationNode.Children.Clear();
+
+                            ASTNode container = new Gekko.ASTNode("nothing");
+                            container.Children = new List<Gekko.ASTNode>();
+
+                            ASTNode cRightOld = new ASTNode("+"); //addition
+                            cRightOld.Children = new List<ASTNode>();
+
+                            container.Add(cRightOld);
+
+                            for (int i = 0; i < intLags - 1; i++)
+                            {
+                                ASTNode cLeft = new ASTNode("ASTLAG");
+                                cLeft.Children = new List<ASTNode>();
+                                cLeft.Add(subTree);
+                                cLeft.Add(new ASTNode("-"));
+                                cLeft.Add(new ASTNode(i.ToString()));
+
+                                ASTNode cRightNew = null;
+
+                                if (i < intLags - 2)
+                                {
+                                    cRightNew = new ASTNode("+"); //addition
+                                    cRightNew.Children = new List<ASTNode>();
+                                }
+                                else
+                                {
+                                    cRightNew = new ASTNode("ASTLAG");
+                                    cRightNew.Children = new List<ASTNode>();
+                                    cRightNew.Add(subTree);
+                                    cRightNew.Add(new ASTNode("-"));
+                                    cRightNew.Add(new ASTNode((i + 1).ToString()));
+                                }
+                                cRightOld.Add(cLeft);
+                                cRightOld.Add(cRightNew);
+
+                                cRightOld = cRightNew;
+                            }
+
+                            if (G.equal(function, "movsum"))
+                            {
+                                equationNode.Add(container);
+                            }
+                            else
+                            {
+                                ASTNode temp = new ASTNode("/");
+                                temp.Children = new List<Gekko.ASTNode>();
+                                temp.Add(container);
+                                temp.Add(new ASTNode("ASTDOUBLE", intLags.ToString()));
+                                equationNode.Add(temp);
+                            }
                         }
                         else if (G.equal(function, "pow"))
                         {
@@ -2354,14 +2475,7 @@ namespace Gekko
                     break;
                 case "ASTASSIGNVAR":
                     //In Gekko 2.0, the var is %x, not #x.
-                    string key = equationNode.GetChild(0).Text.Substring(1);
-                    string value = null;
-                    if (wh2.vals == null || !wh2.vals.TryGetValue(key, out value))
-                    {
-                        G.Writeln2("*** ERROR: Could not find VAL '" + key + "' definition in .frm file");
-                        throw new GekkoException();
-                    }
-                    if (value.EndsWith(".")) value = value + "0";  //otherwise "1." becomes "1.d" which is not allowed
+                    string value = HandleModelVal(equationNode, wh2);
                     wh2.rightHandSideCsCode.Append(value + "d", EEmitType.computerReadable);  //d means double, 1 for non-human readable
                     wh2.rightHandSideCsCode.Append(value, EEmitType.humanReadable);  //2 for human readable
                     break;
@@ -2885,8 +2999,20 @@ namespace Gekko
             }
         }
 
-        
-        
+        private static string HandleModelVal(ASTNode equationNode, WalkerHelper2 wh2)
+        {
+            string key = equationNode.GetChild(0).Text.Substring(1);
+            string value = null;
+            if (wh2.vals == null || !wh2.vals.TryGetValue(key, out value))
+            {
+                G.Writeln2("*** ERROR: Could not find VAL '" + key + "' definition in .frm file");
+                throw new GekkoException();
+            }
+            if (value.EndsWith(".")) value = value + "0";  //otherwise "1." becomes "1.d" which is not allowed
+            return value;
+        }
+
+
         private static void HandlePowFunction(EquationHelper eh, ASTNode equationNode, int depth, WalkerHelper2 wh2, Model model, int subTreeLag, bool isModel, bool function)
         {
             wh2.rightHandSideCsCode.Append("Math.Pow(", EEmitType.computerReadable);

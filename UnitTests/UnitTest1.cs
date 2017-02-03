@@ -284,31 +284,57 @@ namespace UnitTests
         [TestMethod]
         public void Test__Movavg()
         {
+            Program.Flush(); //wipes out existing cached models
+
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("OPTION freq a;");
-            I("MODEL pchy;");
+            I("MODEL movavg;");
             I("CREATE x; SER <2010 2013> x = 2, 3, 4, 5;");
-            I("FOR val i = 1 to 4; CREATE y{i}; END;");
+            I("FOR val i = 1 to 8; CREATE y{i}; END;");
             I("SIM <2013 2013>;");
-            AssertHelper(First(), "y1", 2011, (4d + 5d) / 2d, sharedDelta);
-            AssertHelper(First(), "y2", 2011, (3d + 4d + 5d) / 3d, sharedDelta);
-            AssertHelper(First(), "y3", 2011, (3d + 4d) / 2d, sharedDelta);
-            AssertHelper(First(), "y4", 2011, (2d + 3d + 4d) / 3d, sharedDelta);
+            AssertHelper(First(), "y1", 2013, (4d + 5d) / 2d, sharedDelta);
+            AssertHelper(First(), "y2", 2013, (3d + 4d + 5d) / 3d, sharedDelta);
+            AssertHelper(First(), "y3", 2013, (3d + 4d) / 2d, sharedDelta);
+            AssertHelper(First(), "y4", 2013, (2d + 3d + 4d) / 3d, sharedDelta);
+            AssertHelper(First(), "y5", 2013, (4d + 5d) / 1d, sharedDelta);
+            AssertHelper(First(), "y6", 2013, (3d + 4d + 5d) / 1d, sharedDelta);
+            AssertHelper(First(), "y7", 2013, (3d + 4d) / 1d, sharedDelta);
+            AssertHelper(First(), "y8", 2013, (2d + 3d + 4d) / 1d, sharedDelta);
 
             I("RESET; MODE data;");            
             I("OPTION freq a;");            
             I("CREATE x; SER <2010 2013> x = 2, 3, 4, 5;");
             I("FOR val i = 1 to 4; CREATE y{i}; END;");
-            I("SERIES y1 = movavg(0.5 * x + 0.5 * x, 2);");
-            I("SERIES y1 = movavg(0.5 * x + 0.5 * x, 3);");
-            I("SERIES y1 = movavg(0.5 * x[-1] + 0.5 * x[-1], 2);");
-            I("SERIES y1 = movavg(0.5 * x[-1] + 0.5 * x[-1], 3);");
-            
-            AssertHelper(First(), "y1", 2011, (4d + 5d) / 2d, sharedDelta);
-            AssertHelper(First(), "y2", 2011, (3d + 4d + 5d) / 3d, sharedDelta);
-            AssertHelper(First(), "y3", 2011, (3d + 4d) / 2d, sharedDelta);
-            AssertHelper(First(), "y4", 2011, (2d + 3d + 4d) / 3d, sharedDelta);
+            I("TIME 2013 2013;");
+
+            FAIL("SERIES y1 = movavg(0.5 * x + 0.5 * x, 2);");
+            FAIL("SERIES y2 = movavg(0.5 * x + 0.5 * x, 3);");
+            FAIL("SERIES y3 = movavg(0.5 * x[-1] + 0.5 * x[-1], 2);");
+            FAIL("SERIES y4 = movavg(0.5 * x[-1] + 0.5 * x[-1], 3);");
+
+            I("SERIES y1 = movavg(x, 2);");
+            I("SERIES y2 = movavg(x, 3);");
+            I("SERIES y3 = movavg(x[-1], 2);");
+            I("SERIES y4 = movavg(x[-1], 3);");
+            AssertHelper(First(), "y1", 2013, (4d + 5d) / 2d, sharedDelta);
+            AssertHelper(First(), "y2", 2013, (3d + 4d + 5d) / 3d, sharedDelta);
+            AssertHelper(First(), "y3", 2013, (3d + 4d) / 2d, sharedDelta);
+            AssertHelper(First(), "y4", 2013, (2d + 3d + 4d) / 3d, sharedDelta);
+
+            FAIL("SERIES y1 = movsum(0.5 * x + 0.5 * x, 2);");
+            FAIL("SERIES y2 = movsum(0.5 * x + 0.5 * x, 3);");
+            FAIL("SERIES y3 = movsum(0.5 * x[-1] + 0.5 * x[-1], 2);");
+            FAIL("SERIES y4 = movsum(0.5 * x[-1] + 0.5 * x[-1], 3);");
+
+            I("SERIES y1 = movsum(x, 2);");
+            I("SERIES y2 = movsum(x, 3);");
+            I("SERIES y3 = movsum(x[-1], 2);");
+            I("SERIES y4 = movsum(x[-1], 3);");
+            AssertHelper(First(), "y1", 2013, (4d + 5d) / 1d, sharedDelta);
+            AssertHelper(First(), "y2", 2013, (3d + 4d + 5d) / 1d, sharedDelta);
+            AssertHelper(First(), "y3", 2013, (3d + 4d) / 1d, sharedDelta);
+            AssertHelper(First(), "y4", 2013, (2d + 3d + 4d) / 1d, sharedDelta);
 
         }
 
