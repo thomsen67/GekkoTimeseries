@@ -1017,7 +1017,25 @@ namespace Gekko
 
 
 
+        public static IVariable movavg(GekkoTime t, IVariable x, IVariable ilags)
+        {
+            if (x.Type() != EVariableType.TimeSeries)
+            {
+                G.Writeln2("*** ERROR: movavg() function only valid for time series arguments");
+                throw new GekkoException();
+            }
+            int lags = O.GetInt(ilags);
+            MetaTimeSeries mts = (MetaTimeSeries)x;
 
+            double sum = 0d;
+            double n = 0d;
+            for (int i = 0; i < lags; i++)
+            {
+                sum += mts.ts.GetData(t.Add(-i));
+                n++;
+            }
+            return new ScalarVal(sum / n);
+        }
 
         public static IVariable pchy(GekkoTime t, IVariable x1)
         {

@@ -1563,7 +1563,8 @@ namespace Gekko
             //GetInt() is really just GetVal() converted to int afterwards.
             if (a.Type() == EVariableType.TimeSeries)
             {
-                G.Writeln2("*** ERROR: Using GetInt() on timeseries");
+                G.Writeln2("*** ERROR: Using GetInt() on timeseries.");
+                G.Writeln("           Did you forget []-brackets to pick out an observation, for instance x[2020]?");
                 throw new GekkoException();
             }
             double d = GetVal(a, Globals.tNull);

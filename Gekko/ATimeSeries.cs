@@ -99,7 +99,7 @@ namespace Gekko
             if (t.IsNull())
             {
                 G.Writeln2("*** ERROR: You are trying to extract a single value from timeseries: " + this.ts.variableName + ".");
-                G.Writeln("           Did you forget []-brackets to pick out an observation, for instance gdp[2020]?");
+                G.Writeln("           Did you forget []-brackets to pick out an observation, for instance x[2020]?");
                 throw new GekkoException();
             }
             return this.ts.GetData(t.Add(this.offset));
