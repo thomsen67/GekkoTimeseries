@@ -1960,8 +1960,15 @@ namespace Gekko
                             wh2.rightHandSideCsCode.Append("Abs(", EEmitType.humanReadable);
                             numberOfRightParentheses++;
                         }
-                        else if (G.equal(function, "dlog"))
+                        else if (G.equal(function, "dlog") || G.equal(function, "dlogy"))
                         {
+                            int lag = 1;
+                            if (G.equal(function, "dlogy"))
+                            {
+                                lag = Program.CurrentSubperiods();
+                                Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                            }
+                            
                             if (arguments != 1)
                             {
                                 G.Writeln2("*** ERROR: Expected dlog() function with 1 argument");
@@ -2003,7 +2010,7 @@ namespace Gekko
                             b.Add(d);
                             b.Add(c);
                             ASTNode c1 = new ASTNode("-");  //it is a lag
-                            ASTNode c2 = new ASTNode("1"); //one period lag
+                            ASTNode c2 = new ASTNode(lag.ToString()); //n period lag
                             c.Children = new List<ASTNode>();
                             c.Add(d);
                             c.Add(c1);
@@ -2013,8 +2020,15 @@ namespace Gekko
                             d.Add(e);
                             d.Add(subTree);
                         }
-                        else if (G.equal(function, "pch"))
+                        else if (G.equal(function, "pch") || G.equal(function, "pchy"))
                         {
+                            int lag = 1;
+                            if (G.equal(function, "pchy"))
+                            {
+                                lag = Program.CurrentSubperiods();
+                                Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                            }
+
                             if (arguments != 1)
                             {
                                 G.Writeln2("*** ERROR: Expected pch() function with 1 argument");
@@ -2067,13 +2081,20 @@ namespace Gekko
                             b.Add(d);
                             b.Add(c);
                             ASTNode c1 = new ASTNode("-");  //it is a lag
-                            ASTNode c2 = new ASTNode("1"); //one period lag
+                            ASTNode c2 = new ASTNode(lag.ToString()); //n period lag
                             c.Add(d);
                             c.Add(c1);
                             c.Add(c2);
-                        }
-                        else if (G.equal(function, "dif") || G.equal(function, "diff"))
+                        }                        
+                        else if (G.equal(function, "dif") || G.equal(function, "diff") || G.equal(function, "dify") || G.equal(function, "diffy"))
                         {
+                            int lag = 1;
+                            if (G.equal(function, "dify") || G.equal(function, "diffy"))
+                            {
+                                lag = Program.CurrentSubperiods();
+                                Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                            }
+
                             if (arguments != 1)
                             {
                                 G.Writeln2("*** ERROR: Expected dif() function with 1 argument");
@@ -2115,7 +2136,7 @@ namespace Gekko
                             b.Add(subTree);
                             b.Add(c);
                             ASTNode c1 = new ASTNode("-"); //it is a lag
-                            ASTNode c2 = new ASTNode("1"); //one period lag
+                            ASTNode c2 = new ASTNode(lag.ToString()); //n period lag
                             c.Children = new List<ASTNode>();
                             c.Add(subTree);
                             c.Add(c1);
@@ -2374,6 +2395,7 @@ namespace Gekko
                         // var = exp(...)                   (log)
                         // var = var(-1) * exp(...)         (dlog)
                         // var = var(-1) * (.../100 + 1)    (pch)
+                        // var = var(-n) * (.../100 + 1)    (pchy, n=4 or 12)
                         // var = var(-1) + (...)            (dif)
                         /*
                          *                   ASTFUNCTION
@@ -2387,8 +2409,14 @@ namespace Gekko
                             root1 = new ASTNode("ASTFUNCTION", "exp");
                             root1.Add(root0);
                         }
-                        else if (G.equal(wh2.leftSideFunction, "dlog"))
+                        else if (G.equal(wh2.leftSideFunction, "dlog") || G.equal(wh2.leftSideFunction, "dlogy"))
                         {
+                            int lag = 1;
+                            if (G.equal(wh2.leftSideFunction, "dlogy"))
+                            {
+                                lag = Program.CurrentSubperiods();
+                                Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                            }
                             root1 = new ASTNode("*", true);
                             ASTNode child1 = new ASTNode("ASTVARIABLELAGLEAD", true);
                             ASTNode child2 = new ASTNode("ASTFUNCTION", true);
@@ -2396,14 +2424,20 @@ namespace Gekko
                             root1.Add(child2);
                             child1.Add(new ASTNode(eh.lhs));
                             child1.Add(new ASTNode("-"));  //lag
-                            child1.Add(new ASTNode("1"));  //lag one
+                            child1.Add(new ASTNode(lag.ToString()));  //lag n
                             //for GENR, cannot be a @-variable on left side, so:
                             child1.Add(new ASTNode("FALSE"));  //not baseline bank
                             child2.Add(new ASTNode("exp"));
                             child2.Add(root0);
                         }
-                        else if (G.equal(wh2.leftSideFunction, "pch"))
+                        else if (G.equal(wh2.leftSideFunction, "pch") || G.equal(wh2.leftSideFunction, "pchy"))
                         {
+                            int lag = 1;
+                            if (G.equal(wh2.leftSideFunction, "pchy"))
+                            {
+                                lag = Program.CurrentSubperiods();
+                                Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                            }
                             root1 = new ASTNode("*", true);
                             ASTNode child1 = new ASTNode("ASTVARIABLELAGLEAD", true);
                             ASTNode child2 = new ASTNode("+", true);
@@ -2411,7 +2445,7 @@ namespace Gekko
                             root1.Add(child2);
                             child1.Add(new ASTNode(eh.lhs));
                             child1.Add(new ASTNode("-"));  //lag
-                            child1.Add(new ASTNode("1"));  //lag one
+                            child1.Add(new ASTNode(lag.ToString()));  //lag n
                             //for GENR, cannot be a @-variable on left side, so:
                             child1.Add(new ASTNode("FALSE"));  //not baseline bank
                             ASTNode child21 = new ASTNode("/", true);
@@ -2420,9 +2454,15 @@ namespace Gekko
                             child21.Add(new ASTNode("ASTDOUBLE", "100"));
                             child2.Add(child21);
                             child2.Add(child22);
-                        }
-                        else if (G.equal(wh2.leftSideFunction, "dif") || G.equal(wh2.leftSideFunction, "diff"))
+                        }                        
+                        else if (G.equal(wh2.leftSideFunction, "dif") || G.equal(wh2.leftSideFunction, "diff") || G.equal(wh2.leftSideFunction, "dify") || G.equal(wh2.leftSideFunction, "diffy"))
                         {
+                            int lag = 1;
+                            if (G.equal(wh2.leftSideFunction, "dify") || G.equal(wh2.leftSideFunction, "diffy"))
+                            {
+                                lag = Program.CurrentSubperiods();
+                                Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                            }
                             root1 = new ASTNode("+", true);
                             ASTNode child1 = new ASTNode("ASTVARIABLELAGLEAD", true);
                             ASTNode child2 = root0;
@@ -2430,7 +2470,7 @@ namespace Gekko
                             root1.Add(child2);
                             child1.Add(new ASTNode(eh.lhs));
                             child1.Add(new ASTNode("-"));  //lag
-                            child1.Add(new ASTNode("1"));  //lag one
+                            child1.Add(new ASTNode(lag.ToString()));  //lag n
                             //for GENR, cannot be a @-variable on left side, so:
                             child1.Add(new ASTNode("FALSE"));  //not baseline bank
                         }
@@ -2845,6 +2885,8 @@ namespace Gekko
             }
         }
 
+        
+        
         private static void HandlePowFunction(EquationHelper eh, ASTNode equationNode, int depth, WalkerHelper2 wh2, Model model, int subTreeLag, bool isModel, bool function)
         {
             wh2.rightHandSideCsCode.Append("Math.Pow(", EEmitType.computerReadable);

@@ -13448,8 +13448,24 @@ namespace Gekko
             return G.equal(Program.options.solve_forward_method, "stacked");
         }
 
+        public static int CurrentSubperiods()
+        {
+            int lag = 1;
+            if (Program.options.freq == EFreq.Quarterly) lag = Globals.freqQSubperiods;
+            else if (Program.options.freq == EFreq.Monthly) lag = Globals.freqMSubperiods;
+            return lag;
+        }
+
         public static void Sim(O.Sim o)
         {
+            if (Program.model != null && Program.model.subPeriods != -12345 && Program.model.subPeriods != CurrentSubperiods())
+            {
+                G.Writeln2("*** ERROR: The model was not compiled/loaded with the current frequency");
+                G.Writeln("    This applies to the pchy() function. Remedy: put the MODEL statement");
+                G.Writeln("    after your 'OPTION freq ... ' statement.");
+                throw new GekkoException();
+            }
+
             if (G.equal(o.opt_after, "yes"))
             {
                 Program.Efter(o.t1, o.t2);
