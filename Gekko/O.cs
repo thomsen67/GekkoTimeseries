@@ -23,6 +23,19 @@ namespace Gekko
         //Common methods start
         //Common methods start
 
+        public enum LagType
+        {
+            Pch,
+            Pchy,
+            Dif,
+            Dify,
+            Dlog,
+            Dlogy,
+            Movavg,
+            Movsum,
+            Lag
+        }
+
         public static bool isTableCall = false;
 
         public static string ShowDatesAsString(GekkoTime t1, GekkoTime t2)
@@ -1456,7 +1469,23 @@ namespace Gekko
             }
             return c;
         }
-        
+
+        //public static double HandleLags(O.LagType type, double[] storage)
+        //{
+        //    double data = double.NaN;
+        //    if (type == O.LagType.Movavg || type == O.LagType.Movsum)
+        //    {
+        //        double sum = 0d;
+        //        for (int i = 0; i < storage.Length; i++)
+        //        {
+        //            sum += storage[i];
+        //        }
+        //        if (type == O.LagType.Movavg) data = sum / (double)storage.Length;
+        //        else if (type == O.LagType.Movsum) data = sum;
+        //    }            
+        //    return data;
+        //}
+
         public static List<string> GetList(List<string>l)
         {
             return l;

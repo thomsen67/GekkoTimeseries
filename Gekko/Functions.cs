@@ -1036,8 +1036,9 @@ namespace Gekko
                 if (x.Type() == EVariableType.Val)
                 {
                     //See the MEGA HACK and fix it there
-                    G.Writeln2("*** ERROR: At the moment, movavg() and movsum() only work on pure timeserires, not expressions.");
-                    G.Writeln("           So SERIES y = movavg(x1/x2, 2); will not work, whereas SERIES x = x1/x2; SERIES y = movavg(x, 2); is ok.");
+                    G.Writeln2("*** ERROR: At the moment, movavg() and movsum() only work on pure timeseries, not expressions.");
+                    G.Writeln("           So SERIES y = movavg(x1/x2, 2); will not work, whereas");
+                    G.Writeln("           SERIES x = x1/x2; SERIES y = movavg(x, 2); is ok.");
                     G.Writeln("           This limitation will be addressed.");
                     throw new GekkoException();
                 }

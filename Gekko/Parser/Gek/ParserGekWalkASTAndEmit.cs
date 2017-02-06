@@ -7,10 +7,11 @@ using System.Text;
 namespace Gekko.Parser.Gek
 {
 
+    
     public class GekkoSB
     {
         private StringBuilder storage = null;
-
+        
         public GekkoSB()
         {
             //this.storage = new StringBuilder();
@@ -1420,6 +1421,8 @@ namespace Gekko.Parser.Gek
                                 }
                                 string code = node[1].Code.ToString();
 
+                                W temp = w;
+
                                 //#893243875
                                 //HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA
                                 //HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA
@@ -1430,41 +1433,60 @@ namespace Gekko.Parser.Gek
                                 //Functions. is allowed, for instance dif(log(...))
                                 if (code.StartsWith("Functions.") || code.StartsWith("O.Add(") || code.StartsWith("O.Divide(") || code.StartsWith("O.Multiply(") || code.StartsWith("O.Negate(") || code.StartsWith("O.Power(") || code.StartsWith("O.Subtract("))
                                 {
-                                    //Do this some more robust way....
-                                    //first one: ___(t___ --> ___(t.Add(-1)___
-                                    //next one: ___, t___ --> ___, t.Add(-1)___
-                                    //string codeLag = code.Replace("(" + Globals.functionT1Cs, "(" + Globals.functionT1Cs + ".Add(-1)");
-                                    //codeLag = codeLag.Replace(", " + Globals.functionT1Cs, ", " + Globals.functionT1Cs + ".Add(-1)");
-
-                                    //first one: ___(t)___ --> ___(t.Add(-1))___
-                                    //first one: ___(t,___ --> ___(t.Add(-1),___
-                                    //next one: ___, t,___ --> ___, t.Add(-1),___
-                                    //next one: ___, t)___ --> ___, t.Add(-1))___
-
-                                    int lag = 1;
-                                    if (G.equal(functionName, "dlogy") || G.equal(functionName, "dify") || G.equal(functionName, "diffy") || G.equal(functionName, "pchy"))
+                                    if (Globals.megaHackFix)
                                     {
-                                        lag = Program.CurrentSubperiods();                                        
+                                        //also remove parent if
+                                        //w.headerCs.AppendLine("public static IVariable helper123(GekkoTime t) { return " + code + ";" + "}");
+
+
+
+
                                     }
+                                    else
+                                    {
 
-                                    string codeLag = code.Replace("(" + Globals.functionT1Cs + ")", "(" + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ")");
-                                    codeLag = codeLag.Replace("(" + Globals.functionT1Cs + ",", "(" + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ",");
-                                    codeLag = codeLag.Replace(", " + Globals.functionT1Cs + ",", ", " + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ",");
-                                    codeLag = codeLag.Replace(", " + Globals.functionT1Cs + ")", ", " + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ")");
+                                        //w.headerCs.AppendLine("public static IVariable helper123(GekkoTime t) { return " + code + ";" + "}");
 
-                                    if (functionName == "dlog" || functionName == "dlogy")
-                                    {
-                                        node.Code.A("Functions.log(" + Globals.functionT1Cs + ", " + code + ").Subtract(Functions.log(" + Globals.functionT1Cs + ", " + codeLag + "), " + Globals.functionT1Cs + ")");
+                                        //code is for instance:
+                                        //ser y = pch(x + 0);
+                                        // ==> O.Add(ts4, i5, t)
+
+                                        //Do this some more robust way....
+                                        //first one: ___(t___ --> ___(t.Add(-1)___
+                                        //next one: ___, t___ --> ___, t.Add(-1)___
+                                        //string codeLag = code.Replace("(" + Globals.functionT1Cs, "(" + Globals.functionT1Cs + ".Add(-1)");
+                                        //codeLag = codeLag.Replace(", " + Globals.functionT1Cs, ", " + Globals.functionT1Cs + ".Add(-1)");
+
+                                        //first one: ___(t)___ --> ___(t.Add(-1))___
+                                        //first one: ___(t,___ --> ___(t.Add(-1),___
+                                        //next one: ___, t,___ --> ___, t.Add(-1),___
+                                        //next one: ___, t)___ --> ___, t.Add(-1))___
+
+                                        int lag = 1;
+                                        if (G.equal(functionName, "dlogy") || G.equal(functionName, "dify") || G.equal(functionName, "diffy") || G.equal(functionName, "pchy"))
+                                        {
+                                            lag = Program.CurrentSubperiods();
+                                        }
+
+                                        string codeLag = code.Replace("(" + Globals.functionT1Cs + ")", "(" + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ")");
+                                        codeLag = codeLag.Replace("(" + Globals.functionT1Cs + ",", "(" + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ",");
+                                        codeLag = codeLag.Replace(", " + Globals.functionT1Cs + ",", ", " + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ",");
+                                        codeLag = codeLag.Replace(", " + Globals.functionT1Cs + ")", ", " + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ")");
+
+                                        if (functionName == "dlog" || functionName == "dlogy")
+                                        {
+                                            node.Code.A("Functions.log(" + Globals.functionT1Cs + ", " + code + ").Subtract(Functions.log(" + Globals.functionT1Cs + ", " + codeLag + "), " + Globals.functionT1Cs + ")");
+                                        }
+                                        else if (functionName == "dif" || functionName == "diff" || functionName == "dify" || functionName == "diffy")
+                                        {
+                                            node.Code.A("(" + code + ").Subtract(" + codeLag + " ," + Globals.functionT1Cs + ")");
+                                        }
+                                        else if (functionName == "pch" || functionName == "pchy")
+                                        {
+                                            node.Code.A("(" + code + ").Divide(" + codeLag + ", " + Globals.functionT1Cs + ").Subtract(new ScalarVal(1d), " + Globals.functionT1Cs + ").Multiply(new ScalarVal(100d), " + Globals.functionT1Cs + ")");
+                                        }
+                                        else throw new GekkoException();
                                     }
-                                    else if (functionName == "dif" || functionName == "diff" || functionName == "dify" || functionName == "diffy")
-                                    {
-                                        node.Code.A("(" + code + ").Subtract(" + codeLag + " ," + Globals.functionT1Cs + ")");
-                                    }
-                                    else if (functionName == "pch" || functionName == "pchy")
-                                    {
-                                        node.Code.A("(" + code + ").Divide(" + codeLag + ", " + Globals.functionT1Cs + ").Subtract(new ScalarVal(1d), " + Globals.functionT1Cs + ").Multiply(new ScalarVal(100d), " + Globals.functionT1Cs + ")");
-                                    }                                    
-                                    else throw new GekkoException();
                                 }
                                 else
                                 {

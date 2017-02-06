@@ -1,18 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Windows.Forms;
+using
+ System.Windows.Forms;
 using System.Drawing;
 using Gekko.Parser;
 namespace Gekko
 {
-    public class TranslatedCode
+    public class
+     TranslatedCode
     {
         public static GekkoTime globalGekkoTimeIterator = Globals.tNull;
-        public static IVariable list213 = null;
-        public static IVariable list214 = null;
-        public static IVariable scalar219 = null;
-        public static IVariable scalar220 = null;
+        public static
+         readonly ScalarVal i7 = new ScalarVal(100d);
+        public static readonly ScalarVal i10 = new
+         ScalarVal(-1d);
         public static void ClearTS(P p)
         {
         }
@@ -25,127 +27,113 @@ namespace Gekko
             GekkoTime t = Globals.tNull;
 
 
-            p.SetText(@"¤1");
-            O.Reset o0 = new O.Reset();
+            p.SetText(@"¤2");
+            O.Reset
+             o0 = new O.Reset();
             o0.p = p; o0.Exe();
 
 
 
 
             p.SetText(@"¤2");
-            O.List o1 = new O.List();
-            o1.name = O.GetString((new ScalarString("m1")));
-            o1.listItems = new List<string>();
-            o1.p = p;
-            o1.listItems = new List<string>();
-            o1.listItems.AddRange(O.GetList((new ScalarString("a1"))));
-
-            o1.listItems.AddRange(O.GetList((new ScalarString("b1"))));
-
-            o1.Exe();
+            O.Mode o1 = new
+             O.Mode();
+            o1.mode = @"data"; o1.Exe();
 
 
 
 
             p.SetText(@"¤3");
-            O.List o2 = new O.List();
-            o2.name = O.GetString((new ScalarString("m2")));
-            o2.listItems = new List<string>();
+            O.Genr o2 = new
+             O.Genr();
+            
+            IVariable ts6 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" +
+             O.GetString((new ScalarString("x"))), 1, O.ECreatePossibilities.Can);
+            o2.t1 =
+             Globals.globalPeriodStart;
+            o2.t2 = Globals.globalPeriodEnd;
+
+            o2.lhs = null;
             o2.p = p;
-            o2.listItems = new List<string>();
-            o2.listItems.AddRange(O.GetList((new ScalarString("a2"))));
-
-            o2.listItems.AddRange(O.GetList((new ScalarString("b2"))));
-
+            foreach
+             (GekkoTime t2 in new GekkoTimeIterator(o2.t1, o2.t2))
+            {
+                t = t2;
+                double data = O.GetVal(i7,
+               t);
+                if (o2.lhs == null) o2.lhs = O.GetTimeSeries(ts6);
+                o2.lhs.SetData(t, data);
+            }
+            t =
+             Globals.tNull;
+            o2.meta = @"ser x = 100";
             o2.Exe();
 
 
 
 
+
             p.SetText(@"¤4");
-            O.List o3 = new O.List();
-            o3.name = O.GetString((new ScalarString("m3")));
-            o3.listItems = new List<string>();
+            O.Genr o3 = new
+             O.Genr();
+            IVariable ts8 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" +
+             O.GetString((new ScalarString("y"))), 1, O.ECreatePossibilities.Can);
+            IVariable ts9 =
+             O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new
+             ScalarString("x"))), 1);
+            o3.t1 = Globals.globalPeriodStart;
+            o3.t2 =
+             Globals.globalPeriodEnd;
+
+            o3.lhs = null;
             o3.p = p;
-            o3.listItems = new List<string>();
-            o3.listItems.AddRange(O.GetList((new ScalarString("a3"))));
 
-            o3.listItems.AddRange(O.GetList((new ScalarString("b3"))));
+            IVariable ts4 = null, ts3 = null, i5 = null;
 
+            foreach (GekkoTime t2 in new GekkoTimeIterator(o3.t1, o3.t2))
+            {
+
+                int lag1 = -4;
+                int lag2 = 0;
+                double[] storage = new double[lag2 - lag1 + 1];                
+                int counter = 0;
+                foreach (GekkoTime t3 in new GekkoTimeIterator(t2.Add(-5), t2))
+                {                    
+                    t = t3;
+                    storage[counter] = O.GetVal(O.Multiply(i5, O.Add(ts6, O.Indexer(ts6, i7, t), t), t), t);
+                    counter++;
+                }
+                double data2 = storage[0]; //PUT INSIDE METHOD
+
+                t = t2;
+                double data = O.GetVal(O.Add(ts4, new ScalarVal(data2), t), t);
+                //double data = O.GetVal(O.Add(ts4, O.Multiply(i5, O.Add(ts6, O.Indexer(ts6, i7, t), t), t), t), t);
+                if (o3.lhs == null) o3.lhs =
+                  O.GetTimeSeries(ts3);
+                o3.lhs.SetData(t, data);
+
+                // z + 1*(x+x[-1]);
+            }
+
+            t = Globals.tNull;
+            o3.meta = @"ser y = x+x[-1]";
             o3.Exe();
 
 
 
-            p.SetText(@"¤5");
-
-        }
-
-        public static void C1(P p)
-        {
-
-            GekkoTime t = Globals.tNull;
-
-
-            p.SetText(@"¤7");
-            Program.Tell(O.GetString(new ScalarString(@"hej")), false);
-
-
-
-        }
-
-        public static void C2(P p)
-        {
-
-            GekkoTime t = Globals.tNull;
-
-
 
 
         }
 
 
-        public static void CodeLines(P p)
+        public static void
+         CodeLines(P p)
         {
             GekkoTime t = Globals.tNull;
 
             C0(p);
 
-            O.ForString o4 = new O.ForString();
-            List<List<string>> test215 = new List<List<string>>();
-            List<string> test216 = new List<string>();
-            o4.listItems = new List<string>();
-            o4.listItems.AddRange(O.GetList(O.GetScalarFromCache(ref list213, "#m1", false, false)));
 
-            List<string> x4_0 = o4.listItems;
-            test215.Add(x4_0);
-            test216.Add("i");
-            o4.listItems = new List<string>();
-            o4.listItems.AddRange(O.GetList(O.GetScalarFromCache(ref list214, "#m2", false, false)));
-
-            List<string> x4_1 = o4.listItems;
-            test215.Add(x4_1);
-            test216.Add("j");
-            try
-            {
-                int test217 = O.ForListMax(test215);
-                O.ForListCheck(test216);
-                for (int i = 0; i < test217; i++)
-                {
-                    O.SetStringFromCache(ref scalar219, "i", x4_0[i], true);
-
-                    O.SetStringFromCache(ref scalar220, "j", x4_1[i], true);
-
-                    C1(p);
-
-                }
-            } //end of try
-            finally
-            {
-                O.RemoveScalar("i");
-                O.RemoveScalar("j");
-            }  //end of finally
-
-            C2(p);
 
         }
     }
