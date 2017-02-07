@@ -928,14 +928,11 @@ namespace Gekko.Parser.Gek
                                         string tempName = "temp" + ++Globals.counter;
                                         s += "TimeSeries " + tempName + " = new TimeSeries(Program.options.freq, null);" + G.NL;
                                         s += "foreach (GekkoTime t2 in new GekkoTimeIterator(Globals.globalPeriodStart, Globals.globalPeriodEnd))" + G.NL;
-                                        s += "{" + G.NL;
-                                        s += "    t = t2;" + G.NL;
+                                        s += GekkoTimeIteratorStartCode(w);
                                         s += "    double data = O.GetVal(" + child.Code + ", t);" + G.NL;
-                                        s += "    " + tempName + ".SetData(t, data);" + G.NL;
-                                        s += "}" + G.NL;
-                                        s += "t = Globals.tNull;" + G.NL;
+                                        s += "    " + tempName + ".SetData(t, data);" + G.NL;                                        
+                                        s += GekkoTimeIteratorEndCode();
                                         s += "IVariable " + tn + " = new MetaTimeSeries(" + tempName + ");" + G.NL;
-
                                     }
                                     else
                                     {
@@ -1437,8 +1434,28 @@ namespace Gekko.Parser.Gek
                                     {
                                         //also remove parent if
                                         //w.headerCs.AppendLine("public static IVariable helper123(GekkoTime t) { return " + code + ";" + "}");
+                                        int lag1 = -1;
+                                        int lag2 = 0;
+                                        string lag1Name = "lag1_" + ++Globals.counter;
+                                        string lag2Name = "lag2_" + ++Globals.counter;
+                                        string storageName = "storage" + ++Globals.counter;
+                                        string counterName = "counter" + ++Globals.counter;
 
+                                        StringBuilder sb1 = new StringBuilder();                                        
+                                        sb1.AppendLine("int " + lag1Name + " = " + lag1 + ";");
+                                        sb1.AppendLine("int " + lag2Name + " = " + lag2 + ";");
+                                        sb1.AppendLine("double[] " + storageName + " = new double[" + lag2Name + " - " + lag1Name + " + 1];");
+                                        sb1.AppendLine("int " + counterName + " = 0;");
+                                        sb1.AppendLine("foreach (GekkoTime t3 in new GekkoTimeIterator(t2.Add(" + lag1 + "), t2.Add(" + lag2 + ")))");
+                                        sb1.AppendLine("{");
+                                        sb1.AppendLine("t = t3;");
+                                        sb1.AppendLine("" + storageName + "[" + counterName + "] = O.GetVal(" + code + ", t);");
+                                        sb1.AppendLine("" + counterName + "++;");
+                                        sb1.AppendLine("}");
+                                        if (w.wh.timeLoopCs == null) w.wh.timeLoopCs = new StringBuilder();
+                                        w.wh.timeLoopCs.Append(sb1);
 
+                                        node.Code.A("O.HandleLags(O.LagType.Movsum, " + storageName + ")");
 
 
                                     }
@@ -2806,9 +2823,9 @@ namespace Gekko.Parser.Gek
                             node.Code.A("foreach(int bankNumber in bankNumbers) {" + G.NL);  //For bankNumber = 2, no cache will ever be used to avoid confusion. Cache is only for 1 (Work).                            
                             node.Code.CA(EmitLocalCacheForTimeLooping(node.Code.ToString(), w));
                             node.Code.A("foreach (GekkoTime t2 in new GekkoTimeIterator(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2))" + G.NL);
-                            node.Code.A(Globals.startGekkoTimeIteratorCode);
+                            node.Code.A(GekkoTimeIteratorStartCode(w));
                             node.Code.A("O.GetVal777(" + node[0].Code + ", bankNumber, ope" + Num(node) + ", t);" + G.NL);                            
-                            node.Code.A(Globals.endGekkoTimeIteratorCode);                            
+                            node.Code.A(GekkoTimeIteratorEndCode());                            
                             node.Code.A("}" + G.NL);
                             node.Code.A("o" + Num(node) + ".prtElements.Add(ope" + Num(node) + ");" + G.NL);                            
                             node.Code.A("}" + G.NL);  //avoid scope collisions
@@ -3745,14 +3762,15 @@ namespace Gekko.Parser.Gek
         private static string HandleGenr(ASTNode node, string numNode, string childCodePeriod, string childCodeLhsName, string childCodeRhs, W w, string lhsFunction)
         {
             string nodeCode = null;
-            nodeCode += "O.Genr o" + numNode + " = new O.Genr();" + G.NL;            
+            nodeCode += "O.Genr o" + numNode + " = new O.Genr();" + G.NL;
             nodeCode = EmitLocalCacheForTimeLooping(nodeCode, w);
             nodeCode += childCodePeriod + G.NL;  //dates
             nodeCode += "o" + numNode + ".lhs = null;" + G.NL;
             nodeCode += "o" + numNode + ".p = p;" + G.NL;
             nodeCode += "foreach (GekkoTime t2 in new GekkoTimeIterator(o" + numNode + ".t1, o" + numNode + ".t2))" + G.NL;
-            nodeCode += Globals.startGekkoTimeIteratorCode;
-            nodeCode += "  double data = O.GetVal(" + childCodeRhs + ", t);" + G.NL;            
+            nodeCode += GekkoTimeIteratorStartCode(w);
+
+            nodeCode += "  double data = O.GetVal(" + childCodeRhs + ", t);" + G.NL;
             nodeCode += "if(o" + numNode + ".lhs == null) o" + numNode + ".lhs = O.GetTimeSeries(" + childCodeLhsName + ");" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
             //nodeCode += "  double dataLag = O.GetVal(o" + numNode + ".lhs, t.Add(-1));" + G.NL;
             if (lhsFunction == null)
@@ -3780,15 +3798,27 @@ namespace Gekko.Parser.Gek
                 G.Writeln2("*** ERROR: Left-hand side function '" + lhsFunction + "' is not recognized");
                 G.Writeln("           Legal functions are log, dlog, pch, dif or diff");
                 throw new GekkoException();
-            }                        
-            nodeCode += Globals.endGekkoTimeIteratorCode;
+            }
+            nodeCode += GekkoTimeIteratorEndCode();
 
             if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
             {
                 //specialExpressionAndLabelInfo[0] should be "ASTMETA" here
                 nodeCode += "o" + numNode + ".meta = @`" + node.Parent.specialExpressionAndLabelInfo[1] + "`;" + G.NL;
-            }            
+            }
             nodeCode += "o" + numNode + ".Exe();" + G.NL;
+            return nodeCode;
+        }
+
+        private static string GekkoTimeIteratorEndCode()
+        {
+            return Globals.endGekkoTimeIteratorCode;            
+        }
+
+        private static string GekkoTimeIteratorStartCode(W w)
+        {            
+            string nodeCode = Globals.startGekkoTimeIteratorCode;
+            if (w.wh.timeLoopCs != null) nodeCode += w.wh.timeLoopCs.ToString();
             return nodeCode;
         }
 
@@ -3813,7 +3843,7 @@ namespace Gekko.Parser.Gek
         //    //headerCs.AppendLine("public class " + className + " { " + ss + G.NL + "public " + className + "(" + vv + ") {" + G.NL + uu + "} }");
         //    //tupleClasses.Add(className, true);
         //}        
-        
+
         private static string Num(ASTNode node)
         {
             return "" + node.commandLinesCounter;
@@ -4635,7 +4665,7 @@ namespace Gekko.Parser.Gek
         public StringBuilder headerCs = new StringBuilder(); //stuff to be put at the very start.
         public StringBuilder headerMethodTsCs = new StringBuilder(); //stuff to clear TimeSeries pointers
         public StringBuilder headerMethodScalarCs = new StringBuilder(); //stuff to clear scalar pointers   
-
+        
         //public GekkoDictionary<string, bool> functionUserDefined = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
         public GekkoDictionary<string, bool> tupleClasses = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
@@ -4670,6 +4700,7 @@ namespace Gekko.Parser.Gek
         //public StringBuilder localStatementCode = null;
         public string currentCommand = null;
         public bool isGotoOrTarget = false;
+        public StringBuilder timeLoopCs = null;  //stuff to put into the GekkoTime t2 = ... loop (handles lag sub-loops)
     }
 
     public class OPrt : O_OLD
