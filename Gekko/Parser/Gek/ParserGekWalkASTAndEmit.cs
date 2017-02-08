@@ -928,7 +928,7 @@ namespace Gekko.Parser.Gek
                                         string tempName = "temp" + ++Globals.counter;
                                         s += "TimeSeries " + tempName + " = new TimeSeries(Program.options.freq, null);" + G.NL;
                                         s += "foreach (GekkoTime t2 in new GekkoTimeIterator(Globals.globalPeriodStart, Globals.globalPeriodEnd))" + G.NL;
-                                        s += GekkoTimeIteratorStartCode(w);
+                                        s += GekkoTimeIteratorStartCode(w, node);  //node is where this text is put below
                                         s += "    double data = O.GetVal(" + child.Code + ", t);" + G.NL;
                                         s += "    " + tempName + ".SetData(t, data);" + G.NL;                                        
                                         s += GekkoTimeIteratorEndCode();
@@ -1416,7 +1416,7 @@ namespace Gekko.Parser.Gek
 
                                 
                                 if (Globals.megaHackFix)
-                                {
+                                {                                    
 
                                     string lag1Code = null;  //for instance -1
                                     string lag2Code = null;  //for instance 0
@@ -1450,20 +1450,51 @@ namespace Gekko.Parser.Gek
 
                                     //also remove parent if
                                     //w.headerCs.AppendLine("public static IVariable helper123(GekkoTime t) { return " + code + ";" + "}");
-                                                                     
+
+                                    int timeLoopDepth = 0;
+                                    ASTNode tmp = node.Parent;
+                                    ASTNode parentTimeLoop = null;
+                                    while (tmp != null)
+                                    {
+                                        if (tmp.Text == "ASTFUNCTION" && G.equal(tmp[0].Text, "movsum"))
+                                        {
+
+                                            timeLoopDepth++;
+                                            if (parentTimeLoop == null) parentTimeLoop = tmp;  //only first one                                            
+                                        }
+                                        tmp = tmp.Parent;
+                                    }
+
+                                    int tCounter = 3 + timeLoopDepth;
+                                                            
                                     string storageName = "storage" + ++Globals.counter;
                                     string counterName = "counter" + ++Globals.counter;
                                     StringBuilder sb1 = new StringBuilder();                                    
                                     sb1.AppendLine("double[] " + storageName + " = new double[" + lag2Code + " - (" + lag1Code + ") + 1];");  //remember lag1 and lag2 are <= 0
                                     sb1.AppendLine("int " + counterName + " = 0;");
-                                    sb1.AppendLine("foreach (GekkoTime t3 in new GekkoTimeIterator(t2.Add(" + lag1Code + "), t2.Add(" + lag2Code + ")))");
+                                    sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(t" + (tCounter - 1) + ".Add(" + lag1Code + "), t" + (tCounter - 1) + ".Add(" + lag2Code + ")))");
                                     sb1.AppendLine("{");
-                                    sb1.AppendLine("t = t3;");
+                                    sb1.AppendLine("t = t" + tCounter + ";");
+
+                                    if (node.timeLoopNestCode != null)
+                                    {
+                                        sb1.Append(node.timeLoopNestCode);
+                                    }
+
                                     sb1.AppendLine("" + storageName + "[" + counterName + "] = O.GetVal(" + code + ", t);");
                                     sb1.AppendLine("" + counterName + "++;");
-                                    sb1.AppendLine("}");
-                                    if (w.wh.timeLoopCs == null) w.wh.timeLoopCs = new StringBuilder();
-                                    w.wh.timeLoopCs.Append(sb1);
+                                    sb1.AppendLine("}");                                    
+
+                                    if (parentTimeLoop == null)
+                                    {
+                                        if (w.wh.timeLoopCode == null) w.wh.timeLoopCode = new StringBuilder();
+                                        w.wh.timeLoopCode.Append(sb1);
+                                    }
+                                    else
+                                    {
+                                        parentTimeLoop.timeLoopNestCode = sb1;
+                                    }
+
                                     node.Code.A("O.HandleLags(`" + functionName + "`, " + storageName + ", " + lag1Code + ", " + lag2Code + ")");
                                 }
                                 else
@@ -2851,7 +2882,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("foreach(int bankNumber in bankNumbers) {" + G.NL);  //For bankNumber = 2, no cache will ever be used to avoid confusion. Cache is only for 1 (Work).                            
                             node.Code.CA(EmitLocalCacheForTimeLooping(node.Code.ToString(), w));
                             node.Code.A("foreach (GekkoTime t2 in new GekkoTimeIterator(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2))" + G.NL);
-                            node.Code.A(GekkoTimeIteratorStartCode(w));
+                            node.Code.A(GekkoTimeIteratorStartCode(w, node));
                             node.Code.A("O.GetVal777(" + node[0].Code + ", bankNumber, ope" + Num(node) + ", t);" + G.NL);                            
                             node.Code.A(GekkoTimeIteratorEndCode());                            
                             node.Code.A("}" + G.NL);
@@ -3796,7 +3827,7 @@ namespace Gekko.Parser.Gek
             nodeCode += "o" + numNode + ".lhs = null;" + G.NL;
             nodeCode += "o" + numNode + ".p = p;" + G.NL;
             nodeCode += "foreach (GekkoTime t2 in new GekkoTimeIterator(o" + numNode + ".t1, o" + numNode + ".t2))" + G.NL;
-            nodeCode += GekkoTimeIteratorStartCode(w);
+            nodeCode += GekkoTimeIteratorStartCode(w, node);
             nodeCode += "  double data = O.GetVal(" + childCodeRhs + ", t);" + G.NL;
             nodeCode += "if(o" + numNode + ".lhs == null) o" + numNode + ".lhs = O.GetTimeSeries(" + childCodeLhsName + ");" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
             //nodeCode += "  double dataLag = O.GetVal(o" + numNode + ".lhs, t.Add(-1));" + G.NL;
@@ -3842,10 +3873,10 @@ namespace Gekko.Parser.Gek
             return Globals.endGekkoTimeIteratorCode;            
         }
 
-        private static string GekkoTimeIteratorStartCode(W w)
+        private static string GekkoTimeIteratorStartCode(W w, ASTNode node)
         {            
             string nodeCode = Globals.startGekkoTimeIteratorCode;
-            if (w.wh.timeLoopCs != null) nodeCode += w.wh.timeLoopCs.ToString();
+            if (w.wh.timeLoopCode != null) nodeCode += w.wh.timeLoopCode.ToString();            
             return nodeCode;
         }
 
@@ -4727,7 +4758,7 @@ namespace Gekko.Parser.Gek
         //public StringBuilder localStatementCode = null;
         public string currentCommand = null;
         public bool isGotoOrTarget = false;
-        public StringBuilder timeLoopCs = null;  //stuff to put into the GekkoTime t2 = ... loop (handles lag sub-loops)
+        public StringBuilder timeLoopCode = null;  //stuff to put into the GekkoTime t2 = ... loop (handles lag sub-loops)        
     }
 
     public class OPrt : O_OLD

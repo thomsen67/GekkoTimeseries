@@ -54,6 +54,7 @@ namespace Gekko.Parser
         public int expressionCounter = 0;        
         public string[] specialExpressionAndLabelInfo = null;
         public string leftBlanks = null;
+        public StringBuilder timeLoopNestCode = null;  //code delivered from sub-tree
 
         public ASTNode GetChild(string s)
         {
