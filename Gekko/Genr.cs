@@ -12,10 +12,27 @@ namespace Gekko
     {
         public static GekkoTime globalGekkoTimeIterator = Globals.tNull;
         public static
-         readonly ScalarVal i11 = new ScalarVal(100d);
-        public static readonly ScalarVal i14 = new
+         readonly ScalarVal i18 = new ScalarVal(2010d);
+        public static readonly ScalarVal i19 = new
+         ScalarVal(2017d);
+        public static readonly ScalarVal i20 = new ScalarVal(1d);
+        public static readonly
+         ScalarVal i21 = new ScalarVal(2d);
+        public static readonly ScalarVal i22 = new
+         ScalarVal(3d);
+        public static readonly ScalarVal i23 = new ScalarVal(4d);
+        public static readonly
+         ScalarVal i24 = new ScalarVal(5d);
+        public static readonly ScalarVal i25 = new
+         ScalarVal(6d);
+        public static readonly ScalarVal i26 = new ScalarVal(7d);
+        public static readonly
+         ScalarVal i27 = new ScalarVal(8d);
+        public static readonly ScalarVal i30 = new
          ScalarVal(-1d);
-        public static void ClearTS(P p)
+        public static readonly ScalarVal i31 = new ScalarVal(2d);
+        public static void
+         ClearTS(P p)
         {
         }
         public static void ClearScalar(P p)
@@ -28,92 +45,150 @@ namespace Gekko
 
 
             p.SetText(@"¤2");
-            O.Reset
-             o0 = new O.Reset();
-            o0.p = p; o0.Exe();
+            O.Reset o0 = new O.Reset();
+            o0.p =
+             p; o0.Exe();
 
 
 
 
             p.SetText(@"¤2");
-            O.Mode o1 = new
-             O.Mode();
-            o1.mode = @"data"; o1.Exe();
+            O.Mode o1 = new O.Mode();
+            o1.mode =
+             @"data"; o1.Exe();
 
 
 
 
             p.SetText(@"¤3");
-            O.Genr o2 = new
-             O.Genr();
-            IVariable ts10 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" +
-             O.GetString((new ScalarString("x"))), 1, O.ECreatePossibilities.Can);
-            o2.t1 =
-             Globals.globalPeriodStart;
-            o2.t2 = Globals.globalPeriodEnd;
+            O.Time o2 = new O.Time();
+            o2.t1 = O.GetDate(i18,
+             O.GetDateChoices.FlexibleStart);
+            ;
+            o2.t2 = O.GetDate(i19,
+             O.GetDateChoices.FlexibleEnd);
+            ;
 
-            o2.lhs = null;
-            o2.p = p;
-            foreach
-             (GekkoTime t2 in new GekkoTimeIterator(o2.t1, o2.t2))
-            {
-                t = t2;
-                double data = O.GetVal(i11,
-               t);
-                if (o2.lhs == null) o2.lhs = O.GetTimeSeries(ts10);
-                o2.lhs.SetData(t, data);
-            }
-            t =
-             Globals.tNull;
-            o2.meta = @"ser x = 100";
             o2.Exe();
 
 
 
 
-
-            p.SetText(@"¤4");
-            O.Genr o3 = new
-             O.Genr();
-            IVariable ts12 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" +
-             O.GetString((new ScalarString("y"))), 1, O.ECreatePossibilities.Can);
-            IVariable ts13 =
-             O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new
-             ScalarString("x"))), 1);
-            o3.t1 = Globals.globalPeriodStart;
-            o3.t2 =
-             Globals.globalPeriodEnd;
-
-            o3.lhs = null;
+            p.SetText(@"¤0");
+            O.Upd o3 = new
+             O.Upd();
             o3.p = p;
-            foreach (GekkoTime t2 in new
-             GekkoTimeIterator(o3.t1, o3.t2))
-            {
-                t = t2;
-                int lag1_15 = -1;
-                int lag2_16 = 0;
-                double[]
-                 storage17 = new double[lag2_16 - lag1_15 + 1];
-                int counter18 = 0;
-                foreach (GekkoTime t3 in new
-                 GekkoTimeIterator(t2.Add(-1), t2.Add(0)))
-                {
-                    t = t3;
-                    storage17[counter18] = O.GetVal(O.Add(ts13,
-                     O.Indexer(ts13, i14, t), t), t);
-                    counter18++;
-                }
-                double data =
-               O.GetVal(O.HandleLags(O.LagType.Movsum, storage17), t);
-                if (o3.lhs == null) o3.lhs =
-                  O.GetTimeSeries(ts12);
-                o3.lhs.SetData(t, data);
-            }
-            t = Globals.tNull;
-            o3.meta = @"ser y = 
- pch(x+x[-1])";
+            o3.meta = @"ser x = 1,2,3,4,5,6,7,8";
+            o3.listItems = new
+             List<string>();
+            o3.listItems.AddRange(O.GetList((new ScalarString("x"))));
+
+            o3.op = "=";
+            o3.data
+             = new double[8];
+            o3.rep = new double[8];
+            o3.data[0] = (i20).GetVal(t);
+            o3.rep[0] =
+             1d;
+            o3.data[1] = (i21).GetVal(t);
+            o3.rep[1] = 1d;
+            o3.data[2] = (i22).GetVal(t);
+            o3.rep[2] =
+             1d;
+            o3.data[3] = (i23).GetVal(t);
+            o3.rep[3] = 1d;
+            o3.data[4] = (i24).GetVal(t);
+            o3.rep[4] =
+             1d;
+            o3.data[5] = (i25).GetVal(t);
+            o3.rep[5] = 1d;
+            o3.data[6] = (i26).GetVal(t);
+            o3.rep[6] =
+             1d;
+            o3.data[7] = (i27).GetVal(t);
+            o3.rep[7] = 1d;
             o3.Exe();
 
+
+
+
+
+            p.SetText(@"¤5");
+            O.Genr
+             o4 = new O.Genr();
+            IVariable ts28 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":"
+             + O.GetString((new ScalarString("y"))), 1, O.ECreatePossibilities.Can);
+            IVariable ts29 =
+             O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new
+             ScalarString("x"))), 1);
+            o4.t1 = Globals.globalPeriodStart;
+            o4.t2 =
+             Globals.globalPeriodEnd;
+
+            o4.lhs = null;
+            o4.p = p;
+            foreach (GekkoTime t2 in new
+             GekkoTimeIterator(o4.t1, o4.t2))
+            {
+                t = t2;
+                double[] storage32 = new double[(-O.GetInt(i31) +
+                 1) - (0) + 1];
+                int counter33 = 0;
+                foreach (GekkoTime t3 in new
+                 GekkoTimeIterator(t2.Add((-O.GetInt(i31) + 1)), t2.Add(0)))
+                {
+                    t = t3;
+                    storage32[counter33] =
+                     O.GetVal(O.Add(ts29, O.Indexer(ts29, i30, t), t), t);
+                    counter33++;
+                }
+                double data =
+               O.GetVal(O.HandleLags("movsum", storage32, (-O.GetInt(i31) + 1), 0), t);
+                if (o4.lhs == null) o4.lhs
+                  = O.GetTimeSeries(ts28);
+                o4.lhs.SetData(t, data);
+            }
+            t = Globals.tNull;
+            o4.meta = @"ser y = 
+ movsum(x+x[-1],2)";
+            o4.Exe();
+
+
+
+
+
+            p.SetText(@"¤6");
+            O.Prt o5 = new O.Prt();
+            o5.prtType =
+             "prt";
+
+            {
+                List<int> bankNumbers = null;
+                O.Prt.Element ope5 = new O.Prt.Element();
+                ope5.label =
+                 O.SubstituteScalarsAndLists("y", false);
+                bankNumbers = O.Prt.GetBankNumbers(null,
+                 Program.GetElementPrintCodes(o5, ope5));
+                foreach (int bankNumber in bankNumbers)
+                {
+                    IVariable ts34 =
+                     O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new
+                     ScalarString("y"))), bankNumber);
+                    foreach (GekkoTime t2 in new GekkoTimeIterator(o5.t1.Add(-2),
+                     o5.t2))
+                    {
+                        t = t2;
+                        O.GetVal777(ts34, bankNumber, ope5, t);
+                    }
+                    t = Globals.tNull;
+
+                }
+                o5.prtElements.Add(ope5);
+            }
+
+
+            o5.counter = 2;
+            o5.Exe();
 
 
 
@@ -121,10 +196,10 @@ namespace Gekko
         }
 
 
-        public static void CodeLines(P p)
+        public static void
+         CodeLines(P p)
         {
-            GekkoTime t =
-             Globals.tNull;
+            GekkoTime t = Globals.tNull;
 
             C0(p);
 
@@ -134,144 +209,3 @@ namespace Gekko
     }
 }
 
-
-//using System;
-//using System.Collections.Generic;
-//using System.Text;
-//using
-// System.Windows.Forms;
-//using System.Drawing;
-//using Gekko.Parser;
-//namespace Gekko
-//{
-//    public class
-//     TranslatedCode
-//    {
-//        public static GekkoTime globalGekkoTimeIterator = Globals.tNull;
-//        public static
-//         readonly ScalarVal i7 = new ScalarVal(100d);
-//        public static readonly ScalarVal i10 = new
-//         ScalarVal(-1d);
-//        public static void ClearTS(P p)
-//        {
-//        }
-//        public static void ClearScalar(P p)
-//        {
-//        }
-//        public static void C0(P p)
-//        {
-
-//            GekkoTime t = Globals.tNull;
-
-
-//            p.SetText(@"¤2");
-//            O.Reset
-//             o0 = new O.Reset();
-//            o0.p = p; o0.Exe();
-
-
-
-
-//            p.SetText(@"¤2");
-//            O.Mode o1 = new
-//             O.Mode();
-//            o1.mode = @"data"; o1.Exe();
-
-
-
-
-//            p.SetText(@"¤3");
-//            O.Genr o2 = new
-//             O.Genr();
-
-//            IVariable ts6 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" +
-//             O.GetString((new ScalarString("x"))), 1, O.ECreatePossibilities.Can);
-//            o2.t1 =
-//             Globals.globalPeriodStart;
-//            o2.t2 = Globals.globalPeriodEnd;
-
-//            o2.lhs = null;
-//            o2.p = p;
-//            foreach
-//             (GekkoTime t2 in new GekkoTimeIterator(o2.t1, o2.t2))
-//            {
-//                t = t2;
-//                double data = O.GetVal(i7,
-//               t);
-//                if (o2.lhs == null) o2.lhs = O.GetTimeSeries(ts6);
-//                o2.lhs.SetData(t, data);
-//            }
-//            t =
-//             Globals.tNull;
-//            o2.meta = @"ser x = 100";
-//            o2.Exe();
-
-
-
-
-
-//            p.SetText(@"¤4");
-//            O.Genr o3 = new
-//             O.Genr();
-//            IVariable ts8 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" +
-//             O.GetString((new ScalarString("y"))), 1, O.ECreatePossibilities.Can);
-//            IVariable ts9 =
-//             O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new
-//             ScalarString("x"))), 1);
-//            o3.t1 = Globals.globalPeriodStart;
-//            o3.t2 =
-//             Globals.globalPeriodEnd;
-
-//            o3.lhs = null;
-//            o3.p = p;
-
-//            IVariable ts4 = null, ts3 = null, i5 = null;
-
-//            foreach (GekkoTime t2 in new GekkoTimeIterator(o3.t1, o3.t2))
-//            {
-
-//                int lag1 = -4;
-//                int lag2 = 0;
-//                double[] storage = new double[lag2 - lag1 + 1];                
-//                int counter = 0;
-//                foreach (GekkoTime t3 in new GekkoTimeIterator(t2.Add(-5), t2))
-//                {                    
-//                    t = t3;
-//                    storage[counter++] = O.GetVal(O.Multiply(i5, O.Add(ts6, O.Indexer(ts6, i7, t), t), t), t);
-//                    counter++;
-//                }
-//                double data2 = storage[0]; //PUT INSIDE METHOD
-
-//                t = t2;
-//                double data = O.GetVal(O.Add(ts4, new ScalarVal(data2), t), t);
-//                //double data = O.GetVal(O.Add(ts4, O.Multiply(i5, O.Add(ts6, O.Indexer(ts6, i7, t), t), t), t), t);
-//                if (o3.lhs == null) o3.lhs =
-//                  O.GetTimeSeries(ts3);
-//                o3.lhs.SetData(t, data);
-
-//                // z + 1*(x+x[-1]);
-//            }
-
-//            t = Globals.tNull;
-//            o3.meta = @"ser y = x+x[-1]";
-//            o3.Exe();
-
-
-
-
-
-//        }
-
-
-//        public static void
-//         CodeLines(P p)
-//        {
-//            GekkoTime t = Globals.tNull;
-
-//            C0(p);
-
-
-
-//        }
-//    }
-//}
