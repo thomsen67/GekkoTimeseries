@@ -58,6 +58,8 @@ namespace Gekko
 
         public static bool excelFix = true;
 
+        public static List<string> lagFunctions = new List<string> { "dlog", "dif", "diff", "pch", "dlogy", "dify", "diffy", "pchy", "movsum", "movavg" };
+
         public static bool newSplit = true;
         public static string splitSTART2 = "//[[splitSTART]]";
         public static string splitSTOP2 = "//[[splitSTOP]]";

@@ -1405,21 +1405,20 @@ namespace Gekko.Parser.Gek
                         {
                             string functionName = node[0].Text.ToLower();  //no string composition allowed for functions.
                             if (functionName == "string") functionName = "tostring";
-
-
-
+                            
 
                             //TODO: Should these just override??? And what if inbuilt function does not exist??
 
-                            if (functionName == "dlog" || functionName == "dif" || functionName == "diff" || functionName == "pch" || functionName == "dlogy" || functionName == "dify" || functionName == "diffy" || functionName == "pchy" || functionName == "movsum" || functionName == "movavg")
+                            if (Globals.lagFunctions.Contains(functionName))
                             {
 
                                 
                                 if (Globals.megaHackFix)
-                                {                                    
+                                {
 
                                     string lag1Code = null;  //for instance -1
                                     string lag2Code = null;  //for instance 0
+                                    string code = null;
 
                                     if (functionName == "movavg" || functionName == "movsum")
                                     {
@@ -1430,7 +1429,7 @@ namespace Gekko.Parser.Gek
                                         }
                                         lag1Code = "(-O.GetInt(" + node[2].Code.ToString() + ") + 1)";  //for instance -4, with movsum(..., 5)
                                         lag2Code = "0";                                                 //for instance 0, with movsum(..., 5)
-
+                                        code = node[1].Code.ToString();
                                     }
                                     else
                                     {
@@ -1439,37 +1438,25 @@ namespace Gekko.Parser.Gek
                                             G.Writeln2("*** ERROR: Expected 1 argument for function " + functionName);
                                             throw new GekkoException();
                                         }
-
-                                    }
-
-
-                                    string code = node[1].Code.ToString();
+                                        lag1Code = "-1";  //for instance -4, with movsum(..., 5)
+                                        lag2Code = "0";
+                                        code = node[1].Code.ToString();
+                                    }                                                                       
 
                                     W temp = w;
-
-
+                                    
                                     //also remove parent if
                                     //w.headerCs.AppendLine("public static IVariable helper123(GekkoTime t) { return " + code + ";" + "}");
 
-                                    int timeLoopDepth = 0;
-                                    ASTNode tmp = node.Parent;
-                                    ASTNode parentTimeLoop = null;
-                                    while (tmp != null)
-                                    {
-                                        if (tmp.Text == "ASTFUNCTION" && G.equal(tmp[0].Text, "movsum"))
-                                        {
-
-                                            timeLoopDepth++;
-                                            if (parentTimeLoop == null) parentTimeLoop = tmp;  //only first one                                            
-                                        }
-                                        tmp = tmp.Parent;
-                                    }
+                                    int timeLoopDepth;
+                                    ASTNode parentTimeLoop;
+                                    SearchUpwardsInTreeForParentTimeLoopFunctions(node, out timeLoopDepth, out parentTimeLoop);
 
                                     int tCounter = 3 + timeLoopDepth;
-                                                            
+
                                     string storageName = "storage" + ++Globals.counter;
                                     string counterName = "counter" + ++Globals.counter;
-                                    StringBuilder sb1 = new StringBuilder();                                    
+                                    StringBuilder sb1 = new StringBuilder();
                                     sb1.AppendLine("double[] " + storageName + " = new double[" + lag2Code + " - (" + lag1Code + ") + 1];");  //remember lag1 and lag2 are <= 0
                                     sb1.AppendLine("int " + counterName + " = 0;");
                                     sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(t" + (tCounter - 1) + ".Add(" + lag1Code + "), t" + (tCounter - 1) + ".Add(" + lag2Code + ")))");
@@ -1483,7 +1470,7 @@ namespace Gekko.Parser.Gek
 
                                     sb1.AppendLine("" + storageName + "[" + counterName + "] = O.GetVal(" + code + ", t);");
                                     sb1.AppendLine("" + counterName + "++;");
-                                    sb1.AppendLine("}");                                    
+                                    sb1.AppendLine("}");
 
                                     if (parentTimeLoop == null)
                                     {
@@ -3649,6 +3636,25 @@ namespace Gekko.Parser.Gek
                     node.Code.A(child.Code + G.NL);                
                 }
                 node.Code.A(Globals.splitSTOP);
+            }
+        }
+
+        private static void SearchUpwardsInTreeForParentTimeLoopFunctions(ASTNode node, out int timeLoopDepth, out ASTNode parentTimeLoop)
+        {
+            timeLoopDepth = 0;
+            ASTNode tmp = node.Parent;
+            parentTimeLoop = null;
+            while (tmp != null)
+            {
+                if (tmp.Text == "ASTFUNCTION")
+                {
+                    if (Globals.lagFunctions.Contains(tmp[0].Text.ToLower()))
+                    {
+                        timeLoopDepth++;
+                        if (parentTimeLoop == null) parentTimeLoop = tmp;  //only first one                                            
+                    }
+                }
+                tmp = tmp.Parent;
             }
         }
 
