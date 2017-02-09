@@ -1420,28 +1420,63 @@ namespace Gekko.Parser.Gek
                                     string lag2Code = null;  //for instance 0
                                     string code = null;
 
-                                    if (functionName == "movavg" || functionName == "movsum")
+                                    switch (functionName)
                                     {
-                                        if (node.ChildrenCount() != 2 + 1)
-                                        {
-                                            G.Writeln2("*** ERROR: Expected 2 arguments for function " + functionName);
-                                            throw new GekkoException();
-                                        }
-                                        lag1Code = "(-O.GetInt(" + node[2].Code.ToString() + ") + 1)";  //for instance -4, with movsum(..., 5)
-                                        lag2Code = "0";                                                 //for instance 0, with movsum(..., 5)
-                                        code = node[1].Code.ToString();
-                                    }
-                                    else
-                                    {
-                                        if (node.ChildrenCount() != 1 + 1)
-                                        {
-                                            G.Writeln2("*** ERROR: Expected 1 argument for function " + functionName);
-                                            throw new GekkoException();
-                                        }
-                                        lag1Code = "(-O.CurrentSubperiods())";
-                                        lag2Code = "0";
-                                        code = node[1].Code.ToString();
-                                    }                                                                       
+                                        case "movavg":
+                                        case "movsum":
+                                            {
+
+                                                if (node.ChildrenCount() != 2 + 1)
+                                                {
+                                                    G.Writeln2("*** ERROR: Expected 2 arguments for function " + functionName);
+                                                    throw new GekkoException();
+                                                }
+                                                lag1Code = "(-O.GetInt(" + node[2].Code.ToString() + ") + 1)";  //for instance -4, with movsum(..., 5)
+                                                lag2Code = "0";                                                 //for instance 0, with movsum(..., 5)
+                                                code = node[1].Code.ToString();
+                                            }
+                                            break;
+                                        case "dif":
+                                        case "diff":
+                                        case "dlog":
+                                        case "pch":                                        
+                                            {
+
+                                                if (node.ChildrenCount() != 1 + 1)
+                                                {
+                                                    G.Writeln2("*** ERROR: Expected 1 argument for function " + functionName);
+                                                    throw new GekkoException();
+                                                }
+                                                lag1Code = "-1";
+                                                lag2Code = "0";
+                                                code = node[1].Code.ToString();
+                                            }
+                                            break;
+                                                                                    
+                                        case "dify":
+                                        case "diffy":
+                                        case "dlogy":
+                                        case "pchy":
+                                            {
+
+                                                if (node.ChildrenCount() != 1 + 1)
+                                                {
+                                                    G.Writeln2("*** ERROR: Expected 1 argument for function " + functionName);
+                                                    throw new GekkoException();
+                                                }
+                                                lag1Code = "(-O.CurrentSubperiods())";  //for instance -4 if freq is quarterly
+                                                lag2Code = "0";
+                                                code = node[1].Code.ToString();
+                                            }
+                                            break;
+
+                                        default:
+                                            {
+                                                G.Writeln2("*** ERROR: Function '" + functionName + "' not expected");
+                                                throw new GekkoException();
+                                            }
+                                            break;
+                                    }                                                    
 
                                     W temp = w;
                                     

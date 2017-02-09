@@ -289,7 +289,7 @@ namespace UnitTests
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("OPTION freq a;");
-            I("MODEL movavg;");
+            I("MODEL movavg;");            
             I("CREATE x; SER <2010 2013> x = 2, 3, 4, 5;");
             I("FOR val i = 1 to 8; CREATE y{i}; END;");
             I("SIM <2013 2013>;");
@@ -303,16 +303,21 @@ namespace UnitTests
             AssertHelper(First(), "y8", 2013, (2d + 3d + 4d) / 1d, sharedDelta);
 
             I("RESET; MODE data;");            
-            I("OPTION freq a;");            
-            I("CREATE x; SER <2010 2013> x = 2, 3, 4, 5;");
+            I("OPTION freq a;");                        
+            I("CREATE x; SER <2006 2013> x = -.89, .33, -3.8, 4.32, 2, 3, 4, 5;");  //first 3 values are only used for some of the last tests in the following
             I("FOR val i = 1 to 4; CREATE y{i}; END;");
             I("TIME 2013 2013;");
 
-            FAIL("SERIES y1 = movavg(0.5 * x + 0.5 * x, 2);");
-            FAIL("SERIES y2 = movavg(0.5 * x + 0.5 * x, 3);");
-            FAIL("SERIES y3 = movavg(0.5 * x[-1] + 0.5 * x[-1], 2);");
-            FAIL("SERIES y4 = movavg(0.5 * x[-1] + 0.5 * x[-1], 3);");
+            I("SERIES y1 = movavg(0.5 * x + 0.5 * x, 2);");
+            I("SERIES y2 = movavg(0.5 * x + 0.5 * x, 3);");
+            I("SERIES y3 = movavg(0.5 * x[-1] + 0.5 * x[-1], 2);");
+            I("SERIES y4 = movavg(0.5 * x[-1] + 0.5 * x[-1], 3);");
+            AssertHelper(First(), "y1", 2013, (4d + 5d) / 2d, sharedDelta);
+            AssertHelper(First(), "y2", 2013, (3d + 4d + 5d) / 3d, sharedDelta);
+            AssertHelper(First(), "y3", 2013, (3d + 4d) / 2d, sharedDelta);
+            AssertHelper(First(), "y4", 2013, (2d + 3d + 4d) / 3d, sharedDelta);
 
+            I("DELETE y1, y2, y3, y4;");
             I("SERIES y1 = movavg(x, 2);");
             I("SERIES y2 = movavg(x, 3);");
             I("SERIES y3 = movavg(x[-1], 2);");
@@ -322,11 +327,17 @@ namespace UnitTests
             AssertHelper(First(), "y3", 2013, (3d + 4d) / 2d, sharedDelta);
             AssertHelper(First(), "y4", 2013, (2d + 3d + 4d) / 3d, sharedDelta);
 
-            FAIL("SERIES y1 = movsum(0.5 * x + 0.5 * x, 2);");
-            FAIL("SERIES y2 = movsum(0.5 * x + 0.5 * x, 3);");
-            FAIL("SERIES y3 = movsum(0.5 * x[-1] + 0.5 * x[-1], 2);");
-            FAIL("SERIES y4 = movsum(0.5 * x[-1] + 0.5 * x[-1], 3);");
+            I("DELETE y1, y2, y3, y4;");
+            I("SERIES y1 = movsum(0.5 * x + 0.5 * x, 2);");
+            I("SERIES y2 = movsum(0.5 * x + 0.5 * x, 3);");
+            I("SERIES y3 = movsum(0.5 * x[-1] + 0.5 * x[-1], 2);");
+            I("SERIES y4 = movsum(0.5 * x[-1] + 0.5 * x[-1], 3);");
+            AssertHelper(First(), "y1", 2013, (4d + 5d) / 1d, sharedDelta);
+            AssertHelper(First(), "y2", 2013, (3d + 4d + 5d) / 1d, sharedDelta);
+            AssertHelper(First(), "y3", 2013, (3d + 4d) / 1d, sharedDelta);
+            AssertHelper(First(), "y4", 2013, (2d + 3d + 4d) / 1d, sharedDelta);
 
+            I("DELETE y1, y2, y3, y4;");
             I("SERIES y1 = movsum(x, 2);");
             I("SERIES y2 = movsum(x, 3);");
             I("SERIES y3 = movsum(x[-1], 2);");
@@ -335,6 +346,29 @@ namespace UnitTests
             AssertHelper(First(), "y2", 2013, (3d + 4d + 5d) / 1d, sharedDelta);
             AssertHelper(First(), "y3", 2013, (3d + 4d) / 1d, sharedDelta);
             AssertHelper(First(), "y4", 2013, (2d + 3d + 4d) / 1d, sharedDelta);
+
+            I("DELETE y1, y2, y3, y4;");
+            I("SERIES y1 = movsum(2*x-x,2);");
+            I("SERIES y2 = movsum(movsum(2*x-x,2),2);");
+            I("SERIES y3 = movsum(movsum(movsum(2*x-x,2),2),2);");            
+            AssertHelper(First(), "y1", 2013, 9d, sharedDelta);
+            AssertHelper(First(), "y2", 2013, 16d, sharedDelta);
+            AssertHelper(First(), "y3", 2013, 28d, sharedDelta);
+
+            I("DELETE y1, y2, y3, y4;");
+            I("SERIES y1 = movavg(2*x-x,2);");
+            I("SERIES y2 = movavg(movavg(2*x-x,2),2);");
+            I("SERIES y3 = movavg(movavg(movavg(2*x-x,2),2),2);");
+            AssertHelper(First(), "y1", 2013, 4.5d, sharedDelta);
+            AssertHelper(First(), "y2", 2013, 4d, sharedDelta);
+            AssertHelper(First(), "y3", 2013, 3.5d, sharedDelta);
+
+            I("DELETE y1;");            
+            I("SERIES y1 = dif(movavg(pch(2*x-x),2));");
+            I("SERIES <2012 2013> y2 = movavg(movavg(movavg(2*x-x,4),3),2);");
+            AssertHelper(First(), "y1", 2013, -12.5d, sharedDelta);
+            AssertHelper(First(), "y2", 2012, 1.25083333333333, sharedDelta);
+            AssertHelper(First(), "y2", 2013, 2.2720833333333d, sharedDelta);
 
         }
 
