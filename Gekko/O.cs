@@ -1470,6 +1470,14 @@ namespace Gekko
             return c;
         }
 
+        public static int CurrentSubperiods()
+        {
+            int lag = 1;
+            if (Program.options.freq == EFreq.Quarterly) lag = Globals.freqQSubperiods;
+            else if (Program.options.freq == EFreq.Monthly) lag = Globals.freqMSubperiods;
+            return lag;
+        }
+
         public static IVariable HandleLags(string type, double[] storage, int i1, int i2)
         {
             //i1 and i2 are often not used
@@ -1488,16 +1496,26 @@ namespace Gekko
                         else data = sum;
                     }
                     break;
-                case "pch":                
-                    {
-                        data = (storage[1] / storage[0] - 1d) * 100d;
-                    }
-                    break;
+                case "pch":
                 case "pchy":
                     {
-                        //data = (storage[1] / storage[0] - 1d) * 100d;
+                        data = (storage[storage.Length - 1] / storage[0] - 1d) * 100d;
                     }
                     break;
+                case "dlog":
+                case "dlogy":
+                    {
+                        data = Math.Log(storage[storage.Length - 1] / storage[0]);
+                    }
+                    break;
+                case "dif":
+                case "diff":
+                case "dify":
+                case "diffy":
+                    {
+                        data = storage[storage.Length - 1] - storage[0];
+                    }
+                    break;                   
                 default:
                     {
                         G.Writeln2("*** ERROR: Function " + type + " not recognized as a lag function");

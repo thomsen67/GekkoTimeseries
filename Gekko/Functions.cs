@@ -1074,7 +1074,7 @@ namespace Gekko
             }
             MetaTimeSeries mts = (MetaTimeSeries)x1;
             MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
-            mtsLag.offset = mts.offset - Program.CurrentSubperiods();
+            mtsLag.offset = mts.offset - O.CurrentSubperiods();
             double d1 = O.GetVal(mts, t);
             double d1Lag = O.GetVal(mtsLag, t);
             return new ScalarVal((d1 / d1Lag - 1) * 100d);
@@ -1089,7 +1089,7 @@ namespace Gekko
             }
             MetaTimeSeries mts = (MetaTimeSeries)x1;
             MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
-            mtsLag.offset = mts.offset - Program.CurrentSubperiods();
+            mtsLag.offset = mts.offset - O.CurrentSubperiods();
             double d1 = O.GetVal(mts, t);
             double d1Lag = O.GetVal(mtsLag, t);
             return new ScalarVal(Math.Log(d1 / d1Lag));
@@ -1104,7 +1104,7 @@ namespace Gekko
             }
             MetaTimeSeries mts = (MetaTimeSeries)x1;
             MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
-            mtsLag.offset = mts.offset - Program.CurrentSubperiods();
+            mtsLag.offset = mts.offset - O.CurrentSubperiods();
             double d1 = O.GetVal(mts, t);
             double d1Lag = O.GetVal(mtsLag, t);
             return new ScalarVal(d1 - d1Lag);

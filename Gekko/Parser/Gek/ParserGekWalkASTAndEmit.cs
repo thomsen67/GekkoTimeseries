@@ -1438,7 +1438,7 @@ namespace Gekko.Parser.Gek
                                             G.Writeln2("*** ERROR: Expected 1 argument for function " + functionName);
                                             throw new GekkoException();
                                         }
-                                        lag1Code = "-1";  //for instance -4, with movsum(..., 5)
+                                        lag1Code = "(-O.CurrentSubperiods())";
                                         lag2Code = "0";
                                         code = node[1].Code.ToString();
                                     }                                                                       
@@ -1452,7 +1452,7 @@ namespace Gekko.Parser.Gek
                                     ASTNode parentTimeLoop;
                                     SearchUpwardsInTreeForParentTimeLoopFunctions(node, out timeLoopDepth, out parentTimeLoop);
 
-                                    int tCounter = 3 + timeLoopDepth;
+                                    int tCounter = 2 + timeLoopDepth;
 
                                     string storageName = "storage" + ++Globals.counter;
                                     string counterName = "counter" + ++Globals.counter;
@@ -1474,8 +1474,10 @@ namespace Gekko.Parser.Gek
 
                                     if (parentTimeLoop == null)
                                     {
-                                        if (w.wh.timeLoopCode == null) w.wh.timeLoopCode = new StringBuilder();
-                                        w.wh.timeLoopCode.Append(sb1);
+                                        G.Writeln2("*** ERROR: Internal error related to lag functions");
+                                        throw new GekkoException();
+                                        //if (w.wh.timeLoopCode == null) w.wh.timeLoopCode = new StringBuilder();
+                                        //w.wh.timeLoopCode.Append(sb1);
                                     }
                                     else
                                     {
@@ -1527,7 +1529,7 @@ namespace Gekko.Parser.Gek
                                         int lag = 1;
                                         if (G.equal(functionName, "dlogy") || G.equal(functionName, "dify") || G.equal(functionName, "diffy") || G.equal(functionName, "pchy"))
                                         {
-                                            lag = Program.CurrentSubperiods();
+                                            lag = O.CurrentSubperiods();
                                         }
 
                                         string codeLag = code.Replace("(" + Globals.functionT1Cs + ")", "(" + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ")");
@@ -3646,14 +3648,24 @@ namespace Gekko.Parser.Gek
             parentTimeLoop = null;
             while (tmp != null)
             {
-                if (tmp.Text == "ASTFUNCTION")
+                if ((
+                    tmp.Text == "ASTFUNCTION" && Globals.lagFunctions.Contains(tmp[0].Text.ToLower())) 
+                    || tmp.Text == "ASTOLSELEMENT" 
+                    || tmp.Text == "ASTPRTELEMENT" 
+                    || tmp.Text == "ASTTABLESETVALUESELEMENT"
+                    || tmp.Text == "ASTGENR"
+                    || tmp.Text == "ASTGENRLHSFUNCTION"
+                    || tmp.Text == "ASTGENRLISTINDEXER"
+                    || tmp.Text == "ASTRETURNTUPLE"
+                    || (G.equal(tmp.Text, "series") && (tmp.Parent != null && tmp.Text== "ASTTUPLEITEM") && (tmp.Parent.Parent != null && tmp.Parent.Text == "ASTTUPLE"))
+                    )
                 {
-                    if (Globals.lagFunctions.Contains(tmp[0].Text.ToLower()))
-                    {
-                        timeLoopDepth++;
-                        if (parentTimeLoop == null) parentTimeLoop = tmp;  //only first one                                            
-                    }
+
+                    timeLoopDepth++;
+                    if (parentTimeLoop == null) parentTimeLoop = tmp;  //only first one                                            
+
                 }
+
                 tmp = tmp.Parent;
             }
         }
@@ -3882,7 +3894,10 @@ namespace Gekko.Parser.Gek
         private static string GekkoTimeIteratorStartCode(W w, ASTNode node)
         {            
             string nodeCode = Globals.startGekkoTimeIteratorCode;
-            if (w.wh.timeLoopCode != null) nodeCode += w.wh.timeLoopCode.ToString();            
+            //if (w.wh.timeLoopCode != null) nodeCode += w.wh.timeLoopCode.ToString();
+
+            if (node.timeLoopNestCode != null) nodeCode += node.timeLoopNestCode.ToString();
+                      
             return nodeCode;
         }
 
@@ -4764,7 +4779,7 @@ namespace Gekko.Parser.Gek
         //public StringBuilder localStatementCode = null;
         public string currentCommand = null;
         public bool isGotoOrTarget = false;
-        public StringBuilder timeLoopCode = null;  //stuff to put into the GekkoTime t2 = ... loop (handles lag sub-loops)        
+        //public StringBuilder timeLoopCode = null;  //stuff to put into the GekkoTime t2 = ... loop (handles lag sub-loops)        
     }
 
     public class OPrt : O_OLD

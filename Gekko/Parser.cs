@@ -1965,7 +1965,7 @@ namespace Gekko
                             int lag = 1;
                             if (G.equal(function, "dlogy"))
                             {
-                                lag = Program.CurrentSubperiods();
+                                lag = O.CurrentSubperiods();
                                 Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
 
@@ -2025,7 +2025,7 @@ namespace Gekko
                             int lag = 1;
                             if (G.equal(function, "pchy"))
                             {
-                                lag = Program.CurrentSubperiods();
+                                lag = O.CurrentSubperiods();
                                 Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
 
@@ -2091,7 +2091,7 @@ namespace Gekko
                             int lag = 1;
                             if (G.equal(function, "dify") || G.equal(function, "diffy"))
                             {
-                                lag = Program.CurrentSubperiods();
+                                lag = O.CurrentSubperiods();
                                 Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
 
@@ -2528,7 +2528,7 @@ namespace Gekko
                             int lag = 1;
                             if (G.equal(wh2.leftSideFunction, "dlogy"))
                             {
-                                lag = Program.CurrentSubperiods();
+                                lag = O.CurrentSubperiods();
                                 Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
                             root1 = new ASTNode("*", true);
@@ -2549,7 +2549,7 @@ namespace Gekko
                             int lag = 1;
                             if (G.equal(wh2.leftSideFunction, "pchy"))
                             {
-                                lag = Program.CurrentSubperiods();
+                                lag = O.CurrentSubperiods();
                                 Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
                             root1 = new ASTNode("*", true);
@@ -2574,7 +2574,7 @@ namespace Gekko
                             int lag = 1;
                             if (G.equal(wh2.leftSideFunction, "dify") || G.equal(wh2.leftSideFunction, "diffy"))
                             {
-                                lag = Program.CurrentSubperiods();
+                                lag = O.CurrentSubperiods();
                                 Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
                             root1 = new ASTNode("+", true);
