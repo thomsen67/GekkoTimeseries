@@ -40,13 +40,13 @@ namespace Gekko
                 int ival = O.GetInt(index);                
                 if (ival >= 1900)
                 {
-                    return new ScalarVal(this.ts.GetData(new GekkoTime(EFreq.Annual, ival, 1)));
+                    return new ScalarVal(this.ts.GetData(new GekkoTime(EFreq.Annual, ival + this.offset, 1)));
                 }
                 else
                 {
                     //typically ival numerically < 10 here                    
                     //return new MetaTimeSeries(this.ts, ival, this.bank, this.variable);
-                    return new MetaTimeSeries(this.ts, ival);
+                    return new MetaTimeSeries(this.ts, ival + this.offset);
 
                     //10% faster, but maybe more error prone...
                     //this.offset = ival;
@@ -55,7 +55,7 @@ namespace Gekko
             }
             else if (index.Type() == EVariableType.Date)
             {
-                return new ScalarVal(this.ts.GetData(((ScalarDate)index).date));
+                return new ScalarVal(this.ts.GetData(((ScalarDate)index).date.Add(this.offset)));
             }
             else throw new GekkoException();
         }
