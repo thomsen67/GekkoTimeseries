@@ -77,6 +77,7 @@ Additionally, there are model, solve, equation options.
         public string interface_excel_language = "danish";
         public bool interface_excel_modernlook = true;
         public bool interface_help_copylocal = true;
+        public bool interface_lagfix = true;
         public string interface_mode = "sim";  //sim, data, mixed
         public bool interface_sound = false;  //overall sound switch
         public string interface_sound_type = "bowl";  //bowl, ding, notify, ring

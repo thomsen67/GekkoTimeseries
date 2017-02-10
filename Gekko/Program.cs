@@ -5057,12 +5057,9 @@ namespace Gekko
                         if (ts != null) break;
                     }
                     if (ts == null)
-                    {
-                        string s = "*** ERROR: Timeseries '" + variable + "' could not be found in any open databank";
-                        {
-                            G.Writeln2(s);
-                            throw new GekkoException();
-                        }
+                    {                        
+                        G.Writeln2("*** ERROR: " + G.GetFreqString() + " timeseries '" + variable + "' could not be found in any open databank");
+                        throw new GekkoException();                        
                     }
                 }
                 else
@@ -5086,9 +5083,8 @@ namespace Gekko
                             ts = new TimeSeries(Program.options.freq, "temp_timeseries_not_to_be_used");
                         }
                         else
-                        {
-                            string s = "*** ERROR: Timeseries '" + variable + "' could not be found in '" + bank + "' databank";
-                            G.Writeln2(s);
+                        {                            
+                            G.Writeln2("*** ERROR: "+ G.GetFreqString() + " timeseries '" + variable + "' could not be found in '" + bank + "' databank");
                             throw new GekkoException();
                         }
                     }
@@ -10919,70 +10915,65 @@ namespace Gekko
                                         }
                                         //==========================================
 
-                                        string ident3 = null;
-                                        int j2 = GetNextIdent(lineNewVersion, j1, out ident3);
-                                        if (j2 != -12345)
+
+                                        int j3 = GetNextEquals2(lineNewVersion, j1);
+                                        if (j3 != -12345)
                                         {
-                                            int j3 = GetNextEquals(lineNewVersion, j2);
-                                            if (j3 != -12345)
+                                            int j4 = GetNextComment(lineNewVersion, j3);
+                                            string rest = null;
+                                            if (j4 == -12345) rest = lineNewVersion.Substring(j3, lineNewVersion.Length - j3);
+                                            else rest = lineNewVersion.Substring(j3, j4 - j3);
+
+                                            int semi = rest.IndexOf(";");
+                                            if (semi != -1)
                                             {
-                                                int j4 = GetNextComment(lineNewVersion, j3);
-                                                string rest = null;
-                                                if (j4 == -12345) rest = lineNewVersion.Substring(j3, lineNewVersion.Length - j3);
-                                                else rest = lineNewVersion.Substring(j3, j4 - j3);
+                                                rest = rest.Substring(0, semi);
+                                            }
 
-                                                int semi = rest.IndexOf(";");
-                                                if (semi != -1)
+                                            StringTokenizer2 tok = new StringTokenizer2(rest, false, false);
+                                            tok.IgnoreWhiteSpace = false;
+                                            tok.SymbolChars = new char[] { '%', '&', '/', '(', ')', '=', '?', '@', '$', '{', '[', ']', '}', '+', '|', '^', '*', '<', '>', ';', ',', ':', '-' };
+                                            Token token;
+                                            int numberCounter = 0;
+                                            bool simpleBlankSeparatedUpd = true;
+                                            do
+                                            {
+                                                token = tok.Next();
+                                                string value = token.Value;
+                                                string kind = token.Kind.ToString();
+                                                if (kind == "EOF" || kind == "WhiteSpace" || kind == "Number" || (kind == "Word" && value.ToLower() == "m") || (kind == "Symbol" && value == "-"))
                                                 {
-                                                    rest = rest.Substring(0, semi);
+                                                    //continue
                                                 }
-
-                                                                                                
-                                                StringTokenizer2 tok = new StringTokenizer2(rest, false, false);
-                                                tok.IgnoreWhiteSpace = false;
-                                                tok.SymbolChars = new char[] { '%', '&', '/', '(', ')', '=', '?', '@', '$', '{', '[', ']', '}', '+', '|', '^', '*', '<', '>', ';', ',', ':', '-' };
-                                                Token token;
-                                                int numberCounter = 0;
-                                                bool simpleBlankSeparatedUpd = true;
-                                                do
+                                                else
                                                 {
-                                                    token = tok.Next();
-                                                    string value = token.Value;
-                                                    string kind = token.Kind.ToString();
-                                                    if (kind == "EOF" || kind == "WhiteSpace" || kind == "Number" || (kind == "Word" && value.ToLower() == "m") || (kind == "Symbol" && value == "-"))
-                                                    {
-                                                        //continue
-                                                    }
-                                                    else
-                                                    {
-                                                        simpleBlankSeparatedUpd = false;
-                                                        break;
-                                                    }
-                                                    if (kind == "Number") numberCounter++;                                                                                                                                                         
-                                                } while (token.Kind != TokenKind.EOF);
-
-                                                //Must have at least two numbers to be activated
-                                                if (simpleBlankSeparatedUpd && numberCounter == 1)
-                                                {
-                                                    //number = 0: if the numbers are on the next line. That is typically upd type then.
-                                                    //it must be rather seldom that we have 1 number on the SERIES line, and the rest
-                                                    //on the next line, and that such a line is upd type.
                                                     simpleBlankSeparatedUpd = false;
+                                                    break;
                                                 }
-                                                                                                
-                                                if (simpleBlankSeparatedUpd)
-                                                {
-                                                    //will be of the form "1 -1 -2 3 4 -5 1e6 5" (with at least 2 numbers)
-                                                    //if (Globals.runningOnTTComputer) G.Writeln("DETECTED simpleBlankSeparatedUpd!");
-                                                    //really ugly hack
-                                                    success = true;
-                                                    sb.Append(c2);
-                                                    sb.Append("_");
-                                                    sb.Append("_");
-                                                    sb.Append("_");
-                                                    sb.Append("_");  //SER -> S____ER, SERIES -> S____ERIES, see also //#098275432874
-                                                    continue;
-                                                }
+                                                if (kind == "Number") numberCounter++;
+                                            } while (token.Kind != TokenKind.EOF);
+
+                                            //Must have at least two numbers to be activated
+                                            if (simpleBlankSeparatedUpd && numberCounter == 1)
+                                            {
+                                                //number = 0: if the numbers are on the next line. That is typically upd type then.
+                                                //it must be rather seldom that we have 1 number on the SERIES line, and the rest
+                                                //on the next line, and that such a line is upd type.
+                                                simpleBlankSeparatedUpd = false;
+                                            }
+
+                                            if (simpleBlankSeparatedUpd)
+                                            {
+                                                //will be of the form "1 -1 -2 3 4 -5 1e6 5" (with at least 2 numbers)
+                                                //if (Globals.runningOnTTComputer) G.Writeln("DETECTED simpleBlankSeparatedUpd!");
+                                                //really ugly hack
+                                                success = true;
+                                                sb.Append(c2);
+                                                sb.Append("_");
+                                                sb.Append("_");
+                                                sb.Append("_");
+                                                sb.Append("_");  //SER -> S____ER, SERIES -> S____ERIES, see also //#098275432874
+                                                continue;
                                             }
                                         }
                                     }
@@ -11156,6 +11147,16 @@ namespace Gekko
                 return -12345;
             }
             return rv;
+        }
+
+        private static int GetNextEquals2(string lineNewVersion, int i)
+        {            
+            for (int ii = i; ii < lineNewVersion.Length; ii++)
+            {
+                if (lineNewVersion[ii] != '=') continue;
+                return ii + 1;
+            }
+            return -12345;
         }
 
         private static int GetNextComment(string lineNewVersion, int i)

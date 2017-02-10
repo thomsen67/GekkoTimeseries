@@ -1404,16 +1404,14 @@ namespace Gekko.Parser.Gek
                     case "ASTFUNCTION":
                         {
                             string functionName = node[0].Text.ToLower();  //no string composition allowed for functions.
-                            if (functionName == "string") functionName = "tostring";
-                            
+                            if (functionName == "string") functionName = "tostring";                            
 
                             //TODO: Should these just override??? And what if inbuilt function does not exist??
 
-                            if (Globals.lagFunctions.Contains(functionName))
+                            if (Globals.lagFunctions.Contains(functionName))  //functionName is lower case
                             {
-
                                 
-                                if (Globals.megaHackFix)
+                                if (Program.options.interface_lagfix)
                                 {
 
                                     string lag1Code = null;  //for instance -1
@@ -1510,9 +1508,7 @@ namespace Gekko.Parser.Gek
                                     if (parentTimeLoop == null)
                                     {
                                         G.Writeln2("*** ERROR: Internal error related to lag functions");
-                                        throw new GekkoException();
-                                        //if (w.wh.timeLoopCode == null) w.wh.timeLoopCode = new StringBuilder();
-                                        //w.wh.timeLoopCode.Append(sb1);
+                                        throw new GekkoException();                                        
                                     }
                                     else
                                     {

@@ -660,6 +660,7 @@ ASTOPT_STRING_Y2;
     ASTZERO;
 	ASTXEDIT;
 
+	LAGFIX = 'LAGFIX';
 	REBASE = 'REBASE';
 	LINESPOINTS = 'LINESPOINTS';
 //LINES = 'LINES';
@@ -1176,6 +1177,7 @@ Y2                    = 'Y2'                       ;
                                 {
                                         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 										
+		d.Add("LAGFIX" ,LAGFIX);
 		d.Add("LINESPOINTS" ,LINESPOINTS);
 		d.Add("REBASE", REBASE);
 //d.Add("LINES" , LINES);
@@ -3026,6 +3028,7 @@ optionType :
 			 | INTERFACE EXCEL LANGUAGE '='? optionInterfaceExcelLanguage -> INTERFACE EXCEL LANGUAGE ^(ASTSTRINGSIMPLE optionInterfaceExcelLanguage)
              | INTERFACE EXCEL MODERNLOOK '='? yesNoSimple -> INTERFACE EXCEL MODERNLOOK ^(ASTBOOL yesNoSimple)
              | INTERFACE HELP COPYLOCAL '='? yesNoSimple -> INTERFACE HELP COPYLOCAL ^(ASTBOOL yesNoSimple)
+			 | INTERFACE LAGFIX '='? yesNoSimple -> INTERFACE LAGFIX ^(ASTBOOL yesNoSimple)
              | INTERFACE SOUND '='? yesNoSimple -> INTERFACE SOUND ^(ASTBOOL yesNoSimple)
              | INTERFACE SOUND TYPE '='? optionInterfaceSound -> INTERFACE SOUND TYPE ^(ASTSTRINGSIMPLE optionInterfaceSound)
              | INTERFACE SOUND WAIT '='? Integer -> INTERFACE SOUND WAIT ^(ASTINTEGER Integer)
@@ -3194,6 +3197,7 @@ doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 
 ident                     : Ident|
 							REBASE|
+							LAGFIX|
 							THOUSANDSSEPARATOR|
 							MDATEFORMAT|
                             LINESPOINTS|

@@ -42,7 +42,7 @@ namespace Gekko
     {
         public static bool testFileChange = true;
 
-        public static bool megaHackFix = true;
+        //public static bool megaHackFix = true;
 
         public static string extensionPlot = "gpt";
         public static string extensionCommand = "gcm";
@@ -465,6 +465,7 @@ namespace Gekko
 "R_EXPORT",
 "R_FILE",
 "R_RUN",
+"REBASE",
 "READ",
 "RENAME",
 "RESET",
