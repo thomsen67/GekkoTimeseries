@@ -1991,7 +1991,9 @@ hdg						  : HDG expression -> ^({token("ASTHDG", ASTHDG, $HDG.Line)} expression
 
 help					  : HELP ident? -> ^({token("ASTHELP", ASTHELP, $HELP.Line)} ident?);
 
-if2						  : IF leftParen logicalOr rightParen expressions (ELSE expressions)? END SEMICOLON -> ^({token("ASTIF", ASTIF, $IF.Line)} logicalOr ^(ASTIFSTATEMENTS expressions) ^(ASTELSESTATEMENTS expressions?));
+if2						  : IF leftParen logicalOr rightParen expressions1? (ELSE expressions2?)? END SEMICOLON -> ^({token("ASTIF", ASTIF, $IF.Line)} logicalOr ^(ASTIFSTATEMENTS expressions1?) ^(ASTELSESTATEMENTS expressions2?));
+expressions1              : expressions;
+expressions2              : expressions;
 
 download                  : DOWNLOAD HTTP? url fileName -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, $DOWNLOAD.Line)} ^(ASTHTTP HTTP?) url ^(ASTHANDLEFILENAME fileName));
 

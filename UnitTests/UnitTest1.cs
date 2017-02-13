@@ -5307,7 +5307,7 @@ namespace UnitTests
 
         [TestMethod]
         public void Test__If()
-        {
+        {                        
             // Testing IF and logical operators etc.
             I("RESET;");
 
@@ -5326,6 +5326,11 @@ namespace UnitTests
             I("DATE d0 = 2000q3;");
             I("DATE d1 = 2000q4;");
             I("DATE d2 = 2001q1;");
+
+            I("IF(%s1 == 'abc'); END;");  //empty test
+            I("IF(%s1 == 'abc'); ELSE tell'hej'; END;");  //empty test
+            I("IF(%s1 == 'abc'); tell 'hej'; ELSE ; END;");  //empty test
+            I("IF(%s1 == 'abc'); ELSE ; END;");  //empty test
 
             //basic
             I("IF(%s1 == 'abc') VAL q = 0; VAL xx = 1; ELSE VAL q = 0; VAL xx = 0; END;");

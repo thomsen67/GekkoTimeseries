@@ -1519,6 +1519,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
+                                    //This mega-hack is now switched off per default. Remove all of this at some point.
                                     if (node.ChildrenCount() > 2)
                                     {
                                         G.Writeln2("*** ERROR: Expected 1 argument for " + functionName + "() function");
@@ -1527,8 +1528,7 @@ namespace Gekko.Parser.Gek
                                     string code = node[1].Code.ToString();
 
                                     W temp = w;
-
-                                    //#893243875
+                                                                        
                                     //HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA
                                     //HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA
                                     //HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA
@@ -1538,7 +1538,6 @@ namespace Gekko.Parser.Gek
                                     //Functions. is allowed, for instance dif(log(...))
                                     if (code.StartsWith("Functions.") || code.StartsWith("O.Add(") || code.StartsWith("O.Divide(") || code.StartsWith("O.Multiply(") || code.StartsWith("O.Negate(") || code.StartsWith("O.Power(") || code.StartsWith("O.Subtract("))
                                     {
-
 
                                         //w.headerCs.AppendLine("public static IVariable helper123(GekkoTime t) { return " + code + ";" + "}");
 
