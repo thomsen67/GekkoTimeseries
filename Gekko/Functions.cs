@@ -641,6 +641,50 @@ namespace Gekko
             return new ScalarVal(s1.Length);
         }
 
+        public static IVariable chol(GekkoTime t, IVariable x)
+        {
+            return chol(t, x, new ScalarString("upper"));
+        }
+
+        public static IVariable chol(GekkoTime t, IVariable x, IVariable type)
+        {
+            if (x.Type() != EVariableType.Matrix)
+            {
+                G.Writeln2("*** ERROR: Chol() only accepts a matrix");
+                throw new GekkoException();
+            }
+
+            if (type.Type() != EVariableType.String)
+            {
+                G.Writeln2("*** ERROR: Chol() only accepts a string as type");
+                throw new GekkoException();
+            }
+
+            double[,] y = ((Matrix)x).data;
+
+            string s = ((ScalarString)type)._string2;
+
+            bool upper = true;
+            if(G.equal(s,"upper"))
+            {
+
+            }
+            else if (G.equal(s, "lower"))
+            {
+                upper = false;
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Type must be 'upper' or 'lower'");
+                throw new GekkoException();
+            }
+
+            double[,] z = Cholesky(y, upper);
+            Matrix rv = new Matrix();
+            rv.data = z;
+            return rv;
+        }
+
         public static IVariable rseed(GekkoTime t, IVariable seed)
         {
             double seed2 = O.GetVal(seed, t);
@@ -649,18 +693,103 @@ namespace Gekko
             return new ScalarVal(i);
         }
 
-        public static IVariable rnorm(GekkoTime t, IVariable mean2, IVariable stdDev2)
+        public static IVariable rnorm(GekkoTime t, IVariable means, IVariable vcov)
         {
-            double mean = O.GetVal(mean2, t);
-            double stdDev = O.GetVal(stdDev2, t);            
-            Random rand = new Random(); //reuse this if you are generating many
-            double u1 = Globals.random.NextDouble(); //these are uniform(0,1) random doubles
-            double u2 = Globals.random.NextDouble();
-            double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) *
-                         Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
-            double randNormal =
-                         mean + stdDev * randStdNormal; //random normal(mean,stdDev^2)
-            return new ScalarVal(randNormal);
+            //Maybe it is stupid that we are using stddev versus matrix of covariance
+
+            if (means.Type() == EVariableType.Matrix && vcov.Type() == EVariableType.Matrix)
+            {
+                //This will be SLOW, because of cholesky decomp for each drawing
+                //To circumvent this, we would have to define an object to store to fixed cover matrix
+                
+                //Otherwise, we could output a n x sims matrix instead of n x 1.
+
+                Matrix m = (Matrix)vcov;
+                int n = m.data.GetLength(0);
+                if (m.data.GetLength(1) != n)
+                {
+                    G.Writeln2("*** ERROR: Covar matrix is not square");
+                    throw new GekkoException();
+                }
+
+                Matrix mean = (Matrix)means;
+                if (mean.data.GetLength(0) != n || mean.data.GetLength(1) != 1)
+                {
+                    G.Writeln2("*** ERROR: Mean matrix does not correspond to covar matrix");
+                    throw new GekkoException();
+                }
+                                
+                double[,] tmp = Cholesky(m.data, false);
+                //after this, #m = t(#tmp)*#tmp
+                
+                double[,] randoms = new double[n, 1];
+                //https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Drawing_values_from_the_distribution
+                for (int i = 0; i < n; i++)
+                {
+                    double random = O.GetVal(rnorm(t, new ScalarVal(0d), new ScalarVal(1d)), t); //could be sped up by interfacing to the interior of the method
+                    randoms[i, 0] = random;
+                }                
+                
+                Matrix rv = new Matrix();
+                rv.data = O.AddMatrixMatrix(mean.data, Program.MultiplyMatrices(tmp, randoms), n, 1);
+                
+                return rv;
+
+
+            }
+            else
+            {
+                double mean = O.GetVal(means, t);
+                double stdDev = Math.Sqrt(O.GetVal(vcov, t));
+                Random rand = new Random(); //reuse this if you are generating many
+                double u1 = Globals.random.NextDouble(); //these are uniform(0,1) random doubles
+                double u2 = Globals.random.NextDouble();
+                double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
+                double randNormal = mean + stdDev * randStdNormal; //random normal(mean,stdDev^2)
+                return new ScalarVal(randNormal);
+            }
+        }
+
+        private static double[,] Cholesky(double[,] m, bool upper)
+        {
+            if (m.GetLength(0) != m.GetLength(1))
+            {
+                G.Writeln2("*** ERROR: Matrix must be square");
+                throw new GekkoException();
+            }
+            int n = m.GetLength(0);
+            double[,] tmp = new double[n, n];
+
+            if (upper)
+            {
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = i; j < n; j++)
+                    {
+                        tmp[i, j] = m[i, j];
+                    }
+                }
+            }
+            else
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    for (int i = j; i < n; i++)
+                    {
+                        tmp[i, j] = m[i, j];
+                    }
+                }
+            }
+
+            bool result = alglib.spdmatrixcholesky(ref tmp, n, upper);
+
+            if (!result)
+            {
+                G.Writeln2("*** ERROR: Could not perform Cholesky decomposition");
+                throw new GekkoException();
+            }
+
+            return tmp;
         }
 
         public static IVariable runif(GekkoTime t)

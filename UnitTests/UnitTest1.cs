@@ -6200,7 +6200,18 @@ namespace UnitTests
 
         }
 
+        [TestMethod]
+        public void Test__Random()
+        {            
+            I("RESET;");
+            I("MATRIX mean = [10 || 11];");
+            I("MATRIX covar = [10, 3 || 3, 2];");
+            I("MATRIX norm = rnorm(#mean, #covar);");
 
+            I("VAL norm = rnorm(1, 2);");
+
+            //hard to test random numbers.......               
+        }
 
         [TestMethod]
         public void Test__UpdAndGenr()
@@ -7432,7 +7443,8 @@ namespace UnitTests
 
         [TestMethod]
         public void Test__Matrix()
-        {                        
+        {
+            
             I("RESET;");
             I("MATRIX a = miss(2,3);");
             I("MATRIX a[1, 1] = 1;");
@@ -8137,6 +8149,51 @@ namespace UnitTests
             FAIL("MATRIX a[1, 1..2] = [10, 20 || 30, 40];");
             FAIL("MATRIX a[1..2, 1] = [10, 20 || 30, 40];");
             FAIL("MATRIX a[1, 1] = [10, 20 || 30, 40];");
+
+            I("RESET;");
+            I("MATRIX a = [25, 15, -5 || 15, 18, 0 || -5, 0, 11];");
+            I("MATRIX b = chol(#a, 'lower');");  //upper er default
+            AssertHelperMatrix("b", "rows", 3);
+            AssertHelperMatrix("b", "cols", 3);
+            AssertHelperMatrix("b", 1, 1, 5d, sharedDelta);
+            AssertHelperMatrix("b", 1, 2, 0d, sharedDelta);
+            AssertHelperMatrix("b", 1, 3, 0d, sharedDelta);
+            AssertHelperMatrix("b", 2, 1, 3d, sharedDelta);
+            AssertHelperMatrix("b", 2, 2, 3d, sharedDelta);
+            AssertHelperMatrix("b", 2, 3, 0d, sharedDelta);
+            AssertHelperMatrix("b", 3, 1, -1d, sharedDelta);
+            AssertHelperMatrix("b", 3, 2, 1d, sharedDelta);
+            AssertHelperMatrix("b", 3, 3, 3d, sharedDelta);
+
+            I("RESET;");
+            I("MATRIX a = [25, 15, -5 || 15, 18, 0 || -5, 0, 11];");
+            I("MATRIX b = t(chol(#a, 'upper'));");
+            AssertHelperMatrix("b", "rows", 3);
+            AssertHelperMatrix("b", "cols", 3);
+            AssertHelperMatrix("b", 1, 1, 5d, sharedDelta);
+            AssertHelperMatrix("b", 1, 2, 0d, sharedDelta);
+            AssertHelperMatrix("b", 1, 3, 0d, sharedDelta);
+            AssertHelperMatrix("b", 2, 1, 3d, sharedDelta);
+            AssertHelperMatrix("b", 2, 2, 3d, sharedDelta);
+            AssertHelperMatrix("b", 2, 3, 0d, sharedDelta);
+            AssertHelperMatrix("b", 3, 1, -1d, sharedDelta);
+            AssertHelperMatrix("b", 3, 2, 1d, sharedDelta);
+            AssertHelperMatrix("b", 3, 3, 3d, sharedDelta);
+
+            I("RESET;");
+            I("MATRIX a = [25, 15, -5 || 15, 18, 0 || -5, 0, 11];");
+            I("MATRIX b = t(chol(#a));");  //upper er default
+            AssertHelperMatrix("b", "rows", 3);
+            AssertHelperMatrix("b", "cols", 3);
+            AssertHelperMatrix("b", 1, 1, 5d, sharedDelta);
+            AssertHelperMatrix("b", 1, 2, 0d, sharedDelta);
+            AssertHelperMatrix("b", 1, 3, 0d, sharedDelta);
+            AssertHelperMatrix("b", 2, 1, 3d, sharedDelta);
+            AssertHelperMatrix("b", 2, 2, 3d, sharedDelta);
+            AssertHelperMatrix("b", 2, 3, 0d, sharedDelta);
+            AssertHelperMatrix("b", 3, 1, -1d, sharedDelta);
+            AssertHelperMatrix("b", 3, 2, 1d, sharedDelta);
+            AssertHelperMatrix("b", 3, 3, 3d, sharedDelta);
 
 
         }

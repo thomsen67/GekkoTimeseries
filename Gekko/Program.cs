@@ -5751,6 +5751,12 @@ namespace Gekko
             GAMSWorkspace ws = new GAMSWorkspace(workingDirectory: "c:\\tools\\decomp");
             GAMSDatabase db = ws.AddDatabaseFromGDX("c:\\tools\\decomp\\calib_d.gdx");
 
+            if (false)
+            {
+                GAMSVariable xx = db.GetVariable("LMax");
+                
+            }            
+
             double[,,,] LMax = new double[3, 2, 85, 116];
             db.GetVariable("LMax").CopyToArray(LMax, 0);
 
@@ -9581,9 +9587,16 @@ namespace Gekko
 
                 if (s2.StartsWith("dream"))
                 {
-                    DecompOptions decompOptions = new DecompOptions();
-                    decompOptions.dream = s2;
-                    Decomp(decompOptions);
+                    if (false)                    {
+
+                        DecompOptions decompOptions = new DecompOptions();
+                        decompOptions.dream = s2;
+                        Decomp(decompOptions);
+                    }
+                    else
+                    {
+                        Program.Dream("t=2010-2010");
+                    }
                     return "";
                 }
 
