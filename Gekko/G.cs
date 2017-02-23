@@ -50,6 +50,7 @@ namespace Gekko
         /// <returns>True if equal</returns>
         public static bool equal(string s1, string s2)
         {
+            //s1 or s2 may be null
             return (string.Compare(s1, s2, true) == 0);  //true for ignoreCase                
         }
 
@@ -179,23 +180,7 @@ namespace Gekko
             int indx = key.IndexOf(Globals.lagIndicator);
             variable = key.Substring(0, indx - 0);
             lag = key.Substring(indx + 1, key.Length - (indx + 1));            
-        }
-
-        //transforms "xx.yy" into "xx" and "yy".
-        public static void ExtractNameAndExtension(string input, out string name, out string extension)
-        {            
-            int indx = input.IndexOf('.');
-            if (indx == -1)
-            {
-                name = input;
-                extension = "";
-            }
-            else
-            {
-                name = input.Substring(0, indx - 0);
-                extension = input.Substring(indx + 1, input.Length - (indx + 1));
-            }            
-        }
+        }        
 
         public static EFreq GetFreq(string freq)
         {

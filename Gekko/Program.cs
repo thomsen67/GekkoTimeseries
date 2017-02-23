@@ -2639,6 +2639,7 @@ namespace Gekko
                 else
                 {
                     G.Writeln2("*** ERROR: Could not find data storage file inside zipped databank file");
+                    G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
                     throw new GekkoException();
                 }
 
@@ -2659,6 +2660,7 @@ namespace Gekko
                     catch (Exception e)
                     {
                         G.Writeln2("*** ERROR: Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version 1.1 format (protobuffers)");
+                        G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
                         throw new GekkoException();
                     }
 
@@ -7363,7 +7365,7 @@ namespace Gekko
             }
         }
 
-        private static double[,] PutTimeseriesIntoArrayPossiblyNegative(GekkoTime tStart0, GekkoTime tEnd, Databank work, List<string> varsX)
+        private static double[,] PutTimeseriesIntoArrayPossiblyNegative(GekkoTime tStart0, GekkoTime tEnd, List<string> varsX)
         {
             int obs = GekkoTime.Observations(tStart0, tEnd);
             double[,] aX = new double[varsX.Count, obs];
@@ -7382,7 +7384,9 @@ namespace Gekko
                     var2 = var2.Substring(1);
                     negative = true;
                 }
-                TimeSeries ts = work.GetVariable(var2);  //Could have an A-array with TimeSeries...
+
+                TimeSeries ts = O.GetTimeSeries(var2, 0).ts;
+
                 if (ts == null)
                 {
                     G.Writeln2("*** ERROR: Variable '" + var2 + "' does not exist");
@@ -16237,27 +16241,8 @@ namespace Gekko
                 G.Writeln();
                 G.Writeln2("*** ERROR: Index functions only work for annual frequency at the moment");
                 throw new GekkoException();
-            }
-
-            //GekkoTime tStart, tEnd; ConvertToGekkoTime(tp, out tStart, out tEnd);
-            //GekkoTime indexYear = G.FromStringToDate(date);
-
-            Databank work = Program.databanks.GetFirst();
-
-            //if (!list1.StartsWith("#"))
-            //{
-            //    G.Writeln();
-            //    G.Writeln("*** ERROR: List '" + list1 + "' should start with '#'");
-            //    throw new GekkoException();
-            //}
-
-            //if (!list2.StartsWith("#"))
-            //{
-            //    G.Writeln();
-            //    G.Writeln("*** ERROR: List '" + list2 + "' should start with '#'");
-            //    throw new GekkoException();
-            //}
-
+            }                        
+                        
             int indexYearI = -12345;
             int counter = -1;
             bool found = false;
@@ -16277,24 +16262,7 @@ namespace Gekko
                 G.Writeln();
                 G.Writeln("*** ERROR with index year in Laspeyres function: seems outside time period");
                 throw new GekkoException();
-            }
-
-            //list1 = list1.Substring(1);
-            //list2 = list2.Substring(1);
-
-            //if (!Program.lists.ContainsKey(list1))
-            //{
-            //    G.Writeln();
-            //    G.Writeln("*** ERROR: Could not find list '#" + list1 + "'");
-            //    throw new GekkoException();
-            //}
-
-            //if (!Program.lists.ContainsKey(list2))
-            //{
-            //    G.Writeln();
-            //    G.Writeln("*** ERROR: Could not find list '#" + list2 + "'");
-            //    throw new GekkoException();
-            //}
+            }                      
 
             List<string> varsP = ((MetaList)list1).list;
             List<string> varsX = ((MetaList)list2).list;
@@ -16323,8 +16291,8 @@ namespace Gekko
                 }
             }
 
-            double[,] aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, work, varsX);
-            double[,] aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, work, varsP);
+            double[,] aX = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsX);
+            double[,] aP = PutTimeseriesIntoArrayPossiblyNegative(tStart, tEnd, varsP);
             int obs = GekkoTime.Observations(tStart, tEnd);
             int obs2 = GekkoTime.Observations(tStart, indexYear);
 
@@ -17381,9 +17349,9 @@ namespace Gekko
             int repeats = totalTime / gap;
             string tsdFile = "";
             bool isProtobuf = false;
-
+            string ext = Path.GetExtension(zipFileName);
+            if (G.equal(ext, "." + Globals.extensionDatabank)) isProtobuf = true; //with .gbk files, the inside is always protobuf-files.
             DirectoryInfo folderInfo = new DirectoryInfo(folder);
-
             for (int j = 0; j < repeats; j++)
             {
                 if (Globals.threadIsInProcessOfAborting && !Globals.applicationIsInProcessOfAborting) throw new GekkoException();
@@ -17408,7 +17376,7 @@ namespace Gekko
                     catch (Exception e)
                     {
                         //It seems this happens if the file is not a 'real' zip file
-                        G.Writeln2("*** ERROR: It seems the .gbk file is not in the right format");
+                        G.Writeln2("*** ERROR: It seems the databank file is not in the right format (unzipping failed)");
                         throw new GekkoException();
                     }
                     
@@ -17422,6 +17390,7 @@ namespace Gekko
 
                             if (G.equal(fileName2, Globals.protobufFileName) || G.equal(fileName2, Globals.protobufFileName2) || G.equal(fileName2, Program.options.databank_file_gbk_internal))
                             {
+                                //this is only relevant for the older .tsdx files, .gbk files always has isProtobuf = true.
                                 isProtobuf = true;
                             }
 

@@ -237,22 +237,50 @@ namespace Gekko
             GekkoTime gt1 = Globals.globalPeriodStart;
             GekkoTime gt2 = Globals.globalPeriodEnd;
             int offset = 0;
-            int obs = PackHelper(vars, ref gt1, ref gt2, ref offset);
-            int n = vars.Length - offset;
-            if (n < 1)
-            {
-                G.Writeln2("*** ERROR: Number of timeseries is " + n);
-                throw new GekkoException();
-            }
-            Matrix m = new Matrix(obs, n);            
+            int obs = PackHelper(vars, ref gt1, ref gt2, ref offset);            
+                        
+            List<TimeSeries> tss = new List<TimeSeries>();
             for (int j = offset; j < vars.Length; j++)
             {
-                TimeSeries ts = O.GetTimeSeries(vars[j]);
+                if (vars[j].Type() == EVariableType.List)
+                {
+                    foreach (string s in ((MetaList)vars[j]).list)
+                    {
+                        TimeSeries tmp = Program.GetTimeSeriesFromString(s, O.ECreatePossibilities.None);
+                        tss.Add(tmp);
+                    }
+                }
+                else if (vars[j].Type() == EVariableType.TimeSeries)
+                {
+                    tss.Add(((MetaTimeSeries)vars[j]).ts);
+                }       
+                else
+                {
+                    G.Writeln2("*** ERROR: Expected timeseries or list as argument");
+                    throw new GekkoException();
+                }         
+            }
+
+            int n = tss.Count;
+            if (n < 1)
+            {
+                G.Writeln2("*** ERROR: Number of items is " + n);
+                throw new GekkoException();
+            }
+
+            Matrix m = new Matrix(obs, n);
+
+            //    List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(s);
+
+            int varcount = -1;
+            foreach(TimeSeries ts in tss)
+            {
+                varcount++;
                 int counter = -1;
                 foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
                 {
                     counter++;
-                    m.data[counter, j - offset] = ts.GetData(gt);
+                    m.data[counter, varcount] = ts.GetData(gt);
                 }
             }
             return m;

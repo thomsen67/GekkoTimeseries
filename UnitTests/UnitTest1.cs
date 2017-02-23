@@ -2358,7 +2358,8 @@ namespace UnitTests
             I("series s3 = bul1;");
             I("series s4 = bul1.1;");
             I("series s5 = 1;");
-            I("matrix x = pack(2000, 2010, s1, s2, s3, s4, s5);");
+            I("LIST m = s4, s5;");
+            I("matrix x = pack(2000, 2010, s1, work:s2, s3, work:#m);");  //just testing the syntax and that lists work
             I("matrix y = pack(2000, 2010, s0);");
             I("matrix b = inv(t(#x)*#x)*t(#x)*#y;");
             I("show #b;");
@@ -10407,7 +10408,7 @@ namespace UnitTests
             UData u = null;
 
             //testing chain index
-            I("RESET;");
+            I("RESET; MODE data;");  //data mode, because we test searching in banks
             I("TIME 90 2002;");
             I("CREATE pibp, pibo, pibh, fibp, fibo, fibh, pib, fib;");
             //from dec09 databank
@@ -10420,17 +10421,19 @@ namespace UnitTests
             I("SERIES <1998 2002> pib =  0.947841  0.979390  1.000000  1.041533  1.064828;");
             I("SERIES <1998 2002> fIb =  122568.000000  119988.000000  128727.000000  125635.000000  121152.000000;");
             I("list p= pibp, pibo, pibh;");
-            I("list x=fIbp, fIbo, fIbh;");
-
+            I("list x=fIbp, fIbo, work:fIbh;");
             //I("SERIES <98 2002> (xx_p, xx_x) = laspchain(#p, #x, 2000);");
-
             //TODO TODO TODO
             //TODO TODO TODO
             //TODO TODO TODO  think about how to indicate time in tuples
             //TODO TODO TODO
             //TODO TODO TODO
+            I("OPEN<edit>temp;");
             I("TIME 98 2002;");
-            I("(SERIES xx_p, SERIES xx_x) = laspchain(#p, #x, 2000);");
+            I("(SERIES xx_p, SERIES xx_x) = laspchain(#p, #x, 2000);");  //these have to be searched for in Work databank, but it is ok since we use data mode.
+            I("COPY temp:xx_p TO work:xx_p;");
+            I("COPY temp:xx_x TO work:xx_x;");
+            I("CLOSE temp;");
             I("CREATE dif_p, dif_x;");
             I("SERIES dif_p = pib/xx_p;");
             I("SERIES dif_x = fib/xx_x;");

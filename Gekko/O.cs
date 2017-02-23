@@ -4648,9 +4648,9 @@ namespace Gekko
                 string zfilename = Program.CreateFullPathAndFileName(Program.AddExtension(this.fileName, ".cmd"));
                 string xx = Program.GetTextFromFileWithWait(zfilename);
                 List<string> xxx = G.ExtractLinesFromText(xx);
-                string s1 = null;
-                string s2 = null;
-                G.ExtractNameAndExtension(zfilename, out s1, out s2);
+                //string s1 = null;
+                //string s2 = null;
+                //G.ExtractNameAndExtension(zfilename, out s1, out s2);
                 if (zfilename.ToLower().EndsWith(".cmd") || zfilename.ToLower().EndsWith("." + Globals.extensionCommand)) 
                     zfilename = zfilename.Substring(0, zfilename.Length - 4);
                 string zz = zfilename + "." + Globals.extensionCommand;
