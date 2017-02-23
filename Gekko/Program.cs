@@ -6692,34 +6692,39 @@ namespace Gekko
 
             string meta = null;
             int counter = 0;
-            foreach (string item in o.listItems)
+
+            string bank = "Work";
+            for (int i = 0; i < o.listItems.Count; i++)
             {
-                counter++;
-                //string s = null;
-                string data = null;
-                MetaTimeSeries ats = O.GetTimeSeries(item, 0, O.ECreatePossibilities.None);
-                TimeSeries ts = ats.ts;
-                foreach (GekkoTime t in new GekkoTimeIterator(o.t1, o.t2))
+                //GetTimeSeriesFromStringWildcard() implicitly calls GetInfoFromStringWildcard() which we will call again later.
+                List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(o.listItems[i], bank);
+                foreach (TimeSeries ts in tss)
                 {
-                    double v = ts.GetData(t);
-                    if (G.isNumericalError(v))
+                    counter++;
+                    string data = null;
+                    foreach (GekkoTime t in new GekkoTimeIterator(o.t1, o.t2))
                     {
-                        G.Writeln2("*** ERROR: Missing value in '" + item + "', period " + G.FromDateToString(t));
-                        throw new GekkoException();
+                        double v = ts.GetData(t);
+                        if (G.isNumericalError(v))
+                        {
+                            G.Writeln2("*** ERROR: Missing value in '" + ts.variableName + "', period " + G.FromDateToString(t));
+                            throw new GekkoException();
+                        }
+                        //data += t.super + " " + t.sub + " " + v.ToString() + G.NL;
+                        data += v.ToString() + G.NL;
                     }
-                    //data += t.super + " " + t.sub + " " + v.ToString() + G.NL;
-                    data += v.ToString() + G.NL;
-                }
-                //Create data files
-                meta += tempName + counter + ".dat" + G.NL;
-                using (FileStream fs = WaitForFileStream(Globals.localTempFilesLocation + "\\" + tempName + counter + ".dat", GekkoFileReadOrWrite.Write))
-                using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                {
-                    sw.Write(data);
-                    sw.Flush();
-                    sw.Close();
+                    //Create data files
+                    meta += tempName + counter + ".dat" + G.NL;
+                    using (FileStream fs = WaitForFileStream(Globals.localTempFilesLocation + "\\" + tempName + counter + ".dat", GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        sw.Write(data);
+                        sw.Flush();
+                        sw.Close();
+                    }
                 }
             }
+            
             using (FileStream fs = WaitForFileStream(Globals.localTempFilesLocation + "\\" + tempName + ".dta", GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
@@ -6781,51 +6786,62 @@ namespace Gekko
             {
                 for (int i = 0; i < o.listItems.Count; i++)
                 {
-                    foreach (string e in ext)
+                    List<BankNameVersion> list = GetInfoFromStringWildcard(o.listItems[i], bank);
+                    foreach (BankNameVersion bnv in list)
                     {
-                        string sss = Path.GetFileName(file);
-                        if (G.equal(sss, tempName + (i + 1) + "." + e))
+                        foreach (string e in ext)
                         {
-                            string varName = o.listItems[i] + "_" + e;
-                            TimeSeries ts = new TimeSeries(o.t1.freq, varName);
-                            string s = Program.GetTextFromFileWithWait(file);
-                            List<string> lines = G.ExtractLinesFromText(s);
-                            foreach (string line in lines)
+                            string sss = Path.GetFileName(file);
+                            if (G.equal(sss, tempName + (i + 1) + "." + e))
                             {
-                                if (line.TrimStart().ToLower().StartsWith("date")) continue;
-                                if (line.TrimStart().ToLower().StartsWith("---")) continue;
-                                string[] ss = line.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries);
-                                if (ss.Length != 2)
+                                string varName = bnv.name + "_" + e;
+                                TimeSeries ts = new TimeSeries(o.t1.freq, varName);
+                                string s = Program.GetTextFromFileWithWait(file);
+                                List<string> lines = G.ExtractLinesFromText(s);
+                                foreach (string line in lines)
                                 {
-                                    G.Writeln2("*** ERROR: Error #8907523 in X12A");
-                                    throw new GekkoException();
-                                }
-                                try
-                                {
-                                    if (ss[0].Length != 6)
+                                    if (line.TrimStart().ToLower().StartsWith("date")) continue;
+                                    if (line.TrimStart().ToLower().StartsWith("---")) continue;
+                                    string[] ss = line.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries);
+                                    if (ss.Length != 2)
                                     {
-                                        G.Writeln2("*** ERROR: Error #897525 in X12A");
+                                        G.Writeln2("*** ERROR: Error #8907523 in X12A");
                                         throw new GekkoException();
                                     }
-                                    int i1 = int.Parse(ss[0].Substring(0, 4));
-                                    int i2 = int.Parse(ss[0].Substring(4, 2));
-                                    GekkoTime gt = new GekkoTime(o.t1.freq, i1, i2);
-                                    ts.SetData(gt, double.Parse(ss[1]));
+                                    try
+                                    {
+                                        if (ss[0].Length != 6)
+                                        {
+                                            G.Writeln2("*** ERROR: Error #897525 in X12A");
+                                            throw new GekkoException();
+                                        }
+                                        int i1 = int.Parse(ss[0].Substring(0, 4));
+                                        int i2 = int.Parse(ss[0].Substring(4, 2));
+                                        GekkoTime gt = new GekkoTime(o.t1.freq, i1, i2);
+                                        ts.SetData(gt, double.Parse(ss[1]));
+                                    }
+                                    catch
+                                    {
+                                        G.Writeln2("*** ERROR: Error #897524 in X12A");
+                                        throw new GekkoException();
+                                    }
                                 }
-                                catch
+                                Databank db = Program.databanks.GetDatabank(bnv.bank);
+                                if (db == null)
                                 {
-                                    G.Writeln2("*** ERROR: Error #897524 in X12A");
+                                    //this is probably not possible, since the bank would have failed previously
+                                    G.Writeln2("*** ERROR: Databank " + bnv.bank + " not found");
                                     throw new GekkoException();
                                 }
+                                if (db.ContainsVariable(varName))
+                                {
+                                    db.RemoveVariable(varName);
+                                }
+                                db.AddVariable(ts);
+                                if (first) G.Writeln();
+                                G.Writeln("Adjusted timeseries: " + db.aliasName + ":" + varName);
+                                first = false;
                             }
-                            if (Program.databanks.GetFirst().ContainsVariable(varName))
-                            {
-                                Program.databanks.GetFirst().RemoveVariable(varName);
-                            }
-                            Program.databanks.GetFirst().AddVariable(ts);
-                            if (first) G.Writeln();
-                            G.Writeln("Adjusted timeseries: " + varName);
-                            first = false;
                         }
                     }
                 }

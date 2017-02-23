@@ -708,7 +708,7 @@ namespace UnitTests
                 AssertHelper(First(), "ts0a", 2009, 46d, delta);
                 AssertHelper(First(), "ts0a", 2010, 46d, delta);
                 AssertHelper(First(), "ts0a", 2011, double.NaN, delta);
-                I("splice ts0b = ts1 2006 ts2;                               //splicing on one observation instead, follows ts2 growth from 2007 and on.");
+                I("splice work:ts0b = work:ts1 2006 work:ts2;                               //splicing on one observation instead, follows ts2 growth from 2007 and on.");
                 AssertHelper(First(), "ts0b", 2001, double.NaN, delta);
                 AssertHelper(First(), "ts0b", 2002, 14.3333333d, delta);
                 AssertHelper(First(), "ts0b", 2003, 21.5d, delta);
@@ -806,9 +806,9 @@ namespace UnitTests
             I("SERIES <2002 2004> ts = 2 3 4;");
             I("SERIES <2008 2010> ts = 9 8 7;");
             I("smooth ts1 = ts spline;                                  //fill holes with cubic spline");
-            I("smooth ts2 = ts linear;                                  //fill holes with linear interpolation");
-            I("smooth ts3 = ts geometric;                               //fill holes with geometric interpolation");
-            I("smooth ts4 = ts repeat;                                  //fill holes with last known value.");
+            I("smooth work:ts2 = ts linear;                                  //fill holes with linear interpolation");
+            I("smooth ts3 = work:ts geometric;                               //fill holes with geometric interpolation");
+            I("smooth work:ts4 = work:ts repeat;                                  //fill holes with last known value.");
             AssertHelper(First(), "ts4", 2005, 4d, sharedDelta);
             AssertHelper(First(), "ts4", 2006, 4d, sharedDelta);
             AssertHelper(First(), "ts4", 2007, 4d, sharedDelta);
@@ -851,7 +851,7 @@ namespace UnitTests
             I("option freq m;");
             I("create ts4;");
             I("SERIES <2000m1 2000m7> ts4 = 1 1 2 3 4 5 5;");
-            I("truncate <2000m3 2000m5> ts4;");
+            I("truncate <2000m3 2000m5> work:ts4;");  //also testing bank
             AssertHelper(First(), "ts4", EFreq.Monthly, 2000, 1, double.NaN, sharedDelta);
             AssertHelper(First(), "ts4", EFreq.Monthly, 2000, 2, double.NaN, sharedDelta);
             AssertHelper(First(), "ts4", EFreq.Monthly, 2000, 3, 2d, sharedDelta);
@@ -2312,7 +2312,8 @@ namespace UnitTests
             I("CREATE y; SERIES <2000q1 2009q2> y = 85.2  87.2  87.1  87.2  87.3  90   90.1  90.4  90.5  92.4  92.5  94.7   96.3  98.5  98.6  98.5  99.2  99.8  100.4  100.5  101.2  102.3  101.9  101.7  102.9  103.5  103.5  103.5  104.6  104.5  104.9  104.9  105.9  106  106  106   106.5  106.7 ;");
             I("CREATE ytrue; SERIES <2000q1 2009q2> ytrue = 85.80 86.44 87.07 87.38 87.86 89.23 90.09 90.61 90.96 91.67 92.51 94.96 96.62 97.82 98.60 98.86 99.34 99.22 100.41 100.93 101.20 101.81 101.92 102.18 102.75 103.13 103.56 103.96 104.37 104.23 104.97 105.32 105.64 105.80 106.08 106.38 106.25 106.51;");
             I("STRING param = 'save=(d10, d11, saa) mode=mult sigmalim=(1.50,2.50) seasonalma=msr force=totals print=alltables';");
-            I("X12A <2000q1 2009q2 param = %param> y ;");
+            I("LIST m = y;");
+            I("X12A <2000q1 2009q2 param = %param> work:#m;");
             TimeSeries ts1 = First().GetVariable("ytrue");
             TimeSeries ts2 = First().GetVariable("y_saa");
             foreach (GekkoTime gt in new GekkoTimeIterator(new GekkoTime(EFreq.Quarterly, 2000, 1), new GekkoTime(EFreq.Quarterly, 2009, 2)))
@@ -10242,6 +10243,19 @@ namespace UnitTests
             Assert.AreEqual(First().GetVariable("y").source, "");
             Assert.AreEqual(First().GetVariable("y").stamp, "");
             I("DOC y label='a' source='b' stamp='c';");
+            Assert.AreEqual(First().GetVariable("y").label, "a");
+            Assert.AreEqual(First().GetVariable("y").source, "b");
+            Assert.AreEqual(First().GetVariable("y").stamp, "c");
+
+            //Testing quarters
+            I("RESET;");
+            I("OPTION freq q;");
+            I("CREATE x, y;");
+            I("LIST m = x, y;");
+            I("DOC work:#m label='a' source='b' stamp='c';");
+            Assert.AreEqual(First().GetVariable("x").label, "a");
+            Assert.AreEqual(First().GetVariable("x").source, "b");
+            Assert.AreEqual(First().GetVariable("x").stamp, "c");
             Assert.AreEqual(First().GetVariable("y").label, "a");
             Assert.AreEqual(First().GetVariable("y").source, "b");
             Assert.AreEqual(First().GetVariable("y").stamp, "c");

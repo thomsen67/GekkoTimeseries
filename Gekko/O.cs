@@ -3343,7 +3343,7 @@ namespace Gekko
                         ts.Stamp();
                     }                    
                 }
-                G.Writeln2("Truncated " + counter + " timeseries in Work databank to " + t1 + "-" + t2 + "");
+                G.Writeln2("Truncated " + counter + " timeseries to " + t1 + "-" + t2 + "");
             }
         }
 
@@ -3355,7 +3355,7 @@ namespace Gekko
             public void Exe()
             {
                 //listItems = null;  //just for safety, should not be used.
-                Databank work = Program.databanks.GetFirst();
+                
                 if (true)
                 {
                     if (listItems0.Count != listItems1.Count)
@@ -3381,20 +3381,26 @@ namespace Gekko
                     string s2 = listItems1[i];
                     if (s1.Contains(":") || s2.Contains(":"))
                     {
-                        G.Writeln2("*** ERROR: Banknames not yet allowed for RENAME command");
+                        G.Writeln2("*** ERROR: Banknames not yet allowed for RENAME command.");
+                        G.Writeln("           You may try the <bank=...> option.");
                         throw new GekkoException();
                     }
                     //the string may be with or without bank (bank:varname)
-                    TimeSeries ts = Program.GetTimeSeriesFromString(s1, ECreatePossibilities.None);
-                    if (work.ContainsVariable(s2))
+                    string bank = "Work";                    
+                    List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(s1, bank);
+                    foreach (TimeSeries ts in tss)
                     {
-                        G.Writeln2("*** ERROR: Cannot rename into existing timeseries '" + s2 + "'");
-                        throw new GekkoException();
+                        //There is probably always only 1 here
+                        if (ts.parentDatabank.ContainsVariable(s2))
+                        {
+                            G.Writeln2("*** ERROR: Databank " + ts.parentDatabank.aliasName + " already contains timeseries '" + s2 + "'");
+                            throw new GekkoException();
+                        }
+                        ts.parentDatabank.RemoveVariable(ts.variableName);                        
+                        ts.variableName = s2;
+                        ts.parentDatabank.AddVariable(ts);
+                        counter++;
                     }
-                    work.RemoveVariable(s1);
-                    ts.variableName = s2;
-                    work.AddVariable(ts);
-                    counter++;
                 }                
                 G.Writeln2("Renamed " + counter + " timeseries in Work databank");
             }
@@ -3716,7 +3722,7 @@ namespace Gekko
         {
             public string name = null;
             public string opt_mute = null;
-            public string opt_bank = null;
+            public string opt_addbank = null;
             //public string listFile = null; //make it work
             public string wildCard1 = null; //--> delete??
             public string wildCard2 = null;  //only active if range   //--> delete??
@@ -3724,7 +3730,7 @@ namespace Gekko
             public string listFile = null;
             public void Exe()
             {
-                bool bank = false; if (G.equal(this.opt_bank, "yes")) bank = true;
+                bool addbank = false; if (G.equal(this.opt_addbank, "yes")) addbank = true;
                 List<string> names = new List<string>();
 
                 foreach (string s in this.listItems)
@@ -3732,7 +3738,7 @@ namespace Gekko
                     List<BankNameVersion> xx = Program.GetInfoFromStringWildcard(s, null);  //could use .from or .bank here!!!!
                     foreach (BankNameVersion bnv in xx)
                     {                        
-                        if (bank)
+                        if (addbank)
                         {
                             names.Add(bnv.bank + Globals.symbolBankColon + bnv.name);
                         }

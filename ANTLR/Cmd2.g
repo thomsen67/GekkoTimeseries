@@ -391,6 +391,7 @@ ASTOPT_STRING_Y2;
 
 	ASTOPT_STRING_DUMP;
 	ASTOPT_STRING_BANK;
+	ASTOPT_STRING_ADDBANK;
 	ASTOPT_STRING_ERROR;
 	ASTOPT_STRING_USING;
     ASTOPT_STRING_ABS ;
@@ -661,6 +662,7 @@ ASTOPT_STRING_Y2;
 	ASTXEDIT;
 
 	LAGFIX = 'LAGFIX';
+	ADDBANK = 'ADDBANK';
 	REBASE = 'REBASE';
 	LINESPOINTS = 'LINESPOINTS';
 //LINES = 'LINES';
@@ -1178,6 +1180,7 @@ Y2                    = 'Y2'                       ;
                                         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 										
 		d.Add("LAGFIX" ,LAGFIX);
+		d.Add("ADDBANK" ,ADDBANK);
 		d.Add("LINESPOINTS" ,LINESPOINTS);
 		d.Add("REBASE", REBASE);
 //d.Add("LINES" , LINES);
@@ -2001,7 +2004,7 @@ index                     : INDEX indexOpt1? SERIES? listItemsWildRange listName
 //index                     : INDEX indexOpt1? SERIES? indexerAlone nameWithDot? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} ^(ASTINDEXERALONE indexerAlone) ^(ASTPLACEHOLDER nameWithDot?) indexOpt1?);
 indexOpt1                 : ISNOTQUAL | leftAngle indexOpt1h* RIGHTANGLE -> ^(ASTOPT1 indexOpt1h*);							
 indexOpt1h                : MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)	
-						  |	BANK (EQUAL yesNo)? -> ^(ASTOPT_STRING_BANK yesNo?)	
+						  |	ADDBANK (EQUAL yesNo)? -> ^(ASTOPT_STRING_ADDBANK yesNo?)	
 						  ;
 
 ini						  : INI -> ^({token("ASTINI", ASTINI, $INI.Line)});
@@ -2336,7 +2339,7 @@ translateOpt1h            : GEKKO18 (EQUAL yesNo)? -> ^(ASTOPT_STRING_GEKKO18 ye
 						  | AREMOS (EQUAL yesNo)? -> ^(ASTOPT_STRING_AREMOS yesNo?)
 						  ;						
 
-truncate                  : TRUNCATE truncateOpt1? listItems -> ^({token("ASTTRUNCATE", ASTTRUNCATE, $TRUNCATE.Line)} ^(ASTOPT_ truncateOpt1?) listItems);
+truncate                  : TRUNCATE truncateOpt1? listItemsWildRange -> ^({token("ASTTRUNCATE", ASTTRUNCATE, $TRUNCATE.Line)} ^(ASTOPT_ truncateOpt1?) listItemsWildRange);
 
 udvalg					  : DECOMP (leftAngle dates? RIGHTANGLE)? udvalgElement -> ^({token("ASTDECOMP¤"+($udvalgElement.text), ASTDECOMP, $DECOMP.Line)} ^(ASTDATES dates?) ^(ASTDECOMPITEMS udvalgElement));
 
@@ -2400,7 +2403,7 @@ exportType                : D -> ASTOPD
 						  ;
 
 
-x12a					  : X12A x12aOpt1? listItems -> ^({token("ASTX12A", ASTX12A, $X12A.Line)} x12aOpt1? listItems?);
+x12a					  : X12A x12aOpt1? listItemsWildRange -> ^({token("ASTX12A", ASTX12A, $X12A.Line)} x12aOpt1? listItemsWildRange);
 x12aOpt1                  : ISNOTQUAL
 						  | leftAngle2          x12aOpt1h* RIGHTANGLE -> x12aOpt1h*
 						  | leftAngleNo2 dates? x12aOpt1h* RIGHTANGLE ->  ^(ASTDATES dates?) x12aOpt1h*
@@ -3200,6 +3203,7 @@ doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 ident                     : Ident|
 							REBASE|
 							LAGFIX|
+							ADDBANK|
 							THOUSANDSSEPARATOR|
 							MDATEFORMAT|
                             LINESPOINTS|
