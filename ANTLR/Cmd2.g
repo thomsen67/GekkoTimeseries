@@ -1852,7 +1852,7 @@ compareOpt1h              : ABS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ABS yesNo?);
 count                     : COUNT SERIES? indexerAlone -> ^({token("ASTCOUNT", ASTCOUNT, $COUNT.Line)} ^(ASTINDEXERALONE indexerAlone));
 
 create                    : CREATE nameWithBank '=' expression -> ^({token("ASTCREATEEXPRESSION", ASTCREATEEXPRESSION, $CREATE.Line)} nameWithBank expression)
-						  | CREATE listItems -> ^({token("ASTCREATE", ASTCREATE, $CREATE.Line)} listItems)
+						  | CREATE listItemsWildRange -> ^({token("ASTCREATE", ASTCREATE, $CREATE.Line)} listItemsWildRange)
                           | CREATE question -> ^({token("ASTCREATEQUESTION", ASTCREATEQUESTION, $CREATE.Line)})						
 						  ;
 
@@ -1861,7 +1861,7 @@ date                      : DATE nameWithDot EQUAL expression -> ^({token("ASTDA
 						  | DATE question -> ^({token("ASTDATE", ASTDATE, $DATE.Line)} question)
 						  ;
 
-delete					  : DELETE deleteOpt1? listItems? -> ^({token("ASTDELETE", ASTDELETE, $DELETE.Line)} listItems? deleteOpt1?)
+delete					  : DELETE deleteOpt1? listItemsWildRange? -> ^({token("ASTDELETE", ASTDELETE, $DELETE.Line)} listItemsWildRange? deleteOpt1?)
         				  //| DELETE deleteOpt1? -> ^({token("ASTDELETE", ASTDELETE, $DELETE.Line)} deleteOpt1?)
 						  ;
 deleteOpt1                : ISNOTQUAL | leftAngle deleteOpt1h* RIGHTANGLE -> deleteOpt1h*;

@@ -4865,14 +4865,19 @@ namespace Gekko
             return GetTimeSeriesFromStringWildcard(s, null);
         }
 
+        public static List<TimeSeries> GetTimeSeriesFromStringWildcard(string s, string defaultBank)
+        {
+            return GetTimeSeriesFromStringWildcard(s, defaultBank, false);  //no ignore per default
+        }
+
         //Can be "adambk:fX*2"
         //May return 0 items if wildcard does not exist
         //May be used without wildcard: "adambk:fy", then it is similar to GetTimeSeriesFromString() -> will return empty list if variable does not exist.
-        public static List<TimeSeries> GetTimeSeriesFromStringWildcard(string s, string defaultBank)
+        public static List<TimeSeries> GetTimeSeriesFromStringWildcard(string s, string defaultBank, bool ignoreNonExistingSeries)
         {
             List<TimeSeries> listTs = new List<TimeSeries>();
             List<BankNameVersion> list = GetInfoFromStringWildcard(s, defaultBank);
-
+            //See #89052349875, maybe merge it
             foreach (BankNameVersion bnv in list)
             {
                 Databank db = null;
@@ -4887,8 +4892,8 @@ namespace Gekko
                     }
                 }
                 TimeSeries ts = db.GetVariable(bnv.name);
-                if (ts == null)
-                {
+                if (ts == null && !ignoreNonExistingSeries)
+                {                    
                     G.Writeln2("*** ERROR: Could not find timeseries '" + bnv.name + "' in databank '" + bnv.bank + "'");
                     throw new GekkoException();
                 }
@@ -19654,45 +19659,65 @@ namespace Gekko
 
         public static int CreateVariables(List<string> vars, bool usedInCreateCommand)
         {
-            Databank work = Program.databanks.GetFirst();
             int counter = 0;
-            foreach (string name in vars)
+            foreach (string s in vars)
             {
-                if (work.ContainsVariable(name))
+                string defaultBank = null;
+                List<BankNameVersion> list = GetInfoFromStringWildcard(s, defaultBank);
+                
+                foreach(BankNameVersion bnv in list)
                 {
-                    if (usedInCreateCommand && Program.options.databank_create_message)
+                    //See //#89052349875, maybe merge it
+                    Databank db = null;
+                    if (bnv.bank == null) db = Program.databanks.GetFirst();
+                    else
                     {
-                        G.Writeln2("+++ WARNING: CREATE: variable '" + name + "' already exists");
-                    }
-                }
-                else
-                {
-                    //#642842749283
-                    TimeSeries ts = new TimeSeries(Program.options.freq, name);
-                    if (!Globals.globalPeriodStart.IsNull())
-                    {
-                        //WHY is this done. For efficiency afterwards??
-                        //TO get start/end date??
-                        foreach (GekkoTime gt in new GekkoTimeIterator(Globals.globalPeriodStart, Globals.globalPeriodEnd))
+                        db = Program.databanks.GetDatabank(bnv.bank);
+                        if (db == null)
                         {
-                            ts.SetData(gt, double.NaN);
+                            G.Writeln2("*** ERROR: Could not find databank '" + bnv.bank + "'");
+                            throw new GekkoException();
                         }
                     }
-
-                    //We know the timeseries does not already exist
-                    Program.databanks.GetFirst().AddVariable(ts);
-
-                    if (usedInCreateCommand == true)
+                    TimeSeries ts = db.GetVariable(bnv.name);
+                    if (ts == null)
                     {
-                        //normally it shouldn't exist, but we check for safety
-                        if (!Globals.createdVariables.ContainsKey(AddFreqAtEndOfVariableName(name)))
+                        //#642842749283
+                        ts = new TimeSeries(Program.options.freq, bnv.name);
+                        if (!Globals.globalPeriodStart.IsNull())
                         {
-                            Globals.createdVariables.Add(AddFreqAtEndOfVariableName(name), "");
+                            //WHY is this done. For efficiency afterwards??
+                            //TO get start/end date??
+                            foreach (GekkoTime gt in new GekkoTimeIterator(Globals.globalPeriodStart, Globals.globalPeriodEnd))
+                            {
+                                ts.SetData(gt, double.NaN);
+                            }
+                        }
+
+                        //We know the timeseries does not already exist
+                        //database will throw a protecterror if it is non-editable
+                        db.AddVariable(ts);
+
+                        if (usedInCreateCommand == true)
+                        {
+                            //normally it shouldn't exist, but we check for safety
+                            if (!Globals.createdVariables.ContainsKey(AddFreqAtEndOfVariableName(ts.variableName)))
+                            {
+                                Globals.createdVariables.Add(AddFreqAtEndOfVariableName(ts.variableName), "");
+                            }
+                        }
+                        counter++;
+                    }
+                    else
+                    {
+                        if (usedInCreateCommand && Program.options.databank_create_message)
+                        {
+                            G.Writeln2("+++ WARNING: CREATE: variable " + db.aliasName + ":" + ts.variableName + " already exists");
                         }
                     }
-                    counter++;
                 }
             }
+                        
             return counter;
         }
 
@@ -20010,19 +20035,26 @@ namespace Gekko
         {
             int counter = 0;
             G.Writeln();
-            foreach (string s in vars)
+
+            for (int i = 0; i < vars.Count; i++)
             {
-                ExtractBankAndRestHelper h = ExtractBankAndRest(s, EExtrackBankAndRest.GetDatabankAndTimeSeries, false);
-                if (h.ts == null)
+                //may contain nulls if ts not found in bank
+                List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(vars[i], null, true);
+                foreach (TimeSeries ts in tss)
                 {
-                    G.Writeln("+++ WARNING: DELETE: variable '" + s + "' does not exist");
-                }
-                else
-                {
-                    h.databank.RemoveVariable(h.name);  //has been tested that it exists
-                    counter++;
+                    if (ts == null)
+                    {
+                        G.Writeln("+++ WARNING: DELETE: variable '" + vars[i] + "' does not exist");
+                    }
+                    else
+                    {
+                        if (ts.parentDatabank.protect) Program.ProtectError("You cannot delete a timeseries in a non-editable databank (" + ts.parentDatabank + ")");
+                        ts.parentDatabank.RemoveVariable(ts.variableName);
+                        counter++;
+                    }
                 }
             }
+            
             if (counter == 0) G.Writeln("Did not delete any variables");
             else if (counter == 1) G.Writeln("Deleted 1 variable");
             else G.Writeln("Deleted " + counter + " variables");

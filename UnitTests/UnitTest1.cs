@@ -3685,8 +3685,28 @@ namespace UnitTests
             I("TIME 2005 2010;");
             I("CREATE a, b, c;");
             Assert.AreEqual(Globals.createdVariables.Count, 3);
+            Assert.AreEqual(Program.databanks.GetFirst().storage.Count, 3);
             I("CREATE?;");
             I("CREATE ?;");
+                        
+            I("RESET;");
+            I("LIST m = a, b, c;");
+            I("CREATE work:#m;");
+            Assert.AreEqual(Globals.createdVariables.Count, 3);
+            Assert.AreEqual(Program.databanks.GetFirst().storage.Count, 3);
+            I("OPTION freq m;");
+            I("CREATE work:#m;");
+            Assert.AreEqual(Globals.createdVariables.Count, 6);
+            Assert.AreEqual(Program.databanks.GetFirst().storage.Count, 6);
+
+            I("LIST m2 = b;");
+            I("DELETE work:#m2;");
+            Assert.AreEqual(Globals.createdVariables.Count, 6);  //what are these used for anyway?
+            Assert.AreEqual(Program.databanks.GetFirst().storage.Count, 5);
+            I("OPTION freq a;");
+            I("DELETE work:#m2;");
+            Assert.AreEqual(Globals.createdVariables.Count, 6);  //what are these used for anyway?
+            Assert.AreEqual(Program.databanks.GetFirst().storage.Count, 4);
         }
 
         [TestMethod]
@@ -3721,31 +3741,39 @@ namespace UnitTests
         [TestMethod]
         public void Test__Delete()
         {
-            //just testing that it parses
-            I("RESET;");
-            I("CREATE a, b, c, d;");            
-            Assert.AreEqual(First().storage.Count, 4);
-            I("DELETE b, c;");
-            Assert.AreEqual(First().storage.Count, 2);
-            I("CREATE x1, x2;");
-            Assert.AreEqual(First().storage.Count, 4);
-            I("DELETE [*];");
-            Assert.AreEqual(First().storage.Count, 0);
-            I("CREATE x1, x2, x3;");
-            Assert.AreEqual(First().storage.Count, 3);            
-            I("DELETE all;");  //will just warn that all is not existing            
+            //Also checked somewhat in Test_Create()
+            foreach (string f in new string[] { "a", "q" })  //testing both A and Q
+            {
 
-            I("RESET;");
-            I("CREATE a, b, c, d;");
-            Assert.AreEqual(First().storage.Count, 4);
-            I("DELETE <series> b, c;");
-            Assert.AreEqual(First().storage.Count, 2);
-            I("CREATE x1, x2;");
-            Assert.AreEqual(First().storage.Count, 4);
-            I("DELETE <ser> [*];");
-            Assert.AreEqual(First().storage.Count, 0);
-            I("CREATE x1, x2, x3;");
-            Assert.AreEqual(First().storage.Count, 3);                      
+                //just testing that it parses
+                I("RESET;");
+                I("OPTION freq " + f + ";");
+                I("CREATE a, b, c, d;");
+                Assert.AreEqual(First().storage.Count, 4);
+                I("DELETE b, c;");
+                Assert.AreEqual(First().storage.Count, 2);
+                I("CREATE x1, x2;");
+                Assert.AreEqual(First().storage.Count, 4);
+                I("DELETE [*];");
+                Assert.AreEqual(First().storage.Count, 0);
+                I("CREATE x1, x2, x3;");
+                Assert.AreEqual(First().storage.Count, 3);
+                I("DELETE all;");  //will just warn that all is not existing            
+                Assert.AreEqual(First().storage.Count, 3);
+
+                I("RESET;");
+                I("OPTION freq " + f + ";");
+                I("CREATE a, b, c, d;");
+                Assert.AreEqual(First().storage.Count, 4);
+                I("DELETE <series> b, c;");
+                Assert.AreEqual(First().storage.Count, 2);
+                I("CREATE x1, x2;");
+                Assert.AreEqual(First().storage.Count, 4);
+                I("DELETE <ser> [*];");
+                Assert.AreEqual(First().storage.Count, 0);
+                I("CREATE x1, x2, x3;");
+                Assert.AreEqual(First().storage.Count, 3);
+            }                
         }
 
         [TestMethod]

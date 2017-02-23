@@ -3806,11 +3806,8 @@ namespace Gekko
                     List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(this.listItems[i], opt_bank);
                     foreach (TimeSeries ts in tss)
                     {
-                        if (ts.parentDatabank.protect)
-                        {
-                            Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + ts.parentDatabank + ")");
-                        }
-
+                        if (ts.parentDatabank.protect) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + ts.parentDatabank + ")");
+                        
                         GekkoTime ddate1 = date1;
                         GekkoTime ddate2 = date2;
 

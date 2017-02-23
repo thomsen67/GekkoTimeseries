@@ -537,7 +537,8 @@ namespace Gekko
                 if (G.equal(databank.aliasName, Globals.Ref)) continue;
                 dbList.Add(databank);
             }
-            Program.databanks.storage = dbList;            
+            Program.databanks.storage = dbList;
+            G.Writeln2("Moved Work and Ref back to their normal positions in the databank list (F2)");                     
         }
     }
 }
