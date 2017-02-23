@@ -1141,7 +1141,7 @@ namespace Gekko
             double d1Lag = O.GetVal(mtsLag, t);
             return new ScalarVal((d1 / d1Lag - 1) * 100d);
         }
-
+        
         public static IVariable dlog(GekkoTime t, IVariable x1)
         {
             if (x1.Type() != EVariableType.TimeSeries)
@@ -1170,6 +1170,20 @@ namespace Gekko
             double d1 = O.GetVal(mts, t);
             double d1Lag = O.GetVal(mtsLag, t);
             return new ScalarVal(d1 - d1Lag);
+        }
+
+        public static IVariable lag(GekkoTime t, IVariable x, IVariable ilag)
+        {            
+            if (x.Type() != EVariableType.TimeSeries)
+            {
+                G.Writeln2("*** ERROR: lag() function only valid for time series arguments");
+                throw new GekkoException();
+            }
+            MetaTimeSeries mts = (MetaTimeSeries)x;
+            MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
+            mtsLag.offset = mts.offset - O.GetInt(ilag);
+            double d1Lag = O.GetVal(mtsLag, t);
+            return new ScalarVal(d1Lag);
         }
 
         public static IVariable movsum(GekkoTime t, IVariable x, IVariable ilags)

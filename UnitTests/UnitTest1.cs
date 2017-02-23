@@ -384,7 +384,7 @@ namespace UnitTests
                 I("OPTION freq a;");
                 I("MODEL pchy;");
                 I("CREATE x; SER <2010 2011> x = 200, 202;");
-                I("FOR val i = 1 to 8; CREATE y{i}; SER <2010 2010> y{i} = 100; END;");
+                I("FOR val i = 1 to 9; CREATE y{i}; SER <2010 2010> y{i} = 100; END;");
                 I("SIM <2011 2011>;");
 
                 AssertHelper(First(), "y1", 2011, 100d * ((0.5d * (202d / 200d - 1d) * 100d + 1d) / 100d + 1d), sharedDelta);
@@ -396,6 +396,7 @@ namespace UnitTests
                 AssertHelper(First(), "y6", 2011, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
                 AssertHelper(First(), "y7", 2011, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
                 AssertHelper(First(), "y8", 2011, Math.Exp(0.5d * Math.Log(202d / 200d) + 1d + Math.Log(100d)), sharedDelta);
+                AssertHelper(First(), "y9", 2011, 0.5d * 200d + 1d, sharedDelta);
 
                 if (i == 0) Program.Flush(); //wipes out existing cached models
 
@@ -404,7 +405,7 @@ namespace UnitTests
                 I("OPTION freq q;");
                 I("MODEL pchy;");
                 I("CREATE x; SER <2010q1 2011q1> x = 200, 1, 2, 3, 202;");
-                I("FOR val i = 1 to 8; CREATE y{i}; SER <2010q4 2010q4> y{i} = 7; SER <2010q1 2010q1> y{i} = 100; END;");
+                I("FOR val i = 1 to 9; CREATE y{i}; SER <2010q4 2010q4> y{i} = 7; SER <2010q1 2010q1> y{i} = 100; END;");
                 I("SIM <2011q1 2011q1>;");
 
                 AssertHelper(First(), "y1", EFreq.Quarterly, 2011, 1, 100d * ((0.5d * (202d / 200d - 1d) * 100d + 1d) / 100d + 1d), sharedDelta);
@@ -416,6 +417,7 @@ namespace UnitTests
                 AssertHelper(First(), "y6", EFreq.Quarterly, 2011, 1, 0.5d * (202d - 3d) + 1d + 7d, sharedDelta);
                 AssertHelper(First(), "y7", EFreq.Quarterly, 2011, 1, 0.5d * (202d - 3d) + 1d + 7d, sharedDelta);
                 AssertHelper(First(), "y8", EFreq.Quarterly, 2011, 1, Math.Exp(0.5d * Math.Log(202d / 3d) + 1d + Math.Log(7d)), sharedDelta);
+                AssertHelper(First(), "y9", EFreq.Quarterly, 2011, 1, 0.5d * 3d + 1d, sharedDelta);
             }
 
             I("RESET; MODE data;");            
@@ -2908,7 +2910,7 @@ namespace UnitTests
             I("SERIES<2010 2010> gdp = 100;");
             I("SERIES<2011 2012> gdp ^ 1;");
             I("SERIES<2010 2012> x = 1;");
-
+                        
             I("SERIES xx1 = dlog(gdp);");
             AssertHelper(First(), "xx1", 2010, double.NaN, sharedDelta);
             AssertHelper(First(), "xx1", 2011, Math.Log(101d / 100d), sharedDelta);
@@ -2925,6 +2927,10 @@ namespace UnitTests
             AssertHelper(First(), "xx4", 2010, double.NaN, sharedDelta);
             AssertHelper(First(), "xx4", 2011, (101d - 100d), sharedDelta);
             AssertHelper(First(), "xx4", 2012, (102d - 101d), sharedDelta);
+            I("SERIES xx5 = lag(gdp, 2);");
+            AssertHelper(First(), "xx5", 2010, double.NaN, sharedDelta);
+            AssertHelper(First(), "xx5", 2011, double.NaN, sharedDelta);
+            AssertHelper(First(), "xx5", 2012, 100d, sharedDelta);
 
             I("SERIES xx1 = dlog(gdp/x+0);");
             AssertHelper(First(), "xx1", 2010, double.NaN, sharedDelta);
@@ -2942,6 +2948,10 @@ namespace UnitTests
             AssertHelper(First(), "xx4", 2010, double.NaN, sharedDelta);
             AssertHelper(First(), "xx4", 2011, (101d - 100d), sharedDelta);
             AssertHelper(First(), "xx4", 2012, (102d - 101d), sharedDelta);
+            I("SERIES xx5 = lag(gdp/x+0, 2);");
+            AssertHelper(First(), "xx5", 2010, double.NaN, sharedDelta);
+            AssertHelper(First(), "xx5", 2011, double.NaN, sharedDelta);
+            AssertHelper(First(), "xx5", 2012, 100d, sharedDelta);
 
             I("SERIES xx1 = dlog(gdp[-1]);");
             AssertHelper(First(), "xx1", 2010, double.NaN, sharedDelta);
@@ -2959,6 +2969,10 @@ namespace UnitTests
             AssertHelper(First(), "xx4", 2010, double.NaN, sharedDelta);
             AssertHelper(First(), "xx4", 2011, double.NaN, sharedDelta);
             AssertHelper(First(), "xx4", 2012, (101d - 100d), sharedDelta);
+            I("SERIES xx5 = lag(gdp[-1], 1);");
+            AssertHelper(First(), "xx5", 2010, double.NaN, sharedDelta);
+            AssertHelper(First(), "xx5", 2011, double.NaN, sharedDelta);
+            AssertHelper(First(), "xx5", 2012, 100d, sharedDelta);
 
             I("SERIES xx1 = dlog(gdp[-1]/x+0);");
             AssertHelper(First(), "xx1", 2010, double.NaN, sharedDelta);
@@ -2976,7 +2990,10 @@ namespace UnitTests
             AssertHelper(First(), "xx4", 2010, double.NaN, sharedDelta);
             AssertHelper(First(), "xx4", 2011, double.NaN, sharedDelta);
             AssertHelper(First(), "xx4", 2012, (101d - 100d), sharedDelta);
-
+            I("SERIES xx5 = lag(gdp[-1]/x+0, 1);");
+            AssertHelper(First(), "xx5", 2010, double.NaN, sharedDelta);
+            AssertHelper(First(), "xx5", 2011, double.NaN, sharedDelta);
+            AssertHelper(First(), "xx5", 2012, 100d, sharedDelta);
 
             //I("SERIES ");
         }

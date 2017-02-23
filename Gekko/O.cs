@@ -1515,7 +1515,12 @@ namespace Gekko
                     {
                         data = storage[storage.Length - 1] - storage[0];
                     }
-                    break;                   
+                    break;
+                case "lag":
+                    {
+                        data = storage[0];
+                    }
+                    break;
                 default:
                     {
                         G.Writeln2("*** ERROR: Function " + type + " not recognized as a lag function");

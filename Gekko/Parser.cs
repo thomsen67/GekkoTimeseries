@@ -2086,6 +2086,53 @@ namespace Gekko
                             c.Add(c1);
                             c.Add(c2);
                         }
+                        else if (G.equal(function, "lag"))
+                        {
+                            if (arguments != 2)
+                            {
+                                G.Writeln2("*** ERROR: Expected lag() function with 2 arguments");
+                                throw new GekkoException();
+                            }
+                            recognized = true;
+
+                            ASTNode lags = equationNode.GetChild(2);
+                            int intLags = GetLags(wh2, function, lags);
+
+                            /*
+                           *
+                           *                         x
+                           *                         |
+                           *                     ASTFUNCTION
+                           *                       /    \
+                           *                    dif     subtree
+                           *
+                           *                         x
+                           *                         |
+                           *                     "nothing" (equationNode)
+                           *                         |
+                           *                          \
+                           *                           \                             
+                           *                            ASTLAG (c)
+                           *                            |    \ \
+                           *                           /    "-" 1
+                           *                     subtree
+                           *
+                           *
+                           *
+                           * */
+
+                            ASTNode subTree = equationNode.GetChild(1);
+                            equationNode.Text = "nothing";  //function that does nothing
+                            equationNode.Children.Clear();
+                            ASTNode c = new ASTNode("ASTLAG");
+                            ASTNode c1 = new ASTNode("-"); //it is a lag
+                            ASTNode c2 = new ASTNode(intLags.ToString()); //n period lag
+                            equationNode.Add(c);
+                            c.Children = new List<ASTNode>();
+                            c.Add(subTree);
+                            c.Add(c1);
+                            c.Add(c2);
+                        }
                         else if (G.equal(function, "dif") || G.equal(function, "diff") || G.equal(function, "dify") || G.equal(function, "diffy"))
                         {
                             int lag = 1;
@@ -2143,7 +2190,7 @@ namespace Gekko
                             c.Add(c2);
                         }
                         else if (G.equal(function, "movavg") || G.equal(function, "movsum"))
-                        {                           
+                        {
 
                             if (arguments != 2)
                             {
@@ -2154,33 +2201,7 @@ namespace Gekko
 
                             ASTNode lags = equationNode.GetChild(2);
 
-
-                            int intLags = -12345;
-                            if (lags.Text == "ASTINTEGER")
-                            {
-                                intLags = int.Parse(lags.GetChild(0).Text);
-                            }
-                            else if (lags.Text == "ASTASSIGNVAR")
-                            {
-                                string value2 = HandleModelVal(lags, wh2);
-                                bool xx = int.TryParse(value2, out intLags);
-                                if (!xx)
-                                {
-                                    G.Writeln2("*** ERROR: The VAL " + value2 + " is not suitable as second argument of " + function + "()");
-                                    throw new GekkoException();
-                                }
-                            }
-                            else
-                            {
-                                G.Writeln2("*** ERROR: Expected the second argument of " + function + "() function to be a fixed value");
-                                throw new GekkoException();
-                            }
-
-                            if (intLags <= 0 || intLags >= 100)
-                            {
-                                G.Writeln2("*** ERROR: Expected lags in " + function + "() function to > 0 and < 100");
-                                throw new GekkoException();
-                            }
+                            int intLags = GetLags(wh2, function, lags);
 
                             /*
                             *
@@ -2997,6 +3018,38 @@ namespace Gekko
             {
                 wh2.rightHandSideCsCode.Append(")");
             }
+        }
+
+        private static int GetLags(WalkerHelper2 wh2, string function, ASTNode lags)
+        {
+            int intLags = -12345;
+            if (lags.Text == "ASTINTEGER")
+            {
+                intLags = int.Parse(lags.GetChild(0).Text);
+            }
+            else if (lags.Text == "ASTASSIGNVAR")
+            {
+                string value2 = HandleModelVal(lags, wh2);
+                bool xx = int.TryParse(value2, out intLags);
+                if (!xx)
+                {
+                    G.Writeln2("*** ERROR: The VAL " + value2 + " is not suitable as second argument of " + function + "()");
+                    throw new GekkoException();
+                }
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Expected the second argument of " + function + "() function to be a fixed value");
+                throw new GekkoException();
+            }
+
+            if (intLags <= 0 || intLags >= 100)
+            {
+                G.Writeln2("*** ERROR: Expected lags in " + function + "() function to > 0 and < 100");
+                throw new GekkoException();
+            }
+
+            return intLags;
         }
 
         private static string HandleModelVal(ASTNode equationNode, WalkerHelper2 wh2)

@@ -1434,6 +1434,18 @@ namespace Gekko.Parser.Gek
                                                 code = node[1].Code.ToString();
                                             }
                                             break;
+                                        case "lag":                                        
+                                            {
+                                                if (node.ChildrenCount() != 2 + 1)
+                                                {
+                                                    G.Writeln2("*** ERROR: Expected 2 arguments for function " + functionName);
+                                                    throw new GekkoException();
+                                                }
+                                                lag1Code = "(-O.GetInt(" + node[2].Code.ToString() + "))";  //for instance -4, with lag(..., 4)
+                                                lag2Code = lag1Code;                                       //same
+                                                code = node[1].Code.ToString();
+                                            }
+                                            break;
                                         case "dif":
                                         case "diff":
                                         case "dlog":
@@ -1494,15 +1506,17 @@ namespace Gekko.Parser.Gek
                                     sb1.AppendLine("int " + counterName + " = 0;");
                                     sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(t" + (tCounter - 1) + ".Add(" + lag1Code + "), t" + (tCounter - 1) + ".Add(" + lag2Code + ")))");
                                     sb1.AppendLine("{");
-                                    sb1.AppendLine("t = t" + tCounter + ";");
+                                    sb1.AppendLine("t = t" + tCounter + ";");  //setting t, cf. #098745345
 
                                     if (node.timeLoopNestCode != null)
                                     {
                                         sb1.Append(node.timeLoopNestCode);
                                     }
-
+                                                                        
                                     sb1.AppendLine("" + storageName + "[" + counterName + "] = O.GetVal(" + code + ", t);");
                                     sb1.AppendLine("" + counterName + "++;");
+
+                                    sb1.AppendLine("t = t" + (tCounter - 1) + ";");  //t may have been set, cf. #098745345, so we are setting it back
                                     sb1.AppendLine("}");
 
                                     if (parentTimeLoop == null)
