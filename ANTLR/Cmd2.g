@@ -2005,6 +2005,7 @@ index                     : INDEX indexOpt1? SERIES? listItemsWildRange listName
 indexOpt1                 : ISNOTQUAL | leftAngle indexOpt1h* RIGHTANGLE -> ^(ASTOPT1 indexOpt1h*);							
 indexOpt1h                : MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)	
 						  |	ADDBANK (EQUAL yesNo)? -> ^(ASTOPT_STRING_ADDBANK yesNo?)	
+						  | BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //name can be without quotes
 						  ;
 
 ini						  : INI -> ^({token("ASTINI", ASTINI, $INI.Line)});
@@ -2063,7 +2064,7 @@ rebase                    : REBASE rebaseOpt1? listItemsWildRange rebaseDate1? r
 rebaseDate1               : expression;
 rebaseDate2               : expression;
 rebaseOpt1                : ISNOTQUAL | leftAngle rebaseOpt1h* RIGHTANGLE -> ^(ASTOPT1 rebaseOpt1h*);							
-rebaseOpt1h               : BANK (EQUAL name)? -> ^(ASTOPT_STRING_BANK name?)  //name can be without quotes
+rebaseOpt1h               : BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //name can be without quotes
 						  | PREFIX EQUAL name -> ^(ASTOPT_STRING_PREFIX name) //name can be without quotes
 						  | INDEX EQUAL expression -> ^(ASTOPT_VAL_INDEX expression)
 						  ;
@@ -2231,7 +2232,10 @@ r_run  				      : R_RUN r_runOpt1? -> ^({token("ASTR_RUN", ASTR_RUN, $R_RUN.Lin
 r_runOpt1			      : ISNOTQUAL | leftAngle r_runOpt1h* RIGHTANGLE -> r_runOpt1h*;
 r_runOpt1h                : MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);
 
-rename                    : RENAME listItems0 AS listItems1 -> ^({token("ASTRENAME", ASTRENAME, $RENAME.Line)} listItems0 listItems1);
+rename                    : RENAME renameOpt1? listItems0 AS listItems1 -> ^({token("ASTRENAME", ASTRENAME, $RENAME.Line)} listItems0 listItems1 renameOpt1?);
+renameOpt1                : ISNOTQUAL | leftAngle renameOpt1h* RIGHTANGLE -> renameOpt1h*;
+renameOpt1h               : BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //name can be without quotes
+						  ;
 
 res						  : RES (leftAngle dates? RIGHTANGLE)? -> ^({token("ASTRES", ASTRES, $RES.Line)} ^(ASTDATES dates?));
 
@@ -2409,6 +2413,7 @@ x12aOpt1                  : ISNOTQUAL
 						  | leftAngleNo2 dates? x12aOpt1h* RIGHTANGLE ->  ^(ASTDATES dates?) x12aOpt1h*
 						  ;
 x12aOpt1h                 : PARAM EQUAL expression -> ^(ASTOPT_STRING_PARAM expression)
+						  | BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //name can be without quotes
 						  ;
 
 

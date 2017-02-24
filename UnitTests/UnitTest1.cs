@@ -2930,7 +2930,7 @@ namespace UnitTests
             I("SERIES xx5 = lag(gdp, 2);");
             AssertHelper(First(), "xx5", 2010, double.NaN, sharedDelta);
             AssertHelper(First(), "xx5", 2011, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx5", 2012, 100d, sharedDelta);
+            AssertHelper(First(), "xx5", 2012, 100d, sharedDelta);            
 
             I("SERIES xx1 = dlog(gdp/x+0);");
             AssertHelper(First(), "xx1", 2010, double.NaN, sharedDelta);
@@ -3089,6 +3089,15 @@ namespace UnitTests
             AssertHelper(First(), "xx1", 2010, 2012, 1, sharedDelta);
             I("SERIES xx1 = sum(#m1);");
             AssertHelper(First(), "xx1", 2010, 2012, 10d, sharedDelta);
+            I("RESET; TIME 2000 2000; MODE data;");
+            I("open<edit> xx;");
+            I("ser xx1 = 1;");
+            I("ser xx2 = 2;");            
+            I("close xx;");
+            I("open xx;");
+            I("list xx = xx1, xx2;");
+            I("ser yy = sum(#xx);");  //test that timeseries are searched for in data mode
+            AssertHelper(First(), "yy", 2000, 3d, sharedDelta);
 
             //percentile()
             I("RESET;");

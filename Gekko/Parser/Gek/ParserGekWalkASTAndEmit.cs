@@ -2938,6 +2938,7 @@ namespace Gekko.Parser.Gek
                             //node.Code.A("o" + Num(node) + ".listItems1 = o" + Num(node) + ".listItems;" + G.NL;                            
                             //node.Code.A("o" + Num(node) + ".listItems = new List<string>();" + G.NL;
                             node.Code.A(node[1].Code);  //list2
+                            if (node[2] != null) node.Code.A(node[2].Code); //options
                             //node.Code.A("o" + Num(node) + ".listItems2 = o" + Num(node) + ".listItems;" + G.NL;                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }

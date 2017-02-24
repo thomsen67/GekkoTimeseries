@@ -6692,12 +6692,11 @@ namespace Gekko
 
             string meta = null;
             int counter = 0;
-
-            string bank = "Work";
+                        
             for (int i = 0; i < o.listItems.Count; i++)
             {
                 //GetTimeSeriesFromStringWildcard() implicitly calls GetInfoFromStringWildcard() which we will call again later.
-                List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(o.listItems[i], bank);
+                List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(o.listItems[i], o.opt_bank);
                 foreach (TimeSeries ts in tss)
                 {
                     counter++;
@@ -6786,7 +6785,7 @@ namespace Gekko
             {
                 for (int i = 0; i < o.listItems.Count; i++)
                 {
-                    List<BankNameVersion> list = GetInfoFromStringWildcard(o.listItems[i], bank);
+                    List<BankNameVersion> list = GetInfoFromStringWildcard(o.listItems[i], o.opt_bank);
                     foreach (BankNameVersion bnv in list)
                     {
                         foreach (string e in ext)

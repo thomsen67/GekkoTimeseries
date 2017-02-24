@@ -1225,9 +1225,10 @@ namespace Gekko
 
         public static MetaTimeSeries IndirectionHelper(string variable)
         {
-            //In that case, we are inside a GENR/PRT implicit time loop            
-            ExtractBankAndRestHelper h = Program.ExtractBankAndRest(variable, EExtrackBankAndRest.GetDatabankAndTimeSeries);            
-            MetaTimeSeries ats = new MetaTimeSeries(h.ts);
+            //In that case, we are inside a GENR/PRT implicit time loop                        
+            //Code below implicitly calls Program.ExtractBankAndRest and Program.FindOrCreateTimeseries()
+            //So stuff in banks down the list will be found in data mode
+            MetaTimeSeries ats = O.GetTimeSeries(variable, 0);            
             return ats;
         }        
 
@@ -3357,6 +3358,7 @@ namespace Gekko
             //public List<string> listItems = null;  //only temporary storage, use namesList1+2
             public List<string> listItems0 = null;
             public List<string> listItems1 = null;
+            public string opt_bank = null;
             public void Exe()
             {
                 //listItems = null;  //just for safety, should not be used.
@@ -3391,8 +3393,8 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     //the string may be with or without bank (bank:varname)
-                    string bank = "Work";                    
-                    List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(s1, bank);
+                                     
+                    List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(s1, opt_bank);
                     foreach (TimeSeries ts in tss)
                     {
                         //There is probably always only 1 here
@@ -3728,6 +3730,7 @@ namespace Gekko
             public string name = null;
             public string opt_mute = null;
             public string opt_addbank = null;
+            public string opt_bank = null;
             //public string listFile = null; //make it work
             public string wildCard1 = null; //--> delete??
             public string wildCard2 = null;  //only active if range   //--> delete??
@@ -3738,9 +3741,16 @@ namespace Gekko
                 bool addbank = false; if (G.equal(this.opt_addbank, "yes")) addbank = true;
                 List<string> names = new List<string>();
 
+                if (G.equal(this.opt_bank, "yes"))
+                {
+                    //For safety, remove in Gekko 2.4 or 2.6
+                    G.Writeln2("+++ ERROR: In Gekko 2.2, INDEX<bank=yes> is INDEX<addbank=yes>.");
+                    throw new GekkoException();
+                }                
+
                 foreach (string s in this.listItems)
                 {
-                    List<BankNameVersion> xx = Program.GetInfoFromStringWildcard(s, null);  //could use .from or .bank here!!!!
+                    List<BankNameVersion> xx = Program.GetInfoFromStringWildcard(s, this.opt_bank);
                     foreach (BankNameVersion bnv in xx)
                     {                        
                         if (addbank)
@@ -4610,6 +4620,7 @@ namespace Gekko
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
             public List<string> listItems = null;
+            public string opt_bank = null;
             public string opt_param = null;
             public void Exe()
             {
