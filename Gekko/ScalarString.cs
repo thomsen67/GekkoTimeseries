@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Gekko
 {
@@ -49,7 +50,7 @@ namespace Gekko
             bool hit = false;
             int lastEnd = -1;
             for (int j = 0; j < s.Length - 1; j++)
-            {                
+            {
                 bool tilde = (j > 0 && s[j - 1] == Globals.symbolTilde);  // ~%x or ~$x or ~{x}
                 bool isDollarPercent = false;
                 bool isDollar = false;
@@ -57,10 +58,10 @@ namespace Gekko
                 if (j > 0 && s[j - 1] == Globals.symbolDollar[0] && s[j - 0] == Globals.symbolMemvar) isDollarPercent = true;
                 if (j > 1 && s[j - 2] == Globals.symbolTilde && isDollarPercent) tilde = true;  // ~$%x
                 if (s[j] == Globals.symbolDollar[0]) isDollar = true;
-                if (s[j] ==  '{') isCurly = true;
+                if (s[j] == '{') isCurly = true;
                 if (j > 0 && s[j - 1] == Globals.symbolTilde && isDollar) tilde = true;  // ~$x                                
                 if ((s[j] == Globals.symbolMemvar || isDollar) && !tilde)
-                {                    
+                {
                     string variable = null;
                     int end = -1;
                     for (int jj = j + 1; jj < s.Length; jj++)
@@ -78,10 +79,10 @@ namespace Gekko
                     if (end == -1) end = s.Length;
                     variable = s.Substring(j + 1, end - (j + 1));
                     if (variable.Length > 0)
-                    {                        
+                    {
                         try
                         {
-                            IVariable a = O.GetScalar(variable, false);                                                        
+                            IVariable a = O.GetScalar(variable, false);
                             if (a.Type() == EVariableType.String || a.Type() == EVariableType.Date || a.Type() == EVariableType.Val)
                             {
                                 bool valfail = false;
@@ -129,7 +130,7 @@ namespace Gekko
                 else if (isCurly && !tilde)  //curly is at position j
                 {
                     string variable = null;
-                    int end = -1;                    
+                    int end = -1;
                     for (int jj = j + 1; jj < s.Length; jj++)
                     {
                         if (s[jj] == '}')
@@ -143,7 +144,7 @@ namespace Gekko
                         variable = s.Substring(j + 1, end - (j + 1)).Trim();
                         if (variable.StartsWith(Globals.symbolMemvar.ToString())) variable = variable.Substring(1);
                         if (G.IsSimpleToken(variable))
-                        {                            
+                        {
                             try
                             {
                                 IVariable a = O.GetScalar(variable, false);
@@ -151,10 +152,10 @@ namespace Gekko
                                 {
                                     IVariable b = new ScalarString("");
                                     IVariable c = b.Add(a, Globals.tNull);
-                                    string s3 = c.GetString();                                    
+                                    string s3 = c.GetString();
                                     string s4 = s.Substring(lastEnd + 1, j - lastEnd - 1);
                                     s2 += s4 + s3;
-                                    hit = true;                                    
+                                    hit = true;
                                 }
                                 else
                                 {
@@ -168,11 +169,11 @@ namespace Gekko
                             lastEnd = end;
                             j = lastEnd;
                         }
-                    }                    
+                    }
                 }
             }
             if (hit)
-            {                
+            {
                 s2 += s.Substring(lastEnd + 1, s.Length - lastEnd - 1);
                 s = s2;
             }
@@ -188,7 +189,14 @@ namespace Gekko
             //Hmmm, in 'Hej~%s|du', this will become 'Hej%sdu', not 'Hej%s|du'
             //This is maybe not too good, but never mind            
             string concat = new string(Globals.symbolConcatenation, 1);
+
+            //The following 3 lines remove single '|', but not double '||'.
+            //Could use regex, but this is ok.
+            //This means that PRT f|e will be fe, but show [1 || 2] keeps the '||'.
+            s = s.Replace(concat + concat, "[<{2concats}>]");
             s = s.Replace(concat, "");
+            s = s.Replace("[<{2concats}>]", concat + concat);
+
             return s;
         }
         
