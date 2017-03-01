@@ -384,7 +384,7 @@ namespace UnitTests
                 I("OPTION freq a;");
                 I("MODEL pchy;");
                 I("CREATE x; SER <2010 2011> x = 200, 202;");
-                I("FOR val i = 1 to 9; CREATE y{i}; SER <2010 2010> y{i} = 100; END;");
+                I("FOR val i = 1 to 10; CREATE y{i}; SER <2010 2010> y{i} = 100; END;");
                 I("SIM <2011 2011>;");
 
                 AssertHelper(First(), "y1", 2011, 100d * ((0.5d * (202d / 200d - 1d) * 100d + 1d) / 100d + 1d), sharedDelta);
@@ -397,6 +397,7 @@ namespace UnitTests
                 AssertHelper(First(), "y7", 2011, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
                 AssertHelper(First(), "y8", 2011, Math.Exp(0.5d * Math.Log(202d / 200d) + 1d + Math.Log(100d)), sharedDelta);
                 AssertHelper(First(), "y9", 2011, 0.5d * 200d + 1d, sharedDelta);
+                AssertHelper(First(), "y10", 2011, 2d, sharedDelta);
 
                 if (i == 0) Program.Flush(); //wipes out existing cached models
 
@@ -405,7 +406,7 @@ namespace UnitTests
                 I("OPTION freq q;");
                 I("MODEL pchy;");
                 I("CREATE x; SER <2010q1 2011q1> x = 200, 1, 2, 3, 202;");
-                I("FOR val i = 1 to 9; CREATE y{i}; SER <2010q4 2010q4> y{i} = 7; SER <2010q1 2010q1> y{i} = 100; END;");
+                I("FOR val i = 1 to 10; CREATE y{i}; SER <2010q4 2010q4> y{i} = 7; SER <2010q1 2010q1> y{i} = 100; END;");
                 I("SIM <2011q1 2011q1>;");
 
                 AssertHelper(First(), "y1", EFreq.Quarterly, 2011, 1, 100d * ((0.5d * (202d / 200d - 1d) * 100d + 1d) / 100d + 1d), sharedDelta);
@@ -2994,6 +2995,10 @@ namespace UnitTests
             AssertHelper(First(), "xx5", 2010, double.NaN, sharedDelta);
             AssertHelper(First(), "xx5", 2011, double.NaN, sharedDelta);
             AssertHelper(First(), "xx5", 2012, 100d, sharedDelta);
+            I("SERIES xx6 = dif(gdp) + dif(gdp);");
+            AssertHelper(First(), "xx6", 2010, double.NaN, sharedDelta);
+            AssertHelper(First(), "xx6", 2011, 2d, sharedDelta);
+            AssertHelper(First(), "xx6", 2012, 2d, sharedDelta);
 
             //I("SERIES ");
         }

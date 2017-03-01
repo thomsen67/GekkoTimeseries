@@ -1526,7 +1526,7 @@ namespace Gekko.Parser.Gek
                                     }
                                     else
                                     {
-                                        parentTimeLoop.timeLoopNestCode = sb1;
+                                        parentTimeLoop.timeLoopNestCode += sb1.ToString();
                                     }
 
                                     node.Code.A("O.HandleLags(`" + functionName + "`, " + storageName + ", " + lag1Code + ", " + lag2Code + ")");
@@ -3941,7 +3941,7 @@ namespace Gekko.Parser.Gek
             string nodeCode = Globals.startGekkoTimeIteratorCode;
             //if (w.wh.timeLoopCode != null) nodeCode += w.wh.timeLoopCode.ToString();
 
-            if (node.timeLoopNestCode != null) nodeCode += node.timeLoopNestCode.ToString();
+            if (node.timeLoopNestCode != null) nodeCode += node.timeLoopNestCode;
                       
             return nodeCode;
         }
