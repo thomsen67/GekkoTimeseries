@@ -570,28 +570,50 @@ namespace Gekko
         {
             Matrix m1 = O.GetMatrix(x1);
             Matrix m2 = O.GetMatrix(x2);
+            bool fixedRow1 = false;
+            bool fixedCol1 = false;
             if (m1.data.GetLength(0) != m2.data.GetLength(0))
             {
-                G.Writeln2("*** ERROR: " + type.ToString() + "(): There are " + m1.data.GetLength(0) + " and " + m2.data.GetLength(0) + " rows in the matrices");
-                throw new GekkoException();
+                if (m2.data.GetLength(0) != 1)
+                {
+                    G.Writeln2("*** ERROR: " + type.ToString() + "(): There are " + m1.data.GetLength(0) + " and " + m2.data.GetLength(0) + " rows in the matrices");
+                    throw new GekkoException();
+                }
+                else
+                {
+                    //for instance div ( 2x3 , 1x3 ) --> use fixed row 1 instead of i
+                    fixedRow1 = true;
+                }
             }
             if (m1.data.GetLength(1) != m2.data.GetLength(1))
             {
-                G.Writeln2("*** ERROR: " + type.ToString() + "(): There are " + m1.data.GetLength(1) + " and " + m2.data.GetLength(1) + " cols in the matrices");
-                throw new GekkoException();
+                if (m2.data.GetLength(1) != 1)
+                {
+                    G.Writeln2("*** ERROR: " + type.ToString() + "(): There are " + m1.data.GetLength(1) + " and " + m2.data.GetLength(1) + " cols in the matrices");
+                    throw new GekkoException();
+                }
+                else
+                {                    
+                    //for instance div ( 2x3 , 2x1 ) --> use fixed column 1 instead of j
+                    fixedCol1 = true;
+                }
             }
             Matrix m = new Matrix(m1.data.GetLength(0), m1.data.GetLength(1));
             for (int i = 0; i < m1.data.GetLength(0); i++)
             {
                 for (int j = 0; j < m1.data.GetLength(1); j++)
                 {
+                    int ii = i;
+                    int jj = j;
+                    if (fixedRow1) ii = 0; //internal arrays are 0-based
+                    if (fixedCol1) jj = 0; //internal arrays are 0-based
                     if (type == EElementByElementType.Times)
-                    {
-                        m.data[i, j] = m1.data[i, j] * m2.data[i, j];
+                    {                        
+                        m.data[i, j] = m1.data[i, j] * m2.data[ii, jj];
                     }
                     else if (type == EElementByElementType.Divide)
                     {
-                        m.data[i, j] = m1.data[i, j] / m2.data[i, j];
+                        m.data[i, j] = m1.data[i, j] / m2.data[ii, jj];
                     }
                 }
             }

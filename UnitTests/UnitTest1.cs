@@ -7878,6 +7878,78 @@ namespace UnitTests
             AssertHelperMatrix("c", 2, 3, 6d / 7d, sharedDelta);
             FAIL("MATRIX c = multiply(#a, #b1);");
             FAIL("MATRIX c = multiply(#a, #b2);");
+            //Special 1
+            I("RESET;");
+            I("MATRIX a = [1, 2, 3 || 4, 5, 6];");
+            I("MATRIX b = [2, 3, 4];");            
+            I("MATRIX c = multiply(#a, #b);"); 
+            AssertHelperMatrix("c", "rows", 2);
+            AssertHelperMatrix("c", "cols", 3);
+            AssertHelperMatrix("c", 1, 1, 1d * 2d, sharedDelta);
+            AssertHelperMatrix("c", 1, 2, 2d * 3d, sharedDelta);
+            AssertHelperMatrix("c", 1, 3, 3d * 4d, sharedDelta);
+            AssertHelperMatrix("c", 2, 1, 4d * 2d, sharedDelta);
+            AssertHelperMatrix("c", 2, 2, 5d * 3d, sharedDelta);
+            AssertHelperMatrix("c", 2, 3, 6d * 4d, sharedDelta);
+            FAIL("MATRIX c = multiply(#b, #a);");  //not the other way around
+            I("MATRIX c = divide(#a, #b);");
+            AssertHelperMatrix("c", "rows", 2);
+            AssertHelperMatrix("c", "cols", 3);
+            AssertHelperMatrix("c", 1, 1, 1d / 2d, sharedDelta);
+            AssertHelperMatrix("c", 1, 2, 2d / 3d, sharedDelta);
+            AssertHelperMatrix("c", 1, 3, 3d / 4d, sharedDelta);
+            AssertHelperMatrix("c", 2, 1, 4d / 2d, sharedDelta);
+            AssertHelperMatrix("c", 2, 2, 5d / 3d, sharedDelta);
+            AssertHelperMatrix("c", 2, 3, 6d / 4d, sharedDelta);
+            FAIL("MATRIX c = divide(#b, #a);");  //not the other way around
+            //Special 2
+            I("RESET;");
+            I("MATRIX a = [1, 2, 3 || 4, 5, 6];");
+            I("MATRIX b = [2 || 3];");
+            I("MATRIX c = multiply(#a, #b);");
+            AssertHelperMatrix("c", "rows", 2);
+            AssertHelperMatrix("c", "cols", 3);
+            AssertHelperMatrix("c", 1, 1, 1d * 2d, sharedDelta);
+            AssertHelperMatrix("c", 1, 2, 2d * 2d, sharedDelta);
+            AssertHelperMatrix("c", 1, 3, 3d * 2d, sharedDelta);
+            AssertHelperMatrix("c", 2, 1, 4d * 3d, sharedDelta);
+            AssertHelperMatrix("c", 2, 2, 5d * 3d, sharedDelta);
+            AssertHelperMatrix("c", 2, 3, 6d * 3d, sharedDelta);
+            FAIL("MATRIX c = multiply(#b, #a);");  //not the other way around            
+            I("MATRIX c = divide(#a, #b);");
+            AssertHelperMatrix("c", "rows", 2);
+            AssertHelperMatrix("c", "cols", 3);
+            AssertHelperMatrix("c", 1, 1, 1d / 2d, sharedDelta);
+            AssertHelperMatrix("c", 1, 2, 2d / 2d, sharedDelta);
+            AssertHelperMatrix("c", 1, 3, 3d / 2d, sharedDelta);
+            AssertHelperMatrix("c", 2, 1, 4d / 3d, sharedDelta);
+            AssertHelperMatrix("c", 2, 2, 5d / 3d, sharedDelta);
+            AssertHelperMatrix("c", 2, 3, 6d / 3d, sharedDelta);
+            FAIL("MATRIX c = divide(#b, #a);");  //not the other way around
+            //Special 3
+            I("RESET;");
+            I("MATRIX a = [1, 2, 3 || 4, 5, 6];");
+            I("MATRIX b = [2];");
+            I("MATRIX c = multiply(#a, #b);");
+            AssertHelperMatrix("c", "rows", 2);
+            AssertHelperMatrix("c", "cols", 3);
+            AssertHelperMatrix("c", 1, 1, 1d * 2d, sharedDelta);
+            AssertHelperMatrix("c", 1, 2, 2d * 2d, sharedDelta);
+            AssertHelperMatrix("c", 1, 3, 3d * 2d, sharedDelta);
+            AssertHelperMatrix("c", 2, 1, 4d * 2d, sharedDelta);
+            AssertHelperMatrix("c", 2, 2, 5d * 2d, sharedDelta);
+            AssertHelperMatrix("c", 2, 3, 6d * 2d, sharedDelta);
+            FAIL("MATRIX c = multiply(#b, #a);");  //not the other way around            
+            I("MATRIX c = divide(#a, #b);");
+            AssertHelperMatrix("c", "rows", 2);
+            AssertHelperMatrix("c", "cols", 3);
+            AssertHelperMatrix("c", 1, 1, 1d / 2d, sharedDelta);
+            AssertHelperMatrix("c", 1, 2, 2d / 2d, sharedDelta);
+            AssertHelperMatrix("c", 1, 3, 3d / 2d, sharedDelta);
+            AssertHelperMatrix("c", 2, 1, 4d / 2d, sharedDelta);
+            AssertHelperMatrix("c", 2, 2, 5d / 2d, sharedDelta);
+            AssertHelperMatrix("c", 2, 3, 6d / 2d, sharedDelta);
+            FAIL("MATRIX c = divide(#b, #a);");  //not the other way around
 
             // -------------- zeros(), ones()
 
