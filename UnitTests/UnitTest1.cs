@@ -2906,11 +2906,12 @@ namespace UnitTests
 
             Databank work = First();
             I("RESET;");
-            I("CREATE gdp, x;");
+            I("CREATE gdp, x, a;");
             I("TIME 2010 2012;");
             I("SERIES<2010 2010> gdp = 100;");
-            I("SERIES<2011 2012> gdp ^ 1;");
-            I("SERIES<2010 2012> x = 1;");
+            I("SERIES<2011 2012> gdp ^ 1;");  //100, 101, 102
+            I("SERIES<2010 2012> x = 1;");            
+            I("SERIES<2009 2012> a = 10 13 17 25;");
                         
             I("SERIES xx1 = dlog(gdp);");
             AssertHelper(First(), "xx1", 2010, double.NaN, sharedDelta);
@@ -2999,6 +3000,19 @@ namespace UnitTests
             AssertHelper(First(), "xx6", 2010, double.NaN, sharedDelta);
             AssertHelper(First(), "xx6", 2011, 2d, sharedDelta);
             AssertHelper(First(), "xx6", 2012, 2d, sharedDelta);
+            I("SERIES xx7 = dif(a) + dif(a[-1]);");  //10 13 17 25 from 2009-12, dif(a) -> m, 3, 4, 8, dif(a.1) -> m, m, 3, 4
+            AssertHelper(First(), "xx7", 2010, double.NaN, sharedDelta);
+            AssertHelper(First(), "xx7", 2011, 4d + 3d, sharedDelta);
+            AssertHelper(First(), "xx7", 2012, 8d + 4d, sharedDelta);
+            I("SERIES xx8 = dif(a) + dif(dif(a[-1]));");  //10 13 17 25 from 2009-12, dif(a) -> m, 3, 4, 8, dif(dif(a.1)) -> m, m, m, 1
+            AssertHelper(First(), "xx8", 2010, double.NaN, sharedDelta);
+            AssertHelper(First(), "xx8", 2011, double.NaN, sharedDelta);
+            AssertHelper(First(), "xx8", 2012, 8d + 1d, sharedDelta);
+            I("SERIES<2009 2012> xx9 = 123, 124, 125, 126;");
+            I("SERIES<2012 2012> dif(xx9) = dif(a) + dif(dif(a[-1]));");  //see above
+            AssertHelper(First(), "xx9", 2010, 124d, sharedDelta);
+            AssertHelper(First(), "xx9", 2011, 125d, sharedDelta);
+            AssertHelper(First(), "xx9", 2012, 125d + 8d + 1d, sharedDelta);
 
             //I("SERIES ");
         }
