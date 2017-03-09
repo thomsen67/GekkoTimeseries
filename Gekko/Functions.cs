@@ -9,6 +9,7 @@ namespace Gekko
     {
         //NOTE:
         //NOTE: All function names should be with lower-case only!!
+        //NOTE: All function helpers should be PRIVATE!!
         //NOTE:
 
         public enum EElementByElementType {
@@ -29,6 +30,7 @@ namespace Gekko
         }
 
         //just to test against user defined function
+        //is this used at all???
         public static IVariable sum_test_method(GekkoTime t, IVariable x1, IVariable x2)
         {
             double y1 = x1.GetVal(t);
@@ -79,7 +81,7 @@ namespace Gekko
             return new ScalarString(s);
         }
 
-        public static void HandleLasp(GekkoTuple.Tuple2 tuple, IVariable p, IVariable q) {
+        private void HandleLasp(GekkoTuple.Tuple2 tuple, IVariable p, IVariable q) {
             //This is pretty bad style, but the content of the tuple is put into p and q...
 
             TimeSeries tsp1 = O.GetTimeSeries(p);
@@ -450,7 +452,7 @@ namespace Gekko
             return SumHelper(t, x, ESumDim.Cols, ESumType.Max);
         }
         
-        public static IVariable SumHelper(GekkoTime t, IVariable x, ESumDim dim, ESumType type)
+        private static IVariable SumHelper(GekkoTime t, IVariable x, ESumDim dim, ESumType type)
         {
             Matrix m = O.GetMatrix(x);
             int rows = m.data.GetLength(0);

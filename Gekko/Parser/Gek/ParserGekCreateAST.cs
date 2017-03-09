@@ -9,6 +9,8 @@ using System.Drawing;
 using System.Collections;
 using System.Linq.Expressions;
 using System.Drawing;
+using System.Reflection;
+using System.Reflection.Emit;
 
 namespace Gekko.Parser.Gek
 {
@@ -81,7 +83,7 @@ namespace Gekko.Parser.Gek
             //TODO  
             //TODO
             //EmitCsCodeForCmdHelperStatic helperStatic = new EmitCsCodeForCmdHelperStatic(textInput);
-                        
+
             wh2.fileNameContainingParsedCode = ph.fileName;
 
             ASTNode root = new ASTNode(null);
@@ -91,6 +93,9 @@ namespace Gekko.Parser.Gek
 
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("EMIT cs start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
 
+            Dictionary<string, int> functions = new Dictionary<string, int>();
+            Gekko.Parser.Gek.ParserGekWalkASTAndEmit.FindFunctions(root, functions);                       
+            
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("WALK START");
             Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmit(root, 0, 0, textInput, wh2, p);
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("WALK END");
@@ -102,9 +107,9 @@ namespace Gekko.Parser.Gek
             //if (Globals.testing) G.Writeln(s.ToString(), Color.Gray);
 
             string csCode = s.ToString();
-            string csMethods = null;            
-                        
-            if (Program.options.system_code_split > 0) CodeSplit(ref csCode, ref csMethods);            
+            string csMethods = null;
+
+            if (Program.options.system_code_split > 0) CodeSplit(ref csCode, ref csMethods);
 
             StringBuilder s2 = new StringBuilder();
             s2.AppendLine("using System;");
@@ -114,13 +119,13 @@ namespace Gekko.Parser.Gek
             s2.AppendLine("using System.Drawing;");  //to use Color.Red in G.Writeln()
             s2.AppendLine("using Gekko.Parser;"); //all the AST_Xxx() methods are found in Gekko.Parser.AST.cs
             s2.AppendLine("namespace Gekko");
-            s2.AppendLine("{");            
+            s2.AppendLine("{");
 
             s2.AppendLine("public class TranslatedCode");
             s2.AppendLine("{");
 
             s2.AppendLine("public static GekkoTime globalGekkoTimeIterator = Globals.tNull;");
-            s2.Append(wh2.headerCs);            
+            s2.Append(wh2.headerCs);
 
             s2.AppendLine("public static void ClearTS(P p) {");
             s2.Append(wh2.headerMethodTsCs);
@@ -129,9 +134,9 @@ namespace Gekko.Parser.Gek
             s2.AppendLine("public static void ClearScalar(P p) {");
             s2.Append(wh2.headerMethodScalarCs);
             s2.AppendLine("}");
-            
+
             s2.AppendLine(csMethods);  //definitions of C1(), C2(), etc. -- may be empty
-            
+
             s2.AppendLine("public static void CodeLines(P p)");
             s2.AppendLine("{");
             s2.AppendLine(Globals.gekkoTimeIniCs);
@@ -145,14 +150,14 @@ namespace Gekko.Parser.Gek
 
             ch2.code = s2.ToString().Replace("`", Globals.QT);
             ch2.errors = errors;  //not used?
-            
-            if(Globals.uFunctionStorageCs.Count > 0)
+
+            if (Globals.uFunctionStorageCs.Count > 0)
             {
-                StringBuilder s3 = new StringBuilder();     
-                foreach(string sCode in Globals.uFunctionStorageCs.Values)
+                StringBuilder s3 = new StringBuilder();
+                foreach (string sCode in Globals.uFunctionStorageCs.Values)
                 {
                     s3.Append(sCode);
-                }                                      
+                }
                 ch2.codeUFunctions = s3.ToString().Replace("`", Globals.QT);
             }
 
@@ -166,7 +171,7 @@ namespace Gekko.Parser.Gek
             }
 
             return ch2;
-        }
+        }                
 
         private static void CodeSplit(ref string csCode, ref string csMethods)
         {

@@ -37,10 +37,13 @@ namespace Gekko
         public static void ClearScalar(P p)
         {
         }
+
+       
+
         public static void C0(P p)
         {
 
-            GekkoTime t = Globals.tNull;
+                        GekkoTime t = Globals.tNull;
 
 
             p.SetText(@"¤2");
@@ -177,6 +180,7 @@ namespace Gekko
              "prt";
 
             {
+                
                 List<int> bankNumbers = null;
                 O.Prt.Element ope5 = new O.Prt.Element();
                 ope5.label =

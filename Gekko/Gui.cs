@@ -309,44 +309,7 @@ namespace Gekko
                 Globals.runningOnTTComputer = true;  //for some debugging                
                 G.WritelnGray("DEBUGGING: Seems to be running on TT computer -- some debugging is switched on");
             }
-
-            //if (true && Globals.runningOnTTComputer)
-            //{
-            //    Translators.Translate1();
-            //    return;
-            //}
-
-            if (false)
-            {
-                //Testing nested exeptions
-                try
-                {
-                    Rekur(0);
-                }
-                catch (Exception e)
-                {
-                    {
-                        DialogResult myDialogResult = MessageBox.Show(Globals.guiDialogErrorText, Globals.guiDialogErrorCaption, MessageBoxButtons.YesNo);
-                        if (myDialogResult == DialogResult.Yes) throw;
-                    }
-                }
-
-                try
-                {
-                    Rekur(0);
-                }
-                catch (Exception e)
-                {
-                    DialogResult myDialogResult = MessageBox.Show("question", "caption", MessageBoxButtons.YesNo);
-                    if (myDialogResult == DialogResult.Yes)
-                    {
-                        //yes was clicked
-                        throw;
-                    }
-                }
-
-            }
-
+            
             this.StartThread(" ", true);  //to get a worker thread started
             CrossThreadStuff.SetTab("main", false);
             G.WriteDirs("small", false);
@@ -717,6 +680,9 @@ namespace Gekko
             if (track) MessageBox.Show("26");
             GuiUpdateRecentFilesMenu();
             if (track) MessageBox.Show("27");
+
+            Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();  //uses reflection to do this
+
             //string helpfile = "I_OVERVIEW";
             //try
             //{

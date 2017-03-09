@@ -18173,6 +18173,20 @@ namespace Gekko
             Globals.guiHomeMenuEnabled = false;
         }
 
+        public static Dictionary<string, int> FindGekkoInbuiltFunctions()
+        {
+            Dictionary<string, int> gekkoBuiltInFunctions = new Dictionary<string, int>();
+            Type myType = (typeof(Functions));
+            MethodInfo[] myArrayMethodInfo = myType.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+            for (int i = 0; i < myArrayMethodInfo.Length; i++)
+            {
+                MethodInfo myMethodInfo = (MethodInfo)myArrayMethodInfo[i];
+                string name = myMethodInfo.Name.ToLower();  //should be superfluous
+                if (!gekkoBuiltInFunctions.ContainsKey(name)) gekkoBuiltInFunctions.Add(name, 1);  //1 is just arbitrary                
+            }
+            return gekkoBuiltInFunctions;
+        }
+
         public static void MaybeWriteOpenDatabanks(ref int w, ref int b)
         {
             for (int i = 0; i < Program.databanks.storage.Count; i++)

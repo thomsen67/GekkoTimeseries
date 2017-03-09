@@ -561,6 +561,8 @@ namespace Gekko
 
         public static int guiMainLinePosition = 0;
 
+        public static Dictionary<string, int> gekkoInbuiltFunctions = null;
+
         public static string autoExecCmdFileName = "gekko.ini";
 
         public static string detectedRPath = null;

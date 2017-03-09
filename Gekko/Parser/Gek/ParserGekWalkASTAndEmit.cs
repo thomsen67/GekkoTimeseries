@@ -127,15 +127,15 @@ namespace Gekko.Parser.Gek
         String,
         Val,
         Date
-    }               
-    
+    }
+
     public class ParserGekWalkASTAndEmit
     {
 
         public static readonly GekkoTime tNULL = new GekkoTime(EFreq.Annual, -12345, 1);
 
-        
-        
+
+
         public enum ELastCommand
         {
             Unknown,
@@ -144,6 +144,19 @@ namespace Gekko.Parser.Gek
             String,
             Date
         }
+
+        public static void FindFunctions(ASTNode node, Dictionary<string, int> functions)
+        {
+            if (node.Text == "ASTFUNCTION")
+            {                
+                string functionName = GetFunctionName(node);
+                if (!functions.ContainsKey(functionName)) functions.Add(functionName, 1);  //1 just arbitrary            
+            }
+            foreach (ASTNode child in node.ChildrenIterator())
+            {
+                FindFunctions(child, functions);                
+            }
+        }    
 
         public static void WalkASTAndEmit(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p)
         {            
@@ -1403,14 +1416,13 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTFUNCTION":
                         {
-                            string functionName = node[0].Text.ToLower();  //no string composition allowed for functions.
-                            if (functionName == "string") functionName = "tostring";                            
+                            string functionName = GetFunctionName(node);
 
                             //TODO: Should these just override??? And what if inbuilt function does not exist??
 
                             if (Globals.lagFunctions.Contains(functionName))  //functionName is lower case
                             {
-                                
+
                                 if (Program.options.interface_lagfix)
                                 {
 
@@ -1434,7 +1446,7 @@ namespace Gekko.Parser.Gek
                                                 code = node[1].Code.ToString();
                                             }
                                             break;
-                                        case "lag":                                        
+                                        case "lag":
                                             {
                                                 if (node.ChildrenCount() != 2 + 1)
                                                 {
@@ -1449,7 +1461,7 @@ namespace Gekko.Parser.Gek
                                         case "dif":
                                         case "diff":
                                         case "dlog":
-                                        case "pch":                                        
+                                        case "pch":
                                             {
 
                                                 if (node.ChildrenCount() != 1 + 1)
@@ -1462,7 +1474,7 @@ namespace Gekko.Parser.Gek
                                                 code = node[1].Code.ToString();
                                             }
                                             break;
-                                                                                    
+
                                         case "dify":
                                         case "diffy":
                                         case "dlogy":
@@ -1486,10 +1498,10 @@ namespace Gekko.Parser.Gek
                                                 throw new GekkoException();
                                             }
                                             break;
-                                    }                                                    
+                                    }
 
                                     W temp = w;
-                                    
+
                                     //also remove parent if
                                     //w.headerCs.AppendLine("public static IVariable helper123(GekkoTime t) { return " + code + ";" + "}");
 
@@ -1512,7 +1524,7 @@ namespace Gekko.Parser.Gek
                                     {
                                         sb1.Append(node.timeLoopNestCode);
                                     }
-                                                                        
+
                                     sb1.AppendLine("" + storageName + "[" + counterName + "] = O.GetVal(" + code + ", t);");
                                     sb1.AppendLine("" + counterName + "++;");
 
@@ -1522,7 +1534,7 @@ namespace Gekko.Parser.Gek
                                     if (parentTimeLoop == null)
                                     {
                                         G.Writeln2("*** ERROR: Internal error related to lag functions");
-                                        throw new GekkoException();                                        
+                                        throw new GekkoException();
                                     }
                                     else
                                     {
@@ -1542,7 +1554,7 @@ namespace Gekko.Parser.Gek
                                     string code = node[1].Code.ToString();
 
                                     W temp = w;
-                                                                        
+
                                     //HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA
                                     //HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA
                                     //HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA
@@ -3684,6 +3696,13 @@ namespace Gekko.Parser.Gek
                 }
                 node.Code.A(Globals.splitSTOP);
             }
+        }
+
+        private static string GetFunctionName(ASTNode node)
+        {
+            string functionName = node[0].Text.ToLower();  //no string composition allowed for functions.
+            if (functionName == "string") functionName = "tostring";
+            return functionName;
         }
 
         private static void SearchUpwardsInTreeForParentTimeLoopFunctions(ASTNode node, out int timeLoopDepth, out ASTNode parentTimeLoop)
