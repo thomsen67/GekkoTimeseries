@@ -145,7 +145,7 @@ namespace Gekko.Parser.Gek
             Date
         }
 
-        public static void FindFunctions(ASTNode node, Dictionary<string, int> functions)
+        public static void FindFunctionsUsedInGekkoCode(ASTNode node, Dictionary<string, int> functions)
         {
             if (node.Text == "ASTFUNCTION")
             {                
@@ -154,7 +154,7 @@ namespace Gekko.Parser.Gek
             }
             foreach (ASTNode child in node.ChildrenIterator())
             {
-                FindFunctions(child, functions);                
+                FindFunctionsUsedInGekkoCode(child, functions);                
             }
         }    
 

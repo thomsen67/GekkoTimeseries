@@ -94,7 +94,7 @@ namespace Gekko.Parser.Gek
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("EMIT cs start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
 
             Dictionary<string, int> functions = new Dictionary<string, int>();
-            Gekko.Parser.Gek.ParserGekWalkASTAndEmit.FindFunctions(root, functions);
+            Gekko.Parser.Gek.ParserGekWalkASTAndEmit.FindFunctionsUsedInGekkoCode(root, functions);
             foreach (string function in functions.Keys)
             {
                 if (Globals.uFunctionStorageCs.ContainsKey(function))  //case-insensitive anyway

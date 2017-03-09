@@ -11396,19 +11396,13 @@ namespace Gekko
             s = StripQuotes(s);
             if (run)
             {
+                //always called like this
                 if (!s.Contains("."))
                 {
                     s += "." + Globals.extensionCommand;
                 }
             }
-            else
-            {
-                throw new GekkoException();
-                if (!s.Contains("."))
-                {
-                    s += ".add";
-                }
-            }
+            else throw new GekkoException();            
 
             List<string> folders = new List<string>();
             folders.Add(Program.options.folder_command);
@@ -11421,11 +11415,18 @@ namespace Gekko
             {
                 //calling RUN gekko.ini here manually will fail if the file does not exist, which is fine
                 G.Writeln2("*** ERROR: Could not find file: " + s);
+                if (isLibrary)
+                {
+                    G.Writeln("*** ERROR: A function with that name is used, looking for definition .gcm");
+                }
                 throw new GekkoException();
             }
 
-            Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
-            Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
+            if (!isLibrary)
+            {
+                Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
+                Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
+            }
 
             Program.EmitCodeFromANTLR("", fileName2, isLibrary, p);
 

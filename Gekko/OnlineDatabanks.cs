@@ -93,9 +93,10 @@ namespace Gekko
 
                 string path = Globals.localTempFilesLocation + "\\pc-axis-data.px";
                 DateTime t0 = DateTime.Now;
+
                 using (FileStream fs = Program.WaitForFileStream(path, Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = new StreamWriter(fs, Encoding.UTF8))
-                {                                                                    
+                {
                     G.Writeln2("--> Download of data file start...");
                     HttpWebResponse httpResponse = null;
                     try
@@ -105,13 +106,22 @@ namespace Gekko
                     catch (Exception e)
                     {
                         //timeout errors and the like
-                        G.Writeln2("*** ERROR: Download failed after " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + " with the following error:");                        
+                        G.Writeln2("*** ERROR: Download failed after " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + " with the following error:");
                         G.Writeln("           " + e.Message);
                         throw;
                     }
-                    //It seems the px file is in ANSI/win 1252: the file also reports this at the top: CHARSET="ANSI"; CODEPAGE = "Windows-1252";
-                    //Setting UTF8 here will fail!
+
                     Encoding encoding = System.Text.Encoding.GetEncoding("Windows-1252");
+
+                    //-------- is it possible to make it into a file like this?
+                    //using (Stream output = File.OpenWrite("file.dat"))
+                    //using (Stream input = http.Response.GetResponseStream())
+                    //{
+                    //    input.CopyTo(output);
+                    //}
+
+                    //It seems the px file is in ANSI/win 1252: the file also reports this at the top: CHARSET="ANSI"; CODEPAGE = "Windows-1252";
+                    //Setting UTF8 here will fail!                        
                     using (var streamReader = new StreamReader(httpResponse.GetResponseStream(), encoding))
                     {
                         result = streamReader.ReadToEnd();
@@ -119,6 +129,7 @@ namespace Gekko
                         sw.Flush();
                     }
                 }
+
                 string size = null;
                 if (File.Exists(path))
                 {
@@ -134,20 +145,8 @@ namespace Gekko
                 bool start = false;
                 List<string> lines2 = G.ExtractLinesFromText(result);
                 result = null;  //clearing it
-                //StringBuilder temp = new StringBuilder();
-                //List<string> lines = new List<string>();
-                //foreach (string line in lines2)
-                //{
-                //    temp.Append(line);
-                //    if (line.TrimEnd().EndsWith(";"))
-                //    {
-                //        lines.Add(temp.ToString());
-                //        temp = new StringBuilder();
-                //    }
-                //}
-
+               
                 List<string> codesHeader = new List<string>();
-
                 List<List<string>> codes = new List<List<string>>();
                 List<List<string>> values = new List<List<string>>();
 
@@ -258,16 +257,7 @@ namespace Gekko
                         }
 
                         string s = line;
-                        //s = s.Substring(5);
-                        //if (s.EndsWith(";")) s = s.Substring(0, s.Length - 1);
-                        //read the data
-                        //string[] ss = s.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                        //if (ss.Length != codesCombi.Count * dates.Count)
-                        //{
-                        //    G.Writeln2("*** ERROR: Gekko expected " + codesCombi.Count + " * " + dates.Count + " = " + (codesCombi.Count * dates.Count) + " values, but got " + ss.Length);
-                        //    throw new GekkoException();
-                        //}
-
+                        
                         int sstate = 1;
                         int lastStart = 0;
                         int counter = 0;
