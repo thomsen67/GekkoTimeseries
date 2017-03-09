@@ -1647,6 +1647,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     node.Code.A("Functions." + functionName + "(" + Globals.functionT1Cs + ", ");
                                 }
+
                                 for (int i = 1; i < node.ChildrenCount(); i++)
                                 {
                                     node.Code.A(node[i].Code);
@@ -3502,7 +3503,7 @@ namespace Gekko.Parser.Gek
                                 //string cs1 = "IVariable p" + Num(node) + "= " + node[0][0][2].Code + ";";
                                 //string cs2 = "IVariable q" + Num(node) + " = " + node[0][1][2].Code + ";";
                                 //string cs3 = "GekkoTuple.Tuple2 temp = " + rhsCode + ";";
-                                node.Code.A("Functions.HandleLasp(" + rhsCode + ", " + node[0][0][2].Code + ", " + node[0][1][2].Code + ");" + G.NL);                            
+                                node.Code.A("Functions.HELPER_HandleLasp(" + rhsCode + ", " + node[0][0][2].Code + ", " + node[0][1][2].Code + ");" + G.NL);                            
                             }
                             else
                             {

@@ -160,6 +160,8 @@ namespace UnitTests
             Globals.globalPeriodStart = new GekkoTime(EFreq.Annual, 2000, 1);
             Globals.globalPeriodEnd = new GekkoTime(EFreq.Annual, 2010, 1);
 
+            Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();  //uses reflection to do this
+
             //Globals.unitTestCounter++;
             //if (Globals.unitTestWindow == null)
             //{

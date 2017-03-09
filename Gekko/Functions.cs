@@ -10,6 +10,8 @@ namespace Gekko
         //NOTE:
         //NOTE: All function names should be with lower-case only!!
         //NOTE: All function helpers should be PRIVATE!!
+        //        --> or if the function must have access from CS code,
+        //            call it HELPER_methodname().
         //NOTE:
 
         public enum EElementByElementType {
@@ -81,7 +83,7 @@ namespace Gekko
             return new ScalarString(s);
         }
 
-        private void HandleLasp(GekkoTuple.Tuple2 tuple, IVariable p, IVariable q) {
+        public static void HELPER_HandleLasp(GekkoTuple.Tuple2 tuple, IVariable p, IVariable q) {
             //This is pretty bad style, but the content of the tuple is put into p and q...
 
             TimeSeries tsp1 = O.GetTimeSeries(p);
