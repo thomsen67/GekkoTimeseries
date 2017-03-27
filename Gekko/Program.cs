@@ -4131,8 +4131,18 @@ namespace Gekko
                 i1++;
                 model.m2.fromEqNumberToBNumberFeedbackNEW[i1] = model.m2.fromEqNumberToBNumber[eq];
             }
-            model.m2.fromBNumberToEqNumberFeedbackNEW = G.CreateArray(1000000, -12345);  //slack
-            Globals.testing = true; //set to 100.000, but...
+
+            try
+            {
+                //TODO: This is a hack, but probably rare with > 1.000.000 b-elements
+                model.m2.fromBNumberToEqNumberFeedbackNEW = G.CreateArray(1000000, -12345);  //slack
+            }
+            catch (Exception e)
+            {
+                G.Writeln2("*** ERROR: Array size problem in MODEL command");
+                throw new GekkoException();
+            }
+
             for (int i = 0; i < model.m2.fromEqNumberToBNumberFeedbackNEW.Length; i++)
             {
                 int j = model.m2.fromEqNumberToBNumberFeedbackNEW[i];
@@ -9672,6 +9682,22 @@ namespace Gekko
                     {
                         CGE.Run();
                         CGE.GamsReader();
+                        return "";   //no need for the parser to chew on this afterwards!
+                    }
+                }
+
+                if (s2.Length == 6)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "deploy"))
+                    {
+                        //Deploy
+                        if (Globals.runningOnTTComputer)
+                        {
+                            Deploy.MainWindow w = new Deploy.MainWindow();
+                            w.SetStartupPath(Application.StartupPath);                            
+                            w.ShowDialog();
+                        }
                         return "";   //no need for the parser to chew on this afterwards!
                     }
                 }

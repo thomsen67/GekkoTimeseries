@@ -107,9 +107,7 @@ namespace Gekko
         public static bool isBetaVersion = false; 
         public static bool isGammaVersion = false; 
         public static bool isPreviewVersion = false; //for preview of 2.0        
-        public static bool testVersion = false;  //SEEMS TO NOT WORK for errors: false in deployment version                                
-        public static bool testing = true;  //just provides a pointer to remove temporary testing stuff  
-
+        
         public static string Work = "Work";
         public static string Ref = "Ref";
 

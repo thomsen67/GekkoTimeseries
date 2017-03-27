@@ -37,8 +37,7 @@ namespace Gekko
             {
                 th = (TimerHelper)data[name];
                 if (th.running)
-                {
-                    if (Globals.testVersion) G.Writeln("*** ERROR in Timer, name =" + name + "already running");
+                {                    
                     return;
                 }                
             }
@@ -64,14 +63,12 @@ namespace Gekko
                     th.millisUntiNow += more;
                 }
                 else
-                {
-                    if (Globals.testVersion) G.Writeln("*** ERROR in Timer, name =" + name + "does not run");
+                {                    
                     return;
                 }
             }
             else
-            {
-                if (Globals.testVersion) G.Writeln("*** ERROR in Timer, name =" + name + " does not exist");
+            {                
                 return;
             }            
             th.running = false;

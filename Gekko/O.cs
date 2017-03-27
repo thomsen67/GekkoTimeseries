@@ -193,9 +193,7 @@ namespace Gekko
                     ((ScalarVal)lhs).val = value;                    
                 }
                 else
-                {
-                    Globals.testing = true;  //FIX THIS: if type changes, scalarCache points to wrong objects...
-                    //The object has to die and be recreated, since it is of a wrong type.                                
+                {                    
                     Program.scalars.Remove(name2);
                     lhs = new ScalarVal(value);
                     Program.scalars.Add(name2, lhs);                    

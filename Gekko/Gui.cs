@@ -218,7 +218,7 @@ namespace Gekko
             //Code to handle unexpected crashes, for instance after hibernation
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.UnhandledException += new UnhandledExceptionEventHandler(CrashHandler);
-                        
+
             //args can be tested in VS, see Gekko project options, debug.
             string noini = null;
             string folder = null;
@@ -257,36 +257,29 @@ namespace Gekko
 
             Application.EnableVisualStyles();
 
-            if (Globals.testVersion == true)
+            try
             {
                 GuiStuff(folder, noini, nogui);
             }
-            else
+            catch (Exception e2)
             {
-
-                try
-                {
-                    GuiStuff(folder, noini, nogui);
-                }
-                catch (Exception e2)
-                {
-                    //This exception is only if Gekko can not even start up...
-                    string stackTrace = Program.GetStackTraceWithOffset(e2);
-                    string s = "";
-                    s += "*** ERROR: Gekko encountered a problem.\n";
-                    s += "\n";
-                    s += "============ System output start =====================\n";
-                    s += "           " + e2.ToString() + "\n";
-                    //s += stackTrace + "\n";
-                    //s += "           " + e2.Message + "\n";
-                    s += "============ System output end =======================\n";
-                    s += "\n";
-                    //MessageBox.Show(s);
-                    WindowMessageBox w = new WindowMessageBox();
-                    w.textBox1.Text = s;
-                    w.ShowDialog();
-                }
+                //This exception is only if Gekko can not even start up...
+                string stackTrace = Program.GetStackTraceWithOffset(e2);
+                string s = "";
+                s += "*** ERROR: Gekko encountered a problem.\n";
+                s += "\n";
+                s += "============ System output start =====================\n";
+                s += "           " + e2.ToString() + "\n";
+                //s += stackTrace + "\n";
+                //s += "           " + e2.Message + "\n";
+                s += "============ System output end =======================\n";
+                s += "\n";
+                //MessageBox.Show(s);
+                WindowMessageBox w = new WindowMessageBox();
+                w.textBox1.Text = s;
+                w.ShowDialog();
             }
+
         }
 
 
@@ -1755,39 +1748,33 @@ namespace Gekko
             this.p = new P();  //keeps track of where thread is
             LongProcess longProcess;
             longProcess = new LongProcess(threadEventStopThread, threadEventThreadStopped, this);
-            if (Globals.testVersion)
-            {
-                longProcess.Run(p);
-            }
-            else
-            {
 
+
+            {
+                string commandLine = longProcess.gekkoGui.threadInput;
+
+                if (true)
                 {
-                    string commandLine = longProcess.gekkoGui.threadInput;
 
-                    if (true)
+                    try
                     {
-
-                        try
+                        longProcess.Run(p);
+                    }
+                    catch (Exception e2)
+                    {
+                        Program.PrintExceptionAndFinishThread(e2, p);
+                        if (!Globals.applicationIsInProcessOfAborting)
                         {
-                            longProcess.Run(p);
+                            Globals.aTimer.Stop();  //otherwise it will blink on
+                            Gui.gui.toolStripStatusLabel3a.Text = " ";
+                            toolStripStatusLabel3.Image = red;
+                            toolStripButton3.Enabled = false;
                         }
-                        catch (Exception e2)
-                        {
-                            Program.PrintExceptionAndFinishThread(e2, p);
-                            if (!Globals.applicationIsInProcessOfAborting)
-                            {
-                                Globals.aTimer.Stop();  //otherwise it will blink on
-                                Gui.gui.toolStripStatusLabel3a.Text = " ";
-                                toolStripStatusLabel3.Image = red;
-                                toolStripButton3.Enabled = false;
-                            }
-                            Program.GekkoExceptionCleanup(p);
-                        }
+                        Program.GekkoExceptionCleanup(p);
                     }
                 }
             }
-        }        
+        } 
 
         // Stop worker thread if it is running.
         // Called when user presses Stop button or form is closed.
