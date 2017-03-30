@@ -665,6 +665,7 @@ ASTOPT_STRING_Y2;
 
 	// --- tokens1 start ---
 	            XLABELS = 'XLABELS';
+				YLABELS = 'YLABELS';
             ANNUAL = 'ANNUAL';
             AT2 = 'AT';
             BETWEEN = 'BETWEEN';
@@ -1193,6 +1194,7 @@ Y2                    = 'Y2'                       ;
 										
 // --- tokens2 start ---
             d.Add("XLABELS", XLABELS);
+			d.Add("YLABELS", YLABELS);
             d.Add("ANNUAL", ANNUAL);
             d.Add("AT", AT2);
             d.Add("BETWEEN", BETWEEN);
@@ -3082,13 +3084,13 @@ optionType :
              | MODEL CACHE '='? yesNoSimple -> MODEL CACHE ^(ASTBOOL yesNoSimple)
 			 | MODEL INFOFILE '='? optionModelInfoFile -> MODEL INFOFILE ^(ASTSTRINGSIMPLE optionModelInfoFile)
 
-			 | PLOT question -> PLOT question
-			 | PLOT DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator ->  PLOT DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
+			 | PLOT question -> PLOT question			 
 			 | PLOT LINES POINTS '='? yesNoSimple -> PLOT LINES POINTS ^(ASTBOOL yesNoSimple )	
 			 | PLOT XLABELS ANNUAL '='? optionPlotXlabels ->  PLOT XLABELS ANNUAL ^(ASTSTRINGSIMPLE optionPlotXlabels)
 			 | PLOT XLABELS DIGITS '='? Integer ->  PLOT XLABELS DIGITS  ^(ASTINTEGER Integer)
 			 | PLOT XLABELS NONANNUAL '='? optionPlotXlabels ->  PLOT XLABELS NONANNUAL ^(ASTSTRINGSIMPLE optionPlotXlabels)
-			 
+			 | PLOT DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator ->  PLOT DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
+
 			 | PLOT NEW '='? yesNoSimple -> PLOT NEW ^(ASTBOOL yesNoSimple )		
 			
 			 | PRINT question -> PRINT question
@@ -3242,6 +3244,7 @@ doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 ident                     : Ident|
                             // --- tokens3 start ---			
             XLABELS|
+			YLABELS|
             ANNUAL|
             AT2|
             BETWEEN|
