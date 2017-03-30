@@ -23333,6 +23333,21 @@ namespace Gekko
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
 
+            //bool isInside = true;
+            //bool test2 = false;
+
+            bool isInside = false;  //corresponds to at
+            if (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)
+            {
+                //annual
+                if (G.equal(Program.options.plot_xlabels_annual, "between")) isInside = true;
+            }
+            else
+            {
+                //nonannual
+                if (G.equal(Program.options.plot_xlabels_nonannual, "between")) isInside = true;
+            }
+
             //https://groups.google.com/forum/#!topic/comp.graphics.apps.gnuplot/csbgSFAbIv4
 
             double zoom = 1d;
@@ -23514,7 +23529,7 @@ namespace Gekko
             double fontsize = ParseIntoDouble(GetText(null, G.isNumericalError(o.opt_fontsize) ? null : o.opt_fontsize.ToString(), null, doc.SelectSingleNode("gekkoplot/fontsize"), "12"));
             string ticsInOut = GetText(null, o.opt_tics, null, doc.SelectSingleNode("gekkoplot/tics"), "out");
             string grid = GetText(null, o.opt_grid, null, doc.SelectSingleNode("gekkoplot/grid"), "yes");  //normally null or "" --> grid. Switch off with <grid>no</grid>                        
-            string key = GetText(null, o.opt_key, null, doc.SelectSingleNode("gekkoplot/key"), "out horiz bot center Left reverse");
+            string key = GetText(null, o.opt_key, null, doc.SelectSingleNode("gekkoplot/key"), "out horiz bot center Left reverse height 1");  //height 1 givers nicer vertical spacing
             string palette = GetText(null, o.opt_palette, null, doc.SelectSingleNode("gekkoplot/palette"), "red,web-green,web-blue,orange,dark-blue,magenta,brown4,dark-violet,grey50,black");
             string stack = GetText(null, o.opt_stack, null, doc.SelectSingleNode("gekkoplot/stack"), "no");  //default: no, #23475432985    
             double boxwidth = ParseIntoDouble(GetText(null, G.isNumericalError(o.opt_boxwidth) ? null : o.opt_boxwidth.ToString(), null, doc.SelectSingleNode("gekkoplot/boxwidth"), "0.75"));
@@ -23653,11 +23668,20 @@ namespace Gekko
             // ---------------------------------------
             // ---------------------------------------
             
-            string discard = PlotHandleLines(true, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, quarterFix, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, linetypes, dashtypes, linewidths, linecolors, pointtypes, pointsizes, fillstyles, y2s, linewidthCorrection, pointsizeCorrection);
+            string discard = PlotHandleLines(true, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, quarterFix, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, linetypes, dashtypes, linewidths, linecolors, pointtypes, pointsizes, fillstyles, y2s, linewidthCorrection, pointsizeCorrection, isInside);
             
             StringBuilder txt = new StringBuilder();
 
+            //double gap = 0.80; double magic = 1.7;
+            //double gap = 0.50; double magic = 1.2;
+            //double gap = 0.30; double magic = 1.15;
+            //double gap = 0.20; double magic = 1.10;
+            //double gap = 0.10; double magic = 1.10;
+
+            //if (test) txt.AppendLine("set size 1.0, " + (1 - gap));
+            //if (test) txt.AppendLine("set origin 0.0, " + gap);
             txt.AppendLine("set size " + zoom + "," + zoom + "");
+
             txt.AppendLine("set encoding iso_8859_1");
             txt.AppendLine("set format y " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
             txt.AppendLine("set format y2 " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
@@ -23699,21 +23723,16 @@ namespace Gekko
             
             txt.AppendLine("set terminal " + pplotType + enhanced + " font '" + font + "," + (zoom * fontsize) + "'"); ;
             txt.AppendLine("set output \"" + file2 + "\"");
+                       
+            
             txt.AppendLine("set key " + key);
-
-            string subtitle2 = null;
-            if (!NullOrEmpty(subtitle)) subtitle2 = subtitle;
-            if (!NullOrEmpty(o.opt_subtitle)) subtitle2 = o.opt_subtitle;
-            if (!NullOrEmpty(subtitle2)) subtitle2 = "\\n{/*0.80 " + subtitle2 + "}";
-
-            string title2 = null;
-            if (!NullOrEmpty(title)) title2 = title;
-            if (!NullOrEmpty(o.opt_title)) title2 = o.opt_title;
-            if (!NullOrEmpty(title2)) txt.AppendLine("set title " + Globals.QT + EncodeDanish(GnuplotText(title2 + subtitle2)) + Globals.QT);
-
-            
             
 
+            if (G.equal(Program.options.plot_decimalseparator, "comma"))
+            {
+                txt.AppendLine("set decimalsign ','");
+            }
+            
             if (G.equal(pplotType, "emf"))
             {
                 fontfactor = 1.4d / 1.2d;
@@ -23766,6 +23785,7 @@ namespace Gekko
             }
             else
             {
+                //annual or undated
                 if (numberOfObs > 70)
                 {
                     txt.AppendLine("set xtics 10");
@@ -23778,11 +23798,13 @@ namespace Gekko
                 }
             }
 
-            txt.AppendLine("set tic scale 1.4, 0.7");
-            txt.AppendLine("set xtics nomirror " + ticsInOut);
+            //txt.AppendLine("set xtic scale 1.7, 0.85");
+            txt.AppendLine("set xtic scale 2, 0.7");
+            txt.AppendLine("set xtics nomirror " + ticsInOut + "");
 
             if (NotNullAndNotNo(xzeroaxis)) txt.AppendLine("set xzeroaxis lt -1"); //draws x axis. May get ugly if residuals are present.
 
+            bool setTitlePlaceholder = false;
             if (numberOfY2s == 0 && !isSeparated)
             {
                 //the y2 axis is just mirrored
@@ -23790,28 +23812,34 @@ namespace Gekko
                 {
                     txt.AppendLine("set ytics nomirror " + ticsInOut);
                     txt.AppendLine("set border 3");
-                    if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
+                    //if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
+                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, true);
+                   
                 }
                 else if (ymirror == "1")  //y2 axis
                 {
                     txt.AppendLine("set ytics " + ticsInOut);
                     txt.AppendLine("set border 11");
-                    if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
+                    //if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
+                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, true);
                 }
                 else if (ymirror == "2")  //y2 axis and y2 tics
                 {
                     txt.AppendLine("set ytics " + ticsInOut);
                     txt.AppendLine("set y2tics " + ticsInOut);
                     txt.AppendLine("set border 11");
-                    if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
+                    //if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
+                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, true);
                 }
                 else if (ymirror == "3")
                 {
                     txt.AppendLine("set ytics " + ticsInOut);  //y2 axis and y2 tics and y2 label
                     txt.AppendLine("set y2tics " + ticsInOut);
                     txt.AppendLine("set border 11");
-                    if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
-                    if (!NullOrEmpty(ytitle)) txt.AppendLine("set y2label \"" + GnuplotText(ytitle) + "\"");
+                    //if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
+                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, true);
+                    //if (!NullOrEmpty(ytitle)) txt.AppendLine("set y2label \"" + GnuplotText(ytitle) + "\"");
+                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, false);
                 }
             }
             else
@@ -23820,29 +23848,48 @@ namespace Gekko
                 txt.AppendLine("set ytics nomirror " + ticsInOut);
                 txt.AppendLine("set y2tics " + ticsInOut);
                 txt.AppendLine("set border 11");
-                if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
-                if (!NullOrEmpty(y2title)) txt.AppendLine("set y2label \"" + GnuplotText(y2title) + "\"");
+                //if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
+                if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, true);
+                //if (!NullOrEmpty(y2title)) txt.AppendLine("set y2label \"" + GnuplotText(y2title) + "\"");
+                if (!NullOrEmpty(y2title)) setTitlePlaceholder = SetYAxisText(y2title, txt, false);
                 if (NotNullAndNotNo(x2zeroaxis) || isSeparated) txt.AppendLine("set x2zeroaxis lt -1");  //draws x axis for y2=0, #23475432985 
             }
+
+            //must be after labels
+            string subtitle2 = null;
+            if (!NullOrEmpty(subtitle)) subtitle2 = subtitle;
+            if (!NullOrEmpty(o.opt_subtitle)) subtitle2 = o.opt_subtitle;
+            if (!NullOrEmpty(subtitle2)) subtitle2 = "\\n{/*0.80 " + subtitle2 + "}";
+            string title2 = null;
+            if (!NullOrEmpty(title)) title2 = title;
+            if (!NullOrEmpty(o.opt_title)) title2 = o.opt_title;
+            if (!NullOrEmpty(title2))
+            {
+                txt.AppendLine("set title " + Globals.QT + EncodeDanish(GnuplotText(title2 + subtitle2)) + Globals.QT);
+            }
+            else
+            {
+                if (setTitlePlaceholder) txt.AppendLine("set title " + Globals.QT + " " + Globals.QT);
+            }            
 
             foreach (string s in xlines)
             {
                 GekkoTime gt = G.FromStringToDate(s);
-                double d = G.FromDateToFloating(gt);
+                double d = G.FromDateToFloating(gt) + GetXAdjustmentForInsideTics(isInside);                
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
             foreach (string s in xlinebefores)
             {
                 GekkoTime gt = G.FromStringToDate(s);
-                double d = (G.FromDateToFloating(gt) + G.FromDateToFloating(gt.Add(-1))) / 2d;
+                double d = (G.FromDateToFloating(gt) + G.FromDateToFloating(gt.Add(-1))) / 2d + GetXAdjustmentForInsideTics(isInside);
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
             foreach (string s in xlineafters)
             {
                 GekkoTime gt = G.FromStringToDate(s);
-                double d = (G.FromDateToFloating(gt) + G.FromDateToFloating(gt.Add(1))) / 2d;
+                double d = (G.FromDateToFloating(gt) + G.FromDateToFloating(gt.Add(1))) / 2d + +GetXAdjustmentForInsideTics(isInside);
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
@@ -23861,17 +23908,123 @@ namespace Gekko
                 }
             }
 
-            if (!G.equal(grid, "no"))  //it can be an empty <grid/>
+            if (G.equal(grid, "yes"))  //it can be an empty <grid/>
             {
                 txt.AppendLine("set style line 102 lc rgb '#f0f0f0' lt 1 lw 1");  //lt 0 or dt 3 gives ugly lines when viewed in Gekko
-                txt.AppendLine("set grid back ls 102");
+                txt.AppendLine("set grid back ls 102");                
+            }
+            else if (G.equal(grid, "yline"))
+            {
+                txt.AppendLine("set style line 102 lc rgb '#f0f0f0' lt 1 lw 1");  //lt 0 or dt 3 gives ugly lines when viewed in Gekko
+                txt.AppendLine("set grid ytics back ls 102");                
+            }
+            else if (G.equal(grid, "xline")) 
+            {
+                txt.AppendLine("set style line 102 lc rgb '#f0f0f0' lt 1 lw 1");  //lt 0 or dt 3 gives ugly lines when viewed in Gekko                
+                txt.AppendLine("set grid xtics back ls 102");
             }
 
-            int mxtics = -12345;
-            string ticsTxt = null;
-            mxtics = HandleXTics(quarterFix, labels1, labels2, ref ticsTxt, mxtics);
-            if (ticsTxt != null) txt.AppendLine(ticsTxt);
+            if (isInside)
+            {
 
+                //TODO: if there are too many minor tics, turn them off
+                //TODO: if years get too cramped, show every second (even)
+                //TODO: if years get too cramped, show only 15, 16, 17, not 2015, 2016, 2017
+                //TODO: if years are still very cramped, switch to isInside = false!
+
+                //??? what about mixed freqs?? They can either be (a) only annual at-tics, and q and m are without tics
+                //                                             or (b) between-tics, showing highest freq if not too many minor, else next-highest.
+                //    with mixed freqs we treat is as highest frequency plot, and sneak in the lower freqs.
+                //OPTION plot xlabels nonannual = at | between | auto ;  //auto will start with between and then jump to at
+                //OPTION plot xlabels annual    = at | between | auto ;  //auto will start with between and then jump to at
+                //OPTION plot xlabels between truncate = digits | skip | both | auto ; 
+
+                double extra = 0;
+
+                int t1 = o.t1.super;
+                int t2 = o.t2.super;
+                //txt.AppendLine("set xtics " + (t1 - 1) + ",1," + (t2 + 0) + "");
+                int sub = 1;
+                if (Program.options.freq == EFreq.Quarterly)
+                {
+                    sub = 4;
+                    extra = (double)o.t2.sub / (double)sub;
+                }
+                else if (Program.options.freq == EFreq.Monthly)
+                {
+                    sub = 12;
+                    extra = (double)o.t2.sub / (double)sub;
+                }
+                else
+                {
+                    sub = 1;
+                    extra = 1;
+                }
+
+                bool deduct = false;
+                if (extra <= 0.40) deduct = true;            
+
+                if (Program.options.plot_xlabels_digits != 4 && Program.options.plot_xlabels_digits != 2)
+                {
+                    G.Writeln2("*** ERROR: 'OPTION plot xlabels digits' should be either 4 or 2");
+                    throw new GekkoException();
+                }
+
+                string ss = null;
+                for (int t = t1; t <= t2; t++)
+                {
+                    int years = t2 - t1 + 1;
+                    bool twoDigits = false;
+                    if (Program.options.plot_xlabels_digits == 2) twoDigits = true;
+
+                    int skip = 1;
+                    if (twoDigits)
+                    {
+                        if (years > 2 * 48) skip = 10;
+                        else if (years > 48) skip = 5;
+                        else if (years > 24) skip = 2;                        
+                    }
+                    else
+                    {
+                        //4 digits
+                        if (years > 2 * 24) skip = 10;
+                        else if (years > 24) skip = 5;
+                        else if (years > 12) skip = 2;                        
+                    }
+
+                    string tx = t.ToString();
+                    if (twoDigits) tx = (t % 100).ToString().PadLeft(2, '0');
+
+                    if (skip > 1 && t % skip != 0) tx = null;  //all uneven are zapped
+
+                    if (deduct && t == t2) tx = null;
+
+                    string tlabel = "\"" + tx + "\"";
+                    
+                    ss += tlabel + " " + t + " " + "0, ";  //0 is major tic
+                    if ((Program.options.freq == EFreq.Monthly && years <= 25) || (Program.options.freq == EFreq.Quarterly && years <= 75))
+                    {
+                        for (int tt = 1; tt < sub; tt++)  //is skipped if sub = 1
+                        {
+                            double d = (double)tt / (double)sub;
+                            ss += (t + d) + " " + "1, ";  //1 is minor tic
+                        }
+                    }
+                }
+
+                //txt.AppendLine("set mxtics " + sub);
+
+                txt.AppendLine("set xtics (" + ss + ")");
+                txt.AppendLine("set xtics offset first 0.5, first 0");  //moves xtic labels a half year to the right, but not the tic itself
+                
+            }
+            else
+            {
+                int mxtics = -12345;
+                string ticsTxt = null;
+                mxtics = HandleXTics(quarterFix, labels1, labels2, ref ticsTxt, mxtics);
+                if (ticsTxt != null) txt.AppendLine(ticsTxt);
+            }
 
             if (o.opt_plotcode != null)
             {
@@ -23915,7 +24068,7 @@ namespace Gekko
             //          SECOND PASS
             // ---------------------------------------
             // ---------------------------------------
-            string plotline = PlotHandleLines(false, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, quarterFix, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, linetypes, dashtypes, linewidths, linecolors, pointtypes, pointsizes, fillstyles, y2s, linewidthCorrection, pointsizeCorrection);
+            string plotline = PlotHandleLines(false, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, quarterFix, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, linetypes, dashtypes, linewidths, linecolors, pointtypes, pointsizes, fillstyles, y2s, linewidthCorrection, pointsizeCorrection, isInside);
 
             txt.AppendLine(plotline);
 
@@ -24062,7 +24215,16 @@ namespace Gekko
             }
         }
 
-        private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, int quarterFix, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<string> linetypes, List<string> dashtypes, List<double> linewidths, List<string> linecolors, List<string> pointtypes, List<double> pointsizes, List<string> fillstyles, List<string> y2s, double linewidthCorrection, double pointsizeCorrection)
+        private static bool SetYAxisText(string ytitle, StringBuilder txt, bool isLeft)
+        {
+            bool setTitlePlaceholder;
+            setTitlePlaceholder = true; //to make space
+            if (isLeft) txt.AppendLine("set label \"" + GnuplotText(ytitle) + "\" at graph 0, graph 1 offset -2,2 left");
+            else txt.AppendLine("set label \"" + GnuplotText(ytitle) + "\" at graph 1, graph 1 offset -2,2 left");
+            return setTitlePlaceholder;
+        }
+
+        private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, int quarterFix, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<string> linetypes, List<string> dashtypes, List<double> linewidths, List<string> linecolors, List<string> pointtypes, List<double> pointsizes, List<string> fillstyles, List<string> y2s, double linewidthCorrection, double pointsizeCorrection, bool isInside)
         {
             string plotline = "plot ";
 
@@ -24232,7 +24394,14 @@ namespace Gekko
                             }
                         }
                         if (ss != null && ss.EndsWith("+")) ss = ss.Substring(0, ss.Length - 1); //remove last '+'                       
-                        xAdjustment = "" + (quarterFix + 1) + ":(" + ss + ")" + ":(" + d_width3 + ")";
+                        if (isInside)
+                        {
+                            xAdjustment = "($" + (quarterFix + 1) + "+" + GetXAdjustmentForInsideTics(isInside) + ")(" + ss + ")" + ":(" + d_width3 + ")";
+                        }
+                        else
+                        {
+                            xAdjustment = "" + (quarterFix + 1) + ":(" + ss + ")" + ":(" + d_width3 + ")";
+                        }
                     }
                     else
                     {
@@ -24244,7 +24413,14 @@ namespace Gekko
                             d = Math.Abs(d);
                             minus = "-";
                         }
-                        xAdjustment = "($" + (quarterFix + 1) + " " + minus + d + "):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
+                        if (isInside)
+                        {
+                            xAdjustment = "($" + (quarterFix + 1) + " " + minus + d + "+" + GetXAdjustmentForInsideTics(isInside) + "):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
+                        }
+                        else
+                        {
+                            xAdjustment = "($" + (quarterFix + 1) + " " + minus + d + "):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
+                        }                        
                     }
                 }
                 else if (G.equal(linetype, "filledcurve") || G.equal(linetype, "filledcurves"))
@@ -24286,11 +24462,25 @@ namespace Gekko
                             }
                         }
                         if (ss != null && ss.EndsWith("+")) ss = ss.Substring(0, ss.Length - 1);  //remove last '+'                       
-                        xAdjustment = "" + (quarterFix + 1) + ":(" + ss + ")";
+                        if (isInside)
+                        {
+                            xAdjustment = "($" + (quarterFix + 1) + "+" + GetXAdjustmentForInsideTics(isInside) + "):(" + ss + ")";
+                        }
+                        else
+                        {
+                            xAdjustment = "" + (quarterFix + 1) + ":(" + ss + ")";
+                        }
                     }
                     else
-                    {                        
-                        xAdjustment = "" + (quarterFix + 1) + ":" + (i + quarterFix + 2);  //just normal positioning
+                    {
+                        if (isInside)
+                        {
+                            xAdjustment = "($" + (quarterFix + 1) + "+" + GetXAdjustmentForInsideTics(isInside) + "):" + (i + quarterFix + 2);  //just normal positioning
+                        }
+                        else
+                        {
+                            xAdjustment = "" + (quarterFix + 1) + ":" + (i + quarterFix + 2);  //just normal positioning
+                        }
                     }
                 }
                 else
@@ -24300,7 +24490,15 @@ namespace Gekko
                         minMax[4] = Math.Min(minMax[4], dataMin[i]);
                         minMax[5] = Math.Max(minMax[5], dataMax[i]);
                     }
-                    xAdjustment = "" + (quarterFix + 1) + ":" + (i + quarterFix + 2);
+                    if (isInside)
+                    {                        
+                        xAdjustment = "($" + (quarterFix + 1) + "+" + GetXAdjustmentForInsideTics(isInside) + "):" + (i + quarterFix + 2);
+                    }
+                    else
+                    {
+                        xAdjustment = "" + (quarterFix + 1) + ":" + (i + quarterFix + 2);
+                    }
+                    //xAdjustment = "" + (quarterFix + 1) + ":" + (i + quarterFix + 2);
                 }
 
                 //string xlabel = GnuplotText(label);
@@ -24311,6 +24509,16 @@ namespace Gekko
             }
 
             return plotline;
+        }
+
+        private static double GetXAdjustmentForInsideTics(bool isInside)
+        {
+            if (!isInside) return 0d;
+            int sub = 1;
+            if (Program.options.freq == EFreq.Quarterly) sub = 4;
+            else if (Program.options.freq == EFreq.Monthly) sub = 12;
+            double adj = 1d / sub / 2d;
+            return adj;
         }
 
         private static bool NotNullAndNotNo(string s)

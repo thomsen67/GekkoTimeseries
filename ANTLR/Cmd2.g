@@ -56,6 +56,8 @@ options {
 tokens {
     ASTOPT_STRING_PREFIX;
 	ASTOPT_VAL_INDEX;
+	ASTXLINE;
+	ASTYLINE;
 	ASTREBASE;
     ASTLINESPOINTS;
 	ASTLINES;
@@ -661,6 +663,13 @@ ASTOPT_STRING_Y2;
     ASTZERO;
 	ASTXEDIT;
 
+	// --- tokens1 start ---
+	            XLABELS = 'XLABELS';
+            ANNUAL = 'ANNUAL';
+            AT2 = 'AT';
+            BETWEEN = 'BETWEEN';
+            NONANNUAL = 'NONANNUAL';
+            DIGITS = 'DIGITS';
 	LAGFIX = 'LAGFIX';
 	ADDBANK = 'ADDBANK';
 	REBASE = 'REBASE';
@@ -720,7 +729,9 @@ FILLSTYLE             = 'FILLSTYLE'                ;
 LABEL                 = 'LABEL'                    ;
 Y2                    = 'Y2'                       ;
 
-    MDATEFORMAT = 'MDATEFORMAT';
+    X = 'X';
+	Y = 'Y';
+	MDATEFORMAT = 'MDATEFORMAT';
 	THOUSANDSSEPARATOR = 'THOUSANDSSEPARATOR';
 	XEDIT = 'XEDIT';
 	IMPOSE = 'IMPOSE';
@@ -1143,6 +1154,7 @@ Y2                    = 'Y2'                       ;
     ZERO             = 'ZERO'            ;
     ZOOM = 'ZOOM';
     ZVAR             = 'ZVAR'            ;
+	// --- tokens1 end ---
 }
 
                               @parser::namespace { Gekko }
@@ -1179,6 +1191,15 @@ Y2                    = 'Y2'                       ;
                                 {
                                         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 										
+// --- tokens2 start ---
+            d.Add("XLABELS", XLABELS);
+            d.Add("ANNUAL", ANNUAL);
+            d.Add("AT", AT2);
+            d.Add("BETWEEN", BETWEEN);
+            d.Add("NONANNUAL", NONANNUAL);
+            d.Add("DIGITS", DIGITS);            
+d.Add("X" ,X);
+d.Add("Y" ,Y);
 		d.Add("LAGFIX" ,LAGFIX);
 		d.Add("ADDBANK" ,ADDBANK);
 		d.Add("LINESPOINTS" ,LINESPOINTS);
@@ -1657,6 +1678,7 @@ Y2                    = 'Y2'                       ;
                                         d.Add("zero"    , ZERO      );
                                         d.Add("ZOOM", ZOOM);
                                         d.Add("ZVAR"    , ZVAR     );
+										// --- tokens2 end ---
                                         return d;
                                 }
 
@@ -1737,7 +1759,7 @@ expr2                     :
 						  | option         SEMICOLON!
 						  | pause          SEMICOLON!
 						  | pipe           SEMICOLON!
-						  | sheetImport    SEMICOLON!                          
+						  | sheetImport    SEMICOLON!
 						  | prt            SEMICOLON!
 						  | splice         SEMICOLON!
 						  | r_file         SEMICOLON!
@@ -1962,7 +1984,7 @@ genr                      :
 						    // GENR: w:y[2020] = x1 + x2
 						  | genr2 nameWithBank leftBracketGlue expression RIGHTBRACKET EQUAL expression  (REP star)* -> ^({token("ASTGENRINDEXER", ASTGENRINDEXER, $EQUAL.Line)}  nameWithBank expression expression)						
 
-						  | genr2 question -> ASTSERIESQUESTION   
+						  | genr2 question -> ASTSERIESQUESTION
 						  ;
 
 genr2                     : SER | SERIES;
@@ -2102,7 +2124,7 @@ prtOpt1Helper             : filter
 						  | PWIDTH EQUAL expression -> ^(ASTOPT_VAL_PWIDTH expression)
 						  | NDEC EQUAL expression -> ^(ASTOPT_VAL_NDEC expression)
 						  | PDEC EQUAL expression -> ^(ASTOPT_VAL_PDEC expression)
-						  
+						
 						  | APPEND (EQUAL yesNo)? -> ^(ASTOPT_STRING_APPEND yesNo?)
 						  | BOXWIDTH '=' expression -> ^(ASTOPT_VAL_BOXWIDTH expression)  //PLOT
 						  | BOXGAP '=' expression -> ^(ASTOPT_VAL_BOXGAP expression)  //PLOT
@@ -2110,33 +2132,33 @@ prtOpt1Helper             : filter
 						  | COLLAPSE (EQUAL prtOptCollapseHelper)? -> ^(ASTOPT_STRING_COLLAPSE prtOptCollapseHelper?)
 						  | COLORS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLORS yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)
-						  | DATES (EQUAL yesNo)? -> ^(ASTOPT_STRING_DATES yesNo?)						  
+						  | DATES (EQUAL yesNo)? -> ^(ASTOPT_STRING_DATES yesNo?)						
 						  | DUMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_DUMP yesNo?)
 						  | FONT '=' expression -> ^(ASTOPT_STRING_FONT expression)  //PLOT
-						  | FONTSIZE '=' expression -> ^(ASTOPT_VAL_FONTSIZE expression)  //PLOT						  
-						  | GRID (EQUAL yesNo)? -> ^(ASTOPT_STRING_GRID yesNo?)
+						  | FONTSIZE '=' expression -> ^(ASTOPT_VAL_FONTSIZE expression)  //PLOT						
+						  | GRID '=' gridHelper -> ^(ASTOPT_STRING_GRID gridHelper)
 						  | HEADING '=' expression -> ^(ASTOPT_STRING_TITLE expression)
 						  | KEY '=' expression -> ^(ASTOPT_STRING_KEY expression)  //PLOT
 						  | TITLE '=' expression -> ^(ASTOPT_STRING_TITLE expression)
 						  | NAMES (EQUAL yesNo)? -> ^(ASTOPT_STRING_NAMES yesNo?)	
-						  | PALETTE '=' expression -> ^(ASTOPT_STRING_PALETTE expression)  //PLOT					  
+						  | PALETTE '=' expression -> ^(ASTOPT_STRING_PALETTE expression)  //PLOT					
 						  | PLOTCODE '=' expression -> ^(ASTOPT_STRING_PLOTCODE expression)
-						  | ROWS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ROWS yesNo?)						  
+						  | ROWS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ROWS yesNo?)						
 						  | SEPARATE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SEPARATE yesNo?)  //PLOT
 						  | SHEET '=' expression -> ^(ASTOPT_STRING_SHEET expression)
 						  | SIZE '=' expression -> ^(ASTOPT_STRING_SIZE expression)  //PLOT
-						  
+						
 						  | STACK (EQUAL yesNo)? -> ^(ASTOPT_STRING_STACK yesNo?)  //PLOT
 						  | STAMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STAMP yesNo?)	
 						  | SUBTITLE '=' expression -> ^(ASTOPT_STRING_SUBTITLE expression)	  //PLOT	
-						  | TICS '=' expression -> ^(ASTOPT_STRING_TICS expression)  //PLOT			  
+						  | TICS '=' expression -> ^(ASTOPT_STRING_TICS expression)  //PLOT			
 						  | USING EQUAL fileNameStar -> ^(ASTOPT_STRING_USING fileNameStar)		
 						  | XLINE '=' expression -> ^(ASTOPT_DATE_XLINE expression)  //PLOT	
 						  | XLINEBEFORE '=' expression -> ^(ASTOPT_DATE_XLINEBEFORE expression)  //PLOT	
-						  | XLINEAFTER '=' expression -> ^(ASTOPT_DATE_XLINEAFTER expression)  //PLOT							  						  
+						  | XLINEAFTER '=' expression -> ^(ASTOPT_DATE_XLINEAFTER expression)  //PLOT							  						
 						  | X2ZEROAXIS (EQUAL yesNo)? -> ^(ASTOPT_STRING_X2ZEROAXIS yesNo?)
 
-						  | Y2LINE EQUAL expression -> ^(ASTOPT_VAL_Y2LINE expression)  //PLOT						  
+						  | Y2LINE EQUAL expression -> ^(ASTOPT_VAL_Y2LINE expression)  //PLOT						
 						  | Y2MAX EQUAL expression -> ^(ASTOPT_VAL_Y2MAX expression)  //PLOT	
 						  | Y2MIN EQUAL expression -> ^(ASTOPT_VAL_Y2MIN expression)  //PLOT	
 						  | Y2MAXHARD EQUAL expression -> ^(ASTOPT_VAL_Y2MAXHARD expression)  //PLOT	
@@ -2151,18 +2173,18 @@ prtOpt1Helper             : filter
 						  | YMAXHARD EQUAL expression -> ^(ASTOPT_VAL_YMAXHARD expression)  //PLOT	
 						  | YMINHARD EQUAL expression -> ^(ASTOPT_VAL_YMINHARD expression)  //PLOT	
 						  | YMAXSOFT EQUAL expression -> ^(ASTOPT_VAL_YMAXSOFT expression)  //PLOT	
-						  | YMINSOFT EQUAL expression -> ^(ASTOPT_VAL_YMINSOFT expression)  //PLOT						  
+						  | YMINSOFT EQUAL expression -> ^(ASTOPT_VAL_YMINSOFT expression)  //PLOT						
 						  | YMIRROR '=' expression -> ^(ASTOPT_STRING_YMIRROR expression)  //PLOT
 						  | YTITLE EQUAL expression -> ^(ASTOPT_STRING_YTITLE expression)  //PLOT
 						  | Y2TITLE EQUAL expression -> ^(ASTOPT_STRING_Y2TITLE expression)  //PLOT
-						  
+						
 						  | TYPE '=' linetypeHelper -> ^(ASTOPT_STRING_LINETYPE linetypeHelper)
 						  | DASHTYPE '=' expression -> ^(ASTOPT_STRING_DASHTYPE expression)
 						  | LINEWIDTH '=' expression -> ^(ASTOPT_VAL_LINEWIDTH expression)
 						  | LINECOLOR '=' expression -> ^(ASTOPT_STRING_LINECOLOR expression)
 						  | POINTTYPE '=' expression -> ^(ASTOPT_STRING_POINTTYPE expression)
 						  | POINTSIZE '=' expression -> ^(ASTOPT_VAL_POINTSIZE expression)
-						  | FILLSTYLE '=' expression -> ^(ASTOPT_STRING_FILLSTYLE expression)						  						  
+						  | FILLSTYLE '=' expression -> ^(ASTOPT_STRING_FILLSTYLE expression)						  						
 						  ;
 linetypeHelper            : LINESPOINTS -> ASTLINESPOINTS
 						  | LINES -> ASTLINES
@@ -2174,6 +2196,12 @@ linetypeHelper            : LINESPOINTS -> ASTLINESPOINTS
 						  | IMPULSES -> ASTIMPULSES
 						  | expression
 						  ;
+
+gridHelper                : YLINE -> ASTYLINE
+						  | XLINE -> ASTXLINE
+						  | yesNo					
+						  ;
+
 prtOpt2                   : prtOpt2Helper+ -> ^(ASTOPT2 prtOpt2Helper+);
 prtOpt2Helper             : FILE '=' fileName -> ^(ASTOPT_STRING_FILENAME fileName)
 						  | USING '=' fileNameStar -> ^(ASTOPT_STRING_USING fileNameStar)
@@ -2627,10 +2655,10 @@ prtOptionField4Helper     : width
 						  | LINECOLOR '=' expression -> ^(ASTPRTELEMENTLINECOLOR expression)
 						  | POINTTYPE '=' expression -> ^(ASTPRTELEMENTPOINTTYPE expression)
 						  | POINTSIZE '=' expression -> ^(ASTPRTELEMENTPOINTSIZE expression)
-						  | FILLSTYLE '=' expression -> ^(ASTPRTELEMENTFILLSTYLE expression)						  
+						  | FILLSTYLE '=' expression -> ^(ASTPRTELEMENTFILLSTYLE expression)						
 						  | Y2 -> ^(ASTPRTELEMENTY2)
 						  ;
-						  
+						
 opt2                      : optNew | optOld;
 							
 optOld                    : N    ('=' yesNo -> ^(ASTN yesNo) | -> ^(ASTN ASTYES))
@@ -3055,7 +3083,12 @@ optionType :
 			 | MODEL INFOFILE '='? optionModelInfoFile -> MODEL INFOFILE ^(ASTSTRINGSIMPLE optionModelInfoFile)
 
 			 | PLOT question -> PLOT question
-			 | PLOT LINES POINTS '='? yesNoSimple -> PLOT LINES POINTS ^(ASTBOOL yesNoSimple )			
+			 | PLOT DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator ->  PLOT DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
+			 | PLOT LINES POINTS '='? yesNoSimple -> PLOT LINES POINTS ^(ASTBOOL yesNoSimple )	
+			 | PLOT XLABELS ANNUAL '='? optionPlotXlabels ->  PLOT XLABELS ANNUAL ^(ASTSTRINGSIMPLE optionPlotXlabels)
+			 | PLOT XLABELS DIGITS '='? Integer ->  PLOT XLABELS DIGITS  ^(ASTINTEGER Integer)
+			 | PLOT XLABELS NONANNUAL '='? optionPlotXlabels ->  PLOT XLABELS NONANNUAL ^(ASTSTRINGSIMPLE optionPlotXlabels)
+			 
 			 | PLOT NEW '='? yesNoSimple -> PLOT NEW ^(ASTBOOL yesNoSimple )		
 			
 			 | PRINT question -> PRINT question
@@ -3162,7 +3195,7 @@ optionType :
 			 | TABLE HTML SPECIALMINUS '='? yesNoSimple ->  TABLE HTML SPECIALMINUS ^(ASTBOOL yesNoSimple)
              | TABLE IGNOREMISSINGVARS '='? yesNoSimple ->  TABLE IGNOREMISSINGVARS ^(ASTBOOL yesNoSimple)			
              | TABLE TYPE '='? tableType ->  TABLE TYPE ^(ASTSTRINGSIMPLE tableType)
-			 
+			
 		     | TABLE MDATEFORMAT '='? expression ->  TABLE MDATEFORMAT ^(ASTSTRINGSIMPLE expression)
 			 | TABLE DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator ->  TABLE DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
 			 | TABLE THOUSANDSSEPARATOR '='? yesNoSimple ->  TABLE THOUSANDSSEPARATOR ^(ASTBOOL yesNoSimple)
@@ -3176,6 +3209,7 @@ optionType :
 			 optionModelInfoFile: YES | NO | TEMP;
 			 timefilterType: HIDE | AVG;
 			 tableType: TXT | HTML;
+			 optionPlotXlabels: AT2 | BETWEEN ;
 			 optionPrintCollapse: AVG | TOTAL | NONE;
 			 optionPrintFreq: SIMPLE | PRETTY;
 			 optionSolveMethodOptions : NEWTON | GAUSS ;
@@ -3206,6 +3240,15 @@ integerNegative           : MINUS integer -> ^(ASTINTEGERNEGATIVE integer);
 doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 
 ident                     : Ident|
+                            // --- tokens3 start ---			
+            XLABELS|
+            ANNUAL|
+            AT2|
+            BETWEEN|
+            NONANNUAL|
+            DIGITS|
+							X|
+							Y|
 							REBASE|
 							LAGFIX|
 							ADDBANK|
@@ -3675,6 +3718,7 @@ ident                     : Ident|
                             ZOOM|
 							XEDIT|	
                             ZVAR
+							// --- tokens3 end ---
 ;
 
 

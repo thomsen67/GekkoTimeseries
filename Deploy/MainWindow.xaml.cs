@@ -223,5 +223,97 @@ namespace Deploy
         {
 
         }
+
+        private void button7_Click(object sender, RoutedEventArgs e)
+        {
+            int ii = 0;
+
+            //string file = @"c:\Thomas\Gekko\GekkoCS\ANTLR\Cmd2.g";
+            //string s = GetTextFromFileWithWait(file);
+            //using (FileStream temp = Program.WaitForFileStream(file + "_", Program.GekkoFileReadOrWrite.Write))
+            //using (StreamWriter tempFs = G.GekkoStreamWriter(temp))
+            //{
+            //    tempFs.Write(s);
+            //}
+                        
+            string[] sss = textBox13.Text.Trim().ToUpper().Split(',');
+
+            List<string> output1 = new List<string>();
+            List<string> output2 = new List<string>();
+            List<string> output3 = new List<string>();
+            string file = @"c:\Thomas\Gekko\GekkoCS\ANTLR\Cmd2.g";
+            string[] txt2 = File.ReadAllLines(file, Encoding.GetEncoding(1252));  //why 1252, but otherwise ¤ and æøå go wrong. Do not write with 1252 though...
+
+            List<string> txt = new List<string>(txt2);
+            int i1 = 0, i2 = 0, i3 = 0;
+            foreach (string s in txt)
+            {
+                if (s.Contains("--- tokens1 start ---")) i1++;
+                if (s.Contains("--- tokens1 end ---")) i1++;
+                if (s.Contains("--- tokens2 start ---")) i2++;
+                if (s.Contains("--- tokens2 end ---")) i2++;
+                if (s.Contains("--- tokens3 start ---")) i3++;
+                if (s.Contains("--- tokens3 end ---")) i3++;
+            }
+            if (i1 != 2 || i2 != 2 || i3 != 2) throw new Exception();
+
+
+            foreach (string ss2 in sss)
+            {
+
+                string ss = ss2.Trim().ToUpper();
+
+                bool dublet = false;
+                                
+                
+                bool started = false;
+                foreach (string s in txt)
+                {
+                    if (s.Contains("--- tokens1 start ---"))
+                    {
+                        started = true;
+                    }
+                    if (s.Contains("--- tokens1 end ---"))
+                    {
+                        break;
+                    }
+                    if (started && s.Trim().ToUpper().StartsWith(ss))
+                    {
+                        ii++;
+                        dublet = true;
+                    }
+                }
+
+                if (!dublet)
+                {
+
+                    foreach (string s in txt)
+                    {
+                        //output.Add(s);
+                        if (s.Contains("--- tokens1 start ---"))
+                        {
+                            output1.Add("            " + ss + " = '" + ss + "';");
+                        }
+                        else if (s.Contains("--- tokens2 start ---"))
+                        {
+                            output2.Add("            d.Add(\"" + ss + "\", " + ss + ");");
+                        }
+                        else if (s.Contains("--- tokens3 start ---"))
+                        {
+                            output3.Add("            " + ss + "|");
+                        }
+                    }
+                }
+            }
+
+            MessageBox.Show("Output is in extra.g, " + ii + " items were dublets");
+
+            List<string> output = new List<string>();
+            output.AddRange(output1);
+            output.AddRange(output2);
+            output.AddRange(output3);
+
+            File.WriteAllLines(@"c:\Thomas\Gekko\GekkoCS\ANTLR\extra.g", output, Encoding.UTF8);
+        }
     }
 }

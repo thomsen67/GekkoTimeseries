@@ -321,8 +321,16 @@ namespace Gekko.Parser.Gek
                             }                            
                         }
                         break;
-
-
+                    case "ASTXLINE":
+                        {
+                            node.Code.CA("new ScalarString(`xline`)");
+                        }
+                        break;
+                    case "ASTYLINE":
+                        {
+                            node.Code.CA("new ScalarString(`yline`)");
+                        }
+                        break;
                     case "ASTLINESPOINTS":
                         {
                             node.Code.CA("new ScalarString(`linespoints`)");

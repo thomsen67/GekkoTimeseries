@@ -7,6 +7,8 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="990.85" Width="696.333">
     <Grid>
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="51" Margin="291,510,0,0" VerticalAlignment="Top" Width="254"/>
+
         <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Margin="10,15,0,0" TextWrapping="Wrap" Text="Deployment of Gekko" VerticalAlignment="Top" Width="317" FontWeight="Bold" BorderThickness="0"/>
         <TextBox x:Name="textBox1" HorizontalAlignment="Left" Height="23" Margin="14,91,0,0" TextWrapping="Wrap" Text="Compile help files (Help+Manual)" VerticalAlignment="Top" Width="359" BorderThickness="0"/>
         <Button x:Name="button" Content="Copy chm file" HorizontalAlignment="Left" Margin="392,93,0,0" VerticalAlignment="Top" Width="108" Click="button_Click"/>
@@ -28,6 +30,8 @@
         <Button x:Name="button6" Content="Zip source" HorizontalAlignment="Left" Margin="392,467,0,0" VerticalAlignment="Top" Width="75" Click="button6_Click"/>
         <TextBox x:Name="textBox7" HorizontalAlignment="Left" Height="23" Margin="14,309,0,0" TextWrapping="Wrap" Text="Test the new Gekko a bit, including help files" VerticalAlignment="Top" Width="359"/>
         <TextBox x:Name="textBox12" HorizontalAlignment="Left" Height="43" Margin="14,512,0,0" TextWrapping="Wrap" Text="Git commit, and put on web etc." VerticalAlignment="Top" Width="220"/>
+        <TextBox x:Name="textBox13" HorizontalAlignment="Left" Height="23" Margin="312,525,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <Button x:Name="button7" Content="TOKEN" HorizontalAlignment="Left" Margin="452,524,0,0" VerticalAlignment="Top" Width="75" Click="button7_Click"/>
 
     </Grid>
 </Window>
