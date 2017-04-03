@@ -23745,13 +23745,19 @@ namespace Gekko
             {
                 fontfactor = 1.0d / 1.2d;
             }
-            txt.AppendLine("set title font '" + font + "," + (1.5d * zoom * fontsize * fontfactor) + "'");
-            txt.AppendLine("set ylabel font '" + font + "," + (zoom * fontsize * fontfactor) + "'");
-            txt.AppendLine("set y2label font '" + font + "," + (zoom * fontsize * fontfactor) + "'");
-            txt.AppendLine("set xtics font '" + font + "," + (zoom * fontsize * fontfactor) + "'");
-            txt.AppendLine("set ytics font '" + font + "," + (zoom * fontsize * fontfactor) + "'");
-            if (numberOfY2s > 0) txt.AppendLine("set y2tics font '" + font + "," + (zoom * fontsize * fontfactor) + "'");
-            txt.AppendLine("set key font '" + font + "," + (zoom * fontsize * fontfactor) + "'");
+
+            double siz1 = (1.5d * zoom * fontsize * fontfactor);
+            double siz2 = (zoom * fontsize * fontfactor);
+            string font1 = "'" + font + "," + siz1 + "'";
+            string font2 = "'" + font + "," + siz2 + "'";
+
+            txt.AppendLine("set title font " + font1);
+            txt.AppendLine("set ylabel font " + font2);
+            txt.AppendLine("set y2label font " + font2);
+            txt.AppendLine("set xtics font " + font2);
+            txt.AppendLine("set ytics font " + font2);
+            if (numberOfY2s > 0) txt.AppendLine("set y2tics font " + font2);
+            txt.AppendLine("set key font " + font2);
 
             string set_yrange = null;
             string set_y2range = null;
@@ -23813,7 +23819,7 @@ namespace Gekko
                     txt.AppendLine("set ytics nomirror " + ticsInOut);
                     txt.AppendLine("set border 3");
                     //if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
-                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, true);
+                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, font2, true);
                    
                 }
                 else if (ymirror == "1")  //y2 axis
@@ -23821,7 +23827,7 @@ namespace Gekko
                     txt.AppendLine("set ytics " + ticsInOut);
                     txt.AppendLine("set border 11");
                     //if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
-                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, true);
+                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, font2, true);
                 }
                 else if (ymirror == "2")  //y2 axis and y2 tics
                 {
@@ -23829,7 +23835,7 @@ namespace Gekko
                     txt.AppendLine("set y2tics " + ticsInOut);
                     txt.AppendLine("set border 11");
                     //if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
-                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, true);
+                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, font2, true);
                 }
                 else if (ymirror == "3")
                 {
@@ -23837,9 +23843,9 @@ namespace Gekko
                     txt.AppendLine("set y2tics " + ticsInOut);
                     txt.AppendLine("set border 11");
                     //if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
-                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, true);
+                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, font2, true);
                     //if (!NullOrEmpty(ytitle)) txt.AppendLine("set y2label \"" + GnuplotText(ytitle) + "\"");
-                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, false);
+                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, font2, false);
                 }
             }
             else
@@ -23849,9 +23855,9 @@ namespace Gekko
                 txt.AppendLine("set y2tics " + ticsInOut);
                 txt.AppendLine("set border 11");
                 //if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
-                if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, true);
+                if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, font2, true);
                 //if (!NullOrEmpty(y2title)) txt.AppendLine("set y2label \"" + GnuplotText(y2title) + "\"");
-                if (!NullOrEmpty(y2title)) setTitlePlaceholder = SetYAxisText(y2title, txt, false);
+                if (!NullOrEmpty(y2title)) setTitlePlaceholder = SetYAxisText(y2title, txt, font2, false);
                 if (NotNullAndNotNo(x2zeroaxis) || isSeparated) txt.AppendLine("set x2zeroaxis lt -1");  //draws x axis for y2=0, #23475432985 
             }
 
@@ -24215,12 +24221,12 @@ namespace Gekko
             }
         }
 
-        private static bool SetYAxisText(string ytitle, StringBuilder txt, bool isLeft)
+        private static bool SetYAxisText(string ytitle, StringBuilder txt, string font, bool isLeft)
         {
             bool setTitlePlaceholder;
             setTitlePlaceholder = true; //to make space
-            if (isLeft) txt.AppendLine("set label \"" + GnuplotText(ytitle) + "\" at graph 0, graph 1 offset -2,2 left");
-            else txt.AppendLine("set label \"" + GnuplotText(ytitle) + "\" at graph 1, graph 1 offset -2,2 left");
+            if (isLeft) txt.AppendLine("set label \"" + GnuplotText(ytitle) + "\" at graph 0, graph 1 offset -2,2.2 left font " + font);
+            else txt.AppendLine("set label \"" + GnuplotText(ytitle) + "\" at graph 1, graph 1 offset -2,2.2 left font " + font);
             return setTitlePlaceholder;
         }
 

@@ -54,7 +54,10 @@ options {
 
 //Token definitions I
 tokens {
-    ASTOPT_STRING_PREFIX;
+    ASTSERIES;
+	ASTSERIESLHS;
+	ASTSERIESRHS;
+	ASTOPT_STRING_PREFIX;
 	ASTOPT_VAL_INDEX;
 	ASTXLINE;
 	ASTYLINE;
@@ -664,6 +667,8 @@ ASTOPT_STRING_Y2;
 	ASTXEDIT;
 
 	// --- tokens1 start ---
+	            ASER = 'ASER';
+            ASERIES = 'ASERIES';
 	            XLABELS = 'XLABELS';
 				YLABELS = 'YLABELS';
             ANNUAL = 'ANNUAL';
@@ -1193,7 +1198,9 @@ Y2                    = 'Y2'                       ;
                                         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 										
 // --- tokens2 start ---
-            d.Add("XLABELS", XLABELS);
+            d.Add("ASER", ASER);
+            d.Add("ASERIES", ASERIES);
+		    d.Add("XLABELS", XLABELS);
 			d.Add("YLABELS", YLABELS);
             d.Add("ANNUAL", ANNUAL);
             d.Add("AT", AT2);
@@ -1774,6 +1781,7 @@ expr2                     :
 						  | reset          SEMICOLON!
 						  | return2        SEMICOLON!
                           | run            SEMICOLON!
+						  | series         SEMICOLON!
 						  | show           SEMICOLON!
 						  | sim            SEMICOLON!
 						  | sign           SEMICOLON!
@@ -1992,6 +2000,13 @@ genr                      :
 genr2                     : SER | SERIES;
 genr3                     : SER2 | SERIES2; //has a special SERIES #m = ... pattern, see also //#098275432874
 genr4                     : SER3 | SERIES3; //has a special SERIES y = 1 -2 3 4 -3 -4 pattern, see also //#098275432874
+
+series2                   : ASER | ASERIES;
+series                    : series2 seriesLhs EQUAL seriesRhs (REP star)* -> ^({token("ASTSERIES", ASTSERIES, $EQUAL.Line)}  seriesLhs seriesRhs);
+seriesLhs                 : nameWithBank ( leftBracketGlue (indexerExpressionHelper (',' indexerExpressionHelper)*)? RIGHTBRACKET)* -> ^(ASTSERIESLHS nameWithBank indexerExpressionHelper*);
+						  
+seriesRhs                 : expression (',' expression)* -> ^(ASTSERIESRHS expression+);
+						  
 
 seriesOpt1                : ISNOTQUAL
 						  | leftAngle2          seriesOpt1h* RIGHTANGLE -> ^(ASTOPT1 seriesOpt1h*)
@@ -3243,7 +3258,9 @@ doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 
 ident                     : Ident|
                             // --- tokens3 start ---			
-            XLABELS|
+            ASER|
+            ASERIES|
+			XLABELS|
 			YLABELS|
             ANNUAL|
             AT2|

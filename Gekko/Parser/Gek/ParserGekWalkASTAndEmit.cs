@@ -1765,6 +1765,33 @@ namespace Gekko.Parser.Gek
                             node.Code.A(HandleGenr(node, Num(node), node[0].Code.ToString(), node[1].Code.ToString(), node[2].Code.ToString(), w, null));
                         }
                         break;
+                    case "ASTSERIES":
+                        {
+                            //GENR fy = ...                            
+                            node.Code.A(node[0].Code);
+                            //string s1 = node[0].Code.ToString();
+
+                        }
+                        break;                    
+                    case "ASTSERIESLHS":
+                        {
+                            ASTNode n0 = node[0];
+                            ASTNode n1 = node[1];
+                            ASTNode n2 = node[2];
+                            string s = null;
+                            for (int i = 1; i < node.ChildrenCount(); i++)
+                            {
+                                s += node[i].Code.ToString() + ", ";
+                            }
+                            if (s != null) s = s.Substring(0, s.Length - 2);
+                            node.Code.A("O.HandleIndexer(" + s + ");");
+                        }
+                        break;
+                    case "ASTSERIESRHS":
+                        {
+                            ASTNode n0 = node[0];
+                        }
+                        break;
                     case "ASTGENRLHSFUNCTION":
                         {
                             //GENR dlog(fy) = ...                            

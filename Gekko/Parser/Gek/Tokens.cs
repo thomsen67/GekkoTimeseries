@@ -12,6 +12,12 @@ namespace Gekko.Parser.Gek
         public static string tokens = @"
 
 
+'XLABELS'=1
+'ANNUAL'=1
+'NONANNUAL'=1
+'AT'=1
+'BETWEEN'=1
+'DIGITS'=1
 ')'=886
 ','=882
 '-'=902

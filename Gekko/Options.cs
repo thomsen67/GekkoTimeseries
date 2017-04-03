@@ -94,9 +94,9 @@ Additionally, there are model, solve, equation options.
         public bool plot_new = true;
 
         //public string plot_xlabels_between_truncate = "auto";     //digits|skip|digitsskip|skipdigits|none  --> when all too pressed we use label at.
-        public string plot_xlabels_annual = "at";                 //at|between
-        public string plot_xlabels_nonannual = "between";         //at|between          
-        public int plot_xlabels_digits = 4; //or 2        
+        public string plot_xlabels_annual = "at"; //at|between
+        public string plot_xlabels_nonannual = "between"; //at|between          
+        public int plot_xlabels_digits = 4; // 4 or 2, only applies to 'between' type   
 
         public int print_disp_maxlines = 3; //-1 means infinite, 0 means no data shown
         public int print_fields_ndec = 4;

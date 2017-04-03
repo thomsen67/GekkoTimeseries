@@ -333,7 +333,12 @@ namespace Gekko
             }
             return rv;
         }
-        
+
+        public static void HandleIndexer(params IVariable[] x)
+        {
+            G.Writeln2("");
+        }
+
         public static IVariable Indexer(IVariable x, IVariable y, GekkoTime t)
         {            
             if (x == null)
@@ -1607,7 +1612,7 @@ namespace Gekko
         public static double GetVal(IVariable a, int bankNumber, GekkoTime t)  //used in PRT and similar, can accept a list that will show itself as a being an integer with ._isName set.
         {            
             return a.GetVal(t);            
-        }
+        }               
 
         public static TimeSeries GetTimeSeries(IVariable a)
         {

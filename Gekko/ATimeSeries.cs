@@ -36,8 +36,8 @@ namespace Gekko
         public IVariable Indexer(IVariable index, GekkoTime t)
         {
             if (index.Type() == EVariableType.Val)
-            {                
-                int ival = O.GetInt(index);                
+            {
+                int ival = O.GetInt(index);
                 if (ival >= 1900)
                 {
                     return new ScalarVal(this.ts.GetData(new GekkoTime(EFreq.Annual, ival + this.offset, 1)));
@@ -47,7 +47,6 @@ namespace Gekko
                     //typically ival numerically < 10 here                    
                     //return new MetaTimeSeries(this.ts, ival, this.bank, this.variable);
                     return new MetaTimeSeries(this.ts, ival + this.offset);
-
                     //10% faster, but maybe more error prone...
                     //this.offset = ival;
                     //return this;
@@ -57,7 +56,12 @@ namespace Gekko
             {
                 return new ScalarVal(this.ts.GetData(((ScalarDate)index).date.Add(this.offset)));
             }
-            else throw new GekkoException();
+            else
+            {
+                G.Writeln2("*** ERROR: Expected indexer to be DATE or VAL");
+                throw new GekkoException();
+            }
+
         }
 
         public IVariable Indexer(IVariablesFilterRange indexRange, GekkoTime t)

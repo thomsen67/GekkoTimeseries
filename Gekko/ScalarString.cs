@@ -317,7 +317,6 @@ namespace Gekko
                 throw new GekkoException();
             }            
         }
-
         
         public string GetString()
         {
