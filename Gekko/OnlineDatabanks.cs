@@ -179,6 +179,8 @@ namespace Gekko
                 GekkoTime gt0 = Globals.tNull;
                 GekkoTime gt1 = Globals.tNull;
 
+                long allCcounter = 0;
+
                 foreach (string line2 in lines2)
                 {
                     lineCounter++;
@@ -253,7 +255,7 @@ namespace Gekko
                             valuesCombi = new List<string>();
                             //we are using codesHeaderJson instead of codesHeader (these are more verbose)
                             Walk(table, codesHeaderJson, codes, codesCombi, values, valuesCombi, 0, "", "");
-                            data = new double[codesCombi.Count * dates.Count];
+                            data = G.CreateArrayDouble(codesCombi.Count * dates.Count, double.NaN);  //fill it with NaN for safety. Statistikbanken sometimes return only a subset of the data (and the subset is zeroes)
                         }
 
                         string s = line;
@@ -422,7 +424,8 @@ namespace Gekko
                     for (int i = 0; i < dates.Count; i++)  //periods
                     {
                         GekkoTime gt = G.FromStringToDate(dates[i], true);
-                        ts.SetData(gt, data[i + j * dates.Count]);                        
+                        ts.SetData(gt, data[i + j * dates.Count]);
+                        allCcounter++;                   
                         if (gt0.IsNull()) gt0 = gt;
                         if (gt1.IsNull()) gt1 = gt;
                         if (gt.StrictlySmallerThan(gt0)) gt0 = gt;
@@ -442,6 +445,11 @@ namespace Gekko
                 G.Writeln("    Name of first timeseries: " + codesCombi[0]);
                 G.Writeln("    Name of last timeseries: " + codesCombi[codesCombi.Count - 1]);
 
+                if(data.LongLength != allCcounter)
+                {
+                    //See not in constrution of data array
+                    G.Writeln2("+++ WARNING: Downloaded " + allCcounter + " observations, expected " + data.LongLength);
+                }
             }
         }
     }
