@@ -2038,7 +2038,7 @@ help					  : HELP ident? -> ^({token("ASTHELP", ASTHELP, $HELP.Line)} ident?);
 
 if2						  : IF leftParen logicalOr rightParen expressions1? (ELSE expressions2?)? END SEMICOLON -> ^({token("ASTIF", ASTIF, $IF.Line)} logicalOr ^(ASTIFSTATEMENTS expressions1?) ^(ASTELSESTATEMENTS expressions2?));
 expressions1              : expressions;
-expressions2              : expressions;
+expressions2              : expressions;  
 
 download                  : DOWNLOAD HTTP? url fileName -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, $DOWNLOAD.Line)} ^(ASTHTTP HTTP?) url ^(ASTHANDLEFILENAME fileName));
 
@@ -2849,10 +2849,10 @@ listName                  : simpleHashName -> ^(ASTHASH simpleHashName)
 				          | listComplicated -> ^(ASTHASH listComplicated)
 				          ;
 
-simpleHashName            : hashNoGlue GLUE ident -> ^(ASTHASHNAMESIMPLE ident) //we can have #y, without parentheses
-                          | dollarHashNoGlue GLUE ident -> ^(ASTDOLLARHASHNAMESIMPLE ident); //we can have #y, without parentheses
-listComplicated           : hashNoGlue leftParenGlue nameOrScalar RIGHTPAREN -> ^(ASTHASHPAREN nameOrScalar)
-                          | dollarHashNoGlue leftParenGlue nameOrScalar RIGHTPAREN -> ^(ASTDOLLARHASHPAREN nameOrScalar);
+simpleHashName            : hashNoGlue GLUE ident -> ^(ASTHASHNAMESIMPLE ident); //we can have #y, without parentheses
+                          //| dollarHashNoGlue GLUE ident -> ^(ASTDOLLARHASHNAMESIMPLE ident); //we can have #y, without parentheses
+listComplicated           : hashNoGlue leftParenGlue nameOrScalar RIGHTPAREN -> ^(ASTHASHPAREN nameOrScalar);
+                          //| dollarHashNoGlue leftParenGlue nameOrScalar RIGHTPAREN -> ^(ASTDOLLARHASHPAREN nameOrScalar);
 
 //-----------------------------------------------------------------------------------------
 //Scalar name
@@ -2863,10 +2863,11 @@ scalarName                : simplePercentName -> ^(ASTSCALAR simplePercentName)
 				          | scalarComplicated -> ^(ASTSCALAR scalarComplicated)
 				          ;
 
-simplePercentName         : percentNoGlue GLUE ident -> ^(ASTPERCENTNAMESIMPLE ident)  //same as scalarSimple
-                          | dollarPercentNoGlue GLUE ident -> ^(ASTDOLLARPERCENTNAMESIMPLE ident); //same as scalarSimple
-scalarComplicated         : percentNoGlue leftParenGlue nameOrScalar RIGHTPAREN -> ^(ASTPERCENTPAREN nameOrScalar)
-                          | dollarPercentNoGlue leftParenGlue nameOrScalar RIGHTPAREN -> ^(ASTDOLLARPERCENTPAREN nameOrScalar);
+simplePercentName         : percentNoGlue GLUE ident -> ^(ASTPERCENTNAMESIMPLE ident);  //same as scalarSimple
+                          //| dollarPercentNoGlue GLUE ident -> ^(ASTDOLLARPERCENTNAMESIMPLE ident) //same as scalarSimple
+
+scalarComplicated         : percentNoGlue leftParenGlue nameOrScalar RIGHTPAREN -> ^(ASTPERCENTPAREN nameOrScalar) ;
+                          //| dollarPercentNoGlue leftParenGlue nameOrScalar RIGHTPAREN -> ^(ASTDOLLARPERCENTPAREN nameOrScalar);
 
 //-----------------------------------------------------------------------------------------
 
@@ -3839,12 +3840,12 @@ percentSimple             : (GLUE!)? PERCENT;
 percent                   : (GLUE!)? (PERCENT);
 percentGlue               : GLUE! (PERCENT);
 percentNoGlue             : PERCENT;
-dollarPercentNoGlue       : DOLLAR | DOLLARPERCENT;
+//dollarPercentNoGlue       : DOLLAR | DOLLARPERCENT;
 
 hash                      : (GLUE!)? HASH;
 hashGlue                  : GLUE! HASH;
 hashNoGlue                : HASH;
-dollarHashNoGlue          : DOLLARHASH;
+//dollarHashNoGlue          : DOLLARHASH;
 
 star                      : (GLUESTAR!)? STAR (GLUESTAR!)?;
 starGlueBoth              : GLUESTAR! STAR GLUESTAR!;
@@ -3928,9 +3929,9 @@ COLON                     : ':';
 COMMA2                    : ',';
 DOT                       : '.';
 HASH                      : '#';
-DOLLARHASH                : '$#';
+//DOLLARHASH                : '$#';
 PERCENT                   : '%';
-DOLLARPERCENT             : '$%';
+//DOLLARPERCENT             : '$%';
 DOLLAR                    : '$';
 LEFTCURLY                 : '{';
 RIGHTCURLY                : '}';
