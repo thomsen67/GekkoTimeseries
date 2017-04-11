@@ -1769,6 +1769,7 @@ namespace Gekko.Parser.Gek
                         {
                             //GENR fy = ...                            
                             node.Code.A(node[0].Code);
+                            node.Code.A(node[1].Code);
                             //string s1 = node[0].Code.ToString();
 
                         }
@@ -1781,15 +1782,17 @@ namespace Gekko.Parser.Gek
                             string s = null;
                             for (int i = 1; i < node.ChildrenCount(); i++)
                             {
-                                s += node[i].Code.ToString() + ", ";
+                                s += node[i].Code + ", ";
                             }
                             if (s != null) s = s.Substring(0, s.Length - 2);
-                            node.Code.A("O.HandleIndexer(" + s + ");");
+                            string ss = ", " + s;
+                            if (s == null) ss = null;
+                            node.Code.CA("O.HandleIndexer(" + node[0].Code + ss + ");");
                         }
                         break;
                     case "ASTSERIESRHS":
                         {
-                            ASTNode n0 = node[0];
+                            node.Code.CA(node[0].Code.ToString() + ";");
                         }
                         break;
                     case "ASTGENRLHSFUNCTION":

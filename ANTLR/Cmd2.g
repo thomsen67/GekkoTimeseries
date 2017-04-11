@@ -2001,12 +2001,51 @@ genr2                     : SER | SERIES;
 genr3                     : SER2 | SERIES2; //has a special SERIES #m = ... pattern, see also //#098275432874
 genr4                     : SER3 | SERIES3; //has a special SERIES y = 1 -2 3 4 -3 -4 pattern, see also //#098275432874
 
+//In Gams, we have e(i,j) ..  y(i,j) = a(i)*b(j) + c(i,j) + d(i,j,'u');
+//e(isubset) ..  y(i) = x(i); -> where isubset is in i.
+//e('v') ..  y(i) = x(i);  -> where 'v' is in i.
+//After .. all must be elements ('u') or subset, or squash with sum() etc.
+//wsum .. sum = sum(i, x(i))
+//REMEMBER: do a 
+
+//SERIES y[#i, #j] = x1[#i, #j] + sum(#k, x2[#i, #j, #k]); 
+//SERIES y[#i, #j] $ #i0[#i] = x1[#i, #j] + sum(#k $ #k0[#k], x2[#i, #j, #k]);
+//SERIES y[#i, #j] $ (#i0(i) and #i1(i)) = x1[#i, #j] + sum(#k $ (#k0[#k] and #k1[#k]), x2[#i, #j, #k]);
+//SERIES y[#i] $ (x[#i] > 0) = x[#i];  --> only assigned for x[#i]>0 otherwise not touched
+//                                         BUT if the t[#i] does not exist, a 0 is set!!!
+//										 !!! if the $-expression is a number, 0 = fase, and non-0 is true !!!
+//SERIES y[#i] = x[#i] $ (x[#i] > 0)   --> Then y[#i] = 0 if x[#i] <= 0. This 0 is always assigned, no skipping! 
+//SERIES u[#k] $ s[#k] = a[#k] ;
+//SERIES u[#s] = a[#s] ;               --> equivalent
+//SERIES shipcost[i,j] $ ij[i,j] = factor * distance[i,j]; 
+//SERIES shipcost[#ij] = factor * distance[#ij]; --> #ij is a tuple set, only if #i and #j are not used independently
+//       y = sum(#i $ #i0[#i], x[#i]), but what about y = sum(#i, x[#i] $ #i0[#i]) --> possible but GAMS advokates the first one, easier to read
+//So the dollars are NEVER inside variables, for instance x[#i $ #i0[#i]], but check that this is so....
+//
+//On the RHS, probably we have either var[...] $(...) or (...)$(...). In the first case it applies to the var.
+//  so p[#i]*x[#i] $ #i0[#i] should only work on x[#i].
+//OKAY so we say that $ is either left of variable x[...] or left of parenthesis (...) or left of first index in sum()-function.
+//We have to look if sum(#i,...) if #i is in ... somewhere. Demands looking forward, counting parentheses () and [], skipping comments 
+//We have to kill $ for scalars --> '%x'
+//SER y[#i] $ #i1[#i] = x[#i]; scope is all
+//SER y[#i] = x[#i] $ #i1[#i];
+//SER y[#i] = sum(#j $ #j0[#j], x[#i, #j]); scope is second arg
+//SER y[#i] = sum(#j, x[#i, #j] $ #j0[#j]);
+
+//SER y{#i} $ #i1[#i] = x{#i}; scope is all
+//SER y{#i} = x{#i} $ #i1[#i];
+//SER y{#i} = sum(#j $ #j0[#j], x{#i}{#j}); scope is second arg
+//SER y{#i} = sum(#j, x{#i}{#j} $ #j0[#j]);
+
 series2                   : ASER | ASERIES;
 series                    : series2 seriesLhs EQUAL seriesRhs (REP star)* -> ^({token("ASTSERIES", ASTSERIES, $EQUAL.Line)}  seriesLhs seriesRhs);
 seriesLhs                 : nameWithBank ( leftBracketGlue (indexerExpressionHelper (',' indexerExpressionHelper)*)? RIGHTBRACKET)* -> ^(ASTSERIESLHS nameWithBank indexerExpressionHelper*);
 						  
 seriesRhs                 : expression (',' expression)* -> ^(ASTSERIESRHS expression+);
-						  
+
+dollarConditional         : LEFTPAREN DOLLAR DOLLAR RIGHTPAREN   //should catch #i0[#i] or #i0 might be composed but not #i
+                          | seriesLhs                            //stuff like $( #i0[#i] and #j0[#j] )
+						  ;						  
 
 seriesOpt1                : ISNOTQUAL
 						  | leftAngle2          seriesOpt1h* RIGHTANGLE -> ^(ASTOPT1 seriesOpt1h*)
@@ -2889,9 +2928,11 @@ multiplicativeExpression  : powerExpression ( starHelper^ powerExpression )*;
 
 powerExpression           : unaryExpression ( pow^ unaryExpression )*;
 
-unaryExpression           : indexerExpression
-                          | MINUS indexerExpression -> ^(NEGATE indexerExpression)
+unaryExpression           : dollarExpression
+                          | MINUS dollarExpression -> ^(NEGATE dollarExpression)
 						  ;
+
+dollarExpression          : indexerExpression ('§'^ dollarConditional)*;
 
 indexerExpression         : primaryExpression ( leftBracketGlue^ (indexerExpressionHelper (','! indexerExpressionHelper)*)? RIGHTBRACKET!)*
 						  ;

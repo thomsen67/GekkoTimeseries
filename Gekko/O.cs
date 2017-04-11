@@ -334,9 +334,23 @@ namespace Gekko
             return rv;
         }
 
-        public static void HandleIndexer(params IVariable[] x)
+        public static void HandleIndexer(IVariable y, params IVariable[] x)
         {
-            G.Writeln2("");
+            HandleIndexerHelper(0, y, x);            
+        }
+
+        public static void HandleIndexerHelper(int depth, IVariable y, params IVariable[] x)
+        {
+            if (depth >= x.Length)
+            {
+                //HandleIndexerHelper2()
+            }          
+            MetaList m = (MetaList)x[depth];
+            foreach (string s in m.list)
+            {
+                G.Writeln2(depth + " " + s);
+                HandleIndexerHelper(depth + 1, y, x);
+            }
         }
 
         public static IVariable Indexer(IVariable x, IVariable y, GekkoTime t)
