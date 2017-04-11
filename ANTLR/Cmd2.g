@@ -3920,7 +3920,7 @@ ISNOTQUAL                 : '<>';
 ISLARGEROREQUAL			  : '>=';			
 ISSMALLEROREQUAL          : '<=';
 
-AT                        : '@';
+AT                        : '@'; 
 HAT                       : '^';
 SEMICOLON                 : ';';
 COLONGLUE                 : ':|';
