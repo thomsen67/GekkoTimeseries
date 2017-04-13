@@ -2001,8 +2001,10 @@ genr2                     : SER | SERIES;
 genr3                     : SER2 | SERIES2; //has a special SERIES #m = ... pattern, see also //#098275432874
 genr4                     : SER3 | SERIES3; //has a special SERIES y = 1 -2 3 4 -3 -4 pattern, see also //#098275432874
 
-series2                   : ASER | ASERIES;
-series                    : series2 seriesLhs EQUAL seriesRhs (REP star)* -> ^({token("ASTSERIES", ASTSERIES, $EQUAL.Line)}  seriesLhs seriesRhs);
+series                    : ASER seriesLhs seriesOperator DOLLAR? seriesRhs (REP star)* -> ^({token("ASTSERIES", ASTSERIES, $ASER.Line)}  seriesLhs seriesRhs);
+seriesOperator            : EQUAL
+						  | PERCENT						  
+						  ;
 seriesLhs                 : nameWithBank ( leftBracketGlue (indexerExpressionHelper (',' indexerExpressionHelper)*)? RIGHTBRACKET)* -> ^(ASTSERIESLHS nameWithBank indexerExpressionHelper*);
 						  
 seriesRhs                 : expression (',' expression)* -> ^(ASTSERIESRHS expression+);
@@ -2897,7 +2899,7 @@ unaryExpression           : dollarExpression
                           | MINUS dollarExpression -> ^(NEGATE dollarExpression)
 						  ;
 
-dollarExpression          : indexerExpression ('§'^ dollarConditional)*;
+dollarExpression          : indexerExpression (DOLLAR^ dollarConditional)*;
 
 indexerExpression         : primaryExpression ( leftBracketGlue^ (indexerExpressionHelper (','! indexerExpressionHelper)*)? RIGHTBRACKET!)*
 						  ;

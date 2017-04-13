@@ -10751,9 +10751,9 @@ namespace Gekko
                             else if (c1 == Globals.symbolMemvar && c2 == '(') glue = true;
                             else if (c1 == Globals.symbolMemvar && c2 == '{') glue = true;
 
-                            else if (c1 == Globals.symbolDollar[0] && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
-                            else if (c1 == Globals.symbolDollar[0] && c2 == '(') glue = true;
-                            else if (c1 == Globals.symbolDollar[0] && c2 == '{') glue = true;
+                            //else if (c1 == Globals.symbolDollar[0] && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
+                            //else if (c1 == Globals.symbolDollar[0] && c2 == '(') glue = true;
+                            //else if (c1 == Globals.symbolDollar[0] && c2 == '{') glue = true;
 
                             else if (c1 == Globals.symbolList && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
                             else if (c1 == Globals.symbolList && c2 == '(') glue = true;

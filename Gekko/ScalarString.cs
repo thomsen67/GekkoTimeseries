@@ -38,7 +38,7 @@ namespace Gekko
 
         public static string SubstituteScalarsInString(string s, bool reportError, bool avoidVal)
         {
-            //UPDATE: also replaces $ and $%, for instance $n or $%n.
+            //UPDATE: also replaces $ and $%, for instance $n or $%n. NOTE!! -> $ scalars are removed not
             //Will look for '%' and find alphanumeric + underscore after that, to construct a scalar name.
             //So STRING s = 'abc%de,%f' will find two scalars. If tilde is used, scalars are not found:
             //STRING s = 'abc~%de,~%f' will return abc%d,%f
@@ -52,15 +52,15 @@ namespace Gekko
             for (int j = 0; j < s.Length - 1; j++)
             {
                 bool tilde = (j > 0 && s[j - 1] == Globals.symbolTilde);  // ~%x or ~$x or ~{x}
-                bool isDollarPercent = false;
-                bool isDollar = false;
+                //bool isDollarPercent = false;
+                //bool isDollar = false;
                 bool isCurly = false;
-                if (j > 0 && s[j - 1] == Globals.symbolDollar[0] && s[j - 0] == Globals.symbolMemvar) isDollarPercent = true;
-                if (j > 1 && s[j - 2] == Globals.symbolTilde && isDollarPercent) tilde = true;  // ~$%x
-                if (s[j] == Globals.symbolDollar[0]) isDollar = true;
+                //if (j > 0 && s[j - 1] == Globals.symbolDollar[0] && s[j - 0] == Globals.symbolMemvar) isDollarPercent = true;
+                //if (j > 1 && s[j - 2] == Globals.symbolTilde && isDollarPercent) tilde = true;  // ~$%x
+                //if (s[j] == Globals.symbolDollar[0]) isDollar = true;
                 if (s[j] == '{') isCurly = true;
-                if (j > 0 && s[j - 1] == Globals.symbolTilde && isDollar) tilde = true;  // ~$x                                
-                if ((s[j] == Globals.symbolMemvar || isDollar) && !tilde)
+                //if (j > 0 && s[j - 1] == Globals.symbolTilde && isDollar) tilde = true;  // ~$x                                
+                if ((s[j] == Globals.symbolMemvar) && !tilde)
                 {
                     string variable = null;
                     int end = -1;
@@ -108,7 +108,7 @@ namespace Gekko
                                     IVariable c = b.Add(a, Globals.tNull);
                                     string s3 = c.GetString();
                                     int x = 0;
-                                    if (isDollarPercent) x = 1;
+                                    //if (isDollarPercent) x = 1;
                                     string s4 = s.Substring(lastEnd + 1, j - lastEnd - 1 - x);
                                     s2 += s4 + s3;
                                     hit = true;
@@ -180,9 +180,9 @@ namespace Gekko
             string tp = new string(new char[] { Globals.symbolTilde, Globals.symbolMemvar });
             string p = new string(Globals.symbolMemvar, 1);
             s = s.Replace(tp, p);
-            string tp2 = new string(new char[] { Globals.symbolTilde, Globals.symbolDollar[0] });
-            string p2 = new string(Globals.symbolDollar[0], 1);
-            s = s.Replace(tp2, p2);
+            //string tp2 = new string(new char[] { Globals.symbolTilde, Globals.symbolDollar[0] });
+            //string p2 = new string(Globals.symbolDollar[0], 1);
+            //s = s.Replace(tp2, p2);
             string tp3 = new string(new char[] { '{', Globals.symbolTilde });  //a{~n}b
             string p3 = new string('{', 1);
             s = s.Replace(tp3, p3);
