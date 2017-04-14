@@ -54,7 +54,8 @@ options {
 
 //Token definitions I
 tokens {
-    ASTSERIES;
+    ASTCOMPARE2;
+	ASTSERIES;
 	ASTSERIESLHS;
 	ASTSERIESRHS;
 	ASTOPT_STRING_PREFIX;
@@ -152,6 +153,7 @@ tokens {
     ASTDOLLARHASHPAREN;
     ASTDOLLARPERCENTNAMESIMPLE;
     ASTDOLLARPERCENTPAREN;
+	ASTDOLLARCONDITIONAL;
     ASTDOTINDEXER;
     ASTDOUBLE;
     ASTDOUBLE;
@@ -2012,10 +2014,6 @@ seriesLhs                 : nameOrListOrScalarWithBank ( leftBracketGlue (indexe
 						  
 seriesRhs                 : expression (',' expression)* -> ^(ASTSERIESRHS expression+);
 
-dollarConditional         : LEFTPAREN DOLLAR DOLLAR RIGHTPAREN   //should catch #i0[#i] or #i0 might be composed but not #i
-                          | seriesLhs                            //stuff like $( #i0[#i] and #j0[#j] )
-						  ;						  
-
 // ========================== new SERIES command end =============================
 
 
@@ -2491,6 +2489,7 @@ logicalNot				  :  NOT logicalAtom     -> ^(ASTNOT logicalAtom)
 
 logicalAtom				  :  expression ifOperator expression -> ^(ASTCOMPARE ifOperator expression expression)
 						  |  leftParen! logicalOr rightParen!           // omit both '(' and ')'
+						  |  listName ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 ^(LEFTBRACKETGLUE listName expression))    //should catch #i0[#i], does not need a parenthesis!						  
 						  ;
 
 ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
@@ -2934,6 +2933,10 @@ matrixRow                 :  expression (',' expression)*  -> ^(ASTMATRIXROW exp
 
 doubleVerticalBar         : GLUE? (DOUBLEVERTICALBAR1 | DOUBLEVERTICALBAR2);
 
+dollarConditional         : LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)
+						  | listName ( leftBracketGlue listName RIGHTBRACKET ) -> ^(ASTDOLLARCONDITIONAL ^(LEFTBRACKETGLUE listName listName))    //should catch #i0[#i], does not need a parenthesis!						  
+						  ;
+                                                                           
 //using rangeWithBank and wildcardWithBank in the last of value rule gives problems with PRT [pxa..pxb] etc.
 indexerExpressionHelper   : range -> ^(ASTINDEXERELEMENT ^(ASTINDEXERELEMENTBANK) range)                             //fm1..fm5
                           | wildcard -> ^(ASTINDEXERELEMENT ^(ASTINDEXERELEMENTBANK) ^(ASTWILDCARD wildcard))                          //fm*

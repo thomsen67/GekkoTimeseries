@@ -888,6 +888,8 @@ namespace UnitTests
             //      check that ref:a,ref:b,ref:c   or    'ref:a','ref:b','ref:c'         etc are ok.
             //      check that {%b}:{%a}...
 
+            //It is also possible to use scalar strings, for instance PRT %b:%ts
+
             I("RESET;");
             I("CREATE fa, fb, fc;");
             I("CLONE;");
@@ -939,6 +941,11 @@ namespace UnitTests
             //I("PRT {%b}:[f*][1];");
             //I("PRT {%b}:[fa..fc][1];");
             //----------------------------
+
+            I("PRT %b:%s;");
+            I("PRT %b:{%s};");
+            I("PRT {%b}:%s;");
+
             //================================ PRT end ==========================================
 
 

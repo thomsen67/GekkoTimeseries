@@ -882,8 +882,31 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("!O.Equals(" + code1 + "," + code2 + ", t)");
                             }
                         }
-                        break;                    
+                        break;
 
+                    case "ASTDOLLARCONDITIONAL":
+                        {
+                            GetCodeFromAllChildren(node);
+                            break;
+                        }
+
+                    case Globals.symbolDollar:
+                        {
+                            //Codesplitting would interfere really bad here, so not allowed
+                            //Conditional, for instance SERIES y = x $ (%d == 1);
+                            //node.Code.A(Globals.splitSTOP);
+                            node.Code.A("(" + node[1].Code + ")");
+                            node.Code.A(" ? ");
+                            node.Code.A("(");                            
+                            node.Code.A(node[0].Code);                            
+                            node.Code.A(")");
+                            node.Code.A(" : ");
+                            node.Code.A("(");                            
+                            node.Code.A("new ScalarVal(0d)");                            
+                            node.Code.A(")");
+                            //node.Code.A(Globals.splitSTART);
+                            break;
+                        }
                     case "ASTFORSTATEMENTS":
                         {
                             GetCodeFromAllChildren(node);
@@ -1247,29 +1270,22 @@ namespace Gekko.Parser.Gek
                     case "ASTIF":
                         {
                             node.Code.A(Globals.splitSTOP);
-
                             node.Code.A("if(" + node[0].Code + ") {");
-
                             node.Code.A(Globals.splitSTART);
                             node.Code.A(node[1].Code);
-                            node.Code.A(Globals.splitSTOP);                            
-                            
+                            node.Code.A(Globals.splitSTOP);                                                        
                             node.Code.A("}");
                             if (node[2] != null)
                             {
                                 node.Code.A("else {");
-
                                 node.Code.A(Globals.splitSTART);
                                 node.Code.A(node[2].Code);
-                                node.Code.A(Globals.splitSTOP);
-                                
+                                node.Code.A(Globals.splitSTOP);                                
                                 node.Code.A("}");
                             }
-
                             node.Code.A(Globals.splitSTART);
                         }
                         break;
-
                     case "ASTFUNCTIONDEF":
                         {
                             //NOTE: Splitting
