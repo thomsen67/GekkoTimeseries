@@ -1185,6 +1185,21 @@ namespace Gekko
             return rv;
         }
 
+        public static bool ListContains(IVariable x, IVariable y)
+        {
+            
+            if (x.Type() != EVariableType.List || y.Type() != EVariableType.String)
+            {
+                G.Writeln2("*** ERROR: Expected syntax like ... $ #a['b'], with list and string");
+                throw new GekkoException();
+            }
+            MetaList ml = (MetaList)x;
+            ScalarString ss = (ScalarString)y;
+
+            return ml.list.Contains(ss._string2);           
+            
+        }
+
         public static bool LargerThanOrEqual(IVariable x, IVariable y, GekkoTime t)
         {
             bool rv = false;

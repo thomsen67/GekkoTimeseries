@@ -852,6 +852,11 @@ namespace Gekko.Parser.Gek
                             node.Code.A(")");
                         }
                         break;
+                    case "ASTCOMPARE2":
+                        {                            
+                            node.Code.A("O.ListContains(" + node[0].Code + "," + node[1].Code + ")");                            
+                        }
+                        break;
                     case "ASTCOMPARE":
                         {
                             string op = node[0][0].Text;

@@ -2489,7 +2489,7 @@ logicalNot				  :  NOT logicalAtom     -> ^(ASTNOT logicalAtom)
 
 logicalAtom				  :  expression ifOperator expression -> ^(ASTCOMPARE ifOperator expression expression)
 						  |  leftParen! logicalOr rightParen!           // omit both '(' and ')'
-						  |  listName ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 ^(LEFTBRACKETGLUE listName expression))    //should catch #i0[#i], does not need a parenthesis!						  
+						  |  listName ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 listName expression)    //should catch #i0[#i], does not need a parenthesis!						  
 						  ;
 
 ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
