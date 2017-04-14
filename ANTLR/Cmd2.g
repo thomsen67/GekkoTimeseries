@@ -2008,7 +2008,7 @@ series                    : ASER seriesLhs seriesOperator DOLLAR? seriesRhs (REP
 seriesOperator            : EQUAL
 						  | PERCENT						  
 						  ;
-seriesLhs                 : nameOrListOrScalarWithBank ( leftBracketGlue (indexerExpressionHelper (',' indexerExpressionHelper)*)? RIGHTBRACKET)* -> ^(ASTSERIESLHS nameWithBank indexerExpressionHelper*);
+seriesLhs                 : nameOrListOrScalarWithBank ( leftBracketGlue (indexerExpressionHelper (',' indexerExpressionHelper)*)? RIGHTBRACKET)* -> ^(ASTSERIESLHS nameOrListOrScalarWithBank indexerExpressionHelper*);
 						  
 seriesRhs                 : expression (',' expression)* -> ^(ASTSERIESRHS expression+);
 

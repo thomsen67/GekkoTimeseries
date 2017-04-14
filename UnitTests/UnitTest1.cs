@@ -2540,15 +2540,10 @@ namespace UnitTests
             // ---
             // b pV040000
             // b pV050000
-            I("string sum=''; list erha = V010000,V020000,V030000; list erhb = V040000,V050000; for i = a, b; string xx = 'erh$i'; list xxx = #(%xx) prefix=p; string sum = %sum + $#xxx[2]; end;");
+            I("string sum=''; list erha = V010000,V020000,V030000; list erhb = V040000,V050000; for i = a, b; string xx = 'erh%i'; list xxx = #(%xx) prefix=p; string sum = %sum + string(#xxx[2]); end;");
             AssertHelperScalarString("sum", "pV020000pV050000");
-            if (Globals.UNITTESTFOLLOWUP)
-            {
-                //This should work -- actually the STRING version above should not work...
-                I("string sum=''; list erha = V010000,V020000,V030000; list erhb = V040000,V050000; for i = a, b; name xx = 'erh$i'; list xxx = #(%xx) prefix=p; string sum = %sum + $#xxx[2]; end;");
-                AssertHelperScalarString("sum", "pV020000pV050000");
-            }
-            I("string sum=''; list erha = V010000,V020000,V030000; list erhb = V040000,V050000; for i = a, b; list xxx = #(erh%i) prefix=p; string sum = %sum + $#xxx[2]; end;");
+                        
+            I("string sum=''; list erha = V010000,V020000,V030000; list erhb = V040000,V050000; for i = a, b; list xxx = #(erh%i) prefix=p; string sum = %sum + string(#xxx[2]); end;");
             AssertHelperScalarString("sum", "pV020000pV050000");
 
             // ----------------- First we use % ----------------------------------------------
@@ -2563,7 +2558,7 @@ namespace UnitTests
 
             //Define a string from a name
             FAIL("STRING s3 = %n;");
-            I("STRING s4 = '$n';");
+            I("STRING s4 = '%n';");
             AssertHelperScalarString("s4", "fy");
 
             //Define a name from a string
@@ -2574,34 +2569,7 @@ namespace UnitTests
             //Define a name from a name
             FAIL("NAME n3 = %n;");  //NAME n3 = fy; would not work either
             FAIL("NAME n4 = {%n};");  //NAME n4 = fy; would not work either
-
-            // ----------------- Then we use $ ----------------------------------------------
-
-            //Define a string from a string
-            I("STRING s1 = $s;"); I("STRING s1 = $%s;"); //$ has no effect, we also test $%
-            AssertHelperScalarString("s1", "fy");
-            I("STRING s2 = 'x$s|y';");
-            AssertHelperScalarString("s2", "xfyy");
-            I("STRING s2a = 'x$%s|y';");
-            AssertHelperScalarString("s2a", "xfyy");
-
-            //Define a string from a name
-            I("STRING s3 = $n;");  //this works!
-            AssertHelperScalarString("s3", "fy");
-            I("STRING s4 = '$n';");  //double stringify must work, too
-            AssertHelperScalarString("s4", "fy");
-
-            //Define a name from a string
-            I("NAME n1 = $s;");  //$ has no effect
-            AssertHelperScalarString("n1", "fy");
-            FAIL("NAME n2 = {$s};");
-
-            //Define a name from a name
-            I("NAME n3 = $n;");  //ok
-            AssertHelperScalarString("n3", "fy");
-            FAIL("NAME n4 = {$n};");  //name becomes string, then name...
-
-            // ----------------- Using % and $ end ----------------------------------------------
+                        
 
             I("RESET;");
             I("CREATE fx, fy;");
@@ -2609,9 +2577,9 @@ namespace UnitTests
             I("NAME n = 'abc';");
             I("LIST n = fx, fy;"); //is list of names
             I("STRING s = 'def';");
-            I("STRING s2 = $n + %s + $#n[2];");
+            I("STRING s2 = '%n' + %s + string(#n[2]);");  //is string() function necessary??
             AssertHelperScalarString("s2", "abcdeffy");
-            I("STRING s3 = '$n' + %s + $#n[2];");
+            I("STRING s3 = '%n' + %s + string(#n[2]);");
             AssertHelperScalarString("s3", "abcdeffy");
             FAIL("STRING s2 = %s + %n;");
             if (Globals.UNITTESTFOLLOWUP)
@@ -2736,7 +2704,7 @@ namespace UnitTests
             I("SERIES fxb0 = 3, 4;");
             I("LIST a = a, b;");
             I("FOR i = #a; PRT fX{%i}0; END;");
-            I("FOR VAL i = 1 to #a[0]; PRT fX{$#a[%i]}0; END;");
+            I("FOR VAL i = 1 to #a[0]; PRT fX{#a[%i]}0; END;");
             if (Globals.UNITTESTFOLLOWUP)
             {
                 //these do not work yet, but should later on
@@ -2818,7 +2786,7 @@ namespace UnitTests
             I("VAL b2 = #a[0];");         //b2 = 5, length of the list as a value
             ScalarVal b2 = (ScalarVal)Program.scalars["b2"];
             Assert.AreEqual(b2.val, 5d);
-            I("STRING b3 = $#a[%i];");     //b3 = 'a2', picking out the %i'th name as a string
+            I("STRING b3 = string(#a[%i]);");     //b3 = 'a2', picking out the %i'th name as a string
             ScalarString b3 = (ScalarString)Program.scalars["b3"];
             Assert.AreEqual(b3._string2, "a2");
             I("SERIES y = #a[%i];");      //y = a2, SERIES corresponds to the SERIES command.
@@ -4117,10 +4085,10 @@ namespace UnitTests
             AssertHelperScalarString("s7", "aHejb");
             I("STRING s7a = 'a%n%n|b';");  //two substitutions
             AssertHelperScalarString("s7a", "aHejHejb");
-            I("STRING s = 'a$%n|b';");  //stringify
-            AssertHelperScalarString("s", "aHejb");
-            I("STRING ss = 'a$n|b';");  //stringify
-            AssertHelperScalarString("ss", "aHejb");
+            //I("STRING s = 'a$%n|b';");  //stringify
+            //AssertHelperScalarString("s", "aHejb");
+            //I("STRING ss = 'a$n|b';");  //stringify
+            //AssertHelperScalarString("ss", "aHejb");
 
             I("RESET;");
             I("NAME n = 'Hej';");
@@ -4165,10 +4133,11 @@ namespace UnitTests
             I("RESET;");
             I("NAME n = 'Hej';");
             I("STRING s = 'a~%n|b';");
-            I("STRING s = 'a~$%n|b';");  //stringify
-            AssertHelperScalarString("s", "a$%nb");
-            I("STRING ss = 'a~$n|b';");  //stringify
-            AssertHelperScalarString("ss", "a$nb");
+            AssertHelperScalarString("s", "a%nb");
+            //I("STRING s = 'a~$%n|b';");  //stringify
+            //AssertHelperScalarString("s", "a$%nb");
+            //I("STRING ss = 'a~$n|b';");  //stringify
+            //AssertHelperScalarString("ss", "a$nb");
 
             I("RESET;");
             I("NAME n = 'Hej';");
@@ -5284,14 +5253,14 @@ namespace UnitTests
             I("LIST m2 = a2, b2;");
             I("LIST m3 = a3, b3;");
             I("STRING s = '';");
-            I("FOR i=#m1 j=#m2; STRING s = %s + '[$i,$j]'; END;");
+            I("FOR i=#m1 j=#m2; STRING s = %s + '[%i,%j]'; END;");
             AssertHelperScalarString("s", "[a1,a2][b1,b2]");
             I("STRING s = '';");
-            I("FOR i=#m1 j=#m2 k=#m3; STRING s = %s + '[$i,$j,$k]'; END;");
+            I("FOR i=#m1 j=#m2 k=#m3; STRING s = %s + '[%i,%j,%k]'; END;");
             AssertHelperScalarString("s", "[a1,a2,a3][b1,b2,b3]");
 
             I("STRING s = '';");
-            I("FOR i=#m1 j=#m2; FOR ii=#m1 jj=#m2; STRING s = %s + '[$i,$j,$ii,$jj]'; END; END;");
+            I("FOR i=#m1 j=#m2; FOR ii=#m1 jj=#m2; STRING s = %s + '[%i,%j,%ii,%jj]'; END; END;");
             AssertHelperScalarString("s", "[a1,a2,a1,a2][a1,a2,b1,b2][b1,b2,a1,a2][b1,b2,b1,b2]");
 
             FAIL("FOR i=#m1 i=#m2; END;");
