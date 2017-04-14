@@ -2001,17 +2001,23 @@ genr2                     : SER | SERIES;
 genr3                     : SER2 | SERIES2; //has a special SERIES #m = ... pattern, see also //#098275432874
 genr4                     : SER3 | SERIES3; //has a special SERIES y = 1 -2 3 4 -3 -4 pattern, see also //#098275432874
 
+
+// ========================== new SERIES command start =============================
+
 series                    : ASER seriesLhs seriesOperator DOLLAR? seriesRhs (REP star)* -> ^({token("ASTSERIES", ASTSERIES, $ASER.Line)}  seriesLhs seriesRhs);
 seriesOperator            : EQUAL
 						  | PERCENT						  
 						  ;
-seriesLhs                 : nameWithBank ( leftBracketGlue (indexerExpressionHelper (',' indexerExpressionHelper)*)? RIGHTBRACKET)* -> ^(ASTSERIESLHS nameWithBank indexerExpressionHelper*);
+seriesLhs                 : nameOrListOrScalarWithBank ( leftBracketGlue (indexerExpressionHelper (',' indexerExpressionHelper)*)? RIGHTBRACKET)* -> ^(ASTSERIESLHS nameWithBank indexerExpressionHelper*);
 						  
 seriesRhs                 : expression (',' expression)* -> ^(ASTSERIESRHS expression+);
 
 dollarConditional         : LEFTPAREN DOLLAR DOLLAR RIGHTPAREN   //should catch #i0[#i] or #i0 might be composed but not #i
                           | seriesLhs                            //stuff like $( #i0[#i] and #j0[#j] )
 						  ;						  
+
+// ========================== new SERIES command end =============================
+
 
 seriesOpt1                : ISNOTQUAL
 						  | leftAngle2          seriesOpt1h* RIGHTANGLE -> ^(ASTOPT1 seriesOpt1h*)
@@ -2992,6 +2998,10 @@ nameOrListOrScalarWithBank: name bankColon nameWithDot -> ^(ASTNAMEWITHBANK ^(AS
 						  | name bankColon listName -> ^(ASTLISTWITHBANK ^(ASTBANK name) listName)						  						
 						  | name bankColon scalarName -> ^(ASTNAMEWITHBANK ^(ASTBANK name) scalarName)
 						
+						  | scalarName bankColon nameWithDot -> ^(ASTNAMEWITHBANK ^(ASTBANK scalarName) nameWithDot)
+						  | scalarName bankColon listName -> ^(ASTLISTWITHBANK ^(ASTBANK scalarName) listName)						  						
+						  | scalarName bankColon scalarName -> ^(ASTNAMEWITHBANK ^(ASTBANK scalarName) scalarName)
+
 						  | AT GLUE nameWithDot ->  ^(ASTNAMEWITHBANK ^(ASTBANK ASTAT) nameWithDot)
 						  | AT GLUE listName ->  ^(ASTLISTWITHBANK ^(ASTBANK ASTAT) listName)	
 						  | AT GLUE scalarName -> ^(ASTNAMEWITHBANK ^(ASTBANK ASTAT) scalarName)						
@@ -3000,15 +3010,18 @@ nameOrListOrScalarWithBank: name bankColon nameWithDot -> ^(ASTNAMEWITHBANK ^(AS
 						  ;						
 
 nameWithBank              : name bankColon nameWithDot -> ^(ASTNAMEWITHBANK ^(ASTBANK name) nameWithDot)
+						  | scalarName bankColon nameWithDot -> ^(ASTNAMEWITHBANK ^(ASTBANK scalarName) nameWithDot)
 						  | AT GLUE nameWithDot ->  ^(ASTNAMEWITHBANK ^(ASTBANK ASTAT) nameWithDot)
 						  | nameWithDot -> ^(ASTNAMEWITHBANK ^(ASTBANK) nameWithDot)
 						  ;
 
 listWithBank              : name bankColon listName -> ^(ASTLISTWITHBANK ^(ASTBANK name) listName)
+						  | scalarName bankColon listName -> ^(ASTLISTWITHBANK ^(ASTBANK scalarName) listName)
 						  | AT GLUE listName ->  ^(ASTLISTWITHBANK ^(ASTBANK ASTAT) listName)						
 						  ;
 
 scalarWithBank            : name bankColon scalarName -> ^(ASTNAMEWITHBANK ^(ASTBANK name) scalarName)
+						  | scalarName bankColon scalarName -> ^(ASTNAMEWITHBANK ^(ASTBANK scalarName) scalarName)
 						  | AT GLUE scalarName ->  ^(ASTNAMEWITHBANK ^(ASTBANK ASTAT) scalarName)
 						  | scalarName -> ^(ASTNAMEWITHBANK ^(ASTBANK) scalarName)
 						  ;
