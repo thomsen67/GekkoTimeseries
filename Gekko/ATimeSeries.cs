@@ -35,7 +35,12 @@ namespace Gekko
 
         public IVariable Indexer(IVariable index, GekkoTime t)
         {
-            if (index.Type() == EVariableType.Val)
+            if (index.Type() == EVariableType.String)
+            {
+                string s = ((ScalarString)index)._string2;
+                throw new GekkoException();  //FIXME
+            }
+            else if (index.Type() == EVariableType.Val)
             {
                 int ival = O.GetInt(index);
                 if (ival >= 1900)

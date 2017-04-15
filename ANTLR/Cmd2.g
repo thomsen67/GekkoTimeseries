@@ -55,6 +55,8 @@ options {
 //Token definitions I
 tokens {
     ASTCOMPARE2;
+	ASTSERIESOPERATOR;
+	ASTSERIESDOLLARCONDITION;
 	ASTSERIES;
 	ASTSERIESLHS;
 	ASTSERIESRHS;
@@ -2006,7 +2008,7 @@ genr4                     : SER3 | SERIES3; //has a special SERIES y = 1 -2 3 4 
 
 // ========================== new SERIES command start =============================
 
-series                    : ASER seriesLhs seriesOperator DOLLAR? seriesRhs (REP star)* -> ^({token("ASTSERIES", ASTSERIES, $ASER.Line)}  seriesLhs seriesRhs);
+series                    : ASER seriesLhs (DOLLAR dollarConditional)? seriesOperator DOLLAR? seriesRhs (REP star)* -> ^({token("ASTSERIES", ASTSERIES, $ASER.Line)}  seriesLhs seriesRhs ^(ASTSERIESDOLLARCONDITION dollarConditional?) ^(ASTSERIESOPERATOR seriesOperator));
 seriesOperator            : EQUAL
 						  | PERCENT						  
 						  ;

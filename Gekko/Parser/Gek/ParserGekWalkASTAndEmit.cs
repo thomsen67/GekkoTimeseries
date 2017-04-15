@@ -1788,10 +1788,34 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTSERIES":
                         {
-                            //GENR fy = ...                            
-                            node.Code.A(node[0].Code);
-                            node.Code.A(node[1].Code);
-                            //string s1 = node[0].Code.ToString();
+
+                            //ASTNode node, string numNode, string childCodePeriod, string childCodeLhsName, string childCodeRhs, W w, string lhsFunction
+
+                            string childCodePeriod = "";  //FIXME                            
+                            string childCodeLhsName = node[0].Code.ToString();
+                            string childCodeRhs = node[1].Code.ToString();
+                            string numNode = Num(node);
+                            string nodeCode = null;
+                            nodeCode += "O.Series o" + numNode + " = new O.Series();" + G.NL;
+                            nodeCode = EmitLocalCacheForTimeLooping(nodeCode, w);
+                            nodeCode += childCodePeriod + G.NL;  //dates
+                            nodeCode += "o" + numNode + ".lhs = null;" + G.NL;
+                            nodeCode += "o" + numNode + ".p = p;" + G.NL;
+                            nodeCode += "foreach (GekkoTime t2 in new GekkoTimeIterator(o" + numNode + ".t1, o" + numNode + ".t2))" + G.NL;
+                            nodeCode += GekkoTimeIteratorStartCode(w, node);
+                            nodeCode += "  double data = O.GetVal(" + childCodeRhs + ", t);" + G.NL;
+                            nodeCode += "if(o" + numNode + ".lhs == null) o" + numNode + ".lhs = O.GetTimeSeries(" + childCodeLhsName + ");" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
+                                                                                                                                                     //nodeCode += "  double dataLag = O.GetVal(o" + numNode + ".lhs, t.Add(-1));" + G.NL;
+                                                                                                                                                     //HANDLE LEFT-SIDE FUNCTION!!
+
+                            nodeCode += GekkoTimeIteratorEndCode();
+
+                            if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
+                            {
+                                //specialExpressionAndLabelInfo[0] should be "ASTMETA" here
+                                nodeCode += "o" + numNode + ".meta = @`" + node.Parent.specialExpressionAndLabelInfo[1] + "`;" + G.NL;
+                            }
+                            nodeCode += "o" + numNode + ".Exe();" + G.NL;
 
                         }
                         break;                    
