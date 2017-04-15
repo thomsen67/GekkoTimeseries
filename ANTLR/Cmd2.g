@@ -2489,7 +2489,7 @@ logicalNot				  :  NOT logicalAtom     -> ^(ASTNOT logicalAtom)
 
 logicalAtom				  :  expression ifOperator expression -> ^(ASTCOMPARE ifOperator expression expression)
 						  |  leftParen! logicalOr rightParen!           // omit both '(' and ')'
-						  |  listName ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 listName expression)    //should catch #i0[#i], does not need a parenthesis!						  
+						  |  listWithIndexer
 						  ;
 
 ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
@@ -2499,6 +2499,8 @@ ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
 			              |  ISLARGEROREQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR5)
 						  |  ISSMALLEROREQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR6)
 			              ;
+
+listWithIndexer           : listName ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 listName expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!  //should catch #i0[#i], does not need a parenthesis!						  
 
 truncateOpt1              : ISNOTQUAL | leftAngle truncateOpt1h? RIGHTANGLE -> truncateOpt1h?;
 truncateOpt1h             : dates -> ^(ASTDATES dates);
@@ -2933,8 +2935,8 @@ matrixRow                 :  expression (',' expression)*  -> ^(ASTMATRIXROW exp
 
 doubleVerticalBar         : GLUE? (DOUBLEVERTICALBAR1 | DOUBLEVERTICALBAR2);
 
-dollarConditional         : LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)
-						  | listName ( leftBracketGlue listName RIGHTBRACKET ) -> ^(ASTDOLLARCONDITIONAL ^(LEFTBRACKETGLUE listName listName))    //should catch #i0[#i], does not need a parenthesis!						  
+dollarConditional         : LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)  //logicalOr can contain a listWithIndexer
+						  | listWithIndexer						  
 						  ;
                                                                            
 //using rangeWithBank and wildcardWithBank in the last of value rule gives problems with PRT [pxa..pxb] etc.

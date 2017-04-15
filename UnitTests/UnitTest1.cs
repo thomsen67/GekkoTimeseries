@@ -869,6 +869,47 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void Test__DollarConditional()
+        {
+            I("RESET; MODE data;");
+            I("TIME 2000 2000;");
+            I("VAL v = 10;");
+            I("LIST m = a, b;");
+            I("SERIES y = 2;");            
+            I("SERIES y = 3 $ (%v == 9);");
+            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+            I("SERIES y = 2;");            
+            I("SERIES y = 3 $ (%v == 10);");
+            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+            I("SERIES y = 2;");            
+            I("SERIES y = 3 $ (#m['c']);");
+            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+            I("SERIES y = 2;");            
+            I("SERIES y = 3 $ (#m['b']);");
+            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (#m['b'] and %v == 10);");
+            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (#m['b'] and %v == 9);");
+            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (#m['c'] and %v == 10);");
+            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (#m['c'] or %v == 10);");
+            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+
+            //Without parenthesis (...) for lists
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ #m['a'];");
+            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ #m['c'];");
+            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+        }
+
+        [TestMethod]
         public void Test__BankSyntaxLogic()
         {
             //COPY: (the following should work for LIST command, too, excluding the stand-alone wildcards a*b and a..b)
