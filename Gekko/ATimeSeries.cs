@@ -66,32 +66,11 @@ namespace Gekko
                 {
                     throw new GekkoException();  //should not be possible
                 }
-                string hash = null;
-                //this produces a string like "b,nz,w"
-                for (int i = 0; i < indexes.Length; i++)
-                {
-                    if (indexes[i].Type() != EVariableType.String)
-                    {
-                        G.Writeln2("*** ERROR: Expected " + this.ts.variableName + "[] indexer element #" + (i + 1) + " to be STRING");
-                        throw new GekkoException();
-                    }
-                    if (i > 0) hash += ",";  //ok as delimiter
-                    hash += ((ScalarString)indexes[i])._string2;
-                }
-                if (this.ts.timeSeriesArray == null)
-                {
-                    G.Writeln2("*** ERROR: The timeseries " + this.ts.variableName + " is not an array-timeseries");
-                    throw new GekkoException();
-                }
-                TimeSeries ts = null;
-                ts = this.ts.timeSeriesArray[hash];
-                if (ts == null)
-                {
-                    G.Writeln2("*** ERROR: Array-timeseries " + this.ts.variableName + "[" + G.PrettifyTimeseriesHash(hash) + "] not found");
-                }
-                return new MetaTimeSeries(ts);
+                TimeSeries ts = O.GetArrayTimeSeries(this.ts, indexes);
+                MetaTimeSeries mts = new MetaTimeSeries(ts);
+                return mts;
             }
-        }       
+        }               
 
         public IVariable Indexer(IVariablesFilterRange indexRange, GekkoTime t)
         {

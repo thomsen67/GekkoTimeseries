@@ -12,49 +12,44 @@ namespace Gekko
     {
         public static GekkoTime globalGekkoTimeIterator = Globals.tNull;
         public static
-         IVariable list3 = null;
+         readonly ScalarVal i2 = new ScalarVal(5d);
         public static void ClearTS(P p)
         {
         }
-        public static void ClearScalar(P p)
+        public static void
+         ClearScalar(P p)
         {
         }
         public static void C0(P p)
         {
 
-            GekkoTime t = Globals.tNull;
+            GekkoTime t =
+             Globals.tNull;
 
 
             p.SetText(@"¤1");
-            O.Genr o0
-             = new O.Genr();
-            IVariable ts1 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" +
-             O.GetString((new ScalarString("y"))), 1, O.ECreatePossibilities.Can);
-            IVariable ts2 =
-             O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new
-             ScalarString("x"))), 1);
-            o0.t1 = Globals.globalPeriodStart;
-            o0.t2 =
-             Globals.globalPeriodEnd;
+            O.Reset o0 = new O.Reset();
+            o0.p =
+             p; o0.Exe();
 
-            o0.lhs = null;
-            o0.p = p;
-            foreach (GekkoTime t2 in new
-             GekkoTimeIterator(o0.t1, o0.t2))
+
+
+
+            p.SetText(@"¤3");
+            O.Series o1 = new O.Series();
+
+            o1.lhs = null;
+            o1.p =
+             p;
+            foreach (GekkoTime t2 in new GekkoTimeIterator(o1.t1, o1.t2))
             {
                 t = t2;
-                double data = O.GetVal((true
-              ) ? (ts2) : (new
-               ScalarVal(0d)), t);
-                if (o0.lhs == null) o0.lhs = O.GetTimeSeries(ts1);
-                o0.lhs.SetData(t,
-                 data);
+                double data =
+               O.GetVal(i2, t);
+                MetaTimeSeries mts= O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")), 1, new ScalarString(@"a"), new ScalarString(@"b"));
             }
             t = Globals.tNull;
-            o0.meta = @"ser y = x $
- #m['a']";
-            o0.Exe();
-
+            o1.Exe();
 
 
 
@@ -62,10 +57,10 @@ namespace Gekko
         }
 
 
-        public static void CodeLines(P p)
+        public static void
+         CodeLines(P p)
         {
-            GekkoTime t =
-             Globals.tNull;
+            GekkoTime t = Globals.tNull;
 
             C0(p);
 

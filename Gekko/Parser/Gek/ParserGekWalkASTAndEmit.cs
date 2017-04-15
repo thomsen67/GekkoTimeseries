@@ -1816,28 +1816,41 @@ namespace Gekko.Parser.Gek
                                 nodeCode += "o" + numNode + ".meta = @`" + node.Parent.specialExpressionAndLabelInfo[1] + "`;" + G.NL;
                             }
                             nodeCode += "o" + numNode + ".Exe();" + G.NL;
+                            node.Code.A(nodeCode);
 
                         }
                         break;                    
                     case "ASTSERIESLHS":
                         {
-                            ASTNode n0 = node[0];
-                            ASTNode n1 = node[1];
-                            ASTNode n2 = node[2];
+
                             string s = null;
+
                             for (int i = 1; i < node.ChildrenCount(); i++)
                             {
-                                s += node[i].Code + ", ";
+                                s += ", ";
+                                s += node[i].Code;
                             }
-                            if (s != null) s = s.Substring(0, s.Length - 2);
-                            string ss = ", " + s;
-                            if (s == null) ss = null;
-                            node.Code.CA("O.HandleIndexer(" + node[0].Code + ss + ");");
+
+                            node.Code.A("O.GetTimeSeries(" + node[0].Code + ", 1" + s + ");" + G.NL);  //1 is banknumber (1 for first)
+                            //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
+
+                            //ASTNode n0 = node[0];
+                            //ASTNode n1 = node[1];
+                            //ASTNode n2 = node[2];
+                            //string s = null;
+                            //for (int i = 1; i < node.ChildrenCount(); i++)
+                            //{
+                            //    s += node[i].Code + ", ";
+                            //}
+                            //if (s != null) s = s.Substring(0, s.Length - 2);
+                            //string ss = ", " + s;
+                            //if (s == null) ss = null;
+                            //node.Code.CA("O.HandleIndexer(" + node[0].Code + ss + ");");
                         }
                         break;
                     case "ASTSERIESRHS":
                         {
-                            node.Code.CA(node[0].Code.ToString() + ";");
+                            node.Code.CA(node[0].Code.ToString());
                         }
                         break;
                     case "ASTGENRLHSFUNCTION":

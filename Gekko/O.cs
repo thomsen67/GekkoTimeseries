@@ -1054,11 +1054,21 @@ namespace Gekko
 
         public static MetaTimeSeries GetTimeSeries(string originalName, int bankNumber)
         {
-            return GetTimeSeries(originalName, bankNumber, ECreatePossibilities.None);
+            return GetTimeSeries(originalName, bankNumber, ECreatePossibilities.None, null);
+        }
+
+        public static MetaTimeSeries GetTimeSeries(string originalName, int bankNumber, ECreatePossibilities canAutoCreate)
+        {
+            return GetTimeSeries(originalName, bankNumber, canAutoCreate, null);
+        }
+
+        public static MetaTimeSeries GetTimeSeries(string originalName, int bankNumber, params IVariable[] indexes)
+        {
+            return GetTimeSeries(originalName, bankNumber, ECreatePossibilities.None, indexes);
         }
 
         //See also Program.GetTimeSeriesFromString()
-        public static MetaTimeSeries GetTimeSeries(string originalName, int bankNumber, ECreatePossibilities canAutoCreate)
+        public static MetaTimeSeries GetTimeSeries(string originalName, int bankNumber, ECreatePossibilities canAutoCreate, params IVariable[] indexes)
         {            
             ExtractBankAndRestHelper h = Program.ExtractBankAndRest(originalName, EExtrackBankAndRest.OnlyStrings);
 
@@ -1072,10 +1082,40 @@ namespace Gekko
                 h.bank = Program.databanks.GetRef().aliasName;  //overrides the bank name given
                 h.hasColon = true;  //signals later on that this bank is explicitely given, so we cannot search for the timeseries
             }
-            TimeSeries ts = Program.FindOrCreateTimeseries(h.bank, h.name, canAutoCreate, h.hasColon, false);
-            MetaTimeSeries ats = new MetaTimeSeries(ts);
-            return ats;
-        }        
+            TimeSeries ts = Program.FindOrCreateTimeseries(h.bank, h.name, canAutoCreate, h.hasColon, false);            
+            TimeSeries ats = O.GetArrayTimeSeries(ts, indexes);
+            MetaTimeSeries mts = new MetaTimeSeries(ats);
+            return mts;
+        }
+
+        public static TimeSeries GetArrayTimeSeries(TimeSeries its, IVariable[] indexes)
+        {
+            string hash = null;
+            //this produces a string like "b,nz,w"
+            for (int i = 0; i < indexes.Length; i++)
+            {
+                if (indexes[i].Type() != EVariableType.String)
+                {
+                    G.Writeln2("*** ERROR: Expected " + its.variableName + "[] indexer element #" + (i + 1) + " to be STRING");
+                    throw new GekkoException();
+                }
+                if (i > 0) hash += ",";  //ok as delimiter
+                hash += ((ScalarString)indexes[i])._string2;
+            }
+            if (its.timeSeriesArray == null)
+            {
+                G.Writeln2("*** ERROR: The timeseries " + its.variableName + " is not an array-timeseries");
+                throw new GekkoException();
+            }
+            TimeSeries ts = null;
+            ts = its.timeSeriesArray[hash];
+            if (ts == null)
+            {
+                G.Writeln2("*** ERROR: Array-timeseries " + its.variableName + "[" + G.PrettifyTimeseriesHash(hash) + "] not found");
+            }
+
+            return ts;
+        }
 
         public static IVariable GetListWithBankPrefix(IVariable x, IVariable y, int bankNumber)
         {
@@ -1642,7 +1682,7 @@ namespace Gekko
         {            
             return a.GetVal(t);            
         }               
-
+                
         public static TimeSeries GetTimeSeries(IVariable a)
         {
             if (a.Type() == EVariableType.TimeSeries)
@@ -3755,6 +3795,32 @@ namespace Gekko
                     G.Write2("1 series updated " + t1.ToString() + "-" + t2.ToString() + " "); G.ServiceMessage();
                 }
             }            
+        }
+
+
+        public class Series
+        {
+            public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
+            public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
+            public string lhsFunction = null;
+            public TimeSeries lhs = null;
+            public string meta = null;
+            public P p = null;
+            public void Exe()
+            {
+                if (this.meta != null)
+                {
+                    //For instance, "SERIES y = 2 * x;" --> meta = "SERIES y = 2 * x" (without the semicolon)    
+                    string s = ShowDatesAsString(this.t1, this.t2);
+                    lhs.source = s + this.meta;
+                    lhs.isDirty = true;
+                }
+                lhs.Stamp();
+                if (this.p.IsSimple())
+                {
+                    G.Write2("1 series updated " + t1.ToString() + "-" + t2.ToString() + " "); G.ServiceMessage();
+                }
+            }
         }
 
         public class Index
