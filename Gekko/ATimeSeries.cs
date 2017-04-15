@@ -25,20 +25,16 @@ namespace Gekko
             //ONLY use this in Index() function here
             this.ts = ts;
             this.offset = offset;
-        }        
+        }
 
         public IVariable Indexer(GekkoTime t, params IVariable[] indexes)
         {
-            if (indexes.Length == 1)
+            if (indexes.Length == 1 && (indexes[0].Type() == EVariableType.Val || indexes[0].Type() == EVariableType.Date))
             {
+                //y[2010] or y[-1]
                 IVariable index = indexes[0];
-                if (index.Type() == EVariableType.String)
-                {
-                    string s = ((ScalarString)index)._string2;
-                    throw new GekkoException();  //FIXME
-                }
-                else if (index.Type() == EVariableType.Val)
-                {
+
+                if (index.Type() == EVariableType.Date) {
                     int ival = O.GetInt(index);
                     if (ival >= 1900)
                     {
@@ -60,17 +56,42 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Expected indexer to be DATE or VAL");
+                    //should not be possible
                     throw new GekkoException();
                 }
             }
             else
             {
-                G.Writeln2("*** ERROR: Cannot use " + indexes.Length + "-dimensional indexer on SERIES");
-                throw new GekkoException();
+                if (indexes.Length == 0)
+                {
+                    throw new GekkoException();  //should not be possible
+                }
+                string hash = null;
+                //this produces a string like "b,nz,w"
+                for (int i = 0; i < indexes.Length; i++)
+                {
+                    if (indexes[i].Type() != EVariableType.String)
+                    {
+                        G.Writeln2("*** ERROR: Expected " + this.ts.variableName + "[] indexer element #" + (i + 1) + " to be STRING");
+                        throw new GekkoException();
+                    }
+                    if (i > 0) hash += ",";  //ok as delimiter
+                    hash += ((ScalarString)indexes[i])._string2;
+                }
+                if (this.ts.timeSeriesArray == null)
+                {
+                    G.Writeln2("*** ERROR: The timeseries " + this.ts.variableName + " is not an array-timeseries");
+                    throw new GekkoException();
+                }
+                TimeSeries ts = null;
+                ts = this.ts.timeSeriesArray[hash];
+                if (ts == null)
+                {
+                    G.Writeln2("*** ERROR: Array-timeseries " + this.ts.variableName + "[" + G.PrettifyTimeseriesHash(hash) + "] not found");
+                }
+                return new MetaTimeSeries(ts);
             }
-
-        }
+        }       
 
         public IVariable Indexer(IVariablesFilterRange indexRange, GekkoTime t)
         {

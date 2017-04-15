@@ -139,6 +139,10 @@ namespace Gekko
         /// <summary>
         /// The time of the last last change in the timeseries
         /// </summary>
+        /// 
+
+        [ProtoMember(13)]
+        public GekkoDictionary<string, TimeSeries> timeSeriesArray = null;
         
         public bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf

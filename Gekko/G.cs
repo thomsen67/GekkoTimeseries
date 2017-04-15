@@ -629,6 +629,11 @@ namespace Gekko
         //also accepts [-1] (AREMOS)
         // i is located at the first lag parenthesis in fy(-1)
 
+        public static string PrettifyTimeseriesHash(string hash)
+        {
+            return "'" + hash.Replace(",", "', '") + "'";
+        }
+
         public static List<string> RemoveEmptyLines(List<string> s)
         {
             List<string> xx = new List<string>();
