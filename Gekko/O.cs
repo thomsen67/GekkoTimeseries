@@ -360,20 +360,20 @@ namespace Gekko
                 //[y]
                 //['q*']
                 ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);  //a bit cheating, but we save an interface method, and performance is not really an issue when indexing whole databanks
-                return ss.Indexer(y, t);
+                return ss.Indexer(t, new IVariable[] { y });  //must have an array of these
             }
             else
             {
                 //x[y]
                 //a[1] or #a['q*']
-                return x.Indexer(y, t);
+                return x.Indexer(t, new IVariable[] { y });
             }
         }
 
         public static IVariable Indexer(IVariable x, IVariable y, IVariable z, GekkoTime t)
         {
             //#x[1, 2]            
-            return x.Indexer(y, z, t);            
+            return x.Indexer(t, new IVariable[] { y, z });            
         }
 
         public static IVariable IndexerPlus(IVariable x, IVariable y, GekkoTime t)
@@ -387,7 +387,7 @@ namespace Gekko
             {
                 //x[+y], #a[+'q*'], hmmmmmmmmmmmmmmm
                 //a[+1] ok
-                return x.Indexer(y, t);
+                return x.Indexer(t, new IVariable[] { y });
             }
         }
 
@@ -1033,7 +1033,7 @@ namespace Gekko
         {
             if (list.Type() == EVariableType.List)
             {
-                ScalarString x = (ScalarString)list.Indexer(index, t);  //will return ScalarString with .isName = true.
+                ScalarString x = (ScalarString)list.Indexer(t, new IVariable[] { index });  //will return ScalarString with .isName = true.
                 MetaTimeSeries mts = O.GetTimeSeries(x._string2, 1);  //always from work....
                 return mts;
             }

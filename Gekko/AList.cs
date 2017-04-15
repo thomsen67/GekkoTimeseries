@@ -19,54 +19,58 @@ namespace Gekko
         {
             this.list = list;
         }
+               
 
-        public IVariable Indexer(IVariable index1, IVariable index2, GekkoTime t)
+        public IVariable Indexer(GekkoTime t, params IVariable[] indexes)
         {
-            G.Writeln2("List cannot used with [i, j] indexer");
-            throw new GekkoException();
-        }
-
-        public IVariable Indexer(IVariable index, GekkoTime t)
-        {
-            //Indices run from 1, 2, 3, ... n. Element 0 is length of list.
-            if (index.Type() == EVariableType.Val)
-            {                
-                int ival = O.GetInt(index);
-                if (ival < 0)
-                {
-                    G.Writeln2("*** ERROR: Illegal element access [" + ival + "]: negative number not allowed");
-                    throw new GekkoException();
-                }
-                else if (ival == 0)
-                {
-                    ScalarVal a = new ScalarVal(this.list.Count);
-                    return a;
-                }
-                else if (ival > this.list.Count)
-                {
-                    G.Writeln2("*** ERROR: Illegal element access [" + ival + "]: larger than length of list (" + this.list.Count + ")");
-                    throw new GekkoException();
-                }
-                string s = this.list[ival - 1];
-
-                IVariable ss = null;
-                ss = new ScalarString(s, isNameList);
-                if (Globals.fixIndexerMaybeTransform)
-                {
-                    bool didTransform = false;
-                    ss = O.MaybeTransform(ref didTransform, ss, true);
-                }
-                return ss;
-            }
-            else if (index.Type() == EVariableType.String)
+            if (indexes.Length == 1)
             {
-                string s5 = ((ScalarString)index)._string2;
-                List<string> found = Program.MatchWildcard(s5, this.list, null);
-                return new MetaList(found);
+                IVariable index = indexes[0];
+                //Indices run from 1, 2, 3, ... n. Element 0 is length of list.
+                if (index.Type() == EVariableType.Val)
+                {
+                    int ival = O.GetInt(index);
+                    if (ival < 0)
+                    {
+                        G.Writeln2("*** ERROR: Illegal element access [" + ival + "]: negative number not allowed");
+                        throw new GekkoException();
+                    }
+                    else if (ival == 0)
+                    {
+                        ScalarVal a = new ScalarVal(this.list.Count);
+                        return a;
+                    }
+                    else if (ival > this.list.Count)
+                    {
+                        G.Writeln2("*** ERROR: Illegal element access [" + ival + "]: larger than length of list (" + this.list.Count + ")");
+                        throw new GekkoException();
+                    }
+                    string s = this.list[ival - 1];
+
+                    IVariable ss = null;
+                    ss = new ScalarString(s, isNameList);
+                    if (Globals.fixIndexerMaybeTransform)
+                    {
+                        bool didTransform = false;
+                        ss = O.MaybeTransform(ref didTransform, ss, true);
+                    }
+                    return ss;
+                }
+                else if (index.Type() == EVariableType.String)
+                {
+                    string s5 = ((ScalarString)index)._string2;
+                    List<string> found = Program.MatchWildcard(s5, this.list, null);
+                    return new MetaList(found);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Type mismatch regarding []-index");
+                    throw new GekkoException();
+                }
             }
             else
             {
-                G.Writeln2("*** ERROR: Type mismatch regarding []-index");                
+                G.Writeln2("*** ERROR: Cannot use " + indexes.Length + "-dimensional indexer on LIST");
                 throw new GekkoException();
             }
         }

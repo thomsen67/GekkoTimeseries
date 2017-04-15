@@ -48,36 +48,33 @@ namespace Gekko
             return EVariableType.Date;
         }
 
-        public IVariable Indexer(IVariable index1, IVariable index2, GekkoTime t)
+        public IVariable Indexer(GekkoTime t, params IVariable[] index1)
         {
-            G.Writeln2("Date cannot used with [i, j] indexer");
+            G.Writeln2("*** ERROR: Cannot use []-indexer on DATE");
             throw new GekkoException();
         }
-
-        public IVariable Indexer(IVariable index, GekkoTime t)
-        {
-            G.Writeln2("*** ERROR: You cannot use []-index on DATE");                
-            throw new GekkoException();
-        }
-
+        
         public IVariable Indexer(IVariablesFilterRange indexRange, GekkoTime t)
         {
-            G.Writeln2("*** ERROR: You cannot use []-index on DATE");                
+            G.Writeln2("*** ERROR: Cannot use []-indexer on DATE");
             throw new GekkoException();
         }
 
         public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, GekkoTime t)
         {
+            G.Writeln2("*** ERROR: Cannot use []-indexer on DATE");
             throw new GekkoException();
         }
 
         public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, GekkoTime t)
         {
+            G.Writeln2("*** ERROR: Cannot use []-indexer on DATE");
             throw new GekkoException();
         }
 
         public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, GekkoTime t)
         {
+            G.Writeln2("*** ERROR: Cannot use []-indexer on DATE");
             throw new GekkoException();
         }        
 

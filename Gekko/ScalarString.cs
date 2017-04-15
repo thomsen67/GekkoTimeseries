@@ -207,50 +207,53 @@ namespace Gekko
         public EVariableType Type()
         {
             return EVariableType.String;
-        }
+        }                       
 
-
-        public IVariable Indexer(IVariable index1, IVariable index2, GekkoTime t)
+        public IVariable Indexer(GekkoTime t, params IVariable[] indexes)
         {
-            G.Writeln2("String cannot used with [i, j] indexer");
-            throw new GekkoException();
-        }
-
-        public IVariable Indexer(IVariable index, GekkoTime t)
-        {
-            IVariable rv = null;
-            if (this._string2 == Globals.indexerAloneCheatString)
+            if (indexes.Length == 1)
             {
-                //corresponds to empty indexer like ['fy*'], different from #a['fy*']
-                if (index.Type() == EVariableType.String)
+                IVariable index = indexes[0];
+                IVariable rv = null;
+                if (this._string2 == Globals.indexerAloneCheatString)
                 {
-                    //string vars = null;                    
-                    ExtractBankAndRestHelper h = Program.ExtractBankAndRest(((ScalarString)index)._string2, EExtrackBankAndRest.GetDatabank);                   
-                    List<string> output = Program.MatchWildcardInDatabank(h.name, h.databank);
-                    rv = new MetaList(output);
+                    //corresponds to empty indexer like ['fy*'], different from #a['fy*']
+                    if (index.Type() == EVariableType.String)
+                    {
+                        //string vars = null;                    
+                        ExtractBankAndRestHelper h = Program.ExtractBankAndRest(((ScalarString)index)._string2, EExtrackBankAndRest.GetDatabank);
+                        List<string> output = Program.MatchWildcardInDatabank(h.name, h.databank);
+                        rv = new MetaList(output);
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: The inside of a free-standing [...] list should not be a");
+                        G.Writeln("    VAL, DATE or the like, for instance PRT [2.3] or PRT [2010q5].");
+                        G.Writeln("    The right use is PRT [gd*] and similar.");
+                        throw new GekkoException();
+                    }
+                }
+                else if (this._isName)
+                {
+                    //#8932074324
+                    //TODO: What about string 'jul05:fy' ??????
+                    IVariable result = O.GetValFromStringIndexer(this._string2, index, 1, t);
+                    rv = result;
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: The inside of a free-standing [...] list should not be a");
-                    G.Writeln("    VAL, DATE or the like, for instance PRT [2.3] or PRT [2010q5].");
-                    G.Writeln("    The right use is PRT [gd*] and similar.");
+                    G.Writeln2("*** ERROR: You cannot use indexer on a string, for instance %s[2],");
+                    G.Writeln("    but you may use the string as a name instead: {%s}[2015].");
                     throw new GekkoException();
                 }
-            }
-            else if (this._isName)
-            {
-                //#8932074324
-                //TODO: What about string 'jul05:fy' ??????
-                IVariable result = O.GetValFromStringIndexer(this._string2, index, 1, t);
-                rv = result;
+                return rv;
             }
             else
             {
-                G.Writeln2("*** ERROR: You cannot use indexer on a string, for instance %s[2],");
-                G.Writeln("    but you may use the string as a name instead: {%s}[2015].");
+                G.Writeln2("*** ERROR: Cannot use " + indexes.Length + "-dimensional indexer on STRING or NAME");
                 throw new GekkoException();
             }
-            return rv;
+
         }
 
         public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, GekkoTime t)
