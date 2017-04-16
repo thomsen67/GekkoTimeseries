@@ -1054,22 +1054,11 @@ namespace Gekko
 
         public static MetaTimeSeries GetTimeSeries(string originalName, int bankNumber)
         {
-            return GetTimeSeries(originalName, bankNumber, ECreatePossibilities.None, null);
+            return GetTimeSeries(originalName, bankNumber, ECreatePossibilities.None);
         }
 
         public static MetaTimeSeries GetTimeSeries(string originalName, int bankNumber, ECreatePossibilities canAutoCreate)
         {
-            return GetTimeSeries(originalName, bankNumber, canAutoCreate, null);
-        }
-
-        public static MetaTimeSeries GetTimeSeries(string originalName, int bankNumber, params IVariable[] indexes)
-        {
-            return GetTimeSeries(originalName, bankNumber, ECreatePossibilities.None, indexes);
-        }
-
-        //See also Program.GetTimeSeriesFromString()
-        public static MetaTimeSeries GetTimeSeries(string originalName, int bankNumber, ECreatePossibilities canAutoCreate, params IVariable[] indexes)
-        {            
             ExtractBankAndRestHelper h = Program.ExtractBankAndRest(originalName, EExtrackBankAndRest.OnlyStrings);
 
             if (h.bank == Globals.firstCheatString)
@@ -1083,35 +1072,96 @@ namespace Gekko
                 h.hasColon = true;  //signals later on that this bank is explicitely given, so we cannot search for the timeseries
             }
             TimeSeries ts = Program.FindOrCreateTimeseries(h.bank, h.name, canAutoCreate, h.hasColon, false);            
-            TimeSeries ats = O.GetArrayTimeSeries(ts, indexes);
-            MetaTimeSeries mts = new MetaTimeSeries(ats);
+            MetaTimeSeries mts = new MetaTimeSeries(ts);
             return mts;
         }
-
-        public static TimeSeries GetArrayTimeSeries(TimeSeries its, IVariable[] indexes)
+                
+        public static MetaTimeSeries GetArrayTimeSeries(MetaTimeSeries mts, ECreatePossibilities create, params IVariable[] indexes)
         {
-            string hash = null;
-            //this produces a string like "b,nz,w"
-            for (int i = 0; i < indexes.Length; i++)
+            if (indexes.Length == 0) return mts;  //fast return for normal timeseries
+            TimeSeries ts = O.GetArrayTimeSeries(mts.ts, create, indexes);            
+            return new MetaTimeSeries(ts);
+        }
+
+        public static TimeSeries GetArrayTimeSeries(TimeSeries its, ECreatePossibilities create, IVariable[] indexes)
+        {
+            //When a timeseries is on rhs, it will have crete=none. In that case, we expect dimension to fit. If dimension is -12345,
+            //the timeseries does exist but has never been written to (is that possible)? 
+
+            if (create == ECreatePossibilities.None)
             {
-                if (indexes[i].Type() != EVariableType.String)
+                //rhs
+                if (its.dimension == -12345)
                 {
-                    G.Writeln2("*** ERROR: Expected " + its.variableName + "[] indexer element #" + (i + 1) + " to be STRING");
+                    //should not be possible?
+                    G.Writeln2("*** ERROR: Timeseries " + its.variableName + " has no dimensions and no data");
                     throw new GekkoException();
                 }
-                if (i > 0) hash += ",";  //ok as delimiter
-                hash += ((ScalarString)indexes[i])._string2;
+                if (its.dimension != indexes.Length)
+                {
+                    G.Writeln2("*** ERROR: The timeseries " + its.variableName + " has " + its.dimension + " dimensions,");
+                    G.Writeln("           but the []-indexer has " + indexes.Length + " dimensions");
+                    throw new GekkoException();
+                }
             }
-            if (its.timeSeriesArray == null)
+            else
             {
-                G.Writeln2("*** ERROR: The timeseries " + its.variableName + " is not an array-timeseries");
-                throw new GekkoException();
+                //lhs
+                if (its.dimension != -12345 && (its.dimension != indexes.Length))
+                {
+                    G.Writeln2("*** ERROR: The timeseries " + its.variableName + " has " + its.dimension + " dimensions,");
+                    G.Writeln("           but the []-indexer has " + indexes.Length + " dimensions");
+                    throw new GekkoException();
+                }
             }
+
             TimeSeries ts = null;
-            ts = its.timeSeriesArray[hash];
-            if (ts == null)
+
+            if (indexes.Length == 0)
             {
-                G.Writeln2("*** ERROR: Array-timeseries " + its.variableName + "[" + G.PrettifyTimeseriesHash(hash) + "] not found");
+                ts = its;  //relevant for normal timeseries
+            }
+            else
+            {
+                //We know that indexes.Length >= 1.
+                //Now dimension may be (a) -12345 [only for create=yes LHS] or (b) same as indexes.Length.                             
+
+                string hash = null;
+                //this produces a string like "b,nz,w"
+                for (int i = 0; i < indexes.Length; i++)
+                {
+                    if (indexes[i].Type() != EVariableType.String)
+                    {
+                        G.Writeln2("*** ERROR: Expected " + its.variableName + "[] indexer element #" + (i + 1) + " to be STRING");
+                        throw new GekkoException();
+                    }
+                    if (i > 0) hash += ",";  //ok as delimiter
+                    hash += ((ScalarString)indexes[i])._string2;
+                }
+
+                if (its.dimension == -12345)
+                {
+                    //can only be so for LHS type, RHS would give an exception above
+                    its.timeSeriesArray = new GekkoDictionary<string, TimeSeries>(StringComparer.OrdinalIgnoreCase);
+                    its.dimension = indexes.Length;
+                }                               
+                
+                //we know that dimension >= 1                
+                                
+                its.timeSeriesArray.TryGetValue(hash, out ts);
+                
+                if (ts == null)
+                {
+                    if (create != ECreatePossibilities.None)
+                    {
+                        ts = new TimeSeries(its.freqEnum, its.variableName + "[]");  //the name is not really used, but we could put in the indices...?
+                        its.timeSeriesArray.Add(hash, ts);  //put it in
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Array-timeseries " + its.variableName + "[" + G.PrettifyTimeseriesHash(hash) + "] not found");
+                    }
+                }
             }
 
             return ts;

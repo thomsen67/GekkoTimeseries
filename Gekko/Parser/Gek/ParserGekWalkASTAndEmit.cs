@@ -1831,8 +1831,11 @@ namespace Gekko.Parser.Gek
                                 s += node[i].Code;
                             }
 
-                            node.Code.A("O.GetTimeSeries(" + node[0].Code + ", 1" + s + ");" + G.NL);  //1 is banknumber (1 for first)
+                            //node.Code.A("O.GetArrayTimeSeries(O.GetTimeSeries(" + node[0].Code + ", 1)" + s + ")");  //1 is banknumber (1 for first)
+                            node.Code.A("O.GetArrayTimeSeries(" + node[0].Code + ", O.ECreatePossibilities.Can" + s + ")"); //1 is banknumber (1 for first)
                             //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
+
+                            
 
                             //ASTNode n0 = node[0];
                             //ASTNode n1 = node[1];
@@ -4297,7 +4300,7 @@ namespace Gekko.Parser.Gek
         private static string AstBankHelper(ASTNode node, W wh2, int type)
         {
             string isLhsSoCanAutoCreate = null;
-            if ((node.Number == 1 && (node.Parent.Text == "ASTGENR" || node.Parent.Text == "ASTGENRLHSFUNCTION")) || node.Parent.Text == "ASTTUPLEITEM")
+            if ((node.Number == 1 && (node.Parent.Text == "ASTGENR" || node.Parent.Text == "ASTGENRLHSFUNCTION")) || node.Parent.Text == "ASTTUPLEITEM" || node.Parent.Text == "ASTSERIESLHS")
             {
                 isLhsSoCanAutoCreate = ", O.ECreatePossibilities.Can";
             }

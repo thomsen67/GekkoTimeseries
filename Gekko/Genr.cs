@@ -12,7 +12,7 @@ namespace Gekko
     {
         public static GekkoTime globalGekkoTimeIterator = Globals.tNull;
         public static
-         readonly ScalarVal i2 = new ScalarVal(5d);
+         readonly ScalarVal i3 = new ScalarVal(5d);
         public static void ClearTS(P p)
         {
         }
@@ -45,10 +45,11 @@ namespace Gekko
             {
                 t = t2;
                 double data =
-               O.GetVal(i2, t);
-                MetaTimeSeries mts= O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")), 1, new ScalarString(@"a"), new ScalarString(@"b"));
+               O.GetVal(i3, t);
+                
             }
             t = Globals.tNull;
+
             o1.Exe();
 
 
@@ -57,10 +58,10 @@ namespace Gekko
         }
 
 
-        public static void
-         CodeLines(P p)
+        public static void CodeLines(P p)
         {
-            GekkoTime t = Globals.tNull;
+            GekkoTime t =
+             Globals.tNull;
 
             C0(p);
 

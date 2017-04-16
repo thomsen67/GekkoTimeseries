@@ -66,7 +66,7 @@ namespace Gekko
                 {
                     throw new GekkoException();  //should not be possible
                 }
-                TimeSeries ts = O.GetArrayTimeSeries(this.ts, indexes);
+                TimeSeries ts = O.GetArrayTimeSeries(this.ts, O.ECreatePossibilities.None, indexes);  //cannot create just because we are looking at an index
                 MetaTimeSeries mts = new MetaTimeSeries(ts);
                 return mts;
             }

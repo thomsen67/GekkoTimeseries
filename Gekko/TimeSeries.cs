@@ -143,7 +143,10 @@ namespace Gekko
 
         [ProtoMember(13)]
         public GekkoDictionary<string, TimeSeries> timeSeriesArray = null;
-        
+
+        [ProtoMember(14)]
+        public int dimension = -12345;
+
         public bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf
 
