@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using ProtoBuf;
+using System.Drawing;
 
 namespace Gekko
 {
@@ -174,6 +175,7 @@ namespace Gekko
         /// <returns>The cloned TimeSeries object.</returns>
         public TimeSeries Clone()
         {
+            DimensionCheck();
             //Always make sure new fields are remembered in the Clone() method
             TimeSeries tsCopy = new TimeSeries(this.freqEnum, this.variableName);
             if (this.dataArray == null)
@@ -207,7 +209,7 @@ namespace Gekko
         /// </exception>
         public void Truncate(GekkoTime start, GekkoTime end)
         {
-
+            DimensionCheck();
             if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot truncate a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             int indexStart = this.GetArrayIndex(start);
             int indexEnd = this.GetArrayIndex(end);
@@ -281,6 +283,7 @@ namespace Gekko
         /// </summary>
         public void Trim()
         {
+            DimensionCheck();
             if (this.dataArray == null) return;
             if (this.IsNullPeriod()) return;  //could actually trim this, but oh well
             if (!(this.firstPeriodPositionInArray == 0 && this.lastPeriodPositionInArray == this.dataArray.Length - 1))  //already trimmed                
@@ -305,6 +308,7 @@ namespace Gekko
         /// <exception cref="GekkoException">Exception if frequency of timeseries and period do not match.</exception>
         public double GetData(GekkoTime t)
         {
+            DimensionCheck();
             if (this.freqEnum != t.freq)
             {
                 //t.freq will almost always correspond to the frequency setting in Gekko, that is, Program.options.freq.
@@ -331,6 +335,7 @@ namespace Gekko
                 return this.dataArray[index];
             }
         }
+               
 
         /// <summary>
         /// This sets the observation (period) to the given value.
@@ -340,6 +345,7 @@ namespace Gekko
         /// <exception cref="GekkoException">Exception if frequency of timeseries and period do not match.</exception>
         public void SetData(GekkoTime t, double value)
         {
+            DimensionCheck();
             //TODO: Remove this at some point
             if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             //Program.ErrorIfDatabanksSwapped(this);
@@ -396,6 +402,9 @@ namespace Gekko
             //
             //Also beware that if the array returned is touched afterwards, the timeseries will be dirty. This only happens in the 
             //simulation code, though. See #98726527!
+
+            DimensionCheck();
+
             if (this.freqEnum != gt1.freq || gt1.freq != gt2.freq)
             {
                 //This check: better safe than sorry!
@@ -454,6 +463,7 @@ namespace Gekko
         /// <exception cref="GekkoException">Exception if frequency of timeseries and periods differ.</exception>
         public void SetDataSequence(GekkoTime gt1, GekkoTime gt2, double[] input, int inputOffset)
         {
+            DimensionCheck();
             if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot change observations in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             //Program.ErrorIfDatabanksSwapped(this);
             if (this.freqEnum != gt1.freq || gt1.freq != gt2.freq)
@@ -510,6 +520,7 @@ namespace Gekko
         /// </returns>
         public GekkoTime GetPeriodLast()
         {
+            DimensionCheck();
             return GetPeriod(this.lastPeriodPositionInArray);
         }
 
@@ -517,6 +528,7 @@ namespace Gekko
         {
             //Could be sped up by means of looping through dataaraay with GetDataSequence, but oh well...
             //returns tNull if all missing
+            DimensionCheck();
             GekkoTime realStart = Globals.tNull;
             foreach (GekkoTime dt in new GekkoTimeIterator(GetPeriodFirst(), GetPeriodLast()))
             {
@@ -534,6 +546,7 @@ namespace Gekko
         {
             //Could be sped up by means of looping through dataaraay with GetDataSequence, but oh well...
             //returns tNull if all missing
+            DimensionCheck();
             GekkoTime realEnd = Globals.tNull;
             foreach (GekkoTime dt in new GekkoTimeIteratorBackwards(GetPeriodLast(), GetPeriodFirst()))
             {
@@ -555,6 +568,7 @@ namespace Gekko
         /// </returns>
         public GekkoTime GetPeriodFirst()
         {
+            DimensionCheck();
             return GetPeriod(this.firstPeriodPositionInArray);
         }
 
@@ -568,6 +582,7 @@ namespace Gekko
             //The inverse method is GetArrayIndex()
             //Should maybe be private method? But then how to unit-test?
             //see also AddToPeriod()
+            DimensionCheck();
             int subPeriods = 1;
             if (this.freqEnum == EFreq.Quarterly) subPeriods = 4;
             else if (this.freqEnum == EFreq.Monthly) subPeriods = 12;
@@ -686,6 +701,18 @@ namespace Gekko
             //were for the very first observation entering the double[] array (unless the array is resized).
             this.anchorSuperPeriod = gt.super;
             this.anchorSubPeriod = gt.sub;
+        }
+
+        private void DimensionCheck()
+        {
+            //Checks that for instance a 3-dimensional xx is accessed as xx[.., .., ..] and not just xx.
+            //In the latter case, 
+            if (this.dimensions > 0)
+            {
+                G.Writeln2("*** ERROR: Timeseries " + this.variableName + " has " + dimensions + " dimension(s).");
+                G.Writeln("           Please use an indexer " + this.variableName + "[...] to access the elements", Color.Red);
+                throw new GekkoException();
+            }
         }
     }
 

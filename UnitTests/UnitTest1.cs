@@ -922,22 +922,31 @@ namespace UnitTests
             AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 1999, double.NaN, sharedDelta);
             AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 2000, 3, sharedDelta);
             AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 2001, double.NaN, sharedDelta);
+            //I("ASER x['a', 'b', 'd'] = 4;");
+            //AssertHelper(First(), "x", new string[] { "a", "b", "d" }, 1999, double.NaN, sharedDelta);
+            //AssertHelper(First(), "x", new string[] { "a", "b", "d" }, 2000, 4, sharedDelta);
+            //AssertHelper(First(), "x", new string[] { "a", "b", "d" }, 2001, double.NaN, sharedDelta);
             I("ASER y['d', 'e'] = x['a', 'b', 'c'];");
             AssertHelper(First(), "y", new string[] { "d", "e" }, 1999, double.NaN, sharedDelta);
             AssertHelper(First(), "y", new string[] { "d", "e" }, 2000, 3, sharedDelta);
             AssertHelper(First(), "y", new string[] { "d", "e" }, 2001, double.NaN, sharedDelta);
+
+            //I("SERIES z = 100;"); //normal
 
             I("WRITE arrayts;");
 
             // --------------------------------
 
             I("RESET; MODE data; TIME 2000;");
-            I("READ arrayts;");                        
+            I("READ arrayts;");
+            Assert.AreEqual(First().storage.Count, 3);
             AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 2000, 3, sharedDelta);            
             AssertHelper(First(), "y", new string[] { "d", "e" }, 2000, 3, sharedDelta);
-
-
+            AssertHelper(First(), "z", 2000, 100, sharedDelta);
             
+
+
+
 
         }
 

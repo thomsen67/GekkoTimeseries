@@ -203,9 +203,20 @@ namespace Gekko
         {
             //Used to save some RAM, or just before serializing the databank via protobuf-net.
             DateTime t0 = DateTime.Now;
-            foreach (TimeSeries ts in this.storage.Values)
+            foreach (TimeSeries ts in this.storage.Values)  //ATSFIXME
             {
-                ts.Trim();
+                if (ts.dimensions > 0)
+                {
+                    //trimming the array-timeseries one by one
+                    foreach (TimeSeries ts2 in ts.dim.timeSeriesArray.Values)
+                    {
+                        ts2.Trim();
+                    }
+                }
+                else
+                {
+                    ts.Trim();
+                }
             }
             G.WritelnGray("TRIM: " + G.Seconds(t0));
             //This does not change the databank, so this.hasBeenChanged is not touched!!

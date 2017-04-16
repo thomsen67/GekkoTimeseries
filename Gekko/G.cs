@@ -544,7 +544,7 @@ namespace Gekko
             newDatabank.date = originalDatabank.date;
             newDatabank.isDirty = true;
             //don't touch alias names: we are cloning the content of the databank, not altering its name.
-            foreach (TimeSeries ts in originalDatabank.storage.Values)
+            foreach (TimeSeries ts in originalDatabank.storage.Values)  //ATSFIXME
             {
                 TimeSeries tsCopy = ts.Clone();
                 newDatabank.AddVariable(ts.frequency, tsCopy);  //FIXME: what if already there
