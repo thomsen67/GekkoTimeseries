@@ -16908,7 +16908,7 @@ namespace Gekko
                 }
                 TimeSeries ts = db.GetVariable(false, s.name);
                 if (ts == null) continue;
-                if (ts.IsNullPeriod()) remove.Add(s);
+                if (ts.IsNullPeriod() && ts.dimensions == 0) remove.Add(s);  //don't remove if it is an array-timeseries (which is kind of an empty shell)
             }
             if (remove.Count > 0)
             {

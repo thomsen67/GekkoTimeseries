@@ -692,8 +692,14 @@ namespace Gekko
     [ProtoContract]
     public class Dim
     {
+        public Dim()
+        {
+            //This is ONLY because protobuf-net needs it
+            this.timeSeriesArray = new GekkoDictionary<string, TimeSeries>(StringComparer.OrdinalIgnoreCase);
+        }
+
         [ProtoMember(1)]
-        public GekkoDictionary<string, TimeSeries> timeSeriesArray = null;
+        public GekkoDictionary<string, TimeSeries> timeSeriesArray;
     }
 
 

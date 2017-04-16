@@ -907,7 +907,17 @@ namespace UnitTests
             I("SERIES y = 2;");
             I("SERIES y = 3 $ #m['c'];");
             AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+            
+        }
 
+        [TestMethod]
+        public void Test__ArrayTimeSeries()
+        {
+            Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+            Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
+            I("RESET; MODE data; TIME 2000;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");            
+            
             I("ASER x['a', 'b', 'c'] = 3;");
             AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 1999, double.NaN, sharedDelta);
             AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 2000, 3, sharedDelta);
@@ -916,6 +926,18 @@ namespace UnitTests
             AssertHelper(First(), "y", new string[] { "d", "e" }, 1999, double.NaN, sharedDelta);
             AssertHelper(First(), "y", new string[] { "d", "e" }, 2000, 3, sharedDelta);
             AssertHelper(First(), "y", new string[] { "d", "e" }, 2001, double.NaN, sharedDelta);
+
+            I("WRITE arrayts;");
+
+            // --------------------------------
+
+            I("RESET; MODE data; TIME 2000;");
+            I("READ arrayts;");                        
+            AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 2000, 3, sharedDelta);            
+            AssertHelper(First(), "y", new string[] { "d", "e" }, 2000, 3, sharedDelta);
+
+
+            
 
         }
 
