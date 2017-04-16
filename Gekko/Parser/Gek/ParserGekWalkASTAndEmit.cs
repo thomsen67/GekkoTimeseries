@@ -301,23 +301,20 @@ namespace Gekko.Parser.Gek
                     case "[":  //indexer
                     case Globals.symbolGlueChar6:  //indexer, '[_['
                     case Globals.symbolGlueChar7:  //indexer, '[¨['
-                        {
-                            //At the moment only 1 dimension supported                        
-                            if (node.ChildrenCount() > 3) throw new GekkoException();
+                        {                           
+                            
                             if (node[1].Text == "ASTINDEXERELEMENTPLUS")
                             {
                                 node.Code.A("O.IndexerPlus(" + node[0].Code + ", " + node[1].Code + ", t)");
                             }
                             else
                             {
-                                if (node.ChildrenCount() == 2)
+                                string s = null;
+                                for (int i = 0; i < node.ChildrenCount(); i++)
                                 {
-                                    node.Code.A("O.Indexer(" + node[0].Code + ", " + node[1].Code + ", t)");
+                                    s += ", " + node[i].Code;
                                 }
-                                else
-                                {
-                                    node.Code.A("O.Indexer(" + node[0].Code + ", " + node[1].Code + ", " + node[2].Code + ", t)");
-                                }
+                                node.Code.A("O.Indexer(t" + s + ")");
                             }                            
                         }
                         break;

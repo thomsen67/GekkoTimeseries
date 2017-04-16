@@ -353,28 +353,31 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(IVariable x, IVariable y, GekkoTime t)
-        {            
+        public static IVariable Indexer(GekkoTime t, IVariable x, params IVariable[] indexes)
+        {
             if (x == null)
             {
-                //[y]
-                //['q*']
-                ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);  //a bit cheating, but we save an interface method, and performance is not really an issue when indexing whole databanks
-                return ss.Indexer(t, new IVariable[] { y });  //must have an array of these
+                if (indexes.Length == 1)
+                {
+                    //[y]
+                    //['q*']
+                    ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);  //a bit cheating, but we save an interface method, and performance is not really an issue when indexing whole databanks
+                    return ss.Indexer(t, indexes);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Stand-alone indexer with pattern [... , ... ] not possible");
+                    throw new GekkoException();
+                }
             }
-            else
-            {
-                //x[y]
-                //a[1] or #a['q*']
-                return x.Indexer(t, new IVariable[] { y });
-            }
-        }
 
-        public static IVariable Indexer(IVariable x, IVariable y, IVariable z, GekkoTime t)
-        {
-            //#x[1, 2]            
-            return x.Indexer(t, new IVariable[] { y, z });            
-        }
+            //x[y]
+            //a[1] or #a['q*']
+            //#x[1, 2]                 
+            //x['nz', 'w']           
+            return x.Indexer(t, indexes);
+                        
+        }               
 
         public static IVariable IndexerPlus(IVariable x, IVariable y, GekkoTime t)
         {
@@ -1048,7 +1051,7 @@ namespace Gekko
         {
             //Used to pick out a value from a list item, like #m[2][2015], where index=2015
             MetaTimeSeries mts = O.GetTimeSeries(name, bank);  //always from work....
-            IVariable result = O.Indexer(mts, index, t);
+            IVariable result = O.Indexer(t, mts, index);
             return result;
         }
 
