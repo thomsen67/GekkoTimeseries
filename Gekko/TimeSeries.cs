@@ -513,6 +513,18 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Gets the first observation/data as a period (GekkoTime).
+        /// </summary>
+        /// <returns>
+        /// Period
+        /// </returns>
+        public GekkoTime GetPeriodFirst()
+        {
+            DimensionCheck();
+            return GetPeriod(this.firstPeriodPositionInArray);
+        }
+
+        /// <summary>
         /// Gets the last observation/data as a period (GekkoTime).
         /// </summary>
         /// <returns>
@@ -560,16 +572,20 @@ namespace Gekko
             return realEnd;
         }
 
-        /// <summary>
-        /// Gets the first observation/data as a period (GekkoTime).
-        /// </summary>
-        /// <returns>
-        /// Period
-        /// </returns>
-        public GekkoTime GetPeriodFirst()
+        public IEnumerator<TimeSeries> GetEnumerator()
         {
-            DimensionCheck();
-            return GetPeriod(this.firstPeriodPositionInArray);
+            //Will loop through timeseries. Returns only 1 if 0-dimensional
+            if (this.dimensions == 0)
+            {
+                yield return this;
+            }
+            else
+            {
+                foreach (TimeSeries ts in this.dim.timeSeriesArray.Values)
+                {
+                    yield return ts;
+                }
+            }
         }
 
         /// <summary>

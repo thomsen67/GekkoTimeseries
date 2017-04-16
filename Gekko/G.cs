@@ -631,7 +631,7 @@ namespace Gekko
 
         public static string PrettifyTimeseriesHash(string hash)
         {
-            return "'" + hash.Replace(",", "', '") + "'";
+            return "'" + hash.Replace(Globals.symbolTurtle, "', '") + "'";
         }
 
         public static List<string> RemoveEmptyLines(List<string> s)
