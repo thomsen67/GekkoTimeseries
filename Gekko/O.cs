@@ -379,7 +379,7 @@ namespace Gekko
                         
         }               
 
-        public static IVariable IndexerPlus(IVariable x, IVariable y, GekkoTime t)
+        public static IVariable IndexerPlus(GekkoTime t, IVariable x, IVariable y)
         {
             if (x == null)
             {
@@ -394,7 +394,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(IVariable x, IVariablesFilterRange y, GekkoTime t)
+        public static IVariable Indexer(GekkoTime t, IVariable x, IVariablesFilterRange y)
         {            
             if (x == null)
             {
@@ -411,7 +411,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(IVariable x, IVariablesFilterRange y1, IVariablesFilterRange y2, GekkoTime t)
+        public static IVariable Indexer(GekkoTime t, IVariable x, IVariablesFilterRange y1, IVariablesFilterRange y2)
         {
             if (x == null)
             {
@@ -425,7 +425,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(IVariable x, IVariable y1, IVariablesFilterRange y2, GekkoTime t)
+        public static IVariable Indexer(GekkoTime t, IVariable x, IVariable y1, IVariablesFilterRange y2)
         {
             if (x == null)
             {
@@ -439,7 +439,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(IVariable x, IVariablesFilterRange y1, IVariable y2, GekkoTime t)
+        public static IVariable Indexer(GekkoTime t, IVariable x, IVariablesFilterRange y1, IVariable y2)
         {
             if (x == null)
             {
@@ -1094,25 +1094,25 @@ namespace Gekko
             if (create == ECreatePossibilities.None)
             {
                 //rhs
-                if (its.dimension == -12345)
+                if (its.dimensions == -12345)
                 {
                     //should not be possible?
                     G.Writeln2("*** ERROR: Timeseries " + its.variableName + " has no dimensions and no data");
                     throw new GekkoException();
                 }
-                if (its.dimension != indexes.Length)
+                if (its.dimensions != indexes.Length)
                 {
-                    G.Writeln2("*** ERROR: The timeseries " + its.variableName + " has " + its.dimension + " dimensions,");
-                    G.Writeln("           but the []-indexer has " + indexes.Length + " dimensions");
+                    G.Writeln2("*** ERROR: The timeseries " + its.variableName + " has " + its.dimensions + " dimensions,");
+                    G.Writeln("           but the []-indexer has " + indexes.Length + " dimensions", Color.Red);
                     throw new GekkoException();
                 }
             }
             else
             {
                 //lhs
-                if (its.dimension != -12345 && (its.dimension != indexes.Length))
+                if (its.dimensions != -12345 && (its.dimensions != indexes.Length))
                 {
-                    G.Writeln2("*** ERROR: The timeseries " + its.variableName + " has " + its.dimension + " dimensions,");
+                    G.Writeln2("*** ERROR: The timeseries " + its.variableName + " has " + its.dimensions + " dimensions,");
                     G.Writeln("           but the []-indexer has " + indexes.Length + " dimensions");
                     throw new GekkoException();
                 }
@@ -1142,23 +1142,24 @@ namespace Gekko
                     hash += ((ScalarString)indexes[i])._string2;
                 }
 
-                if (its.dimension == -12345)
+                if (its.dimensions == -12345)
                 {
                     //can only be so for LHS type, RHS would give an exception above
-                    its.timeSeriesArray = new GekkoDictionary<string, TimeSeries>(StringComparer.OrdinalIgnoreCase);
-                    its.dimension = indexes.Length;
+                    its.dim = new Gekko.Dim();
+                    its.dim.timeSeriesArray = new GekkoDictionary<string, TimeSeries>(StringComparer.OrdinalIgnoreCase);
+                    its.dimensions = indexes.Length;
                 }                               
                 
                 //we know that dimension >= 1                
                                 
-                its.timeSeriesArray.TryGetValue(hash, out ts);                                
+                its.dim.timeSeriesArray.TryGetValue(hash, out ts);                                
                 
                 if (ts == null)
                 {
                     if (create != ECreatePossibilities.None)
                     {
                         ts = new TimeSeries(its.freqEnum, its.variableName + "[]");  //the name is not really used, but we could put in the indices...?
-                        its.timeSeriesArray.Add(hash, ts);  //put it in
+                        its.dim.timeSeriesArray.Add(hash, ts);  //put it in
                     }
                     else
                     {

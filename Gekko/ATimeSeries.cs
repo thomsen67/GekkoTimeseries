@@ -34,7 +34,7 @@ namespace Gekko
                 //y[2010] or y[-1]
                 IVariable index = indexes[0];
 
-                if (index.Type() == EVariableType.Date) {
+                if (index.Type() == EVariableType.Val) {
                     int ival = O.GetInt(index);
                     if (ival >= 1900)
                     {

@@ -305,7 +305,7 @@ namespace Gekko.Parser.Gek
                             
                             if (node[1].Text == "ASTINDEXERELEMENTPLUS")
                             {
-                                node.Code.A("O.IndexerPlus(" + node[0].Code + ", " + node[1].Code + ", t)");
+                                node.Code.A("O.IndexerPlus(t, " + node[0].Code + ", " + node[1].Code + ")");
                             }
                             else
                             {
