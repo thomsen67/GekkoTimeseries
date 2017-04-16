@@ -907,6 +907,16 @@ namespace UnitTests
             I("SERIES y = 2;");
             I("SERIES y = 3 $ #m['c'];");
             AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+
+            I("ASER x['a', 'b', 'c'] = 3;");
+            AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 1999, double.NaN, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 2000, 3, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 2001, double.NaN, sharedDelta);
+            I("ASER y['d', 'e'] = x['a', 'b', 'c'];");
+            AssertHelper(First(), "y", new string[] { "d", "e" }, 1999, double.NaN, sharedDelta);
+            AssertHelper(First(), "y", new string[] { "d", "e" }, 2000, 3, sharedDelta);
+            AssertHelper(First(), "y", new string[] { "d", "e" }, 2001, double.NaN, sharedDelta);
+
         }
 
         [TestMethod]
@@ -3684,29 +3694,61 @@ namespace UnitTests
 
         private static void AssertHelper(Databank db, string s, int year, double x, double delta)
         {
-            AssertHelper(db, s, EFreq.Annual, year, 1, year, 1, x, delta);
+            AssertHelper(db, s, null, EFreq.Annual, year, 1, year, 1, x, delta);
         }
-
+        
         private static void AssertHelper(Databank db, string s, int year1, int year2, double x, double delta)
         {
-            AssertHelper(db, s, EFreq.Annual, year1, 1, year2, 1, x, delta);
+            AssertHelper(db, s, null, EFreq.Annual, year1, 1, year2, 1, x, delta);
         }
 
         private static void AssertHelper(Databank db, string s, EFreq freq, int year, int subper, double x, double delta)
         {
-            AssertHelper(db, s, freq, year, subper, year, subper, x, delta);
+            AssertHelper(db, s, null, freq, year, subper, year, subper, x, delta);
+        }
+        
+        private static void AssertHelper(Databank db, string s, string[] indexes, int year, double x, double delta)
+        {
+            AssertHelper(db, s, indexes, EFreq.Annual, year, 1, year, 1, x, delta);
         }
 
-        private static void AssertHelper(Databank db, string s, EFreq freq, int year1, int sub1, int year2, int sub2, double x, double delta)
+        private static void AssertHelper(Databank db, string s, string[] indexes, int year1, int year2, double x, double delta)
+        {
+            AssertHelper(db, s, indexes, EFreq.Annual, year1, 1, year2, 1, x, delta);
+        }
+
+        private static void AssertHelper(Databank db, string s, string[] indexes, EFreq freq, int year, int subper, double x, double delta)
+        {
+            AssertHelper(db, s, indexes, freq, year, subper, year, subper, x, delta);
+        }
+        
+        private static void AssertHelper(Databank db, string s, string[] indexes, EFreq freq, int year1, int sub1, int year2, int sub2, double x, double delta)
         {
             GekkoTime t1 = new GekkoTime(freq, year1, sub1);
             GekkoTime t2 = new GekkoTime(freq, year2, sub2);
 
             if (t1.StrictlyLargerThan(t2)) throw new GekkoException();
 
+            IVariable[] indexes2 = null;
+
+            if (indexes != null)
+            {
+                indexes2 = new IVariable[indexes.Length];
+                for (int i = 0; i < indexes.Length; i++)
+                {
+                    indexes2[i] = new ScalarString(indexes[i]);
+                }
+            }
+
+            TimeSeries ts = db.GetVariable(freq, s);
+            if (indexes2 != null)
+            {
+                ts = O.GetArrayTimeSeries(ts, O.ECreatePossibilities.None, indexes2);
+            }
+
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
-                double y = db.GetVariable(freq, s).GetData(t);
+                double y = ts.GetData(t);
                 AssertHelperTwoDoubles(x, y, delta);
             }
         }
@@ -7255,30 +7297,30 @@ namespace UnitTests
                     AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2011, 1, 1d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2012, 1, double.NaN, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2010, 4, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 1, 2011, 4, 2d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx2", null, EFreq.Quarterly, 2011, 1, 2011, 4, 2d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2012, 1, double.NaN, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2010, 12, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 1, 2011, 12, 3d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx3", null, EFreq.Monthly, 2011, 1, 2011, 12, 3d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2012, 1, double.NaN, sharedDelta);
                     I("RESET; IMPORT<2011q2 2011q3>mixed;");
                     AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2010, 1, double.NaN, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2011, 1, 1d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2012, 1, double.NaN, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 1, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 2, 2011, 3, 2d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx2", null, EFreq.Quarterly, 2011, 2, 2011, 3, 2d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 4, double.NaN, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 3, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 4, 2011, 9, 3d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx3", null, EFreq.Monthly, 2011, 4, 2011, 9, 3d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 10, double.NaN, sharedDelta);
                     I("RESET; IMPORT<2011m2 2011m4>mixed;");
                     AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2010, 1, double.NaN, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2011, 1, 1d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2012, 1, double.NaN, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2010, 4, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 1, 2011, 2, 2d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx2", null, EFreq.Quarterly, 2011, 1, 2011, 2, 2d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 3, double.NaN, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 1, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 2, 2011, 4, 3d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx3", null, EFreq.Monthly, 2011, 2, 2011, 4, 3d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 5, double.NaN, sharedDelta);
                     FAIL("IMPORT<2011u1 2011u1>mixed;");
                     FAIL("IMPORT<2011 2011q1>mixed;");

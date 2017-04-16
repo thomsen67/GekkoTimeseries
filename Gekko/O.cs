@@ -1148,7 +1148,7 @@ namespace Gekko
                 
                 //we know that dimension >= 1                
                                 
-                its.timeSeriesArray.TryGetValue(hash, out ts);
+                its.timeSeriesArray.TryGetValue(hash, out ts);                                
                 
                 if (ts == null)
                 {

@@ -1805,8 +1805,8 @@ namespace Gekko.Parser.Gek
                             nodeCode += GekkoTimeIteratorStartCode(w, node);
                             nodeCode += "  double data = O.GetVal(" + childCodeRhs + ", t);" + G.NL;
                             nodeCode += "if(o" + numNode + ".lhs == null) o" + numNode + ".lhs = O.GetTimeSeries(" + childCodeLhsName + ");" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
-                                                                                                                                                   //nodeCode += "  double dataLag = O.GetVal(o" + numNode + ".lhs, t.Add(-1));" + G.NL;
-                                                                                                                                                    //HANDLE LEFT-SIDE FUNCTION!!
+                                                                                                                                                     //nodeCode += "  double dataLag = O.GetVal(o" + numNode + ".lhs, t.Add(-1));" + G.NL;
+                            nodeCode += "o" + numNode + ".lhs.SetData(t, data);" + G.NL;                                                                                                                  //HANDLE LEFT-SIDE FUNCTION!!
 
                             nodeCode += GekkoTimeIteratorEndCode();
 
