@@ -143,7 +143,7 @@ namespace Gekko
         /// 
 
         [ProtoMember(13)]
-        public int dimensions = -12345;
+        public int dimensions = -12345;  //is default.
 
         [ProtoMember(14)]
         public Dim dim = null;      
@@ -572,21 +572,23 @@ namespace Gekko
             return realEnd;
         }
 
-        public IEnumerator<TimeSeries> GetEnumerator()
-        {
-            //Will loop through timeseries. Returns only 1 if 0-dimensional
-            if (this.dimensions == 0)
-            {
-                yield return this;
-            }
-            else
-            {
-                foreach (TimeSeries ts in this.dim.timeSeriesArray.Values)
-                {
-                    yield return ts;
-                }
-            }
-        }
+        //public IEnumerator<TimeSeries> GetEnumerator()
+        //{
+        //    //Will loop through timeseries. Returns only 1 if 0-dimensional
+        //    if (this.dimensions == 0)
+        //    {
+        //        yield return this;
+        //    }
+        //    else
+        //    {
+        //        foreach (TimeSeries ts in this.dim.timeSeriesArray.Values)
+        //        {
+        //            yield return ts;
+        //        }
+        //    }
+        //}
+
+
 
         /// <summary>
         /// Gets the period (GekkoTime) corresponding to a particular index in the data array.
@@ -743,6 +745,37 @@ namespace Gekko
 
         [ProtoMember(1)]
         public GekkoDictionary<string, TimeSeries> timeSeriesArray;
+    }
+
+    public class GekkoTimeSeriesIterator : IEnumerable<TimeSeries>
+    {
+        private TimeSeries _ts;
+
+        public GekkoTimeSeriesIterator(TimeSeries ts)
+        {
+            _ts = ts;
+        }
+
+        public IEnumerator<TimeSeries> GetEnumerator()
+        {
+            if (_ts.dimensions == 0)
+            {
+                yield return _ts;
+            }
+            else
+            {
+                foreach (TimeSeries ts in _ts.dim.timeSeriesArray.Values)
+                {
+                    yield return ts;
+                }
+            }
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            G.Writeln("*** ERROR: iterator problem");
+            throw new GekkoException();
+        }
     }
 
 

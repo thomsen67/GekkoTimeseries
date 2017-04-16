@@ -2678,8 +2678,23 @@ namespace Gekko
                             continue;
                         }
 
-                        GekkoTime first = tsTemp.GetPeriodFirst();
-                        GekkoTime last = tsTemp.GetPeriodLast();
+                        int counter = 0;
+                        GekkoTime first = Globals.tNull;
+                        GekkoTime last = Globals.tNull;
+                        foreach (TimeSeries ts2 in new GekkoTimeSeriesIterator(tsTemp))
+                        {
+                            counter++;
+                            if (counter == 1)
+                            {
+                                first = ts2.GetPeriodFirst();
+                                last = ts2.GetPeriodLast();
+                            }
+                            else
+                            {
+                                if (ts2.GetPeriodFirst().StrictlySmallerThan(first)) first = ts2.GetPeriodFirst();
+                                if (ts2.GetPeriodLast().StrictlyLargerThan(last)) last = ts2.GetPeriodLast();
+                            }
+                        }
 
                         if (mergeOrTimeLimit)  //doing tsdx-protobuf merge (or time limits), get data into Work from deserialized temp databank
                         {
