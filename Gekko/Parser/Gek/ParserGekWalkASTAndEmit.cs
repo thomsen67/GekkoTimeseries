@@ -2047,7 +2047,7 @@ namespace Gekko.Parser.Gek
                         {
                             //Only 1 dimension supported                        
                             if (node.ChildrenCount() > 1) throw new GekkoException();
-                            node.Code.A("O.Indexer(null, " + node[0].Code + ", t)");  //null signals that it has nothing on the left
+                            node.Code.A("O.Indexer(t, null, " + node[0].Code + ")");  //null signals that it has nothing on the left
                         }
                         break;
                     case "ASTINDEXERELEMENT":  //For ASTINDEXER, see "["
@@ -2510,7 +2510,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     //This is a fY.1 type of variable.
                                     //Why does this work, and why is 'code' not used??
-                                    node.Code.CA("O.Indexer(" + node.Code + ", " + lagTypeCs + ", t)");
+                                    node.Code.CA("O.Indexer(t, " + node.Code + ", " + lagTypeCs + ")");
                                 }
                                 else
                                 {
