@@ -5051,6 +5051,7 @@ namespace Gekko
                     {
                         //See also similar code regarding CREATE
                         ts = new TimeSeries(Program.options.freq, variable);
+                        //ts.dimensions = 0;  //to start with, else it is -12345. May later on be changed to > 0 via an indexer.
                         //if (!Globals.globalPeriodStart.IsNull())
                         //{
                         //    //WHY is this done. For efficiency afterwards??
@@ -5657,6 +5658,81 @@ namespace Gekko
             {
                 return item[0].GetHashCode();
             }
+        }
+
+        public static void D()
+        {
+            GAMSWorkspace ws = new GAMSWorkspace(workingDirectory: "c:\\tools\\decomp");
+            GAMSDatabase db = ws.AddDatabaseFromGDX("c:\\tools\\decomp\\report.gdx");
+            
+            GAMSVariable n = db.GetVariable("N");
+            
+            TimeSeries ts = new Gekko.TimeSeries(EFreq.Annual, "N");
+            ts.dimensions = n.Domains.Count - 1;
+            ts.dim = new Gekko.Dim();
+
+            int[] dims = new int[n.Domains.Count];
+
+            //N has --> a=86, t=116, s=4, scns=5.
+
+            int timeIndex = -12345;
+            for (int i = 0; i < n.Domains.Count; i++)
+            {
+                GAMSSet gs = (GAMSSet)n.Domains.ElementAt(i);
+                dims[i] = gs.NumberRecords;
+                if (gs.Name == "t")
+                {
+                    timeIndex = i;
+                }
+            }
+
+            //string firstTimePeriod = ((GAMSSet)n.Domains.ElementAt(timeIndex)).FirstRecord().Keys[0];  //one dimensional set
+
+            TimeSeries ts2 = null;
+            int counter = 0;
+            string oldHash = "";            
+
+            DateTime t0 = DateTime.Now;            
+
+            //double[,,,] N2 = new double[dims[0], dims[1], dims[2], dims[3]];
+            //n.CopyToArray(N2, 0);            
+
+            foreach (GAMSVariableRecord record in n)
+            {
+                counter++;                
+                string t = record.Keys[timeIndex]; 
+                            
+                double d = record.Level;
+                int tt = int.Parse(t.Substring(1)) + 2010;  //remove the "t" and add 2010                
+                string hash = null;
+                for (int i = 0; i < record.Keys.Length; i++)
+                {
+                    if (i == timeIndex) continue;
+                    hash += record.Keys[i];
+                    if (i < record.Keys.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter;                    
+                }
+                                
+                if (hash != oldHash) ts.dim.timeSeriesArray.TryGetValue(hash, out ts2);
+                
+                if (ts2 == null)
+                {
+                    ts2 = new Gekko.TimeSeries(EFreq.Annual, "N[]");
+                    ts2.dimensions = -12345;
+                    ts.dim.timeSeriesArray.Add(hash, ts2);
+                }
+
+                ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), d);
+
+                //G.Writeln2(a + " " + t + " " + s + " " + scns + " = " + d);
+                oldHash = hash;
+
+            }
+
+            double time = (DateTime.Now - t0).TotalMilliseconds;
+            G.Writeln2("TIME: " + time / 1000d);
+
+            if (Program.databanks.GetFirst().ContainsVariable("N")) Program.databanks.GetFirst().RemoveVariable("N");
+            Program.databanks.GetFirst().AddVariable(ts);
         }
 
         public static Table Dream(string options)

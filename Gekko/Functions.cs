@@ -1607,6 +1607,12 @@ namespace Gekko
             return z2;
         }
 
+        public static IVariable d(GekkoTime t)
+        {
+            Program.D();
+            return new ScalarVal(1d);
+        }
+
         public static IVariable exist(GekkoTime t, IVariable x1)
         {
             double d = 0d;

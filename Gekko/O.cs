@@ -1137,9 +1137,9 @@ namespace Gekko
                     {
                         G.Writeln2("*** ERROR: Expected " + its.variableName + "[] indexer element #" + (i + 1) + " to be STRING");
                         throw new GekkoException();
-                    }
-                    if (i > 0) hash += Globals.symbolTurtle; //the strings can be more or less anything, but not ¤
+                    }                    
                     hash += ((ScalarString)indexes[i])._string2;
+                    if (i < indexes.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter
                 }
 
                 if (its.dimensions == -12345)
