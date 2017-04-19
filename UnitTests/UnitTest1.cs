@@ -3771,12 +3771,8 @@ namespace UnitTests
                 }
             }
 
-            TimeSeries ts = db.GetVariable(freq, s);
-            if (indexes2 != null)
-            {
-                ts = O.GetArrayTimeSeries(ts, O.ECreatePossibilities.None, indexes2);
-            }
-
+            TimeSeries ts = db.GetVariable(freq, s + Globals.symbolTurtle + TimeSeries.GetHashCodeFromIvariables(indexes));
+            
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
                 double y = ts.GetData(t);

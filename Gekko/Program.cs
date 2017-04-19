@@ -2681,21 +2681,7 @@ namespace Gekko
                         int counter = 0;
                         GekkoTime first = Globals.tNull;
                         GekkoTime last = Globals.tNull;
-                        foreach (TimeSeries ts2 in new GekkoTimeSeriesIterator(tsTemp))
-                        {
-                            counter++;
-                            if (counter == 1)
-                            {
-                                first = ts2.GetPeriodFirst();
-                                last = ts2.GetPeriodLast();
-                            }
-                            else
-                            {
-                                if (ts2.GetPeriodFirst().StrictlySmallerThan(first)) first = ts2.GetPeriodFirst();
-                                if (ts2.GetPeriodLast().StrictlyLargerThan(last)) last = ts2.GetPeriodLast();
-                            }
-                        }
-
+                        
                         if (mergeOrTimeLimit)  //doing tsdx-protobuf merge (or time limits), get data into Work from deserialized temp databank
                         {
                             if (dates != null)
@@ -5662,15 +5648,16 @@ namespace Gekko
 
         public static void D()
         {
+            string gvar = "N";
+
             GAMSWorkspace ws = new GAMSWorkspace(workingDirectory: "c:\\tools\\decomp");
             GAMSDatabase db = ws.AddDatabaseFromGDX("c:\\tools\\decomp\\report.gdx");
             
-            GAMSVariable n = db.GetVariable("N");
+            GAMSVariable n = db.GetVariable(gvar);
             
-            TimeSeries ts = new Gekko.TimeSeries(EFreq.Annual, "N");
-            ts.dimensions = n.Domains.Count - 1;
-            ts.dim = new Gekko.Dim();
-
+            //TimeSeries ts = new Gekko.TimeSeries(EFreq.Annual, "N");
+            //ts.dimensions = n.Domains.Count - 1;
+            
             int[] dims = new int[n.Domains.Count];
 
             //N has --> a=86, t=116, s=4, scns=5.
@@ -5704,6 +5691,7 @@ namespace Gekko
                             
                 double d = record.Level;
                 int tt = int.Parse(t.Substring(1)) + 2010;  //remove the "t" and add 2010                
+
                 string hash = null;
                 for (int i = 0; i < record.Keys.Length; i++)
                 {
@@ -5711,14 +5699,14 @@ namespace Gekko
                     hash += record.Keys[i];
                     if (i < record.Keys.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter;                    
                 }
-                                
-                if (hash != oldHash) ts.dim.timeSeriesArray.TryGetValue(hash, out ts2);
+
+                if (hash != oldHash) ts2 = Program.databanks.GetFirst().GetVariable(EFreq.Annual, gvar + Globals.symbolTurtle + hash);
                 
                 if (ts2 == null)
                 {
-                    ts2 = new Gekko.TimeSeries(EFreq.Annual, "N[]");
-                    ts2.dimensions = -12345;
-                    ts.dim.timeSeriesArray.Add(hash, ts2);
+                    ts2 = new TimeSeries(EFreq.Annual, gvar + Globals.symbolTurtle + hash);                    
+                    ts2.dimensions = 1;
+                    Program.databanks.GetFirst().AddVariable(ts2);
                 }
 
                 ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), d);
@@ -5730,9 +5718,7 @@ namespace Gekko
 
             double time = (DateTime.Now - t0).TotalMilliseconds;
             G.Writeln2("TIME: " + time / 1000d);
-
-            if (Program.databanks.GetFirst().ContainsVariable("N")) Program.databanks.GetFirst().RemoveVariable("N");
-            Program.databanks.GetFirst().AddVariable(ts);
+            
         }
 
         public static Table Dream(string options)

@@ -288,20 +288,35 @@ namespace Gekko
             return variable;
         }
 
-        public static bool IsSimpleToken(string varName)
+        public static bool IsSimpleToken(string varName, bool allowTurtle)
         {
             //must be like a38, f16, var2, _var3, x_y etc. Cannot start with digit.
             if (varName == null) return false;
             if (varName.Length == 0) return false;
             if (!G.IsLetterOrUnderscore(varName[0])) return false;
             for (int jj = 1; jj < varName.Length; jj++)
-            {                
-                if (!G.IsLetterOrDigitOrUnderscore(varName[jj]))
+            {
+                if (!allowTurtle)
                 {
-                    return false;                    
+                    if (!G.IsLetterOrDigitOrUnderscore(varName[jj]))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (!G.IsLetterOrDigitOrUnderscoreOrTurtle(varName[jj]))
+                    {
+                        return false;
+                    }
                 }
             }
             return true;
+        }
+
+        public static bool IsSimpleToken(string varName)
+        {
+            return IsSimpleToken(varName, false);
         }
 
         public static string varFormat(string level1, int width)
@@ -682,6 +697,13 @@ namespace Gekko
         public static bool IsLetterOrDigitOrUnderscore(char c)
         {
             if (char.IsLetterOrDigit(c) || c == '_')
+                return true;
+            else return false;
+        }
+
+        public static bool IsLetterOrDigitOrUnderscoreOrTurtle(char c)
+        {
+            if (char.IsLetterOrDigit(c) || c == '_' || c == '¤')
                 return true;
             else return false;
         }

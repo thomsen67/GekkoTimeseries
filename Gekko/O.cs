@@ -1079,97 +1079,97 @@ namespace Gekko
             return mts;
         }
                 
-        public static MetaTimeSeries GetArrayTimeSeries(MetaTimeSeries mts, ECreatePossibilities create, params IVariable[] indexes)
-        {
-            if (indexes.Length == 0) return mts;  //fast return for normal timeseries
-            TimeSeries ts = O.GetArrayTimeSeries(mts.ts, create, indexes);            
-            return new MetaTimeSeries(ts);
-        }
+        //public static MetaTimeSeries GetArrayTimeSeries(MetaTimeSeries mts, ECreatePossibilities create, params IVariable[] indexes)
+        //{
+        //    if (indexes.Length == 0) return mts;  //fast return for normal timeseries
+        //    TimeSeries ts = O.GetArrayTimeSeries(mts.ts, create, indexes);            
+        //    return new MetaTimeSeries(ts);
+        //}
 
-        public static TimeSeries GetArrayTimeSeries(TimeSeries its, ECreatePossibilities create, IVariable[] indexes)
-        {
-            //When a timeseries is on rhs, it will have crete=none. In that case, we expect dimension to fit. If dimension is -12345,
-            //the timeseries does exist but has never been written to (is that possible)? 
+        //public static TimeSeries GetArrayTimeSeries(TimeSeries its, ECreatePossibilities create, IVariable[] indexes)
+        //{
+        //    //When a timeseries is on rhs, it will have crete=none. In that case, we expect dimension to fit. If dimension is -12345,
+        //    //the timeseries does exist but has never been written to (is that possible)? 
 
-            if (create == ECreatePossibilities.None)
-            {
-                //rhs
-                if (its.dimensions == -12345)
-                {
-                    //should not be possible?
-                    G.Writeln2("*** ERROR: Timeseries " + its.variableName + " has no dimensions and no data");
-                    throw new GekkoException();
-                }
-                if (its.dimensions != indexes.Length)
-                {
-                    G.Writeln2("*** ERROR: The timeseries " + its.variableName + " has " + its.dimensions + " dimensions,");
-                    G.Writeln("           but the []-indexer has " + indexes.Length + " dimensions", Color.Red);
-                    throw new GekkoException();
-                }
-            }
-            else
-            {
-                //lhs
-                if (its.dimensions != -12345 && (its.dimensions != indexes.Length))
-                {
-                    G.Writeln2("*** ERROR: The timeseries " + its.variableName + " has " + its.dimensions + " dimensions,");
-                    G.Writeln("           but the []-indexer has " + indexes.Length + " dimensions");
-                    throw new GekkoException();
-                }
-            }
+        //    if (create == ECreatePossibilities.None)
+        //    {
+        //        //rhs
+        //        if (its.dimensions == -12345)
+        //        {
+        //            //should not be possible?
+        //            G.Writeln2("*** ERROR: Timeseries " + its.variableName + " has no dimensions and no data");
+        //            throw new GekkoException();
+        //        }
+        //        if (its.dimensions != indexes.Length)
+        //        {
+        //            G.Writeln2("*** ERROR: The timeseries " + its.variableName + " has " + its.dimensions + " dimensions,");
+        //            G.Writeln("           but the []-indexer has " + indexes.Length + " dimensions", Color.Red);
+        //            throw new GekkoException();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        //lhs
+        //        if (its.dimensions != -12345 && (its.dimensions != indexes.Length))
+        //        {
+        //            G.Writeln2("*** ERROR: The timeseries " + its.variableName + " has " + its.dimensions + " dimensions,");
+        //            G.Writeln("           but the []-indexer has " + indexes.Length + " dimensions");
+        //            throw new GekkoException();
+        //        }
+        //    }
 
-            TimeSeries ts = null;
+        //    TimeSeries ts = null;
 
-            if (indexes.Length == 0)
-            {
-                ts = its;  //relevant for normal timeseries
-            }
-            else
-            {
-                //We know that indexes.Length >= 1.
-                //Now dimension may be (a) -12345 [only for create=yes LHS] or (b) same as indexes.Length.                             
+        //    if (indexes.Length == 0)
+        //    {
+        //        ts = its;  //relevant for normal timeseries
+        //    }
+        //    else
+        //    {
+        //        //We know that indexes.Length >= 1.
+        //        //Now dimension may be (a) -12345 [only for create=yes LHS] or (b) same as indexes.Length.                             
 
-                string hash = null;
-                //this produces a string like "b,nz,w"
-                for (int i = 0; i < indexes.Length; i++)
-                {
-                    if (indexes[i].Type() != EVariableType.String)
-                    {
-                        G.Writeln2("*** ERROR: Expected " + its.variableName + "[] indexer element #" + (i + 1) + " to be STRING");
-                        throw new GekkoException();
-                    }                    
-                    hash += ((ScalarString)indexes[i])._string2;
-                    if (i < indexes.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter
-                }
+        //        string hash = null;
+        //        //this produces a string like "b,nz,w"
+        //        for (int i = 0; i < indexes.Length; i++)
+        //        {
+        //            if (indexes[i].Type() != EVariableType.String)
+        //            {
+        //                G.Writeln2("*** ERROR: Expected " + its.variableName + "[] indexer element #" + (i + 1) + " to be STRING");
+        //                throw new GekkoException();
+        //            }                    
+        //            hash += ((ScalarString)indexes[i])._string2;
+        //            if (i < indexes.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter
+        //        }
 
-                if (its.dimensions == -12345)
-                {
-                    //can only be so for LHS type, RHS would give an exception above
-                    its.dim = new Gekko.Dim();
-                    its.dim.timeSeriesArray = new GekkoDictionary<string, TimeSeries>(StringComparer.OrdinalIgnoreCase);
-                    its.dimensions = indexes.Length;
-                }                               
+        //        //if (its.dimensions == -12345)
+        //        //{
+        //        //    //can only be so for LHS type, RHS would give an exception above
+        //        //    its.dim = new Gekko.Dim();
+        //        //    its.dim.timeSeriesArray = new GekkoDictionary<string, TimeSeries>(StringComparer.OrdinalIgnoreCase);
+        //        //    its.dimensions = indexes.Length;
+        //        //}                               
                 
-                //we know that dimension >= 1                
+        //        //we know that dimension >= 1                
                                 
-                its.dim.timeSeriesArray.TryGetValue(hash, out ts);                                
+        //        its.dim.timeSeriesArray.TryGetValue(hash, out ts);                                
                 
-                if (ts == null)
-                {
-                    if (create != ECreatePossibilities.None)
-                    {
-                        ts = new TimeSeries(its.freqEnum, its.variableName + "[]");  //the name is not really used, but we could put in the indices...?
-                        its.dim.timeSeriesArray.Add(hash, ts);  //put it in
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: Array-timeseries " + its.variableName + "[" + G.PrettifyTimeseriesHash(hash) + "] not found");
-                    }
-                }
-            }
+        //        if (ts == null)
+        //        {
+        //            if (create != ECreatePossibilities.None)
+        //            {
+        //                ts = new TimeSeries(its.freqEnum, its.variableName + "[]");  //the name is not really used, but we could put in the indices...?
+        //                its.dim.timeSeriesArray.Add(hash, ts);  //put it in
+        //            }
+        //            else
+        //            {
+        //                G.Writeln2("*** ERROR: Array-timeseries " + its.variableName + "[" + G.PrettifyTimeseriesHash(hash) + "] not found");
+        //            }
+        //        }
+        //    }
 
-            return ts;
-        }
+        //    return ts;
+        //}
 
         public static IVariable GetListWithBankPrefix(IVariable x, IVariable y, int bankNumber)
         {

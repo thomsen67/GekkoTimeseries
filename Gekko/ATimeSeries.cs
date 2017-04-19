@@ -62,15 +62,13 @@ namespace Gekko
             }
             else
             {
-                if (indexes.Length == 0)
-                {
-                    throw new GekkoException();  //should not be possible
-                }
-                TimeSeries ts = O.GetArrayTimeSeries(this.ts, O.ECreatePossibilities.None, indexes);  //cannot create just because we are looking at an index
-                MetaTimeSeries mts = new MetaTimeSeries(ts);
-                return mts;
+                string hash = TimeSeries.GetHashCodeFromIvariables(indexes);
+                TimeSeries ts = Program.GetTimeSeriesFromString(this.ts.variableName + Globals.symbolTurtle + hash, O.ECreatePossibilities.None);
+                return new MetaTimeSeries(ts);
             }
-        }               
+        }
+
+        
 
         public IVariable Indexer(IVariablesFilterRange indexRange, GekkoTime t)
         {

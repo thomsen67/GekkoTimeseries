@@ -204,11 +204,8 @@ namespace Gekko
             //Used to save some RAM, or just before serializing the databank via protobuf-net.
             DateTime t0 = DateTime.Now;
             foreach (TimeSeries ts in this.storage.Values) 
-            {
-                foreach (TimeSeries ts2 in new GekkoTimeSeriesIterator(ts))
-                {
-                    ts2.Trim();
-                }
+            {                
+                ts.Trim();                
             }
             G.WritelnGray("TRIM: " + G.Seconds(t0));
             //This does not change the databank, so this.hasBeenChanged is not touched!!
@@ -230,7 +227,7 @@ namespace Gekko
         {            
             if (this.protect) Program.ProtectError("You cannot add a timeseries to a non-editable databank, see OPEN<edit> or UNLOCK");
             string variable = ts.variableName;
-            if (!G.IsSimpleToken(variable))  //also checks for null and ""
+            if (!G.IsSimpleToken(variable, true))  //also checks for null and "" and '¤'
             {
                 G.Writeln2("*** ERROR in databank: the name '" + variable + "' is not a simple variable name");
                 throw new GekkoException();
