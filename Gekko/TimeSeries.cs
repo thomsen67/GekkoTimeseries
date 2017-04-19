@@ -143,7 +143,7 @@ namespace Gekko
         /// 
 
         [ProtoMember(13)]
-        public int dimensions = -12345;  //is default.
+        public bool ghost = false; //A ghost variable x is a placeholder for x['a', 'b'] for example. This x variable should not be used for anything.
 
         //[ProtoMember(14)]
         //public Dim dim = null;      

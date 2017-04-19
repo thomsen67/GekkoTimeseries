@@ -5705,8 +5705,12 @@ namespace Gekko
                 if (ts2 == null)
                 {
                     ts2 = new TimeSeries(EFreq.Annual, gvar + Globals.symbolTurtle + hash);                    
-                    ts2.dimensions = 1;
+                    //ts2.dimensions = 1;
                     Program.databanks.GetFirst().AddVariable(ts2);
+                    if(G.equal(ts2.variableName,"N"))
+                    {
+
+                    }
                 }
 
                 ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), d);
@@ -5715,6 +5719,14 @@ namespace Gekko
                 oldHash = hash;
 
             }
+
+            TimeSeries ts = Program.databanks.GetFirst().GetVariable(EFreq.Annual, gvar);
+            if (ts == null)
+            {
+                ts = new TimeSeries(EFreq.Annual, gvar);
+                ts.ghost = true;  //only a placeholder, should not be counted etc.
+                Program.databanks.GetFirst().AddVariable(ts);
+            }            
 
             double time = (DateTime.Now - t0).TotalMilliseconds;
             G.Writeln2("TIME: " + time / 1000d);
@@ -16986,7 +16998,8 @@ namespace Gekko
                 }
                 TimeSeries ts = db.GetVariable(false, s.name);
                 if (ts == null) continue;
-                if (ts.IsNullPeriod() && ts.dimensions == 0) remove.Add(s);  //don't remove if it is an array-timeseries (which is kind of an empty shell)
+                if (ts.ghost) continue;   //don't remove if it is an array-timeseries (which is kind of an empty shell)
+                if (ts.IsNullPeriod()) remove.Add(s); 
             }
             if (remove.Count > 0)
             {
