@@ -143,12 +143,12 @@ namespace Gekko
         /// 
 
         [ProtoMember(13)]
-        public bool ghost = false; //A ghost variable x is a placeholder for x['a', 'b'] for example. This x variable should not be used for anything.
+        private bool isGhost = false; //A ghost variable x is a placeholder for x['a', 'b'] for example. This x variable should not be used for anything.
 
         //[ProtoMember(14)]
         //public Dim dim = null;      
         
-        public bool isDirty = false;  //do not keep this in protobuf
+        private bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf
 
         private TimeSeries()
@@ -252,10 +252,8 @@ namespace Gekko
                 {
                     this.dataArray[i] = double.NaN;
                 }
-            }
-
-            this.isDirty = true;
-
+            }                        
+            this.Dirty(true);
         }
 
         private void SetNullPeriod()
@@ -373,8 +371,8 @@ namespace Gekko
             if (index < this.firstPeriodPositionInArray)
             {
                 this.firstPeriodPositionInArray = index;
-            }
-            this.isDirty = true;
+            }            
+            this.DirtyGhost(true, false);
         }
 
         /// <summary>
@@ -499,7 +497,34 @@ namespace Gekko
             {
                 this.firstPeriodPositionInArray = index1;
             }
-            this.isDirty = true;
+            this.DirtyGhost(true, false);
+
+        }
+
+        public void DirtyGhost(bool b1, bool b2)
+        {
+            this.isDirty = b1;
+            this.isGhost = b2;
+        }
+
+        public void Dirty(bool b1)
+        {
+            this.isDirty = b1;            
+        }
+
+        public void Ghost(bool b2)
+        {         
+            this.isGhost = b2;
+        }
+
+        public bool IsDirty()
+        {
+            return this.isDirty;
+        }
+
+        public bool IsGhost()
+        {
+            return this.isGhost;
         }
 
         /// <summary>

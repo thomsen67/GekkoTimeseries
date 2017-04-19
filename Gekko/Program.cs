@@ -2292,7 +2292,7 @@ namespace Gekko
             {
                 foreach (TimeSeries ts in removed.storage.Values)  //ATSFIXME
                 {
-                    if (ts.isDirty)
+                    if (ts.IsDirty())
                     {
                         isDirty = true;
                         break;
@@ -2307,8 +2307,8 @@ namespace Gekko
             db.isDirty = false;
             foreach (TimeSeries ts in db.storage.Values)  //ATSFIXME
             {
-                if (!merge) ts.isDirty = false;  //if we are not merging, the bank is comletely new, and the timeseries are all considered clean. When merging, dirt is all over.
-                ts.parentDatabank = db;
+                if (!merge) ts.Dirty(false);  //if we are not merging, the bank is comletely new, and the timeseries are all considered clean. When merging, dirt is all over.
+                ts.parentDatabank = db;                
             }
         }
 
@@ -5724,7 +5724,7 @@ namespace Gekko
             if (ts == null)
             {
                 ts = new TimeSeries(EFreq.Annual, gvar);
-                ts.ghost = true;  //only a placeholder, should not be counted etc.
+                ts.Ghost(true);  //only a placeholder, should not be counted etc.
                 Program.databanks.GetFirst().AddVariable(ts);
             }            
 
@@ -15531,7 +15531,8 @@ namespace Gekko
                 int index2 = -12345;
                 double[] x = ts.GetDataSequence(out index1, out index2, tStart, tEnd, true);
                 //#98726527
-                ts.isDirty = true;  //we have to indicate this manually here: normally GetDataSequence() is only for getting, but here stuff is put into it (to keep the method speedy)
+                //we have to indicate this manually here: normally GetDataSequence() is only for getting, but here stuff is put into it (to keep the method speedy)
+                ts.DirtyGhost(true, false);
                 int length = index2 - index1 + 1;  //only done for sim period, not from tStart0 (i.e. lags)
                 Buffer.BlockCopy(a, 8 * id * obsWithLags + 8 * (obsWithLags - obsSimPeriod), x, 8 * (index1), 8 * length); //TODO: what if out of bounds regarding x???
                 if(bNumberPointers!=null) {
@@ -15540,8 +15541,8 @@ namespace Gekko
                         if (endoNoLagPointers[b] == 1)
                         {
                             ts.source = src;
-                            ts.Stamp();
-                            ts.isDirty = true;
+                            ts.Stamp();                            
+                            ts.DirtyGhost(true, false);
                         }
                         else
                         {
@@ -16745,8 +16746,8 @@ namespace Gekko
                 {
                     //For instance, "UPD <p> y = 5, 4, 5;" --> meta = "UPD <p> y = 5, 4, 5"
                     string s = O.ShowDatesAsString(tStart, tEnd);
-                    ts.source = s + o.meta;
-                    ts.isDirty = true;
+                    ts.source = s + o.meta;                    
+                    ts.DirtyGhost(true, false);
                 }
             }
         }
@@ -16998,7 +16999,7 @@ namespace Gekko
                 }
                 TimeSeries ts = db.GetVariable(false, s.name);
                 if (ts == null) continue;
-                if (ts.ghost) continue;   //don't remove if it is an array-timeseries (which is kind of an empty shell)
+                if (ts.IsGhost()) continue;   //don't remove if it is an array-timeseries (which is kind of an empty shell)
                 if (ts.IsNullPeriod()) remove.Add(s); 
             }
             if (remove.Count > 0)
