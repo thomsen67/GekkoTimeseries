@@ -310,11 +310,11 @@ namespace Gekko.Parser.Gek
                             else
                             {
                                 string s = null;
-                                for (int i = 0; i < node.ChildrenCount(); i++)
+                                for (int i = 1; i < node.ChildrenCount(); i++)
                                 {
                                     s += ", " + node[i].Code;
                                 }
-                                node.Code.A("O.Indexer(t" + s + ")");
+                                node.Code.A("O.Indexer(t, " + node[0].Code + ", false " + s + ")");
                             }                            
                         }
                         break;
@@ -1832,7 +1832,7 @@ namespace Gekko.Parser.Gek
                             //node.Code.A("O.GetTimeSeries(" + node[0].Code + ", O.ECreatePossibilities.Can" + s + ")"); //1 is banknumber (1 for first)
                             //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
 
-                            node.Code.A("O.Indexer(t, " + node[0].Code + s + ")");
+                            node.Code.A("O.Indexer(t, " + node[0].Code + ", true "+ s + ")");
 
                             //ASTNode n0 = node[0];
                             //ASTNode n1 = node[1];
@@ -2047,7 +2047,7 @@ namespace Gekko.Parser.Gek
                         {
                             //Only 1 dimension supported                        
                             if (node.ChildrenCount() > 1) throw new GekkoException();
-                            node.Code.A("O.Indexer(t, null, " + node[0].Code + ")");  //null signals that it has nothing on the left
+                            node.Code.A("O.Indexer(t, null, false, " + node[0].Code + ")");  //null signals that it has nothing on the left
                         }
                         break;
                     case "ASTINDEXERELEMENT":  //For ASTINDEXER, see "["
@@ -2510,7 +2510,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     //This is a fY.1 type of variable.
                                     //Why does this work, and why is 'code' not used??
-                                    node.Code.CA("O.Indexer(t, " + node.Code + ", " + lagTypeCs + ")");
+                                    node.Code.CA("O.Indexer(t, " + node.Code + ", false, " + lagTypeCs + ")");
                                 }
                                 else
                                 {

@@ -60,7 +60,7 @@ namespace Gekko
 
         IVariable Negate(GekkoTime t); //returns a new object!
         
-        IVariable Indexer(GekkoTime t, params IVariable[] index); //returns a new object! t needs to be 1. argument.
+        IVariable Indexer(GekkoTime t, bool isLhs, params IVariable[] index); //returns a new object! t needs to be 1. argument.
 
         IVariable Indexer(IVariablesFilterRange index, GekkoTime t); //x[2..3]: returns a new object with sub-items
 

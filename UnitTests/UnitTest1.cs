@@ -931,7 +931,7 @@ namespace UnitTests
             AssertHelper(First(), "y", new string[] { "d", "e" }, 2000, 3, sharedDelta);
             AssertHelper(First(), "y", new string[] { "d", "e" }, 2001, double.NaN, sharedDelta);
 
-            //I("SERIES z = 100;"); //normal
+            I("SERIES z = 100;"); //normal
 
             I("WRITE arrayts;");
 
@@ -3752,7 +3752,7 @@ namespace UnitTests
         {
             AssertHelper(db, s, indexes, freq, year, subper, year, subper, x, delta);
         }
-        
+
         private static void AssertHelper(Databank db, string s, string[] indexes, EFreq freq, int year1, int sub1, int year2, int sub2, double x, double delta)
         {
             GekkoTime t1 = new GekkoTime(freq, year1, sub1);
@@ -3762,17 +3762,19 @@ namespace UnitTests
 
             IVariable[] indexes2 = null;
 
+            string name = null;
+
             if (indexes != null)
             {
-                indexes2 = new IVariable[indexes.Length];
-                for (int i = 0; i < indexes.Length; i++)
-                {
-                    indexes2[i] = new ScalarString(indexes[i]);
-                }
+                name = s + Globals.symbolTurtle + TimeSeries.GetHashCodeFromIvariables(indexes);
+            }
+            else
+            {
+                name = s;
             }
 
-            TimeSeries ts = db.GetVariable(freq, s + Globals.symbolTurtle + TimeSeries.GetHashCodeFromIvariables(indexes));
-            
+            TimeSeries ts = db.GetVariable(freq, name);
+
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
                 double y = ts.GetData(t);

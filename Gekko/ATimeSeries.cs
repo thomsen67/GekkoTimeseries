@@ -27,7 +27,7 @@ namespace Gekko
             this.offset = offset;
         }
 
-        public IVariable Indexer(GekkoTime t, params IVariable[] indexes)
+        public IVariable Indexer(GekkoTime t, bool isLhs, params IVariable[] indexes)
         {
             if (indexes.Length == 1 && (indexes[0].Type() == EVariableType.Val || indexes[0].Type() == EVariableType.Date))
             {
@@ -63,7 +63,11 @@ namespace Gekko
             else
             {
                 string hash = TimeSeries.GetHashCodeFromIvariables(indexes);
-                TimeSeries ts = Program.GetTimeSeriesFromString(this.ts.variableName + Globals.symbolTurtle + hash, O.ECreatePossibilities.None);
+
+                O.ECreatePossibilities canCreate = O.ECreatePossibilities.None;
+                if (isLhs) canCreate = O.ECreatePossibilities.Can;
+
+                TimeSeries ts = Program.GetTimeSeriesFromString(this.ts.variableName + Globals.symbolTurtle + hash, canCreate);
                 return new MetaTimeSeries(ts);
             }
         }

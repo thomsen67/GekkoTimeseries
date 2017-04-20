@@ -353,7 +353,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(GekkoTime t, IVariable x, params IVariable[] indexes)
+        public static IVariable Indexer(GekkoTime t, IVariable x, bool isLhs, params IVariable[] indexes)
         {
             if (x == null)
             {
@@ -362,7 +362,7 @@ namespace Gekko
                     //[y]
                     //['q*']
                     ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);  //a bit cheating, but we save an interface method, and performance is not really an issue when indexing whole databanks
-                    return ss.Indexer(t, indexes);
+                    return ss.Indexer(t, false, indexes);
                 }
                 else
                 {
@@ -375,7 +375,7 @@ namespace Gekko
             //a[1] or #a['q*']
             //#x[1, 2]                 
             //x['nz', 'w']           
-            return x.Indexer(t, indexes);
+            return x.Indexer(t, isLhs, indexes);
                         
         }               
 
@@ -390,7 +390,7 @@ namespace Gekko
             {
                 //x[+y], #a[+'q*'], hmmmmmmmmmmmmmmm
                 //a[+1] ok
-                return x.Indexer(t, new IVariable[] { y });
+                return x.Indexer(t, false, new IVariable[] { y });
             }
         }
 
@@ -1036,7 +1036,7 @@ namespace Gekko
         {
             if (list.Type() == EVariableType.List)
             {
-                ScalarString x = (ScalarString)list.Indexer(t, new IVariable[] { index });  //will return ScalarString with .isName = true.
+                ScalarString x = (ScalarString)list.Indexer(t, false, new IVariable[] { index });  //will return ScalarString with .isName = true.
                 MetaTimeSeries mts = O.GetTimeSeries(x._string2, 1);  //always from work....
                 return mts;
             }
@@ -1051,7 +1051,7 @@ namespace Gekko
         {
             //Used to pick out a value from a list item, like #m[2][2015], where index=2015
             MetaTimeSeries mts = O.GetTimeSeries(name, bank);  //always from work....
-            IVariable result = O.Indexer(t, mts, index);
+            IVariable result = O.Indexer(t, mts, false, index);
             return result;
         }
 

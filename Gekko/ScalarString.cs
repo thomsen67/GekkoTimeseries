@@ -209,7 +209,7 @@ namespace Gekko
             return EVariableType.String;
         }                       
 
-        public IVariable Indexer(GekkoTime t, params IVariable[] indexes)
+        public IVariable Indexer(GekkoTime t, bool isLhs, params IVariable[] indexes)
         {
             if (indexes.Length == 1)
             {
