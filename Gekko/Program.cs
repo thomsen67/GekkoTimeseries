@@ -2290,7 +2290,7 @@ namespace Gekko
             if (removed.isDirty) isDirty = true;
             else
             {
-                foreach (TimeSeries ts in removed.storage.Values)  //ATSFIXME
+                foreach (TimeSeries ts in removed.storage.Values)  
                 {
                     if (ts.IsDirty())
                     {
@@ -2305,7 +2305,7 @@ namespace Gekko
         public static void HandleCleanAndParentForTimeseries(Databank db, bool merge)
         {
             db.isDirty = false;
-            foreach (TimeSeries ts in db.storage.Values)  //ATSFIXME
+            foreach (TimeSeries ts in db.storage.Values) 
             {
                 if (!merge) ts.Dirty(false);  //if we are not merging, the bank is comletely new, and the timeseries are all considered clean. When merging, dirt is all over.
                 ts.parentDatabank = db;                
@@ -2654,7 +2654,7 @@ namespace Gekko
                     {
                         DateTime dt3 = DateTime.Now;
                         temp = Serializer.Deserialize<Databank>(fs);
-                        readInfo.variables = temp.storage.Count;  //ATSFIXME
+                        readInfo.variables = temp.storage.Count;  
                         G.WritelnGray("Protobuf deserialize took: " + G.Seconds(dt3));
                     }
                     catch (Exception e)
@@ -2667,7 +2667,7 @@ namespace Gekko
                     int maxYearInProtobufFile = int.MinValue;
                     int minYearInProtobufFile = int.MaxValue;
                     int emptyWarnings = 0;
-                    foreach (TimeSeries tsTemp in temp.storage.Values)  //for each timeseries in temp (deserialized) databank //ATSFIXME
+                    foreach (TimeSeries tsTemp in temp.storage.Values)  //for each timeseries in temp (deserialized) databank 
                     {  
 
                         //looping through each timeseries to find databank start and end year (and to merge variables if we are merging)
@@ -5210,8 +5210,8 @@ namespace Gekko
             string banks = "";
             if (s1.Equals(""))
             {
-                int wCount = Program.databanks.GetFirst().storage.Count;  //ATSFIXME
-                int rCount = Program.databanks.GetRef().storage.Count;  //ATSFIXME
+                int wCount = Program.databanks.GetFirst().storage.Count;  
+                int rCount = Program.databanks.GetRef().storage.Count;  
                 string originalDataFileWork = "[empty]";
                 string originalDataFileBaseline = "[empty]";
                 string w = GetDatabankFileNameWithPath(Program.databanks.GetFirst().aliasName);
@@ -17208,7 +17208,7 @@ namespace Gekko
                         // truncate the periods
                         //----------------------
                         GekkoDictionary<string, TimeSeries> databankWithFewerPeriods = new GekkoDictionary<string, TimeSeries>(StringComparer.OrdinalIgnoreCase);
-                        foreach (KeyValuePair<string, TimeSeries> kvp in databank.storage)  //ATSFIXME
+                        foreach (KeyValuePair<string, TimeSeries> kvp in databank.storage)  
                         {
                             TimeSeries ts = kvp.Value;
                             TimeSeries tsClone = ts.Clone();
@@ -19540,7 +19540,7 @@ namespace Gekko
                         List<string> onlyWork = new List<string>();
                         List<string> onlyGrund = new List<string>();
 
-                        foreach (string tsString in work.storage.Keys)  //ATSFIXME
+                        foreach (string tsString in work.storage.Keys) 
                         {
                             if (G.GetFreqFromKey(tsString) != Program.options.freq) continue;  //filter out other freqs
                             TimeSeries tsGrund = base2.GetVariable(false, tsString);
@@ -19553,7 +19553,7 @@ namespace Gekko
                                 both.Add(G.RemoveFreqFromKey(tsString));
                             }
                         }
-                        foreach (string tsString in base2.storage.Keys)  //ATSFIXME
+                        foreach (string tsString in base2.storage.Keys)  
                         {
                             if (G.GetFreqFromKey(tsString) != Program.options.freq) continue;  //filter out other freqs
                             TimeSeries tsWork = work.GetVariable(false, tsString);
@@ -29800,7 +29800,7 @@ namespace Gekko
                     List<string> onlyWork = new List<string>();
                     List<string> onlyGrund = new List<string>();
 
-                    foreach (string tsString in work.storage.Keys)  //ATSFIXME
+                    foreach (string tsString in work.storage.Keys) 
                     {
                         if (G.GetFreqFromKey(tsString) != Program.options.freq) continue;  //filter other freqs
                         string s = G.RemoveFreqFromKey(tsString);
@@ -29814,7 +29814,7 @@ namespace Gekko
                             both.Add(s);
                         }
                     }
-                    foreach (string tsString in base2.storage.Keys)  //ATSFIXME
+                    foreach (string tsString in base2.storage.Keys)  
                     {
                         if (G.GetFreqFromKey(tsString) != Program.options.freq) continue;  //filter other freqs
                         string s = G.RemoveFreqFromKey(tsString);
@@ -30599,7 +30599,7 @@ namespace Gekko
                 tab.CurRow.SetText(1, "Period   : The file contains data from " + this.startPerInFile + "-" + this.endPerInFile);
                 tab.CurRow.Next();
                 //#8572309572439
-                int total = Program.databanks.GetDatabank(this.dbName).storage.Count;  //ATSFIXME
+                int total = Program.databanks.GetDatabank(this.dbName).storage.Count;  
                 if (this.shouldMerge)
                 {
                     tab.CurRow.SetText(1, "Size     : Merged " + this.variables + " variables from file into " + this.dbName + " databank (" + G.SecondsFormat(time) + ")");

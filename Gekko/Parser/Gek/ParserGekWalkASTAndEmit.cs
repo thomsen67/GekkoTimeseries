@@ -1829,10 +1829,10 @@ namespace Gekko.Parser.Gek
                             }
 
                             //node.Code.A("O.GetArrayTimeSeries(O.GetTimeSeries(" + node[0].Code + ", 1)" + s + ")");  //1 is banknumber (1 for first)
-                            node.Code.A("O.GetArrayTimeSeries(" + node[0].Code + ", O.ECreatePossibilities.Can" + s + ")"); //1 is banknumber (1 for first)
+                            //node.Code.A("O.GetTimeSeries(" + node[0].Code + ", O.ECreatePossibilities.Can" + s + ")"); //1 is banknumber (1 for first)
                             //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
 
-                            
+                            node.Code.A("O.Indexer(t, " + node[0].Code + s + ")");
 
                             //ASTNode n0 = node[0];
                             //ASTNode n1 = node[1];

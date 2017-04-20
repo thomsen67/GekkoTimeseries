@@ -114,7 +114,7 @@ namespace Gekko
                     G.Writeln2("Databank " + bank.aliasName + " is empty");
                     continue;
                 }
-                foreach (TimeSeries ts in bank.storage.Values)  //ATSFIXME
+                foreach (TimeSeries ts in bank.storage.Values)  
                 {
                     if (ts.freqEnum == EFreq.Annual) a++;
                     else if (ts.freqEnum == EFreq.Quarterly) q++;
