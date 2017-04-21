@@ -2307,7 +2307,7 @@ namespace Gekko
             db.isDirty = false;
             foreach (TimeSeries ts in db.storage.Values) 
             {
-                if (!merge) ts.Dirty(false);  //if we are not merging, the bank is comletely new, and the timeseries are all considered clean. When merging, dirt is all over.
+                if (!merge) ts.SetDirty(false);  //if we are not merging, the bank is comletely new, and the timeseries are all considered clean. When merging, dirt is all over.
                 ts.parentDatabank = db;                
             }
         }
@@ -5724,7 +5724,7 @@ namespace Gekko
             if (ts == null)
             {
                 ts = new TimeSeries(EFreq.Annual, gvar);
-                ts.Ghost(true);  //only a placeholder, should not be counted etc.
+                ts.SetGhost(true);  //only a placeholder, should not be counted etc.
                 Program.databanks.GetFirst().AddVariable(ts);
             }            
 

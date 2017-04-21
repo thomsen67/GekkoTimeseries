@@ -2994,7 +2994,7 @@ namespace Gekko
                     if (opt_label != null) h.ts.label = opt_label;
                     if (opt_source != null) h.ts.source = opt_source;
                     if (opt_stamp != null) h.ts.stamp = opt_stamp;
-                    h.ts.Dirty(true);
+                    h.ts.SetDirty(true);
                 }
             }         
         }

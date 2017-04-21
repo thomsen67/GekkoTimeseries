@@ -253,7 +253,7 @@ namespace Gekko
                     this.dataArray[i] = double.NaN;
                 }
             }                        
-            this.Dirty(true);
+            this.SetDirty(true);
         }
 
         private void SetNullPeriod()
@@ -322,7 +322,16 @@ namespace Gekko
             if (this.dataArray == null)
             {
                 //If no data has been added to the timeseries, NaN will always be returned.
-                return double.NaN;
+                if (this.IsGhost())
+                {
+                    G.Writeln2("*** ERROR: The variable '" + this.variableName + "' is an array-timeseries,");
+                    G.Writeln2("           but is used as a normal timeseries here (without []-indexer)", Color.Red);
+                    throw new GekkoException();
+                }
+                else
+                {
+                    return double.NaN;
+                }
             }
             int index = GetArrayIndex(t);
             if (index < 0 || index >= this.dataArray.Length)
@@ -507,12 +516,12 @@ namespace Gekko
             this.isGhost = b2;
         }
 
-        public void Dirty(bool b1)
+        public void SetDirty(bool b1)
         {
             this.isDirty = b1;            
         }
 
-        public void Ghost(bool b2)
+        public void SetGhost(bool b2)
         {         
             this.isGhost = b2;
         }
