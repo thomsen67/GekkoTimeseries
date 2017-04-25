@@ -77,6 +77,11 @@ namespace Gekko.Parser.Gek
             if (this.storage == null) this.storage = new StringBuilder();            
             this.storage.Insert(0, s);
         }
+
+        public void Replace(string s1, string s2)
+        {
+            this.storage.Replace(s1, s2);
+        }
         
     }
 
@@ -169,7 +174,7 @@ namespace Gekko.Parser.Gek
                 }
                 node.commandLinesCounter = node.Parent.commandLinesCounter + s;  //default, may be overridden if new command is encountered.               
             }
-
+            
             //See also #890752345
             if (node.Text == "ASTIFSTATEMENTS" || node.Text == "ASTELSESTATEMENTS" || node.Text == "ASTFORSTATEMENTS" || node.Text == "ASTFUNCTIONDEFCODE")
             {
@@ -212,6 +217,16 @@ namespace Gekko.Parser.Gek
                             throw new GekkoException();
                         }
                         w.uFunctionsHelper = new FunctionArgumentsHelper();
+                    }
+                    break;
+                case "ASTSERIESLHS":
+                    {
+                        w.wh.seriesHelper = "seriesLhs";
+                    }
+                    break;
+                case "ASTSERIESRHS":
+                    {
+                        w.wh.seriesHelper = "seriesRhs";
                     }
                     break;
             }
@@ -314,7 +329,10 @@ namespace Gekko.Parser.Gek
                                 {
                                     s += ", " + node[i].Code;
                                 }
-                                node.Code.A("O.Indexer(t, " + node[0].Code + ", false " + s + ")");
+                                string tf = "false";
+                                if (w.wh.seriesHelper == "seriesLhs") tf = "true";
+                                
+                                node.Code.A("O.Indexer(t, " + node[0].Code + ", " + tf + s + ")");
                             }                            
                         }
                         break;
@@ -1820,36 +1838,20 @@ namespace Gekko.Parser.Gek
                     case "ASTSERIESLHS":
                         {
 
-                            string s = null;
+                            GetCodeFromAllChildren(node);                                                       
 
-                            for (int i = 1; i < node.ChildrenCount(); i++)
-                            {
-                                s += ", ";
-                                s += node[i].Code;
-                            }
+                            //kind of a hack, but avoids some complexity
+                            //alternative: have "ASTSERIESLHS" register in the w object
 
-                            //node.Code.A("O.GetArrayTimeSeries(O.GetTimeSeries(" + node[0].Code + ", 1)" + s + ")");  //1 is banknumber (1 for first)
-                            //node.Code.A("O.GetTimeSeries(" + node[0].Code + ", O.ECreatePossibilities.Can" + s + ")"); //1 is banknumber (1 for first)
-                            //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
-
-                            node.Code.A("O.Indexer(t, " + node[0].Code + ", true "+ s + ")");
-
-                            //ASTNode n0 = node[0];
-                            //ASTNode n1 = node[1];
-                            //ASTNode n2 = node[2];
-                            //string s = null;
-                            //for (int i = 1; i < node.ChildrenCount(); i++)
-                            //{
-                            //    s += node[i].Code + ", ";
-                            //}
-                            //if (s != null) s = s.Substring(0, s.Length - 2);
-                            //string ss = ", " + s;
-                            //if (s == null) ss = null;
-                            //node.Code.CA("O.HandleIndexer(" + node[0].Code + ss + ");");
+                            
+                            //node.Code.Replace("O.seriesHelperFalse", "O.seriesHelperTrue");
+                           
+                                  
                         }
                         break;
                     case "ASTSERIESRHS":
                         {
+                            
                             node.Code.CA(node[0].Code.ToString());
                         }
                         break;
@@ -4938,6 +4940,7 @@ namespace Gekko.Parser.Gek
         //created for each new command (except IF, FOR, etc -- hmm is this true now?)
         public GekkoDictionary<string, string> localStatementCache = null;
         //public StringBuilder localStatementCode = null;
+        public string seriesHelper = null;
         public string currentCommand = null;
         public bool isGotoOrTarget = false;
         //public StringBuilder timeLoopCode = null;  //stuff to put into the GekkoTime t2 = ... loop (handles lag sub-loops)        

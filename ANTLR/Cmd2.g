@@ -2012,7 +2012,7 @@ series                    : ASER seriesLhs (DOLLAR dollarConditional)? seriesOpe
 seriesOperator            : EQUAL
 						  | PERCENT						  
 						  ;
-seriesLhs                 : nameOrListOrScalarWithBank ( leftBracketGlue (indexerExpressionHelper (',' indexerExpressionHelper)*)? RIGHTBRACKET)* -> ^(ASTSERIESLHS nameOrListOrScalarWithBank indexerExpressionHelper*);
+seriesLhs                 : nameOrListOrScalarWithBank ( leftBracketGlue (indexerExpressionHelper (',' indexerExpressionHelper)*)? RIGHTBRACKET)* -> ^(ASTSERIESLHS ^(leftBracketGlue nameOrListOrScalarWithBank indexerExpressionHelper*));
 						  
 seriesRhs                 : expression (',' expression)* -> ^(ASTSERIESRHS expression+);
 

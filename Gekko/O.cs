@@ -18,10 +18,11 @@ namespace Gekko
 
   
     public static class O
-    {        
+    {
         //Common methods start
         //Common methods start
         //Common methods start
+                
 
         public enum LagType
         {
