@@ -316,77 +316,69 @@ namespace Gekko.Parser.Gek
                     case "[":  //indexer
                     case Globals.symbolGlueChar6:  //indexer, '[_['
                     case Globals.symbolGlueChar7:  //indexer, '[¨['
-                        {                           
-                            
+                        {
+
                             if (node[1].Text == "ASTINDEXERELEMENTPLUS")
                             {
                                 node.Code.A("O.IndexerPlus(t, " + node[0].Code + ", " + node[1].Code + ")");
                             }
                             else
                             {
-
-                                if (node[0].Text == "ASTNAMEWITHBANK")
+                                
+                                string s = null;
+                                if (node[0].Text == "ASTNAMEWITHBANK") //is a "normal" variable with indexer
                                 {
-                                    if (w.wh.seriesHelper == "seriesLhs")
+
+                                    for (int i = 1; i < node.ChildrenCount(); i++)
                                     {
-                                        for (int i = 1; i < node.ChildrenCount(); i++)
+                                        if (IsSimpleListname(node, i))
                                         {
-                                            if (node[i].Text != "ASTINDEXERELEMENT")
-                                            {
-                                                G.Writeln2("*** ERROR: Internal error #987329874");
-                                                throw new GekkoException();
-                                            }
-                                            if (node[i][0] == null) continue;
-                                            if (node[i][0].Text != "ASTINDEXERELEMENTBANK") continue;
-                                            if (node[i][1] == null) continue;
-                                            if (node[i][1].Text != "ASTHASH") continue;
-
-                                            if (node[i][1][0] == null) continue;
-                                            if (node[i][1][0].Text != "ASTHASHNAMESIMPLE") continue;
-
+                                            string nameCode = null;
                                             string listName = node[i][1][0][0].Text;
 
-                                            if (w.wh.seriesHelper != null && w.wh.seriesHelperListNames != null && w.wh.seriesHelperListNames.Contains(listName.ToLower()))
+                                            string found = null; if (w.wh.seriesHelperListNames != null) w.wh.seriesHelperListNames.TryGetValue(listName, out found);
+
+                                            if (w.wh.seriesHelper == "seriesLhs")
                                             {
-                                                G.Writeln2("*** ERROR: SERIES problem: the same list name is used multiple times in []-indexer");
-                                                throw new GekkoException();
+                                                if (found != null)
+                                                {
+                                                    G.Writeln2("*** ERROR: SERIES problem: the same list name is used multiple times in []-indexer");
+                                                    throw new GekkoException();
+                                                }
+                                                if (w.wh.seriesHelperListNames == null) w.wh.seriesHelperListNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                                                w.wh.seriesHelperListNames.Add(listName, node[i].Code.ToString());                                                
+                                                found = node[i].Code.ToString();
+                                            }
+                                            
+                                            if (found == null)  //not found
+                                            {
+                                                nameCode = found;
                                             }
                                             else
                                             {
-                                                //if (w.wh.seriesHelperListNames == null) w.wh.seriesHelperListNames = new List<string>();                                                                                             
-                                                //w.wh.seriesHelperListNames.Add(listName.ToLower());
-
-                                                if (w.wh.seriesHelperListNumbers == null) w.wh.seriesHelperListNumbers = new List<int>();
-                                                w.wh.seriesHelperListNumbers.Add(i);
+                                                nameCode = GetLoopNameCs(node, listName);
                                             }
+
+                                            s += ", " + nameCode;
+
+
                                         }
-                                    }
-                                }
-
-
-                                string s = null;
-                                for (int i = 1; i < node.ChildrenCount(); i++)
-                                {
-                                    if (w.wh.seriesHelperListNumbers != null && w.wh.seriesHelperListNumbers.Contains(i))
-                                    {
-                                        s += ", " + GetLoopNameCs(node, i);
-                                        if (w.wh.seriesHelper == "seriesLhs")
+                                        else
                                         {
-                                            if (w.wh.seriesHelperListNames == null) w.wh.seriesHelperListNames = new List<string>();
-                                            w.wh.seriesHelperListNames.Add(node[i].Code.ToString());
+                                            s += ", " + node[i].Code.ToString();
                                         }
+
+
                                     }
-                                    else
-                                    {
-                                        s += ", " + node[i].Code;
-                                    }
+
                                 }
+
                                 string tf = "false";
-                                if (w.wh.seriesHelper == "seriesLhs") tf = "true";                                
+                                if (w.wh.seriesHelper == "seriesLhs") tf = "true";
                                 node.Code.A("O.Indexer(t, " + node[0].Code + ", " + tf + s + ")");
 
-                                
-                            }                            
+
+                            }                          
                         }
                         break;
                     case "ASTXLINE":
@@ -1868,13 +1860,12 @@ namespace Gekko.Parser.Gek
                             
                             if (w.wh.seriesHelperListNames != null)
                             {
-                                for (int i = 0; i < w.wh.seriesHelperListNumbers.Count; i++)
-                                {
-                                    string nameCs = GetLoopNameCs(node, w.wh.seriesHelperListNumbers[i]);
-                                    nodeCode += "foreach (ScalarString " + nameCs + " in new O.GekkoListIterator(" + w.wh.seriesHelperListNames[i] + ")) {" + G.NL;
+                                foreach (KeyValuePair<string, string> kvp in w.wh.seriesHelperListNames)
+                                {                                    
+                                    string nameCs = GetLoopNameCs(node, kvp.Key);
+                                    nodeCode += "foreach (ScalarString " + nameCs + " in new O.GekkoListIterator(" + kvp.Value + ")) {" + G.NL;
                                 }
-                            }                                                     
-                            
+                            }                            
 
                             nodeCode += "O.Series o" + numNode + " = new O.Series();" + G.NL;
                             nodeCode = EmitLocalCacheForTimeLooping(nodeCode, w);
@@ -1899,9 +1890,8 @@ namespace Gekko.Parser.Gek
 
                             if (w.wh.seriesHelperListNames != null)
                             {
-                                for (int i = 0; i < w.wh.seriesHelperListNumbers.Count; i++)
+                                foreach (KeyValuePair<string, string> kvp in w.wh.seriesHelperListNames)
                                 {
-                                    string nameCs = GetLoopNameCs(node, w.wh.seriesHelperListNumbers[i]);
                                     nodeCode += "}" + G.NL;
                                 }
                             }
@@ -3872,7 +3862,12 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        private static string GetLoopNameCs(ASTNode node, int i)
+        private static bool IsSimpleListname(ASTNode node, int i)
+        {
+            return node[i][0] != null && node[i][0].Text == "ASTINDEXERELEMENTBANK" && node[i][1] != null && node[i][1].Text == "ASTHASH" && node[i][1][0] != null && node[i][1][0].Text == "ASTHASHNAMESIMPLE";
+        }
+
+        private static string GetLoopNameCs(ASTNode node, string i)
         {
             return "loop" + Num(node) + "_" + i;
         }
@@ -5021,8 +5016,8 @@ namespace Gekko.Parser.Gek
         public GekkoDictionary<string, string> localStatementCache = null;
         //public StringBuilder localStatementCode = null;
         public string seriesHelper = "none";
-        public List<string> seriesHelperListNames = null;
-        public List<int> seriesHelperListNumbers = null;
+        public GekkoDictionary<string, string> seriesHelperListNames = null;
+        //public List<int> seriesHelperListNumbers = null;
         public string currentCommand = null;
         public bool isGotoOrTarget = false;
         //public StringBuilder timeLoopCode = null;  //stuff to put into the GekkoTime t2 = ... loop (handles lag sub-loops)        

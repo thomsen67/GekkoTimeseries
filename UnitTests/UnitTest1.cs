@@ -955,12 +955,14 @@ namespace UnitTests
             I("ASER y['a', 'd'] = 101;");
             I("ASER y['b', 'c'] = 102;");
             I("ASER y['b', 'd'] = 103;");
-            I("ASER x[#i, #j] = 1+y[#i, #j];");
+            I("ASER z['c'] = 1000;");
+            I("ASER z['d'] = 1001;");
+            I("ASER x[#i, #j] = 1 + y[#i, #j] + z[#j];");
 
-            AssertHelper(First(), "x", new string[] { "a", "c" }, 2000, 101, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "a", "d" }, 2000, 102, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "b", "c" }, 2000, 103, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "b", "d" }, 2000, 104, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "a", "c" }, 2000, 1101, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "a", "d" }, 2000, 1103, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "c" }, 2000, 1103, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "d" }, 2000, 1105, sharedDelta);
 
         }
 
