@@ -935,7 +935,7 @@ namespace UnitTests
 
             I("WRITE arrayts;");
 
-            // --------------------------------
+            // ------ test of read and write
 
             I("RESET; MODE data; TIME 2000;");
             I("READ arrayts;");
@@ -943,10 +943,24 @@ namespace UnitTests
             AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 2000, 3, sharedDelta);            
             AssertHelper(First(), "y", new string[] { "d", "e" }, 2000, 3, sharedDelta);
             AssertHelper(First(), "z", 2000, 100, sharedDelta);
-            
 
+            // --------------------------------
+            // looping with lists
+            // --------------------------------
 
+            I("RESET; MODE data; TIME 2000;");
+            I("LIST i = a, b;");
+            I("LIST j = c, d;");
+            I("ASER y['a', 'c'] = 100;");
+            I("ASER y['a', 'd'] = 101;");
+            I("ASER y['b', 'c'] = 102;");
+            I("ASER y['b', 'd'] = 103;");
+            I("ASER x[#i, #j] = 1+y[#i, #j];");
 
+            AssertHelper(First(), "x", new string[] { "a", "c" }, 2000, 101, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "a", "d" }, 2000, 102, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "c" }, 2000, 103, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "d" }, 2000, 104, sharedDelta);
 
         }
 

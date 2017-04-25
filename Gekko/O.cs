@@ -52,6 +52,35 @@ namespace Gekko
             return s;
         }
 
+        public class GekkoListIterator : IEnumerable<ScalarString>
+        {            
+            private MetaList _ml = null;
+
+            public GekkoListIterator(IVariable list)
+            {
+                if(list.Type() != EVariableType.List)
+                {
+                    G.Writeln2("*** ERROR: Expected a list in iterator");
+                    throw new GekkoException();
+                }
+                _ml = (MetaList)list;
+            }
+
+            public IEnumerator<ScalarString> GetEnumerator()
+            {
+                foreach(string s in _ml.list)
+                {
+                    yield return new ScalarString(s);
+                }                                         
+            }
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+            {
+                G.Writeln("*** ERROR: iterator problem");
+                throw new GekkoException();
+            }
+        }
+
         public static IVariable Add(IVariable x, IVariable y, GekkoTime t)
         {
             return x.Add(y, t);
