@@ -950,21 +950,47 @@ namespace UnitTests
 
             I("RESET; MODE data; TIME 2000;");
             I("LIST i = a, b;");
-            I("LIST j = c, d;");
-            I("ASER y['a', 'c'] = 100;");
-            I("ASER y['a', 'd'] = 101;");
-            I("ASER y['b', 'c'] = 102;");
-            I("ASER y['b', 'd'] = 103;");
-            I("ASER z['c'] = 1000;");
-            I("ASER z['d'] = 1001;");
+            I("LIST j = x, y;");
+            I("ASER y['a', 'x'] = 100;");
+            I("ASER y['a', 'y'] = 101;");
+            I("ASER y['b', 'x'] = 102;");
+            I("ASER y['b', 'y'] = 103;");
+            I("ASER z['x'] = 1000;");
+            I("ASER z['y'] = 1001;");
             I("ASER x[#i, #j] = 1 + y[#i, #j] + z[#j];");
 
-            AssertHelper(First(), "x", new string[] { "a", "c" }, 2000, 1101, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "a", "d" }, 2000, 1103, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "b", "c" }, 2000, 1103, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "b", "d" }, 2000, 1105, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "a", "x" }, 2000, 1101, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "a", "y" }, 2000, 1103, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "x" }, 2000, 1103, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "y" }, 2000, 1105, sharedDelta);
+
+
+            // --------------------------------
+            // looping with lists and dollar
+            // --------------------------------
+
+            I("RESET; MODE data; TIME 2000;");
+            I("LIST i = a, b, c;");
+            I("LIST i0 = a, b;");
+            I("LIST j = x, y;");
+            I("ASER y['a', 'x'] = 100;");
+            I("ASER y['a', 'y'] = 101;");
+            I("ASER y['b', 'x'] = 102;");
+            I("ASER y['b', 'y'] = 103;");
+            I("ASER z['x'] = 1000;");
+            I("ASER z['y'] = 1001;");
+            I("ASER x[#i, #j] = 1 + y[#i, #j] $ #i0[#i] + z[#j];");
+
+            AssertHelper(First(), "x", new string[] { "a", "x" }, 2000, 1101, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "a", "y" }, 2000, 1103, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "x" }, 2000, 1103, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "y" }, 2000, 1105, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "c", "x" }, 2000, 101, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "c", "y" }, 2000, 102, sharedDelta);
+
 
         }
+
 
         [TestMethod]
         public void Test__BankSyntaxLogic()
