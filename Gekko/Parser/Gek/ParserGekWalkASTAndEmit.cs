@@ -326,7 +326,7 @@ namespace Gekko.Parser.Gek
                             {
                                 
                                 string s = null;
-                                if (node[0].Text == "ASTNAMEWITHBANK") //is a "normal" variable with indexer
+                                if (w.wh.seriesHelper == "seriesLhs" && node[0].Text == "ASTNAMEWITHBANK") //is a "normal" variable with indexer
                                 {
 
                                     for (int i = 1; i < node.ChildrenCount(); i++)
@@ -338,18 +338,18 @@ namespace Gekko.Parser.Gek
 
                                             string found = null; if (w.wh.seriesHelperListNames != null) w.wh.seriesHelperListNames.TryGetValue(listName, out found);
 
-                                            if (w.wh.seriesHelper == "seriesLhs")
+
+
+                                            if (found != null)
                                             {
-                                                if (found != null)
-                                                {
-                                                    G.Writeln2("*** ERROR: SERIES problem: the same list name is used multiple times in []-indexer");
-                                                    throw new GekkoException();
-                                                }
-                                                if (w.wh.seriesHelperListNames == null) w.wh.seriesHelperListNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                                                w.wh.seriesHelperListNames.Add(listName, node[i].Code.ToString());                                                
-                                                found = node[i].Code.ToString();
+                                                G.Writeln2("*** ERROR: SERIES problem: the same list name is used multiple times in []-indexer");
+                                                throw new GekkoException();
                                             }
-                                            
+                                            if (w.wh.seriesHelperListNames == null) w.wh.seriesHelperListNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                                            w.wh.seriesHelperListNames.Add(listName, node[i].Code.ToString());
+                                            found = node[i].Code.ToString();
+
+
                                             if (found == null)  //not found
                                             {
                                                 nameCode = found;
@@ -367,10 +367,14 @@ namespace Gekko.Parser.Gek
                                         {
                                             s += ", " + node[i].Code.ToString();
                                         }
-
-
                                     }
-
+                                }
+                                else
+                                {
+                                    for (int i = 1; i < node.ChildrenCount(); i++)
+                                    {
+                                        s += ", " + node[i].Code.ToString();
+                                    }
                                 }
 
                                 string tf = "false";
@@ -3935,23 +3939,39 @@ namespace Gekko.Parser.Gek
 
         private static void AstListHelper(ASTNode node, W w, string simpleIdent, bool stringify)
         {
+
             node.Code.CA(""); //clearing
-            string stringifyString = "false"; if (stringify) stringifyString = "true";
 
-            GekkoDictionary<string, string> listCache = GetListCache(w);
+            string nameCode = null;
+            string listName = simpleIdent;
 
-            string s = null; listCache.TryGetValue(simpleIdent, out s);
-            if (s == null)
+            string found = null; if (w.wh.seriesHelperListNames != null) w.wh.seriesHelperListNames.TryGetValue(listName, out found);
+
+            if (found != null)  //not found
             {
-                //has not been seen before
-                string listWithNumber = "list" + ++Globals.counter;
-                listCache.Add(simpleIdent, listWithNumber);
-                GetHeaderCs(w).AppendLine("public static IVariable " + listWithNumber + " = null;");  //cannot set it to ScalarVal since it may change type...
-                node.Code.A("O.GetScalarFromCache(ref " + listWithNumber + ", `" + Globals.symbolList + simpleIdent + "`, false, " + stringifyString + ")");
+                nameCode = GetLoopNameCs(node, listName);
+                node.Code.A(nameCode);
             }
             else
             {
-                node.Code.A("O.GetScalarFromCache(ref " + s + ", `" + Globals.symbolList + simpleIdent + "`, false, " + stringifyString + ")");
+                
+                string stringifyString = "false"; if (stringify) stringifyString = "true";
+
+                GekkoDictionary<string, string> listCache = GetListCache(w);
+
+                string s = null; listCache.TryGetValue(simpleIdent, out s);
+                if (s == null)
+                {
+                    //has not been seen before
+                    string listWithNumber = "list" + ++Globals.counter;
+                    listCache.Add(simpleIdent, listWithNumber);
+                    GetHeaderCs(w).AppendLine("public static IVariable " + listWithNumber + " = null;");  //cannot set it to ScalarVal since it may change type...
+                    node.Code.A("O.GetScalarFromCache(ref " + listWithNumber + ", `" + Globals.symbolList + simpleIdent + "`, false, " + stringifyString + ")");
+                }
+                else
+                {
+                    node.Code.A("O.GetScalarFromCache(ref " + s + ", `" + Globals.symbolList + simpleIdent + "`, false, " + stringifyString + ")");
+                }
             }
         }
 
