@@ -67,7 +67,20 @@ namespace Gekko
                 O.ECreatePossibilities canCreate = O.ECreatePossibilities.None;
                 if (isLhs) canCreate = O.ECreatePossibilities.Can;
 
-                TimeSeries ts = Program.GetTimeSeriesFromString(this.ts.variableName + Globals.symbolTurtle + hash, canCreate);
+                string varHash = this.ts.variableName + Globals.symbolTurtle + hash;
+
+                TimeSeries ts = this.ts.parentDatabank.GetVariable(this.ts.freqEnum, varHash);
+                if (ts == null)
+                {
+                    if (canCreate == O.ECreatePossibilities.None)
+                    {
+                        G.Writeln2("*** ERROR: Cannot find " + this.ts.parentDatabank.aliasName + ":" + this.ts.variableName + "[" + G.PrettifyTimeseriesHash(hash) + "]");
+                        throw new GekkoException();
+                    }
+                    ts = new TimeSeries(this.ts.freqEnum, varHash);
+                    this.ts.parentDatabank.AddVariable(ts);
+                }                
+
                 return new MetaTimeSeries(ts);
             }
         }
