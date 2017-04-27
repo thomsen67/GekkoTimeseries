@@ -3871,7 +3871,7 @@ namespace Gekko
                     //For instance, "SERIES y = 2 * x;" --> meta = "SERIES y = 2 * x" (without the semicolon)    
                     string s = ShowDatesAsString(this.t1, this.t2);
                     lhs.source = s + this.meta;                    
-                    lhs.DirtyGhost(true, false);
+                    lhs.SetDirtyGhost(true, false);
                 }
                 lhs.Stamp();
                 if (this.p.IsSimple())
@@ -3897,7 +3897,7 @@ namespace Gekko
                     //For instance, "SERIES y = 2 * x;" --> meta = "SERIES y = 2 * x" (without the semicolon)    
                     string s = ShowDatesAsString(this.t1, this.t2);
                     lhs.source = s + this.meta;                    
-                    lhs.DirtyGhost(true, false);
+                    lhs.SetDirtyGhost(true, false);
                 }
                 lhs.Stamp();
                 if (this.p.IsSimple())

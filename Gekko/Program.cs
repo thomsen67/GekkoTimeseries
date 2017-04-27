@@ -5652,17 +5652,27 @@ namespace Gekko
 
             GAMSWorkspace ws = new GAMSWorkspace(workingDirectory: "c:\\tools\\decomp");
             GAMSDatabase db = ws.AddDatabaseFromGDX("c:\\tools\\decomp\\report.gdx");
-            
+
+            foreach (string s in new string[] { "M", "myFM", "F", "PM", "PFF", "EF" })
+            {
+                GetGamsVariable(s, db, "base");
+            }
+                        
+
+            //GetGamsVariable("N", db);
+
+        }
+
+        private static void GetGamsVariable(string gvar, GAMSDatabase db, string filterScn)
+        {
             GAMSVariable n = db.GetVariable(gvar);
-            
-            //TimeSeries ts = new Gekko.TimeSeries(EFreq.Annual, "N");
-            //ts.dimensions = n.Domains.Count - 1;
-            
+
             int[] dims = new int[n.Domains.Count];
 
             //N has --> a=86, t=116, s=4, scns=5.
 
             int timeIndex = -12345;
+            int scnsIndex = -12345;
             for (int i = 0; i < n.Domains.Count; i++)
             {
                 GAMSSet gs = (GAMSSet)n.Domains.ElementAt(i);
@@ -5671,26 +5681,36 @@ namespace Gekko
                 {
                     timeIndex = i;
                 }
+                else if (gs.Name == "scns")
+                {
+                    scnsIndex = i;
+                }
             }
-
-            //string firstTimePeriod = ((GAMSSet)n.Domains.ElementAt(timeIndex)).FirstRecord().Keys[0];  //one dimensional set
 
             TimeSeries ts2 = null;
             int counter = 0;
-            string oldHash = "";            
+            string oldHash = "";
 
-            DateTime t0 = DateTime.Now;            
-
-            //double[,,,] N2 = new double[dims[0], dims[1], dims[2], dims[3]];
-            //n.CopyToArray(N2, 0);            
+            DateTime t0 = DateTime.Now;
 
             foreach (GAMSVariableRecord record in n)
             {
-                counter++;                
-                string t = record.Keys[timeIndex]; 
-                            
+                if (scnsIndex != -12345)
+                {
+                    string scns = record.Keys[scnsIndex];
+                    if (filterScn != null && !G.equal(scns, filterScn)) continue;
+                }
+                counter++;
+
+                int tt = -12345;
+                string t = null;
+                if (timeIndex != -12345)
+                {
+                    t = record.Keys[timeIndex];
+                    tt = int.Parse(t.Substring(1)) + 2010;  //remove the "t" and add 2010                
+                }
+
                 double d = record.Level;
-                int tt = int.Parse(t.Substring(1)) + 2010;  //remove the "t" and add 2010                
 
                 string hash = null;
                 for (int i = 0; i < record.Keys.Length; i++)
@@ -5701,23 +5721,26 @@ namespace Gekko
                 }
 
                 if (hash != oldHash) ts2 = Program.databanks.GetFirst().GetVariable(EFreq.Annual, gvar + Globals.symbolTurtle + hash);
-                
+
                 if (ts2 == null)
                 {
-                    ts2 = new TimeSeries(EFreq.Annual, gvar + Globals.symbolTurtle + hash);                    
-                    //ts2.dimensions = 1;
+                    ts2 = new TimeSeries(EFreq.Annual, gvar + Globals.symbolTurtle + hash);
                     Program.databanks.GetFirst().AddVariable(ts2);
-                    if(G.equal(ts2.variableName,"N"))
+                    if (timeIndex == -12345)
                     {
-
+                        ts2.isTimeless = true;
                     }
                 }
 
-                ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), d);
-
-                //G.Writeln2(a + " " + t + " " + s + " " + scns + " = " + d);
+                if (timeIndex == -12345)
+                {
+                    ts2.SetTimelessData(d);
+                }
+                else
+                {
+                    ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), d);
+                }
                 oldHash = hash;
-
             }
 
             TimeSeries ts = Program.databanks.GetFirst().GetVariable(EFreq.Annual, gvar);
@@ -5726,11 +5749,10 @@ namespace Gekko
                 ts = new TimeSeries(EFreq.Annual, gvar);
                 ts.SetGhost(true);  //only a placeholder, should not be counted etc.
                 Program.databanks.GetFirst().AddVariable(ts);
-            }            
+            }
 
             double time = (DateTime.Now - t0).TotalMilliseconds;
             G.Writeln2("TIME: " + time / 1000d);
-            
         }
 
         public static Table Dream(string options)
@@ -15532,7 +15554,7 @@ namespace Gekko
                 double[] x = ts.GetDataSequence(out index1, out index2, tStart, tEnd, true);
                 //#98726527
                 //we have to indicate this manually here: normally GetDataSequence() is only for getting, but here stuff is put into it (to keep the method speedy)
-                ts.DirtyGhost(true, false);
+                ts.SetDirtyGhost(true, false);
                 int length = index2 - index1 + 1;  //only done for sim period, not from tStart0 (i.e. lags)
                 Buffer.BlockCopy(a, 8 * id * obsWithLags + 8 * (obsWithLags - obsSimPeriod), x, 8 * (index1), 8 * length); //TODO: what if out of bounds regarding x???
                 if(bNumberPointers!=null) {
@@ -15542,7 +15564,7 @@ namespace Gekko
                         {
                             ts.source = src;
                             ts.Stamp();                            
-                            ts.DirtyGhost(true, false);
+                            ts.SetDirtyGhost(true, false);
                         }
                         else
                         {
@@ -16747,7 +16769,7 @@ namespace Gekko
                     //For instance, "UPD <p> y = 5, 4, 5;" --> meta = "UPD <p> y = 5, 4, 5"
                     string s = O.ShowDatesAsString(tStart, tEnd);
                     ts.source = s + o.meta;                    
-                    ts.DirtyGhost(true, false);
+                    ts.SetDirtyGhost(true, false);
                 }
             }
         }

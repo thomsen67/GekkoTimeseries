@@ -3895,6 +3895,7 @@ namespace Gekko.Parser.Gek
                     || tmp.Text == "ASTOLSELEMENT" 
                     || tmp.Text == "ASTPRTELEMENT" 
                     || tmp.Text == "ASTTABLESETVALUESELEMENT"
+                    || tmp.Text == "ASTSERIES"
                     || tmp.Text == "ASTGENR"
                     || tmp.Text == "ASTGENRLHSFUNCTION"
                     || tmp.Text == "ASTGENRLISTINDEXER"

@@ -868,47 +868,7 @@ namespace UnitTests
             
         }
 
-        [TestMethod]
-        public void Test__DollarConditional()
-        {
-            I("RESET; MODE data;");
-            I("TIME 2000 2000;");
-            I("VAL v = 10;");
-            I("LIST m = a, b;");
-            I("SERIES y = 2;");            
-            I("SERIES y = 3 $ (%v == 9);");
-            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
-            I("SERIES y = 2;");            
-            I("SERIES y = 3 $ (%v == 10);");
-            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
-            I("SERIES y = 2;");            
-            I("SERIES y = 3 $ (#m['c']);");
-            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
-            I("SERIES y = 2;");            
-            I("SERIES y = 3 $ (#m['b']);");
-            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
-            I("SERIES y = 2;");
-            I("SERIES y = 3 $ (#m['b'] and %v == 10);");
-            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
-            I("SERIES y = 2;");
-            I("SERIES y = 3 $ (#m['b'] and %v == 9);");
-            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
-            I("SERIES y = 2;");
-            I("SERIES y = 3 $ (#m['c'] and %v == 10);");
-            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
-            I("SERIES y = 2;");
-            I("SERIES y = 3 $ (#m['c'] or %v == 10);");
-            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
-
-            //Without parenthesis (...) for lists
-            I("SERIES y = 2;");
-            I("SERIES y = 3 $ #m['a'];");
-            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
-            I("SERIES y = 2;");
-            I("SERIES y = 3 $ #m['c'];");
-            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
-            
-        }
+        
 
         [TestMethod]
         public void Test__ArrayTimeSeries()
@@ -985,9 +945,79 @@ namespace UnitTests
             AssertHelper(First(), "x", new string[] { "a", "y" }, 2000, 1103, sharedDelta);
             AssertHelper(First(), "x", new string[] { "b", "x" }, 2000, 1103, sharedDelta);
             AssertHelper(First(), "x", new string[] { "b", "y" }, 2000, 1105, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "c", "x" }, 2000, 101, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "c", "y" }, 2000, 102, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "c", "x" }, 2000, 1001, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "c", "y" }, 2000, 1002, sharedDelta);
 
+            I("LIST i0 = a;");
+            I("ASER x[#i, #j] = 1 + y[#i, #j] $ #i0[#i] + z[#j];");
+            AssertHelper(First(), "x", new string[] { "a", "x" }, 2000, 1101, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "a", "y" }, 2000, 1103, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "x" }, 2000, 1001, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "y" }, 2000, 1002, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "c", "x" }, 2000, 1001, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "c", "y" }, 2000, 1002, sharedDelta);
+
+            I("LIST i0 = null;");
+            I("ASER x[#i, #j] = 1 + y[#i, #j] $ #i0[#i] + z[#j];");
+            AssertHelper(First(), "x", new string[] { "a", "x" }, 2000, 1001, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "a", "y" }, 2000, 1002, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "x" }, 2000, 1001, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "y" }, 2000, 1002, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "c", "x" }, 2000, 1001, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "c", "y" }, 2000, 1002, sharedDelta);
+
+
+            // --------------------------------
+            // fun with loop
+            // --------------------------------
+            I("RESET; MODE data; TIME 2000;");
+            I("LIST i = a, b, c;");
+            I("SER aa = 1; SER bb = 2; SER cc = 3;");
+            I("ASER xx[#i] = {#i + #i};");
+            AssertHelper(First(), "xx", new string[] { "a" }, 2000, 1, sharedDelta);
+            AssertHelper(First(), "xx", new string[] { "b" }, 2000, 2, sharedDelta);
+            AssertHelper(First(), "xx", new string[] { "c" }, 2000, 3, sharedDelta);
+
+            // -----------------------------------------
+            // DOLLAR CONDITIONAL TESTING
+            // -----------------------------------------
+
+            I("RESET; MODE data;");
+            I("TIME 2000 2000;");
+            I("VAL v = 10;");
+            I("LIST m = a, b;");
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (%v == 9);");
+            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (%v == 10);");
+            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (#m['c']);");
+            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (#m['b']);");
+            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (#m['b'] and %v == 10);");
+            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (#m['b'] and %v == 9);");
+            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (#m['c'] and %v == 10);");
+            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (#m['c'] or %v == 10);");
+            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+
+            //Without parenthesis (...) for lists
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ #m['a'];");
+            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ #m['c'];");
+            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
 
         }
 

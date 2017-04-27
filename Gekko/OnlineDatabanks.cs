@@ -419,7 +419,7 @@ namespace Gekko
                     ts.label = valuesCombi[j];
                     ts.source = url + ", " + jsonName;
                     ts.stamp = Globals.dateStamp;                    
-                    ts.DirtyGhost(true, false);
+                    ts.SetDirtyGhost(true, false);
                     
                     for (int i = 0; i < dates.Count; i++)  //periods
                     {
