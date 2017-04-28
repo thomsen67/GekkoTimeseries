@@ -3271,7 +3271,9 @@ namespace Gekko.Parser.Gek
                             {
                                 G.Writeln2("*** ERROR: Sorry, decomposition of expressions not yet implemented in Gekko 2.0");
                                 throw new GekkoException();
-                                node.Code.A("o" + Num(node) + ".expressionCs = " + child.Code + ";" + G.NL);
+                                //node.Code.A("o" + Num(node) + ".expressionCs = " + Globals.QT + child.Code.ToString().Replace("\"", "\\\"") + Globals.QT + ";" + G.NL);
+                                string sss = child.Code.ToString();
+                                node.Code.A("o" + Num(node) + ".expressionCs = " + Globals.QT + sss.Replace("`", "\\\"") + Globals.QT + ";" + G.NL);
                             }                            
                         }
                         break;

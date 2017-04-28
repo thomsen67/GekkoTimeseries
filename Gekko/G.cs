@@ -167,7 +167,8 @@ namespace Gekko
             string variable = null;
             int lag = 0;
             G.ExtractVariableAndLag(varName, out variable, out lag);
-            if (lag != 0) variable += "(" + lag + ")";
+            variable = G.PrettifyTimeseriesHash(variable, true, false);
+            if (lag != 0) variable += "[" + lag + "]";
             return variable;
         }
 
@@ -281,10 +282,15 @@ namespace Gekko
 
         public static string ExtractOnlyVariableIgnoreLag(string key, string code)
         {
-            string variable;
-            int indx = key.IndexOf(code);            
-            if (indx != -1) variable = key.Substring(0, indx - 0);
-            else variable = key;
+            string variable = null;
+            int indx = key.LastIndexOf(code); //in decomp window, we may have x['a', 'z'][-1], so therefore we look for the last '['       
+            if (indx != -1)
+            {
+                string rest = key.Substring(indx);
+                if (rest.Contains("'") || rest.Contains(Globals.symbolList.ToString())) variable = key;  //if input is x['a', 'z'] or x[#i, #j], etc.
+                else variable = key.Substring(0, indx - 0);
+            }
+            else variable = key;            
             return variable;
         }
 
@@ -644,9 +650,31 @@ namespace Gekko
         //also accepts [-1] (AREMOS)
         // i is located at the first lag parenthesis in fy(-1)
 
-        public static string PrettifyTimeseriesHash(string hash)
+        public static string PrettifyTimeseriesHash(string s, bool isVarName, bool isInverse)
         {
-            return "'" + hash.Replace(Globals.symbolTurtle, "', '") + "'";
+            if (!isVarName && isInverse) throw new GekkoException();
+            if (isInverse)
+            {
+                string ss = s.Replace(Globals.leftParenthesisIndicator, Globals.symbolTurtle);
+                ss = ss.Replace(Globals.rightParenthesisIndicator, "");
+                ss = ss.Replace(",", Globals.symbolTurtle);
+                ss = ss.Replace("'", "");
+                ss = ss.Replace(" ", "");
+                ss = ss.Trim();
+                return ss;
+            }
+            else
+            {
+                if (isVarName)
+                {
+                    int i = s.IndexOf(Globals.symbolTurtle);
+                    if (i <= 0) return s;
+                    string s1 = s.Substring(0, i);
+                    string s2 = s.Substring(i + Globals.symbolTurtle.Length, s.Length - (i + Globals.symbolTurtle.Length));
+                    return s1 + "[" + PrettifyTimeseriesHash(s2, false, false) + "]";
+                }
+                else return "'" + s.Replace(Globals.symbolTurtle, "', '") + "'";
+            }
         }
 
         public static List<string> RemoveEmptyLines(List<string> s)

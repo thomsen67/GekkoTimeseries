@@ -7158,7 +7158,7 @@ namespace Gekko
 
         public static string GetVariableExplanationAugmented(string variableNameWithLag, string variableNameWithoutLag)
         {
-            string ss = variableNameWithLag + "\n";
+            string ss = G.PrettifyTimeseriesHash(variableNameWithLag, true, false) + "\n";
             List<string> varExpl = Program.GetVariableExplanation(variableNameWithoutLag);
             if (Program.unfoldedVariableList == null) varExpl.Add("[Label not found: no model varlist loaded]");
             foreach (string line in varExpl)
@@ -8468,18 +8468,7 @@ namespace Gekko
                 decompOptions.isPercentageType = true;
                 table.Set(1, 1, "% ");
             }
-
-            //List<string> unfoldedList = new List<string>();
-
-            //if (decompOptions.isExpression)
-            //{
-            //    unfoldedList.AddRange(vars);
-            //}
-            //else
-            //{
-            //    unfoldedList = UnfoldLists(vars);
-            //}
-
+            
             string var2 = decompOptions.variable;
 
             if (true)
@@ -8514,9 +8503,7 @@ namespace Gekko
 
                 CompilerResults cr;
                 CreateDecompDll(leftSideVariable, decompOptions.expression != null, eh, out cr);
-
-                //Databank databank = Program.databanks.GetDatabank(bank);  //this is where X0 is found
-                //GekkoTime tStart, tEnd; Program.ConvertToGekkoTime(tp, out tStart, out tEnd);
+                                
                 List<Dictionary<string, string>> precedents2 = new List<Dictionary<string, string>>();
                 precedents2.Add(precedents);
                 CheckVariableExistence(null, precedents2, false, false, false, false);  //checking in work bank, also ok for time decomp
@@ -8524,6 +8511,7 @@ namespace Gekko
                 p2.AddRange(precedents.Keys);
                 p2.Sort(StringComparer.InvariantCulture);
 
+                //Beware: best to keep this constant for different years to deal with timeless variables
                 double delta = Globals.jacobiDeltaProbe;  //can just as well be the same stepsize as used in newton algorithm
 
                 Dictionary<string, List<DecompHelper>> decompHelpers = new Dictionary<string, List<DecompHelper>>();
@@ -8643,7 +8631,7 @@ namespace Gekko
                         }
                         else
                         {
-                            table.Set(2, 1, leftSideVariable);
+                            table.Set(2, 1, G.PrettifyTimeseriesHash(leftSideVariable, true, false));
                         }
 
                     }
@@ -9036,7 +9024,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     //rightSideVariables.Add(split[0], "");
-                    G.Writeln2("*** ERROR: fixed periods (" + split[0] + "(" + split[1] + ")" + ") cannot be used when decomposing");
+                    G.Writeln2("*** ERROR: fixed periods (" + split[0] + Globals.leftParenthesisIndicator + split[1] + Globals.rightParenthesisIndicator + ") cannot be used when decomposing");
                     throw new GekkoException();
                 }
                 else
@@ -15375,8 +15363,8 @@ namespace Gekko
                     //but it could be an exogenous or lagged exogenous with a missing somewhere in the simulation period.
                     //todo: write if exo, lagged endo, and the lag
                     string lag = "";
-                    if (lagPointers[i] < 0) lag = "(" + lagPointers[i] + ")";
-                    else if (lagPointers[i] > 0) lag = "(+" + lagPointers[i] + ")";
+                    if (lagPointers[i] < 0) lag = Globals.leftParenthesisIndicator + lagPointers[i] + Globals.rightParenthesisIndicator;
+                    else if (lagPointers[i] > 0) lag = Globals.leftParenthesisIndicator + "+" + lagPointers[i] + Globals.rightParenthesisIndicator;
                     string type = "exogenous";
                     if (endoPointers[i] == 1) type = "endogenous";
 
@@ -15732,8 +15720,8 @@ namespace Gekko
                     {
                         count++;
                         string s2 = s.Replace("[0]", "");
-                        s2 = s2.Replace("[", "(");
-                        s2 = s2.Replace("]", ")");
+                        //s2 = s2.Replace("[", "(");
+                        //s2 = s2.Replace("]", ")");
                         string count2 = count.ToString();
                         string blank = "";
                         if (count > 0) blank = Globals.blankUsedAsPadding;

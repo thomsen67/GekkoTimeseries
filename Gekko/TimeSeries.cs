@@ -378,8 +378,10 @@ namespace Gekko
         {
             if (this.isTimeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #0");
-                throw new GekkoException();
+                //Should not normally be used.
+                //But this may be called from for instance DECOMP, calling it with a time period
+                //Normally timeless variables should be called via the SetData(double value) method
+                this.dataArray[0] = value;
             }
             if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             
@@ -449,8 +451,12 @@ namespace Gekko
 
             if (this.isTimeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #1");
-                throw new GekkoException();
+                int n = GekkoTime.Observations(gt1, gt2);
+                double[] numbers = new double[n];
+                for (int i = 0; i < n; i++) numbers[i] = this.dataArray[0];
+                index1 = 0;
+                index2 = n - 1;
+                return numbers;
             }
 
             if (this.freqEnum != gt1.freq || gt1.freq != gt2.freq)

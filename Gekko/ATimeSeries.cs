@@ -74,7 +74,7 @@ namespace Gekko
                 {
                     if (canCreate == O.ECreatePossibilities.None)
                     {
-                        G.Writeln2("*** ERROR: Cannot find " + this.ts.parentDatabank.aliasName + ":" + this.ts.variableName + "[" + G.PrettifyTimeseriesHash(hash) + "]");
+                        G.Writeln2("*** ERROR: Cannot find " + this.ts.parentDatabank.aliasName + ":" + this.ts.variableName + "[" + G.PrettifyTimeseriesHash(hash, false, false) + "]");
                         throw new GekkoException();
                     }
                     ts = new TimeSeries(this.ts.freqEnum, varHash);
