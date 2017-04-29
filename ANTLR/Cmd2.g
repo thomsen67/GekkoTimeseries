@@ -54,9 +54,14 @@ options {
 
 //Token definitions I
 tokens {
-    ASTSERIES;
+    
+	
+	ASTSERIES;
 	ASTSERIESLHS;
 	ASTSERIESRHS;
+	ASTOPT_STRING_BOLD;
+	ASTOPT_STRING_ITALIC;
+	ASTOPT_STRING_GRIDSTYLE;
 	ASTOPT_STRING_PREFIX;
 	ASTOPT_VAL_INDEX;
 	ASTXLINE;
@@ -667,6 +672,9 @@ ASTOPT_STRING_Y2;
 	ASTXEDIT;
 
 	// --- tokens1 start ---
+		     GRIDSTYLE = 'GRIDSTYLE';
+            BOLD = 'BOLD';
+            ITALIC = 'ITALIC';
 	            ASER = 'ASER';
             ASERIES = 'ASERIES';
 	            XLABELS = 'XLABELS';
@@ -1198,7 +1206,12 @@ Y2                    = 'Y2'                       ;
                                         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 										
 // --- tokens2 start ---
-            d.Add("ASER", ASER);
+            			
+            d.Add("GRIDSTYLE", GRIDSTYLE);
+            d.Add("BOLD", BOLD);
+            d.Add("ITALIC", ITALIC);
+            			
+			d.Add("ASER", ASER);
             d.Add("ASERIES", ASERIES);
 		    d.Add("XLABELS", XLABELS);
 			d.Add("YLABELS", YLABELS);
@@ -2197,6 +2210,9 @@ prtOpt1Helper             : filter
 						  | YMIRROR '=' expression -> ^(ASTOPT_STRING_YMIRROR expression)  //PLOT
 						  | YTITLE EQUAL expression -> ^(ASTOPT_STRING_YTITLE expression)  //PLOT
 						  | Y2TITLE EQUAL expression -> ^(ASTOPT_STRING_Y2TITLE expression)  //PLOT
+						  | GRIDSTYLE EQUAL expression -> ^(ASTOPT_STRING_GRIDSTYLE expression)  //PLOT
+						  | BOLD EQUAL expression -> ^(ASTOPT_STRING_BOLD expression)  //PLOT
+						  | ITALIC EQUAL expression -> ^(ASTOPT_STRING_ITALIC expression)  //PLOT
 						
 						  | TYPE '=' linetypeHelper -> ^(ASTOPT_STRING_LINETYPE linetypeHelper)
 						  | DASHTYPE '=' expression -> ^(ASTOPT_STRING_DASHTYPE expression)
@@ -3263,7 +3279,13 @@ doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 
 ident                     : Ident|
                             // --- tokens3 start ---			
-            ASER|
+            
+			     
+            GRIDSTYLE|
+            BOLD|
+            ITALIC|
+			
+			ASER|
             ASERIES|
 			XLABELS|
 			YLABELS|

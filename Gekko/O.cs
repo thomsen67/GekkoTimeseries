@@ -4132,9 +4132,13 @@ namespace Gekko
 
             public string opt_size = null;
             public string opt_font = null;
-            public double opt_fontsize = double.NaN; 
+            public double opt_fontsize = double.NaN;
+            public string opt_bold = null;
+            public string opt_italic = null;
+
             public string opt_tics = null;
             public string opt_grid = null;
+            public string opt_gridstyle = null;
             public string opt_key = null;
             public string opt_palette = null;
             public string opt_stack = null;

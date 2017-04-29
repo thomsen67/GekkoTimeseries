@@ -23527,8 +23527,11 @@ namespace Gekko
             string subtitle = GetText(null, o.opt_subtitle, null, doc.SelectSingleNode("gekkoplot/subtitle"), null);
             string font = GetText(null, o.opt_font, null, doc.SelectSingleNode("gekkoplot/font"), "Verdana");
             double fontsize = ParseIntoDouble(GetText(null, G.isNumericalError(o.opt_fontsize) ? null : o.opt_fontsize.ToString(), null, doc.SelectSingleNode("gekkoplot/fontsize"), "12"));
+            string bold = GetText(null, o.opt_bold, null, doc.SelectSingleNode("gekkoplot/bold"), null);
+            string italic = GetText(null, o.opt_italic, null, doc.SelectSingleNode("gekkoplot/italic"), null);
             string ticsInOut = GetText(null, o.opt_tics, null, doc.SelectSingleNode("gekkoplot/tics"), "out");
             string grid = GetText(null, o.opt_grid, null, doc.SelectSingleNode("gekkoplot/grid"), "yes");  //normally null or "" --> grid. Switch off with <grid>no</grid>                        
+            string gridstyle = GetText(null, o.opt_gridstyle, null, doc.SelectSingleNode("gekkoplot/gridstyle"), "linecolor rgb \"#d3d3d3\" dashtype 3 linewidth 1.5");
             string key = GetText(null, o.opt_key, null, doc.SelectSingleNode("gekkoplot/key"), "out horiz bot center Left reverse height 1");  //height 1 givers nicer vertical spacing
             string palette = GetText(null, o.opt_palette, null, doc.SelectSingleNode("gekkoplot/palette"), "red,web-green,web-blue,orange,dark-blue,magenta,brown4,dark-violet,grey50,black");
             string stack = GetText(null, o.opt_stack, null, doc.SelectSingleNode("gekkoplot/stack"), "no");  //default: no, #23475432985    
@@ -23748,16 +23751,52 @@ namespace Gekko
 
             double siz1 = (1.5d * zoom * fontsize * fontfactor);
             double siz2 = (zoom * fontsize * fontfactor);
-            string font1 = "'" + font + "," + siz1 + "'";
-            string font2 = "'" + font + "," + siz2 + "'";
 
-            txt.AppendLine("set title font " + font1);
-            txt.AppendLine("set ylabel font " + font2);
-            txt.AppendLine("set y2label font " + font2);
-            txt.AppendLine("set xtics font " + font2);
-            txt.AppendLine("set ytics font " + font2);
-            if (numberOfY2s > 0) txt.AppendLine("set y2tics font " + font2);
-            txt.AppendLine("set key font " + font2);
+            string bold2 = "";
+            if (bold != null) bold2 = bold.Replace(" ", "").ToLower();
+            string[] bold3 = bold2.Split(',');
+            foreach (string s in bold3)
+            {
+                if (s.Trim() == "") continue;  //can contain empty entry
+                if (s != "title" && s != "ytitle" && s != "xtics" && s != "ytics" && s != "key")
+                {
+                    G.Writeln2("*** ERROR: <bold = '...'> must be title, ytitle, xtics, ytics or key");
+                    throw new GekkoException();
+                }
+            }
+            string title_bold = null; if (bold3.Contains("title")) title_bold = " Bold";
+            string ytitle_bold = null; if (bold3.Contains("ytitle")) ytitle_bold = " Bold";            
+            string xtics_bold = null; if (bold3.Contains("xtics")) xtics_bold = " Bold";
+            string ytics_bold = null; if (bold3.Contains("ytics")) ytics_bold = " Bold";
+            string key_bold = null; if (bold3.Contains("key")) key_bold = " Bold";
+
+            string italic2 = "";
+            if (italic != null) italic2 = italic.Replace(" ", "").ToLower();
+            string[] italic3 = italic2.Split(',');
+            string title_italic = null; if (italic3.Contains("title")) title_italic = " Italic";
+            string ytitle_italic = null; if (italic3.Contains("ytitle")) ytitle_italic = " Italic";
+            string xtics_italic = null; if (italic3.Contains("xtics")) xtics_italic = " Italic";
+            string ytics_italic = null; if (italic3.Contains("ytics")) ytics_italic = " Italic";
+            string key_italic = null; if (italic3.Contains("key")) key_italic = " Italic";
+            foreach (string s in italic3)
+            {
+                if (s.Trim() == "") continue;  //can contain empty entry
+                if (s != "title" && s != "ytitle" && s != "xtics" && s != "ytics" && s != "key")
+                {
+                    G.Writeln2("*** ERROR: <italic = '...'> must be title, ytitle, xtics, ytics or key");
+                    throw new GekkoException();
+                }
+            }
+
+
+
+            txt.AppendLine("set title font " + "'" + font + title_bold + title_italic + "," + siz1 + "'");
+            txt.AppendLine("set ylabel font " + "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'");
+            txt.AppendLine("set y2label font " + "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'");
+            txt.AppendLine("set xtics font " + "'" + font + xtics_bold + xtics_italic + "," + siz2 + "'");
+            txt.AppendLine("set ytics font " + "'" + font + ytics_bold + ytics_italic + "," + siz2 + "'");
+            if (numberOfY2s > 0 || ymirror == "2" || ymirror == "3") txt.AppendLine("set y2tics font " + "'" + font + ytics_bold + ytics_italic + "," + siz2 + "'");
+            txt.AppendLine("set key font " + "'" + font + key_bold + key_italic + "," + siz2 + "'");
 
             string set_yrange = null;
             string set_y2range = null;
@@ -23817,35 +23856,30 @@ namespace Gekko
                 if (ymirror == "0")  //nothing
                 {
                     txt.AppendLine("set ytics nomirror " + ticsInOut);
-                    txt.AppendLine("set border 3");
-                    //if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
-                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, font2, true);
+                    txt.AppendLine("set border 3");                    
+                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);
                    
                 }
                 else if (ymirror == "1")  //y2 axis
                 {
                     txt.AppendLine("set ytics " + ticsInOut);
-                    txt.AppendLine("set border 11");
-                    //if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
-                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, font2, true);
+                    txt.AppendLine("set border 11");                    
+                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);
                 }
                 else if (ymirror == "2")  //y2 axis and y2 tics
                 {
                     txt.AppendLine("set ytics " + ticsInOut);
                     txt.AppendLine("set y2tics " + ticsInOut);
-                    txt.AppendLine("set border 11");
-                    //if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
-                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, font2, true);
+                    txt.AppendLine("set border 11");                    
+                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);                                    
                 }
                 else if (ymirror == "3")
                 {
                     txt.AppendLine("set ytics " + ticsInOut);  //y2 axis and y2 tics and y2 label
                     txt.AppendLine("set y2tics " + ticsInOut);
-                    txt.AppendLine("set border 11");
-                    //if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
-                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, font2, true);
-                    //if (!NullOrEmpty(ytitle)) txt.AppendLine("set y2label \"" + GnuplotText(ytitle) + "\"");
-                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, font2, false);
+                    txt.AppendLine("set border 11");                    
+                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);                    
+                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", false);
                 }
             }
             else
@@ -23855,9 +23889,9 @@ namespace Gekko
                 txt.AppendLine("set y2tics " + ticsInOut);
                 txt.AppendLine("set border 11");
                 //if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
-                if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, font2, true);
+                if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);
                 //if (!NullOrEmpty(y2title)) txt.AppendLine("set y2label \"" + GnuplotText(y2title) + "\"");
-                if (!NullOrEmpty(y2title)) setTitlePlaceholder = SetYAxisText(y2title, txt, font2, false);
+                if (!NullOrEmpty(y2title)) setTitlePlaceholder = SetYAxisText(y2title, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", false);
                 if (NotNullAndNotNo(x2zeroaxis) || isSeparated) txt.AppendLine("set x2zeroaxis lt -1");  //draws x axis for y2=0, #23475432985 
             }
 
@@ -23916,17 +23950,18 @@ namespace Gekko
 
             if (G.equal(grid, "yes"))  //it can be an empty <grid/>
             {
-                txt.AppendLine("set style line 102 lc rgb '#f0f0f0' lt 1 lw 1");  //lt 0 or dt 3 gives ugly lines when viewed in Gekko
+                //txt.AppendLine("set style line 102 lc rgb '#d3d3d3' dt 3 lw 1.5");  //line width looks ok in Gekko window, with lw 1 it looks bad there.
+                txt.AppendLine("set style line 102 " + gridstyle);  //lt 0 or dt 3 gives ugly lines when viewed in Gekko
                 txt.AppendLine("set grid back ls 102");                
             }
             else if (G.equal(grid, "yline"))
             {
-                txt.AppendLine("set style line 102 lc rgb '#f0f0f0' lt 1 lw 1");  //lt 0 or dt 3 gives ugly lines when viewed in Gekko
+                txt.AppendLine("set style line 102 " + gridstyle);  //lt 0 or dt 3 gives ugly lines when viewed in Gekko
                 txt.AppendLine("set grid ytics back ls 102");                
             }
             else if (G.equal(grid, "xline")) 
             {
-                txt.AppendLine("set style line 102 lc rgb '#f0f0f0' lt 1 lw 1");  //lt 0 or dt 3 gives ugly lines when viewed in Gekko                
+                txt.AppendLine("set style line 102 " + gridstyle);  //lt 0 or dt 3 gives ugly lines when viewed in Gekko                
                 txt.AppendLine("set grid xtics back ls 102");
             }
 
