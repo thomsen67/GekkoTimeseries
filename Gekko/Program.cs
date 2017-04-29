@@ -5653,7 +5653,7 @@ namespace Gekko
             GAMSWorkspace ws = new GAMSWorkspace(workingDirectory: "c:\\tools\\decomp");
             GAMSDatabase db = ws.AddDatabaseFromGDX("c:\\tools\\decomp\\report.gdx");
 
-            foreach (string s in new string[] { "M", "myFM", "F", "PM", "PFF", "EF" })
+            foreach (string s in new string[] { "M", "myFM", "F", "PM", "PFF", "EF", "PMI", "MI", "MID", "MIF", "p", "pF", "tCus_M", "tDuty_MID", "tDuty_MIF", "tVAT_MID", "tVAT_MIF" })
             {
                 GetGamsVariable(s, db, "base");
             }
@@ -24018,7 +24018,7 @@ namespace Gekko
 
             if (G.equal(grid, "yes"))  //it can be an empty <grid/>
             {
-                txt.AppendLine("set style line 102 lc rgb '#f0f0f0' lt 1 lw 1");  //lt 0 or dt 3 gives ugly lines when viewed in Gekko
+                txt.AppendLine("set style line 102 lc rgb '#f0f0f0' lt 1 lw 1");  //lt 0 or dt 3 gives ugly lines when viewed in Gekko                                
                 txt.AppendLine("set grid back ls 102");                
             }
             else if (G.equal(grid, "yline"))

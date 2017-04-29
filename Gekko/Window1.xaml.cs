@@ -861,7 +861,7 @@ namespace Gekko
             {
                 string var = c.CellText.TextData[0];
 
-                string var2 = G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator);                
+                string var2 = G.PrettifyTimeseriesHash(G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator), true, true);
                 
                 //List<string> vars = new List<string>();
                 //vars.Add(var2);
