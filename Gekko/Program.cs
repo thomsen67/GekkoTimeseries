@@ -1996,6 +1996,11 @@ namespace Gekko
                     extension = "bnk";
                     isTsdx = false;
                 }
+                if (oRead.Type == EDataFormat.Gdx)
+                {
+                    extension = "gdx";
+                    isTsdx = false;
+                }
 
                 bool cancel = false;
                 bool createNewOpenFile = false;
@@ -2095,6 +2100,10 @@ namespace Gekko
                             throw new GekkoException();
                         }
                         TspUtilities.tspDataUtility(file, databank, oRead, readInfo, open);
+                    }
+                    else if (oRead.Type == EDataFormat.Gdx)
+                    {
+                        Program.ReadGdx(databank, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
                     }
                     else
                     {
@@ -3297,6 +3306,194 @@ namespace Gekko
                     return;
                 }
             }
+        }
+
+        public static void ReadGdx(Databank databank, ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
+        {
+            DateTime dt1 = DateTime.Now;
+
+            GAMSWorkspace ws = new GAMSWorkspace(workingDirectory: Program.options.folder_working);
+            GAMSDatabase db = ws.AddDatabaseFromGDX(file);
+
+
+            string filterScn = "base";
+
+            DateTime t00 = DateTime.Now;
+
+            G.Writeln();
+
+            int counterVariables = 0;
+            int counterParameters = 0;
+
+            if (!merge)
+            {
+                databank.Clear();
+            }
+
+            int yearMin = int.MaxValue;
+            int yearMax = int.MinValue;
+
+            foreach (GAMSSymbol n in db)
+            {
+                //if (n.GetType() == typeof(GAMSParameter)) continue;  //fixme
+                //if (n.GetType() == typeof(GAMSSet)) continue;  //fixme
+
+                if (n.GetType() == typeof(GAMSParameter) || n.GetType() == typeof(GAMSVariable))
+                {
+
+                    string gvar = n.Name;
+                    if (gvar.ToLower().StartsWith("j_")) continue;  //fixme
+
+                    //GAMSVariable n = db.GetVariable(gvar);
+
+                    int[] dims = new int[n.Domains.Count];
+
+                    //N has --> a=86, t=116, s=4, scns=5.
+
+                    int timeIndex = -12345;
+                    int scnsIndex = -12345;
+                    for (int i = 0; i < n.Domains.Count; i++)
+                    {
+                        Object o = n.Domains.ElementAt(i);
+                        if (o.GetType() == typeof(GAMSSet))
+                        {
+                            GAMSSet gs = (GAMSSet)n.Domains.ElementAt(i);
+                            dims[i] = gs.NumberRecords;
+                            if (gs.Name == "t")
+                            {
+                                timeIndex = i;
+                            }
+                            else if (gs.Name == "scns")
+                            {
+                                scnsIndex = i;
+                            }
+                        }
+                        else
+                        {
+                            //this may be a string = "*", for instance the parameter y_ps
+                        }
+                    }
+
+                    TimeSeries ts2 = null;
+                    //int counter = 0;
+                    string oldHash = "";
+
+                    foreach (GAMSSymbolRecord record2 in n)
+                    {
+
+                        string[] keys = record2.Keys;
+
+                        if (scnsIndex != -12345)
+                        {
+                            string scns = keys[scnsIndex];
+                            if (filterScn != null && !G.equal(scns, filterScn)) continue;
+                        }
+
+                        double d = double.NaN;
+
+                        if (n.GetType() == typeof(GAMSParameter))
+                        {
+                            d = ((GAMSParameterRecord)record2).Value;
+                        }
+                        else if (n.GetType() == typeof(GAMSVariable))
+                        {
+                            d = ((GAMSVariableRecord)record2).Level;
+                        }
+
+                        //counter++;
+
+                        int tt = -12345;
+                        string t = null;
+                        if (timeIndex != -12345)
+                        {
+                            t = keys[timeIndex];
+                            tt = int.Parse(t.Substring(1)) + 2006;  //remove the "t" and add 2006
+                        }
+
+                        string hash = null;
+                        for (int i = 0; i < keys.Length; i++)
+                        {
+                            if (i == timeIndex) continue;
+                            hash += keys[i];
+                            if (i < keys.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter;                    
+                        }
+
+                        if (hash != oldHash) ts2 = Program.databanks.GetFirst().GetVariable(EFreq.Annual, gvar + Globals.symbolTurtle + hash);
+
+                        if (ts2 == null)
+                        {
+                            ts2 = new TimeSeries(EFreq.Annual, gvar + Globals.symbolTurtle + hash);
+                            Program.databanks.GetFirst().AddVariable(ts2, false);
+                            if (timeIndex == -12345)
+                            {
+                                ts2.SetTimeless();
+                            }
+                            if (n.GetType() == typeof(GAMSParameter)) counterParameters++;
+                            else if (n.GetType() == typeof(GAMSVariable)) counterVariables++;
+                        }
+
+                        if (timeIndex == -12345)
+                        {
+                            ts2.SetTimelessData(d);
+                        }
+                        else
+                        {
+                            ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), d);
+
+                            if (tt > yearMax) yearMax = tt;
+                            if (tt < yearMin) yearMin = tt;
+
+                        }
+                        oldHash = hash;
+                    }                    
+
+                    TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, gvar, EFreq.Annual);  //HARDCODE: annual
+
+                    if (ts == null)
+                    {
+                        ts = new TimeSeries(EFreq.Annual, gvar);
+                        ts.SetGhost(true);  //only a placeholder, should not be counted etc.
+                        Program.databanks.GetFirst().AddVariable(ts);
+                    }
+
+                    //G.Writeln("Imported GAMS variable: " + gvar + " " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
+                }
+                else
+                {
+                    //ignore it
+                }
+            }
+            G.Writeln2("Finished GAMS import of " + counterVariables + " variables and " + counterParameters + " parameters (" + G.SecondsFormat((DateTime.Now - t00).TotalMilliseconds) + ")");
+
+
+
+            readInfo.startPerInFile = yearMin;
+            readInfo.endPerInFile = yearMax;
+            readInfo.nanCounter = 0;
+
+            readInfo.variables = counterVariables + counterParameters;
+            readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
+
+            //See almost identical code in readTsd and readCsv
+            if (merge)
+            {
+                readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
+                readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
+            }
+            else
+            {
+                readInfo.startPerResultingBank = readInfo.startPerInFile;
+                readInfo.endPerResultingBank = readInfo.endPerInFile;
+            }
+            Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
+            currentBank.yearStart = readInfo.startPerResultingBank;
+            currentBank.yearEnd = readInfo.endPerResultingBank;
+            
+            readInfo.databank.info1 = readInfo.info1;
+            readInfo.databank.date = readInfo.date;
+            readInfo.databank.FileNameWithPath = readInfo.fileName;
+                       
+
         }
 
         public static string NumberFormat(double d, string format2)
@@ -5644,24 +5841,7 @@ namespace Gekko
             {
                 return item[0].GetHashCode();
             }
-        }
-
-        public static void D()
-        {
-            string gvar = "N";
-
-            GAMSWorkspace ws = new GAMSWorkspace(workingDirectory: "c:\\tools\\decomp");
-            GAMSDatabase db = ws.AddDatabaseFromGDX("c:\\tools\\decomp\\report.gdx");
-
-            foreach (string s in new string[] { "M", "myFM", "F", "PM", "PFF", "EF", "PMI", "MI", "MID", "MIF", "p", "pF", "tCus_M", "tDuty_MID", "tDuty_MIF", "tVAT_MID", "tVAT_MIF" })
-            {
-                GetGamsVariable(s, db, "base");
-            }
-                        
-
-            //GetGamsVariable("N", db);
-
-        }
+        }        
 
         private static void GetGamsVariable(string gvar, GAMSDatabase db, string filterScn)
         {
@@ -5728,7 +5908,7 @@ namespace Gekko
                     Program.databanks.GetFirst().AddVariable(ts2);
                     if (timeIndex == -12345)
                     {
-                        ts2.isTimeless = true;
+                        ts2.SetTimeless();
                     }
                 }
 
@@ -17010,6 +17190,7 @@ namespace Gekko
                 TimeSeries ts = db.GetVariable(false, s.name);
                 if (ts == null) continue;
                 if (ts.IsGhost()) continue;   //don't remove if it is an array-timeseries (which is kind of an empty shell)
+                if (ts.IsTimeless()) continue;  //keep timeless variables
                 if (ts.IsNullPeriod()) remove.Add(s); 
             }
             if (remove.Count > 0)
@@ -24018,17 +24199,17 @@ namespace Gekko
 
             if (G.equal(grid, "yes"))  //it can be an empty <grid/>
             {
-                txt.AppendLine("set style line 102 lc rgb '#f0f0f0' lt 1 lw 1");  //lt 0 or dt 3 gives ugly lines when viewed in Gekko                                
+                txt.AppendLine("set style line 102 linecolor rgb \"#d3d3d3\" dashtype 3 linewidth 1.5");  //stuff from main branch
                 txt.AppendLine("set grid back ls 102");                
             }
             else if (G.equal(grid, "yline"))
             {
-                txt.AppendLine("set style line 102 lc rgb '#f0f0f0' lt 1 lw 1");  //lt 0 or dt 3 gives ugly lines when viewed in Gekko
+                txt.AppendLine("set style line 102 linecolor rgb \"#d3d3d3\" dashtype 3 linewidth 1.5");  //stuff from main branch
                 txt.AppendLine("set grid ytics back ls 102");                
             }
             else if (G.equal(grid, "xline")) 
             {
-                txt.AppendLine("set style line 102 lc rgb '#f0f0f0' lt 1 lw 1");  //lt 0 or dt 3 gives ugly lines when viewed in Gekko                
+                txt.AppendLine("set style line 102 linecolor rgb \"#d3d3d3\" dashtype 3 linewidth 1.5");  //stuff from main branch
                 txt.AppendLine("set grid xtics back ls 102");
             }
 
@@ -31053,7 +31234,8 @@ namespace Gekko
         Prn,
         Pcim,
         Xls,
-        Xlsx
+        Xlsx,
+        Gdx
     }
 
     public enum EOpenType

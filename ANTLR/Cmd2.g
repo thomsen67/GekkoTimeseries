@@ -61,6 +61,7 @@ tokens {
 	ASTSERIESLHS;
 	ASTSERIESRHS;
 	ASTOPT_STRING_PREFIX;
+	ASTOPT_STRING_GDX;
 	ASTOPT_VAL_INDEX;
 	ASTXLINE;
 	ASTYLINE;
@@ -680,6 +681,7 @@ ASTOPT_STRING_Y2;
             BETWEEN = 'BETWEEN';
             NONANNUAL = 'NONANNUAL';
             DIGITS = 'DIGITS';
+			GDX = 'GDX';
 	LAGFIX = 'LAGFIX';
 	ADDBANK = 'ADDBANK';
 	REBASE = 'REBASE';
@@ -1422,6 +1424,7 @@ d.Add("Y" ,Y);
                                         d.Add("function", FUNCTION);
                                         d.Add("gauss"   , GAUSS     );
                                         d.Add("GBK" ,GBK);
+										d.Add("GDX", GDX);
                                         d.Add("gdif"    , GDIF   );
                                         d.Add("gdiff"    , GDIFF   );
                                         d.Add("GEKKO18", GEKKO18);
@@ -2264,6 +2267,7 @@ readOpt1h                 : MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
 						  | GBK (EQUAL yesNo)? -> ^(ASTOPT_STRING_GBK yesNo?)
+						  | GDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_GDX yesNo?)
 						  | TSP (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSP yesNo?)
 						  | PCIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PCIM yesNo?)
 						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
@@ -2442,6 +2446,7 @@ writeOpt1                 : ISNOTQUAL
 writeOpt1h                : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  //all these will fail, just to provide better error messages for WRITE<csv> etc.
 						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
 						  | GBK (EQUAL yesNo)? -> ^(ASTOPT_STRING_GBK yesNo?)
+						  | GDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_GDX yesNo?)
 						  | TSP (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSP yesNo?)
 						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
 						  | PRN (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRN yesNo?)
@@ -2531,6 +2536,7 @@ openOpt1                  : ISNOTQUAL | leftAngle openOpt1h* RIGHTANGLE -> openO
 openOpt1h                 : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
 						  | GBK (EQUAL yesNo)? -> ^(ASTOPT_STRING_GBK yesNo?)
+						  | GDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_GDX yesNo?)
 						  | PCIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PCIM yesNo?)
 						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
 						  | PRN (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRN yesNo?)						
@@ -2558,6 +2564,7 @@ mulbkOpt1                 : ISNOTQUAL | leftAngle mulbkOpt1h* RIGHTANGLE -> mulb
 mulbkOpt1h                : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
 						  | GBK (EQUAL yesNo)? -> ^(ASTOPT_STRING_GBK yesNo?)
+						  | GDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_GDX yesNo?)
 						  | PCIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PCIM yesNo?)
 						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
 						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
@@ -3495,6 +3502,7 @@ ident                     : Ident|
                             FUNCTION|
                             GAUSS|
                             GBK|
+							GDX|
                             GDIFF|
                             GDIF|
                             GEKKO18|

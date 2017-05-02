@@ -294,7 +294,8 @@ namespace Gekko
             return variable;
         }
 
-        public static bool IsSimpleToken(string varName, bool allowTurtle)
+        //Maybe allowTurtle should be removed
+        private static bool IsSimpleToken(string varName, bool allowTurtle)
         {
             //must be like a38, f16, var2, _var3, x_y etc. Cannot start with digit.
             if (varName == null) return false;
@@ -322,7 +323,7 @@ namespace Gekko
 
         public static bool IsSimpleToken(string varName)
         {
-            return IsSimpleToken(varName, false);
+            return IsSimpleToken(varName, false);  //no turtle allowed, maybe remove that
         }
 
         public static string varFormat(string level1, int width)
@@ -568,7 +569,7 @@ namespace Gekko
             foreach (TimeSeries ts in originalDatabank.storage.Values) 
             {
                 TimeSeries tsCopy = ts.Clone();
-                newDatabank.AddVariable(ts.frequency, tsCopy);  //FIXME: what if already there
+                newDatabank.AddVariable(ts.frequency, tsCopy, false);  //FIXME: what if already there. No variable name check -- just wastes time, and not good regarding GAMS variable names.
             }
         }
 

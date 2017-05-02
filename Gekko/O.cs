@@ -1823,6 +1823,7 @@ namespace Gekko
             public string opt_tsd = null;
             public string opt_tsdx = null;
             public string opt_gbk = null;
+            public string opt_gdx = null;
             public string opt_tsp = null;
             public string opt_csv = null;
             public string opt_prn = null;
@@ -1885,8 +1886,10 @@ namespace Gekko
                 if (G.equal(this.opt_tsp, "yes")) hlp.Type = EDataFormat.Tsp;
                 if (G.equal(this.opt_xls, "yes")) hlp.Type = EDataFormat.Xls;
                 if (G.equal(this.opt_xlsx, "yes")) hlp.Type = EDataFormat.Xlsx;
-                if (G.equal(this.opt_cols, "yes")) hlp.Orientation = "cols";                
+                if (G.equal(this.opt_gdx, "yes")) hlp.Type = EDataFormat.Gdx;
+                if (G.equal(this.opt_cols, "yes")) hlp.Orientation = "cols";
                 
+
                 bool isSimple = false;
 
                 if (isTo)
@@ -2870,6 +2873,7 @@ namespace Gekko
             //public string fileName = null;
             public string opt_tsd = null;
             public string opt_gbk = null;
+            public string opt_gdx = null;
             public string opt_tsdx = null;
             public string opt_csv = null;
             public string opt_prn = null;
@@ -2915,7 +2919,8 @@ namespace Gekko
                 if (this.opt_tsdx == "yes") hlp.Type = EDataFormat.Tsdx;
                 if (this.opt_gbk == "yes") hlp.Type = EDataFormat.Gbk;
                 if (this.opt_xls == "yes") hlp.Type = EDataFormat.Xls;
-                if (this.opt_xlsx == "yes") hlp.Type = EDataFormat.Xlsx;            
+                if (this.opt_xlsx == "yes") hlp.Type = EDataFormat.Xlsx;
+                if (this.opt_gdx == "yes") hlp.Type = EDataFormat.Gdx;
                 if (this.opt_cols == "yes") hlp.Orientation = "cols";
                 //if (this.as2 != null) hlp.As = this.as2;
 

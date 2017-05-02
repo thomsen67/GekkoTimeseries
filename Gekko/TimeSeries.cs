@@ -146,7 +146,7 @@ namespace Gekko
         private bool isGhost = false; //A ghost variable x is a placeholder for x['a', 'b'] for example. This x variable should not be used for anything.
 
         [ProtoMember(14)]
-        public bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]
+        private bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]
         
         private bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf
@@ -589,6 +589,16 @@ namespace Gekko
         public bool IsGhost()
         {
             return this.isGhost;
+        }
+
+        public bool IsTimeless()
+        {
+            return this.isTimeless;
+        }
+
+        public void SetTimeless()
+        {
+            this.isTimeless = true;
         }
 
         /// <summary>
