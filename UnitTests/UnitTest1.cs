@@ -1055,6 +1055,8 @@ namespace UnitTests
             I("read <first> struc;");
             I("read <ref> base;");
             I("mulprt m['chou'];");
+            I("PRT m['chou'] - @m['chou'];");
+            I("PRT work:m['chou'] - ref:m['chou'];");
             AssertHelper(First(), "m", new string[] { "chou" }, 2006 + 27, 35.0258600515369d, sharedDelta);
             AssertHelper(Ref(), "m", new string[] { "chou" }, 2006 + 27, 35.0289043466536d, sharedDelta);
             
