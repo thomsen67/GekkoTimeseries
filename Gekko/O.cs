@@ -409,8 +409,9 @@ namespace Gekko
                         
         }               
 
-        public static IVariable IndexerPlus(GekkoTime t, IVariable x, IVariable y)
+        public static IVariable IndexerPlus(GekkoTime t, IVariable x, bool isLhs, IVariable y)
         {
+            //isLhs will always be false
             if (x == null)
             {
                 G.Writeln2("*** ERROR: You cannot use '+' as first character inside a [] wildcard");
@@ -420,11 +421,11 @@ namespace Gekko
             {
                 //x[+y], #a[+'q*'], hmmmmmmmmmmmmmmm
                 //a[+1] ok
-                return x.Indexer(t, false, new IVariable[] { y });
+                return x.Indexer(t, isLhs, new IVariable[] { y });
             }
         }
 
-        public static IVariable Indexer(GekkoTime t, IVariable x, IVariablesFilterRange y)
+        public static IVariable Indexer(GekkoTime t, IVariable x, bool isLhs, IVariablesFilterRange y)
         {            
             if (x == null)
             {
@@ -441,7 +442,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(GekkoTime t, IVariable x, IVariablesFilterRange y1, IVariablesFilterRange y2)
+        public static IVariable Indexer(GekkoTime t, IVariable x, bool isLhs, IVariablesFilterRange y1, IVariablesFilterRange y2)
         {
             if (x == null)
             {
@@ -455,7 +456,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(GekkoTime t, IVariable x, IVariable y1, IVariablesFilterRange y2)
+        public static IVariable Indexer(GekkoTime t, IVariable x, bool isLhs, IVariable y1, IVariablesFilterRange y2)
         {
             if (x == null)
             {
@@ -469,7 +470,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(GekkoTime t, IVariable x, IVariablesFilterRange y1, IVariable y2)
+        public static IVariable Indexer(GekkoTime t, IVariable x, bool isLhs, IVariablesFilterRange y1, IVariable y2)
         {
             if (x == null)
             {

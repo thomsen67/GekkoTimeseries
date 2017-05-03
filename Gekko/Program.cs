@@ -2690,6 +2690,10 @@ namespace Gekko
                         int counter = 0;
                         GekkoTime first = Globals.tNull;
                         GekkoTime last = Globals.tNull;
+
+                        //Seems the omission of this was a but, still it only relates to metadata
+                        first = tsTemp.GetPeriodFirst();
+                        last = tsTemp.GetPeriodLast();
                         
                         if (mergeOrTimeLimit)  //doing tsdx-protobuf merge (or time limits), get data into Work from deserialized temp databank
                         {
@@ -3310,14 +3314,29 @@ namespace Gekko
 
         public static void ReadGdx(Databank databank, ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
         {
+            
             DateTime dt1 = DateTime.Now;
 
             GAMSWorkspace ws = new GAMSWorkspace(workingDirectory: Program.options.folder_working);
             GAMSDatabase db = ws.AddDatabaseFromGDX(file);
 
+            string readType = "scns['base']"; //cut="scns['base']" 
+            readType = null;
 
-            string filterScn = "base";
-
+            if (readType == null) readType = "";
+            string cut1 = null; string cut2 = null;
+            string s = readType.Replace("[", "¤");
+            s = s.Replace("]", "¤");
+            string[] ss = s.Split(new char[] { '¤' }, StringSplitOptions.RemoveEmptyEntries);
+            if (ss.Length == 2 && ss[0] != null && ss[0].Trim() != "" && ss[1] != null && ss[1].Trim() != "")
+            {
+                if(ss[1].Trim().StartsWith("'") && ss[1].Trim().EndsWith("'"))
+                {
+                    cut1 = ss[0].Trim();
+                    cut2 = ss[1].Trim().Substring(1, ss[1].Trim().Length - 2);
+                }
+            }
+            
             DateTime t00 = DateTime.Now;
 
             G.Writeln();
@@ -3342,13 +3361,12 @@ namespace Gekko
                 {
 
                     string gvar = n.Name;
-                    if (gvar.ToLower().StartsWith("j_")) continue;  //fixme
+                   
+                    //if (gvar.ToLower().StartsWith("j_")) continue;  //make filtering possible!
 
-                    //GAMSVariable n = db.GetVariable(gvar);
-
-                    int[] dims = new int[n.Domains.Count];
-
-                    //N has --> a=86, t=116, s=4, scns=5.
+                    if (G.IsUnitTesting() && !(G.equal(gvar, "m") || G.equal(gvar, "myfm") || G.equal(gvar, "f") || G.equal(gvar, "pm") || G.equal(gvar, "pff") || G.equal(gvar, "ef"))) continue;  //to not waste time on this when unit testing
+                    
+                    int[] dims = new int[n.Domains.Count];                                       
 
                     int timeIndex = -12345;
                     int scnsIndex = -12345;
@@ -3359,11 +3377,11 @@ namespace Gekko
                         {
                             GAMSSet gs = (GAMSSet)n.Domains.ElementAt(i);
                             dims[i] = gs.NumberRecords;
-                            if (gs.Name == "t")
+                            if (G.equal(gs.Name, "t"))
                             {
                                 timeIndex = i;
                             }
-                            else if (gs.Name == "scns")
+                            else if (G.equal(gs.Name, cut1))
                             {
                                 scnsIndex = i;
                             }
@@ -3378,15 +3396,17 @@ namespace Gekko
                     //int counter = 0;
                     string oldHash = "";
 
+                    bool isDimensionless = false;
+
+                    int ii = 0;
                     foreach (GAMSSymbolRecord record2 in n)
                     {
-
-                        string[] keys = record2.Keys;
+                        
+                        string[] keys = record2.Keys;                        
 
                         if (scnsIndex != -12345)
-                        {
-                            string scns = keys[scnsIndex];
-                            if (filterScn != null && !G.equal(scns, filterScn)) continue;
+                        {                            
+                            if (cut1 != null && scnsIndex >= 0 && !G.equal(keys[scnsIndex], cut2)) continue;  //ignore this
                         }
 
                         double d = double.NaN;
@@ -3414,15 +3434,31 @@ namespace Gekko
                         for (int i = 0; i < keys.Length; i++)
                         {
                             if (i == timeIndex) continue;
-                            hash += keys[i];
-                            if (i < keys.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter;                    
-                        }
 
-                        if (hash != oldHash) ts2 = Program.databanks.GetFirst().GetVariable(EFreq.Annual, gvar + Globals.symbolTurtle + hash);
+                            if (i == scnsIndex && G.equal(keys[i], cut2))
+                            {
+                                //skip it
+                            }
+                            else
+                            {
+                                hash += keys[i] + Globals.symbolTurtle;
+                                //if (i < keys.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter;                    
+                            }
+                        }
+                        if (hash != null && hash.EndsWith(Globals.symbolTurtle)) hash = hash.Substring(0, hash.Length - Globals.symbolTurtle.Length);
+                                                
+                        if (hash == null || hash == "") isDimensionless = true;
+                        string varName = null;
+                        if (isDimensionless) varName = gvar;
+                        else varName = gvar + Globals.symbolTurtle + hash;
+
+                        if (hash != oldHash) ts2 = Program.databanks.GetFirst().GetVariable(EFreq.Annual, varName);
 
                         if (ts2 == null)
                         {
-                            ts2 = new TimeSeries(EFreq.Annual, gvar + Globals.symbolTurtle + hash);
+                            
+                            ts2 = new TimeSeries(EFreq.Annual, varName);
+                            
                             Program.databanks.GetFirst().AddVariable(ts2, false);
                             if (timeIndex == -12345)
                             {
@@ -3445,15 +3481,22 @@ namespace Gekko
 
                         }
                         oldHash = hash;
-                    }                    
+                        ii++;
+                    }
 
-                    TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, gvar, EFreq.Annual);  //HARDCODE: annual
-
-                    if (ts == null)
+                    if (isDimensionless)
                     {
-                        ts = new TimeSeries(EFreq.Annual, gvar);
-                        ts.SetGhost(true);  //only a placeholder, should not be counted etc.
-                        Program.databanks.GetFirst().AddVariable(ts);
+                        //do nothing, do not create a ghost
+                    }
+                    else
+                    {
+                        TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, gvar, EFreq.Annual);  //HARDCODE: annual
+                        if (ts == null)
+                        {
+                            ts = new TimeSeries(EFreq.Annual, gvar);
+                            ts.SetGhost(true);  //only a placeholder, should not be counted etc.
+                            Program.databanks.GetFirst().AddVariable(ts);
+                        }
                     }
 
                     //G.Writeln("Imported GAMS variable: " + gvar + " " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));

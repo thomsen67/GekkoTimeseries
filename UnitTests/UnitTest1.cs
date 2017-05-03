@@ -1025,14 +1025,15 @@ namespace UnitTests
             // -----------------------------------------
 
             I("reset; mode data;");
-            I("val d = d();");  //This reads from gdx file, note that 2010 is added to t{i}, for instance t0=2010, t1=2011...
+            I("read <gdx> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...
+            //I("val d = d();");  
             I("list scn = base;");
             I("list psl = chou, cpub, ccon, cgoo, cser;");
             I("clone;");
             I("delete m;");
             I("aser M[#psl,#scn] = myFM[#psl,#scn] * F[#psl,#scn] * ((PM[#psl,#scn]/PFF[#psl,#scn])*(PM[#psl,#scn]/PFF[#psl,#scn]))**(-EF[#psl]/2);");
-            AssertHelper(First(), "m", new string[] { "chou", "base" }, 2010, 32.1879605531923d, sharedDelta);
-            AssertHelper(Ref(), "m", new string[] { "chou", "base" }, 2010, 32.1879605531923d, sharedDelta);
+            AssertHelper(First(), "m", new string[] { "chou", "base" }, 2006, 32.1879605531923d, sharedDelta);
+            AssertHelper(Ref(), "m", new string[] { "chou", "base" }, 2006, 32.1879605531923d, sharedDelta);          
 
             
         }
