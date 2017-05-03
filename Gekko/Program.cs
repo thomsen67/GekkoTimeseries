@@ -2669,6 +2669,7 @@ namespace Gekko
                     catch (Exception e)
                     {
                         G.Writeln2("*** ERROR: Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version 1.1 format (protobuffers)");
+                        G.Writeln("           Message: " + e.Message, Color.Red);
                         G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
                         throw new GekkoException();
                     }
@@ -2691,10 +2692,12 @@ namespace Gekko
                         GekkoTime first = Globals.tNull;
                         GekkoTime last = Globals.tNull;
 
-                        //Seems the omission of this was a bug, still it only relates to metadata
-                        first = tsTemp.GetPeriodFirst();
-                        last = tsTemp.GetPeriodLast();
-                        
+                        if (!tsTemp.IsTimeless())
+                        {
+                            first = tsTemp.GetPeriodFirst();
+                            last = tsTemp.GetPeriodLast();
+                        }                                                
+
                         if (mergeOrTimeLimit)  //doing tsdx-protobuf merge (or time limits), get data into Work from deserialized temp databank
                         {
                             if (dates != null)
@@ -3424,7 +3427,7 @@ namespace Gekko
                             t = keys[timeIndex];
                             tt = int.Parse(t.Substring(1)) + 2006;  //remove the "t" and add 2006
                         }
-
+                        
                         string hash = null;
                         for (int i = 0; i < keys.Length; i++)
                         {
@@ -3447,14 +3450,17 @@ namespace Gekko
                         if (isDimensionless) varName = gvar;
                         else varName = gvar + Globals.symbolTurtle + hash;
 
-                        if (hash != oldHash) ts2 = Program.databanks.GetFirst().GetVariable(EFreq.Annual, varName);
+                        if (hash != oldHash)
+                        {                            
+                            ts2 = databank.GetVariable(EFreq.Annual, varName);
+                        }
 
                         if (ts2 == null)
                         {
                             
                             ts2 = new TimeSeries(EFreq.Annual, varName);
                             
-                            Program.databanks.GetFirst().AddVariable(ts2, false);
+                            databank.AddVariable(ts2, false);
                             if (timeIndex == -12345)
                             {
                                 ts2.SetTimeless();
@@ -3484,14 +3490,10 @@ namespace Gekko
                         //do nothing, do not create a ghost
                     }
                     else
-                    {
-                        TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, gvar, EFreq.Annual);  //HARDCODE: annual
-                        if (ts == null)
-                        {
-                            ts = new TimeSeries(EFreq.Annual, gvar);
-                            ts.SetGhost(true);  //only a placeholder, should not be counted etc.
-                            Program.databanks.GetFirst().AddVariable(ts);
-                        }
+                    {                        
+                        TimeSeries ts = new TimeSeries(EFreq.Annual, gvar);  //we wipe it out if it is alreay existing
+                        ts.SetGhost(true);  //only a placeholder, should not be counted etc.
+                        databank.AddVariable(ts);                        
                     }
 
                     //G.Writeln("Imported GAMS variable: " + gvar + " " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
@@ -3502,9 +3504,7 @@ namespace Gekko
                 }
             }
             G.Writeln2("Finished GAMS import of " + counterVariables + " variables and " + counterParameters + " parameters (" + G.SecondsFormat((DateTime.Now - t00).TotalMilliseconds) + ")");
-
-
-
+                        
             readInfo.startPerInFile = yearMin;
             readInfo.endPerInFile = yearMax;
             readInfo.nanCounter = 0;
@@ -3530,7 +3530,10 @@ namespace Gekko
             readInfo.databank.info1 = readInfo.info1;
             readInfo.databank.date = readInfo.date;
             readInfo.databank.FileNameWithPath = readInfo.fileName;
-                       
+
+            //TODO: Maybe only do this on the gdx variables if possible
+            //Anyway, the speed penalty is small anyway.
+            databank.Trim();  
 
         }
 
@@ -17229,7 +17232,10 @@ namespace Gekko
                 if (ts == null) continue;
                 if (ts.IsGhost()) continue;   //don't remove if it is an array-timeseries (which is kind of an empty shell)
                 if (ts.IsTimeless()) continue;  //keep timeless variables
-                if (ts.IsNullPeriod()) remove.Add(s); 
+                if (ts.IsNullPeriod())
+                {
+                    remove.Add(s);
+                }
             }
             if (remove.Count > 0)
             {
@@ -17459,9 +17465,9 @@ namespace Gekko
                             count = databank.storage.Count;
                         }
                         catch (Exception e)
-                        {
-                            G.Writeln();
-                            G.Writeln("*** ERROR: Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers)");
+                        {                            
+                            G.Writeln2("*** ERROR: Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers)");
+                            G.Writeln("           Message: " + e.Message, Color.Red);
                             throw new GekkoException();
                         }
                     }

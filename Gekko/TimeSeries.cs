@@ -326,7 +326,7 @@ namespace Gekko
                 if (this.IsGhost())
                 {
                     G.Writeln2("*** ERROR: The variable '" + this.variableName + "' is an array-timeseries,");
-                    G.Writeln2("           but is used as a normal timeseries here (without []-indexer)", Color.Red);
+                    G.Writeln("           but is used as a normal timeseries here (without []-indexer)", Color.Red);
                     throw new GekkoException();
                 }
                 else
