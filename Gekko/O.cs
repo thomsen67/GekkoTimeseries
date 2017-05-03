@@ -1971,8 +1971,8 @@ namespace Gekko
                     if (isRead && !isTo && hlp.openType == EOpenType.Ref)
                     {
                         G.Writeln2("+++ WARNING: READ<ref> is not intended for data-mode.");
-                        G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);
-                        throw new GekkoException();
+                        //G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);
+                        //throw new GekkoException();
                     }
                 }                                                              
 

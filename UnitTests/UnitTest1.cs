@@ -1044,7 +1044,20 @@ namespace UnitTests
             AssertHelper(First(), "m", new string[] { "chou" }, 2006, 32.1879605531923d, sharedDelta);
             AssertHelper(Ref(), "m", new string[] { "chou" }, 2006, 32.1879605531923d, sharedDelta);
 
-
+            //comparing scenarios            
+            I("reset;");
+            I("read <gdx gdxopt='scns.base'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
+            I("write base;");
+            I("reset;");
+            I("read <gdx gdxopt='scns.struc'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
+            I("write struc;");
+            I("reset;");
+            I("read <first> struc;");
+            I("read <ref> base;");
+            I("mulprt m['chou'];");
+            AssertHelper(First(), "m", new string[] { "chou" }, 2006 + 27, 35.0258600515369d, sharedDelta);
+            AssertHelper(Ref(), "m", new string[] { "chou" }, 2006 + 27, 35.0289043466536d, sharedDelta);
+            
         }
 
 
