@@ -1825,6 +1825,7 @@ namespace Gekko
             public string opt_tsdx = null;
             public string opt_gbk = null;
             public string opt_gdx = null;
+            public string opt_gdxopt = null;
             public string opt_tsp = null;
             public string opt_csv = null;
             public string opt_prn = null;
@@ -1889,7 +1890,8 @@ namespace Gekko
                 if (G.equal(this.opt_xlsx, "yes")) hlp.Type = EDataFormat.Xlsx;
                 if (G.equal(this.opt_gdx, "yes")) hlp.Type = EDataFormat.Gdx;
                 if (G.equal(this.opt_cols, "yes")) hlp.Orientation = "cols";
-                
+
+                hlp.gdxopt = this.opt_gdxopt;                
 
                 bool isSimple = false;
 
@@ -2875,6 +2877,7 @@ namespace Gekko
             public string opt_tsd = null;
             public string opt_gbk = null;
             public string opt_gdx = null;
+            public string opt_gdxopt = null;
             public string opt_tsdx = null;
             public string opt_csv = null;
             public string opt_prn = null;
@@ -2924,6 +2927,8 @@ namespace Gekko
                 if (this.opt_gdx == "yes") hlp.Type = EDataFormat.Gdx;
                 if (this.opt_cols == "yes") hlp.Orientation = "cols";
                 //if (this.as2 != null) hlp.As = this.as2;
+
+                hlp.gdxopt = this.opt_gdxopt;
 
                 int posCounter = 0;
                 if (G.equal(opt_first, "yes")) posCounter++;

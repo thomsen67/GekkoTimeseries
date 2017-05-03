@@ -2691,7 +2691,7 @@ namespace Gekko
                         GekkoTime first = Globals.tNull;
                         GekkoTime last = Globals.tNull;
 
-                        //Seems the omission of this was a but, still it only relates to metadata
+                        //Seems the omission of this was a bug, still it only relates to metadata
                         first = tsTemp.GetPeriodFirst();
                         last = tsTemp.GetPeriodLast();
                         
@@ -3320,21 +3320,16 @@ namespace Gekko
             GAMSWorkspace ws = new GAMSWorkspace(workingDirectory: Program.options.folder_working);
             GAMSDatabase db = ws.AddDatabaseFromGDX(file);
 
-            string readType = "scns['base']"; //cut="scns['base']" 
-            readType = null;
-
-            if (readType == null) readType = "";
+            string readType = oRead.gdxopt; //for instance: "scns['base']" 
+            
             string cut1 = null; string cut2 = null;
-            string s = readType.Replace("[", "¤");
-            s = s.Replace("]", "¤");
-            string[] ss = s.Split(new char[] { '¤' }, StringSplitOptions.RemoveEmptyEntries);
+            if (readType == null) readType = "";
+            readType = readType.Replace(" ", "");  //no blanks            
+            string[] ss = readType.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
             if (ss.Length == 2 && ss[0] != null && ss[0].Trim() != "" && ss[1] != null && ss[1].Trim() != "")
             {
-                if(ss[1].Trim().StartsWith("'") && ss[1].Trim().EndsWith("'"))
-                {
-                    cut1 = ss[0].Trim();
-                    cut2 = ss[1].Trim().Substring(1, ss[1].Trim().Length - 2);
-                }
+                cut1 = ss[0];
+                cut2 = ss[1];
             }
             
             DateTime t00 = DateTime.Now;
@@ -31305,7 +31300,7 @@ namespace Gekko
         public EOpenType openType = EOpenType.Normal;
         public int openTypePosition = -12345;
         public bool protect = true;
-        
+        public string gdxopt = null;        
 
         public string FileName
         {
