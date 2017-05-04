@@ -3320,7 +3320,25 @@ namespace Gekko
             
             DateTime dt1 = DateTime.Now;
 
-            GAMSWorkspace ws = new GAMSWorkspace(workingDirectory: Program.options.folder_working);
+            string GamsDir = null;
+            if (Program.options.gams_exe_folder != null && Program.options.gams_exe_folder.Trim() != null)
+            {
+                GamsDir = Path.GetDirectoryName(Program.options.gams_exe_folder.Trim());
+            }
+
+            GAMSWorkspace ws = null;
+            try
+            {
+                ws = new GAMSWorkspace(workingDirectory: Program.options.folder_working, systemDirectory: GamsDir);
+            }
+            catch (Exception e)
+            {
+                G.Writeln2("*** ERROR: Import of gdx file (GAMS) failed.");
+                G.Writeln("           Technical error:");
+                G.Writeln("           " + e.Message);
+                G.Writeln("+++ NOTE:  You may manually indicate the GAMS program folder with OPTION gams exe path = ...");
+            }
+
             GAMSDatabase db = ws.AddDatabaseFromGDX(file);
 
             string readType = oRead.gdxopt; //for instance: "scns['base']" 
@@ -3399,7 +3417,13 @@ namespace Gekko
                     int ii = 0;
                     foreach (GAMSSymbolRecord record2 in n)
                     {
-                        
+
+                        if (Globals.threadIsInProcessOfAborting)
+                        {
+                            G.Writeln2("Stopping GAMS file import");
+                            return;
+                        }
+
                         string[] keys = record2.Keys;                        
 
                         if (scnsIndex != -12345)
@@ -6804,6 +6828,15 @@ namespace Gekko
 
         public static void RunR(Gekko.O.R_run o)
         {
+            //This is just a rename, can be remove at some point in the future
+            if (Program.options.r_exe_folder == null || Program.options.r_exe_folder == "")
+            {
+                if (Program.options.r_exe_path != null && Program.options.r_exe_path != "")
+                {
+                    Program.options.r_exe_folder = Program.options.r_exe_path;
+                }
+            }
+
             string RFileName = Globals.localTempFilesLocation + "\\tempRFile.r";
             string RExportFileName = Globals.localTempFilesLocation + "\\tempR2Gekko.txt";
             List<string> lines2 = new List<string>();
@@ -6851,7 +6884,7 @@ namespace Gekko
             }
 
             string RPathUsedHere = null;
-            if (Program.options.r_exe_path.Trim() == "")
+            if (Program.options.r_exe_folder.Trim() == "")
             {
                 //no path stated manually
                 if (Globals.detectedRPath == null || Globals.detectedRPath == "[[RDetectFailed]]")
@@ -6870,14 +6903,14 @@ namespace Gekko
             else
             {
                 //overrides
-                if (Program.options.r_exe_path.ToLower().EndsWith("\\r.exe"))
+                if (Program.options.r_exe_folder.ToLower().EndsWith("\\r.exe"))
                 {
-                    RPathUsedHere = Program.options.r_exe_path;
+                    RPathUsedHere = Program.options.r_exe_folder;
                 }
                 else
                 {
-                    if (Program.options.r_exe_path.EndsWith("\\")) RPathUsedHere = Program.options.r_exe_path + "R.exe";
-                    else RPathUsedHere = Program.options.r_exe_path + "\\R.exe";
+                    if (Program.options.r_exe_folder.EndsWith("\\")) RPathUsedHere = Program.options.r_exe_folder + "R.exe";
+                    else RPathUsedHere = Program.options.r_exe_folder + "\\R.exe";
                 }
             }
 
@@ -6909,7 +6942,7 @@ namespace Gekko
             {
                 if (!File.Exists(r.StartInfo.FileName))
                 {
-                    if (Program.options.r_exe_path.Trim() == "")
+                    if (Program.options.r_exe_folder.Trim() == "")
                     {
                         //auto-detect
                         G.Writeln2("*** ERROR: Error message: " + e.Message);

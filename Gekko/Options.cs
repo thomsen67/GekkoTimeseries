@@ -68,7 +68,8 @@ Additionally, there are model, solve, equation options.
         public string folder_table1 = "";
         public string folder_table2 = "";
         public string folder_working = "";
-        public EFreq freq = EFreq.Annual;        
+        public EFreq freq = EFreq.Annual;
+        public string gams_exe_folder = null;  
         //logic could be that interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).
         public string interface_clipboard_decimalseparator = "period";
         public string interface_csv_decimalseparator = "period";  //has to do with Windows interface, so ok here
@@ -92,12 +93,10 @@ Additionally, there are model, solve, equation options.
         public string plot_decimalseparator = "period";  //comma|period
         public bool plot_lines_points = true;
         public bool plot_new = true;
-
         //public string plot_xlabels_between_truncate = "auto";     //digits|skip|digitsskip|skipdigits|none  --> when all too pressed we use label at.
         public string plot_xlabels_annual = "at"; //at|between
         public string plot_xlabels_nonannual = "between"; //at|between          
         public int plot_xlabels_digits = 4; // 4 or 2, only applies to 'between' type   
-
         public int print_disp_maxlines = 3; //-1 means infinite, 0 means no data shown
         public int print_fields_ndec = 4;
         public int print_fields_nwidth = 13;
@@ -116,7 +115,10 @@ Additionally, there are model, solve, equation options.
         public bool print_prt_pch = true;  //p
         public bool print_prt_gdif = false;  //dp        
         public int print_width = 100;  //so that eqs look ok in DISP
-        public string r_exe_path = "";  //there will probably be more R options later on
+
+        public string r_exe_folder = "";  //there will probably be more R options later on
+        public string r_exe_path = "";  //old name
+
         public bool sheet_mulprt_lev = false;  //n
         public bool sheet_mulprt_abs = true;  //m
         public bool sheet_mulprt_pch = false;  //q
@@ -271,6 +273,7 @@ Additionally, there are model, solve, equation options.
             lines.Sort(StringComparer.InvariantCulture);
             foreach (string s in lines)
             {
+                if (s.Contains("option r exe path")) continue; //renamed to folder
                 G.Writeln(s);
             }
             G.Writeln();

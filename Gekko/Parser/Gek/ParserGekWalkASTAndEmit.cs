@@ -2692,6 +2692,11 @@ namespace Gekko.Parser.Gek
                                     node.Code.A("G.Writeln();");
                                     node.Code.A("G.Writeln(`+++ NOTE: Damping in Gekko 2.0 should be set to 1 minus damping in Gekko 1.8.`);");
                                 }
+                                if (o == "r_exe_path")
+                                {
+                                    node.Code.A("G.Writeln();");
+                                    node.Code.A("G.Writeln(`+++ NOTE: Please use OPTION r exe folder ... instead`);");
+                                }
                             }
                         }
                         break;

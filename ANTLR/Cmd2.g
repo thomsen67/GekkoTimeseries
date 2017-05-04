@@ -682,6 +682,7 @@ ASTOPT_STRING_Y2;
             BETWEEN = 'BETWEEN';
             NONANNUAL = 'NONANNUAL';
             DIGITS = 'DIGITS';
+			GAMS = 'GAMS';
 			GDX = 'GDX';
 			GDXOPT = 'GDXOPT';
 	LAGFIX = 'LAGFIX';
@@ -1426,6 +1427,7 @@ d.Add("Y" ,Y);
                                         d.Add("function", FUNCTION);
                                         d.Add("gauss"   , GAUSS     );
                                         d.Add("GBK" ,GBK);
+										d.Add("GAMS", GAMS);	
 										d.Add("GDX", GDX);
 										d.Add("GDXOPT", GDXOPT);
                                         d.Add("gdif"    , GDIF   );
@@ -3120,6 +3122,8 @@ optionType :
 			 | FREQ question -> FREQ question
              | FREQ '='? optionFreq -> FREQ ^(ASTSTRINGSIMPLE optionFreq)
 
+			 | GAMS EXE FOLDER '='? fileName -> GAMS EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
+
 			 | INTERFACE question -> INTERFACE question
              | INTERFACE CLIPBOARD DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CLIPBOARD DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
 			 | INTERFACE CSV DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CSV DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
@@ -3174,8 +3178,9 @@ optionType :
              | PRINT PRT PCH '='? yesNoSimple -> PRINT PRT PCH ^(ASTBOOL yesNoSimple)
 			 | PRINT WIDTH '='? Integer -> PRINT WIDTH ^(ASTINTEGER Integer)
 
-			 | R EXE PATH '='? fileName -> R EXE PATH ^(ASTSTRINGSIMPLE fileName)
-
+			 | R EXE FOLDER '='? fileName -> R EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
+			 | R EXE PATH '='? fileName -> R EXE PATH ^(ASTSTRINGSIMPLE fileName)  //obsolete, same as above and for legacy
+			 
 			 | SHEET question -> SHEET question
 			 | SHEET MULPRT (GDIF|GDIFF) '='? yesNoSimple -> SHEET MULPRT GDIF ^(ASTBOOL yesNoSimple)
              | SHEET MULPRT ABS '='? yesNoSimple -> SHEET MULPRT ABS ^(ASTBOOL yesNoSimple)
@@ -3512,6 +3517,7 @@ ident                     : Ident|
                             FROM|
                             FUNCTION|
                             GAUSS|
+							GAMS|
                             GBK|
 							GDX|
 							GDXOPT|
