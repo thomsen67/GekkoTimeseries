@@ -58,6 +58,7 @@ using System.Diagnostics;
 using System.Collections.ObjectModel;
 using GAMS;
 using System.Linq;
+using Microsoft.CSharp;
 
 namespace Gekko
 {
