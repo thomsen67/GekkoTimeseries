@@ -3336,7 +3336,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Import of gdx file (GAMS) failed.");
                 G.Writeln("           Technical error:");
                 G.Writeln("           " + e.Message);
-                G.Writeln("+++ NOTE:  You may manually indicate the GAMS program folder with OPTION gams exe path = ...");
+                G.Writeln("+++ NOTE:  You may manually indicate the GAMS program folder with 'OPTION gams exe folder = ...;'");
             }
 
             GAMSDatabase db = ws.AddDatabaseFromGDX(file);
@@ -6921,7 +6921,7 @@ namespace Gekko
             if (RPathUsedHere == "[[RDetectFailed]]")
             {
                 G.Writeln2("*** ERROR: R.exe path could not be auto-detected.");
-                G.Writeln("           Please state the R.exe path manually with OPTION r exe path = ...");
+                G.Writeln("           Please state the R.exe path manually with OPTION r exe folder = ...");
                 throw new GekkoException();
             }
 
@@ -6947,7 +6947,7 @@ namespace Gekko
                         //auto-detect
                         G.Writeln2("*** ERROR: Error message: " + e.Message);
                         G.Writeln("*** ERROR: The file " + RPathUsedHere + " does not seem to exist.");
-                        G.Writeln("           You may try to manually set \"OPTION r exe path = ... , if you know the R.exe location.");
+                        G.Writeln("           You may try to manually set \"OPTION r exe folder = ... , if you know the R.exe location.");
                         G.Writeln("           R.exe file locations may be similar to these:");
                         G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\R.exe");
                         G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\i386\\R.exe");
