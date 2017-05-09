@@ -175,6 +175,9 @@ namespace Gekko
 
         public static bool patch_zvar = true;
 
+        //public const string symbolTurtle = "¤";
+        public const string symbolTurtle = "___";
+
         public const string symbolBankColon = ":";
         public const char symbolTilde = '~';
         public const char symbolList = '#';
@@ -378,7 +381,8 @@ namespace Gekko
         public static int removeAllLags = 0;
         public static char parserErrorSeparator = '¤';
         public static string lagIndicator = "¤";
-        public static string leftParenthesisIndicator = "(";
+        public static string leftParenthesisIndicator = "[";
+        public static string rightParenthesisIndicator = "]";
         public static string freqIndicator = "%";  //see also #09832752
         public static string afterModelJIndicator = "Y";
         public static string reverseIndicator1 = "REVERSE1";

@@ -18,10 +18,11 @@ namespace Gekko
 
   
     public static class O
-    {        
+    {
         //Common methods start
         //Common methods start
         //Common methods start
+                
 
         public enum LagType
         {
@@ -49,6 +50,35 @@ namespace Gekko
                 s = G.FromDateToString(t1) + "-" + G.FromDateToString(t2) + ": ";
             }
             return s;
+        }
+
+        public class GekkoListIterator : IEnumerable<ScalarString>
+        {            
+            private MetaList _ml = null;
+
+            public GekkoListIterator(IVariable list)
+            {
+                if(list.Type() != EVariableType.List)
+                {
+                    G.Writeln2("*** ERROR: Expected a list in iterator");
+                    throw new GekkoException();
+                }
+                _ml = (MetaList)list;
+            }
+
+            public IEnumerator<ScalarString> GetEnumerator()
+            {
+                foreach(string s in _ml.list)
+                {
+                    yield return new ScalarString(s);
+                }                                         
+            }
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+            {
+                G.Writeln("*** ERROR: iterator problem");
+                throw new GekkoException();
+            }
         }
 
         public static IVariable Add(IVariable x, IVariable y, GekkoTime t)
@@ -114,7 +144,7 @@ namespace Gekko
                     G.Writeln2("Databank " + bank.aliasName + " is empty");
                     continue;
                 }
-                foreach (TimeSeries ts in bank.storage.Values)
+                foreach (TimeSeries ts in bank.storage.Values)  
                 {
                     if (ts.freqEnum == EFreq.Annual) a++;
                     else if (ts.freqEnum == EFreq.Quarterly) q++;
@@ -353,31 +383,35 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(IVariable x, IVariable y, GekkoTime t)
-        {            
+        public static IVariable Indexer(GekkoTime t, IVariable x, bool isLhs, params IVariable[] indexes)
+        {
             if (x == null)
             {
-                //[y]
-                //['q*']
-                ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);  //a bit cheating, but we save an interface method, and performance is not really an issue when indexing whole databanks
-                return ss.Indexer(y, t);
+                if (indexes.Length == 1)
+                {
+                    //[y]
+                    //['q*']
+                    ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);  //a bit cheating, but we save an interface method, and performance is not really an issue when indexing whole databanks
+                    return ss.Indexer(t, false, indexes);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Stand-alone indexer with pattern [... , ... ] not possible");
+                    throw new GekkoException();
+                }
             }
-            else
-            {
-                //x[y]
-                //a[1] or #a['q*']
-                return x.Indexer(y, t);
-            }
-        }
 
-        public static IVariable Indexer(IVariable x, IVariable y, IVariable z, GekkoTime t)
-        {
-            //#x[1, 2]            
-            return x.Indexer(y, z, t);            
-        }
+            //x[y]
+            //a[1] or #a['q*']
+            //#x[1, 2]                 
+            //x['nz', 'w']           
+            return x.Indexer(t, isLhs, indexes);
+                        
+        }               
 
-        public static IVariable IndexerPlus(IVariable x, IVariable y, GekkoTime t)
+        public static IVariable IndexerPlus(GekkoTime t, IVariable x, bool isLhs, IVariable y)
         {
+            //isLhs will always be false
             if (x == null)
             {
                 G.Writeln2("*** ERROR: You cannot use '+' as first character inside a [] wildcard");
@@ -387,11 +421,11 @@ namespace Gekko
             {
                 //x[+y], #a[+'q*'], hmmmmmmmmmmmmmmm
                 //a[+1] ok
-                return x.Indexer(y, t);
+                return x.Indexer(t, isLhs, new IVariable[] { y });
             }
         }
 
-        public static IVariable Indexer(IVariable x, IVariablesFilterRange y, GekkoTime t)
+        public static IVariable Indexer(GekkoTime t, IVariable x, bool isLhs, IVariablesFilterRange y)
         {            
             if (x == null)
             {
@@ -408,7 +442,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(IVariable x, IVariablesFilterRange y1, IVariablesFilterRange y2, GekkoTime t)
+        public static IVariable Indexer(GekkoTime t, IVariable x, bool isLhs, IVariablesFilterRange y1, IVariablesFilterRange y2)
         {
             if (x == null)
             {
@@ -422,7 +456,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(IVariable x, IVariable y1, IVariablesFilterRange y2, GekkoTime t)
+        public static IVariable Indexer(GekkoTime t, IVariable x, bool isLhs, IVariable y1, IVariablesFilterRange y2)
         {
             if (x == null)
             {
@@ -436,7 +470,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(IVariable x, IVariablesFilterRange y1, IVariable y2, GekkoTime t)
+        public static IVariable Indexer(GekkoTime t, IVariable x, bool isLhs, IVariablesFilterRange y1, IVariable y2)
         {
             if (x == null)
             {
@@ -1033,7 +1067,7 @@ namespace Gekko
         {
             if (list.Type() == EVariableType.List)
             {
-                ScalarString x = (ScalarString)list.Indexer(index, t);  //will return ScalarString with .isName = true.
+                ScalarString x = (ScalarString)list.Indexer(t, false, new IVariable[] { index });  //will return ScalarString with .isName = true.
                 MetaTimeSeries mts = O.GetTimeSeries(x._string2, 1);  //always from work....
                 return mts;
             }
@@ -1048,7 +1082,7 @@ namespace Gekko
         {
             //Used to pick out a value from a list item, like #m[2][2015], where index=2015
             MetaTimeSeries mts = O.GetTimeSeries(name, bank);  //always from work....
-            IVariable result = O.Indexer(mts, index, t);
+            IVariable result = O.Indexer(t, mts, false, index);
             return result;
         }
 
@@ -1057,9 +1091,8 @@ namespace Gekko
             return GetTimeSeries(originalName, bankNumber, ECreatePossibilities.None);
         }
 
-        //See also Program.GetTimeSeriesFromString()
         public static MetaTimeSeries GetTimeSeries(string originalName, int bankNumber, ECreatePossibilities canAutoCreate)
-        {            
+        {
             ExtractBankAndRestHelper h = Program.ExtractBankAndRest(originalName, EExtrackBankAndRest.OnlyStrings);
 
             if (h.bank == Globals.firstCheatString)
@@ -1072,10 +1105,102 @@ namespace Gekko
                 h.bank = Program.databanks.GetRef().aliasName;  //overrides the bank name given
                 h.hasColon = true;  //signals later on that this bank is explicitely given, so we cannot search for the timeseries
             }
-            TimeSeries ts = Program.FindOrCreateTimeseries(h.bank, h.name, canAutoCreate, h.hasColon, false);
-            MetaTimeSeries ats = new MetaTimeSeries(ts);
-            return ats;
-        }        
+            TimeSeries ts = Program.FindOrCreateTimeseries(h.bank, h.name, canAutoCreate, h.hasColon, false);            
+            MetaTimeSeries mts = new MetaTimeSeries(ts);
+            return mts;
+        }
+                
+        //public static MetaTimeSeries GetArrayTimeSeries(MetaTimeSeries mts, ECreatePossibilities create, params IVariable[] indexes)
+        //{
+        //    if (indexes.Length == 0) return mts;  //fast return for normal timeseries
+        //    TimeSeries ts = O.GetArrayTimeSeries(mts.ts, create, indexes);            
+        //    return new MetaTimeSeries(ts);
+        //}
+
+        //public static TimeSeries GetArrayTimeSeries(TimeSeries its, ECreatePossibilities create, IVariable[] indexes)
+        //{
+        //    //When a timeseries is on rhs, it will have crete=none. In that case, we expect dimension to fit. If dimension is -12345,
+        //    //the timeseries does exist but has never been written to (is that possible)? 
+
+        //    if (create == ECreatePossibilities.None)
+        //    {
+        //        //rhs
+        //        if (its.dimensions == -12345)
+        //        {
+        //            //should not be possible?
+        //            G.Writeln2("*** ERROR: Timeseries " + its.variableName + " has no dimensions and no data");
+        //            throw new GekkoException();
+        //        }
+        //        if (its.dimensions != indexes.Length)
+        //        {
+        //            G.Writeln2("*** ERROR: The timeseries " + its.variableName + " has " + its.dimensions + " dimensions,");
+        //            G.Writeln("           but the []-indexer has " + indexes.Length + " dimensions", Color.Red);
+        //            throw new GekkoException();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        //lhs
+        //        if (its.dimensions != -12345 && (its.dimensions != indexes.Length))
+        //        {
+        //            G.Writeln2("*** ERROR: The timeseries " + its.variableName + " has " + its.dimensions + " dimensions,");
+        //            G.Writeln("           but the []-indexer has " + indexes.Length + " dimensions");
+        //            throw new GekkoException();
+        //        }
+        //    }
+
+        //    TimeSeries ts = null;
+
+        //    if (indexes.Length == 0)
+        //    {
+        //        ts = its;  //relevant for normal timeseries
+        //    }
+        //    else
+        //    {
+        //        //We know that indexes.Length >= 1.
+        //        //Now dimension may be (a) -12345 [only for create=yes LHS] or (b) same as indexes.Length.                             
+
+        //        string hash = null;
+        //        //this produces a string like "b,nz,w"
+        //        for (int i = 0; i < indexes.Length; i++)
+        //        {
+        //            if (indexes[i].Type() != EVariableType.String)
+        //            {
+        //                G.Writeln2("*** ERROR: Expected " + its.variableName + "[] indexer element #" + (i + 1) + " to be STRING");
+        //                throw new GekkoException();
+        //            }                    
+        //            hash += ((ScalarString)indexes[i])._string2;
+        //            if (i < indexes.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter
+        //        }
+
+        //        //if (its.dimensions == -12345)
+        //        //{
+        //        //    //can only be so for LHS type, RHS would give an exception above
+        //        //    its.dim = new Gekko.Dim();
+        //        //    its.dim.timeSeriesArray = new GekkoDictionary<string, TimeSeries>(StringComparer.OrdinalIgnoreCase);
+        //        //    its.dimensions = indexes.Length;
+        //        //}                               
+                
+        //        //we know that dimension >= 1                
+                                
+        //        its.dim.timeSeriesArray.TryGetValue(hash, out ts);                                
+                
+        //        if (ts == null)
+        //        {
+        //            if (create != ECreatePossibilities.None)
+        //            {
+        //                ts = new TimeSeries(its.freqEnum, its.variableName + "[]");  //the name is not really used, but we could put in the indices...?
+        //                its.dim.timeSeriesArray.Add(hash, ts);  //put it in
+        //            }
+        //            else
+        //            {
+        //                G.Writeln2("*** ERROR: Array-timeseries " + its.variableName + "[" + G.PrettifyTimeseriesHash(hash) + "] not found");
+        //            }
+        //        }
+        //    }
+
+        //    return ts;
+        //}
 
         public static IVariable GetListWithBankPrefix(IVariable x, IVariable y, int bankNumber)
         {
@@ -1183,6 +1308,21 @@ namespace Gekko
                 throw new GekkoException();
             }
             return rv;
+        }
+
+        public static bool ListContains(IVariable x, IVariable y)
+        {
+            
+            if (x.Type() != EVariableType.List || y.Type() != EVariableType.String)
+            {
+                G.Writeln2("*** ERROR: Expected syntax like ... $ #a['b'], with list and string");
+                throw new GekkoException();
+            }
+            MetaList ml = (MetaList)x;
+            ScalarString ss = (ScalarString)y;
+
+            return ml.list.Contains(ss._string2);           
+            
         }
 
         public static bool LargerThanOrEqual(IVariable x, IVariable y, GekkoTime t)
@@ -1627,7 +1767,7 @@ namespace Gekko
         {            
             return a.GetVal(t);            
         }               
-
+                
         public static TimeSeries GetTimeSeries(IVariable a)
         {
             if (a.Type() == EVariableType.TimeSeries)
@@ -1684,6 +1824,8 @@ namespace Gekko
             public string opt_tsd = null;
             public string opt_tsdx = null;
             public string opt_gbk = null;
+            public string opt_gdx = null;
+            public string opt_gdxopt = null;
             public string opt_tsp = null;
             public string opt_csv = null;
             public string opt_prn = null;
@@ -1746,8 +1888,11 @@ namespace Gekko
                 if (G.equal(this.opt_tsp, "yes")) hlp.Type = EDataFormat.Tsp;
                 if (G.equal(this.opt_xls, "yes")) hlp.Type = EDataFormat.Xls;
                 if (G.equal(this.opt_xlsx, "yes")) hlp.Type = EDataFormat.Xlsx;
-                if (G.equal(this.opt_cols, "yes")) hlp.Orientation = "cols";                
-                
+                if (G.equal(this.opt_gdx, "yes")) hlp.Type = EDataFormat.Gdx;
+                if (G.equal(this.opt_cols, "yes")) hlp.Orientation = "cols";
+
+                hlp.gdxopt = this.opt_gdxopt;                
+
                 bool isSimple = false;
 
                 if (isTo)
@@ -1826,8 +1971,8 @@ namespace Gekko
                     if (isRead && !isTo && hlp.openType == EOpenType.Ref)
                     {
                         G.Writeln2("+++ WARNING: READ<ref> is not intended for data-mode.");
-                        G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);
-                        throw new GekkoException();
+                        //G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);
+                        //throw new GekkoException();
                     }
                 }                                                              
 
@@ -2731,6 +2876,8 @@ namespace Gekko
             //public string fileName = null;
             public string opt_tsd = null;
             public string opt_gbk = null;
+            public string opt_gdx = null;
+            public string opt_gdxopt = null;
             public string opt_tsdx = null;
             public string opt_csv = null;
             public string opt_prn = null;
@@ -2776,9 +2923,12 @@ namespace Gekko
                 if (this.opt_tsdx == "yes") hlp.Type = EDataFormat.Tsdx;
                 if (this.opt_gbk == "yes") hlp.Type = EDataFormat.Gbk;
                 if (this.opt_xls == "yes") hlp.Type = EDataFormat.Xls;
-                if (this.opt_xlsx == "yes") hlp.Type = EDataFormat.Xlsx;            
+                if (this.opt_xlsx == "yes") hlp.Type = EDataFormat.Xlsx;
+                if (this.opt_gdx == "yes") hlp.Type = EDataFormat.Gdx;
                 if (this.opt_cols == "yes") hlp.Orientation = "cols";
                 //if (this.as2 != null) hlp.As = this.as2;
+
+                hlp.gdxopt = this.opt_gdxopt;
 
                 int posCounter = 0;
                 if (G.equal(opt_first, "yes")) posCounter++;
@@ -2885,7 +3035,7 @@ namespace Gekko
                     if (opt_label != null) h.ts.label = opt_label;
                     if (opt_source != null) h.ts.source = opt_source;
                     if (opt_stamp != null) h.ts.stamp = opt_stamp;
-                    h.ts.isDirty = true;
+                    h.ts.SetDirty(true);
                 }
             }         
         }
@@ -3731,8 +3881,8 @@ namespace Gekko
                 {                    
                     //For instance, "SERIES y = 2 * x;" --> meta = "SERIES y = 2 * x" (without the semicolon)    
                     string s = ShowDatesAsString(this.t1, this.t2);
-                    lhs.source = s + this.meta;
-                    lhs.isDirty = true;
+                    lhs.source = s + this.meta;                    
+                    lhs.SetDirtyGhost(true, false);
                 }
                 lhs.Stamp();
                 if (this.p.IsSimple())
@@ -3740,6 +3890,32 @@ namespace Gekko
                     G.Write2("1 series updated " + t1.ToString() + "-" + t2.ToString() + " "); G.ServiceMessage();
                 }
             }            
+        }
+
+
+        public class Series
+        {
+            public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
+            public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
+            public string lhsFunction = null;
+            public TimeSeries lhs = null;
+            public string meta = null;
+            public P p = null;
+            public void Exe()
+            {
+                if (this.meta != null)
+                {
+                    //For instance, "SERIES y = 2 * x;" --> meta = "SERIES y = 2 * x" (without the semicolon)    
+                    string s = ShowDatesAsString(this.t1, this.t2);
+                    lhs.source = s + this.meta;                    
+                    lhs.SetDirtyGhost(true, false);
+                }
+                lhs.Stamp();
+                if (this.p.IsSimple())
+                {
+                    G.Write2("1 series updated " + t1.ToString() + "-" + t2.ToString() + " "); G.ServiceMessage();
+                }
+            }
         }
 
         public class Index

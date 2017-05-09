@@ -418,8 +418,8 @@ namespace Gekko
                     TimeSeries ts = new TimeSeries(G.GetFreq(freq), name2);
                     ts.label = valuesCombi[j];
                     ts.source = url + ", " + jsonName;
-                    ts.stamp = Globals.dateStamp;
-                    ts.isDirty = true; //for safety
+                    ts.stamp = Globals.dateStamp;                    
+                    ts.SetDirtyGhost(true, false);
                     
                     for (int i = 0; i < dates.Count; i++)  //periods
                     {

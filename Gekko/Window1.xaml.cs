@@ -484,7 +484,9 @@ namespace Gekko
             {
                 if (type == GekkoTableTypes.Left)
                 {
-                    EEndoOrExo e = Program.VariableTypeEndoExo(G.ExtractOnlyVariableIgnoreLag(s, Globals.leftParenthesisIndicator));
+                    string ss = G.ExtractOnlyVariableIgnoreLag(s, Globals.leftParenthesisIndicator);
+                    ss = G.PrettifyTimeseriesHash(ss, true, true);
+                    EEndoOrExo e = Program.VariableTypeEndoExo(ss);
                     if (e == EEndoOrExo.Endo || s == Globals.decompText0)
                     {
                         textBlock.MouseEnter += Mouse_Enter;
@@ -542,6 +544,8 @@ namespace Gekko
             dockPanel.SetValue(Grid.RowProperty, i);            
             g.Children.Add(dockPanel);            
         }
+
+       
 
         private void SetBorderThickness(Grid g, int i, int j, Border border)
         {
@@ -857,7 +861,7 @@ namespace Gekko
             {
                 string var = c.CellText.TextData[0];
 
-                string var2 = G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator);                
+                string var2 = G.PrettifyTimeseriesHash(G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator), true, true);
                 
                 //List<string> vars = new List<string>();
                 //vars.Add(var2);
@@ -1166,19 +1170,7 @@ namespace Gekko
         }
 
         private void MakeTable(Table table, DecompOptions decompOptions)
-        {
-            
-            //if (Globals.testing)
-            //{
-            //    table = new Table();
-            //    for (int i = 1; i < 100; i++)
-            //    {
-            //        for (int j = 1; j < 100; j++)
-            //        {
-            //            table.Set(new Coord(i, j), "hej " + (i + j));
-            //        }
-            //    }
-            //}                        
+        {                       
             
             CreateGridRowsAndColumns(this.grid1, table, GekkoTableTypes.TableContent);
             

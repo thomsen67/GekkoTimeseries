@@ -38,7 +38,7 @@ namespace Gekko
 
         public static string SubstituteScalarsInString(string s, bool reportError, bool avoidVal)
         {
-            //UPDATE: also replaces $ and $%, for instance $n or $%n.
+            //UPDATE: also replaces $ and $%, for instance $n or $%n. NOTE!! -> $ scalars are removed not
             //Will look for '%' and find alphanumeric + underscore after that, to construct a scalar name.
             //So STRING s = 'abc%de,%f' will find two scalars. If tilde is used, scalars are not found:
             //STRING s = 'abc~%de,~%f' will return abc%d,%f
@@ -52,15 +52,15 @@ namespace Gekko
             for (int j = 0; j < s.Length - 1; j++)
             {
                 bool tilde = (j > 0 && s[j - 1] == Globals.symbolTilde);  // ~%x or ~$x or ~{x}
-                bool isDollarPercent = false;
-                bool isDollar = false;
+                //bool isDollarPercent = false;
+                //bool isDollar = false;
                 bool isCurly = false;
-                if (j > 0 && s[j - 1] == Globals.symbolDollar[0] && s[j - 0] == Globals.symbolMemvar) isDollarPercent = true;
-                if (j > 1 && s[j - 2] == Globals.symbolTilde && isDollarPercent) tilde = true;  // ~$%x
-                if (s[j] == Globals.symbolDollar[0]) isDollar = true;
+                //if (j > 0 && s[j - 1] == Globals.symbolDollar[0] && s[j - 0] == Globals.symbolMemvar) isDollarPercent = true;
+                //if (j > 1 && s[j - 2] == Globals.symbolTilde && isDollarPercent) tilde = true;  // ~$%x
+                //if (s[j] == Globals.symbolDollar[0]) isDollar = true;
                 if (s[j] == '{') isCurly = true;
-                if (j > 0 && s[j - 1] == Globals.symbolTilde && isDollar) tilde = true;  // ~$x                                
-                if ((s[j] == Globals.symbolMemvar || isDollar) && !tilde)
+                //if (j > 0 && s[j - 1] == Globals.symbolTilde && isDollar) tilde = true;  // ~$x                                
+                if ((s[j] == Globals.symbolMemvar) && !tilde)
                 {
                     string variable = null;
                     int end = -1;
@@ -108,7 +108,7 @@ namespace Gekko
                                     IVariable c = b.Add(a, Globals.tNull);
                                     string s3 = c.GetString();
                                     int x = 0;
-                                    if (isDollarPercent) x = 1;
+                                    //if (isDollarPercent) x = 1;
                                     string s4 = s.Substring(lastEnd + 1, j - lastEnd - 1 - x);
                                     s2 += s4 + s3;
                                     hit = true;
@@ -180,9 +180,9 @@ namespace Gekko
             string tp = new string(new char[] { Globals.symbolTilde, Globals.symbolMemvar });
             string p = new string(Globals.symbolMemvar, 1);
             s = s.Replace(tp, p);
-            string tp2 = new string(new char[] { Globals.symbolTilde, Globals.symbolDollar[0] });
-            string p2 = new string(Globals.symbolDollar[0], 1);
-            s = s.Replace(tp2, p2);
+            //string tp2 = new string(new char[] { Globals.symbolTilde, Globals.symbolDollar[0] });
+            //string p2 = new string(Globals.symbolDollar[0], 1);
+            //s = s.Replace(tp2, p2);
             string tp3 = new string(new char[] { '{', Globals.symbolTilde });  //a{~n}b
             string p3 = new string('{', 1);
             s = s.Replace(tp3, p3);
@@ -207,50 +207,53 @@ namespace Gekko
         public EVariableType Type()
         {
             return EVariableType.String;
-        }
+        }                       
 
-
-        public IVariable Indexer(IVariable index1, IVariable index2, GekkoTime t)
+        public IVariable Indexer(GekkoTime t, bool isLhs, params IVariable[] indexes)
         {
-            G.Writeln2("String cannot used with [i, j] indexer");
-            throw new GekkoException();
-        }
-
-        public IVariable Indexer(IVariable index, GekkoTime t)
-        {
-            IVariable rv = null;
-            if (this._string2 == Globals.indexerAloneCheatString)
+            if (indexes.Length == 1)
             {
-                //corresponds to empty indexer like ['fy*'], different from #a['fy*']
-                if (index.Type() == EVariableType.String)
+                IVariable index = indexes[0];
+                IVariable rv = null;
+                if (this._string2 == Globals.indexerAloneCheatString)
                 {
-                    //string vars = null;                    
-                    ExtractBankAndRestHelper h = Program.ExtractBankAndRest(((ScalarString)index)._string2, EExtrackBankAndRest.GetDatabank);                   
-                    List<string> output = Program.MatchWildcardInDatabank(h.name, h.databank);
-                    rv = new MetaList(output);
+                    //corresponds to empty indexer like ['fy*'], different from #a['fy*']
+                    if (index.Type() == EVariableType.String)
+                    {
+                        //string vars = null;                    
+                        ExtractBankAndRestHelper h = Program.ExtractBankAndRest(((ScalarString)index)._string2, EExtrackBankAndRest.GetDatabank);
+                        List<string> output = Program.MatchWildcardInDatabank(h.name, h.databank);
+                        rv = new MetaList(output);
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: The inside of a free-standing [...] list should not be a");
+                        G.Writeln("    VAL, DATE or the like, for instance PRT [2.3] or PRT [2010q5].");
+                        G.Writeln("    The right use is PRT [gd*] and similar.");
+                        throw new GekkoException();
+                    }
+                }
+                else if (this._isName)
+                {
+                    //#8932074324
+                    //TODO: What about string 'jul05:fy' ??????
+                    IVariable result = O.GetValFromStringIndexer(this._string2, index, 1, t);
+                    rv = result;
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: The inside of a free-standing [...] list should not be a");
-                    G.Writeln("    VAL, DATE or the like, for instance PRT [2.3] or PRT [2010q5].");
-                    G.Writeln("    The right use is PRT [gd*] and similar.");
+                    G.Writeln2("*** ERROR: You cannot use indexer on a string, for instance %s[2],");
+                    G.Writeln("    but you may use the string as a name instead: {%s}[2015].");
                     throw new GekkoException();
                 }
-            }
-            else if (this._isName)
-            {
-                //#8932074324
-                //TODO: What about string 'jul05:fy' ??????
-                IVariable result = O.GetValFromStringIndexer(this._string2, index, 1, t);
-                rv = result;
+                return rv;
             }
             else
             {
-                G.Writeln2("*** ERROR: You cannot use indexer on a string, for instance %s[2],");
-                G.Writeln("    but you may use the string as a name instead: {%s}[2015].");
+                G.Writeln2("*** ERROR: Cannot use " + indexes.Length + "-dimensional indexer on STRING or NAME");
                 throw new GekkoException();
             }
-            return rv;
+
         }
 
         public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, GekkoTime t)

@@ -21,9 +21,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using ProtoBuf;
+using System.Drawing;
 
 namespace Gekko
-{    
+{
     /// <summary>
     /// The TimeSeries class is a class designed for storing and retrieving timeseries (vectors/arrays of consecutive time data) 
     /// in a fast and reliable way. Timeseries can be of different frequencies (for instance annual, quarterly or monthly). 
@@ -139,15 +140,22 @@ namespace Gekko
         /// <summary>
         /// The time of the last last change in the timeseries
         /// </summary>
+        /// 
+
+        [ProtoMember(13)]
+        private bool isGhost = false; //A ghost variable x is a placeholder for x['a', 'b'] for example. This x variable should not be used for anything.
+
+        [ProtoMember(14)]
+        private bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]
         
-        public bool isDirty = false;  //do not keep this in protobuf
+        private bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf
 
         private TimeSeries()
         {
             //This is ONLY because protobuf-net needs it! 
             //Empty timeseries should not be created that way.
-        }        
+        }
 
         /// <summary>
         /// Constructor that creates a new TimeSeries object with a particular frequency and variable name.
@@ -157,7 +165,7 @@ namespace Gekko
         public TimeSeries(EFreq frequency, string variableName)
         {
             this.freqEnum = frequency;
-            this.frequency = G.GetFreq(frequency);            
+            this.frequency = G.GetFreq(frequency);
             this.variableName = variableName;
         }
 
@@ -166,9 +174,10 @@ namespace Gekko
         /// </summary>
         /// <returns>The cloned TimeSeries object.</returns>
         public TimeSeries Clone()
-        {            
+        {
+            //DimensionCheck();
             //Always make sure new fields are remembered in the Clone() method
-            TimeSeries tsCopy = new TimeSeries(this.freqEnum, this.variableName);            
+            TimeSeries tsCopy = new TimeSeries(this.freqEnum, this.variableName);
             if (this.dataArray == null)
             {
                 tsCopy.dataArray = null;
@@ -177,7 +186,7 @@ namespace Gekko
             {
                 tsCopy.dataArray = new double[this.dataArray.Length];
                 System.Array.Copy(this.dataArray, tsCopy.dataArray, this.dataArray.Length);
-            }            
+            }
             tsCopy.anchorSuperPeriod = this.anchorSuperPeriod;
             tsCopy.anchorSubPeriod = this.anchorSubPeriod;
             tsCopy.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray;
@@ -186,6 +195,8 @@ namespace Gekko
             if (this.label != null) tsCopy.label = string.Copy(this.label);  //using string.Copy() probably not be necessary, but we use it for extra safety
             if (this.source != null) tsCopy.source = string.Copy(this.source); //using string.Copy() probably not be necessary, but we use it for extra safety                        
             if (this.stamp != null) tsCopy.stamp = string.Copy(this.stamp); //using string.Copy() probably not be necessary, but we use it for extra safety                        
+            tsCopy.isGhost = this.isGhost;
+            tsCopy.isTimeless = this.isTimeless;            
             return tsCopy;
         }
 
@@ -199,9 +210,9 @@ namespace Gekko
         /// <exception cref="GekkoException">
         /// </exception>
         public void Truncate(GekkoTime start, GekkoTime end)
-        {          
-
-            if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot truncate a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");            
+        {
+            //DimensionCheck();
+            if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot truncate a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             int indexStart = this.GetArrayIndex(start);
             int indexEnd = this.GetArrayIndex(end);
 
@@ -235,17 +246,15 @@ namespace Gekko
                 //The time loss is very small, and usually WRITE is not time-truncated anyway.
 
                 for (int i = 0; i < this.firstPeriodPositionInArray; i++)
-                {                    
+                {
                     this.dataArray[i] = double.NaN;
                 }
                 for (int i = this.lastPeriodPositionInArray + 1; i < this.dataArray.Length; i++)
                 {
                     this.dataArray[i] = double.NaN;
                 }
-            }
-
-            this.isDirty = true;
-
+            }                        
+            this.SetDirty(true);
         }
 
         private void SetNullPeriod()
@@ -274,6 +283,7 @@ namespace Gekko
         /// </summary>
         public void Trim()
         {
+            //DimensionCheck();
             if (this.dataArray == null) return;
             if (this.IsNullPeriod()) return;  //could actually trim this, but oh well
             if (!(this.firstPeriodPositionInArray == 0 && this.lastPeriodPositionInArray == this.dataArray.Length - 1))  //already trimmed                
@@ -298,6 +308,7 @@ namespace Gekko
         /// <exception cref="GekkoException">Exception if frequency of timeseries and period do not match.</exception>
         public double GetData(GekkoTime t)
         {
+            //DimensionCheck();
             if (this.freqEnum != t.freq)
             {
                 //t.freq will almost always correspond to the frequency setting in Gekko, that is, Program.options.freq.
@@ -308,21 +319,53 @@ namespace Gekko
                 //safety, and might be omitted at some point.
                 G.Writeln2("*** ERROR: Freq mismatch");
                 throw new GekkoException();
-            }            
+            }
             if (this.dataArray == null)
             {
                 //If no data has been added to the timeseries, NaN will always be returned.
-                return double.NaN;
+                if (this.IsGhost())
+                {
+                    G.Writeln2("*** ERROR: The variable '" + this.variableName + "' is an array-timeseries,");
+                    G.Writeln("           but is used as a normal timeseries here (without []-indexer)", Color.Red);
+                    throw new GekkoException();
+                }
+                else
+                {
+                    return double.NaN;
+                }
             }
-            int index = GetArrayIndex(t);
-            if (index < 0 || index >= this.dataArray.Length)
+            if (this.isTimeless)
             {
-                return double.NaN;  //out of bounds, we return a missing value (NaN)
+                return this.dataArray[0];
             }
             else
             {
-                return this.dataArray[index];
+                int index = GetArrayIndex(t);
+                if (index < 0 || index >= this.dataArray.Length)
+                {
+                    return double.NaN;  //out of bounds, we return a missing value (NaN)
+                }
+                else
+                {
+                    return this.dataArray[index];
+                }
             }
+        }
+
+        public void SetTimelessData(double value)
+        {
+            if (!this.isTimeless)
+            {
+                G.Writeln2("*** ERROR: Timeless variable error #100");
+                throw new GekkoException();
+            }
+            if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
+                        
+            if (this.dataArray == null)
+            {
+                this.dataArray = new double[1];
+            }
+            this.dataArray[0] = value;
         }
 
         /// <summary>
@@ -332,10 +375,16 @@ namespace Gekko
         /// <param name="value">The value.</param>
         /// <exception cref="GekkoException">Exception if frequency of timeseries and period do not match.</exception>
         public void SetData(GekkoTime t, double value)
-        {            
-            //TODO: Remove this at some point
+        {
+            if (this.isTimeless)
+            {
+                //Should not normally be used.
+                //But this may be called from for instance DECOMP, calling it with a time period
+                //Normally timeless variables should be called via the SetData(double value) method
+                this.dataArray[0] = value;
+            }
             if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
-            //Program.ErrorIfDatabanksSwapped(this);
+            
             if (this.freqEnum != t.freq)
             {
                 //See comment to GetData()
@@ -346,23 +395,31 @@ namespace Gekko
             {
                 InitDataArray(t);
             }
-            //Get the array index corresponding to the period. If this index is out of array bounds, the array will
-            //be resized (1.5 times larger).
-            int index = ResizeDataArray(t, true);
-            this.dataArray[index] = value;
-            //Start and end date for observations are adjusted.
-            //for the first obs put into a new timeseries, both the if's should trigger.
-            if (index > this.lastPeriodPositionInArray)
+
+            if (this.isTimeless)
             {
-                this.lastPeriodPositionInArray = index;
+                this.dataArray[0] = value;             
             }
-            if (index < this.firstPeriodPositionInArray)
+            else
             {
-                this.firstPeriodPositionInArray = index;
+                //Get the array index corresponding to the period. If this index is out of array bounds, the array will
+                //be resized (1.5 times larger).
+                int index = ResizeDataArray(t, true);
+                this.dataArray[index] = value;
+                //Start and end date for observations are adjusted.
+                //for the first obs put into a new timeseries, both the if's should trigger.
+                if (index > this.lastPeriodPositionInArray)
+                {
+                    this.lastPeriodPositionInArray = index;
+                }
+                if (index < this.firstPeriodPositionInArray)
+                {
+                    this.firstPeriodPositionInArray = index;
+                }
+                this.SetDirtyGhost(true, false);
             }
-            this.isDirty = true;
-        }        
-        
+        }
+
         /// <summary>
         /// Gets a pointer to the data array of the timeseries corresponding to the given time period.
         /// </summary>
@@ -389,6 +446,19 @@ namespace Gekko
             //
             //Also beware that if the array returned is touched afterwards, the timeseries will be dirty. This only happens in the 
             //simulation code, though. See #98726527!
+
+            //DimensionCheck();
+
+            if (this.isTimeless)
+            {
+                int n = GekkoTime.Observations(gt1, gt2);
+                double[] numbers = new double[n];
+                for (int i = 0; i < n; i++) numbers[i] = this.dataArray[0];
+                index1 = 0;
+                index2 = n - 1;
+                return numbers;
+            }
+
             if (this.freqEnum != gt1.freq || gt1.freq != gt2.freq)
             {
                 //This check: better safe than sorry!
@@ -398,9 +468,9 @@ namespace Gekko
             }
             if (this.dataArray == null)
             {
-                InitDataArray(gt1);                
-            };            
-            
+                InitDataArray(gt1);
+            };
+
             index1 = GetArrayIndex(gt1);
             index2 = GetArrayIndex(gt2);
 
@@ -421,7 +491,7 @@ namespace Gekko
                     this.firstPeriodPositionInArray = index1;
                 }
             }
-            return this.dataArray;            
+            return this.dataArray;
         }
 
         /// <summary>
@@ -434,6 +504,11 @@ namespace Gekko
         /// <returns></returns>
         public double[] GetDataSequence(out int index1, out int index2, GekkoTime per1, GekkoTime per2)
         {
+            if (this.isTimeless)
+            {
+                G.Writeln2("*** ERROR: Timeless variable error #2");
+                throw new GekkoException();
+            }
             return GetDataSequence(out index1, out index2, per1, per2, false);
         }
 
@@ -447,6 +522,11 @@ namespace Gekko
         /// <exception cref="GekkoException">Exception if frequency of timeseries and periods differ.</exception>
         public void SetDataSequence(GekkoTime gt1, GekkoTime gt2, double[] input, int inputOffset)
         {
+            if (this.isTimeless)
+            {
+                G.Writeln2("*** ERROR: Timeless variable error #3");
+                throw new GekkoException();
+            }
             if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot change observations in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             //Program.ErrorIfDatabanksSwapped(this);
             if (this.freqEnum != gt1.freq || gt1.freq != gt2.freq)
@@ -463,7 +543,7 @@ namespace Gekko
                 InitDataArray(gtTemp);  //assumes subperiod 1
             }
             int index1 = -12345;
-            int index2 = -12345;            
+            int index2 = -12345;
             index1 = GetArrayIndex(gt1);
             index2 = GetArrayIndex(gt2);
             if (index1 < 0 || index1 >= this.dataArray.Length || index2 < 0 || index2 >= this.dataArray.Length)
@@ -481,7 +561,44 @@ namespace Gekko
             {
                 this.firstPeriodPositionInArray = index1;
             }
-            this.isDirty = true;
+            this.SetDirtyGhost(true, false);
+
+        }
+
+        public void SetDirtyGhost(bool b1, bool b2)
+        {
+            this.isDirty = b1;
+            this.isGhost = b2;
+        }
+
+        public void SetDirty(bool b1)
+        {
+            this.isDirty = b1;            
+        }
+
+        public void SetGhost(bool b2)
+        {         
+            this.isGhost = b2;
+        }
+
+        public bool IsDirty()
+        {
+            return this.isDirty;
+        }
+
+        public bool IsGhost()
+        {
+            return this.isGhost;
+        }
+
+        public bool IsTimeless()
+        {
+            return this.isTimeless;
+        }
+
+        public void SetTimeless()
+        {
+            this.isTimeless = true;
         }
 
         /// <summary>
@@ -492,7 +609,23 @@ namespace Gekko
         /// <param name="input">The input.</param>
         public void SetDataSequence(GekkoTime gt1, GekkoTime gt2, double[] input)
         {
-            SetDataSequence(gt1, gt2, input, 0);            
+            SetDataSequence(gt1, gt2, input, 0);
+        }
+
+        /// <summary>
+        /// Gets the first observation/data as a period (GekkoTime).
+        /// </summary>
+        /// <returns>
+        /// Period
+        /// </returns>
+        public GekkoTime GetPeriodFirst()
+        {
+            if (this.isTimeless)
+            {
+                G.Writeln2("*** ERROR: Timeless variable error #4");
+                throw new GekkoException();
+            }
+            return GetPeriod(this.firstPeriodPositionInArray);
         }
 
         /// <summary>
@@ -503,14 +636,25 @@ namespace Gekko
         /// </returns>
         public GekkoTime GetPeriodLast()
         {
+            if (this.isTimeless)
+            {
+                G.Writeln2("*** ERROR: Timeless variable error #5");
+                throw new GekkoException();
+            }
             return GetPeriod(this.lastPeriodPositionInArray);
         }
 
         public GekkoTime GetRealDataPeriodFirst()
         {
+            if (this.isTimeless)
+            {
+                G.Writeln2("*** ERROR: Timeless variable error #6");
+                throw new GekkoException();
+            }
             //Could be sped up by means of looping through dataaraay with GetDataSequence, but oh well...
             //returns tNull if all missing
-            GekkoTime realStart = Globals.tNull;            
+            //DimensionCheck();
+            GekkoTime realStart = Globals.tNull;
             foreach (GekkoTime dt in new GekkoTimeIterator(GetPeriodFirst(), GetPeriodLast()))
             {
                 if (!G.isNumericalError(this.GetData(dt)))
@@ -525,9 +669,15 @@ namespace Gekko
 
         public GekkoTime GetRealDataPeriodLast()
         {
+            if (this.isTimeless)
+            {
+                G.Writeln2("*** ERROR: Timeless variable error #7");
+                throw new GekkoException();
+            }
             //Could be sped up by means of looping through dataaraay with GetDataSequence, but oh well...
             //returns tNull if all missing
-            GekkoTime realEnd = Globals.tNull;            
+            //DimensionCheck();
+            GekkoTime realEnd = Globals.tNull;
             foreach (GekkoTime dt in new GekkoTimeIteratorBackwards(GetPeriodLast(), GetPeriodFirst()))
             {
                 if (!G.isNumericalError(this.GetData(dt)))
@@ -539,18 +689,7 @@ namespace Gekko
             }
             return realEnd;
         }
-
-        /// <summary>
-        /// Gets the first observation/data as a period (GekkoTime).
-        /// </summary>
-        /// <returns>
-        /// Period
-        /// </returns>
-        public GekkoTime GetPeriodFirst()
-        {
-            return GetPeriod(this.firstPeriodPositionInArray);
-        }
-                
+        
         /// <summary>
         /// Gets the period (GekkoTime) corresponding to a particular index in the data array.
         /// </summary>
@@ -558,9 +697,15 @@ namespace Gekko
         /// <returns>The period (GekkoTime).</returns>
         public GekkoTime GetPeriod(int indexInDataArray)
         {
+            if (this.isTimeless)
+            {
+                G.Writeln2("*** ERROR: Timeless variable error #7");
+                throw new GekkoException();
+            }
             //The inverse method is GetArrayIndex()
             //Should maybe be private method? But then how to unit-test?
             //see also AddToPeriod()
+            //DimensionCheck();
             int subPeriods = 1;
             if (this.freqEnum == EFreq.Quarterly) subPeriods = 4;
             else if (this.freqEnum == EFreq.Monthly) subPeriods = 12;
@@ -581,7 +726,7 @@ namespace Gekko
                 resultSuperPer -= 1;
                 resultSubPer += subPeriods;
             }
-            GekkoTime t = new GekkoTime(this.freqEnum, resultSuperPer, resultSubPer);            
+            GekkoTime t = new GekkoTime(this.freqEnum, resultSuperPer, resultSubPer);
             return t;
         }
 
@@ -590,7 +735,7 @@ namespace Gekko
         // -----------------------------------------------------------------------------
 
         private void InitializeDataArray(double[] dataArray)
-        {
+        {            
             //Fill it with NaN's.
             if (Globals.initializeDataArrayWithNaN)
             {
@@ -671,14 +816,96 @@ namespace Gekko
 
         private void InitDataArray(GekkoTime gt)
         {
-            //The anchor is set in the middle of the array, and the anchor date is set to gt.
-            this.dataArray = new double[Globals.defaultPeriodsWhenCreatingTimeSeries];
-            this.anchorPeriodPositionInArray = Globals.defaultPeriodsWhenCreatingTimeSeries / 2;  //possible to simulate 100 years forwards, and have data 100 years back.
-            InitializeDataArray(this.dataArray);  //may fill it with NaN's
-            //the following two will always be fixed to what they
-            //were for the very first observation entering the double[] array (unless the array is resized).
-            this.anchorSuperPeriod = gt.super;
-            this.anchorSubPeriod = gt.sub;
-        }        
-    }    
+            if (this.isTimeless)
+            {
+                G.Writeln2("*** ERROR: Timeless error #10");
+                throw new GekkoException();
+            }
+            else
+            {
+                //The anchor is set in the middle of the array, and the anchor date is set to gt.
+                this.dataArray = new double[Globals.defaultPeriodsWhenCreatingTimeSeries];
+                this.anchorPeriodPositionInArray = Globals.defaultPeriodsWhenCreatingTimeSeries / 2;  //possible to simulate 100 years forwards, and have data 100 years back.
+                InitializeDataArray(this.dataArray);  //may fill it with NaN's
+                                                      //the following two will always be fixed to what they
+                                                      //were for the very first observation entering the double[] array (unless the array is resized).
+                this.anchorSuperPeriod = gt.super;
+                this.anchorSubPeriod = gt.sub;
+            }
+        }
+
+        public static string GetHashCodeFromIvariables(IVariable[] indexes)
+        {
+            string hash = null;
+            for (int i = 0; i < indexes.Length; i++)
+            {
+                if (indexes[i].Type() != EVariableType.String)
+                {
+                    G.Writeln2("*** ERROR: Expected [] indexer element #" + (i + 1) + " to be STRING");
+                    throw new GekkoException();
+                }
+                hash += ((ScalarString)indexes[i])._string2;
+                if (i < indexes.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter
+            }
+            return hash;
+        }
+
+        public static string GetHashCodeFromIvariables(string[] indexes)
+        {
+            string hash = null;
+            for (int i = 0; i < indexes.Length; i++)
+            {                
+                hash += indexes[i];
+                if (i < indexes.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter
+            }
+            return hash;
+        }
+                
+    }
+
+    //[ProtoContract]
+    //public class Dim
+    //{
+    //    public Dim()
+    //    {
+    //        //This is ONLY because protobuf-net needs it
+    //        this.timeSeriesArray = new GekkoDictionary<string, TimeSeries>(StringComparer.OrdinalIgnoreCase);
+    //    }
+
+    //    [ProtoMember(1)]
+    //    public GekkoDictionary<string, TimeSeries> timeSeriesArray;
+    //}
+
+    //public class GekkoTimeSeriesIterator : IEnumerable<TimeSeries>
+    //{
+    //    private TimeSeries _ts;
+
+    //    public GekkoTimeSeriesIterator(TimeSeries ts)
+    //    {
+    //        _ts = ts;
+    //    }
+
+    //    public IEnumerator<TimeSeries> GetEnumerator()
+    //    {
+    //        if (_ts.dimensions == 0)
+    //        {
+    //            yield return _ts;
+    //        }
+    //        else
+    //        {
+    //            foreach (TimeSeries ts in _ts.dim.timeSeriesArray.Values)
+    //            {
+    //                yield return ts;
+    //            }
+    //        }
+    //    }
+
+    //    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+    //    {
+    //        G.Writeln("*** ERROR: iterator problem");
+    //        throw new GekkoException();
+    //    }
+    //}
+
+
 }

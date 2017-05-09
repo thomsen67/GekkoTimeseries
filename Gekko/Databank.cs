@@ -203,9 +203,9 @@ namespace Gekko
         {
             //Used to save some RAM, or just before serializing the databank via protobuf-net.
             DateTime t0 = DateTime.Now;
-            foreach (TimeSeries ts in this.storage.Values)
-            {
-                ts.Trim();
+            foreach (TimeSeries ts in this.storage.Values) 
+            {                
+                ts.Trim();                
             }
             G.WritelnGray("TRIM: " + G.Seconds(t0));
             //This does not change the databank, so this.hasBeenChanged is not touched!!
@@ -213,21 +213,30 @@ namespace Gekko
 
         public void AddVariable(TimeSeries ts)
         {             
-            AddVariable(true, null, ts);            
-        }        
+            AddVariable(true, null, ts, true);            
+        }
+
+        public void AddVariable(TimeSeries ts, bool variableNameCheck)
+        {
+            AddVariable(true, null, ts, variableNameCheck);
+        }
 
         public void AddVariable(string frequency, TimeSeries ts)
         {
-            AddVariable(false, frequency, ts);
+            AddVariable(false, frequency, ts, true);
         }
 
+        public void AddVariable(string frequency, TimeSeries ts, bool variableNameCheck)
+        {
+            AddVariable(false, frequency, ts, variableNameCheck);
+        }
 
         //generic method, not for outside use
-        private void AddVariable(bool freqAddToName, string frequency, TimeSeries ts)
+        private void AddVariable(bool freqAddToName, string frequency, TimeSeries ts, bool variableNameCheck)
         {            
             if (this.protect) Program.ProtectError("You cannot add a timeseries to a non-editable databank, see OPEN<edit> or UNLOCK");
             string variable = ts.variableName;
-            if (!G.IsSimpleToken(variable))  //also checks for null and ""
+            if (variableNameCheck && !G.IsSimpleToken(variable))  //also checks for null and "" and '¤'
             {
                 G.Writeln2("*** ERROR in databank: the name '" + variable + "' is not a simple variable name");
                 throw new GekkoException();

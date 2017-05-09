@@ -1606,7 +1606,7 @@ namespace Gekko
             }
             return z2;
         }
-
+        
         public static IVariable exist(GekkoTime t, IVariable x1)
         {
             double d = 0d;

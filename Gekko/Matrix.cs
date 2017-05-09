@@ -34,13 +34,47 @@ namespace Gekko
             }
         }
 
-        public IVariable Indexer(IVariable index1, IVariable index2, GekkoTime t)
+        public IVariable Indexer(GekkoTime t, bool isLhs, params IVariable[] indexes)
         {
+            if (indexes.Length == 1)
+            {
+                IVariable index1 = indexes[0];
+                int i1 = O.GetInt(index1);
+                int d1 = this.data.GetLength(0);
+                int d2 = this.data.GetLength(1);
+                if (d2 == 1)
+                {
+                    //1 col: column vector
+                    IVariable one = new ScalarVal(1d);
+                    IVariable[] newIndex = new IVariable[2];
+                    newIndex[0] = index1;
+                    newIndex[1] = one;
+                    return Handle2dIndexer(newIndex);  //we implicitly understand #a[3] as #a[3,1] here. But we cannot do the inverse on a row vector.
+                }
+                G.Writeln("*** ERROR: You are trying to use [" + i1 + "] on a " + d1 + "x" + d2 + " matrix");
+                G.Writeln("           This notation can only be used regarding nx1 matrices (column vectors)");
+                throw new GekkoException();
+            }
+            else if (indexes.Length == 2)
+            {
+                return Handle2dIndexer(indexes);
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Cannot use " + indexes.Length + "-dimensional indexer on MATRIX");
+                throw new GekkoException();
+            }
+        }
+
+        private IVariable Handle2dIndexer(IVariable[] indexes)
+        {
+            IVariable index1 = indexes[0];
+            IVariable index2 = indexes[1];
             int i1 = O.GetInt(index1);
-            int i2 = O.GetInt(index2);            
+            int i2 = O.GetInt(index2);
             try
             {
-                double d = this.data[i1 - 1, i2 - 1];            
+                double d = this.data[i1 - 1, i2 - 1];
                 return new ScalarVal(d);
             }
             catch (System.IndexOutOfRangeException e)  // CS0168
@@ -49,22 +83,7 @@ namespace Gekko
                 throw new GekkoException();
             }
         }
-
-        public IVariable Indexer(IVariable index1, GekkoTime t)
-        {
-            int i1 = O.GetInt(index1);
-            int d1 = this.data.GetLength(0);
-            int d2 = this.data.GetLength(1);            
-            if (d2 == 1)
-            {
-                //1 col: column vector
-                IVariable one = new ScalarVal(1d);
-                return Indexer(index1, one, t);  //we implicitly understand #a[3] as #a[3,1] here. But we cannot do the inverse on a row vector.
-            }
-            G.Writeln("*** ERROR: You are trying to use [" + i1 + "] on a " + d1 + "x" + d2 + " matrix");
-            G.Writeln("           This notation can only be used regarding nx1 matrices (column vectors)");
-            throw new GekkoException();
-        }
+        
 
         public IVariable Indexer(IVariablesFilterRange indexRange, GekkoTime t)
         {

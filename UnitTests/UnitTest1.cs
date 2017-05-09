@@ -868,6 +868,201 @@ namespace UnitTests
             
         }
 
+        
+
+        [TestMethod]
+        public void Test__ArrayTimeSeries()
+        {
+            Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+            Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
+            I("RESET; MODE data; TIME 2000;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");            
+            
+            I("ASER x['a', 'b', 'c'] = 3;");
+            AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 1999, double.NaN, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 2000, 3, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 2001, double.NaN, sharedDelta);
+            //I("ASER x['a', 'b', 'd'] = 4;");
+            //AssertHelper(First(), "x", new string[] { "a", "b", "d" }, 1999, double.NaN, sharedDelta);
+            //AssertHelper(First(), "x", new string[] { "a", "b", "d" }, 2000, 4, sharedDelta);
+            //AssertHelper(First(), "x", new string[] { "a", "b", "d" }, 2001, double.NaN, sharedDelta);
+            I("ASER y['d', 'e'] = x['a', 'b', 'c'];");
+            AssertHelper(First(), "y", new string[] { "d", "e" }, 1999, double.NaN, sharedDelta);
+            AssertHelper(First(), "y", new string[] { "d", "e" }, 2000, 3, sharedDelta);
+            AssertHelper(First(), "y", new string[] { "d", "e" }, 2001, double.NaN, sharedDelta);
+
+            I("SERIES z = 100;"); //normal
+
+            I("WRITE arrayts;");
+
+            // ------ test of read and write
+
+            I("RESET; MODE data; TIME 2000;");
+            I("READ arrayts;");
+            Assert.AreEqual(First().storage.Count, 3);
+            AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 2000, 3, sharedDelta);            
+            AssertHelper(First(), "y", new string[] { "d", "e" }, 2000, 3, sharedDelta);
+            AssertHelper(First(), "z", 2000, 100, sharedDelta);
+
+            // --------------------------------
+            // looping with lists
+            // --------------------------------
+
+            I("RESET; MODE data; TIME 2000;");
+            I("LIST i = a, b;");
+            I("LIST j = x, y;");
+            I("ASER y['a', 'x'] = 100;");
+            I("ASER y['a', 'y'] = 101;");
+            I("ASER y['b', 'x'] = 102;");
+            I("ASER y['b', 'y'] = 103;");
+            I("ASER z['x'] = 1000;");
+            I("ASER z['y'] = 1001;");
+            I("ASER x[#i, #j] = 1 + y[#i, #j] + z[#j];");
+
+            AssertHelper(First(), "x", new string[] { "a", "x" }, 2000, 1101, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "a", "y" }, 2000, 1103, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "x" }, 2000, 1103, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "y" }, 2000, 1105, sharedDelta);
+
+
+            // --------------------------------
+            // looping with lists and dollar
+            // --------------------------------
+
+            I("RESET; MODE data; TIME 2000;");
+            I("LIST i = a, b, c;");
+            I("LIST i0 = a, b;");
+            I("LIST j = x, y;");
+            I("ASER y['a', 'x'] = 100;");
+            I("ASER y['a', 'y'] = 101;");
+            I("ASER y['b', 'x'] = 102;");
+            I("ASER y['b', 'y'] = 103;");
+            I("ASER z['x'] = 1000;");
+            I("ASER z['y'] = 1001;");
+            I("ASER x[#i, #j] = 1 + y[#i, #j] $ #i0[#i] + z[#j];");
+
+            AssertHelper(First(), "x", new string[] { "a", "x" }, 2000, 1101, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "a", "y" }, 2000, 1103, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "x" }, 2000, 1103, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "y" }, 2000, 1105, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "c", "x" }, 2000, 1001, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "c", "y" }, 2000, 1002, sharedDelta);
+
+            I("LIST i0 = a;");
+            I("ASER x[#i, #j] = 1 + y[#i, #j] $ #i0[#i] + z[#j];");
+            AssertHelper(First(), "x", new string[] { "a", "x" }, 2000, 1101, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "a", "y" }, 2000, 1103, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "x" }, 2000, 1001, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "y" }, 2000, 1002, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "c", "x" }, 2000, 1001, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "c", "y" }, 2000, 1002, sharedDelta);
+
+            I("LIST i0 = null;");
+            I("ASER x[#i, #j] = 1 + y[#i, #j] $ #i0[#i] + z[#j];");
+            AssertHelper(First(), "x", new string[] { "a", "x" }, 2000, 1001, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "a", "y" }, 2000, 1002, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "x" }, 2000, 1001, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "b", "y" }, 2000, 1002, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "c", "x" }, 2000, 1001, sharedDelta);
+            AssertHelper(First(), "x", new string[] { "c", "y" }, 2000, 1002, sharedDelta);
+
+
+            // --------------------------------
+            // fun with loop
+            // --------------------------------
+            I("RESET; MODE data; TIME 2000;");
+            I("LIST i = a, b, c;");
+            I("SER aa = 1; SER bb = 2; SER cc = 3;");
+            I("ASER xx[#i] = {#i + #i};");
+            AssertHelper(First(), "xx", new string[] { "a" }, 2000, 1, sharedDelta);
+            AssertHelper(First(), "xx", new string[] { "b" }, 2000, 2, sharedDelta);
+            AssertHelper(First(), "xx", new string[] { "c" }, 2000, 3, sharedDelta);
+
+            // -----------------------------------------
+            // DOLLAR CONDITIONAL TESTING
+            // -----------------------------------------
+
+            I("RESET; MODE data;");
+            I("TIME 2000 2000;");
+            I("VAL v = 10;");
+            I("LIST m = a, b;");
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (%v == 9);");
+            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (%v == 10);");
+            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (#m['c']);");
+            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (#m['b']);");
+            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (#m['b'] and %v == 10);");
+            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (#m['b'] and %v == 9);");
+            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (#m['c'] and %v == 10);");
+            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ (#m['c'] or %v == 10);");
+            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+
+            //Without parenthesis (...) for lists
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ #m['a'];");
+            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+            I("SERIES y = 2;");
+            I("SERIES y = 3 $ #m['c'];");
+            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+
+            // -----------------------------------------
+            // Reading from a gdx file and validating
+            // a series statement from Gams model.
+            // -----------------------------------------
+
+            I("reset; mode data;");
+            I("read <gdx> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...            
+            I("list scn = base;");
+            I("list psl = chou, cpub, ccon, cgoo, cser;");
+            I("clone;");
+            I("delete m;");
+            I("aseries M[#psl,#scn] = myFM[#psl,#scn] * F[#psl,#scn] * ((PM[#psl,#scn]/PFF[#psl,#scn])*(PM[#psl,#scn]/PFF[#psl,#scn]))**(-EF[#psl]/2);");
+            AssertHelper(First(), "m", new string[] { "chou", "base" }, 2006, 32.1879605531923d, sharedDelta);
+            AssertHelper(Ref(), "m", new string[] { "chou", "base" }, 2006, 32.1879605531923d, sharedDelta);
+
+            //Cutting off a dimension
+            I("reset; mode data;");
+            I("read <gdx gdxopt='scns.base'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
+            I("list psl = chou, cpub, ccon, cgoo, cser;");
+            I("clone;");
+            I("delete m;");
+            I("aseries M[#psl] = myFM[#psl] * F[#psl] * ((PM[#psl]/PFF[#psl])*(PM[#psl]/PFF[#psl]))**(-EF[#psl]/2);");
+            AssertHelper(First(), "m", new string[] { "chou" }, 2006, 32.1879605531923d, sharedDelta);
+            AssertHelper(Ref(), "m", new string[] { "chou" }, 2006, 32.1879605531923d, sharedDelta);
+
+            //comparing scenarios            
+            I("reset;");
+            I("read <gdx gdxopt='scns.base'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
+            I("write base;");
+            I("reset;");
+            I("read <gdx gdxopt='scns.struc'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
+            I("write struc;");
+            I("reset;");
+            I("read <first> struc;");
+            I("read <ref> base;");
+            I("mulprt m['chou'];");
+            I("PRT m['chou'] - @m['chou'];");
+            I("PRT work:m['chou'] - ref:m['chou'];");
+            AssertHelper(First(), "m", new string[] { "chou" }, 2006 + 27, 35.0258600515369d, sharedDelta);
+            AssertHelper(Ref(), "m", new string[] { "chou" }, 2006 + 27, 35.0289043466536d, sharedDelta);
+            
+        }
+
+
         [TestMethod]
         public void Test__BankSyntaxLogic()
         {
@@ -887,6 +1082,8 @@ namespace UnitTests
             //LIST: check that a,b,c   or    'a','b','c'         etc are ok.
             //      check that ref:a,ref:b,ref:c   or    'ref:a','ref:b','ref:c'         etc are ok.
             //      check that {%b}:{%a}...
+
+            //It is also possible to use scalar strings, for instance PRT %b:%ts
 
             I("RESET;");
             I("CREATE fa, fb, fc;");
@@ -939,6 +1136,11 @@ namespace UnitTests
             //I("PRT {%b}:[f*][1];");
             //I("PRT {%b}:[fa..fc][1];");
             //----------------------------
+
+            I("PRT %b:%s;");
+            I("PRT %b:{%s};");
+            I("PRT {%b}:%s;");
+
             //================================ PRT end ==========================================
 
 
@@ -2540,15 +2742,10 @@ namespace UnitTests
             // ---
             // b pV040000
             // b pV050000
-            I("string sum=''; list erha = V010000,V020000,V030000; list erhb = V040000,V050000; for i = a, b; string xx = 'erh$i'; list xxx = #(%xx) prefix=p; string sum = %sum + $#xxx[2]; end;");
+            I("string sum=''; list erha = V010000,V020000,V030000; list erhb = V040000,V050000; for i = a, b; string xx = 'erh%i'; list xxx = #(%xx) prefix=p; string sum = %sum + string(#xxx[2]); end;");
             AssertHelperScalarString("sum", "pV020000pV050000");
-            if (Globals.UNITTESTFOLLOWUP)
-            {
-                //This should work -- actually the STRING version above should not work...
-                I("string sum=''; list erha = V010000,V020000,V030000; list erhb = V040000,V050000; for i = a, b; name xx = 'erh$i'; list xxx = #(%xx) prefix=p; string sum = %sum + $#xxx[2]; end;");
-                AssertHelperScalarString("sum", "pV020000pV050000");
-            }
-            I("string sum=''; list erha = V010000,V020000,V030000; list erhb = V040000,V050000; for i = a, b; list xxx = #(erh%i) prefix=p; string sum = %sum + $#xxx[2]; end;");
+                        
+            I("string sum=''; list erha = V010000,V020000,V030000; list erhb = V040000,V050000; for i = a, b; list xxx = #(erh%i) prefix=p; string sum = %sum + string(#xxx[2]); end;");
             AssertHelperScalarString("sum", "pV020000pV050000");
 
             // ----------------- First we use % ----------------------------------------------
@@ -2563,7 +2760,7 @@ namespace UnitTests
 
             //Define a string from a name
             FAIL("STRING s3 = %n;");
-            I("STRING s4 = '$n';");
+            I("STRING s4 = '%n';");
             AssertHelperScalarString("s4", "fy");
 
             //Define a name from a string
@@ -2574,34 +2771,7 @@ namespace UnitTests
             //Define a name from a name
             FAIL("NAME n3 = %n;");  //NAME n3 = fy; would not work either
             FAIL("NAME n4 = {%n};");  //NAME n4 = fy; would not work either
-
-            // ----------------- Then we use $ ----------------------------------------------
-
-            //Define a string from a string
-            I("STRING s1 = $s;"); I("STRING s1 = $%s;"); //$ has no effect, we also test $%
-            AssertHelperScalarString("s1", "fy");
-            I("STRING s2 = 'x$s|y';");
-            AssertHelperScalarString("s2", "xfyy");
-            I("STRING s2a = 'x$%s|y';");
-            AssertHelperScalarString("s2a", "xfyy");
-
-            //Define a string from a name
-            I("STRING s3 = $n;");  //this works!
-            AssertHelperScalarString("s3", "fy");
-            I("STRING s4 = '$n';");  //double stringify must work, too
-            AssertHelperScalarString("s4", "fy");
-
-            //Define a name from a string
-            I("NAME n1 = $s;");  //$ has no effect
-            AssertHelperScalarString("n1", "fy");
-            FAIL("NAME n2 = {$s};");
-
-            //Define a name from a name
-            I("NAME n3 = $n;");  //ok
-            AssertHelperScalarString("n3", "fy");
-            FAIL("NAME n4 = {$n};");  //name becomes string, then name...
-
-            // ----------------- Using % and $ end ----------------------------------------------
+                        
 
             I("RESET;");
             I("CREATE fx, fy;");
@@ -2609,9 +2779,9 @@ namespace UnitTests
             I("NAME n = 'abc';");
             I("LIST n = fx, fy;"); //is list of names
             I("STRING s = 'def';");
-            I("STRING s2 = $n + %s + $#n[2];");
+            I("STRING s2 = '%n' + %s + string(#n[2]);");  //is string() function necessary??
             AssertHelperScalarString("s2", "abcdeffy");
-            I("STRING s3 = '$n' + %s + $#n[2];");
+            I("STRING s3 = '%n' + %s + string(#n[2]);");
             AssertHelperScalarString("s3", "abcdeffy");
             FAIL("STRING s2 = %s + %n;");
             if (Globals.UNITTESTFOLLOWUP)
@@ -2736,7 +2906,7 @@ namespace UnitTests
             I("SERIES fxb0 = 3, 4;");
             I("LIST a = a, b;");
             I("FOR i = #a; PRT fX{%i}0; END;");
-            I("FOR VAL i = 1 to #a[0]; PRT fX{$#a[%i]}0; END;");
+            I("FOR VAL i = 1 to #a[0]; PRT fX{#a[%i]}0; END;");
             if (Globals.UNITTESTFOLLOWUP)
             {
                 //these do not work yet, but should later on
@@ -2818,7 +2988,7 @@ namespace UnitTests
             I("VAL b2 = #a[0];");         //b2 = 5, length of the list as a value
             ScalarVal b2 = (ScalarVal)Program.scalars["b2"];
             Assert.AreEqual(b2.val, 5d);
-            I("STRING b3 = $#a[%i];");     //b3 = 'a2', picking out the %i'th name as a string
+            I("STRING b3 = string(#a[%i]);");     //b3 = 'a2', picking out the %i'th name as a string
             ScalarString b3 = (ScalarString)Program.scalars["b3"];
             Assert.AreEqual(b3._string2, "a2");
             I("SERIES y = #a[%i];");      //y = a2, SERIES corresponds to the SERIES command.
@@ -3668,29 +3838,59 @@ namespace UnitTests
 
         private static void AssertHelper(Databank db, string s, int year, double x, double delta)
         {
-            AssertHelper(db, s, EFreq.Annual, year, 1, year, 1, x, delta);
+            AssertHelper(db, s, null, EFreq.Annual, year, 1, year, 1, x, delta);
         }
-
+        
         private static void AssertHelper(Databank db, string s, int year1, int year2, double x, double delta)
         {
-            AssertHelper(db, s, EFreq.Annual, year1, 1, year2, 1, x, delta);
+            AssertHelper(db, s, null, EFreq.Annual, year1, 1, year2, 1, x, delta);
         }
 
         private static void AssertHelper(Databank db, string s, EFreq freq, int year, int subper, double x, double delta)
         {
-            AssertHelper(db, s, freq, year, subper, year, subper, x, delta);
+            AssertHelper(db, s, null, freq, year, subper, year, subper, x, delta);
+        }
+        
+        private static void AssertHelper(Databank db, string s, string[] indexes, int year, double x, double delta)
+        {
+            AssertHelper(db, s, indexes, EFreq.Annual, year, 1, year, 1, x, delta);
         }
 
-        private static void AssertHelper(Databank db, string s, EFreq freq, int year1, int sub1, int year2, int sub2, double x, double delta)
+        private static void AssertHelper(Databank db, string s, string[] indexes, int year1, int year2, double x, double delta)
+        {
+            AssertHelper(db, s, indexes, EFreq.Annual, year1, 1, year2, 1, x, delta);
+        }
+
+        private static void AssertHelper(Databank db, string s, string[] indexes, EFreq freq, int year, int subper, double x, double delta)
+        {
+            AssertHelper(db, s, indexes, freq, year, subper, year, subper, x, delta);
+        }
+
+        private static void AssertHelper(Databank db, string s, string[] indexes, EFreq freq, int year1, int sub1, int year2, int sub2, double x, double delta)
         {
             GekkoTime t1 = new GekkoTime(freq, year1, sub1);
             GekkoTime t2 = new GekkoTime(freq, year2, sub2);
 
             if (t1.StrictlyLargerThan(t2)) throw new GekkoException();
 
+            IVariable[] indexes2 = null;
+
+            string name = null;
+
+            if (indexes != null)
+            {
+                name = s + Globals.symbolTurtle + TimeSeries.GetHashCodeFromIvariables(indexes);
+            }
+            else
+            {
+                name = s;
+            }
+
+            TimeSeries ts = db.GetVariable(freq, name);
+
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
-                double y = db.GetVariable(freq, s).GetData(t);
+                double y = ts.GetData(t);
                 AssertHelperTwoDoubles(x, y, delta);
             }
         }
@@ -4117,10 +4317,10 @@ namespace UnitTests
             AssertHelperScalarString("s7", "aHejb");
             I("STRING s7a = 'a%n%n|b';");  //two substitutions
             AssertHelperScalarString("s7a", "aHejHejb");
-            I("STRING s = 'a$%n|b';");  //stringify
-            AssertHelperScalarString("s", "aHejb");
-            I("STRING ss = 'a$n|b';");  //stringify
-            AssertHelperScalarString("ss", "aHejb");
+            //I("STRING s = 'a$%n|b';");  //stringify
+            //AssertHelperScalarString("s", "aHejb");
+            //I("STRING ss = 'a$n|b';");  //stringify
+            //AssertHelperScalarString("ss", "aHejb");
 
             I("RESET;");
             I("NAME n = 'Hej';");
@@ -4165,10 +4365,11 @@ namespace UnitTests
             I("RESET;");
             I("NAME n = 'Hej';");
             I("STRING s = 'a~%n|b';");
-            I("STRING s = 'a~$%n|b';");  //stringify
-            AssertHelperScalarString("s", "a$%nb");
-            I("STRING ss = 'a~$n|b';");  //stringify
-            AssertHelperScalarString("ss", "a$nb");
+            AssertHelperScalarString("s", "a%nb");
+            //I("STRING s = 'a~$%n|b';");  //stringify
+            //AssertHelperScalarString("s", "a$%nb");
+            //I("STRING ss = 'a~$n|b';");  //stringify
+            //AssertHelperScalarString("ss", "a$nb");
 
             I("RESET;");
             I("NAME n = 'Hej';");
@@ -5284,14 +5485,14 @@ namespace UnitTests
             I("LIST m2 = a2, b2;");
             I("LIST m3 = a3, b3;");
             I("STRING s = '';");
-            I("FOR i=#m1 j=#m2; STRING s = %s + '[$i,$j]'; END;");
+            I("FOR i=#m1 j=#m2; STRING s = %s + '[%i,%j]'; END;");
             AssertHelperScalarString("s", "[a1,a2][b1,b2]");
             I("STRING s = '';");
-            I("FOR i=#m1 j=#m2 k=#m3; STRING s = %s + '[$i,$j,$k]'; END;");
+            I("FOR i=#m1 j=#m2 k=#m3; STRING s = %s + '[%i,%j,%k]'; END;");
             AssertHelperScalarString("s", "[a1,a2,a3][b1,b2,b3]");
 
             I("STRING s = '';");
-            I("FOR i=#m1 j=#m2; FOR ii=#m1 jj=#m2; STRING s = %s + '[$i,$j,$ii,$jj]'; END; END;");
+            I("FOR i=#m1 j=#m2; FOR ii=#m1 jj=#m2; STRING s = %s + '[%i,%j,%ii,%jj]'; END; END;");
             AssertHelperScalarString("s", "[a1,a2,a1,a2][a1,a2,b1,b2][b1,b2,a1,a2][b1,b2,b1,b2]");
 
             FAIL("FOR i=#m1 i=#m2; END;");
@@ -7238,30 +7439,30 @@ namespace UnitTests
                     AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2011, 1, 1d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2012, 1, double.NaN, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2010, 4, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 1, 2011, 4, 2d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx2", null, EFreq.Quarterly, 2011, 1, 2011, 4, 2d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2012, 1, double.NaN, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2010, 12, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 1, 2011, 12, 3d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx3", null, EFreq.Monthly, 2011, 1, 2011, 12, 3d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2012, 1, double.NaN, sharedDelta);
                     I("RESET; IMPORT<2011q2 2011q3>mixed;");
                     AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2010, 1, double.NaN, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2011, 1, 1d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2012, 1, double.NaN, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 1, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 2, 2011, 3, 2d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx2", null, EFreq.Quarterly, 2011, 2, 2011, 3, 2d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 4, double.NaN, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 3, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 4, 2011, 9, 3d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx3", null, EFreq.Monthly, 2011, 4, 2011, 9, 3d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 10, double.NaN, sharedDelta);
                     I("RESET; IMPORT<2011m2 2011m4>mixed;");
                     AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2010, 1, double.NaN, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2011, 1, 1d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Annual, 2012, 1, double.NaN, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2010, 4, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 1, 2011, 2, 2d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx2", null, EFreq.Quarterly, 2011, 1, 2011, 2, 2d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Quarterly, 2011, 3, double.NaN, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 1, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 2, 2011, 4, 3d, sharedDelta);
+                    AssertHelper(Program.databanks.GetFirst(), "xx3", null, EFreq.Monthly, 2011, 2, 2011, 4, 3d, sharedDelta);
                     AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.Monthly, 2011, 5, double.NaN, sharedDelta);
                     FAIL("IMPORT<2011u1 2011u1>mixed;");
                     FAIL("IMPORT<2011 2011q1>mixed;");

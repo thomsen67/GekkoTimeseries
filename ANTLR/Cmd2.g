@@ -54,8 +54,9 @@ options {
 
 //Token definitions I
 tokens {
-    
-	
+    ASTCOMPARE2;
+	ASTSERIESOPERATOR;
+	ASTSERIESDOLLARCONDITION;
 	ASTSERIES;
 	ASTSERIESLHS;
 	ASTSERIESRHS;
@@ -63,6 +64,8 @@ tokens {
 	ASTOPT_STRING_ITALIC;
 	ASTOPT_STRING_GRIDSTYLE;
 	ASTOPT_STRING_PREFIX;
+	ASTOPT_STRING_GDX;
+	ASTOPT_STRING_GDXOPT;
 	ASTOPT_VAL_INDEX;
 	ASTXLINE;
 	ASTYLINE;
@@ -157,6 +160,7 @@ tokens {
     ASTDOLLARHASHPAREN;
     ASTDOLLARPERCENTNAMESIMPLE;
     ASTDOLLARPERCENTPAREN;
+	ASTDOLLARCONDITIONAL;
     ASTDOTINDEXER;
     ASTDOUBLE;
     ASTDOUBLE;
@@ -684,6 +688,9 @@ ASTOPT_STRING_Y2;
             BETWEEN = 'BETWEEN';
             NONANNUAL = 'NONANNUAL';
             DIGITS = 'DIGITS';
+			GAMS = 'GAMS';
+			GDX = 'GDX';
+			GDXOPT = 'GDXOPT';
 	LAGFIX = 'LAGFIX';
 	ADDBANK = 'ADDBANK';
 	REBASE = 'REBASE';
@@ -1431,6 +1438,9 @@ d.Add("Y" ,Y);
                                         d.Add("function", FUNCTION);
                                         d.Add("gauss"   , GAUSS     );
                                         d.Add("GBK" ,GBK);
+										d.Add("GAMS", GAMS);	
+										d.Add("GDX", GDX);
+										d.Add("GDXOPT", GDXOPT);
                                         d.Add("gdif"    , GDIF   );
                                         d.Add("gdiff"    , GDIFF   );
                                         d.Add("GEKKO18", GEKKO18);
@@ -2014,15 +2024,23 @@ genr2                     : SER | SERIES;
 genr3                     : SER2 | SERIES2; //has a special SERIES #m = ... pattern, see also //#098275432874
 genr4                     : SER3 | SERIES3; //has a special SERIES y = 1 -2 3 4 -3 -4 pattern, see also //#098275432874
 
-series2                   : ASER | ASERIES;
-series                    : series2 seriesLhs EQUAL seriesRhs (REP star)* -> ^({token("ASTSERIES", ASTSERIES, $EQUAL.Line)}  seriesLhs seriesRhs);
-seriesLhs                 : nameWithBank ( leftBracketGlue (indexerExpressionHelper (',' indexerExpressionHelper)*)? RIGHTBRACKET)* -> ^(ASTSERIESLHS nameWithBank indexerExpressionHelper*);
+
+// ========================== new SERIES command start =============================
+
+
+series                    : ASER    seriesLhs (DOLLAR dollarConditional)? seriesOperator DOLLAR? seriesRhs (REP star)* -> ^({token("ASTSERIES", ASTSERIES, $ASER.Line)}     seriesLhs seriesRhs ^(ASTSERIESDOLLARCONDITION dollarConditional?) ^(ASTSERIESOPERATOR seriesOperator))
+						  |	ASERIES seriesLhs (DOLLAR dollarConditional)? seriesOperator DOLLAR? seriesRhs (REP star)* -> ^({token("ASTSERIES", ASTSERIES, $ASERIES.Line)}  seriesLhs seriesRhs ^(ASTSERIESDOLLARCONDITION dollarConditional?) ^(ASTSERIESOPERATOR seriesOperator))
+						  ;
+
+seriesOperator            : EQUAL
+						  | PERCENT						  
+						  ;
+seriesLhs                 : nameOrListOrScalarWithBank ( leftBracketGlue (indexerExpressionHelper (',' indexerExpressionHelper)*)? RIGHTBRACKET)* -> ^(ASTSERIESLHS ^(leftBracketGlue nameOrListOrScalarWithBank indexerExpressionHelper*));
 						  
 seriesRhs                 : expression (',' expression)* -> ^(ASTSERIESRHS expression+);
 
-dollarConditional         : LEFTPAREN DOLLAR DOLLAR RIGHTPAREN   //should catch #i0[#i] or #i0 might be composed but not #i
-                          | seriesLhs                            //stuff like $( #i0[#i] and #j0[#j] )
-						  ;						  
+// ========================== new SERIES command end =============================
+
 
 seriesOpt1                : ISNOTQUAL
 						  | leftAngle2          seriesOpt1h* RIGHTANGLE -> ^(ASTOPT1 seriesOpt1h*)
@@ -2051,7 +2069,7 @@ help					  : HELP ident? -> ^({token("ASTHELP", ASTHELP, $HELP.Line)} ident?);
 
 if2						  : IF leftParen logicalOr rightParen expressions1? (ELSE expressions2?)? END SEMICOLON -> ^({token("ASTIF", ASTIF, $IF.Line)} logicalOr ^(ASTIFSTATEMENTS expressions1?) ^(ASTELSESTATEMENTS expressions2?));
 expressions1              : expressions;
-expressions2              : expressions;
+expressions2              : expressions;  
 
 download                  : DOWNLOAD HTTP? url fileName -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, $DOWNLOAD.Line)} ^(ASTHTTP HTTP?) url ^(ASTHANDLEFILENAME fileName));
 
@@ -2272,6 +2290,8 @@ readOpt1h                 : MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
 						  | GBK (EQUAL yesNo)? -> ^(ASTOPT_STRING_GBK yesNo?)
+						  | GDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_GDX yesNo?)
+						  | GDXOPT EQUAL expression -> ^(ASTOPT_STRING_GDXOPT expression)
 						  | TSP (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSP yesNo?)
 						  | PCIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PCIM yesNo?)
 						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
@@ -2450,6 +2470,8 @@ writeOpt1                 : ISNOTQUAL
 writeOpt1h                : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  //all these will fail, just to provide better error messages for WRITE<csv> etc.
 						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
 						  | GBK (EQUAL yesNo)? -> ^(ASTOPT_STRING_GBK yesNo?)
+						  | GDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_GDX yesNo?)
+						  | GDXOPT EQUAL expression -> ^(ASTOPT_STRING_GDXOPT expression)
 						  | TSP (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSP yesNo?)
 						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
 						  | PRN (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRN yesNo?)
@@ -2499,6 +2521,7 @@ logicalNot				  :  NOT logicalAtom     -> ^(ASTNOT logicalAtom)
 
 logicalAtom				  :  expression ifOperator expression -> ^(ASTCOMPARE ifOperator expression expression)
 						  |  leftParen! logicalOr rightParen!           // omit both '(' and ')'
+						  |  listWithIndexer
 						  ;
 
 ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
@@ -2508,6 +2531,8 @@ ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
 			              |  ISLARGEROREQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR5)
 						  |  ISSMALLEROREQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR6)
 			              ;
+
+listWithIndexer           : listName ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 listName expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!  //should catch #i0[#i], does not need a parenthesis!						  
 
 truncateOpt1              : ISNOTQUAL | leftAngle truncateOpt1h? RIGHTANGLE -> truncateOpt1h?;
 truncateOpt1h             : dates -> ^(ASTDATES dates);
@@ -2536,6 +2561,8 @@ openOpt1                  : ISNOTQUAL | leftAngle openOpt1h* RIGHTANGLE -> openO
 openOpt1h                 : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
 						  | GBK (EQUAL yesNo)? -> ^(ASTOPT_STRING_GBK yesNo?)
+						  | GDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_GDX yesNo?)
+						  | GDXOPT EQUAL expression -> ^(ASTOPT_STRING_GDXOPT expression)
 						  | PCIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PCIM yesNo?)
 						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
 						  | PRN (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRN yesNo?)						
@@ -2563,6 +2590,8 @@ mulbkOpt1                 : ISNOTQUAL | leftAngle mulbkOpt1h* RIGHTANGLE -> mulb
 mulbkOpt1h                : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
 						  | GBK (EQUAL yesNo)? -> ^(ASTOPT_STRING_GBK yesNo?)
+						  | GDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_GDX yesNo?)
+						  | GDXOPT EQUAL expression -> ^(ASTOPT_STRING_GDXOPT expression)
 						  | PCIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PCIM yesNo?)
 						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
 						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
@@ -2865,10 +2894,10 @@ listName                  : simpleHashName -> ^(ASTHASH simpleHashName)
 				          | listComplicated -> ^(ASTHASH listComplicated)
 				          ;
 
-simpleHashName            : hashNoGlue GLUE ident -> ^(ASTHASHNAMESIMPLE ident) //we can have #y, without parentheses
-                          | dollarHashNoGlue GLUE ident -> ^(ASTDOLLARHASHNAMESIMPLE ident); //we can have #y, without parentheses
-listComplicated           : hashNoGlue leftParenGlue nameOrScalar RIGHTPAREN -> ^(ASTHASHPAREN nameOrScalar)
-                          | dollarHashNoGlue leftParenGlue nameOrScalar RIGHTPAREN -> ^(ASTDOLLARHASHPAREN nameOrScalar);
+simpleHashName            : hashNoGlue GLUE ident -> ^(ASTHASHNAMESIMPLE ident); //we can have #y, without parentheses
+                          //| dollarHashNoGlue GLUE ident -> ^(ASTDOLLARHASHNAMESIMPLE ident); //we can have #y, without parentheses
+listComplicated           : hashNoGlue leftParenGlue nameOrScalar RIGHTPAREN -> ^(ASTHASHPAREN nameOrScalar);
+                          //| dollarHashNoGlue leftParenGlue nameOrScalar RIGHTPAREN -> ^(ASTDOLLARHASHPAREN nameOrScalar);
 
 //-----------------------------------------------------------------------------------------
 //Scalar name
@@ -2879,10 +2908,11 @@ scalarName                : simplePercentName -> ^(ASTSCALAR simplePercentName)
 				          | scalarComplicated -> ^(ASTSCALAR scalarComplicated)
 				          ;
 
-simplePercentName         : percentNoGlue GLUE ident -> ^(ASTPERCENTNAMESIMPLE ident)  //same as scalarSimple
-                          | dollarPercentNoGlue GLUE ident -> ^(ASTDOLLARPERCENTNAMESIMPLE ident); //same as scalarSimple
-scalarComplicated         : percentNoGlue leftParenGlue nameOrScalar RIGHTPAREN -> ^(ASTPERCENTPAREN nameOrScalar)
-                          | dollarPercentNoGlue leftParenGlue nameOrScalar RIGHTPAREN -> ^(ASTDOLLARPERCENTPAREN nameOrScalar);
+simplePercentName         : percentNoGlue GLUE ident -> ^(ASTPERCENTNAMESIMPLE ident);  //same as scalarSimple
+                          //| dollarPercentNoGlue GLUE ident -> ^(ASTDOLLARPERCENTNAMESIMPLE ident) //same as scalarSimple
+
+scalarComplicated         : percentNoGlue leftParenGlue nameOrScalar RIGHTPAREN -> ^(ASTPERCENTPAREN nameOrScalar) ;
+                          //| dollarPercentNoGlue leftParenGlue nameOrScalar RIGHTPAREN -> ^(ASTDOLLARPERCENTPAREN nameOrScalar);
 
 //-----------------------------------------------------------------------------------------
 
@@ -2912,7 +2942,7 @@ unaryExpression           : dollarExpression
                           | MINUS dollarExpression -> ^(NEGATE dollarExpression)
 						  ;
 
-dollarExpression          : indexerExpression ('§'^ dollarConditional)*;
+dollarExpression          : indexerExpression (DOLLAR^ dollarConditional)*;
 
 indexerExpression         : primaryExpression ( leftBracketGlue^ (indexerExpressionHelper (','! indexerExpressionHelper)*)? RIGHTBRACKET!)*
 						  ;
@@ -2941,6 +2971,10 @@ matrixRow                 :  expression (',' expression)*  -> ^(ASTMATRIXROW exp
 
 doubleVerticalBar         : GLUE? (DOUBLEVERTICALBAR1 | DOUBLEVERTICALBAR2);
 
+dollarConditional         : LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)  //logicalOr can contain a listWithIndexer
+						  | listWithIndexer						  
+						  ;
+                                                                           
 //using rangeWithBank and wildcardWithBank in the last of value rule gives problems with PRT [pxa..pxb] etc.
 indexerExpressionHelper   : range -> ^(ASTINDEXERELEMENT ^(ASTINDEXERELEMENTBANK) range)                             //fm1..fm5
                           | wildcard -> ^(ASTINDEXERELEMENT ^(ASTINDEXERELEMENTBANK) ^(ASTWILDCARD wildcard))                          //fm*
@@ -3005,6 +3039,10 @@ nameOrListOrScalarWithBank: name bankColon nameWithDot -> ^(ASTNAMEWITHBANK ^(AS
 						  | name bankColon listName -> ^(ASTLISTWITHBANK ^(ASTBANK name) listName)						  						
 						  | name bankColon scalarName -> ^(ASTNAMEWITHBANK ^(ASTBANK name) scalarName)
 						
+						  | scalarName bankColon nameWithDot -> ^(ASTNAMEWITHBANK ^(ASTBANK scalarName) nameWithDot)
+						  | scalarName bankColon listName -> ^(ASTLISTWITHBANK ^(ASTBANK scalarName) listName)						  						
+						  | scalarName bankColon scalarName -> ^(ASTNAMEWITHBANK ^(ASTBANK scalarName) scalarName)
+
 						  | AT GLUE nameWithDot ->  ^(ASTNAMEWITHBANK ^(ASTBANK ASTAT) nameWithDot)
 						  | AT GLUE listName ->  ^(ASTLISTWITHBANK ^(ASTBANK ASTAT) listName)	
 						  | AT GLUE scalarName -> ^(ASTNAMEWITHBANK ^(ASTBANK ASTAT) scalarName)						
@@ -3013,15 +3051,18 @@ nameOrListOrScalarWithBank: name bankColon nameWithDot -> ^(ASTNAMEWITHBANK ^(AS
 						  ;						
 
 nameWithBank              : name bankColon nameWithDot -> ^(ASTNAMEWITHBANK ^(ASTBANK name) nameWithDot)
+						  | scalarName bankColon nameWithDot -> ^(ASTNAMEWITHBANK ^(ASTBANK scalarName) nameWithDot)
 						  | AT GLUE nameWithDot ->  ^(ASTNAMEWITHBANK ^(ASTBANK ASTAT) nameWithDot)
 						  | nameWithDot -> ^(ASTNAMEWITHBANK ^(ASTBANK) nameWithDot)
 						  ;
 
 listWithBank              : name bankColon listName -> ^(ASTLISTWITHBANK ^(ASTBANK name) listName)
+						  | scalarName bankColon listName -> ^(ASTLISTWITHBANK ^(ASTBANK scalarName) listName)
 						  | AT GLUE listName ->  ^(ASTLISTWITHBANK ^(ASTBANK ASTAT) listName)						
 						  ;
 
 scalarWithBank            : name bankColon scalarName -> ^(ASTNAMEWITHBANK ^(ASTBANK name) scalarName)
+						  | scalarName bankColon scalarName -> ^(ASTNAMEWITHBANK ^(ASTBANK scalarName) scalarName)
 						  | AT GLUE scalarName ->  ^(ASTNAMEWITHBANK ^(ASTBANK ASTAT) scalarName)
 						  | scalarName -> ^(ASTNAMEWITHBANK ^(ASTBANK) scalarName)
 						  ;
@@ -3095,6 +3136,8 @@ optionType :
 			 | FREQ question -> FREQ question
              | FREQ '='? optionFreq -> FREQ ^(ASTSTRINGSIMPLE optionFreq)
 
+			 | GAMS EXE FOLDER '='? fileName -> GAMS EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
+
 			 | INTERFACE question -> INTERFACE question
              | INTERFACE CLIPBOARD DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CLIPBOARD DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
 			 | INTERFACE CSV DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CSV DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
@@ -3149,8 +3192,9 @@ optionType :
              | PRINT PRT PCH '='? yesNoSimple -> PRINT PRT PCH ^(ASTBOOL yesNoSimple)
 			 | PRINT WIDTH '='? Integer -> PRINT WIDTH ^(ASTINTEGER Integer)
 
-			 | R EXE PATH '='? fileName -> R EXE PATH ^(ASTSTRINGSIMPLE fileName)
-
+			 | R EXE FOLDER '='? fileName -> R EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
+			 | R EXE PATH '='? fileName -> R EXE PATH ^(ASTSTRINGSIMPLE fileName)  //obsolete, same as above and for legacy
+			 
 			 | SHEET question -> SHEET question
 			 | SHEET MULPRT (GDIF|GDIFF) '='? yesNoSimple -> SHEET MULPRT GDIF ^(ASTBOOL yesNoSimple)
              | SHEET MULPRT ABS '='? yesNoSimple -> SHEET MULPRT ABS ^(ASTBOOL yesNoSimple)
@@ -3493,7 +3537,10 @@ ident                     : Ident|
                             FROM|
                             FUNCTION|
                             GAUSS|
+							GAMS|
                             GBK|
+							GDX|
+							GDXOPT|
                             GDIFF|
                             GDIF|
                             GEKKO18|
@@ -3861,12 +3908,12 @@ percentSimple             : (GLUE!)? PERCENT;
 percent                   : (GLUE!)? (PERCENT);
 percentGlue               : GLUE! (PERCENT);
 percentNoGlue             : PERCENT;
-dollarPercentNoGlue       : DOLLAR | DOLLARPERCENT;
+//dollarPercentNoGlue       : DOLLAR | DOLLARPERCENT;
 
 hash                      : (GLUE!)? HASH;
 hashGlue                  : GLUE! HASH;
 hashNoGlue                : HASH;
-dollarHashNoGlue          : DOLLARHASH;
+//dollarHashNoGlue          : DOLLARHASH;
 
 star                      : (GLUESTAR!)? STAR (GLUESTAR!)?;
 starGlueBoth              : GLUESTAR! STAR GLUESTAR!;
@@ -3950,9 +3997,9 @@ COLON                     : ':';
 COMMA2                    : ',';
 DOT                       : '.';
 HASH                      : '#';
-DOLLARHASH                : '$#';
+//DOLLARHASH                : '$#';
 PERCENT                   : '%';
-DOLLARPERCENT             : '$%';
+//DOLLARPERCENT             : '$%';
 DOLLAR                    : '$';
 LEFTCURLY                 : '{';
 RIGHTCURLY                : '}';

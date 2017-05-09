@@ -27,42 +27,65 @@ namespace Gekko
             this.offset = offset;
         }
 
-        public IVariable Indexer(IVariable index1, IVariable index2, GekkoTime t)
+        public IVariable Indexer(GekkoTime t, bool isLhs, params IVariable[] indexes)
         {
-            G.Writeln2("Timeseries cannot used with [i, j] indexer");
-            throw new GekkoException();
-        }
-
-        public IVariable Indexer(IVariable index, GekkoTime t)
-        {
-            if (index.Type() == EVariableType.Val)
+            if (indexes.Length == 1 && (indexes[0].Type() == EVariableType.Val || indexes[0].Type() == EVariableType.Date))
             {
-                int ival = O.GetInt(index);
-                if (ival >= 1900)
+                //y[2010] or y[-1]
+                IVariable index = indexes[0];
+
+                if (index.Type() == EVariableType.Val) {
+                    int ival = O.GetInt(index);
+                    if (ival >= 1900)
+                    {
+                        return new ScalarVal(this.ts.GetData(new GekkoTime(EFreq.Annual, ival + this.offset, 1)));
+                    }
+                    else
+                    {
+                        //typically ival numerically < 10 here                    
+                        //return new MetaTimeSeries(this.ts, ival, this.bank, this.variable);
+                        return new MetaTimeSeries(this.ts, ival + this.offset);
+                        //10% faster, but maybe more error prone...
+                        //this.offset = ival;
+                        //return this;
+                    }
+                }
+                else if (index.Type() == EVariableType.Date)
                 {
-                    return new ScalarVal(this.ts.GetData(new GekkoTime(EFreq.Annual, ival + this.offset, 1)));
+                    return new ScalarVal(this.ts.GetData(((ScalarDate)index).date.Add(this.offset)));
                 }
                 else
                 {
-                    //typically ival numerically < 10 here                    
-                    //return new MetaTimeSeries(this.ts, ival, this.bank, this.variable);
-                    return new MetaTimeSeries(this.ts, ival + this.offset);
-                    //10% faster, but maybe more error prone...
-                    //this.offset = ival;
-                    //return this;
+                    //should not be possible
+                    throw new GekkoException();
                 }
-            }
-            else if (index.Type() == EVariableType.Date)
-            {
-                return new ScalarVal(this.ts.GetData(((ScalarDate)index).date.Add(this.offset)));
             }
             else
             {
-                G.Writeln2("*** ERROR: Expected indexer to be DATE or VAL");
-                throw new GekkoException();
-            }
+                string hash = TimeSeries.GetHashCodeFromIvariables(indexes);
 
+                O.ECreatePossibilities canCreate = O.ECreatePossibilities.None;
+                if (isLhs) canCreate = O.ECreatePossibilities.Can;
+
+                string varHash = this.ts.variableName + Globals.symbolTurtle + hash;
+
+                TimeSeries ts = this.ts.parentDatabank.GetVariable(this.ts.freqEnum, varHash);
+                if (ts == null)
+                {
+                    if (canCreate == O.ECreatePossibilities.None)
+                    {
+                        G.Writeln2("*** ERROR: Cannot find " + this.ts.parentDatabank.aliasName + ":" + this.ts.variableName + "[" + G.PrettifyTimeseriesHash(hash, false, false) + "]");
+                        throw new GekkoException();
+                    }
+                    ts = new TimeSeries(this.ts.freqEnum, varHash);
+                    this.ts.parentDatabank.AddVariable(ts);
+                }                
+
+                return new MetaTimeSeries(ts);
+            }
         }
+
+        
 
         public IVariable Indexer(IVariablesFilterRange indexRange, GekkoTime t)
         {

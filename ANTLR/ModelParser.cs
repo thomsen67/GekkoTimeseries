@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 Model.g 2016-03-03 11:35:01
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 Model.g 2017-04-28 15:07:55
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -171,8 +171,8 @@ public partial class ModelParser : Parser
     public const int Y = 83;
     public const int T__88 = 88;
     public const int X = 82;
-    public const int Z = 84;
     public const int ASTAFTER2 = 24;
+    public const int Z = 84;
     public const int Ident = 44;
     public const int ASTEXPRESSION = 29;
     public const int VARLIST = 10;
@@ -195,8 +195,8 @@ public partial class ModelParser : Parser
     public const int DIGIT = 49;
     public const int DOT = 19;
     public const int NEGATE = 13;
-    public const int MINUS = 12;
     public const int AFTER = 7;
+    public const int MINUS = 12;
     public const int TRUE = 20;
     public const int ASTLEFTSIDE = 33;
     public const int NEWLINE = 57;
@@ -815,7 +815,7 @@ public partial class ModelParser : Parser
 
 
             	// AST REWRITE
-            	// elements:          expression2, genrLeftSide, code
+            	// elements:          code, expression2, genrLeftSide
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -1743,7 +1743,7 @@ public partial class ModelParser : Parser
 
 
             	// AST REWRITE
-            	// elements:          expression, expression, ident
+            	// elements:          expression, ident, expression
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -1920,7 +1920,7 @@ public partial class ModelParser : Parser
 
 
             	// AST REWRITE
-            	// elements:          logExp, expression, expression
+            	// elements:          expression, expression, logExp
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -3180,7 +3180,7 @@ public partial class ModelParser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          numberPlusMinus, ident
+                    	// elements:          ident, numberPlusMinus
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -3232,7 +3232,7 @@ public partial class ModelParser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          numberPlusMinus, ident
+                    	// elements:          ident, numberPlusMinus
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 

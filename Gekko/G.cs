@@ -167,7 +167,8 @@ namespace Gekko
             string variable = null;
             int lag = 0;
             G.ExtractVariableAndLag(varName, out variable, out lag);
-            if (lag != 0) variable += "(" + lag + ")";
+            variable = G.PrettifyTimeseriesHash(variable, true, false);
+            if (lag != 0) variable += "[" + lag + "]";
             return variable;
         }
 
@@ -281,27 +282,48 @@ namespace Gekko
 
         public static string ExtractOnlyVariableIgnoreLag(string key, string code)
         {
-            string variable;
-            int indx = key.IndexOf(code);            
-            if (indx != -1) variable = key.Substring(0, indx - 0);
-            else variable = key;
+            string variable = null;
+            int indx = key.LastIndexOf(code); //in decomp window, we may have x['a', 'z'][-1], so therefore we look for the last '['       
+            if (indx != -1)
+            {
+                string rest = key.Substring(indx);
+                if (rest.Contains("'") || rest.Contains(Globals.symbolList.ToString())) variable = key;  //if input is x['a', 'z'] or x[#i, #j], etc.
+                else variable = key.Substring(0, indx - 0);
+            }
+            else variable = key;            
             return variable;
         }
 
-        public static bool IsSimpleToken(string varName)
+        //Maybe allowTurtle should be removed
+        private static bool IsSimpleToken(string varName, bool allowTurtle)
         {
             //must be like a38, f16, var2, _var3, x_y etc. Cannot start with digit.
             if (varName == null) return false;
             if (varName.Length == 0) return false;
             if (!G.IsLetterOrUnderscore(varName[0])) return false;
             for (int jj = 1; jj < varName.Length; jj++)
-            {                
-                if (!G.IsLetterOrDigitOrUnderscore(varName[jj]))
+            {
+                if (!allowTurtle)
                 {
-                    return false;                    
+                    if (!G.IsLetterOrDigitOrUnderscore(varName[jj]))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (!G.IsLetterOrDigitOrUnderscoreOrTurtle(varName[jj]))
+                    {
+                        return false;
+                    }
                 }
             }
             return true;
+        }
+
+        public static bool IsSimpleToken(string varName)
+        {
+            return IsSimpleToken(varName, false);  //no turtle allowed, maybe remove that
         }
 
         public static string varFormat(string level1, int width)
@@ -544,10 +566,10 @@ namespace Gekko
             newDatabank.date = originalDatabank.date;
             newDatabank.isDirty = true;
             //don't touch alias names: we are cloning the content of the databank, not altering its name.
-            foreach (TimeSeries ts in originalDatabank.storage.Values)
+            foreach (TimeSeries ts in originalDatabank.storage.Values) 
             {
                 TimeSeries tsCopy = ts.Clone();
-                newDatabank.AddVariable(ts.frequency, tsCopy);  //FIXME: what if already there
+                newDatabank.AddVariable(ts.frequency, tsCopy, false);  //FIXME: what if already there. No variable name check -- just wastes time, and not good regarding GAMS variable names.
             }
         }
 
@@ -629,6 +651,33 @@ namespace Gekko
         //also accepts [-1] (AREMOS)
         // i is located at the first lag parenthesis in fy(-1)
 
+        public static string PrettifyTimeseriesHash(string s, bool isVarName, bool isInverse)
+        {
+            if (!isVarName && isInverse) throw new GekkoException();
+            if (isInverse)
+            {
+                string ss = s.Replace(Globals.leftParenthesisIndicator, Globals.symbolTurtle);
+                ss = ss.Replace(Globals.rightParenthesisIndicator, "");
+                ss = ss.Replace(",", Globals.symbolTurtle);
+                ss = ss.Replace("'", "");
+                ss = ss.Replace(" ", "");
+                ss = ss.Trim();
+                return ss;
+            }
+            else
+            {
+                if (isVarName)
+                {
+                    int i = s.IndexOf(Globals.symbolTurtle);
+                    if (i <= 0) return s;
+                    string s1 = s.Substring(0, i);
+                    string s2 = s.Substring(i + Globals.symbolTurtle.Length, s.Length - (i + Globals.symbolTurtle.Length));
+                    return s1 + "[" + PrettifyTimeseriesHash(s2, false, false) + "]";
+                }
+                else return "'" + s.Replace(Globals.symbolTurtle, "', '") + "'";
+            }
+        }
+
         public static List<string> RemoveEmptyLines(List<string> s)
         {
             List<string> xx = new List<string>();
@@ -677,6 +726,13 @@ namespace Gekko
         public static bool IsLetterOrDigitOrUnderscore(char c)
         {
             if (char.IsLetterOrDigit(c) || c == '_')
+                return true;
+            else return false;
+        }
+
+        public static bool IsLetterOrDigitOrUnderscoreOrTurtle(char c)
+        {
+            if (char.IsLetterOrDigit(c) || c == '_' || c == '¤')
                 return true;
             else return false;
         }

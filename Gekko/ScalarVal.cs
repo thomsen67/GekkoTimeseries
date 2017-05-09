@@ -67,37 +67,33 @@ namespace Gekko
             return gt;
         }        
 
-        public IVariable Indexer(IVariable index, GekkoTime t)
+        public IVariable Indexer(GekkoTime t, bool isLhs, params IVariable[] indexes)
         {
-            G.Writeln2("*** ERROR: You cannot use []-index on VAL");                
+            G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
             throw new GekkoException();
         }
-
-
-        public IVariable Indexer(IVariable index1, IVariable index2, GekkoTime t)
-        {
-            G.Writeln2("Val cannot used with [i, j] indexer");
-            throw new GekkoException();
-        }
-
+        
         public IVariable Indexer(IVariablesFilterRange indexRange, GekkoTime t)
         {
-            G.Writeln2("*** ERROR: You cannot use []-index on VAL");                
-            throw new GekkoException();            
+            G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
+            throw new GekkoException();
         }
 
         public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, GekkoTime t)
         {
+            G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
             throw new GekkoException();
         }
 
         public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, GekkoTime t)
         {
+            G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
             throw new GekkoException();
         }
 
         public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, GekkoTime t)
         {
+            G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
             throw new GekkoException();
         }        
 

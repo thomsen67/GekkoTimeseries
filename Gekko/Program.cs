@@ -1996,6 +1996,11 @@ namespace Gekko
                     extension = "bnk";
                     isTsdx = false;
                 }
+                if (oRead.Type == EDataFormat.Gdx)
+                {
+                    extension = "gdx";
+                    isTsdx = false;
+                }
 
                 bool cancel = false;
                 bool createNewOpenFile = false;
@@ -2095,6 +2100,10 @@ namespace Gekko
                             throw new GekkoException();
                         }
                         TspUtilities.tspDataUtility(file, databank, oRead, readInfo, open);
+                    }
+                    else if (oRead.Type == EDataFormat.Gdx)
+                    {
+                        Program.ReadGdx(databank, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
                     }
                     else
                     {
@@ -2290,9 +2299,9 @@ namespace Gekko
             if (removed.isDirty) isDirty = true;
             else
             {
-                foreach (TimeSeries ts in removed.storage.Values)
+                foreach (TimeSeries ts in removed.storage.Values)  
                 {
-                    if (ts.isDirty)
+                    if (ts.IsDirty())
                     {
                         isDirty = true;
                         break;
@@ -2305,10 +2314,10 @@ namespace Gekko
         public static void HandleCleanAndParentForTimeseries(Databank db, bool merge)
         {
             db.isDirty = false;
-            foreach (TimeSeries ts in db.storage.Values)
+            foreach (TimeSeries ts in db.storage.Values) 
             {
-                if (!merge) ts.isDirty = false;  //if we are not merging, the bank is comletely new, and the timeseries are all considered clean. When merging, dirt is all over.
-                ts.parentDatabank = db;
+                if (!merge) ts.SetDirty(false);  //if we are not merging, the bank is comletely new, and the timeseries are all considered clean. When merging, dirt is all over.
+                ts.parentDatabank = db;                
             }
         }
 
@@ -2654,12 +2663,13 @@ namespace Gekko
                     {
                         DateTime dt3 = DateTime.Now;
                         temp = Serializer.Deserialize<Databank>(fs);
-                        readInfo.variables = temp.storage.Count;
+                        readInfo.variables = temp.storage.Count;  
                         G.WritelnGray("Protobuf deserialize took: " + G.Seconds(dt3));
                     }
                     catch (Exception e)
                     {
                         G.Writeln2("*** ERROR: Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version 1.1 format (protobuffers)");
+                        G.Writeln("           Message: " + e.Message, Color.Red);
                         G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
                         throw new GekkoException();
                     }
@@ -2667,8 +2677,9 @@ namespace Gekko
                     int maxYearInProtobufFile = int.MinValue;
                     int minYearInProtobufFile = int.MaxValue;
                     int emptyWarnings = 0;
-                    foreach (TimeSeries tsTemp in temp.storage.Values)  //for each timeseries in temp (deserialized) databank
-                    {
+                    foreach (TimeSeries tsTemp in temp.storage.Values)  //for each timeseries in temp (deserialized) databank 
+                    {  
+
                         //looping through each timeseries to find databank start and end year (and to merge variables if we are merging)
 
                         if (IsNonsenseVariableName(tsTemp.variableName))
@@ -2677,8 +2688,15 @@ namespace Gekko
                             continue;
                         }
 
-                        GekkoTime first = tsTemp.GetPeriodFirst();
-                        GekkoTime last = tsTemp.GetPeriodLast();
+                        int counter = 0;
+                        GekkoTime first = Globals.tNull;
+                        GekkoTime last = Globals.tNull;
+
+                        if (!tsTemp.IsTimeless())
+                        {
+                            first = tsTemp.GetPeriodFirst();
+                            last = tsTemp.GetPeriodLast();
+                        }                                                
 
                         if (mergeOrTimeLimit)  //doing tsdx-protobuf merge (or time limits), get data into Work from deserialized temp databank
                         {
@@ -3295,6 +3313,252 @@ namespace Gekko
                     return;
                 }
             }
+        }
+
+        public static void ReadGdx(Databank databank, ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
+        {
+            
+            DateTime dt1 = DateTime.Now;
+
+            string GamsDir = null;
+            if (Program.options.gams_exe_folder != null && Program.options.gams_exe_folder.Trim() != null)
+            {
+                GamsDir = Path.GetDirectoryName(Program.options.gams_exe_folder.Trim());
+            }
+
+            GAMSWorkspace ws = null;
+            try
+            {
+                ws = new GAMSWorkspace(workingDirectory: Program.options.folder_working, systemDirectory: GamsDir);
+            }
+            catch (Exception e)
+            {
+                G.Writeln2("*** ERROR: Import of gdx file (GAMS) failed.");
+                G.Writeln("           Technical error:");
+                G.Writeln("           " + e.Message);
+                G.Writeln("+++ NOTE:  You may manually indicate the GAMS program folder with 'OPTION gams exe folder = ...;'");
+            }
+
+            GAMSDatabase db = ws.AddDatabaseFromGDX(file);
+
+            string readType = oRead.gdxopt; //for instance: "scns['base']" 
+            
+            string cut1 = null; string cut2 = null;
+            if (readType == null) readType = "";
+            readType = readType.Replace(" ", "");  //no blanks            
+            string[] ss = readType.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+            if (ss.Length == 2 && ss[0] != null && ss[0].Trim() != "" && ss[1] != null && ss[1].Trim() != "")
+            {
+                cut1 = ss[0];
+                cut2 = ss[1];
+            }
+            
+            DateTime t00 = DateTime.Now;
+
+            G.Writeln();
+
+            int counterVariables = 0;
+            int counterParameters = 0;
+
+            if (!merge)
+            {
+                databank.Clear();
+            }
+
+            int yearMin = int.MaxValue;
+            int yearMax = int.MinValue;
+
+            foreach (GAMSSymbol n in db)
+            {
+                //if (n.GetType() == typeof(GAMSParameter)) continue;  //fixme
+                //if (n.GetType() == typeof(GAMSSet)) continue;  //fixme
+
+                if (n.GetType() == typeof(GAMSParameter) || n.GetType() == typeof(GAMSVariable))
+                {
+
+                    string gvar = n.Name;
+                   
+                    //if (gvar.ToLower().StartsWith("j_")) continue;  //make filtering possible!
+
+                    if (G.IsUnitTesting() && !(G.equal(gvar, "m") || G.equal(gvar, "myfm") || G.equal(gvar, "f") || G.equal(gvar, "pm") || G.equal(gvar, "pff") || G.equal(gvar, "ef"))) continue;  //to not waste time on this when unit testing
+                    
+                    int[] dims = new int[n.Domains.Count];                                       
+
+                    int timeIndex = -12345;
+                    int scnsIndex = -12345;
+                    for (int i = 0; i < n.Domains.Count; i++)
+                    {
+                        Object o = n.Domains.ElementAt(i);
+                        if (o.GetType() == typeof(GAMSSet))
+                        {
+                            GAMSSet gs = (GAMSSet)n.Domains.ElementAt(i);
+                            dims[i] = gs.NumberRecords;
+                            if (G.equal(gs.Name, "t"))
+                            {
+                                timeIndex = i;
+                            }
+                            else if (G.equal(gs.Name, cut1))
+                            {
+                                scnsIndex = i;
+                            }
+                        }
+                        else
+                        {
+                            //this may be a string = "*", for instance the parameter y_ps
+                        }
+                    }
+
+                    TimeSeries ts2 = null;
+                    //int counter = 0;
+                    string oldHash = "";
+
+                    bool isDimensionless = false;
+
+                    int ii = 0;
+                    foreach (GAMSSymbolRecord record2 in n)
+                    {
+
+                        if (Globals.threadIsInProcessOfAborting)
+                        {
+                            G.Writeln2("Stopping GAMS file import");
+                            return;
+                        }
+
+                        string[] keys = record2.Keys;                        
+
+                        if (scnsIndex != -12345)
+                        {                            
+                            if (cut1 != null && scnsIndex >= 0 && !G.equal(keys[scnsIndex], cut2)) continue;  //ignore this
+                        }
+
+                        double d = double.NaN;
+
+                        if (n.GetType() == typeof(GAMSParameter))
+                        {
+                            d = ((GAMSParameterRecord)record2).Value;
+                        }
+                        else if (n.GetType() == typeof(GAMSVariable))
+                        {
+                            d = ((GAMSVariableRecord)record2).Level;
+                        }
+
+                        //counter++;
+
+                        int tt = -12345;
+                        string t = null;
+                        if (timeIndex != -12345)
+                        {
+                            t = keys[timeIndex];
+                            tt = int.Parse(t.Substring(1)) + 2006;  //remove the "t" and add 2006
+                        }
+                        
+                        string hash = null;
+                        for (int i = 0; i < keys.Length; i++)
+                        {
+                            if (i == timeIndex) continue;
+
+                            if (i == scnsIndex && G.equal(keys[i], cut2))
+                            {
+                                //skip it
+                            }
+                            else
+                            {
+                                hash += keys[i] + Globals.symbolTurtle;
+                                //if (i < keys.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter;                    
+                            }
+                        }
+                        if (hash != null && hash.EndsWith(Globals.symbolTurtle)) hash = hash.Substring(0, hash.Length - Globals.symbolTurtle.Length);
+                                                
+                        if (hash == null || hash == "") isDimensionless = true;
+                        string varName = null;
+                        if (isDimensionless) varName = gvar;
+                        else varName = gvar + Globals.symbolTurtle + hash;
+
+                        if (hash != oldHash)
+                        {                            
+                            ts2 = databank.GetVariable(EFreq.Annual, varName);
+                        }
+
+                        if (ts2 == null)
+                        {
+                            
+                            ts2 = new TimeSeries(EFreq.Annual, varName);
+                            
+                            databank.AddVariable(ts2, false);
+                            if (timeIndex == -12345)
+                            {
+                                ts2.SetTimeless();
+                            }
+                            if (n.GetType() == typeof(GAMSParameter)) counterParameters++;
+                            else if (n.GetType() == typeof(GAMSVariable)) counterVariables++;
+                        }
+
+                        if (timeIndex == -12345)
+                        {
+                            ts2.SetTimelessData(d);
+                        }
+                        else
+                        {
+                            ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), d);
+
+                            if (tt > yearMax) yearMax = tt;
+                            if (tt < yearMin) yearMin = tt;
+
+                        }
+                        oldHash = hash;
+                        ii++;
+                    }
+
+                    if (isDimensionless)
+                    {
+                        //do nothing, do not create a ghost
+                    }
+                    else
+                    {                        
+                        TimeSeries ts = new TimeSeries(EFreq.Annual, gvar);  //we wipe it out if it is alreay existing
+                        ts.SetGhost(true);  //only a placeholder, should not be counted etc.
+                        databank.AddVariable(ts);                        
+                    }
+
+                    //G.Writeln("Imported GAMS variable: " + gvar + " " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
+                }
+                else
+                {
+                    //ignore it
+                }
+            }
+            G.Writeln2("Finished GAMS import of " + counterVariables + " variables and " + counterParameters + " parameters (" + G.SecondsFormat((DateTime.Now - t00).TotalMilliseconds) + ")");
+                        
+            readInfo.startPerInFile = yearMin;
+            readInfo.endPerInFile = yearMax;
+            readInfo.nanCounter = 0;
+
+            readInfo.variables = counterVariables + counterParameters;
+            readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
+
+            //See almost identical code in readTsd and readCsv
+            if (merge)
+            {
+                readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
+                readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
+            }
+            else
+            {
+                readInfo.startPerResultingBank = readInfo.startPerInFile;
+                readInfo.endPerResultingBank = readInfo.endPerInFile;
+            }
+            Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
+            currentBank.yearStart = readInfo.startPerResultingBank;
+            currentBank.yearEnd = readInfo.endPerResultingBank;
+            
+            readInfo.databank.info1 = readInfo.info1;
+            readInfo.databank.date = readInfo.date;
+            readInfo.databank.FileNameWithPath = readInfo.fileName;
+
+            //TODO: Maybe only do this on the gdx variables if possible
+            //Anyway, the speed penalty is small anyway.
+            databank.Trim();  
+
         }
 
         public static string NumberFormat(double d, string format2)
@@ -5035,6 +5299,7 @@ namespace Gekko
                     {
                         //See also similar code regarding CREATE
                         ts = new TimeSeries(Program.options.freq, variable);
+                        //ts.dimensions = 0;  //to start with, else it is -12345. May later on be changed to > 0 via an indexer.
                         //if (!Globals.globalPeriodStart.IsNull())
                         //{
                         //    //WHY is this done. For efficiency afterwards??
@@ -5207,8 +5472,8 @@ namespace Gekko
             string banks = "";
             if (s1.Equals(""))
             {
-                int wCount = Program.databanks.GetFirst().storage.Count;
-                int rCount = Program.databanks.GetRef().storage.Count;
+                int wCount = Program.databanks.GetFirst().storage.Count;  
+                int rCount = Program.databanks.GetRef().storage.Count;  
                 string originalDataFileWork = "[empty]";
                 string originalDataFileBaseline = "[empty]";
                 string w = GetDatabankFileNameWithPath(Program.databanks.GetFirst().aliasName);
@@ -5641,6 +5906,98 @@ namespace Gekko
             {
                 return item[0].GetHashCode();
             }
+        }        
+
+        private static void GetGamsVariable(string gvar, GAMSDatabase db, string filterScn)
+        {
+            GAMSVariable n = db.GetVariable(gvar);
+
+            int[] dims = new int[n.Domains.Count];
+
+            //N has --> a=86, t=116, s=4, scns=5.
+
+            int timeIndex = -12345;
+            int scnsIndex = -12345;
+            for (int i = 0; i < n.Domains.Count; i++)
+            {
+                GAMSSet gs = (GAMSSet)n.Domains.ElementAt(i);
+                dims[i] = gs.NumberRecords;
+                if (gs.Name == "t")
+                {
+                    timeIndex = i;
+                }
+                else if (gs.Name == "scns")
+                {
+                    scnsIndex = i;
+                }
+            }
+
+            TimeSeries ts2 = null;
+            int counter = 0;
+            string oldHash = "";
+
+            DateTime t0 = DateTime.Now;
+
+            foreach (GAMSVariableRecord record in n)
+            {
+                if (scnsIndex != -12345)
+                {
+                    string scns = record.Keys[scnsIndex];
+                    if (filterScn != null && !G.equal(scns, filterScn)) continue;
+                }
+                counter++;
+
+                int tt = -12345;
+                string t = null;
+                if (timeIndex != -12345)
+                {
+                    t = record.Keys[timeIndex];
+                    tt = int.Parse(t.Substring(1)) + 2010;  //remove the "t" and add 2010                
+                }
+
+                double d = record.Level;
+
+                string hash = null;
+                for (int i = 0; i < record.Keys.Length; i++)
+                {
+                    if (i == timeIndex) continue;
+                    hash += record.Keys[i];
+                    if (i < record.Keys.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter;                    
+                }
+
+                if (hash != oldHash) ts2 = Program.databanks.GetFirst().GetVariable(EFreq.Annual, gvar + Globals.symbolTurtle + hash);
+
+                if (ts2 == null)
+                {
+                    ts2 = new TimeSeries(EFreq.Annual, gvar + Globals.symbolTurtle + hash);
+                    Program.databanks.GetFirst().AddVariable(ts2);
+                    if (timeIndex == -12345)
+                    {
+                        ts2.SetTimeless();
+                    }
+                }
+
+                if (timeIndex == -12345)
+                {
+                    ts2.SetTimelessData(d);
+                }
+                else
+                {
+                    ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), d);
+                }
+                oldHash = hash;
+            }
+
+            TimeSeries ts = Program.databanks.GetFirst().GetVariable(EFreq.Annual, gvar);
+            if (ts == null)
+            {
+                ts = new TimeSeries(EFreq.Annual, gvar);
+                ts.SetGhost(true);  //only a placeholder, should not be counted etc.
+                Program.databanks.GetFirst().AddVariable(ts);
+            }
+
+            double time = (DateTime.Now - t0).TotalMilliseconds;
+            G.Writeln2("TIME: " + time / 1000d);
         }
 
         public static Table Dream(string options)
@@ -6471,6 +6828,15 @@ namespace Gekko
 
         public static void RunR(Gekko.O.R_run o)
         {
+            //This is just a rename, can be remove at some point in the future
+            if (Program.options.r_exe_folder == null || Program.options.r_exe_folder == "")
+            {
+                if (Program.options.r_exe_path != null && Program.options.r_exe_path != "")
+                {
+                    Program.options.r_exe_folder = Program.options.r_exe_path;
+                }
+            }
+
             string RFileName = Globals.localTempFilesLocation + "\\tempRFile.r";
             string RExportFileName = Globals.localTempFilesLocation + "\\tempR2Gekko.txt";
             List<string> lines2 = new List<string>();
@@ -6518,7 +6884,7 @@ namespace Gekko
             }
 
             string RPathUsedHere = null;
-            if (Program.options.r_exe_path.Trim() == "")
+            if (Program.options.r_exe_folder.Trim() == "")
             {
                 //no path stated manually
                 if (Globals.detectedRPath == null || Globals.detectedRPath == "[[RDetectFailed]]")
@@ -6537,14 +6903,14 @@ namespace Gekko
             else
             {
                 //overrides
-                if (Program.options.r_exe_path.ToLower().EndsWith("\\r.exe"))
+                if (Program.options.r_exe_folder.ToLower().EndsWith("\\r.exe"))
                 {
-                    RPathUsedHere = Program.options.r_exe_path;
+                    RPathUsedHere = Program.options.r_exe_folder;
                 }
                 else
                 {
-                    if (Program.options.r_exe_path.EndsWith("\\")) RPathUsedHere = Program.options.r_exe_path + "R.exe";
-                    else RPathUsedHere = Program.options.r_exe_path + "\\R.exe";
+                    if (Program.options.r_exe_folder.EndsWith("\\")) RPathUsedHere = Program.options.r_exe_folder + "R.exe";
+                    else RPathUsedHere = Program.options.r_exe_folder + "\\R.exe";
                 }
             }
 
@@ -6555,7 +6921,7 @@ namespace Gekko
             if (RPathUsedHere == "[[RDetectFailed]]")
             {
                 G.Writeln2("*** ERROR: R.exe path could not be auto-detected.");
-                G.Writeln("           Please state the R.exe path manually with OPTION r exe path = ...");
+                G.Writeln("           Please state the R.exe path manually with OPTION r exe folder = ...");
                 throw new GekkoException();
             }
 
@@ -6576,12 +6942,12 @@ namespace Gekko
             {
                 if (!File.Exists(r.StartInfo.FileName))
                 {
-                    if (Program.options.r_exe_path.Trim() == "")
+                    if (Program.options.r_exe_folder.Trim() == "")
                     {
                         //auto-detect
                         G.Writeln2("*** ERROR: Error message: " + e.Message);
                         G.Writeln("*** ERROR: The file " + RPathUsedHere + " does not seem to exist.");
-                        G.Writeln("           You may try to manually set \"OPTION r exe path = ... , if you know the R.exe location.");
+                        G.Writeln("           You may try to manually set \"OPTION r exe folder = ... , if you know the R.exe location.");
                         G.Writeln("           R.exe file locations may be similar to these:");
                         G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\R.exe");
                         G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\i386\\R.exe");
@@ -7046,7 +7412,7 @@ namespace Gekko
 
         public static string GetVariableExplanationAugmented(string variableNameWithLag, string variableNameWithoutLag)
         {
-            string ss = variableNameWithLag + "\n";
+            string ss = G.PrettifyTimeseriesHash(variableNameWithLag, true, false) + "\n";
             List<string> varExpl = Program.GetVariableExplanation(variableNameWithoutLag);
             if (Program.unfoldedVariableList == null) varExpl.Add("[Label not found: no model varlist loaded]");
             foreach (string line in varExpl)
@@ -8356,18 +8722,7 @@ namespace Gekko
                 decompOptions.isPercentageType = true;
                 table.Set(1, 1, "% ");
             }
-
-            //List<string> unfoldedList = new List<string>();
-
-            //if (decompOptions.isExpression)
-            //{
-            //    unfoldedList.AddRange(vars);
-            //}
-            //else
-            //{
-            //    unfoldedList = UnfoldLists(vars);
-            //}
-
+            
             string var2 = decompOptions.variable;
 
             if (true)
@@ -8402,9 +8757,7 @@ namespace Gekko
 
                 CompilerResults cr;
                 CreateDecompDll(leftSideVariable, decompOptions.expression != null, eh, out cr);
-
-                //Databank databank = Program.databanks.GetDatabank(bank);  //this is where X0 is found
-                //GekkoTime tStart, tEnd; Program.ConvertToGekkoTime(tp, out tStart, out tEnd);
+                                
                 List<Dictionary<string, string>> precedents2 = new List<Dictionary<string, string>>();
                 precedents2.Add(precedents);
                 CheckVariableExistence(null, precedents2, false, false, false, false);  //checking in work bank, also ok for time decomp
@@ -8412,6 +8765,7 @@ namespace Gekko
                 p2.AddRange(precedents.Keys);
                 p2.Sort(StringComparer.InvariantCulture);
 
+                //Beware: best to keep this constant for different years to deal with timeless variables
                 double delta = Globals.jacobiDeltaProbe;  //can just as well be the same stepsize as used in newton algorithm
 
                 Dictionary<string, List<DecompHelper>> decompHelpers = new Dictionary<string, List<DecompHelper>>();
@@ -8531,7 +8885,7 @@ namespace Gekko
                         }
                         else
                         {
-                            table.Set(2, 1, leftSideVariable);
+                            table.Set(2, 1, G.PrettifyTimeseriesHash(leftSideVariable, true, false));
                         }
 
                     }
@@ -8924,7 +9278,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     //rightSideVariables.Add(split[0], "");
-                    G.Writeln2("*** ERROR: fixed periods (" + split[0] + "(" + split[1] + ")" + ") cannot be used when decomposing");
+                    G.Writeln2("*** ERROR: fixed periods (" + split[0] + Globals.leftParenthesisIndicator + split[1] + Globals.rightParenthesisIndicator + ") cannot be used when decomposing");
                     throw new GekkoException();
                 }
                 else
@@ -10751,9 +11105,9 @@ namespace Gekko
                             else if (c1 == Globals.symbolMemvar && c2 == '(') glue = true;
                             else if (c1 == Globals.symbolMemvar && c2 == '{') glue = true;
 
-                            else if (c1 == Globals.symbolDollar[0] && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
-                            else if (c1 == Globals.symbolDollar[0] && c2 == '(') glue = true;
-                            else if (c1 == Globals.symbolDollar[0] && c2 == '{') glue = true;
+                            //else if (c1 == Globals.symbolDollar[0] && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
+                            //else if (c1 == Globals.symbolDollar[0] && c2 == '(') glue = true;
+                            //else if (c1 == Globals.symbolDollar[0] && c2 == '{') glue = true;
 
                             else if (c1 == Globals.symbolList && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
                             else if (c1 == Globals.symbolList && c2 == '(') glue = true;
@@ -15263,8 +15617,8 @@ namespace Gekko
                     //but it could be an exogenous or lagged exogenous with a missing somewhere in the simulation period.
                     //todo: write if exo, lagged endo, and the lag
                     string lag = "";
-                    if (lagPointers[i] < 0) lag = "(" + lagPointers[i] + ")";
-                    else if (lagPointers[i] > 0) lag = "(+" + lagPointers[i] + ")";
+                    if (lagPointers[i] < 0) lag = Globals.leftParenthesisIndicator + lagPointers[i] + Globals.rightParenthesisIndicator;
+                    else if (lagPointers[i] > 0) lag = Globals.leftParenthesisIndicator + "+" + lagPointers[i] + Globals.rightParenthesisIndicator;
                     string type = "exogenous";
                     if (endoPointers[i] == 1) type = "endogenous";
 
@@ -15441,7 +15795,8 @@ namespace Gekko
                 int index2 = -12345;
                 double[] x = ts.GetDataSequence(out index1, out index2, tStart, tEnd, true);
                 //#98726527
-                ts.isDirty = true;  //we have to indicate this manually here: normally GetDataSequence() is only for getting, but here stuff is put into it (to keep the method speedy)
+                //we have to indicate this manually here: normally GetDataSequence() is only for getting, but here stuff is put into it (to keep the method speedy)
+                ts.SetDirtyGhost(true, false);
                 int length = index2 - index1 + 1;  //only done for sim period, not from tStart0 (i.e. lags)
                 Buffer.BlockCopy(a, 8 * id * obsWithLags + 8 * (obsWithLags - obsSimPeriod), x, 8 * (index1), 8 * length); //TODO: what if out of bounds regarding x???
                 if(bNumberPointers!=null) {
@@ -15450,8 +15805,8 @@ namespace Gekko
                         if (endoNoLagPointers[b] == 1)
                         {
                             ts.source = src;
-                            ts.Stamp();
-                            ts.isDirty = true;
+                            ts.Stamp();                            
+                            ts.SetDirtyGhost(true, false);
                         }
                         else
                         {
@@ -15619,8 +15974,8 @@ namespace Gekko
                     {
                         count++;
                         string s2 = s.Replace("[0]", "");
-                        s2 = s2.Replace("[", "(");
-                        s2 = s2.Replace("]", ")");
+                        //s2 = s2.Replace("[", "(");
+                        //s2 = s2.Replace("]", ")");
                         string count2 = count.ToString();
                         string blank = "";
                         if (count > 0) blank = Globals.blankUsedAsPadding;
@@ -16655,8 +17010,8 @@ namespace Gekko
                 {
                     //For instance, "UPD <p> y = 5, 4, 5;" --> meta = "UPD <p> y = 5, 4, 5"
                     string s = O.ShowDatesAsString(tStart, tEnd);
-                    ts.source = s + o.meta;
-                    ts.isDirty = true;
+                    ts.source = s + o.meta;                    
+                    ts.SetDirtyGhost(true, false);
                 }
             }
         }
@@ -16908,7 +17263,12 @@ namespace Gekko
                 }
                 TimeSeries ts = db.GetVariable(false, s.name);
                 if (ts == null) continue;
-                if (ts.IsNullPeriod()) remove.Add(s);
+                if (ts.IsGhost()) continue;   //don't remove if it is an array-timeseries (which is kind of an empty shell)
+                if (ts.IsTimeless()) continue;  //keep timeless variables
+                if (ts.IsNullPeriod())
+                {
+                    remove.Add(s);
+                }
             }
             if (remove.Count > 0)
             {
@@ -17116,7 +17476,7 @@ namespace Gekko
                         // truncate the periods
                         //----------------------
                         GekkoDictionary<string, TimeSeries> databankWithFewerPeriods = new GekkoDictionary<string, TimeSeries>(StringComparer.OrdinalIgnoreCase);
-                        foreach (KeyValuePair<string, TimeSeries> kvp in databank.storage)
+                        foreach (KeyValuePair<string, TimeSeries> kvp in databank.storage)  
                         {
                             TimeSeries ts = kvp.Value;
                             TimeSeries tsClone = ts.Clone();
@@ -17138,9 +17498,9 @@ namespace Gekko
                             count = databank.storage.Count;
                         }
                         catch (Exception e)
-                        {
-                            G.Writeln();
-                            G.Writeln("*** ERROR: Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers)");
+                        {                            
+                            G.Writeln2("*** ERROR: Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers)");
+                            G.Writeln("           Message: " + e.Message, Color.Red);
                             throw new GekkoException();
                         }
                     }
@@ -19448,7 +19808,7 @@ namespace Gekko
                         List<string> onlyWork = new List<string>();
                         List<string> onlyGrund = new List<string>();
 
-                        foreach (string tsString in work.storage.Keys)
+                        foreach (string tsString in work.storage.Keys) 
                         {
                             if (G.GetFreqFromKey(tsString) != Program.options.freq) continue;  //filter out other freqs
                             TimeSeries tsGrund = base2.GetVariable(false, tsString);
@@ -19461,7 +19821,7 @@ namespace Gekko
                                 both.Add(G.RemoveFreqFromKey(tsString));
                             }
                         }
-                        foreach (string tsString in base2.storage.Keys)
+                        foreach (string tsString in base2.storage.Keys)  
                         {
                             if (G.GetFreqFromKey(tsString) != Program.options.freq) continue;  //filter out other freqs
                             TimeSeries tsWork = work.GetVariable(false, tsString);
@@ -29743,7 +30103,7 @@ namespace Gekko
                     List<string> onlyWork = new List<string>();
                     List<string> onlyGrund = new List<string>();
 
-                    foreach (string tsString in work.storage.Keys)
+                    foreach (string tsString in work.storage.Keys) 
                     {
                         if (G.GetFreqFromKey(tsString) != Program.options.freq) continue;  //filter other freqs
                         string s = G.RemoveFreqFromKey(tsString);
@@ -29757,7 +30117,7 @@ namespace Gekko
                             both.Add(s);
                         }
                     }
-                    foreach (string tsString in base2.storage.Keys)
+                    foreach (string tsString in base2.storage.Keys)  
                     {
                         if (G.GetFreqFromKey(tsString) != Program.options.freq) continue;  //filter other freqs
                         string s = G.RemoveFreqFromKey(tsString);
@@ -30542,7 +30902,7 @@ namespace Gekko
                 tab.CurRow.SetText(1, "Period   : The file contains data from " + this.startPerInFile + "-" + this.endPerInFile);
                 tab.CurRow.Next();
                 //#8572309572439
-                int total = Program.databanks.GetDatabank(this.dbName).storage.Count;
+                int total = Program.databanks.GetDatabank(this.dbName).storage.Count;  
                 if (this.shouldMerge)
                 {
                     tab.CurRow.SetText(1, "Size     : Merged " + this.variables + " variables from file into " + this.dbName + " databank (" + G.SecondsFormat(time) + ")");
@@ -30986,7 +31346,8 @@ namespace Gekko
         Prn,
         Pcim,
         Xls,
-        Xlsx
+        Xlsx,
+        Gdx
     }
 
     public enum EOpenType
@@ -31013,7 +31374,7 @@ namespace Gekko
         public EOpenType openType = EOpenType.Normal;
         public int openTypePosition = -12345;
         public bool protect = true;
-        
+        public string gdxopt = null;        
 
         public string FileName
         {

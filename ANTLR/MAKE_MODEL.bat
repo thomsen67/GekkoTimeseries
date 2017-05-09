@@ -1,5 +1,7 @@
-set CLASSPATH=%CLASSPATH%;C:\Program Files (x86)\ANTLR\antlr-3.1.3.jar 
-java org.antlr.Tool -traceParser Model.g >> ljadsf
+set CLASSPATH=%CLASSPATH%;C:\Program Files (x86)\ANTLR\antlr-3.1.3.jar
+
+
+"c:\Program Files (x86)\Java\jre6\bin\java.exe" org.antlr.Tool -traceParser Model.g >> ljadsf
 
 
 rem set CLASSPATH=%CLASSPATH%
