@@ -221,12 +221,12 @@ namespace Gekko.Parser.Gek
                     break;
                 case "ASTSERIESLHS":
                     {
-                        w.wh.seriesHelper = "seriesLhs";
+                        w.wh.seriesHelper = WalkHelper.seriesType.SeriesLhs;
                     }
                     break;
                 case "ASTSERIESRHS":
                     {
-                        w.wh.seriesHelper = "seriesRhs";
+                        w.wh.seriesHelper = WalkHelper.seriesType.SeriesRhs;
                     }
                     break;
             }
@@ -326,7 +326,7 @@ namespace Gekko.Parser.Gek
                             {
                                 
                                 string s = null;
-                                if (w.wh.seriesHelper == "seriesLhs" && node[0].Text == "ASTNAMEWITHBANK") //is a "normal" variable with indexer
+                                if (w.wh.seriesHelper == WalkHelper.seriesType.SeriesLhs && node[0].Text == "ASTNAMEWITHBANK") //is a "normal" variable with indexer
                                 {
 
                                     for (int i = 1; i < node.ChildrenCount(); i++)
@@ -337,9 +337,7 @@ namespace Gekko.Parser.Gek
                                             string listName = node[i][1][0][0].Text;
 
                                             string found = null; if (w.wh.seriesHelperListNames != null) w.wh.seriesHelperListNames.TryGetValue(listName, out found);
-
-
-
+                                            
                                             if (found != null)
                                             {
                                                 G.Writeln2("*** ERROR: SERIES problem: the same list name is used multiple times in []-indexer");
@@ -378,7 +376,7 @@ namespace Gekko.Parser.Gek
                                 }
 
                                 string tf = "false";
-                                if (w.wh.seriesHelper == "seriesLhs") tf = "true";
+                                if (w.wh.seriesHelper == WalkHelper.seriesType.SeriesLhs) tf = "true";
                                 node.Code.A("O.Indexer(t, " + node[0].Code + ", " + tf + s + ")");
 
 
@@ -1878,10 +1876,28 @@ namespace Gekko.Parser.Gek
                             nodeCode += "o" + numNode + ".p = p;" + G.NL;
                             nodeCode += "foreach (GekkoTime t2 in new GekkoTimeIterator(o" + numNode + ".t1, o" + numNode + ".t2))" + G.NL;
                             nodeCode += GekkoTimeIteratorStartCode(w, node);
+
+                            
+                            
+                            
+                            //¤¤¤¤¤                                                                                    
+                            nodeCode += "foreach (ScalarString ss in new O.GekkoListIterator(new MetaList(new List<string>(new string[] { `a` })))) {" + G.NL;
+
+
+
+
+
                             nodeCode += "  double data = O.GetVal(" + childCodeRhs + ", t);" + G.NL;
                             nodeCode += "if(o" + numNode + ".lhs == null) o" + numNode + ".lhs = O.GetTimeSeries(" + childCodeLhsName + ");" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
                                                                                                                                                      //nodeCode += "  double dataLag = O.GetVal(o" + numNode + ".lhs, t.Add(-1));" + G.NL;
                             nodeCode += "o" + numNode + ".lhs.SetData(t, data);" + G.NL;                                                                                                                  //HANDLE LEFT-SIDE FUNCTION!!
+
+
+
+                            //¤¤¤¤¤                            
+                            nodeCode += "}" + G.NL;
+
+
 
                             nodeCode += GekkoTimeIteratorEndCode();
 
@@ -4402,7 +4418,7 @@ namespace Gekko.Parser.Gek
         private static string AstBankHelper(ASTNode node, W wh2, int type)
         {
             string isLhsSoCanAutoCreate = null;
-            if ((node.Number == 1 && (node.Parent.Text == "ASTGENR" || node.Parent.Text == "ASTGENRLHSFUNCTION")) || node.Parent.Text == "ASTTUPLEITEM" ||  wh2.wh.seriesHelper == "seriesLhs")
+            if ((node.Number == 1 && (node.Parent.Text == "ASTGENR" || node.Parent.Text == "ASTGENRLHSFUNCTION")) || node.Parent.Text == "ASTTUPLEITEM" ||  wh2.wh.seriesHelper == WalkHelper.seriesType.SeriesLhs)
             {
                 isLhsSoCanAutoCreate = ", O.ECreatePossibilities.Can";
             }
@@ -5040,10 +5056,17 @@ namespace Gekko.Parser.Gek
 
     public class WalkHelper
     {
+        public enum seriesType
+        {
+            None,
+            SeriesLhs,
+            SeriesRhs
+        }
+        
         //created for each new command (except IF, FOR, etc -- hmm is this true now?)
         public GekkoDictionary<string, string> localStatementCache = null;
         //public StringBuilder localStatementCode = null;
-        public string seriesHelper = "none";
+        public seriesType seriesHelper = seriesType.None;
         public GekkoDictionary<string, string> seriesHelperListNames = null;
         //public List<int> seriesHelperListNumbers = null;
         public string currentCommand = null;

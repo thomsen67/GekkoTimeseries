@@ -982,6 +982,38 @@ namespace UnitTests
             // DOLLAR CONDITIONAL TESTING
             // -----------------------------------------
 
+            //Switch on timeseries
+            I("RESET; MODE data;");
+            I("TIME 2001 2005;");
+            I("SERIES x = 10, 10, 11, 12, 10;");
+            I("SERIES y = (x + 100) $ (x + 10 == 20);");
+            AssertHelper(First(), "y", 2001, 110d, sharedDelta);
+            AssertHelper(First(), "y", 2002, 110d, sharedDelta);
+            AssertHelper(First(), "y", 2003, 0d, sharedDelta);
+            AssertHelper(First(), "y", 2004, 0d, sharedDelta);
+            AssertHelper(First(), "y", 2005, 110d, sharedDelta);
+
+            //Switching between two values depending upon same criterion 
+            I("RESET; MODE data;");
+            I("TIME 2001 2005;");
+            I("SERIES x = 10, 10, 11, 12, 10;");
+            I("SERIES y1 = 110 $ (x + 10 == 20) + 111 $ (x + 10 <> 20);");
+            //This is equivalent, using iif()
+            I("SERIES y2 = iif(x + 10, '==', 20, 110, 111);");
+            AssertHelper(First(), "y1", 2001, 110d, sharedDelta);
+            AssertHelper(First(), "y1", 2002, 110d, sharedDelta);
+            AssertHelper(First(), "y1", 2003, 111d, sharedDelta);
+            AssertHelper(First(), "y1", 2004, 111d, sharedDelta);
+            AssertHelper(First(), "y1", 2005, 110d, sharedDelta);            
+            AssertHelper(First(), "y2", 2001, 110d, sharedDelta);
+            AssertHelper(First(), "y2", 2002, 110d, sharedDelta);
+            AssertHelper(First(), "y2", 2003, 111d, sharedDelta);
+            AssertHelper(First(), "y2", 2004, 111d, sharedDelta);
+            AssertHelper(First(), "y2", 2005, 110d, sharedDelta);
+
+
+
+
             I("RESET; MODE data;");
             I("TIME 2000 2000;");
             I("VAL v = 10;");
@@ -1025,6 +1057,12 @@ namespace UnitTests
             // -----------------------------------------
 
             I("reset; mode data;");
+            //!!!!!!!!!!! FIXME
+            //!!!!!!!!!!! FIXME
+            //!!!!!!!!!!! FIXME last \
+            //!!!!!!!!!!! FIXME
+            //!!!!!!!!!!! FIXME
+            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.1\\';");
             I("read <gdx> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...            
             I("list scn = base;");
             I("list psl = chou, cpub, ccon, cgoo, cser;");
@@ -1036,6 +1074,7 @@ namespace UnitTests
 
             //Cutting off a dimension
             I("reset; mode data;");
+            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.1\\';");
             I("read <gdx gdxopt='scns.base'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
             I("list psl = chou, cpub, ccon, cgoo, cser;");
             I("clone;");
@@ -1046,9 +1085,11 @@ namespace UnitTests
 
             //comparing scenarios            
             I("reset;");
+            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.1\\';");
             I("read <gdx gdxopt='scns.base'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
             I("write base;");
             I("reset;");
+            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.1\\';");
             I("read <gdx gdxopt='scns.struc'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
             I("write struc;");
             I("reset;");
