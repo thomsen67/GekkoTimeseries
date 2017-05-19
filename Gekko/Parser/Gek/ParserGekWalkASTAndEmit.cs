@@ -37,6 +37,12 @@ namespace Gekko.Parser.Gek
             return this.storage.ToString();
         }
 
+        public bool Contains(string s)
+        {
+            if (this.storage == null) return false;
+            return this.storage.ToString().Contains(s);
+        }
+
         public GekkoSB A(string s)
         {
             if (this.storage == null) this.storage = new StringBuilder();                
@@ -161,7 +167,26 @@ namespace Gekko.Parser.Gek
             {
                 FindFunctionsUsedInGekkoCode(child, functions);                
             }
-        }    
+        }
+
+        public static void WalkASTToCheckSumFunction(ASTNode node, int[] found)
+        {
+            switch (node.Text)
+            {
+                case "[":  //indexer
+                case Globals.symbolGlueChar6:  //indexer, '[_['
+                case Globals.symbolGlueChar7:  //indexer, '[¨['
+                    {
+                        found[0] = 1;
+                    }
+                    break;
+            }
+            if (found[0] == 1) return;
+            foreach (ASTNode child in node.ChildrenIterator())
+            {
+                WalkASTToCheckSumFunction(child, found);                
+            }
+        }
 
         public static void WalkASTAndEmit(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p)
         {            
@@ -203,7 +228,7 @@ namespace Gekko.Parser.Gek
 
             //Before sub-nodes
             switch (node.Text)
-            {                
+            {
                 case "ASTFUNCTIONDEF":
                     {
                         if (w.uFunctionsHelper != null)
@@ -227,6 +252,13 @@ namespace Gekko.Parser.Gek
                 case "ASTSERIESRHS":
                     {
                         w.wh.seriesHelper = WalkHelper.seriesType.SeriesRhs;
+                    }
+                    break;
+                case "ASTFUNCTION":
+                    {
+                        string functionName = GetFunctionName(node);
+                        string[] listNames = IsGamsLikeSumFunction1(true, node, w, functionName);
+                        if (listNames != null) HandleGamsLikeSumFunction(listNames, true, w, null);
                     }
                     break;
             }
@@ -331,13 +363,17 @@ namespace Gekko.Parser.Gek
 
                                     for (int i = 1; i < node.ChildrenCount(); i++)
                                     {
-                                        if (IsSimpleListname(node, i))
+
+                                        if (node[i][0] != null && node[i][0].Text == "ASTINDEXERELEMENTBANK" && GetSimpleHashName(node[i][1]) != null)
+
                                         {
+
+                                            string listName = GetSimpleHashName(node[i][1]);
                                             string nameCode = null;
-                                            string listName = node[i][1][0][0].Text;
+                                            //string listName = node[i][1][0][0].Text;
 
                                             string found = null; if (w.wh.seriesHelperListNames != null) w.wh.seriesHelperListNames.TryGetValue(listName, out found);
-                                            
+
                                             if (found != null)
                                             {
                                                 G.Writeln2("*** ERROR: SERIES problem: the same list name is used multiple times in []-indexer");
@@ -1508,10 +1544,33 @@ namespace Gekko.Parser.Gek
                     case "ASTFUNCTION":
                         {
                             string functionName = GetFunctionName(node);
-
+                            string[] sumFunctionListNames = IsGamsLikeSumFunction1(false, node, w, functionName);  //can return null                                                        
                             //TODO: Should these just override??? And what if inbuilt function does not exist??
 
-                            if (Globals.lagFunctions.Contains(functionName))  //functionName is lower case
+                            if (sumFunctionListNames != null)  //GAMS-like sum function, sum(#i, x[#i])
+                            {
+                                string nodeCode = null;
+                                string dName = "sumHelper" + ++Globals.counter;
+                                nodeCode += "double " + dName + "" + " = 0d;" + G.NL;
+
+                                foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
+                                {
+                                    nodeCode += EmitListLoopingCode(node, kvp);  //foreach(...
+                                    nodeCode += dName + " += " + node[2].Code.ToString() + ";";
+                                }
+
+                                foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
+                                {
+                                    nodeCode += "}" + G.NL;
+                                }
+
+                                HandleGamsLikeSumFunction(sumFunctionListNames, false, w, node[2].Code.ToString());
+
+                                node.Code.A(nodeCode);
+
+                            }
+
+                            else if (Globals.lagFunctions.Contains(functionName))  //functionName is lower case
                             {
 
                                 if (Program.options.interface_lagfix)
@@ -1598,7 +1657,7 @@ namespace Gekko.Parser.Gek
 
                                     int timeLoopDepth;
                                     ASTNode parentTimeLoop;
-                                    SearchUpwardsInTreeForParentTimeLoopFunctions(node, out timeLoopDepth, out parentTimeLoop);
+                                    SearchUpwardsInTree(node, out timeLoopDepth, out parentTimeLoop);
 
                                     int tCounter = 2 + timeLoopDepth;
 
@@ -1863,9 +1922,8 @@ namespace Gekko.Parser.Gek
                             if (w.wh.seriesHelperListNames != null)
                             {
                                 foreach (KeyValuePair<string, string> kvp in w.wh.seriesHelperListNames)
-                                {                                    
-                                    string nameCs = GetLoopNameCs(node, kvp.Key);
-                                    nodeCode += "foreach (ScalarString " + nameCs + " in new O.GekkoListIterator(" + kvp.Value + ")) {" + G.NL;
+                                {
+                                    nodeCode += EmitListLoopingCode(node, kvp);
                                 }
                             }                            
 
@@ -1876,29 +1934,12 @@ namespace Gekko.Parser.Gek
                             nodeCode += "o" + numNode + ".p = p;" + G.NL;
                             nodeCode += "foreach (GekkoTime t2 in new GekkoTimeIterator(o" + numNode + ".t1, o" + numNode + ".t2))" + G.NL;
                             nodeCode += GekkoTimeIteratorStartCode(w, node);
-
                             
-                            
-                            
-                            //¤¤¤¤¤                                                                                    
-                            nodeCode += "foreach (ScalarString ss in new O.GekkoListIterator(new MetaList(new List<string>(new string[] { `a` })))) {" + G.NL;
-
-
-
-
-
                             nodeCode += "  double data = O.GetVal(" + childCodeRhs + ", t);" + G.NL;
                             nodeCode += "if(o" + numNode + ".lhs == null) o" + numNode + ".lhs = O.GetTimeSeries(" + childCodeLhsName + ");" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
                                                                                                                                                      //nodeCode += "  double dataLag = O.GetVal(o" + numNode + ".lhs, t.Add(-1));" + G.NL;
                             nodeCode += "o" + numNode + ".lhs.SetData(t, data);" + G.NL;                                                                                                                  //HANDLE LEFT-SIDE FUNCTION!!
-
-
-
-                            //¤¤¤¤¤                            
-                            nodeCode += "}" + G.NL;
-
-
-
+                            
                             nodeCode += GekkoTimeIteratorEndCode();
 
                             if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
@@ -3889,10 +3930,81 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        private static bool IsSimpleListname(ASTNode node, int i)
+        private static string EmitListLoopingCode(ASTNode node, KeyValuePair<string, string> kvp)
         {
-            return node[i][0] != null && node[i][0].Text == "ASTINDEXERELEMENTBANK" && node[i][1] != null && node[i][1].Text == "ASTHASH" && node[i][1][0] != null && node[i][1][0].Text == "ASTHASHNAMESIMPLE";
+            string nameCs = GetLoopNameCs(node, kvp.Key);
+            string nodeCode = "foreach (ScalarString " + nameCs + " in new O.GekkoListIterator(" + kvp.Value + ")) {" + G.NL;
+            return nodeCode;
         }
+
+        private static string[] IsGamsLikeSumFunction1(bool firstTime, ASTNode node, W w, string functionName)
+        {
+            string[] rv = null;
+            string firstArgumentListName = null;
+            //firstArgIsOneOrMoreLists = false;
+            bool isGamsLikeSumFunction = false;
+            if (functionName == "sum")
+            {
+                if (node.ChildrenCount() == 3)
+                {
+                    rv = new string[1];
+                    rv[0] = GetSimpleHashName(node[1]);
+                }
+            }
+
+            if (rv == null)
+            {
+                //do nothing
+            }
+            else
+            {
+                int[] found = new int[1];
+                WalkASTToCheckSumFunction(node[2], found);
+                if (found[0] == 0) rv = null;  //this may be, for instance, sum(#i, x) or sum(#i, #j) --> these are not GAMS-like sums
+            }
+            return rv;
+        }
+
+        private static void HandleGamsLikeSumFunction(string[] listNames, bool firstTime, W w, string code)
+        {
+            if (firstTime)
+            {
+                //Add the item
+                if (w.wh.sumHelperListNames == null) w.wh.sumHelperListNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                w.wh.sumHelperListNames.Add(listNames[0], code);
+            }
+            else
+            {
+                //Remove the item
+                if (w.wh.sumHelperListNames == null)
+                {
+                    G.Writeln2("*** ERROR: Internal error #7986432523");
+                    throw new GekkoException();
+                }
+                if (!w.wh.sumHelperListNames.ContainsKey(listNames[0]))
+                {
+                    G.Writeln2("*** ERROR: Internal error #7986432524");
+                    throw new GekkoException();
+                }
+                w.wh.sumHelperListNames.Remove(listNames[0]);
+            }
+
+        }
+
+        
+
+        private static string GetSimpleHashName(ASTNode node)
+        {
+            string rv = null;
+            if (node != null && node.Text == "ASTHASH")
+            {
+                if (node[0].Text == "ASTHASHNAMESIMPLE")
+                {
+                    rv = node[0][0].Text;
+                }
+            }
+            return rv;
+        }       
 
         private static string GetLoopNameCs(ASTNode node, string i)
         {
@@ -3906,36 +4018,41 @@ namespace Gekko.Parser.Gek
             return functionName;
         }
 
-        private static void SearchUpwardsInTreeForParentTimeLoopFunctions(ASTNode node, out int timeLoopDepth, out ASTNode parentTimeLoop)
+        private static void SearchUpwardsInTree(ASTNode node, out int timeLoopDepth, out ASTNode parentTimeLoop)
         {
             timeLoopDepth = 0;
             ASTNode tmp = node.Parent;
             parentTimeLoop = null;
             while (tmp != null)
             {
-                if ((
-                    tmp.Text == "ASTFUNCTION" && Globals.lagFunctions.Contains(tmp[0].Text.ToLower())) 
-                    || tmp.Text == "ASTOLSELEMENT" 
-                    || tmp.Text == "ASTPRTELEMENT" 
-                    || tmp.Text == "ASTTABLESETVALUESELEMENT"
-                    || tmp.Text == "ASTSERIES"
-                    || tmp.Text == "ASTGENR"
-                    || tmp.Text == "ASTGENRLHSFUNCTION"
-                    || tmp.Text == "ASTGENRLISTINDEXER"
-                    || tmp.Text == "ASTRETURNTUPLE"
-                    || (G.equal(tmp.Text, "series") && (tmp.Parent != null && tmp.Text== "ASTTUPLEITEM") && (tmp.Parent.Parent != null && tmp.Parent.Text == "ASTTUPLE"))
-                    )
+                bool ok = false;
+                if (true)
                 {
+                    if (
 
-                    timeLoopDepth++;
-                    if (parentTimeLoop == null) parentTimeLoop = tmp;  //only first one                                            
+                           (tmp.Text == "ASTFUNCTION" && Globals.lagFunctions.Contains(tmp[0].Text.ToLower()))
+                        || tmp.Text == "ASTOLSELEMENT"
+                        || tmp.Text == "ASTPRTELEMENT"
+                        || tmp.Text == "ASTTABLESETVALUESELEMENT"
+                        || tmp.Text == "ASTSERIES"
+                        || tmp.Text == "ASTGENR"
+                        || tmp.Text == "ASTGENRLHSFUNCTION"
+                        || tmp.Text == "ASTGENRLISTINDEXER"
+                        || tmp.Text == "ASTRETURNTUPLE"
+                        || (G.equal(tmp.Text, "series") && (tmp.Parent != null && tmp.Text == "ASTTUPLEITEM") && (tmp.Parent.Parent != null && tmp.Parent.Text == "ASTTUPLE"))
 
+                        ) ok = true;
                 }
-
+                
+                if (ok)
+                {
+                    timeLoopDepth++;
+                    if (parentTimeLoop == null) parentTimeLoop = tmp;  //only first one
+                }
                 tmp = tmp.Parent;
             }
         }
-
+        
         private static void ResetUFunctionHelpers(W w)
         {
             w.uFunctionsHelper = null;  //do not remove this line: important!      
@@ -3969,7 +4086,9 @@ namespace Gekko.Parser.Gek
             string nameCode = null;
             string listName = simpleIdent;
 
+            //trying both left-side of SERIES indexer and sum function
             string found = null; if (w.wh.seriesHelperListNames != null) w.wh.seriesHelperListNames.TryGetValue(listName, out found);
+            if(found == null) if (w.wh.sumHelperListNames != null) w.wh.sumHelperListNames.TryGetValue(listName, out found);
 
             if (found != null)  //not found
             {
@@ -3977,12 +4096,9 @@ namespace Gekko.Parser.Gek
                 node.Code.A(nameCode);
             }
             else
-            {
-                
+            {                
                 string stringifyString = "false"; if (stringify) stringifyString = "true";
-
                 GekkoDictionary<string, string> listCache = GetListCache(w);
-
                 string s = null; listCache.TryGetValue(simpleIdent, out s);
                 if (s == null)
                 {
@@ -5009,11 +5125,9 @@ namespace Gekko.Parser.Gek
     }
 
     public class W
-    {       
-        
-        //Created when running a .cmd/.gcm file
-        public WalkHelper wh = null;
-        //public ParserGekWalkASTAndEmit.ELastCommand lastCommand;
+    {         
+        //W is created when running a .cmd/.gcm file
+        public WalkHelper wh = null;  //is created when encountering a Gekko command (like SERIES, PRT, etc.)        
         public Dictionary<int, List<string>> prtItems;
         public Dictionary<int, List<string>> prtLabels;
         public string fileNameContainingParsedCode = null;
@@ -5064,14 +5178,15 @@ namespace Gekko.Parser.Gek
         }
         
         //created for each new command (except IF, FOR, etc -- hmm is this true now?)
-        public GekkoDictionary<string, string> localStatementCache = null;
-        //public StringBuilder localStatementCode = null;
+        public GekkoDictionary<string, string> localStatementCache = null;        
         public seriesType seriesHelper = seriesType.None;
+
         public GekkoDictionary<string, string> seriesHelperListNames = null;
-        //public List<int> seriesHelperListNumbers = null;
+        public GekkoDictionary<string, string> sumHelperListNames = null;
+
         public string currentCommand = null;
         public bool isGotoOrTarget = false;
-        //public StringBuilder timeLoopCode = null;  //stuff to put into the GekkoTime t2 = ... loop (handles lag sub-loops)        
+             
     }
 
     public class OPrt : O_OLD

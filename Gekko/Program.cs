@@ -8445,6 +8445,52 @@ namespace Gekko
 
         public static void Mem(string tpe)
         {
+            /*
+            
+            //y = 1 + sum(#i, 2 + b[#i] + sum(#j, 3 + a[#i, #j]))
+
+            //når der mødes en #i i en sum(#i, ...) (*) registreres den
+            //  den må ikke allerede findes som loop-variabel eller en anden sum()
+            //  følgende #i'er kobles navnemæssigt til denne.
+            //  måske ved at adde og remover til en dictionary, når den går ind og ud af sum()
+
+            //test at $-conditions virker
+            //test lags
+            //test movsum()
+            //test bank:
+            //test x{i}a[#i]
+
+            //(*) logik mht. sum-funktion: kan kun være array hvis 2 argumenter, og det første skal være #i eller (#i, #j, ...)
+            //og det andet skal indeholde mindst én indexer
+
+            //result 2001 509605.4
+            //result 2002 518934.1
+
+            List<string> ii = new List<string>(new string[] { "m", "b" });
+            List<string> jj = new List<string>(new string[] { "nm", "nk" });
+
+            TimeSeries ts2 = Program.databanks.GetFirst().GetVariable("fk");
+            TimeSeries ts1 = Program.databanks.GetFirst().GetVariable("fim");
+
+            for (int t = 2001; t <= 2002; t++)
+            {
+                GekkoTime gt = new GekkoTime(EFreq.Annual, t, 1);
+                double d1 = 0;  //SUM FUNCTION1 +++++++++++++++++++++++++++
+                foreach (string i in ii)  //SUM FUNCTION1 ARG 1 ++++++++++++++++++++++++++++
+                {
+                    double d2 = 0;  //SUM FUNCTION2
+                    foreach (string j in jj)  //SUM FUNCTION ARG1
+                    {
+                        d2 += 3 + ((MetaTimeSeries)O.Indexer(gt, new MetaTimeSeries(ts2), false, new ScalarString(i), new ScalarString(j))).ts.GetData(gt); //SUM FUNCTION ARG2
+                    }
+                    d1 += 2 + ((MetaTimeSeries)O.Indexer(gt, new MetaTimeSeries(ts1), false, new ScalarString(i))).ts.GetData(gt);  //SUM FUNCTION1 ARG 2 +++++++++++++++++++
+                }
+                double d = 1 + d1;  //PARENT
+                G.Writeln2("result " + t + " " + d);
+            }
+
+            */
+
             //call with null, string, name, date, val
             int counter = 0;
             //if (Program.scalars.Count > 0)
@@ -15480,6 +15526,28 @@ namespace Gekko
 
                 for (int i = 0; i < Program.model.varsBType.Count; i++)
                 {
+
+                    /*
+                     * The logic is more or less like this for the simple case with init=yes and no fair-taylor 
+                     * 
+                    IF series does not exist
+                        IF DJZ-type series
+                            create series and set value to 0
+                        ELSE
+                            abort with error
+                    ELSE
+                        IF endo with no lag   
+                            use lagged value, or the value 0.12345
+                        ELSE
+                            IF databank value = NaN
+                                IF DJZ-type series
+                                    set value to 0
+                                ELSE
+                                    use value from databank
+ 
+                    */
+
+
                     double val = double.NaN;
                     TimeSeries ts = timeSeriesPointers[i];
                     string variable = varNamePointers[i];

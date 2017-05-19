@@ -29,11 +29,29 @@ namespace Gekko
 
         public IVariable Indexer(GekkoTime t, bool isLhs, params IVariable[] indexes)
         {
-            if (indexes.Length == 1 && (indexes[0].Type() == EVariableType.Val || indexes[0].Type() == EVariableType.Date))
+            if (indexes.Length > 0 && indexes[0].Type() == EVariableType.String)
+            {
+                string hash = TimeSeries.GetHashCodeFromIvariables(indexes);
+                O.ECreatePossibilities canCreate = O.ECreatePossibilities.None;
+                if (isLhs) canCreate = O.ECreatePossibilities.Can;
+                string varHash = this.ts.variableName + Globals.symbolTurtle + hash;
+                TimeSeries ts = this.ts.parentDatabank.GetVariable(this.ts.freqEnum, varHash);
+                if (ts == null)
+                {
+                    if (canCreate == O.ECreatePossibilities.None)
+                    {
+                        G.Writeln2("*** ERROR: Cannot find " + this.ts.parentDatabank.aliasName + ":" + this.ts.variableName + "[" + G.PrettifyTimeseriesHash(hash, false, false) + "]");
+                        throw new GekkoException();
+                    }
+                    ts = new TimeSeries(this.ts.freqEnum, varHash);
+                    this.ts.parentDatabank.AddVariable(ts);
+                }
+                return new MetaTimeSeries(ts);
+            }
+            else 
             {
                 //y[2010] or y[-1]
                 IVariable index = indexes[0];
-
                 if (index.Type() == EVariableType.Val) {
                     int ival = O.GetInt(index);
                     if (ival >= 1900)
@@ -57,35 +75,11 @@ namespace Gekko
                 else
                 {
                     //should not be possible
+                    G.Writeln2("*** ERROR: SERIES uses []-indexer with wrong variable type");
                     throw new GekkoException();
                 }
-            }
-            else
-            {
-                string hash = TimeSeries.GetHashCodeFromIvariables(indexes);
-
-                O.ECreatePossibilities canCreate = O.ECreatePossibilities.None;
-                if (isLhs) canCreate = O.ECreatePossibilities.Can;
-
-                string varHash = this.ts.variableName + Globals.symbolTurtle + hash;
-
-                TimeSeries ts = this.ts.parentDatabank.GetVariable(this.ts.freqEnum, varHash);
-                if (ts == null)
-                {
-                    if (canCreate == O.ECreatePossibilities.None)
-                    {
-                        G.Writeln2("*** ERROR: Cannot find " + this.ts.parentDatabank.aliasName + ":" + this.ts.variableName + "[" + G.PrettifyTimeseriesHash(hash, false, false) + "]");
-                        throw new GekkoException();
-                    }
-                    ts = new TimeSeries(this.ts.freqEnum, varHash);
-                    this.ts.parentDatabank.AddVariable(ts);
-                }                
-
-                return new MetaTimeSeries(ts);
-            }
-        }
-
-        
+            }            
+        }        
 
         public IVariable Indexer(IVariablesFilterRange indexRange, GekkoTime t)
         {
