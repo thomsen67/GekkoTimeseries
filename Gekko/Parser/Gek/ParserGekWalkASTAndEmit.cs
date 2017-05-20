@@ -254,13 +254,13 @@ namespace Gekko.Parser.Gek
                         w.wh.seriesHelper = WalkHelper.seriesType.SeriesRhs;
                     }
                     break;
-                case "ASTFUNCTION":
-                    {
-                        string functionName = GetFunctionName(node);
-                        string[] listNames = IsGamsLikeSumFunction1(true, node, w, functionName);
-                        if (listNames != null) HandleGamsLikeSumFunction(listNames, true, w, null);
-                    }
-                    break;
+                //case "ASTFUNCTION":
+                //    {
+                //        string functionName = GetFunctionName(node);
+                //        string[] listNames = IsGamsLikeSumFunction1(true, node, w, functionName);
+                //        if (listNames != null) HandleGamsLikeSumFunction(listNames, true, w, null);
+                //    }
+                //    break;
             }
             
             foreach (ASTNode child in node.ChildrenIterator())
@@ -1544,33 +1544,9 @@ namespace Gekko.Parser.Gek
                     case "ASTFUNCTION":
                         {
                             string functionName = GetFunctionName(node);
-                            string[] sumFunctionListNames = IsGamsLikeSumFunction1(false, node, w, functionName);  //can return null                                                        
-                            //TODO: Should these just override??? And what if inbuilt function does not exist??
-
-                            if (sumFunctionListNames != null)  //GAMS-like sum function, sum(#i, x[#i])
-                            {
-                                string nodeCode = null;
-                                string dName = "sumHelper" + ++Globals.counter;
-                                nodeCode += "double " + dName + "" + " = 0d;" + G.NL;
-
-                                foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
-                                {
-                                    nodeCode += EmitListLoopingCode(node, kvp);  //foreach(...
-                                    nodeCode += dName + " += " + node[2].Code.ToString() + ";";
-                                }
-
-                                foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
-                                {
-                                    nodeCode += "}" + G.NL;
-                                }
-
-                                HandleGamsLikeSumFunction(sumFunctionListNames, false, w, node[2].Code.ToString());
-
-                                node.Code.A(nodeCode);
-
-                            }
-
-                            else if (Globals.lagFunctions.Contains(functionName))  //functionName is lower case
+                            
+                                                        
+                            if (Globals.lagFunctions.Contains(functionName))  //functionName is lower case
                             {
 
                                 if (Program.options.interface_lagfix)
@@ -2066,6 +2042,44 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTHASH":
                         {
+                            if (node.Parent != null && node.Number == 1 && node.Parent.Text == "ASTFUNCTION")
+                            {
+
+                                string[] sumFunctionListNames = IsGamsLikeSumFunction1(false, node.Parent, w, node.Parent[0].Text.ToLower());  //can return null                                                        
+                                                                                                                       //TODO: Should these just override??? And what if inbuilt function does not exist??
+                                if (sumFunctionListNames != null)  //GAMS-like sum function, sum(#i, x[#i])
+                                {
+
+
+                                    string functionName = GetFunctionName(node.Parent);
+                                    string[] listNames = IsGamsLikeSumFunction1(true, node.Parent, w, functionName);
+                                    if (listNames != null) HandleGamsLikeSumFunction(listNames, true, w, null);
+
+
+
+                                    string nodeCode = null;
+                                    string dName = "sumHelper" + ++Globals.counter;
+                                    nodeCode += "double " + dName + "" + " = 0d;" + G.NL;
+
+                                    foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
+                                    {
+                                        nodeCode += EmitListLoopingCode(node, kvp);  //foreach(...
+                                        nodeCode += dName + " += " + node[2].Code.ToString() + ";";
+                                    }
+
+                                    foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
+                                    {
+                                        nodeCode += "}" + G.NL;
+                                    }
+
+                                    HandleGamsLikeSumFunction(sumFunctionListNames, false, w, node.Code.ToString());
+
+                                    node.Code.A(nodeCode);
+
+                                }
+                            }
+
+
                             string simpleIdent = null;
                             bool stringify = false;
                             if (node.ChildrenCount() > 0 && node[0].Text == "ASTDOLLARHASHNAMESIMPLE") stringify = true;
