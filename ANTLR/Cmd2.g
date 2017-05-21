@@ -60,6 +60,7 @@ tokens {
 	ASTSERIES;
 	ASTSERIESLHS;
 	ASTSERIESRHS;
+	ASTOPT_STRING_PX;
 	ASTOPT_STRING_BOLD;
 	ASTOPT_STRING_ITALIC;
 	ASTOPT_STRING_GRIDSTYLE;
@@ -67,6 +68,8 @@ tokens {
 	ASTOPT_STRING_GDX;
 	ASTOPT_STRING_GDXOPT;
 	ASTOPT_VAL_INDEX;
+	ASTOPT_STRING_FILE;
+	ASTOPT_STRING_ARRAY;
 	ASTXLINE;
 	ASTYLINE;
 	ASTREBASE;
@@ -804,6 +807,9 @@ Y2                    = 'Y2'                       ;
     CLS              = 'CLS'             ;
     CODE = 'CODE';
     COLLAPSE         = 'COLLAPSE';
+	PX = 'PX';
+	ARRAY = 'ARRAY';
+	BUGFIX = 'BUGFIX';
     COLORS           = 'COLORS'          ;
     COLS             = 'COLS';
     COMMA            = 'COMMA';
@@ -1349,7 +1355,10 @@ d.Add("Y" ,Y);
                                         d.Add("closebanks", CLOSEBANKS  );
                                         d.Add("cls"     , CLS       );
                                         d.Add("CODE" ,CODE);
-                                        d.Add("collapse"  , COLLAPSE );
+										d.Add("px"  , PX );
+										d.Add("array"  , ARRAY );
+										d.Add("bugfix"  , BUGFIX );
+                                        d.Add("collapse"  , COLLAPSE );										
                                         d.Add("colors"  , COLORS );
                                         d.Add("cols"  , COLS );
                                         d.Add("comma"   , COMMA               );
@@ -2071,10 +2080,13 @@ if2						  : IF leftParen logicalOr rightParen expressions1? (ELSE expressions2?
 expressions1              : expressions;
 expressions2              : expressions;  
 
-download                  : DOWNLOAD HTTP? url fileName -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, $DOWNLOAD.Line)} ^(ASTHTTP HTTP?) url ^(ASTHANDLEFILENAME fileName));
+download                  : DOWNLOAD downloadOpt1? HTTP? url fileName -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, $DOWNLOAD.Line)} ^(ASTHTTP HTTP?) url ^(ASTHANDLEFILENAME fileName));
+downloadOpt1              : ISNOTQUAL | leftAngle downloadOpt1h* RIGHTANGLE -> ^(ASTOPT1 downloadOpt1h*);							
+downloadOpt1h             : FILE (EQUAL yesNo)? -> ^(ASTOPT_STRING_FILE yesNo?)	
+						  |	ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)	
+						  ;
 
 index                     : INDEX indexOpt1? SERIES? listItemsWildRange listNameHelper? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} listItemsWildRange ^(ASTPLACEHOLDER listNameHelper?) indexOpt1?);
-//index                     : INDEX indexOpt1? SERIES? indexerAlone nameWithDot? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} ^(ASTINDEXERALONE indexerAlone) ^(ASTPLACEHOLDER nameWithDot?) indexOpt1?);
 indexOpt1                 : ISNOTQUAL | leftAngle indexOpt1h* RIGHTANGLE -> ^(ASTOPT1 indexOpt1h*);							
 indexOpt1h                : MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)	
 						  |	ADDBANK (EQUAL yesNo)? -> ^(ASTOPT_STRING_ADDBANK yesNo?)	
@@ -2296,6 +2308,7 @@ readOpt1h                 : MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | PCIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PCIM yesNo?)
 						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
 						  | PRN (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRN yesNo?)
+						  | PX (EQUAL yesNo)? -> ^(ASTOPT_STRING_PX yesNo?)
 						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
   						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)
@@ -2565,7 +2578,8 @@ openOpt1h                 : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | GDXOPT EQUAL expression -> ^(ASTOPT_STRING_GDXOPT expression)
 						  | PCIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PCIM yesNo?)
 						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
-						  | PRN (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRN yesNo?)						
+						  | PRN (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRN yesNo?)	
+						  | PX (EQUAL yesNo)? -> ^(ASTOPT_STRING_PX yesNo?)					
 						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
   						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)						
@@ -3098,8 +3112,12 @@ fileNameStar              : fileName
 //-----------------------------------------------------------------------------------------------------------
 						
 //!! do not use '_' as a char in a an option name. 'failsafe' is fine, but fail_safe is not.
-optionType :
-               question -> question
+optionType :			   
+			   question -> question
+
+			 | BUGFIX PX '='? yesNoSimple -> BUGFIX PX ^(ASTBOOL yesNoSimple)
+			 | BUGFIX DOWNLOAD '='? yesNoSimple -> BUGFIX DOWNLOAD ^(ASTBOOL yesNoSimple)
+
              | CALC question -> CALC question
              | CALC IGNOREMISSINGVARS  '='? yesNoSimple -> CALC IGNOREMISSINGVARS ^(ASTBOOL yesNoSimple)  //addresses both UPD and GENR
 			
@@ -3450,6 +3468,9 @@ ident                     : Ident|
                             CLS|
                             CODE|
                             COLLAPSE|
+							PX|
+							ARRAY|
+							BUGFIX|
                             COLORS|
                             COLS|
                             COMMAND1|

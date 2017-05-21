@@ -2047,7 +2047,7 @@ namespace Gekko.Parser.Gek
 
                                 string[] sumFunctionListNames = IsGamsLikeSumFunction1(false, node.Parent, w, node.Parent[0].Text.ToLower());  //can return null                                                        
                                                                                                                        //TODO: Should these just override??? And what if inbuilt function does not exist??
-                                if (sumFunctionListNames != null)  //GAMS-like sum function, sum(#i, x[#i])
+                                if (sumFunctionListNames != null)  //Is first argument of GAMS-like sum function, sum(#i, x[#i])
                                 {
 
 

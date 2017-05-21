@@ -1821,6 +1821,7 @@ namespace Gekko
             public GekkoTime t2 = Globals.tNull;
             public string fileName = null;
             public string readTo = null;
+            public string opt_px = null; //pc-axis
             public string opt_tsd = null;
             public string opt_tsdx = null;
             public string opt_gbk = null;
@@ -1889,6 +1890,7 @@ namespace Gekko
                 if (G.equal(this.opt_xls, "yes")) hlp.Type = EDataFormat.Xls;
                 if (G.equal(this.opt_xlsx, "yes")) hlp.Type = EDataFormat.Xlsx;
                 if (G.equal(this.opt_gdx, "yes")) hlp.Type = EDataFormat.Gdx;
+                if (G.equal(this.opt_px, "yes")) hlp.Type = EDataFormat.Px;
                 if (G.equal(this.opt_cols, "yes")) hlp.Orientation = "cols";
 
                 hlp.gdxopt = this.opt_gdxopt;                
@@ -2103,9 +2105,11 @@ namespace Gekko
         {
             public string dbUrl = null;
             public string fileName = null;
+            public string opt_file = null;
+            public string opt_array = null;
             public void Exe()
             {
-                OnlineDatabanks.Download(dbUrl, fileName);
+                OnlineDatabanks.Download(this);
             }
         }
 
@@ -2883,7 +2887,8 @@ namespace Gekko
             public string opt_prn = null;
             public string opt_pcim = null;
             public string opt_xls = null;
-            public string opt_xlsx = null;            
+            public string opt_xlsx = null;
+            public string opt_px = null;        
             public string opt_cols = null;
             //public string as2 = null;
             public string opt_prim = null;  //obsolete but gives warning
@@ -2925,6 +2930,7 @@ namespace Gekko
                 if (this.opt_xls == "yes") hlp.Type = EDataFormat.Xls;
                 if (this.opt_xlsx == "yes") hlp.Type = EDataFormat.Xlsx;
                 if (this.opt_gdx == "yes") hlp.Type = EDataFormat.Gdx;
+                if (this.opt_px == "yes") hlp.Type = EDataFormat.Px;
                 if (this.opt_cols == "yes") hlp.Orientation = "cols";
                 //if (this.as2 != null) hlp.As = this.as2;
 
