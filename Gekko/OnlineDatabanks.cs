@@ -109,12 +109,12 @@ namespace Gekko
 
                 string source = o1.dbUrl + ", " + o1.fileName;
 
-                if (G.equal(o1.opt_file, "yes"))
+                if (o1.fileName2 != null)
                 {
                     string fileName = null;
                     try
                     {
-                        fileName = Program.CreateFullPathAndFileName(Program.AddExtension(o1.opt_file, "." + "px"));
+                        fileName = Program.CreateFullPathAndFileName(Program.AddExtension(o1.fileName2, "." + "px"));
                         using (FileStream fs = Program.WaitForFileStream(fileName, Program.GekkoFileReadOrWrite.Write))
                         using (StreamWriter sw = G.GekkoStreamWriter(fs))
                         {
@@ -243,12 +243,12 @@ namespace Gekko
 
                 string source = o1.dbUrl + ", " + o1.fileName;
 
-                if (G.equal(o1.opt_file, "yes"))
+                if (o1.fileName2 != null)
                 {
                     string fileName = null;
                     try
                     {
-                        fileName = Program.CreateFullPathAndFileName(Program.AddExtension(o1.opt_file, "." + "px"));
+                        fileName = Program.CreateFullPathAndFileName(Program.AddExtension(o1.fileName2, "." + "px"));
                         using (FileStream fs = Program.WaitForFileStream(fileName, Program.GekkoFileReadOrWrite.Write))
                         using (StreamWriter sw = G.GekkoStreamWriter(fs))
                         {

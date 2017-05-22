@@ -237,6 +237,7 @@ tokens {
     ASTGENRLISTINDEXER;
     ASTGOTO;
     ASTHANDLEFILENAME;
+	ASTHANDLEFILENAME2;
     ASTHASH;
     ASTHASHNAMESIMPLE;
     ASTHASHPAREN;
@@ -2080,10 +2081,10 @@ if2						  : IF leftParen logicalOr rightParen expressions1? (ELSE expressions2?
 expressions1              : expressions;
 expressions2              : expressions;  
 
-download                  : DOWNLOAD downloadOpt1? HTTP? url fileName -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, $DOWNLOAD.Line)} ^(ASTHTTP HTTP?) url ^(ASTHANDLEFILENAME fileName));
+download                  : DOWNLOAD downloadOpt1? HTTP? url fileName (DUMP '=' fileName)* -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, $DOWNLOAD.Line)} ^(ASTHTTP HTTP?) url ^(ASTHANDLEFILENAME fileName) ^(ASTHANDLEFILENAME2 fileName?));
 downloadOpt1              : ISNOTQUAL | leftAngle downloadOpt1h* RIGHTANGLE -> ^(ASTOPT1 downloadOpt1h*);							
-downloadOpt1h             : FILE (EQUAL yesNo)? -> ^(ASTOPT_STRING_FILE yesNo?)	
-						  |	ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)	
+downloadOpt1h             : //FILE (EQUAL yesNo)? -> ^(ASTOPT_STRING_FILE yesNo?)	
+						  	ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)	
 						  ;
 
 index                     : INDEX indexOpt1? SERIES? listItemsWildRange listNameHelper? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} listItemsWildRange ^(ASTPLACEHOLDER listNameHelper?) indexOpt1?);

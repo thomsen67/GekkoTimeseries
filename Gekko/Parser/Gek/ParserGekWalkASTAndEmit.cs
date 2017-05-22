@@ -2141,7 +2141,8 @@ namespace Gekko.Parser.Gek
                             string s = null;
                             if (node[0].Text != null) s = "http://";
                             node.Code.A("o" + Num(node) + ".dbUrl = `" + s + "` + O.GetString(" + node[1].Code + ");" + G.NL);
-                            node.Code.A(node[2].Code);  //fileName
+                            node.Code.A(node[2].Code);  //fileName json
+                            if (node[3] != null) node.Code.A(node[3].Code); //px file dump
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -3495,7 +3496,15 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("o" + Num(node) + ".fileName = O.GetString(" + node[0].Code + ");" + G.NL);
                             }
                         }
-                        break;                    
+                        break;
+                    case "ASTHANDLEFILENAME2": //in case we have 2 filenames
+                        {
+                            if (node.ChildrenCount() > 0)
+                            {
+                                node.Code.A("o" + Num(node) + ".fileName2 = O.GetString(" + node[0].Code + ");" + G.NL);
+                            }
+                        }
+                        break;
                     case "ASTRUN":
                         {
                             node.Code.A("O.Run o" + Num(node) + " = new O.Run();" + G.NL);

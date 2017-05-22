@@ -3122,17 +3122,16 @@ namespace Gekko
                 databank.Clear();
             }
 
-            string pxLinesText = Program.GetTextFromFileWithWait(file);
+            string pxLinesText = Program.GetTextFromFileWithWait(fileLocal);
 
             int vars = -12345;
-            int startYear = -12345;
-            int endYear = -12345;
-            ReadPx(null, "tablename", null, pxLinesText, out vars, out startYear, out endYear);
+            GekkoTime startYear;
+            GekkoTime endYear;
+            ReadPx(null, null, null, pxLinesText, out vars, out startYear, out endYear);
 
-            readInfo.startPerInFile = 1;
-            readInfo.endPerInFile = 1;                        
-
-            readInfo.variables = 1;  //does not count emptyWarnings
+            readInfo.startPerInFile = startYear.super;
+            readInfo.endPerInFile = endYear.super;        
+            readInfo.variables = vars;
             readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
 
             //See almost identical code in readTsd and readCsv and readPcim and...
@@ -3388,6 +3387,8 @@ namespace Gekko
             string codeString = "CODES(";
             string valueTimeString = "VALUES(\"tid\")=";
             string valueString = "VALUES(";
+            string matrixString = "MATRIX=";
+
 
             List<string> codesCombi = null;
             List<string> valuesCombi = null;
@@ -3407,7 +3408,7 @@ namespace Gekko
 
             int lineCounter = 0;
 
-            G.Writeln("    Starting to read " + lines2.Count + " data lines from data file");
+            G.Writeln2("Starting to read " + lines2.Count + " data lines from data file");
 
             GekkoTime gt0 = Globals.tNull;
             GekkoTime gt1 = Globals.tNull;
@@ -3417,7 +3418,7 @@ namespace Gekko
             foreach (string line2 in lines2)
             {
                 lineCounter++;
-                if (lines2.Count >= 100)
+                if (lines2.Count >= 10000)
                 {
                     for (int i = 0; i < fractions.Count; i++)
                     {
@@ -3457,6 +3458,13 @@ namespace Gekko
                     firstLine = true;
                     state = 4;
                 }
+                else if (line.StartsWith(matrixString))
+                {
+                    if (tableName == null)
+                    {
+                        tableName = line.Substring(matrixString.Length).Replace("\"", "").Replace(";", "").Trim();
+                    }
+                }
                 else
                 {
                     firstLine = false;
@@ -3486,8 +3494,16 @@ namespace Gekko
                     {
                         codesCombi = new List<string>();
                         valuesCombi = new List<string>();
+
+                        List<string> codesHeader2 = codesHeaderJson;
+                        if (codesHeader2 == null)
+                        {
+                            codesHeader2 = codesHeader;
+                            codesHeader2.Add("TID");  //will be removed again below!
+                        }
+
                         //we are using codesHeaderJson instead of codesHeader (these are more verbose)
-                        Walk(tableName, codesHeaderJson, codes, codesCombi, values, valuesCombi, 0, "", "");
+                        Walk(tableName, codesHeader2, codes, codesCombi, values, valuesCombi, 0, "", "");
                         data = G.CreateArrayDouble(codesCombi.Count * dates.Count, double.NaN);  //fill it with NaN for safety. Statistikbanken sometimes return only a subset of the data (and the subset is zeroes)
                     }
 

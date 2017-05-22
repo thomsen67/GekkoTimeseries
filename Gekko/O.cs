@@ -2103,10 +2103,10 @@ namespace Gekko
 
         public class Download
         {
-            public string dbUrl = null;
-            public string fileName = null;
-            public string opt_file = null;
-            public string opt_array = null;
+            public string dbUrl = null;  //path to server
+            public string fileName = null;  //json file
+            public string fileName2 = null;  //dump file (for instance px)            
+            public string opt_array = null;  //not in use
             public void Exe()
             {
                 OnlineDatabanks.Download(this);

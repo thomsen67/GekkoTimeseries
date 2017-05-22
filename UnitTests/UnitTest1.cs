@@ -789,13 +789,27 @@ namespace UnitTests
             Databank work = First();
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
-            I("OPTION freq m;"); //TODO should not be necessary
-            I("TIME 2000m1 2014m12;");
+            //I("OPTION freq m;"); //TODO should not be necessary
+            //I("TIME 2000m1 2014m12;");
             I("DOWNLOAD http://api.statbank.dk/v1/data statbank.json;");
             AssertHelper(First(), "pris6_VAREGR_011200_enhed_100", EFreq.Monthly, 2000, 1, 98.1d, sharedDelta);
             AssertHelper(First(), "pris6_VAREGR_011100_enhed_100", EFreq.Monthly, 2000, 1, 98.3d, sharedDelta);
             AssertHelper(First(), "pris6_VAREGR_011200_enhed_100", EFreq.Monthly, 2001, 3, 102.9d, sharedDelta);
             AssertHelper(First(), "pris6_VAREGR_011100_enhed_100", EFreq.Monthly, 2001, 3, 103.1d, sharedDelta);
+        }
+
+        [TestMethod]
+        public void Test__Px()
+        {
+            Databank work = First();
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");            
+            I("DOWNLOAD http://api.statbank.dk/v1/data statbank.json dump = data;");
+            I("IMPORT <px> data;");
+            AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.Monthly, 2000, 1, 98.1d, sharedDelta);
+            AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.Monthly, 2000, 1, 98.3d, sharedDelta);
+            AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.Monthly, 2001, 3, 102.9d, sharedDelta);
+            AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.Monthly, 2001, 3, 103.1d, sharedDelta);
         }
 
         [TestMethod]
@@ -871,7 +885,7 @@ namespace UnitTests
         
 
         [TestMethod]
-        public void Test__ArrayTimeSeries()
+        public void Test__ArrayTimeSeriesAndGdxImport()
         {
             Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
             Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
@@ -1010,10 +1024,7 @@ namespace UnitTests
             AssertHelper(First(), "y2", 2003, 111d, sharedDelta);
             AssertHelper(First(), "y2", 2004, 111d, sharedDelta);
             AssertHelper(First(), "y2", 2005, 110d, sharedDelta);
-
-
-
-
+            
             I("RESET; MODE data;");
             I("TIME 2000 2000;");
             I("VAL v = 10;");
