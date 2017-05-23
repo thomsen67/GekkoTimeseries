@@ -797,21 +797,7 @@ namespace UnitTests
             AssertHelper(First(), "pris6_VAREGR_011200_enhed_100", EFreq.Monthly, 2001, 3, 102.9d, sharedDelta);
             AssertHelper(First(), "pris6_VAREGR_011100_enhed_100", EFreq.Monthly, 2001, 3, 103.1d, sharedDelta);
         }
-
-        [TestMethod]
-        public void Test__Px()
-        {
-            Databank work = First();
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");            
-            I("DOWNLOAD http://api.statbank.dk/v1/data statbank.json dump = data;");
-            I("IMPORT <px> data;");
-            AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.Monthly, 2000, 1, 98.1d, sharedDelta);
-            AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.Monthly, 2000, 1, 98.3d, sharedDelta);
-            AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.Monthly, 2001, 3, 102.9d, sharedDelta);
-            AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.Monthly, 2001, 3, 103.1d, sharedDelta);
-        }
-
+        
         [TestMethod]
         public void Test__Smooth()
         {
@@ -8945,8 +8931,10 @@ namespace UnitTests
             //xls(x), also via SHEET            
             //gnplot (only writing)
             //tsp... hmmm not done...
+            //px (only reading)
 
             //The testing includes tests where data is put in a separate bank named 'other'
+            //There is also a test of IMPORT<per1 per2>
 
             // testing on annual
             // testing on annual
@@ -9197,6 +9185,31 @@ namespace UnitTests
                     I("WRITE<2001q1 2001q2 gnuplot>xx1, " + bank + "xx3 file=temp;");
                 }
             }
+
+            // ----------------------------- testing px reading ---------------------
+            // this downloads the px:             //I("DOWNLOAD http://api.statbank.dk/v1/data statbank.json dump = data;");
+            // Note varegruppe instead of VAREGR
+
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+            I("IMPORT <px> data;");
+            AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.Monthly, 2000, 1, 98.1d, sharedDelta);
+            AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.Monthly, 2000, 1, 98.3d, sharedDelta);
+            AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.Monthly, 2001, 3, 102.9d, sharedDelta);
+            AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.Monthly, 2001, 3, 103.1d, sharedDelta);
+                        
+            //Good test of truncated time period in IMPORT
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");            
+            I("IMPORT <2000m2 2001m3 px> data;");
+            AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.Monthly, 2000, 1, double.NaN, sharedDelta);
+            AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.Monthly, 2000, 1, double.NaN, sharedDelta);
+            AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.Monthly, 2000, 2, 97.8, sharedDelta);
+            AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.Monthly, 2000, 2, 98.7, sharedDelta);
+            AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.Monthly, 2001, 3, 102.9d, sharedDelta);
+            AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.Monthly, 2001, 3, 103.1d, sharedDelta);
+            AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.Monthly, 2001, 4, double.NaN, sharedDelta);
+            AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.Monthly, 2001, 4, double.NaN, sharedDelta);
 
         }
 

@@ -2108,6 +2108,11 @@ namespace Gekko
                     }
                     else if (oRead.Type == EDataFormat.Gdx)
                     {
+                        if (dates != null)
+                        {
+                            G.Writeln2("*** ERROR: You cannot use period truncation in GDX data import");
+                            throw new GekkoException();
+                        }
                         Program.ReadGdx(databank, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
                     }
                     else if (oRead.Type == EDataFormat.Px)
@@ -2829,9 +2834,9 @@ namespace Gekko
             else if (first.freq == EFreq.Quarterly)
             {
                 if (first.SmallerThanOrEqual(dates.t1Quarterly))
-                {
-                    first = dates.t1Quarterly;
+                {                    
                     offset = GekkoTime.Observations(first, dates.t1Quarterly) - 1;
+                    first = dates.t1Quarterly;
                 }
                 if (last.LargerThanOrEqual(dates.t2Quarterly))
                 {
@@ -2842,8 +2847,8 @@ namespace Gekko
             {
                 if (first.SmallerThanOrEqual(dates.t1Monthly))
                 {
-                    first = dates.t1Monthly;
                     offset = GekkoTime.Observations(first, dates.t1Monthly) - 1;
+                    first = dates.t1Monthly;                    
                 }
                 if (last.LargerThanOrEqual(dates.t2Monthly))
                 {
@@ -3087,6 +3092,7 @@ namespace Gekko
 
                             int offset = 0;
 
+                            //See similar code in px reader
                             if (dates != null)
                             {
                                 offset = GetFirstLastDates(dates, ref gt1, ref gt2);
@@ -3127,7 +3133,7 @@ namespace Gekko
             int vars = -12345;
             GekkoTime startYear;
             GekkoTime endYear;
-            ReadPx(false, null, null, null, pxLinesText, out vars, out startYear, out endYear);
+            ReadPx(false, dates, null, null, null, pxLinesText, out vars, out startYear, out endYear);
 
             readInfo.startPerInFile = startYear.super;
             readInfo.endPerInFile = endYear.super;        
@@ -3369,7 +3375,7 @@ namespace Gekko
         }
 
 
-        public static void ReadPx(bool isDownload, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
+        public static void ReadPx(bool isDownload, ReadDatesHelper datesRestrict, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
         {
             string freq = "a";
 
@@ -3668,21 +3674,38 @@ namespace Gekko
                 ts.label = valuesCombi[j];
                 ts.source = source;
                 ts.stamp = Globals.dateStamp;
-                ts.SetDirtyGhost(true, false);
-                bool runFast = true;
+                ts.SetDirtyGhost(true, false);                
 
                 if (Program.options.bugfix_px)  //can be switched off
                 {
+                                                            
                     GekkoTime gt_start = G.FromStringToDate(dates[0], true);
                     GekkoTime gt_end = G.FromStringToDate(dates[dates.Count - 1], true);
-                    int obs = GekkoTime.Observations(gt_start, gt_end);
-                    if (obs != dates.Count)
+
+                    if (gt_start.freq != gt_end.freq)
+                    {
+                        G.Writeln2("*** ERROR: Frequency mismatch problem in px file");
+                        throw new GekkoException();
+                    }
+
+                    if (GekkoTime.Observations(gt_start, gt_end) != dates.Count)
                     {
                         //Guards against holes in the date sequence
+                        //Note that gt_start and gt_end may be changed with datesRestrict below
                         G.Writeln2("*** ERROR: Expected " + dates.Count + " obs between " + dates[0] + " and " + dates[dates.Count - 1]);
                         throw new GekkoException();
                     }
-                    ts.SetDataSequence(gt_start, gt_end, data, j * dates.Count);  //the last is the offset
+
+                    //See similar code in the tsd reader
+                    int offset = 0;
+                    if (datesRestrict != null)
+                    {
+                        offset = GetFirstLastDates(datesRestrict, ref gt_start, ref gt_end);
+                    }
+
+                    int obs = GekkoTime.Observations(gt_start, gt_end);
+                    
+                    ts.SetDataSequence(gt_start, gt_end, data, j * dates.Count + offset);  //the last is the offset
                     allCcounter += obs;
                     if (gt0.IsNull()) gt0 = gt_start;
                     if (gt1.IsNull()) gt1 = gt_end;
@@ -3691,6 +3714,7 @@ namespace Gekko
                 }
                 else
                 {
+                    //does not handle datesRestrict
                     for (int i = 0; i < dates.Count; i++)  //periods
                     {
                         GekkoTime gt = G.FromStringToDate(dates[i], true);
