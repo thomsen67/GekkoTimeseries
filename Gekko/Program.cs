@@ -3127,7 +3127,7 @@ namespace Gekko
             int vars = -12345;
             GekkoTime startYear;
             GekkoTime endYear;
-            ReadPx(null, null, null, pxLinesText, out vars, out startYear, out endYear);
+            ReadPx(false, null, null, null, pxLinesText, out vars, out startYear, out endYear);
 
             readInfo.startPerInFile = startYear.super;
             readInfo.endPerInFile = endYear.super;        
@@ -3369,7 +3369,7 @@ namespace Gekko
         }
 
 
-        public static void ReadPx(string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
+        public static void ReadPx(bool isDownload, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
         {
             string freq = "a";
 
@@ -3675,13 +3675,15 @@ namespace Gekko
                 {
                     GekkoTime gt_start = G.FromStringToDate(dates[0], true);
                     GekkoTime gt_end = G.FromStringToDate(dates[dates.Count - 1], true);
-                    if (GekkoTime.Observations(gt_start, gt_end) != dates.Count)
+                    int obs = GekkoTime.Observations(gt_start, gt_end);
+                    if (obs != dates.Count)
                     {
                         //Guards against holes in the date sequence
                         G.Writeln2("*** ERROR: Expected " + dates.Count + " obs between " + dates[0] + " and " + dates[dates.Count - 1]);
                         throw new GekkoException();
                     }
                     ts.SetDataSequence(gt_start, gt_end, data, j * dates.Count);  //the last is the offset
+                    allCcounter += obs;
                     if (gt0.IsNull()) gt0 = gt_start;
                     if (gt1.IsNull()) gt1 = gt_end;
                     if (gt_start.StrictlySmallerThan(gt0)) gt0 = gt_start;
@@ -3710,7 +3712,11 @@ namespace Gekko
                 //G.Writeln(ts.variableName + ", with freq " + freq.ToUpper() + ", " + G.FromDateToString(gt0) + "-" + G.FromDateToString(gt1));
                 //counter++;                        
             }
-            G.Writeln("--> Downloaded " + codesCombi.Count + " timeseries in total, frequency " + freq + ", " + G.FromDateToString(gt0) + "-" + G.FromDateToString(gt1));
+
+            string downloadOrImport = "Read";
+            if (isDownload) downloadOrImport = "Downloaded";
+
+            G.Writeln("--> " + downloadOrImport + " " + codesCombi.Count + " timeseries in total, frequency " + freq + ", " + G.FromDateToString(gt0) + "-" + G.FromDateToString(gt1));
             G.Writeln("    Name of first timeseries: " + codesCombi[0]);
             G.Writeln("    Name of last timeseries: " + codesCombi[codesCombi.Count - 1]);
 
@@ -3722,7 +3728,7 @@ namespace Gekko
             if (data.LongLength != allCcounter)
             {
                 //See not in constrution of data array
-                G.Writeln2("+++ WARNING: Downloaded " + allCcounter + " observations, expected " + data.LongLength);
+                G.Writeln2("+++ WARNING: " + downloadOrImport + " " + allCcounter + " data points in all, expected " + data.LongLength);
             }
 
 

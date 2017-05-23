@@ -3334,6 +3334,7 @@ namespace UnitTests
             I("SERIES ts3 = 3;");
             I("SERIES ts4 = 4;");
             I("LIST m1 = ts1, ts2, ts3, ts4;");
+            I("LIST m2 = ts1, ts2;");
 
             //avg()
             I("VAL v1 = avg(%a1, %a2);");
@@ -3360,6 +3361,12 @@ namespace UnitTests
             AssertHelper(First(), "xx1", 2010, 2012, 1, sharedDelta);
             I("SERIES xx1 = sum(#m1);");
             AssertHelper(First(), "xx1", 2010, 2012, 10d, sharedDelta);
+            //To make sure that it is not confused with sum(#i, x[#i]) stuff
+            I("SERIES xx1 = sum(#m1, #m2);");            
+            AssertHelper(First(), "xx1", 2010, 2012, 13d, sharedDelta);
+            //To make sure that it is not confused with sum(#i, x[#i]) stuff
+            I("SERIES xx1 = sum(#m1, ts1);");
+            AssertHelper(First(), "xx1", 2010, 2012, 11d, sharedDelta);
             I("RESET; TIME 2000 2000; MODE data;");
             I("open<edit> xx;");
             I("ser xx1 = 1;");
