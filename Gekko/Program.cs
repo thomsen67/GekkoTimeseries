@@ -3706,6 +3706,7 @@ namespace Gekko
                     int obs = GekkoTime.Observations(gt_start, gt_end);
                     
                     ts.SetDataSequence(gt_start, gt_end, data, j * dates.Count + offset);  //the last is the offset
+                    ts.Trim();  //to save ram
                     allCcounter += obs;
                     if (gt0.IsNull()) gt0 = gt_start;
                     if (gt1.IsNull()) gt1 = gt_end;
@@ -3718,7 +3719,7 @@ namespace Gekko
                     for (int i = 0; i < dates.Count; i++)  //periods
                     {
                         GekkoTime gt = G.FromStringToDate(dates[i], true);
-                        ts.SetData(gt, data[i + j * dates.Count]);
+                        ts.SetData(gt, data[i + j * dates.Count]);                        
                         allCcounter++;
                         if (gt0.IsNull()) gt0 = gt;
                         if (gt1.IsNull()) gt1 = gt;
@@ -19046,8 +19047,8 @@ namespace Gekko
             //Program.lists.Clear();
             //Program.macros.Clear();
             Globals.commandMemory = new CommandMemory();  //these commands are only remembered up to last clearing of workspace
-            Globals.prtCsSnippets.Clear();  //just to save ram
-            Globals.prtCsSnippetsHeaders.Clear(); //just to save ram
+            //Globals.prtCsSnippets.Clear();  //just to save ram  --> can induce bugs
+            //Globals.prtCsSnippetsHeaders.Clear(); //just to save ram --> can induce bugs
 
             //Globals.uFunctionStorageCs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);  //resetting user functions
 
