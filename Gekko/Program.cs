@@ -9174,9 +9174,11 @@ namespace Gekko
             w.RecalcCellsWithNewType();
             decompOptions.numberOfRecalcs++;  //signal for Decomp() method to move on
 
-            if (w.isClosing)  //if something goes wrong it will close
+            if (w.isClosing)  //if something goes wrong, .isClosing will be true
             {
-            }
+                //The line below removes the window from the global list of active windows.
+                //Without this line, this half-dead window will mess up automatic closing of windows (Window -> Close -> Close all...)
+                if (Globals.windowsDecomp.Count > 0) Globals.windowsDecomp.RemoveAt(Globals.windowsDecomp.Count - 1);                            }
             else
             {
                 w.ShowDialog();
