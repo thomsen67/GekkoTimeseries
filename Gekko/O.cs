@@ -1249,11 +1249,11 @@ namespace Gekko
         public static bool StrictlySmallerThan(IVariable x, IVariable y, GekkoTime t)
         {
             bool rv = false;
-            if (x.Type() == EVariableType.Date && x.Type() == EVariableType.Date)
+            if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
             {
                 if (O.GetDate(x).StrictlySmallerThan(O.GetDate(y))) rv = true;
             }
-            else if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
+            else if ((x.Type() == EVariableType.TimeSeries || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.TimeSeries || y.Type() == EVariableType.Val))
             {
                 if (x.GetVal(t) < y.GetVal(t)) rv = true;
             }
@@ -1273,7 +1273,7 @@ namespace Gekko
             {
                 if (O.GetDate(x).SmallerThanOrEqual(O.GetDate(y))) rv = true;
             }
-            else if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
+            else if ((x.Type() == EVariableType.TimeSeries || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.TimeSeries || y.Type() == EVariableType.Val))
             {
                 if (x.GetVal(t) <= y.GetVal(t)) rv = true;
             }
@@ -1289,7 +1289,7 @@ namespace Gekko
         public static bool Equals(IVariable x, IVariable y, GekkoTime t)
         {
             bool rv = false;
-            if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
+            if ((x.Type() == EVariableType.TimeSeries || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.TimeSeries || y.Type() == EVariableType.Val))
             {
                 if (x.GetVal(t) == y.GetVal(t)) rv = true;
             }
@@ -1309,21 +1309,7 @@ namespace Gekko
             }
             return rv;
         }
-
-        public static bool ListContains(IVariable x, IVariable y)
-        {
-            
-            if (x.Type() != EVariableType.List || y.Type() != EVariableType.String)
-            {
-                G.Writeln2("*** ERROR: Expected syntax like ... $ #a['b'], with list and string");
-                throw new GekkoException();
-            }
-            MetaList ml = (MetaList)x;
-            ScalarString ss = (ScalarString)y;
-
-            return ml.list.Contains(ss._string2);           
-            
-        }
+               
 
         public static bool LargerThanOrEqual(IVariable x, IVariable y, GekkoTime t)
         {
@@ -1332,7 +1318,7 @@ namespace Gekko
             {
                 if (O.GetDate(x).LargerThanOrEqual(O.GetDate(y))) rv = true;
             }
-            else if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
+            else if ((x.Type() == EVariableType.TimeSeries || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.TimeSeries || y.Type() == EVariableType.Val))
             {
                 if (x.GetVal(t) >= y.GetVal(t)) rv = true;
             }
@@ -1352,7 +1338,7 @@ namespace Gekko
             {
                 if (O.GetDate(x).StrictlyLargerThan(O.GetDate(y))) rv = true;
             }
-            else if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
+            else if ((x.Type() == EVariableType.TimeSeries || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.TimeSeries || y.Type() == EVariableType.Val))
             {
                 if (x.GetVal(t) > y.GetVal(t)) rv = true;
             }
@@ -1363,8 +1349,23 @@ namespace Gekko
                 throw new GekkoException();
             }
             return rv;
-        }        
-        
+        }
+
+        public static bool ListContains(IVariable x, IVariable y)
+        {
+
+            if (x.Type() != EVariableType.List || y.Type() != EVariableType.String)
+            {
+                G.Writeln2("*** ERROR: Expected syntax like ... $ #a['b'], with list and string");
+                throw new GekkoException();
+            }
+            MetaList ml = (MetaList)x;
+            ScalarString ss = (ScalarString)y;
+
+            return ml.list.Contains(ss._string2);
+
+        }
+
         // =================================== end comparisons ==================================        
 
         public static string SubstituteScalarsAndLists(string label, bool reportError)

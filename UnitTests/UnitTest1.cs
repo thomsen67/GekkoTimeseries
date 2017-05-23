@@ -999,13 +999,41 @@ namespace UnitTests
             //Switch on timeseries
             I("RESET; MODE data;");
             I("TIME 2001 2005;");
-            I("SERIES x = 10, 10, 11, 12, 10;");
+            I("SERIES x = 10, 10, 11, 12, 10;");            
             I("SERIES y = (x + 100) $ (x + 10 == 20);");
             AssertHelper(First(), "y", 2001, 110d, sharedDelta);
             AssertHelper(First(), "y", 2002, 110d, sharedDelta);
             AssertHelper(First(), "y", 2003, 0d, sharedDelta);
             AssertHelper(First(), "y", 2004, 0d, sharedDelta);
             AssertHelper(First(), "y", 2005, 110d, sharedDelta);
+
+            //Switch on timeseries, testing of different types (VAL vs. SERIES)
+            I("RESET; MODE data;");
+            I("TIME 2000 2000;");
+            I("SERIES x = 10;");
+            I("SERIES x2 = 10;");
+            I("SERIES y1 = (x + 100) $ (x < 10);");
+            AssertHelper(First(), "y1", 2000, 0d, sharedDelta);
+            I("SERIES y2 = (x + 100) $ (x <= 10);");
+            AssertHelper(First(), "y2", 2000, 110d, sharedDelta);
+            I("SERIES y3 = (x + 100) $ (x == 10);");
+            AssertHelper(First(), "y3", 2000, 110d, sharedDelta);
+            I("SERIES y4 = (x + 100) $ (x >= 10);");
+            AssertHelper(First(), "y4", 2000, 110d, sharedDelta);
+            I("SERIES y5 = (x + 100) $ (x > 10);");
+            AssertHelper(First(), "y5", 2000, 0d, sharedDelta);
+            I("SERIES y11 = (x + 100) $ (10 > x);");
+            AssertHelper(First(), "y11", 2000, 0d, sharedDelta);
+            I("SERIES y12 = (x + 100) $ (10 >= x);");
+            AssertHelper(First(), "y12", 2000, 110d, sharedDelta);
+            I("SERIES y13 = (x + 100) $ (10 == x);");
+            AssertHelper(First(), "y13", 2000, 110d, sharedDelta);
+            I("SERIES y14 = (x + 100) $ (10 <= x);");
+            AssertHelper(First(), "y14", 2000, 110d, sharedDelta);
+            I("SERIES y15 = (x + 100) $ (10 < x);");
+            AssertHelper(First(), "y15", 2000, 0d, sharedDelta);
+            I("SERIES y3 = (x + 100) $ (x == x2);");
+            AssertHelper(First(), "y3", 2000, 110d, sharedDelta);
 
             //Switching between two values depending upon same criterion 
             I("RESET; MODE data;");
