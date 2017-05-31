@@ -1397,7 +1397,13 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolMemvar + name + "' was not found");
                 throw new GekkoException();
             }
-        }                
+        }
+
+        public static GekkoTime GetDate(GekkoTime x)
+        {
+            //used for avgt() or sumt() without period indication
+            return x;
+        }
 
         public static GekkoTime GetDate(IVariable x, GetDateChoices c)
         {            
@@ -1619,7 +1625,7 @@ namespace Gekko
             return lag;
         }
 
-        public static IVariable HandleLags(string type, double[] storage, int i1, int i2)
+        public static IVariable HandleLags(string type, double[] storage)
         {
             //i1 and i2 are often not used
             double data = double.NaN;
@@ -1627,13 +1633,15 @@ namespace Gekko
             {
                 case "movavg":
                 case "movsum":
+                case "avgt":
+                case "sumt":
                     {
                         double sum = 0d;
                         for (int i = 0; i < storage.Length; i++)
                         {
                             sum += storage[i];
                         }
-                        if (type == "movavg") data = sum / (double)storage.Length;
+                        if (type == "movavg" || type == "avgt") data = sum / (double)storage.Length;
                         else data = sum;
                     }
                     break;

@@ -1562,6 +1562,8 @@ namespace Gekko.Parser.Gek
                                     string lag2Code = null;  //for instance 0
                                     string code = null;
 
+                                    bool isAvgtOrSumt = false;
+
                                     switch (functionName)
                                     {
                                         case "movavg":
@@ -1576,6 +1578,30 @@ namespace Gekko.Parser.Gek
                                                 lag1Code = "(-O.GetInt(" + node[2].Code.ToString() + ") + 1)";  //for instance -4, with movsum(..., 5)
                                                 lag2Code = "0";                                                 //for instance 0, with movsum(..., 5)
                                                 code = node[1].Code.ToString();
+                                            }
+                                            break;
+                                        case "avgt":
+                                        case "sumt":
+                                            {
+                                                isAvgtOrSumt = true;
+                                                if (node.ChildrenCount() != 1 + 1 && node.ChildrenCount() != 1 + 3)
+                                                {
+                                                    G.Writeln2("*** ERROR: Expected 1 or 3 arguments for function " + functionName);
+                                                    throw new GekkoException();
+                                                }
+
+                                                if (node.ChildrenCount() == 1 + 1)
+                                                {
+                                                    lag1Code = "Globals.globalPeriodStart";
+                                                    lag2Code = "Globals.globalPeriodEnd";
+                                                    code = node[1].Code.ToString();
+                                                }
+                                                else
+                                                {
+                                                    lag1Code = node[1].Code.ToString();
+                                                    lag2Code = node[2].Code.ToString();
+                                                    code = node[3].Code.ToString();
+                                                }                                                
                                             }
                                             break;
                                         case "lag":
@@ -1646,34 +1672,55 @@ namespace Gekko.Parser.Gek
                                     string storageName = "storage" + ++Globals.counter;
                                     string counterName = "counter" + ++Globals.counter;
                                     StringBuilder sb1 = new StringBuilder();
-                                    sb1.AppendLine("double[] " + storageName + " = new double[" + lag2Code + " - (" + lag1Code + ") + 1];");  //remember lag1 and lag2 are <= 0
+                                    if (isAvgtOrSumt)
+                                    {
+                                        sb1.AppendLine("double[] " + storageName + " = new double[Math.Max(0, GekkoTime.Observations(O.GetDate(" + lag1Code + "), O.GetDate(" + lag2Code + ")))];");  //remember lag1 and lag2 are <= 0
+                                    }
+                                    else
+                                    {
+                                        sb1.AppendLine("double[] " + storageName + " = new double[" + lag2Code + " - (" + lag1Code + ") + 1];");  //remember lag1 and lag2 are <= 0
+                                    }
                                     sb1.AppendLine("int " + counterName + " = 0;");
-                                    sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(t" + (tCounter - 1) + ".Add(" + lag1Code + "), t" + (tCounter - 1) + ".Add(" + lag2Code + ")))");
+                                    if (isAvgtOrSumt)
+                                    {
+                                        sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(O.GetDate(" + lag1Code + "), O.GetDate(" + lag2Code + ")))");                                        
+                                    }
+                                    else
+                                    {
+                                        sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(t" + (tCounter - 1) + ".Add(" + lag1Code + "), t" + (tCounter - 1) + ".Add(" + lag2Code + ")))");
+                                    }
                                     sb1.AppendLine("{");
                                     sb1.AppendLine("t = t" + tCounter + ";");  //setting t, cf. #098745345
 
                                     if (node.timeLoopNestCode != null)
                                     {
-                                        sb1.Append(node.timeLoopNestCode);
+                                        sb1.Append(node.timeLoopNestCode);                                        
                                     }
 
                                     sb1.AppendLine("" + storageName + "[" + counterName + "] = O.GetVal(" + code + ", t);");
                                     sb1.AppendLine("" + counterName + "++;");
 
-                                    sb1.AppendLine("t = t" + (tCounter - 1) + ";");  //t may have been set, cf. #098745345, so we are setting it back
+                                    if (parentTimeLoop != null) sb1.AppendLine("t = t" + (tCounter - 1) + ";");  //t may have been set, cf. #098745345, so we are setting it back
                                     sb1.AppendLine("}");
 
                                     if (parentTimeLoop == null)
                                     {
-                                        G.Writeln2("*** ERROR: Internal error related to lag functions");
-                                        throw new GekkoException();
+                                        if (functionName != "avgt" && functionName != "sumt")
+                                        {
+                                            G.Writeln2("*** ERROR: Internal error related to lag functions");
+                                            throw new GekkoException();
+                                        }
+                                        node.Code.A(sb1.ToString());
+
                                     }
                                     else
                                     {
                                         parentTimeLoop.timeLoopNestCode += sb1.ToString();
                                     }
 
-                                    node.Code.A("O.HandleLags(`" + functionName + "`, " + storageName + ", " + lag1Code + ", " + lag2Code + ")");
+                                    node.Code.A("O.HandleLags(`" + functionName + "`, " + storageName + ")");
+                                    
+
                                 }
                                 else
                                 {

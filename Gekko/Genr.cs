@@ -12,11 +12,20 @@ namespace Gekko
     {
         public static GekkoTime globalGekkoTimeIterator = Globals.tNull;
         public static
-         IVariable list6 = null;
-        public static IVariable scalar7 = null;
-        public static readonly ScalarVal
-         i8 = new ScalarVal(2d);
-        public static void ClearTS(P p)
+         readonly ScalarVal i12 = new ScalarVal(2010d);
+        public static readonly ScalarVal i13 = new
+         ScalarVal(2012d);
+        public static readonly ScalarVal i14 = new ScalarVal(1d);
+        public static readonly
+         ScalarVal i15 = new ScalarVal(2d);
+        public static readonly ScalarVal i16 = new
+         ScalarVal(3d);
+        public static readonly ScalarVal i17 = new ScalarVal(2010d);
+        public static readonly
+         ScalarVal i18 = new ScalarVal(2012d);
+        public static IVariable scalar22 = null;
+        public static void
+         ClearTS(P p)
         {
         }
         public static void ClearScalar(P p)
@@ -29,18 +38,69 @@ namespace Gekko
 
 
             p.SetText(@"¤1");
-            O.List o0
-             = new O.List();
-            o0.name = O.GetString((new ScalarString("b1")));
-            o0.listItems = new
-             List<string>();
-            o0.p = p;
-            o0.listItems = new
-             List<string>();
-            o0.listItems.AddRange(O.GetList(O.Indexer(t, i8, false, new IVariablesFilterRange(i8,
-             i8))));
+            O.Time o0 = new O.Time();
+            o0.t1 =
+             O.GetDate(i12, O.GetDateChoices.FlexibleStart);
+            ;
+            o0.t2 = O.GetDate(i13,
+             O.GetDateChoices.FlexibleEnd);
+            ;
 
             o0.Exe();
+
+
+
+
+            p.SetText(@"¤0");
+            O.Upd o1 = new
+             O.Upd();
+            o1.p = p;
+            o1.meta = @"ser xx=1,2,3";
+            o1.listItems = new
+             List<string>();
+            o1.listItems.AddRange(O.GetList((new ScalarString("xx"))));
+
+            o1.op =
+             "=";
+            o1.data = new double[3];
+            o1.rep = new double[3];
+            o1.data[0] = (i14).GetVal(t);
+            o1.rep[0] =
+             1d;
+            o1.data[1] = (i15).GetVal(t);
+            o1.rep[1] = 1d;
+            o1.data[2] = (i16).GetVal(t);
+            o1.rep[2] =
+             1d;
+            o1.Exe();
+
+
+
+
+
+            p.SetText(@"¤3");
+            double tempDouble21 = 1;
+                
+                
+                double[] storage19 = new
+             double[Math.Max(0, GekkoTime.Observations(O.GetDate(i17), O.GetDate(i18)))];
+            int counter20 =
+             0;
+            foreach (GekkoTime t2 in new GekkoTimeIterator(O.GetDate(i17), O.GetDate(i18)))
+            {
+                t =
+                 t2;
+                storage19[counter20] = O.GetVal(O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":"
+                 + O.GetString((new ScalarString("xx"))), 1), t);
+                counter20++;
+   //             t = t1;
+            }
+            O.HandleLags("avgt",
+             storage19);
+             
+  //           ).GetVal(t);
+            O.SetValFromCache(ref scalar22, "v", tempDouble21);
+
 
 
 
@@ -48,10 +108,10 @@ namespace Gekko
         }
 
 
-        public static void CodeLines(P p)
+        public
+         static void CodeLines(P p)
         {
-            GekkoTime t =
-             Globals.tNull;
+            GekkoTime t = Globals.tNull;
 
             C0(p);
 
