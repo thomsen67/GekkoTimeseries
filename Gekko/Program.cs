@@ -3128,7 +3128,7 @@ namespace Gekko
                 databank.Clear();
             }
 
-            string pxLinesText = Program.GetTextFromFileWithWait(fileLocal);
+            string pxLinesText = Program.GetTextFromFileWithWait(fileLocal);  //also removes some kinds of funny characters
 
             int vars = -12345;
             GekkoTime startYear;
@@ -3377,6 +3377,8 @@ namespace Gekko
 
         public static void ReadPx(bool isDownload, ReadDatesHelper datesRestrict, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
         {
+            bool hyphenFound = false;
+
             string freq = "a";
 
             List<string> dates = new List<string>();
@@ -3509,7 +3511,7 @@ namespace Gekko
                         }
 
                         //we are using codesHeaderJson instead of codesHeader (these are more verbose)
-                        Walk(tableName, codesHeader2, codes, codesCombi, values, valuesCombi, 0, "", "");
+                        Walk(tableName, codesHeader2, codes, codesCombi, values, valuesCombi, 0, "", "", ref hyphenFound);
                         data = G.CreateArrayDouble(codesCombi.Count * dates.Count, double.NaN);  //fill it with NaN for safety. Statistikbanken sometimes return only a subset of the data (and the subset is zeroes)
                     }
 
@@ -3756,22 +3758,73 @@ namespace Gekko
                 G.Writeln2("+++ WARNING: " + downloadOrImport + " " + allCcounter + " data points in all, expected " + data.LongLength);
             }
 
+            if (hyphenFound)
+            {
+                //See not in constrution of data array
+                G.Writeln2("+++ WARNING: From Gekko 2.3.2 and onwards, hyphens ('-') in names are removed instead of being replaced with 'h'");
+            }
+
 
         }
-        private static void Walk(string table, List<string> codesHeader, List<List<string>> codes, List<string> codesCombi, List<List<string>> values, List<string> valuesCombi, int depth, string sCodes, string sValues)
+        private static void Walk(string table, List<string> codesHeader, List<List<string>> codes, List<string> codesCombi, List<List<string>> values, List<string> valuesCombi, int depth, string sCodes, string sValues, ref bool hyphenFound)
         {
+            //Hmmm what if a table name or column has a name with '_' inside? Probably not probable.
             if (depth > codes.Count - 1)
             {
                 if (sCodes.EndsWith("_")) sCodes = sCodes.Substring(0, sCodes.Length - 1);
                 if (sValues.StartsWith(", ")) sValues = sValues.Substring(2);
-                string name2 = table + sCodes;
-                name2 = name2.Replace("Æ", "AE");
-                name2 = name2.Replace("Ø", "OE");
-                name2 = name2.Replace("Å", "AA");
-                name2 = name2.Replace("æ", "ae");
-                name2 = name2.Replace("ø", "oe");
-                name2 = name2.Replace("å", "aa");
-                name2 = name2.Replace("-", "h");  //h like hyphen
+
+                string name2 = null;
+
+                if (Program.options.bugfix_px)
+                {
+                    string temp = table + sCodes;
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < temp.Length; i++)
+                    {
+                        char tempi = temp[i];
+                        if (tempi == '-')
+                        {
+                            hyphenFound = true;
+                        }
+
+                        if (tempi == 'æ') sb.Append("ae");
+                        else if (tempi == 'ø') sb.Append("oe");
+                        else if (tempi == 'å') sb.Append("aa");
+                        else if (tempi == 'Æ') sb.Append("AE");
+                        else if (tempi == 'Ø') sb.Append("OE");
+                        else if (tempi == 'Å') sb.Append("AA");
+                        else if (!G.IsLetterOrDigitOrUnderscore(tempi))  //only accepts english letters
+                        {
+                            //ignore it, 
+                        }
+                        else
+                        {
+                            sb.Append(tempi);  //here we know that it is englishletter or digit or underscore
+                        }
+                    }
+                    name2 = sb.ToString();
+                }
+                else
+                {
+                    if (name2.Contains("-")) hyphenFound = true;
+                    name2 = table + sCodes;
+                    name2 = name2.Replace("Æ", "AE");
+                    name2 = name2.Replace("Ø", "OE");
+                    name2 = name2.Replace("Å", "AA");
+                    name2 = name2.Replace("æ", "ae");
+                    name2 = name2.Replace("ø", "oe");
+                    name2 = name2.Replace("å", "aa");
+                    //name2 = name2.Replace("-", "h");  //h like hyphen, cannot use "_" since this is used as delimiter when composing names
+                    name2 = name2.Replace("-", "");
+                    name2 = name2.Replace(" ", "");
+                    name2 = name2.Replace("(", "");
+                    name2 = name2.Replace(")", "");
+                    name2 = name2.Replace("=", "");
+                    name2 = name2.Replace(".", "");
+                    name2 = name2.Replace(",", "");
+                    name2 = name2.Replace(":", "");                    
+                }
                 codesCombi.Add(name2);
                 valuesCombi.Add(sValues);
                 return;
@@ -3782,7 +3835,7 @@ namespace Gekko
                 string sCodesTemp = sCodes + "_" + codesHeader[depth] + "_" + codes[depth][i];
                 string sValuesTemp = sValues + ", " + values[depth][i];
 
-                Walk(table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodesTemp, sValuesTemp);
+                Walk(table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodesTemp, sValuesTemp, ref hyphenFound);
             }
 
         }
@@ -3791,17 +3844,15 @@ namespace Gekko
         {
             
             DateTime dt1 = DateTime.Now;
-
-            string GamsDir = null;
-            if (Program.options.gams_exe_folder != null && Program.options.gams_exe_folder.Trim() != null)
-            {
-                GamsDir = Path.GetDirectoryName(Program.options.gams_exe_folder.Trim());
-            }
-
+                        
+            string gamsDir = Program.options.gams_exe_folder.Trim();
+            if (gamsDir.EndsWith("\\")) gamsDir = gamsDir.Substring(0, gamsDir.Length - "\\".Length);
+            if (gamsDir.Trim() == "") gamsDir = null;  //must be so and not an empty string in the GAMSWorkspace call later on
+            
             GAMSWorkspace ws = null;
             try
             {
-                ws = new GAMSWorkspace(workingDirectory: Program.options.folder_working, systemDirectory: GamsDir);
+                ws = new GAMSWorkspace(workingDirectory: Program.options.folder_working, systemDirectory: gamsDir);
             }
             catch (Exception e)
             {
@@ -8960,7 +9011,7 @@ namespace Gekko
                 double d = 1 + d1;  //PARENT
                 G.Writeln2("result " + t + " " + d);
             }
-
+        
             */
 
             //call with null, string, name, date, val
@@ -9178,7 +9229,7 @@ namespace Gekko
             {
                 //The line below removes the window from the global list of active windows.
                 //Without this line, this half-dead window will mess up automatic closing of windows (Window -> Close -> Close all...)
-                if (Globals.windowsDecomp.Count > 0) Globals.windowsDecomp.RemoveAt(Globals.windowsDecomp.Count - 1);                            }
+               if (Globals.windowsDecomp.Count > 0) Globals.windowsDecomp.RemoveAt(Globals.windowsDecomp.Count - 1);                            }
             else
             {
                 w.ShowDialog();
@@ -11763,7 +11814,7 @@ namespace Gekko
                         // -------------------------------------------------------------
                         if (true)
                         {
-                            if (!char.IsLetter(c1) && (c2 == 's' || c2 == 'S') && (c3 == 'e' || c3 == 'E'))
+                            if (!G.IsEnglishLetter(c1) && (c2 == 's' || c2 == 'S') && (c3 == 'e' || c3 == 'E'))
                             {
                                 bool success = false;
                                 string ident1 = null;
@@ -11823,7 +11874,7 @@ namespace Gekko
                         // -------------------------------------------------------------
                         if (true)
                         {
-                            if (!char.IsLetter(c1) && (c2 == 's' || c2 == 'S') && (c3 == 'e' || c3 == 'E'))
+                            if (!G.IsEnglishLetter(c1) && (c2 == 's' || c2 == 'S') && (c3 == 'e' || c3 == 'E'))
                             {
                                 bool success = false;
                                 string ident1 = null;
@@ -31186,7 +31237,7 @@ namespace Gekko
         }
 
         public static string AddFreqAtEndOfVariableName(string var, EFreq freq)
-        {
+        {            
             if (freq == EFreq.Annual) return var;
             string var2 = var;
             if (freq == EFreq.Quarterly || freq == EFreq.Monthly || freq == EFreq.Undated)

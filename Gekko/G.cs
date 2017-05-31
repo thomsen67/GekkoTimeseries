@@ -294,6 +294,12 @@ namespace Gekko
             return variable;
         }
 
+        public static bool IsEnglishLetter(char c)
+        {
+            //Problem is that char.IsLetter accepts æøå and others
+            return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+        }
+
         //Maybe allowTurtle should be removed
         private static bool IsSimpleToken(string varName, bool allowTurtle)
         {
@@ -725,21 +731,21 @@ namespace Gekko
 
         public static bool IsLetterOrDigitOrUnderscore(char c)
         {
-            if (char.IsLetterOrDigit(c) || c == '_')
+            if (G.IsEnglishLetter(c) || char.IsDigit(c) || c == '_')
                 return true;
             else return false;
         }
 
         public static bool IsLetterOrDigitOrUnderscoreOrTurtle(char c)
         {
-            if (char.IsLetterOrDigit(c) || c == '_' || c == '¤')
+            if (G.IsEnglishLetter(c) || char.IsDigit(c) || c == '_' || c == '¤')
                 return true;
             else return false;
         }
 
         public static bool IsLetterOrUnderscore(char c)
         {
-            if (char.IsLetter(c) || c == '_')
+            if (G.IsEnglishLetter(c) || c == '_')
                 return true;
             else return false;
         }

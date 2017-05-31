@@ -9198,7 +9198,7 @@ namespace UnitTests
             AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.Monthly, 2001, 3, 102.9d, sharedDelta);
             AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.Monthly, 2001, 3, 103.1d, sharedDelta);
                         
-            //Good test of truncated time period in IMPORT
+            //Truncated time period
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");            
             I("IMPORT <2000m2 2001m3 px> data;");
@@ -9210,6 +9210,14 @@ namespace UnitTests
             AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.Monthly, 2001, 3, 103.1d, sharedDelta);
             AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.Monthly, 2001, 4, double.NaN, sharedDelta);
             AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.Monthly, 2001, 4, double.NaN, sharedDelta);
+
+            //Another px-file, with blanks and parentheses in stub
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+            I("IMPORT <px> prod01;");            
+            AssertHelper(First(), "PROD01_saesonkorrigering_EJSAESON_brancheDB07_BC", EFreq.Monthly, 2017, 3, 119.9d, sharedDelta);
+            AssertHelper(First(), "PROD01_saesonkorrigering_EJSAESON_brancheDB07_10001", EFreq.Monthly, 2017, 3, 106.5d, sharedDelta);
+            
 
         }
 

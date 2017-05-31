@@ -72,7 +72,7 @@ Additionally, there are model, solve, equation options.
         public string folder_table2 = "";
         public string folder_working = "";
         public EFreq freq = EFreq.Annual;
-        public string gams_exe_folder = null;  
+        public string gams_exe_folder = "";  
         //logic could be that interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).
         public string interface_clipboard_decimalseparator = "period";
         public string interface_csv_decimalseparator = "period";  //has to do with Windows interface, so ok here
