@@ -7798,25 +7798,50 @@ namespace Gekko
                     Cell c = new Cell();
                     c.cellType = CellType.Number;
                     c.number = a.data[i, j];
-
                     c.numberFormat = "f" + Program.options.print_fields_nwidth + "." + Program.options.print_fields_ndec + "";
                     tab.Set(new Coord(i + 2, j + 2), c);
                 }
             }
             for (int i = 0; i < a.data.GetLength(0); i++)
             {
-                Cell c = new Cell();
-                c.cellType = CellType.Number;
-                c.number = i + 1;
-                c.numberFormat = "f4.0";
+                //row dimension
+                Cell c = null;
+                if (a.rownames != null && i < a.rownames.Count && a.rownames[i].Trim() != "")
+                {
+                    c = new Cell();
+                    c.cellType = CellType.Text;
+                    c.CellText = new Gekko.Text();
+                    c.CellText.TextData = new List<string> { a.rownames[i].Trim() };
+                    c.align = -1;                                   
+                }
+                else
+                {
+                    c = new Cell();
+                    c.cellType = CellType.Number;
+                    c.number = i + 1;
+                    c.numberFormat = "f4.0";
+                }
                 tab.Set(new Coord(i + 2, 1), c);
             }
             for (int i = 0; i < a.data.GetLength(1); i++)
             {
-                Cell c = new Cell();
-                c.cellType = CellType.Number;
-                c.number = i + 1;
-                c.numberFormat = "f" + Program.options.print_fields_nwidth + ".0";
+                //col dimension                
+                Cell c = null;
+                if (a.colnames != null && i < a.colnames.Count && a.colnames[i].Trim() != "")
+                {
+                    c = new Cell();
+                    c.cellType = CellType.Text;
+                    c.CellText = new Gekko.Text();
+                    c.CellText.TextData = new List<string> { a.colnames[i].Trim() };
+                    c.align = 1;
+                }
+                else
+                {
+                    c = new Cell();
+                    c.cellType = CellType.Number;
+                    c.number = i + 1;
+                    c.numberFormat = "f4.0";
+                }
                 tab.Set(new Coord(1, i + 2), c);
             }
             List<string> xx = tab.PrintText();

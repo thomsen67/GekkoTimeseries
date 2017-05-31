@@ -8618,7 +8618,31 @@ namespace UnitTests
             AssertHelperMatrix("b", 3, 2, 1d, sharedDelta);
             AssertHelperMatrix("b", 3, 3, 3d, sharedDelta);
 
+            //testing labels -----------------------------
 
+            I("RESET;");
+            I("LIST rn = a, b, c;");
+            I("LIST cn = x, y, z, w;");
+            I("MATRIX <rownames = #rn colnames = #cn> a = ones(3, 4);");
+            Matrix m = (Matrix)Program.scalars["#a"];
+            Assert.AreEqual(m.rownames.Count, 3);
+            Assert.AreEqual(m.colnames.Count, 4);
+            I("SHOW #a;");
+
+            I("RESET;");
+            I("LIST rn = a, b, c;");
+            I("LIST cn = x, y, z, w;");
+            I("MATRIX a = ones(3, 4);");
+            I("MATRIX <rownames = #rn colnames = #cn> a;");
+            Matrix m2 = (Matrix)Program.scalars["#a"];
+            Assert.AreEqual(m2.rownames.Count, 3);
+            Assert.AreEqual(m2.colnames.Count, 4);
+            I("SHOW #a;");
+
+            FAIL("MATRIX a;");
+            FAIL("MATRIX <rownames = #rn colnames = #cn> b;");  //the #b matrix does not exist
+            I("LIST b = r, t;");  
+            FAIL("MATRIX <rownames = #rn colnames = #cn> b;");  //the #b object is a list
         }
 
         [TestMethod]

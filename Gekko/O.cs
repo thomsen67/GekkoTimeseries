@@ -300,39 +300,7 @@ namespace Gekko
             }
             return (ScalarDate)lhs;
         }
-
-        public static Matrix SetMatrixData(IVariable name, IVariable rhs)
-        {
-            //Returns the IVariable it finds here (or creates)
-            
-            Matrix value = O.GetMatrix(rhs);
-            IVariable lhs = null;
-
-            string name2 = name.GetString();
-            if (Program.scalars.TryGetValue(Globals.symbolList + name2, out lhs))
-            {
-                //Scalar is already existing                
-                if (lhs.Type() == EVariableType.Matrix)
-                {
-                    //Already existing lhs is a MATRIX, inject into it. Injecting is faster than recreating an object.
-                    ((Matrix)lhs).data = value.data;
-                }
-                else
-                {
-                    //The object has to die and be recreated, since it is of a wrong type.                                
-                    Program.scalars.Remove(Globals.symbolList + name2);
-                    //lhs = new ScalarDate(value);
-                    Program.scalars.Add(Globals.symbolList + name2, value);
-                }
-            }
-            else
-            {
-                //Scalar does not exist beforehand            
-                //lhs = new ScalarDate(value);
-                Program.scalars.Add(Globals.symbolList + name2, value);
-            }
-            return (Matrix)lhs;
-        }                
+                               
 
         public static bool ContinueIterating(double i, double max, double step) {
             if (step > 0)
@@ -534,11 +502,21 @@ namespace Gekko
 
         private static void GetRawListElements(string fileName, List<string> input, List<string> result)
         {
+            //quoted elements are not allowed, too
+            //also out-commented items, and items with minus are ok
             int counter = 0;
             foreach (string ss in input)
             {
                 counter++;
                 string s = ss.Trim();  //will also remove any newline characters!
+
+                bool quotes = false;     
+                string s2 = Program.StripQuotes(s);
+                if (s2.Length != s.Length)
+                {
+                    s = s2;
+                    quotes = true;
+                }
 
                 if (fileName != null && s == "")
                 {
@@ -569,43 +547,47 @@ namespace Gekko
                     }
                 }
 
-                int colonCounter = 0;
-                for (int i = 0; i < s.Length; i++)
+                if (quotes == false)  //with quotes, anything is accepted
                 {
-                    char c = s[i]; 
-                    if (i == 0 && (c == '-'))  //starting with # not considered ok, only simple elements (perhaps with minus) allowed
+
+                    int colonCounter = 0;
+                    for (int i = 0; i < s.Length; i++)
                     {
-                        //ok
-                    }
-                    else
-                    {
-                        if (G.IsLetterOrDigitOrUnderscore(c))
+                        char c = s[i];
+                        if (i == 0 && (c == '-'))  //starting with # not considered ok, only simple elements (perhaps with minus) allowed
                         {
                             //ok
                         }
-                        else if(c.ToString() == Globals.symbolBankColon)
-                        {
-                            colonCounter++;
-                            if (colonCounter > 1)
-                            {
-                                //probably very rare, but we check here
-                                G.Writeln2("*** ERROR in list: at most 1 colon allowed: '" + s + "'");                                
-                                throw new GekkoException();
-                            }
-                        }
                         else
                         {
-                            if (fileName == null)
+                            if (G.IsLetterOrDigitOrUnderscore(c))
                             {
-                                G.Writeln2("*** ERROR in <direct> list, item = '" + s + "'");
-                                G.Writeln("    Items should only contain numbers, digits, '_', ':' (or start with '-').", Color.Red);
-                                throw new GekkoException();
+                                //ok
+                            }
+                            else if (c.ToString() == Globals.symbolBankColon)
+                            {
+                                colonCounter++;
+                                if (colonCounter > 1)
+                                {
+                                    //probably very rare, but we check here
+                                    G.Writeln2("*** ERROR in list: at most 1 colon allowed: '" + s + "'");
+                                    throw new GekkoException();
+                                }
                             }
                             else
                             {
-                                G.Writeln2("*** ERROR in listfile '" + fileName + "', line [" + counter + "], item = '" + s + "'");
-                                G.Writeln("    Items should only contain numbers, digits, '_', ':' (or start with '-').", Color.Red);
-                                throw new GekkoException();
+                                if (fileName == null)
+                                {
+                                    G.Writeln2("*** ERROR in <direct> list, item = '" + s + "'");
+                                    G.Writeln("    Items should only contain numbers, digits, '_', ':' (or start with '-', or be enclosed in quotes).", Color.Red);
+                                    throw new GekkoException();
+                                }
+                                else
+                                {
+                                    G.Writeln2("*** ERROR in listfile '" + fileName + "', line [" + counter + "], item = '" + s + "'");
+                                    G.Writeln("    Items should only contain numbers, digits, '_', ':' (or start with '-', or be enclosed in quotes).", Color.Red);
+                                    throw new GekkoException();
+                                }
                             }
                         }
                     }
@@ -2374,6 +2356,73 @@ namespace Gekko
 
         public class Matrix2
         {
+            public List<string> opt_rownames = null;
+            public List<string> opt_colnames = null;
+
+            public void Exe(IVariable name, IVariable rhs)
+            {
+                if (rhs == null && opt_rownames == null && opt_colnames == null)
+                {
+                    G.Writeln2("*** ERROR: You must indicate either <rownames=...> or <colnames=...>");
+                    throw new GekkoException();
+                }
+
+                Matrix value = null;
+                if (rhs != null) value = O.GetMatrix(rhs);
+
+                if (value != null)
+                {
+                    if (opt_rownames != null) value.rownames = opt_rownames;
+                    if (opt_colnames != null) value.colnames = opt_colnames;
+                }
+
+                IVariable lhs = null;
+
+                string name2 = name.GetString();
+                if (Program.scalars.TryGetValue(Globals.symbolList + name2, out lhs))
+                {
+                    //Matrix is already existing, may inherit the row/columnames               
+                    if (lhs.Type() == EVariableType.Matrix)
+                    {
+                        if (value == null)
+                        {
+                            //do not touch the .data
+                        }
+                        else
+                        {
+                            //Already existing lhs is a MATRIX, inject into it. Injecting is faster than recreating an object in the dictionary
+                            ((Matrix)lhs).data = value.data;                            
+                        }
+                        if (opt_rownames != null) ((Matrix)lhs).rownames = opt_rownames;
+                        if (opt_colnames != null) ((Matrix)lhs).colnames = opt_colnames;
+                    }
+                    else
+                    {
+                        if (value == null)
+                        {
+                            G.Writeln2("*** ERROR: No matrix with name '" + Globals.symbolList + name2 + "' exists");
+                            throw new GekkoException();
+                        }
+                        //The object has to die and be recreated, since it is of a wrong type.                                
+                        Program.scalars.Remove(Globals.symbolList + name2);
+                        //lhs = new ScalarDate(value);
+                        Program.scalars.Add(Globals.symbolList + name2, value);
+                    }
+                }
+                else
+                {
+                    if (value == null)
+                    {
+                        G.Writeln2("*** ERROR: No matrix with name '" + Globals.symbolList + name2 + "' exists");
+                        throw new GekkoException();
+                    }
+                    //Scalar does not exist beforehand            
+                    //lhs = new ScalarDate(value);
+                    Program.scalars.Add(Globals.symbolList + name2, value);
+                }
+                //return (Matrix)lhs;
+            }
+
             public static void Q(string s)
             {                
                 Show ss = new Show();

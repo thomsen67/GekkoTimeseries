@@ -310,6 +310,8 @@ tokens {
     ASTM;
     ASTMACRO;
     ASTMACROPLUS;
+	ASTOPT_LIST_ROWNAMES;
+	ASTOPT_LIST_COLNAMES;
     ASTMATRIX;
     ASTMATRIXCOL;
     ASTMATRIXINDEXER;
@@ -958,6 +960,8 @@ Y2                    = 'Y2'                       ;
     MAIN             = 'MAIN';  //alternative could be 'table' (table tab) or 'new' (floating window)
     MAT = 'MAT';
     MATRIX = 'MATRIX';
+	ROWNAMES = 'ROWNAMES';
+	COLNAMES = 'COLNAMES';
     MAX              = 'MAX'               ;
     MAXLINES         = 'MAXLINES';
     MEM              = 'MEM'          ;
@@ -1508,6 +1512,8 @@ d.Add("Y" ,Y);
                                         d.Add("main"   , MAIN     );
                                         d.Add("mat",MAT);
                                         d.Add("matrix",MATRIX);
+										d.Add("colnames",COLNAMES);
+										d.Add("rownames",ROWNAMES);
                                         d.Add("max"   , MAX    );
                                         d.Add("maxlines", MAXLINES    );
                                         d.Add("mem"     , MEM     );
@@ -2112,14 +2118,18 @@ listOpt1h                 : DIRECT -> ASTDIRECT
 lock_                     : LOCK_ ident -> ^({token("ASTLOCK", ASTLOCK, $LOCK_.Line)} ident);
 unlock_                   : UNLOCK_ ident -> ^({token("ASTUNLOCK", ASTUNLOCK, $UNLOCK_.Line)} ident);
 
-matrix                    : //matrixHelper nameWithDot leftBracketGlue expression ',' expression RIGHTBRACKET EQUAL expression -> ^({token("ASTMATRIXINDEXER", ASTMATRIXINDEXER, $EQUAL.Line)} nameWithDot expression expression expression)
-                           matrixHelper nameWithDot leftBracketGlue indexerExpressionHelper ',' indexerExpressionHelper RIGHTBRACKET EQUAL expression -> ^({token("ASTMATRIXINDEXER", ASTMATRIXINDEXER, $EQUAL.Line)} nameWithDot indexerExpressionHelper indexerExpressionHelper expression)
-
-						  | matrixHelper nameWithDot EQUAL expression -> ^({token("ASTMATRIX", ASTMATRIX, $EQUAL.Line)} nameWithDot expression)
-						  						  						
-						  | matrixHelper question hashNoGlue GLUE ident -> ^(ASTMATRIX question ident)
-						  | matrixHelper question -> ^(ASTMATRIX question)						  						
+matrix                    : matrixHelper nameWithDot leftBracketGlue indexerExpressionHelper ',' indexerExpressionHelper RIGHTBRACKET EQUAL expression -> ^({token("ASTMATRIXINDEXER", ASTMATRIXINDEXER, $EQUAL.Line)} nameWithDot indexerExpressionHelper indexerExpressionHelper expression)
+						  | matrixHelper matrixOpt1? nameWithDot EQUAL expression -> ^({token("ASTMATRIX", ASTMATRIX, $EQUAL.Line)} ^(ASTPLACEHOLDER matrixOpt1?) nameWithDot expression)						  						  						
+						  | matrixHelper matrixOpt1? nameWithDot                  -> ^(ASTMATRIX ^(ASTPLACEHOLDER matrixOpt1?) nameWithDot)						  						  						
+						  | matrixHelper question hashNoGlue GLUE ident -> ^(ASTMATRIX ^(ASTPLACEHOLDER) question ident)
+						  | matrixHelper question -> ^(ASTMATRIX ^(ASTPLACEHOLDER) question)						  						
 						  ;
+
+matrixOpt1                : ISNOTQUAL | leftAngle matrixOpt1h* RIGHTANGLE -> matrixOpt1h*;
+matrixOpt1h               : ROWNAMES EQUAL expression -> ^(ASTOPT_LIST_ROWNAMES expression)
+                          | COLNAMES EQUAL expression -> ^(ASTOPT_LIST_COLNAMES expression)
+						  ;
+
 matrixHelper              : MAT | MATRIX;
 
 mem                       : MEM -> ^({token("ASTMEM", ASTMEM, $MEM.Line)});
@@ -3616,6 +3626,8 @@ ident                     : Ident|
                             MACRO2|
                             MAIN|
                             MATRIX|
+							COLNAMES|
+							ROWNAMES|
                             MAXLINES|
                             MAX|
                             MEM|

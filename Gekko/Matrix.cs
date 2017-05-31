@@ -11,6 +11,8 @@ namespace Gekko
         //Abstract class containing a Matrix                
 
         public double[,] data = null;
+        public List<string> colnames = null;
+        public List<string> rownames = null;
 
         public Matrix()
         {
