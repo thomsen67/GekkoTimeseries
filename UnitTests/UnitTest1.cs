@@ -3313,7 +3313,7 @@ namespace UnitTests
             I("VAL a2 = 2;");
             I("VAL a3 = 3;");
             I("VAL a4 = 4;");
-            I("CREATE ts1, ts2, ts3, ts4;");
+            I("CREATE ts1, ts2, ts3, ts4, ts5;");
             I("TIME 2010 2012;");
             I("SERIES ts1 = 1;");
             I("SERIES ts2 = 2;");
@@ -3321,6 +3321,7 @@ namespace UnitTests
             I("SERIES ts4 = 4;");
             I("LIST m1 = ts1, ts2, ts3, ts4;");
             I("LIST m2 = ts1, ts2;");
+            I("SERIES ts5 = 10, 12, 16;");
 
             //avg()
             I("VAL v1 = avg(%a1, %a2);");
@@ -3331,6 +3332,18 @@ namespace UnitTests
             AssertHelper(First(), "xx1", 2010, 2012, 1, sharedDelta);
             I("SERIES xx1 = avg(#m1);");
             AssertHelper(First(), "xx1", 2010, 2012, 10d / 4d, sharedDelta);
+
+            //avgt()
+            I("VAL v1 = avgt(ts5);");
+            AssertHelperScalarVal("v1", 38d / 3d, sharedDelta);
+            I("VAL v1 = avgt(2011, 2012, ts5);");
+            AssertHelperScalarVal("v1", 28d / 2d, sharedDelta);
+
+            //sumt()
+            I("VAL v1 = sumt(ts5);");
+            AssertHelperScalarVal("v1", 38d, sharedDelta);
+            I("VAL v1 = sumt(2011, 2012, ts5);");
+            AssertHelperScalarVal("v1", 28d, sharedDelta);
 
             //sqrt()
             I("VAL v1 = sqrt(%a4);");

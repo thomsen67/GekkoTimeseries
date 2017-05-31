@@ -902,6 +902,61 @@ namespace Gekko
             return new ScalarVal(v / n);
         }
 
+        public static IVariable avgt(GekkoTime t, params IVariable[] items)
+        {
+            double rv = AvgtSumtHelper(true, items);
+            return new ScalarVal(rv);
+        }
+
+        public static IVariable sumt(GekkoTime t, params IVariable[] items)
+        {
+            double rv = AvgtSumtHelper(false, items);
+            return new ScalarVal(rv);
+        }
+
+        private static double AvgtSumtHelper(bool isAvg, IVariable[] items)
+        {
+            string fn = "avgt";
+            if (!isAvg) fn = "sumt";
+            IVariable a = null;
+            double rv = double.NaN;
+            GekkoTime gt1 = Globals.tNull;
+            GekkoTime gt2 = Globals.tNull;
+            if (items.Length == 1)
+            {
+                gt1 = Globals.globalPeriodStart;
+                gt2 = Globals.globalPeriodEnd;
+                a = items[0];
+            }
+            else if (items.Length == 3)
+            {
+                gt1 = items[0].GetDate(O.GetDateChoices.Strict);
+                gt2 = items[1].GetDate(O.GetDateChoices.Strict);
+                a = items[2];
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: " + fn + "() function must have 1 or 3 arguments.");
+                throw new GekkoException();
+            }
+
+            double n = GekkoTime.Observations(gt1, gt2);
+            if (n <= 0)
+            {
+                G.Writeln2("*** ERROR: " + fn + "() function must have > 0 observations");
+                throw new GekkoException();
+            }
+
+            double sum = 0d;
+            foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
+            {
+                sum += a.GetVal(gt);
+            }
+            if (!isAvg) rv = sum;
+            else rv = sum / n;
+            return rv;
+        }
+
         public static IVariable percentile(GekkoTime t, IVariable inputVar, IVariable percent)
         {
             //Mimics Excel's percentile function, see unit tests
