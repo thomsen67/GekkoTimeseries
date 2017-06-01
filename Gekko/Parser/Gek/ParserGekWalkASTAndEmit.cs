@@ -439,7 +439,7 @@ namespace Gekko.Parser.Gek
                                 else
                                 {
                                     //fixme zxcvb
-                                    node.Code.A("O.Indexer(t, " + node[0].Code + ", " + tf + ", new ScalarString(s1177)" + ")");
+                                    node.Code.A("O.Indexer(t, " + node[0].Code + ", " + tf + ", s1177" + ")");
                                     
                                 }
 
@@ -1765,10 +1765,10 @@ namespace Gekko.Parser.Gek
                                         sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(O.GetDate(" + lag1Code + "), O.GetDate(" + lag2Code + ")))");
                                     }
                                     else if (isGamsSum)
-                                    {
-                                        //foreach (string s1177 in new List<string> { "a", "b" }) 
+                                    {                                        
                                         sb1.AppendLine("GekkoTime t" + tCounter + " = t" + (tCounter - 1) + ";" + G.NL);  //instead of the loop seen in the others. This way, we hook up the t's, even though the t's in this case are artificial
-                                        sb1.AppendLine("foreach (string s1177 in new List<string> { \"a\", \"b\" })");  //FIXME zxcvb
+                                        //sb1.AppendLine("foreach (string s1177 in new List<string> { \"a\", \"b\" })");  //FIXME zxcvb
+                                        sb1.AppendLine("foreach (IVariable s1177 in new O.GekkoListIterator(" + node[1].Code.ToString() + "))"); //FIXME zxcvb
                                     }
                                     else
                                     {

@@ -176,48 +176,6 @@ o9.Exe();
 
 
 
-p.SetText(@"¤10");
-O.Genr o10 = new O.Genr();
-IVariable ts11 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("y"))), 1, O.ECreatePossibilities.Can);
-IVariable ts13 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("x"))), 1);
-o10.t1 = Globals.globalPeriodStart;
-o10.t2 = Globals.globalPeriodEnd;
-
-o10.lhs = null;
-o10.p = p;
-foreach (GekkoTime t2 in new GekkoTimeIterator(o10.t1, o10.t2))
-{
-  t = t2; 
-double[] storage16 = new double[2];
-int counter17 = 0;
-GekkoTime t3 = t2;
-
-foreach (string s1177 in new List<string> { "a", "b" })
-{
-t = t3;
-double[] storage14 = new double[0 - (-1) + 1];
-int counter15 = 0;
-foreach (GekkoTime t4 in new GekkoTimeIterator(t3.Add(-1), t3.Add(0)))
-{
-t = t4;
-storage14[counter15] = O.GetVal(O.Indexer(t, ts13, false, new ScalarString(s1177)), t);
-counter15++;
-t = t3;
-}
-storage16[counter17] = O.GetVal(O.HandleSummations("dif", storage14), t);
-counter17++;
-}
-  double data = O.GetVal(O.HandleSummations("sum", storage16), t);
-if(o10.lhs == null) o10.lhs = O.GetTimeSeries(ts11);
-o10.lhs.SetData(t, data);
-}
-t = Globals.tNull; 
-o10.meta = @"ser y = sum(#i, dif(x[#i]))";
-o10.Exe();
-
-
-
-
 
 p.SetText(@"¤12");
 O.Prt o11 = new O.Prt();
