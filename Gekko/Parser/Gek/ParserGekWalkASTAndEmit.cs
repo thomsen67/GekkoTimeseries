@@ -254,13 +254,19 @@ namespace Gekko.Parser.Gek
                         w.wh.seriesHelper = WalkHelper.seriesType.SeriesRhs;
                     }
                     break;
-                //case "ASTFUNCTION":
-                //    {
-                //        string functionName = GetFunctionName(node);
-                //        string[] listNames = IsGamsLikeSumFunction1(true, node, w, functionName);
-                //        if (listNames != null) HandleGamsLikeSumFunction(listNames, true, w, null);
-                //    }
-                //    break;
+                case "ASTGENR":
+                    {
+                        //For now we just say that old GENR is all rhs (there will be no loop [#i] on lhs anyway!)
+                        w.wh.seriesHelper = WalkHelper.seriesType.SeriesRhs;
+                    }
+                    break;
+                    //case "ASTFUNCTION":
+                    //    {
+                    //        string functionName = GetFunctionName(node);
+                    //        string[] listNames = IsGamsLikeSumFunction1(true, node, w, functionName);
+                    //        if (listNames != null) HandleGamsLikeSumFunction(listNames, true, w, null);
+                    //    }
+                    //    break;
             }
             
             foreach (ASTNode child in node.ChildrenIterator())
@@ -362,7 +368,7 @@ namespace Gekko.Parser.Gek
                             }
                             else
                             {
-                                
+
                                 string s = null;
                                 if (w.wh.seriesHelper == WalkHelper.seriesType.SeriesLhs && node[0].Text == "ASTNAMEWITHBANK") //is a "normal" variable with indexer
                                 {
@@ -419,10 +425,25 @@ namespace Gekko.Parser.Gek
 
                                 string tf = "false";
                                 if (w.wh.seriesHelper == WalkHelper.seriesType.SeriesLhs) tf = "true";
-                                node.Code.A("O.Indexer(t, " + node[0].Code + ", " + tf + s + ")");
 
+                                bool isKnown = false; //fix zxcvb
+                                try
+                                {
+                                    if (node[1][1][0][0].Text == "i") isKnown = true;
+                                }
+                                catch { };
+                                if (!isKnown)  
+                                {
+                                    node.Code.A("O.Indexer(t, " + node[0].Code + ", " + tf + s + ")");
+                                }
+                                else
+                                {
+                                    //fixme zxcvb
+                                    node.Code.A("O.Indexer(t, " + node[0].Code + ", " + tf + ", new ScalarString(s1177)" + ")");
+                                    
+                                }
 
-                            }                          
+                            }                      
                         }
                         break;
                     case "ASTXLINE":
@@ -1549,38 +1570,49 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTFUNCTION":
                         {
-                            string functionName = GetFunctionName(node);                            
+                            string functionName = GetFunctionName(node);
 
-                            if (functionName == "sum")  //sum(#i, x[#i]), check that it is gams-like
-                            {
-                                string nodeCode = null;
-                                w.wh.sumHelperListNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                                w.wh.sumHelperListNames.Add(node[1][0][0].Text, node[1].Code.ToString());
+                            //if (functionName == "sum")  //sum(#i, x[#i]), check that it is gams-like
+                            //{
+                            //    string nodeCode = null;
+                            //    w.wh.sumHelperListNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                            //    w.wh.sumHelperListNames.Add(node[1][0][0].Text, node[1].Code.ToString());
 
-                                if (w.wh.sumHelperListNames != null)
-                                {
-                                    foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
-                                    {
-                                        nodeCode += EmitListLoopingCode(node, kvp);
-                                    }
-                                }
-
-                                
-                                
-                                                                
-                                if (w.wh.sumHelperListNames != null)
-                                {
-                                    foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
-                                    {
-                                        nodeCode += "}" + G.NL;
-                                    }
-                                }
+                            //    if (w.wh.sumHelperListNames != null)
+                            //    {
+                            //        foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
+                            //        {
+                            //            nodeCode += EmitListLoopingCode(node, kvp);
+                            //        }
+                            //    }
 
 
-                                node.Code.A(nodeCode);
 
-                            }
-                            else if (Globals.lagFunctions.Contains(functionName))  //functionName is lower case
+
+                            //    if (w.wh.sumHelperListNames != null)
+                            //    {
+                            //        foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
+                            //        {
+                            //            nodeCode += "}" + G.NL;
+                            //        }
+                            //    }
+
+
+                            //    node.Code.A(nodeCode);
+
+                            //}
+
+                            //NOTE: check "sum" for GAMS-like!!
+                            //NOTE: check "sum" for GAMS-like!!
+                            //NOTE: check "sum" for GAMS-like!!
+                            //NOTE: check "sum" for GAMS-like!! fixme zxcvb
+                            //NOTE: check "sum" for GAMS-like!!
+                            //NOTE: check "sum" for GAMS-like!!
+
+                            bool isGamsSum = false;
+                            if (functionName == "sum") isGamsSum = true;
+
+                            if (Globals.lagFunctions.Contains(functionName) || isGamsSum)  //functionName is lower case, zxcvb
                             {
 
                                 if (Program.options.interface_lagfix)
@@ -1594,6 +1626,19 @@ namespace Gekko.Parser.Gek
 
                                     switch (functionName)
                                     {
+                                        case "sum":                                        
+                                            {
+                                                //fixme zxcvb
+                                                if (node.ChildrenCount() != 2 + 1)
+                                                {
+                                                    G.Writeln2("*** ERROR: Expected 2 arguments for function " + functionName);
+                                                    throw new GekkoException();
+                                                }
+                                                lag1Code = "2";  //FIXME FIXME
+                                                lag2Code = "0";               
+                                                code = node[2].Code.ToString();
+                                            }
+                                            break;
                                         case "movavg":
                                         case "movsum":
                                             {
@@ -1704,21 +1749,32 @@ namespace Gekko.Parser.Gek
                                     {
                                         sb1.AppendLine("double[] " + storageName + " = new double[Math.Max(0, GekkoTime.Observations(O.GetDate(" + lag1Code + "), O.GetDate(" + lag2Code + ")))];");  //remember lag1 and lag2 are <= 0
                                     }
+                                    else if (isGamsSum)
+                                    {
+                                        sb1.AppendLine("double[] " + storageName + " = new double[" + lag1Code + "];");  //fixme zxcvb
+                                    }
                                     else
                                     {
                                         sb1.AppendLine("double[] " + storageName + " = new double[" + lag2Code + " - (" + lag1Code + ") + 1];");  //remember lag1 and lag2 are <= 0
                                     }
+
                                     sb1.AppendLine("int " + counterName + " = 0;");
+
                                     if (isAvgtOrSumt)
                                     {
                                         sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(O.GetDate(" + lag1Code + "), O.GetDate(" + lag2Code + ")))");
+                                    }
+                                    else if (isGamsSum)
+                                    {
+                                        //foreach (string s1177 in new List<string> { "a", "b" }) 
+                                        sb1.AppendLine("foreach (string s1177 in new List<string> { \"a\", \"b\" })");  //FIXME zxcvb
                                     }
                                     else
                                     {
                                         sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(t" + (tCounter - 1) + ".Add(" + lag1Code + "), t" + (tCounter - 1) + ".Add(" + lag2Code + ")))");
                                     }
                                     sb1.AppendLine("{");
-                                    sb1.AppendLine("t = t" + tCounter + ";");  //setting t, cf. #098745345
+                                    if(!isGamsSum) sb1.AppendLine("t = t" + tCounter + ";");  //setting t, cf. #098745345
 
                                     if (node.timeLoopNestCode != null)
                                     {
@@ -1728,7 +1784,7 @@ namespace Gekko.Parser.Gek
                                     sb1.AppendLine("" + storageName + "[" + counterName + "] = O.GetVal(" + code + ", t);");
                                     sb1.AppendLine("" + counterName + "++;");
 
-                                    if (parentTimeLoop != null) sb1.AppendLine("t = t" + (tCounter - 1) + ";");  //t may have been set, cf. #098745345, so we are setting it back
+                                    if (parentTimeLoop != null && !isGamsSum) sb1.AppendLine("t = t" + (tCounter - 1) + ";");  //t may have been set, cf. #098745345, so we are setting it back
                                     sb1.AppendLine("}");
 
                                     if (parentTimeLoop == null)
