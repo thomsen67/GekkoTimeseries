@@ -902,18 +902,21 @@ namespace Gekko
             return new ScalarVal(v / n);
         }
 
+        //ALL THESE SHOULD BE DELETED
         public static IVariable avgt(GekkoTime t, params IVariable[] items)
         {
             double rv = AvgtSumtHelper(true, items);
             return new ScalarVal(rv);
         }
 
+        //ALL THESE SHOULD BE DELETED
         public static IVariable sumt(GekkoTime t, params IVariable[] items)
         {
             double rv = AvgtSumtHelper(false, items);
             return new ScalarVal(rv);
         }
 
+        //ALL THESE SHOULD BE DELETED
         private static double AvgtSumtHelper(bool isAvg, IVariable[] items)
         {
             string fn = "avgt";
@@ -1208,6 +1211,7 @@ namespace Gekko
             return new ScalarVal(Math.Pow(d1, d2));
         }
 
+        //ALL THESE SHOULD BE DELETED
         public static IVariable pch(GekkoTime t, IVariable x1)
         {
             if (x1.Type() != EVariableType.TimeSeries)
@@ -1222,7 +1226,8 @@ namespace Gekko
             double d1Lag = O.GetVal(mtsLag, t);
             return new ScalarVal((d1 / d1Lag - 1) * 100d);
         }
-        
+
+        //ALL THESE SHOULD BE DELETED
         public static IVariable dlog(GekkoTime t, IVariable x1)
         {
             if (x1.Type() != EVariableType.TimeSeries)
@@ -1238,6 +1243,7 @@ namespace Gekko
             return new ScalarVal(Math.Log(d1 / d1Lag));
         }
 
+        //ALL THESE SHOULD BE DELETED
         public static IVariable dif(GekkoTime t, IVariable x1)
         {
             if (x1.Type() != EVariableType.TimeSeries)
@@ -1253,6 +1259,7 @@ namespace Gekko
             return new ScalarVal(d1 - d1Lag);
         }
 
+        //ALL THESE SHOULD BE DELETED
         public static IVariable lag(GekkoTime t, IVariable x, IVariable ilag)
         {            
             if (x.Type() != EVariableType.TimeSeries)
@@ -1267,6 +1274,7 @@ namespace Gekko
             return new ScalarVal(d1Lag);
         }
 
+        //ALL THESE SHOULD BE DELETED
         public static IVariable movsum(GekkoTime t, IVariable x, IVariable ilags)
         {
             double sum, n;
@@ -1274,6 +1282,7 @@ namespace Gekko
             return new ScalarVal(sum);
         }
 
+        //ALL THESE SHOULD BE DELETED
         public static IVariable movavg(GekkoTime t, IVariable x, IVariable ilags)
         {
             double sum, n;
@@ -1281,6 +1290,7 @@ namespace Gekko
             return new ScalarVal(sum / n);
         }
 
+        //ALL THESE SHOULD BE DELETED
         private static void MovAvgSum(GekkoTime t, IVariable x, IVariable ilags, out double sum, out double n)
         {
             if (x.Type() != EVariableType.TimeSeries)
@@ -1317,6 +1327,7 @@ namespace Gekko
             }
         }
 
+        //ALL THESE SHOULD BE DELETED
         public static IVariable pchy(GekkoTime t, IVariable x1)
         {
             if (x1.Type() != EVariableType.TimeSeries)
@@ -1332,6 +1343,7 @@ namespace Gekko
             return new ScalarVal((d1 / d1Lag - 1) * 100d);
         }
 
+        //ALL THESE SHOULD BE DELETED
         public static IVariable dlogy(GekkoTime t, IVariable x1)
         {
             if (x1.Type() != EVariableType.TimeSeries)
@@ -1347,6 +1359,7 @@ namespace Gekko
             return new ScalarVal(Math.Log(d1 / d1Lag));
         }
 
+        //ALL THESE SHOULD BE DELETED
         public static IVariable dify(GekkoTime t, IVariable x1)
         {
             if (x1.Type() != EVariableType.TimeSeries)
@@ -1370,9 +1383,6 @@ namespace Gekko
             ScalarString ss = new ScalarString(x);
             return ss;
         }
-
-        
-        
 
         public static IVariable round(GekkoTime t, IVariable x1, IVariable x2)
         {            

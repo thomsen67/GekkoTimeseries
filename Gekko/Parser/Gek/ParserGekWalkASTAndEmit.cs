@@ -1705,12 +1705,12 @@ namespace Gekko.Parser.Gek
 
                                     if (parentTimeLoop == null)
                                     {
-                                        if (functionName != "avgt" && functionName != "sumt")
-                                        {
-                                            G.Writeln2("*** ERROR: Internal error related to lag functions");
+                                        //if (functionName != "avgt" && functionName != "sumt")
+                                        //{
+                                        G.Writeln2("*** ERROR: Lag function " + functionName + "() intended for SERIES/PRT/PLOT type commands");
                                             throw new GekkoException();
-                                        }
-                                        node.Code.A(sb1.ToString());
+                                        //}
+                                        //node.Code.A(sb1.ToString());
 
                                     }
                                     else

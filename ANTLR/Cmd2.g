@@ -1875,7 +1875,7 @@ clearOpt1h				  : PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)  //obsolet
 						
 clone                     : CLONE -> ^({token("ASTCLONE", ASTCLONE, $CLONE.Line)});
 
-close					  : CLOSE closeOpt1? ident -> ^({token("ASTCLOSE", ASTCLOSE, $CLOSE.Line)} ident closeOpt1?)
+close					  : CLOSE closeOpt1? listItems -> ^({token("ASTCLOSE", ASTCLOSE, $CLOSE.Line)} listItems closeOpt1?)
 						  | CLOSE closeOpt1? star -> ^({token("ASTCLOSESTAR", ASTCLOSESTAR, $CLOSE.Line)} closeOpt1?)
 						  ;
 closeOpt1                 : ISNOTQUAL | leftAngle closeOpt1h* RIGHTANGLE -> ^(ASTOPT1 closeOpt1h*);

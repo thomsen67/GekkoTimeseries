@@ -1154,21 +1154,26 @@ namespace Gekko
         }
 
         public static string GetFreqString()
+        {            
+            return GetFreqString(Program.options.freq);            
+        }
+
+        public static string GetFreqString(EFreq input)
         {
             string f = "";
-            if ((Program.options.freq == EFreq.Annual))
+            if ((input == EFreq.Annual))
             {
                 f = "Annual";
             }
-            else if ((Program.options.freq == EFreq.Quarterly))
+            else if ((input == EFreq.Quarterly))
             {
                 f = "Quarterly";
             }
-            else if ((Program.options.freq == EFreq.Monthly))  //ttfreq
+            else if ((input == EFreq.Monthly))  //ttfreq
             {
                 f = "Monthly";
             }
-            else if ((Program.options.freq == EFreq.Undated))
+            else if ((input == EFreq.Undated))
             {
                 f = "Undated";
             }
@@ -1176,6 +1181,7 @@ namespace Gekko
             {
                 G.Writeln("*** ERROR: strange error regarding freq");
             }
+
             return f;
         }
 

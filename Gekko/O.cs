@@ -2865,30 +2865,43 @@ namespace Gekko
 
         public class Close
         {
-            public string name = null;
+            public string name = null;  //only if '*' is indicated, not used otherwise
+            public List<string> listItems = null;
             public string opt_save = null;
             public void Exe()
             {
                 
                 List<string> databanks = new List<string>();
-                if (this.name == "*")
+                if (this.listItems == null)
                 {
-                    foreach (Databank db in Program.databanks.storage)
+                    if (this.name == "*")
                     {
-                        if (G.equal(db.aliasName, Globals.Work) || G.equal(db.aliasName, Globals.Ref))
+                        foreach (Databank db in Program.databanks.storage)
                         {
+                            if (G.equal(db.aliasName, Globals.Work) || G.equal(db.aliasName, Globals.Ref))
+                            {
+                                //skip it
+                            }
+                            else databanks.Add(db.aliasName);
                         }
-                        else databanks.Add(db.aliasName);
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Internal error #7983264234");
+                        throw new GekkoException();
                     }
                 }
                 else
                 {
-                    if (G.equal(this.name, Globals.Work) || G.equal(this.name, Globals.Ref))
+                    foreach (string dbName in this.listItems)
                     {
-                        G.Writeln2("*** ERROR: Databanks '" + Globals.Work + "' or '" + Globals.Ref + "' cannot be closed (see CLEAR command)");
-                        throw new GekkoException();
+                        if (G.equal(dbName, Globals.Work) || G.equal(dbName, Globals.Ref))
+                        {
+                            G.Writeln2("*** ERROR: Databanks '" + Globals.Work + "' or '" + Globals.Ref + "' cannot be closed (see CLEAR command)");
+                            throw new GekkoException();
+                        }
+                        databanks.Add(dbName);
                     }
-                    databanks.Add(this.name);
                 }
                 foreach (string databank in databanks)
                 {

@@ -75,34 +75,30 @@ namespace Gekko
             o1.Exe();
 
 
+                double[] storage19 = new double[Math.Max(0, GekkoTime.Observations(O.GetDate(i17), O.GetDate(i18)))];
+                int counter20 =
+                 0;
+                foreach (GekkoTime t2 in new GekkoTimeIterator(O.GetDate(i17), O.GetDate(i18)))
+                {
+                    t =
+                     t2;
+                    storage19[counter20] = O.GetVal(O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":"
+                     + O.GetString((new ScalarString("xx"))), 1), t);
+                    counter20++;
+                    //             t = t1;
+                }
 
 
+                IVariable zzz = O.HandleLags("avgt", storage19);
 
-            p.SetText(@"¤3");
-            double tempDouble21 = 1;
-                
-                
-                double[] storage19 = new
-             double[Math.Max(0, GekkoTime.Observations(O.GetDate(i17), O.GetDate(i18)))];
-            int counter20 =
-             0;
-            foreach (GekkoTime t2 in new GekkoTimeIterator(O.GetDate(i17), O.GetDate(i18)))
-            {
-                t =
-                 t2;
-                storage19[counter20] = O.GetVal(O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":"
-                 + O.GetString((new ScalarString("xx"))), 1), t);
-                counter20++;
-   //             t = t1;
-            }
-            O.HandleLags("avgt",
-             storage19);
-             
-  //           ).GetVal(t);
+           
+
+
+            //find start of statement, and put zz stuff in there instead of in ()
+
+            double tempDouble21 = (zzz).GetVal(t);
+            
             O.SetValFromCache(ref scalar22, "v", tempDouble21);
-
-
-
 
 
         }

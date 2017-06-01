@@ -5862,9 +5862,9 @@ namespace Gekko
                         if (ts != null) break;
                     }
                     if (ts == null)
-                    {                        
-                        G.Writeln2("*** ERROR: " + G.GetFreqString() + " timeseries '" + variable + "' could not be found in any open databank");
-                        throw new GekkoException();                        
+                    {
+                        ReportTimeseriesNotFound(variable, null);
+                        throw new GekkoException();
                     }
                 }
                 else
@@ -5888,8 +5888,8 @@ namespace Gekko
                             ts = new TimeSeries(Program.options.freq, "temp_timeseries_not_to_be_used");
                         }
                         else
-                        {                            
-                            G.Writeln2("*** ERROR: "+ G.GetFreqString() + " timeseries '" + variable + "' could not be found in '" + bank + "' databank");
+                        {
+                            ReportTimeseriesNotFound(variable, bank);
                             throw new GekkoException();
                         }
                     }
@@ -5897,6 +5897,41 @@ namespace Gekko
             }
 
             return ts;
+
+        }
+
+        private static void ReportTimeseriesNotFound(string variable, string bank)
+        {
+            string b = "any open";
+            if (bank != null) b = "'" + bank + "'";
+            G.Writeln2("*** ERROR: " + G.GetFreqString() + " timeseries '" + variable + "' could not be found in " + b + " databank");
+
+            bool changeFreq = false;
+
+            foreach (EFreq freq in Enum.GetValues(typeof(EFreq)))
+            {
+                List<string> found = new List<string>();                
+                foreach (Databank db in Program.databanks.storage)
+                {
+                    TimeSeries ts = db.GetVariable(freq, variable);
+                    if (ts != null)
+                    {
+                        found.Add("'" + db.aliasName + "'");
+                        if (freq != Program.options.freq) changeFreq = true;  //mention that freq change could be used
+                    }
+                }
+                if (found.Count > 0)
+                {
+                    G.Writeln("       --> Note: " + G.GetFreqString(freq) + " timeseries '" + variable + "' exists in: " + G.GetListWithCommas(found), Color.Red);
+                }
+            }
+
+            if (changeFreq)
+            {
+                G.Writeln("       --> Note: You may change frequency by means of OPTION freq = ... ;", Color.Red);
+            }
+
+            //Program.databanks.storage
 
         }
 
