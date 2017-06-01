@@ -1767,6 +1767,7 @@ namespace Gekko.Parser.Gek
                                     else if (isGamsSum)
                                     {
                                         //foreach (string s1177 in new List<string> { "a", "b" }) 
+                                        sb1.AppendLine("GekkoTime t" + tCounter + " = t" + (tCounter - 1) + ";" + G.NL);  //instead of the loop seen in the others. This way, we hook up the t's, even though the t's in this case are artificial
                                         sb1.AppendLine("foreach (string s1177 in new List<string> { \"a\", \"b\" })");  //FIXME zxcvb
                                     }
                                     else
@@ -1774,7 +1775,9 @@ namespace Gekko.Parser.Gek
                                         sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(t" + (tCounter - 1) + ".Add(" + lag1Code + "), t" + (tCounter - 1) + ".Add(" + lag2Code + ")))");
                                     }
                                     sb1.AppendLine("{");
-                                    if(!isGamsSum) sb1.AppendLine("t = t" + tCounter + ";");  //setting t, cf. #098745345
+                                    
+                                    sb1.AppendLine("t = t" + tCounter + ";");  //setting t, cf. #098745345
+                                    
 
                                     if (node.timeLoopNestCode != null)
                                     {
@@ -4204,7 +4207,7 @@ namespace Gekko.Parser.Gek
                 {
                     if (
 
-                           (tmp.Text == "ASTFUNCTION" && Globals.lagFunctions.Contains(tmp[0].Text.ToLower()))
+                           (tmp.Text == "ASTFUNCTION" && (Globals.lagFunctions.Contains(tmp[0].Text.ToLower()) || tmp[0].Text.ToLower()=="sum"))  //check that sum is gams-like
                         || tmp.Text == "ASTOLSELEMENT"
                         || tmp.Text == "ASTPRTELEMENT"
                         || tmp.Text == "ASTTABLESETVALUESELEMENT"
