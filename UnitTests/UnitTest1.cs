@@ -4578,6 +4578,17 @@ namespace UnitTests
                 Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
                 Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
 
+                //bulk close
+                I("RESET;");
+                if (i == 0) I("OPTION databank logic = aremos;");
+                I("OPEN temp\\bank1;");
+                I("OPEN temp\\bank2;");
+                Assert.AreEqual(Program.databanks.storage.Count, 4);                
+                I("CLOSE bank1, bank2;");
+                Assert.AreEqual(Program.databanks.storage.Count, 2);
+                Assert.AreEqual(Program.databanks.storage[0].aliasName, "Work");
+                Assert.AreEqual(Program.databanks.storage[1].aliasName, Globals.Ref);
+
                 I("RESET;");
                 if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bank1;");

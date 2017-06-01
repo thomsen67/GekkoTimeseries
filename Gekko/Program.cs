@@ -3377,12 +3377,26 @@ namespace Gekko
 
         public static void ReadPx(bool isDownload, ReadDatesHelper datesRestrict, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
         {
+            /*
+             * Description
+             * -----------
+             * 
+             * Læser linje for linje
+             * 
+             *
+             *
+             *
+             * 
+            */
+             
+
+
             bool hyphenFound = false;
 
             string freq = "a";
 
             List<string> dates = new List<string>();
-            bool start = false;
+            
             List<string> lines2 = G.ExtractLinesFromText(pxLinesText);
             pxLinesText = null;  //clearing it
 
@@ -3393,7 +3407,7 @@ namespace Gekko
             //int counter = 0;
             string codeTimeString = "CODES(\"tid\")=";
             string codeString = "CODES(";
-            string valueTimeString = "VALUES(\"tid\")=";
+            //string valueTimeString = "VALUES(\"tid\")=";
             string valueString = "VALUES(";
             string matrixString = "MATRIX=";
 
@@ -3631,11 +3645,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     codes.Add(names2);
-                }
-                //else if (line.StartsWith(valueTimeString))
-                //{
-                //    //ignore
-                //}
+                }                
                 else if (state == 4)
                 {
                     //state=4

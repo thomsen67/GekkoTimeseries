@@ -2108,42 +2108,43 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTHASH":
                         {
-                            if (node.Parent != null && node.Number == 1 && node.Parent.Text == "ASTFUNCTION")
-                            {
+                            //if (node.Parent != null && node.Number == 1 && node.Parent.Text == "ASTFUNCTION")
+                            //{
+                            //    //for instance the first #i in sum(#i, x[#i])
 
-                                string[] sumFunctionListNames = IsGamsLikeSumFunction1(false, node.Parent, w, node.Parent[0].Text.ToLower());  //can return null                                                        
-                                                                                                                       //TODO: Should these just override??? And what if inbuilt function does not exist??
-                                if (sumFunctionListNames != null)  //Is first argument of GAMS-like sum function, sum(#i, x[#i])
-                                {
-
-
-                                    string functionName = GetFunctionName(node.Parent);
-                                    string[] listNames = IsGamsLikeSumFunction1(true, node.Parent, w, functionName);
-                                    if (listNames != null) HandleGamsLikeSumFunction(listNames, true, w, null);
+                            //    string[] sumFunctionListNames = IsGamsLikeSumFunction1(false, node.Parent, w, node.Parent[0].Text.ToLower());  //can return null                                                        
+                                
+                            //    if (sumFunctionListNames != null)  //Is first argument of GAMS-like sum function, sum(#i, x[#i])
+                            //    {
 
 
+                            //        string functionName = GetFunctionName(node.Parent);
+                            //        string[] listNames = IsGamsLikeSumFunction1(true, node.Parent, w, functionName);
+                            //        if (listNames != null) HandleGamsLikeSumFunction(listNames, true, w, null);
 
-                                    string nodeCode = null;
-                                    string dName = "sumHelper" + ++Globals.counter;
-                                    nodeCode += "double " + dName + "" + " = 0d;" + G.NL;
 
-                                    foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
-                                    {
-                                        nodeCode += EmitListLoopingCode(node, kvp);  //foreach(...
-                                        nodeCode += dName + " += " + node[2].Code.ToString() + ";";
-                                    }
 
-                                    foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
-                                    {
-                                        nodeCode += "}" + G.NL;
-                                    }
+                            //        string nodeCode = null;
+                            //        string dName = "sumHelper" + ++Globals.counter;
+                            //        nodeCode += "double " + dName + "" + " = 0d;" + G.NL;
 
-                                    HandleGamsLikeSumFunction(sumFunctionListNames, false, w, node.Code.ToString());
+                            //        foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
+                            //        {
+                            //            nodeCode += EmitListLoopingCode(node, kvp);  //foreach(...
+                            //            nodeCode += dName + " += " + node[2].Code.ToString() + ";";
+                            //        }
 
-                                    node.Code.A(nodeCode);
+                            //        foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
+                            //        {
+                            //            nodeCode += "}" + G.NL;
+                            //        }
 
-                                }
-                            }
+                            //        HandleGamsLikeSumFunction(sumFunctionListNames, false, w, node.Code.ToString());
+
+                            //        node.Code.A(nodeCode);
+
+                            //    }
+                            //}
 
 
                             string simpleIdent = null;
