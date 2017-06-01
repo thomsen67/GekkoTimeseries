@@ -1549,10 +1549,38 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTFUNCTION":
                         {
-                            string functionName = GetFunctionName(node);
-                            
-                                                        
-                            if (Globals.lagFunctions.Contains(functionName))  //functionName is lower case
+                            string functionName = GetFunctionName(node);                            
+
+                            if (functionName == "sum")  //sum(#i, x[#i]), check that it is gams-like
+                            {
+                                string nodeCode = null;
+                                w.wh.sumHelperListNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                                w.wh.sumHelperListNames.Add(node[1][0][0].Text, node[1].Code.ToString());
+
+                                if (w.wh.sumHelperListNames != null)
+                                {
+                                    foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
+                                    {
+                                        nodeCode += EmitListLoopingCode(node, kvp);
+                                    }
+                                }
+
+                                
+                                
+                                                                
+                                if (w.wh.sumHelperListNames != null)
+                                {
+                                    foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
+                                    {
+                                        nodeCode += "}" + G.NL;
+                                    }
+                                }
+
+
+                                node.Code.A(nodeCode);
+
+                            }
+                            else if (Globals.lagFunctions.Contains(functionName))  //functionName is lower case
                             {
 
                                 if (Program.options.interface_lagfix)
@@ -1601,7 +1629,7 @@ namespace Gekko.Parser.Gek
                                                     lag1Code = node[1].Code.ToString();
                                                     lag2Code = node[2].Code.ToString();
                                                     code = node[3].Code.ToString();
-                                                }                                                
+                                                }
                                             }
                                             break;
                                         case "lag":
@@ -1683,7 +1711,7 @@ namespace Gekko.Parser.Gek
                                     sb1.AppendLine("int " + counterName + " = 0;");
                                     if (isAvgtOrSumt)
                                     {
-                                        sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(O.GetDate(" + lag1Code + "), O.GetDate(" + lag2Code + ")))");                                        
+                                        sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(O.GetDate(" + lag1Code + "), O.GetDate(" + lag2Code + ")))");
                                     }
                                     else
                                     {
@@ -1694,7 +1722,7 @@ namespace Gekko.Parser.Gek
 
                                     if (node.timeLoopNestCode != null)
                                     {
-                                        sb1.Append(node.timeLoopNestCode);                                        
+                                        sb1.Append(node.timeLoopNestCode);
                                     }
 
                                     sb1.AppendLine("" + storageName + "[" + counterName + "] = O.GetVal(" + code + ", t);");
@@ -1708,7 +1736,7 @@ namespace Gekko.Parser.Gek
                                         //if (functionName != "avgt" && functionName != "sumt")
                                         //{
                                         G.Writeln2("*** ERROR: Lag function " + functionName + "() intended for SERIES/PRT/PLOT type commands");
-                                            throw new GekkoException();
+                                        throw new GekkoException();
                                         //}
                                         //node.Code.A(sb1.ToString());
 
@@ -1718,8 +1746,8 @@ namespace Gekko.Parser.Gek
                                         parentTimeLoop.timeLoopNestCode += sb1.ToString();
                                     }
 
-                                    node.Code.A("O.HandleLags(`" + functionName + "`, " + storageName + ")");
-                                    
+                                    node.Code.A("O.HandleSummations(`" + functionName + "`, " + storageName + ")");
+
 
                                 }
                                 else
@@ -4379,15 +4407,24 @@ namespace Gekko.Parser.Gek
             return Globals.endGekkoTimeIteratorCode;            
         }
 
+        //private static string GekkoListIteratorEndCode()
+        //{
+        //    return Globals.endGekkoListIteratorCode;
+        //}
+
         private static string GekkoTimeIteratorStartCode(W w, ASTNode node)
         {            
             string nodeCode = Globals.startGekkoTimeIteratorCode;
-            //if (w.wh.timeLoopCode != null) nodeCode += w.wh.timeLoopCode.ToString();
-
-            if (node.timeLoopNestCode != null) nodeCode += node.timeLoopNestCode;
-                      
+            if (node.timeLoopNestCode != null) nodeCode += node.timeLoopNestCode;                      
             return nodeCode;
         }
+
+        //private static string GekkoListIteratorStartCode(W w, ASTNode node)
+        //{
+        //    string nodeCode = Globals.startGekkoListIteratorCode;
+        //    if (node.listLoopNestCode != null) nodeCode += node.listLoopNestCode;
+        //    return nodeCode;
+        //}
 
         //private static void CreateTupleClass(StringBuilder headerCs, int number, string className, GekkoDictionary<string, bool> tupleClasses)
         //{

@@ -1625,12 +1625,13 @@ namespace Gekko
             return lag;
         }
 
-        public static IVariable HandleLags(string type, double[] storage)
+        public static IVariable HandleSummations(string type, double[] storage)
         {
             //i1 and i2 are often not used
             double data = double.NaN;
             switch(type)
             {
+                case "sum":  //this is the GAMS-like sum function, for instance sum(#i, x[#i]). It does not exist in an avg() version.
                 case "movavg":
                 case "movsum":
                 case "avgt":

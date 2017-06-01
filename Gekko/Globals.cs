@@ -144,7 +144,10 @@ namespace Gekko
                 
         public static string startGekkoTimeIteratorCode = "{" + G.NL + "  t = t2; " + G.NL;
         public static string endGekkoTimeIteratorCode = "}" + G.NL + "t = Globals.tNull; " + G.NL;
-        
+
+        //public static string startGekkoListIteratorCode = "{" + G.NL + " //HEJ1 " + G.NL;
+        //public static string endGekkoListIteratorCode = "}" + G.NL + " //HEJ2 " + G.NL;
+
         public const string indexerAloneCheatString = "[<{THIS IS AN IndexerAlone CALL}>]";
         public const string labelCheatString = "[<{THIS IS A LABEL}>]";
 
