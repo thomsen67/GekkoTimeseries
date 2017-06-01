@@ -1408,7 +1408,7 @@ namespace Gekko
             return;
         }
 
-        public static string GetListWithCommas(List<string> list)
+        public static string GetListWithCommas(List<string> list) 
         {
             StringBuilder sb = new StringBuilder();            
             for (int i = 0; i < list.Count; i++)
