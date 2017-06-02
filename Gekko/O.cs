@@ -1830,7 +1830,9 @@ namespace Gekko
             public string opt_prim = null;  //obsolete
             public string opt_first = null;
             public string opt_ref = null;
+            public string opt_array = null;
             public string type = null;  //read or import
+            
             public P p = null;
             public void Exe()
             {
@@ -1998,6 +2000,8 @@ namespace Gekko
                     //No READ ... TO
                     wipeDatabankBeforeInsertingData = true;
                 }
+
+                hlp.array = this.opt_array;
 
                 Program.OpenOrRead(wipeDatabankBeforeInsertingData, hlp, open, readInfos);
                 Program.ReadInfo readInfo = readInfos[0];

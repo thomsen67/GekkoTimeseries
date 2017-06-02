@@ -66,9 +66,9 @@ namespace Gekko
                 streamWriter.Flush();
                 streamWriter.Close();
                 string pxLinesText = null;
-                
+
                 DateTime t0 = DateTime.Now;
-                
+
                 G.Writeln2("--> Download of data file start...");
                 HttpWebResponse httpResponse = null;
                 try
@@ -131,11 +131,11 @@ namespace Gekko
                     }
                 }
                 else
-                {
+                {                    
                     int vars;
                     GekkoTime perStart;
                     GekkoTime perEnd;
-                    Program.ReadPx(true, null, source, tableName, codesHeaderJson, pxLinesText, out vars, out perStart, out perEnd);
+                    Program.ReadPx(o1.opt_array, true, null, source, tableName, codesHeaderJson, pxLinesText, out vars, out perStart, out perEnd);
                 }
             }
         }
@@ -269,7 +269,7 @@ namespace Gekko
                     int vars;
                     GekkoTime perStart;
                     GekkoTime perEnd;
-                    Program.ReadPx(true, null, source, tableName, codesHeaderJson, pxLinesText, out vars, out perStart, out perEnd);                    
+                    Program.ReadPx(o1.opt_array, true, null, source, tableName, codesHeaderJson, pxLinesText, out vars, out perStart, out perEnd);                    
                 }
             }
         }

@@ -3133,7 +3133,7 @@ namespace Gekko
             int vars = -12345;
             GekkoTime startYear;
             GekkoTime endYear;
-            ReadPx(false, dates, null, null, null, pxLinesText, out vars, out startYear, out endYear);
+            ReadPx(oRead.array, false, dates, null, null, null, pxLinesText, out vars, out startYear, out endYear);
 
             readInfo.startPerInFile = startYear.super;
             readInfo.endPerInFile = endYear.super;        
@@ -3375,7 +3375,7 @@ namespace Gekko
         }
 
 
-        public static void ReadPx(bool isDownload, ReadDatesHelper datesRestrict, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
+        public static void ReadPx(string array, bool isDownload, ReadDatesHelper datesRestrict, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
         {
             /*
              * Description
@@ -3388,15 +3388,15 @@ namespace Gekko
              *
              * 
             */
-             
 
+            bool isArray = false; if (G.equal(array, "yes")) isArray = true;
 
             bool hyphenFound = false;
 
             string freq = "a";
 
             List<string> dates = new List<string>();
-            
+
             List<string> lines2 = G.ExtractLinesFromText(pxLinesText);
             pxLinesText = null;  //clearing it
 
@@ -3645,7 +3645,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     codes.Add(names2);
-                }                
+                }
                 else if (state == 4)
                 {
                     //state=4
@@ -3676,21 +3676,46 @@ namespace Gekko
 
             }  //for each line
 
-            G.Writeln("    All data read, now putting into timeseries");
+            G.Writeln("    All data read, now putting into array-timeseries");
+
+            if (isArray)
+            {
+                TimeSeries ts = new TimeSeries(G.GetFreq(freq), tableName);
+                ts.SetDirtyGhost(true, true);
+                if (Program.databanks.GetFirst().GetVariable(G.GetFreq(freq), ts.variableName) != null)
+                {
+                    Program.databanks.GetFirst().RemoveVariable(G.GetFreq(freq), ts.variableName);
+                }
+                Program.databanks.GetFirst().AddVariable(freq, ts);
+            }
 
             for (int j = 0; j < codesCombi.Count; j++)
             {
 
-                string name2 = codesCombi[j];
-                TimeSeries ts = new TimeSeries(G.GetFreq(freq), name2);
-                ts.label = valuesCombi[j];
-                ts.source = source;
-                ts.stamp = Globals.dateStamp;
-                ts.SetDirtyGhost(true, false);                
+                TimeSeries ts = null;
+
+                if (isArray)
+                {
+                    string name3 = GetArrayName(tableName, codesCombi[j]);
+                    ts = new TimeSeries(G.GetFreq(freq), name3);
+                    ts.label = valuesCombi[j];
+                    ts.source = source;
+                    ts.stamp = Globals.dateStamp;
+                    ts.SetDirtyGhost(true, false);
+                }
+                else
+                {
+                    string name2 = codesCombi[j];
+                    ts = new TimeSeries(G.GetFreq(freq), name2);
+                    ts.label = valuesCombi[j];
+                    ts.source = source;
+                    ts.stamp = Globals.dateStamp;
+                    ts.SetDirtyGhost(true, false);
+                }                
 
                 if (Program.options.bugfix_px)  //can be switched off
                 {
-                                                            
+
                     GekkoTime gt_start = G.FromStringToDate(dates[0], true);
                     GekkoTime gt_end = G.FromStringToDate(dates[dates.Count - 1], true);
 
@@ -3716,7 +3741,7 @@ namespace Gekko
                     }
 
                     int obs = GekkoTime.Observations(gt_start, gt_end);
-                    
+
                     ts.SetDataSequence(gt_start, gt_end, data, j * dates.Count + offset);  //the last is the offset
                     ts.Trim();  //to save ram
                     allCcounter += obs;
@@ -3731,7 +3756,7 @@ namespace Gekko
                     for (int i = 0; i < dates.Count; i++)  //periods
                     {
                         GekkoTime gt = G.FromStringToDate(dates[i], true);
-                        ts.SetData(gt, data[i + j * dates.Count]);                        
+                        ts.SetData(gt, data[i + j * dates.Count]);
                         allCcounter++;
                         if (gt0.IsNull()) gt0 = gt;
                         if (gt1.IsNull()) gt1 = gt;
@@ -3745,17 +3770,27 @@ namespace Gekko
                     Program.databanks.GetFirst().RemoveVariable(G.GetFreq(freq), ts.variableName);
                 }
                 Program.databanks.GetFirst().AddVariable(freq, ts);
-                //if (j == 0) G.Writeln();
-                //G.Writeln(ts.variableName + ", with freq " + freq.ToUpper() + ", " + G.FromDateToString(gt0) + "-" + G.FromDateToString(gt1));
-                //counter++;                        
+
             }
+
+
+
 
             string downloadOrImport = "Read";
             if (isDownload) downloadOrImport = "Downloaded";
 
             G.Writeln("--> " + downloadOrImport + " " + codesCombi.Count + " timeseries in total, frequency " + freq + ", " + G.FromDateToString(gt0) + "-" + G.FromDateToString(gt1));
-            G.Writeln("    Name of first timeseries: " + codesCombi[0]);
-            G.Writeln("    Name of last timeseries: " + codesCombi[codesCombi.Count - 1]);
+
+            if (isArray)
+            {
+                G.Writeln("    Name of first timeseries: " + G.PrettifyTimeseriesHash(GetArrayName(tableName, codesCombi[0]), true, false));
+                G.Writeln("    Name of last timeseries: " + G.PrettifyTimeseriesHash(GetArrayName(tableName, codesCombi[codesCombi.Count - 1]), true, false));
+            }
+            else
+            {
+                G.Writeln("    Name of first timeseries: " + codesCombi[0]);
+                G.Writeln("    Name of last timeseries: " + codesCombi[codesCombi.Count - 1]);
+            }
 
             //return values
             vars = codesCombi.Count;
@@ -3776,6 +3811,26 @@ namespace Gekko
 
 
         }
+
+        private static string GetArrayName(string tableName, string codesCombi)
+        {
+            string name3 = null;
+            string name2 = codesCombi;
+            string[] ss = name2.Split('_');
+            List<string> dims = new List<string>();
+            for (int i = 2; i < ss.Length; i += 2)
+            {
+                //kind of hacky, make it more robust later on
+                dims.Add(ss[i]);
+            }
+            foreach (string s in dims)
+            {
+                name3 += Globals.symbolTurtle + s;
+            }
+            name3 = tableName + name3;
+            return name3;
+        }
+
         private static void Walk(string table, List<string> codesHeader, List<List<string>> codes, List<string> codesCombi, List<List<string>> values, List<string> valuesCombi, int depth, string sCodes, string sValues, ref bool hyphenFound)
         {
             //Hmmm what if a table name or column has a name with '_' inside? Probably not probable.
@@ -5986,7 +6041,13 @@ namespace Gekko
         public static List<string> MatchWildcardInDatabank(string wildcard, Databank db)
         {
             List<string> input = new List<string>();
-            input.AddRange(db.storage.Keys);
+            
+            //input.AddRange(db.storage.Keys);
+            foreach (KeyValuePair<string, TimeSeries> kvp in db.storage)
+            {
+                if (!kvp.Value.IsGhost()) input.Add(kvp.Key);  //do not look at the ghosts here!
+            }
+
             string endsWith = null;
             if (Program.options.freq != EFreq.Annual) endsWith = Globals.freqIndicator + G.GetFreq(Program.options.freq);
             List<string> output = Program.MatchWildcard(wildcard, input, endsWith);
@@ -32018,7 +32079,8 @@ namespace Gekko
         public EOpenType openType = EOpenType.Normal;
         public int openTypePosition = -12345;
         public bool protect = true;
-        public string gdxopt = null;        
+        public string gdxopt = null;
+        public string array = null;      
 
         public string FileName
         {

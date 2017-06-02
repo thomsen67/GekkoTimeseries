@@ -2087,7 +2087,7 @@ if2						  : IF leftParen logicalOr rightParen expressions1? (ELSE expressions2?
 expressions1              : expressions;
 expressions2              : expressions;  
 
-download                  : DOWNLOAD downloadOpt1? HTTP? url fileName (DUMP '=' fileName)* -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, $DOWNLOAD.Line)} ^(ASTHTTP HTTP?) url ^(ASTHANDLEFILENAME fileName) ^(ASTHANDLEFILENAME2 fileName?));
+download                  : DOWNLOAD downloadOpt1? HTTP? url fileName (DUMP '=' fileName)* -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, $DOWNLOAD.Line)} ^(ASTHTTP HTTP?) url ^(ASTHANDLEFILENAME fileName) ^(ASTHANDLEFILENAME2 fileName?) downloadOpt1?);
 downloadOpt1              : ISNOTQUAL | leftAngle downloadOpt1h* RIGHTANGLE -> ^(ASTOPT1 downloadOpt1h*);							
 downloadOpt1h             : //FILE (EQUAL yesNo)? -> ^(ASTOPT_STRING_FILE yesNo?)	
 						  	ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)	
@@ -2323,6 +2323,7 @@ readOpt1h                 : MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
   						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)
+						  | ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)
 						  ;
 identOrStar               : ident -> ident
 						  | star -> ASTBANKISSTARCHEATCODE
