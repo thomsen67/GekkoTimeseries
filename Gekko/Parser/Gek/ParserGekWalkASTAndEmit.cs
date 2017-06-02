@@ -1656,15 +1656,14 @@ namespace Gekko.Parser.Gek
                                     switch (functionName)
                                     {
                                         case "sum":                                        
-                                            {
-                                                //fixme zxcvb
+                                            {                                                
                                                 if (node.ChildrenCount() != 2 + 1)
                                                 {
                                                     G.Writeln2("*** ERROR: Expected 2 arguments for function " + functionName);
                                                     throw new GekkoException();
                                                 }
-                                                lag1Code = "2";  //FIXME FIXME
-                                                lag2Code = "0";               
+                                                lag1Code = null;  //not used
+                                                lag2Code = null;  //not used          
                                                 code = node[2].Code.ToString();
                                             }
                                             break;
@@ -1773,6 +1772,9 @@ namespace Gekko.Parser.Gek
 
                                     string storageName = "storage" + ++Globals.counter;
                                     string counterName = "counter" + ++Globals.counter;
+                                    string tempName = "temp" + ++Globals.counter;  //this is the name of the list
+
+
                                     StringBuilder sb1 = new StringBuilder();
                                     if (isAvgtOrSumt)
                                     {
@@ -1780,7 +1782,8 @@ namespace Gekko.Parser.Gek
                                     }
                                     else if (isGamsSum)
                                     {
-                                        sb1.AppendLine("double[] " + storageName + " = new double[" + lag1Code + "];");  //fixme zxcvb
+                                        sb1.AppendLine("IVariable " + tempName + " = " + node[1].Code.ToString() + ";" + G.NL);
+                                        sb1.AppendLine("double[] " + storageName + " = new double[((MetaList)" + tempName + ").Count()];");
                                     }
                                     else
                                     {
@@ -1812,9 +1815,7 @@ namespace Gekko.Parser.Gek
                                             listCode = kvp.Value;
                                         }
 
-                                        sb1.AppendLine("foreach (IVariable " + listCode + " in new O.GekkoListIterator(" + node[1].Code.ToString() + "))"); //FIXME zxcvb
-
-
+                                        sb1.AppendLine("foreach (IVariable " + listCode + " in new O.GekkoListIterator(" + tempName + "))"); 
 
                                     }
                                     else

@@ -20,6 +20,10 @@ namespace Gekko
             this.list = list;
         }
                
+        public int Count()
+        {
+            return this.list.Count;
+        }
 
         public IVariable Indexer(GekkoTime t, bool isLhs, params IVariable[] indexes)
         {
