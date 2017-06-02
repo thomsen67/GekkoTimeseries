@@ -3346,7 +3346,7 @@ namespace Gekko
                 int type1 = 0;
                 int type2 = 0;
                 int type3 = 0;
-                int type4 = 0;                
+                int type4 = 0;
 
                 for (int i = 0; i < listItems0.Count; i++)  //regarding this list, #-lists like "COPY #m;" are unfolded, but any wildcards or ranges are not.
                 {
@@ -3372,7 +3372,7 @@ namespace Gekko
                         {
                             //Stuff like "COPY bank1:#m TO bank2:#m;"
                             ss = listItems1[i];
-                        }                        
+                        }
                         ExtractBankAndRestHelper h = Program.ExtractBankAndRest(ss, EExtrackBankAndRest.GetDatabank);
 
                         string bankName2 = null;
@@ -3393,56 +3393,51 @@ namespace Gekko
                     string bankName = null;
                     if (localOptionFromBank != null) bankName = localOptionFromBank.aliasName;
 
-                    List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(listItems0[i], bankName);  //gets these from the 'fromBank', so ExtractBankAndRest() gets called two times, but never mind
+                    bool ignoreErrors = false; if (G.equal(opt_error, "no")) ignoreErrors = true;
 
-                    if (tss.Count == 0)
+                    List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(listItems0[i], bankName, ignoreErrors);  //gets these from the 'fromBank', so ExtractBankAndRest() gets called two times, but never mind
+
+                    if (tss.Count == 0 || (tss.Count == 1 && tss[0] == null))  //the first one is if a wildcard does not match at all, and the second is a normal timeseries name is not found, and COPY<error=no> is used.
                     {
-                        string s = listItems0[i].Replace(Globals.firstCheatString, "");
-
-                        if (s.Contains("*") || s.Contains("?") || s.Contains(".."))
-                        {                            
-                            G.Writeln2("+++ ERROR: COPY: The following item was not found: " + s);
-                            throw new GekkoException();                            
+                        string s = listItems0[i].Replace(Globals.firstCheatString, "");                        
+                        if (ignoreErrors)
+                        {
+                            errorCounter++;
+                            G.Writeln2("+++ NOTE: COPY: Could not find this timeseries: " + s + "");
+                            continue;
                         }
                         else
                         {
-                            if (G.equal(opt_error, "no"))
-                            {
-                                errorCounter++;                                
-                                G.Writeln("Note: the following item was not found: " + s);
-                                continue;
-                            }
-                            else
-                            {
-                                G.Writeln2("*** ERROR: COPY: Could not find this timeseries: '" + s + "'");
-                                throw new GekkoException();
-                            }
-                        }                        
+                            G.Writeln2("*** ERROR: COPY: Could not find this timeseries: " + s + "");
+                            throw new GekkoException();
+                        }
                     }
 
                     foreach (TimeSeries ts in tss)
                     {
+                        if (ts == null) continue;  //for safety, this should not be possible since there is a continue above.
+
                         //If a wildcard like "COPY a*;" is used, tss may have > 1 elements
                         string newName = null;
                         if (listItems1 == null)
-                        {                            
+                        {
                             //Stuff like "COPY adbk:fx*;"  (copies to first)                            
                             newName = ts.variableName;  //same name is used
                         }
                         else
-                        {                            
+                        {
                             if (isUsingPlaceholder)
                             {
                                 //Stuff like "COPY #m TO simbk:a_*;"
                                 //here we use item #0 (there can only be 1 such item)
-                                ExtractBankAndRestHelper h = Program.ExtractBankAndRest(listItems1[0], EExtrackBankAndRest.GetDatabank);                            
+                                ExtractBankAndRestHelper h = Program.ExtractBankAndRest(listItems1[0], EExtrackBankAndRest.GetDatabank);
                                 newName = placeholderPrefix + ts.variableName + placeholderSuffix;
                             }
                             else
                             {
                                 //Stuff like "COPY bank1:#m1 TO bank2:#m2;"
                                 //new names are provided with TO keyword (in a list with same number of items)                                
-                                ExtractBankAndRestHelper h = Program.ExtractBankAndRest(listItems1[i], EExtrackBankAndRest.GetDatabank);                                
+                                ExtractBankAndRestHelper h = Program.ExtractBankAndRest(listItems1[i], EExtrackBankAndRest.GetDatabank);
                                 newName = h.name;
                             }
                         }
@@ -3468,9 +3463,9 @@ namespace Gekko
                                 }
                             }
                         }
-                        
+
                         if (G.equal(this.opt_respect, "yes"))
-                        {                                                       
+                        {
                             //Truncate time period
                             TimeSeries ts2 = toBank.GetVariable(newName);
                             if (ts2 != null)
@@ -3500,7 +3495,7 @@ namespace Gekko
                             //No truncate of time period
                             TimeSeries ts2 = ts.Clone();  //will inherit the date stamp                          
                             if (listItems1 != null)
-                            {                                
+                            {
                                 ts2.variableName = newName;
                             }
                             if (toBank.ContainsVariable(newName))
@@ -3544,7 +3539,7 @@ namespace Gekko
                 }
                 if(errorCounter > 0)
                 {
-                    G.Writeln2("+++ WARNING: COPY: Note that " + errorCounter + " variables were not copied");
+                    G.Writeln("+++ WARNING: COPY: Note that " + errorCounter + " variables were not copied");
                 }
             }
 

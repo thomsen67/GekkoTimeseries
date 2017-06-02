@@ -1658,7 +1658,8 @@ namespace UnitTests
 
         [TestMethod]
         public void Test__Copy()
-        {
+        {           
+
             //TODO: quarters and months
 
             //We assume all the respect etc. stuff (tested above) still works...!
@@ -2416,9 +2417,25 @@ namespace UnitTests
 
             }
 
+            //Test of COPY <error=no>
 
-
-
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\temp';");
+            I("SERIES xx1 = 1;");
+            I("OPEN<edit>tmp; CLEAR tmp;");
+            I("COPY work:xx1 to tmp:xx1;");
+            FAIL("COPY work:xx2 to tmp:xx2;");
+            FAIL("COPY work:xx2* to tmp:*;");
+            Assert.AreEqual(Program.databanks.GetDatabank("tmp").storage.Count, 1);
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\temp';");
+            I("SERIES xx1 = 1;");
+            I("OPEN<edit>tmp; CLEAR tmp;");
+            I("COPY <error=no> work:xx1 to tmp:xx1;");
+            I("COPY <error=no> work:xx2 to tmp:xx2;");
+            I("COPY <error=no> work:xx2* to tmp:*;");
+            Assert.AreEqual(Program.databanks.GetDatabank("tmp").storage.Count, 1);
+            
 
         }
 

@@ -263,7 +263,7 @@ namespace Gekko.Parser.Gek
                 case "ASTFUNCTION":  //kind of like ASTFUNCTIONDEF, but the difference is that these sum() functions may be nested, so the nodes themselves need to keep the anchor info
                     {
                         string functionName = GetFunctionName(node);
-                        string[] listNames = IsGamsLikeSumFunction1(true, node, w, functionName);
+                        string[] listNames = IsGamsLikeSumFunction1(node, functionName);
                         //if (listNames != null) HandleGamsLikeSumFunction(listNames, true, w, null);                        
                         if (listNames != null)
                         {
@@ -1601,47 +1601,11 @@ namespace Gekko.Parser.Gek
                         {
                             string functionName = GetFunctionName(node);
 
-                            //if (functionName == "sum")  //sum(#i, x[#i]), check that it is gams-like
-                            //{
-                            //    string nodeCode = null;
-                            //    w.wh.sumHelperListNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                            //    w.wh.sumHelperListNames.Add(node[1][0][0].Text, node[1].Code.ToString());
+                            bool isGamsLikeSumFunction = false;
+                            string[] listNames = IsGamsLikeSumFunction1(node, functionName);
+                            if (listNames != null) isGamsLikeSumFunction = true;
 
-                            //    if (w.wh.sumHelperListNames != null)
-                            //    {
-                            //        foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
-                            //        {
-                            //            nodeCode += EmitListLoopingCode(node, kvp);
-                            //        }
-                            //    }
-
-
-
-
-                            //    if (w.wh.sumHelperListNames != null)
-                            //    {
-                            //        foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
-                            //        {
-                            //            nodeCode += "}" + G.NL;
-                            //        }
-                            //    }
-
-
-                            //    node.Code.A(nodeCode);
-
-                            //}
-
-                            //NOTE: check "sum" for GAMS-like!!
-                            //NOTE: check "sum" for GAMS-like!!
-                            //NOTE: check "sum" for GAMS-like!!
-                            //NOTE: check "sum" for GAMS-like!! fixme zxcvb
-                            //NOTE: check "sum" for GAMS-like!!
-                            //NOTE: check "sum" for GAMS-like!!
-
-                            bool isGamsSum = false;
-                            if (functionName == "sum") isGamsSum = true;
-
-                            if (Globals.lagFunctions.Contains(functionName) || isGamsSum)  //functionName is lower case, zxcvb
+                            if (Globals.lagFunctions.Contains(functionName) || isGamsLikeSumFunction)  //functionName is lower case
                             {
 
                                 if (Program.options.interface_lagfix)
@@ -1655,8 +1619,9 @@ namespace Gekko.Parser.Gek
 
                                     switch (functionName)
                                     {
-                                        case "sum":                                        
-                                            {                                                
+                                        case "sum":                                   
+                                            {
+                                                //must be GAMS-like if we are here
                                                 if (node.ChildrenCount() != 2 + 1)
                                                 {
                                                     G.Writeln2("*** ERROR: Expected 2 arguments for function " + functionName);
@@ -1780,7 +1745,7 @@ namespace Gekko.Parser.Gek
                                     {
                                         sb1.AppendLine("double[] " + storageName + " = new double[Math.Max(0, GekkoTime.Observations(O.GetDate(" + lag1Code + "), O.GetDate(" + lag2Code + ")))];");  //remember lag1 and lag2 are <= 0
                                     }
-                                    else if (isGamsSum)
+                                    else if (isGamsLikeSumFunction)
                                     {
                                         sb1.AppendLine("IVariable " + tempName + " = " + node[1].Code.ToString() + ";" + G.NL);
                                         sb1.AppendLine("double[] " + storageName + " = new double[((MetaList)" + tempName + ").Count()];");
@@ -1796,7 +1761,7 @@ namespace Gekko.Parser.Gek
                                     {
                                         sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(O.GetDate(" + lag1Code + "), O.GetDate(" + lag2Code + ")))");
                                     }
-                                    else if (isGamsSum)
+                                    else if (isGamsLikeSumFunction)
                                     {
                                         sb1.AppendLine("GekkoTime t" + tCounter + " = t" + (tCounter - 1) + ";" + G.NL);  //instead of the loop seen in the others. This way, we hook up the t's, even though the t's in this case are artificial                                        
 
@@ -1835,7 +1800,7 @@ namespace Gekko.Parser.Gek
                                     sb1.AppendLine("" + storageName + "[" + counterName + "] = O.GetVal(" + code + ", t);");
                                     sb1.AppendLine("" + counterName + "++;");
 
-                                    if (parentTimeLoop != null && !isGamsSum) sb1.AppendLine("t = t" + (tCounter - 1) + ";");  //t may have been set, cf. #098745345, so we are setting it back
+                                    if (parentTimeLoop != null && !isGamsLikeSumFunction) sb1.AppendLine("t = t" + (tCounter - 1) + ";");  //t may have been set, cf. #098745345, so we are setting it back
                                     sb1.AppendLine("}");
 
                                     if (parentTimeLoop == null)
@@ -4162,8 +4127,9 @@ namespace Gekko.Parser.Gek
             return nodeCode;
         }
 
-        private static string[] IsGamsLikeSumFunction1(bool firstTime, ASTNode node, W w, string functionName)
+        private static string[] IsGamsLikeSumFunction1(ASTNode node, string functionName)
         {
+            //returns null if it is NOT a GAMS-like sum() function
             string[] rv = null;
             string firstArgumentListName = null;
             //firstArgIsOneOrMoreLists = false;
