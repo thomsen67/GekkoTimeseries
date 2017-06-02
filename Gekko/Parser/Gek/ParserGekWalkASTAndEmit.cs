@@ -260,13 +260,26 @@ namespace Gekko.Parser.Gek
                         w.wh.seriesHelper = WalkHelper.seriesType.SeriesRhs;
                     }
                     break;
-                    //case "ASTFUNCTION":
-                    //    {
-                    //        string functionName = GetFunctionName(node);
-                    //        string[] listNames = IsGamsLikeSumFunction1(true, node, w, functionName);
-                    //        if (listNames != null) HandleGamsLikeSumFunction(listNames, true, w, null);
-                    //    }
-                    //    break;
+                case "ASTFUNCTION":  //kind of like ASTFUNCTIONDEF, but the difference is that these sum() functions may be nested, so the nodes themselves need to keep the anchor info
+                    {
+                        string functionName = GetFunctionName(node);
+                        string[] listNames = IsGamsLikeSumFunction1(true, node, w, functionName);
+                        //if (listNames != null) HandleGamsLikeSumFunction(listNames, true, w, null);                        
+                        if (listNames != null)
+                        {
+                            if (node.listLoopAnchor == null) node.listLoopAnchor = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                            foreach (string s in listNames)
+                            {
+                                if (node.listLoopAnchor.ContainsKey(s))
+                                {
+                                    G.Writeln2("*** ERROR: The list " + Globals.symbolList + s + " is used several times for multidimensional looping in sum() function");
+                                    throw new GekkoException();
+                                }
+                                node.listLoopAnchor.Add(s, "listloop_" + s + ++Globals.counter);
+                            }
+                        }
+                    }
+                    break;
             }
             
             foreach (ASTNode child in node.ChildrenIterator())
@@ -372,6 +385,11 @@ namespace Gekko.Parser.Gek
                                 string s = null;
                                 if (w.wh.seriesHelper == WalkHelper.seriesType.SeriesLhs && node[0].Text == "ASTNAMEWITHBANK") //is a "normal" variable with indexer
                                 {
+                                    //
+                                    //
+                                    // NOTE NOTE NOTE: This only deals with the left-hand side of SERIES, for instance SERIES y[#i] = .... ;
+                                    //
+                                    //
 
                                     for (int i = 1; i < node.ChildrenCount(); i++)
                                     {
@@ -382,7 +400,6 @@ namespace Gekko.Parser.Gek
 
                                             string listName = GetSimpleHashName(node[i][1]);
                                             string nameCode = null;
-                                            //string listName = node[i][1][0][0].Text;
 
                                             string found = null; if (w.wh.seriesHelperListNames != null) w.wh.seriesHelperListNames.TryGetValue(listName, out found);
 
@@ -394,7 +411,6 @@ namespace Gekko.Parser.Gek
                                             if (w.wh.seriesHelperListNames == null) w.wh.seriesHelperListNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                                             w.wh.seriesHelperListNames.Add(listName, node[i].Code.ToString());
                                             found = node[i].Code.ToString();
-
 
                                             if (found == null)  //not found
                                             {
@@ -417,33 +433,46 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
+                                    //
+                                    //  Here, an indexer like x[#i] will be on the right-hand side (or at least certainly NOT be for instance SERIES x[#i] = ... ;
+                                    //
+                                                                       
+
                                     for (int i = 1; i < node.ChildrenCount(); i++)
                                     {
-                                        s += ", " + node[i].Code.ToString();
+
+                                        bool success = false;
+                                        if (node[i][0] != null && node[i][0].Text == "ASTINDEXERELEMENTBANK" && GetSimpleHashName(node[i][1]) != null)
+                                        {
+
+                                            string listName = GetSimpleHashName(node[i][1]);
+
+
+
+                                            if (listName != null)
+                                            {
+                                                ASTNode xx = null; SearchUpwardsInTree2(node[i], listName, out xx);
+                                                if (xx != null)
+                                                {
+                                                    string internalName = xx.listLoopAnchor[listName];  //must exist
+                                                    s += ", " + internalName;
+                                                    success = true;
+                                                }
+                                            }
+
+                                        }
+                                        if (success == false)
+                                        {
+                                            s += ", " + node[i].Code.ToString();
+                                        }
                                     }
                                 }
 
                                 string tf = "false";
-                                if (w.wh.seriesHelper == WalkHelper.seriesType.SeriesLhs) tf = "true";
+                                if (w.wh.seriesHelper == WalkHelper.seriesType.SeriesLhs) tf = "true";                                
+                                node.Code.A("O.Indexer(t, " + node[0].Code + ", " + tf + s + ")");                               
 
-                                bool isKnown = false; //fix zxcvb
-                                try
-                                {
-                                    if (node[1][1][0][0].Text == "i") isKnown = true;
-                                }
-                                catch { };
-                                if (!isKnown)  
-                                {
-                                    node.Code.A("O.Indexer(t, " + node[0].Code + ", " + tf + s + ")");
-                                }
-                                else
-                                {
-                                    //fixme zxcvb
-                                    node.Code.A("O.Indexer(t, " + node[0].Code + ", " + tf + ", s1177" + ")");
-                                    
-                                }
-
-                            }                      
+                            }
                         }
                         break;
                     case "ASTXLINE":
@@ -1765,10 +1794,28 @@ namespace Gekko.Parser.Gek
                                         sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(O.GetDate(" + lag1Code + "), O.GetDate(" + lag2Code + ")))");
                                     }
                                     else if (isGamsSum)
-                                    {                                        
-                                        sb1.AppendLine("GekkoTime t" + tCounter + " = t" + (tCounter - 1) + ";" + G.NL);  //instead of the loop seen in the others. This way, we hook up the t's, even though the t's in this case are artificial
-                                        //sb1.AppendLine("foreach (string s1177 in new List<string> { \"a\", \"b\" })");  //FIXME zxcvb
-                                        sb1.AppendLine("foreach (IVariable s1177 in new O.GekkoListIterator(" + node[1].Code.ToString() + "))"); //FIXME zxcvb
+                                    {
+                                        sb1.AppendLine("GekkoTime t" + tCounter + " = t" + (tCounter - 1) + ";" + G.NL);  //instead of the loop seen in the others. This way, we hook up the t's, even though the t's in this case are artificial                                        
+
+                                        string listName = null;
+                                        if (node.listLoopAnchor == null || node.listLoopAnchor.Count != 1)
+                                        {
+                                            G.Writeln2("*** ERROR: Internal error #98973422");
+                                            throw new GekkoException();
+                                        }
+
+                                        string listCode = null;
+
+                                        foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
+                                        {
+                                            //there is only 1!
+                                            listCode = kvp.Value;
+                                        }
+
+                                        sb1.AppendLine("foreach (IVariable " + listCode + " in new O.GekkoListIterator(" + node[1].Code.ToString() + "))"); //FIXME zxcvb
+
+
+
                                     }
                                     else
                                     {
@@ -4142,31 +4189,31 @@ namespace Gekko.Parser.Gek
             return rv;
         }
 
-        private static void HandleGamsLikeSumFunction(string[] listNames, bool firstTime, W w, string code)
-        {
-            if (firstTime)
-            {
-                //Add the item
-                if (w.wh.sumHelperListNames == null) w.wh.sumHelperListNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                w.wh.sumHelperListNames.Add(listNames[0], code);
-            }
-            else
-            {
-                //Remove the item
-                if (w.wh.sumHelperListNames == null)
-                {
-                    G.Writeln2("*** ERROR: Internal error #7986432523");
-                    throw new GekkoException();
-                }
-                if (!w.wh.sumHelperListNames.ContainsKey(listNames[0]))
-                {
-                    G.Writeln2("*** ERROR: Internal error #7986432524");
-                    throw new GekkoException();
-                }
-                w.wh.sumHelperListNames.Remove(listNames[0]);
-            }
+        //private static void HandleGamsLikeSumFunction(string[] listNames, bool firstTime, W w, string code)
+        //{
+        //    if (firstTime)
+        //    {
+        //        //Add the item
+        //        if (w.wh.sumHelperListNames == null) w.wh.sumHelperListNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        //        w.wh.sumHelperListNames.Add(listNames[0], code);
+        //    }
+        //    else
+        //    {
+        //        //Remove the item
+        //        if (w.wh.sumHelperListNames == null)
+        //        {
+        //            G.Writeln2("*** ERROR: Internal error #7986432523");
+        //            throw new GekkoException();
+        //        }
+        //        if (!w.wh.sumHelperListNames.ContainsKey(listNames[0]))
+        //        {
+        //            G.Writeln2("*** ERROR: Internal error #7986432524");
+        //            throw new GekkoException();
+        //        }
+        //        w.wh.sumHelperListNames.Remove(listNames[0]);
+        //    }
 
-        }
+        //}
 
         
 
@@ -4203,24 +4250,22 @@ namespace Gekko.Parser.Gek
             while (tmp != null)
             {
                 bool ok = false;
-                if (true)
-                {
-                    if (
 
-                           (tmp.Text == "ASTFUNCTION" && (Globals.lagFunctions.Contains(tmp[0].Text.ToLower()) || tmp[0].Text.ToLower()=="sum"))  //check that sum is gams-like
-                        || tmp.Text == "ASTOLSELEMENT"
-                        || tmp.Text == "ASTPRTELEMENT"
-                        || tmp.Text == "ASTTABLESETVALUESELEMENT"
-                        || tmp.Text == "ASTSERIES"
-                        || tmp.Text == "ASTGENR"
-                        || tmp.Text == "ASTGENRLHSFUNCTION"
-                        || tmp.Text == "ASTGENRLISTINDEXER"
-                        || tmp.Text == "ASTRETURNTUPLE"
-                        || (G.equal(tmp.Text, "series") && (tmp.Parent != null && tmp.Text == "ASTTUPLEITEM") && (tmp.Parent.Parent != null && tmp.Parent.Text == "ASTTUPLE"))
+                if (
 
-                        ) ok = true;
-                }
-                
+                       (tmp.Text == "ASTFUNCTION" && (Globals.lagFunctions.Contains(tmp[0].Text.ToLower()) || tmp[0].Text.ToLower() == "sum"))  //check that sum is gams-like
+                    || tmp.Text == "ASTOLSELEMENT"
+                    || tmp.Text == "ASTPRTELEMENT"
+                    || tmp.Text == "ASTTABLESETVALUESELEMENT"
+                    || tmp.Text == "ASTSERIES"
+                    || tmp.Text == "ASTGENR"
+                    || tmp.Text == "ASTGENRLHSFUNCTION"
+                    || tmp.Text == "ASTGENRLISTINDEXER"
+                    || tmp.Text == "ASTRETURNTUPLE"
+                    || (G.equal(tmp.Text, "series") && (tmp.Parent != null && tmp.Text == "ASTTUPLEITEM") && (tmp.Parent.Parent != null && tmp.Parent.Text == "ASTTUPLE"))
+
+                    ) ok = true;
+
                 if (ok)
                 {
                     timeLoopDepth++;
@@ -4229,7 +4274,23 @@ namespace Gekko.Parser.Gek
                 tmp = tmp.Parent;
             }
         }
-        
+
+        private static void SearchUpwardsInTree2(ASTNode node, string listName, out ASTNode parentTimeLoop)
+        {            
+            ASTNode tmp = node.Parent;
+            parentTimeLoop = null;
+            while (tmp != null)
+            {
+                bool ok = false;
+                if (tmp.listLoopAnchor != null && tmp.listLoopAnchor.ContainsKey(listName)) ok = true;
+                if (ok)
+                {                    
+                    if (parentTimeLoop == null) parentTimeLoop = tmp;  //only first one
+                }
+                tmp = tmp.Parent;
+            }
+        }
+
         private static void ResetUFunctionHelpers(W w)
         {
             w.uFunctionsHelper = null;  //do not remove this line: important!      
