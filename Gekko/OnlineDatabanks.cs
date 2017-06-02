@@ -16,6 +16,36 @@ namespace Gekko
             else DownloadOld(o1);
         }
 
+        private static void SLETMIG(O.Download o1)
+        {
+            string dbUrl = "url til databanken";
+            string jsonCode = "json code fra json-fil";
+
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(dbUrl);
+            httpWebRequest.Timeout = 24 * 60 * 60 * 1000; //24 hours max        
+            httpWebRequest.ContentType = "text/json";
+            httpWebRequest.Method = "POST";
+            bool xxxx = httpWebRequest.UseDefaultCredentials;
+
+            StreamWriter streamWriter = new StreamWriter(httpWebRequest.GetRequestStream());
+            
+            using (streamWriter)
+            {
+                streamWriter.Write(jsonCode);
+                streamWriter.Flush();
+                streamWriter.Close();                
+                HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                Encoding encoding = System.Text.Encoding.GetEncoding("Windows-1252");                                
+                using (var streamReader = new StreamReader(httpResponse.GetResponseStream(), encoding))
+                {
+                    string pxLinesText = streamReader.ReadToEnd();  //encoded as Windows-1252    
+                    
+                    //pxLinesText er den px-fil, som returneres.
+                    //denne inlæses i det følgende                                    
+                }                
+            }
+        }
+
         private static void DownloadNew(O.Download o1)
         {
             string input = Program.options.folder_working + "\\" + o1.fileName;
@@ -25,6 +55,24 @@ namespace Gekko
             httpWebRequest.ContentType = "text/json";
             httpWebRequest.Method = "POST";
             System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+            httpWebRequest.UseDefaultCredentials = true;  //to be able to access sumdatabasen from inside DST
+            httpWebRequest.Credentials = CredentialCache.DefaultNetworkCredentials;
+
+            if (false)
+            {
+                //It is probably either Credentials or UseDefaultCredentials that must be messed with.
+
+                httpWebRequest.Credentials = new NetworkCredential("user", "password", "http://...");
+
+                var x1 = httpWebRequest.AuthenticationLevel;                   //MutualAuthRequested, vælg fra [None, MutualAuthRequested, MutualAuthRequired]
+                var x2 = httpWebRequest.ClientCertificates;                    //X.509-certifikater, der ser ikke ud til at være nogen, for count = 0
+                var x3 = httpWebRequest.Credentials;                           //Det anbefales i stedet for denne at sætte httpWebRequest.UseDefaultCredentials = true, men et sted står det at man OGSÅ skal sætte denne til CredentialCache.DefaultNetworkCredentials;
+                var x4 = httpWebRequest.ImpersonationLevel;                    //Delegation,  vælg fra [None, Anonymous, Identification, Impersonation, Delegation] 
+                var x5 = httpWebRequest.PreAuthenticate;                       //false, vælg fra [false|true].
+                var x6 = httpWebRequest.UnsafeAuthenticatedConnectionSharing;  //false, vælg fra [false|true]
+                var x7 = httpWebRequest.UseDefaultCredentials;                 //false, vælg fra [false|true]
+                                
+            }
 
             Dictionary<string, object> jsonTree = null;
             try
