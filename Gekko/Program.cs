@@ -3987,14 +3987,14 @@ namespace Gekko
                     
                     int[] dims = new int[n.Domains.Count];   
                     
-                    if(G.equal(gvar, "j_cqi")) {
+                    //if(G.equal(gvar, "j_cqi")) { 
 
-                    }
+                    //}
 
-                    if (G.equal(gvar, "gnslon"))
-                    {
+                    //if (G.equal(gvar, "gnslon"))
+                    //{
 
-                    }
+                    //}
 
                     int timeIndex = -12345;
                     int scnsIndex = -12345;
