@@ -327,6 +327,7 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: The variable '" + this.variableName + "' is an array-timeseries,");
                     G.Writeln("           but is used as a normal timeseries here (without []-indexer)", Color.Red);
+                    Program.ArrayTimeseriesTip(this.variableName);
                     throw new GekkoException();
                 }
                 else
@@ -351,6 +352,8 @@ namespace Gekko
                 }
             }
         }
+
+       
 
         public void SetTimelessData(double value)
         {

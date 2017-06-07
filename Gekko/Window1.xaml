@@ -312,7 +312,7 @@
                     </DockPanel>
                     <TextBox                        
                      Text="Equation"                        
-                     Margin="5"
+                     Margin="0"
                      VerticalAlignment="Center"
                      Height="120" Grid.Row="1" Name="equation" FontFamily="Courier New" AutoWordSelection="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" ToolTip="Equation. The field shows variable labels when mouse hovers over a variable name (first column)">
                     </TextBox>

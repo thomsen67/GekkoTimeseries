@@ -40,12 +40,18 @@ namespace Gekko
                 {
                     if (canCreate == O.ECreatePossibilities.None)
                     {
-                        G.Writeln2("*** ERROR: Cannot find " + this.ts.parentDatabank.aliasName + ":" + this.ts.variableName + "[" + G.PrettifyTimeseriesHash(hash, false, false) + "]");
+                        string prettyName = this.ts.parentDatabank.aliasName + ":" + this.ts.variableName + "[" + G.PrettifyTimeseriesHash(hash, false, false) + "]";
+                        G.Writeln2("*** ERROR: Cannot find " + prettyName);
+                        if (prettyName.Contains("["))
+                        {
+                            Program.ArrayTimeseriesTip(this.ts.variableName);
+                        }
                         throw new GekkoException();
                     }
                     ts = new TimeSeries(this.ts.freqEnum, varHash);
                     this.ts.parentDatabank.AddVariable(ts);
                 }
+                this.ts.SetDirtyGhost(true, true);  //otherwise, an ASER x['a'] = ... will not register 'x' as a ghost.
                 return new MetaTimeSeries(ts);
             }
             else 

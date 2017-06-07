@@ -3377,18 +3377,7 @@ namespace Gekko
 
         public static void ReadPx(string array, bool isDownload, ReadDatesHelper datesRestrict, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
         {
-            /*
-             * Description
-             * -----------
-             * 
-             * Læser linje for linje
-             * 
-             *
-             *
-             *
-             * 
-            */
-
+         
             bool isArray = false; if (G.equal(array, "yes")) isArray = true;
 
             bool hyphenFound = false;
@@ -3907,7 +3896,17 @@ namespace Gekko
 
         public static void ReadGdx(Databank databank, ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
         {
+
+            //Hardcoded --------------
+            string tName = "t";  //name of the set identified as time
+            int timePartLength = 1;  //how many chars to remove from for instance 't30'
+            int year0 = 2006; //'t30' --> 30 + 2006 = 2036.
+
+            bool identifyTPlusIntegerAsTime = true;
+            char identifierT = 't';
             
+            //------------------------
+
             DateTime dt1 = DateTime.Now;
                         
             string gamsDir = Program.options.gams_exe_folder.Trim();
@@ -3921,13 +3920,25 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                G.Writeln2("*** ERROR: Import of gdx file (GAMS) failed.");
+                G.Writeln2("*** ERROR: Import of gdx file (GAMS) failed. GAMSWorkspace problem.");
                 G.Writeln("           Technical error:");
                 G.Writeln("           " + e.Message);
                 G.Writeln("+++ NOTE:  You may manually indicate the GAMS program folder with 'OPTION gams exe folder = ...;'");
+                throw;
             }
 
-            GAMSDatabase db = ws.AddDatabaseFromGDX(file);
+            GAMSDatabase db = null;
+            try
+            {
+                db = ws.AddDatabaseFromGDX(file);                
+            }
+            catch (Exception e)
+            {                
+                G.Writeln2("*** ERROR: Import of gdx file (GAMS) failed. AddDatabaseFromGDX problem.");
+                G.Writeln("           Technical error:");
+                G.Writeln("           " + e.Message);                
+                throw;
+            }
 
             string readType = oRead.gdxopt; //for instance: "scns['base']" 
             
@@ -3965,12 +3976,25 @@ namespace Gekko
                 {
 
                     string gvar = n.Name;
-                   
-                    //if (gvar.ToLower().StartsWith("j_")) continue;  //make filtering possible!
+
+                    if (gvar.ToLower().StartsWith("j_"))
+                    {
+                        //continue;  //make filtering possible!
+                    }
+                        
 
                     if (G.IsUnitTesting() && !(G.equal(gvar, "m") || G.equal(gvar, "myfm") || G.equal(gvar, "f") || G.equal(gvar, "pm") || G.equal(gvar, "pff") || G.equal(gvar, "ef"))) continue;  //to not waste time on this when unit testing
                     
-                    int[] dims = new int[n.Domains.Count];                                       
+                    int[] dims = new int[n.Domains.Count];   
+                    
+                    if(G.equal(gvar, "j_cqi")) {
+
+                    }
+
+                    if (G.equal(gvar, "gnslon"))
+                    {
+
+                    }
 
                     int timeIndex = -12345;
                     int scnsIndex = -12345;
@@ -3981,7 +4005,7 @@ namespace Gekko
                         {
                             GAMSSet gs = (GAMSSet)n.Domains.ElementAt(i);
                             dims[i] = gs.NumberRecords;
-                            if (G.equal(gs.Name, "t"))
+                            if (G.equal(gs.Name, tName))
                             {
                                 timeIndex = i;
                             }
@@ -3995,6 +4019,7 @@ namespace Gekko
                             //this may be a string = "*", for instance the parameter y_ps
                         }
                     }
+
 
                     TimeSeries ts2 = null;
                     //int counter = 0;
@@ -4032,26 +4057,55 @@ namespace Gekko
 
                         //counter++;
 
+                        
                         int tt = -12345;
                         string t = null;
                         if (timeIndex != -12345)
                         {
                             t = keys[timeIndex];
-                            tt = int.Parse(t.Substring(1)) + 2006;  //remove the "t" and add 2006
+                            tt = int.Parse(t.Substring(timePartLength)) + year0;  //remove the "t" and add 2006
                         }
-                        
+                                                
                         string hash = null;
                         for (int i = 0; i < keys.Length; i++)
                         {
-                            if (i == timeIndex) continue;
+                            string keysi = keys[i];
 
-                            if (i == scnsIndex && G.equal(keys[i], cut2))
+                            if (i == timeIndex) continue;  //not to be part of name
+
+                            if (timeIndex == -12345 && identifyTPlusIntegerAsTime)
                             {
-                                //skip it
+                                bool isTime = true;
+                                bool first = true;
+                                foreach (char c in keysi)
+                                {
+                                    if (first && c != identifierT)
+                                    {
+                                        isTime = false;
+                                        break;
+                                    }
+                                    if (!first && !char.IsDigit(c))
+                                    {
+                                        isTime = false;
+                                        break;
+                                    }
+                                    first = false;
+                                }
+                                if (isTime)
+                                {
+                                    tt = int.Parse(keysi.Substring(1)) + year0;
+                                    continue;  //not to be part of name
+                                }
+                            }
+
+
+                            if (i == scnsIndex && G.equal(keysi, cut2))
+                            {
+                                //skip it entirely, not to be part of name
                             }
                             else
                             {
-                                hash += keys[i] + Globals.symbolTurtle;
+                                hash += keysi + Globals.symbolTurtle;
                                 //if (i < keys.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter;                    
                             }
                         }
@@ -4073,7 +4127,7 @@ namespace Gekko
                             ts2 = new TimeSeries(EFreq.Annual, varName);
                             
                             databank.AddVariable(ts2, false);
-                            if (timeIndex == -12345)
+                            if (tt == -12345)
                             {
                                 ts2.SetTimeless();
                             }
@@ -4081,16 +4135,16 @@ namespace Gekko
                             else if (n.GetType() == typeof(GAMSVariable)) counterVariables++;
                         }
 
-                        if (timeIndex == -12345)
+                        if (tt == -12345)
                         {
                             ts2.SetTimelessData(d);
                         }
                         else
                         {
                             ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), d);
-
-                            if (tt > yearMax) yearMax = tt;
-                            if (tt < yearMin) yearMin = tt;
+                            
+                            yearMax = Math.Max(tt, yearMax);
+                            yearMin = Math.Min(tt, yearMin);
 
                         }
                         oldHash = hash;
@@ -12730,6 +12784,63 @@ namespace Gekko
                         existenceCheck++;
                         varCounter++;
 
+                        if (ts.IsGhost())
+                        {
+                            //show info on array-timeseries
+                            List<string> names = MatchWildcardInDatabank(var + Globals.symbolTurtle + "*", db);  //are sorted
+                            if (names == null || names.Count == 0)
+                            {
+                                G.Writeln2("Could not find any " + var + "[...] array-timeseries");
+                                continue;
+                            }
+
+                            List<GekkoDictionary<string, string>> dimensions = new List<GekkoDictionary<string, string>>();
+                            foreach (string s in names)
+                            {
+                                string[] ss = s.Split(new string[] { Globals.symbolTurtle }, StringSplitOptions.None);
+                                int dims = ss.Length - 1;
+                                for (int i = dimensions.Count; i < dims; i++)
+                                {
+                                    dimensions.Add(new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+                                }
+                                for (int i = 0; i < dims; i++)
+                                {
+                                    string name = ss[i + 1];
+                                    if (!dimensions[i].ContainsKey(name))
+                                    {
+                                        dimensions[i].Add(name, "");
+                                    }
+                                }
+                            }
+
+                            G.Writeln2("Array-timeseries '" + var + "' has " + names.Count + " elements in the following dimensions:");
+
+                            int counter = 0;
+                            double product = 1d;
+                            string productString = "";
+                            foreach (GekkoDictionary<string, string> xxx in dimensions)
+                            {
+                                counter++;
+                                List<string> xxxx = new List<string>(xxx.Keys);
+                                xxxx.Sort();
+                                G.Writeln2("Dimension " + counter + " has " + xxxx.Count + " elements; " + G.GetListWithCommas(xxxx));
+                                product = product * xxxx.Count;
+                                productString += xxxx.Count + " x ";
+                            }
+                            productString = productString.Substring(0, productString.Length - " x ".Length);
+
+                            string first = names[0];
+                            string last = names[names.Count - 1];
+
+                            G.Writeln2("First element: " + G.PrettifyTimeseriesHash(first, true, false));
+                            G.Writeln("Last element: " + G.PrettifyTimeseriesHash(last, true, false));
+
+                            G.Writeln2("Dimension span: " + productString + " = " + product+", sparsity =  1 - " + names.Count + "/" + product + " = " + Program.NumberFormat(100d * (1d - names.Count / product), "0.00") + "%");
+
+                            return;
+
+                        }
+
                         //MetaTimeSeries ats = O.GetTimeSeries(var, 0, O.ECreatePossibilities.None);
                         //TimeSeries ts = ats.ts;                    
 
@@ -14457,16 +14568,17 @@ namespace Gekko
 
             //all variables in work databank
             foreach (string ss in work.storage.Keys)
-            {
+            {                
                 if (G.GetFreqFromKey(ss) != Program.options.freq) continue;  //we filter out other freqs
                 string s = G.RemoveFreqFromKey(ss);
                 if (hasFilter)
                 {
                     if (!filter.ContainsKey(s)) continue;  //ignore this
                 }
+                TimeSeries ts = work.GetVariable(s);  //can this not be moved before loop??
+                if (ts.IsGhost()) continue;  //ignore it
                 foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-                {
-                    TimeSeries ts = work.GetVariable(s);
+                {                    
                     double value = ts.GetData(t);
                     if (G.isNumericalError(value))
                     {
@@ -17968,6 +18080,11 @@ namespace Gekko
             eo.fileName = fileName;
 
             Program.CreateExcelWorkbook2(eo, null, false);
+        }
+
+        public static void ArrayTimeseriesTip(string name)
+        {
+            G.Writeln("           Tip: try 'DISP " + name + ";' to see the dimensions.");
         }
 
         private static bool RemoveNullTimeseries(List<BankNameVersion> newList)

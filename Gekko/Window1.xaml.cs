@@ -825,7 +825,9 @@ namespace Gekko
                 int x; int y;
                 CoordConversion(out x, out y, dockPanel.type, row, col);
                 Cell c = this.decompOptions.guiDecompValues.Get(x, y);
-                equation.Text = FindEquationText(this.decompOptions);                
+                string s = FindEquationText(this.decompOptions);
+                if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
+                equation.Text = s;
             }
         }
 
@@ -979,7 +981,9 @@ namespace Gekko
                 }
                 else
                 {
-                    equation.Text = FindEquationText(this.decompOptions);
+                    string s = FindEquationText(this.decompOptions);
+                    if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
+                    equation.Text = s;
                 }
             }
         }
@@ -1138,8 +1142,11 @@ namespace Gekko
 
                 Table table = null;                
                 table = Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
-                equation.Text = FindEquationText(this.decompOptions);                
-                
+
+                string s = FindEquationText(this.decompOptions);
+                if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
+                equation.Text = s;
+
                 this.decompOptions.guiDecompValues = table;
                 ClearGrid();                                
                 MakeTable(table, this.decompOptions);
