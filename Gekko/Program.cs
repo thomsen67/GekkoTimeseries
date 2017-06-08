@@ -2692,8 +2692,8 @@ namespace Gekko
                     int minYearInProtobufFile = int.MaxValue;
                     int emptyWarnings = 0;
                     foreach (TimeSeries tsTemp in temp.storage.Values)  //for each timeseries in temp (deserialized) databank 
-                    {  
-
+                    {
+                        bool isGhost = tsTemp.IsGhost();
                         //looping through each timeseries to find databank start and end year (and to merge variables if we are merging)
 
                         if (IsNonsenseVariableName(tsTemp.variableName))
@@ -2740,14 +2740,20 @@ namespace Gekko
                                 GekkoTime firstX = ts.GetPeriodFirst();
                                 GekkoTime lastX = ts.GetPeriodLast();
 
-                                maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, lastX.super);
-                                minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, firstX.super);
+                                if (!isGhost)
+                                {
+                                    maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, lastX.super);
+                                    minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, firstX.super);
+                                }
                             }
                         }
                         else
                         {
-                            maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, last.super);
-                            minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, first.super);
+                            if (!isGhost)
+                            {
+                                maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, last.super);
+                                minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, first.super);
+                            }
                         }
                     }
                     if (emptyWarnings > 0) G.Writeln("+++ WARNING: " + emptyWarnings + " variables with empty string as name in ." + Globals.extensionDatabank + " file (skipped)");
@@ -4037,8 +4043,8 @@ namespace Gekko
                             return;
                         }
 
-                        string[] keys = record2.Keys;                        
-
+                        string[] keys = record2.Keys;
+                        
                         if (scnsIndex != -12345)
                         {                            
                             if (cut1 != null && scnsIndex >= 0 && !G.equal(keys[scnsIndex], cut2)) continue;  //ignore this
@@ -12722,6 +12728,7 @@ namespace Gekko
             return;
         }
 
+                
         public static void Disp(GekkoTime tStart, GekkoTime tEnd, List<string> list, bool showFrnEquation, bool showAllPeriods, bool clickedLink, O.Disp o)
         {
             if (o != null && G.equal(o.opt_info, "yes"))
@@ -12813,7 +12820,7 @@ namespace Gekko
                                 }
                             }
 
-                            G.Writeln2("Array-timeseries '" + var + "' has " + names.Count + " elements in the following dimensions:");
+                            G.Writeln2("Array-timeseries '" + var + "' has " + names.Count + " subseries in the following dimensions:");
 
                             int counter = 0;
                             double product = 1d;
@@ -12822,10 +12829,11 @@ namespace Gekko
                             {
                                 counter++;
                                 List<string> xxxx = new List<string>(xxx.Keys);
-                                xxxx.Sort();
-                                G.Writeln2("Dimension " + counter + " has " + xxxx.Count + " elements; " + G.GetListWithCommas(xxxx));
+                                //xxxx.Sort();
+                                xxxx = new List<string>(xxxx.OrderBy(f => f, new G.CustomComparer<string>(G.CompareNatural)).ToArray());                                
+                                G.Writeln2("Dimension #" + counter + " (" + xxxx.Count + " elements): " + G.GetListWithCommas(xxxx));
                                 product = product * xxxx.Count;
-                                productString += xxxx.Count + " x ";
+                                productString += xxxx.Count + " * ";
                             }
                             productString = productString.Substring(0, productString.Length - " x ".Length);
 
@@ -12835,7 +12843,7 @@ namespace Gekko
                             G.Writeln2("First element: " + G.PrettifyTimeseriesHash(first, true, false));
                             G.Writeln("Last element: " + G.PrettifyTimeseriesHash(last, true, false));
 
-                            G.Writeln2("Dimension span: " + productString + " = " + product+", sparsity =  1 - " + names.Count + "/" + product + " = " + Program.NumberFormat(100d * (1d - names.Count / product), "0.00") + "%");
+                            G.Writeln2("Dimension span: " + productString + " = " + product+", density: " + names.Count + "/" + product + " = " + Program.NumberFormat(100d * (names.Count / product), "0.00") + "%");
 
                             return;
 
@@ -18031,7 +18039,7 @@ namespace Gekko
         {
             if (listFilteredForCurrentFreq.Count == 0)
             {
-                G.Writeln2("No variables to write");
+                G.Writeln2("*** ERROR: No variables to write");
                 throw new GekkoException();
             }
         }
@@ -18192,8 +18200,9 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Databank '" + databank.aliasName + "' is empty -- nothing to write");
-                    throw new GekkoException();
+                    //nowadays we may have WRITE b2:* file=myfile, not related to Work or first bank at all!
+                    //G.Writeln2("*** ERROR: Databank '" + databank.aliasName + "' is empty -- nothing to write");
+                    //throw new GekkoException();
                 }
             }
 
@@ -18396,7 +18405,7 @@ namespace Gekko
                         if (ts == null)  //if list is given "manually"
                         {
                             G.Writeln();
-                            G.Writeln("*** ERROR: Could not find timeseries '" + var + "' while writing tsd records");
+                            G.Writeln("*** ERROR: Could not find timeseries '" + var.bank + Globals.symbolBankColon + var.name + "' while writing tsd records");
                             throw new GekkoException();
                         }
                         count++;
@@ -19271,6 +19280,8 @@ namespace Gekko
 
         public static void Clear(O.Clear o, P p)
         {
+            //Take care with filename, when clearing: only wipe it out if it is Work or Ref banks, other banks may be OPENed banks that we would like to write back to when CLOSEing
+
             if (o.name != null && (o.opt_first != null || o.opt_ref != null))
             {
                 G.Writeln2("*** ERROR: You should use 'CLEAR<first>;' or  'CLEAR<ref>;'");
@@ -19284,17 +19295,22 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Trying to clear non-existing databank '" + o.name + "'");
                     throw new GekkoException();
                 }
-                Program.databanks.GetDatabank(o.name).Clear();
+
+                Databank db1 = Program.databanks.GetDatabank(o.name);
+                db1.Clear();
+                if (db1.aliasName == Globals.Work || db1.aliasName == Globals.Ref) db1.FileNameWithPath = null;
                 G.Writeln2("Cleared databank: " + o.name);
             }
             if (G.equal(o.opt_first, "yes"))
             {
                 Program.databanks.GetFirst().Clear();
+                if (Program.databanks.GetFirst().aliasName == Globals.Work || Program.databanks.GetFirst().aliasName == Globals.Ref) Program.databanks.GetFirst().FileNameWithPath = null;
                 G.Writeln2("Cleared first databank ('" + Program.databanks.GetFirst().aliasName + "')");
             }
             if (G.equal(o.opt_ref, "yes"))
             {
                 Program.databanks.GetRef().Clear();
+                if (Program.databanks.GetRef().aliasName == Globals.Work || Program.databanks.GetRef().aliasName == Globals.Ref) Program.databanks.GetRef().FileNameWithPath = null;
                 G.Writeln2("Cleared ref databank ('" + Program.databanks.GetRef().aliasName + "')");
             }
             if (o.name == null && !G.equal(o.opt_first, "yes") && !G.equal(o.opt_ref, "yes"))
@@ -19302,6 +19318,8 @@ namespace Gekko
                 //Before: Cleared 'Work' and 'Ref' regardless of position
                 Program.databanks.GetFirst().Clear();
                 Program.databanks.GetRef().Clear();
+                if (Program.databanks.GetFirst().aliasName == Globals.Work || Program.databanks.GetFirst().aliasName == Globals.Ref) Program.databanks.GetFirst().FileNameWithPath = null;
+                if (Program.databanks.GetRef().aliasName == Globals.Work || Program.databanks.GetRef().aliasName == Globals.Ref) Program.databanks.GetRef().FileNameWithPath = null;
                 G.Writeln2("Cleared first and ref databanks ('" + Program.databanks.GetFirst().aliasName + "' and '" + Program.databanks.GetRef().aliasName + "')");
             }
         }
@@ -22233,6 +22251,7 @@ namespace Gekko
                         if (printCodesCounter == 0)  //first item
                         {
                             string label = GetLabelInPrt(pe, subElementCounter);
+                            label = G.PrettifyTimeseriesHash(label, true, false);
                             string originalLabel = label;
                             if (label.StartsWith(Globals.labelCheatString)) label = label.Substring(Globals.labelCheatString.Length);                            
 
@@ -24662,63 +24681,9 @@ namespace Gekko
                     tw.WriteLine(s);
                 }
             }
-
-            //double linesMin = double.MaxValue;
-            //double linesMax = double.MinValue;
-            //double boxesMin = double.MaxValue;
-            //double boxesMax = double.MinValue;
-            //double areasMin = double.MaxValue;
-            //double areasMax = double.MinValue;
-
+            
             XmlNodeList lines3 = doc.SelectNodes("gekkoplot/lines/line");
-        
-
-            //for (int i = 0; i < count; i++)
-            //{
-            //    XmlNode line3 = lines3[i];
-            //    string linetype = "linespoints";
-            //    if (!NullOrEmpty(o.opt_linetype)) linetype = o.opt_linetype;
-            //    string s = GetText(line3.SelectSingleNode("linetype"));
-            //    if (!NullOrEmpty(s)) linetype = s;
-
-
-            //    if (G.equal(linetype, "boxes"))
-            //    {
-            //        if (line3.SelectSingleNode("y2") != null)
-            //        {
-            //            boxesY2.Add(i);
-            //        }
-            //        else
-            //        {
-            //            boxesY.Add(i);
-            //        }
-
-            //        boxesMin = Math.Min(boxesMin, dataMin[i]);
-            //        boxesMax = Math.Max(boxesMax, dataMax[i]);
-            //    }
-            //    if (G.equal(linetype, "filledcurve") || G.equal(linetype, "filledcurves"))
-            //    {
-            //        if (line3.SelectSingleNode("y2") != null)
-            //        {
-            //            areasY2.Add(i);
-            //        }
-            //        else
-            //        {
-            //            areasY.Add(i);
-            //        }
-            //        areasMin = Math.Min(areasMin, dataMin[i]);
-            //        areasMax = Math.Max(areasMax, dataMax[i]);
-            //    }
-            //    else
-            //    {
-            //        linesMin = Math.Min(linesMin, dataMin[i]);
-            //        linesMax = Math.Max(linesMax, dataMax[i]);
-            //    }
-            //    string lineY2 = GetText(line3.SelectSingleNode("y2"));
-            //    if (lineY2 != null) numberOfY2s++;
-
-            //}
-
+                    
             // ---------------------------------------------
             // --------- loading main section start
             // ---------------------------------------------
@@ -24863,6 +24828,7 @@ namespace Gekko
             double d_width3 = double.NaN;  //not used in first pass
             double left = double.NaN;  //not used in first pass
             double[] minMax = new double[6]; minMax[0] = double.MaxValue; minMax[1] = double.MinValue; minMax[2] = double.MaxValue; minMax[3] = double.MinValue; minMax[4] = double.MaxValue; minMax[5] = double.MinValue;
+
             // ---------------------------------------
             // ---------------------------------------
             //          FIRST PASS
@@ -24875,17 +24841,8 @@ namespace Gekko
             string discard = PlotHandleLines(true, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, quarterFix, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, linetypes, dashtypes, linewidths, linecolors, pointtypes, pointsizes, fillstyles, y2s, linewidthCorrection, pointsizeCorrection, isInside);
             
             StringBuilder txt = new StringBuilder();
-
-            //double gap = 0.80; double magic = 1.7;
-            //double gap = 0.50; double magic = 1.2;
-            //double gap = 0.30; double magic = 1.15;
-            //double gap = 0.20; double magic = 1.10;
-            //double gap = 0.10; double magic = 1.10;
-
-            //if (test) txt.AppendLine("set size 1.0, " + (1 - gap));
-            //if (test) txt.AppendLine("set origin 0.0, " + gap);
+                        
             txt.AppendLine("set size " + zoom + "," + zoom + "");
-
             txt.AppendLine("set encoding iso_8859_1");
             txt.AppendLine("set format y " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
             txt.AppendLine("set format y2 " + Globals.QT + "%g" + Globals.QT);  //uses for instance 1.65e+006, not trying to put uppercase exponent which fails in emf terminal
@@ -24896,12 +24853,7 @@ namespace Gekko
             {
                 if (s.StartsWith("out")) ii++;
                 if (s.StartsWith("bot")) ii++;
-            }
-
-            if (ii >= 2)
-            {
-                //txt.AppendLine("set bmargin 4");  //larger padding to key (legend)
-            }
+            }            
 
             string enhanced = null;
             if (G.equal(pplotType, "emf"))
@@ -24913,24 +24865,10 @@ namespace Gekko
             {
                 fontsize = 0.75 * fontsize;
             }
-
-            XmlNode x = doc.SelectSingleNode("gekkoplot/x");
-            if (x != null)
-            {
-                XmlNodeList list = x.SelectNodes("/line");
-                foreach (XmlNode node in list)
-                {
-                    //handle line
-                    //also do linebefore and lineafter
-                }
-            }
-            
+                        
             txt.AppendLine("set terminal " + pplotType + enhanced + " font '" + font + "," + (zoom * fontsize) + "'"); ;
             txt.AppendLine("set output \"" + file2 + "\"");
-                       
-            
-            txt.AppendLine("set key " + key);
-            
+            txt.AppendLine("set key " + key);            
 
             if (G.equal(Program.options.plot_decimalseparator, "comma"))
             {
@@ -24989,8 +24927,6 @@ namespace Gekko
                 }
             }
 
-
-
             txt.AppendLine("set title font " + "'" + font + title_bold + title_italic + "," + siz1 + "'");
             txt.AppendLine("set ylabel font " + "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'");
             txt.AppendLine("set y2label font " + "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'");
@@ -25032,7 +24968,12 @@ namespace Gekko
             else
             {
                 //annual or undated
-                if (numberOfObs > 70)
+                if (numberOfObs > 140)
+                {
+                    txt.AppendLine("set xtics 20");
+                    txt.AppendLine("set mxtics 20");
+                }
+                else if (numberOfObs > 70)
                 {
                     txt.AppendLine("set xtics 10");
                     txt.AppendLine("set mxtics 10");

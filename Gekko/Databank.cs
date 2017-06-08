@@ -145,7 +145,7 @@ namespace Gekko
             this.storage.Clear();
             //this.fileNameWithPath = null;  --> NO! This would be ok regarding READ, but not regarding OPEN<edit/first> for instance --> we need a bank to write back to!
             //this.readInfo = null;  //must be ok to remove, just contains stuff for printing --> but let us keep it for ultra safety for now
-            this.isDirty = true;
+            this.isDirty = true;            
         }        
         
         public bool ContainsVariable(string variable) {
