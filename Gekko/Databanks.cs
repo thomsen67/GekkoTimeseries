@@ -181,12 +181,7 @@ namespace Gekko
                         if (databank.protect == false)
                         {
                             G.Writeln2("Databank '" + databank.aliasName + "' is already editable in first position.");
-                        }
-                        else
-                        {
-                            databank.protect = false;
-                            G.Writeln2("Databank '" + databank.aliasName + "' set editable.");
-                        }
+                        }                        
                     }
                     m.AddRange(this.storage);  //just copied, and put back again later on
                 }
@@ -199,7 +194,7 @@ namespace Gekko
                     {
                         if (i == BaseI) continue;
                         m.Add(this.storage[i]);
-                    }
+                    }                    
                 }
                 else  //Trying an OPEN<edit>db on a db that is already there in slot [2] or below
                 {
@@ -210,9 +205,14 @@ namespace Gekko
                     {
                         if (i == existI) continue;
                         m.Add(this.storage[i]);
-                    }
+                    }                                        
                 }
-                if (openType == EOpenType.Edit) G.Writeln2("Databank '" + name + "' set as editable databank, put first position.");
+
+                if (openType == EOpenType.Edit)
+                {
+                    if (openType == EOpenType.Edit) databank.protect = false;
+                    G.Writeln2("Databank '" + name + "' set as editable databank, put first position.");
+                }
                 else G.Writeln2("Databank '" + name + "' put in first position.");
             }
             else if (openType == EOpenType.Ref)

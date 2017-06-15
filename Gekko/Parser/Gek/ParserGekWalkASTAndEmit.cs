@@ -1757,12 +1757,14 @@ namespace Gekko.Parser.Gek
 
                                     sb1.AppendLine("int " + counterName + " = 0;");
 
+                                    sb1.AppendLine("{" + G.NL);  //#5839073458573, necessary when for instance doing sum(#i, ...) + sum(#i, ...). If scope not set, where will be a collision with the GekkoTime t... variable.
+
                                     if (isAvgtOrSumt)
                                     {
                                         sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(O.GetDate(" + lag1Code + "), O.GetDate(" + lag2Code + ")))");
                                     }
                                     else if (isGamsLikeSumFunction)
-                                    {
+                                    {                                        
                                         sb1.AppendLine("GekkoTime t" + tCounter + " = t" + (tCounter - 1) + ";" + G.NL);  //instead of the loop seen in the others. This way, we hook up the t's, even though the t's in this case are artificial                                        
 
                                         string listName = null;
@@ -1787,8 +1789,8 @@ namespace Gekko.Parser.Gek
                                     {
                                         sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(t" + (tCounter - 1) + ".Add(" + lag1Code + "), t" + (tCounter - 1) + ".Add(" + lag2Code + ")))");
                                     }
-                                    sb1.AppendLine("{");
-                                    
+                                    sb1.AppendLine("{");  //corresponds to #08745235230
+
                                     sb1.AppendLine("t = t" + tCounter + ";");  //setting t, cf. #098745345
                                     
 
@@ -1801,7 +1803,8 @@ namespace Gekko.Parser.Gek
                                     sb1.AppendLine("" + counterName + "++;");
 
                                     if (parentTimeLoop != null && !isGamsLikeSumFunction) sb1.AppendLine("t = t" + (tCounter - 1) + ";");  //t may have been set, cf. #098745345, so we are setting it back
-                                    sb1.AppendLine("}");
+                                    sb1.AppendLine("}");  //corresponds to #08745235230
+                                    sb1.AppendLine("}");  //corresponds to #5839073458573
 
                                     if (parentTimeLoop == null)
                                     {

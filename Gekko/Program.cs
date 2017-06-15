@@ -4034,6 +4034,7 @@ namespace Gekko
                     bool isDimensionless = false;
 
                     int ii = 0;
+                    
                     foreach (GAMSSymbolRecord record2 in n)
                     {
 
