@@ -3345,7 +3345,7 @@ namespace UnitTests
             I("VAL a2 = 2;");
             I("VAL a3 = 3;");
             I("VAL a4 = 4;");
-            I("CREATE ts1, ts2, ts3, ts4, ts5;");
+            I("CREATE ts1, ts2, ts3, ts4, ts5, v1;");
             I("TIME 2010 2012;");
             I("SERIES ts1 = 1;");
             I("SERIES ts2 = 2;");
@@ -3365,17 +3365,34 @@ namespace UnitTests
             I("SERIES xx1 = avg(#m1);");
             AssertHelper(First(), "xx1", 2010, 2012, 10d / 4d, sharedDelta);
 
+            if (Globals.UNITTESTFOLLOWUP)
+            {
+
+                //avgt()
+                I("VAL v1 = avgt(ts5);");
+                AssertHelperScalarVal("v1", 38d / 3d, sharedDelta);
+                I("VAL v1 = avgt(2011, 2012, ts5);");
+                AssertHelperScalarVal("v1", 28d / 2d, sharedDelta);
+
+                //sumt()
+                I("VAL v1 = sumt(ts5);");
+                AssertHelperScalarVal("v1", 38d, sharedDelta);
+                I("VAL v1 = sumt(2011, 2012, ts5);");
+                AssertHelperScalarVal("v1", 28d, sharedDelta);
+
+            }
+
             //avgt()
-            I("VAL v1 = avgt(ts5);");
-            AssertHelperScalarVal("v1", 38d / 3d, sharedDelta);
-            I("VAL v1 = avgt(2011, 2012, ts5);");
-            AssertHelperScalarVal("v1", 28d / 2d, sharedDelta);
+            I("SER v1 = avgt(ts5);");
+            AssertHelper(First(), "v1", 2011, 38d / 3d, sharedDelta);
+            I("SER v1 = avgt(2011, 2012, ts5);");
+            AssertHelper(First(), "v1", 2011, 28d / 2d, sharedDelta);
 
             //sumt()
-            I("VAL v1 = sumt(ts5);");
-            AssertHelperScalarVal("v1", 38d, sharedDelta);
-            I("VAL v1 = sumt(2011, 2012, ts5);");
-            AssertHelperScalarVal("v1", 28d, sharedDelta);
+            I("SER v1 = sumt(ts5);");
+            AssertHelper(First(), "v1", 2011, 38d, sharedDelta);            
+            I("SER v1 = sumt(2011, 2012, ts5);");
+            AssertHelper(First(), "v1", 2011, 28d, sharedDelta);            
 
             //sqrt()
             I("VAL v1 = sqrt(%a4);");
@@ -3407,6 +3424,22 @@ namespace UnitTests
             I("list xx = xx1, xx2;");
             I("ser yy = sum(#xx);");  //test that timeseries are searched for in data mode
             AssertHelper(First(), "yy", 2000, 3d, sharedDelta);
+
+            I("RESET;");
+            I("OPEN <edit> b1;");
+            I("OPEN <edit> b2;");
+            I("STRING b1 = bankname('first');");
+            I("STRING b0 = bankname('ref');");
+            I("STRING b1a = bankname(1);");
+            I("STRING b2 = bankname(2);");
+            I("STRING b3 = bankname(3);");
+            I("VAL v = bankname(0);");
+            AssertHelperScalarString("b1", "b2");
+            AssertHelperScalarString("b1a", "b2");
+            AssertHelperScalarString("b0", "Ref");            
+            AssertHelperScalarString("b2", "b1");
+            AssertHelperScalarString("b3", "Work");
+            AssertHelperScalarVal("v", 3d);
 
             //percentile()
             I("RESET;");

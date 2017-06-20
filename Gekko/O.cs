@@ -4888,6 +4888,24 @@ namespace Gekko
             }
         }
 
+        public class Sys
+        {
+            public string opt_mute = null;
+            public IVariable s = null;
+            public void Exe()
+            {            
+                if (s == null)
+                {
+                    Process myProcess = Process.Start("cmd", "/K");
+                }
+                else
+                {
+                    string ss = O.GetString(s);
+                    Program.ExecuteShellCommand(ss, G.equal(this.opt_mute, "yes"));
+                }
+            }
+        }
+        
 
         public class X12a
         {

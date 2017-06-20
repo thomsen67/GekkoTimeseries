@@ -830,14 +830,10 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTSYS":
                         {
-                            if (node.ChildrenCount() == 0)
-                            {
-                                node.Code.A("Program.Sys(null);");
-                            }
-                            else
-                            {
-                                node.Code.A("Program.Sys(O.GetString(" + node[0].Code + "));");
-                            }
+                            node.Code.A("O.Sys o" + Num(node) + " = new O.Sys();" + G.NL);
+                            if (node[0] != null) node.Code.A("o" + Num(node) + ".s = " + node[0].Code + ";" + G.NL);
+                            if (node[1] != null) node.Code.A(node[1].Code);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
                     case "ASTHELP":

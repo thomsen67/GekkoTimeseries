@@ -2210,7 +2210,7 @@ namespace Gekko
                 {
                     if (open)
                     {
-                        if (createNewOpenFile) databank.fileHash = "brand new file"; //signifies that the bank is brand new
+                        if (createNewOpenFile) databank.fileHash = Globals.brandNewFile; //signifies that the bank is brand new
                         else databank.fileHash = Program.GetMD5Hash(GetTextFromFileWithWait(databank.FileNameWithPath));  //MD5 hash of file                
                     }
                 }
@@ -7561,8 +7561,6 @@ namespace Gekko
                 sw.Close();
             }
 
-
-
             //Make r2gekko.txt file that R later on fills into
             using (FileStream fs = WaitForFileStream(RExportFileName, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
@@ -7675,8 +7673,7 @@ namespace Gekko
                 bool skip = true;  //avoid the method and the R header in input
                 G.Writeln();
                 foreach (string s2 in ss)
-                {
-                    //if (s2.Contains(def1)) skip = true;                    
+                {                    
                     if (!skip) G.Writeln(s2);
                     if (s2.Contains(def2)) skip = false;
                 }
@@ -17179,37 +17176,22 @@ namespace Gekko
             return shouldFilter;
         }
 
-        public static void Sys(string s)
-        {
-            if (s == null)
-            {
-                Process myProcess = Process.Start("cmd", "/K");
-            }
-            else
-            {
-                //s = Program.SubstituteAssignVarsInExpression(s);
-                string outp = "";
-                string err = "";
-                ExecuteShellCommand(s, ref outp, ref err);
-            }
-        }
-
-
+        
         /// <summary>
         /// Execute a <b style="color:black;background-color:#ff9999">shell</b> command
         /// </summary>
         /// <param name="_CommandLine">Command line parameters to pass</param>
         /// <param name="_outputMessage">returned string value after executing <b style="color:black;background-color:#ff9999">shell</b> command</param>
         /// <param name="_errorMessage">Error messages generated during <b style="color:black;background-color:#ff9999">shell</b> execution</param>
-        public static void ExecuteShellCommand(string _CommandLine, ref string _outputMessage, ref string _errorMessage)
+        public static void ExecuteShellCommand(string _CommandLine, bool mute)
         {
             bool fail = false;
             // Set process variable
             // Provides access to local and remote processes and enables you to start and stop local <b style="color:black;background-color:#99ff99">system</b> processes.
-            System.Diagnostics.Process _Process = null;
+            System.Diagnostics.Process process = null;
             try
             {
-                _Process = new System.Diagnostics.Process();
+                process = new System.Diagnostics.Process();
                 // invokes the cmd process specifying the command to be executed.
                 string _CMDProcess = string.Format(System.Globalization.CultureInfo.InvariantCulture, @"{0}\cmd.exe", new object[] { Environment.SystemDirectory });
                 // pass executing file to cmd (Windows command interpreter) as a arguments
@@ -17220,37 +17202,104 @@ namespace Gekko
                 if (_CommandLine != null && _CommandLine.Length > 0)
                 {
                     _Arguments = string.Format(System.Globalization.CultureInfo.InvariantCulture, "/C {0}", new object[] { _CommandLine, System.Globalization.CultureInfo.InvariantCulture });
-                }
-                // Specifies a set of values used when starting a process.
-                System.Diagnostics.ProcessStartInfo _ProcessStartInfo = new System.Diagnostics.ProcessStartInfo(_CMDProcess, _Arguments);
+                }                
                 // sets a value indicating not to start the process in a new window.
-                _ProcessStartInfo.CreateNoWindow = true;
-                //_ProcessStartInfo.CreateNoWindow = false;
+                process.StartInfo.CreateNoWindow = true;
                 // sets a value indicating not to use the operating system shell to start the process.
-                _ProcessStartInfo.UseShellExecute = false;
-                //_ProcessStartInfo.UseShellExecute = true;
+                process.StartInfo.UseShellExecute = false;
                 // sets a value that indicates the output/input/error of an application is written to the Process.
-                _ProcessStartInfo.RedirectStandardOutput = true;
-                _ProcessStartInfo.RedirectStandardOutput = false;
-                _ProcessStartInfo.RedirectStandardInput = true;
-                _ProcessStartInfo.RedirectStandardInput = false;
-                _ProcessStartInfo.RedirectStandardError = true;
-                _ProcessStartInfo.RedirectStandardError = false;
-                _ProcessStartInfo.WorkingDirectory = Program.options.folder_working;
-                _Process.StartInfo = _ProcessStartInfo;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardInput = false;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.WorkingDirectory = Program.options.folder_working;
+                process.StartInfo.Arguments = _Arguments;
+                process.StartInfo.FileName = _CMDProcess;
+                //process.StartInfo = p;
                 // Starts a process resource and associates it with a Process component.
-                _Process.Start();
-                // Instructs the Process component to wait indefinitely for the associated process to exit.
-                _Process.WaitForExit();
-                // Instructs the Process component to wait indefinitely for the associated process to exit.
-                _Process.WaitForExit();
-                int exitCode = _Process.ExitCode;
+
+                int timeout = 7 * 24 * 60 * 60 * 1000; //7*24 hours
+
+                //See https://stackoverflow.com/questions/139593/processstartinfo-hanging-on-waitforexit-why?lq=1
+
+                StringBuilder output = new StringBuilder();
+                StringBuilder error = new StringBuilder();
+                using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
+                using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
+                {
+                    process.OutputDataReceived += (sender, e) => {
+                        if (e.Data == null)
+                        {
+                            outputWaitHandle.Set();
+                        }
+                        else
+                        {
+                            output.AppendLine(e.Data);
+                        }
+                    };
+                    process.ErrorDataReceived += (sender, e) =>
+                    {
+                        if (e.Data == null)
+                        {
+                            errorWaitHandle.Set();
+                        }
+                        else
+                        {
+                            error.AppendLine(e.Data);
+                        }
+                    };
+
+                    process.Start();
+
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+
+                    if (process.WaitForExit(timeout) &&
+                        outputWaitHandle.WaitOne(timeout) &&
+                        errorWaitHandle.WaitOne(timeout))
+                    {
+                        // Process completed. Check process.ExitCode here.
+                    }
+                    else
+                    {
+                        // Timed out.
+                    }
+                }                
+                
+                int exitCode = process.ExitCode;
                 if (exitCode != 0)
                 {
                     G.Writeln2("*** ERROR: SYS command exited with exit code: " + exitCode);
                     G.Writeln("           SYS command: " + _CommandLine);
                     fail = true;
                 }
+
+                if (!mute)
+                {
+                    int widthRemember = Program.options.print_width;
+                    int fileWidthRemember = Program.options.print_filewidth;
+                    Program.options.print_width = int.MaxValue;
+                    Program.options.print_filewidth = int.MaxValue;
+                    try
+                    {
+                        G.Writeln2(output.ToString());
+                        if (error.Length > 0)
+                        {
+                            G.Writeln2("------------------- SYS ERROR -------------------");
+                            G.Writeln2(error.ToString());
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        G.Writeln2("*** ERROR: Could not write output from SYS command");
+                        throw new GekkoException();
+                    }
+                    finally
+                    {
+                        //resetting, also if there is an error
+                        Program.options.print_width = widthRemember;
+                        Program.options.print_filewidth = fileWidthRemember;
+                    }
+                }    
             }
             catch (Win32Exception _Win32Exception)
             {
@@ -17265,9 +17314,9 @@ namespace Gekko
             finally
             {
                 // close process and do cleanup
-                _Process.Close();
-                _Process.Dispose();
-                _Process = null;
+                process.Close();
+                process.Dispose();
+                process = null;
             }
             if (fail) throw new GekkoException();
         }
@@ -18196,8 +18245,16 @@ namespace Gekko
             {
                 if (isCloseCommand)
                 {
-                    G.Writeln2("Databank " + databank.aliasName + " is empty and hence not written");
-                    return 0;
+                    if (databank.fileHash == Globals.brandNewFile)
+                    {
+                        G.Writeln2("Databank " + databank.aliasName + " is empty and hence not written");
+                        return 0;
+                    }
+                    else
+                    {
+                        //write it: it could be an OPEN<edit> on existing file with series. Then CLEAR. Then CLOSE.
+                        //in that case, an empty bank should be written.
+                    }
                 }
                 else
                 {
@@ -19471,7 +19528,7 @@ namespace Gekko
                 {
                     //do nothing, fileHashing is probably not active
                 }
-                else if (removed.fileHash == "brand new file")
+                else if (removed.fileHash == Globals.brandNewFile)
                 {
                     if (File.Exists(removed.FileNameWithPath))
                     {
@@ -31168,6 +31225,11 @@ namespace Gekko
             }
             if (isInt) s = s + ".0";  //so it does not look like an integer -- user can see it is float
             return s;
+        }
+
+        public static string GetDatabankFilename(Databank databank)
+        {
+            return System.IO.Path.GetFileName(databank.FileNameWithPath);
         }
 
         private static List<Dictionary<string, string>> CreateSimplePrecedentsForPrtPplot(List<string> variables)

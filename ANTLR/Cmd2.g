@@ -2390,7 +2390,9 @@ name2                     : NAME nameWithDot EQUAL expression -> ^({token("ASTNA
 stop					  : STOP -> ^({token("ASTSTOP", ASTSTOP, $STOP.Line)});
 
 sys						  : SYS -> ^({token("ASTSYS", ASTSYS, $SYS.Line)})
-						  | SYS expression -> ^({token("ASTSYS", ASTSYS, $SYS.Line)} expression);
+						  | SYS sysOpt1? expression -> ^({token("ASTSYS", ASTSYS, $SYS.Line)} expression sysOpt1?);
+sysOpt1			          : ISNOTQUAL | leftAngle sysOpt1h* RIGHTANGLE -> sysOpt1h*;
+sysOpt1h                  : MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);
 
 						  //TODO: use {token()} for line numbers...
 table					  :	TABLE name EQUAL NEW TABLE leftParenGlue ')'  -> ^(ASTNEWTABLE name)
@@ -2607,7 +2609,7 @@ openOpt1h                 : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | POS EQUAL expression -> ^(ASTOPT_VAL_POS expression)
 						  ;
 
-olsOpt1                   : ISNOTQUAL | leftAngle olsOpt1h? RIGHTANGLE -> olsOpt1h?;
+olsOpt1                   : ISNOTQUAL | leftAngle olsOpt1h* RIGHTANGLE -> olsOpt1h*;
 olsOpt1h                  : dates -> ^(ASTDATES dates)
 						  | CONSTANT (EQUAL yesNo)? -> ^(ASTOPT_STRING_CONSTANT yesNo?)
 						  ;

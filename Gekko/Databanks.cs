@@ -211,7 +211,7 @@ namespace Gekko
                 if (openType == EOpenType.Edit)
                 {
                     if (openType == EOpenType.Edit) databank.protect = false;
-                    G.Writeln2("Databank '" + name + "' set as editable databank, put first position.");
+                    G.Writeln2("Databank '" + name + "' set as editable databank, put in first position.");
                 }
                 else G.Writeln2("Databank '" + name + "' put in first position.");
             }

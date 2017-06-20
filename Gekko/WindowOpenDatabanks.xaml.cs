@@ -123,21 +123,23 @@ namespace Gekko
                     {
                         if (databank.storage.Count == 0) continue; //skip it, so that Ref is not shown in the list when it is empty
                     }
-                }                
-                string c = "";                                
+                }
+                string c = "";
                 string period = databank.yearStart + "-" + databank.yearEnd;
                 if (databank.yearStart == -12345 || databank.yearEnd == -12345) period = "";
                 string prot = null;
                 if (!databank.protect) prot = Globals.protectSymbol;
                 else prot = "";
-                list.Add(new Task(s, System.IO.Path.GetFileName(databank.FileNameWithPath), databank.FileNameWithPath, databank.storage.Count.ToString(), period, databank.info1, databank.date, c, prot, i));
+                list.Add(new Task(s, Program.GetDatabankFilename(databank), databank.FileNameWithPath, databank.storage.Count.ToString(), period, databank.info1, databank.date, c, prot, i));
 
-            }           
+            }
             //unswap.IsEnabled = Program.AreDatabanksSwapped();
             //unswap.IsEnabled = false;  //FIXME
         }
 
-		#endregion // Window1_Loaded
+        
+
+        #endregion // Window1_Loaded
 
         private void CloseOnEscape(object sender, KeyEventArgs e)
         {

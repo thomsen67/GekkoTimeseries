@@ -31,6 +31,91 @@ namespace Gekko
             Avg
         }
 
+        public static IVariable bankname(GekkoTime t, IVariable x1)
+        {
+            if (x1.Type() == EVariableType.String)
+            {
+                string s = x1.GetString();
+                if (G.equal(s, "first"))
+                {
+                    return new ScalarString(Program.databanks.GetFirst().aliasName);
+                }
+                else if (G.equal(s, "ref"))
+                {
+                    return new ScalarString(Program.databanks.GetRef().aliasName);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: bankname() accepts strings 'first' or 'ref'");
+                    throw new GekkoException();
+                }
+            }
+            else if (x1.Type() == EVariableType.Val)
+            {
+
+                int x = O.GetInt(x1);
+                Databank db = null;
+                if (x < 0)
+                {
+                    G.Writeln2("*** ERROR: bankname() must be called with value >= 0");
+                    throw new GekkoException();
+                }
+                else if (x == 0)
+                {
+                    return new ScalarVal(Program.databanks.storage.Count - 1);  //number of open banks (except Ref)
+                }
+                else if (x >= Program.databanks.storage.Count)
+                {
+                    G.Writeln2("*** ERROR: bankname() must be called with < " + Program.databanks.storage.Count);
+                    throw new GekkoException();
+                }
+                else if (x == 1) return new ScalarString(Program.databanks.GetFirst().aliasName);
+                else
+                {
+                    return new ScalarString(Program.databanks.storage[x].aliasName);
+                }                
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: bankname() only accepts string or val");
+                throw new GekkoException();
+            }
+            
+        }
+
+        public static IVariable refname(GekkoTime t)
+        {
+            return new ScalarString(Program.databanks.GetRef().aliasName);
+        }
+
+        public static IVariable bankfilename(GekkoTime t, IVariable x1)
+        {
+            return bankfilename(t, x1, new ScalarString(""));
+        }
+
+        public static IVariable bankfilename(GekkoTime t, IVariable x1, IVariable x2)
+        {
+            string y1 = x1.GetString();
+            string rv = null;
+            Databank db = Program.databanks.GetDatabank(y1);
+            if (db == null)
+            {
+                G.Writeln2("*** ERROR: No open databank has the name '" + y1 + "'");
+                throw new GekkoException();
+            }
+
+            string y2 = x2.GetString();
+            if (G.equal(y2, "fullpath"))
+            {
+                rv = db.FileNameWithPath;
+            }
+            else
+            {
+                rv = Program.GetDatabankFilename(db);
+            }
+            return new ScalarString(rv);
+        }
+
         //just to test against user defined function
         //is this used at all???
         public static IVariable sum_test_method(GekkoTime t, IVariable x1, IVariable x2)

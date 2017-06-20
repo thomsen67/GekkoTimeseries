@@ -75,7 +75,9 @@ namespace Gekko
         public static int graphBackground = 255; //221 before
         
         public static string splitCommandBlockStart = "//[[commandStart]]";
-        public static string splitCommandBlockEnd = "//[[commandEnd]]";        
+        public static string splitCommandBlockEnd = "//[[commandEnd]]";
+
+        public const string brandNewFile = "brand new file";
         
         public static bool showTimings = false;  //use comand TIMINGS
         
