@@ -24658,6 +24658,7 @@ namespace Gekko
 
             //bool isInside = true;
             //bool test2 = false;
+            bool firstXLabelFix = true;
 
             bool isInside = false;  //corresponds to at
             if (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)
@@ -25300,7 +25301,15 @@ namespace Gekko
 
                 txt.AppendLine("set xtics (" + ss + ")");
                 txt.AppendLine("set xtics offset first 0.5, first 0");  //moves xtic labels a half year to the right, but not the tic itself
-                
+                if (firstXLabelFix)
+                {
+                    if ((o.t1.freq == EFreq.Monthly && o.t1.sub <= 1) || (o.t1.freq == EFreq.Quarterly && o.t1.sub <= 1))  //these could perhaps be <=4 and <=2 respectively. Often the plot starts in first subperiod anyway.
+                    {
+                        //only show whole first year if monthly and m1-m4 or quarterly and q1-q2
+                        double tStart = (double)t1 - 0.000000001d;                      //deducts a small number to activate the first x-axis label
+                        txt.AppendLine("set xrange [" + tStart.ToString() + ":]");      //see above
+                    }                    
+                }
             }
             else
             {
