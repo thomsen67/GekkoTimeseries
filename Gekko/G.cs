@@ -39,10 +39,10 @@ namespace Gekko
     /// <summary>
     /// Class containing a library of functions used in many places
     /// </summary>
-    public class G    {
+    public class G {
 
         public static string NL = "\r\n";
-        
+
         /// <summary>
         /// Compares two strings, ignoring case (so "aBc" == "Abc").
         /// </summary>
@@ -77,10 +77,17 @@ namespace Gekko
         /// <returns>True if match</returns>
         public static bool Contains(string s1, string s2)
         {
-            return s1.IndexOf(s2, StringComparison.OrdinalIgnoreCase) >= 0;            
+            return s1.IndexOf(s2, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-        //
+        //NOTE: only deals with ints like 123, 007, 5. No minus, delimiters etc.!
+        public static int IntParse(string s)
+        {
+            int y = 0;
+            for (int i = 0; i < s.Length; i++)
+                y = y * 10 + (s[i] - '0');
+            return y;
+        }
 
         public static string TrueFalse(bool x) {
             string s = "false";

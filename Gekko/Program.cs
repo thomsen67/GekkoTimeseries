@@ -3900,9 +3900,8 @@ namespace Gekko
 
         }
 
-        public static void ReadGdx(Databank databank, ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
+        public static void ReadGdx(Databank databank, ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file2, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
         {
-
             //Hardcoded --------------
             string tName = "t";  //name of the set identified as time
             int timePartLength = 1;  //how many chars to remove from for instance 't30'
@@ -3910,15 +3909,18 @@ namespace Gekko
 
             bool identifyTPlusIntegerAsTime = true;
             char identifierT = 't';
-            
+
+            bool loadIntoTimeseriesWithArrays = true;
             //------------------------
 
+            string file = AddExtension(file2, "." + "gdx");
+
             DateTime dt1 = DateTime.Now;
-                        
+
             string gamsDir = Program.options.gams_exe_folder.Trim();
             if (gamsDir.EndsWith("\\")) gamsDir = gamsDir.Substring(0, gamsDir.Length - "\\".Length);
             if (gamsDir.Trim() == "") gamsDir = null;  //must be so and not an empty string in the GAMSWorkspace call later on
-            
+
             GAMSWorkspace ws = null;
             try
             {
@@ -3926,20 +3928,21 @@ namespace Gekko
             }
             catch (Exception e)
             {
+
                 G.Writeln2("*** ERROR: Import of gdx file (GAMS) failed. GAMSWorkspace problem.");
                 G.Writeln("           Technical error:");
                 G.Writeln("           " + e.Message);
-                G.Writeln("+++ NOTE:  You may manually indicate the GAMS program folder with 'OPTION gams exe folder = ...;'");
+                G.Writeln("+++ NOTE:  You may manually indicate the GAMS program folder with 'OPTION gams exe folder = ...;'");                
                 throw;
             }
 
             GAMSDatabase db = null;
             try
             {
-                db = ws.AddDatabaseFromGDX(file);                
+                db = ws.AddDatabaseFromGDX(file);
             }
             catch (Exception e)
-            {                
+            {
                 G.Writeln2("*** ERROR: Import of gdx file (GAMS) failed. AddDatabaseFromGDX problem.");
                 G.Writeln("           Technical error:");
                 G.Writeln("           " + e.Message);                
@@ -3947,7 +3950,7 @@ namespace Gekko
             }
 
             string readType = oRead.gdxopt; //for instance: "scns['base']" 
-            
+
             string cut1 = null; string cut2 = null;
             if (readType == null) readType = "";
             readType = readType.Replace(" ", "");  //no blanks            
@@ -3957,7 +3960,7 @@ namespace Gekko
                 cut1 = ss[0];
                 cut2 = ss[1];
             }
-            
+
             DateTime t00 = DateTime.Now;
 
             G.Writeln();
@@ -3973,26 +3976,42 @@ namespace Gekko
             int yearMin = int.MaxValue;
             int yearMax = int.MinValue;
 
-            foreach (GAMSSymbol n in db)
+            foreach (GAMSSymbol gamsSymbol in db)
             {
-                //if (n.GetType() == typeof(GAMSParameter)) continue;  //fixme
-                //if (n.GetType() == typeof(GAMSSet)) continue;  //fixme
-
-                if (n.GetType() == typeof(GAMSParameter) || n.GetType() == typeof(GAMSVariable))
+                if (gamsSymbol.GetType() == typeof(GAMSParameter) || gamsSymbol.GetType() == typeof(GAMSVariable))
                 {
+                    //The data may or may not be arranged with time (t) as the last set.
+                    //If so, we read it in chunks.
 
-                    string gvar = n.Name;
+                    // ----------------------------
+                    // age  status   t       value
+                    // ----------------------------
+                    // 20   u        t0        ...
+                    // 20   u        t1        ...
+                    // 20   u        t2        ...
+                    // - - - - - - - - - - - - - - 
+                    // 20   g        t0        ...
+                    // 20   g        t1        ...
+                    // 20   g        t2        ...
+                    // ----------------------------
 
-                    if (gvar.ToLower().StartsWith("j_"))
-                    {
-                        //continue;  //make filtering possible!
-                    }
-                        
+                    //For each os the records, we create a hash that does not include time (t). So the first
+                    //three will have equal hash. While the hash is equal, we put the data in an array.
+                    //When the hash changes (or there are no more records), we put the array into the
+                    //corresponding array-timeseries.                
+
+                    string gvar = gamsSymbol.Name;
+
+                    //if (gvar.ToLower().StartsWith("j_"))
+                    //{
+                    //    //continue;  //make filtering possible!
+                    //}
+
 
                     if (G.IsUnitTesting() && !(G.equal(gvar, "m") || G.equal(gvar, "myfm") || G.equal(gvar, "f") || G.equal(gvar, "pm") || G.equal(gvar, "pff") || G.equal(gvar, "ef"))) continue;  //to not waste time on this when unit testing
-                    
-                    int[] dims = new int[n.Domains.Count];   
-                    
+
+                    //int[] dims = new int[gamsSymbol.Domains.Count];   
+
                     //if(G.equal(gvar, "j_cqi")) { 
 
                     //}
@@ -4004,13 +4023,13 @@ namespace Gekko
 
                     int timeIndex = -12345;
                     int scnsIndex = -12345;
-                    for (int i = 0; i < n.Domains.Count; i++)
+                    for (int i = 0; i < gamsSymbol.Domains.Count; i++)  //only few of these, speed not an issue
                     {
-                        Object o = n.Domains.ElementAt(i);
+                        Object o = gamsSymbol.Domains.ElementAt(i);
                         if (o.GetType() == typeof(GAMSSet))
                         {
-                            GAMSSet gs = (GAMSSet)n.Domains.ElementAt(i);
-                            dims[i] = gs.NumberRecords;
+                            GAMSSet gs = (GAMSSet)gamsSymbol.Domains.ElementAt(i);
+                            //dims[i] = gs.NumberRecords;
                             if (G.equal(gs.Name, tName))
                             {
                                 timeIndex = i;
@@ -4028,14 +4047,14 @@ namespace Gekko
 
 
                     TimeSeries ts2 = null;
-                    //int counter = 0;
-                    string oldHash = "";
+
+                    string oldHash = "<{Some random characters}>";
 
                     bool isDimensionless = false;
 
                     int ii = 0;
-                    
-                    foreach (GAMSSymbolRecord record2 in n)
+
+                    foreach (GAMSSymbolRecord gamsSymbolRecord in gamsSymbol)
                     {
 
                         if (Globals.threadIsInProcessOfAborting)
@@ -4044,102 +4063,82 @@ namespace Gekko
                             return;
                         }
 
-                        string[] keys = record2.Keys;
-                        
+                        string[] keys = gamsSymbolRecord.Keys;
+
                         if (scnsIndex != -12345)
-                        {                            
+                        {
                             if (cut1 != null && scnsIndex >= 0 && !G.equal(keys[scnsIndex], cut2)) continue;  //ignore this
                         }
 
                         double d = double.NaN;
 
-                        if (n.GetType() == typeof(GAMSParameter))
+                        if (true)
                         {
-                            d = ((GAMSParameterRecord)record2).Value;
-                        }
-                        else if (n.GetType() == typeof(GAMSVariable))
-                        {
-                            d = ((GAMSVariableRecord)record2).Level;
-                        }
-
-                        //counter++;
-
-                        
-                        int tt = -12345;
-                        string t = null;
-                        if (timeIndex != -12345)
-                        {
-                            t = keys[timeIndex];
-                            tt = int.Parse(t.Substring(timePartLength)) + year0;  //remove the "t" and add 2006
-                        }
-                                                
-                        string hash = null;
-                        for (int i = 0; i < keys.Length; i++)
-                        {
-                            string keysi = keys[i];
-
-                            if (i == timeIndex) continue;  //not to be part of name
-
-                            if (timeIndex == -12345 && identifyTPlusIntegerAsTime)
+                            GAMSParameterRecord xx1 = gamsSymbolRecord as GAMSParameterRecord;
+                            if (xx1 != null)
                             {
-                                bool isTime = true;
-                                bool first = true;
-                                foreach (char c in keysi)
-                                {
-                                    if (first && c != identifierT)
-                                    {
-                                        isTime = false;
-                                        break;
-                                    }
-                                    if (!first && !char.IsDigit(c))
-                                    {
-                                        isTime = false;
-                                        break;
-                                    }
-                                    first = false;
-                                }
-                                if (isTime)
-                                {
-                                    tt = int.Parse(keysi.Substring(1)) + year0;
-                                    continue;  //not to be part of name
-                                }
-                            }
-
-
-                            if (i == scnsIndex && G.equal(keysi, cut2))
-                            {
-                                //skip it entirely, not to be part of name
+                                d = xx1.Value;
                             }
                             else
                             {
-                                hash += keysi + Globals.symbolTurtle;
-                                //if (i < keys.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter;                    
+                                GAMSVariableRecord xx2 = gamsSymbolRecord as GAMSVariableRecord;
+                                if (xx2 != null)
+                                {
+                                    d = xx2.Level;
+                                }
+                                else
+                                {
+                                    //Sets could go here...
+                                    G.Writeln2("*** ERROR: #09843750983275");
+                                    throw new GekkoException();
+                                }
                             }
                         }
-                        if (hash != null && hash.EndsWith(Globals.symbolTurtle)) hash = hash.Substring(0, hash.Length - Globals.symbolTurtle.Length);
-                                                
-                        if (hash == null || hash == "") isDimensionless = true;
-                        string varName = null;
-                        if (isDimensionless) varName = gvar;
-                        else varName = gvar + Globals.symbolTurtle + hash;
 
-                        if (hash != oldHash)
-                        {                            
+
+                        //without continue here, a gdx is around 16s, with continue it is around 12s. So GAMS iterator is slow (pure iterator takes around 5-6 s)
+                        //continue; 
+
+                        int tt = -12345;
+                        string t = null;
+                        if (timeIndex != -12345)  //time has been identified from sets above
+                        {
+                            t = keys[timeIndex];
+                            tt = G.IntParse(t.Substring(timePartLength)) + year0;  //remove the "t" and add 2006
+                        }
+
+                        string hash = "";
+                        //returns hash and tt
+                        GamsGetHashAndTime(year0, identifyTPlusIntegerAsTime, identifierT, cut2, timeIndex, scnsIndex, keys, ref tt, ref hash);
+
+                        string varName = null;
+                        if (hash.Length > 0)
+                        {
+                            varName = gvar + Globals.symbolTurtle + hash.Substring(0, hash.Length - Globals.symbolTurtle.Length);
+                        }
+                        else
+                        {
+                            isDimensionless = true;
+                            varName = gvar;
+                        }
+
+                        if (hash != oldHash)  //oldHash starts out as ""
+                        {
+                            //if time is the last dimension, the hash is the same for all periods
+                            //this avoids getting the same Gekko variable over and over
                             ts2 = databank.GetVariable(EFreq.Annual, varName);
                         }
 
                         if (ts2 == null)
                         {
-                            
                             ts2 = new TimeSeries(EFreq.Annual, varName);
-                            
                             databank.AddVariable(ts2, false);
                             if (tt == -12345)
                             {
                                 ts2.SetTimeless();
                             }
-                            if (n.GetType() == typeof(GAMSParameter)) counterParameters++;
-                            else if (n.GetType() == typeof(GAMSVariable)) counterVariables++;
+                            if (gamsSymbol.GetType() == typeof(GAMSParameter)) counterParameters++;
+                            else if (gamsSymbol.GetType() == typeof(GAMSVariable)) counterVariables++;
                         }
 
                         if (tt == -12345)
@@ -4148,11 +4147,9 @@ namespace Gekko
                         }
                         else
                         {
-                            ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), d);
-                            
+                            ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), d);  //seems this is not a time-bottleneck
                             yearMax = Math.Max(tt, yearMax);
                             yearMin = Math.Min(tt, yearMin);
-
                         }
                         oldHash = hash;
                         ii++;
@@ -4163,10 +4160,10 @@ namespace Gekko
                         //do nothing, do not create a ghost
                     }
                     else
-                    {                        
+                    {
                         TimeSeries ts = new TimeSeries(EFreq.Annual, gvar);  //we wipe it out if it is alreay existing
                         ts.SetGhost(true);  //only a placeholder, should not be counted etc.
-                        databank.AddVariable(ts);                        
+                        databank.AddVariable(ts);
                     }
 
                     //G.Writeln("Imported GAMS variable: " + gvar + " " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
@@ -4177,7 +4174,7 @@ namespace Gekko
                 }
             }
             G.Writeln2("Finished GAMS import of " + counterVariables + " variables and " + counterParameters + " parameters (" + G.SecondsFormat((DateTime.Now - t00).TotalMilliseconds) + ")");
-                        
+
             readInfo.startPerInFile = yearMin;
             readInfo.endPerInFile = yearMax;
             readInfo.nanCounter = 0;
@@ -4199,15 +4196,63 @@ namespace Gekko
             Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
             currentBank.yearStart = readInfo.startPerResultingBank;
             currentBank.yearEnd = readInfo.endPerResultingBank;
-            
+
             readInfo.databank.info1 = readInfo.info1;
             readInfo.databank.date = readInfo.date;
             readInfo.databank.FileNameWithPath = readInfo.fileName;
 
             //TODO: Maybe only do this on the gdx variables if possible
             //Anyway, the speed penalty is small anyway.
-            databank.Trim();  
+            databank.Trim();
+        }
 
+        private static void GamsGetHashAndTime(int year0, bool identifyTPlusIntegerAsTime, char identifierT, string cut2, int timeIndex, int scnsIndex, string[] keys, ref int tt, ref string hash)
+        {
+            for (int i = 0; i < keys.Length; i++)
+            {
+                if (i == timeIndex) continue;  //not to be part of name
+                string keysi = keys[i];
+                if (timeIndex == -12345 && identifyTPlusIntegerAsTime)
+                {
+                    //Time not found above, so now we take a closer look at the key. This will cost performance
+                    bool isTime = true;
+                    GamsCheckIfTimeDimension(identifierT, keysi, ref isTime);
+                    if (isTime)
+                    {
+                        tt = G.IntParse(keysi.Substring(1)) + year0;  //used later on
+                        continue;  //not to be part of name
+                    }
+                }
+
+                if (i == scnsIndex && G.equal(keysi, cut2))
+                {
+                    //skip it entirely, not to be part of name
+                }
+                else
+                {
+                    hash += keysi + Globals.symbolTurtle;
+                    //if (i < keys.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter;                    
+                }
+            }
+        }
+
+        private static void GamsCheckIfTimeDimension(char identifierT, string keysi, ref bool isTime)
+        {
+            bool first = true;
+            foreach (char c in keysi)
+            {
+                if (first && c != identifierT)
+                {
+                    isTime = false;
+                    break;
+                }
+                if (!first && !char.IsDigit(c))
+                {
+                    isTime = false;
+                    break;
+                }
+                first = false;
+            }
         }
 
         public static string NumberFormat(double d, string format2)
@@ -17180,11 +17225,11 @@ namespace Gekko
         /// <summary>
         /// Execute a <b style="color:black;background-color:#ff9999">shell</b> command
         /// </summary>
-        /// <param name="_CommandLine">Command line parameters to pass</param>
-        /// <param name="_outputMessage">returned string value after executing <b style="color:black;background-color:#ff9999">shell</b> command</param>
-        /// <param name="_errorMessage">Error messages generated during <b style="color:black;background-color:#ff9999">shell</b> execution</param>
+        /// <param name="_CommandLine">Command line parameters to pass</param>        
         public static void ExecuteShellCommand(string _CommandLine, bool mute)
         {
+            //To get it dynamically, maybe this?: https://stackoverflow.com/questions/12678407/getting-command-line-output-dynamically
+
             bool fail = false;
             // Set process variable
             // Provides access to local and remote processes and enables you to start and stop local <b style="color:black;background-color:#99ff99">system</b> processes.
@@ -17284,7 +17329,7 @@ namespace Gekko
                         G.Writeln2(output.ToString());
                         if (error.Length > 0)
                         {
-                            G.Writeln2("------------------- SYS ERROR -------------------");
+                            G.Writeln2("=================== SYS error message ===================");
                             G.Writeln2(error.ToString());
                         }
                     }
@@ -25087,10 +25132,8 @@ namespace Gekko
                 //there is a series being shown at the y2 axis
                 txt.AppendLine("set ytics nomirror " + ticsInOut);
                 txt.AppendLine("set y2tics " + ticsInOut);
-                txt.AppendLine("set border 11");
-                //if (!NullOrEmpty(ytitle)) txt.AppendLine("set ylabel \"" + GnuplotText(ytitle) + "\"");
-                if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);
-                //if (!NullOrEmpty(y2title)) txt.AppendLine("set y2label \"" + GnuplotText(y2title) + "\"");
+                txt.AppendLine("set border 11");                
+                if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);                
                 if (!NullOrEmpty(y2title)) setTitlePlaceholder = SetYAxisText(y2title, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", false);
                 if (NotNullAndNotNo(x2zeroaxis) || isSeparated) txt.AppendLine("set x2zeroaxis lt -1");  //draws x axis for y2=0, #23475432985 
             }
@@ -25440,8 +25483,8 @@ namespace Gekko
         {
             bool setTitlePlaceholder;
             setTitlePlaceholder = true; //to make space
-            if (isLeft) txt.AppendLine("set label \"" + GnuplotText(ytitle) + "\" at graph 0, graph 1 offset -2,2.2 left font " + font);
-            else txt.AppendLine("set label \"" + GnuplotText(ytitle) + "\" at graph 1, graph 1 offset -2,2.2 left font " + font);
+            if (isLeft) txt.AppendLine("set label \"" + GnuplotText(ytitle) + "\" at graph 0, graph 1 offset -3,2.2 left font " + font);
+            else txt.AppendLine("set label \"" + GnuplotText(ytitle) + "\" at graph 1, graph 1 offset 3,2.2 right font " + font);
             return setTitlePlaceholder;
         }
 

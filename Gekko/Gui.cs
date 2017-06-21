@@ -218,7 +218,7 @@ namespace Gekko
             //Code to handle unexpected crashes, for instance after hibernation
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.UnhandledException += new UnhandledExceptionEventHandler(CrashHandler);
-
+            
             //args can be tested in VS, see Gekko project options, debug.
             string noini = null;
             string folder = null;
@@ -263,25 +263,25 @@ namespace Gekko
             }
             catch (Exception e2)
             {
-                //This exception is only if Gekko can not even start up...
-                string stackTrace = Program.GetStackTraceWithOffset(e2);
-                string s = "";
-                s += "*** ERROR: Gekko encountered a problem.\n";
-                s += "\n";
-                s += "============ System output start =====================\n";
-                s += "           " + e2.ToString() + "\n";
-                //s += stackTrace + "\n";
-                //s += "           " + e2.Message + "\n";
-                s += "============ System output end =======================\n";
-                s += "\n";
-                //MessageBox.Show(s);
-                WindowMessageBox w = new WindowMessageBox();
-                w.textBox1.Text = s;
-                w.ShowDialog();
+                ShowStackTraceWindow(e2);
             }
-
         }
 
+        public static void ShowStackTraceWindow(Exception e2)
+        {
+            //This exception is only if Gekko can not even start up...
+            string stackTrace = Program.GetStackTraceWithOffset(e2);
+            string s = "";
+            s += "*** ERROR: Gekko encountered a problem.\n";
+            s += "\n";
+            s += "============ System output start =====================\n";
+            s += "           " + e2.ToString() + "\n";  //ToString() contains stacktrace etc.
+            s += "============ System output end =======================\n";
+            s += "\n";
+            WindowMessageBox w = new WindowMessageBox();
+            w.textBox1.Text = s;
+            w.ShowDialog();
+        }
 
         private void Rekur(int d)
         {
