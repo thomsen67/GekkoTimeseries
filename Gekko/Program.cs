@@ -17234,6 +17234,12 @@ namespace Gekko
             // Set process variable
             // Provides access to local and remote processes and enables you to start and stop local <b style="color:black;background-color:#99ff99">system</b> processes.
             System.Diagnostics.Process process = null;
+
+            int widthRemember = Program.options.print_width;
+            int fileWidthRemember = Program.options.print_filewidth;
+            Program.options.print_width = int.MaxValue;
+            Program.options.print_filewidth = int.MaxValue;
+
             try
             {
                 process = new System.Diagnostics.Process();
@@ -17266,7 +17272,7 @@ namespace Gekko
 
                 //See https://stackoverflow.com/questions/139593/processstartinfo-hanging-on-waitforexit-why?lq=1
 
-                StringBuilder output = new StringBuilder();
+                //StringBuilder output = new StringBuilder();
                 StringBuilder error = new StringBuilder();
                 using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
                 using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
@@ -17278,7 +17284,8 @@ namespace Gekko
                         }
                         else
                         {
-                            output.AppendLine(e.Data);
+                            if (!mute) G.Writeln(e.Data);  //write it as a flowing stream
+                            //output.AppendLine(e.Data);
                         }
                     };
                     process.ErrorDataReceived += (sender, e) =>
@@ -17298,9 +17305,7 @@ namespace Gekko
                     process.BeginOutputReadLine();
                     process.BeginErrorReadLine();
 
-                    if (process.WaitForExit(timeout) &&
-                        outputWaitHandle.WaitOne(timeout) &&
-                        errorWaitHandle.WaitOne(timeout))
+                    if (process.WaitForExit(timeout) && outputWaitHandle.WaitOne(timeout) && errorWaitHandle.WaitOne(timeout))
                     {
                         // Process completed. Check process.ExitCode here.
                     }
@@ -17319,14 +17324,10 @@ namespace Gekko
                 }
 
                 if (!mute)
-                {
-                    int widthRemember = Program.options.print_width;
-                    int fileWidthRemember = Program.options.print_filewidth;
-                    Program.options.print_width = int.MaxValue;
-                    Program.options.print_filewidth = int.MaxValue;
+                {                    
                     try
                     {
-                        G.Writeln2(output.ToString());
+                        //G.Writeln2(output.ToString());
                         if (error.Length > 0)
                         {
                             G.Writeln2("=================== SYS error message ===================");
@@ -17340,9 +17341,7 @@ namespace Gekko
                     }
                     finally
                     {
-                        //resetting, also if there is an error
-                        Program.options.print_width = widthRemember;
-                        Program.options.print_filewidth = fileWidthRemember;
+                        
                     }
                 }    
             }
@@ -17358,6 +17357,9 @@ namespace Gekko
             }
             finally
             {
+                //resetting, also if there is an error
+                Program.options.print_width = widthRemember;
+                Program.options.print_filewidth = fileWidthRemember;
                 // close process and do cleanup
                 process.Close();
                 process.Dispose();

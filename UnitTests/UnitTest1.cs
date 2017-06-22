@@ -1102,7 +1102,7 @@ namespace UnitTests
             //!!!!!!!!!!! FIXME last \
             //!!!!!!!!!!! FIXME
             //!!!!!!!!!!! FIXME
-            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.1\\';");
+            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.8\\';");
             I("read <gdx> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...            
             I("list scn = base;");
             I("list psl = chou, cpub, ccon, cgoo, cser;");
@@ -1114,7 +1114,7 @@ namespace UnitTests
 
             //Cutting off a dimension
             I("reset; mode data;");
-            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.1\\';");
+            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.8\\';");
             I("read <gdx gdxopt='scns.base'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
             I("list psl = chou, cpub, ccon, cgoo, cser;");
             I("clone;");
@@ -1125,11 +1125,11 @@ namespace UnitTests
 
             //comparing scenarios            
             I("reset;");
-            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.1\\';");
+            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.8\\';");
             I("read <gdx gdxopt='scns.base'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
             I("write base;");
             I("reset;");
-            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.1\\';");
+            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.8\\';");
             I("read <gdx gdxopt='scns.struc'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
             I("write struc;");
             I("reset;");
