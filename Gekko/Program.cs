@@ -10974,6 +10974,15 @@ namespace Gekko
 
                 if (s2.Length == 3)
                 {
+                    if (G.equal(s2, "tsl"))
+                    {
+                        Program.Tsl();
+                    }
+                    return "";
+                }
+
+                if (s2.Length == 3)
+                {
                     string sub = s2;
                     if (G.equal(sub, "ast"))
                     {
@@ -14127,6 +14136,29 @@ namespace Gekko
                 Globals.pipeFileHelper.pipeFile.Write(s1);  //this is the case if it is a html file, then we write the original content up until the </body> tag
                 Globals.pipeFileHelper.htmlEndingTagsStuff = s2;
             }
+        }
+
+        public static void Tsl()
+        {
+            GekkoTime tStart = new GekkoTime(EFreq.Annual, 2000, 1);
+            GekkoTime tEnd = new GekkoTime(EFreq.Annual, 2002, 1);
+            GekkoTime t = Globals.tNull;
+            TimeSeries ts1_ = new TimeSeries(EFreq.Annual, "x");
+            ts1_.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 10d);
+            ts1_.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 11d);
+            ts1_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 13d);
+            TimeSeries ts2_ = new TimeSeries(EFreq.Annual, "y");
+            ts2_.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 110d);
+            ts2_.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 111d);
+            ts2_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 115d);
+
+
+            IVariable ts1 = new Gekko.TimeSeriesLight(ts1_, tStart, tEnd);
+            IVariable ts2 = new Gekko.TimeSeriesLight(ts2_, tStart, tEnd);
+
+            //ts1 + ts2
+            IVariable ts3 = ts1.Add(ts2, t);
+
         }
 
         private static void AddHtmlToExistingHtml(ref string s1, ref string s2, string css, string s)
