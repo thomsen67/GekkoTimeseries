@@ -36,7 +36,7 @@ namespace Gekko
         {
             public static IVariable Add(ScalarString s, ScalarVal d, bool invert)
             {
-                double dd = d.GetVal(Globals.tNull);
+                double dd = d.GetVal(null);
                 string i = null;
                 if (G.isNumericalError(dd))
                 {
@@ -79,13 +79,13 @@ namespace Gekko
 
         public static class ValTimeSeries
         {
-            public static IVariable Add(ScalarVal x, MetaTimeSeries ats, GekkoTime t)
+            public static IVariable Add(ScalarVal x, MetaTimeSeries ats, IVariableHelper t)
             {
                 //no need to implement swap
-                if (t.IsNull()) throw new GekkoException();                
+                if (t == null) throw new GekkoException();                
                 TimeSeries ts = ats.ts;
                 double val1 = x.val;
-                double val2 = ts.GetData(t.Add(ats.offset));
+                double val2 = ts.GetData(t.t1.Add(ats.offset));  //uuu
                 return new ScalarVal(val1 + val2);
             }
         }

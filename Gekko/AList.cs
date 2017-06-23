@@ -25,7 +25,7 @@ namespace Gekko
             return this.list.Count;
         }
 
-        public IVariable Indexer(GekkoTime t, bool isLhs, params IVariable[] indexes)
+        public IVariable Indexer(IVariableHelper t, bool isLhs, params IVariable[] indexes)
         {
             if (indexes.Length == 1)
             {
@@ -79,22 +79,22 @@ namespace Gekko
             }
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, GekkoTime t)
+        public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, IVariableHelper t)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, GekkoTime t)
+        public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, IVariableHelper t)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, GekkoTime t)
+        public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, IVariableHelper t)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, GekkoTime t)
+        public IVariable Indexer(IVariablesFilterRange indexRange, IVariableHelper t)
         {            
             IVariable iv1 = indexRange.first;
             IVariable iv2 = indexRange.last;
@@ -129,19 +129,19 @@ namespace Gekko
             }
         }
         
-        public IVariable Negate(GekkoTime t)
+        public IVariable Negate(IVariableHelper t)
         {
             G.Writeln2("*** ERROR: You cannot use minus with lists");                
             throw new GekkoException();
         }
 
-        public void InjectAdd(IVariable x, IVariable y, GekkoTime t)
+        public void InjectAdd(IVariable x, IVariable y, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: #8703458724");                
             throw new GekkoException();
         }
 
-        public double GetVal(GekkoTime t)
+        public double GetVal(IVariableHelper t)
         {
             G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a list.");
             G.Writeln("           Maybe you need an []-indexer on the list, for instance #mylist[2]?");
@@ -170,7 +170,7 @@ namespace Gekko
             return EVariableType.List;
         }
 
-        public IVariable Add(IVariable x, GekkoTime t)
+        public IVariable Add(IVariable x, IVariableHelper t)
         {
             switch (x.Type())
             {                    
@@ -187,25 +187,25 @@ namespace Gekko
             }
         }
 
-        public IVariable Subtract(IVariable x, GekkoTime t)
+        public IVariable Subtract(IVariable x, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: You cannot use subtract with lists");                
             throw new GekkoException();
         }
 
-        public IVariable Multiply(IVariable x, GekkoTime t)
+        public IVariable Multiply(IVariable x, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: You cannot use multiply with lists");                
             throw new GekkoException();
         }
 
-        public IVariable Divide(IVariable x, GekkoTime t)
+        public IVariable Divide(IVariable x, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: You cannot use divide with lists");                
             throw new GekkoException();
         }
 
-        public IVariable Power(IVariable x, GekkoTime t)
+        public IVariable Power(IVariable x, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: You cannot use power function with lists");                
             throw new GekkoException();

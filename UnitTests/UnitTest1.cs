@@ -5774,153 +5774,153 @@ namespace UnitTests
 
             //basic
             I("IF(%s1 == 'abc') VAL q = 0; VAL xx = 1; ELSE VAL q = 0; VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
 
             I("IF(%s1 == 'abc ') VAL q = 0; VAL xx = 1; ELSE VAL q = 0; VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%s1 == 'abc0') VAL q = 0; VAL xx = 1; ELSE VAL q = 0; VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
 
             //parentheses + not
             I("IF((%s1 == 'abc')) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(not %s1 == 'abc') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(not(%s1 == 'abc')) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
 
             //or table
             I("IF(%s1 == 'abc' or %s2 == 'abcd') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%s1 == 'abc' or %s2 == 'abcd7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%s1 == 'abc7' or %s2 == 'abcd') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%s1 == 'abc7' or %s2 == 'abcd7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
 
             //and table
             I("IF(%s1 == 'abc' and %s2 == 'abcd') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%s1 == 'abc' and %s2 == 'abcd7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%s1 == 'abc7' and %s2 == 'abcd') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%s1 == 'abc7' and %s2 == 'abcd7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
 
             //precedence and over or
             I("IF(%s1 == 'abc' or %s2 == 'abcd7' and %s2 == 'abcd7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%s1 == 'abc' or (%s2 == 'abcd7' and %s2 == 'abcd7')) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF((%s1 == 'abc' or %s2 == 'abcd7') and %s2 == 'abcd7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
 
             //precedence not
             I("IF(not %s1 == 'abc7' and %s2 == 'abcd7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(not( %s1 == 'abc7' and %s2 == 'abcd7')) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
 
             //expressions
             I("IF(%s1 == 'abc' and %s1+%s2 == 'abcabcd' and %s1+%s2+%s1 == 'abcabcd'+%s1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             //decorated with a lot of parentheses
             I("IF(((%s1 == 'abc')) and (((%s1)+%s2) == ('abcabcd')) and (%s1+(%s2+(%s1))) == ('abcabcd'+%s1)) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
 
             // == and <> operators
             I("IF(%s1 == 'abc') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%s1 <> 'abc') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%s1 == 'abc7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%s1 <> 'abc7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
 
             //values, relations
 
             I("IF(%v0+1-1 < 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%v0+1-1 <= 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%v0+1-1 == 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%v0+1-1 >= 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%v0+1-1 > 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%v0+1-1 <> 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
 
             I("IF(%v1+1-1 < 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%v1+1-1 <= 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%v1+1-1 == 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%v1+1-1 >= 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%v1+1-1 > 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%v1+1-1 <> 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
 
             I("IF(%v2+1-1 < 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%v2+1-1 <= 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%v2+1-1 == 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%v2+1-1 >= 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%v2+1-1 > 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%v2+1-1 <> 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
 
             //dates, relations
 
             I("IF(%d0-1 < 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%d0-1 <= 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%d0-1 == 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%d0-1 >= 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%d0-1 > 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%d0-1 <> 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
 
             I("IF(%d1-1 < 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%d1-1 <= 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%d1-1 == 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%d1-1 >= 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%d1-1 > 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%d1-1 <> 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
 
             I("IF(%d2-1 < 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%d2-1 <= 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%d2-1 == 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%d2-1 >= 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%d2-1 > 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%d2-1 <> 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
 
             // FIXME FIXME FIXME
             // FIXME FIXME FIXME
@@ -5937,9 +5937,9 @@ namespace UnitTests
             I("TIME 2000 2001;");
             I("SERIES y = 123;");
             I("IF(y[%d+1-1] == 123.0+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(y[%v+1-1] == 123.0+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
 
             //casting
 

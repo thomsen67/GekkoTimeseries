@@ -62,6 +62,12 @@ using System.Linq;
 namespace Gekko
 {
 
+    public class IVariableHelper
+    {
+        public GekkoTime t1 = Globals.tNull;
+        public GekkoTime t2 = Globals.tNull;
+    }
+
     public class GekkoList<T>
     {
         private List<T> container = new List<T>();
@@ -5911,7 +5917,7 @@ namespace Gekko
             {
                 string[] ss2 = varName.Split(new string[] { ".." }, StringSplitOptions.None);
                 ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);
-                IVariable xx = ss.Indexer(new IVariablesFilterRange(new ScalarString(bank + ":" + ss2[0]), new ScalarString(ss2[1])), Globals.tNull);
+                IVariable xx = ss.Indexer(new IVariablesFilterRange(new ScalarString(bank + ":" + ss2[0]), new ScalarString(ss2[1])), null);
                 Databank db = Program.databanks.GetDatabank(bank);
                 if (db == null)
                 {
@@ -9284,7 +9290,7 @@ namespace Gekko
                     else if (a.Type() == EVariableType.Val)
                     {
                         if (tpe != null && tpe != "val") continue;
-                        value = a.GetVal(Globals.tNull).ToString();
+                        value = a.GetVal(null).ToString();
                         if (value == "NaN") value = "M";
                     }
                     else if (a.Type() == EVariableType.List)
@@ -11038,7 +11044,7 @@ namespace Gekko
                         DateTime t1 = DateTime.Now;
                         double ms = (t1 - t0).TotalMilliseconds;
                         G.Writeln2("Speed1 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
-                        double x = Program.scalars["m"].GetVal(Globals.tNull);
+                        double x = Program.scalars["m"].GetVal(null);
                         G.Writeln("Difference from true: " + (x - (n * (n + 1) / 2)));
                         return "";  //no need for the parser to chew on this afterwards!
                     }
@@ -14157,7 +14163,7 @@ namespace Gekko
             IVariable ts2 = new Gekko.TimeSeriesLight(ts2_, tStart, tEnd);
 
             //ts1 + ts2
-            IVariable ts3 = ts1.Add(ts2, t);
+            IVariable ts3 = ts1.Add(ts2, null);
 
         }
 

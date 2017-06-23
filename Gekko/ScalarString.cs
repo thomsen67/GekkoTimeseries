@@ -105,7 +105,7 @@ namespace Gekko
                                 if (!valfail)
                                 {
                                     IVariable b = new ScalarString("");
-                                    IVariable c = b.Add(a, Globals.tNull);
+                                    IVariable c = b.Add(a, null);
                                     string s3 = c.GetString();
                                     int x = 0;
                                     //if (isDollarPercent) x = 1;
@@ -151,7 +151,7 @@ namespace Gekko
                                 if (a.Type() == EVariableType.String || a.Type() == EVariableType.Date || a.Type() == EVariableType.Val)
                                 {
                                     IVariable b = new ScalarString("");
-                                    IVariable c = b.Add(a, Globals.tNull);
+                                    IVariable c = b.Add(a, null);
                                     string s3 = c.GetString();
                                     string s4 = s.Substring(lastEnd + 1, j - lastEnd - 1);
                                     s2 += s4 + s3;
@@ -209,7 +209,7 @@ namespace Gekko
             return EVariableType.String;
         }                       
 
-        public IVariable Indexer(GekkoTime t, bool isLhs, params IVariable[] indexes)
+        public IVariable Indexer(IVariableHelper t, bool isLhs, params IVariable[] indexes)
         {
             if (indexes.Length == 1)
             {
@@ -256,12 +256,12 @@ namespace Gekko
 
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, GekkoTime t)
+        public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, IVariableHelper t)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, GekkoTime t)
+        public IVariable Indexer(IVariablesFilterRange indexRange, IVariableHelper t)
         {
             if (this._string2 == Globals.indexerAloneCheatString)
             {
@@ -281,29 +281,29 @@ namespace Gekko
             }            
         }
 
-        public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, GekkoTime t)
+        public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, IVariableHelper t)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, GekkoTime t)
+        public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, IVariableHelper t)
         {
             throw new GekkoException();
         }
 
-        public IVariable Negate(GekkoTime t)
+        public IVariable Negate(IVariableHelper t)
         {
             G.Writeln2("*** ERROR: You cannot use minus on string");
             throw new GekkoException();
         }
 
-        public void InjectAdd(IVariable x, IVariable y, GekkoTime t)
+        public void InjectAdd(IVariable x, IVariable y, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: You cannot use add on string");
             throw new GekkoException();
         }
 
-        public double GetVal(GekkoTime t)
+        public double GetVal(IVariableHelper t)
         {            
             if (this._isName)
             {
@@ -339,7 +339,7 @@ namespace Gekko
             return new List<string>() { this._string2 };
         }
         
-        public IVariable Add(IVariable x, GekkoTime t)
+        public IVariable Add(IVariable x, IVariableHelper t)
         {
             switch (x.Type())
             {
@@ -372,25 +372,25 @@ namespace Gekko
             }
         }
 
-        public IVariable Subtract(IVariable x, GekkoTime t)
+        public IVariable Subtract(IVariable x, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: %x -%y (minus) is not allowed if %x is a STRING scalar.");
             throw new GekkoException();
         }
 
-        public IVariable Multiply(IVariable x, GekkoTime t)
+        public IVariable Multiply(IVariable x, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: %x*%y (multiply) is not allowed if %x is a STRING scalar.");
             throw new GekkoException();            
         }
 
-        public IVariable Divide(IVariable x, GekkoTime t)
+        public IVariable Divide(IVariable x, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: %x/%y (divide) is not allowed if %x is a STRING scalar.");
             throw new GekkoException();            
         }
 
-        public IVariable Power(IVariable x, GekkoTime t)
+        public IVariable Power(IVariable x, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: %x^%y or %x**%y (power) is not allowed if %x is a STRING scalar.");
             throw new GekkoException();            

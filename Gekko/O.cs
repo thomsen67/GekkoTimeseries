@@ -81,52 +81,52 @@ namespace Gekko
             }
         }
 
-        public static IVariable Add(IVariable x, IVariable y, GekkoTime t)
+        public static IVariable Add(IVariable x, IVariable y, IVariableHelper t)
         {
             return x.Add(y, t);
         }
 
-        public static IVariable Add(IVariable x, IVariable y, IVariable z, GekkoTime t)
+        public static IVariable Add(IVariable x, IVariable y, IVariable z, IVariableHelper t)
         {
             return x.Add(y, t).Add(z, t);
         }
 
-        public static IVariable Subtract(IVariable x, IVariable y, GekkoTime t)
+        public static IVariable Subtract(IVariable x, IVariable y, IVariableHelper t)
         {
             return x.Subtract(y, t);
         }
 
-        public static IVariable Multiply(IVariable x, IVariable y, GekkoTime t)
+        public static IVariable Multiply(IVariable x, IVariable y, IVariableHelper t)
         {
             return x.Multiply(y, t);
         }
 
-        public static IVariable Divide(IVariable x, IVariable y, GekkoTime t)
+        public static IVariable Divide(IVariable x, IVariable y, IVariableHelper t)
         {
             return x.Divide(y, t);
         }
 
-        public static IVariable Power(IVariable x, IVariable y, GekkoTime t)
+        public static IVariable Power(IVariable x, IVariable y, IVariableHelper t)
         {
             return x.Power(y, t);
         }
 
-        public static IVariable Negate(IVariable x, GekkoTime t)
+        public static IVariable Negate(IVariable x, IVariableHelper t)
         {
             return x.Negate(t);
         }
 
-        public static IVariable AndAdd(IVariable x, IVariable y, GekkoTime t)
+        public static IVariable AndAdd(IVariable x, IVariable y, IVariableHelper t)
         {
             return Functions.union(t, x, y);
         }
 
-        public static IVariable AndSubtract(IVariable x, IVariable y, GekkoTime t)
+        public static IVariable AndSubtract(IVariable x, IVariable y, IVariableHelper t)
         {
             return Functions.difference(t, x, y);
         }
 
-        public static IVariable AndMultiply(IVariable x, IVariable y, GekkoTime t)
+        public static IVariable AndMultiply(IVariable x, IVariable y, IVariableHelper t)
         {
             return Functions.intersect(t, x, y);
         }
@@ -208,7 +208,7 @@ namespace Gekko
             FlexibleEnd
         }
 
-        public static ScalarVal SetValData(IVariable name, IVariable rhs, GekkoTime t)
+        public static ScalarVal SetValData(IVariable name, IVariable rhs, IVariableHelper t)
         {
             //Returns the IVariable it finds here (or creates)            
             string name2 = name.GetString();            
@@ -351,7 +351,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(GekkoTime t, IVariable x, bool isLhs, params IVariable[] indexes)
+        public static IVariable Indexer(IVariableHelper t, IVariable x, bool isLhs, params IVariable[] indexes)
         {
             if (x == null)
             {
@@ -377,7 +377,7 @@ namespace Gekko
                         
         }               
 
-        public static IVariable IndexerPlus(GekkoTime t, IVariable x, bool isLhs, IVariable y)
+        public static IVariable IndexerPlus(IVariableHelper t, IVariable x, bool isLhs, IVariable y)
         {
             //isLhs will always be false
             if (x == null)
@@ -393,7 +393,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(GekkoTime t, IVariable x, bool isLhs, IVariablesFilterRange y)
+        public static IVariable Indexer(IVariableHelper t, IVariable x, bool isLhs, IVariablesFilterRange y)
         {            
             if (x == null)
             {
@@ -410,7 +410,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(GekkoTime t, IVariable x, bool isLhs, IVariablesFilterRange y1, IVariablesFilterRange y2)
+        public static IVariable Indexer(IVariableHelper t, IVariable x, bool isLhs, IVariablesFilterRange y1, IVariablesFilterRange y2)
         {
             if (x == null)
             {
@@ -424,7 +424,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(GekkoTime t, IVariable x, bool isLhs, IVariable y1, IVariablesFilterRange y2)
+        public static IVariable Indexer(IVariableHelper t, IVariable x, bool isLhs, IVariable y1, IVariablesFilterRange y2)
         {
             if (x == null)
             {
@@ -438,7 +438,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(GekkoTime t, IVariable x, bool isLhs, IVariablesFilterRange y1, IVariable y2)
+        public static IVariable Indexer(IVariableHelper t, IVariable x, bool isLhs, IVariablesFilterRange y1, IVariable y2)
         {
             if (x == null)
             {
@@ -1045,7 +1045,7 @@ namespace Gekko
             }
         }        
 
-        public static MetaTimeSeries GetTimeSeriesFromList(IVariable list, IVariable index, int bankNumber, GekkoTime t)
+        public static MetaTimeSeries GetTimeSeriesFromList(IVariable list, IVariable index, int bankNumber, IVariableHelper t)
         {
             if (list.Type() == EVariableType.List)
             {
@@ -1060,7 +1060,7 @@ namespace Gekko
             }            
         }
 
-        public static IVariable GetValFromStringIndexer(string name, IVariable index, int bank, GekkoTime t)
+        public static IVariable GetValFromStringIndexer(string name, IVariable index, int bank, IVariableHelper t)
         {
             //Used to pick out a value from a list item, like #m[2][2015], where index=2015
             MetaTimeSeries mts = O.GetTimeSeries(name, bank);  //always from work....
@@ -1228,7 +1228,7 @@ namespace Gekko
 
         // =================================== start comparisons ==================================
 
-        public static bool StrictlySmallerThan(IVariable x, IVariable y, GekkoTime t)
+        public static bool StrictlySmallerThan(IVariable x, IVariable y, IVariableHelper t)
         {
             bool rv = false;
             if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
@@ -1248,7 +1248,7 @@ namespace Gekko
             return rv;
         }
 
-        public static bool SmallerThanOrEqual(IVariable x, IVariable y, GekkoTime t)
+        public static bool SmallerThanOrEqual(IVariable x, IVariable y, IVariableHelper t)
         {
             bool rv = false;
             if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
@@ -1268,7 +1268,7 @@ namespace Gekko
             return rv;
         }
 
-        public static bool Equals(IVariable x, IVariable y, GekkoTime t)
+        public static bool Equals(IVariable x, IVariable y, IVariableHelper t)
         {
             bool rv = false;
             if ((x.Type() == EVariableType.TimeSeries || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.TimeSeries || y.Type() == EVariableType.Val))
@@ -1293,7 +1293,7 @@ namespace Gekko
         }
                
 
-        public static bool LargerThanOrEqual(IVariable x, IVariable y, GekkoTime t)
+        public static bool LargerThanOrEqual(IVariable x, IVariable y, IVariableHelper t)
         {
             bool rv = false;
             if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
@@ -1313,7 +1313,7 @@ namespace Gekko
             return rv;
         }
 
-        public static bool StrictlyLargerThan(IVariable x, IVariable y, GekkoTime t)
+        public static bool StrictlyLargerThan(IVariable x, IVariable y, IVariableHelper t)
         {
             bool rv = false;
             if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
@@ -1687,12 +1687,12 @@ namespace Gekko
             return l;
         }
 
-        public static double GetVal(IVariable a, GekkoTime t)
+        public static double GetVal(IVariable a, IVariableHelper t) //uuu
         {
             return a.GetVal(t);            
         }
 
-        public static void GetVal777(IVariable a, int bankNumber, O.Prt.Element e, GekkoTime t)  //used in PRT and similar, can accept a list that will show itself as a being an integer with ._isName set.
+        public static void GetVal777(IVariable a, int bankNumber, O.Prt.Element e, IVariableHelper t)  //used in PRT and similar, can accept a list that will show itself as a being an integer with ._isName set.
         {
             if (a.Type() == EVariableType.List)
             {
@@ -1716,12 +1716,12 @@ namespace Gekko
                     if (bankNumber == 1)
                     {
                         if (e.subElements[i].tsWork == null) e.subElements[i].tsWork = new TimeSeries(Program.options.freq, null);
-                        e.subElements[i].tsWork.SetData(t, dd);
+                        e.subElements[i].tsWork.SetData(t.t1, dd); //uuu
                     }
                     else
                     {
                         if (e.subElements[i].tsBase == null) e.subElements[i].tsBase = new TimeSeries(Program.options.freq, null);
-                        e.subElements[i].tsBase.SetData(t, dd);
+                        e.subElements[i].tsBase.SetData(t.t1, dd); //uuu
                     }
                     if (e.subElements[i].label == null) e.subElements[i].label = s;  //this is a bit slow because it gets repeated for each t, but PRT is slow anyways, and it only slows down list-unfolding
                 }                
@@ -1742,12 +1742,12 @@ namespace Gekko
                 if (bankNumber == 1)
                 {
                     if (e.subElements[0].tsWork == null) e.subElements[0].tsWork = new TimeSeries(Program.options.freq, null);
-                    e.subElements[0].tsWork.SetData(t, dd);
+                    e.subElements[0].tsWork.SetData(t.t1, dd); //uuu
                 }
                 else
                 {
                     if (e.subElements[0].tsBase == null) e.subElements[0].tsBase = new TimeSeries(Program.options.freq, null);
-                    e.subElements[0].tsBase.SetData(t, dd);
+                    e.subElements[0].tsBase.SetData(t.t1, dd); //uuu
                 }
 
                 //The return value is not used, but we keep it for now...                
@@ -1755,7 +1755,7 @@ namespace Gekko
             }            
         }
 
-        public static double GetVal(IVariable a, int bankNumber, GekkoTime t)  //used in PRT and similar, can accept a list that will show itself as a being an integer with ._isName set.
+        public static double GetVal(IVariable a, int bankNumber, IVariableHelper t)  //used in PRT and similar, can accept a list that will show itself as a being an integer with ._isName set.
         {            
             return a.GetVal(t);            
         }               
@@ -1792,7 +1792,7 @@ namespace Gekko
                 G.Writeln("           Did you forget []-brackets to pick out an observation, for instance x[2020]?");
                 throw new GekkoException();
             }
-            double d = GetVal(a, Globals.tNull);
+            double d = GetVal(a, null);
             int intValue = -12345;
             if (!G.Round(out intValue, d))
             {
@@ -2339,7 +2339,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: VAL " + Globals.symbolMemvar.ToString() + s + " was not found");
                     throw new GekkoException();
                 }
-                string ss = a.GetVal(Globals.tNull).ToString();
+                string ss = a.GetVal(null).ToString();
                 if (ss == "NaN") ss = "M";
                 G.Writeln2("VAL " + s + " = " + ss);                
             }

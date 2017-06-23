@@ -27,7 +27,7 @@ namespace Gekko
             this.offset = offset;
         }
 
-        public IVariable Indexer(GekkoTime t, bool isLhs, params IVariable[] indexes)
+        public IVariable Indexer(IVariableHelper t, bool isLhs, params IVariable[] indexes)
         {
             if (indexes.Length > 0 && indexes[0].Type() == EVariableType.String)
             {
@@ -87,49 +87,52 @@ namespace Gekko
             }            
         }        
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, GekkoTime t)
+        public IVariable Indexer(IVariablesFilterRange indexRange, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: You are trying to use an [] index range on timeseries: " + this.ts.variableName + ".");            
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, GekkoTime t)
+        public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, IVariableHelper t)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, GekkoTime t)
+        public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, IVariableHelper t)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, GekkoTime t)
+        public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, IVariableHelper t)
         {
             throw new GekkoException();
         }        
 
-        public IVariable Negate(GekkoTime t)
+        public IVariable Negate(IVariableHelper t)
         {            
             double val = O.GetVal(this, t);
             return new ScalarVal(-val);            
         }
 
-        public void InjectAdd(IVariable x, IVariable y, GekkoTime t)
+        public void InjectAdd(IVariable x, IVariable y, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: error #734632321 regarding timeseries: " + this.ts.variableName + ".");            
             throw new GekkoException();
         }        
 
-        public double GetVal(GekkoTime t)
+        public double GetVal(IVariableHelper t)
         {
-            //Asking a general timeless GetVal() from a timeseries (and not getting a val with a particular GekkoTime) is used in GENR, PRT etc. in an internal GekkoTime loop. Hence the use of Globals.globalGekkoTimeIterator_DO_NOT_ALTER.
-            if (t.IsNull())
-            {
-                G.Writeln2("*** ERROR: You are trying to extract a single value from timeseries: " + this.ts.variableName + ".");
-                G.Writeln("           Did you forget []-brackets to pick out an observation, for instance x[2020]?");
-                throw new GekkoException();
-            }
-            return this.ts.GetData(t.Add(this.offset));
+            //uuu
+            return double.NaN;
+
+            ////Asking a general timeless GetVal() from a timeseries (and not getting a val with a particular GekkoTime) is used in GENR, PRT etc. in an internal GekkoTime loop. Hence the use of Globals.globalGekkoTimeIterator_DO_NOT_ALTER.
+            //if (t.IsNull())
+            //{
+            //    G.Writeln2("*** ERROR: You are trying to extract a single value from timeseries: " + this.ts.variableName + ".");
+            //    G.Writeln("           Did you forget []-brackets to pick out an observation, for instance x[2020]?");
+            //    throw new GekkoException();
+            //}
+            //return this.ts.GetData(t.Add(this.offset));
         }
 
         public string GetString()
@@ -155,7 +158,7 @@ namespace Gekko
             return EVariableType.TimeSeries;
         }
 
-        public IVariable Add(IVariable x, GekkoTime t)
+        public IVariable Add(IVariable x, IVariableHelper t)
         {
             if (x.Type() == EVariableType.TimeSeries)
             {                
@@ -177,7 +180,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Subtract(IVariable x, GekkoTime t)
+        public IVariable Subtract(IVariable x, IVariableHelper t)
         {
             if (x.Type() == EVariableType.TimeSeries)
             {                
@@ -194,7 +197,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Multiply(IVariable x, GekkoTime t)
+        public IVariable Multiply(IVariable x, IVariableHelper t)
         {
             if (x.Type() == EVariableType.TimeSeries)
             {                
@@ -211,7 +214,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Divide(IVariable x, GekkoTime t)
+        public IVariable Divide(IVariable x, IVariableHelper t)
         {
             if (x.Type() == EVariableType.TimeSeries)
             {                
@@ -228,7 +231,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Power(IVariable x, GekkoTime t)
+        public IVariable Power(IVariable x, IVariableHelper t)
         {
             if (x.Type() == EVariableType.TimeSeries)
             {                

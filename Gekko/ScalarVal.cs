@@ -14,7 +14,7 @@ namespace Gekko
             val = d;
         }
 
-        public double GetVal(GekkoTime t)
+        public double GetVal(IVariableHelper t)
         {
             return this.val;
         }
@@ -67,31 +67,31 @@ namespace Gekko
             return gt;
         }        
 
-        public IVariable Indexer(GekkoTime t, bool isLhs, params IVariable[] indexes)
+        public IVariable Indexer(IVariableHelper t, bool isLhs, params IVariable[] indexes)
         {
             G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
             throw new GekkoException();
         }
         
-        public IVariable Indexer(IVariablesFilterRange indexRange, GekkoTime t)
+        public IVariable Indexer(IVariablesFilterRange indexRange, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, GekkoTime t)
+        public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, GekkoTime t)
+        public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, GekkoTime t)
+        public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
             throw new GekkoException();
@@ -112,12 +112,12 @@ namespace Gekko
             return EVariableType.Val;
         }
         
-        public IVariable Negate(GekkoTime t)
+        public IVariable Negate(IVariableHelper t)
         {
             return new ScalarVal(-this.val);
         }        
 
-        public void InjectAdd(IVariable x, IVariable y, GekkoTime t)
+        public void InjectAdd(IVariable x, IVariable y, IVariableHelper t)
         {
             if (x.Type() == EVariableType.Val)
             {
@@ -154,7 +154,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Add(IVariable x, GekkoTime t)
+        public IVariable Add(IVariable x, IVariableHelper t)
         {
             switch (x.Type())
             {
@@ -188,7 +188,7 @@ namespace Gekko
             }            
         }
 
-        public IVariable Subtract(IVariable x, GekkoTime t)
+        public IVariable Subtract(IVariable x, IVariableHelper t)
         {
             switch (x.Type())
             {
@@ -208,7 +208,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Multiply(IVariable x, GekkoTime t)
+        public IVariable Multiply(IVariable x, IVariableHelper t)
         {
             switch (x.Type())
             {
@@ -240,7 +240,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Divide(IVariable x, GekkoTime t)
+        public IVariable Divide(IVariable x, IVariableHelper t)
         {
             switch (x.Type())
             {
@@ -260,7 +260,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Power(IVariable x, GekkoTime t)
+        public IVariable Power(IVariable x, IVariableHelper t)
         {
             switch (x.Type())
             {

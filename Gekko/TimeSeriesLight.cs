@@ -25,7 +25,7 @@ namespace Gekko
             Array.Copy(dataPointer, i1, storage, 0, (i2 - i1 + 1));
         }
 
-        public IVariable Indexer(GekkoTime t, bool isLhs, params IVariable[] indexes)
+        public IVariable Indexer(IVariableHelper t, bool isLhs, params IVariable[] indexes)
         {
             if (indexes.Length > 0 && indexes[0].Type() == EVariableType.String)
             {
@@ -50,13 +50,22 @@ namespace Gekko
                     else
                     {
                         //lag or lead
-                        if (ival == 0) return this;  //no lag, x[-0] or x[0]
-                        else
+                        if (ival == 0) return this;  //no lag, x[-0] or x[0]                        
                         {                            
                             double[] data = new double[this.storage.Length];
                             if (ival < 0)  //lag
                             {
-
+                                int lags = -ival;
+                                if (lags > this.storage.Length) lags = this.storage.Length;
+                                for (int i = 0; i < lags; i++)
+                                {
+                                    data[i] = double.NaN;
+                                }
+                                if (lags < this.storage.Length) Array.Copy(this.storage, 0, data, -ival, this.storage.Length - lags);
+                            }
+                            else  //lead
+                            {
+                                throw new GekkoException();
                             }
                         }
                     }
@@ -70,39 +79,39 @@ namespace Gekko
             }
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, GekkoTime t)
+        public IVariable Indexer(IVariablesFilterRange indexRange, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: You are trying to use an [] index range on timeseries");
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, GekkoTime t)
+        public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, IVariableHelper t)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, GekkoTime t)
+        public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, IVariableHelper t)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, GekkoTime t)
+        public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, IVariableHelper t)
         {
             throw new GekkoException();
         }
 
-        public IVariable Negate(GekkoTime t)
+        public IVariable Negate(IVariableHelper t)
         {
             return null;
         }
 
-        public void InjectAdd(IVariable x, IVariable y, GekkoTime t)
+        public void InjectAdd(IVariable x, IVariable y, IVariableHelper t)
         {
             G.Writeln2("*** ERROR: error #734632321 regarding timeseries");
             throw new GekkoException();
         }
 
-        public double GetVal(GekkoTime t)
+        public double GetVal(IVariableHelper t)
         {
             return double.NaN;
         }
@@ -130,7 +139,7 @@ namespace Gekko
             return EVariableType.TimeSeries;
         }
 
-        public IVariable Add(IVariable x, GekkoTime t)
+        public IVariable Add(IVariable x, IVariableHelper t)
         {
             TimeSeriesLight tsl = x as TimeSeriesLight;
             if (tsl != null)
@@ -152,22 +161,22 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public IVariable Subtract(IVariable x, GekkoTime t)
+        public IVariable Subtract(IVariable x, IVariableHelper t)
         {
             return null;
         }
 
-        public IVariable Multiply(IVariable x, GekkoTime t)
+        public IVariable Multiply(IVariable x, IVariableHelper t)
         {
             return null;
         }
 
-        public IVariable Divide(IVariable x, GekkoTime t)
+        public IVariable Divide(IVariable x, IVariableHelper t)
         {
             return null;
         }
 
-        public IVariable Power(IVariable x, GekkoTime t)
+        public IVariable Power(IVariable x, IVariableHelper t)
         {
             return null;
         }
