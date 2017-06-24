@@ -1694,6 +1694,8 @@ namespace Gekko
 
         public static void GetVal777(IVariable a, int bankNumber, O.Prt.Element e, IVariableHelper t)  //used in PRT and similar, can accept a list that will show itself as a being an integer with ._isName set.
         {
+            G.Writeln2("*** ERROR: Obsolete");
+            throw new GekkoException();
             if (a.Type() == EVariableType.List)
             {
                 List<string> items = ((MetaList)a).list;
@@ -1715,13 +1717,13 @@ namespace Gekko
                     double dd = O.GetVal(O.GetTimeSeries(s, bankNumber), t);                    
                     if (bankNumber == 1)
                     {
-                        if (e.subElements[i].tsWork == null) e.subElements[i].tsWork = new TimeSeries(Program.options.freq, null);
-                        e.subElements[i].tsWork.SetData(t.t1, dd); //uuu
+                        //if (e.subElements[i].tsWork == null) e.subElements[i].tsWork = new TimeSeries(Program.options.freq, null);
+                        //e.subElements[i].tsWork.SetData(t.t1, dd); //uuu
                     }
                     else
                     {
-                        if (e.subElements[i].tsBase == null) e.subElements[i].tsBase = new TimeSeries(Program.options.freq, null);
-                        e.subElements[i].tsBase.SetData(t.t1, dd); //uuu
+                        //if (e.subElements[i].tsBase == null) e.subElements[i].tsBase = new TimeSeries(Program.options.freq, null);
+                        //e.subElements[i].tsBase.SetData(t.t1, dd); //uuu
                     }
                     if (e.subElements[i].label == null) e.subElements[i].label = s;  //this is a bit slow because it gets repeated for each t, but PRT is slow anyways, and it only slows down list-unfolding
                 }                
@@ -1741,13 +1743,13 @@ namespace Gekko
 
                 if (bankNumber == 1)
                 {
-                    if (e.subElements[0].tsWork == null) e.subElements[0].tsWork = new TimeSeries(Program.options.freq, null);
-                    e.subElements[0].tsWork.SetData(t.t1, dd); //uuu
+                    //if (e.subElements[0].tsWork == null) e.subElements[0].tsWork = new TimeSeries(Program.options.freq, null);
+                    //e.subElements[0].tsWork.SetData(t.t1, dd); //uuu
                 }
                 else
                 {
-                    if (e.subElements[0].tsBase == null) e.subElements[0].tsBase = new TimeSeries(Program.options.freq, null);
-                    e.subElements[0].tsBase.SetData(t.t1, dd); //uuu
+                    //if (e.subElements[0].tsBase == null) e.subElements[0].tsBase = new TimeSeries(Program.options.freq, null);
+                    //e.subElements[0].tsBase.SetData(t.t1, dd); //uuu
                 }
 
                 //The return value is not used, but we keep it for now...                
@@ -4613,8 +4615,8 @@ namespace Gekko
             public class SubElement
             {
                 //Items that are unfolded via lists
-                public TimeSeries tsWork = null;
-                public TimeSeries tsBase = null;
+                public TimeSeriesLight tsWork = null;
+                public TimeSeriesLight tsBase = null;
                 public string label;
             }
         }

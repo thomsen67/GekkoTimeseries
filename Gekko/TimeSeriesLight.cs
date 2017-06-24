@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Gekko
 {
-    class TimeSeriesLight : IVariable
+    public class TimeSeriesLight : IVariable
     {
         public bool isPointerToRealTimeseriesArray = false;
         public double[] storage = null;
@@ -91,9 +91,22 @@ namespace Gekko
                     }
                     else
                     {
+                        if (ival == 0) return this;  //no lag, x[-0] or x[0]  
+
                         //lag or lead
-                        if (ival == 0) return this;  //no lag, x[-0] or x[0]                        
-                        {                            
+                        TimeSeriesLight tsl = new Gekko.TimeSeriesLight();
+
+                        if (Globals.timeSeriesLightShallowCopy)
+                        {
+                            tsl.freqEnum = this.freqEnum;
+                            tsl.isPointerToRealTimeseriesArray = this.isPointerToRealTimeseriesArray;
+                            tsl.storage = this.storage;
+                            tsl.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray - ival;
+                            tsl.anchorSuperPeriod = this.anchorSuperPeriod;
+                            tsl.anchorSubPeriod = this.anchorSubPeriod;                            
+                        }
+                        else
+                        {
                             double[] data = new double[this.storage.Length];
                             if (ival < 0)  //lag
                             {
@@ -104,12 +117,15 @@ namespace Gekko
                                     data[i] = double.NaN;
                                 }
                                 if (lags < this.storage.Length) Array.Copy(this.storage, 0, data, -ival, this.storage.Length - lags);
+                                tsl.storage = data;                               
+
                             }
                             else  //lead
                             {
                                 throw new GekkoException();
-                            }
+                            }                        
                         }
+                        return tsl;
                     }
                 }
                 else if (index.Type() == EVariableType.Date)
@@ -239,6 +255,26 @@ namespace Gekko
         public IVariable Power(IVariable x, IVariableHelper t)
         {
             return null;
+        }
+
+        public double GetData(GekkoTime t)
+        {
+            int index = GetArrayIndex(t);
+            if (index < 0 || index >= this.storage.Length)
+            {
+                G.Writeln2("*** ERROR: out of bounds");
+                throw new GekkoException();
+            }
+            else
+            {
+                return this.storage[index];
+            }
+        }
+
+        private int GetArrayIndex(GekkoTime gt)
+        {
+            int rv = TimeSeries.FromGekkoTimeToArrayIndex(gt, this.freqEnum, this.anchorPeriodPositionInArray, this.anchorSuperPeriod, this.anchorSubPeriod);
+            return rv;
         }
     }
 }

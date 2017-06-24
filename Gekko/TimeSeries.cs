@@ -749,6 +749,7 @@ namespace Gekko
             }
         }
 
+        //Not intended for outside use
         private int GetArrayIndex(GekkoTime gt)
         {
             int rv = FromGekkoTimeToArrayIndex(gt, this.freqEnum, this.anchorPeriodPositionInArray, this.anchorSuperPeriod, this.anchorSubPeriod);

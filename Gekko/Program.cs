@@ -14175,15 +14175,66 @@ namespace Gekko
 
             //ts1 + ts1 + ts2
             IVariableHelper smpl = new Gekko.IVariableHelper();
-            smpl.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
-            smpl.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
+            smpl.t1 = new GekkoTime(EFreq.Annual, 1998, 1);
+            smpl.t2 = new GekkoTime(EFreq.Annual, 2004, 1);
 
-            IVariableHelper smplSLET = new Gekko.IVariableHelper();
-            smplSLET.t1 = new GekkoTime(EFreq.Annual, 1999, 1);
-            smplSLET.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
+            IVariable[] indexes = new IVariable[1];
+            indexes[0] = new ScalarVal(-1);
+            IVariable ts1000 = O.Indexer(smpl, O.Add(O.Add(ts1, ts2, smpl), O.Add(ts3, ts4, smpl), smpl), false, indexes);
+            //double[] result = ((TimeSeriesLight)ts1000).storage;
 
-            IVariable ts1000 = O.Add(O.Add(ts1, ts2, smpl), O.Add(ts3, ts4, smpl), smplSLET);
-            double[] result = ((TimeSeriesLight)ts1000).storage;
+            if (ts1000.Type() != EVariableType.TimeSeries)
+            {
+                //handle that! VAL should be ok.
+                throw new GekkoException();
+            }
+
+            TimeSeriesLight tsl = (TimeSeriesLight)ts1000;
+
+
+            O.Prt o0 = new O.Prt();
+            o0.prtType = "prt";
+            o0.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
+            o0.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
+
+            {
+                List<int> bankNumbers = null;
+                O.Prt.Element ope0 = new O.Prt.Element();
+                ope0.label =  O.SubstituteScalarsAndLists("xx", false);
+                bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o0, ope0));
+                foreach (int bankNumber in bankNumbers)
+                {
+                    
+                    if (ope0.subElements == null)
+                    {
+                        ope0.subElements = new List<O.Prt.SubElement>();
+                        O.Prt.SubElement opeSub0 = new O.Prt.SubElement();
+                        ope0.subElements.Add(opeSub0);
+                    }
+                    
+                    if (bankNumber == 1)
+                    {
+                        ope0.subElements[0].tsWork = tsl;
+                        
+                    }
+                    else
+                    {
+                        ope0.subElements[0].tsBase = tsl;
+                        
+                    }
+
+                }
+                o0.prtElements.Add(ope0);
+            }
+            
+            o0.counter = 1;
+            o0.Exe();
+
+
+
+
+
+
 
         }
 
@@ -22503,8 +22554,8 @@ namespace Gekko
                         {
                             bool filter = timefilter && ShouldFilterPeriod(gt);
 
-                            TimeSeries ts = subPe.tsWork;
-                            TimeSeries tsGrund = subPe.tsBase;
+                            TimeSeriesLight ts = subPe.tsWork;
+                            TimeSeriesLight tsGrund = subPe.tsBase;
 
                             double var1;
                             double varPch;
@@ -26410,7 +26461,7 @@ namespace Gekko
             return;
         }
 
-        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string printCode2, GekkoTime gt, TimeSeries tsWork, TimeSeries tsBase, bool isLogTransform, bool isCalledFromTable)
+        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string printCode2, GekkoTime gt, TimeSeriesLight tsWork, TimeSeriesLight tsBase, bool isLogTransform, bool isCalledFromTable)
         {
             string printCode = printCode2.Trim();  //when it comes from for instance a table
 
