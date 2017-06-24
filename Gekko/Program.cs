@@ -14159,11 +14159,14 @@ namespace Gekko
             ts2_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 115d);
 
 
-            IVariable ts1 = new Gekko.TimeSeriesLight(ts1_, tStart, tEnd);
-            IVariable ts2 = new Gekko.TimeSeriesLight(ts2_, tStart, tEnd);
+            IVariable ts1 = new Gekko.TimeSeriesLight(ts1_, tStart, tEnd, true);
+            IVariable ts2 = new Gekko.TimeSeriesLight(ts2_, tStart, tEnd, true);
 
-            //ts1 + ts2
-            IVariable ts3 = ts1.Add(ts2, null);
+            //ts1 + ts1 + ts2
+            IVariableHelper smpl = new Gekko.IVariableHelper();
+            smpl.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
+            smpl.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
+            IVariable ts3 = ts1.Add(ts1.Add(ts2, smpl), smpl);
 
         }
 

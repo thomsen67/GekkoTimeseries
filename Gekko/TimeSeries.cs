@@ -751,26 +751,35 @@ namespace Gekko
 
         private int GetArrayIndex(GekkoTime gt)
         {
+            int rv = FromGekkoTimeToArrayIndex(gt, this.freqEnum, this.anchorPeriodPositionInArray, this.anchorSuperPeriod, this.anchorSubPeriod);
+            return rv;
+        }
+
+        public static int FromGekkoTimeToArrayIndex(GekkoTime gt, EFreq freqEnum,int anchorPeriodPositionInArray, int anchorSuperPeriod, int anchorSubPeriod)
+        {            
             //this.anchorSubPeriod is always 1 at the moment, and will always be 1 for Annual.
-            //but we cannot count on anchorSubPeriod being 1 forever (for instance for daily obs)            
-            if (this.freqEnum == EFreq.Annual)
+            //but we cannot count on anchorSubPeriod being 1 forever (for instance for daily obs)   
+            int rv = -12345;
+            if (freqEnum == EFreq.Annual)
             {
                 //Special treatment in order to make it fast.
                 //undated freq could return fast in the same way as this??
-                return this.anchorPeriodPositionInArray + gt.super - this.anchorSuperPeriod;
+                rv = anchorPeriodPositionInArray + gt.super - anchorSuperPeriod;
             }
             else
             {
                 //Non-annual                
                 int subPeriods = 1;
-                if (this.freqEnum == EFreq.Quarterly) subPeriods = 4;
-                else if (this.freqEnum == EFreq.Monthly) subPeriods = 12;
-                else if (this.freqEnum == EFreq.Undated) subPeriods = 1;
+                if (freqEnum == EFreq.Quarterly) subPeriods = 4;
+                else if (freqEnum == EFreq.Monthly) subPeriods = 12;
+                else if (freqEnum == EFreq.Undated) subPeriods = 1;
                 //For quarterly data for instance, each super period amounts to 4 observations. Therefore the multiplication.
-                int offset = subPeriods * (gt.super - this.anchorSuperPeriod) + (gt.sub - this.anchorSubPeriod);
-                int index = this.anchorPeriodPositionInArray + offset;
-                return index;
+                int offset = subPeriods * (gt.super - anchorSuperPeriod) + (gt.sub - anchorSubPeriod);
+                int index = anchorPeriodPositionInArray + offset;
+                rv = index;
             }
+
+            return rv;
         }
 
         private int ResizeDataArray(GekkoTime gt)

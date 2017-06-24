@@ -13,8 +13,8 @@ namespace Gekko
         Val,
         TimeSeries,
         List,
-        Matrix,
-        ArrayTimeSeries
+        Matrix,         
+        GekkoError
     }
 
     public enum EScalarRefType
