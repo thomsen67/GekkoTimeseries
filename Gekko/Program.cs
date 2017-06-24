@@ -14149,24 +14149,41 @@ namespace Gekko
             GekkoTime tStart = new GekkoTime(EFreq.Annual, 2000, 1);
             GekkoTime tEnd = new GekkoTime(EFreq.Annual, 2002, 1);
             GekkoTime t = Globals.tNull;
-            TimeSeries ts1_ = new TimeSeries(EFreq.Annual, "x");
-            ts1_.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 10d);
-            ts1_.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 11d);
-            ts1_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 13d);
-            TimeSeries ts2_ = new TimeSeries(EFreq.Annual, "y");
-            ts2_.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 110d);
-            ts2_.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 111d);
-            ts2_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 115d);
+            TimeSeries ts1_ = new TimeSeries(EFreq.Annual, "");
+            ts1_.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 1d);
+            ts1_.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 2d);
+            ts1_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 3d);
+            TimeSeries ts2_ = new TimeSeries(EFreq.Annual, "");
+            ts2_.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 2d);
+            ts2_.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 3d);
+            ts2_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 4d);
+            TimeSeries ts3_ = new TimeSeries(EFreq.Annual, "");
+            ts3_.SetData(new GekkoTime(EFreq.Annual, 1999, 1), 100d);
+            ts3_.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 3d);
+            ts3_.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 4d);
+            ts3_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 5d);
+            TimeSeries ts4_ = new TimeSeries(EFreq.Annual, "");            
+            ts4_.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 4d);
+            ts4_.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 5d);
+            ts4_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 6d);
 
 
-            IVariable ts1 = new Gekko.TimeSeriesLight(ts1_, tStart, tEnd, true);
-            IVariable ts2 = new Gekko.TimeSeriesLight(ts2_, tStart, tEnd, true);
+            TimeSeriesLight ts1 = new Gekko.TimeSeriesLight(ts1_, tStart, tEnd, true);
+            TimeSeriesLight ts2 = new Gekko.TimeSeriesLight(ts2_, tStart, tEnd, true);
+            TimeSeriesLight ts3 = new Gekko.TimeSeriesLight(ts3_, tStart, tEnd, true);
+            TimeSeriesLight ts4 = new Gekko.TimeSeriesLight(ts4_, tStart, tEnd, true);
 
             //ts1 + ts1 + ts2
             IVariableHelper smpl = new Gekko.IVariableHelper();
             smpl.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
             smpl.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
-            IVariable ts3 = ts1.Add(ts1.Add(ts2, smpl), smpl);
+
+            IVariableHelper smplSLET = new Gekko.IVariableHelper();
+            smplSLET.t1 = new GekkoTime(EFreq.Annual, 1999, 1);
+            smplSLET.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
+
+            IVariable ts1000 = O.Add(O.Add(ts1, ts2, smpl), O.Add(ts3, ts4, smpl), smplSLET);
+            double[] result = ((TimeSeriesLight)ts1000).storage;
 
         }
 
