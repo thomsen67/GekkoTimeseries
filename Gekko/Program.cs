@@ -14167,7 +14167,6 @@ namespace Gekko
             ts4_.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 5d);
             ts4_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 6d);
 
-
             TimeSeriesLight ts1 = new Gekko.TimeSeriesLight(ts1_, tStart, tEnd, true);
             TimeSeriesLight ts2 = new Gekko.TimeSeriesLight(ts2_, tStart, tEnd, true);
             TimeSeriesLight ts3 = new Gekko.TimeSeriesLight(ts3_, tStart, tEnd, true);
@@ -14180,8 +14179,13 @@ namespace Gekko
 
             IVariable[] indexes = new IVariable[1];
             indexes[0] = new ScalarVal(-1);
+            // PRT <1998 2004>   ( (ts1+ts2) + (ts3+ts4) ) [-1]
+            // data fra 2000-2002, så [-1] er fra 2001-2003, dvs. 
             IVariable ts1000 = O.Indexer(smpl, O.Add(O.Add(ts1, ts2, smpl), O.Add(ts3, ts4, smpl), smpl), false, indexes);
-            //double[] result = ((TimeSeriesLight)ts1000).storage;
+            
+
+
+
 
             if (ts1000.Type() != EVariableType.TimeSeries)
             {
@@ -14192,16 +14196,16 @@ namespace Gekko
             TimeSeriesLight tsl = (TimeSeriesLight)ts1000;
 
 
-            O.Prt o0 = new O.Prt();
-            o0.prtType = "prt";
-            o0.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
-            o0.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
+            O.Prt o5 = new O.Prt();
+            o5.prtType = "prt";
+            o5.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
+            o5.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
 
             {
                 List<int> bankNumbers = null;
                 O.Prt.Element ope0 = new O.Prt.Element();
                 ope0.label =  O.SubstituteScalarsAndLists("xx", false);
-                bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o0, ope0));
+                bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o5, ope0));
                 foreach (int bankNumber in bankNumbers)
                 {
                     
@@ -14224,11 +14228,42 @@ namespace Gekko
                     }
 
                 }
-                o0.prtElements.Add(ope0);
+                o5.prtElements.Add(ope0);
             }
             
-            o0.counter = 1;
+            o5.counter = 1;
+            o5.Exe();
+
+
+
+
+
+
+            O.Genr o0 = new O.Genr();
+            IVariable ts9 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("xx2"))), 1, O.ECreatePossibilities.Can);
+            IVariable ts10 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("xx"))), 1);
+            o0.t1 = Globals.globalPeriodStart;
+            o0.t2 = Globals.globalPeriodEnd;
+            o0.lhs = null;
+            o0.p = null;
+            foreach (GekkoTime t2 in new GekkoTimeIterator(o0.t1, o0.t2))
+            {
+                t = t2;
+                //double data = O.GetVal(O.Add(ts10, O.Indexer(t, ts10, false, new ScalarVal(-1d)), t), t);
+                if (o0.lhs == null) o0.lhs = O.GetTimeSeries(ts9);
+                //o0.lhs.SetData(t, data);
+            }
+            t = Globals.tNull;
+            o0.meta = @"ser xx2=xx+xx[-1]";
             o0.Exe();
+
+
+
+
+
+
+
+
 
 
 

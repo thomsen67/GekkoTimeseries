@@ -38,7 +38,7 @@ namespace Gekko
 
         public TimeSeriesLight(TimeSeries ts, GekkoTime gt1, GekkoTime gt2, bool shallow)
         {
-            if (shallow)
+            if (Globals.timeSeriesLightShallowCopy)
             {
                 this.isPointerToRealTimeseriesArray = true;
                 int i1 = -12345;
