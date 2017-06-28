@@ -409,6 +409,8 @@ namespace Gekko
             //gekko.exe parameters are read first, and then afterwards any gekko.ini local file
             StartupExeAndIniStuff();
             CrossThreadStuff.Mode();
+
+            Program.StartPulse();  //regarding remote.gcm
         }
 
         private void StartupExeAndIniStuff()
@@ -1216,6 +1218,8 @@ namespace Gekko
                     GuiUpdateRecentFilesMenu();
                 }
                 ChangeWorkingFolderNoteMessage();
+                Globals.remoteIsInvestigating = false;  //probably superfluous
+                Globals.remoteFileStamp = new DateTime(0l);  //just because we change working folder, an existing remote.gcm file in that folder should not be considered 'new' just because of that change.
             }
         }
 
@@ -1676,14 +1680,14 @@ namespace Gekko
 
             //Blinking icon
             Globals.guiTimerCounter = 0;
-            if (Globals.aTimer == null)
+            if (Globals.guiTimer == null)
             {
-                Globals.aTimer = new System.Timers.Timer();
-                Globals.aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-                Globals.aTimer.Interval = 500;
+                Globals.guiTimer = new System.Timers.Timer();
+                Globals.guiTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
+                Globals.guiTimer.Interval = 500;
             }
-            Globals.aTimer.Stop();
-            Globals.aTimer.Start();
+            Globals.guiTimer.Stop();
+            Globals.guiTimer.Start();
 
             //TODO: Really this stuff should be stored in the P object, instead of here
             Globals.numberOfErrors = 0;
@@ -1765,7 +1769,7 @@ namespace Gekko
                         Program.PrintExceptionAndFinishThread(e2, p);
                         if (!Globals.applicationIsInProcessOfAborting)
                         {
-                            Globals.aTimer.Stop();  //otherwise it will blink on
+                            Globals.guiTimer.Stop();  //otherwise it will blink on
                             Gui.gui.toolStripStatusLabel3a.Text = " ";
                             toolStripStatusLabel3.Image = red;
                             toolStripButton3.Enabled = false;
@@ -1853,7 +1857,7 @@ namespace Gekko
             {
                 try
                 {
-                    Globals.aTimer.Stop();  //otherwise it will blink on
+                    Globals.guiTimer.Stop();  //otherwise it will blink on
                     Gui.gui.toolStripStatusLabel3a.Text = " ";
                     toolStripStatusLabel3.Image = green;
                     int goals = 0;

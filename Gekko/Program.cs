@@ -19664,6 +19664,31 @@ namespace Gekko
             Program.guiBrowseHistory.Clear();
             Program.guiBrowseNumber = 0;
             Globals.guiHomeMenuEnabled = false;
+
+            Globals.remoteFileStamp = new DateTime(0l);  //fresh init of this
+            Globals.remoteIsInvestigating = false;  //fresh init of this
+
+            StartPulse();
+
+        }
+
+        public static void StartPulse()
+        {
+            //Pulse (for remote.gcm)
+            Globals.guiTimerCounter2 = 0;
+            if (Globals.guiTimer2 == null)
+            {
+                Globals.guiTimer2 = new System.Timers.Timer();
+                Globals.guiTimer2.Elapsed += new System.Timers.ElapsedEventHandler(OnTimedEvent2);
+                Globals.guiTimer2.Interval = 200;  //every 0.2 s
+            }
+            Globals.guiTimer2.Stop();
+            Globals.guiTimer2.Start();
+        }
+
+        private static void OnTimedEvent2(object source, System.Timers.ElapsedEventArgs e)
+        {
+            CrossThreadStuff.Pulse();
         }
 
         public static Dictionary<string, int> FindGekkoInbuiltFunctions()

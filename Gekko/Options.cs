@@ -83,6 +83,7 @@ Additionally, there are model, solve, equation options.
         public bool interface_help_copylocal = true;
         public bool interface_lagfix = true;
         public string interface_mode = "sim";  //sim, data, mixed
+        public bool interface_remote = false;  //remote control via remote.gcm
         public bool interface_sound = false;  //overall sound switch
         public string interface_sound_type = "bowl";  //bowl, ding, notify, ring
         public int interface_sound_wait = 60; //seconds command files run to get a sound        

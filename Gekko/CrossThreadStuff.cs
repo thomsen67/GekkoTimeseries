@@ -457,7 +457,53 @@ namespace Gekko
             {
                 if (Globals.guiTimerCounter % 4 == 0) Gui.gui.toolStripStatusLabel3a.Text = " ";
                 if (Globals.guiTimerCounter % 4 == 3) Gui.gui.toolStripStatusLabel3a.Text = "+";
-                Globals.guiTimerCounter++;
+                Globals.guiTimerCounter++;                
+            }
+        }
+
+        //weird delegate pattern, but it works!
+        delegate void PulseCallback();
+        public static void Pulse()
+        {
+            if (G.IsUnitTesting()) return;
+            if (Gui.gui.InvokeRequired)
+            {
+                // It's on a different thread, so use Invoke.
+                Gui.gui.Invoke(new PulseCallback(Pulse), new object[] { });
+            }
+            else
+            {
+                
+                if (Program.options.interface_remote && Globals.remoteIsInvestigating == false)
+                {
+                    try
+                    {
+                        Globals.remoteIsInvestigating = true;
+                        string remoteFile = Program.options.folder_working + "\\remote.gcm";
+                        //see if there is new stuff from the remote
+                        if (File.Exists(remoteFile))
+                        {
+                            //TODO: What if it is there to begin with????
+
+                            DateTime dt = File.GetLastWriteTime(remoteFile);
+                            if (dt.CompareTo(Globals.remoteFileStamp) != 0)
+                            {
+                                //run it
+                                Globals.remoteFileStamp = dt;
+                                Program.Run(remoteFile, new P());
+                            }
+                        }
+                        else
+                        {
+                            //do nothing
+                        }
+                    }
+                    catch { } //do not let an error crash the whole thing.
+                    finally
+                    {
+                        Globals.remoteIsInvestigating = false;  //make sure it is false on exit no matter what happens
+                    }
+                }
             }
         }
 
