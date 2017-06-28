@@ -752,36 +752,63 @@ namespace Gekko
         //Not intended for outside use
         private int GetArrayIndex(GekkoTime gt)
         {
-            int rv = FromGekkoTimeToArrayIndex(gt, this.freqEnum, this.anchorPeriodPositionInArray, this.anchorSuperPeriod, this.anchorSubPeriod);
+            int rv = FromGekkoTimeToArrayIndex(gt, new GekkoTime(this.freqEnum, this.anchorSuperPeriod, this.anchorSubPeriod), this.anchorPeriodPositionInArray);
             return rv;
         }
 
-        public static int FromGekkoTimeToArrayIndex(GekkoTime gt, EFreq freqEnum,int anchorPeriodPositionInArray, int anchorSuperPeriod, int anchorSubPeriod)
-        {            
+        public static int FromGekkoTimeToArrayIndex(GekkoTime gt, GekkoTime anchorPeriod, int anchorPeriodPositionInArray)
+        {
             //this.anchorSubPeriod is always 1 at the moment, and will always be 1 for Annual.
             //but we cannot count on anchorSubPeriod being 1 forever (for instance for daily obs)   
             int rv = -12345;
-            if (freqEnum == EFreq.Annual)
+            if (anchorPeriod.freq == EFreq.Annual)
             {
                 //Special treatment in order to make it fast.
                 //undated freq could return fast in the same way as this??
-                rv = anchorPeriodPositionInArray + gt.super - anchorSuperPeriod;
+                rv = anchorPeriodPositionInArray + gt.super - anchorPeriod.super;
             }
             else
             {
                 //Non-annual                
                 int subPeriods = 1;
-                if (freqEnum == EFreq.Quarterly) subPeriods = 4;
-                else if (freqEnum == EFreq.Monthly) subPeriods = 12;
-                else if (freqEnum == EFreq.Undated) subPeriods = 1;
+                if (anchorPeriod.freq == EFreq.Quarterly) subPeriods = 4;
+                else if (anchorPeriod.freq == EFreq.Monthly) subPeriods = 12;
+                else if (anchorPeriod.freq == EFreq.Undated) subPeriods = 1;
                 //For quarterly data for instance, each super period amounts to 4 observations. Therefore the multiplication.
-                int offset = subPeriods * (gt.super - anchorSuperPeriod) + (gt.sub - anchorSubPeriod);
+                int offset = subPeriods * (gt.super - anchorPeriod.super) + (gt.sub - anchorPeriod.sub);
                 int index = anchorPeriodPositionInArray + offset;
                 rv = index;
             }
 
             return rv;
         }
+
+        //public static int FromGekkoTimeToArrayIndex(GekkoTime gt, EFreq freqEnum,int anchorPeriodPositionInArray, int anchorSuperPeriod, int anchorSubPeriod)
+        //{            
+        //    //this.anchorSubPeriod is always 1 at the moment, and will always be 1 for Annual.
+        //    //but we cannot count on anchorSubPeriod being 1 forever (for instance for daily obs)   
+        //    int rv = -12345;
+        //    if (freqEnum == EFreq.Annual)
+        //    {
+        //        //Special treatment in order to make it fast.
+        //        //undated freq could return fast in the same way as this??
+        //        rv = anchorPeriodPositionInArray + gt.super - anchorSuperPeriod;
+        //    }
+        //    else
+        //    {
+        //        //Non-annual                
+        //        int subPeriods = 1;
+        //        if (freqEnum == EFreq.Quarterly) subPeriods = 4;
+        //        else if (freqEnum == EFreq.Monthly) subPeriods = 12;
+        //        else if (freqEnum == EFreq.Undated) subPeriods = 1;
+        //        //For quarterly data for instance, each super period amounts to 4 observations. Therefore the multiplication.
+        //        int offset = subPeriods * (gt.super - anchorSuperPeriod) + (gt.sub - anchorSubPeriod);
+        //        int index = anchorPeriodPositionInArray + offset;
+        //        rv = index;
+        //    }
+
+        //    return rv;
+        //}
 
         private int ResizeDataArray(GekkoTime gt)
         {
