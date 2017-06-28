@@ -1220,6 +1220,8 @@ namespace Gekko
                 ChangeWorkingFolderNoteMessage();
                 Globals.remoteIsInvestigating = false;  //probably superfluous
                 Globals.remoteFileStamp = new DateTime(0l);  //just because we change working folder, an existing remote.gcm file in that folder should not be considered 'new' just because of that change.
+
+                Program.RemoteInit();
             }
         }
 
@@ -1678,7 +1680,8 @@ namespace Gekko
 
             //System.Threading.Timer timer = new System.Threading.Timer(new TimerCallback(xx), null, 0, 1000);
 
-            //Blinking icon
+            //Blinking icon when running a command
+            //Not active/blinking when Gekko is idle
             Globals.guiTimerCounter = 0;
             if (Globals.guiTimer == null)
             {

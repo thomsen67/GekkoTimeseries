@@ -2906,10 +2906,12 @@ namespace Gekko.Parser.Gek
                                     node.Code.A("CrossThreadStuff.Zoom();");
                                 }
                                 if (o == "folder_working")
-                                {
-                                    //s.AppendLine("Gui.ChangeWorkingFolder(Program.options.folder_working);");
-                                    //Gui.ChangeWorkingFolder(Program.options.folder_working);
+                                {                                    
                                     node.Code.A("CrossThreadStuff.WorkingFolder(``);");
+                                }
+                                if (o == "interface_remote")
+                                {
+                                    node.Code.A("Program.RemoteInit();");
                                 }
                                 if (o == "solve_gauss_reorder")
                                 {
