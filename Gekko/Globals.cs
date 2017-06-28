@@ -224,7 +224,13 @@ namespace Gekko
         public static bool printOnlyErrors = true;  //normally false
 
         public static int guiTimerCounter = 0;
-        public static System.Timers.Timer aTimer = null;
+        public static System.Timers.Timer guiTimer = null;  //only runs when executing a command
+
+        public static int guiTimerCounter2 = 0;  
+        public static System.Timers.Timer guiTimer2 = null;  //runs the entire time (listens for remote.gcm)
+
+        public static bool remoteIsInvestigating = false;  //to provide some thread safety
+        public static DateTime remoteFileStamp = new DateTime(0l);
 
         public static string printNaNIndicator = "M";  //= AREMOS, could be "NaN" instead
 

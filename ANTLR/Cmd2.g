@@ -682,7 +682,8 @@ ASTOPT_STRING_Y2;
 	ASTXEDIT;
 
 	// --- tokens1 start ---
-		     GRIDSTYLE = 'GRIDSTYLE';
+		     REMOTE = 'REMOTE';
+			 GRIDSTYLE = 'GRIDSTYLE';
             BOLD = 'BOLD';
             ITALIC = 'ITALIC';
 	            ASER = 'ASER';
@@ -1225,6 +1226,7 @@ Y2                    = 'Y2'                       ;
 										
 // --- tokens2 start ---
             			
+d.Add("REMOTE", REMOTE);
             d.Add("GRIDSTYLE", GRIDSTYLE);
             d.Add("BOLD", BOLD);
             d.Add("ITALIC", ITALIC);
@@ -3180,6 +3182,7 @@ optionType :
              | INTERFACE EXCEL MODERNLOOK '='? yesNoSimple -> INTERFACE EXCEL MODERNLOOK ^(ASTBOOL yesNoSimple)
              | INTERFACE HELP COPYLOCAL '='? yesNoSimple -> INTERFACE HELP COPYLOCAL ^(ASTBOOL yesNoSimple)
 			 | INTERFACE LAGFIX '='? yesNoSimple -> INTERFACE LAGFIX ^(ASTBOOL yesNoSimple)
+			 | INTERFACE REMOTE '='? yesNoSimple -> INTERFACE REMOTE ^(ASTBOOL yesNoSimple)
              | INTERFACE SOUND '='? yesNoSimple -> INTERFACE SOUND ^(ASTBOOL yesNoSimple)
              | INTERFACE SOUND TYPE '='? optionInterfaceSound -> INTERFACE SOUND TYPE ^(ASTSTRINGSIMPLE optionInterfaceSound)
              | INTERFACE SOUND WAIT '='? Integer -> INTERFACE SOUND WAIT ^(ASTINTEGER Integer)
@@ -3370,6 +3373,7 @@ ident                     : Ident|
             BETWEEN|
             NONANNUAL|
             DIGITS|
+			REMOTE|
 							X|
 							Y|
 							REBASE|
