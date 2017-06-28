@@ -131,6 +131,23 @@ namespace Gekko
             return Functions.intersect(t, x, y);
         }
 
+        public static string ResolvePath(string fileName2)
+        {
+            string rv = null;
+            try
+            {
+                rv = Path.GetFullPath(fileName2);
+            }
+            catch { };
+            if (rv == null)
+            {
+                G.Writeln2("+++ NOTE: Could not resolve the path '" + fileName2 + "'");
+                rv = fileName2;
+            }
+            return rv;
+        }
+
+
         public static void SeriesQuestion()
         {
             foreach (Databank bank in Program.databanks.storage)

@@ -5140,8 +5140,29 @@ namespace Gekko.Parser.Gek
                     }
                     else if (child.Text == "ASTSTRINGSIMPLE")
                     {
+
+                        bool resolvePath = false;
+                        List<string> folder = new List<string>();
+                        folder.Add("folder_bank");
+                        folder.Add("folder_bank1");
+                        folder.Add("folder_bank2");
+                        folder.Add("folder_command");
+                        folder.Add("folder_command1");
+                        folder.Add("folder_command2");
+                        folder.Add("folder_help");
+                        folder.Add("folder_menu");
+                        folder.Add("folder_model");
+                        folder.Add("folder_pipe");
+                        folder.Add("folder_table");
+                        folder.Add("folder_table1");
+                        folder.Add("folder_table2");
+                        folder.Add("folder_working");
+                        folder.Add("gams_exe_folder");
+                        folder.Add("r_exe_folder");
+                        if (folder.Contains(s1.ToString().ToLower())) resolvePath = true;
+
                         type = "string";
-                        string temp = "";                        
+                        string temp = "";
                         string s7 = null;
                         if (child[0].Code.IsNull())
                         {
@@ -5154,6 +5175,10 @@ namespace Gekko.Parser.Gek
                         if (G.equal(node[0].Text, "freq"))  //OPTION freq = ...
                         {
                             s7 = "G.GetFreq(" + s7 + ")";
+                        }
+                        if (resolvePath)
+                        {
+                            s7 = "O.ResolvePath(" + s7 + ")";
                         }
                         temp += s7;
                         //}

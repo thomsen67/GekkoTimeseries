@@ -3804,12 +3804,11 @@ namespace Gekko
                 G.Writeln2("+++ WARNING: " + downloadOrImport + " " + allCcounter + " data points in all, expected " + data.LongLength);
             }
 
-            if (hyphenFound)
+            if (hyphenFound && !isArray)
             {
                 //See not in constrution of data array
                 G.Writeln2("+++ WARNING: From Gekko 2.3.2 and onwards, hyphens ('-') in names are removed instead of being replaced with 'h'");
             }
-
 
         }
 
@@ -10983,8 +10982,8 @@ namespace Gekko
                     if (G.equal(s2, "tsl"))
                     {
                         Program.Tsl();
-                    }
-                    return "";
+                        return "";
+                    }                    
                 }
 
                 if (s2.Length == 3)
@@ -12596,11 +12595,7 @@ namespace Gekko
             s = StripQuotes(s);
             if (run)
             {
-                //always called like this
-                if (!s.Contains("."))
-                {
-                    s += "." + Globals.extensionCommand;
-                }
+                s = Program.AddExtension(s, "." + Globals.extensionCommand);
             }
             else throw new GekkoException();            
 
@@ -12699,8 +12694,11 @@ namespace Gekko
                 if (count == fileName2.Length) break;  //keeps on going until nothing more to substitute
             }
 
-            return fileName2;
+            string rv = O.ResolvePath(fileName2);
+
+            return rv;  //see https://stackoverflow.com/questions/970911/net-remove-dots-from-the-path
         }
+               
 
         public static void Disp(GekkoTime tStart, GekkoTime tEnd, List<string> list, O.Disp o)
         {
