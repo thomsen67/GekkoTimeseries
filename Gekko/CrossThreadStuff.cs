@@ -473,29 +473,53 @@ namespace Gekko
             }
             else
             {
-                
+                //The guiTimer2 runs all the time from when the GUI starts
+                //remote.gcm should be run in two cases:
+                // 1. If it already exists and has just been changed
+                // 2. If it pops into existence 
+                //It should not be run just because af RESET/RESTART or change of working folder location.
+
+                //At start, Globals.remoteFileStamp is = new DateTime(0l), kind of like = null.
+
                 if (Program.options.interface_remote && Globals.remoteIsInvestigating == false)
                 {
+                    Globals.remoteIsInvestigating = true;
                     try
-                    {
-                        Globals.remoteIsInvestigating = true;
+                    {                        
                         string remoteFile = Program.options.folder_working + "\\remote.gcm";
                         //see if there is new stuff from the remote
                         if (File.Exists(remoteFile))
                         {
-                            //TODO: What if it is there to begin with????
-
                             DateTime dt = File.GetLastWriteTime(remoteFile);
-                            if (dt.CompareTo(Globals.remoteFileStamp) != 0)
+                            if (Globals.remoteExists == 0)
                             {
-                                //run it
+                                Globals.remoteExists = 1;
+                                //suddently pops into existence, then it MUST be run no matter stamps
                                 Globals.remoteFileStamp = dt;
                                 Program.Run(remoteFile, new P());
+
+                            }
+                            else {
+
+                                Globals.remoteExists = 1;
+                                                                
+                                if (Globals.remoteFileStamp.Ticks != 0l && dt.CompareTo(Globals.remoteFileStamp) != 0)
+                                {
+                                    //run it
+                                    Globals.remoteFileStamp = dt;
+                                    Program.Run(remoteFile, new P());
+                                }
+                                else
+                                {
+                                    Globals.remoteFileStamp = dt;
+                                }
                             }
                         }
                         else
                         {
                             //do nothing
+                            //Globals.remoteFileStamp = new DateTime(0l);
+                            Globals.remoteExists = 0;
                         }
                     }
                     catch { } //do not let an error crash the whole thing.

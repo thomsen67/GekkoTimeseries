@@ -231,6 +231,7 @@ namespace Gekko
 
         public static bool remoteIsInvestigating = false;  //to provide some thread safety
         public static DateTime remoteFileStamp = new DateTime(0l);
+        public static int remoteExists = -12345;  //unknown
 
         public static string printNaNIndicator = "M";  //= AREMOS, could be "NaN" instead
 

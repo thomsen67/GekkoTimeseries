@@ -19555,11 +19555,21 @@ namespace Gekko
             Program.guiBrowseNumber = 0;
             Globals.guiHomeMenuEnabled = false;
 
-            Globals.remoteFileStamp = new DateTime(0l);  //fresh init of this
-            Globals.remoteIsInvestigating = false;  //fresh init of this
+            RemoteInit();
 
             StartPulse();
 
+        }
+
+        public static void RemoteInit()
+        {
+            try
+            {
+                Globals.remoteFileStamp = new DateTime(0l);  //fresh init of this
+                Globals.remoteIsInvestigating = false;  //fresh init of this
+                Globals.remoteExists = -12345; //unknown
+            }
+            catch { }  //kind of ok if it fails
         }
 
         public static void StartPulse()
