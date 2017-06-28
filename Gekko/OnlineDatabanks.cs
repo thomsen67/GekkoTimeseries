@@ -59,22 +59,6 @@ namespace Gekko
             httpWebRequest.Credentials = CredentialCache.DefaultNetworkCredentials;  //seems necessary together with the above
             httpWebRequest.UserAgent = "Gekko/" + Globals.gekkoVersion;  //Pelle Rossau von Hedemann (DST) skriver "Jeg kan i øvrigt anbefale at sætte UserAgent, fx Gekko/2.3.4, på request-objektet, således at denne kan genfindes i loggen. API’et returnerer i øvrigt en header med navnet ” StatbankAPI-Request-Id”, som indeholder et GUID for hvert eneste kald. Denne gør det muligt at identificere det specifikke kald i vores log. Man kan, hvis man ønsker det, opsamle denne id og præsentere den for brugeren på en eller anden måde"
 
-            if (false)
-            {
-                //It is probably either Credentials or UseDefaultCredentials that must be messed with.
-
-                httpWebRequest.Credentials = new NetworkCredential("user", "password", "http://...");
-
-                var x1 = httpWebRequest.AuthenticationLevel;                   //MutualAuthRequested, vælg fra [None, MutualAuthRequested, MutualAuthRequired]
-                var x2 = httpWebRequest.ClientCertificates;                    //X.509-certifikater, der ser ikke ud til at være nogen, for count = 0
-                var x3 = httpWebRequest.Credentials;                           //Det anbefales i stedet for denne at sætte httpWebRequest.UseDefaultCredentials = true, men et sted står det at man OGSÅ skal sætte denne til CredentialCache.DefaultNetworkCredentials;
-                var x4 = httpWebRequest.ImpersonationLevel;                    //Delegation,  vælg fra [None, Anonymous, Identification, Impersonation, Delegation] 
-                var x5 = httpWebRequest.PreAuthenticate;                       //false, vælg fra [false|true].
-                var x6 = httpWebRequest.UnsafeAuthenticatedConnectionSharing;  //false, vælg fra [false|true]
-                var x7 = httpWebRequest.UseDefaultCredentials;                 //false, vælg fra [false|true]
-                                
-            }
-
             Dictionary<string, object> jsonTree = null;
             try
             {
@@ -87,13 +71,43 @@ namespace Gekko
                 throw;
             }
 
-            string tableName = (string)jsonTree["table"];
-            List<string> codesHeaderJson = new List<string>();
-
-            object[] o = (object[])jsonTree["variables"];
-            foreach (Dictionary<string, object> oo in o)
+            string tableName = null;
+            try
             {
-                codesHeaderJson.Add((string)oo["code"]);
+                tableName = (string)jsonTree["table"];
+            }
+            catch { }
+            if (tableName == null)
+            {
+                G.Writeln2("*** ERROR: You should use \"table\": \"...\", in the .json file");
+                throw new GekkoException();
+            }
+            
+            string format = null;
+            try
+            {
+                format = (string)jsonTree["format"];
+            }
+            catch { }
+            if (format == null || !G.equal(format, "px"))
+            {
+                G.Writeln2("*** ERROR: You should use \"format\": \"px\", in the .json file");
+                throw new GekkoException();
+            }
+            
+            List<string> codesHeaderJson = new List<string>();
+            try
+            {
+                object[] o = (object[])jsonTree["variables"];
+                foreach (Dictionary<string, object> oo in o)
+                {
+                    codesHeaderJson.Add((string)oo["code"]);
+                }
+            }
+            catch
+            {
+                G.Writeln2("*** ERROR: The \"variables\" field in the .json file seems malformed");
+                throw new GekkoException();
             }
 
             StreamWriter streamWriter = null;

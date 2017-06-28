@@ -89,6 +89,7 @@ namespace Gekko
             return y;
         }
 
+        
         public static string TrueFalse(bool x) {
             string s = "false";
             if (x) s = "true";
