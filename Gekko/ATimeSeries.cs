@@ -87,34 +87,34 @@ namespace Gekko
             }            
         }        
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange)
         {
             G.Writeln2("*** ERROR: You are trying to use an [] index range on timeseries: " + this.ts.variableName + ".");            
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariable index, IVariablesFilterRange indexRange)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange, IVariable index)
         {
             throw new GekkoException();
         }        
 
         public IVariable Negate(IVariableHelper t)
         {            
-            double val = O.GetVal(this, t);
+            double val = O.GetVal(t, this);
             return new ScalarVal(-val);            
         }
 
-        public void InjectAdd(IVariable x, IVariable y, IVariableHelper t)
+        public void InjectAdd(IVariableHelper t, IVariable x, IVariable y)
         {
             G.Writeln2("*** ERROR: error #734632321 regarding timeseries: " + this.ts.variableName + ".");            
             throw new GekkoException();
@@ -158,11 +158,11 @@ namespace Gekko
             return EVariableType.TimeSeries;
         }
 
-        public IVariable Add(IVariable x, IVariableHelper t)
+        public IVariable Add(IVariableHelper t, IVariable x)
         {
             if (x.Type() == EVariableType.TimeSeries)
             {                
-                return new ScalarVal(O.GetVal(this, t) + O.GetVal(x, t));
+                return new ScalarVal(O.GetVal(t, this) + O.GetVal(t, x));
             }
             else if (x.Type() == EVariableType.Val)
             {
@@ -180,15 +180,15 @@ namespace Gekko
             }
         }
 
-        public IVariable Subtract(IVariable x, IVariableHelper t)
+        public IVariable Subtract(IVariableHelper t, IVariable x)
         {
             if (x.Type() == EVariableType.TimeSeries)
             {                
-                return new ScalarVal(O.GetVal(this, t) - O.GetVal(x, t));
+                return new ScalarVal(O.GetVal(t, this) - O.GetVal(t, x));
             }
             else if (x.Type() == EVariableType.Val)
             {
-                return new ScalarVal(O.GetVal(this, t) - O.GetVal(x, t));
+                return new ScalarVal(O.GetVal(t, this) - O.GetVal(t, x));
             }
             else
             {
@@ -197,15 +197,15 @@ namespace Gekko
             }
         }
 
-        public IVariable Multiply(IVariable x, IVariableHelper t)
+        public IVariable Multiply(IVariableHelper t, IVariable x)
         {
             if (x.Type() == EVariableType.TimeSeries)
             {                
-                return new ScalarVal(O.GetVal(this, t) * O.GetVal(x, t));
+                return new ScalarVal(O.GetVal(t, this) * O.GetVal(t, x));
             }
             else if (x.Type() == EVariableType.Val)
             {
-                return new ScalarVal(O.GetVal(this, t) * O.GetVal(x, t));
+                return new ScalarVal(O.GetVal(t, this) * O.GetVal(t, x));
             }
             else
             {
@@ -214,15 +214,15 @@ namespace Gekko
             }
         }
 
-        public IVariable Divide(IVariable x, IVariableHelper t)
+        public IVariable Divide(IVariableHelper t, IVariable x)
         {
             if (x.Type() == EVariableType.TimeSeries)
             {                
-                return new ScalarVal(O.GetVal(this, t) / O.GetVal(x, t));
+                return new ScalarVal(O.GetVal(t, this) / O.GetVal(t, x));
             }
             else if (x.Type() == EVariableType.Val)
             {
-                return new ScalarVal(O.GetVal(this, t) / O.GetVal(x, t));
+                return new ScalarVal(O.GetVal(t, this) / O.GetVal(t, x));
             }
             else
             {
@@ -231,15 +231,15 @@ namespace Gekko
             }
         }
 
-        public IVariable Power(IVariable x, IVariableHelper t)
+        public IVariable Power(IVariableHelper t, IVariable x)
         {
             if (x.Type() == EVariableType.TimeSeries)
             {                
-                return new ScalarVal(Math.Pow(O.GetVal(this, t), O.GetVal(x, t)));
+                return new ScalarVal(Math.Pow(O.GetVal(t, this), O.GetVal(t, x)));
             }
             else if (x.Type() == EVariableType.Val)
             {
-                return new ScalarVal(Math.Pow(O.GetVal(this, t), O.GetVal(x, t)));
+                return new ScalarVal(Math.Pow(O.GetVal(t, this), O.GetVal(t, x)));
             }
             else
             {

@@ -20,22 +20,22 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariable index, IVariablesFilterRange indexRange)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange, IVariable index)
         {
             throw new GekkoException();
         }
@@ -45,7 +45,7 @@ namespace Gekko
             return null;
         }
 
-        public void InjectAdd(IVariable x, IVariable y, IVariableHelper t)
+        public void InjectAdd(IVariableHelper t, IVariable x, IVariable y)
         {
             throw new GekkoException();
         }
@@ -75,27 +75,27 @@ namespace Gekko
             return EVariableType.GekkoError;
         }
 
-        public IVariable Add(IVariable x, IVariableHelper t)
+        public IVariable Add(IVariableHelper t, IVariable x)
         {            
             throw new GekkoException();
         }
 
-        public IVariable Subtract(IVariable x, IVariableHelper t)
+        public IVariable Subtract(IVariableHelper t, IVariable x)
         {
             return null;
         }
 
-        public IVariable Multiply(IVariable x, IVariableHelper t)
+        public IVariable Multiply(IVariableHelper t, IVariable x)
         {
             return null;
         }
 
-        public IVariable Divide(IVariable x, IVariableHelper t)
+        public IVariable Divide(IVariableHelper t, IVariable x)
         {
             return null;
         }
 
-        public IVariable Power(IVariable x, IVariableHelper t)
+        public IVariable Power(IVariableHelper t, IVariable x)
         {
             return null;
         }

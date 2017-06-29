@@ -5916,7 +5916,7 @@ namespace Gekko
             {
                 string[] ss2 = varName.Split(new string[] { ".." }, StringSplitOptions.None);
                 ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);
-                IVariable xx = ss.Indexer(new IVariablesFilterRange(new ScalarString(bank + ":" + ss2[0]), new ScalarString(ss2[1])), null);
+                IVariable xx = ss.Indexer(null, new IVariablesFilterRange(new ScalarString(bank + ":" + ss2[0]), new ScalarString(ss2[1])));
                 Databank db = Program.databanks.GetDatabank(bank);
                 if (db == null)
                 {
@@ -14181,7 +14181,7 @@ namespace Gekko
             // data fra 2000-2002, så [-1] er fra 2001-2003, dvs. 
             //IVariable ts1000 = O.Indexer(smpl, O.Add(O.Add(ts1, ts2, smpl), O.Add(ts3, ts4, smpl), smpl), false, indexes);
 
-            IVariable ts1000 = Functions.test(smpl, ts1);            
+            IVariable ts1000 = Functions.test(smpl, O.Add(smpl, ts1, ts1));            
 
             if (ts1000.Type() != EVariableType.TimeSeries)
             {

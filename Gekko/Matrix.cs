@@ -87,20 +87,20 @@ namespace Gekko
         }
         
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange)
         {
             int d1 = this.data.GetLength(0);
             int d2 = this.data.GetLength(1);
             if (d2 == 1)
             {
-                return Indexer(indexRange, new ScalarVal(1d), t);                
+                return Indexer(t, indexRange, new ScalarVal(1d));                
             }
             G.Writeln("*** ERROR: You are trying to use [ .. ] on a " + d1 + "x" + d2 + " matrix");
             G.Writeln("           This notation can only be used regarding nx1 matrices (column vectors)");
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
         {
             int i1 = 1;
             int i2 = this.data.GetLength(0);
@@ -142,7 +142,7 @@ namespace Gekko
             }
         }
         
-        public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariable index, IVariablesFilterRange indexRange)
         {
             int i0 = O.GetInt(index);            
             int j1 = 1;
@@ -171,7 +171,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange, IVariable index)
         {
             int i1 = 1;
             int i2 = this.data.GetLength(0);            
@@ -219,7 +219,7 @@ namespace Gekko
             return m;               
         }
 
-        public void InjectAdd(IVariable x, IVariable y, IVariableHelper t)
+        public void InjectAdd(IVariableHelper t, IVariable x, IVariable y)
         {
             G.Writeln2("*** ERROR: #8703458724");
             throw new GekkoException();
@@ -277,7 +277,7 @@ namespace Gekko
             return m;
         }
 
-        public IVariable Add(IVariable x, IVariableHelper t)
+        public IVariable Add(IVariableHelper t, IVariable x)
         {
             //clone this Add() method and do with O.SubtractMatrixScalar, also for Matrix and matrix            
             switch (x.Type())
@@ -313,7 +313,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Subtract(IVariable x, IVariableHelper t)
+        public IVariable Subtract(IVariableHelper t, IVariable x)
         {
             //clone this Add() method and do with O.SubtractMatrixScalar, also for Matrix and matrix            
             EVariableType type = x.Type();
@@ -342,7 +342,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Multiply(IVariable x, IVariableHelper t)
+        public IVariable Multiply(IVariableHelper t, IVariable x)
         {
             EVariableType type = x.Type();
             if (type == EVariableType.Matrix)
@@ -401,7 +401,7 @@ namespace Gekko
             {
                 //This is allowed in AREMOS, too
                 double[,] a = this.data;
-                double b = O.GetVal(x, t);
+                double b = O.GetVal(t, x);
                 int m = a.GetLength(0);                
                 int k = a.GetLength(1);
                 double[,] c = O.MultiplyMatrixScalar(a, b, m, k);
@@ -416,7 +416,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Divide(IVariable x, IVariableHelper t)
+        public IVariable Divide(IVariableHelper t, IVariable x)
         {
             switch (x.Type())
             {
@@ -448,7 +448,7 @@ namespace Gekko
                 case EVariableType.Val:
                     {
                         double[,] a = this.data;
-                        double b = O.GetVal(x, t);
+                        double b = O.GetVal(t, x);
                         int m = a.GetLength(0);
                         int k = a.GetLength(1);
                         double[,] c = O.MultiplyMatrixScalar(a, 1d/b, m, k);
@@ -464,7 +464,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Power(IVariable x, IVariableHelper t)
+        public IVariable Power(IVariableHelper t, IVariable x)
         {
             G.Writeln2("*** ERROR: You cannot use power function with matrices");
             throw new GekkoException();
@@ -474,7 +474,7 @@ namespace Gekko
         {
             try
             {
-                this.data[O.GetInt(x1) - 1, O.GetInt(x2) - 1] = O.GetVal(x3, null);
+                this.data[O.GetInt(x1) - 1, O.GetInt(x2) - 1] = O.GetVal(null, x3);
             }
             catch (IndexOutOfRangeException e)
             {

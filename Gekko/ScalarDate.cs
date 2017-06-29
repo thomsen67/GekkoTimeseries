@@ -54,25 +54,25 @@ namespace Gekko
             throw new GekkoException();
         }
         
-        public IVariable Indexer(IVariablesFilterRange indexRange, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange)
         {
             G.Writeln2("*** ERROR: Cannot use []-indexer on DATE");
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
         {
             G.Writeln2("*** ERROR: Cannot use []-indexer on DATE");
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariable index, IVariablesFilterRange indexRange)
         {
             G.Writeln2("*** ERROR: Cannot use []-indexer on DATE");
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange, IVariable index)
         {
             G.Writeln2("*** ERROR: Cannot use []-indexer on DATE");
             throw new GekkoException();
@@ -84,13 +84,13 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public void InjectAdd(IVariable x, IVariable y, IVariableHelper t)
+        public void InjectAdd(IVariableHelper t, IVariable x, IVariable y)
         {
             G.Writeln2("*** ERROR: You cannot use add on DATE");                
             throw new GekkoException();
         }
 
-        public IVariable Add(IVariable x, IVariableHelper t)
+        public IVariable Add(IVariableHelper t, IVariable x)
         {
             switch (x.Type())
             {
@@ -110,7 +110,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Subtract(IVariable x, IVariableHelper t)
+        public IVariable Subtract(IVariableHelper t, IVariable x)
         {
             switch (x.Type())
             {
@@ -140,19 +140,19 @@ namespace Gekko
             }
         }
 
-        public IVariable Multiply(IVariable x, IVariableHelper t)
+        public IVariable Multiply(IVariableHelper t, IVariable x)
         {
             G.Writeln2("*** ERROR: %x*%y (multiply) is not allowed if %x is a DATE scalar.");
             throw new GekkoException();
         }
 
-        public IVariable Divide(IVariable x, IVariableHelper t)
+        public IVariable Divide(IVariableHelper t, IVariable x)
         {
             G.Writeln2("*** ERROR: %x/%y (divide) is not allowed if %x is a DATE scalar.");
             throw new GekkoException();
         }
 
-        public IVariable Power(IVariable x, IVariableHelper t)
+        public IVariable Power(IVariableHelper t, IVariable x)
         {
             G.Writeln2("*** ERROR: %x^%y or %x**%y (power) is not allowed if %x is a DATE scalar.");
             throw new GekkoException();

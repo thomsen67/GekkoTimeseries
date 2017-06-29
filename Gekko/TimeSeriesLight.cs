@@ -48,7 +48,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Indexer(IVariableHelper t, bool isLhs, params IVariable[] indexes)
+        public IVariable Indexer(IVariableHelper smpl, bool isLhs, params IVariable[] indexes)
         {
             if (indexes.Length > 0 && indexes[0].Type() == EVariableType.String)
             {
@@ -78,11 +78,14 @@ namespace Gekko
                         TimeSeriesLight tsl = new Gekko.TimeSeriesLight();
 
                         if (Globals.timeSeriesLightShallowCopy)
-                        {                            
+                        {
+                            //Indexer() is called with a smpl window. If start of smpl window is < 0 in array or end of smpl window is >= length in error,
+                            //we have a problem.
+
                             tsl.isPointerToRealTimeseriesArray = this.isPointerToRealTimeseriesArray;
                             tsl.storage = this.storage;
-                            tsl.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray - ival;                         
-                            tsl.anchorPeriod = this.anchorPeriod;                     
+                            tsl.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray - ival;
+                            tsl.anchorPeriod = this.anchorPeriod;             
                         }
                         else
                         {
@@ -116,39 +119,39 @@ namespace Gekko
             }
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper smpl, IVariablesFilterRange indexRange)
         {
             G.Writeln2("*** ERROR: You are trying to use an [] index range on timeseries");
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper smpl, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper smpl, IVariable index, IVariablesFilterRange indexRange)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper smpl, IVariablesFilterRange indexRange, IVariable index)
         {
             throw new GekkoException();
         }
 
-        public IVariable Negate(IVariableHelper t)
+        public IVariable Negate(IVariableHelper smpl)
         {
             return null;
         }
 
-        public void InjectAdd(IVariable x, IVariable y, IVariableHelper t)
+        public void InjectAdd(IVariableHelper smpl, IVariable x, IVariable y)
         {
             G.Writeln2("*** ERROR: error #734632321 regarding timeseries");
             throw new GekkoException();
         }
 
-        public double GetVal(IVariableHelper t)
+        public double GetVal(IVariableHelper smpl)
         {
             return double.NaN;
         }
@@ -176,15 +179,15 @@ namespace Gekko
             return EVariableType.TimeSeries;
         }
 
-        public IVariable Add(IVariable x, IVariableHelper t)
+        public IVariable Add(IVariableHelper smpl, IVariable x)
         {
             TimeSeriesLight tsl = x as TimeSeriesLight;
                         
             if (tsl != null)
             {
-                int startIndex1 = TimeSeries.FromGekkoTimeToArrayIndex(t.t1, this.anchorPeriod, this.anchorPeriodPositionInArray);
-                int startIndex2 = TimeSeries.FromGekkoTimeToArrayIndex(t.t2, this.anchorPeriod, this.anchorPeriodPositionInArray);
-                int n = GekkoTime.Observations(t.t1, t.t2);
+                int startIndex1 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t1, this.anchorPeriod, this.anchorPeriodPositionInArray);
+                int startIndex2 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t2, this.anchorPeriod, this.anchorPeriodPositionInArray);
+                int n = GekkoTime.Observations(smpl.t1, smpl.t2);
 
                 //0 1 2 = 3 obs
                 int overflow1 = startIndex1 + n - 1 - this.storage.Length;
@@ -199,7 +202,7 @@ namespace Gekko
 
                 TimeSeriesLight tslResult = new TimeSeriesLight();
                 tslResult.storage = new double[n];
-                tslResult.anchorPeriod = t.t1;
+                tslResult.anchorPeriod = smpl.t1;
                 tslResult.anchorPeriodPositionInArray = 0;
 
                 for (int i = 0; i < n; i++)
@@ -215,22 +218,22 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public IVariable Subtract(IVariable x, IVariableHelper t)
+        public IVariable Subtract(IVariableHelper smpl, IVariable x)
         {
             return null;
         }
 
-        public IVariable Multiply(IVariable x, IVariableHelper t)
+        public IVariable Multiply(IVariableHelper smpl, IVariable x)
         {
             return null;
         }
 
-        public IVariable Divide(IVariable x, IVariableHelper t)
+        public IVariable Divide(IVariableHelper smpl, IVariable x)
         {
             return null;
         }
 
-        public IVariable Power(IVariable x, IVariableHelper t)
+        public IVariable Power(IVariableHelper smpl, IVariable x)
         {
             return null;
         }
@@ -240,7 +243,7 @@ namespace Gekko
             int index = GetArrayIndex(t);
             if (index < 0 || index >= this.storage.Length)
             {
-                G.Writeln2("*** ERROR: out of bounds");
+                G.Writeln2("*** ERROR: Out of bounds");
                 throw new GekkoException();
             }
             else

@@ -73,25 +73,25 @@ namespace Gekko
             throw new GekkoException();
         }
         
-        public IVariable Indexer(IVariablesFilterRange indexRange, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange)
         {
             G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
         {
             G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariable index, IVariablesFilterRange indexRange, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariable index, IVariablesFilterRange indexRange)
         {
             G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariablesFilterRange indexRange, IVariable index, IVariableHelper t)
+        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange, IVariable index)
         {
             G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
             throw new GekkoException();
@@ -117,7 +117,7 @@ namespace Gekko
             return new ScalarVal(-this.val);
         }        
 
-        public void InjectAdd(IVariable x, IVariable y, IVariableHelper t)
+        public void InjectAdd(IVariableHelper t, IVariable x, IVariable y)
         {
             if (x.Type() == EVariableType.Val)
             {
@@ -154,7 +154,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Add(IVariable x, IVariableHelper t)
+        public IVariable Add(IVariableHelper t, IVariable x)
         {
             switch (x.Type())
             {
@@ -188,7 +188,7 @@ namespace Gekko
             }            
         }
 
-        public IVariable Subtract(IVariable x, IVariableHelper t)
+        public IVariable Subtract(IVariableHelper t, IVariable x)
         {
             switch (x.Type())
             {
@@ -198,7 +198,7 @@ namespace Gekko
                     }
                 case EVariableType.TimeSeries:
                     {
-                        return new ScalarVal(this.val - O.GetVal(x, t));
+                        return new ScalarVal(this.val - O.GetVal(t, x));
                     }                
                 default:
                     {
@@ -208,7 +208,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Multiply(IVariable x, IVariableHelper t)
+        public IVariable Multiply(IVariableHelper t, IVariable x)
         {
             switch (x.Type())
             {
@@ -218,13 +218,13 @@ namespace Gekko
                     }
                 case EVariableType.TimeSeries:
                     {
-                        return new ScalarVal(this.val * O.GetVal(x, t));
+                        return new ScalarVal(this.val * O.GetVal(t, x));
                     }
                 case EVariableType.Matrix:
                     {
                         //This is allowed in AREMOS, too
                         double[,] a = O.GetMatrix(x).data;
-                        double b = O.GetVal(this, t);
+                        double b = O.GetVal(t, this);
                         int m = a.GetLength(0);
                         int k = a.GetLength(1);
                         double[,] c = O.MultiplyMatrixScalar(a, b, m, k);
@@ -240,7 +240,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Divide(IVariable x, IVariableHelper t)
+        public IVariable Divide(IVariableHelper t, IVariable x)
         {
             switch (x.Type())
             {
@@ -250,7 +250,7 @@ namespace Gekko
                     }
                 case EVariableType.TimeSeries:
                     {
-                        return new ScalarVal(this.val / O.GetVal(x, t));
+                        return new ScalarVal(this.val / O.GetVal(t, x));
                     }                
                 default:
                     {
@@ -260,7 +260,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Power(IVariable x, IVariableHelper t)
+        public IVariable Power(IVariableHelper t, IVariable x)
         {
             switch (x.Type())
             {
@@ -270,7 +270,7 @@ namespace Gekko
                     }
                 case EVariableType.TimeSeries:
                     {
-                        return new ScalarVal(Math.Pow(this.val, O.GetVal(x, t)));
+                        return new ScalarVal(Math.Pow(this.val, O.GetVal(t, x)));
                     }                
                 default:
                     {

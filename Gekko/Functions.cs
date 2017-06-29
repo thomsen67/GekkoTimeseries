@@ -128,7 +128,7 @@ namespace Gekko
 
         public static IVariable test(IVariableHelper t, IVariable x1)
         {
-            return x1.Indexer(t, false, new ScalarDate(new GekkoTime(EFreq.Annual, 1900, 1)));
+            return x1.Indexer(t, false, new ScalarVal(-2d));
         }
 
         public static IVariable concat(GekkoTime t, IVariable x1, IVariable x2)
@@ -236,8 +236,8 @@ namespace Gekko
             
             int obs = GekkoTime.Observations(tStart, tEnd);
 
-            double lambda = O.GetVal(ilambda, t);
-            double log = O.GetVal(ilog, t);
+            double lambda = O.GetVal(t, ilambda);
+            double log = O.GetVal(t, ilog);
 
             TimeSeries lhs = new TimeSeries(Program.options.freq, null);            
 
@@ -831,7 +831,7 @@ namespace Gekko
 
         public static IVariable rseed(IVariableHelper t, IVariable seed)
         {
-            double seed2 = O.GetVal(seed, t);
+            double seed2 = O.GetVal(t, seed);
             int i = (int)seed2;
             Globals.random = new Random(i);            
             return new ScalarVal(i);
@@ -870,7 +870,7 @@ namespace Gekko
                 //https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Drawing_values_from_the_distribution
                 for (int i = 0; i < n; i++)
                 {
-                    double random = O.GetVal(rnorm(t, new ScalarVal(0d), new ScalarVal(1d)), t); //could be sped up by interfacing to the interior of the method
+                    double random = O.GetVal(t, rnorm(t, new ScalarVal(0d), new ScalarVal(1d))); //could be sped up by interfacing to the interior of the method
                     randoms[i, 0] = random;
                 }                
                 
@@ -883,8 +883,8 @@ namespace Gekko
             }
             else
             {
-                double mean = O.GetVal(means, t);
-                double stdDev = Math.Sqrt(O.GetVal(vcov, t));
+                double mean = O.GetVal(t, means);
+                double stdDev = Math.Sqrt(O.GetVal(t, vcov));
                 Random rand = new Random(); //reuse this if you are generating many
                 double u1 = Globals.random.NextDouble(); //these are uniform(0,1) random doubles
                 double u2 = Globals.random.NextDouble();
@@ -999,7 +999,7 @@ namespace Gekko
             GekkoTime t2 = Globals.globalPeriodEnd;
 
             TimeSeries ts = O.GetTimeSeries(inputVar);
-            double percent2 = O.GetVal(percent, t);
+            double percent2 = O.GetVal(t, percent);
 
             int index1 = -12345;
             int index2 = -12345;
@@ -1022,7 +1022,7 @@ namespace Gekko
             IVariable rv = null;
             if (IsValOrTimeseries(x))
             {
-                double d = O.GetVal(x, t);
+                double d = O.GetVal(t, x);
                 rv = new ScalarVal(Math.Abs(d));
             }
             else if (x.Type() == EVariableType.Matrix)
@@ -1067,10 +1067,10 @@ namespace Gekko
                 G.Writeln2("*** ERROR: iif(): arg 5, type " + o2.Type().ToString() + " not supported");
                 throw new GekkoException();
             }
-            double di1 = O.GetVal(i1, t);
-            double di2 = O.GetVal(i2, t);
-            double do1 = O.GetVal(o1, t);
-            double do2 = O.GetVal(o2, t);
+            double di1 = O.GetVal(t, i1);
+            double di2 = O.GetVal(t, i2);
+            double do1 = O.GetVal(t, o1);
+            double do2 = O.GetVal(t, o2);
             string x = O.GetString(op).Trim();
 
             if (x == "==")
@@ -1152,7 +1152,7 @@ namespace Gekko
             IVariable rv = null;
             if (IsValOrTimeseries(x))
             {
-                double d = O.GetVal(x, t);
+                double d = O.GetVal(t, x);
                 rv = new ScalarVal(Math.Log(d));
             }
             else if (x.Type() == EVariableType.Matrix)
@@ -1180,7 +1180,7 @@ namespace Gekko
             IVariable rv = null;
             if (IsValOrTimeseries(x))
             {
-                double d = O.GetVal(x, t);
+                double d = O.GetVal(t, x);
                 rv = new ScalarVal(Math.Exp(d));
             }
             else if (x.Type() == EVariableType.Matrix)
@@ -1208,7 +1208,7 @@ namespace Gekko
             IVariable rv = null;
             if (IsValOrTimeseries(x))
             {
-                double d = O.GetVal(x, t);
+                double d = O.GetVal(t, x);
                 rv = new ScalarVal(Math.Sqrt(d));
             }
             else if (x.Type() == EVariableType.Matrix)
@@ -1238,8 +1238,8 @@ namespace Gekko
 
         public static IVariable pow(IVariableHelper t, IVariable x1, IVariable x2)
         {
-            double d1 = O.GetVal(x1, t);
-            double d2 = O.GetVal(x2, t);
+            double d1 = O.GetVal(t, x1);
+            double d2 = O.GetVal(t, x2);
             return new ScalarVal(Math.Pow(d1, d2));
         }
 
@@ -1254,8 +1254,8 @@ namespace Gekko
             MetaTimeSeries mts = (MetaTimeSeries)x1;
             MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
             mtsLag.offset = mts.offset - 1;
-            double d1 = O.GetVal(mts, t);
-            double d1Lag = O.GetVal(mtsLag, t);
+            double d1 = O.GetVal(t, mts);
+            double d1Lag = O.GetVal(t, mtsLag);
             return new ScalarVal((d1 / d1Lag - 1) * 100d);
         }
 
@@ -1270,8 +1270,8 @@ namespace Gekko
             MetaTimeSeries mts = (MetaTimeSeries)x1;
             MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
             mtsLag.offset = mts.offset - 1;
-            double d1 = O.GetVal(mts, t);
-            double d1Lag = O.GetVal(mtsLag, t);
+            double d1 = O.GetVal(t, mts);
+            double d1Lag = O.GetVal(t, mtsLag);
             return new ScalarVal(Math.Log(d1 / d1Lag));
         }
 
@@ -1286,8 +1286,8 @@ namespace Gekko
             MetaTimeSeries mts = (MetaTimeSeries)x1;
             MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
             mtsLag.offset = mts.offset - 1;
-            double d1 = O.GetVal(mts, t);
-            double d1Lag = O.GetVal(mtsLag, t);
+            double d1 = O.GetVal(t, mts);
+            double d1Lag = O.GetVal(t, mtsLag);
             return new ScalarVal(d1 - d1Lag);
         }
 
@@ -1302,7 +1302,7 @@ namespace Gekko
             MetaTimeSeries mts = (MetaTimeSeries)x;
             MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
             mtsLag.offset = mts.offset - O.GetInt(ilag);
-            double d1Lag = O.GetVal(mtsLag, t);
+            double d1Lag = O.GetVal(t, mtsLag);
             return new ScalarVal(d1Lag);
         }
 
@@ -1370,8 +1370,8 @@ namespace Gekko
             MetaTimeSeries mts = (MetaTimeSeries)x1;
             MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
             mtsLag.offset = mts.offset - O.CurrentSubperiods();
-            double d1 = O.GetVal(mts, t);
-            double d1Lag = O.GetVal(mtsLag, t);
+            double d1 = O.GetVal(t, mts);
+            double d1Lag = O.GetVal(t, mtsLag);
             return new ScalarVal((d1 / d1Lag - 1) * 100d);
         }
 
@@ -1386,8 +1386,8 @@ namespace Gekko
             MetaTimeSeries mts = (MetaTimeSeries)x1;
             MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
             mtsLag.offset = mts.offset - O.CurrentSubperiods();
-            double d1 = O.GetVal(mts, t);
-            double d1Lag = O.GetVal(mtsLag, t);
+            double d1 = O.GetVal(t, mts);
+            double d1Lag = O.GetVal(t, mtsLag);
             return new ScalarVal(Math.Log(d1 / d1Lag));
         }
 
@@ -1402,14 +1402,14 @@ namespace Gekko
             MetaTimeSeries mts = (MetaTimeSeries)x1;
             MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
             mtsLag.offset = mts.offset - O.CurrentSubperiods();
-            double d1 = O.GetVal(mts, t);
-            double d1Lag = O.GetVal(mtsLag, t);
+            double d1 = O.GetVal(t, mts);
+            double d1Lag = O.GetVal(t, mtsLag);
             return new ScalarVal(d1 - d1Lag);
         }
         
         public static IVariable format(IVariableHelper t, IVariable x1, IVariable x2)
         {
-            double d = O.GetVal(x1, t);
+            double d = O.GetVal(t, x1);
             string format2 = O.GetString(x2);
             string x = Program.NumberFormat(d, format2);
             ScalarString ss = new ScalarString(x);
@@ -1418,7 +1418,7 @@ namespace Gekko
 
         public static IVariable round(IVariableHelper t, IVariable x1, IVariable x2)
         {            
-            double d2 = O.GetVal(x2, t);            
+            double d2 = O.GetVal(t, x2);            
             int aaa1 = 0;
             if (!G.Round(out aaa1, d2))
             {
@@ -1434,7 +1434,7 @@ namespace Gekko
 
             if (IsValOrTimeseries(x1))
             {
-                double d1 = O.GetVal(x1, t);
+                double d1 = O.GetVal(t, x1);
                 double value2 = Math.Round(d1, decimals);
                 return new ScalarVal(value2);
             }
