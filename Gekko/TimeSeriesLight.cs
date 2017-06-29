@@ -10,26 +10,9 @@ namespace Gekko
         public bool isPointerToRealTimeseriesArray = false;
         public double[] storage = null;
         //public int offset = -12345;  //where the data forresponding to anchorPeriod and anchorSubPeriod starts
-
-        /// <summary>
-        /// Indicates the frequency of the TimeSeries.
-        /// </summary>        
-        public EFreq freqEnum;
-        /// <summary>
-        /// The 'super' period (year) corresponding to the anchor date.
-        /// </summary>        
-        public int anchorSuperPeriod;
-        /// <summary>
-        /// The 'sub' period (quarter, month, etc.) corresponding to the anchor date.
-        /// </summary>        
-        public int anchorSubPeriod;
-        /// <summary>
-        /// The index corresponding to the anchor date.
-        /// </summary>        
-        public int anchorPeriodPositionInArray;
-        /// <summary>
-        /// The label of the timeseries (meta-data), for instance 'GDP in current prices'.
-        /// </summary>
+        
+        public GekkoTime anchorPeriod;
+        public int anchorPeriodPositionInArray;        
 
         public TimeSeriesLight()
         {
@@ -50,8 +33,7 @@ namespace Gekko
                 
                 this.storage = dataArray;
                 this.anchorPeriodPositionInArray = ts.anchorPeriodPositionInArray;
-                this.anchorSuperPeriod = ts.anchorSuperPeriod;
-                this.anchorSubPeriod = ts.anchorSubPeriod;
+                this.anchorPeriod = new GekkoTime(ts.freqEnum, ts.anchorSuperPeriod, ts.anchorSubPeriod);
             }
             else
             {
@@ -62,8 +44,7 @@ namespace Gekko
                 this.storage = new double[i2 - i1 + 1];
                 Array.Copy(dataPointer, i1, storage, 0, (i2 - i1 + 1));
                 this.anchorPeriodPositionInArray = 0;
-                this.anchorSuperPeriod = gt1.super;
-                this.anchorSubPeriod = gt1.sub;
+                this.anchorPeriod = gt1;
             }
         }
 
@@ -97,13 +78,11 @@ namespace Gekko
                         TimeSeriesLight tsl = new Gekko.TimeSeriesLight();
 
                         if (Globals.timeSeriesLightShallowCopy)
-                        {
-                            tsl.freqEnum = this.freqEnum;
+                        {                            
                             tsl.isPointerToRealTimeseriesArray = this.isPointerToRealTimeseriesArray;
                             tsl.storage = this.storage;
-                            tsl.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray - ival;
-                            tsl.anchorSuperPeriod = this.anchorSuperPeriod;
-                            tsl.anchorSubPeriod = this.anchorSubPeriod;                            
+                            tsl.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray - ival;                         
+                            tsl.anchorPeriod = this.anchorPeriod;                     
                         }
                         else
                         {
@@ -203,8 +182,8 @@ namespace Gekko
                         
             if (tsl != null)
             {
-                int startIndex1 = TimeSeries.FromGekkoTimeToArrayIndex(t.t1, this.freqEnum, this.anchorPeriodPositionInArray, this.anchorSuperPeriod, this.anchorSubPeriod);
-                int startIndex2 = TimeSeries.FromGekkoTimeToArrayIndex(t.t1, tsl.freqEnum, tsl.anchorPeriodPositionInArray, tsl.anchorSuperPeriod, tsl.anchorSubPeriod);
+                int startIndex1 = TimeSeries.FromGekkoTimeToArrayIndex(t.t1, this.anchorPeriod, this.anchorPeriodPositionInArray);
+                int startIndex2 = TimeSeries.FromGekkoTimeToArrayIndex(t.t2, this.anchorPeriod, this.anchorPeriodPositionInArray);
                 int n = GekkoTime.Observations(t.t1, t.t2);
 
                 //0 1 2 = 3 obs
@@ -220,8 +199,7 @@ namespace Gekko
 
                 TimeSeriesLight tslResult = new TimeSeriesLight();
                 tslResult.storage = new double[n];
-                tslResult.anchorSuperPeriod = t.t1.super;
-                tslResult.anchorSubPeriod = t.t1.sub;
+                tslResult.anchorPeriod = t.t1;
                 tslResult.anchorPeriodPositionInArray = 0;
 
                 for (int i = 0; i < n; i++)
@@ -273,7 +251,7 @@ namespace Gekko
 
         private int GetArrayIndex(GekkoTime gt)
         {
-            int rv = TimeSeries.FromGekkoTimeToArrayIndex(gt, this.freqEnum, this.anchorPeriodPositionInArray, this.anchorSuperPeriod, this.anchorSubPeriod);
+            int rv = TimeSeries.FromGekkoTimeToArrayIndex(gt, this.anchorPeriod, this.anchorPeriodPositionInArray);
             return rv;
         }
     }

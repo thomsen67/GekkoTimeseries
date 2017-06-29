@@ -14181,11 +14181,9 @@ namespace Gekko
             indexes[0] = new ScalarVal(-1);
             // PRT <1998 2004>   ( (ts1+ts2) + (ts3+ts4) ) [-1]
             // data fra 2000-2002, så [-1] er fra 2001-2003, dvs. 
-            IVariable ts1000 = O.Indexer(smpl, O.Add(O.Add(ts1, ts2, smpl), O.Add(ts3, ts4, smpl), smpl), false, indexes);
-            
+            //IVariable ts1000 = O.Indexer(smpl, O.Add(O.Add(ts1, ts2, smpl), O.Add(ts3, ts4, smpl), smpl), false, indexes);
 
-
-
+            IVariable ts1000 = Functions.test(smpl, ts1);            
 
             if (ts1000.Type() != EVariableType.TimeSeries)
             {

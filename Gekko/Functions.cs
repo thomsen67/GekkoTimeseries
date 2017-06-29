@@ -126,6 +126,11 @@ namespace Gekko
             return new ScalarVal(y);
         }
 
+        public static IVariable test(IVariableHelper t, IVariable x1)
+        {
+            return x1.Indexer(t, false, new ScalarDate(new GekkoTime(EFreq.Annual, 1900, 1)));
+        }
+
         public static IVariable concat(GekkoTime t, IVariable x1, IVariable x2)
         {
             //same as %s1 + %s2 anyway.
