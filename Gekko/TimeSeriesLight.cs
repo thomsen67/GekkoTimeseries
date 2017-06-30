@@ -74,40 +74,37 @@ namespace Gekko
                     {
                         if (ival == 0) return this;  //no lag, x[-0] or x[0]  
 
+                        TimeSeriesLight x = this;
+
+                        // =================================== window test start ================================================
+                        int ix1; GekkoError ge;
+                        Check1Smpl(smpl, ival, x, out ix1, out ge);  //offset corresponding to lag
+                        if (ge != null) return ge;
+                        // =================================== window test end ===================================================
+                        
                         //lag or lead
-                        TimeSeriesLight tsl = new Gekko.TimeSeriesLight();
+                        TimeSeriesLight z = new Gekko.TimeSeriesLight();
+                        z.isPointerToRealTimeseriesArray = x.isPointerToRealTimeseriesArray;
+                        z.storage = x.storage;
+                        z.anchorPeriodPositionInArray = x.anchorPeriodPositionInArray;
+                        z.anchorPeriod = x.anchorPeriod.Add(ival);
 
-                        if (Globals.timeSeriesLightShallowCopy)
-                        {
-                            //Indexer() is called with a smpl window. If start of smpl window is < 0 in array or end of smpl window is >= length in error,
-                            //we have a problem.
 
-                            tsl.isPointerToRealTimeseriesArray = this.isPointerToRealTimeseriesArray;
-                            tsl.storage = this.storage;
-                            tsl.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray - ival;
-                            tsl.anchorPeriod = this.anchorPeriod;             
-                        }
-                        else
-                        {
-                            double[] data = new double[this.storage.Length];
-                            if (ival < 0)  //lag
-                            {
-                                int lags = -ival;
-                                if (lags > this.storage.Length) lags = this.storage.Length;
-                                for (int i = 0; i < lags; i++)
-                                {
-                                    data[i] = double.NaN;
-                                }
-                                if (lags < this.storage.Length) Array.Copy(this.storage, 0, data, -ival, this.storage.Length - lags);
-                                tsl.storage = data;                               
+                        //double[] data = new double[this.storage.Length];
+                        //if (ival < 0)  //lag
+                        //{
+                        //    int lags = -ival;
+                        //    if (lags > this.storage.Length) lags = this.storage.Length;
+                        //    for (int i = 0; i < lags; i++)
+                        //    {
+                        //        data[i] = double.NaN;
+                        //    }
+                        //    if (lags < this.storage.Length) Array.Copy(this.storage, 0, data, -ival, this.storage.Length - lags);
+                        //    z.storage = data;                               
 
-                            }
-                            else  //lead
-                            {
-                                throw new GekkoException();
-                            }                        
-                        }
-                        return tsl;
+                        //}
+
+                        return z;
                     }
                 }
                 else if (index.Type() == EVariableType.Date)
@@ -118,6 +115,8 @@ namespace Gekko
                 return null;
             }
         }
+
+       
 
         public IVariable Indexer(IVariableHelper smpl, IVariablesFilterRange indexRange)
         {
@@ -179,43 +178,86 @@ namespace Gekko
             return EVariableType.TimeSeries;
         }
 
-        public IVariable Add(IVariableHelper smpl, IVariable x)
+        public IVariable Add(IVariableHelper smpl, IVariable input)
         {
-            TimeSeriesLight tsl = x as TimeSeriesLight;
-                        
-            if (tsl != null)
+            switch(input.Type())
             {
-                int startIndex1 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t1, this.anchorPeriod, this.anchorPeriodPositionInArray);
-                int startIndex2 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t2, this.anchorPeriod, this.anchorPeriodPositionInArray);
-                int n = GekkoTime.Observations(smpl.t1, smpl.t2);
+                case EVariableType.TimeSeries:
+                    {
+                        TimeSeriesLight x = this;
+                        TimeSeriesLight y = (TimeSeriesLight)input;
 
-                //0 1 2 = 3 obs
-                int overflow1 = startIndex1 + n - 1 - this.storage.Length;
-                int overflow2 = startIndex2 + n - 1 - tsl.storage.Length;
-                if (startIndex1 < 0 || startIndex2 < 0 || overflow1 > 0 || overflow2 > 0)
+                        // =================================== window test start ================================================
+                        int ix1, iy1; GekkoError ge;
+                        Check2Smpl(smpl, 0, x, y, out ix1, out iy1, out ge);  //no offset
+                        if (ge != null) return ge;
+                        // =================================== window test end== ================================================
+
+                        int n = GekkoTime.Observations(smpl.t1, smpl.t2);
+
+                        TimeSeriesLight z = new TimeSeriesLight();
+                        z.isPointerToRealTimeseriesArray = false;
+                        z.storage = new double[n];
+                        z.anchorPeriod = smpl.t1;
+                        z.anchorPeriodPositionInArray = 0;
+
+                        for (int i = 0; i < n; i++)
+                        {
+                            double xVal = double.NaN;
+                            double yVal = double.NaN;
+                            int ix = ix1 + i;
+                            int iy = iy1 + i;
+                            if (ix >= 0 && ix < x.storage.Length) xVal = x.storage[ix];
+                            if (iy >= 0 && iy < y.storage.Length) yVal = y.storage[iy];
+                            z.storage[i] = xVal + yVal;
+                        }
+
+                        return z;
+                    }
+                    break;
+                default:
+                    {
+                        G.Writeln2("*** ERROR: Cannot add SERIES and " + (input.Type().ToString().ToUpper()));
+                        throw new GekkoException();
+                    }
+                    break;
+            }           
+        }
+
+        private static void Check1Smpl(IVariableHelper smpl, int offset, TimeSeriesLight x, out int ix1, out GekkoError ge)
+        {
+            ix1 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t1.Add(offset), x.anchorPeriod, x.anchorPeriodPositionInArray);
+            int ix2 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t2.Add(offset), x.anchorPeriod, x.anchorPeriodPositionInArray);
+            int underflow = 0; int overflow = 0;
+            UnderOverflow(x, ix1, ix2, ref underflow, ref overflow);
+            ge = Program.CheckGekkoError(underflow, overflow);
+        }
+
+        private static void Check2Smpl(IVariableHelper smpl, int offset, TimeSeriesLight x, TimeSeriesLight y, out int ix1, out int iy1, out GekkoError ge)
+        {
+            ix1 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t1.Add(offset), x.anchorPeriod, x.anchorPeriodPositionInArray);
+            int ix2 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t2.Add(offset), x.anchorPeriod, x.anchorPeriodPositionInArray);
+            iy1 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t1.Add(offset), y.anchorPeriod, y.anchorPeriodPositionInArray);
+            int iy2 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t2.Add(offset), y.anchorPeriod, y.anchorPeriodPositionInArray);
+            int underflow = 0; int overflow = 0;
+            UnderOverflow(x, ix1, ix2, ref underflow, ref overflow);
+            UnderOverflow(y, iy1, iy2, ref underflow, ref overflow);
+            ge = Program.CheckGekkoError(underflow, overflow);
+        }
+
+        private static void UnderOverflow(TimeSeriesLight x, int xStartIndex, int xEndIndex, ref int underflow, ref int overflow)
+        {
+            if (!x.isPointerToRealTimeseriesArray)
+            {
+                if (xStartIndex < 0)
                 {
-                    GekkoError ge = new Gekko.GekkoError();
-                    if (startIndex1 < 0 || startIndex2 < 0) ge.underflow = Math.Max(-startIndex1, -startIndex2);
-                    if (overflow1 > 0 || overflow2 > 0) ge.overflow = Math.Max(overflow1, overflow2);
-                    return ge;
+                    underflow = Math.Max(underflow, -xStartIndex);  //now underflow is 1 or more
                 }
-
-                TimeSeriesLight tslResult = new TimeSeriesLight();
-                tslResult.storage = new double[n];
-                tslResult.anchorPeriod = smpl.t1;
-                tslResult.anchorPeriodPositionInArray = 0;
-
-                for (int i = 0; i < n; i++)
+                if (xEndIndex - x.storage.Length + 1 > 0)
                 {
-                    int i1 = startIndex1 + i;
-                    int i2 = startIndex2 + i;
-                    tslResult.storage[i] = this.storage[i1] + tsl.storage[i2];
+                    overflow = Math.Max(overflow, xEndIndex - x.storage.Length + 1);  //now overflow is 1 or more                        
                 }
-
-                return tslResult;
             }
-            G.Writeln2("*** ERROR: Unknown type");
-            throw new GekkoException();
         }
 
         public IVariable Subtract(IVariableHelper smpl, IVariable x)

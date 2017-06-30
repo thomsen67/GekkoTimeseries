@@ -186,6 +186,8 @@ namespace Gekko
             //see also GetPeriod()
             //Could probably use DateTime functions, but we like to keep it fast and simple
 
+            if (addedPeriods == 0) return this;
+
             int subPeriods = 1;
 
             if (this.freq == EFreq.Annual)

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Gekko
 {
-    class GekkoError : IVariable
+    public class GekkoError : IVariable
     {
         public int underflow = 0;
         public int overflow = 0;

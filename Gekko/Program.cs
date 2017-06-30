@@ -14142,6 +14142,18 @@ namespace Gekko
             }
         }
 
+        public static GekkoError CheckGekkoError(int underflow, int overflow)
+        {
+            GekkoError ge = null;
+            if (underflow > 0 || overflow > 0)
+            {
+                ge = new GekkoError();
+                ge.underflow = underflow;
+                ge.overflow = overflow;
+            }
+            return ge;
+        }
+
         public static void Tsl()
         {
             GekkoTime tStart = new GekkoTime(EFreq.Annual, 2000, 1);
@@ -14172,8 +14184,8 @@ namespace Gekko
 
             //ts1 + ts1 + ts2
             IVariableHelper smpl = new Gekko.IVariableHelper();
-            smpl.t1 = new GekkoTime(EFreq.Annual, 1998, 1);
-            smpl.t2 = new GekkoTime(EFreq.Annual, 2004, 1);
+            smpl.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
+            smpl.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
 
             IVariable[] indexes = new IVariable[1];
             indexes[0] = new ScalarVal(-1);
