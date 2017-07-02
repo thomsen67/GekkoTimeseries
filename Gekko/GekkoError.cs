@@ -8,12 +8,18 @@ namespace Gekko
     public class GekkoError : IVariable
     {
         public int underflow = 0;
-        public int overflow = 0;
+        public int overflow = 0;        
         
         public GekkoError()
         {
 
-        }        
+        }
+
+        public GekkoError(int underflow, int overflow)
+        {
+            this.underflow = underflow;
+            this.overflow = overflow;
+        }
 
         public IVariable Indexer(IVariableHelper t, bool isLhs, params IVariable[] indexes)
         {

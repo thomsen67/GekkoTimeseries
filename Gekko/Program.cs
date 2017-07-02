@@ -14150,8 +14150,21 @@ namespace Gekko
                 ge = new GekkoError();
                 ge.underflow = underflow;
                 ge.overflow = overflow;
+
             }
             return ge;
+        }
+
+        public static IVariable SmplCheck(IVariableHelper smpl, IVariable input)
+        {            
+            if (smpl != null && input.Type() == EVariableType.TimeSeries && !((TimeSeriesLight)input).isPointerToRealTimeseriesArray)
+            {
+                TimeSeriesLight x = (TimeSeriesLight)input;
+                int ix1 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t1, x.anchorPeriod, x.anchorPeriodPositionInArray);
+                int ix2 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t2, x.anchorPeriod, x.anchorPeriodPositionInArray);
+
+            }
+            return input;
         }
 
         public static void Tsl()
@@ -14187,13 +14200,23 @@ namespace Gekko
             smpl.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
             smpl.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
 
+            //So that print can be with percentage growth
+            smpl.t1 = smpl.t1.Add(-2);  //this is standard!
+
+            smpl.t1 = smpl.t1.Add(-1);  //lag
+
+
             IVariable[] indexes = new IVariable[1];
             indexes[0] = new ScalarVal(-1);
             // PRT <1998 2004>   ( (ts1+ts2) + (ts3+ts4) ) [-1]
             // data fra 2000-2002, så [-1] er fra 2001-2003, dvs. 
             //IVariable ts1000 = O.Indexer(smpl, O.Add(O.Add(ts1, ts2, smpl), O.Add(ts3, ts4, smpl), smpl), false, indexes);
 
-            IVariable ts1000 = Functions.test(smpl, O.Add(smpl, ts1, ts1));            
+            IVariable ts1000 = Functions.test(smpl, O.Add(smpl, ts1, ts1));
+
+
+
+            //IVariable ts1000 = O.Add(smpl, ts1, O.Add(smpl, ts1, ts1));
 
             if (ts1000.Type() != EVariableType.TimeSeries)
             {

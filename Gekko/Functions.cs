@@ -128,7 +128,7 @@ namespace Gekko
 
         public static IVariable test(IVariableHelper t, IVariable x1)
         {
-            return x1.Indexer(t, false, new ScalarVal(-2d));
+            return x1.Indexer(t, false, new ScalarVal(-1d));
         }
 
         public static IVariable concat(GekkoTime t, IVariable x1, IVariable x2)

@@ -756,6 +756,13 @@ namespace Gekko
             return rv;
         }
 
+        public static GekkoTime FromArrayIndexToGekkoTime(int i, GekkoTime anchorPeriod, int anchorPeriodPositionInArray)
+        {
+            int dif = i - anchorPeriodPositionInArray;
+            GekkoTime rv = anchorPeriod.Add(dif);
+            return rv;
+        }
+
         public static int FromGekkoTimeToArrayIndex(GekkoTime gt, GekkoTime anchorPeriod, int anchorPeriodPositionInArray)
         {
             //this.anchorSubPeriod is always 1 at the moment, and will always be 1 for Annual.
