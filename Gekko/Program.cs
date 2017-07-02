@@ -14236,13 +14236,13 @@ namespace Gekko
             o5.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
             o5.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
 
-            IVariable ts1000 = null;
+            IVariable result = null;
             for (int i = 0; i < int.MaxValue; i++)
             {
-                ts1000 = SmplCheck(new GekkoSmpl(o5.t1.Add(-deduct), o5.t2), Functions.test(smpl, O.Add(smpl, ts1, ts1)));
-                if (ts1000.Type() != EVariableType.GekkoError) break;
-                GekkoError ge = (GekkoError)ts1000;
-                int factor = (int)Math.Pow(2d, i); //Use a factor, 1 first time, 2 second, 4 fourth...
+                result = SmplCheck(new GekkoSmpl(o5.t1.Add(-deduct), o5.t2), Functions.test(smpl, O.Add(smpl, ts1, ts1)));
+                if (result.Type() != EVariableType.GekkoError) break;
+                GekkoError ge = (GekkoError)result;
+                int factor = i + 1; //Use a factor, 1 first time, 2 second, 3 third...
                 smpl.t1 = smpl.t1.Add(-ge.underflow * factor);
                 smpl.t2 = smpl.t2.Add(ge.overflow * factor);
                 if (i > 10)
@@ -14252,9 +14252,9 @@ namespace Gekko
                 }
             }
 
-            if (!(ts1000.Type() == EVariableType.TimeSeries))
+            if (!(result.Type() == EVariableType.TimeSeries))
             {
-                if (ts1000.Type() == EVariableType.Val)
+                if (result.Type() == EVariableType.Val)
                 {
                     //convert to ts...
                     throw new GekkoException();
@@ -14265,7 +14265,7 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            TimeSeriesLight tsl = (TimeSeriesLight)ts1000;
+            TimeSeriesLight tsl = (TimeSeriesLight)result;
 
             {
                 List<int> bankNumbers = null;
@@ -14279,18 +14279,21 @@ namespace Gekko
                     {
                         ope0.subElements = new List<O.Prt.SubElement>();
                         O.Prt.SubElement opeSub0 = new O.Prt.SubElement();
+                        O.Prt.SubElement opeSub1 = new O.Prt.SubElement();
                         ope0.subElements.Add(opeSub0);
+                        ope0.subElements.Add(opeSub1);
                     }
                     
                     if (bankNumber == 1)
                     {
                         ope0.subElements[0].tsWork = tsl;
-                        
+                        ope0.subElements[1].tsWork = ts1;
                     }
                     else
                     {
                         ope0.subElements[0].tsBase = tsl;
-                        
+                        ope0.subElements[1].tsBase = ts1;
+
                     }
 
                 }
