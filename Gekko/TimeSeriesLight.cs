@@ -18,7 +18,9 @@ namespace Gekko
 
         }
 
-        public TimeSeriesLight(TimeSeries ts, GekkoTime gt1, GekkoTime gt2, bool shallow)
+        public TimeSeriesLight(GekkoSmpl smpl, TimeSeries ts) : this(smpl, ts, true) { }        
+
+        public TimeSeriesLight(GekkoSmpl smpl, TimeSeries ts, bool shallow)
         {
             if (Globals.timeSeriesLightShallowCopy)
             {
@@ -28,8 +30,7 @@ namespace Gekko
                 //just a pointer to the real timeseries. The real timeseries will not change during the
                 //lifetime of this object, so it is safe to consider the array fixed.
                 //one benefit of this is that if we are out of bounds of the array, we just return a NaN.
-                double[] dataArray = ts.GetDataSequence(out i1, out i2, gt1, gt2);
-                
+                double[] dataArray = ts.GetDataSequence(out i1, out i2, smpl.t1, smpl.t2);                
                 this.storage = dataArray;
                 this.anchorPeriodPositionInArray = ts.anchorPeriodPositionInArray;
                 this.anchorPeriod = new GekkoTime(ts.freqEnum, ts.anchorSuperPeriod, ts.anchorSubPeriod);
@@ -39,11 +40,11 @@ namespace Gekko
                 //a full copy of the data
                 int i1 = -12345;
                 int i2 = -12345;
-                double[] dataPointer = ts.GetDataSequence(out i1, out i2, gt1, gt2);
+                double[] dataPointer = ts.GetDataSequence(out i1, out i2, smpl.t1, smpl.t2);
                 this.storage = new double[i2 - i1 + 1];
                 Array.Copy(dataPointer, i1, storage, 0, (i2 - i1 + 1));
                 this.anchorPeriodPositionInArray = 0;
-                this.anchorPeriod = gt1;
+                this.anchorPeriod = smpl.t1;
             }
         }
         

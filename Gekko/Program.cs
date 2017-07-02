@@ -14168,6 +14168,21 @@ namespace Gekko
             return input;
         }
 
+        //public static IVariable SmplCheck(GekkoSmpl smpl, IVariable input)
+        //{
+        //    //Checks if the IVariable has data in the smpl range. If not, a GekkoError is returned.
+        //    //  Else the variable is returned untouched.
+        //    //If it is a TimeSeriesLight, and the double[] data array is a pointer to the real TimeSeries array,
+        //    //  this method will never return a GekkoError.
+        //    if (input.Type() == EVariableType.TimeSeries)
+        //    {
+        //        TimeSeriesLight x = (TimeSeriesLight)input;
+        //        int ix1, ix2; GekkoError ge; TimeSeriesLight.SpmlCheck(smpl, x, out ix1, out ix2, out ge);
+        //        if (ge != null) return ge;
+        //    }
+        //    return input;
+        //}
+
         //public static GekkoError CheckGekkoError(int underflow, int overflow)
         //{
         //    GekkoError ge = null;
@@ -14195,6 +14210,7 @@ namespace Gekko
 
         public static void Tsl()
         {
+            
             GekkoTime tStart = new GekkoTime(EFreq.Annual, 2000, 1);
             GekkoTime tEnd = new GekkoTime(EFreq.Annual, 2002, 1);
             GekkoTime t = Globals.tNull;
@@ -14202,29 +14218,12 @@ namespace Gekko
             ts1_.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 1d);
             ts1_.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 2d);
             ts1_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 3d);
-            TimeSeries ts2_ = new TimeSeries(EFreq.Annual, "");
-            ts2_.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 2d);
-            ts2_.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 3d);
-            ts2_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 4d);
-            TimeSeries ts3_ = new TimeSeries(EFreq.Annual, "");
-            ts3_.SetData(new GekkoTime(EFreq.Annual, 1999, 1), 100d);
-            ts3_.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 3d);
-            ts3_.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 4d);
-            ts3_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 5d);
-            TimeSeries ts4_ = new TimeSeries(EFreq.Annual, "");            
-            ts4_.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 4d);
-            ts4_.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 5d);
-            ts4_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 6d);
-
-            TimeSeriesLight ts1 = new Gekko.TimeSeriesLight(ts1_, tStart, tEnd, true);
-            TimeSeriesLight ts2 = new Gekko.TimeSeriesLight(ts2_, tStart, tEnd, true);
-            TimeSeriesLight ts3 = new Gekko.TimeSeriesLight(ts3_, tStart, tEnd, true);
-            TimeSeriesLight ts4 = new Gekko.TimeSeriesLight(ts4_, tStart, tEnd, true);
-
-            //ts1 + ts1 + ts2
+                        
             GekkoSmpl smpl = new Gekko.GekkoSmpl();
             smpl.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
             smpl.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
+
+            TimeSeriesLight ts1 = new Gekko.TimeSeriesLight(smpl, ts1_);
 
             int deduct = 2;
 
@@ -14235,38 +14234,11 @@ namespace Gekko
             o5.prtType = "prt";
             o5.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
             o5.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
+            GekkoSmpl smpl2 = new GekkoSmpl(o5.t1.Add(-deduct), o5.t2);
+            
+            
 
-            IVariable result = null;
-            for (int i = 0; i < int.MaxValue; i++)
-            {
-                result = SmplCheck(new GekkoSmpl(o5.t1.Add(-deduct), o5.t2), Functions.test(smpl, O.Add(smpl, ts1, ts1)));
-                if (result.Type() != EVariableType.GekkoError) break;
-                GekkoError ge = (GekkoError)result;
-                int factor = i + 1; //Use a factor, 1 first time, 2 second, 3 third...
-                smpl.t1 = smpl.t1.Add(-ge.underflow * factor);
-                smpl.t2 = smpl.t2.Add(ge.overflow * factor);
-                if (i > 10)
-                {
-                    G.Writeln2("*** ERROR: Unexpected lag error #89032984325");
-                    throw new GekkoException();
-                }
-            }
-
-            if (!(result.Type() == EVariableType.TimeSeries))
-            {
-                if (result.Type() == EVariableType.Val)
-                {
-                    //convert to ts...
-                    throw new GekkoException();
-                }
-                //Maybe this is not necessary, could be handled via GetVal() --> rename GetDouble()?
-                //handle that! VAL should be ok.
-                G.Writeln2("*** ERROR: Expected SERIES or VAL");
-                throw new GekkoException();
-            }
-
-            TimeSeriesLight tsl = (TimeSeriesLight)result;
-
+            
             {
                 List<int> bankNumbers = null;
                 O.Prt.Element ope0 = new O.Prt.Element();
@@ -14274,7 +14246,38 @@ namespace Gekko
                 bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o5, ope0));
                 foreach (int bankNumber in bankNumbers)
                 {
-                    
+
+
+                    IVariable result = null;
+                    for (int i = 0; i < int.MaxValue; i++)
+                    {
+                        result = SmplCheck(smpl2, Expression1(smpl));
+                        if (result.Type() != EVariableType.GekkoError) break;
+                        GekkoError ge = (GekkoError)result;
+                        smpl.t1 = smpl.t1.Add(-ge.underflow * (i + 1));  //Use a factor, 1 first time, 2 second, 3 third...
+                        smpl.t2 = smpl.t2.Add(ge.overflow * (i + 1));
+                        if (i > 10)
+                        {
+                            G.Writeln2("*** ERROR: Unexpected lag error #89032984325");
+                            throw new GekkoException();
+                        }
+                    }
+                    if (!(result.Type() == EVariableType.TimeSeries))
+                    {
+                        if (result.Type() == EVariableType.Val)
+                        {
+                            //convert to ts...
+                            throw new GekkoException();
+                        }
+                        //Maybe this is not necessary, could be handled via GetVal() --> rename GetDouble()?
+                        //handle that! VAL should be ok.
+                        G.Writeln2("*** ERROR: Expected SERIES or VAL");
+                        throw new GekkoException();
+                    }
+                    TimeSeriesLight tsl = (TimeSeriesLight)result;
+
+
+
                     if (ope0.subElements == null)
                     {
                         ope0.subElements = new List<O.Prt.SubElement>();
@@ -14302,12 +14305,8 @@ namespace Gekko
             
             o5.counter = 1;
             o5.Exe();
-
-
-
-
-
-
+                                  
+            
             O.Genr o0 = new O.Genr();
             IVariable ts9 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("xx2"))), 1, O.ECreatePossibilities.Can);
             IVariable ts10 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("xx"))), 1);
@@ -14325,21 +14324,15 @@ namespace Gekko
             t = Globals.tNull;
             o0.meta = @"ser xx2=xx+xx[-1]";
             o0.Exe();
+                       
 
+        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        private static IVariable Expression1(GekkoSmpl smpl)
+        {
+            TimeSeries ts = Program.databanks.GetDatabank("Work").GetVariable("xx");
+            TimeSeriesLight tsl = new TimeSeriesLight(smpl, ts, true);
+            return Functions.test(smpl, O.Add(smpl, tsl, tsl));
         }
 
         private static void AddHtmlToExistingHtml(ref string s1, ref string s2, string css, string s)
