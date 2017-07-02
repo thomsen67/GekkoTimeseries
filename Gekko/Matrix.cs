@@ -36,7 +36,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Indexer(IVariableHelper t, bool isLhs, params IVariable[] indexes)
+        public IVariable Indexer(GekkoSmpl t, bool isLhs, params IVariable[] indexes)
         {
             if (indexes.Length == 1)
             {
@@ -87,7 +87,7 @@ namespace Gekko
         }
         
 
-        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange)
+        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange)
         {
             int d1 = this.data.GetLength(0);
             int d2 = this.data.GetLength(1);
@@ -100,7 +100,7 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
+        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
         {
             int i1 = 1;
             int i2 = this.data.GetLength(0);
@@ -142,7 +142,7 @@ namespace Gekko
             }
         }
         
-        public IVariable Indexer(IVariableHelper t, IVariable index, IVariablesFilterRange indexRange)
+        public IVariable Indexer(GekkoSmpl t, IVariable index, IVariablesFilterRange indexRange)
         {
             int i0 = O.GetInt(index);            
             int j1 = 1;
@@ -171,7 +171,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange, IVariable index)
+        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange, IVariable index)
         {
             int i1 = 1;
             int i2 = this.data.GetLength(0);            
@@ -204,7 +204,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Negate(IVariableHelper t)
+        public IVariable Negate(GekkoSmpl t)
         {
             int ni = this.data.GetLength(0);
             int nj = this.data.GetLength(1);            
@@ -219,13 +219,13 @@ namespace Gekko
             return m;               
         }
 
-        public void InjectAdd(IVariableHelper t, IVariable x, IVariable y)
+        public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
         {
             G.Writeln2("*** ERROR: #8703458724");
             throw new GekkoException();
         }
 
-        public double GetVal(IVariableHelper t)
+        public double GetVal(GekkoSmpl t)
         {
             if (this.data.GetLength(0) == 1 && this.data.GetLength(1) == 1)
             {
@@ -277,7 +277,7 @@ namespace Gekko
             return m;
         }
 
-        public IVariable Add(IVariableHelper t, IVariable x)
+        public IVariable Add(GekkoSmpl t, IVariable x)
         {
             //clone this Add() method and do with O.SubtractMatrixScalar, also for Matrix and matrix            
             switch (x.Type())
@@ -313,7 +313,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Subtract(IVariableHelper t, IVariable x)
+        public IVariable Subtract(GekkoSmpl t, IVariable x)
         {
             //clone this Add() method and do with O.SubtractMatrixScalar, also for Matrix and matrix            
             EVariableType type = x.Type();
@@ -342,7 +342,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Multiply(IVariableHelper t, IVariable x)
+        public IVariable Multiply(GekkoSmpl t, IVariable x)
         {
             EVariableType type = x.Type();
             if (type == EVariableType.Matrix)
@@ -416,7 +416,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Divide(IVariableHelper t, IVariable x)
+        public IVariable Divide(GekkoSmpl t, IVariable x)
         {
             switch (x.Type())
             {
@@ -464,7 +464,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Power(IVariableHelper t, IVariable x)
+        public IVariable Power(GekkoSmpl t, IVariable x)
         {
             G.Writeln2("*** ERROR: You cannot use power function with matrices");
             throw new GekkoException();

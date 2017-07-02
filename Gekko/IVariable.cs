@@ -48,31 +48,31 @@ namespace Gekko
         //      That will speed up i=i+1 stuff up a lot.
         //      How to do this consistently without duplicating code???
 
-        IVariable Add(IVariableHelper smpl, IVariable x); //returns a new object! z = x.Add(y) creates a new z (does not alter x or y).        
+        IVariable Add(GekkoSmpl smpl, IVariable x); //returns a new object! z = x.Add(y) creates a new z (does not alter x or y).        
         
-        IVariable Subtract(IVariableHelper smpl, IVariable x);
+        IVariable Subtract(GekkoSmpl smpl, IVariable x);
 
-        IVariable Multiply(IVariableHelper smpl, IVariable x); //returns a new object! z = x.Add(y) creates a new z (does not alter x or y).        
+        IVariable Multiply(GekkoSmpl smpl, IVariable x); //returns a new object! z = x.Add(y) creates a new z (does not alter x or y).        
 
-        IVariable Divide(IVariableHelper smpl, IVariable x); //returns a new object! z = x.Add(y) creates a new z (does not alter x or y).        
+        IVariable Divide(GekkoSmpl smpl, IVariable x); //returns a new object! z = x.Add(y) creates a new z (does not alter x or y).        
 
-        IVariable Power(IVariableHelper smpl, IVariable x); //returns a new object! z = x.Add(y) creates a new z (does not alter x or y).        
+        IVariable Power(GekkoSmpl smpl, IVariable x); //returns a new object! z = x.Add(y) creates a new z (does not alter x or y).        
 
-        IVariable Negate(IVariableHelper smpl); //returns a new object!
+        IVariable Negate(GekkoSmpl smpl); //returns a new object!
         
-        IVariable Indexer(IVariableHelper smpl, bool isLhs, params IVariable[] index); //returns a new object! t needs to be 1. argument.
+        IVariable Indexer(GekkoSmpl smpl, bool isLhs, params IVariable[] index); //returns a new object! t needs to be 1. argument.
 
-        IVariable Indexer(IVariableHelper smpl, IVariablesFilterRange index); //x[2..3]: returns a new object with sub-items
+        IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange index); //x[2..3]: returns a new object with sub-items
 
-        IVariable Indexer(IVariableHelper smpl, IVariablesFilterRange index1, IVariablesFilterRange index2); //x[2..3, 3..5]: returns a new object with sub-items
+        IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange index1, IVariablesFilterRange index2); //x[2..3, 3..5]: returns a new object with sub-items
 
-        IVariable Indexer(IVariableHelper smpl, IVariable index, IVariablesFilterRange indexRange);
+        IVariable Indexer(GekkoSmpl smpl, IVariable index, IVariablesFilterRange indexRange);
 
-        IVariable Indexer(IVariableHelper smpl, IVariablesFilterRange indexRange, IVariable index);
+        IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange indexRange, IVariable index);
 
-        void InjectAdd(IVariableHelper smpl, IVariable x, IVariable y); //z.InjectAdd(x,y) inserts the sum of x and y into the z object.        
+        void InjectAdd(GekkoSmpl smpl, IVariable x, IVariable y); //z.InjectAdd(x,y) inserts the sum of x and y into the z object.        
 
-        double GetVal(IVariableHelper smpl);
+        double GetVal(GekkoSmpl smpl);
 
         string GetString();
 

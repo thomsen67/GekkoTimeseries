@@ -62,10 +62,21 @@ using System.Linq;
 namespace Gekko
 {
 
-    public class IVariableHelper
+    public class GekkoSmpl
     {
         public GekkoTime t1 = Globals.tNull;
         public GekkoTime t2 = Globals.tNull;
+
+        public GekkoSmpl()
+        {
+
+        }
+
+        public GekkoSmpl(GekkoTime t1, GekkoTime t2)
+        {
+            this.t1 = t1;
+            this.t2 = t2;
+        }
     }
 
     public class GekkoList<T>
@@ -14142,30 +14153,45 @@ namespace Gekko
             }
         }
 
-        public static GekkoError CheckGekkoError(int underflow, int overflow)
+        public static IVariable SmplCheck(GekkoSmpl smpl, IVariable input)
         {
-            GekkoError ge = null;
-            if (underflow > 0 || overflow > 0)
-            {
-                ge = new GekkoError();
-                ge.underflow = underflow;
-                ge.overflow = overflow;
-
-            }
-            return ge;
-        }
-
-        public static IVariable SmplCheck(IVariableHelper smpl, IVariable input)
-        {            
-            if (smpl != null && input.Type() == EVariableType.TimeSeries && !((TimeSeriesLight)input).isPointerToRealTimeseriesArray)
+            //Checks if the IVariable has data in the smpl range. If not, a GekkoError is returned.
+            //  Else the variable is returned untouched.
+            //If it is a TimeSeriesLight, and the double[] data array is a pointer to the real TimeSeries array,
+            //  this method will never return a GekkoError.
+            if (input.Type() == EVariableType.TimeSeries)
             {
                 TimeSeriesLight x = (TimeSeriesLight)input;
-                int ix1 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t1, x.anchorPeriod, x.anchorPeriodPositionInArray);
-                int ix2 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t2, x.anchorPeriod, x.anchorPeriodPositionInArray);
-
+                int ix1, ix2; GekkoError ge; TimeSeriesLight.SpmlCheck(smpl, x, out ix1, out ix2, out ge);
+                if (ge != null) return ge;
             }
             return input;
         }
+
+        //public static GekkoError CheckGekkoError(int underflow, int overflow)
+        //{
+        //    GekkoError ge = null;
+        //    if (underflow > 0 || overflow > 0)
+        //    {
+        //        ge = new GekkoError();
+        //        ge.underflow = underflow;
+        //        ge.overflow = overflow;
+
+        //    }
+        //    return ge;
+        //}
+
+        //public static IVariable SmplCheck(IVariableHelper smpl, IVariable input)
+        //{            
+        //    if (smpl != null && input.Type() == EVariableType.TimeSeries && !((TimeSeriesLight)input).isPointerToRealTimeseriesArray)
+        //    {
+        //        TimeSeriesLight x = (TimeSeriesLight)input;
+        //        int ix1 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t1, x.anchorPeriod, x.anchorPeriodPositionInArray);
+        //        int ix2 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t2, x.anchorPeriod, x.anchorPeriodPositionInArray);
+
+        //    }
+        //    return input;
+        //}
 
         public static void Tsl()
         {
@@ -14196,41 +14222,50 @@ namespace Gekko
             TimeSeriesLight ts4 = new Gekko.TimeSeriesLight(ts4_, tStart, tEnd, true);
 
             //ts1 + ts1 + ts2
-            IVariableHelper smpl = new Gekko.IVariableHelper();
+            GekkoSmpl smpl = new Gekko.GekkoSmpl();
             smpl.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
             smpl.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
 
+            int deduct = 2;
+
             //So that print can be with percentage growth
-            smpl.t1 = smpl.t1.Add(-2);  //this is standard!
-
-            smpl.t1 = smpl.t1.Add(-1);  //lag
-
-
-            IVariable[] indexes = new IVariable[1];
-            indexes[0] = new ScalarVal(-1);
-            // PRT <1998 2004>   ( (ts1+ts2) + (ts3+ts4) ) [-1]
-            // data fra 2000-2002, så [-1] er fra 2001-2003, dvs. 
-            //IVariable ts1000 = O.Indexer(smpl, O.Add(O.Add(ts1, ts2, smpl), O.Add(ts3, ts4, smpl), smpl), false, indexes);
-
-            IVariable ts1000 = Functions.test(smpl, O.Add(smpl, ts1, ts1));
-
-
-
-            //IVariable ts1000 = O.Add(smpl, ts1, O.Add(smpl, ts1, ts1));
-
-            if (ts1000.Type() != EVariableType.TimeSeries)
-            {
-                //handle that! VAL should be ok.
-                throw new GekkoException();
-            }
-
-            TimeSeriesLight tsl = (TimeSeriesLight)ts1000;
-
-
+            smpl.t1 = smpl.t1.Add(-deduct);  //this is standard!
+            
             O.Prt o5 = new O.Prt();
             o5.prtType = "prt";
             o5.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
             o5.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
+
+            IVariable ts1000 = null;
+            for (int i = 0; i < int.MaxValue; i++)
+            {
+                ts1000 = SmplCheck(new GekkoSmpl(o5.t1.Add(-deduct), o5.t2), Functions.test(smpl, O.Add(smpl, ts1, ts1)));
+                if (ts1000.Type() != EVariableType.GekkoError) break;
+                GekkoError ge = (GekkoError)ts1000;
+                int factor = (int)Math.Pow(2d, i); //Use a factor, 1 first time, 2 second, 4 fourth...
+                smpl.t1 = smpl.t1.Add(-ge.underflow * factor);
+                smpl.t2 = smpl.t2.Add(ge.overflow * factor);
+                if (i > 10)
+                {
+                    G.Writeln2("*** ERROR: Unexpected lag error #89032984325");
+                    throw new GekkoException();
+                }
+            }
+
+            if (!(ts1000.Type() == EVariableType.TimeSeries))
+            {
+                if (ts1000.Type() == EVariableType.Val)
+                {
+                    //convert to ts...
+                    throw new GekkoException();
+                }
+                //Maybe this is not necessary, could be handled via GetVal() --> rename GetDouble()?
+                //handle that! VAL should be ok.
+                G.Writeln2("*** ERROR: Expected SERIES or VAL");
+                throw new GekkoException();
+            }
+
+            TimeSeriesLight tsl = (TimeSeriesLight)ts1000;
 
             {
                 List<int> bankNumbers = null;

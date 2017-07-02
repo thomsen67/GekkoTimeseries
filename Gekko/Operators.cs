@@ -79,7 +79,7 @@ namespace Gekko
 
         public static class ValTimeSeries
         {
-            public static IVariable Add(ScalarVal x, MetaTimeSeries ats, IVariableHelper t)
+            public static IVariable Add(ScalarVal x, MetaTimeSeries ats, GekkoSmpl t)
             {
                 //no need to implement swap
                 if (t == null) throw new GekkoException();                

@@ -126,9 +126,9 @@ namespace Gekko
             return new ScalarVal(y);
         }
 
-        public static IVariable test(IVariableHelper t, IVariable x1)
+        public static IVariable test(GekkoSmpl t, IVariable x1)
         {
-            return x1.Indexer(t, false, new ScalarVal(-1d));
+            return x1.Indexer(t, false, new ScalarVal(-2d));
         }
 
         public static IVariable concat(GekkoTime t, IVariable x1, IVariable x2)
@@ -204,22 +204,22 @@ namespace Gekko
             return tuple;
         }
 
-        public static IVariable hpfilter(IVariableHelper t, IVariable rightSide, IVariable ilambda)
+        public static IVariable hpfilter(GekkoSmpl t, IVariable rightSide, IVariable ilambda)
         {
             return hpfilter(t, null, null, rightSide, ilambda, new ScalarVal(0d));
         }
 
-        public static IVariable hpfilter(IVariableHelper t, IVariable per1, IVariable per2, IVariable rightSide, IVariable ilambda)
+        public static IVariable hpfilter(GekkoSmpl t, IVariable per1, IVariable per2, IVariable rightSide, IVariable ilambda)
         {
             return hpfilter(t, per1, per2, rightSide, ilambda, new ScalarVal(0d));
         }
 
-        public static IVariable hpfilter(IVariableHelper t, IVariable rightSide, IVariable ilambda, IVariable ilog)
+        public static IVariable hpfilter(GekkoSmpl t, IVariable rightSide, IVariable ilambda, IVariable ilog)
         {
             return hpfilter(t, null, null, rightSide, ilambda, ilog);
         }
 
-        public static IVariable hpfilter(IVariableHelper t, IVariable per1, IVariable per2, IVariable rightSide, IVariable ilambda, IVariable ilog) 
+        public static IVariable hpfilter(GekkoSmpl t, IVariable per1, IVariable per2, IVariable rightSide, IVariable ilambda, IVariable ilog) 
         {
             GekkoTime tStart = Globals.tNull;
             GekkoTime tEnd = Globals.tNull;
@@ -829,7 +829,7 @@ namespace Gekko
             return rv;
         }
 
-        public static IVariable rseed(IVariableHelper t, IVariable seed)
+        public static IVariable rseed(GekkoSmpl t, IVariable seed)
         {
             double seed2 = O.GetVal(t, seed);
             int i = (int)seed2;
@@ -837,7 +837,7 @@ namespace Gekko
             return new ScalarVal(i);
         }
 
-        public static IVariable rnorm(IVariableHelper t, IVariable means, IVariable vcov)
+        public static IVariable rnorm(GekkoSmpl t, IVariable means, IVariable vcov)
         {
             //Maybe it is stupid that we are using stddev versus matrix of covariance
 
@@ -942,7 +942,7 @@ namespace Gekko
             return new ScalarVal(u2);
         }
 
-        public static IVariable sum(IVariableHelper t, params IVariable[] items) //uuu
+        public static IVariable sum(GekkoSmpl t, params IVariable[] items) //uuu
         {
             if (items.Length == 0)
             {
@@ -964,7 +964,7 @@ namespace Gekko
             return new ScalarVal(v);
         }
 
-        public static IVariable avg(IVariableHelper t, params IVariable[] items)//uuu
+        public static IVariable avg(GekkoSmpl t, params IVariable[] items)//uuu
         {
             if (items.Length == 0)
             {
@@ -992,7 +992,7 @@ namespace Gekko
             return new ScalarVal(v / n);
         }
 
-        public static IVariable percentile(IVariableHelper t, IVariable inputVar, IVariable percent)
+        public static IVariable percentile(GekkoSmpl t, IVariable inputVar, IVariable percent)
         {
             //Mimics Excel's percentile function, see unit tests
             GekkoTime t1 = Globals.globalPeriodStart;
@@ -1017,7 +1017,7 @@ namespace Gekko
             return z2;
         }
 
-        public static IVariable abs(IVariableHelper t, IVariable x)
+        public static IVariable abs(GekkoSmpl t, IVariable x)
         {
             IVariable rv = null;
             if (IsValOrTimeseries(x))
@@ -1044,7 +1044,7 @@ namespace Gekko
             return rv;
         }
 
-        public static IVariable iif(IVariableHelper t, IVariable i1, IVariable op, IVariable i2, IVariable o1, IVariable o2)
+        public static IVariable iif(GekkoSmpl t, IVariable i1, IVariable op, IVariable i2, IVariable o1, IVariable o2)
         {            
             double result=double.NaN;
             if (!IsValOrTimeseries(i1))
@@ -1147,7 +1147,7 @@ namespace Gekko
             return new ScalarVal(result);            
         }
 
-        public static IVariable log(IVariableHelper t, IVariable x)
+        public static IVariable log(GekkoSmpl t, IVariable x)
         {
             IVariable rv = null;
             if (IsValOrTimeseries(x))
@@ -1175,7 +1175,7 @@ namespace Gekko
             return rv;            
         }
 
-        public static IVariable exp(IVariableHelper t, IVariable x)
+        public static IVariable exp(GekkoSmpl t, IVariable x)
         {
             IVariable rv = null;
             if (IsValOrTimeseries(x))
@@ -1203,7 +1203,7 @@ namespace Gekko
             return rv;
         }
 
-        public static IVariable sqrt(IVariableHelper t, IVariable x)
+        public static IVariable sqrt(GekkoSmpl t, IVariable x)
         {
             IVariable rv = null;
             if (IsValOrTimeseries(x))
@@ -1236,7 +1236,7 @@ namespace Gekko
             return x.Type() == EVariableType.Val || x.Type() == EVariableType.TimeSeries;
         }
 
-        public static IVariable pow(IVariableHelper t, IVariable x1, IVariable x2)
+        public static IVariable pow(GekkoSmpl t, IVariable x1, IVariable x2)
         {
             double d1 = O.GetVal(t, x1);
             double d2 = O.GetVal(t, x2);
@@ -1244,7 +1244,7 @@ namespace Gekko
         }
 
         //ALL THESE SHOULD BE DELETED
-        public static IVariable pch(IVariableHelper t, IVariable x1)
+        public static IVariable pch(GekkoSmpl t, IVariable x1)
         {
             if (x1.Type() != EVariableType.TimeSeries)
             {
@@ -1260,7 +1260,7 @@ namespace Gekko
         }
 
         //ALL THESE SHOULD BE DELETED
-        public static IVariable dlog(IVariableHelper t, IVariable x1)
+        public static IVariable dlog(GekkoSmpl t, IVariable x1)
         {
             if (x1.Type() != EVariableType.TimeSeries)
             {
@@ -1276,7 +1276,7 @@ namespace Gekko
         }
 
         //ALL THESE SHOULD BE DELETED
-        public static IVariable dif(IVariableHelper t, IVariable x1)
+        public static IVariable dif(GekkoSmpl t, IVariable x1)
         {
             if (x1.Type() != EVariableType.TimeSeries)
             {
@@ -1292,7 +1292,7 @@ namespace Gekko
         }
 
         //ALL THESE SHOULD BE DELETED
-        public static IVariable lag(IVariableHelper t, IVariable x, IVariable ilag)
+        public static IVariable lag(GekkoSmpl t, IVariable x, IVariable ilag)
         {            
             if (x.Type() != EVariableType.TimeSeries)
             {
@@ -1360,7 +1360,7 @@ namespace Gekko
         }
 
         //ALL THESE SHOULD BE DELETED
-        public static IVariable pchy(IVariableHelper t, IVariable x1)
+        public static IVariable pchy(GekkoSmpl t, IVariable x1)
         {
             if (x1.Type() != EVariableType.TimeSeries)
             {
@@ -1376,7 +1376,7 @@ namespace Gekko
         }
 
         //ALL THESE SHOULD BE DELETED
-        public static IVariable dlogy(IVariableHelper t, IVariable x1)
+        public static IVariable dlogy(GekkoSmpl t, IVariable x1)
         {
             if (x1.Type() != EVariableType.TimeSeries)
             {
@@ -1392,7 +1392,7 @@ namespace Gekko
         }
 
         //ALL THESE SHOULD BE DELETED
-        public static IVariable dify(IVariableHelper t, IVariable x1)
+        public static IVariable dify(GekkoSmpl t, IVariable x1)
         {
             if (x1.Type() != EVariableType.TimeSeries)
             {
@@ -1407,7 +1407,7 @@ namespace Gekko
             return new ScalarVal(d1 - d1Lag);
         }
         
-        public static IVariable format(IVariableHelper t, IVariable x1, IVariable x2)
+        public static IVariable format(GekkoSmpl t, IVariable x1, IVariable x2)
         {
             double d = O.GetVal(t, x1);
             string format2 = O.GetString(x2);
@@ -1416,7 +1416,7 @@ namespace Gekko
             return ss;
         }
 
-        public static IVariable round(IVariableHelper t, IVariable x1, IVariable x2)
+        public static IVariable round(GekkoSmpl t, IVariable x1, IVariable x2)
         {            
             double d2 = O.GetVal(t, x2);            
             int aaa1 = 0;
@@ -1804,7 +1804,7 @@ namespace Gekko
         // LIST functions start
         // -----------------------------------
 
-        public static IVariable union(IVariableHelper t, IVariable x1, IVariable x2)
+        public static IVariable union(GekkoSmpl t, IVariable x1, IVariable x2)
         {
             //tager dem der nu er i a (inkl. dubletter) og tilføjer dem fra b (uden dubletter). Hvis dubletter i b skal med, skal der bruges komma...
             List<string> lx1 = O.GetList(x1);
@@ -1828,7 +1828,7 @@ namespace Gekko
             return new MetaList(union);
         }               
 
-        public static IVariable difference(IVariableHelper t, IVariable x1, IVariable x2)
+        public static IVariable difference(GekkoSmpl t, IVariable x1, IVariable x2)
         {
             //tager dem der nu er i a (inkl. dubletter) og retainer dem hvis ikke i b.
             List<string> lx1 = O.GetList(x1);
@@ -1850,7 +1850,7 @@ namespace Gekko
             return new MetaList(difference);
         }
 
-        public static IVariable intersect(IVariableHelper t, IVariable x1, IVariable x2)
+        public static IVariable intersect(GekkoSmpl t, IVariable x1, IVariable x2)
         {
             //tager dem der nu er i a (inkl. dubletter) og retainer dem hvis også i b.
             List<string> lx1 = O.GetList(x1);

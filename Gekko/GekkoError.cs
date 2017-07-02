@@ -21,42 +21,42 @@ namespace Gekko
             this.overflow = overflow;
         }
 
-        public IVariable Indexer(IVariableHelper t, bool isLhs, params IVariable[] indexes)
+        public IVariable Indexer(GekkoSmpl t, bool isLhs, params IVariable[] indexes)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange)
+        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
+        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariableHelper t, IVariable index, IVariablesFilterRange indexRange)
+        public IVariable Indexer(GekkoSmpl t, IVariable index, IVariablesFilterRange indexRange)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariableHelper t, IVariablesFilterRange indexRange, IVariable index)
+        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange, IVariable index)
         {
             throw new GekkoException();
         }
 
-        public IVariable Negate(IVariableHelper t)
+        public IVariable Negate(GekkoSmpl t)
         {
             return null;
         }
 
-        public void InjectAdd(IVariableHelper t, IVariable x, IVariable y)
+        public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
         {
             throw new GekkoException();
         }
 
-        public double GetVal(IVariableHelper t)
+        public double GetVal(GekkoSmpl t)
         {
             throw new GekkoException();
         }
@@ -81,27 +81,27 @@ namespace Gekko
             return EVariableType.GekkoError;
         }
 
-        public IVariable Add(IVariableHelper t, IVariable x)
+        public IVariable Add(GekkoSmpl t, IVariable x)
         {            
             throw new GekkoException();
         }
 
-        public IVariable Subtract(IVariableHelper t, IVariable x)
+        public IVariable Subtract(GekkoSmpl t, IVariable x)
         {
             return null;
         }
 
-        public IVariable Multiply(IVariableHelper t, IVariable x)
+        public IVariable Multiply(GekkoSmpl t, IVariable x)
         {
             return null;
         }
 
-        public IVariable Divide(IVariableHelper t, IVariable x)
+        public IVariable Divide(GekkoSmpl t, IVariable x)
         {
             return null;
         }
 
-        public IVariable Power(IVariableHelper t, IVariable x)
+        public IVariable Power(GekkoSmpl t, IVariable x)
         {
             return null;
         }

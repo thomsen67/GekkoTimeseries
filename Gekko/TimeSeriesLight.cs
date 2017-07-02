@@ -47,7 +47,7 @@ namespace Gekko
             }
         }
         
-        public IVariable Indexer(IVariableHelper smpl, bool isLhs, params IVariable[] indexes)
+        public IVariable Indexer(GekkoSmpl smpl, bool isLhs, params IVariable[] indexes)
         {
             if (indexes.Length > 0 && indexes[0].Type() == EVariableType.String)
             {
@@ -129,39 +129,39 @@ namespace Gekko
 
        
 
-        public IVariable Indexer(IVariableHelper smpl, IVariablesFilterRange indexRange)
+        public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange indexRange)
         {
             G.Writeln2("*** ERROR: You are trying to use an [] index range on timeseries");
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariableHelper smpl, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
+        public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariableHelper smpl, IVariable index, IVariablesFilterRange indexRange)
+        public IVariable Indexer(GekkoSmpl smpl, IVariable index, IVariablesFilterRange indexRange)
         {
             throw new GekkoException();
         }
 
-        public IVariable Indexer(IVariableHelper smpl, IVariablesFilterRange indexRange, IVariable index)
+        public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange indexRange, IVariable index)
         {
             throw new GekkoException();
         }
 
-        public IVariable Negate(IVariableHelper smpl)
+        public IVariable Negate(GekkoSmpl smpl)
         {
             return null;
         }
 
-        public void InjectAdd(IVariableHelper smpl, IVariable x, IVariable y)
+        public void InjectAdd(GekkoSmpl smpl, IVariable x, IVariable y)
         {
             G.Writeln2("*** ERROR: error #734632321 regarding timeseries");
             throw new GekkoException();
         }
 
-        public double GetVal(IVariableHelper smpl)
+        public double GetVal(GekkoSmpl smpl)
         {
             return double.NaN;
         }
@@ -189,31 +189,23 @@ namespace Gekko
             return EVariableType.TimeSeries;
         }
 
-        public IVariable Add(IVariableHelper smpl, IVariable input)
+        public IVariable Add(GekkoSmpl smpl, IVariable input)
         {
             switch(input.Type())
             {
                 case EVariableType.TimeSeries:
-                    {                                              
-                        
+                    {
+
                         TimeSeriesLight x = this;
                         TimeSeriesLight y = (TimeSeriesLight)input;
                         TimeSeriesLight z = new TimeSeriesLight();
 
-                        int ix1 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t1, x.anchorPeriod, x.anchorPeriodPositionInArray);
-                        int ix2 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t2, x.anchorPeriod, x.anchorPeriodPositionInArray);
-
-                        if (!x.isPointerToRealTimeseriesArray)
-                        {
-                            if (ix1 < 0 || ix2 >= x.storage.Length)
-                            {
-                                return new GekkoError(Math.Max(0, -ix1), Math.Max(0, ix2 - x.storage.Length + 1));
-                            }
-                        }
+                        int ix1, ix2; GekkoError ge; SpmlCheck(smpl, x, out ix1, out ix2, out ge);
+                        if (ge != null) return ge;
 
                         int iy1 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t1, y.anchorPeriod, y.anchorPeriodPositionInArray);
                         int iy2 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t2, y.anchorPeriod, y.anchorPeriodPositionInArray);
-                        
+
                         if (!y.isPointerToRealTimeseriesArray)
                         {
                             if (iy1 < 0 || iy2 >= y.storage.Length)
@@ -259,7 +251,7 @@ namespace Gekko
                         ////2: Periods overlap or no overlap.
                         ////3: smpl irrelevant. Periods overlap or no overlap. If not overlap -> uoverflow.
 
-                        
+
                         ////=================
 
                         ////These are the dates spanning the double[] arrays
@@ -323,14 +315,28 @@ namespace Gekko
             }           
         }
 
-        private static void Check1Smpl(IVariableHelper smpl, int offset, TimeSeriesLight x, out int ix1, out GekkoError ge)
+        public static void SpmlCheck(GekkoSmpl smpl, TimeSeriesLight x, out int ix1, out int ix2, out GekkoError ge)
         {
-            ix1 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t1.Add(offset), x.anchorPeriod, x.anchorPeriodPositionInArray);
-            int ix2 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t2.Add(offset), x.anchorPeriod, x.anchorPeriodPositionInArray);
-            int underflow = 0; int overflow = 0;
-            UnderOverflow(x, ix1, ix2, ref underflow, ref overflow);
-            ge = Program.CheckGekkoError(underflow, overflow);
+            ix1 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t1, x.anchorPeriod, x.anchorPeriodPositionInArray);
+            ix2 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t2, x.anchorPeriod, x.anchorPeriodPositionInArray);
+            ge = null;
+            if (!x.isPointerToRealTimeseriesArray)
+            {
+                if (ix1 < 0 || ix2 >= x.storage.Length)
+                {
+                    ge = new GekkoError(Math.Max(0, -ix1), Math.Max(0, ix2 - x.storage.Length + 1));
+                }
+            }
         }
+
+        //private static void Check1Smpl(IVariableHelper smpl, int offset, TimeSeriesLight x, out int ix1, out GekkoError ge)
+        //{
+        //    ix1 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t1.Add(offset), x.anchorPeriod, x.anchorPeriodPositionInArray);
+        //    int ix2 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t2.Add(offset), x.anchorPeriod, x.anchorPeriodPositionInArray);
+        //    int underflow = 0; int overflow = 0;
+        //    UnderOverflow(x, ix1, ix2, ref underflow, ref overflow);
+        //    ge = Program.CheckGekkoError(underflow, overflow);
+        //}
 
         //private static void Check2Smpl(IVariableHelper smpl, int offset, TimeSeriesLight x, TimeSeriesLight y, out int ix1, out int iy1, out GekkoError ge)
         //{
@@ -359,22 +365,22 @@ namespace Gekko
             }
         }
 
-        public IVariable Subtract(IVariableHelper smpl, IVariable x)
+        public IVariable Subtract(GekkoSmpl smpl, IVariable x)
         {
             return null;
         }
 
-        public IVariable Multiply(IVariableHelper smpl, IVariable x)
+        public IVariable Multiply(GekkoSmpl smpl, IVariable x)
         {
             return null;
         }
 
-        public IVariable Divide(IVariableHelper smpl, IVariable x)
+        public IVariable Divide(GekkoSmpl smpl, IVariable x)
         {
             return null;
         }
 
-        public IVariable Power(IVariableHelper smpl, IVariable x)
+        public IVariable Power(GekkoSmpl smpl, IVariable x)
         {
             return null;
         }
