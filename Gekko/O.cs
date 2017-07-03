@@ -4036,6 +4036,38 @@ namespace Gekko
             public P p = null;
             public void Exe()
             {
+                if (true)
+
+                {
+                    //a full copy of the data
+                    //int i1 = -12345;
+                    //int i2 = -12345;
+                    //double[] dataPointer = ts.GetDataSequence(out i1, out i2, smpl.t1, smpl.t2);
+                    //this.lhs.storage = new double[i2 - i1 + 1];
+                    //Array.Copy(dataPointer, i1, storage, 0, (i2 - i1 + 1));
+                    //this.anchorPeriodPositionInArray = 0;
+                    //this.anchorPeriod = smpl.t1;
+
+                    int i = TimeSeries.FromGekkoTimeToArrayIndex(this.t1, this.t2, this.rhs.anchorPeriodPositionInArray);
+                    int n = GekkoTime.Observations(this.t1, this.t2);
+
+                    //TODO TODO TODO, should not be possible
+                    if (i < 0 || i >= this.rhs.storage.Length)
+                    {
+                        G.Writeln2("*** ERROR: Sample error #9876201872");
+                        throw new GekkoException();
+                    }
+
+                    int index1; int index2;
+                    double[] dataArray = lhs.GetDataSequence(out index1, out index2, this.t1, this.t2); //Method will resize the double[] array if it is too small
+                    if (index2 - index1 + 1 != n)
+                    {
+                        G.Writeln2("*** ERROR: Sample error #9376201872");
+                        throw new GekkoException();
+                    }
+                    Array.Copy(this.rhs.storage, i, dataArray, index1, n);
+                }
+
                 if (this.meta != null)
                 {
                     //For instance, "SERIES y = 2 * x;" --> meta = "SERIES y = 2 * x" (without the semicolon)    
