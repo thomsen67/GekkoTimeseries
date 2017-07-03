@@ -3360,6 +3360,7 @@ namespace Gekko.Parser.Gek
                             }                            
                             node.Code.A("O.Prt.Element ope" + Num(node) + " = new O.Prt.Element();" + G.NL);  //this must be after the list start iterator code
                             node.Code.A("ope" + Num(node) + ".label = O.SubstituteScalarsAndLists(`" + givenLabel + "`, false);" + G.NL);
+                            node.Code.A("GekkoSmpl smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2);" + G.NL);
                             ASTNode child = node.GetChild("ASTPRTELEMENTOPTIONFIELD");
                             if (child != null) node.Code.A(child.Code);
                             if (node.Text == "ASTPRTELEMENT")
@@ -3373,9 +3374,14 @@ namespace Gekko.Parser.Gek
                             node.Code.A("foreach(int bankNumber in bankNumbers) {" + G.NL);  //For bankNumber = 2, no cache will ever be used to avoid confusion. Cache is only for 1 (Work).                            
                             node.Code.CA(EmitLocalCacheForTimeLooping(node.Code.ToString(), w));
 
-                            node.Code.A("ope" + Num(node) + ".ts = ("+ node[0].Code+ ");" + G.NL);  //uuu                            
+                            //node.Code.A("ope" + Num(node) + ".ts = ("+ node[0].Code+ ");" + G.NL);  //uuu   
+
+                            node.Code.A("ope0.subElements = new List<O.Prt.SubElement>();" + G.NL);
+                            node.Code.A("ope0.subElements.Add(new O.Prt.SubElement());" + G.NL);
+                            node.Code.A("ope0.subElements[0].tsWork = (TimeSeriesLight)(" + node[0].Code + ");" + G.NL);  //HMMMMM: 0...?
+
                             //node.Code.A("O.GetVal777(" + node[0].Code + ", bankNumber, ope" + Num(node) + ", t);" + G.NL);  //uuu                            
-                                                   
+
                             node.Code.A("}" + G.NL);
                             node.Code.A("o" + Num(node) + ".prtElements.Add(ope" + Num(node) + ");" + G.NL);                            
                             node.Code.A("}" + G.NL);  //avoid scope collisions
@@ -4943,12 +4949,12 @@ namespace Gekko.Parser.Gek
                     //GENR statement for instance, maybe also VAL if indexer fY[2010]??
                     //This means there is a GENR statement at the top of the AST tree
                     //In that case, we look for the variable in the local cache
-                    string fallBackCode2 = "O.GetTimeSeries(" + fallBackCode + ", " + bankNumberCode + isLhsSoCanAutoCreate + ")";  //here, bankNumberCode will always be = "1", since this is not a PRT statement
+                    string fallBackCode2 = "O.GetTimeSeries(smpl, " + fallBackCode + ", " + bankNumberCode + isLhsSoCanAutoCreate + ")";  //here, bankNumberCode will always be = "1", since this is not a PRT statement
                     string xx = null; wh2.wh.localStatementCache.TryGetValue(fallBackCode2, out xx);
                     if (xx != null)
                     {
                         //This complicated timeseries (or scalar) has been seen before in this particular GENR/PRT statement                        
-                        code = xx;
+                        code = xx;                                                
                     }
                     else
                     {
@@ -4959,7 +4965,7 @@ namespace Gekko.Parser.Gek
                 }
                 else
                 {
-                    node.Code.A("O.GetTimeSeries(" + fallBackCode + ", " + bankNumberCode + isLhsSoCanAutoCreate + ")");
+                    node.Code.A("O.GetTimeSeries(smpl, " + fallBackCode + ", " + bankNumberCode + isLhsSoCanAutoCreate + ")");
                     //Complicated name, but not inside a GENR statement: just use the statement directly without use of any caches
                 }
             }

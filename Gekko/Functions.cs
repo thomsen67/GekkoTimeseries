@@ -954,7 +954,7 @@ namespace Gekko
             {
                 if (a.Type() == EVariableType.List)
                 {
-                    foreach (string s in ((MetaList)a).GetList()) v += O.IndirectionHelper(s).GetVal(t);
+                    foreach (string s in ((MetaList)a).GetList()) v += O.IndirectionHelper(t, s).GetVal(t);
                 }
                 else
                 {
@@ -979,7 +979,7 @@ namespace Gekko
                 {
                     foreach (string s in ((MetaList)a).GetList())
                     {
-                        v += O.IndirectionHelper(s).GetVal(t);
+                        v += O.IndirectionHelper(t, s).GetVal(t);
                         n++;
                     }
                 }

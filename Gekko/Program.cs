@@ -8554,7 +8554,7 @@ namespace Gekko
                     negative = true;
                 }
 
-                TimeSeries ts = O.GetTimeSeries(var2, 0).ts;
+                TimeSeries ts = O.FindTimeSeries(var2, 0);
 
                 if (ts == null)
                 {
@@ -14308,8 +14308,8 @@ namespace Gekko
                                   
             
             O.Genr o0 = new O.Genr();
-            IVariable ts9 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("xx2"))), 1, O.ECreatePossibilities.Can);
-            IVariable ts10 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("xx"))), 1);
+            IVariable ts9 = O.GetTimeSeries(smpl, O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("xx2"))), 1, O.ECreatePossibilities.Can);
+            IVariable ts10 = O.GetTimeSeries(smpl, O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("xx"))), 1);
             o0.t1 = Globals.globalPeriodStart;
             o0.t2 = Globals.globalPeriodEnd;
             o0.lhs = null;

@@ -303,12 +303,12 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public double GetVal(GekkoSmpl t)
+        public double GetVal(GekkoSmpl smpl)
         {            
             if (this._isName)
             {
-                MetaTimeSeries ats = O.IndirectionHelper(this._string2);
-                double x = O.GetVal(t, ats);
+                TimeSeriesLight ats = O.IndirectionHelper(smpl, this._string2);
+                double x = O.GetVal(smpl, ats);
                 return x;
             }
             else

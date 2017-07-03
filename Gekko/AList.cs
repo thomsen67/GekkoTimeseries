@@ -53,11 +53,11 @@ namespace Gekko
 
                     IVariable ss = null;
                     ss = new ScalarString(s, isNameList);
-                    if (Globals.fixIndexerMaybeTransform)
-                    {
-                        bool didTransform = false;
-                        ss = O.MaybeTransform(ref didTransform, ss, true);
-                    }
+                    //if (Globals.fixIndexerMaybeTransform)
+                    //{
+                    //    bool didTransform = false;
+                    //    ss = O.MaybeTransform(ref didTransform, ss, true);
+                    //}
                     return ss;
                 }
                 else if (index.Type() == EVariableType.String)
