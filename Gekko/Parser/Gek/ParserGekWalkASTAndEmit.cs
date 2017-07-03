@@ -2070,7 +2070,7 @@ namespace Gekko.Parser.Gek
 
                             nodeCode += "o" + numNode + ".p = p;" + G.NL;
                             
-                            //nodeCode += "o" + numNode + ".lhs = O.GetTimeSeries(" + childCodeLhsName + ");" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
+                            nodeCode += "o" + numNode + ".lhs = " + childCodeLhsName + ";" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
                             
                             nodeCode += "o" + numNode + ".rhs = " + childCodeRhs + ";" + G.NL;
                             
@@ -4969,8 +4969,15 @@ namespace Gekko.Parser.Gek
                 }
                 else
                 {
-                    node.Code.A("O.GetTimeSeries(smpl, " + fallBackCode + ", " + bankNumberCode + isLhsSoCanAutoCreate + ")");
-                    //Complicated name, but not inside a GENR statement: just use the statement directly without use of any caches
+                    if (wh2.wh.seriesHelper == WalkHelper.seriesType.SeriesLhs)
+                    {
+                        node.Code.A("O.FindTimeSeries(" + fallBackCode + ", " + bankNumberCode + isLhsSoCanAutoCreate + ")");
+                    }
+                    else
+                    {
+                        node.Code.A("O.GetTimeSeries(smpl, " + fallBackCode + ", " + bankNumberCode + isLhsSoCanAutoCreate + ")");
+                        //Complicated name, but not inside a GENR statement: just use the statement directly without use of any caches
+                    }
                 }
             }
             else throw new GekkoException();
