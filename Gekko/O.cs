@@ -1386,6 +1386,16 @@ namespace Gekko
             return rv;
         }
 
+        public static TimeSeriesLight ConvertToTimeSeriesLight(IVariable iv)
+        {
+            if (iv.Type() != EVariableType.TimeSeries)
+            {
+                G.Writeln2("*** ERROR: Could not convert right-hand side to SERIES");
+                throw new GekkoException();
+            }
+            return (TimeSeriesLight)iv;
+        }
+
         public static bool ListContains(IVariable x, IVariable y)
         {
 
@@ -4048,7 +4058,7 @@ namespace Gekko
                     //this.anchorPeriodPositionInArray = 0;
                     //this.anchorPeriod = smpl.t1;
 
-                    int i = TimeSeries.FromGekkoTimeToArrayIndex(this.t1, this.t2, this.rhs.anchorPeriodPositionInArray);
+                    int i = TimeSeries.FromGekkoTimeToArrayIndex(this.t1, this.rhs.anchorPeriod, this.rhs.anchorPeriodPositionInArray);
                     int n = GekkoTime.Observations(this.t1, this.t2);
 
                     //TODO TODO TODO, should not be possible
@@ -4066,6 +4076,8 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     Array.Copy(this.rhs.storage, i, dataArray, index1, n);
+                                       
+
                 }
 
                 if (this.meta != null)

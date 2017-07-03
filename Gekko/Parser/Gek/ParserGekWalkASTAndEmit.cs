@@ -2072,7 +2072,7 @@ namespace Gekko.Parser.Gek
                             
                             nodeCode += "o" + numNode + ".lhs = " + childCodeLhsName + ";" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
                             
-                            nodeCode += "o" + numNode + ".rhs = " + childCodeRhs + ";" + G.NL;
+                            nodeCode += "o" + numNode + ".rhs = O.ConvertToTimeSeriesLight(" + childCodeRhs + ");" + G.NL;
                             
                             if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
                             {
@@ -3382,7 +3382,7 @@ namespace Gekko.Parser.Gek
 
                             node.Code.A("ope0.subElements = new List<O.Prt.SubElement>();" + G.NL);
                             node.Code.A("ope0.subElements.Add(new O.Prt.SubElement());" + G.NL);
-                            node.Code.A("ope0.subElements[0].tsWork = (TimeSeriesLight)(" + node[0].Code + ");" + G.NL);  //HMMMMM: 0...?
+                            node.Code.A("ope0.subElements[0].tsWork = O.ConvertToTimeSeriesLight(" + node[0].Code + ");" + G.NL);  //HMMMMM: 0...?
 
                             //node.Code.A("O.GetVal777(" + node[0].Code + ", bankNumber, ope" + Num(node) + ", t);" + G.NL);  //uuu                            
 
