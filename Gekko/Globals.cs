@@ -197,8 +197,10 @@ namespace Gekko
         public const string symbolGlueChar4 = "½";  //for '*' and '?'
         public const string symbolGlueChar5 = "<=<"; //for option fields like <2000 2012>, using <_< is not good, interferes with <_lev> etc.
         public const string symbolGlueChar6 = "[_["; //for a[1], not a [1]    
+        public const string symbolGlueChar6a = "ASTLEFTBRACKETGLUE";  //same as above
         public const string symbolGlueChar7 = "[¨["; //for [a1*b*c2] that must be interpreted as a wildcard, not 1x1 array
         
+
         public static bool poolGenrLines = false;
 
         public static bool fastGauss = true;  //Beware: RES command should switch it off

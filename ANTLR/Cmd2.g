@@ -55,6 +55,7 @@ options {
 //Token definitions I
 tokens {
     ASTCOMPARE2;
+	ASTLEFTBRACKETGLUE;
 	ASTSERIESOPERATOR;
 	ASTSERIESDOLLARCONDITION;
 	ASTSERIES;
@@ -2053,7 +2054,10 @@ series                    : ASER    seriesLhs (DOLLAR dollarConditional)? series
 seriesOperator            : EQUAL
 						  | PERCENT						  
 						  ;
-seriesLhs                 : nameOrListOrScalarWithBank ( leftBracketGlue (indexerExpressionHelper (',' indexerExpressionHelper)*)? RIGHTBRACKET)* -> ^(ASTSERIESLHS ^(leftBracketGlue nameOrListOrScalarWithBank indexerExpressionHelper*));
+
+seriesLhs                 : nameOrListOrScalarWithBank ( LEFTBRACKETGLUE (indexerExpressionHelper (',' indexerExpressionHelper)*)? RIGHTBRACKET)+ -> ^(ASTSERIESLHS ^( ASTLEFTBRACKETGLUE nameOrListOrScalarWithBank indexerExpressionHelper+))
+						  | nameOrListOrScalarWithBank -> ^(ASTSERIESLHS nameOrListOrScalarWithBank)
+						  ;
 						  
 seriesRhs                 : expression (',' expression)* -> ^(ASTSERIESRHS expression+);
 

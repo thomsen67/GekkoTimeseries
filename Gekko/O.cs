@@ -4031,6 +4031,7 @@ namespace Gekko
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
             public string lhsFunction = null;
             public TimeSeries lhs = null;
+            public TimeSeriesLight rhs = null;
             public string meta = null;
             public P p = null;
             public void Exe()

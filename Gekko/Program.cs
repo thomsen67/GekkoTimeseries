@@ -14235,8 +14235,10 @@ namespace Gekko
             o5.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
             o5.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
             GekkoSmpl smpl2 = new GekkoSmpl(o5.t1.Add(-deduct), o5.t2);
-            
-            
+
+            O.Read o = new O.Read();
+            o.fileName = "jul05";
+            o.Exe();
 
             
             {

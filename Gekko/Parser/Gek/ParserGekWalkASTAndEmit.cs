@@ -175,6 +175,7 @@ namespace Gekko.Parser.Gek
             {
                 case "[":  //indexer
                 case Globals.symbolGlueChar6:  //indexer, '[_['
+                case Globals.symbolGlueChar6a: //indexer, '[_['
                 case Globals.symbolGlueChar7:  //indexer, '[¨['
                     {
                         found[0] = 1;
@@ -372,10 +373,11 @@ namespace Gekko.Parser.Gek
                         break;
                     case "[":  //indexer
                     case Globals.symbolGlueChar6:  //indexer, '[_['
+                    case Globals.symbolGlueChar6a:  //indexer, '[_['
                     case Globals.symbolGlueChar7:  //indexer, '[¨['
                         {
 
-                            if (node[1].Text == "ASTINDEXERELEMENTPLUS")
+                            if (node.ChildrenCount() > 1 && node[1].Text == "ASTINDEXERELEMENTPLUS")
                             {
                                 node.Code.A("O.IndexerPlus(smpl, " + node[0].Code + ", false, " + node[1].Code + ")");
                             }
@@ -2056,20 +2058,22 @@ namespace Gekko.Parser.Gek
                             }                            
 
                             nodeCode += "O.Series o" + numNode + " = new O.Series();" + G.NL;
-                            nodeCode = EmitLocalCacheForTimeLooping(nodeCode, w);
-                            nodeCode += childCodePeriod + G.NL;  //dates
-                            nodeCode += "o" + numNode + ".lhs = null;" + G.NL;
-                            nodeCode += "o" + numNode + ".p = p;" + G.NL;
-                            nodeCode += "foreach (GekkoTime t2 in new GekkoTimeIterator(o" + numNode + ".t1, o" + numNode + ".t2))" + G.NL;
-                            nodeCode += GekkoTimeIteratorStartCode(w, node);
-                            
-                            nodeCode += "  double data = O.GetVal(" + childCodeRhs + ", t);" + G.NL;  //uuu
-                            nodeCode += "if(o" + numNode + ".lhs == null) o" + numNode + ".lhs = O.GetTimeSeries(" + childCodeLhsName + ");" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
-                                                                                                                                                     //nodeCode += "  double dataLag = O.GetVal(o" + numNode + ".lhs, t.Add(-1));" + G.NL;
-                            nodeCode += "o" + numNode + ".lhs.SetData(t, data);" + G.NL;                                                                                                                  //HANDLE LEFT-SIDE FUNCTION!!
-                            
-                            nodeCode += GekkoTimeIteratorEndCode();
 
+                            nodeCode += "o" + numNode + ".t1 = Globals.globalPeriodStart;";
+                            nodeCode += "o" + numNode + ".t2 = Globals.globalPeriodEnd;";
+
+
+                            nodeCode = EmitLocalCacheForTimeLooping(nodeCode, w);  //HMMMMMMMMMMMMMMM necessary???
+                            nodeCode += childCodePeriod + G.NL;  //dates
+
+                            nodeCode += "GekkoSmpl smpl = new GekkoSmpl(o" + numNode + ".t1, o" + numNode + ".t2);" + G.NL;
+
+                            nodeCode += "o" + numNode + ".p = p;" + G.NL;
+                            
+                            //nodeCode += "o" + numNode + ".lhs = O.GetTimeSeries(" + childCodeLhsName + ");" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
+                            
+                            nodeCode += "o" + numNode + ".rhs = " + childCodeRhs + ";" + G.NL;
+                            
                             if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
                             {
                                 //specialExpressionAndLabelInfo[0] should be "ASTMETA" here
@@ -2104,9 +2108,9 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTSERIESRHS":
-                        {
-                            
+                        {                            
                             node.Code.CA(node[0].Code.ToString());
+                                                        
                         }
                         break;
                     case "ASTGENRLHSFUNCTION":

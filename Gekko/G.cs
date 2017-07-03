@@ -1408,6 +1408,7 @@ namespace Gekko
             s = s.Replace(Globals.symbolGlueChar4, "");
             s = s.Replace(Globals.symbolGlueChar5, "<");  //--> fixme, this is a workaround
             s = s.Replace(Globals.symbolGlueChar6, "[");  //--> fixme, this is a workaround, #098523
+            s = s.Replace(Globals.symbolGlueChar6a, "["); //--> is this necessary?
             s = s.Replace(Globals.symbolGlueChar7, "[");            
             s = Regex.Replace(s, "s___er", "ser", RegexOptions.IgnoreCase);  //#098275432874
             s = Regex.Replace(s, "s___eries", "series", RegexOptions.IgnoreCase);
