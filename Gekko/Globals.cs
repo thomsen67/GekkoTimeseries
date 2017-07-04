@@ -199,7 +199,7 @@ namespace Gekko
         public const string symbolGlueChar6 = "[_["; //for a[1], not a [1]    
         public const string symbolGlueChar6a = "ASTLEFTBRACKETGLUE";  //same as above
         public const string symbolGlueChar7 = "[¨["; //for [a1*b*c2] that must be interpreted as a wildcard, not 1x1 array
-        
+               
 
         public static bool poolGenrLines = false;
 

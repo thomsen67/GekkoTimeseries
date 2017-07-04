@@ -218,7 +218,7 @@ namespace Gekko.Parser.Gek
                 w.expressionCounter = -1;  //for labels in PRT elements
             }
 
-            if (node.Text == "ASTGENR" || node.Text == "ASTGENRLHSFUNCTION" || node.Text == "ASTPRTELEMENT" || node.Text == "ASTOLSELEMENT" || node.Text == "ASTTABLESETVALUESELEMENT")
+            if (node.Text == "ASTGENR" || node.Text == "ASTSERIES" || node.Text == "ASTGENRLHSFUNCTION" || node.Text == "ASTPRTELEMENT" || node.Text == "ASTOLSELEMENT" || node.Text == "ASTTABLESETVALUESELEMENT")
             {
                 //This local cache is only used for commands that do implicit timeseries looping with expressions
                 //For instance PRT fX%i (PRT fXnz would end in global cache), where we do not have to 
@@ -2061,19 +2061,27 @@ namespace Gekko.Parser.Gek
 
                             nodeCode += "o" + numNode + ".t1 = Globals.globalPeriodStart;";
                             nodeCode += "o" + numNode + ".t2 = Globals.globalPeriodEnd;";
-
-
-                            nodeCode = EmitLocalCacheForTimeLooping(nodeCode, w);  //HMMMMMMMMMMMMMMM necessary???
+                                                        
                             nodeCode += childCodePeriod + G.NL;  //dates
-
+                            
                             nodeCode += "GekkoSmpl smpl = new GekkoSmpl(o" + numNode + ".t1, o" + numNode + ".t2);" + G.NL;
 
                             nodeCode += "o" + numNode + ".p = p;" + G.NL;
-                            
+
+                            nodeCode += EmitLocalCacheForTimeLooping(w);
+
                             nodeCode += "o" + numNode + ".lhs = " + childCodeLhsName + ";" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
-                            
+
+                            //NB NB NB
+                            //NB NB NB
+                            //NB NB NB   EmitLocalCacheForTimeLooping should perhaps be only RHS for series???
+                            //NB NB NB   it contains the lhs variable too --> superfluous!
+                            //NB NB NB
+
                             nodeCode += "o" + numNode + ".rhs = O.ConvertToTimeSeriesLight(" + childCodeRhs + ");" + G.NL;
-                            
+
+                            w.headerExpressions.Append("public static IVariable GekkoExpression1(GekkoSmpl smpl, int bankNumber, P p) {" + G.NL + EmitLocalCacheForTimeLooping(w) + G.NL + "return " + childCodeRhs + ";" + G.NL + "}" + G.NL);
+
                             if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
                             {
                                 //specialExpressionAndLabelInfo[0] should be "ASTMETA" here
@@ -3376,12 +3384,13 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("bankNumbers = O.Prt.GetBankNumbers(Globals.tableOption, new List<string>(){o" + Num(node) + ".printcode}" + ");" + G.NL);
                             }
                             node.Code.A("foreach(int bankNumber in bankNumbers) {" + G.NL);  //For bankNumber = 2, no cache will ever be used to avoid confusion. Cache is only for 1 (Work).                            
-                            node.Code.CA(EmitLocalCacheForTimeLooping(node.Code.ToString(), w));
-
+                            
                             //node.Code.A("ope" + Num(node) + ".ts = ("+ node[0].Code+ ");" + G.NL);  //uuu   
 
                             node.Code.A("ope0.subElements = new List<O.Prt.SubElement>();" + G.NL);
                             node.Code.A("ope0.subElements.Add(new O.Prt.SubElement());" + G.NL);
+
+                            node.Code.A(EmitLocalCacheForTimeLooping(w));
                             node.Code.A("ope0.subElements[0].tsWork = O.ConvertToTimeSeriesLight(" + node[0].Code + ");" + G.NL);  //HMMMMM: 0...?
 
                             //node.Code.A("O.GetVal777(" + node[0].Code + ", bankNumber, ope" + Num(node) + ", t);" + G.NL);  //uuu                            
@@ -4538,7 +4547,7 @@ namespace Gekko.Parser.Gek
         {
             string nodeCode = null;
             nodeCode += "O.Genr o" + numNode + " = new O.Genr();" + G.NL;
-            nodeCode = EmitLocalCacheForTimeLooping(nodeCode, w);
+            nodeCode += EmitLocalCacheForTimeLooping(w);
             nodeCode += childCodePeriod + G.NL;  //dates
             nodeCode += "o" + numNode + ".lhs = null;" + G.NL;
             nodeCode += "o" + numNode + ".p = p;" + G.NL;
@@ -4635,8 +4644,9 @@ namespace Gekko.Parser.Gek
             return "" + node.commandLinesCounter;
         }        
 
-        private static string EmitLocalCacheForTimeLooping(string s, W wh2)
+        private static string EmitLocalCacheForTimeLooping(W wh2)
         {
+            string s = null;
             StringBuilder sb = null;
             if (wh2.wh != null && wh2.wh.localStatementCache != null && wh2.wh.localStatementCache.Count > 0)
             {
@@ -4839,7 +4849,7 @@ namespace Gekko.Parser.Gek
             return code;
         }
         
-        
+
         private static string AstBankHelper(ASTNode node, W wh2, int type)
         {
             string isLhsSoCanAutoCreate = null;
@@ -4948,7 +4958,7 @@ namespace Gekko.Parser.Gek
             else if (choice == 3)
             {
                 //This means that the name is complicated like %x or b:%x or %y:a or %x:%y (or fx%i)                
-                if (wh2.wh.localStatementCache != null)
+                if (wh2.wh.seriesHelper != WalkHelper.seriesType.SeriesLhs && wh2.wh.localStatementCache != null)
                 {
                     //GENR statement for instance, maybe also VAL if indexer fY[2010]??
                     //This means there is a GENR statement at the top of the AST tree
@@ -5481,7 +5491,8 @@ namespace Gekko.Parser.Gek
         public StringBuilder headerCs = new StringBuilder(); //stuff to be put at the very start.
         public StringBuilder headerMethodTsCs = new StringBuilder(); //stuff to clear TimeSeries pointers
         public StringBuilder headerMethodScalarCs = new StringBuilder(); //stuff to clear scalar pointers   
-        
+        public StringBuilder headerExpressions = new StringBuilder();
+
         //public GekkoDictionary<string, bool> functionUserDefined = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
         public GekkoDictionary<string, bool> tupleClasses = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
