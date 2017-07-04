@@ -3922,10 +3922,8 @@ namespace Gekko
             string tName = "t";  //name of the set identified as time
             int timePartLength = 1;  //how many chars to remove from for instance 't30'
             int year0 = 2006; //'t30' --> 30 + 2006 = 2036.
-
             bool identifyTPlusIntegerAsTime = true;
             char identifierT = 't';
-
             bool loadIntoTimeseriesWithArrays = true;
             //------------------------
 
@@ -4221,7 +4219,7 @@ namespace Gekko
             //Anyway, the speed penalty is small anyway.
             databank.Trim();
         }
-
+        
         private static void GamsGetHashAndTime(int year0, bool identifyTPlusIntegerAsTime, char identifierT, string cut2, int timeIndex, int scnsIndex, string[] keys, ref int tt, ref string hash)
         {
             for (int i = 0; i < keys.Length; i++)

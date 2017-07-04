@@ -2078,7 +2078,9 @@ namespace Gekko.Parser.Gek
                             //NB NB NB   it contains the lhs variable too --> superfluous!
                             //NB NB NB
 
-                            nodeCode += "o" + numNode + ".rhs = O.ConvertToTimeSeriesLight(" + childCodeRhs + ");" + G.NL;
+                            //nodeCode += "o" + numNode + ".rhs = O.ConvertToTimeSeriesLight(" + childCodeRhs + ");" + G.NL;
+
+                            nodeCode += "o" + numNode + ".rhs = O.ConvertToTimeSeriesLight(GekkoExpression1(smpl, 1, p));" + G.NL;
 
                             w.headerExpressions.Append("public static IVariable GekkoExpression1(GekkoSmpl smpl, int bankNumber, P p) {" + G.NL + EmitLocalCacheForTimeLooping(w) + G.NL + "return " + childCodeRhs + ";" + G.NL + "}" + G.NL);
 
@@ -3391,6 +3393,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("ope0.subElements.Add(new O.Prt.SubElement());" + G.NL);
 
                             node.Code.A(EmitLocalCacheForTimeLooping(w));
+
                             node.Code.A("ope0.subElements[0].tsWork = O.ConvertToTimeSeriesLight(" + node[0].Code + ");" + G.NL);  //HMMMMM: 0...?
 
                             //node.Code.A("O.GetVal777(" + node[0].Code + ", bankNumber, ope" + Num(node) + ", t);" + G.NL);  //uuu                            
