@@ -5034,6 +5034,7 @@ namespace Gekko
             public string opt_tsp = null;
             public string opt_xls = null;
             public string opt_xlsx = null;
+            public string opt_gdx = null;
             public string opt_gnuplot= null;            
             public string opt_caps = null;
             public string opt_series = null;

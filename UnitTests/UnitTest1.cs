@@ -871,7 +871,7 @@ namespace UnitTests
 
 
         [TestMethod]
-        public void Test__ArrayTimeSeriesAndGdxImport()
+        public void Test__ArrayTimeSeries()
         {
             Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
             Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
