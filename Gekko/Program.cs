@@ -4205,6 +4205,143 @@ namespace Gekko
             databank.Trim();
         }
 
+
+        public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2  ,  string file2, List<BankNameVersion> list, string writeOption, bool isCloseCommand)
+        {
+            //TODO: try-catch if writing fails
+
+            //Hardcoded --------------
+            bool useSpecialT = true;
+            string tName = "t";  //name of the set identified as time            
+            int year0 = 2006; //'t30' --> 30 + 2006 = 2036.            
+            //bool loadIntoTimeseriesWithArrays = true;
+            //------------------------
+
+            DateTime t00 = DateTime.Now;
+            int counterVariables = 0;
+            int timelessCounter = 0;
+
+            string file = AddExtension(file2, "." + "gdx");
+            string pathAndFilename = CreateFullPathAndFileName(file);
+
+            DateTime dt1 = DateTime.Now;
+
+            string gamsDir = Program.options.gams_exe_folder.Trim();
+            if (gamsDir.EndsWith("\\")) gamsDir = gamsDir.Substring(0, gamsDir.Length - "\\".Length);
+            if (gamsDir.Trim() == "") gamsDir = null;  //must be so and not an empty string in the GAMSWorkspace call later on
+
+            GAMSWorkspace ws = null;
+            try
+            {
+                ws = new GAMSWorkspace(workingDirectory: Program.options.folder_working, systemDirectory: gamsDir);
+            }
+            catch (Exception e)
+            {
+
+                G.Writeln2("*** ERROR: Import of gdx file (GAMS) failed. GAMSWorkspace problem.");
+                G.Writeln("           Technical error:");
+                G.Writeln("           " + e.Message);
+                G.Writeln("+++ NOTE:  You may manually indicate the GAMS program folder with 'OPTION gams exe folder = ...;'");
+                throw;
+            }
+            
+            GAMSDatabase db = ws.AddDatabase();
+
+            foreach (BankNameVersion bnv in list)
+            {
+                string nameWithoutFreq = bnv.name;
+                if (bnv.name.EndsWith(Globals.freqIndicator + "q") || bnv.name.EndsWith(Globals.freqIndicator + "m"))
+                {
+                    nameWithoutFreq = bnv.name.Substring(0, bnv.name.Length - 2);
+                }
+                Databank gdb = GetBankFromBankNameVersion(bnv.bank);
+                TimeSeries ts = gdb.GetVariable(false, bnv.name);  //do not add freq to name
+
+                if (ts == null)
+                {
+                    G.Writeln2("*** ERROR: Could not find timeseries " + nameWithoutFreq);
+                    throw new GekkoException();
+                }
+
+                if (ts.IsGhost() && !ts.IsTimeless())
+                {
+                    string match = nameWithoutFreq + Globals.symbolTurtle + "*";
+                    
+                    List<string> names = MatchWildcardInDatabank(match, gdb);  //are sorted
+                    if (names == null || names.Count == 0)
+                    {
+                        //G.Writeln2("Could not find any " + gdb + "[...] array-timeseries");
+                        continue;
+                    }
+
+                    List<GekkoDictionary<string, string>> dimensions = GetDimensions(names);
+
+                    GAMSVariable gvar = db.AddVariable(nameWithoutFreq, dimensions.Count + 1, VarType.Free);  //+ 1 for time dimension
+
+                    foreach (string s in names)
+                    {
+                        string[] ss = GetArrayTimeseriesName(s);
+                        
+                        counterVariables++;
+
+                        TimeSeries ts2 = gdb.GetVariable(s);
+
+                        if (ts2.IsTimeless())
+                        {
+                            timelessCounter++;
+                            continue;
+                        }
+
+                        GekkoTime gt1 = t1;
+                        GekkoTime gt2 = t2;
+                        if (t1.IsNull())
+                        {
+                            gt1 = ts2.GetRealDataPeriodFirst();
+                            gt2 = ts2.GetRealDataPeriodLast();
+                        }
+
+                        foreach (GekkoTime t in new GekkoTimeIterator(gt1, gt2))
+                        {
+                            string[] ss2 = new string[ss.Length];
+                            Array.Copy(ss, 1, ss2, 0, ss.Length - 1);
+                            string date = null;
+
+                            if (useSpecialT && t.freq == EFreq.Annual)
+                            {
+                                date = tName + (t.super - year0).ToString();
+                            }
+                            else
+                            {
+                                date = t.ToString();
+                            }
+
+                            ss2[ss2.Length - 1] = date;
+
+                            gvar.AddRecord(ss2).Level = ts2.GetData(t);
+                        }                        
+                    }
+                }
+                else
+                {
+                    
+                    //skip it, it may be either a variable with turtle, or a normal timeseries
+
+                    //G.Writeln2("*** ERROR: Gdx export only intended for array-timeseries");
+                    //G.Writeln("    Variable: " + bnv.name + "", Color.Red);
+                    //throw new GekkoException();
+                }
+            }
+
+            //GAMSSet i2 = db.AddSet("i", "");
+            //i2.AddRecord("a");
+            //i2.AddRecord("b");                        
+
+            db.Export(pathAndFilename);
+                              
+            G.Writeln2("Exported " + counterVariables + " variables to " + pathAndFilename + " (" + G.SecondsFormat((DateTime.Now - t00).TotalMilliseconds) + ")");
+            if (timelessCounter > 0) G.Writeln("+++ NOTE: " + timelessCounter + " timeless timeseries skipped");            
+        }
+
         private static void GamsGetHashAndTime(int year0, bool identifyTPlusIntegerAsTime, char identifierT, string cut2, int timeIndex, int scnsIndex, string[] keys, ref int tt, ref string hash)
         {
             for (int i = 0; i < keys.Length; i++)
@@ -12851,24 +12988,7 @@ namespace Gekko
                                 continue;
                             }
 
-                            List<GekkoDictionary<string, string>> dimensions = new List<GekkoDictionary<string, string>>();
-                            foreach (string s in names)
-                            {
-                                string[] ss = s.Split(new string[] { Globals.symbolTurtle }, StringSplitOptions.None);
-                                int dims = ss.Length - 1;
-                                for (int i = dimensions.Count; i < dims; i++)
-                                {
-                                    dimensions.Add(new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
-                                }
-                                for (int i = 0; i < dims; i++)
-                                {
-                                    string name = ss[i + 1];
-                                    if (!dimensions[i].ContainsKey(name))
-                                    {
-                                        dimensions[i].Add(name, "");
-                                    }
-                                }
-                            }
+                            List<GekkoDictionary<string, string>> dimensions = GetDimensions(names);
 
                             G.Writeln2("Array-timeseries '" + var + "' has " + names.Count + " subseries in the following dimensions:");
 
@@ -12880,7 +13000,7 @@ namespace Gekko
                                 counter++;
                                 List<string> xxxx = new List<string>(xxx.Keys);
                                 //xxxx.Sort();
-                                xxxx = new List<string>(xxxx.OrderBy(f => f, new G.CustomComparer<string>(G.CompareNatural)).ToArray());                                
+                                xxxx = new List<string>(xxxx.OrderBy(f => f, new G.CustomComparer<string>(G.CompareNatural)).ToArray());
                                 G.Writeln2("Dimension #" + counter + " (" + xxxx.Count + " elements): " + G.GetListWithCommas(xxxx));
                                 product = product * xxxx.Count;
                                 productString += xxxx.Count + " * ";
@@ -12893,7 +13013,7 @@ namespace Gekko
                             G.Writeln2("First element: " + G.PrettifyTimeseriesHash(first, true, false));
                             G.Writeln("Last element: " + G.PrettifyTimeseriesHash(last, true, false));
 
-                            G.Writeln2("Dimension span: " + productString + " = " + product+", density: " + names.Count + "/" + product + " = " + Program.NumberFormat(100d * (names.Count / product), "0.00") + "%");
+                            G.Writeln2("Dimension span: " + productString + " = " + product + ", density: " + names.Count + "/" + product + " = " + Program.NumberFormat(100d * (names.Count / product), "0.00") + "%");
 
                             return;
 
@@ -13175,6 +13295,34 @@ namespace Gekko
             }
         }
 
+        private static List<GekkoDictionary<string, string>> GetDimensions(List<string> names)
+        {
+            List<GekkoDictionary<string, string>> dimensions = new List<GekkoDictionary<string, string>>();
+            foreach (string s in names)
+            {
+                string[] ss = GetArrayTimeseriesName(s);
+                int dims = ss.Length - 1;
+                for (int i = dimensions.Count; i < dims; i++)
+                {
+                    dimensions.Add(new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+                }
+                for (int i = 0; i < dims; i++)
+                {
+                    string name = ss[i + 1];
+                    if (!dimensions[i].ContainsKey(name))
+                    {
+                        dimensions[i].Add(name, "");
+                    }
+                }
+            }
+
+            return dimensions;
+        }
+
+        private static string[] GetArrayTimeseriesName(string s)
+        {
+            return s.Split(new string[] { Globals.symbolTurtle }, StringSplitOptions.None);
+        }
 
         public static List<string> SplitStringAndKeepDelimiters(string strSplit, char[] arrDelimiters)
         {
@@ -18020,7 +18168,7 @@ namespace Gekko
             }
 
             bool isDefault = false;
-            if (o.opt_tsd == null && o.opt_gbk == null && o.opt_csv == null && o.opt_prn == null && o.opt_tsp == null && o.opt_xls == null && o.opt_xlsx == null && o.opt_gnuplot == null && o.opt_series == null)
+            if (o.opt_tsd == null && o.opt_gbk == null && o.opt_csv == null && o.opt_prn == null && o.opt_tsp == null && o.opt_xls == null && o.opt_xlsx == null && o.opt_gnuplot == null && o.opt_series == null && o.opt_gdx == null)
             {
                 isDefault = true;  //implicitly GBK
             }
@@ -18081,7 +18229,7 @@ namespace Gekko
 
             if (tStart.IsNull() && tEnd.IsNull())
             {
-                if (isDefault || G.equal(o.opt_gbk, "yes") || G.equal(o.opt_tsd, "yes"))
+                if (isDefault || G.equal(o.opt_gbk, "yes") || G.equal(o.opt_tsd, "yes") || G.equal(o.opt_gdx, "yes"))
                 {
                     //Do nothing, skip this, we do not need to know the timespan of the bank
                     //Not done for GBK or TSD, would just waste time. For these formats, a null period
@@ -18134,6 +18282,18 @@ namespace Gekko
                 }
                 CheckSomethingToWrite(listFilteredForCurrentFreq);
                 Program.Updprt(listFilteredForCurrentFreq, tStart, tEnd, o.opt_series, fileName);
+                return 0;
+            }
+            else if (o.opt_gdx != null)
+            {
+                //RECORDS
+                if (fileName == null || fileName.Trim() == "")
+                {
+                    G.Writeln2("*** ERROR: Please indicate a file name for EXPORT<gdx>");
+                    throw new GekkoException();
+                }
+                CheckSomethingToWrite(listFilteredForCurrentFreq);
+                WriteGdx(Program.databanks.GetFirst(), tStart, tEnd, fileName, list, writeOption, false);
                 return 0;
             }
             else if (isRecordsFormat)
