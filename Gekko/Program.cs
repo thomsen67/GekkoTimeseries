@@ -4219,10 +4219,6 @@ namespace Gekko
             //Anyway, the speed penalty is small anyway.
             databank.Trim();
         }
-<<<<<<< HEAD
-        
-=======
-
 
         public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2  ,  string file2, List<BankNameVersion> list, string writeOption, bool isCloseCommand)
         {
@@ -4360,9 +4356,9 @@ namespace Gekko
             if (timelessCounter > 0) G.Writeln("+++ NOTE: " + timelessCounter + " timeless timeseries skipped");            
         }
 
->>>>>>> f10f487... EXPORT<gdx>
         private static void GamsGetHashAndTime(int year0, bool identifyTPlusIntegerAsTime, char identifierT, string cut2, int timeIndex, int scnsIndex, string[] keys, ref int tt, ref string hash)
         {
+            
             for (int i = 0; i < keys.Length; i++)
             {
                 if (i == timeIndex) continue;  //not to be part of name
