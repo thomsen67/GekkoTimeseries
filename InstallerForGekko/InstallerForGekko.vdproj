@@ -2994,7 +2994,7 @@
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:FALSE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:2.3.4"
+        "ProductVersion" = "8:2.3.5"
         "Manufacturer" = "8:T-T Analyse"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:www.t-t.dk/gekko"
