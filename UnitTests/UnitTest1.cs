@@ -3469,6 +3469,17 @@ namespace UnitTests
             I("VAL v = percentile(a, 1.0);");
             AssertHelperScalarVal("v", 7.0d, sharedDelta);  //same as max
 
+            //percentile()
+            I("RESET; TIME 2000 2002;");
+            I("VAL v = miss();");
+            I("SER xx = m, 1, m;");
+            I("VAL v1 = 0;");
+            I("VAL v2 = 0;");
+            I("IF(ismiss(%v)==1); VAL v1 = 1; END;");
+            I("IF(ismiss(xx[2002])==1); VAL v2 = 1; END;");
+            AssertHelperScalarVal("v1", 1.0d, sharedDelta);
+            AssertHelperScalarVal("v2", 1.0d, sharedDelta);
+
 
         }
 
@@ -5763,6 +5774,7 @@ namespace UnitTests
             I("VAL v0 = 99.0;");
             I("VAL v1 = 100.0;");
             I("VAL v2 = 101.0;");
+            I("VAL v3 = miss();");
             I("DATE d0 = 2000q3;");
             I("DATE d1 = 2000q4;");
             I("DATE d2 = 2001q1;");
@@ -5838,6 +5850,15 @@ namespace UnitTests
             I("IF(%s1 == 'abc7') VAL xx = 1; ELSE VAL xx = 0; END;");
             Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
             I("IF(%s1 <> 'abc7') VAL xx = 1; ELSE VAL xx = 0; END;");
+            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+
+            I("IF(%v3 == miss()) VAL xx = 1; ELSE VAL xx = 0; END;");
+            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            I("IF(%v3 <> miss()) VAL xx = 1; ELSE VAL xx = 0; END;");
+            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            I("IF(%v2 == miss()) VAL xx = 1; ELSE VAL xx = 0; END;");
+            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            I("IF(%v2 <> miss()) VAL xx = 1; ELSE VAL xx = 0; END;");
             Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
 
             //values, relations

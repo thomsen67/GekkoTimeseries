@@ -1290,7 +1290,10 @@ namespace Gekko
             bool rv = false;
             if ((x.Type() == EVariableType.TimeSeries || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.TimeSeries || y.Type() == EVariableType.Val))
             {
-                if (x.GetVal(t) == y.GetVal(t)) rv = true;
+                double d1 = x.GetVal(t);
+                double d2 = y.GetVal(t);
+                if (G.isNumericalError(d1) && G.isNumericalError(d2)) return true;
+                if (d1 == d2) rv = true;
             }
             else if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
             {
