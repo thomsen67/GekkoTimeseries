@@ -1235,9 +1235,9 @@ namespace Gekko.Parser.Gek
                             string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.Val, "double.NaN", false, true, false);
                                                         
                             node.Code.A(setLoopStringCs + G.NL);                            
-                            node.Code.A("double " + stepName + " = " + codeStep + ".GetVal(t);" + G.NL);
-                            node.Code.A("double " + startName + " = " + codeFrom + ".GetVal(t);" + G.NL);
-                            node.Code.A("double " + endName + " = " + codeEnd + ".GetVal(t) + " + stepName + "/1000000d;" + G.NL);  //added a tiny bit of steplength, to guard against rounding errors
+                            node.Code.A("double " + stepName + " = " + codeStep + ".GetVal("+Globals.smpl+");" + G.NL);
+                            node.Code.A("double " + startName + " = " + codeFrom + ".GetVal("+Globals.smpl+");" + G.NL);
+                            node.Code.A("double " + endName + " = " + codeEnd + ".GetVal("+Globals.smpl+") + " + stepName + "/1000000d;" + G.NL);  //added a tiny bit of steplength, to guard against rounding errors
                             node.Code.A("ScalarVal " + tempName + " = (ScalarVal)" + loopVariable + ";" + G.NL);
                             node.Code.A("try {");                            
                             node.Code.A("for (" + tempName + ".val = " + startName + " ; O.ContinueIterating(" + tempName + ".val, " + endName + ", " + stepName + "); " + tempName + ".val += " + stepName + ")");
@@ -2064,7 +2064,7 @@ namespace Gekko.Parser.Gek
                                                         
                             nodeCode += childCodePeriod + G.NL;  //dates
                             
-                            nodeCode += "GekkoSmpl smpl = new GekkoSmpl(o" + numNode + ".t1, o" + numNode + ".t2);" + G.NL;
+                            nodeCode += "smpl = new GekkoSmpl(o" + numNode + ".t1, o" + numNode + ".t2);" + G.NL;
 
                             nodeCode += "o" + numNode + ".p = p;" + G.NL;
 
@@ -2080,9 +2080,9 @@ namespace Gekko.Parser.Gek
 
                             //nodeCode += "o" + numNode + ".rhs = O.ConvertToTimeSeriesLight(" + childCodeRhs + ");" + G.NL;
 
-                            nodeCode += "o" + numNode + ".rhs = O.ConvertToTimeSeriesLight(GekkoExpression1(smpl, 1, p));" + G.NL;
+                            nodeCode += "o" + numNode + ".rhs = O.ConvertToTimeSeriesLight(" + Globals.smpl + ", GekkoExpression1(" + Globals.smpl + ", 1, p));" + G.NL;
 
-                            w.headerExpressions.Append("public static IVariable GekkoExpression1(GekkoSmpl smpl, int bankNumber, P p) {" + G.NL + EmitLocalCacheForTimeLooping(w) + G.NL + "return " + childCodeRhs + ";" + G.NL + "}" + G.NL);
+                            w.headerExpressions.Append("public static IVariable GekkoExpression1(GekkoSmpl " + Globals.smpl + ", int bankNumber, P p) {" + G.NL + EmitLocalCacheForTimeLooping(w) + G.NL + "return " + childCodeRhs + ";" + G.NL + "}" + G.NL);
 
                             if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
                             {
@@ -2090,6 +2090,8 @@ namespace Gekko.Parser.Gek
                                 nodeCode += "o" + numNode + ".meta = @`" + node.Parent.specialExpressionAndLabelInfo[1] + "`;" + G.NL;
                             }
                             nodeCode += "o" + numNode + ".Exe();" + G.NL;
+
+                            node.Code.A(Globals.GekkoSmplNull);
 
                             if (w.wh.seriesHelperListNames != null)
                             {
@@ -3374,7 +3376,7 @@ namespace Gekko.Parser.Gek
                             }                            
                             node.Code.A("O.Prt.Element ope" + Num(node) + " = new O.Prt.Element();" + G.NL);  //this must be after the list start iterator code
                             node.Code.A("ope" + Num(node) + ".label = O.SubstituteScalarsAndLists(`" + givenLabel + "`, false);" + G.NL);
-                            node.Code.A("GekkoSmpl smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2);" + G.NL);
+                            node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2);" + G.NL);
                             ASTNode child = node.GetChild("ASTPRTELEMENTOPTIONFIELD");
                             if (child != null) node.Code.A(child.Code);
                             if (node.Text == "ASTPRTELEMENT")
@@ -3394,7 +3396,7 @@ namespace Gekko.Parser.Gek
 
                             node.Code.A(EmitLocalCacheForTimeLooping(w));
 
-                            node.Code.A("ope0.subElements[0].tsWork = O.ConvertToTimeSeriesLight(" + node[0].Code + ");" + G.NL);  //HMMMMM: 0...?
+                            node.Code.A("ope0.subElements[0].tsWork = O.ConvertToTimeSeriesLight(" + Globals.smpl + ", " + node[0].Code + ");" + G.NL);  //HMMMMM: 0...?
 
                             //node.Code.A("O.GetVal777(" + node[0].Code + ", bankNumber, ope" + Num(node) + ", t);" + G.NL);  //uuu                            
 
@@ -3402,7 +3404,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".prtElements.Add(ope" + Num(node) + ");" + G.NL);                            
                             node.Code.A("}" + G.NL);  //avoid scope collisions
 
-
+                            node.Code.A(Globals.GekkoSmplNull);
 
                             //OLD:
                             //w.expressionCounter++;
@@ -3937,7 +3939,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o").A(Num(node)).A(".rep = new double[").A(n).A("];").A(G.NL);
                             for (int i = 0; i < n; i++)
                             {
-                                node.Code.A("o").A(Num(node)).A(".data[").A(i).A("] = (").A(node[i + nn][0].Code).A(").GetVal(t);").A(G.NL);
+                                node.Code.A("o").A(Num(node)).A(".data[").A(i).A("] = (").A(node[i + nn][0].Code).A(").GetVal(" + Globals.smpl + ");").A(G.NL);
                                 string repCs = "new ScalarVal(1d)";
                                 bool one = false;
                                 if (node[i + nn].ChildrenCount() > 1)
@@ -3963,7 +3965,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
-                                    node.Code.A("o").A(Num(node)).A(".rep[").A(i).A("] = (").A(repCs).A(").GetVal(t);").A(G.NL);
+                                    node.Code.A("o").A(Num(node)).A(".rep[").A(i).A("] = (").A(repCs).A(").GetVal(" + Globals.smpl + ")").A(G.NL);
                                 }
                             }                            
                             node.Code.A("o").A(Num(node)).A(".Exe();").A(G.NL);
@@ -4532,7 +4534,7 @@ namespace Gekko.Parser.Gek
                 {
                     //It is a simple ident code, such as VAL x = ...                                
                     string tempDoubleCs = "tempDouble" + ++Globals.counter;
-                    nodeCodeTemp += "double " + tempDoubleCs + " = (" + childCode + ").GetVal(t);" + G.NL;
+                    nodeCodeTemp += "double " + tempDoubleCs + " = (" + childCode + ").GetVal(" + Globals.smpl + ");" + G.NL;
                     string notUsed = null;
                     string leftSideCs = CacheRefScalarCs(out notUsed, node0.nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.Val, tempDoubleCs, false, true, false);
                     nodeCodeTemp += leftSideCs + G.NL;

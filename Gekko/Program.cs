@@ -10315,7 +10315,7 @@ namespace Gekko
             s2.AppendLine(s3);
             s2.AppendLine("public static O.Prt Snippet()");
             s2.AppendLine("{");
-            s2.AppendLine(Globals.gekkoTimeIniCs);
+            s2.AppendLine(Globals.gekkoSmplInit);
             s2.AppendLine(s);
             s2.AppendLine("}");  //method
             s2.AppendLine("}");  //class

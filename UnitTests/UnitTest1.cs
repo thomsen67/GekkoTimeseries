@@ -5853,13 +5853,13 @@ namespace UnitTests
             Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
 
             I("IF(%v3 == miss()) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
             I("IF(%v3 <> miss()) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%v2 == miss()) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 0.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 0.0d);
             I("IF(%v2 <> miss()) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetVal(Globals.tNull), 1.0d);
+            Assert.AreEqual(Program.scalars["xx"].GetVal(null), 1.0d);
 
             //values, relations
 

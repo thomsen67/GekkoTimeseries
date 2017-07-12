@@ -165,7 +165,7 @@ namespace Gekko.Parser.Gek
 
             s2.AppendLine("public static void CodeLines(P p)");
             s2.AppendLine("{");
-            s2.AppendLine(Globals.gekkoTimeIniCs);
+            s2.AppendLine(Globals.gekkoSmplInit);
             //The generated code, but much of it may be in codeCi
             s2.AppendLine(csCode);
 
@@ -298,7 +298,7 @@ namespace Gekko.Parser.Gek
         private static void CodeSplitFlush(List<string> tempHelperForMethodsCs, List<string> mainCs, List<string> methodsCs, ref int nCi, ref int counterExtra)
         {
             methodsCs.Add("public static void C" + nCi + "(P p) {" + G.NL); counterExtra++;
-            methodsCs.Add(Globals.gekkoTimeIniCs + G.NL); counterExtra++;
+            methodsCs.Add(Globals.gekkoSmplInit + G.NL); counterExtra++;
             methodsCs.AddRange(tempHelperForMethodsCs);
             methodsCs.Add("}" + G.NL); counterExtra++;
             mainCs.Add("C" + nCi + "(p);" + G.NL);

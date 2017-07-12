@@ -1326,7 +1326,16 @@ namespace Gekko
             bool rv = false;
             if ((x.Type() == EVariableType.TimeSeries || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.TimeSeries || y.Type() == EVariableType.Val))
             {
-                if (x.GetVal(smpl) == y.GetVal(smpl)) rv = true;
+                double d1 = x.GetVal(smpl);
+                double d2 = y.GetVal(smpl);
+                if (G.isNumericalError(d1) && G.isNumericalError(d2))
+                {
+                    rv = true;
+                }
+                else
+                {
+                    if (d1 == d2) rv = true;
+                }
             }
             else if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
             {
@@ -1386,14 +1395,79 @@ namespace Gekko
             return rv;
         }
 
-        public static TimeSeriesLight ConvertToTimeSeriesLight(IVariable iv)
+        public static TimeSeriesLight ConvertToTimeSeriesLight(GekkoSmpl smpl, IVariable x)
         {
-            if (iv.Type() != EVariableType.TimeSeries)
+            TimeSeriesLight tsl = null;
+            switch (x.Type())
             {
-                G.Writeln2("*** ERROR: Could not convert right-hand side to SERIES");
+                case EVariableType.TimeSeries:
+                    {
+                        tsl = (TimeSeriesLight)x;
+                    }
+                    break;
+                case EVariableType.Val:
+                    {
+                        double d = ((ScalarVal)x).val;
+                        tsl = O.CreateTimeSeriesLightFromVal(smpl, d);
+                    }
+                    break;
+                case EVariableType.Matrix:
+                    {
+                        G.Writeln2("*** ERROR: Please use the unpack() function to transform matrix to series");
+                        throw new GekkoException();                        
+                    }
+                    break;
+                default:
+                    {
+                        G.Writeln2("*** ERROR: Could not convert right-hand side to SERIES");
+                        throw new GekkoException();
+                    }
+                    break;
+            }
+
+            return tsl;
+        }
+
+        public static TimeSeriesLight CreateTimeSeriesLightFromVal(GekkoSmpl smpl, double d)
+        {
+            TimeSeriesLight tsl = new TimeSeriesLight();
+            tsl.storage = new double[GekkoTime.Observations(smpl.t1, smpl.t2)];
+            tsl.anchorPeriod = smpl.t1;
+            tsl.anchorPeriodPositionInArray = 0;
+            for (int i = 0; i < tsl.storage.Length; i++)
+            {
+                tsl.storage[i] = d;
+            }
+            return tsl;
+        }
+
+        public static TimeSeriesLight CreateTimeSeriesLightFromMatrix(GekkoSmpl smpl, Matrix m)
+        {
+            if (m.data.GetLength(1) != 1)
+            {
+                G.Writeln2("*** ERROR: Expected matrix with 1 column");
                 throw new GekkoException();
             }
-            return (TimeSeriesLight)iv;
+            if (m.data.GetLength(0) < 1)
+            {
+                G.Writeln2("*** ERROR: Expected > 0 rows in matrix");
+                throw new GekkoException();
+            }
+            int n = GekkoTime.Observations(smpl.t1, smpl.t2);
+            if (n != m.data.GetLength(0))
+            {
+                G.Writeln2("*** ERROR: Expected " + n + " rows in matrix");
+                throw new GekkoException();
+            }
+            TimeSeriesLight tsl = new TimeSeriesLight();
+            tsl.storage = new double[n];
+            tsl.anchorPeriod = smpl.t1;
+            tsl.anchorPeriodPositionInArray = 0;
+            for (int i = 0; i < n; i++)
+            {
+                tsl.storage[i] = m.data[i, 0];
+            }
+            return tsl;
         }
 
         public static bool ListContains(IVariable x, IVariable y)

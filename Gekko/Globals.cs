@@ -128,8 +128,11 @@ namespace Gekko
 
         public static bool smart1 = true;
 
-        public static string functionT1Cs = "t";
-        public static string functionT2Cs = "GekkoTime t";
+        //public static string functionT1Cs = "t";
+        //public static string functionT2Cs = "GekkoTime t";
+        
+        public static string functionT1Cs = "smpl";
+        public static string functionT2Cs = "GekkoTime smpl";
 
         public static string functionP1Cs = "p";
         public static string functionP2Cs = "P p";
@@ -653,7 +656,10 @@ namespace Gekko
         public static Dictionary<long, string> prtCsSnippetsHeaders = new Dictionary<long, string>();
         public static long prtCsSnippetsCounter = 0;
         
-        public static string gekkoTimeIniCs = "GekkoTime t = Globals.tNull;";
+        //public static string gekkoTimeIniCs = "GekkoTime t = Globals.tNull;";
+        public static string gekkoSmplInit = "GekkoSmpl smpl = null;";
+        public static string GekkoSmplNull = "smpl = null;";
+        public static string smpl = "smpl";
 
         public static string iniFileSecretName = "[[RunGekkoIniFile]]";
 
