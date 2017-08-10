@@ -11936,6 +11936,7 @@ namespace Gekko
                     List<char> glued4 = new List<char> { '@' };  //only checked if no blank right of this
                     List<char> glued5 = new List<char> { '.' };  //only checked if no blank right of this
                     List<char> glued6 = new List<char> { '*', '?' };  //wildcards: a*b and a?b cannot have blanks.
+                    List<char> glued7 = new List<char> { '~' };
 
                     //=========== note =========================
                     // [c1] [c2] [c3], where c2 is the char analyzed.
@@ -12371,7 +12372,7 @@ namespace Gekko
                             //c2 is a '.'
                             if (c1 != '\n' && c3 != '\n')
                             {
-                                if (c3 != '\n')
+                                if (c3 != '\n')  //remove this?
                                 {
                                     if (c3 == ' ')
                                     {
@@ -12444,6 +12445,24 @@ namespace Gekko
                                 else
                                 {
                                     //ending with a dot
+                                }
+                            }
+                        }
+
+                        // -------------------------------------------------------------
+                        // Handle tilde (~)  --> if no spaces --> ¨~¨
+                        // -------------------------------------------------------------
+                        if (glued7.Contains(c2))
+                        {
+                            //c2 is a '~'
+                            if (c1 != '\n' && c3 != '\n')
+                            {
+                                if (c1 != ' ' && c3 != ' ')
+                                {
+                                    sb.Append(Globals.symbolGlueChar1);
+                                    sb.Append(c2);
+                                    sb.Append(Globals.symbolGlueChar1);
+                                    continue;
                                 }
                             }
                         }
@@ -21389,6 +21408,10 @@ namespace Gekko
 
         public static void obeyCommandCalledFromGUI(string s, P p)
         {
+            if (Globals.parser3)
+            {
+                if (s == " " || s.StartsWith("[[")) return;
+            }
             //Globals.prtCsSnippets.Clear();  //to save RAM for long sessions, should be ok to delete it here (otherwise we will just get an exception)
             Program.EmitCodeFromANTLR(s, "", false, p);
             if (!G.IsUnitTesting()) ShowPeriodInStatusField("");

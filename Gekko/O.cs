@@ -81,6 +81,30 @@ namespace Gekko
             }
         }
 
+        //public static void AssignVal(IVariable lhs, IVariable rhs)
+        //{
+        //    string s = O.GetString(lhs);
+        //    double d = O.GetVal(null, rhs);
+        //    IVariable iv = null; Program.scalars.TryGetValue(s, out iv);
+        //    if (iv != null)
+        //    {
+        //        if (iv.Type() == EVariableType.Val)
+        //        {
+        //            ((ScalarVal)iv).val = d;
+        //        }
+        //        else
+        //        {
+        //            Program.scalars.Remove(s);
+        //            Program.scalars.Add(s, new ScalarVal(d));
+        //        }
+
+        //    }
+        //    else
+        //    {
+        //        Program.scalars.Add(s, new ScalarVal(d));
+        //    }
+        //}
+
         public static IVariable Add(GekkoSmpl smpl, IVariable x, IVariable y)
         {
             return x.Add(smpl, y);

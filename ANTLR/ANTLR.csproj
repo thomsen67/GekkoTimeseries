@@ -97,6 +97,8 @@
   <ItemGroup>
     <Compile Include="Cmd2Lexer.cs" />
     <Compile Include="Cmd2Parser.cs" />
+    <Compile Include="Cmd3Lexer.cs" />
+    <Compile Include="Cmd3Parser.cs" />
     <Compile Include="ModelLexer.cs" />
     <Compile Include="ModelParser.cs" />
     <Compile Include="Program.cs" />
@@ -108,6 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cmd2.g" />
+    <None Include="Cmd3.g" />
     <None Include="Model.g" />
     <None Include="T1.g" />
     <None Include="T2.g" />

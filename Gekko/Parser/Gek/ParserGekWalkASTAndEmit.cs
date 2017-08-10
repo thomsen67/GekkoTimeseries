@@ -2778,12 +2778,8 @@ namespace Gekko.Parser.Gek
                                 {
                                     node.nameSimpleIdent = node[0].nameSimpleIdent + "." + node[1].nameSimpleIdent;
                                     node.Code.CA("new ScalarString(`" + node.nameSimpleIdent + "`)");  //overrides
-                                }
-                                else
-                                {
-                                }
+                                }                               
                             }
-
                         }
                         break;
                     case "ASTNAMESLIST":
@@ -2802,45 +2798,53 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTNAMEWITHBANK":
                         {
-                            //Must always have 2 children, ASTBANK and ASTNAMEWITHDOT
-                            string lagTypeCs = null;
-                            if (node[1].Text == "ASTNAMEWITHDOT")  //probably is always so, but we check it.
+                            if (Globals.version24)
                             {
-                                if (Globals.useDotFunctionalityInParser)
-                                {
-                                    lagTypeCs = node[1].dotNumber;
-                                }
-                            }                            
 
-                            if (node[0].ChildrenCount() == 0 && node[1].ChildrenCount() == 1 && node[1][0].Text == "ASTNAME" && node[1][0].ChildrenCount() == 1 && node[1][0][0].Text == "ASTSCALAR")
-                            {
-                                G.Writeln2("*** ERROR #24737643");
-                                throw new GekkoException();
-                                ////For instance this structure corresponding to "%b". This is interpreted as a VAL scalar even though it might be a STRING scalar pointing to a timeseries.
-                                ////ASTNAMEWITHBANK
-                                ////  ASTBANK
-                                ////  ASTNAMEWITHDOT
-                                ////    ASTNAME
-                                ////      ASTSCALAR
-                                ////        ASTPERCENTNAMESIMPLE
-                                ////          b
-                                //node[1][0][0].Code = null;  //sub-nodes have been visited: this result gets overridden
-                                //HandleScalar(node[1][0][0], false, wh2);
-                                //node.Code.CA(node[1][0][0].Code;                                
                             }
                             else
                             {
 
-                                string code = AstBankHelper(node, w, 0);
-                                if (Globals.useDotFunctionalityInParser && lagTypeCs != null)
+                                //Must always have 2 children, ASTBANK and ASTNAMEWITHDOT
+                                string lagTypeCs = null;
+                                if (node[1].Text == "ASTNAMEWITHDOT")  //probably is always so, but we check it.
                                 {
-                                    //This is a fY.1 type of variable.
-                                    //Why does this work, and why is 'code' not used??
-                                    node.Code.CA("O.Indexer(smpl, " + node.Code + ", false, " + lagTypeCs + ")");
+                                    if (Globals.useDotFunctionalityInParser)
+                                    {
+                                        lagTypeCs = node[1].dotNumber;
+                                    }
+                                }
+
+                                if (node[0].ChildrenCount() == 0 && node[1].ChildrenCount() == 1 && node[1][0].Text == "ASTNAME" && node[1][0].ChildrenCount() == 1 && node[1][0][0].Text == "ASTSCALAR")
+                                {
+                                    G.Writeln2("*** ERROR #24737643");
+                                    throw new GekkoException();
+                                    ////For instance this structure corresponding to "%b". This is interpreted as a VAL scalar even though it might be a STRING scalar pointing to a timeseries.
+                                    ////ASTNAMEWITHBANK
+                                    ////  ASTBANK
+                                    ////  ASTNAMEWITHDOT
+                                    ////    ASTNAME
+                                    ////      ASTSCALAR
+                                    ////        ASTPERCENTNAMESIMPLE
+                                    ////          b
+                                    //node[1][0][0].Code = null;  //sub-nodes have been visited: this result gets overridden
+                                    //HandleScalar(node[1][0][0], false, wh2);
+                                    //node.Code.CA(node[1][0][0].Code;                                
                                 }
                                 else
                                 {
-                                    node.Code.A(code);
+
+                                    string code = AstBankHelper(node, w, 0);
+                                    if (Globals.useDotFunctionalityInParser && lagTypeCs != null)
+                                    {
+                                        //This is a fY.1 type of variable.
+                                        //Why does this work, and why is 'code' not used??
+                                        node.Code.CA("O.Indexer(smpl, " + node.Code + ", false, " + lagTypeCs + ")");
+                                    }
+                                    else
+                                    {
+                                        node.Code.A(code);
+                                    }
                                 }
                             }
                         }
@@ -3992,7 +3996,19 @@ namespace Gekko.Parser.Gek
                             }
                             else
                             {
-                                node.Code.A(HandleVal(node, node[1].Code.ToString(), w));
+                                if (Globals.version24)
+                                {
+                                    string s1 = node[0].Code.ToString();
+                                    string s2 = node[1].Code.ToString();
+
+                                    node.Code.A("O.Assign(" + s1 + ", " + s2 + ", " + "EVariableType.Val");
+
+
+                                }
+                                else
+                                {
+                                    node.Code.A(HandleVal(node, node[1].Code.ToString(), w));
+                                }
                             }
                         }
                         break;

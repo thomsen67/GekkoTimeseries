@@ -40,6 +40,12 @@ namespace Gekko
     /// </summary>
     public class Globals        
     {
+        public static bool version30 = true;
+
+        public static bool version24 = true;
+
+        public static bool parser3 = true;
+
         public static bool testFileChange = true;
 
         //public static bool megaHackFix = true;

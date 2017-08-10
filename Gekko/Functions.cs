@@ -721,10 +721,10 @@ namespace Gekko
             }
             return m;
         }
-
+        
         //Converts matrix to timeseries
         public static IVariable unpack(GekkoSmpl smpl, GekkoTime t1, GekkoTime t2, IVariable x)
-        {
+        {            
             //from matrix to timeseries
             //smpl is not used
             GekkoTime gt1 = Globals.globalPeriodStart;

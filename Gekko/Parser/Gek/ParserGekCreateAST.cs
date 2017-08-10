@@ -33,6 +33,51 @@ namespace Gekko.Parser.Gek
 
             List<string> errors = null;
             CommonTree t = null;
+
+            if (true)
+            {
+                G.Writeln2(ph.commandsText, Color.Green);
+                // Create a lexer attached to that input            
+                Cmd3Parser parser3 = null;
+                Cmd3Lexer lexer3 = new Cmd3Lexer(input);
+                //usually debugTokens=false, and this is stepped into manually (otherwise the tokens are consumed and preliminary steps cannot be run)
+                //if (Globals.runningOnTTComputer && Globals.debugTokens) Gekko.Parser.ParserCommon.DebugTokens(lexer3);
+                // Create a stream of tokens pulled from the lexer
+                CommonTokenStream tokens3 = new CommonTokenStream(lexer3);
+                // Create a parser attached to the token stream
+                parser3 = new Cmd3Parser(tokens3);
+                // Invoke the program rule in get return value
+                Cmd3Parser.expr_return r3 = null;
+                
+                try
+                {
+                    r3 = parser3.expr();
+                }
+                catch (Exception e)
+                {
+                    //G.Writeln(e.Message);
+                    List<string> temp = new List<string>();
+                    temp.Add(e.Message);
+                    //string textInput = ph.commandsText + "\r\n";
+                    string input2 = textInput + "\r\n";
+                    PrintLexerErrors(temp, Program.CreateListOfStringsFromString(input2), ph);
+                    throw new GekkoException(); //this will make a double error -- but the other one will be identified later on (both text and filename are null) and skipped -- a little bit hacky, but oh well...
+                }
+
+                //if (parser3.NumberOfSyntaxErrors > 0) G.Writeln2("ERROR!!");
+                                              
+
+                if (parser3.GetErrors().Count > 0)
+                {
+                    PrintParserErrors(parser3.GetErrors(), Program.CreateListOfStringsFromString(textInput), ph);
+                    throw new GekkoException();
+                }
+                t = (CommonTree)r3.Tree;                                
+                PrintAST(t, 0);                
+                return null;
+            }
+
+            
             // Create a lexer attached to that input            
             Cmd2Parser parser2 = null;
             Cmd2Lexer lexer2 = new Cmd2Lexer(input);
