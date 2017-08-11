@@ -11953,36 +11953,36 @@ namespace Gekko
                         char c4 = '\n';
                         if (i < lineNewVersion.Length - 2) c4 = lineNewVersion[i + 2];
 
-                        // -------------------------------------------------------------
-                        // Handle .1, .2, etc. For instance y.1 --> y[-1]
-                        // -------------------------------------------------------------
-                        if (c2 == '.' && char.IsDigit(c3) && !G.IsLetterOrDigitOrUnderscore(c4) && c4 != '.')
-                        {
-                            //now we have stuff like .1, and we need to check the chars before the '.'
-                            bool good = false;
-                            for (int ii = i - 1; ii >= 0; ii--)
-                            {
-                                //it may be for instance y.1 or y12345.1, so we run it backwards looking for
-                                //digits only. When there are no more digits, it MUST be a letter or underscore
-                                if (char.IsDigit(lineNewVersion[ii])) continue;
-                                if (G.IsLetterOrUnderscore(lineNewVersion[ii])) good = true;
-                                break;
-                            }
-                            //not ok: fy.11  fy.1a  fy.1_  fy.1.    All else is ok for fy[-1] translation, also if fy were fy12345 instead
-                            //this will also get translated: %n.1  {s}.1   #m.1
-                            if (good)
-                            {
-                                if (!lineNewVersion.Contains("'"))
-                                {
-                                    //You can have stuff like TABLE xx.currow.setvalues(1,2000,2010,1,'n',0.001,'f10.3'), where 'f10.3' should not become 'f10[-3]' !!!
-                                    //This seems hard to solve properly, so the stuff here is only temporary
-                                    //CONCLUSION: should be solved in the PARSER in the long run
-                                    sb.Append(Globals.symbolGlueChar6 + "-" + c3 + "]");
-                                    i++;
-                                    continue;
-                                }
-                            }
-                        }
+                        //// -------------------------------------------------------------
+                        //// Handle .1, .2, etc. For instance y.1 --> y[-1]
+                        //// -------------------------------------------------------------
+                        //if (c2 == '.' && char.IsDigit(c3) && !G.IsLetterOrDigitOrUnderscore(c4) && c4 != '.')
+                        //{
+                        //    //now we have stuff like .1, and we need to check the chars before the '.'
+                        //    bool good = false;
+                        //    for (int ii = i - 1; ii >= 0; ii--)
+                        //    {
+                        //        //it may be for instance y.1 or y12345.1, so we run it backwards looking for
+                        //        //digits only. When there are no more digits, it MUST be a letter or underscore
+                        //        if (char.IsDigit(lineNewVersion[ii])) continue;
+                        //        if (G.IsLetterOrUnderscore(lineNewVersion[ii])) good = true;
+                        //        break;
+                        //    }
+                        //    //not ok: fy.11  fy.1a  fy.1_  fy.1.    All else is ok for fy[-1] translation, also if fy were fy12345 instead
+                        //    //this will also get translated: %n.1  {s}.1   #m.1
+                        //    if (good)
+                        //    {
+                        //        if (!lineNewVersion.Contains("'"))
+                        //        {
+                        //            //You can have stuff like TABLE xx.currow.setvalues(1,2000,2010,1,'n',0.001,'f10.3'), where 'f10.3' should not become 'f10[-3]' !!!
+                        //            //This seems hard to solve properly, so the stuff here is only temporary
+                        //            //CONCLUSION: should be solved in the PARSER in the long run
+                        //            sb.Append(Globals.symbolGlueChar6 + "-" + c3 + "]");
+                        //            i++;
+                        //            continue;
+                        //        }
+                        //    }
+                        //}
 
                         // -------------------------------------------------------------
                         // Handle PRT<m d> etc.
@@ -12372,63 +12372,55 @@ namespace Gekko
                             //c2 is a '.'
                             if (c1 != '\n' && c3 != '\n')
                             {
-                                if (c3 != '\n')  //remove this?
+
+                                if (c3 == ' ')
                                 {
-                                    if (c3 == ' ')
+                                    //do nothing, normal dot, for instance 12. 34
+                                }
+                                else if (char.IsDigit(c3))
+                                {
+                                    if (glued3a.Contains(c1))
                                     {
-                                        //do nothing, normal dot, for instance 12. 34
+                                        //  +.12, **.12, >.12, (.12, etc.
+                                        sb.Append(Globals.symbolGlueChar3);  //GLUEDOTNUMBER
+                                        sb.Append(c2);
+                                        continue;
                                     }
-                                    else if (char.IsDigit(c3))
+                                    else if (char.IsDigit(c1))
                                     {
-                                        if (glued3a.Contains(c1))
+                                        //in stuff like 12.34 the dot becomes a GLUEDOTNUMBER
+                                        //but only if stuff before 12 is not ident, for instance
+                                        //x12.34. We could have hgn2.1, and that is not a number.
+                                        bool number = true;
+                                        for (int ii = i - 1 - 1; ii >= 0; ii--)
                                         {
-                                            //  +.12, **.12, >.12, (.12, etc.
+                                            //.... +123.45 loops through pure digits until + is met. Here number would be true.
+                                            if (glued3a.Contains(lineNewVersion[ii])) break;  //for instance a "," or "+" to delimit the number ('token')
+                                            if (!char.IsDigit(lineNewVersion[ii]))
+                                            {
+                                                number = false;
+                                                break;
+                                            }
+                                        }
+                                        if (number)
+                                        {
                                             sb.Append(Globals.symbolGlueChar3);  //GLUEDOTNUMBER
                                             sb.Append(c2);
                                             continue;
                                         }
-                                        else if (char.IsDigit(c1))
+                                        else
                                         {
-                                            //in stuff like 12.34 the dot becomes a GLUEDOTNUMBER
-                                            //but only if stuff before 12 is not ident, for instance
-                                            //x12.34. We could have hgn2.1, and that is not a number.
-                                            bool number = true;
-                                            for (int ii = i - 1 - 1; ii >= 0; ii--)
-                                            {
-                                                //.... +123.45 loops through pure digits until + is met. Here number would be true.
-                                                if (glued3a.Contains(lineNewVersion[ii])) break;  //for instance a "," or "+" to delimit the number ('token')
-                                                if (!char.IsDigit(lineNewVersion[ii]))
-                                                {
-                                                    number = false;
-                                                    break;
-                                                }
-                                            }
-                                            if (number)
-                                            {
-                                                sb.Append(Globals.symbolGlueChar3);  //GLUEDOTNUMBER
-                                                sb.Append(c2);
-                                                continue;
-                                            }
-                                            else
-                                            {
-                                                sb.Append(Globals.symbolGlueChar2);  //GLUEDOT
-                                                sb.Append(c2);
-                                                continue;
-                                            }
+                                            sb.Append(Globals.symbolGlueChar2);  //GLUEDOT
+                                            sb.Append(c2);
+                                            continue;
                                         }
                                     }
-                                    if (c1 != ' ' && c2 != ' ')
-                                    {
-                                        sb.Append(Globals.symbolGlueChar2);  //GLUEDOT
-                                        sb.Append(c2);
-                                        continue;
-                                    }
-
-
                                 }
-                                else
+                                if (c1 != ' ' && c3 != ' ')
                                 {
-                                    //ending with a dot
+                                    sb.Append(Globals.symbolGlueChar2);  //GLUEDOT
+                                    sb.Append(c2);
+                                    continue;
                                 }
                             }
                             else
@@ -12441,11 +12433,7 @@ namespace Gekko
                                         sb.Append(Globals.symbolGlueChar3);  //GLUEDOTNUMBER
                                         continue;
                                     }
-                                }
-                                else
-                                {
-                                    //ending with a dot
-                                }
+                                }                                
                             }
                         }
 

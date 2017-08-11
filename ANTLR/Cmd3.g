@@ -41,6 +41,40 @@ tokens {
 	ASTPLACEHOLDER;
 	ASTDOT;
 	ASTFUNCTION;
+	ASTLOGICALIN;
+	
+	ASTPLUS;
+	ASTMINUS;	
+	ASTSTAR;
+	ASTDIV;
+	ASTPOWER;
+	ASTNEGATE;
+	ASTINDEXER;
+
+	ASTDOLLARCONDITIONAL;
+ASTOR;
+ASTAND;
+ASTNOT;
+ASTCOMPARE;
+ASTIFOPERATOR;
+ASTIFOPERATOR1;
+ASTIFOPERATOR;
+ASTIFOPERATOR2;
+ASTIFOPERATOR;
+ASTIFOPERATOR3;
+ASTIFOPERATOR;
+ASTIFOPERATOR4;
+ASTIFOPERATOR;
+ASTIFOPERATOR5;
+ASTIFOPERATOR;
+ASTIFOPERATOR6;
+ASTCOMPARE2;
+
+
+	AND              = 'AND';    
+	NOT              = 'NOT';    
+	OR              = 'OR';   
+	IN             = 'IN'; 
 }
 
                               @parser::namespace { Gekko }
@@ -85,27 +119,48 @@ expr                      : expression ';'? EOF;  //EOF is necessary in order to
 //This makes sense, and after parenthesis everything is possible again (expression)
 //So therefore indexers arguments get expression
 //-----------------------------------------------------------------------------------------
-expression                : listExpression;
+expression                : additiveExpression; 
 
-listExpression            : additiveExpression ( (LISTPLUS|LISTMINUS|LISTSTAR)^ additiveExpression )*;
+additiveExpression        :
+     (multiplicativeExpression        -> multiplicativeExpression)
+     ((PLUS lbla=multiplicativeExpression -> ^(ASTPLUS $additiveExpression $lbla))*
+	 |(MINUS lblb=multiplicativeExpression -> ^(ASTMINUS $additiveExpression  $lblb))*)
+  ;  
 
-additiveExpression        : multiplicativeExpression ( (PLUS|MINUS)^ multiplicativeExpression )*;
+multiplicativeExpression        :
+     (powerExpression        -> powerExpression)
+     ((star lbla=powerExpression -> ^(ASTSTAR $multiplicativeExpression $lbla))*
+	 |(DIV lblb=powerExpression -> ^(ASTDIV $multiplicativeExpression  $lblb))*)
+  ;  
+  
+powerExpression        :
+     (unaryExpression        -> unaryExpression)
+     (pow lbla=unaryExpression -> ^(ASTPOWER $powerExpression $lbla))*	 
+  ; 
+  
+unaryExpression        :
+     dollarExpression        -> dollarExpression
+     | MINUS dollarExpression -> ^(ASTNEGATE dollarExpression)	 
+  ;  
 
-multiplicativeExpression  : powerExpression ( starHelper^ powerExpression )*;
+dollarExpression        :
+     (indexerExpression        -> indexerExpression)
+     (DOLLAR lbla=dollarConditional -> ^(ASTPOWER $dollarExpression $lbla))*	 
+  ; 
 
-powerExpression           : unaryExpression ( pow^ unaryExpression )*;
 
-unaryExpression           : dollarExpression
-                          | MINUS dollarExpression -> ^(NEGATE dollarExpression)
-						  ;
 
-dollarExpression          : indexerExpression;   //dollar!!!!
+indexerExpression         : 
+	(primaryExpression -> primaryExpression)
+	(leftBracketGlue lbla=indexerExpressionHelper2? RIGHTBRACKET -> ^(ASTINDEXER $indexerExpression $lbla?))*
+	(GLUEDOT DOT lblb=dotHelper -> ^(ASTDOT $indexerExpression $lblb))*
+//	| GLUEDOT! DOT^ (variableName | function | Integer))*;  //a.q, a.f(), a.1
+;
 
-//indexerExpression         : dotExpression (leftBracketGlue^ (indexerExpressionHelper (','! indexerExpressionHelper)*)? RIGHTBRACKET!)*;
+indexerExpressionHelper2 : (indexerExpressionHelper (',' indexerExpressionHelper)*); 
 
-//dotExpression             : primaryExpression (GLUEDOT DOT^ expression)*;
+dotHelper: variableName | function | Integer;
 
-indexerExpression         : primaryExpression (leftBracketGlue^ (indexerExpressionHelper (','! indexerExpressionHelper)*)? RIGHTBRACKET! | GLUEDOT DOT^ (variableName | function))*;
 
 primaryExpression         : leftParen! expression RIGHTPAREN!
                           | value
@@ -119,8 +174,15 @@ value                     : variable
 
 function                  : Ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTFUNCTION Ident expression*);
 
-variable                  : variableName (GLUEDOT DOT^ (variableName|function))*
+//variable                  : variableName (GLUEDOT DOT^ (variableName|function))*
+//						  ;
+						  
+variable                  : variableName
 						  ;
+
+dollarConditional         : LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)  //logicalOr can contain a listWithIndexer
+						  | variableWithIndexer  //does not need parenthesis						
+						  ;  
 
 indexerExpressionHelper   : //range -> ^(ASTINDEXERELEMENT range)                             //fm1..fm5
                             expressionOrNothing doubleDot expressionOrNothing -> ^(ASTINDEXERELEMENT expressionOrNothing expressionOrNothing)     //'fm1'..'fm5'
@@ -142,10 +204,40 @@ hashOrPercent             : HASH | PERCENT;
 
 freq			   		  : GLUE TILDE GLUE name -> name;      //TODO: glue
 
-starHelper				  : star
-						  | DIV
-						  | MOD						
+// -------------------- logical or start ---------------------------------
+
+logicalOr
+  :  (logicalAnd        -> logicalAnd)
+     (OR? lbla=logicalAnd -> ^(ASTOR $logicalOr $lbla))*  | 
+  ;
+
+logicalAnd
+  :  (logicalNot        -> logicalNot)
+     (AND? lbla=logicalNot -> ^(ASTAND $logicalAnd $lbla))*
+  ;
+
+logicalNot				  :  NOT logicalAtom     -> ^(ASTNOT logicalAtom)
+						  |  logicalAtom
 						  ;
+
+logicalAtom				  :  expression ifOperator expression -> ^(ASTCOMPARE ifOperator expression expression)
+						  |  leftParen! logicalOr rightParen!           // omit both '(' and ')'
+						  |  variableWithIndexer
+						  |  expression IN expression -> ^(ASTLOGICALIN expression expression)
+						  ;
+
+ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
+						  |  ISNOTQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR2)
+						  |  RIGHTANGLE -> ^(ASTIFOPERATOR ASTIFOPERATOR3)
+						  |  leftAngle -> ^(ASTIFOPERATOR ASTIFOPERATOR4)
+			              |  ISLARGEROREQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR5)
+						  |  ISSMALLEROREQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR6)
+			              ;
+
+variableWithIndexer       : variableName ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 variableName expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!  //should catch #i0[#i], does not need a parenthesis!						
+
+// -------------------- logical or end -----------------------------------
+
 
 leftParen                 : (GLUE!)? LEFTPAREN;
 leftParenGlue             : GLUE! LEFTPAREN;
@@ -154,6 +246,13 @@ star                      : (GLUESTAR!)? STAR (GLUESTAR!)?;
 pow                       : stars -> ASTPOW
                           | HAT -> ASTPOW
                           ;
+
+leftAngle                 : leftAngle2 | leftAngleNo2;
+leftAngle2				  : LEFTANGLESPECIAL;
+leftAngleNo2	          : LEFTANGLESIMPLE; 
+
+rightParen                : RIGHTPAREN (GLUE!)?;
+
 stars                     : (GLUESTAR!)? STARS (GLUESTAR!)?;
 
 leftBracketNoGlue         : LEFTBRACKET;
@@ -217,7 +316,7 @@ GLUEDOTNUMBER             : '§';  //only relevant for '.', for instance 12.34 be
 GLUESTAR                  : '½';  //only relevant for '*' and '?', for instance a*b --> a½*½b
 LEFTANGLESPECIAL          : '<=<';  //indicates that there are two idents following the '<' in the text input.
                                     // using <_< is not good, since it stumbles on mulprt<_lev>xx
-MOD                       : '¤';  //does not work with '%¨%' ================> NOT DONE YET!!
+//MOD                       : '¤';  //does not work with '%¨%' ================> NOT DONE YET!!
 GLUEBACKSLASH             : '¨\\';
 // -----------------------------------------------------------------------------------------------
 
