@@ -42,6 +42,17 @@ tokens {
 	ASTDOT;
 	ASTFUNCTION;
 	ASTLOGICALIN;
+	ASTDATE2;
+	ASTSTRINGINQUOTES;
+	ASTDOUBLE;
+
+	ASTNAME;
+ASTNAME;
+ASTIDENT;
+ASTIDENT;
+ASTCURLYSIMPLE;
+ASTCURLY;
+ASTIDENTDIGIT;
 	
 	ASTPLUS;
 	ASTMINUS;	
@@ -50,6 +61,9 @@ tokens {
 	ASTPOWER;
 	ASTNEGATE;
 	ASTINDEXER;
+	ASTMATRIXCOL;
+	ASTMATRIXROW;
+	ASTLISTFILE;
 
 	ASTDOLLARCONDITIONAL;
 ASTOR;
@@ -75,6 +89,7 @@ ASTCOMPARE2;
 	NOT              = 'NOT';    
 	OR              = 'OR';   
 	IN             = 'IN'; 
+	LISTFILE = 'LISTFILE';
 }
 
                               @parser::namespace { Gekko }
@@ -166,20 +181,32 @@ primaryExpression         : leftParen! expression RIGHTPAREN!
                           | value
 						  ;
 
-value                     : variable
-						  | function
+value                     : function //must be before variableName
+						  | variableName						  
 						  | Integer -> ^(ASTINTEGER Integer)
 						  | (leftBracketNoGlue|leftBracketNoGlueWild) indexerExpressionHelper RIGHTBRACKET -> ^(ASTINDEXERALONE indexerExpressionHelper) //also see rule indexerExpression
+						  | double2 -> double2						
+						  | date2 -> ^(ASTDATE2 date2) //a date like: 2001q3 (luckily we do not have 'e' freq, then what about 2012e3 (in principle, = 2012000))
+						  | StringInQuotes -> ^(ASTSTRINGINQUOTES StringInQuotes)
+						  | listFile						
+						  | matrixCol
 						  ;
+
+matrixCol                 : leftBracketNoGlue matrixRow (doubleVerticalBar matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
+matrixRow                 :  expression (',' expression)*  -> ^(ASTMATRIXROW expression+);
+
+doubleVerticalBar         : GLUE? (DOUBLEVERTICALBAR1 | DOUBLEVERTICALBAR2);
+
+
+//FIXME
+//FIXME
+//FIXME Ident -> fileName
+//FIXME
+//FIXME
+listFile                  : HASH leftParenGlue LISTFILE Ident RIGHTPAREN -> ^(ASTLISTFILE Ident);
 
 function                  : Ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTFUNCTION Ident expression*);
-
-//variable                  : variableName (GLUEDOT DOT^ (variableName|function))*
-//						  ;
-						  
-variable                  : variableName
-						  ;
-
+					  
 dollarConditional         : LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)  //logicalOr can contain a listWithIndexer
 						  | variableWithIndexer  //does not need parenthesis						
 						  ;  
@@ -194,15 +221,52 @@ doubleDot                 : GLUEDOT? DOT GLUEDOT DOT;
 expressionOrNothing       : expression -> expression
 						  | -> ASTEMPTYRANGEELEMENT
 						  ;
-name                      : Ident;
 
-variableName              : sigil? name freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER sigil?) ^(ASTPLACEHOLDER name) ^(ASTPLACEHOLDER freq?));
+
+						  // name is in principle just like characters, excluding sigils. Kind of like an advanced ident.
+
+name                      : (ident | nameCurlyStart) 
+							(GLUE sigil? identDigit | nameCurly | GLUE VERTICALBAR identDigit)*
+						  ;
+
+simpleName                : ident;
+						     
+
+nameCurlyStart            : leftCurlyNoGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
+					      | leftCurlyNoGlue expression RIGHTCURLY -> ^(ASTCURLY expression)
+						  ;
+
+nameCurly                 : leftCurlyGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
+					      | leftCurlyGlue expression RIGHTCURLY -> ^(ASTCURLY expression)
+						  ;
+
+variableName              : sigil simpleName freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER simpleName) ^(ASTPLACEHOLDER freq?))
+						  | sigil leftParen name rightParen freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER name) ^(ASTPLACEHOLDER freq?))
+						  | simpleName freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER simpleName) ^(ASTPLACEHOLDER freq?))						  
+						  | name freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER name) ^(ASTPLACEHOLDER freq?))
+						  ;
 
 sigil                     : hashOrPercent GLUE -> hashOrPercent;
 
 hashOrPercent             : HASH | PERCENT;
 
 freq			   		  : GLUE TILDE GLUE name -> name;      //TODO: glue
+
+double2                   : double2Helper -> ^(ASTDOUBLE double2Helper);
+double2Helper             : Double            //0.123 or 25e+12
+						  | DigitsEDigits     //for instance 25e12 which can also be a name chunk.
+						  ;
+
+date2                     : Integer | DateDef;
+
+//fixme
+//fixme
+//fixme
+//fixme
+//fixme
+ident					  : Ident
+						  | NOT
+						  ;
 
 // -------------------- logical or start ---------------------------------
 
@@ -258,6 +322,18 @@ stars                     : (GLUESTAR!)? STARS (GLUESTAR!)?;
 leftBracketNoGlue         : LEFTBRACKET;
 leftBracketNoGlueWild     : LEFTBRACKETWILD; 
 
+identDigit                : identDigitHelper -> ^(ASTIDENTDIGIT identDigitHelper);
+identDigitHelper
+						  : ident                 //for instance ab27
+						  | Integer               //for instance 0123
+						  | DigitsEDigits         //for instance 25e12 (will end here, not in IdentStartingWithInt)
+						  | DateDef               //for instance 2012q3 (will end here, not in IdentStartingWithInt)						  						
+						  | IdentStartingWithInt  //for instance 0123ab27 (catches the rest of these cases)						  						
+						  ;			
+						
+leftCurly                 : (GLUE!)? LEFTCURLY;
+leftCurlyGlue             : GLUE! LEFTCURLY;
+leftCurlyNoGlue           : LEFTCURLY;
 
 /*------------------------------------------------------------------
  * LEXER RULES
