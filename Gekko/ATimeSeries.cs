@@ -29,7 +29,90 @@ namespace Gekko
 
         public IVariable Indexer(GekkoTime t, bool isLhs, params IVariable[] indexes)
         {
-            if (indexes.Length > 0 && indexes[0].Type() == EVariableType.String)
+            //Check if any indexer elements are LIST type, if not lists = null.
+            List<int> lists = null;
+            for (int i = 0; i < indexes.Length; i++)
+            {
+                IVariable iv = indexes[i];
+                if (iv.Type() == EVariableType.List)
+                {
+                    if (lists == null) lists = new List<int>();
+                    lists.Add(i);
+                }
+            }
+
+            if (lists != null)
+            {
+                List<string> temp = new List<string>();
+                if (lists.Count == 1)
+                {
+                    List<string> m = ((MetaList)indexes[lists[0]]).list;
+                    foreach (string s in m)
+                    {
+                        string ss = null;
+                        for (int i = 0; i < indexes.Length; i++)
+                        {
+                            if (i == lists[0])
+                            {
+                                ss += Globals.symbolTurtle + s;
+                            }
+                            else
+                            {
+                                ss += Globals.symbolTurtle + O.GetString(indexes[i]);
+                            }
+                        }
+                        ss = this.ts.variableName + ss;                        
+                        string bankname = null;
+                        if (!G.equal(Program.databanks.GetFirst().aliasName, this.ts.parentDatabank.aliasName))
+                        {
+                            bankname = this.ts.parentDatabank.aliasName + ":";
+                        }
+                        temp.Add(bankname + ss);
+                    }
+                }
+                else if (lists.Count == 2)
+                {
+                    List<string> m1 = ((MetaList)indexes[lists[0]]).list;
+                    List<string> m2 = ((MetaList)indexes[lists[1]]).list;                    
+                    foreach (string s1 in m1)
+                    {
+                        foreach (string s2 in m2)
+                        {
+                            string ss = null;
+                            for (int i = 0; i < indexes.Length; i++)
+                            {
+                                if (i == lists[0])
+                                {
+                                    ss += Globals.symbolTurtle + s1;
+                                }
+                                else if (i == lists[1])
+                                {
+                                    ss += Globals.symbolTurtle + s2;
+                                }
+                                else
+                                {
+                                    ss += Globals.symbolTurtle + O.GetString(indexes[i]);
+                                }
+                            }
+                            ss = this.ts.variableName + ss;                            
+                            string bankname = null;
+                            if (!G.equal(Program.databanks.GetFirst().aliasName, this.ts.parentDatabank.aliasName))
+                            {
+                                bankname = this.ts.parentDatabank.aliasName + ":";
+                            }
+                            temp.Add(bankname + ss);
+                        }
+                    }
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Sorry, unfolding of > 2 dimension not supported at the moment");
+                    throw new GekkoException();
+                }                
+                MetaList ml = new Gekko.MetaList(temp);
+                return ml;
+            }
+            else if (indexes.Length > 0 && indexes[0].Type() == EVariableType.String)
             {
                 string hash = TimeSeries.GetHashCodeFromIvariables(indexes);
                 O.ECreatePossibilities canCreate = O.ECreatePossibilities.None;
@@ -54,11 +137,12 @@ namespace Gekko
                 this.ts.SetDirtyGhost(true, true);  //otherwise, an ASER x['a'] = ... will not register 'x' as a ghost.
                 return new MetaTimeSeries(ts);
             }
-            else 
+            else
             {
                 //y[2010] or y[-1]
                 IVariable index = indexes[0];
-                if (index.Type() == EVariableType.Val) {
+                if (index.Type() == EVariableType.Val)
+                {
                     int ival = O.GetInt(index);
                     if (ival >= 1900)
                     {
@@ -79,7 +163,7 @@ namespace Gekko
                     return new ScalarVal(this.ts.GetData(((ScalarDate)index).date.Add(this.offset)));
                 }
                 else
-                {
+                {                    
                     //should not be possible
                     G.Writeln2("*** ERROR: SERIES uses []-indexer with wrong variable type");
                     throw new GekkoException();
