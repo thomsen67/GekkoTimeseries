@@ -1085,6 +1085,20 @@ namespace UnitTests
             I("SERIES y = 2;");
             I("SERIES y = 3 $ #m['c'];");
             AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+
+            //PRT/PLOT
+            I("mode data;");
+            I("aser x['y', 'a'] = 5;");
+            I("aser x['y', 'b'] = 6;");
+            I("aser x['z', 'a'] = 7;");
+            I("aser x['z', 'b'] = 8;");
+            I("list m1 = a, b;");
+            I("list m2 = y, z;");
+            I("prt x[#m2, #m1];");
+            I("prt x['y', #m1];");
+            I("prt x[#m2, 'a'];");
+            I("prt x['y', 'a'];");
+
         }
 
         [TestMethod]
