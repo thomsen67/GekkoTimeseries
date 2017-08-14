@@ -163,23 +163,10 @@ dollarExpression        :
      (DOLLAR lbla=dollarConditional -> ^(ASTPOWER $dollarExpression $lbla))*	 
   ; 
 
-
-
 indexerExpression         : 
 	primaryExpression
 	dotOrIndexer*
-//	| GLUEDOT! DOT^ (variableName | function | Integer))*;  //a.q, a.f(), a.1
 ;
-
-
-dotOrIndexer             : 
-						   GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
-						 | leftBracketGlue indexerExpressionHelper2 RIGHTBRACKET -> ^(ASTINDEXER indexerExpressionHelper2)
-						 ;
-
-indexerExpressionHelper2 : (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper;
-dotHelper: variableName | function | Integer;
-
 
 primaryExpression         : leftParen! expression RIGHTPAREN!
                           | value
@@ -196,47 +183,45 @@ value                     : function //must be before variableName
 						  | matrixCol
 						  ;
 
+dotOrIndexer             : GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
+						 | leftBracketGlue indexerExpressionHelper2 RIGHTBRACKET -> ^(ASTINDEXER indexerExpressionHelper2)
+						 ;
+
+dotHelper: variableName | function | Integer;
+indexerExpressionHelper2 : (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper;
+
 matrixCol                 : leftBracketNoGlue matrixRow (doubleVerticalBar matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
 matrixRow                 :  expression (',' expression)*  -> ^(ASTMATRIXROW expression+);
 
-doubleVerticalBar         : GLUE? (DOUBLEVERTICALBAR1 | DOUBLEVERTICALBAR2);
+//FIXME
+//FIXME
+//FIXME ident -> fileName
+//FIXME
+//FIXME
+listFile                  : HASH leftParenGlue LISTFILE ident RIGHTPAREN -> ^(ASTLISTFILE ident);
 
-
-//FIXME
-//FIXME
-//FIXME Ident -> fileName
-//FIXME
-//FIXME
-listFile                  : HASH leftParenGlue LISTFILE Ident RIGHTPAREN -> ^(ASTLISTFILE Ident);
-
-function                  : Ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTFUNCTION Ident expression*);
+function                  : ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTFUNCTION ident expression*);
 					  
 dollarConditional         : LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)  //logicalOr can contain a listWithIndexer
 						  | variableWithIndexer  //does not need parenthesis						
 						  ; 
 					  
-					  indexerExpressionHelper: expression;
-
-indexerExpressionHelper77   : //range -> ^(ASTINDEXERELEMENT range)                             //fm1..fm5
+indexerExpressionHelper   : //range -> ^(ASTINDEXERELEMENT range)                             //fm1..fm5
                             expressionOrNothing doubleDot expressionOrNothing -> ^(ASTINDEXERELEMENT expressionOrNothing expressionOrNothing)     //'fm1'..'fm5'
 						  | expression -> ^(ASTINDEXERELEMENT expression)                                     //'fm*' or -2 or 2000 or 2010q3
 						  | PLUS expression -> ^(ASTINDEXERELEMENTPLUS expression)                            //+1   
                           ;
 range                     : name doubleDot name -> name name;
-doubleDot                 : GLUEDOT? DOT GLUEDOT DOT;
 expressionOrNothing       : expression -> expression
 						  | -> ASTEMPTYRANGEELEMENT
 						  ;
 
-
 						  // name is in principle just like characters, excluding sigils. Kind of like an advanced ident.
 
+						  //name is without sigil
 name                      : (ident | nameCurlyStart) 
 							(GLUE sigil? identDigit | nameCurly | GLUE VERTICALBAR identDigit)*
-						  ;
-
-simpleName                : ident;
-						     
+						  ;					     
 
 nameCurlyStart            : leftCurlyNoGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
 					      | leftCurlyNoGlue expression RIGHTCURLY -> ^(ASTCURLY expression)
@@ -246,33 +231,16 @@ nameCurly                 : leftCurlyGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE i
 					      | leftCurlyGlue expression RIGHTCURLY -> ^(ASTCURLY expression)
 						  ;
 
-variableName              : sigil simpleName freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER simpleName) ^(ASTPLACEHOLDER freq?))
+						  //includes sigil and freq
+variableName              : sigil ident freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER ident) ^(ASTPLACEHOLDER freq?))
 						  | sigil leftParen name rightParen freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER name) ^(ASTPLACEHOLDER freq?))
-						  | simpleName freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER simpleName) ^(ASTPLACEHOLDER freq?))						  
+						  | ident freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER ident) ^(ASTPLACEHOLDER freq?))						  
 						  | name freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER name) ^(ASTPLACEHOLDER freq?))
 						  ;
 
 sigil                     : hashOrPercent GLUE -> hashOrPercent;
-
 hashOrPercent             : HASH | PERCENT;
-
 freq			   		  : GLUE TILDE GLUE name -> name;      //TODO: glue
-
-double2                   : double2Helper -> ^(ASTDOUBLE double2Helper);
-double2Helper             : Double            //0.123 or 25e+12
-						  | DigitsEDigits     //for instance 25e12 which can also be a name chunk.
-						  ;
-
-date2                     : Integer | DateDef;
-
-//fixme
-//fixme
-//fixme
-//fixme
-//fixme
-ident					  : Ident
-						  | NOT
-						  ;
 
 // -------------------- logical or start ---------------------------------
 
@@ -341,13 +309,30 @@ leftCurly                 : (GLUE!)? LEFTCURLY;
 leftCurlyGlue             : GLUE! LEFTCURLY;
 leftCurlyNoGlue           : LEFTCURLY;
 
+doubleVerticalBar         : GLUE? (DOUBLEVERTICALBAR1 | DOUBLEVERTICALBAR2);
+
+doubleDot                 : GLUEDOT? DOT GLUEDOT DOT;
+
+double2                   : double2Helper -> ^(ASTDOUBLE double2Helper);
+double2Helper             : Double            //0.123 or 25e+12
+						  | DigitsEDigits     //for instance 25e12 which can also be a name chunk.
+						  ;
+
+date2                     : Integer | DateDef;
+
+//fixme
+//fixme
+//fixme
+//fixme
+//fixme
+ident					  : Ident
+						  | NOT
+						  ;
+
+
 /*------------------------------------------------------------------
  * LEXER RULES
  *------------------------------------------------------------------*/
-
-LISTSTAR                  : '&*';
-LISTPLUS                  : '&+';
-LISTMINUS                 : '&-';
 
 
  //TODO: Clean up what is fragments and tokens. Stuff used inside lexer rules should be fragments for sure.
