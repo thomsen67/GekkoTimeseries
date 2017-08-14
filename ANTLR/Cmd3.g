@@ -30,6 +30,7 @@ options {
 
 tokens {
     NEGATE;
+	ASTBANKVARIABLENAME;
     ASTINDEXERELEMENT;
     ASTINDEXERELEMENTBANK;
     ASTPOW;
@@ -136,44 +137,38 @@ expr                      : expression ';'? EOF;  //EOF is necessary in order to
 //-----------------------------------------------------------------------------------------
 expression                : additiveExpression; 
 
-additiveExpression        :
-     (multiplicativeExpression        -> multiplicativeExpression)
-     ((PLUS lbla=multiplicativeExpression -> ^(ASTPLUS $additiveExpression $lbla))*
-	 |(MINUS lblb=multiplicativeExpression -> ^(ASTMINUS $additiveExpression  $lblb))*)
-  ;  
+additiveExpression        : (multiplicativeExpression -> multiplicativeExpression)
+							( (PLUS lbla=multiplicativeExpression -> ^(ASTPLUS $additiveExpression $lbla))
+							| (MINUS lblb=multiplicativeExpression -> ^(ASTMINUS $additiveExpression  $lblb)) )*
+						  ;  
 
-multiplicativeExpression        :
-     (powerExpression        -> powerExpression)
-     ((star lbla=powerExpression -> ^(ASTSTAR $multiplicativeExpression $lbla))*
-	 |(DIV lblb=powerExpression -> ^(ASTDIV $multiplicativeExpression  $lblb))*)
-  ;  
+multiplicativeExpression  : (powerExpression -> powerExpression)
+						    ( (star lbla=powerExpression -> ^(ASTSTAR $multiplicativeExpression $lbla))
+						    | (DIV lblb=powerExpression -> ^(ASTDIV $multiplicativeExpression  $lblb)) )*  
+						  ;  
+
+powerExpression			  : (unaryExpression -> unaryExpression)
+						    (pow lbla=unaryExpression -> ^(ASTPOWER $powerExpression $lbla))*	 
+						  ; 
   
-powerExpression        :
-     (unaryExpression        -> unaryExpression)
-     (pow lbla=unaryExpression -> ^(ASTPOWER $powerExpression $lbla))*	 
-  ; 
-  
-unaryExpression        :
-     dollarExpression        -> dollarExpression
-     | MINUS dollarExpression -> ^(ASTNEGATE dollarExpression)	 
-  ;  
+unaryExpression           : dollarExpression -> dollarExpression
+					      | MINUS dollarExpression -> ^(ASTNEGATE dollarExpression)
+						  ;						 
 
-dollarExpression        :
-     (indexerExpression        -> indexerExpression)
-     (DOLLAR lbla=dollarConditional -> ^(ASTPOWER $dollarExpression $lbla))*	 
-  ; 
+dollarExpression		  : (indexerExpression -> indexerExpression)
+						    (DOLLAR lbla=dollarConditional -> ^(ASTPOWER $dollarExpression $lbla))*	 
+						  ; 						  
 
-indexerExpression         : 
-	primaryExpression
-	dotOrIndexer*
-;
+indexerExpression         : primaryExpression
+						    dotOrIndexer*
+						  ;
 
 primaryExpression         : leftParen! expression RIGHTPAREN!
                           | value
 						  ;
 
 value                     : function //must be before variableName
-						  | variableName						  
+						  | bankVariableName						  
 						  | Integer -> ^(ASTINTEGER Integer)
 						  | (leftBracketNoGlue|leftBracketNoGlueWild) indexerExpressionHelper RIGHTBRACKET -> ^(ASTINDEXERALONE indexerExpressionHelper) //also see rule indexerExpression
 						  | double2 -> double2						
@@ -183,12 +178,12 @@ value                     : function //must be before variableName
 						  | matrixCol
 						  ;
 
-dotOrIndexer             : GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
-						 | leftBracketGlue indexerExpressionHelper2 RIGHTBRACKET -> ^(ASTINDEXER indexerExpressionHelper2)
-						 ;
+dotOrIndexer              : GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
+						  | leftBracketGlue indexerExpressionHelper2 RIGHTBRACKET -> ^(ASTINDEXER indexerExpressionHelper2)
+						  ;
 
-dotHelper: variableName | function | Integer;
-indexerExpressionHelper2 : (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper;
+dotHelper				  : variableName | function | Integer;
+indexerExpressionHelper2  : (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper;
 
 matrixCol                 : leftBracketNoGlue matrixRow (doubleVerticalBar matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
 matrixRow                 :  expression (',' expression)*  -> ^(ASTMATRIXROW expression+);
@@ -237,6 +232,8 @@ variableName              : sigil ident freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOL
 						  | ident freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER ident) ^(ASTPLACEHOLDER freq?))						  
 						  | name freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER name) ^(ASTPLACEHOLDER freq?))
 						  ;
+
+bankVariableName          : (name COLON)? variableName -> ^(ASTBANKVARIABLENAME ^(ASTPLACEHOLDER name?) ^(ASTPLACEHOLDER variableName));
 
 sigil                     : hashOrPercent GLUE -> hashOrPercent;
 hashOrPercent             : HASH | PERCENT;
