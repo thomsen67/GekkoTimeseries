@@ -166,14 +166,18 @@ dollarExpression        :
 
 
 indexerExpression         : 
-	(primaryExpression -> primaryExpression)
-	(leftBracketGlue lbla=indexerExpressionHelper2? RIGHTBRACKET -> ^(ASTINDEXER $indexerExpression $lbla?))*
-	(GLUEDOT DOT lblb=dotHelper -> ^(ASTDOT $indexerExpression $lblb))*
+	primaryExpression
+	dotOrIndexer*
 //	| GLUEDOT! DOT^ (variableName | function | Integer))*;  //a.q, a.f(), a.1
 ;
 
-indexerExpressionHelper2 : (indexerExpressionHelper (',' indexerExpressionHelper)*); 
 
+dotOrIndexer             : 
+						   GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
+						 | leftBracketGlue indexerExpressionHelper2 RIGHTBRACKET -> ^(ASTINDEXER indexerExpressionHelper2)
+						 ;
+
+indexerExpressionHelper2 : (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper;
 dotHelper: variableName | function | Integer;
 
 
@@ -209,9 +213,11 @@ function                  : Ident leftParenGlue (expression (',' expression)*)? 
 					  
 dollarConditional         : LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)  //logicalOr can contain a listWithIndexer
 						  | variableWithIndexer  //does not need parenthesis						
-						  ;  
+						  ; 
+					  
+					  indexerExpressionHelper: expression;
 
-indexerExpressionHelper   : //range -> ^(ASTINDEXERELEMENT range)                             //fm1..fm5
+indexerExpressionHelper77   : //range -> ^(ASTINDEXERELEMENT range)                             //fm1..fm5
                             expressionOrNothing doubleDot expressionOrNothing -> ^(ASTINDEXERELEMENT expressionOrNothing expressionOrNothing)     //'fm1'..'fm5'
 						  | expression -> ^(ASTINDEXERELEMENT expression)                                     //'fm*' or -2 or 2000 or 2010q3
 						  | PLUS expression -> ^(ASTINDEXERELEMENTPLUS expression)                            //+1   
