@@ -3931,6 +3931,9 @@ namespace Gekko
 
             DateTime dt1 = DateTime.Now;
 
+            int skippedSets = 0;
+            int importedSets = 0;
+
             string gamsDir = Program.options.gams_exe_folder.Trim();
             if (gamsDir.EndsWith("\\")) gamsDir = gamsDir.Substring(0, gamsDir.Length - "\\".Length);
             if (gamsDir.Trim() == "") gamsDir = null;  //must be so and not an empty string in the GAMSWorkspace call later on
@@ -3992,7 +3995,25 @@ namespace Gekko
 
             foreach (GAMSSymbol gamsSymbol in db)
             {
-                if (gamsSymbol.GetType() == typeof(GAMSParameter) || gamsSymbol.GetType() == typeof(GAMSVariable))
+                if (gamsSymbol.GetType() == typeof(GAMSSet))
+                {
+                    GAMSSet gs = (GAMSSet)gamsSymbol;
+                    if (gs.Dim == 1)
+                    {
+                        List<string> setData = new List<string>();
+                        foreach (GAMSSetRecord gsr in gs)
+                        {
+                            string s = gsr.Keys[0];
+                            setData.Add(s);
+                        }
+                        string name = Globals.symbolList + gs.Name;
+                        if (Program.scalars.ContainsKey(name)) Program.scalars.Remove(name);
+                        Program.scalars.Add(name, new MetaList(setData));
+                        importedSets++;
+                    }
+                    else skippedSets++;
+                }
+                else if (gamsSymbol.GetType() == typeof(GAMSParameter) || gamsSymbol.GetType() == typeof(GAMSVariable))
                 {
                     //The data may or may not be arranged with time (t) as the last set.
                     //If so, we read it in chunks.
@@ -4021,20 +4042,8 @@ namespace Gekko
                     //    //continue;  //make filtering possible!
                     //}
 
-
                     if (G.IsUnitTesting() && !(G.equal(gvar, "m") || G.equal(gvar, "myfm") || G.equal(gvar, "f") || G.equal(gvar, "pm") || G.equal(gvar, "pff") || G.equal(gvar, "ef"))) continue;  //to not waste time on this when unit testing
-
-                    //int[] dims = new int[gamsSymbol.Domains.Count];   
-
-                    //if(G.equal(gvar, "j_cqi")) { 
-
-                    //}
-
-                    //if (G.equal(gvar, "gnslon"))
-                    //{
-
-                    //}
-
+                                       
                     int timeIndex = -12345;
                     int scnsIndex = -12345;
                     for (int i = 0; i < gamsSymbol.Domains.Count; i++)  //only few of these, speed not an issue
@@ -4187,7 +4196,9 @@ namespace Gekko
                     //ignore it
                 }
             }
-            G.Writeln2("Finished GAMS import of " + counterVariables + " variables and " + counterParameters + " parameters (" + G.SecondsFormat((DateTime.Now - t00).TotalMilliseconds) + ")");
+
+            G.Writeln2("Finished GAMS import of " + counterVariables + " variables, " + counterParameters + " parameters and " + importedSets + " sets (" + G.SecondsFormat((DateTime.Now - t00).TotalMilliseconds) + ")");
+            if (skippedSets > 0) G.Writeln("+++ NOTE: " + skippedSets + " sets with dim > 1 were not imported");
 
             readInfo.startPerInFile = yearMin;
             readInfo.endPerInFile = yearMax;

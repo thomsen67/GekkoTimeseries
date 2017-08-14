@@ -1118,8 +1118,8 @@ namespace UnitTests
             //!!!!!!!!!!! FIXME
             I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.8\\';");
             I("read <gdx> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...            
-            I("list scn = base;");
-            I("list psl = chou, cpub, ccon, cgoo, cser;");
+            //I("list scn = base;");
+            //I("list psl = chou, cpub, ccon, cgoo, cser;");
             I("clone;");
             I("delete m;");
             I("aseries M[#psl,#scn] = myFM[#psl,#scn] * F[#psl,#scn] * ((PM[#psl,#scn]/PFF[#psl,#scn])*(PM[#psl,#scn]/PFF[#psl,#scn]))**(-EF[#psl]/2);");
@@ -1130,7 +1130,7 @@ namespace UnitTests
             I("reset; mode data;");
             I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.8\\';");
             I("read <gdx gdxopt='scns.base'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
-            I("list psl = chou, cpub, ccon, cgoo, cser;");
+            //I("list psl = chou, cpub, ccon, cgoo, cser;");
             I("clone;");
             I("delete m;");
             I("aseries M[#psl] = myFM[#psl] * F[#psl] * ((PM[#psl]/PFF[#psl])*(PM[#psl]/PFF[#psl]))**(-EF[#psl]/2);");
