@@ -83,6 +83,7 @@ ASTIFOPERATOR;
 ASTIFOPERATOR5;
 ASTIFOPERATOR;
 ASTIFOPERATOR6;
+ASTIFOPERATOR7;
 ASTCOMPARE2;
 
 
@@ -183,7 +184,7 @@ dotOrIndexer              : GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
 						  ;
 
 dotHelper				  : variableName | function | Integer;
-indexerExpressionHelper2  : (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper;
+indexerExpressionHelper2  : (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper+;
 
 matrixCol                 : leftBracketNoGlue matrixRow (doubleVerticalBar matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
 matrixRow                 :  expression (',' expression)*  -> ^(ASTMATRIXROW expression+);
@@ -241,15 +242,13 @@ freq			   		  : GLUE TILDE GLUE name -> name;      //TODO: glue
 
 // -------------------- logical or start ---------------------------------
 
-logicalOr
-  :  (logicalAnd        -> logicalAnd)
-     (OR? lbla=logicalAnd -> ^(ASTOR $logicalOr $lbla))*  | 
-  ;
+logicalOr				  : (logicalAnd -> logicalAnd)
+							(OR lbla=logicalAnd -> ^(ASTOR $logicalOr $lbla))*  
+						  ;
 
-logicalAnd
-  :  (logicalNot        -> logicalNot)
-     (AND? lbla=logicalNot -> ^(ASTAND $logicalAnd $lbla))*
-  ;
+logicalAnd				  : (logicalNot -> logicalNot)
+							(AND lbla=logicalNot -> ^(ASTAND $logicalAnd $lbla))*
+						  ;
 
 logicalNot				  :  NOT logicalAtom     -> ^(ASTNOT logicalAtom)
 						  |  logicalAtom
@@ -258,7 +257,7 @@ logicalNot				  :  NOT logicalAtom     -> ^(ASTNOT logicalAtom)
 logicalAtom				  :  expression ifOperator expression -> ^(ASTCOMPARE ifOperator expression expression)
 						  |  leftParen! logicalOr rightParen!           // omit both '(' and ')'
 						  |  variableWithIndexer
-						  |  expression IN expression -> ^(ASTLOGICALIN expression expression)
+						  //|  expression IN expression -> ^(ASTLOGICALIN expression expression)
 						  ;
 
 ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
@@ -267,6 +266,7 @@ ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
 						  |  leftAngle -> ^(ASTIFOPERATOR ASTIFOPERATOR4)
 			              |  ISLARGEROREQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR5)
 						  |  ISSMALLEROREQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR6)
+						  |  IN -> ^(ASTIFOPERATOR ASTIFOPERATOR7)
 			              ;
 
 variableWithIndexer       : variableName ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 variableName expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!  //should catch #i0[#i], does not need a parenthesis!						
