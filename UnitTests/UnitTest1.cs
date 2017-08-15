@@ -1099,9 +1099,35 @@ namespace UnitTests
             I("prt x[#m2, 'a'];");
             I("prt x['y', 'a'];");
 
+            //MULPRT with x[#a, #i]
+            I("reset; OPTION databank create auto = yes;");
+            I("time 2010 2012;");
+            I("aser x['a', 'i'] = 1;");
+            I("aser x['a', 'j'] = 2;");
+            I("aser x['b', 'i'] = 3;");
+            I("aser x['b', 'j'] = 4;");
+            I("aser y['a', 'i'] = 5;");
+            I("aser y['a', 'j'] = 6;");
+            I("aser y['b', 'i'] = 7;");
+            I("aser y['b', 'j'] = 8;");
+            I("clone;");
+            I("aser x['a', 'i'] = 11;");
+            I("aser x['a', 'j'] = 12;");
+            I("aser x['b', 'i'] = 13;");
+            I("aser x['b', 'j'] = 14;");
+            I("aser y['a', 'i'] = 15;");
+            I("aser y['a', 'j'] = 16;");
+            I("aser y['b', 'i'] = 17;");
+            I("aser y['b', 'j'] = 18;");
+            I("list a = a, b;");
+            I("list i = i, j;");
+            I("for ts = x, y;");
+            I("  mulprt {ts}[#a, #i];");  //should be tested, yields 10 abs difference for each
+            I("end;");
+
         }
 
-        [TestMethod]
+    [TestMethod]
         public void Test__ReadGdx()
         {
 
