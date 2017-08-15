@@ -3905,10 +3905,8 @@ namespace Gekko
             string tName = "t";  //name of the set identified as time
             int timePartLength = 1;  //how many chars to remove from for instance 't30'
             int year0 = 2006; //'t30' --> 30 + 2006 = 2036.
-
             bool identifyTPlusIntegerAsTime = true;
             char identifierT = 't';
-
             bool loadIntoTimeseriesWithArrays = true;
             //------------------------
 
