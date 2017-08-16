@@ -976,7 +976,21 @@ namespace UnitTests
             AssertHelper(First(), "x", new string[] { "c", "x" }, 2000, 1001, sharedDelta);
             AssertHelper(First(), "x", new string[] { "c", "y" }, 2000, 1002, sharedDelta);
 
+            // ---------- ignore missing cells ------------------------
 
+            I("RESET; MODE data; TIME 2000;");
+            I("LIST i = a, b, c, d;");
+            I("ASER y['a'] = 100;");
+            I("ASER y['b'] = 101;");
+            I("ASER y['c'] = 102;");
+            FAIL("SER z = sum(#i, y[#i]);");
+            FAIL("SER z = y['d']);");            
+            I("OPTION series array ignoremissing = yes;");
+            I("ASER z['1'] = sum(#i, y[#i]);");
+            AssertHelper(First(), "z", new string[] { "1" }, 2000, 303d, sharedDelta);
+            I("ASER z['2'] = y['d'];");
+            AssertHelper(First(), "z", new string[] { "2" }, 2000, 0d, sharedDelta);
+                        
             // --------------------------------
             // fun with loop
             // --------------------------------
@@ -1121,10 +1135,8 @@ namespace UnitTests
             I("aser y['b', 'j'] = 18;");
             I("list a = a, b;");
             I("list i = i, j;");
-            I("for ts = x, y;");
-            I("  mulprt {ts}[#a, #i];");  //should be tested, yields 10 abs difference for each
-            I("end;");
-
+            I("for ts = x, y; mulprt {ts}[#a, #i]; end;");  //should be tested, yields 10 abs difference for each
+            
         }
 
     [TestMethod]
@@ -1143,6 +1155,10 @@ namespace UnitTests
             //!!!!!!!!!!! FIXME
             //!!!!!!!!!!! FIXME
             I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.8\\';");
+            I("OPTION gams time set = 't';");
+            I("OPTION gams time prefix = 't';");
+            I("OPTION gams time offset = 2006;");
+            I("OPTION gams time detect auto = yes;");  //probably not necessary here
             I("read <gdx> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...            
             //I("list scn = base;");
             //I("list psl = chou, cpub, ccon, cgoo, cser;");
@@ -1155,6 +1171,10 @@ namespace UnitTests
             //Cutting off a dimension
             I("reset; mode data;");
             I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.8\\';");
+            I("OPTION gams time set = 't';");
+            I("OPTION gams time prefix = 't';");
+            I("OPTION gams time offset = 2006;");
+            I("OPTION gams time detect auto = yes;");  //probably not necessary here
             I("read <gdx gdxopt='scns.base'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
             //I("list psl = chou, cpub, ccon, cgoo, cser;");
             I("clone;");
@@ -1166,10 +1186,18 @@ namespace UnitTests
             //comparing scenarios            
             I("reset;");
             I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.8\\';");
+            I("OPTION gams time set = 't';");
+            I("OPTION gams time prefix = 't';");
+            I("OPTION gams time offset = 2006;");
+            I("OPTION gams time detect auto = yes;");  //probably not necessary here
             I("read <gdx gdxopt='scns.base'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
             I("write base;");
             I("reset;");
             I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.8\\';");
+            I("OPTION gams time set = 't';");
+            I("OPTION gams time prefix = 't';");
+            I("OPTION gams time offset = 2006;");
+            I("OPTION gams time detect auto = yes;");  //probably not necessary here
             I("read <gdx gdxopt='scns.struc'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
             I("write struc;");
             I("reset;");
@@ -1180,8 +1208,16 @@ namespace UnitTests
             I("PRT work:m['chou'] - ref:m['chou'];");
             AssertHelper(First(), "m", new string[] { "chou" }, 2006 + 27, 35.0258600515369d, sharedDelta);
             AssertHelper(Ref(), "m", new string[] { "chou" }, 2006 + 27, 35.0289043466536d, sharedDelta);
-            
+
+            I("reset; mode data;");
+            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.8\\';");            
+            I("read <gdx> c:\\tools\\decomp\\calib.gdx;");            
+            AssertHelper(First(), "adam_ib", new string[] { "iba" }, 1990, 3147.56d, sharedDelta);
+            AssertHelper(First(), "qc_a_y", new string[] { "52", "ccon" }, 2047, 0.000865742646856205d, sharedDelta);
+
         }
+       
+
 
 
         [TestMethod]
