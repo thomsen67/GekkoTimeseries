@@ -81,11 +81,19 @@ namespace Gekko
         }
 
         //NOTE: only deals with ints like 123, 007, 5. No minus, delimiters etc.!
+        //Returns -12345 if s is not such an integer
         public static int IntParse(string s)
         {
             int y = 0;
             for (int i = 0; i < s.Length; i++)
-                y = y * 10 + (s[i] - '0');
+            {
+                int x = s[i] - '0';
+                if (x < 0 || x > 9)
+                {
+                    return -12345;
+                }
+                y = y * 10 + x;
+            }
             return y;
         }
 

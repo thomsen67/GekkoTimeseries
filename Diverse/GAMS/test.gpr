@@ -1,0 +1,22 @@
+[RP:TEST]
+1=
+
+[OPENWINDOW_1]
+FILE0=C:\Thomas\Gekko\GekkoCS\Diverse\GAMS\test.gdx
+FILE1=C:\Thomas\Gekko\GekkoCS\Diverse\GAMS\test.gms
+FILE2=C:\Thomas\Gekko\GekkoCS\Diverse\GAMS\test.lst
+FILE3=C:\Thomas\Gekko\GekkoCS\Diverse\GAMS\test.gdx
+MAXIM=0
+TOP=50
+LEFT=50
+HEIGHT=400
+WIDTH=400
+
+[GDXDISP: s Set 1]
+PlaneDim=0
+RowDim=1
+Squeeze=1
+SqTrail0=0
+Order=1
+Decim=7
+PlaneRownr=-1
