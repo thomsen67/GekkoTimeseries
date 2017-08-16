@@ -3918,15 +3918,15 @@ namespace Gekko
 
         public static void ReadGdx(Databank databank, ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file2, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
         {
-            //Hardcoded --------------
-            string tName = "t";  //name of the set identified as time
-            int timePartLength = 1;  //how many chars to remove from for instance 't30'
-            int year0 = 2006; //'t30' --> 30 + 2006 = 2036.
-            bool identifyTPlusIntegerAsTime = true;
-            char identifierT = 't';
-            bool loadIntoTimeseriesWithArrays = true;
-            //------------------------
 
+            //OPTIONS
+            //public string gams_time_set = "t";  //name of the time set in GAMS
+            //public string gams_time_prefix = "t";  //prefix of time set elements, for instance t0
+            //public double gams_time_offset = 2006;  //add to the integer, for instance t0 -> 2006
+            //public bool gams_time_autodetect = true;  //will test if a dim looks like time. Only possible with gams_time_prefix != "".
+                        
+            string prefix = Program.options.gams_time_prefix.Trim().ToLower();
+                        
             string file = AddExtension(file2, "." + "gdx");
 
             DateTime dt1 = DateTime.Now;
@@ -4042,7 +4042,7 @@ namespace Gekko
                     //    //continue;  //make filtering possible!
                     //}
 
-                    if (G.IsUnitTesting() && !(G.equal(gvar, "m") || G.equal(gvar, "myfm") || G.equal(gvar, "f") || G.equal(gvar, "pm") || G.equal(gvar, "pff") || G.equal(gvar, "ef"))) continue;  //to not waste time on this when unit testing
+                    if (G.IsUnitTesting() && !(G.equal(gvar, "m") || G.equal(gvar, "myfm") || G.equal(gvar, "f") || G.equal(gvar, "pm") || G.equal(gvar, "pff") || G.equal(gvar, "ef") || G.equal(gvar, "qc_a_y") || G.equal(gvar, "adam_ib"))) continue;  //to not waste time on this when unit testing
                                        
                     int timeIndex = -12345;
                     int scnsIndex = -12345;
@@ -4053,7 +4053,7 @@ namespace Gekko
                         {
                             GAMSSet gs = (GAMSSet)gamsSymbol.Domains.ElementAt(i);
                             //dims[i] = gs.NumberRecords;
-                            if (G.equal(gs.Name, tName))
+                            if (G.equal(gs.Name, Program.options.gams_time_set))
                             {
                                 timeIndex = i;
                             }
@@ -4127,12 +4127,19 @@ namespace Gekko
                         if (timeIndex != -12345)  //time has been identified from sets above
                         {
                             t = keys[timeIndex];
-                            tt = G.IntParse(t.Substring(timePartLength)) + year0;  //remove the "t" and add 2006
+                            if (prefix.Length > 0 && !t.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                            {
+                                G.Writeln2("*** ERROR: GAMS variable/parameter " + gvar + " has element '" + t + "' in the time dimension (" + Program.options.gams_time_set + ")");
+                                G.Writeln("    The time elements are expected to start with '" + prefix + "'", Color.Red);
+                                G.Writeln("    See 'OPTION gams time set' and 'OPTION gams time prefix", Color.Red);
+                                throw new GekkoException();
+                            }
+                            tt = G.IntParse(t.Substring(prefix.Length)) + (int)Program.options.gams_time_offset; //remove the "t" and add 2006
                         }
 
                         string hash = "";
                         //returns hash and tt
-                        GamsGetHashAndTime(year0, identifyTPlusIntegerAsTime, identifierT, cut2, timeIndex, scnsIndex, keys, ref tt, ref hash);
+                        GamsGetHashAndTime(prefix, cut2, timeIndex, scnsIndex, keys, ref tt, ref hash);
 
                         string varName = null;
                         if (hash.Length > 0)
@@ -4367,21 +4374,33 @@ namespace Gekko
             if (timelessCounter > 0) G.Writeln("+++ NOTE: " + timelessCounter + " timeless timeseries skipped");            
         }
 
+<<<<<<< HEAD
         private static void GamsGetHashAndTime(int year0, bool identifyTPlusIntegerAsTime, char identifierT, string cut2, int timeIndex, int scnsIndex, string[] keys, ref int tt, ref string hash)
         {
             
+=======
+        private static void GamsGetHashAndTime(string prefix, string cut2, int timeIndex, int scnsIndex, string[] keys, ref int tt, ref string hash)
+        {           
+
+>>>>>>> faf0f6d... Better gdx handling, cf. options GAMS TIME DETECT AUTO, GAMS TIME OFFSET, GAMS TIME PREFIX, GAMS TIME SET.
             for (int i = 0; i < keys.Length; i++)
             {
                 if (i == timeIndex) continue;  //not to be part of name
                 string keysi = keys[i];
-                if (timeIndex == -12345 && identifyTPlusIntegerAsTime)
+                if (timeIndex == -12345 && Program.options.gams_time_detect_auto)
                 {
-                    //Time not found above, so now we take a closer look at the key. This will cost performance
-                    bool isTime = true;
-                    GamsCheckIfTimeDimension(identifierT, keysi, ref isTime);
-                    if (isTime)
+                    if (prefix == "")
                     {
-                        tt = G.IntParse(keysi.Substring(1)) + year0;  //used later on
+                        G.Writeln2("*** ERROR: you cannot use 'OPTION gams time detect auto = yes;'");
+                        G.Writeln("           with 'OPTION gams time prefix' set to empty string.", Color.Red);
+                        G.Writeln("           You may consider setting 'OPTION gams time detect auto = no;'.", Color.Red);
+                        throw new GekkoException();
+                    }
+                    //Time not found above, so now we take a closer look at the key. This will cost performance                    
+                    int tt2 = GamsCheckIfTimeDimension(prefix, keysi);
+                    if (tt2 != -12345)
+                    {
+                        tt = tt2 + (int)Program.options.gams_time_offset;  //used later on
                         continue;  //not to be part of name
                     }
                 }
@@ -4392,29 +4411,19 @@ namespace Gekko
                 }
                 else
                 {
-                    hash += keysi + Globals.symbolTurtle;
-                    //if (i < keys.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter;                    
+                    hash += keysi + Globals.symbolTurtle;                                
                 }
             }
         }
 
-        private static void GamsCheckIfTimeDimension(char identifierT, string keysi, ref bool isTime)
+        private static int GamsCheckIfTimeDimension(string identifierT, string keysi)
         {
-            bool first = true;
-            foreach (char c in keysi)
+            int i = -12345;
+            if (keysi.StartsWith(identifierT, StringComparison.OrdinalIgnoreCase))
             {
-                if (first && c != identifierT)
-                {
-                    isTime = false;
-                    break;
-                }
-                if (!first && !char.IsDigit(c))
-                {
-                    isTime = false;
-                    break;
-                }
-                first = false;
+                i = G.IntParse(keysi.Substring(identifierT.Length));
             }
+            return i;
         }
 
         public static string NumberFormat(double d, string format2)

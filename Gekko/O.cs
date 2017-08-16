@@ -5042,13 +5042,18 @@ namespace Gekko
                     //insert at top
                     List<string> l2 = new List<string>();
                     l2.Add(all);
-                    l2.AddRange(Globals.r_fileContent);
+                    if (Globals.r_fileContent != null) l2.AddRange(Globals.r_fileContent);
                     Globals.r_fileContent = l2;
                 }
                 else
                 {
                     bool hit = false;
                     List<string> l2 = new List<string>();
+                    if (Globals.r_fileContent == null)
+                    {
+                        G.Writeln2("*** ERROR: the R_FILE is empty");
+                        throw new GekkoException();
+                    }
                     foreach (string line in Globals.r_fileContent)
                     {
                         l2.Add(line);                        
