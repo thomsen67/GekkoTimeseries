@@ -123,27 +123,16 @@ namespace Gekko
                 {
                     if (canCreate == O.ECreatePossibilities.None)
                     {
-                        if (Program.options.series_array_ignoremissing)
+                        string prettyName = this.ts.parentDatabank.aliasName + ":" + this.ts.variableName + "[" + G.PrettifyTimeseriesHash(hash, false, false) + "]";
+                        G.Writeln2("*** ERROR: Cannot find " + prettyName);
+                        if (prettyName.Contains("["))
                         {
-                            return new ScalarVal(0d);
+                            Program.ArrayTimeseriesTip(this.ts.variableName);
                         }
-                        else
-                        {
-                            string prettyName = this.ts.parentDatabank.aliasName + ":" + this.ts.variableName + "[" + G.PrettifyTimeseriesHash(hash, false, false) + "]";
-                            G.Writeln2("*** ERROR: Cannot find " + prettyName);
-                            if (prettyName.Contains("["))
-                            {
-                                Program.ArrayTimeseriesTip(this.ts.variableName);
-                            }
-                            G.Writeln("+++ NOTE: Set 'OPTION series array ignoremissing = yes;' to ignore this error.");
-                            throw new GekkoException();
-                        }
+                        throw new GekkoException();
                     }
-                    else
-                    {
-                        ts = new TimeSeries(this.ts.freqEnum, varHash);
-                        this.ts.parentDatabank.AddVariable(ts);
-                    }
+                    ts = new TimeSeries(this.ts.freqEnum, varHash);
+                    this.ts.parentDatabank.AddVariable(ts);
                 }
                 this.ts.SetDirtyGhost(true, true);  //otherwise, an ASER x['a'] = ... will not register 'x' as a ghost.
                 return new MetaTimeSeries(ts);

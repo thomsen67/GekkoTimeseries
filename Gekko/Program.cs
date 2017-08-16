@@ -62,6 +62,23 @@ using System.Linq;
 namespace Gekko
 {
 
+    public class GekkoSmpl
+    {
+        public GekkoTime t1 = Globals.tNull;
+        public GekkoTime t2 = Globals.tNull;
+
+        public GekkoSmpl()
+        {
+
+        }
+
+        public GekkoSmpl(GekkoTime t1, GekkoTime t2)
+        {
+            this.t1 = t1;
+            this.t2 = t2;
+        }
+    }
+
     public class GekkoList<T>
     {
         private List<T> container = new List<T>();
@@ -3901,15 +3918,15 @@ namespace Gekko
 
         public static void ReadGdx(Databank databank, ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file2, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
         {
+            //Hardcoded --------------
+            string tName = "t";  //name of the set identified as time
+            int timePartLength = 1;  //how many chars to remove from for instance 't30'
+            int year0 = 2006; //'t30' --> 30 + 2006 = 2036.
+            bool identifyTPlusIntegerAsTime = true;
+            char identifierT = 't';
+            bool loadIntoTimeseriesWithArrays = true;
+            //------------------------
 
-            //OPTIONS
-            //public string gams_time_set = "t";  //name of the time set in GAMS
-            //public string gams_time_prefix = "t";  //prefix of time set elements, for instance t0
-            //public double gams_time_offset = 2006;  //add to the integer, for instance t0 -> 2006
-            //public bool gams_time_autodetect = true;  //will test if a dim looks like time. Only possible with gams_time_prefix != "".
-                        
-            string prefix = Program.options.gams_time_prefix.Trim().ToLower();
-                        
             string file = AddExtension(file2, "." + "gdx");
 
             DateTime dt1 = DateTime.Now;
@@ -4025,7 +4042,7 @@ namespace Gekko
                     //    //continue;  //make filtering possible!
                     //}
 
-                    if (G.IsUnitTesting() && !(G.equal(gvar, "m") || G.equal(gvar, "myfm") || G.equal(gvar, "f") || G.equal(gvar, "pm") || G.equal(gvar, "pff") || G.equal(gvar, "ef") || G.equal(gvar, "qc_a_y") || G.equal(gvar, "adam_ib"))) continue;  //to not waste time on this when unit testing
+                    if (G.IsUnitTesting() && !(G.equal(gvar, "m") || G.equal(gvar, "myfm") || G.equal(gvar, "f") || G.equal(gvar, "pm") || G.equal(gvar, "pff") || G.equal(gvar, "ef"))) continue;  //to not waste time on this when unit testing
                                        
                     int timeIndex = -12345;
                     int scnsIndex = -12345;
@@ -4036,7 +4053,7 @@ namespace Gekko
                         {
                             GAMSSet gs = (GAMSSet)gamsSymbol.Domains.ElementAt(i);
                             //dims[i] = gs.NumberRecords;
-                            if (G.equal(gs.Name, Program.options.gams_time_set))
+                            if (G.equal(gs.Name, tName))
                             {
                                 timeIndex = i;
                             }
@@ -4110,19 +4127,12 @@ namespace Gekko
                         if (timeIndex != -12345)  //time has been identified from sets above
                         {
                             t = keys[timeIndex];
-                            if (prefix.Length > 0 && !t.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                            {
-                                G.Writeln2("*** ERROR: GAMS variable/parameter " + gvar + " has element '" + t + "' in the time dimension (" + Program.options.gams_time_set + ")");
-                                G.Writeln("    The time elements are expected to start with '" + prefix + "'", Color.Red);
-                                G.Writeln("    See 'OPTION gams time set' and 'OPTION gams time prefix", Color.Red);
-                                throw new GekkoException();
-                            }
-                            tt = G.IntParse(t.Substring(prefix.Length)) + (int)Program.options.gams_time_offset; //remove the "t" and add 2006
+                            tt = G.IntParse(t.Substring(timePartLength)) + year0;  //remove the "t" and add 2006
                         }
 
                         string hash = "";
                         //returns hash and tt
-                        GamsGetHashAndTime(prefix, cut2, timeIndex, scnsIndex, keys, ref tt, ref hash);
+                        GamsGetHashAndTime(year0, identifyTPlusIntegerAsTime, identifierT, cut2, timeIndex, scnsIndex, keys, ref tt, ref hash);
 
                         string varName = null;
                         if (hash.Length > 0)
@@ -4220,7 +4230,6 @@ namespace Gekko
             //Anyway, the speed penalty is small anyway.
             databank.Trim();
         }
-
 
         public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2  ,  string file2, List<BankNameVersion> list, string writeOption, bool isCloseCommand)
         {
@@ -4358,27 +4367,21 @@ namespace Gekko
             if (timelessCounter > 0) G.Writeln("+++ NOTE: " + timelessCounter + " timeless timeseries skipped");            
         }
 
-        private static void GamsGetHashAndTime(string prefix, string cut2, int timeIndex, int scnsIndex, string[] keys, ref int tt, ref string hash)
-        {           
-
+        private static void GamsGetHashAndTime(int year0, bool identifyTPlusIntegerAsTime, char identifierT, string cut2, int timeIndex, int scnsIndex, string[] keys, ref int tt, ref string hash)
+        {
+            
             for (int i = 0; i < keys.Length; i++)
             {
                 if (i == timeIndex) continue;  //not to be part of name
                 string keysi = keys[i];
-                if (timeIndex == -12345 && Program.options.gams_time_detect_auto)
+                if (timeIndex == -12345 && identifyTPlusIntegerAsTime)
                 {
-                    if (prefix == "")
+                    //Time not found above, so now we take a closer look at the key. This will cost performance
+                    bool isTime = true;
+                    GamsCheckIfTimeDimension(identifierT, keysi, ref isTime);
+                    if (isTime)
                     {
-                        G.Writeln2("*** ERROR: you cannot use 'OPTION gams time detect auto = yes;'");
-                        G.Writeln("           with 'OPTION gams time prefix' set to empty string.", Color.Red);
-                        G.Writeln("           You may consider setting 'OPTION gams time detect auto = no;'.", Color.Red);
-                        throw new GekkoException();
-                    }
-                    //Time not found above, so now we take a closer look at the key. This will cost performance                    
-                    int tt2 = GamsCheckIfTimeDimension(prefix, keysi);
-                    if (tt2 != -12345)
-                    {
-                        tt = tt2 + (int)Program.options.gams_time_offset;  //used later on
+                        tt = G.IntParse(keysi.Substring(1)) + year0;  //used later on
                         continue;  //not to be part of name
                     }
                 }
@@ -4389,19 +4392,29 @@ namespace Gekko
                 }
                 else
                 {
-                    hash += keysi + Globals.symbolTurtle;                                
+                    hash += keysi + Globals.symbolTurtle;
+                    //if (i < keys.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter;                    
                 }
             }
         }
 
-        private static int GamsCheckIfTimeDimension(string identifierT, string keysi)
+        private static void GamsCheckIfTimeDimension(char identifierT, string keysi, ref bool isTime)
         {
-            int i = -12345;
-            if (keysi.StartsWith(identifierT, StringComparison.OrdinalIgnoreCase))
+            bool first = true;
+            foreach (char c in keysi)
             {
-                i = G.IntParse(keysi.Substring(identifierT.Length));
+                if (first && c != identifierT)
+                {
+                    isTime = false;
+                    break;
+                }
+                if (!first && !char.IsDigit(c))
+                {
+                    isTime = false;
+                    break;
+                }
+                first = false;
             }
-            return i;
         }
 
         public static string NumberFormat(double d, string format2)
@@ -6060,7 +6073,7 @@ namespace Gekko
             {
                 string[] ss2 = varName.Split(new string[] { ".." }, StringSplitOptions.None);
                 ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);
-                IVariable xx = ss.Indexer(new IVariablesFilterRange(new ScalarString(bank + ":" + ss2[0]), new ScalarString(ss2[1])), Globals.tNull);
+                IVariable xx = ss.Indexer(null, new IVariablesFilterRange(new ScalarString(bank + ":" + ss2[0]), new ScalarString(ss2[1])));
                 Databank db = Program.databanks.GetDatabank(bank);
                 if (db == null)
                 {
@@ -8687,7 +8700,7 @@ namespace Gekko
                     negative = true;
                 }
 
-                TimeSeries ts = O.GetTimeSeries(var2, 0).ts;
+                TimeSeries ts = O.FindTimeSeries(var2, 0);
 
                 if (ts == null)
                 {
@@ -9433,7 +9446,7 @@ namespace Gekko
                     else if (a.Type() == EVariableType.Val)
                     {
                         if (tpe != null && tpe != "val") continue;
-                        value = a.GetVal(Globals.tNull).ToString();
+                        value = a.GetVal(null).ToString();
                         if (value == "NaN") value = "M";
                     }
                     else if (a.Type() == EVariableType.List)
@@ -10313,7 +10326,7 @@ namespace Gekko
             s2.AppendLine(s3);
             s2.AppendLine("public static O.Prt Snippet()");
             s2.AppendLine("{");
-            s2.AppendLine(Globals.gekkoTimeIniCs);
+            s2.AppendLine(Globals.gekkoSmplInit);
             s2.AppendLine(s);
             s2.AppendLine("}");  //method
             s2.AppendLine("}");  //class
@@ -11187,7 +11200,7 @@ namespace Gekko
                         DateTime t1 = DateTime.Now;
                         double ms = (t1 - t0).TotalMilliseconds;
                         G.Writeln2("Speed1 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
-                        double x = Program.scalars["m"].GetVal(Globals.tNull);
+                        double x = Program.scalars["m"].GetVal(null);
                         G.Writeln("Difference from true: " + (x - (n * (n + 1) / 2)));
                         return "";  //no need for the parser to chew on this afterwards!
                     }
@@ -11934,6 +11947,7 @@ namespace Gekko
                     List<char> glued4 = new List<char> { '@' };  //only checked if no blank right of this
                     List<char> glued5 = new List<char> { '.' };  //only checked if no blank right of this
                     List<char> glued6 = new List<char> { '*', '?' };  //wildcards: a*b and a?b cannot have blanks.
+                    List<char> glued7 = new List<char> { '~' };
 
                     //=========== note =========================
                     // [c1] [c2] [c3], where c2 is the char analyzed.
@@ -11950,36 +11964,36 @@ namespace Gekko
                         char c4 = '\n';
                         if (i < lineNewVersion.Length - 2) c4 = lineNewVersion[i + 2];
 
-                        // -------------------------------------------------------------
-                        // Handle .1, .2, etc. For instance y.1 --> y[-1]
-                        // -------------------------------------------------------------
-                        if (c2 == '.' && char.IsDigit(c3) && !G.IsLetterOrDigitOrUnderscore(c4) && c4 != '.')
-                        {
-                            //now we have stuff like .1, and we need to check the chars before the '.'
-                            bool good = false;
-                            for (int ii = i - 1; ii >= 0; ii--)
-                            {
-                                //it may be for instance y.1 or y12345.1, so we run it backwards looking for
-                                //digits only. When there are no more digits, it MUST be a letter or underscore
-                                if (char.IsDigit(lineNewVersion[ii])) continue;
-                                if (G.IsLetterOrUnderscore(lineNewVersion[ii])) good = true;
-                                break;
-                            }
-                            //not ok: fy.11  fy.1a  fy.1_  fy.1.    All else is ok for fy[-1] translation, also if fy were fy12345 instead
-                            //this will also get translated: %n.1  {s}.1   #m.1
-                            if (good)
-                            {
-                                if (!lineNewVersion.Contains("'"))
-                                {
-                                    //You can have stuff like TABLE xx.currow.setvalues(1,2000,2010,1,'n',0.001,'f10.3'), where 'f10.3' should not become 'f10[-3]' !!!
-                                    //This seems hard to solve properly, so the stuff here is only temporary
-                                    //CONCLUSION: should be solved in the PARSER in the long run
-                                    sb.Append(Globals.symbolGlueChar6 + "-" + c3 + "]");
-                                    i++;
-                                    continue;
-                                }
-                            }
-                        }
+                        //// -------------------------------------------------------------
+                        //// Handle .1, .2, etc. For instance y.1 --> y[-1]
+                        //// -------------------------------------------------------------
+                        //if (c2 == '.' && char.IsDigit(c3) && !G.IsLetterOrDigitOrUnderscore(c4) && c4 != '.')
+                        //{
+                        //    //now we have stuff like .1, and we need to check the chars before the '.'
+                        //    bool good = false;
+                        //    for (int ii = i - 1; ii >= 0; ii--)
+                        //    {
+                        //        //it may be for instance y.1 or y12345.1, so we run it backwards looking for
+                        //        //digits only. When there are no more digits, it MUST be a letter or underscore
+                        //        if (char.IsDigit(lineNewVersion[ii])) continue;
+                        //        if (G.IsLetterOrUnderscore(lineNewVersion[ii])) good = true;
+                        //        break;
+                        //    }
+                        //    //not ok: fy.11  fy.1a  fy.1_  fy.1.    All else is ok for fy[-1] translation, also if fy were fy12345 instead
+                        //    //this will also get translated: %n.1  {s}.1   #m.1
+                        //    if (good)
+                        //    {
+                        //        if (!lineNewVersion.Contains("'"))
+                        //        {
+                        //            //You can have stuff like TABLE xx.currow.setvalues(1,2000,2010,1,'n',0.001,'f10.3'), where 'f10.3' should not become 'f10[-3]' !!!
+                        //            //This seems hard to solve properly, so the stuff here is only temporary
+                        //            //CONCLUSION: should be solved in the PARSER in the long run
+                        //            sb.Append(Globals.symbolGlueChar6 + "-" + c3 + "]");
+                        //            i++;
+                        //            continue;
+                        //        }
+                        //    }
+                        //}
 
                         // -------------------------------------------------------------
                         // Handle PRT<m d> etc.
@@ -12369,63 +12383,55 @@ namespace Gekko
                             //c2 is a '.'
                             if (c1 != '\n' && c3 != '\n')
                             {
-                                if (c3 != '\n')
+
+                                if (c3 == ' ')
                                 {
-                                    if (c3 == ' ')
+                                    //do nothing, normal dot, for instance 12. 34
+                                }
+                                else if (char.IsDigit(c3))
+                                {
+                                    if (glued3a.Contains(c1))
                                     {
-                                        //do nothing, normal dot, for instance 12. 34
+                                        //  +.12, **.12, >.12, (.12, etc.
+                                        sb.Append(Globals.symbolGlueChar3);  //GLUEDOTNUMBER
+                                        sb.Append(c2);
+                                        continue;
                                     }
-                                    else if (char.IsDigit(c3))
+                                    else if (char.IsDigit(c1))
                                     {
-                                        if (glued3a.Contains(c1))
+                                        //in stuff like 12.34 the dot becomes a GLUEDOTNUMBER
+                                        //but only if stuff before 12 is not ident, for instance
+                                        //x12.34. We could have hgn2.1, and that is not a number.
+                                        bool number = true;
+                                        for (int ii = i - 1 - 1; ii >= 0; ii--)
                                         {
-                                            //  +.12, **.12, >.12, (.12, etc.
+                                            //.... +123.45 loops through pure digits until + is met. Here number would be true.
+                                            if (glued3a.Contains(lineNewVersion[ii])) break;  //for instance a "," or "+" to delimit the number ('token')
+                                            if (!char.IsDigit(lineNewVersion[ii]))
+                                            {
+                                                number = false;
+                                                break;
+                                            }
+                                        }
+                                        if (number)
+                                        {
                                             sb.Append(Globals.symbolGlueChar3);  //GLUEDOTNUMBER
                                             sb.Append(c2);
                                             continue;
                                         }
-                                        else if (char.IsDigit(c1))
+                                        else
                                         {
-                                            //in stuff like 12.34 the dot becomes a GLUEDOTNUMBER
-                                            //but only if stuff before 12 is not ident, for instance
-                                            //x12.34. We could have hgn2.1, and that is not a number.
-                                            bool number = true;
-                                            for (int ii = i - 1 - 1; ii >= 0; ii--)
-                                            {
-                                                //.... +123.45 loops through pure digits until + is met. Here number would be true.
-                                                if (glued3a.Contains(lineNewVersion[ii])) break;  //for instance a "," or "+" to delimit the number ('token')
-                                                if (!char.IsDigit(lineNewVersion[ii]))
-                                                {
-                                                    number = false;
-                                                    break;
-                                                }
-                                            }
-                                            if (number)
-                                            {
-                                                sb.Append(Globals.symbolGlueChar3);  //GLUEDOTNUMBER
-                                                sb.Append(c2);
-                                                continue;
-                                            }
-                                            else
-                                            {
-                                                sb.Append(Globals.symbolGlueChar2);  //GLUEDOT
-                                                sb.Append(c2);
-                                                continue;
-                                            }
+                                            sb.Append(Globals.symbolGlueChar2);  //GLUEDOT
+                                            sb.Append(c2);
+                                            continue;
                                         }
                                     }
-                                    if (c1 != ' ' && c2 != ' ')
-                                    {
-                                        sb.Append(Globals.symbolGlueChar2);  //GLUEDOT
-                                        sb.Append(c2);
-                                        continue;
-                                    }
-
-
                                 }
-                                else
+                                if (c1 != ' ' && c3 != ' ')
                                 {
-                                    //ending with a dot
+                                    sb.Append(Globals.symbolGlueChar2);  //GLUEDOT
+                                    sb.Append(c2);
+                                    continue;
                                 }
                             }
                             else
@@ -12438,10 +12444,24 @@ namespace Gekko
                                         sb.Append(Globals.symbolGlueChar3);  //GLUEDOTNUMBER
                                         continue;
                                     }
-                                }
-                                else
+                                }                                
+                            }
+                        }
+
+                        // -------------------------------------------------------------
+                        // Handle tilde (~)  --> if no spaces --> ¨~¨
+                        // -------------------------------------------------------------
+                        if (glued7.Contains(c2))
+                        {
+                            //c2 is a '~'
+                            if (c1 != '\n' && c3 != '\n')
+                            {
+                                if (c1 != ' ' && c3 != ' ')
                                 {
-                                    //ending with a dot
+                                    sb.Append(Globals.symbolGlueChar1);
+                                    sb.Append(c2);
+                                    sb.Append(Globals.symbolGlueChar1);
+                                    continue;
                                 }
                             }
                         }
@@ -14297,27 +14317,188 @@ namespace Gekko
             }
         }
 
+        public static IVariable SmplCheck(GekkoSmpl smpl, IVariable input)
+        {
+            //Checks if the IVariable has data in the smpl range. If not, a GekkoError is returned.
+            //  Else the variable is returned untouched.
+            //If it is a TimeSeriesLight, and the double[] data array is a pointer to the real TimeSeries array,
+            //  this method will never return a GekkoError.
+            if (input.Type() == EVariableType.TimeSeries)
+            {
+                TimeSeriesLight x = (TimeSeriesLight)input;
+                int ix1, ix2; GekkoError ge; TimeSeriesLight.SpmlCheck(smpl, x, out ix1, out ix2, out ge);
+                if (ge != null) return ge;
+            }
+            return input;
+        }
+
+        //public static IVariable SmplCheck(GekkoSmpl smpl, IVariable input)
+        //{
+        //    //Checks if the IVariable has data in the smpl range. If not, a GekkoError is returned.
+        //    //  Else the variable is returned untouched.
+        //    //If it is a TimeSeriesLight, and the double[] data array is a pointer to the real TimeSeries array,
+        //    //  this method will never return a GekkoError.
+        //    if (input.Type() == EVariableType.TimeSeries)
+        //    {
+        //        TimeSeriesLight x = (TimeSeriesLight)input;
+        //        int ix1, ix2; GekkoError ge; TimeSeriesLight.SpmlCheck(smpl, x, out ix1, out ix2, out ge);
+        //        if (ge != null) return ge;
+        //    }
+        //    return input;
+        //}
+
+        //public static GekkoError CheckGekkoError(int underflow, int overflow)
+        //{
+        //    GekkoError ge = null;
+        //    if (underflow > 0 || overflow > 0)
+        //    {
+        //        ge = new GekkoError();
+        //        ge.underflow = underflow;
+        //        ge.overflow = overflow;
+
+        //    }
+        //    return ge;
+        //}
+
+        //public static IVariable SmplCheck(IVariableHelper smpl, IVariable input)
+        //{            
+        //    if (smpl != null && input.Type() == EVariableType.TimeSeries && !((TimeSeriesLight)input).isPointerToRealTimeseriesArray)
+        //    {
+        //        TimeSeriesLight x = (TimeSeriesLight)input;
+        //        int ix1 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t1, x.anchorPeriod, x.anchorPeriodPositionInArray);
+        //        int ix2 = TimeSeries.FromGekkoTimeToArrayIndex(smpl.t2, x.anchorPeriod, x.anchorPeriodPositionInArray);
+
+        //    }
+        //    return input;
+        //}
+
         public static void Tsl()
         {
+            
             GekkoTime tStart = new GekkoTime(EFreq.Annual, 2000, 1);
             GekkoTime tEnd = new GekkoTime(EFreq.Annual, 2002, 1);
             GekkoTime t = Globals.tNull;
-            TimeSeries ts1_ = new TimeSeries(EFreq.Annual, "x");
-            ts1_.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 10d);
-            ts1_.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 11d);
-            ts1_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 13d);
-            TimeSeries ts2_ = new TimeSeries(EFreq.Annual, "y");
-            ts2_.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 110d);
-            ts2_.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 111d);
-            ts2_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 115d);
+            TimeSeries ts1_ = new TimeSeries(EFreq.Annual, "");
+            ts1_.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 1d);
+            ts1_.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 2d);
+            ts1_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 3d);
+                        
+            GekkoSmpl smpl = new Gekko.GekkoSmpl();
+            smpl.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
+            smpl.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
+
+            TimeSeriesLight ts1 = new Gekko.TimeSeriesLight(smpl, ts1_);
+
+            int deduct = 2;
+
+            //So that print can be with percentage growth
+            smpl.t1 = smpl.t1.Add(-deduct);  //this is standard!
+            
+            O.Prt o5 = new O.Prt();
+            o5.prtType = "prt";
+            o5.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
+            o5.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
+            GekkoSmpl smpl2 = new GekkoSmpl(o5.t1.Add(-deduct), o5.t2);
+
+            O.Read o = new O.Read();
+            o.fileName = "jul05";
+            o.Exe();
+
+            
+            {
+                List<int> bankNumbers = null;
+                O.Prt.Element ope0 = new O.Prt.Element();
+                ope0.label =  O.SubstituteScalarsAndLists("xx", false);
+                bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o5, ope0));
+                foreach (int bankNumber in bankNumbers)
+                {
 
 
-            IVariable ts1 = new Gekko.TimeSeriesLight(ts1_, tStart, tEnd);
-            IVariable ts2 = new Gekko.TimeSeriesLight(ts2_, tStart, tEnd);
+                    IVariable result = null;
+                    for (int i = 0; i < int.MaxValue; i++)
+                    {
+                        result = SmplCheck(smpl2, Expression1(smpl));
+                        if (result.Type() != EVariableType.GekkoError) break;
+                        GekkoError ge = (GekkoError)result;
+                        smpl.t1 = smpl.t1.Add(-ge.underflow * (i + 1));  //Use a factor, 1 first time, 2 second, 3 third...
+                        smpl.t2 = smpl.t2.Add(ge.overflow * (i + 1));
+                        if (i > 10)
+                        {
+                            G.Writeln2("*** ERROR: Unexpected lag error #89032984325");
+                            throw new GekkoException();
+                        }
+                    }
+                    if (!(result.Type() == EVariableType.TimeSeries))
+                    {
+                        if (result.Type() == EVariableType.Val)
+                        {
+                            //convert to ts...
+                            throw new GekkoException();
+                        }
+                        //Maybe this is not necessary, could be handled via GetVal() --> rename GetDouble()?
+                        //handle that! VAL should be ok.
+                        G.Writeln2("*** ERROR: Expected SERIES or VAL");
+                        throw new GekkoException();
+                    }
+                    TimeSeriesLight tsl = (TimeSeriesLight)result;
 
-            //ts1 + ts2
-            IVariable ts3 = ts1.Add(ts2, t);
 
+
+                    if (ope0.subElements == null)
+                    {
+                        ope0.subElements = new List<O.Prt.SubElement>();
+                        O.Prt.SubElement opeSub0 = new O.Prt.SubElement();
+                        O.Prt.SubElement opeSub1 = new O.Prt.SubElement();
+                        ope0.subElements.Add(opeSub0);
+                        ope0.subElements.Add(opeSub1);
+                    }
+                    
+                    if (bankNumber == 1)
+                    {
+                        ope0.subElements[0].tsWork = tsl;
+                        ope0.subElements[1].tsWork = ts1;
+                    }
+                    else
+                    {
+                        ope0.subElements[0].tsBase = tsl;
+                        ope0.subElements[1].tsBase = ts1;
+
+                    }
+
+                }
+                o5.prtElements.Add(ope0);
+            }
+            
+            o5.counter = 1;
+            o5.Exe();
+                                  
+            
+            O.Genr o0 = new O.Genr();
+            IVariable ts9 = O.GetTimeSeries(smpl, O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("xx2"))), 1, O.ECreatePossibilities.Can);
+            IVariable ts10 = O.GetTimeSeries(smpl, O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("xx"))), 1);
+            o0.t1 = Globals.globalPeriodStart;
+            o0.t2 = Globals.globalPeriodEnd;
+            o0.lhs = null;
+            o0.p = null;
+            foreach (GekkoTime t2 in new GekkoTimeIterator(o0.t1, o0.t2))
+            {
+                t = t2;
+                //double data = O.GetVal(O.Add(ts10, O.Indexer(t, ts10, false, new ScalarVal(-1d)), t), t);
+                if (o0.lhs == null) o0.lhs = O.GetTimeSeries(ts9);
+                //o0.lhs.SetData(t, data);
+            }
+            t = Globals.tNull;
+            o0.meta = @"ser xx2=xx+xx[-1]";
+            o0.Exe();
+                       
+
+        }
+
+        private static IVariable Expression1(GekkoSmpl smpl)
+        {
+            TimeSeries ts = Program.databanks.GetDatabank("Work").GetVariable("xx");
+            TimeSeriesLight tsl = new TimeSeriesLight(smpl, ts, true);
+            return Functions.test(smpl, O.Add(smpl, tsl, tsl));
         }
 
         private static void AddHtmlToExistingHtml(ref string s1, ref string s2, string css, string s)
@@ -21226,6 +21407,10 @@ namespace Gekko
 
         public static void obeyCommandCalledFromGUI(string s, P p)
         {
+            if (Globals.parser3)
+            {
+                if (s == " " || s.StartsWith("[[")) return;
+            }
             //Globals.prtCsSnippets.Clear();  //to save RAM for long sessions, should be ok to delete it here (otherwise we will just get an exception)
             Program.EmitCodeFromANTLR(s, "", false, p);
             if (!G.IsUnitTesting()) ShowPeriodInStatusField("");
@@ -22683,8 +22868,8 @@ namespace Gekko
                         {
                             bool filter = timefilter && ShouldFilterPeriod(gt);
 
-                            TimeSeries ts = subPe.tsWork;
-                            TimeSeries tsGrund = subPe.tsBase;
+                            TimeSeriesLight ts = subPe.tsWork;
+                            TimeSeriesLight tsGrund = subPe.tsBase;
 
                             double var1;
                             double varPch;
@@ -26590,7 +26775,7 @@ namespace Gekko
             return;
         }
 
-        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string printCode2, GekkoTime gt, TimeSeries tsWork, TimeSeries tsBase, bool isLogTransform, bool isCalledFromTable)
+        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string printCode2, GekkoTime gt, TimeSeriesLight tsWork, TimeSeriesLight tsBase, bool isLogTransform, bool isCalledFromTable)
         {
             string printCode = printCode2.Trim();  //when it comes from for instance a table
 

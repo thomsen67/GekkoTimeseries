@@ -684,8 +684,6 @@ ASTOPT_STRING_Y2;
 
 	// --- tokens1 start ---
 		     REMOTE = 'REMOTE';
-			 OFFSET = 'OFFSET';
-			 DETECT = 'DETECT';
 			 GRIDSTYLE = 'GRIDSTYLE';
             BOLD = 'BOLD';
             ITALIC = 'ITALIC';
@@ -1256,9 +1254,6 @@ d.Add("Y" ,Y);
 		//d.Add("POINTS" , POINTS);
 		d.Add("DOTS" , DOTS);
 		d.Add("IMPULSES" , IMPULSES);
-		d.Add("OFFSET" , OFFSET);
-		d.Add("DETECT" , DETECT);
-		
 										d.Add("SIZE",SIZE);
 										d.Add("CONTINUE",CONTINUE);
 										//d.Add("TITLE",TITLE);
@@ -3179,11 +3174,7 @@ optionType :
 			 | FREQ question -> FREQ question
              | FREQ '='? optionFreq -> FREQ ^(ASTSTRINGSIMPLE optionFreq)
 
-			 | GAMS TIME DETECT AUTO '='? yesNoSimple -> GAMS TIME DETECT AUTO ^(ASTBOOL yesNoSimple)
 			 | GAMS EXE FOLDER '='? fileName -> GAMS EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
-			 | GAMS TIME OFFSET '='? Integer -> GAMS TIME OFFSET ^(ASTINTEGER Integer)
-			 | GAMS TIME PREFIX '='? expression -> GAMS TIME PREFIX ^(ASTSTRINGSIMPLE expression)
-			 | GAMS TIME SET '='? expression -> GAMS TIME SET ^(ASTSTRINGSIMPLE expression)			 
 
 			 | INTERFACE question -> INTERFACE question
              | INTERFACE CLIPBOARD DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CLIPBOARD DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
@@ -3255,9 +3246,7 @@ optionType :
              | SHEET PRT PCH '='? yesNoSimple -> SHEET PRT PCH ^(ASTBOOL yesNoSimple)
 			 | SHEET PRT PCH '='? yesNoSimple -> SHEET PRT PCH ^(ASTBOOL yesNoSimple)
 			 | SHEET ROWS  '='? yesNoSimple -> SHEET ROWS ^(ASTBOOL yesNoSimple)
-			 | SHEET COLS  '='? yesNoSimple -> SHEET COLS ^(ASTBOOL yesNoSimple)		
-			 
-			 | SERIES ARRAY IGNOREMISSING '='? yesNoSimple -> SERIES ARRAY IGNOREMISSING ^(ASTBOOL yesNoSimple)	
+			 | SHEET COLS  '='? yesNoSimple -> SHEET COLS ^(ASTBOOL yesNoSimple)			
 
              | SOLVE question -> SOLVE question
              | SOLVE DATA CREATE AUTO '='? yesNoSimple -> SOLVE DATA CREATE AUTO ^(ASTBOOL yesNoSimple)
@@ -3389,8 +3378,6 @@ ident                     : Ident|
             NONANNUAL|
             DIGITS|
 			REMOTE|
-			OFFSET|
-			DETECT|
 							X|
 							Y|
 							REBASE|

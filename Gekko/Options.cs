@@ -42,9 +42,7 @@ Set Screen Options	    Set options related to the behavior of the AREMOS Graph s
 Additionally, there are model, solve, equation options.
 */
 
-
         //!! do not use '_' inside an option -- the '_' corresponds to a blank in ANTLR        
-        
         public bool bugfix_px = true;
         public bool bugfix_download = true;
 
@@ -73,15 +71,8 @@ Additionally, there are model, solve, equation options.
         public string folder_table1 = "";
         public string folder_table2 = "";
         public string folder_working = "";
-
         public EFreq freq = EFreq.Annual;
-
-        public string gams_exe_folder = "";
-        public string gams_time_set = "t";  //name of the time set in GAMS
-        public string gams_time_prefix = "";  //prefix of time set elements, if 't' time can be for instance t0
-        public double gams_time_offset = 0;  //add to the integer after prefix, for instance t0 -> 2006
-        public bool gams_time_detect_auto = false;  //will test if a dim looks like time. Only possible with gams_time_prefix != "".
-        
+        public string gams_exe_folder = "";  
         //logic could be that interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).
         public string interface_clipboard_decimalseparator = "period";
         public string interface_csv_decimalseparator = "period";  //has to do with Windows interface, so ok here
@@ -131,8 +122,6 @@ Additionally, there are model, solve, equation options.
 
         public string r_exe_folder = "";  //there will probably be more R options later on
         public string r_exe_path = "";  //old name
-
-        public bool series_array_ignoremissing = false;
 
         public bool sheet_mulprt_lev = false;  //n
         public bool sheet_mulprt_abs = true;  //m
