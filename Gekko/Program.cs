@@ -4374,15 +4374,9 @@ namespace Gekko
             if (timelessCounter > 0) G.Writeln("+++ NOTE: " + timelessCounter + " timeless timeseries skipped");            
         }
 
-<<<<<<< HEAD
-        private static void GamsGetHashAndTime(int year0, bool identifyTPlusIntegerAsTime, char identifierT, string cut2, int timeIndex, int scnsIndex, string[] keys, ref int tt, ref string hash)
-        {
-            
-=======
         private static void GamsGetHashAndTime(string prefix, string cut2, int timeIndex, int scnsIndex, string[] keys, ref int tt, ref string hash)
         {           
 
->>>>>>> faf0f6d... Better gdx handling, cf. options GAMS TIME DETECT AUTO, GAMS TIME OFFSET, GAMS TIME PREFIX, GAMS TIME SET.
             for (int i = 0; i < keys.Length; i++)
             {
                 if (i == timeIndex) continue;  //not to be part of name
