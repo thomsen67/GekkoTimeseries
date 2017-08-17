@@ -31,6 +31,9 @@ options {
 tokens {
     NEGATE;
 	ASTBANKVARIABLENAME;
+	ASTHASH;
+	ASTPERCENT;
+	ASTVERTICALBAR;
     ASTINDEXERELEMENT;
     ASTINDEXERELEMENTBANK;
     ASTPOW;
@@ -46,11 +49,12 @@ tokens {
 	ASTDATE2;
 	ASTSTRINGINQUOTES;
 	ASTDOUBLE;
+	ASTDOLLARCONDITIONALVARIABLE;
 
 	ASTNAME;
 ASTNAME;
 ASTIDENT;
-ASTIDENT;
+
 ASTCURLYSIMPLE;
 ASTCURLY;
 ASTIDENTDIGIT;
@@ -127,15 +131,10 @@ ASTCOMPARE2;
 
 expr                      : expression ';'? EOF;  //EOF is necessary in order to force the whole file to be parsed
 
+// ------------------------------------------------------------------------------------------------------------------
+// ------------------- expression START -------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------------------
-//The followin are math expressions
-//If there are no parentheses, an expression like a*b^c+b*c+a^d*e*f^g is first chopped up after '+', next '*' and last '^'.
-//--> a*b^c         +         b*c        +        a^d*e*f^g
-//--> a  *  b^c     +         b * c      +        a^d * e * f^g
-//This makes sense, and after parenthesis everything is possible again (expression)
-//So therefore indexers arguments get expression
-//-----------------------------------------------------------------------------------------
 expression                : additiveExpression; 
 
 additiveExpression        : (multiplicativeExpression -> multiplicativeExpression)
@@ -176,18 +175,24 @@ value                     : function //must be before variableName
 						  | date2 -> ^(ASTDATE2 date2) //a date like: 2001q3 (luckily we do not have 'e' freq, then what about 2012e3 (in principle, = 2012000))
 						  | StringInQuotes -> ^(ASTSTRINGINQUOTES StringInQuotes)
 						  | listFile						
-						  | matrixCol
+						  | matrix
 						  ;
 
+// ------------------------------------------------------------------------------------------------------------------
+// ------------------- expression END -------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------
+						  
 dotOrIndexer              : GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
 						  | leftBracketGlue indexerExpressionHelper2 RIGHTBRACKET -> ^(ASTINDEXER indexerExpressionHelper2)
 						  ;
 
+						  //just like b1:fy~q, we can use #m.fy~q, where fy~q is the variableName.
 dotHelper				  : variableName | function | Integer;
 indexerExpressionHelper2  : (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper+;
 
+matrix                    : matrixCol;
 matrixCol                 : leftBracketNoGlue matrixRow (doubleVerticalBar matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
-matrixRow                 :  expression (',' expression)*  -> ^(ASTMATRIXROW expression+);
+matrixRow                 : expression (',' expression)*  -> ^(ASTMATRIXROW expression+);
 
 //FIXME
 //FIXME
@@ -199,25 +204,29 @@ listFile                  : HASH leftParenGlue LISTFILE ident RIGHTPAREN -> ^(AS
 function                  : ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTFUNCTION ident expression*);
 					  
 dollarConditional         : LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)  //logicalOr can contain a listWithIndexer
-						  | variableWithIndexer  //does not need parenthesis						
+						  | variableWithIndexer -> ^(ASTDOLLARCONDITIONALVARIABLE variableWithIndexer)  //does not need parenthesis						
 						  ; 
+
+variableWithIndexer       : variableName ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 variableName expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!  //should catch #i0[#i], does not need a parenthesis!						
 					  
-indexerExpressionHelper   : //range -> ^(ASTINDEXERELEMENT range)                             //fm1..fm5
-                            expressionOrNothing doubleDot expressionOrNothing -> ^(ASTINDEXERELEMENT expressionOrNothing expressionOrNothing)     //'fm1'..'fm5'
+indexerExpressionHelper   : expressionOrNothing doubleDot expressionOrNothing -> ^(ASTINDEXERELEMENT expressionOrNothing expressionOrNothing)     //'fm1'..'fm5'
 						  | expression -> ^(ASTINDEXERELEMENT expression)                                     //'fm*' or -2 or 2000 or 2010q3
 						  | PLUS expression -> ^(ASTINDEXERELEMENTPLUS expression)                            //+1   
                           ;
-range                     : name doubleDot name -> name name;
+
 expressionOrNothing       : expression -> expression
 						  | -> ASTEMPTYRANGEELEMENT
 						  ;
 
-						  // name is in principle just like characters, excluding sigils. Kind of like an advanced ident.
 
-						  //name is without sigil
+// ------------------------------------------------------------------------------------------------------------------
+// ------------------- name START -------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------
+
+						  //name is without sigil, name is in principle just like characters, excluding sigils. Kind of like an advanced ident.
 name                      : (ident | nameCurlyStart) 
-							(GLUE sigil? identDigit | nameCurly | GLUE VERTICALBAR identDigit)*
-						  ;					     
+							(nameCurly | GLUE! sigilOrVertical? identDigit)*
+						  ;
 
 nameCurlyStart            : leftCurlyNoGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
 					      | leftCurlyNoGlue expression RIGHTCURLY -> ^(ASTCURLY expression)
@@ -236,11 +245,23 @@ variableName              : sigil ident freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOL
 
 bankVariableName          : (name COLON)? variableName -> ^(ASTBANKVARIABLENAME ^(ASTPLACEHOLDER name?) ^(ASTPLACEHOLDER variableName));
 
-sigil                     : hashOrPercent GLUE -> hashOrPercent;
-hashOrPercent             : HASH | PERCENT;
-freq			   		  : GLUE TILDE GLUE name -> name;      //TODO: glue
+// ------------------------------------------------------------------------------------------------------------------
+// ------------------- name END -------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------
 
-// -------------------- logical or start ---------------------------------
+sigil                     : HASH GLUE -> ASTHASH
+						  | PERCENT GLUE -> ASTPERCENT
+						  ;
+
+sigilOrVertical           : sigil
+						  | VERTICALBAR -> ASTVERTICALBAR  //does not have glue after
+						  ;
+
+freq			   		  : GLUE TILDE GLUE name -> name;
+
+// ------------------------------------------------------------------------------------------------------------------
+// ------------------- logical START -------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------
 
 logicalOr				  : (logicalAnd -> logicalAnd)
 							(OR lbla=logicalAnd -> ^(ASTOR $logicalOr $lbla))*  
@@ -256,8 +277,7 @@ logicalNot				  :  NOT logicalAtom     -> ^(ASTNOT logicalAtom)
 
 logicalAtom				  :  expression ifOperator expression -> ^(ASTCOMPARE ifOperator expression expression)
 						  |  leftParen! logicalOr rightParen!           // omit both '(' and ')'
-						  |  variableWithIndexer
-						  //|  expression IN expression -> ^(ASTLOGICALIN expression expression)
+						  |  variableWithIndexer						  
 						  ;
 
 ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
@@ -269,9 +289,12 @@ ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
 						  |  IN -> ^(ASTIFOPERATOR ASTIFOPERATOR7)
 			              ;
 
-variableWithIndexer       : variableName ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 variableName expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!  //should catch #i0[#i], does not need a parenthesis!						
+// ------------------------------------------------------------------------------------------------------------------
+// ------------------- logical END -------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------
 
-// -------------------- logical or end -----------------------------------
+
+
 
 
 leftParen                 : (GLUE!)? LEFTPAREN;
@@ -317,12 +340,14 @@ double2Helper             : Double            //0.123 or 25e+12
 
 date2                     : Integer | DateDef;
 
+ident                     : ident2 -> ^(ASTIDENT ident2);
+
 //fixme
 //fixme
 //fixme
 //fixme
 //fixme
-ident					  : Ident
+ident2 					  : Ident
 						  | NOT
 						  ;
 
