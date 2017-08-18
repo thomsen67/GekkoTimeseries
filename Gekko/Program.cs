@@ -18405,7 +18405,7 @@ namespace Gekko
 
         public static void ArrayTimeseriesTip(string name)
         {
-            G.Writeln("           Tip: try 'DISP " + name + ";' to see the dimensions.");
+            G.Writeln("           Tip: try 'DISP " + name + ";' to see the dimensions.", Color.Red);
         }
 
         private static bool RemoveNullTimeseries(List<BankNameVersion> newList)
