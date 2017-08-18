@@ -1104,7 +1104,18 @@ namespace Gekko
                 h.bank = Program.databanks.GetRef().aliasName;  //overrides the bank name given
                 h.hasColon = true;  //signals later on that this bank is explicitely given, so we cannot search for the timeseries
             }
-            TimeSeries ts = Program.FindOrCreateTimeseries(h.bank, h.name, canAutoCreate, h.hasColon, false);            
+            TimeSeries ts = Program.FindOrCreateTimeseries(h.bank, h.name, canAutoCreate, h.hasColon, false);
+
+            if (Program.options.series_array_ignoremissing)
+            {
+                if (ts.variableName == "temp_timeseries_not_to_be_used_array")
+                {
+                    ts = new TimeSeries(Program.options.freq, "temp_timeseries_not_to_be_used_array");                    
+                    ts.SetTimeless();
+                    ts.SetTimelessData(0d);
+                }
+            }
+                       
             MetaTimeSeries mts = new MetaTimeSeries(ts);
             return mts;
         }

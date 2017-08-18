@@ -6183,8 +6183,7 @@ namespace Gekko
                     }
                     if (ts == null)
                     {
-                        ReportTimeseriesNotFound(variable, null);
-                        throw new GekkoException();
+                        ts = HandleMissingVariable(null, variable);
                     }
                 }
                 else
@@ -6202,16 +6201,7 @@ namespace Gekko
                     ts = db.GetVariable(variable);
                     if (ts == null)
                     {
-                        if (O.isTableCall && Program.options.table_ignoremissingvars)
-                        {
-                            //ignore if variable does not exist
-                            ts = new TimeSeries(Program.options.freq, "temp_timeseries_not_to_be_used");
-                        }
-                        else
-                        {
-                            ReportTimeseriesNotFound(variable, bank);
-                            throw new GekkoException();
-                        }
+                        ts = HandleMissingVariable(bank, variable);
                     }
                 }
             }
@@ -6220,11 +6210,34 @@ namespace Gekko
 
         }
 
+        private static TimeSeries HandleMissingVariable(string bank, string variable)
+        {
+            TimeSeries ts;
+            if (Program.options.series_array_ignoremissing && variable.Contains(Globals.symbolTurtle))
+            {
+                //ignore if array-series does not exist (normal) and ignore if variable does not exist (table)
+                ts = new TimeSeries(Program.options.freq, "temp_timeseries_not_to_be_used_array");
+            }
+            else if (Program.options.table_ignoremissingvars && O.isTableCall)
+            {
+                //ignore if array-series does not exist (normal) and ignore if variable does not exist (table)
+                ts = new TimeSeries(Program.options.freq, "temp_timeseries_not_to_be_used");
+            }
+            else
+            {
+                ReportTimeseriesNotFound(variable, bank);
+                throw new GekkoException();
+            }
+
+            return ts;
+        }
+
         private static void ReportTimeseriesNotFound(string variable, string bank)
         {
             string b = "any open";
-            if (bank != null) b = "'" + bank + "'";
-            G.Writeln2("*** ERROR: " + G.GetFreqString() + " timeseries '" + variable + "' could not be found in " + b + " databank");
+            if (bank != null) b = "'" + bank + "'";                        
+
+            G.Writeln2("*** ERROR: " + G.GetFreqString() + " timeseries '" + G.PrettifyTimeseriesHash(variable, true, false) + "' could not be found in " + b + " databank");
 
             bool changeFreq = false;
 
