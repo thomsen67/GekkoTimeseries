@@ -29,7 +29,9 @@ options {
 }
 
 tokens {
-    NEGATE;
+
+	ASTDOLLAR;
+	ASTDOTORINDEXER;
 	ASTBANKVARIABLENAME;
 	ASTHASH;
 	ASTPERCENT;
@@ -91,10 +93,10 @@ ASTIFOPERATOR7;
 ASTCOMPARE2;
 
 
-	AND              = 'AND';    
-	NOT              = 'NOT';    
-	OR              = 'OR';   
-	IN             = 'IN'; 
+	AND              = 'AND';
+	NOT              = 'NOT';
+	OR              = 'OR';
+	IN             = 'IN';
 	LISTFILE = 'LISTFILE';
 }
 
@@ -135,32 +137,32 @@ expr                      : expression ';'? EOF;  //EOF is necessary in order to
 // ------------------- expression START -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-expression                : additiveExpression; 
+expression                : additiveExpression;
 
 additiveExpression        : (multiplicativeExpression -> multiplicativeExpression)
 							( (PLUS lbla=multiplicativeExpression -> ^(ASTPLUS $additiveExpression $lbla))
 							| (MINUS lblb=multiplicativeExpression -> ^(ASTMINUS $additiveExpression  $lblb)) )*
-						  ;  
+						  ;
 
 multiplicativeExpression  : (powerExpression -> powerExpression)
 						    ( (star lbla=powerExpression -> ^(ASTSTAR $multiplicativeExpression $lbla))
-						    | (DIV lblb=powerExpression -> ^(ASTDIV $multiplicativeExpression  $lblb)) )*  
-						  ;  
+						    | (DIV lblb=powerExpression -> ^(ASTDIV $multiplicativeExpression  $lblb)) )*
+						  ;
 
 powerExpression			  : (unaryExpression -> unaryExpression)
-						    (pow lbla=unaryExpression -> ^(ASTPOWER $powerExpression $lbla))*	 
-						  ; 
-  
+						    (pow lbla=unaryExpression -> ^(ASTPOWER $powerExpression $lbla))*	
+						  ;
+
 unaryExpression           : dollarExpression -> dollarExpression
 					      | MINUS dollarExpression -> ^(ASTNEGATE dollarExpression)
-						  ;						 
+						  ;						
 
 dollarExpression		  : (indexerExpression -> indexerExpression)
-						    (DOLLAR lbla=dollarConditional -> ^(ASTPOWER $dollarExpression $lbla))*	 
-						  ; 						  
+						    (DOLLAR lbla=dollarConditional -> ^(ASTDOLLAR $dollarExpression $lbla))*	
+						  ; 						
 
-indexerExpression         : primaryExpression
-						    dotOrIndexer*
+indexerExpression         : (primaryExpression -> primaryExpression)
+						    (lbla=dotOrIndexer -> ^(ASTDOTORINDEXER $indexerExpression $lbla))*
 						  ;
 
 primaryExpression         : leftParen! expression RIGHTPAREN!
@@ -168,7 +170,7 @@ primaryExpression         : leftParen! expression RIGHTPAREN!
 						  ;
 
 value                     : function //must be before variableName
-						  | bankVariableName						  
+						  | bankVariableName						
 						  | Integer -> ^(ASTINTEGER Integer)
 						  | (leftBracketNoGlue|leftBracketNoGlueWild) indexerExpressionHelper RIGHTBRACKET -> ^(ASTINDEXERALONE indexerExpressionHelper) //also see rule indexerExpression
 						  | double2 -> double2						
@@ -181,7 +183,7 @@ value                     : function //must be before variableName
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- expression END -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
-						  
+						
 dotOrIndexer              : GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
 						  | leftBracketGlue indexerExpressionHelper2 RIGHTBRACKET -> ^(ASTINDEXER indexerExpressionHelper2)
 						  ;
@@ -202,16 +204,16 @@ matrixRow                 : expression (',' expression)*  -> ^(ASTMATRIXROW expr
 listFile                  : HASH leftParenGlue LISTFILE ident RIGHTPAREN -> ^(ASTLISTFILE ident);
 
 function                  : ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTFUNCTION ident expression*);
-					  
+					
 dollarConditional         : LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)  //logicalOr can contain a listWithIndexer
-						  | variableWithIndexer -> ^(ASTDOLLARCONDITIONALVARIABLE variableWithIndexer)  //does not need parenthesis						
-						  ; 
+						  | bvariableWithIndexer -> ^(ASTDOLLARCONDITIONALVARIABLE bvariableWithIndexer)  //does not need parenthesis						
+						  ;
 
-variableWithIndexer       : variableName ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 variableName expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!  //should catch #i0[#i], does not need a parenthesis!						
-					  
+variableWithIndexer       : bankVariableName ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 bankVariableName expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!  //should catch #i0[#i], does not need a parenthesis!						
+					
 indexerExpressionHelper   : expressionOrNothing doubleDot expressionOrNothing -> ^(ASTINDEXERELEMENT expressionOrNothing expressionOrNothing)     //'fm1'..'fm5'
 						  | expression -> ^(ASTINDEXERELEMENT expression)                                     //'fm*' or -2 or 2000 or 2010q3
-						  | PLUS expression -> ^(ASTINDEXERELEMENTPLUS expression)                            //+1   
+						  | PLUS expression -> ^(ASTINDEXERELEMENTPLUS expression)                            //+1
                           ;
 
 expressionOrNothing       : expression -> expression
@@ -223,10 +225,10 @@ expressionOrNothing       : expression -> expression
 // ------------------- name START -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
+name                      : name2 -> ^(ASTNAME name2);
+
 						  //name is without sigil, name is in principle just like characters, excluding sigils. Kind of like an advanced ident.
-name                      : (ident | nameCurlyStart) 
-							(nameCurly | GLUE! sigilOrVertical? identDigit)*
-						  ;
+name2                      : (ident | nameCurlyStart) (nameCurly | GLUE! sigilOrVertical? identDigit)* ;
 
 nameCurlyStart            : leftCurlyNoGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
 					      | leftCurlyNoGlue expression RIGHTCURLY -> ^(ASTCURLY expression)
@@ -239,7 +241,7 @@ nameCurly                 : leftCurlyGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE i
 						  //includes sigil and freq
 variableName              : sigil ident freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER ident) ^(ASTPLACEHOLDER freq?))
 						  | sigil leftParen name rightParen freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER name) ^(ASTPLACEHOLDER freq?))
-						  | ident freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER ident) ^(ASTPLACEHOLDER freq?))						  
+						  | ident freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER ident) ^(ASTPLACEHOLDER freq?))						
 						  | name freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER name) ^(ASTPLACEHOLDER freq?))
 						  ;
 
@@ -264,7 +266,7 @@ freq			   		  : GLUE TILDE GLUE name -> name;
 // ------------------------------------------------------------------------------------------------------------------
 
 logicalOr				  : (logicalAnd -> logicalAnd)
-							(OR lbla=logicalAnd -> ^(ASTOR $logicalOr $lbla))*  
+							(OR lbla=logicalAnd -> ^(ASTOR $logicalOr $lbla))*
 						  ;
 
 logicalAnd				  : (logicalNot -> logicalNot)
@@ -277,7 +279,7 @@ logicalNot				  :  NOT logicalAtom     -> ^(ASTNOT logicalAtom)
 
 logicalAtom				  :  expression ifOperator expression -> ^(ASTCOMPARE ifOperator expression expression)
 						  |  leftParen! logicalOr rightParen!           // omit both '(' and ')'
-						  |  variableWithIndexer						  
+						  |  variableWithIndexer						
 						  ;
 
 ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
@@ -307,14 +309,14 @@ pow                       : stars -> ASTPOW
 
 leftAngle                 : leftAngle2 | leftAngleNo2;
 leftAngle2				  : LEFTANGLESPECIAL;
-leftAngleNo2	          : LEFTANGLESIMPLE; 
+leftAngleNo2	          : LEFTANGLESIMPLE;
 
 rightParen                : RIGHTPAREN (GLUE!)?;
 
 stars                     : (GLUESTAR!)? STARS (GLUESTAR!)?;
 
 leftBracketNoGlue         : LEFTBRACKET;
-leftBracketNoGlueWild     : LEFTBRACKETWILD; 
+leftBracketNoGlueWild     : LEFTBRACKETWILD;
 
 identDigit                : identDigitHelper -> ^(ASTIDENTDIGIT identDigitHelper);
 identDigitHelper
