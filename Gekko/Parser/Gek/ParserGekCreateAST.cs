@@ -76,7 +76,6 @@ namespace Gekko.Parser.Gek
                 PrintAST(t, 0);                
                 return null;
             }
-
             
             // Create a lexer attached to that input            
             Cmd2Parser parser2 = null;

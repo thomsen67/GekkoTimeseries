@@ -31,8 +31,9 @@ options {
 tokens {
 
 	ASTDOLLAR;
+	ASTCNAME;
 	ASTDOTORINDEXER;
-	ASTBANKVARIABLENAME;
+	ASTBANKVARNAME;
 	ASTHASH;
 	ASTPERCENT;
 	ASTVERTICALBAR;
@@ -43,7 +44,7 @@ tokens {
 	ASTINDEXERALONE;
 	ASTINDEXERELEMENTPLUS;
 	ASTINTEGER;
-	ASTVARIABLENAME;
+	ASTVARNAME;
 	ASTPLACEHOLDER;
 	ASTDOT;
 	ASTFUNCTION;
@@ -73,6 +74,7 @@ ASTIDENTDIGIT;
 	ASTLISTFILE;
 
 	ASTDOLLARCONDITIONAL;
+	ASTLIST;
 ASTOR;
 ASTAND;
 ASTNOT;
@@ -169,8 +171,8 @@ primaryExpression         : leftParen! expression RIGHTPAREN!
                           | value
 						  ;
 
-value                     : function //must be before variableName
-						  | bankVariableName						
+value                     : function //must be before varname
+						  | bankvarname						
 						  | Integer -> ^(ASTINTEGER Integer)
 						  | (leftBracketNoGlue|leftBracketNoGlueWild) indexerExpressionHelper RIGHTBRACKET -> ^(ASTINDEXERALONE indexerExpressionHelper) //also see rule indexerExpression
 						  | double2 -> double2						
@@ -178,6 +180,7 @@ value                     : function //must be before variableName
 						  | StringInQuotes -> ^(ASTSTRINGINQUOTES StringInQuotes)
 						  | listFile						
 						  | matrix
+						  | list
 						  ;
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -188,13 +191,16 @@ dotOrIndexer              : GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
 						  | leftBracketGlue indexerExpressionHelper2 RIGHTBRACKET -> ^(ASTINDEXER indexerExpressionHelper2)
 						  ;
 
-						  //just like b1:fy~q, we can use #m.fy~q, where fy~q is the variableName.
-dotHelper				  : variableName | function | Integer;
+						  //just like b1:fy~q, we can use #m.fy~q, where fy~q is the varname.
+dotHelper				  : varname | function | Integer;
 indexerExpressionHelper2  : (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper+;
 
 matrix                    : matrixCol;
 matrixCol                 : leftBracketNoGlue matrixRow (doubleVerticalBar matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
 matrixRow                 : expression (',' expression)*  -> ^(ASTMATRIXROW expression+);
+
+						  //trailing ',' is allowed, for instance ('a', 'b', ). This is Python style: ('a',) will then be a lsits.
+list                      : leftParenNoGlue (expression (',' expression)*)? ','? RIGHTPAREN -> ^(ASTLIST expression*);
 
 //FIXME
 //FIXME
@@ -206,10 +212,10 @@ listFile                  : HASH leftParenGlue LISTFILE ident RIGHTPAREN -> ^(AS
 function                  : ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTFUNCTION ident expression*);
 					
 dollarConditional         : LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)  //logicalOr can contain a listWithIndexer
-						  | bvariableWithIndexer -> ^(ASTDOLLARCONDITIONALVARIABLE bvariableWithIndexer)  //does not need parenthesis						
+						  | bankvarnameindex -> ^(ASTDOLLARCONDITIONALVARIABLE bankvarnameindex)  //does not need parenthesis						
 						  ;
 
-variableWithIndexer       : bankVariableName ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 bankVariableName expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!  //should catch #i0[#i], does not need a parenthesis!						
+bankvarnameindex          : bankvarname ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 bankvarname expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!  //should catch #i0[#i], does not need a parenthesis!						
 					
 indexerExpressionHelper   : expressionOrNothing doubleDot expressionOrNothing -> ^(ASTINDEXERELEMENT expressionOrNothing expressionOrNothing)     //'fm1'..'fm5'
 						  | expression -> ^(ASTINDEXERELEMENT expression)                                     //'fm*' or -2 or 2000 or 2010q3
@@ -220,7 +226,6 @@ expressionOrNothing       : expression -> expression
 						  | -> ASTEMPTYRANGEELEMENT
 						  ;
 
-
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- name START -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
@@ -228,7 +233,7 @@ expressionOrNothing       : expression -> expression
 name                      : name2 -> ^(ASTNAME name2);
 
 						  //name is without sigil, name is in principle just like characters, excluding sigils. Kind of like an advanced ident.
-name2                      : (ident | nameCurlyStart) (nameCurly | GLUE! sigilOrVertical? identDigit)* ;
+name2                     : (ident | nameCurlyStart) (GLUE! identDigit | nameCurly)* ;
 
 nameCurlyStart            : leftCurlyNoGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
 					      | leftCurlyNoGlue expression RIGHTCURLY -> ^(ASTCURLY expression)
@@ -238,14 +243,17 @@ nameCurly                 : leftCurlyGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE i
 					      | leftCurlyGlue expression RIGHTCURLY -> ^(ASTCURLY expression)
 						  ;
 
-						  //includes sigil and freq
-variableName              : sigil ident freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER ident) ^(ASTPLACEHOLDER freq?))
-						  | sigil leftParen name rightParen freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER name) ^(ASTPLACEHOLDER freq?))
-						  | ident freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER ident) ^(ASTPLACEHOLDER freq?))						
-						  | name freq? -> ^(ASTVARIABLENAME ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER name) ^(ASTPLACEHOLDER freq?))
+cname                     : name cnameHelper+ -> ^(ASTCNAME name cnameHelper+);
+cnameHelper               : GLUE sigilOrVertical name -> sigilOrVertical name;
+
+nameOrCname               : cname | name;  //cname must be before name
+
+varname                   : nameOrCname freq? -> ^(ASTVARNAME ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER nameOrCname) ^(ASTPLACEHOLDER freq?))
+						  | sigil name -> ^(ASTVARNAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER name) ^(ASTPLACEHOLDER))
+						  | sigil leftParen cname rightParen -> ^(ASTVARNAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER cname) ^(ASTPLACEHOLDER))						  
 						  ;
 
-bankVariableName          : (name COLON)? variableName -> ^(ASTBANKVARIABLENAME ^(ASTPLACEHOLDER name?) ^(ASTPLACEHOLDER variableName));
+bankvarname               : (name COLON)? varname -> ^(ASTBANKVARNAME varname name?);
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- name END -------------------------------------------------------------------------------
@@ -265,6 +273,8 @@ freq			   		  : GLUE TILDE GLUE name -> name;
 // ------------------- logical START -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
+logical                   : logicalOr;
+
 logicalOr				  : (logicalAnd -> logicalAnd)
 							(OR lbla=logicalAnd -> ^(ASTOR $logicalOr $lbla))*
 						  ;
@@ -279,7 +289,7 @@ logicalNot				  :  NOT logicalAtom     -> ^(ASTNOT logicalAtom)
 
 logicalAtom				  :  expression ifOperator expression -> ^(ASTCOMPARE ifOperator expression expression)
 						  |  leftParen! logicalOr rightParen!           // omit both '(' and ')'
-						  |  variableWithIndexer						
+						  |  bankvarnameindex						
 						  ;
 
 ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
@@ -295,12 +305,10 @@ ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
 // ------------------- logical END -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-
-
-
-
 leftParen                 : (GLUE!)? LEFTPAREN;
 leftParenGlue             : GLUE! LEFTPAREN;
+leftParenNoGlue           : LEFTPAREN;
+
 leftBracketGlue           : LEFTBRACKETGLUE;
 star                      : (GLUESTAR!)? STAR (GLUESTAR!)?;
 pow                       : stars -> ASTPOW
