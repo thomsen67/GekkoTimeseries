@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 // $ANTLR 3.1.3 Mar 18, 2009 10:09:25 Cmd2.g 2017-08-17 01:58:29
+=======
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 Cmd2.g 2017-08-22 13:41:03
+>>>>>>> 66b8bad... EXPORT<r>
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -16,6 +20,7 @@ using Stack 		= Antlr.Runtime.Collections.StackList;
 namespace  Gekko 
 {
 public partial class Cmd2Lexer : Lexer {
+<<<<<<< HEAD
     public const int FUNCTION = 809;
     public const int ASTTABLESETRIGHTBORDER = 527;
     public const int ASTUPDX = 574;
@@ -261,10 +266,258 @@ public partial class Cmd2Lexer : Lexer {
     public const int DigitsEDigits = 1126;
     public const int FILTER = 794;
     public const int SPECIALMINUS = 1008;
+=======
+    public const int FUNCTION = 810;
+    public const int ASTTABLESETRIGHTBORDER = 528;
+    public const int ASTUPDX = 575;
+    public const int D_ = 1163;
+    public const int UPDX = 1068;
+    public const int ASTVARIABLE = 584;
+    public const int ASTHPFILTERLOG = 188;
+    public const int ASTOPT_STRING_CONTINUE = 302;
+    public const int CONST = 731;
+    public const int ASTDOTINDEXER = 112;
+    public const int MACRO2 = 865;
+    public const int ASTOPT_STRING_GDXOPT = 16;
+    public const int ASTINDEXERELEMENTBANK = 210;
+    public const int DP = 767;
+    public const int NOPCH = 912;
+    public const int UNDO = 1063;
+    public const int ASTOPERATOR = 289;
+    public const int GDX = 617;
+    public const int ASTLISTSUFFIX = 243;
+    public const int E_ = 1154;
+    public const int ASTUNFIX = 557;
+    public const int LINEAR = 856;
+    public const int ROWNAMES = 869;
+    public const int ASTIMPOSE = 33;
+    public const int UPCH = 1066;
+    public const int ASTOPT_STRING_INFO = 378;
+    public const int ASTMODEQUESTION = 265;
+    public const int ASTVAL = 582;
+    public const int RETURN = 970;
+    public const int ASTUPDOPERATORSTARDOLLAR = 574;
+    public const int ANALYZE = 690;
+    public const int ASTOPM = 292;
+    public const int ASTOPN = 294;
+    public const int XLINEBEFORE = 640;
+    public const int ASTOPP = 295;
+    public const int CONV2 = 734;
+    public const int ASTOPQ = 296;
+    public const int YLINE = 644;
+    public const int CONV1 = 733;
+    public const int ASTTABLENEXT = 517;
+    public const int ASTOPD = 286;
+    public const int ASTTABLESETTOPBORDER = 530;
+    public const int SHOW = 996;
+    public const int GLUE = 1099;
+    public const int MISSING = 882;
+    public const int D = 743;
+    public const int A = 677;
+    public const int F_ = 1164;
+    public const int AT2 = 612;
+    public const int M = 864;
+    public const int N = 891;
+    public const int STATIC = 1016;
+    public const int ASTTABLEMERGECOLS = 516;
+    public const int CLOSEALL = 715;
+    public const int ASTOPT_STRING_MUTE = 385;
+    public const int TESTSIM = 1038;
+    public const int U = 1055;
+    public const int V = 1069;
+    public const int Q = 951;
+    public const int ASTTABLESETVALUESELEMENT = 532;
+    public const int P = 923;
+    public const int R = 952;
+    public const int ASTOPT_VAL_POINTSIZE = 345;
+    public const int FILE = 793;
+    public const int TRANSLATE = 1045;
+    public const int ASTCLOSE = 64;
+    public const int Y = 667;
+    public const int X = 666;
+    public const int ASTOPMP = 293;
+    public const int ASTINFO = 212;
+    public const int INI = 841;
+    public const int DASHTYPE = 658;
+    public const int ASTURLFIRST3 = 579;
+    public const int ASTINDEXERELEMENTPLUS = 211;
+    public const int ASTOPT_STRING_FIRST = 368;
+    public const int FAIR = 787;
+    public const int LEFTANGLESPECIAL = 1133;
+    public const int MDATEFORMAT = 668;
+    public const int ASTPRTELEMENTDASHTYPE = 453;
+    public const int ASTGENR = 173;
+    public const int G_ = 1165;
+    public const int ASTFUNCTIONDEFRHSSIMPLE = 165;
+    public const int LOCK_ = 861;
+    public const int ASTOPT_STRING_DASHTYPE = 341;
+    public const int ASTPRTELEMENT = 443;
+    public const int ASTUPDOPERATORHASH = 565;
+    public const int ASTCELL = 58;
+    public const int UDVALG = 1059;
+    public const int ITALIC = 606;
+    public const int ASTLAGORLEAD = 220;
+    public const int DATAWIDTH = 748;
+    public const int FILLSTYLE = 663;
+    public const int ITERSHOW = 849;
+    public const int COLONGLUE = 1160;
+    public const int ASTURLFIRST2 = 578;
+    public const int ASTURLFIRST1 = 577;
+    public const int YTITLE = 643;
+    public const int ASTSERIESLHS = 8;
+    public const int ASTOPT_STRING_GEKKO18 = 374;
+    public const int ASTDISP = 103;
+    public const int Y2MAX = 1088;
+    public const int ASTSHEET = 491;
+    public const int ASTUNSWAP = 558;
+    public const int ASTLIST4 = 226;
+    public const int ASTIMPULSES = 31;
+    public const int ASTOPT_VAL_NWIDTH = 424;
+    public const int ASTLIST3 = 225;
+    public const int ASTLIST2 = 223;
+    public const int LINES = 857;
+    public const int ASTOPT_STRING_GDX = 15;
+    public const int ASTUPDOPERATORSTAR = 573;
+    public const int ASTOPT_STRING_SUBTITLE = 305;
+    public const int DOUBLEVERTICALBAR2 = 1123;
+    public const int ASTOPT_STRING_RESPECT = 402;
+    public const int DOUBLEVERTICALBAR1 = 1122;
+    public const int ZERO = 1090;
+    public const int ASTSIGN = 494;
+    public const int AT = 1098;
+    public const int AS = 694;
+    public const int ASTOLS = 283;
+    public const int NOFILTER = 906;
+    public const int COMPRESS = 730;
+    public const int ASTOPT_STRING_HTML = 377;
+    public const int ASTPERCENTPAREN = 437;
+    public const int AVG = 696;
+    public const int VPRT = 1074;
+    public const int TXT = 1053;
+    public const int A_ = 1155;
+    public const int TRUNCATE = 1049;
+    public const int DUMP = 771;
+    public const int ASTREADTO = 476;
+    public const int ASTBANKISSTARCHEATCODE = 53;
+    public const int ASTOPT_VAL_Y2MINSOFT = 336;
+    public const int ASTPRTTIMEFILTER = 467;
+    public const int GLUESTAR = 1140;
+    public const int SPLICE = 1010;
+    public const int ASTUPDOPERATOREQUAL = 563;
+    public const int STACK = 635;
+    public const int ASTFUNCTIONDEFARGS = 161;
+    public const int ASTPERCENTNAMESIMPLE = 436;
+    public const int PRETTY = 940;
+    public const int ASTMETA = 260;
+    public const int MODE = 883;
+    public const int GOAL = 820;
+    public const int ASTOPT_STRING_Y2 = 347;
+    public const int ALIGNLEFT = 687;
+    public const int BY = 702;
+    public const int ASTMISSING = 261;
+    public const int IGNOREVARS = 836;
+    public const int B_ = 1161;
+    public const int ASTMEM = 257;
+    public const int WUDVALG = 1081;
+    public const int LISTFILE = 859;
+    public const int TARGET = 1031;
+    public const int MINUS = 1121;
+    public const int HEADING = 825;
+    public const int ASTOPT_STRING_GBK = 373;
+    public const int ASTOPT_STRING_STAMP = 412;
+    public const int NOLEV = 909;
+    public const int ULEV = 1062;
+    public const int ASTDOLLARHASHNAMESIMPLE = 107;
+    public const int COLON = 1111;
+    public const int ASTOLSELEMENTS = 285;
+    public const int ASTIFTRUE = 205;
+    public const int DETECT = 603;
+    public const int C_ = 1162;
+    public const int ASTFORRIGHTSIDE = 150;
+    public const int STEPS = 625;
+    public const int ASTOPT_STRING_GNUPLOT = 376;
+    public const int ASTSYS = 508;
+    public const int XLINEAFTER = 641;
+    public const int ROWS = 973;
+    public const int ASTFORLEFTSIDE = 146;
+    public const int ARROW = 657;
+    public const int INTERFACE = 843;
+    public const int ASTINTERPOLATE = 35;
+    public const int ASTFUNCTIONDEFTYPE = 167;
+    public const int GAMS = 616;
+    public const int ASTCLONE = 63;
+    public const int ASTOPT_VAL_NDEC = 426;
+    public const int ASTOPT_DATE_XLINE = 316;
+    public const int SPLINE = 1011;
+    public const int LU = 863;
+    public const int ASTOPT_VAL_YMAXHARD = 323;
+    public const int ADDBANK = 620;
+    public const int ENGLISH = 777;
+    public const int RESET = 967;
+    public const int ASTINDEXERALONE = 208;
+    public const int ASTOPT_STRING_LINEAR = 381;
+    public const int YES = 1085;
+    public const int COUNT = 737;
+    public const int L_ = 1169;
+    public const int ALIGNRIGHT = 688;
+    public const int COMMAND = 726;
+    public const int ASTINTEGER = 214;
+    public const int CODE = 718;
+    public const int ASTSPLICE = 500;
+    public const int ASTABS = 42;
+    public const int ASTPRTELEMENTPOINTSIZE = 457;
+    public const int PATH = 926;
+    public const int MP = 886;
+    public const int ASTSTRINGSTATEMENT = 507;
+    public const int RIGHTCURLY = 1116;
+    public const int ASTFINDMISSINGDATA = 141;
+    public const int ASTOPT_VAL_PWIDTH = 425;
+    public const int ASTLOCK = 246;
+    public const int COMMENT = 1152;
+    public const int INVERT = 845;
+    public const int NODIF = 904;
+    public const int M_ = 1157;
+    public const int ARRAY = 721;
+    public const int ASTHASH = 181;
+    public const int ASTOPT_STRING_POINTTYPE = 344;
+    public const int EXIT = 781;
+    public const int SETVALUES = 994;
+    public const int ASTPRTELEMENTY2 = 459;
+    public const int ASTOPT_VAL_DEC = 423;
+    public const int PERIOD = 933;
+    public const int ASERIES = 608;
+    public const int ASTADD = 44;
+    public const int NO = 901;
+    public const int ASTHASHPAREN = 183;
+    public const int ASTCLS = 68;
+    public const int ASTMATRIXCOL = 254;
+    public const int ASTHANDLEFILENAME = 179;
+    public const int ASTFRML = 155;
+    public const int ASTOPT_STRING_KEY = 310;
+    public const int ASTPRTUSING = 38;
+    public const int N_ = 1170;
+    public const int ENDO = 776;
+    public const int DATABANK = 747;
+    public const int STAMP = 1014;
+    public const int ASTTABLESETBORDER = 524;
+    public const int ASTOPT_ = 299;
+    public const int ASTRETURN = 483;
+    public const int ASTOPT_STRING_SEC = 406;
+    public const int EXCEL = 779;
+    public const int ASTLISTFILE = 230;
+    public const int FILEWIDTH = 794;
+    public const int HPFILTER = 831;
+    public const int MEM = 873;
+    public const int OR = 922;
+    public const int DigitsEDigits = 1126;
+    public const int FILTER = 795;
+    public const int SPECIALMINUS = 1009;
+>>>>>>> 66b8bad... EXPORT<r>
     public const int ASTCOPYWILDCARD4 = 77;
     public const int ASTCOPYWILDCARD3 = 76;
     public const int ASTCOPYWILDCARD2 = 75;
     public const int ASTCOPYWILDCARD1 = 74;
+<<<<<<< HEAD
     public const int ASTNAME2 = 268;
     public const int ASTPRTELEMENTNDEC = 444;
     public const int SETBOTTOMBORDER = 987;
@@ -669,10 +922,418 @@ public partial class Cmd2Lexer : Lexer {
     public const int SEARCH = 976;
     public const int STACKED = 1012;
     public const int SETRIGHTBORDER = 990;
+=======
+    public const int ASTNAME2 = 269;
+    public const int ASTPRTELEMENTNDEC = 445;
+    public const int SETBOTTOMBORDER = 988;
+    public const int SOLVE = 1004;
+    public const int ASTCLOSEALL = 65;
+    public const int O_ = 1171;
+    public const int ASTGENRINDEXER = 174;
+    public const int LEFTBRACKET = 1136;
+    public const int ASTDATESTATEMENT = 94;
+    public const int ASTNAMEDIGIT = 271;
+    public const int ASTOPT_STRING_PARAM = 390;
+    public const int ASTOPT_STRING_ABS = 353;
+    public const int NDEC = 894;
+    public const int ASTOPT2 = 298;
+    public const int HIDE = 827;
+    public const int ASTOPT1 = 297;
+    public const int ASTHPFILTERLAMBDA = 187;
+    public const int ASTFORNAME = 147;
+    public const int ASTVARIABLELAGLEAD = 585;
+    public const int ASTDOLLARPERCENTPAREN = 110;
+    public const int POINTS = 937;
+    public const int ASTFUNCTION = 158;
+    public const int SPLIT = 1012;
+    public const int MAX = 871;
+    public const int H_ = 1148;
+    public const int MAT = 867;
+    public const int HTML = 832;
+    public const int ASTTABLEALIGNLEFT = 511;
+    public const int ANNUAL = 611;
+    public const int IF = 833;
+    public const int ASTOPT_STRING_STATIC = 413;
+    public const int TREL = 1047;
+    public const int ASTLIBRARY = 32;
+    public const int ASTHPFILTER = 186;
+    public const int ASTDECOMPITEMS = 96;
+    public const int EQUAL = 1096;
+    public const int ASTOPT_STRING_AREMOS = 356;
+    public const int ASTPRTELEMENTFILLSTYLE = 458;
+    public const int FAILSAFE = 786;
+    public const int NEXT = 899;
+    public const int I_ = 1166;
+    public const int ASTSCALAR = 487;
+    public const int ASTFLAT = 142;
+    public const int ASTSTAMP = 501;
+    public const int GBK = 812;
+    public const int TERMINAL = 1034;
+    public const int ZVAR = 1092;
+    public const int DEFAULT = 678;
+    public const int ASTDOWNLOAD = 115;
+    public const int NONMODEL = 911;
+    public const int J_ = 1167;
+    public const int ASTPRTELEMENTLINEWIDTH = 454;
+    public const int ASTFORRIGHTSIDE2 = 148;
+    public const int WRITE = 1080;
+    public const int HIDELEFTBORDER = 828;
+    public const int ASTPRTITEMS = 460;
+    public const int PUDVALG = 949;
+    public const int QUESTION = 1143;
+    public const int ASTOPT_STRING_Y2TITLE = 329;
+    public const int K_ = 1168;
+    public const int ASTDATESSTATEMENT = 93;
+    public const int ASTOPT_STRING_MISSING = 394;
+    public const int GROWTH = 823;
+    public const int TICS = 631;
+    public const int ASTLISTITEMWILDRANGE = 238;
+    public const int ASTTUPLE = 551;
+    public const int MOD = 1129;
+    public const int NWIDTH = 917;
+    public const int LEFTBRACKETGLUE = 1137;
+    public const int POINTSIZE = 662;
+    public const int CLONE = 713;
+    public const int ASTOBJFUNCTION = 282;
+    public const int ASTOPT_STRING_YMIRROR = 319;
+    public const int PARAM = 924;
+    public const int ASTTIMEFILTERPERIODS = 542;
+    public const int ASTSN = 498;
+    public const int U_ = 1174;
+    public const int ASTSP = 499;
+    public const int UNFIX = 1064;
+    public const int ASTOPT_STRING_TSDX = 417;
+    public const int ASTSD = 488;
+    public const int ASTIFOPERATOR = 203;
+    public const int NFAIR = 900;
+    public const int TYPE = 1054;
+    public const int ASTPRTOPTIONFIELD = 464;
+    public const int TRANSPOSE = 1046;
+    public const int ASTOPT_STRING_SPLINE = 411;
+    public const int ASTEXOQUESTION = 128;
+    public const int ASTOPT_STRING_COLLAPSE = 360;
+    public const int XLSX = 1084;
+    public const int COLS = 724;
+    public const int YMIRROR = 642;
+    public const int T_ = 1149;
+    public const int ASTTUPLEITEMS = 554;
+    public const int ASTTABLESETLEFTBORDER = 527;
+    public const int ASTPRTOPTIONFIELD2 = 462;
+    public const int ASTPRTOPTIONFIELD3 = 463;
+    public const int Y2 = 665;
+    public const int PRIM = 942;
+    public const int ASTOPT_STRING_FILENAME = 370;
+    public const int ASTOPT_STRING_TSP = 418;
+    public const int ASTCOMPARE2 = 4;
+    public const int KEY = 633;
+    public const int GRID = 632;
+    public const int LISTPLUS = 1118;
+    public const int ASTELSESTATEMENTS = 121;
+    public const int ASTBANK = 52;
+    public const int ASTOPT_STRING_LABELS = 380;
+    public const int ASTASSIGNVARIABLE = 49;
+    public const int ASTOPT_STRING_TSD = 416;
+    public const int W_ = 1176;
+    public const int ASTOPERATORDOLLAR = 290;
+    public const int WAIT = 1075;
+    public const int ASTOPT_STRING_PALETTE = 311;
+    public const int ABS = 680;
+    public const int ASTLISTDIFFERENCE = 229;
+    public const int MERGECOLS = 877;
+    public const int MODERNLOOK = 885;
+    public const int Ident = 1125;
+    public const int READ = 958;
+    public const int ASTFUNCTIONDEFARG = 160;
+    public const int ASTEXPRESSION = 129;
+    public const int TESTRANDOMMODEL = 1036;
+    public const int V_ = 1175;
+    public const int StringInQuotes = 1100;
+    public const int ASTNEWTABLE = 278;
+    public const int ASTFORVAL = 153;
+    public const int ASTENDO = 124;
+    public const int ASTXEDIT = 600;
+    public const int SIZE = 629;
+    public const int CALC = 704;
+    public const int HELP = 826;
+    public const int ASTOPT_STRING_LINECOLOR = 343;
+    public const int RD = 956;
+    public const int EDIT = 772;
+    public const int ASTOPT_STRING_PRN = 396;
+    public const int ASTOPT_STRING_ERROR = 351;
+    public const int RP = 974;
+    public const int ASTBOOL = 55;
+    public const int RN = 972;
+    public const int ASTUPDADVANCED = 560;
+    public const int ASTYMIN = 598;
+    public const int RING = 971;
+    public const int ASTTABLEINPUTFILE = 515;
+    public const int ASTEMPTYRANGEELEMENT = 123;
+    public const int ALIGNCENTER = 686;
+    public const int ASTOPT_DATE_XLINEBEFORE = 317;
+    public const int Q_ = 1156;
+    public const int XZEROAXIS = 649;
+    public const int TIME = 1039;
+    public const int ASTFUNCTIONDEFNAME = 164;
+    public const int SUFFIX = 1021;
+    public const int ASTOPT_STRING_SOURCE = 410;
+    public const int REPLACE = 965;
+    public const int ASTRES = 480;
+    public const int ASTNAME = 270;
+    public const int ASTAPPEND = 46;
+    public const int P_ = 1150;
+    public const int PX = 720;
+    public const int ADD = 683;
+    public const int LINESPOINTS = 622;
+    public const int CAPS = 705;
+    public const int ASTREPLACE = 479;
+    public const int REMOTE = 601;
+    public const int PATCH = 925;
+    public const int ASTOPT_STRING_BOLD = 11;
+    public const int ASTLISTITEMSNEW = 237;
+    public const int COMMAND2 = 728;
+    public const int COMMAND1 = 727;
+    public const int TO = 1043;
+    public const int PCIMSTYLE = 930;
+    public const int ITER = 846;
+    public const int ASTIFFALSE = 196;
+    public const int ASTACCEPT = 43;
+    public const int EFTER = 773;
+    public const int ASTOPT_VAL_Y2MIN = 334;
+    public const int R_RUN = 955;
+    public const int MIN = 880;
+    public const int DATES = 750;
+    public const int MULPCT = 888;
+    public const int ASTOPT_VAL_YMINHARD = 326;
+    public const int ASTWILDQUESTION = 590;
+    public const int ASTTIMEFILTER = 540;
+    public const int LINECOLOR = 660;
+    public const int CHANGE = 707;
+    public const int S_ = 1173;
+    public const int ASTOPT_STRING_PAUSE = 301;
+    public const int ASTOPT_STRING_SERIES = 408;
+    public const int ASTOPT_STRING_PLOTCODE = 392;
+    public const int DIF = 758;
+    public const int ASTTABLEHIDERIGHTBORDER = 514;
+    public const int CLOSE = 714;
+    public const int ASTOPT_VAL_WIDTH = 422;
+    public const int ASTSTAR = 502;
+    public const int ASTMULBK = 267;
+    public const int ASTWILDCARD = 588;
+    public const int CLEAR2 = 710;
+    public const int MAXLINES = 872;
+    public const int DIV = 1128;
+    public const int SHOWBORDERS = 997;
+    public const int SHEET = 995;
+    public const int ASTOPT_STRING_SAVE = 405;
+    public const int BETWEEN = 613;
+    public const int Integer = 1114;
+    public const int R_ = 1172;
+    public const int FIRST = 797;
+    public const int GDIF = 813;
+    public const int ASTTUPLESIMPLE = 555;
+    public const int COLORS = 723;
+    public const int INTERNAL = 844;
+    public const int ASTINDEXERELEMENT = 209;
+    public const int ASTOPT_STRING_LINETYPE = 340;
+    public const int ASTOPT_VAL_REPLACE = 429;
+    public const int ASTOPT_STRING_X2ZEROAXIS = 337;
+    public const int ASTTABLEPRINT = 523;
+    public const int ASTMATRIX = 253;
+    public const int ASTPRTOPTION = 461;
+    public const int ASTDATE = 91;
+    public const int ASTOPT_STRING_STACK = 312;
+    public const int ASTOPT_STRING_TITLE = 304;
+    public const int YMAXSOFT = 646;
+    public const int ASTTEST = 536;
+    public const int ASTPOINTS = 29;
+    public const int ASTDATA = 86;
+    public const int ASTCREATE = 80;
+    public const int ASTNEW = 277;
+    public const int ASTOPT_STRING_PREFIX = 14;
+    public const int OLS = 919;
+    public const int ASTNULL = 280;
+    public const int ASTPRTELEMENTOPTIONFIELD = 447;
+    public const int ASTCREATEQUESTION = 82;
+    public const int ASTCOMPARECOMMAND = 72;
+    public const int UABS = 1056;
+    public const int PRINTCODES = 944;
+    public const int ASTSTRINGINQUOTES = 505;
+    public const int ASTCURLYSIMPLE = 84;
+    public const int HORIZON = 830;
+    public const int YMINHARD = 647;
+    public const int RESTART = 969;
+    public const int NEWTON = 898;
+    public const int ASTURLPART = 580;
+    public const int ASTOPT_STRING_AFTER = 354;
+    public const int LABELS = 851;
+    public const int NAMES = 893;
+    public const int TSD = 1050;
+    public const int ASTMODELFILE = 264;
+    public const int XLINE = 639;
+    public const int ASTNAMEWITHDOT = 276;
+    public const int ASTSERIESQUESTION = 490;
+    public const int ASTTUPLEFUNCTIONSIMPLE = 552;
+    public const int ASTOPT_STRING_XZEROAXIS = 328;
+    public const int TEST = 1035;
+    public const int ASTOPT_STRING_TICS = 308;
+    public const int TSP = 1052;
+    public const int PDEC = 932;
+    public const int ASTCLOSESTAR = 67;
+    public const int ASTTABLEOUTPUTTYPE = 522;
+    public const int BACKSLASH = 1132;
+    public const int ASTPRTELEMENTPDEC = 448;
+    public const int Y_ = 1178;
+    public const int ASTOPT_STRING_STOP = 303;
+    public const int ASTIDENTDIGIT = 192;
+    public const int ASTSTRING = 504;
+    public const int NOGDIFF = 908;
+    public const int Y2MINHARD = 654;
+    public const int UNSWAP = 1065;
+    public const int DOC = 765;
+    public const int DateDef = 1117;
+    public const int UGDIF = 1060;
+    public const int FOR = 804;
+    public const int PCTPRT = 931;
+    public const int ASTRESTART = 482;
+    public const int AND = 691;
+    public const int NDIFPRT = 895;
+    public const int PROT = 946;
+    public const int X_ = 1177;
+    public const int CONTINUE = 628;
+    public const int GEKKO18 = 815;
+    public const int COPY = 735;
+    public const int IdentStartingWithInt = 1127;
+    public const int ALL = 689;
+    public const int ASTIFOPERATOR1 = 197;
+    public const int ASTIFOPERATOR2 = 198;
+    public const int ASTIFOPERATOR4 = 200;
+    public const int ASTIFOPERATOR3 = 199;
+    public const int ASTIFOPERATOR6 = 202;
+    public const int ASTIFOPERATOR5 = 201;
+    public const int ASTDOTS = 30;
+    public const int ASTFORSTATEMENTS = 151;
+    public const int Y2MAXSOFT = 653;
+    public const int DOT = 1107;
+    public const int ASTOPT_STRING_FONT = 306;
+    public const int ASTGENERIC1 = 172;
+    public const int ASTVERS = 587;
+    public const int PRORATE = 674;
+    public const int ASTWILDCARDWITHBANK = 589;
+    public const int LINEWIDTH = 659;
+    public const int FLAT = 800;
+    public const int HASH = 1139;
+    public const int ASTFUNCTIONDEFCODE = 162;
+    public const int ASTTUPLEITEM = 553;
+    public const int ASTFILENAMEPART = 137;
+    public const int ASTOPT_STRING_NAMES = 387;
+    public const int ASTCLOSEBANKS = 66;
+    public const int FEED = 790;
+    public const int COMMA2 = 1097;
+    public const int ASTTABLESETTEXT = 529;
+    public const int PLOTCODE = 936;
+    public const int ASTTELL = 535;
+    public const int ASTMACROPLUS = 250;
+    public const int ASTTABLEALIGNCENTER = 510;
+    public const int ASTOPT_STRING_PRIM = 395;
+    public const int Z_ = 1179;
+    public const int ASTSHOW = 493;
+    public const int ASTMERGE = 259;
+    public const int CONV = 732;
+    public const int ASTNUMBER = 281;
+    public const int ASTTABLEHIDELEFTBORDER = 513;
+    public const int ASTDECOMP = 95;
+    public const int ASTPCH = 434;
+    public const int ASTPRTELEMENTWIDTH = 451;
+    public const int PALETTE = 634;
+    public const int BANK2 = 700;
+    public const int ASTIDENT = 190;
+    public const int ASTINI = 213;
+    public const int ASTFORLEFTSIDE2 = 145;
+    public const int ABSOLUTE = 681;
+    public const int METHOD = 879;
+    public const int BANK1 = 699;
+    public const int COMMENT_MULTILINE = 1153;
+    public const int DUMOFF = 769;
+    public const int IMPULSES = 627;
+    public const int ASTOPT_VAL_FONTSIZE = 307;
+    public const int ASTPOW = 440;
+    public const int ASTOPT_VAL_BOXGAP = 314;
+    public const int LEFTBRACKETWILD = 1138;
+    public const int ASTFILLEDCURVES = 27;
+    public const int ASTRESET = 481;
+    public const int GRAPH = 822;
+    public const int ASTFILENAME2 = 132;
+    public const int ASTFILENAME1 = 131;
+    public const int ASTDISPLAY = 104;
+    public const int ASTGOTO = 178;
+    public const int ASTTARGET = 534;
+    public const int MULBK = 887;
+    public const int ASTTABLESETBOTTOMBORDER = 525;
+    public const int ISSMALLEROREQUAL = 1110;
+    public const int ASTCOLLAPSE = 69;
+    public const int SYS = 1024;
+    public const int ASTHDG = 184;
+    public const int CLEAR = 709;
+    public const int ASTHELP = 185;
+    public const int ASTR_EXPORT = 470;
+    public const int GLUEDOTNUMBER = 1158;
+    public const int CREATE = 739;
+    public const int ASTTABLEOPTIONFIELDWINDOW = 520;
+    public const int ASTIF = 194;
+    public const int ASTDATAORIENTATION = 89;
+    public const int ASTOPT_STRING_PCIM = 391;
+    public const int STRING2 = 1019;
+    public const int ASTWRITE = 592;
+    public const int ASTOPT_VAL_PDEC = 427;
+    public const int FONTSIZE = 803;
+    public const int TELL = 1032;
+    public const int NONANNUAL = 614;
+    public const int FONT = 802;
+    public const int ASTPRTTYPE = 468;
+    public const int CLIP = 711;
+    public const int ASTGENRLISTINDEXER2 = 176;
+    public const int ASTDECOMPTYPE = 97;
+    public const int ASTTIMEQUESTION = 545;
+    public const int DANISH = 745;
+    public const int ASTOPT_STRING_KEEP = 379;
+    public const int MUTE = 890;
+    public const int ASTLIST = 227;
+    public const int ASTOPT_STRING_DUMP = 348;
+    public const int TEMP = 1033;
+    public const int SER2 = 980;
+    public const int ASTFILENAME = 133;
+    public const int SER3 = 981;
+    public const int XLS = 1083;
+    public const int WHITESPACE = 1151;
+    public const int STOP = 1018;
+    public const int VALUE = 1071;
+    public const int ASTLEV = 222;
+    public const int REORDER = 962;
+    public const int ASTSTOP = 503;
+    public const int ASTEXPORTR = 149;
+    public const int UDIF = 1057;
+    public const int ASTDOLLARPERCENTNAMESIMPLE = 109;
+    public const int ASTZERO = 599;
+    public const int WPLOT = 1079;
+    public const int ASTPRT = 442;
+    public const int ASTLISTWITHBANK = 245;
+    public const int YLABELS = 610;
+    public const int ASTBRACKET = 56;
+    public const int ASTUNDOSIM = 556;
+    public const int ASTINDEX = 206;
+    public const int WIDTH = 1076;
+    public const int ASTUPDOPERATORPERCENT = 569;
+    public const int ASTSERIESRHS = 9;
+    public const int CONSTANT = 672;
+    public const int SEARCH = 977;
+    public const int STACKED = 1013;
+    public const int SETRIGHTBORDER = 991;
+>>>>>>> 66b8bad... EXPORT<r>
     public const int ASTSTEPS = 28;
     public const int ASTDOLLARHASHPAREN = 108;
     public const int ASTCURLY = 83;
     public const int ASTASSIGNSTATEMENT = 48;
+<<<<<<< HEAD
     public const int ASTOPT_VAL_YLINE = 320;
     public const int POINTTYPE = 660;
     public const int ASTOPT_STRING_ITALIC = 13;
@@ -1192,6 +1853,527 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTLIST2OLD = 223;
     public const int DATA = 745;
     public const int ASTOPT_STRING_FROM = 371;
+=======
+    public const int ASTOPT_VAL_YLINE = 321;
+    public const int POINTTYPE = 661;
+    public const int ASTOPT_STRING_ITALIC = 12;
+    public const int YMAXHARD = 645;
+    public const int ASTTABLESHOWBORDERS = 533;
+    public const int CPLOT = 738;
+    public const int PRTX = 948;
+    public const int ASTSIMPLEFUNCTION = 496;
+    public const int ASTOPT_VAL_LINEWIDTH = 342;
+    public const int ASTPRTELEMENTLINETYPE = 452;
+    public const int TOTAL = 1044;
+    public const int ASTSHEETIMPORT = 492;
+    public const int NOCR = 903;
+    public const int ASTLISTITEMS1 = 234;
+    public const int ASTLISTITEMS0 = 233;
+    public const int ASTGENRLHSFUNCTION = 175;
+    public const int ASTLISTITEMS2 = 235;
+    public const int TABLE = 1026;
+    public const int SOURCE = 1008;
+    public const int VERSION = 1073;
+    public const int ASTMENUTABLE = 258;
+    public const int PWIDTH = 950;
+    public const int ASTOPT_VAL_YMAXSOFT = 324;
+    public const int DEBUG = 751;
+    public const int ASTOPTION = 431;
+    public const int ASTDISPSEARCH = 105;
+    public const int ASTRANGEWITHBANK = 474;
+    public const int ASTFRMLCODE = 156;
+    public const int ASTPRTELEMENTS = 450;
+    public const int ASTCLEARALL = 62;
+    public const int ISEQUAL = 1108;
+    public const int MIXED = 881;
+    public const int AUTO = 695;
+    public const int SETTEXT = 992;
+    public const int MESSAGE = 878;
+    public const int PLUS = 1113;
+    public const int ASTDP = 116;
+    public const int INFOFILE = 840;
+    public const int ASTAT = 50;
+    public const int ASTEMPTY = 122;
+    public const int PCIM = 929;
+    public const int ASTAS = 47;
+    public const int DETAILS = 756;
+    public const int ASTDIFPRT = 101;
+    public const int ASTRUN = 485;
+    public const int MERGE = 876;
+    public const int ASTOPT_STRING_MERGE = 383;
+    public const int INTERPOLATE = 673;
+    public const int ASTCOPYWILDCARD = 78;
+    public const int LISTMINUS = 1119;
+    public const int SORT = 1006;
+    public const int ASTDIF = 100;
+    public const int ZOOM = 1091;
+    public const int NYTVINDU = 918;
+    public const int ASTIFSTATEMENTS = 204;
+    public const int ASTCREATEEXPRESSION = 81;
+    public const int ASTWILDSTAR = 591;
+    public const int MULPRT = 889;
+    public const int ASTOPT_STRING_ARROW = 339;
+    public const int ASTLISTPREFIX = 240;
+    public const int ASTPRT2 = 441;
+    public const int ASTTABLESETVALUES = 531;
+    public const int TESTRANDOMMODELCHECK = 1037;
+    public const int ASER = 607;
+    public const int SERIES2 = 983;
+    public const int ASTOPT_STRING_YTITLE = 320;
+    public const int ASTOPT_STRING_GRIDSTYLE = 13;
+    public const int SERIES3 = 984;
+    public const int ASTDOUBLE = 113;
+    public const int FORMAT = 805;
+    public const int ASTMATRIXROW = 256;
+    public const int X2ZEROAXIS = 656;
+    public const int GLUEBACKSLASH = 1131;
+    public const int LAGFIX = 619;
+    public const int TITLE = 1042;
+    public const int PREFIX = 939;
+    public const int UGDIFF = 1061;
+    public const int COLNAMES = 870;
+    public const int ASTDOC = 106;
+    public const int FIX = 799;
+    public const int ASTOPT_VAL_Y2LINE = 330;
+    public const int CLIPBOARD = 712;
+    public const int ASTOPT_VAL_POS = 430;
+    public const int BUGFIX = 722;
+    public const int ASTTRANSPOSE = 549;
+    public const int FOLDER = 801;
+    public const int ASTOR = 39;
+    public const int ASTRETURNTUPLE = 484;
+    public const int ASTLISTINTERSECTION = 231;
+    public const int ASTGDIF = 169;
+    public const int NEW = 897;
+    public const int ASTLABEL1 = 217;
+    public const int ASTTIME = 539;
+    public const int Y2LINE = 651;
+    public const int GDIFF = 814;
+    public const int ASTOPT_VAL_Y2MINHARD = 335;
+    public const int ASTTABLEOPTIONFIELD = 519;
+    public const int ASTOPT_VAL_LAG = 428;
+    public const int ASTOPT_LIST_ROWNAMES = 251;
+    public const int MENUTABLE = 875;
+    public const int ASTR_RUN = 473;
+    public const int ASTOPT_STRING_BANK = 349;
+    public const int ASTOPT_STRING_COLORS = 361;
+    public const int HAT = 1112;
+    public const int RES = 966;
+    public const int VERTICALBAR = 1115;
+    public const int SYSTEM = 1025;
+    public const int ASTOPT_STRING_XLSX = 421;
+    public const int ASTDATE2 = 90;
+    public const int BOXGAP = 637;
+    public const int TSDX = 1051;
+    public const int ASTOPT_VAL_Y2MAXHARD = 332;
+    public const int VAL = 1070;
+    public const int ASTIDENTADVANCEDDOT = 191;
+    public const int ISNOTQUAL = 1094;
+    public const int DECOMP = 754;
+    public const int ASTOPT_STRING_FILLSTYLE = 346;
+    public const int ASTPRTELEMENTNWIDTH = 446;
+    public const int ASTNAMESLIST = 272;
+    public const int ASTVALSTATEMENT = 583;
+    public const int ASTDUMOF = 117;
+    public const int THOUSANDSSEPARATOR = 669;
+    public const int ASTMP = 266;
+    public const int SWAP = 1023;
+    public const int ASTIDENTITYCODE = 193;
+    public const int ASTDUMON = 118;
+    public const int ASTDATES = 92;
+    public const int ASTWRITEWITHOPTIONS = 594;
+    public const int ASTLABELS = 219;
+    public const int ITERMIN = 848;
+    public const int ISLARGEROREQUAL = 1109;
+    public const int ASTYLINE = 22;
+    public const int AREMOS = 693;
+    public const int DELETE = 755;
+    public const int SUGGESTIONS = 1022;
+    public const int YMINSOFT = 648;
+    public const int ASTOPT_STRING_RES = 401;
+    public const int ERROR = 778;
+    public const int ASTFILENAMEPARTBACKSLASH = 138;
+    public const int ASTRENAME = 478;
+    public const int ASTGDIFF = 170;
+    public const int ASTOLSELEMENT = 284;
+    public const int ASTOPT_STRING_REF = 407;
+    public const int ASTFORSTRING = 152;
+    public const int ASTLISTCONCATENATION = 228;
+    public const int ASTLABEL2 = 218;
+    public const int ASTNO = 279;
+    public const int DOWNLOAD = 766;
+    public const int ASTTABLEALIGNRIGHT = 512;
+    public const int ASTREADWITHOPTIONS = 477;
+    public const int UNLOCK_ = 862;
+    public const int ASTOPT_STRING_CONSTANT = 359;
+    public const int ASTOPT_STRING_GEOMETRIC = 375;
+    public const int SECONDCOLWIDTH = 979;
+    public const int ITERMAX = 847;
+    public const int ASTOPT_VAL_YMINSOFT = 327;
+    public const int FALSE = 788;
+    public const int TABLE1 = 1027;
+    public const int STARTFILE = 1015;
+    public const int ASTWRITEOPTION = 593;
+    public const int LAG = 852;
+    public const int TABLE2 = 1028;
+    public const int ASTINDEXER = 207;
+    public const int DEC = 752;
+    public const int CHECKOFF = 708;
+    public const int APPEND = 692;
+    public const int ASTPIPE = 438;
+    public const int VERS = 1072;
+    public const int FORWARD = 806;
+    public const int PCH = 928;
+    public const int DIRECT = 762;
+    public const int ASTUPDOPERATOREQUALDOLLAR = 564;
+    public const int COPYLOCAL = 736;
+    public const int ASTTIMEOPTIONFIELD = 543;
+    public const int SETLEFTBORDER = 990;
+    public const int ASTOPT_STRING_NONMODEL = 388;
+    public const int ASTSERIESOPERATOR = 5;
+    public const int ASTREAD = 475;
+    public const int ASTNOT = 41;
+    public const int HDG = 824;
+    public const int TIMEFILTER = 1040;
+    public const int ASTOPENHELPER = 288;
+    public const int ASTUPDOPERATORPLUSDOLLAR = 572;
+    public const int ASTFORDATE = 144;
+    public const int DUMOF = 768;
+    public const int R_FILE = 954;
+    public const int COMMA = 725;
+    public const int SOME = 1005;
+    public const int DIALOG = 757;
+    public const int ASTPRTELEMENTLINECOLOR = 455;
+    public const int DUMON = 770;
+    public const int MODEL = 884;
+    public const int DIGIT = 1146;
+    public const int ASTOPT_VAL_Y2MAX = 331;
+    public const int NOABS = 902;
+    public const int ASTX12A = 595;
+    public const int ASTFUNCTIONSCALAR = 168;
+    public const int TABS = 1030;
+    public const int ASTPRTROWS = 465;
+    public const int BANK = 698;
+    public const int ASTOPERATORNODOLLAR = 291;
+    public const int REP = 963;
+    public const int NEGATE = 896;
+    public const int SAVE = 913;
+    public const int REL = 960;
+    public const int CLOSEBANKS = 716;
+    public const int FIRSTCOLWIDTH = 798;
+    public const int ASTYMAX = 597;
+    public const int ASTOPT_STRING_GRID = 309;
+    public const int PLOT = 935;
+    public const int REF = 959;
+    public const int ASTLISTSORT = 241;
+    public const int ASTHANDLEFILENAME2 = 180;
+    public const int ASTFOR = 143;
+    public const int ASTLEFTSIDE = 221;
+    public const int GNUPLOT = 819;
+    public const int LABEL = 664;
+    public const int ASTUPDOPERATORHASHDOLLAR = 566;
+    public const int ASTOPT_VAL_BOXWIDTH = 313;
+    public const int ASTDATAADVANCED = 87;
+    public const int KEEP = 850;
+    public const int SETDATES = 989;
+    public const int ASTUPDDATA = 561;
+    public const int RDP = 957;
+    public const int CURROW = 742;
+    public const int WINDOW = 1077;
+    public const int RIGHTANGLE = 1095;
+    public const int ASTPRTELEMENTPOINTTYPE = 456;
+    public const int LEV = 855;
+    public const int ASTR_EXPORTITEMS = 471;
+    public const int GAUSS = 811;
+    public const int ASTOPT_STRING_USING = 352;
+    public const int WORKING = 1078;
+    public const int ASTOPT_STRING_ADDBANK = 350;
+    public const int ASTCAPS = 57;
+    public const int LOGIC = 679;
+    public const int STAR = 1141;
+    public const int Y2MINSOFT = 655;
+    public const int ASTTIMEFILTERPERIOD = 541;
+    public const int LETTER = 1147;
+    public const int ASTPERCENT = 435;
+    public const int NODIFF = 905;
+    public const int ASTHASHNAMESIMPLE = 182;
+    public const int NOV = 916;
+    public const int ASTOPT_STRING_EDIT = 367;
+    public const int ASTOPT_STRING_PRESERVE = 393;
+    public const int NOT = 914;
+    public const int CACHE = 703;
+    public const int EOF = -1;
+    public const int ASTTESTRANDOMMODELCHECK = 538;
+    public const int ASTOPT_STRING_ROWS = 403;
+    public const int LEFTPAREN = 1124;
+    public const int ASTTABLE = 509;
+    public const int ASTOPT_STRING_TARGET = 414;
+    public const int IMPORT = 837;
+    public const int YMAX = 1086;
+    public const int BOLD = 605;
+    public const int USING = 676;
+    public const int ASTTRUNCATE = 550;
+    public const int LEFTCURLY = 1135;
+    public const int SIM = 1000;
+    public const int ASTEDIT = 119;
+    public const int TIMESPAN = 1041;
+    public const int ASTURL = 576;
+    public const int LEFTANGLESIMPLE = 1134;
+    public const int IMPOSE = 671;
+    public const int ASTDOLLARCONDITIONAL = 111;
+    public const int EXPORT = 784;
+    public const int GOTO = 821;
+    public const int ASTPRTELEMENTPWIDTH = 449;
+    public const int ASTR_FILE = 472;
+    public const int ASTOPT_STRING_CAPS = 357;
+    public const int ASTFREQ = 154;
+    public const int ASTOPT_STRING_R = 17;
+    public const int Double = 1130;
+    public const int COLLAPSE = 719;
+    public const int ASTPRTELEMENTDEC = 444;
+    public const int ASTOPT_STRING_S = 404;
+    public const int ASTOPT_STRING_P = 389;
+    public const int BOXES = 623;
+    public const int ASTTIMESPAN = 546;
+    public const int ASTOPT_STRING_Q = 399;
+    public const int R_EXPORT = 953;
+    public const int SMOOTH = 1003;
+    public const int ASTTABLEOLD = 518;
+    public const int ASTUNLOCK = 247;
+    public const int ASTTABLEMAIN = 36;
+    public const int ELSE = 774;
+    public const int RIGHTBRACKET = 1101;
+    public const int ASTSDP = 489;
+    public const int ASTGEKKOLABEL = 171;
+    public const int SEPARATE = 638;
+    public const int SEMICOLON = 1093;
+    public const int ASTOPT_STRING_D = 364;
+    public const int REBASE = 621;
+    public const int ASTFILENAMEQUOTES = 139;
+    public const int ASTFUNCTIONDEF = 159;
+    public const int ASTOPT_VAL_YMAX = 322;
+    public const int ASTOPT_STRING_N = 386;
+    public const int ASTOPT_STRING_LAST = 369;
+    public const int DIFPRT = 760;
+    public const int ASTOPT_STRING_M = 382;
+    public const int Y2MAXHARD = 652;
+    public const int ASTSERIES = 7;
+    public const int ASTPAUSE = 433;
+    public const int ASTNAMEHELPER = 34;
+    public const int LANGUAGE = 853;
+    public const int ASTGENRLISTINDEXER = 177;
+    public const int HIDERIGHTBORDER = 829;
+    public const int ASTUPDOPERATORPERCENTDOLLAR = 570;
+    public const int DIFF = 759;
+    public const int ASTNAMEWITHBANK = 275;
+    public const int ASTOPT_STRING_DIRECT = 366;
+    public const int NONE = 910;
+    public const int TRIM = 675;
+    public const int ASTLINESPOINTS = 24;
+    public const int REPEAT = 964;
+    public const int ASTDATAFORMAT = 88;
+    public const int ASTCOPY = 73;
+    public const int END = 775;
+    public const int ASTFILENAMESTAR = 140;
+    public const int INIT = 842;
+    public const int Y2MIN = 1089;
+    public const int ASTBASEBANK = 54;
+    public const int RENAME = 961;
+    public const int ASTUPDOPERATOR = 562;
+    public const int ASTNAMESUBSIMPLE = 274;
+    public const int GENR = 816;
+    public const int OPTION = 921;
+    public const int HTTP = 1105;
+    public const int ASTEXO = 127;
+    public const int ASTOPT_STRING_SEPARATE = 315;
+    public const int ASTENDOQUESTION = 125;
+    public const int ASTHTTP = 189;
+    public const int ASTEXIT = 126;
+    public const int ASTEFTER = 120;
+    public const int ASTOPT_STRING_CSV = 363;
+    public const int GLUEDOT = 1106;
+    public const int STEP = 1017;
+    public const int LIBRARY = 976;
+    public const int ASTCOLORS = 70;
+    public const int XEDIT = 670;
+    public const int ASTLISTITEM = 232;
+    public const int DING = 761;
+    public const int DAMP = 744;
+    public const int ASTP = 432;
+    public const int ASTQ = 469;
+    public const int ASTN = 268;
+    public const int ASTM = 248;
+    public const int SEC = 978;
+    public const int OFFSET = 602;
+    public const int ASTOPT_LIST_COLNAMES = 252;
+    public const int ASTD = 85;
+    public const int ASTCOMPARE = 71;
+    public const int Y2TITLE = 650;
+    public const int PIPE = 934;
+    public const int BACKTRACK = 697;
+    public const int FREQ = 807;
+    public const int ASTOPT_STRING_SIZE = 300;
+    public const int ASTUPDOPERATORPLUS = 571;
+    public const int ASTV = 581;
+    public const int ASTS = 486;
+    public const int TABLEOLD = 1029;
+    public const int SUBTITLE = 630;
+    public const int ASTLINES = 25;
+    public const int SHOWPCH = 998;
+    public const int SER = 982;
+    public const int FAST = 789;
+    public const int SET = 986;
+    public const int ASTMODE = 262;
+    public const int ASTTOTAL = 547;
+    public const int ACCEPT = 682;
+    public const int PRINT = 943;
+    public const int X12A = 1082;
+    public const int ASTXLINE = 21;
+    public const int ASTTRANSLATE = 548;
+    public const int ASTSERIESDOLLARCONDITION = 6;
+    public const int RIGHTPAREN = 1102;
+    public const int ASTUPD = 559;
+    public const int ASTOPT_STRING_MP = 384;
+    public const int CREATEVARS = 740;
+    public const int STARS = 1142;
+    public const int DECIMALSEPARATOR = 753;
+    public const int ASTAVG = 51;
+    public const int GRIDSTYLE = 604;
+    public const int SIGN = 999;
+    public const int ASTDOUBLENEGATIVE = 114;
+    public const int EXTERNAL = 785;
+    public const int UPDATEFREQ = 1067;
+    public const int ASTOPT_STRING_FILE = 19;
+    public const int ASTIFCONDITION = 195;
+    public const int ASTOPT_STRING_SHEET = 409;
+    public const int ASTFRMLTUPLE = 157;
+    public const int LOG = 860;
+    public const int ASTPRTSTAMP = 466;
+    public const int ASTFUNCTIONDEFLHSTUPLE = 163;
+    public const int ASTITERSHOW = 216;
+    public const int AFTER2 = 685;
+    public const int ASTCOUNT = 79;
+    public const int ASTFILENAMEFIRST3 = 136;
+    public const int ASTFILENAMEFIRST2 = 135;
+    public const int ASTOPT_STRING_PX = 10;
+    public const int ASTFILENAMEFIRST1 = 134;
+    public const int GEOMETRIC = 817;
+    public const int NAME = 892;
+    public const int ASTMACRO = 249;
+    public const int EXE = 780;
+    public const int EXP = 783;
+    public const int EXO = 782;
+    public const int POS = 938;
+    public const int ASTOPEN = 287;
+    public const int ASTOPT_STRING_PROT = 398;
+    public const int ASTSIM = 495;
+    public const int ASTPLACEHOLDER = 439;
+    public const int ASTOPT_STRING_ARRAY = 20;
+    public const int LAST = 854;
+    public const int ASTOPT_STRING_REPEAT = 400;
+    public const int GDXOPT = 618;
+    public const int CLS = 717;
+    public const int SETTOPBORDER = 993;
+    public const int SOUND = 1007;
+    public const int MATRIX = 868;
+    public const int YMIN = 1087;
+    public const int ASTLISTITEMWILDRANGEBANK = 239;
+    public const int ASTLISTUNION = 244;
+    public const int ASTOPT_STRING_DATES = 365;
+    public const int NEWLINE2 = 1144;
+    public const int ASTOPT_STRING_WINDOW = 419;
+    public const int NEWLINE3 = 1145;
+    public const int ASTOPT_STRING_FIX = 371;
+    public const int BOWL = 701;
+    public const int ASTUPDOPERATORHAT = 567;
+    public const int LIST = 858;
+    public const int FINDMISSINGDATA = 796;
+    public const int ASTMODEL = 263;
+    public const int ASTLISTTRIM = 37;
+    public const int ASTOPT_VAL_YMIN = 325;
+    public const int ASTTABLESETDATES = 526;
+    public const int SKIP = 1002;
+    public const int ASTINTEGERNEGATIVE = 215;
+    public const int RESPECT = 968;
+    public const int ASTFUNCTIONDEFRHSTUPLE = 166;
+    public const int ASTOPT_STRING_XLS = 420;
+    public const int ASTSMOOTH = 497;
+    public const int ASTCHECKOFF = 59;
+    public const int PAUSE = 927;
+    public const int ASTLISTITEMS = 236;
+    public const int ASTOPT_STRING_APPEND = 355;
+    public const int DISPLAY = 764;
+    public const int SETBORDER = 987;
+    public const int ASTOPT_VAL_INDEX = 18;
+    public const int ASTOPT_VAL_Y2MAXSOFT = 333;
+    public const int ASTANALYZE = 45;
+    public const int FROM = 809;
+    public const int SIMPLE = 1001;
+    public const int ASTREBASE = 23;
+    public const int ASTMATRIXINDEXER = 255;
+    public const int FEEDBACK = 791;
+    public const int DOLLAR = 1103;
+    public const int ASTCLEAR = 61;
+    public const int ASTOPT_DATE_XLINEAFTER = 318;
+    public const int MAIN = 866;
+    public const int PRT = 947;
+    public const int BOXWIDTH = 636;
+    public const int IGNOREMISSINGVARS = 835;
+    public const int DIGITS = 615;
+    public const int ASTBOXES = 26;
+    public const int XLABELS = 609;
+    public const int ASTOPT_STRING_LABEL = 338;
+    public const int PRI = 941;
+    public const int DOTS = 626;
+    public const int Exponent = 1159;
+    public const int CELL = 706;
+    public const int ASTUPDOPERATORHATDOLLAR = 568;
+    public const int ASTSTRINGSIMPLE = 506;
+    public const int PRN = 945;
+    public const int ASTTABLEOUTPUTFILE = 521;
+    public const int INDEX = 838;
+    public const int CSV = 741;
+    public const int ASTOPT_STRING_TO = 415;
+    public const int UDIFF = 1058;
+    public const int ASTOPT_STRING_CELL = 358;
+    public const int COMPARE = 729;
+    public const int STRIP = 1020;
+    public const int ASTDELETE = 98;
+    public const int FRML = 808;
+    public const int FILLEDCURVES = 624;
+    public const int GMULPRT = 818;
+    public const int ASTOPT_STRING_COLS = 362;
+    public const int PERCENT = 1104;
+    public const int SERIES = 985;
+    public const int ASTTIMEPERIOD = 544;
+    public const int ASTLISTSTRIP = 242;
+    public const int IGNOREMISSING = 834;
+    public const int ASTDELETEALL = 99;
+    public const int DISP = 763;
+    public const int FIELDS = 792;
+    public const int AFTER = 684;
+    public const int ASTOPT_STRING_MATRIX = 397;
+    public const int TRUE = 1048;
+    public const int INFO = 839;
+    public const int ASTNAMESTATEMENT = 273;
+    public const int ASTAND = 40;
+    public const int OPEN = 920;
+    public const int RUN = 975;
+    public const int ASTYES = 596;
+    public const int ASTVARNAMEORLIST = 586;
+    public const int NOTIFY = 915;
+    public const int ASTCLEAR2 = 60;
+    public const int ASTDIRECT = 102;
+    public const int ASTEXPRESSIONTUPLE = 130;
+    public const int MENU = 874;
+    public const int NOGDIF = 907;
+    public const int DATE = 749;
+    public const int ASTTESTRANDOMMODEL = 537;
+    public const int LISTSTAR = 1120;
+    public const int ASTLIST2OLD = 224;
+    public const int DATA = 746;
+    public const int ASTOPT_STRING_FROM = 372;
+>>>>>>> 66b8bad... EXPORT<r>
 
 
                                     public static System.Collections.Generic.Dictionary<string, int> kw = GetKw();
@@ -13531,8 +14713,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LISTSTAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:3889:27: ( '&*' )
             // Cmd2.g:3889:29: '&*'
+=======
+            // Cmd2.g:3891:27: ( '&*' )
+            // Cmd2.g:3891:29: '&*'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match("&*"); 
 
@@ -13555,8 +14742,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LISTPLUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:3890:27: ( '&+' )
             // Cmd2.g:3890:29: '&+'
+=======
+            // Cmd2.g:3892:27: ( '&+' )
+            // Cmd2.g:3892:29: '&+'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match("&+"); 
 
@@ -13579,8 +14771,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LISTMINUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:3891:27: ( '&-' )
             // Cmd2.g:3891:29: '&-'
+=======
+            // Cmd2.g:3893:27: ( '&-' )
+            // Cmd2.g:3893:29: '&-'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match("&-"); 
 
@@ -13601,8 +14798,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:3997:27: ( '\\n' )
             // Cmd2.g:3997:29: '\\n'
+=======
+            // Cmd2.g:3999:27: ( '\\n' )
+            // Cmd2.g:3999:29: '\\n'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('\n'); 
 
@@ -13620,8 +14822,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:3998:27: ( '\\r\\n' )
             // Cmd2.g:3998:29: '\\r\\n'
+=======
+            // Cmd2.g:4000:27: ( '\\r\\n' )
+            // Cmd2.g:4000:29: '\\r\\n'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match("\r\n"); 
 
@@ -13640,8 +14847,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:3999:27: ( '0' .. '9' )
             // Cmd2.g:3999:29: '0' .. '9'
+=======
+            // Cmd2.g:4001:27: ( '0' .. '9' )
+            // Cmd2.g:4001:29: '0' .. '9'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	MatchRange('0','9'); 
 
@@ -13659,7 +14871,11 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4000:27: ( 'a' .. 'z' | 'A' .. 'Z' )
+=======
+            // Cmd2.g:4002:27: ( 'a' .. 'z' | 'A' .. 'Z' )
+>>>>>>> 66b8bad... EXPORT<r>
             // Cmd2.g:
             {
             	if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
@@ -13690,16 +14906,26 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = HTTP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4002:27: ( H_ T_ T_ P_ ':' ( '//' ) )
             // Cmd2.g:4002:29: H_ T_ T_ P_ ':' ( '//' )
+=======
+            // Cmd2.g:4004:27: ( H_ T_ T_ P_ ':' ( '//' ) )
+            // Cmd2.g:4004:29: H_ T_ T_ P_ ':' ( '//' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	mH_(); 
             	mT_(); 
             	mT_(); 
             	mP_(); 
             	Match(':'); 
+<<<<<<< HEAD
             	// Cmd2.g:4002:46: ( '//' )
             	// Cmd2.g:4002:47: '//'
+=======
+            	// Cmd2.g:4004:46: ( '//' )
+            	// Cmd2.g:4004:47: '//'
+>>>>>>> 66b8bad... EXPORT<r>
             	{
             		Match("//"); 
 
@@ -13725,10 +14951,17 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = WHITESPACE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4004:27: ( ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+ )
             // Cmd2.g:4004:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
             {
             	// Cmd2.g:4004:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
+=======
+            // Cmd2.g:4006:27: ( ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+ )
+            // Cmd2.g:4006:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
+            {
+            	// Cmd2.g:4006:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
+>>>>>>> 66b8bad... EXPORT<r>
             	int cnt1 = 0;
             	do 
             	{
@@ -13766,35 +14999,55 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt1) 
             		{
             			case 1 :
+<<<<<<< HEAD
             			    // Cmd2.g:4004:31: '\\t'
+=======
+            			    // Cmd2.g:4006:31: '\\t'
+>>>>>>> 66b8bad... EXPORT<r>
             			    {
             			    	Match('\t'); 
 
             			    }
             			    break;
             			case 2 :
+<<<<<<< HEAD
             			    // Cmd2.g:4004:38: ' '
+=======
+            			    // Cmd2.g:4006:38: ' '
+>>>>>>> 66b8bad... EXPORT<r>
             			    {
             			    	Match(' '); 
 
             			    }
             			    break;
             			case 3 :
+<<<<<<< HEAD
             			    // Cmd2.g:4004:44: '\\u000C'
+=======
+            			    // Cmd2.g:4006:44: '\\u000C'
+>>>>>>> 66b8bad... EXPORT<r>
             			    {
             			    	Match('\f'); 
 
             			    }
             			    break;
             			case 4 :
+<<<<<<< HEAD
             			    // Cmd2.g:4004:54: NEWLINE2
+=======
+            			    // Cmd2.g:4006:54: NEWLINE2
+>>>>>>> 66b8bad... EXPORT<r>
             			    {
             			    	mNEWLINE2(); 
 
             			    }
             			    break;
             			case 5 :
+<<<<<<< HEAD
             			    // Cmd2.g:4004:65: NEWLINE3
+=======
+            			    // Cmd2.g:4006:65: NEWLINE3
+>>>>>>> 66b8bad... EXPORT<r>
             			    {
             			    	mNEWLINE3(); 
 
@@ -13833,18 +15086,30 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = COMMENT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4006:27: ( ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
             // Cmd2.g:4006:29: ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
             {
             	// Cmd2.g:4006:29: ( '//' )
             	// Cmd2.g:4006:30: '//'
+=======
+            // Cmd2.g:4008:27: ( ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
+            // Cmd2.g:4008:29: ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
+            {
+            	// Cmd2.g:4008:29: ( '//' )
+            	// Cmd2.g:4008:30: '//'
+>>>>>>> 66b8bad... EXPORT<r>
             	{
             		Match("//"); 
 
 
             	}
 
+<<<<<<< HEAD
             	// Cmd2.g:4006:36: (~ ( NEWLINE2 | NEWLINE3 ) )*
+=======
+            	// Cmd2.g:4008:36: (~ ( NEWLINE2 | NEWLINE3 ) )*
+>>>>>>> 66b8bad... EXPORT<r>
             	do 
             	{
             	    int alt2 = 2;
@@ -13859,7 +15124,11 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt2) 
             		{
             			case 1 :
+<<<<<<< HEAD
             			    // Cmd2.g:4006:37: ~ ( NEWLINE2 | NEWLINE3 )
+=======
+            			    // Cmd2.g:4008:37: ~ ( NEWLINE2 | NEWLINE3 )
+>>>>>>> 66b8bad... EXPORT<r>
             			    {
             			    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t') || (input.LA(1) >= '\u000B' && input.LA(1) <= '\uFFFF') ) 
             			    	{
@@ -13904,12 +15173,21 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = COMMENT_MULTILINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4007:27: ( '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/' )
             // Cmd2.g:4007:29: '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/'
             {
             	Match("/*"); 
 
             	// Cmd2.g:4007:34: ( options {greedy=false; } : COMMENT_MULTILINE | . )*
+=======
+            // Cmd2.g:4009:27: ( '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/' )
+            // Cmd2.g:4009:29: '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/'
+            {
+            	Match("/*"); 
+
+            	// Cmd2.g:4009:34: ( options {greedy=false; } : COMMENT_MULTILINE | . )*
+>>>>>>> 66b8bad... EXPORT<r>
             	do 
             	{
             	    int alt3 = 3;
@@ -13954,14 +15232,22 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt3) 
             		{
             			case 1 :
+<<<<<<< HEAD
             			    // Cmd2.g:4007:60: COMMENT_MULTILINE
+=======
+            			    // Cmd2.g:4009:60: COMMENT_MULTILINE
+>>>>>>> 66b8bad... EXPORT<r>
             			    {
             			    	mCOMMENT_MULTILINE(); 
 
             			    }
             			    break;
             			case 2 :
+<<<<<<< HEAD
             			    // Cmd2.g:4007:80: .
+=======
+            			    // Cmd2.g:4009:80: .
+>>>>>>> 66b8bad... EXPORT<r>
             			    {
             			    	MatchAny(); 
 
@@ -13998,8 +15284,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = Ident;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4010:27: ( ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
             // Cmd2.g:4010:29: ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
+=======
+            // Cmd2.g:4012:27: ( ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
+            // Cmd2.g:4012:29: ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || input.LA(1) == '_' || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
             	{
@@ -14012,7 +15303,11 @@ public partial class Cmd2Lexer : Lexer {
             	    Recover(mse);
             	    throw mse;}
 
+<<<<<<< HEAD
             	// Cmd2.g:4010:42: ( DIGIT | LETTER | '_' )*
+=======
+            	// Cmd2.g:4012:42: ( DIGIT | LETTER | '_' )*
+>>>>>>> 66b8bad... EXPORT<r>
             	do 
             	{
             	    int alt4 = 2;
@@ -14072,10 +15367,17 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = Integer;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4012:27: ( ( DIGIT )+ )
             // Cmd2.g:4012:29: ( DIGIT )+
             {
             	// Cmd2.g:4012:29: ( DIGIT )+
+=======
+            // Cmd2.g:4014:27: ( ( DIGIT )+ )
+            // Cmd2.g:4014:29: ( DIGIT )+
+            {
+            	// Cmd2.g:4014:29: ( DIGIT )+
+>>>>>>> 66b8bad... EXPORT<r>
             	int cnt5 = 0;
             	do 
             	{
@@ -14091,7 +15393,11 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt5) 
             		{
             			case 1 :
+<<<<<<< HEAD
             			    // Cmd2.g:4012:29: DIGIT
+=======
+            			    // Cmd2.g:4014:29: DIGIT
+>>>>>>> 66b8bad... EXPORT<r>
             			    {
             			    	mDIGIT(); 
 
@@ -14129,10 +15435,17 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = DigitsEDigits;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4014:27: ( ( DIGIT )+ ( E_ ) ( DIGIT )+ )
             // Cmd2.g:4014:29: ( DIGIT )+ ( E_ ) ( DIGIT )+
             {
             	// Cmd2.g:4014:29: ( DIGIT )+
+=======
+            // Cmd2.g:4016:27: ( ( DIGIT )+ ( E_ ) ( DIGIT )+ )
+            // Cmd2.g:4016:29: ( DIGIT )+ ( E_ ) ( DIGIT )+
+            {
+            	// Cmd2.g:4016:29: ( DIGIT )+
+>>>>>>> 66b8bad... EXPORT<r>
             	int cnt6 = 0;
             	do 
             	{
@@ -14148,7 +15461,11 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt6) 
             		{
             			case 1 :
+<<<<<<< HEAD
             			    // Cmd2.g:4014:29: DIGIT
+=======
+            			    // Cmd2.g:4016:29: DIGIT
+>>>>>>> 66b8bad... EXPORT<r>
             			    {
             			    	mDIGIT(); 
 
@@ -14167,14 +15484,23 @@ public partial class Cmd2Lexer : Lexer {
             	loop6:
             		;	// Stops C# compiler whining that label 'loop6' has no statements
 
+<<<<<<< HEAD
             	// Cmd2.g:4014:37: ( E_ )
             	// Cmd2.g:4014:39: E_
+=======
+            	// Cmd2.g:4016:37: ( E_ )
+            	// Cmd2.g:4016:39: E_
+>>>>>>> 66b8bad... EXPORT<r>
             	{
             		mE_(); 
 
             	}
 
+<<<<<<< HEAD
             	// Cmd2.g:4014:45: ( DIGIT )+
+=======
+            	// Cmd2.g:4016:45: ( DIGIT )+
+>>>>>>> 66b8bad... EXPORT<r>
             	int cnt7 = 0;
             	do 
             	{
@@ -14190,7 +15516,11 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt7) 
             		{
             			case 1 :
+<<<<<<< HEAD
             			    // Cmd2.g:4014:45: DIGIT
+=======
+            			    // Cmd2.g:4016:45: DIGIT
+>>>>>>> 66b8bad... EXPORT<r>
             			    {
             			    	mDIGIT(); 
 
@@ -14228,10 +15558,17 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = DateDef;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4016:27: ( ( DIGIT )+ ( A_ | Q_ | M_ ) ( DIGIT )+ )
             // Cmd2.g:4016:29: ( DIGIT )+ ( A_ | Q_ | M_ ) ( DIGIT )+
             {
             	// Cmd2.g:4016:29: ( DIGIT )+
+=======
+            // Cmd2.g:4018:27: ( ( DIGIT )+ ( A_ | Q_ | M_ ) ( DIGIT )+ )
+            // Cmd2.g:4018:29: ( DIGIT )+ ( A_ | Q_ | M_ ) ( DIGIT )+
+            {
+            	// Cmd2.g:4018:29: ( DIGIT )+
+>>>>>>> 66b8bad... EXPORT<r>
             	int cnt8 = 0;
             	do 
             	{
@@ -14247,7 +15584,11 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt8) 
             		{
             			case 1 :
+<<<<<<< HEAD
             			    // Cmd2.g:4016:29: DIGIT
+=======
+            			    // Cmd2.g:4018:29: DIGIT
+>>>>>>> 66b8bad... EXPORT<r>
             			    {
             			    	mDIGIT(); 
 
@@ -14277,7 +15618,11 @@ public partial class Cmd2Lexer : Lexer {
             	    Recover(mse);
             	    throw mse;}
 
+<<<<<<< HEAD
             	// Cmd2.g:4016:54: ( DIGIT )+
+=======
+            	// Cmd2.g:4018:54: ( DIGIT )+
+>>>>>>> 66b8bad... EXPORT<r>
             	int cnt9 = 0;
             	do 
             	{
@@ -14293,7 +15638,11 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt9) 
             		{
             			case 1 :
+<<<<<<< HEAD
             			    // Cmd2.g:4016:54: DIGIT
+=======
+            			    // Cmd2.g:4018:54: DIGIT
+>>>>>>> 66b8bad... EXPORT<r>
             			    {
             			    	mDIGIT(); 
 
@@ -14331,10 +15680,17 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = IdentStartingWithInt;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4018:27: ( ( DIGIT | LETTER | '_' )+ )
             // Cmd2.g:4018:29: ( DIGIT | LETTER | '_' )+
             {
             	// Cmd2.g:4018:29: ( DIGIT | LETTER | '_' )+
+=======
+            // Cmd2.g:4020:27: ( ( DIGIT | LETTER | '_' )+ )
+            // Cmd2.g:4020:29: ( DIGIT | LETTER | '_' )+
+            {
+            	// Cmd2.g:4020:29: ( DIGIT | LETTER | '_' )+
+>>>>>>> 66b8bad... EXPORT<r>
             	int cnt10 = 0;
             	do 
             	{
@@ -14398,15 +15754,25 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = Double;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4023:27: ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? )
+=======
+            // Cmd2.g:4025:27: ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? )
+>>>>>>> 66b8bad... EXPORT<r>
             int alt17 = 3;
             alt17 = dfa17.Predict(input);
             switch (alt17) 
             {
                 case 1 :
+<<<<<<< HEAD
                     // Cmd2.g:4023:29: ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )?
                     {
                     	// Cmd2.g:4023:29: ( DIGIT )+
+=======
+                    // Cmd2.g:4025:29: ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )?
+                    {
+                    	// Cmd2.g:4025:29: ( DIGIT )+
+>>>>>>> 66b8bad... EXPORT<r>
                     	int cnt11 = 0;
                     	do 
                     	{
@@ -14422,7 +15788,11 @@ public partial class Cmd2Lexer : Lexer {
                     	    switch (alt11) 
                     		{
                     			case 1 :
+<<<<<<< HEAD
                     			    // Cmd2.g:4023:29: DIGIT
+=======
+                    			    // Cmd2.g:4025:29: DIGIT
+>>>>>>> 66b8bad... EXPORT<r>
                     			    {
                     			    	mDIGIT(); 
 
@@ -14443,7 +15813,11 @@ public partial class Cmd2Lexer : Lexer {
 
                     	mGLUEDOTNUMBER(); 
                     	mDOT(); 
+<<<<<<< HEAD
                     	// Cmd2.g:4023:54: ( DIGIT )*
+=======
+                    	// Cmd2.g:4025:54: ( DIGIT )*
+>>>>>>> 66b8bad... EXPORT<r>
                     	do 
                     	{
                     	    int alt12 = 2;
@@ -14458,7 +15832,11 @@ public partial class Cmd2Lexer : Lexer {
                     	    switch (alt12) 
                     		{
                     			case 1 :
+<<<<<<< HEAD
                     			    // Cmd2.g:4023:54: DIGIT
+=======
+                    			    // Cmd2.g:4025:54: DIGIT
+>>>>>>> 66b8bad... EXPORT<r>
                     			    {
                     			    	mDIGIT(); 
 
@@ -14473,7 +15851,11 @@ public partial class Cmd2Lexer : Lexer {
                     	loop12:
                     		;	// Stops C# compiler whining that label 'loop12' has no statements
 
+<<<<<<< HEAD
                     	// Cmd2.g:4023:61: ( Exponent )?
+=======
+                    	// Cmd2.g:4025:61: ( Exponent )?
+>>>>>>> 66b8bad... EXPORT<r>
                     	int alt13 = 2;
                     	int LA13_0 = input.LA(1);
 
@@ -14484,7 +15866,11 @@ public partial class Cmd2Lexer : Lexer {
                     	switch (alt13) 
                     	{
                     	    case 1 :
+<<<<<<< HEAD
                     	        // Cmd2.g:4023:61: Exponent
+=======
+                    	        // Cmd2.g:4025:61: Exponent
+>>>>>>> 66b8bad... EXPORT<r>
                     	        {
                     	        	mExponent(); 
 
@@ -14497,9 +15883,15 @@ public partial class Cmd2Lexer : Lexer {
                     }
                     break;
                 case 2 :
+<<<<<<< HEAD
                     // Cmd2.g:4024:29: ( DIGIT )+ Exponent
                     {
                     	// Cmd2.g:4024:29: ( DIGIT )+
+=======
+                    // Cmd2.g:4026:29: ( DIGIT )+ Exponent
+                    {
+                    	// Cmd2.g:4026:29: ( DIGIT )+
+>>>>>>> 66b8bad... EXPORT<r>
                     	int cnt14 = 0;
                     	do 
                     	{
@@ -14515,7 +15907,11 @@ public partial class Cmd2Lexer : Lexer {
                     	    switch (alt14) 
                     		{
                     			case 1 :
+<<<<<<< HEAD
                     			    // Cmd2.g:4024:29: DIGIT
+=======
+                    			    // Cmd2.g:4026:29: DIGIT
+>>>>>>> 66b8bad... EXPORT<r>
                     			    {
                     			    	mDIGIT(); 
 
@@ -14539,11 +15935,19 @@ public partial class Cmd2Lexer : Lexer {
                     }
                     break;
                 case 3 :
+<<<<<<< HEAD
                     // Cmd2.g:4025:11: GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )?
                     {
                     	mGLUEDOTNUMBER(); 
                     	mDOT(); 
                     	// Cmd2.g:4025:29: ( DIGIT )+
+=======
+                    // Cmd2.g:4027:11: GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )?
+                    {
+                    	mGLUEDOTNUMBER(); 
+                    	mDOT(); 
+                    	// Cmd2.g:4027:29: ( DIGIT )+
+>>>>>>> 66b8bad... EXPORT<r>
                     	int cnt15 = 0;
                     	do 
                     	{
@@ -14559,7 +15963,11 @@ public partial class Cmd2Lexer : Lexer {
                     	    switch (alt15) 
                     		{
                     			case 1 :
+<<<<<<< HEAD
                     			    // Cmd2.g:4025:29: DIGIT
+=======
+                    			    // Cmd2.g:4027:29: DIGIT
+>>>>>>> 66b8bad... EXPORT<r>
                     			    {
                     			    	mDIGIT(); 
 
@@ -14578,7 +15986,11 @@ public partial class Cmd2Lexer : Lexer {
                     	loop15:
                     		;	// Stops C# compiler whining that label 'loop15' has no statements
 
+<<<<<<< HEAD
                     	// Cmd2.g:4025:36: ( Exponent )?
+=======
+                    	// Cmd2.g:4027:36: ( Exponent )?
+>>>>>>> 66b8bad... EXPORT<r>
                     	int alt16 = 2;
                     	int LA16_0 = input.LA(1);
 
@@ -14589,7 +16001,11 @@ public partial class Cmd2Lexer : Lexer {
                     	switch (alt16) 
                     	{
                     	    case 1 :
+<<<<<<< HEAD
                     	        // Cmd2.g:4025:36: Exponent
+=======
+                    	        // Cmd2.g:4027:36: Exponent
+>>>>>>> 66b8bad... EXPORT<r>
                     	        {
                     	        	mExponent(); 
 
@@ -14617,11 +16033,19 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4029:27: ( E_ ( '+' | '-' )? ( DIGIT )+ )
             // Cmd2.g:4029:29: E_ ( '+' | '-' )? ( DIGIT )+
             {
             	mE_(); 
             	// Cmd2.g:4029:32: ( '+' | '-' )?
+=======
+            // Cmd2.g:4031:27: ( E_ ( '+' | '-' )? ( DIGIT )+ )
+            // Cmd2.g:4031:29: E_ ( '+' | '-' )? ( DIGIT )+
+            {
+            	mE_(); 
+            	// Cmd2.g:4031:32: ( '+' | '-' )?
+>>>>>>> 66b8bad... EXPORT<r>
             	int alt18 = 2;
             	int LA18_0 = input.LA(1);
 
@@ -14651,7 +16075,11 @@ public partial class Cmd2Lexer : Lexer {
 
             	}
 
+<<<<<<< HEAD
             	// Cmd2.g:4029:47: ( DIGIT )+
+=======
+            	// Cmd2.g:4031:47: ( DIGIT )+
+>>>>>>> 66b8bad... EXPORT<r>
             	int cnt19 = 0;
             	do 
             	{
@@ -14667,7 +16095,11 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt19) 
             		{
             			case 1 :
+<<<<<<< HEAD
             			    // Cmd2.g:4029:47: DIGIT
+=======
+            			    // Cmd2.g:4031:47: DIGIT
+>>>>>>> 66b8bad... EXPORT<r>
             			    {
             			    	mDIGIT(); 
 
@@ -14703,6 +16135,7 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = StringInQuotes;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4032:27: ( ( '\\'' (~ '\\'' )* '\\'' ) )
             // Cmd2.g:4032:29: ( '\\'' (~ '\\'' )* '\\'' )
             {
@@ -14711,6 +16144,16 @@ public partial class Cmd2Lexer : Lexer {
             	{
             		Match('\''); 
             		// Cmd2.g:4032:35: (~ '\\'' )*
+=======
+            // Cmd2.g:4034:27: ( ( '\\'' (~ '\\'' )* '\\'' ) )
+            // Cmd2.g:4034:29: ( '\\'' (~ '\\'' )* '\\'' )
+            {
+            	// Cmd2.g:4034:29: ( '\\'' (~ '\\'' )* '\\'' )
+            	// Cmd2.g:4034:30: '\\'' (~ '\\'' )* '\\''
+            	{
+            		Match('\''); 
+            		// Cmd2.g:4034:35: (~ '\\'' )*
+>>>>>>> 66b8bad... EXPORT<r>
             		do 
             		{
             		    int alt20 = 2;
@@ -14725,7 +16168,11 @@ public partial class Cmd2Lexer : Lexer {
             		    switch (alt20) 
             			{
             				case 1 :
+<<<<<<< HEAD
             				    // Cmd2.g:4032:36: ~ '\\''
+=======
+            				    // Cmd2.g:4034:36: ~ '\\''
+>>>>>>> 66b8bad... EXPORT<r>
             				    {
             				    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '&') || (input.LA(1) >= '(' && input.LA(1) <= '\uFFFF') ) 
             				    	{
@@ -14773,8 +16220,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = GLUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4035:27: ( '¨' )
             // Cmd2.g:4035:29: '¨'
+=======
+            // Cmd2.g:4037:27: ( '¨' )
+            // Cmd2.g:4037:29: '¨'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('\u00A8'); 
 
@@ -14796,8 +16248,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = GLUEDOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4036:27: ( '£' )
             // Cmd2.g:4036:29: '£'
+=======
+            // Cmd2.g:4038:27: ( '£' )
+            // Cmd2.g:4038:29: '£'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('\u00A3'); 
 
@@ -14819,8 +16276,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = GLUEDOTNUMBER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4037:27: ( '§' )
             // Cmd2.g:4037:29: '§'
+=======
+            // Cmd2.g:4039:27: ( '§' )
+            // Cmd2.g:4039:29: '§'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('\u00A7'); 
 
@@ -14842,8 +16304,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = GLUESTAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4038:27: ( '½' )
             // Cmd2.g:4038:29: '½'
+=======
+            // Cmd2.g:4040:27: ( '½' )
+            // Cmd2.g:4040:29: '½'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('\u00BD'); 
 
@@ -14865,8 +16332,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LEFTANGLESPECIAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4039:27: ( '<=<' )
             // Cmd2.g:4039:29: '<=<'
+=======
+            // Cmd2.g:4041:27: ( '<=<' )
+            // Cmd2.g:4041:29: '<=<'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match("<=<"); 
 
@@ -14889,8 +16361,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = MOD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4041:27: ( '¤' )
             // Cmd2.g:4041:29: '¤'
+=======
+            // Cmd2.g:4043:27: ( '¤' )
+            // Cmd2.g:4043:29: '¤'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('\u00A4'); 
 
@@ -14912,8 +16389,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = GLUEBACKSLASH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4042:27: ( '¨\\\\' )
             // Cmd2.g:4042:29: '¨\\\\'
+=======
+            // Cmd2.g:4044:27: ( '¨\\\\' )
+            // Cmd2.g:4044:29: '¨\\\\'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match("¨\\"); 
 
@@ -14936,8 +16418,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = ISEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4045:27: ( '==' )
             // Cmd2.g:4045:29: '=='
+=======
+            // Cmd2.g:4047:27: ( '==' )
+            // Cmd2.g:4047:29: '=='
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match("=="); 
 
@@ -14960,8 +16447,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = ISNOTQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4046:27: ( '<>' )
             // Cmd2.g:4046:29: '<>'
+=======
+            // Cmd2.g:4048:27: ( '<>' )
+            // Cmd2.g:4048:29: '<>'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match("<>"); 
 
@@ -14984,8 +16476,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = ISLARGEROREQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4047:21: ( '>=' )
             // Cmd2.g:4047:23: '>='
+=======
+            // Cmd2.g:4049:21: ( '>=' )
+            // Cmd2.g:4049:23: '>='
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match(">="); 
 
@@ -15008,8 +16505,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = ISSMALLEROREQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4048:27: ( '<=' )
             // Cmd2.g:4048:29: '<='
+=======
+            // Cmd2.g:4050:27: ( '<=' )
+            // Cmd2.g:4050:29: '<='
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match("<="); 
 
@@ -15032,8 +16534,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = AT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4050:27: ( '@' )
             // Cmd2.g:4050:29: '@'
+=======
+            // Cmd2.g:4052:27: ( '@' )
+            // Cmd2.g:4052:29: '@'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('@'); 
 
@@ -15055,8 +16562,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = HAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4051:27: ( '^' )
             // Cmd2.g:4051:29: '^'
+=======
+            // Cmd2.g:4053:27: ( '^' )
+            // Cmd2.g:4053:29: '^'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('^'); 
 
@@ -15078,8 +16590,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = SEMICOLON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4052:27: ( ';' )
             // Cmd2.g:4052:29: ';'
+=======
+            // Cmd2.g:4054:27: ( ';' )
+            // Cmd2.g:4054:29: ';'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match(';'); 
 
@@ -15101,8 +16618,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = COLONGLUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4053:27: ( ':|' )
             // Cmd2.g:4053:29: ':|'
+=======
+            // Cmd2.g:4055:27: ( ':|' )
+            // Cmd2.g:4055:29: ':|'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match(":|"); 
 
@@ -15125,8 +16647,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = COLON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4054:27: ( ':' )
             // Cmd2.g:4054:29: ':'
+=======
+            // Cmd2.g:4056:27: ( ':' )
+            // Cmd2.g:4056:29: ':'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match(':'); 
 
@@ -15148,8 +16675,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = COMMA2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4055:27: ( ',' )
             // Cmd2.g:4055:29: ','
+=======
+            // Cmd2.g:4057:27: ( ',' )
+            // Cmd2.g:4057:29: ','
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match(','); 
 
@@ -15171,8 +16703,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = DOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4056:27: ( '.' )
             // Cmd2.g:4056:29: '.'
+=======
+            // Cmd2.g:4058:27: ( '.' )
+            // Cmd2.g:4058:29: '.'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('.'); 
 
@@ -15194,8 +16731,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = HASH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4057:27: ( '#' )
             // Cmd2.g:4057:29: '#'
+=======
+            // Cmd2.g:4059:27: ( '#' )
+            // Cmd2.g:4059:29: '#'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('#'); 
 
@@ -15217,8 +16759,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = PERCENT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4059:27: ( '%' )
             // Cmd2.g:4059:29: '%'
+=======
+            // Cmd2.g:4061:27: ( '%' )
+            // Cmd2.g:4061:29: '%'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('%'); 
 
@@ -15240,8 +16787,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = DOLLAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4061:27: ( '$' )
             // Cmd2.g:4061:29: '$'
+=======
+            // Cmd2.g:4063:27: ( '$' )
+            // Cmd2.g:4063:29: '$'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('$'); 
 
@@ -15263,8 +16815,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LEFTCURLY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4062:27: ( '{' )
             // Cmd2.g:4062:29: '{'
+=======
+            // Cmd2.g:4064:27: ( '{' )
+            // Cmd2.g:4064:29: '{'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('{'); 
 
@@ -15286,8 +16843,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = RIGHTCURLY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4063:27: ( '}' )
             // Cmd2.g:4063:29: '}'
+=======
+            // Cmd2.g:4065:27: ( '}' )
+            // Cmd2.g:4065:29: '}'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('}'); 
 
@@ -15309,8 +16871,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LEFTPAREN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4064:27: ( '(' )
             // Cmd2.g:4064:29: '('
+=======
+            // Cmd2.g:4066:27: ( '(' )
+            // Cmd2.g:4066:29: '('
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('('); 
 
@@ -15332,8 +16899,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = RIGHTPAREN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4065:27: ( ')' )
             // Cmd2.g:4065:29: ')'
+=======
+            // Cmd2.g:4067:27: ( ')' )
+            // Cmd2.g:4067:29: ')'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match(')'); 
 
@@ -15355,8 +16927,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LEFTBRACKETGLUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4066:27: ( '[_[' )
             // Cmd2.g:4066:29: '[_['
+=======
+            // Cmd2.g:4068:27: ( '[_[' )
+            // Cmd2.g:4068:29: '[_['
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match("[_["); 
 
@@ -15379,8 +16956,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LEFTBRACKETWILD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4067:27: ( '[¨[' )
             // Cmd2.g:4067:29: '[¨['
+=======
+            // Cmd2.g:4069:27: ( '[¨[' )
+            // Cmd2.g:4069:29: '[¨['
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match("[¨["); 
 
@@ -15403,8 +16985,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LEFTBRACKET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4068:27: ( '[' )
             // Cmd2.g:4068:29: '['
+=======
+            // Cmd2.g:4070:27: ( '[' )
+            // Cmd2.g:4070:29: '['
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('['); 
 
@@ -15426,8 +17013,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = RIGHTBRACKET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4069:27: ( ']' )
             // Cmd2.g:4069:29: ']'
+=======
+            // Cmd2.g:4071:27: ( ']' )
+            // Cmd2.g:4071:29: ']'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match(']'); 
 
@@ -15449,8 +17041,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LEFTANGLESIMPLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4072:27: ( '<' )
             // Cmd2.g:4072:29: '<'
+=======
+            // Cmd2.g:4074:27: ( '<' )
+            // Cmd2.g:4074:29: '<'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('<'); 
 
@@ -15472,8 +17069,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = RIGHTANGLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4073:27: ( '>' )
             // Cmd2.g:4073:29: '>'
+=======
+            // Cmd2.g:4075:27: ( '>' )
+            // Cmd2.g:4075:29: '>'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('>'); 
 
@@ -15495,8 +17097,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = STAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4074:27: ( '*' )
             // Cmd2.g:4074:29: '*'
+=======
+            // Cmd2.g:4076:27: ( '*' )
+            // Cmd2.g:4076:29: '*'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('*'); 
 
@@ -15518,8 +17125,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = DOUBLEVERTICALBAR1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4075:27: ( '||' )
             // Cmd2.g:4075:29: '||'
+=======
+            // Cmd2.g:4077:27: ( '||' )
+            // Cmd2.g:4077:29: '||'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match("||"); 
 
@@ -15542,8 +17154,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = DOUBLEVERTICALBAR2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4076:27: ( '|¨|' )
             // Cmd2.g:4076:29: '|¨|'
+=======
+            // Cmd2.g:4078:27: ( '|¨|' )
+            // Cmd2.g:4078:29: '|¨|'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match("|¨|"); 
 
@@ -15566,8 +17183,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = VERTICALBAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4078:27: ( '|' )
             // Cmd2.g:4078:29: '|'
+=======
+            // Cmd2.g:4080:27: ( '|' )
+            // Cmd2.g:4080:29: '|'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('|'); 
 
@@ -15589,8 +17211,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = PLUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4079:27: ( '+' )
             // Cmd2.g:4079:29: '+'
+=======
+            // Cmd2.g:4081:27: ( '+' )
+            // Cmd2.g:4081:29: '+'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('+'); 
 
@@ -15612,8 +17239,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = MINUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4080:27: ( '-' )
             // Cmd2.g:4080:29: '-'
+=======
+            // Cmd2.g:4082:27: ( '-' )
+            // Cmd2.g:4082:29: '-'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('-'); 
 
@@ -15635,8 +17267,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = DIV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4081:27: ( '/' )
             // Cmd2.g:4081:29: '/'
+=======
+            // Cmd2.g:4083:27: ( '/' )
+            // Cmd2.g:4083:29: '/'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('/'); 
 
@@ -15658,8 +17295,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = STARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4082:27: ( '**' )
             // Cmd2.g:4082:29: '**'
+=======
+            // Cmd2.g:4084:27: ( '**' )
+            // Cmd2.g:4084:29: '**'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match("**"); 
 
@@ -15682,8 +17324,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = EQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4083:27: ( '=' )
             // Cmd2.g:4083:29: '='
+=======
+            // Cmd2.g:4085:27: ( '=' )
+            // Cmd2.g:4085:29: '='
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('='); 
 
@@ -15705,8 +17352,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = BACKSLASH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4084:27: ( '\\\\' )
             // Cmd2.g:4084:29: '\\\\'
+=======
+            // Cmd2.g:4086:27: ( '\\\\' )
+            // Cmd2.g:4086:29: '\\\\'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('\\'); 
 
@@ -15728,8 +17380,13 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = QUESTION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+<<<<<<< HEAD
             // Cmd2.g:4085:27: ( '?' )
             // Cmd2.g:4085:29: '?'
+=======
+            // Cmd2.g:4087:27: ( '?' )
+            // Cmd2.g:4087:29: '?'
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	Match('?'); 
 
@@ -15749,8 +17406,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4088:12: ( ( 'a' | 'A' ) )
             // Cmd2.g:4088:13: ( 'a' | 'A' )
+=======
+            // Cmd2.g:4090:12: ( ( 'a' | 'A' ) )
+            // Cmd2.g:4090:13: ( 'a' | 'A' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'A' || input.LA(1) == 'a' ) 
             	{
@@ -15778,8 +17440,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4089:12: ( ( 'b' | 'B' ) )
             // Cmd2.g:4089:13: ( 'b' | 'B' )
+=======
+            // Cmd2.g:4091:12: ( ( 'b' | 'B' ) )
+            // Cmd2.g:4091:13: ( 'b' | 'B' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'B' || input.LA(1) == 'b' ) 
             	{
@@ -15807,8 +17474,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4090:12: ( ( 'c' | 'C' ) )
             // Cmd2.g:4090:13: ( 'c' | 'C' )
+=======
+            // Cmd2.g:4092:12: ( ( 'c' | 'C' ) )
+            // Cmd2.g:4092:13: ( 'c' | 'C' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'C' || input.LA(1) == 'c' ) 
             	{
@@ -15836,8 +17508,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4091:12: ( ( 'd' | 'D' ) )
             // Cmd2.g:4091:13: ( 'd' | 'D' )
+=======
+            // Cmd2.g:4093:12: ( ( 'd' | 'D' ) )
+            // Cmd2.g:4093:13: ( 'd' | 'D' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'D' || input.LA(1) == 'd' ) 
             	{
@@ -15865,8 +17542,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4092:12: ( ( 'e' | 'E' ) )
             // Cmd2.g:4092:13: ( 'e' | 'E' )
+=======
+            // Cmd2.g:4094:12: ( ( 'e' | 'E' ) )
+            // Cmd2.g:4094:13: ( 'e' | 'E' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'E' || input.LA(1) == 'e' ) 
             	{
@@ -15894,8 +17576,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4093:12: ( ( 'f' | 'F' ) )
             // Cmd2.g:4093:13: ( 'f' | 'F' )
+=======
+            // Cmd2.g:4095:12: ( ( 'f' | 'F' ) )
+            // Cmd2.g:4095:13: ( 'f' | 'F' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'F' || input.LA(1) == 'f' ) 
             	{
@@ -15923,8 +17610,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4094:12: ( ( 'g' | 'G' ) )
             // Cmd2.g:4094:13: ( 'g' | 'G' )
+=======
+            // Cmd2.g:4096:12: ( ( 'g' | 'G' ) )
+            // Cmd2.g:4096:13: ( 'g' | 'G' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'G' || input.LA(1) == 'g' ) 
             	{
@@ -15952,8 +17644,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4095:12: ( ( 'h' | 'H' ) )
             // Cmd2.g:4095:13: ( 'h' | 'H' )
+=======
+            // Cmd2.g:4097:12: ( ( 'h' | 'H' ) )
+            // Cmd2.g:4097:13: ( 'h' | 'H' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'H' || input.LA(1) == 'h' ) 
             	{
@@ -15981,8 +17678,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4096:12: ( ( 'i' | 'I' ) )
             // Cmd2.g:4096:13: ( 'i' | 'I' )
+=======
+            // Cmd2.g:4098:12: ( ( 'i' | 'I' ) )
+            // Cmd2.g:4098:13: ( 'i' | 'I' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'I' || input.LA(1) == 'i' ) 
             	{
@@ -16010,8 +17712,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4097:12: ( ( 'j' | 'J' ) )
             // Cmd2.g:4097:13: ( 'j' | 'J' )
+=======
+            // Cmd2.g:4099:12: ( ( 'j' | 'J' ) )
+            // Cmd2.g:4099:13: ( 'j' | 'J' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'J' || input.LA(1) == 'j' ) 
             	{
@@ -16039,8 +17746,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4098:12: ( ( 'k' | 'K' ) )
             // Cmd2.g:4098:13: ( 'k' | 'K' )
+=======
+            // Cmd2.g:4100:12: ( ( 'k' | 'K' ) )
+            // Cmd2.g:4100:13: ( 'k' | 'K' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'K' || input.LA(1) == 'k' ) 
             	{
@@ -16068,8 +17780,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4099:12: ( ( 'l' | 'L' ) )
             // Cmd2.g:4099:13: ( 'l' | 'L' )
+=======
+            // Cmd2.g:4101:12: ( ( 'l' | 'L' ) )
+            // Cmd2.g:4101:13: ( 'l' | 'L' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'L' || input.LA(1) == 'l' ) 
             	{
@@ -16097,8 +17814,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4100:12: ( ( 'm' | 'M' ) )
             // Cmd2.g:4100:13: ( 'm' | 'M' )
+=======
+            // Cmd2.g:4102:12: ( ( 'm' | 'M' ) )
+            // Cmd2.g:4102:13: ( 'm' | 'M' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'M' || input.LA(1) == 'm' ) 
             	{
@@ -16126,8 +17848,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4101:12: ( ( 'n' | 'N' ) )
             // Cmd2.g:4101:13: ( 'n' | 'N' )
+=======
+            // Cmd2.g:4103:12: ( ( 'n' | 'N' ) )
+            // Cmd2.g:4103:13: ( 'n' | 'N' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'N' || input.LA(1) == 'n' ) 
             	{
@@ -16155,8 +17882,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4102:12: ( ( 'o' | 'O' ) )
             // Cmd2.g:4102:13: ( 'o' | 'O' )
+=======
+            // Cmd2.g:4104:12: ( ( 'o' | 'O' ) )
+            // Cmd2.g:4104:13: ( 'o' | 'O' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'O' || input.LA(1) == 'o' ) 
             	{
@@ -16184,8 +17916,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4103:12: ( ( 'p' | 'P' ) )
             // Cmd2.g:4103:13: ( 'p' | 'P' )
+=======
+            // Cmd2.g:4105:12: ( ( 'p' | 'P' ) )
+            // Cmd2.g:4105:13: ( 'p' | 'P' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'P' || input.LA(1) == 'p' ) 
             	{
@@ -16213,8 +17950,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4104:12: ( ( 'q' | 'Q' ) )
             // Cmd2.g:4104:13: ( 'q' | 'Q' )
+=======
+            // Cmd2.g:4106:12: ( ( 'q' | 'Q' ) )
+            // Cmd2.g:4106:13: ( 'q' | 'Q' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'Q' || input.LA(1) == 'q' ) 
             	{
@@ -16242,8 +17984,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4105:12: ( ( 'r' | 'R' ) )
             // Cmd2.g:4105:13: ( 'r' | 'R' )
+=======
+            // Cmd2.g:4107:12: ( ( 'r' | 'R' ) )
+            // Cmd2.g:4107:13: ( 'r' | 'R' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'R' || input.LA(1) == 'r' ) 
             	{
@@ -16271,8 +18018,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4106:12: ( ( 's' | 'S' ) )
             // Cmd2.g:4106:13: ( 's' | 'S' )
+=======
+            // Cmd2.g:4108:12: ( ( 's' | 'S' ) )
+            // Cmd2.g:4108:13: ( 's' | 'S' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'S' || input.LA(1) == 's' ) 
             	{
@@ -16300,8 +18052,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4107:12: ( ( 't' | 'T' ) )
             // Cmd2.g:4107:13: ( 't' | 'T' )
+=======
+            // Cmd2.g:4109:12: ( ( 't' | 'T' ) )
+            // Cmd2.g:4109:13: ( 't' | 'T' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'T' || input.LA(1) == 't' ) 
             	{
@@ -16329,8 +18086,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4108:12: ( ( 'u' | 'U' ) )
             // Cmd2.g:4108:13: ( 'u' | 'U' )
+=======
+            // Cmd2.g:4110:12: ( ( 'u' | 'U' ) )
+            // Cmd2.g:4110:13: ( 'u' | 'U' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'U' || input.LA(1) == 'u' ) 
             	{
@@ -16358,8 +18120,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4109:12: ( ( 'v' | 'V' ) )
             // Cmd2.g:4109:13: ( 'v' | 'V' )
+=======
+            // Cmd2.g:4111:12: ( ( 'v' | 'V' ) )
+            // Cmd2.g:4111:13: ( 'v' | 'V' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'V' || input.LA(1) == 'v' ) 
             	{
@@ -16387,8 +18154,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4110:12: ( ( 'w' | 'W' ) )
             // Cmd2.g:4110:13: ( 'w' | 'W' )
+=======
+            // Cmd2.g:4112:12: ( ( 'w' | 'W' ) )
+            // Cmd2.g:4112:13: ( 'w' | 'W' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'W' || input.LA(1) == 'w' ) 
             	{
@@ -16416,8 +18188,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4111:12: ( ( 'x' | 'X' ) )
             // Cmd2.g:4111:13: ( 'x' | 'X' )
+=======
+            // Cmd2.g:4113:12: ( ( 'x' | 'X' ) )
+            // Cmd2.g:4113:13: ( 'x' | 'X' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'X' || input.LA(1) == 'x' ) 
             	{
@@ -16445,8 +18222,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4112:12: ( ( 'y' | 'Y' ) )
             // Cmd2.g:4112:13: ( 'y' | 'Y' )
+=======
+            // Cmd2.g:4114:12: ( ( 'y' | 'Y' ) )
+            // Cmd2.g:4114:13: ( 'y' | 'Y' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'Y' || input.LA(1) == 'y' ) 
             	{
@@ -16474,8 +18256,13 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
+<<<<<<< HEAD
             // Cmd2.g:4113:12: ( ( 'z' | 'Z' ) )
             // Cmd2.g:4113:13: ( 'z' | 'Z' )
+=======
+            // Cmd2.g:4115:12: ( ( 'z' | 'Z' ) )
+            // Cmd2.g:4115:13: ( 'z' | 'Z' )
+>>>>>>> 66b8bad... EXPORT<r>
             {
             	if ( input.LA(1) == 'Z' || input.LA(1) == 'z' ) 
             	{
@@ -20397,7 +22184,11 @@ public partial class Cmd2Lexer : Lexer {
 
         override public string Description
         {
+<<<<<<< HEAD
             get { return "4023:1: Double : ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? );"; }
+=======
+            get { return "4025:1: Double : ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? );"; }
+>>>>>>> 66b8bad... EXPORT<r>
         }
 
     }

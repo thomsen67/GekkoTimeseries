@@ -578,7 +578,7 @@ namespace Gekko.Parser.Gek
                 return;
             }
 
-            cmdNode.Text = ast.Text;
+             cmdNode.Text = ast.Text;
 
             if (ast.Text != null)
             {
