@@ -9489,6 +9489,18 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void Test__ExportR()
+        {
+            //TODO: look at the R file...
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\temp';");
+            I("MATRIX m1 = [1, 2 || 3, 4];");
+            I("MATRIX m2 = [11, 12 || 13, 14];");
+            I("LIST matrices = '#m1', '#m2';");
+            I("EXPORT<r> #matrices file=matrix.r;");
+        }
+
+        [TestMethod]
         public void Test__ExportSeries()
         {
 
