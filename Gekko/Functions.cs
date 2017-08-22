@@ -1105,6 +1105,23 @@ namespace Gekko
             return rv;
         }
 
+        public static IVariable time(GekkoTime t)
+        {
+            if (t.freq == EFreq.Annual || t.freq == EFreq.Undated)
+            {
+                return new ScalarVal(t.super);
+            }
+            else if (t.freq == EFreq.Quarterly)
+            {
+                return new ScalarVal(t.super + 1d / 4d / 2d + 1d / 4d * (t.sub - 1));
+            }
+            else if (t.freq == EFreq.Monthly)
+            {
+                return new ScalarVal(t.super + 1d / 12d / 2d + 1d / 12d * (t.sub - 1));
+            }
+            throw new GekkoException();
+        }
+
         public static IVariable iif(GekkoTime t, IVariable i1, IVariable op, IVariable i2, IVariable o1, IVariable o2)
         {            
             double result=double.NaN;
