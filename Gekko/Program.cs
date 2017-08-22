@@ -18194,7 +18194,7 @@ namespace Gekko
             }
 
             bool isDefault = false;
-            if (o.opt_tsd == null && o.opt_gbk == null && o.opt_csv == null && o.opt_prn == null && o.opt_tsp == null && o.opt_xls == null && o.opt_xlsx == null && o.opt_gnuplot == null && o.opt_series == null && o.opt_gdx == null)
+            if (o.opt_tsd == null && o.opt_gbk == null && o.opt_csv == null && o.opt_prn == null && o.opt_tsp == null && o.opt_xls == null && o.opt_xlsx == null && o.opt_gnuplot == null && o.opt_series == null && o.opt_gdx == null && o.opt_r == null)
             {
                 isDefault = true;  //implicitly GBK
             }
@@ -18209,8 +18209,13 @@ namespace Gekko
                         
             bool writeAllVariables = false;
             if (list == null) writeAllVariables = true;
-                        
-            if (writeAllVariables)  //writing the whole first databank
+
+            if (G.equal(o.opt_r, "yes"))
+            {
+                ExportR(o);
+                return o.listItems.Count();
+            }
+            else if (writeAllVariables)  //writing the whole first databank
             {
                 list = GetAllVariablesFromBank(Program.databanks.GetFirst());
             }
@@ -18335,6 +18340,48 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Unknown databank format");
                 throw new GekkoException();
             }
+        }
+
+        private static void ExportR(O.Write o)
+        {
+            //Special treatment, for the time being
+
+            if (o.fileName == null)
+            {
+                G.Writeln2("*** ERROR: You must state a filename with FILE = ...");
+                throw new GekkoException();
+            }
+
+            string fullFileName = CreateFullPathAndFileName(o.fileName);
+
+            using (FileStream fs = WaitForFileStream(fullFileName, GekkoFileReadOrWrite.Write))
+            using (StreamWriter file = G.GekkoStreamWriter(fs))
+            {
+                foreach (string s in o.listItems)
+                {
+                    if (!s.StartsWith(Globals.symbolList.ToString()))
+                    {
+                        G.Writeln2("*** ERROR: EXPORT<r>: expected all list items to start with '#'");
+                        throw new GekkoException();
+                    }
+                    IVariable iv = null; Program.scalars.TryGetValue(s, out iv);
+                    if (iv == null)
+                    {
+                        G.Writeln2("*** ERROR: " + s + " does not exist");
+                        throw new GekkoException();
+                    }
+                    if (iv.Type() != EVariableType.Matrix)
+                    {
+                        G.Writeln2("*** ERROR: " + s + " is not a matrix");
+                        throw new GekkoException();
+                    }
+                    Matrix m = (Matrix)iv;
+                    file.WriteLine(Program.MatrixFromGekkoToR<double>(s.Substring(1), m.data));
+                    file.WriteLine();
+                }
+                file.Flush();
+            }
+            G.Writeln2("R export of " + o.listItems.Count() + " matrices, " + fullFileName);
         }
 
         private static List<BankNameVersion> GetInfoFromListOfWildcards(List<string> list)

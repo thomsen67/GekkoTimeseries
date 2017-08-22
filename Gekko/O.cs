@@ -4962,11 +4962,13 @@ namespace Gekko
             public GekkoTime t2 = Globals.tNull; //default, if not explicitely set
             public string fileName = null;
             public List<string> listItems = null;
+            
             public string opt_tsd = null;
             public string opt_tsdx = null;
             public string opt_gbk = null;
             public string opt_csv = null;
             public string opt_prn = null;
+            public string opt_r = null;
             public string opt_tsp = null;
             public string opt_xls = null;
             public string opt_xlsx = null;

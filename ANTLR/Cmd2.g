@@ -67,6 +67,7 @@ tokens {
 	ASTOPT_STRING_PREFIX;
 	ASTOPT_STRING_GDX;
 	ASTOPT_STRING_GDXOPT;
+	ASTOPT_STRING_R;
 	ASTOPT_VAL_INDEX;
 	ASTOPT_STRING_FILE;
 	ASTOPT_STRING_ARRAY;
@@ -205,6 +206,7 @@ tokens {
     ASTFORLEFTSIDE;
     ASTFORNAME;
     ASTFORRIGHTSIDE2;
+	ASTEXPORTR;
     ASTFORRIGHTSIDE;
     ASTFORSTATEMENTS;
     ASTFORSTRING;
@@ -2495,6 +2497,7 @@ write					  : WRITE  writeOpt1? listItemsWildRange? FILE '=' fileName -> ^({toke
 						  | EXPORT writeOpt1? listItemsWildRange? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT writeOpt1?  ^(ASTHANDLEFILENAME fileName?) listItemsWildRange?)
 						  | WRITE  writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE  writeOpt1?  ^(ASTHANDLEFILENAME fileName))
 						  | EXPORT writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT writeOpt1?  ^(ASTHANDLEFILENAME fileName))
+						  //| EXPORT writeOpt2 listName (COMMA2 listName)* FILE '=' fileName -> ^({token("ASTEXPORTR", ASTEXPORTR, $EXPORT.Line)} EXPORT writeOpt2 ^(ASTHANDLEFILENAME fileName?) listName+)
 						  ;
 
 writeOpt1                 : ISNOTQUAL
@@ -2509,6 +2512,7 @@ writeOpt1h                : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
 						  | TSP (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSP yesNo?)
 						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
 						  | PRN (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRN yesNo?)
+						  | R (EQUAL yesNo)? -> ^(ASTOPT_STRING_R yesNo?)
 						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
   						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)						
 						  | CAPS (EQUAL yesNo)? -> ^(ASTOPT_STRING_CAPS yesNo?)		
@@ -2517,6 +2521,8 @@ writeOpt1h                : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
 						  | SERIES -> ^(ASTOPT_STRING_SERIES ASTOPN)												  				
 						  ;
 
+//writeOpt2                 : leftAngle R (EQUAL yesNo)? RIGHTANGLE -> ^(ASTOPT_STRING_R yesNo?);
+						  
 exportType                : D -> ASTOPD
 						  | P  -> ASTOPP
 						  | M  -> ASTOPM
