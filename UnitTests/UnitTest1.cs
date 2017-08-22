@@ -3458,12 +3458,18 @@ namespace UnitTests
 
             }
 
+            //time()
+            I("SER xxtrend = time();");
+            AssertHelper(First(), "xxtrend", 2010, 2010d, sharedDelta);
+            AssertHelper(First(), "xxtrend", 2011, 2011d, sharedDelta);
+            AssertHelper(First(), "xxtrend", 2012, 2012d, sharedDelta);
+
             //avgt()
             I("SER v1 = avgt(ts5);");
             AssertHelper(First(), "v1", 2011, 38d / 3d, sharedDelta);
             I("SER v1 = avgt(2011, 2012, ts5);");
             AssertHelper(First(), "v1", 2011, 28d / 2d, sharedDelta);
-
+            
             //sumt()
             I("SER v1 = sumt(ts5);");
             AssertHelper(First(), "v1", 2011, 38d, sharedDelta);            
