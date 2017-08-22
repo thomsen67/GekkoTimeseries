@@ -31,6 +31,7 @@ options {
 tokens {
 
 	ASTDOLLAR;
+	ASTASSIGNMENT;
 	ASTCNAME;
 	ASTDOTORINDEXER;
 	ASTBANKVARNAME;
@@ -133,7 +134,18 @@ ASTCOMPARE2;
  * PARSER RULES
  *------------------------------------------------------------------*/
 
-expr                      : expression ';'? EOF;  //EOF is necessary in order to force the whole file to be parsed
+//expr                      : expression (SEMICOLON|NEWLINE2|NEWLINE3)* EOF;  //EOF is necessary in order to force the whole file to be parsed
+
+expr                      : expressions EOF;  //EOF is necessary in order to force the whole file to be parsed
+
+expressions               : expr2*;
+
+expr2                     :
+                            SEMICOLON -> //stray semicolon is ok, nothing is written
+                          | assignment           SEMICOLON!
+						  ;
+
+assignment				  : leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression);
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- expression START -------------------------------------------------------------------------------
@@ -174,7 +186,7 @@ primaryExpression         : leftParen! expression RIGHTPAREN!
 value                     : function //must be before varname
 						  | bankvarname						
 						  | Integer -> ^(ASTINTEGER Integer)
-						  | (leftBracketNoGlue|leftBracketNoGlueWild) indexerExpressionHelper RIGHTBRACKET -> ^(ASTINDEXERALONE indexerExpressionHelper) //also see rule indexerExpression
+						  | indexerAlone
 						  | double2 -> double2						
 						  | date2 -> ^(ASTDATE2 date2) //a date like: 2001q3 (luckily we do not have 'e' freq, then what about 2012e3 (in principle, = 2012000))
 						  | StringInQuotes -> ^(ASTSTRINGINQUOTES StringInQuotes)
@@ -183,9 +195,27 @@ value                     : function //must be before varname
 						  | list
 						  ;
 
+leftSide                  : leftSideDollarExpression;
+
+leftSideDollarExpression  : (leftSideIndexerExpression -> leftSideIndexerExpression)
+						    (DOLLAR lbla=dollarConditional -> ^(ASTDOLLAR $leftSideDollarExpression $lbla))*	
+						  ; 						
+
+leftSideIndexerExpression : (leftSideValue -> leftSideValue)
+						    (lbla=dotOrIndexer -> ^(ASTDOTORINDEXER $leftSideIndexerExpression $lbla))*
+						  ;
+
+leftSideValue             : bankvarname												  
+						  | indexerAlone
+						  | listFile												  
+						  | list
+						  ;
+
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- expression END -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
+	
+indexerAlone			  : (leftBracketNoGlue|leftBracketNoGlueWild) indexerExpressionHelper RIGHTBRACKET -> ^(ASTINDEXERALONE indexerExpressionHelper); //also see rule indexerExpression
 						
 dotOrIndexer              : GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
 						  | leftBracketGlue indexerExpressionHelper2 RIGHTBRACKET -> ^(ASTINDEXER indexerExpressionHelper2)
@@ -199,8 +229,10 @@ matrix                    : matrixCol;
 matrixCol                 : leftBracketNoGlue matrixRow (doubleVerticalBar matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
 matrixRow                 : expression (',' expression)*  -> ^(ASTMATRIXROW expression+);
 
-						  //trailing ',' is allowed, for instance ('a', 'b', ). This is Python style: ('a',) will then be a lsits.
-list                      : leftParenNoGlue (expression (',' expression)*)? ','? RIGHTPAREN -> ^(ASTLIST expression*);
+						  //trailing ',' is allowed, for instance ('a', 'b', ). This is Python style: ('a',) will then be a lists, not just a.
+list                      : leftParenNoGlue expression ',' (listHelper1|listHelper2) RIGHTPAREN -> ^(ASTLIST expression+);
+listHelper1               : (expression ',')* expression -> expression+;
+listHelper2               : (expression ',')* -> expression*;
 
 //FIXME
 //FIXME
