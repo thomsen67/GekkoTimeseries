@@ -14,7 +14,7 @@ namespace Gekko
 
         public ScalarString(string s)
         {
-            Initialize(s, false, true);
+            Initialize(s, false, false);
         }
 
         public ScalarString(string s, bool isName)

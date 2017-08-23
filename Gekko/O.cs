@@ -22,7 +22,11 @@ namespace Gekko
         //Common methods start
         //Common methods start
         //Common methods start
-                
+
+        public static ScalarString scalarStringPercent = new ScalarString(Globals.symbolMemvar.ToString());
+        public static ScalarString scalarStringHash = new ScalarString(Globals.symbolList.ToString());
+        public static ScalarString scalarStringTilde = new ScalarString(Globals.symbolTilde.ToString());
+        public static ScalarString scalarStringColon = new ScalarString(Globals.symbolBankColon.ToString());
 
         public enum LagType
         {
@@ -376,6 +380,42 @@ namespace Gekko
         public static void HandleIndexer(IVariable y, params IVariable[] x)
         {
             HandleIndexerHelper(0, y, x);            
+        }
+
+        public static void Assignment(GekkoSmpl smpl, IVariable y, IVariable x)
+        {
+            G.Writeln2("HEJ!");
+
+            switch (x.Type())
+            {
+                case EVariableType.Val:
+                    {
+                        string varname = O.GetString(y);
+                        string[] ss = varname.Split(Globals.symbolBankColon2);
+                        if (ss.Length == 1)
+                        {
+                            Program.scalars.Add(varname, x);
+                            Program.Mem(null);
+                        }
+                        else if (ss.Length == 2)
+                        {
+
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: More than 1 colon in '" + varname + "'");
+                            throw new GekkoException();
+                        }
+
+                    }
+                    break;
+                default:
+                    {
+                        G.Writeln2("*** ERROR: Assignment with unknown type");
+                        throw new GekkoException();
+                    }
+                    break;
+            }
         }
 
         public static void HandleIndexerHelper(int depth, IVariable y, params IVariable[] x)

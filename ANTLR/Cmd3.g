@@ -285,7 +285,7 @@ varname                   : nameOrCname freq? -> ^(ASTVARNAME ^(ASTPLACEHOLDER) 
 						  | sigil leftParen cname rightParen -> ^(ASTVARNAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER cname) ^(ASTPLACEHOLDER))						  
 						  ;
 
-bankvarname               : (name COLON)? varname -> ^(ASTBANKVARNAME varname name?);
+bankvarname               : (name COLON)? varname -> ^(ASTBANKVARNAME name? varname);
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- name END -------------------------------------------------------------------------------

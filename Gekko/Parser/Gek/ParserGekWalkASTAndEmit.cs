@@ -48,7 +48,7 @@ namespace Gekko.Parser.Gek
             if (this.storage == null) this.storage = new StringBuilder();                
             this.storage.Append(s);
             return this;
-        }
+        }        
 
         public GekkoSB A(int i)
         {
@@ -76,6 +76,13 @@ namespace Gekko.Parser.Gek
             if (this.storage == null) this.storage = new StringBuilder();                
             this.storage.Clear();
             this.storage.Append(sb.storage);
+        }
+
+        public GekkoSB End()
+        {
+            if (this.storage == null) throw new GekkoException();
+            this.storage.Append(";" + G.NL);
+            return this;
         }
 
         public void Prepend(string s)
@@ -2221,81 +2228,81 @@ namespace Gekko.Parser.Gek
 
                         }
                         break;
-                    case "ASTHASH":
-                        {
-                            //if (node.Parent != null && node.Number == 1 && node.Parent.Text == "ASTFUNCTION")
-                            //{
-                            //    //for instance the first #i in sum(#i, x[#i])
+                    //case "ASTHASH":
+                    //    {
+                    //        //if (node.Parent != null && node.Number == 1 && node.Parent.Text == "ASTFUNCTION")
+                    //        //{
+                    //        //    //for instance the first #i in sum(#i, x[#i])
 
-                            //    string[] sumFunctionListNames = IsGamsLikeSumFunction1(false, node.Parent, w, node.Parent[0].Text.ToLower());  //can return null                                                        
+                    //        //    string[] sumFunctionListNames = IsGamsLikeSumFunction1(false, node.Parent, w, node.Parent[0].Text.ToLower());  //can return null                                                        
                                 
-                            //    if (sumFunctionListNames != null)  //Is first argument of GAMS-like sum function, sum(#i, x[#i])
-                            //    {
+                    //        //    if (sumFunctionListNames != null)  //Is first argument of GAMS-like sum function, sum(#i, x[#i])
+                    //        //    {
 
 
-                            //        string functionName = GetFunctionName(node.Parent);
-                            //        string[] listNames = IsGamsLikeSumFunction1(true, node.Parent, w, functionName);
-                            //        if (listNames != null) HandleGamsLikeSumFunction(listNames, true, w, null);
+                    //        //        string functionName = GetFunctionName(node.Parent);
+                    //        //        string[] listNames = IsGamsLikeSumFunction1(true, node.Parent, w, functionName);
+                    //        //        if (listNames != null) HandleGamsLikeSumFunction(listNames, true, w, null);
 
 
 
-                            //        string nodeCode = null;
-                            //        string dName = "sumHelper" + ++Globals.counter;
-                            //        nodeCode += "double " + dName + "" + " = 0d;" + G.NL;
+                    //        //        string nodeCode = null;
+                    //        //        string dName = "sumHelper" + ++Globals.counter;
+                    //        //        nodeCode += "double " + dName + "" + " = 0d;" + G.NL;
 
-                            //        foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
-                            //        {
-                            //            nodeCode += EmitListLoopingCode(node, kvp);  //foreach(...
-                            //            nodeCode += dName + " += " + node[2].Code.ToString() + ";";
-                            //        }
+                    //        //        foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
+                    //        //        {
+                    //        //            nodeCode += EmitListLoopingCode(node, kvp);  //foreach(...
+                    //        //            nodeCode += dName + " += " + node[2].Code.ToString() + ";";
+                    //        //        }
 
-                            //        foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
-                            //        {
-                            //            nodeCode += "}" + G.NL;
-                            //        }
+                    //        //        foreach (KeyValuePair<string, string> kvp in w.wh.sumHelperListNames)
+                    //        //        {
+                    //        //            nodeCode += "}" + G.NL;
+                    //        //        }
 
-                            //        HandleGamsLikeSumFunction(sumFunctionListNames, false, w, node.Code.ToString());
+                    //        //        HandleGamsLikeSumFunction(sumFunctionListNames, false, w, node.Code.ToString());
 
-                            //        node.Code.A(nodeCode);
+                    //        //        node.Code.A(nodeCode);
 
-                            //    }
-                            //}
+                    //        //    }
+                    //        //}
 
 
-                            string simpleIdent = null;
-                            bool stringify = false;
-                            if (node.ChildrenCount() > 0 && node[0].Text == "ASTDOLLARHASHNAMESIMPLE") stringify = true;
-                            if (node.ChildrenCount() > 0 && (node[0].Text == "ASTHASHNAMESIMPLE" || node[0].Text == "ASTDOLLARHASHNAMESIMPLE"))
-                            {
-                                simpleIdent = node[0][0].Text;
-                            }
+                    //        string simpleIdent = null;
+                    //        bool stringify = false;
+                    //        if (node.ChildrenCount() > 0 && node[0].Text == "ASTDOLLARHASHNAMESIMPLE") stringify = true;
+                    //        if (node.ChildrenCount() > 0 && (node[0].Text == "ASTHASHNAMESIMPLE" || node[0].Text == "ASTDOLLARHASHNAMESIMPLE"))
+                    //        {
+                    //            simpleIdent = node[0][0].Text;
+                    //        }
 
-                            if (node[0].Text == "ASTLISTFILE")
-                            {
-                                node.Code.A("O.ZListFile(O.GetString(" + node[0][0].Code + "))");
-                            }
-                            else
-                            {
+                    //        if (node[0].Text == "ASTLISTFILE")
+                    //        {
+                    //            node.Code.A("O.ZListFile(O.GetString(" + node[0][0].Code + "))");
+                    //        }
+                    //        else
+                    //        {
 
-                                if (simpleIdent != null)
-                                {
-                                    string fa = FindFunctionArguments(node, w, simpleIdent);
-                                    if (fa != null)
-                                    {
-                                        node.Code.A(fa);
-                                    }
-                                    else
-                                    {
-                                        AstListHelper(node, w, simpleIdent, stringify);
-                                    }
-                                }
-                                else
-                                {
-                                    node.Code.A("O.ZList(" + node[0].Code + ")");
-                                }
-                            }
-                            break;
-                        }
+                    //            if (simpleIdent != null)
+                    //            {
+                    //                string fa = FindFunctionArguments(node, w, simpleIdent);
+                    //                if (fa != null)
+                    //                {
+                    //                    node.Code.A(fa);
+                    //                }
+                    //                else
+                    //                {
+                    //                    AstListHelper(node, w, simpleIdent, stringify);
+                    //                }
+                    //            }
+                    //            else
+                    //            {
+                    //                node.Code.A("O.ZList(" + node[0].Code + ")");
+                    //            }
+                    //        }
+                    //        break;
+                    //    }
                     //case "ASTHASHNAMESIMPLE":
                     //    {
                     //        node.Code.CA("O.GetListFromCache(`" + node[0].Text + "`)";
@@ -2304,7 +2311,7 @@ namespace Gekko.Parser.Gek
                     case "ASTIDENT":
                     case "ASTIDENTDIGIT":
                         {
-                            node.Code.CA("new ScalarString(`" + node[0].Text + "`)");
+                            node.Code.CA("new ScalarString(`" + node[0].Text + "`)");  //problem is that we now allow VAL %v = 1, for instance. Here %v is not recursive.
                         }
                         break;
 
@@ -2714,6 +2721,64 @@ namespace Gekko.Parser.Gek
                     case "ASTN":
                         {
                             node.Code.A(AddPrintCode("n", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                        }
+                        break;
+                    case "ASTASSIGNMENT":
+                        {
+                            node.Code.A("O.Assignment(smpl, ").A(node[0].Code).A(", ").A(node[1].Code).A(")").End();
+                        }
+                        break;
+                    case "ASTPERCENT":
+                        {
+                            node.Code.A("O.scalarStringPercent");
+                        }
+                        break;
+                    case "ASTHASH":
+                        {
+                            node.Code.A("O.scalarStringHash");
+                        }
+                        break;
+                    case "ASTBANKVARNAME":
+                        {
+                            if (node[1] == null)
+                            {
+                                //no bank indicator
+                                node.Code = node[0].Code;
+                            }
+                            else
+                            {
+                                //bank indicator
+                                node.Code.A("(" + node[0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1][0].Code + ")");
+                            }
+                        }
+                        break;
+                    case "ASTVARNAME":
+                        {
+                            bool s0 = false; if (node[0][0] != null) s0 = true;  //sigil % or #
+                            bool s2 = false; if (node[2][0] != null) s2 = true;  //tilde ~
+                            
+                            if (s0)
+                            {
+                                if(s2)
+                                {
+                                    node.Code.A("(" + node[0][0].Code + ")").A(".Add(smpl, " + node[1][0].Code + ")").A(".Add(smpl, O.scalarStringTilde)").A(".Add(smpl, " + node[2][0].Code + ")");
+                                }   
+                                else
+                                {
+                                    node.Code.A("(" + node[0][0].Code + ")").A(".Add(smpl, " + node[1][0].Code + ")");
+                                }                         
+                            }
+                            else
+                            {
+                                if(s2)
+                                {
+                                    node.Code.A("(" + node[1][0].Code + ")").A(".Add(smpl, " + node[2][0].Code + ")");
+                                }
+                                else
+                                {
+                                    node.Code = node[1][0].Code.A(".Add(O.scalarStringTilde)");
+                                }                                
+                            }
                         }
                         break;
                     case "ASTNAME":

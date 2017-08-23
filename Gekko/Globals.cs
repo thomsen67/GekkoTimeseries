@@ -195,6 +195,7 @@ namespace Gekko
         public const string symbolTurtle = "___";
 
         public const string symbolBankColon = ":";
+        public const char symbolBankColon2 = ':';
         public const char symbolTilde = '~';
         public const char symbolList = '#';
         public const char symbolMemvar = '%';
