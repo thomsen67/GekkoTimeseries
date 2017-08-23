@@ -17,10 +17,8 @@ namespace Gekko
         {
 
         }
-
-        public TimeSeriesLight(GekkoSmpl smpl, TimeSeries ts) : this(smpl, ts, true) { }        
-
-        public TimeSeriesLight(GekkoSmpl smpl, TimeSeries ts, bool shallow)
+        
+        public TimeSeriesLight(GekkoSmpl smpl, TimeSeries ts)
         {
             if (Globals.timeSeriesLightShallowCopy)
             {

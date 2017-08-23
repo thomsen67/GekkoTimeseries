@@ -382,31 +382,231 @@ namespace Gekko
             HandleIndexerHelper(0, y, x);            
         }
 
+        public static GekkoSmpl Smpl()
+        {
+            return new GekkoSmpl(Globals.globalPeriodStart, Globals.globalPeriodEnd);
+        }
+
+        public static IVariable Replace(GekkoSmpl smpl, IVariable x)
+        {
+            ScalarString x2 = x as ScalarString;
+
+            if (x2 != null)
+            {
+                if (true)
+                {
+                    //Replace/transform
+                    string dbName, varName; char firstChar; Chop(x2, out dbName, out varName, out firstChar);
+                    if (firstChar == Globals.symbolMemvar)
+                    {
+                    }
+                    else if (firstChar == Globals.symbolList)
+                    {
+                    }
+                    else
+                    {
+                        Databank db = Program.databanks.GetFirst();
+                        if (dbName != null) db = Program.databanks.GetDatabank(dbName);
+                        TimeSeries ts = db.GetVariable(varName);
+                        if (ts == null)
+                        {
+                            G.Writeln2("*** ERROR: Could not find " + O.GetString(x2));
+                            throw new GekkoException();
+                        }
+                        TimeSeriesLight tsl = new TimeSeriesLight(smpl, ts);
+                        return tsl;
+                    }
+                }
+            }
+            return x;
+        }                
+
         public static void Assignment(GekkoSmpl smpl, IVariable y, IVariable x)
         {
-            G.Writeln2("HEJ!");
+            string dbName, varName; char firstChar; Chop(y, out dbName, out varName, out firstChar);
 
             switch (x.Type())
             {
                 case EVariableType.Val:
                     {
-                        string varname = O.GetString(y);
-                        string[] ss = varname.Split(Globals.symbolBankColon2);
-                        if (ss.Length == 1)
+                        double d = O.GetVal(smpl, x);
+                        switch (firstChar)
                         {
-                            Program.scalars.Add(varname, x);
-                            Program.Mem(null);
-                        }
-                        else if (ss.Length == 2)
-                        {
+                            case Globals.symbolMemvar:  //%
+                                {
+                                    if (dbName == null)
+                                    {
+                                        Program.scalars.Add(varName, x);
+                                        Program.Mem(null);
+                                    }
+                                }
+                                break;
+                            case Globals.symbolList:  //#
+                                {
+                                    G.Writeln2("*** ERROR: You cannot assign a VAL to a LIST or MATRIX.");
+                                    throw new GekkoException();
+                                }
+                                break;
+                            default:
+                                {
+                                    TimeSeries ts = GetLeftSideVariable(dbName, varName);
+                                    foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                                    {
+                                        ts.SetData(t, d);
+                                    }
 
-                        }
-                        else
-                        {
-                            G.Writeln2("*** ERROR: More than 1 colon in '" + varname + "'");
-                            throw new GekkoException();
+                                    if (true)
+                                    {
+                                        G.Writeln2("PRT of " + varName);
+                                        foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                                        {
+                                            G.Writeln(t.ToString() + "    " + ts.GetData(t));
+                                        }
+                                    }
+
+                                }
+                                break;
                         }
 
+
+
+                    }
+                    break;
+                case EVariableType.String:
+                    {
+                        switch (firstChar)
+                        {
+                            case Globals.symbolMemvar:  //%
+                                {
+
+                                }
+                                break;
+                            case Globals.symbolList:  //#
+                                {
+
+                                }
+                                break;
+                            default:
+                                {
+
+
+                                }
+                                break;
+                        }
+                        break;
+                    }
+                case EVariableType.Date:
+                    {
+                        switch (firstChar)
+                        {
+                            case Globals.symbolMemvar:  //%
+                                {
+
+                                }
+                                break;
+                            case Globals.symbolList:  //#
+                                {
+
+                                }
+                                break;
+                            default:
+                                {
+
+                                }
+                                break;
+                        }
+                        break;
+
+                    }
+                    break;
+                case EVariableType.List:
+                    {
+                        switch (firstChar)
+                        {
+                            case Globals.symbolMemvar:  //%
+                                {
+
+                                }
+                                break;
+                            case Globals.symbolList:  //#
+                                {
+
+                                }
+                                break;
+                            default:
+                                {
+
+                                }
+                                break;
+                        }
+                        break;
+
+                    }
+                    break;
+
+                case EVariableType.TimeSeries:
+                    {
+                        switch (firstChar)
+                        {
+                            case Globals.symbolMemvar:  //%
+                                {
+                                    G.Writeln2("*** ERROR: You are trying to put timeseries data into a scalar");
+                                    throw new GekkoException();
+                                }
+                                break;
+                            case Globals.symbolList:  //#
+                                {
+                                    G.Writeln2("*** ERROR: You are trying to put timeseries data into a list or matrix");
+                                    throw new GekkoException();
+                                }
+                                break;
+                            default:
+                                {
+                                    TimeSeries ts = GetLeftSideVariable(dbName, varName);
+                                    TimeSeriesLight tsl = (TimeSeriesLight)x;                                    
+                                    foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                                    {
+                                        ts.SetData(t, tsl.GetData(t));
+                                    }
+                                    G.Writeln2("PRT of " + varName);
+                                    foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                                    {
+                                        G.Writeln(t.ToString() + "    " + ts.GetData(t));
+                                    }
+                                }
+                                break;
+                        }
+                        break;
+
+                    }
+                    break;
+                case EVariableType.Matrix:
+                    {
+                        switch (firstChar)
+                        {
+                            case Globals.symbolMemvar:  //%
+                                {
+
+                                }
+                                break;
+                            case Globals.symbolList:  //#
+                                {
+
+                                }
+                                break;
+                            default:
+                                {
+
+                                }
+                                break;
+                        }
+                        break;
+
+                    }
+                    break;
+                case EVariableType.GekkoError:
+                    {
+                        G.Writeln2("ERROR!");
                     }
                     break;
                 default:
@@ -416,6 +616,38 @@ namespace Gekko
                     }
                     break;
             }
+        }
+
+        private static TimeSeries GetLeftSideVariable(string dbName, string varName)
+        {
+            Databank db = Program.databanks.GetFirst();
+            if (dbName != null) db = Program.databanks.GetDatabank(dbName);
+            TimeSeries ts = db.GetVariable(varName);
+            if (ts == null)
+            {
+                ts = new TimeSeries(Program.options.freq, varName);
+                db.AddVariable(ts);
+            }
+
+            return ts;
+        }
+
+        private static void Chop(IVariable y, out string dbName, out string varName, out char firstChar)
+        {
+            string[] ss = O.GetString(y).Split(Globals.symbolBankColon2);
+            if (ss.Length > 2)
+            {
+                G.Writeln2("*** ERROR: More than 1 colon in '" + O.GetString(y) + "'");
+                throw new GekkoException();
+            }
+            dbName = null;
+            varName = null;
+            if (ss.Length == 1) varName = ss[0];
+            else if (ss.Length == 2)
+            {
+                dbName = ss[0]; varName = ss[1];
+            }
+            firstChar = varName[0];
         }
 
         public static void HandleIndexerHelper(int depth, IVariable y, params IVariable[] x)

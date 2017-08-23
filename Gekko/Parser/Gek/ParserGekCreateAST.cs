@@ -160,7 +160,7 @@ namespace Gekko.Parser.Gek
             }
 
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("WALK START");
-            Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmit(root, 0, 0, textInput, wh2, p);
+            Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmit(root, 0, 0, textInput, wh2, p, -12345);
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("WALK END");
 
             s.AppendLine(root.Code.ToString());
@@ -382,7 +382,7 @@ namespace Gekko.Parser.Gek
 
 
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("WALK START");
-            Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmit(root, 0, 0, textInput, wh2, p);
+            Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmit(root, 0, 0, textInput, wh2, p, -12345);
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("WALK END");
 
             s.AppendLine(root.Code.ToString());

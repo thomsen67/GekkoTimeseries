@@ -196,7 +196,7 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        public static void WalkASTAndEmit(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p)
+        public static void WalkASTAndEmit(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p, int leftRight)
         {            
             if (node.Parent != null)
             {
@@ -289,10 +289,16 @@ namespace Gekko.Parser.Gek
                     }
                     break;
             }
+
+            bool astAssignment = false;
+            if (node.Text == "ASTASSIGNMENT")
+                astAssignment = true;
             
             foreach (ASTNode child in node.ChildrenIterator())
-            {               
-                WalkASTAndEmit(child, absoluteDepth + 1, relativeDepth + 1, textInput, w, p);
+            {
+                int leftRight2 = leftRight;
+                if (astAssignment) leftRight2 = child.Number;  //0, 1, 2, etc.
+                WalkASTAndEmit(child, absoluteDepth + 1, relativeDepth + 1, textInput, w, p, leftRight2);
                 //return; Globals.testing = true;
             }            
 
@@ -482,6 +488,11 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("O.Indexer(smpl, " + node[0].Code + ", " + tf + s + ")");                               
 
                             }
+                        }
+                        break;
+                    case "ASTPLUS":
+                        {
+                            node.Code.CA("O.Add(smpl, " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
                     case "ASTXLINE":
@@ -2311,7 +2322,7 @@ namespace Gekko.Parser.Gek
                     case "ASTIDENT":
                     case "ASTIDENTDIGIT":
                         {
-                            node.Code.CA("new ScalarString(`" + node[0].Text + "`)");  //problem is that we now allow VAL %v = 1, for instance. Here %v is not recursive.
+                            node.Code.CA("new ScalarString(`" + node[0].Text + "`, true, false)");  //problem is that we now allow VAL %v = 1, for instance. Here %v is not recursive.
                         }
                         break;
 
@@ -2743,12 +2754,15 @@ namespace Gekko.Parser.Gek
                             if (node[1] == null)
                             {
                                 //no bank indicator
-                                node.Code = node[0].Code;
+                                if (leftRight == 0) node.Code.A("(" + node[0].Code + ")");
+                                else node.Code.A("O.Replace(smpl, (" + node[0].Code + "))");
+                                
                             }
                             else
                             {
                                 //bank indicator
-                                node.Code.A("(" + node[0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1][0].Code + ")");
+                                if(leftRight==0) node.Code.A("(" + node[0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + ")");
+                                else node.Code.A("O.Replace(smpl, (" + node[0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "))");
                             }
                         }
                         break;
@@ -2761,10 +2775,12 @@ namespace Gekko.Parser.Gek
                             {
                                 if(s2)
                                 {
+                                    //%a~q, does not make sense...
                                     node.Code.A("(" + node[0][0].Code + ")").A(".Add(smpl, " + node[1][0].Code + ")").A(".Add(smpl, O.scalarStringTilde)").A(".Add(smpl, " + node[2][0].Code + ")");
                                 }   
                                 else
                                 {
+                                    //%a
                                     node.Code.A("(" + node[0][0].Code + ")").A(".Add(smpl, " + node[1][0].Code + ")");
                                 }                         
                             }
@@ -2772,11 +2788,13 @@ namespace Gekko.Parser.Gek
                             {
                                 if(s2)
                                 {
-                                    node.Code.A("(" + node[1][0].Code + ")").A(".Add(smpl, " + node[2][0].Code + ")");
+                                    //a~q
+                                    node.Code.A("(" + node[1][0].Code + ")").A(".Add(smpl, O.scalarStringTilde)").A(".Add(smpl, " + node[2][0].Code + ")");
                                 }
                                 else
                                 {
-                                    node.Code = node[1][0].Code.A(".Add(O.scalarStringTilde)");
+                                    //a
+                                    node.Code = node[1][0].Code;
                                 }                                
                             }
                         }

@@ -664,7 +664,7 @@ namespace Gekko
         public static long prtCsSnippetsCounter = 0;
         
         //public static string gekkoTimeIniCs = "GekkoTime t = Globals.tNull;";
-        public static string gekkoSmplInit = "GekkoSmpl smpl = null;";
+        public static string gekkoSmplInit = "GekkoSmpl smpl = O.Smpl();";
         public static string GekkoSmplNull = "smpl = null;";
         public static string smpl = "smpl";
 

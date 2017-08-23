@@ -14513,7 +14513,7 @@ namespace Gekko
         private static IVariable Expression1(GekkoSmpl smpl)
         {
             TimeSeries ts = Program.databanks.GetDatabank("Work").GetVariable("xx");
-            TimeSeriesLight tsl = new TimeSeriesLight(smpl, ts, true);
+            TimeSeriesLight tsl = new TimeSeriesLight(smpl, ts);
             return Functions.test(smpl, O.Add(smpl, tsl, tsl));
         }
 
