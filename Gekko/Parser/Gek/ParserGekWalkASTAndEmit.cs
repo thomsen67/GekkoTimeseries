@@ -2754,13 +2754,13 @@ namespace Gekko.Parser.Gek
                             {
                                 //no bank indicator
                                 if (leftHandSide == 1) node.Code.A("(" + node[0].Code + ")");
-                                else node.Code.A("O.Replace(smpl, (" + node[0].Code + "))");
+                                else node.Code.A("O.Lookup(smpl, (" + node[0].Code + "))");
                             }
                             else
                             {
                                 //bank indicator
                                 if (leftHandSide == 1) node.Code.A("(" + node[0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + ")");
-                                else node.Code.A("O.Replace(smpl, (" + node[0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "))");
+                                else node.Code.A("O.Lookup(smpl, (" + node[0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "))");
                             }
                         }
                         break;

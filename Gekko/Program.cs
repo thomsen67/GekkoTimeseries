@@ -18850,7 +18850,7 @@ namespace Gekko
                         foreach (BankNameVersion var in list)
                         {
                             Databank db = GetBankFromBankNameVersion(var.bank);
-                            IVariable xx = null; db.storage.TryGetValue(var.name, out xx);
+                            IVariable xx = db.GetIVariable(var.name);
                             if (xx == null)
                             {                                
                                 G.Writeln2("*** ERROR: Could not find variable '" + var + "' in databank '" + db.aliasName + "' for writing (" + Globals.extensionDatabank + ")");
@@ -18954,8 +18954,8 @@ namespace Gekko
             {                
                 foreach (BankNameVersion var in list)
                 {
-                    Databank db = GetBankFromBankNameVersion(var.bank);
-                    IVariable iv = null; db.storage.TryGetValue(var.name, out iv);
+                    Databank db = GetBankFromBankNameVersion(var.bank);                    
+                    IVariable iv = db.GetIVariable(var.name);
                     if (iv == null)
                     {
                         G.Writeln();

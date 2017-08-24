@@ -392,7 +392,7 @@ namespace Gekko
             ScalarString x2 = x as ScalarString;
             if (x2 != null)
             {
-                string dbName, varName; char firstChar; Chop(x2, out dbName, out varName, out firstChar);
+                string dbName, varName, freq; char firstChar; Chop(x2, out dbName, out varName, out firstChar, out freq);                
                 IVariable iv = null;
                 if (Program.options.databank_search && dbName == null)
                 {
@@ -400,7 +400,7 @@ namespace Gekko
                     {
                         if (i == 1) continue;  //The Ref databank IS NEVER SEARCHED!!
                         Databank db2 = Program.databanks.storage[i];
-                        iv = null; db2.storage.TryGetValue(varName, out iv);
+                        iv = db2.GetIVariable(varName);                        
                         if (iv != null) break;
                     }
                     if (iv == null)
@@ -414,10 +414,10 @@ namespace Gekko
                     Databank db = null;
                     if (dbName != null) db = Program.databanks.GetDatabank(dbName);
                     else db = Program.databanks.GetFirst();
-                    iv = null; db.storage.TryGetValue(varName, out iv);
+                    iv = db.GetIVariable(varName);                    
                     if (iv == null)
                     {
-                        G.Writeln2("*** ERROR: Could not find variable '" + varName + "' in databank '" + dbName + "'");
+                        G.Writeln2("*** ERROR: Could not find variable '" + varName + "' in databank '" + db.aliasName + "'");
                         throw new GekkoException();
                     }
                 }
@@ -500,20 +500,38 @@ namespace Gekko
 
         public static void Assignment(GekkoSmpl smpl, IVariable y, IVariable x)
         {
-            string dbName, varName; char firstChar; Chop(y, out dbName, out varName, out firstChar);
+            string dbName, varName, freq; char firstChar; Chop(y, out dbName, out varName, out firstChar, out freq);
+            Databank db = null;
+            if (dbName == null) db = Program.databanks.GetFirst();
+            else db = Program.databanks.GetDatabank(dbName);
+            
+            IVariable iv = db.GetIVariable(varName);
 
-            switch (x.Type())
+            switch (x.Type())  //RHS type
             {
-                case EVariableType.Val:
+                case EVariableType.Val:  //RHS is VAL
                     {
                         double d = O.GetVal(smpl, x);
                         switch (firstChar)
                         {
                             case Globals.symbolMemvar:  //%
                                 {
-                                    if (dbName == null)
+                                    if (iv == null)
                                     {
-                                        Program.scalars.Add(varName, x);                                        
+                                        db.AddIVariable(varName, x);
+                                    }
+                                    else
+                                    {
+                                        ScalarVal v = iv as ScalarVal;
+                                        if (v != null)
+                                        {
+                                            v.val = ((ScalarVal)x).val;  //avoids object creation
+                                        }
+                                        else
+                                        {
+                                            db.RemoveIVariable(varName);
+                                            db.AddIVariable(varName, x);
+                                        }
                                     }
                                 }
                                 break;
@@ -525,7 +543,16 @@ namespace Gekko
                                 break;
                             default:
                                 {
-                                    TimeSeries ts = GetLeftSideVariable(dbName, varName);
+                                    TimeSeries ts = null;
+                                    if (iv == null)
+                                    {
+                                        ts = new TimeSeries(Program.options.freq, varName);
+                                        db.AddIVariable(ts.variableName, ts);  //always use this pattern: AddIVariable(x.variableName, x)
+                                    }
+                                    else
+                                    {
+                                        ts = (TimeSeries)iv;  //timeseries is already existing, we just change the contents                                        
+                                    }
                                     foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
                                     {
                                         ts.SetData(t, d);
@@ -535,7 +562,7 @@ namespace Gekko
                         }
                     }
                     break;
-                case EVariableType.String:
+                case EVariableType.String:  //RHS is STRING
                     {
                         switch (firstChar)
                         {
@@ -558,31 +585,7 @@ namespace Gekko
                         }
                         break;
                     }
-                case EVariableType.Date:
-                    {
-                        switch (firstChar)
-                        {
-                            case Globals.symbolMemvar:  //%
-                                {
-
-                                }
-                                break;
-                            case Globals.symbolList:  //#
-                                {
-
-                                }
-                                break;
-                            default:
-                                {
-
-                                }
-                                break;
-                        }
-                        break;
-
-                    }
-                    break;
-                case EVariableType.List:
+                case EVariableType.Date:  //RHS is DATE
                     {
                         switch (firstChar)
                         {
@@ -606,8 +609,32 @@ namespace Gekko
 
                     }
                     break;
+                case EVariableType.List:  //RHS is LIST
+                    {
+                        switch (firstChar)
+                        {
+                            case Globals.symbolMemvar:  //%
+                                {
 
-                case EVariableType.TimeSeries:
+                                }
+                                break;
+                            case Globals.symbolList:  //#
+                                {
+
+                                }
+                                break;
+                            default:
+                                {
+
+                                }
+                                break;
+                        }
+                        break;
+
+                    }
+                    break;
+
+                case EVariableType.TimeSeries:  //RHS is SERIES
                     {
                         switch (firstChar)
                         {
@@ -626,7 +653,7 @@ namespace Gekko
                             default:
                                 {
                                     TimeSeries ts = GetLeftSideVariable(dbName, varName);
-                                    TimeSeriesLight tsl = (TimeSeriesLight)x;                                    
+                                    TimeSeriesLight tsl = (TimeSeriesLight)x;
                                     foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
                                     {
                                         ts.SetData(t, tsl.GetData(t));
@@ -638,7 +665,7 @@ namespace Gekko
 
                     }
                     break;
-                case EVariableType.Matrix:
+                case EVariableType.Matrix:  //RHS is MATRIX
                     {
                         switch (firstChar)
                         {
@@ -662,7 +689,7 @@ namespace Gekko
 
                     }
                     break;
-                case EVariableType.GekkoError:
+                case EVariableType.GekkoError:  //RHS is ERROR
                     {
                         G.Writeln2("ERROR!");
                     }
@@ -674,6 +701,16 @@ namespace Gekko
                     }
                     break;
             }
+        }
+
+        private static string DecorateWithTilde(string varName, string freq, char firstChar)
+        {
+            if (firstChar != Globals.symbolMemvar && firstChar != Globals.symbolList)
+            {
+                if (freq == null) varName += Globals.symbolTilde + G.GetFreq(Program.options.freq);
+            }
+
+            return varName;
         }
 
         private static TimeSeries GetLeftSideVariable(string dbName, string varName)
@@ -690,22 +727,35 @@ namespace Gekko
             return ts;
         }
 
-        private static void Chop(IVariable y, out string dbName, out string varName, out char firstChar)
+        private static void Chop(IVariable y, out string dbName, out string varName, out char firstChar, out string freq)
         {
             string[] ss = O.GetString(y).Split(Globals.symbolBankColon2);
             if (ss.Length > 2)
             {
-                G.Writeln2("*** ERROR: More than 1 colon in '" + O.GetString(y) + "'");
+                G.Writeln2("*** ERROR: More than 1 colons (':') in '" + O.GetString(y) + "'");
                 throw new GekkoException();
-            }
+            }            
             dbName = null;
             varName = null;
+            freq = null;
             if (ss.Length == 1) varName = ss[0];
             else if (ss.Length == 2)
             {
                 dbName = ss[0]; varName = ss[1];
             }
             firstChar = varName[0];
+            string[] ss2 = varName.Split(Globals.symbolTilde);
+            if (ss2.Length > 2)
+            {
+                G.Writeln2("*** ERROR: More than 1 freq indicators ('~') in '" + O.GetString(y) + "'");
+                throw new GekkoException();
+            }
+            if (ss2.Length == 2)
+            {
+                varName = ss2[0];
+                freq = ss2[1];
+            }
+            varName = DecorateWithTilde(varName, freq, firstChar);
         }
 
         public static void HandleIndexerHelper(int depth, IVariable y, params IVariable[] x)

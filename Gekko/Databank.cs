@@ -260,6 +260,22 @@ namespace Gekko
             return iv;
         }
 
+        public void AddIVariable(string name, IVariable x)
+        {
+            //For TimeSeries, always use this pattern: AddIVariable(x.variableName, x)
+            this.storage.Add(name, x);
+        }
+
+        public void RemoveIVariable(string name)
+        {
+            if (this.storage.ContainsKey(name)) this.storage.Remove(name);
+        }
+
+        public bool ContainsIVariable(string name)
+        {
+            return this.storage.ContainsKey(name);
+        }
+
         public TimeSeries GetVariable(bool freqAddToName, string variable)
         {            
             if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
