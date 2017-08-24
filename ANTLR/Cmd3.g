@@ -76,7 +76,7 @@ ASTIDENTDIGIT;
 	ASTLISTFILE;
 
 	ASTDOLLARCONDITIONAL;
-	ASTLIST;
+	ASTLISTDEF;
 ASTOR;
 ASTAND;
 ASTNOT;
@@ -233,7 +233,8 @@ matrixCol                 : leftBracketNoGlue matrixRow (doubleVerticalBar matri
 matrixRow                 : expression (',' expression)*  -> ^(ASTMATRIXROW expression+);
 
 						  //trailing ',' is allowed, for instance ('a', 'b', ). This is Python style: ('a',) will then be a lists, not just a.
-list                      : leftParenNoGlue expression ',' (listHelper1|listHelper2) RIGHTPAREN -> ^(ASTLIST expression+);
+list                      : leftParenNoGlue expression ',' listHelper RIGHTPAREN -> ^(ASTLISTDEF expression listHelper);
+listHelper                : listHelper1 | listHelper2;
 listHelper1               : (expression ',')* expression -> expression+;
 listHelper2               : (expression ',')* -> expression*;
 

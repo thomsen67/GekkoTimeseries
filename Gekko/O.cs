@@ -387,6 +387,16 @@ namespace Gekko
             return new GekkoSmpl(Globals.globalPeriodStart, Globals.globalPeriodEnd);
         }
 
+        public static IVariable ListDef(params IVariable[] x)
+        {
+            List<IVariable> m = new List<Gekko.IVariable>();
+            foreach (IVariable iv in x)
+            {
+                m.Add(iv);
+            }
+            return null;
+        }
+
         public static IVariable Lookup(GekkoSmpl smpl, IVariable x)
         {
             ScalarString x2 = x as ScalarString;

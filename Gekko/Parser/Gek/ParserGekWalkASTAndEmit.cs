@@ -2463,6 +2463,21 @@ namespace Gekko.Parser.Gek
                             node.Code.CA(intWithNumber);  //no need for checking if it exists
                         }
                         break;
+                    case "ASTLISTDEF":
+                        {
+                            node.Code.A("O.ListDef(");
+                            for (int i = 0; i < node.ChildrenCount(); i++)
+                            {
+                                node.Code.A(node[i].Code);
+                                if (i < node.ChildrenCount() - 1) node.Code.A(", ");
+                            }                                                     
+                            //foreach (ASTNode child in node.ChildrenIterator())
+                            //{
+                            //    node.Code.A(child.Code).A(", "); //last trailing , is not a problem for C#
+                            //}
+                            node.Code.A(")");
+                        }
+                        break;
                     case "ASTLIST":
                         {
                             if (node[0].Text == "?")

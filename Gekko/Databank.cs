@@ -263,6 +263,23 @@ namespace Gekko
         public void AddIVariable(string name, IVariable x)
         {
             //For TimeSeries, always use this pattern: AddIVariable(x.variableName, x)
+            foreach (char c in name)
+            {
+                //The good thing is that this is only checked when putting stuff INTO the databank, and not
+                //when retrieving from the databank. A ScalarVal will for instance just have its contents replaced,
+                //if inside a loop.
+                //The name may still be strange, but that will be caught in the Chop() method.
+                //it seems "SER {'1x'} = ... " will be legal, but never mind. It can never be called with "PRT 1x" anyway.
+                if (G.IsLetterOrDigitOrUnderscore(c) || c == Globals.symbolMemvar || c == Globals.symbolList || c == Globals.symbolTilde)
+                {
+                    //good
+                }
+                else
+                {
+                    G.Writeln2("***ERROR: Malformed name: '" + name + "'");
+                    throw new GekkoException();
+                }
+            }
             this.storage.Add(name, x);
         }
 
