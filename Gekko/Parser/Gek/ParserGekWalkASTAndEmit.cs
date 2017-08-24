@@ -2470,7 +2470,10 @@ namespace Gekko.Parser.Gek
                             {
                                 node.Code.A(node[i].Code);
                                 if (i < node.ChildrenCount() - 1) node.Code.A(", ");
-                            }                                                     
+                            }                   
+                            
+                            
+                                                              
                             //foreach (ASTNode child in node.ChildrenIterator())
                             //{
                             //    node.Code.A(child.Code).A(", "); //last trailing , is not a problem for C#

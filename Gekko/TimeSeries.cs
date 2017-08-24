@@ -998,7 +998,7 @@ namespace Gekko
             return Globals.tNull;
         }
 
-        public List<string> GetList()
+        public List<IVariable> GetList()
         {
             G.Writeln2("Ts error 16");
             return null;

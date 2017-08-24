@@ -3225,7 +3225,7 @@ namespace UnitTests
 
         private static List<string> GetListOfStrings(string s)
         {
-            return O.GetMetaList(Program.scalars[Globals.symbolList + s]).list;
+            return O.GetStringList(Program.scalars[Globals.symbolList + s]);
         }
 
         private static void AssertHelperList(string s, List<string> ss)

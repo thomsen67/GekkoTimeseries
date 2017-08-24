@@ -13,13 +13,23 @@ namespace Gekko
 
         public bool isNameList = true;
 
-        public List<string> list = null;
+        public List<IVariable> list = null;
 
-        public MetaList(List<string> list)
+        public MetaList(List<IVariable> list)
         {
             this.list = list;
         }
-               
+
+        public MetaList(List<string> list)
+        {
+            List<IVariable> m = new List<Gekko.IVariable>();
+            foreach (string s in list)
+            {
+                m.Add(new ScalarString(s));
+            }
+            this.list = m;
+        }
+
         public int Count()
         {
             return this.list.Count;
@@ -49,15 +59,7 @@ namespace Gekko
                         G.Writeln2("*** ERROR: Illegal element access [" + ival + "]: larger than length of list (" + this.list.Count + ")");
                         throw new GekkoException();
                     }
-                    string s = this.list[ival - 1];
-
-                    IVariable ss = null;
-                    ss = new ScalarString(s, isNameList);
-                    //if (Globals.fixIndexerMaybeTransform)
-                    //{
-                    //    bool didTransform = false;
-                    //    ss = O.MaybeTransform(ref didTransform, ss, true);
-                    //}
+                    IVariable ss = this.list[ival - 1];                    
                     return ss;
                 }
                 else if (index.Type() == EVariableType.String)
@@ -160,7 +162,7 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public List<string> GetList()
+        public List<IVariable> GetList()
         {
             return this.list;
         }

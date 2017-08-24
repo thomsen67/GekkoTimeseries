@@ -251,7 +251,7 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public List<string> GetList()
+        public List<IVariable> GetList()
         {
             G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a LIST from a matrix.");
             throw new GekkoException();

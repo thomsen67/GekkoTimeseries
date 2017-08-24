@@ -46,7 +46,7 @@ namespace Gekko
                 List<string> temp = new List<string>();
                 if (lists.Count == 1)
                 {
-                    List<string> m = ((MetaList)indexes[lists[0]]).list;
+                    List<string> m = O.GetStringList((MetaList)indexes[lists[0]]);
                     foreach (string s in m)
                     {
                         string ss = null;
@@ -72,8 +72,8 @@ namespace Gekko
                 }
                 else if (lists.Count == 2)
                 {
-                    List<string> m1 = ((MetaList)indexes[lists[0]]).list;
-                    List<string> m2 = ((MetaList)indexes[lists[1]]).list;                    
+                    List<string> m1 = O.GetStringList((MetaList)indexes[lists[0]]);
+                    List<string> m2 = O.GetStringList((MetaList)indexes[lists[1]]);
                     foreach (string s1 in m1)
                     {
                         foreach (string s2 in m2)
@@ -242,7 +242,7 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public List<string> GetList()
+        public List<IVariable> GetList()
         {
             G.Writeln2("*** ERROR: You are trying to extract a LIST from timeseries: " + this.ts.variableName + ".");            
             throw new GekkoException();

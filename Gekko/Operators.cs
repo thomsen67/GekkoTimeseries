@@ -94,15 +94,16 @@ namespace Gekko
         {
             public static IVariable Add(ScalarString s, MetaList l, bool swap)
             {
+                List<string> m = O.GetStringList(l);
                 List<string> newList = new List<string>();
                 if (!swap)
                 {
                     newList.Add(s._string2);
-                    newList.AddRange(l.list);
+                    newList.AddRange(m);
                 }
                 else
                 {
-                    newList.AddRange(l.list);
+                    newList.AddRange(m);
                     newList.Add(s._string2);
                 }
                 return new MetaList(newList);

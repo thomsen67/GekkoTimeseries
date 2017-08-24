@@ -71,7 +71,7 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public List<string> GetList()
+        public List<IVariable> GetList()
         {
             throw new GekkoException();
         }

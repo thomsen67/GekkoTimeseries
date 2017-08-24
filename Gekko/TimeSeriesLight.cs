@@ -177,7 +177,7 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public List<string> GetList()
+        public List<IVariable> GetList()
         {
             G.Writeln2("*** ERROR: You are trying to extract a LIST from timeseries");
             throw new GekkoException();

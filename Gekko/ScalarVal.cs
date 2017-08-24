@@ -97,7 +97,7 @@ namespace Gekko
             throw new GekkoException();
         }        
 
-        public List<string> GetList()
+        public List<IVariable> GetList()
         {
             //See similar comment: #slkfhas
             G.Writeln2("*** ERROR: You are trying to convert/use the value " + this.val + " as a STRING/NAME item in a list");

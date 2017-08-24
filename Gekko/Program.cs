@@ -2151,7 +2151,7 @@ namespace Gekko
                         {
                             IVariable all2 = null; Program.scalars.TryGetValue(Globals.symbolList + "all", out all2);
                             if (all2 == null) all2 = new MetaList(new List<string>());
-                            List<string> all = O.GetMetaList(all2).list;
+                            List<string> all = O.GetStringList(O.GetMetaList(all2));
                             readInfo.createdVars = Program.CreateVariables(all, false);
                         }
                     }
@@ -5944,7 +5944,7 @@ namespace Gekko
             else
             {
                 //keeps the same list object.
-                List<string> temp = O.GetMetaList(temp2).list;
+                List<string> temp = O.GetStringList(temp2);
                 temp.Clear();
                 temp.AddRange(listItems2);
                 newList = temp;
@@ -5960,17 +5960,20 @@ namespace Gekko
             input.AddRange(db.storage.Keys);
             string endsWith = null;
             if (Program.options.freq != EFreq.Annual) endsWith = Globals.freqIndicator + G.GetFreq(Program.options.freq);
-            List<string> temp = Program.MatchRange(s1, s2, input, endsWith);
+            List<IVariable> m = new List<IVariable>();
+            foreach (string s in input) m.Add(new ScalarString(s));
+            List<string> temp = Program.MatchRange(s1, s2, m, endsWith);
             return temp;
         }
 
-        public static List<string> MatchRange(string s1, string s2, List<string> input, string endsWith)
+        public static List<string> MatchRange(string s1, string s2, List<IVariable> input, string endsWith)
         {
             List<string> temp = new List<string>();
             if (endsWith == null)
             {
-                foreach (string s in input)
+                foreach (IVariable iv in input)
                 {
+                    string s = O.GetString(iv);
                     if (string.Compare(s, s1, true) >= 0 && string.Compare(s, s2, true) <= 0)
                     {
                         temp.Add(s);
@@ -5979,8 +5982,9 @@ namespace Gekko
             }
             else
             {
-                foreach (string s in input)
+                foreach (IVariable iv in input)
                 {
+                    string s = O.GetString(iv);
                     if (!s.EndsWith(endsWith)) continue;
                     string ss = s.Substring(0, s.Length - endsWith.Length);
                     if (string.Compare(ss, s1, true) >= 0 && string.Compare(ss, s2, true) <= 0)
@@ -6083,9 +6087,10 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found");
                     throw new GekkoException();
                 }
-                List<string> names = xx.GetList();
-                foreach (string s2 in names)
+                List<IVariable> names = xx.GetList();
+                foreach (IVariable iv in names)
                 {
+                    string s2 = O.GetString(iv);
                     BankNameVersion bnv = new BankNameVersion();
                     bnv.bank = bank;
                     bnv.name = s2;
@@ -6292,7 +6297,7 @@ namespace Gekko
             return ts;
         }
 
-        public static List<string> MatchWildcard(string wildcard, List<string> input, string endsWith)
+        public static List<string> MatchWildcard(string wildcard, List<IVariable> input, string endsWith)
         {
             //endsWith might be for instance "=q" to indicate quarters. Can also be null.
             Wildcard wc = new Wildcard(wildcard, RegexOptions.IgnoreCase);
@@ -6300,16 +6305,18 @@ namespace Gekko
 
             if (endsWith == null)
             {
-                foreach (string s in input)
+                foreach (IVariable iv in input)
                 {
+                    string s = O.GetString(iv);
                     if (s.Contains(Globals.freqIndicator)) continue;  //#09875230984, filters out fy=q, fy=m, etc. A bit of a hack. Could also check the second-last char to see if it is '='
                     if (wc.IsMatch(s)) found.Add(s);
                 }
             }
             else
             {
-                foreach (string s in input)
+                foreach (IVariable iv in input)
                 {
+                    string s = O.GetString(iv);
                     if (!s.EndsWith(endsWith)) continue;
                     string s2 = s.Substring(0, s.Length - endsWith.Length);
                     if (wc.IsMatch(s2))
@@ -6324,13 +6331,13 @@ namespace Gekko
 
         public static List<string> MatchWildcardInDatabank(string wildcard, Databank db)
         {
-            List<string> input = new List<string>();
+            List<IVariable> input = new List<IVariable>();
 
             //input.AddRange(db.storage.Keys);
             foreach (KeyValuePair<string, IVariable> kvp in db.storage)
             {
                 TimeSeries xx = kvp.Value as TimeSeries; if (xx != null && xx.IsGhost()) continue;  //ignore ghosts
-                input.Add(kvp.Key);
+                input.Add(new ScalarString(kvp.Key));
             }
 
             string endsWith = null;
@@ -11061,7 +11068,7 @@ namespace Gekko
 
                         int min = int.MaxValue;
                         int max = int.MinValue;
-                        List<string> list = O.GetMetaList(Program.scalars[Globals.symbolList + "endo"]).list;
+                        List<string> list = O.GetStringList(Program.scalars[Globals.symbolList + "endo"]);
                         int x = list.Count;
                         G.Writeln("Testing " + x + " endogenous vars");
                         for (int i = 0; i < x; i += n)
@@ -13710,7 +13717,7 @@ namespace Gekko
                     try
                     {
                         string m = type.Substring(2);
-                        List<string> a1 = O.GetMetaList(Program.scalars[Globals.symbolList + m]).list;
+                        List<string> a1 = O.GetStringList(Program.scalars[Globals.symbolList + m]);
                         bool showList = true;
                         if (a1.Count > 5000)
                         {
@@ -13802,7 +13809,7 @@ namespace Gekko
                         {
                             if (hasLargeModel)
                             {
-                                List<string> a1 = O.GetMetaList(Program.scalars[Globals.symbolList + m]).list;                                
+                                List<string> a1 = O.GetStringList(Program.scalars[Globals.symbolList + m]);                                
                                 G.Write("list #" + m + " = ["); G.WriteLink("show", "list:?_" + m); G.Writeln("]  (" + a1.Count + " elements from '" + a1[0] + "' to '" + a1[a1.Count - 1] + "')");
                                 G.Writeln();
                             }
@@ -13886,7 +13893,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: List " + Globals.symbolList + m + " was not found");
                 throw new GekkoException();
             }
-            List<string> a1 = O.GetMetaList(iv).list;
+            List<string> a1 = O.GetStringList(iv);
 
             if (a1.Count == 0)
             {
@@ -14120,14 +14127,14 @@ namespace Gekko
         private static void PutListsIntoModelListHelper()
         {
             ModelListHelper modelListHelper = new ModelListHelper();
-            if (Program.scalars.ContainsKey(Globals.symbolList + "all")) modelListHelper.all = O.GetMetaList(Program.scalars[Globals.symbolList + "all"]).list;
-            if (Program.scalars.ContainsKey(Globals.symbolList + "endo")) modelListHelper.endo = O.GetMetaList(Program.scalars[Globals.symbolList + "endo"]).list;
-            if (Program.scalars.ContainsKey(Globals.symbolList + "exo")) modelListHelper.exo = O.GetMetaList(Program.scalars[Globals.symbolList + "exo"]).list;
-            if (Program.scalars.ContainsKey(Globals.symbolList + "exod")) modelListHelper.exod = O.GetMetaList(Program.scalars[Globals.symbolList + "exod"]).list;
-            if (Program.scalars.ContainsKey(Globals.symbolList + "exodjz")) modelListHelper.exodjz = O.GetMetaList(Program.scalars[Globals.symbolList + "exodjz"]).list;
-            if (Program.scalars.ContainsKey(Globals.symbolList + "exoj")) modelListHelper.exoj = O.GetMetaList(Program.scalars[Globals.symbolList + "exoj"]).list;
-            if (Program.scalars.ContainsKey(Globals.symbolList + "exotrue")) modelListHelper.exotrue = O.GetMetaList(Program.scalars[Globals.symbolList + "exotrue"]).list;
-            if (Program.scalars.ContainsKey(Globals.symbolList + "exoz")) modelListHelper.exoz = O.GetMetaList(Program.scalars[Globals.symbolList + "exoz"]).list;
+            if (Program.scalars.ContainsKey(Globals.symbolList + "all")) modelListHelper.all = O.GetStringList(Program.scalars[Globals.symbolList + "all"]);
+            if (Program.scalars.ContainsKey(Globals.symbolList + "endo")) modelListHelper.endo = O.GetStringList(Program.scalars[Globals.symbolList + "endo"]);
+            if (Program.scalars.ContainsKey(Globals.symbolList + "exo")) modelListHelper.exo = O.GetStringList(Program.scalars[Globals.symbolList + "exo"]);
+            if (Program.scalars.ContainsKey(Globals.symbolList + "exod")) modelListHelper.exod = O.GetStringList(Program.scalars[Globals.symbolList + "exod"]);
+            if (Program.scalars.ContainsKey(Globals.symbolList + "exodjz")) modelListHelper.exodjz = O.GetStringList(Program.scalars[Globals.symbolList + "exodjz"]);
+            if (Program.scalars.ContainsKey(Globals.symbolList + "exoj")) modelListHelper.exoj = O.GetStringList(Program.scalars[Globals.symbolList + "exoj"]);
+            if (Program.scalars.ContainsKey(Globals.symbolList + "exotrue")) modelListHelper.exotrue = O.GetStringList(Program.scalars[Globals.symbolList + "exotrue"]);
+            if (Program.scalars.ContainsKey(Globals.symbolList + "exoz")) modelListHelper.exoz = O.GetStringList(Program.scalars[Globals.symbolList + "exoz"]);
             Program.model.modelInfo.modelListHelper = modelListHelper;
         }
 
@@ -14142,14 +14149,14 @@ namespace Gekko
             {
                 Program.scalars.Add(Globals.symbolList + s, new MetaList(new List<string>()));
             }
-            if (Program.model.modelInfo.modelListHelper.all != null) O.GetMetaList(Program.scalars[Globals.symbolList + "all"]).list.AddRange(Program.model.modelInfo.modelListHelper.all);
-            if (Program.model.modelInfo.modelListHelper.endo != null) O.GetMetaList(Program.scalars[Globals.symbolList + "endo"]).list.AddRange(Program.model.modelInfo.modelListHelper.endo);
-            if (Program.model.modelInfo.modelListHelper.exo != null) O.GetMetaList(Program.scalars[Globals.symbolList + "exo"]).list.AddRange(Program.model.modelInfo.modelListHelper.exo);
-            if (Program.model.modelInfo.modelListHelper.exod != null) O.GetMetaList(Program.scalars[Globals.symbolList + "exod"]).list.AddRange(Program.model.modelInfo.modelListHelper.exod);
-            if (Program.model.modelInfo.modelListHelper.exodjz != null) O.GetMetaList(Program.scalars[Globals.symbolList + "exodjz"]).list.AddRange(Program.model.modelInfo.modelListHelper.exodjz);
-            if (Program.model.modelInfo.modelListHelper.exoj != null) O.GetMetaList(Program.scalars[Globals.symbolList + "exoj"]).list.AddRange(Program.model.modelInfo.modelListHelper.exoj);
-            if (Program.model.modelInfo.modelListHelper.exotrue != null) O.GetMetaList(Program.scalars[Globals.symbolList + "exotrue"]).list.AddRange(Program.model.modelInfo.modelListHelper.exotrue);
-            if (Program.model.modelInfo.modelListHelper.exoz != null) O.GetMetaList(Program.scalars[Globals.symbolList + "exoz"]).list.AddRange(Program.model.modelInfo.modelListHelper.exoz);
+            if (Program.model.modelInfo.modelListHelper.all != null) O.GetStringList(Program.scalars[Globals.symbolList + "all"]).AddRange(Program.model.modelInfo.modelListHelper.all);
+            if (Program.model.modelInfo.modelListHelper.endo != null) O.GetStringList(Program.scalars[Globals.symbolList + "endo"]).AddRange(Program.model.modelInfo.modelListHelper.endo);
+            if (Program.model.modelInfo.modelListHelper.exo != null) O.GetStringList(Program.scalars[Globals.symbolList + "exo"]).AddRange(Program.model.modelInfo.modelListHelper.exo);
+            if (Program.model.modelInfo.modelListHelper.exod != null) O.GetStringList(Program.scalars[Globals.symbolList + "exod"]).AddRange(Program.model.modelInfo.modelListHelper.exod);
+            if (Program.model.modelInfo.modelListHelper.exodjz != null) O.GetStringList(Program.scalars[Globals.symbolList + "exodjz"]).AddRange(Program.model.modelInfo.modelListHelper.exodjz);
+            if (Program.model.modelInfo.modelListHelper.exoj != null) O.GetStringList(Program.scalars[Globals.symbolList + "exoj"]).AddRange(Program.model.modelInfo.modelListHelper.exoj);
+            if (Program.model.modelInfo.modelListHelper.exotrue != null) O.GetStringList(Program.scalars[Globals.symbolList + "exotrue"]).AddRange(Program.model.modelInfo.modelListHelper.exotrue);
+            if (Program.model.modelInfo.modelListHelper.exoz != null) O.GetStringList(Program.scalars[Globals.symbolList + "exoz"]).AddRange(Program.model.modelInfo.modelListHelper.exoz);
             Program.model.modelInfo.modelListHelper = null;  //only used for temporary transfer of these lists
         }
 
@@ -14942,21 +14949,21 @@ namespace Gekko
                 hasModel = true;
                 try
                 {
-                    foreach (string s in O.GetMetaList(Program.scalars[Globals.symbolList + "exod"]).list)
+                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolList + "exod"]))
                         exod.Add(s, "");
-                    foreach (string s in O.GetMetaList(Program.scalars[Globals.symbolList + "exoj"]).list)
+                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolList + "exoj"]))
                         exoj.Add(s, "");
-                    foreach (string s in O.GetMetaList(Program.scalars[Globals.symbolList + "exoz"]).list)
+                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolList + "exoz"]))
                         exoz.Add(s, "");
-                    foreach (string s in O.GetMetaList(Program.scalars[Globals.symbolList + "exodjz"]).list)
+                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolList + "exodjz"]))
                         exodjz.Add(s, "");
-                    foreach (string s in O.GetMetaList(Program.scalars[Globals.symbolList + "exo"]).list)
+                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolList + "exo"]))
                         exo.Add(s, "");
-                    foreach (string s in O.GetMetaList(Program.scalars[Globals.symbolList + "exotrue"]).list)
+                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolList + "exotrue"]))
                         exotrue.Add(s, "");
-                    foreach (string s in O.GetMetaList(Program.scalars[Globals.symbolList + "endo"]).list)
+                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolList + "endo"]))
                         endo.Add(s, "");
-                    foreach (string s in O.GetMetaList(Program.scalars[Globals.symbolList + "all"]).list)
+                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolList + "all"]))
                         all.Add(s, "");
                 }
                 catch { };  //if error, we just ignore it, and the list will be empty.
@@ -17996,8 +18003,8 @@ namespace Gekko
                 throw new GekkoException();
             }                      
 
-            List<string> varsP = ((MetaList)list1).list;
-            List<string> varsX = ((MetaList)list2).list;
+            List<string> varsP = O.GetStringList((MetaList)list1);
+            List<string> varsX = O.GetStringList((MetaList)list2);
 
             if (varsP.Count == 0 || varsX.Count == 0)
             {

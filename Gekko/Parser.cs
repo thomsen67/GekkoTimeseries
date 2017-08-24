@@ -1255,7 +1255,7 @@ namespace Gekko
                 storedList = new MetaList(new List<string>());
                 Program.scalars.Add(Globals.symbolList + listName, storedList);
             }
-            return ((MetaList)storedList).list;
+            return O.GetStringList((MetaList)storedList);
         }
 
         private static void EmitCsCodeAndCompileModel(ECompiledModelType modelType, bool isCalledFromModelStatement)

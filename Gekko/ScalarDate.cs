@@ -34,7 +34,7 @@ namespace Gekko
             return this.date;
         }
 
-        public List<string> GetList()
+        public List<IVariable> GetList()
         {
             //See similar comment: #slkfhas
             G.Writeln2("*** ERROR: You are trying to convert/use the date " + this.date + " as a STRING item in a list");

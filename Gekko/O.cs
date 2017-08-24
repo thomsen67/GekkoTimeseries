@@ -72,8 +72,9 @@ namespace Gekko
 
             public IEnumerator<ScalarString> GetEnumerator()
             {
-                foreach(string s in _ml.list)
+                foreach(IVariable iv in _ml.list)
                 {
+                    string s = O.GetString(iv);
                     yield return new ScalarString(s);
                 }                                         
             }
@@ -394,7 +395,7 @@ namespace Gekko
             {
                 m.Add(iv);
             }
-            return null;
+            return new MetaList(m);
         }
 
         public static IVariable Lookup(GekkoSmpl smpl, IVariable x)
@@ -460,7 +461,7 @@ namespace Gekko
                     break;
                 case EVariableType.List:
                     {
-                        List<string> l = O.GetList(x);
+                        List<string> l = O.GetStringList(x);
                         G.Writeln2("LIST = ");
                         foreach (string s in l) G.Writeln(s);
                     }
@@ -513,9 +514,8 @@ namespace Gekko
             string dbName, varName, freq; char firstChar; Chop(y, out dbName, out varName, out firstChar, out freq);
             Databank db = null;
             if (dbName == null) db = Program.databanks.GetFirst();
-            else db = Program.databanks.GetDatabank(dbName);
-            
-            IVariable iv = db.GetIVariable(varName);
+            else db = Program.databanks.GetDatabank(dbName);            
+            IVariable iv = db.GetIVariable(varName);  //may be null if the variable does not exist.
 
             switch (x.Type())  //RHS type
             {
@@ -535,6 +535,15 @@ namespace Gekko
                                         ScalarVal v = iv as ScalarVal;
                                         if (v != null)
                                         {
+                                            //HMMMMMMMMMMMMMM
+                                            //HMMMMMMMMMMMMMM
+                                            //HMMMMMMMMMMMMMM
+                                            //HMMMMMMMMMMMMMM  can this have sideeffects?
+                                            //HMMMMMMMMMMMMMM
+                                            //HMMMMMMMMMMMMMM
+                                            //HMMMMMMMMMMMMMM
+                                            //HMMMMMMMMMMMMMM
+
                                             v.val = ((ScalarVal)x).val;  //avoids object creation
                                         }
                                         else
@@ -583,7 +592,7 @@ namespace Gekko
                                 break;
                             case Globals.symbolList:  //#
                                 {
-
+                                    
                                 }
                                 break;
                             default:
@@ -630,6 +639,16 @@ namespace Gekko
                                 break;
                             case Globals.symbolList:  //#
                                 {
+                                    if (iv == null)  //check if it exists or not
+                                    {
+                                        db.AddIVariable(varName, x);
+                                    }
+                                    else
+                                    {
+                                        db.RemoveIVariable(varName);
+                                        db.AddIVariable(varName, x);                                        
+                                    }
+
 
                                 }
                                 break;
@@ -775,8 +794,9 @@ namespace Gekko
                 //HandleIndexerHelper2()
             }          
             MetaList m = (MetaList)x[depth];
-            foreach (string s in m.list)
+            foreach (IVariable iv in m.list)
             {
+                string s = O.GetString(iv);
                 G.Writeln2(depth + " " + s);
                 HandleIndexerHelper(depth + 1, y, x);
             }
@@ -1654,7 +1674,7 @@ namespace Gekko
         public static IVariable GetListWithBankPrefix(IVariable x, IVariable y, int bankNumber)
         {
             string bankName = O.GetString(x);
-            List<string> items = O.GetList(y);
+            List<string> items = O.GetStringList(y);
             List<string> newList = new List<string>();
             foreach (string s in items)
             {
@@ -1895,7 +1915,18 @@ namespace Gekko
             MetaList ml = (MetaList)x;
             ScalarString ss = (ScalarString)y;
 
-            return ml.list.Contains(ss._string2);
+            bool b = false;
+            foreach (IVariable iv in ml.list)
+            {
+                string s = O.GetString(iv);
+                if(G.equal(ss._string2,s))
+                {
+                    b = true;
+                    break;
+                }
+            }
+
+            return b;
 
         }
 
@@ -1976,9 +2007,21 @@ namespace Gekko
             return s;
         }
 
-        public static List<string> GetList(IVariable a)
+        public static List<IVariable> GetList(IVariable a)
         {
             return a.GetList();
+        }
+
+        public static List<string> GetStringList(IVariable a)
+        {
+            List<IVariable> m = a.GetList();
+            List<string> mm = new List<string>();
+            foreach (IVariable iv in m)
+            {
+                string s = O.GetString(iv);
+                mm.Add(s);
+            }
+            return mm;
         }
 
         public static Matrix GetMatrixFromString(IVariable name)
@@ -2249,7 +2292,7 @@ namespace Gekko
             throw new GekkoException();
             if (a.Type() == EVariableType.List)
             {
-                List<string> items = ((MetaList)a).list;
+                List<string> items = O.GetStringList((MetaList)a);
                 double[] d = new double[items.Count];
                 
                 if (e.subElements == null)

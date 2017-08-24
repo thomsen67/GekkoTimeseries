@@ -333,10 +333,10 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public List<string> GetList()
+        public List<IVariable> GetList()
         {
             //for instance for list elements, where a string is considered a 1-item list.
-            return new List<string>() { this._string2 };
+            return new List<IVariable>() { new ScalarString(this._string2) };  //always make a copy, so no risk of side effects
         }
         
         public IVariable Add(GekkoSmpl t, IVariable x)

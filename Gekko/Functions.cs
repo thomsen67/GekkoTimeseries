@@ -338,8 +338,9 @@ namespace Gekko
             {
                 if (vars[j].Type() == EVariableType.List)
                 {
-                    foreach (string s in ((MetaList)vars[j]).list)
+                    foreach (IVariable iv in ((MetaList)vars[j]).list)
                     {
+                        string s = O.GetString(iv);
                         TimeSeries tmp = Program.GetTimeSeriesFromString(s, O.ECreatePossibilities.None);
                         tss.Add(tmp);
                     }
@@ -989,7 +990,11 @@ namespace Gekko
             {
                 if (a.Type() == EVariableType.List)
                 {
-                    foreach (string s in ((MetaList)a).GetList()) v += O.IndirectionHelper(t, s).GetVal(t);
+                    foreach (IVariable iv in ((MetaList)a).GetList())
+                    {
+                        string s = O.GetString(iv);
+                        v += O.IndirectionHelper(t, s).GetVal(t);
+                    }
                 }
                 else
                 {
@@ -1012,8 +1017,9 @@ namespace Gekko
             {
                 if (a.Type() == EVariableType.List)
                 {
-                    foreach (string s in ((MetaList)a).GetList())
+                    foreach (IVariable iv in ((MetaList)a).GetList())
                     {
+                        string s = O.GetString(iv);
                         v += O.IndirectionHelper(smpl, s).GetVal(smpl);
                         n++;
                     }
@@ -1584,9 +1590,10 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.List)
             {
-                List<string> l = ((MetaList)x).list;
-                foreach (string ss in l)
+                List<IVariable> l = ((MetaList)x).list;
+                foreach (IVariable iv in l)
                 {
+                    string ss = O.GetString(iv);
                     s += ss + ", ";
                 }                
                 if (s.EndsWith(", ")) s = s.Substring(0, s.Length - 2);
@@ -1864,8 +1871,8 @@ namespace Gekko
         public static IVariable union(GekkoSmpl t, IVariable x1, IVariable x2)
         {
             //tager dem der nu er i a (inkl. dubletter) og tilføjer dem fra b (uden dubletter). Hvis dubletter i b skal med, skal der bruges komma...
-            List<string> lx1 = O.GetList(x1);
-            List<string> lx2 = O.GetList(x2);
+            List<string> lx1 = O.GetStringList(x1);
+            List<string> lx2 = O.GetStringList(x2);
             List<string> union = new List<string>();
             union.AddRange(lx1);
             GekkoDictionary<string, bool> result = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -1888,8 +1895,8 @@ namespace Gekko
         public static IVariable difference(GekkoSmpl t, IVariable x1, IVariable x2)
         {
             //tager dem der nu er i a (inkl. dubletter) og retainer dem hvis ikke i b.
-            List<string> lx1 = O.GetList(x1);
-            List<string> lx2 = O.GetList(x2);
+            List<string> lx1 = O.GetStringList(x1);
+            List<string> lx2 = O.GetStringList(x2);
             List<string> difference = new List<string>();
             GekkoDictionary<string, bool> temp = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             foreach (string s in lx2)
@@ -1910,8 +1917,8 @@ namespace Gekko
         public static IVariable intersect(GekkoSmpl t, IVariable x1, IVariable x2)
         {
             //tager dem der nu er i a (inkl. dubletter) og retainer dem hvis også i b.
-            List<string> lx1 = O.GetList(x1);
-            List<string> lx2 = O.GetList(x2);
+            List<string> lx1 = O.GetStringList(x1);
+            List<string> lx2 = O.GetStringList(x2);
             List<string> intersection = new List<string>();
             if (lx1.Count > lx2.Count)  //for speedup, we do the heaviest looping on the smaller list.
             {

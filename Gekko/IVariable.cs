@@ -78,7 +78,7 @@ namespace Gekko
 
         GekkoTime GetDate(O.GetDateChoices c);
 
-        List<string> GetList();
+        List<IVariable> GetList();
 
         EVariableType Type();
     }
