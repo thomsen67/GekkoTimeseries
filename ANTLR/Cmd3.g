@@ -54,6 +54,7 @@ tokens {
 	ASTSTRINGINQUOTES;
 	ASTDOUBLE;
 	ASTDOLLARCONDITIONALVARIABLE;
+	ASTPRINT;
 
 	ASTNAME;
 ASTNAME;
@@ -96,10 +97,11 @@ ASTIFOPERATOR7;
 ASTCOMPARE2;
 
 
-	AND              = 'AND';
-	NOT              = 'NOT';
-	OR              = 'OR';
-	IN             = 'IN';
+	AND              = 'and';
+	NOT              = 'not';
+	OR              = 'or';
+	IN             = 'in';
+	P              = 'p';
 	LISTFILE = 'LISTFILE';
 }
 
@@ -143,6 +145,7 @@ expressions               : expr2*;
 expr2                     :
                             SEMICOLON -> //stray semicolon is ok, nothing is written
                           | assignment           SEMICOLON!
+						  | print                SEMICOLON!
 						  ;
 
 assignment				  : leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression);
@@ -333,6 +336,9 @@ ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
 						  |  IN -> ^(ASTIFOPERATOR ASTIFOPERATOR7)
 			              ;
 
+
+print					  : P expression -> ^(ASTPRINT expression);
+
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- logical END -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
@@ -391,6 +397,7 @@ ident                     : ident2 -> ^(ASTIDENT ident2);
 //fixme
 ident2 					  : Ident
 						  | NOT
+						  | P
 						  ;
 
 

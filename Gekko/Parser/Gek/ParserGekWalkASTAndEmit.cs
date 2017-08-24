@@ -196,7 +196,7 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        public static void WalkASTAndEmit(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p, int leftRight)
+        public static void WalkASTAndEmit(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p, int leftHandSide)
         {            
             if (node.Parent != null)
             {
@@ -295,10 +295,9 @@ namespace Gekko.Parser.Gek
                 astAssignment = true;
             
             foreach (ASTNode child in node.ChildrenIterator())
-            {
-                int leftRight2 = leftRight;
-                if (astAssignment) leftRight2 = child.Number;  //0, 1, 2, etc.
-                WalkASTAndEmit(child, absoluteDepth + 1, relativeDepth + 1, textInput, w, p, leftRight2);
+            {                
+                if (astAssignment && child.Number == 0) leftHandSide = 1;
+                WalkASTAndEmit(child, absoluteDepth + 1, relativeDepth + 1, textInput, w, p, leftHandSide);
                 //return; Globals.testing = true;
             }            
 
@@ -2754,15 +2753,20 @@ namespace Gekko.Parser.Gek
                             if (node[1] == null)
                             {
                                 //no bank indicator
-                                if (leftRight == 0) node.Code.A("(" + node[0].Code + ")");
-                                else node.Code.A("O.Replace(smpl, (" + node[0].Code + "))");                                
+                                if (leftHandSide == 1) node.Code.A("(" + node[0].Code + ")");
+                                else node.Code.A("O.Replace(smpl, (" + node[0].Code + "))");
                             }
                             else
                             {
                                 //bank indicator
-                                if(leftRight==0) node.Code.A("(" + node[0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + ")");
+                                if (leftHandSide == 1) node.Code.A("(" + node[0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + ")");
                                 else node.Code.A("O.Replace(smpl, (" + node[0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "))");
                             }
+                        }
+                        break;
+                        case "ASTPRINT":
+                        {                            
+                            node.Code.A("O.Print(smpl, (" + node[0].Code + "))").End();   
                         }
                         break;
                     case "ASTVARNAME":

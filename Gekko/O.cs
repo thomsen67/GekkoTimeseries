@@ -387,39 +387,116 @@ namespace Gekko
             return new GekkoSmpl(Globals.globalPeriodStart, Globals.globalPeriodEnd);
         }
 
-        public static IVariable Replace(GekkoSmpl smpl, IVariable x)
+        public static IVariable Lookup(GekkoSmpl smpl, IVariable x)
         {
             ScalarString x2 = x as ScalarString;
-
             if (x2 != null)
             {
-                if (true)
+                string dbName, varName; char firstChar; Chop(x2, out dbName, out varName, out firstChar);
+                IVariable iv = null;
+                if (Program.options.databank_search && dbName == null)
                 {
-                    //Replace/transform
-                    string dbName, varName; char firstChar; Chop(x2, out dbName, out varName, out firstChar);
-                    if (firstChar == Globals.symbolMemvar)
+                    for (int i = 0; i < Program.databanks.storage.Count; i++)
                     {
+                        if (i == 1) continue;  //The Ref databank IS NEVER SEARCHED!!
+                        Databank db2 = Program.databanks.storage[i];
+                        iv = null; db2.storage.TryGetValue(varName, out iv);
+                        if (iv != null) break;
                     }
-                    else if (firstChar == Globals.symbolList)
+                    if (iv == null)
                     {
-                    }
-                    else
-                    {
-                        Databank db = Program.databanks.GetFirst();
-                        if (dbName != null) db = Program.databanks.GetDatabank(dbName);
-                        TimeSeries ts = db.GetVariable(varName);
-                        if (ts == null)
-                        {
-                            G.Writeln2("*** ERROR: Could not find " + O.GetString(x2));
-                            throw new GekkoException();
-                        }
-                        TimeSeriesLight tsl = new TimeSeriesLight(smpl, ts);
-                        return tsl;
+                        G.Writeln2("*** ERROR: Could not find variable '" + varName + "' in any open databank");
+                        throw new GekkoException();
                     }
                 }
+                else
+                {
+                    Databank db = null;
+                    if (dbName != null) db = Program.databanks.GetDatabank(dbName);
+                    else db = Program.databanks.GetFirst();
+                    iv = null; db.storage.TryGetValue(varName, out iv);
+                    if (iv == null)
+                    {
+                        G.Writeln2("*** ERROR: Could not find variable '" + varName + "' in databank '" + dbName + "'");
+                        throw new GekkoException();
+                    }
+                }
+                return iv;
             }
             return x;
-        }                
+        }
+
+        public static void Print(GekkoSmpl smpl, IVariable x)
+        {
+            switch (x.Type())
+            {
+                case EVariableType.Val:
+                    {
+                        double d = O.GetVal(smpl, x);
+                        G.Writeln2("VAL = " + d);                   
+                    }
+                    break;
+                case EVariableType.String:
+                    {
+                        string s = O.GetString(x);                        
+                        G.Writeln2("STRING = " + s);                        
+                    }
+                    break;
+                case EVariableType.Date:
+                    {
+                        string d = O.GetDate(x).ToString();
+                        G.Writeln2("DATE = " + d);
+                    }
+                    break;
+                case EVariableType.List:
+                    {
+                        List<string> l = O.GetList(x);
+                        G.Writeln2("LIST = ");
+                        foreach (string s in l) G.Writeln(s);
+                    }
+                    break;
+
+                case EVariableType.TimeSeries:
+                    {
+                        TimeSeries ts = x as TimeSeries;
+                        if (ts == null)
+                        {
+                            TimeSeriesLight tsl = x as TimeSeriesLight;
+                            G.Writeln2("SERIES = ");
+                            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                            {
+                                G.Writeln(t.ToString() + "    " + tsl.GetData(t));
+                            }
+                        }
+                        else
+                        {
+                            G.Writeln2("SERIES = ");
+                            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                            {
+                                G.Writeln(t.ToString() + "    " + ts.GetData(t));
+                            }
+                        }
+                    }
+                    break;
+                case EVariableType.Matrix:
+                    {
+                        Matrix m = O.GetMatrix(x);
+                        Program.ShowMatrix(m, "label...");
+                    }
+                    break;
+                case EVariableType.GekkoError:
+                    {
+                        G.Writeln2("ERROR!");
+                    }
+                    break;
+                default:
+                    {
+                        G.Writeln2("*** ERROR: Assignment with unknown type");
+                        throw new GekkoException();
+                    }
+                    break;
+            }
+        }
 
         public static void Assignment(GekkoSmpl smpl, IVariable y, IVariable x)
         {
@@ -436,8 +513,7 @@ namespace Gekko
                                 {
                                     if (dbName == null)
                                     {
-                                        Program.scalars.Add(varName, x);
-                                        Program.Mem(null);
+                                        Program.scalars.Add(varName, x);                                        
                                     }
                                 }
                                 break;
@@ -454,22 +530,9 @@ namespace Gekko
                                     {
                                         ts.SetData(t, d);
                                     }
-
-                                    if (true)
-                                    {
-                                        G.Writeln2("PRT of " + varName);
-                                        foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
-                                        {
-                                            G.Writeln(t.ToString() + "    " + ts.GetData(t));
-                                        }
-                                    }
-
                                 }
                                 break;
                         }
-
-
-
                     }
                     break;
                 case EVariableType.String:
@@ -567,11 +630,6 @@ namespace Gekko
                                     foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
                                     {
                                         ts.SetData(t, tsl.GetData(t));
-                                    }
-                                    G.Writeln2("PRT of " + varName);
-                                    foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
-                                    {
-                                        G.Writeln(t.ToString() + "    " + ts.GetData(t));
                                     }
                                 }
                                 break;

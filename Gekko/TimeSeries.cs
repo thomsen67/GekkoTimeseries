@@ -910,81 +910,97 @@ namespace Gekko
 
         public IVariable Add(GekkoSmpl smpl, IVariable x)
         {
+            G.Writeln2("Ts error 1");
             return null;
         }
 
         public IVariable Subtract(GekkoSmpl smpl, IVariable x)
         {
+            G.Writeln2("Ts error 2");
             return null;
         }
 
         public IVariable Multiply(GekkoSmpl smpl, IVariable x)
         {
+            G.Writeln2("Ts error 3");
             return null;
         }
 
         public IVariable Divide(GekkoSmpl smpl, IVariable x)
         {
+            G.Writeln2("Ts error 4");
             return null;
         }
 
         public IVariable Power(GekkoSmpl smpl, IVariable x)
         {
+            G.Writeln2("Ts error 5");
             return null;
         }
 
         public IVariable Negate(GekkoSmpl smpl)
         {
+            G.Writeln2("Ts error 6");
             return null;
         }
 
         public IVariable Indexer(GekkoSmpl smpl, bool isLhs, params IVariable[] index)
         {
+            G.Writeln2("Ts error 7");
             return null;
         }
 
         public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange index)
         {
+            G.Writeln2("Ts error 8");
             return null;
         }
 
         public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange index1, IVariablesFilterRange index2)
         {
+            G.Writeln2("Ts error 9");
             return null;
         }
 
         public IVariable Indexer(GekkoSmpl smpl, IVariable index, IVariablesFilterRange indexRange)
         {
+            G.Writeln2("Ts error 10");
             return null;
         }
 
         public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange indexRange, IVariable index)
         {
+            G.Writeln2("Ts error 11");
             return null;
         }
 
         public void InjectAdd(GekkoSmpl smpl, IVariable x, IVariable y)
         {
+            G.Writeln2("Ts error 12");
             return;
         }
 
         public double GetVal(GekkoSmpl smpl)
         {
+            G.Writeln2("Ts error 13");
             return double.NaN;
         }
 
         public string GetString()
         {
+            G.Writeln2("Ts error 14");
             return null;
         }
 
         public GekkoTime GetDate(O.GetDateChoices c)
         {
+            G.Writeln2("Ts error 15");
             return Globals.tNull;
         }
 
         public List<string> GetList()
         {
+            G.Writeln2("Ts error 16");
             return null;
         }
 

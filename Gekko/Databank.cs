@@ -253,17 +253,24 @@ namespace Gekko
             return GetVariable(true, variable);
         }
 
+        public IVariable GetIVariable(string variable)
+        {
+            IVariable iv = null;
+            this.storage.TryGetValue(variable, out iv);
+            return iv;
+        }
+
         public TimeSeries GetVariable(bool freqAddToName, string variable)
         {            
             if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
-            IVariable x = null; this.storage.TryGetValue(variable, out x);
+            IVariable x = GetIVariable(variable);
             return (TimeSeries)x;            
         }
 
         public TimeSeries GetVariable(EFreq eFreq, string variable)
         {
             if (eFreq != EFreq.Annual) variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);  //we do this IF here because it is speed critical code. Else a new string object will be created.
-            IVariable x = null; this.storage.TryGetValue(variable, out x);
+            IVariable x = GetIVariable(variable);
             return (TimeSeries)x;
         }        
     }
