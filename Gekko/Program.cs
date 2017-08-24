@@ -6325,11 +6325,12 @@ namespace Gekko
         public static List<string> MatchWildcardInDatabank(string wildcard, Databank db)
         {
             List<string> input = new List<string>();
-            
+
             //input.AddRange(db.storage.Keys);
-            foreach (KeyValuePair<string, TimeSeries> kvp in db.storage)
+            foreach (KeyValuePair<string, IVariable> kvp in db.storage)
             {
-                if (!kvp.Value.IsGhost()) input.Add(kvp.Key);  //do not look at the ghosts here!
+                TimeSeries xx = kvp.Value as TimeSeries; if (xx != null && xx.IsGhost()) continue;  //ignore ghosts
+                input.Add(kvp.Key);
             }
 
             string endsWith = null;
@@ -18834,8 +18835,8 @@ namespace Gekko
 
                 //Note that if writeAllVariables=true, we don't make any list of the variables, the databank
                 //object is simply serialized directly. So any timeseries will be written in that case.
-                GekkoDictionary<string, TimeSeries> databankWithFewerVariables = null;
-                GekkoDictionary<string, TimeSeries> storageOriginal = databank.storage;  //for resetting back to this afterwards
+                GekkoDictionary<string, IVariable> databankWithFewerVariables = null;
+                GekkoDictionary<string, IVariable> storageOriginal = databank.storage;  //for resetting back to this afterwards
 
                 try
                 {
@@ -18845,17 +18846,16 @@ namespace Gekko
                         // truncate the variables
                         // here, databank variable is not used (this is actually only used for CLOSEing a bank)
                         //-----------------------
-                        databankWithFewerVariables = new GekkoDictionary<string, TimeSeries>(StringComparer.OrdinalIgnoreCase);
+                        databankWithFewerVariables = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
                         foreach (BankNameVersion var in list)
                         {
                             Databank db = GetBankFromBankNameVersion(var.bank);
-                            TimeSeries ts = null; db.storage.TryGetValue(var.name, out ts);
-                            if (ts == null)  //if list is given "manually"
-                            {
-                                G.Writeln();
-                                G.Writeln("*** ERROR: Could not find timeseries '" + var + "' in databank '" + db.aliasName + "' for writing (" + Globals.extensionDatabank + ")");
+                            IVariable xx = null; db.storage.TryGetValue(var.name, out xx);
+                            if (xx == null)
+                            {                                
+                                G.Writeln2("*** ERROR: Could not find variable '" + var + "' in databank '" + db.aliasName + "' for writing (" + Globals.extensionDatabank + ")");
                                 throw new GekkoException();
-                            }
+                            }                            
                             if (databankWithFewerVariables.ContainsKey(var.name))
                             {
                                 G.Writeln();
@@ -18865,7 +18865,7 @@ namespace Gekko
                             }
                             else
                             {
-                                databankWithFewerVariables.Add(var.name, ts);
+                                databankWithFewerVariables.Add(var.name, xx);
                             }
                         }
                     }
@@ -18877,13 +18877,16 @@ namespace Gekko
                         //----------------------
                         // truncate the periods
                         //----------------------
-                        GekkoDictionary<string, TimeSeries> databankWithFewerPeriods = new GekkoDictionary<string, TimeSeries>(StringComparer.OrdinalIgnoreCase);
-                        foreach (KeyValuePair<string, TimeSeries> kvp in databank.storage)  
+                        GekkoDictionary<string, IVariable> databankWithFewerPeriods = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
+                        foreach (KeyValuePair<string, IVariable> kvp in databank.storage)  
                         {
-                            TimeSeries ts = kvp.Value;
-                            TimeSeries tsClone = ts.Clone();
-                            tsClone.Truncate(yr1, yr2);
-                            databankWithFewerPeriods.Add(kvp.Key, tsClone);
+                            TimeSeries ts = kvp.Value as TimeSeries;
+                            if (ts != null)
+                            {
+                                TimeSeries tsClone = ts.Clone();
+                                tsClone.Truncate(yr1, yr2);
+                                databankWithFewerPeriods.Add(kvp.Key, tsClone);
+                            }
                         }
                         databank.storage = databankWithFewerPeriods;
                         databank.Trim();  //to make it smaller, slack removed from each TimeSeries
@@ -18952,16 +18955,21 @@ namespace Gekko
                 foreach (BankNameVersion var in list)
                 {
                     Databank db = GetBankFromBankNameVersion(var.bank);
-                    TimeSeries ts = null; db.storage.TryGetValue(var.name, out ts);
+                    IVariable iv = null; db.storage.TryGetValue(var.name, out iv);
+                    if (iv == null)
                     {
-                        if (ts == null)  //if list is given "manually"
+                        G.Writeln();
+                        G.Writeln("*** ERROR: Could not find variable '" + var.bank + Globals.symbolBankColon + var.name + "' while writing tsd records");
+                        throw new GekkoException();
+                    }
+                    else
+                    {
+                        TimeSeries ts = iv as TimeSeries;
                         {
-                            G.Writeln();
-                            G.Writeln("*** ERROR: Could not find timeseries '" + var.bank + Globals.symbolBankColon + var.name + "' while writing tsd records");
-                            throw new GekkoException();
+                            if (ts == null) continue;  //skip                            
+                            count++;
+                            WriteTsdRecord(yr1, yr2, res, ts, isCaps, isTsdx);
                         }
-                        count++;
-                        WriteTsdRecord(yr1, yr2, res, ts, isCaps, isTsdx);
                     }
                 }
                 res.Flush();
@@ -30806,48 +30814,48 @@ namespace Gekko
         }
 
 
-        public static void MakeFlatOrZero(GekkoTime tStart, GekkoTime tEnd, List<string> list, bool zero)
-        {
-            Databank db = Program.databanks.GetFirst();
-            List<string> unfoldedList = list;
+        //public static void MakeFlatOrZero(GekkoTime tStart, GekkoTime tEnd, List<string> list, bool zero)
+        //{
+        //    Databank db = Program.databanks.GetFirst();
+        //    List<string> unfoldedList = list;
 
-            List<string> listUsedHere = new List<string>();
-            if (list.Count == 0)
-            {
-                Dictionary<string, TimeSeries> vars = db.storage;
-                foreach (string var in vars.Keys)
-                {
-                    listUsedHere.Add(var);
-                }
-            }
-            else
-            {
-                listUsedHere.AddRange(list);
-            }
+        //    List<string> listUsedHere = new List<string>();
+        //    if (list.Count == 0)
+        //    {
+        //        Dictionary<string, TimeSeries> vars = db.storage;
+        //        foreach (string var in vars.Keys)
+        //        {
+        //            listUsedHere.Add(var);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        listUsedHere.AddRange(list);
+        //    }
 
-            foreach (string var in listUsedHere)
-            {
-                TimeSeries ts = db.GetVariable(var);
-                if (ts == null)
-                {
-                    G.Writeln2("*** ERROR: variable '" + var + "' not found");
-                    throw new GekkoException();
-                }
-                GekkoTime tStartM1 = tStart.Add(-1);
-                double lastVal = ts.GetData(tStartM1);
-                foreach (GekkoTime t in new GekkoTimeIterator( tStart, tEnd))
-                {
-                    if (zero)
-                    {
-                        ts.SetData(t, 0d);
-                    }
-                    else
-                    {
-                        ts.SetData(t, lastVal);
-                    }
-                }
-            }
-        }
+        //    foreach (string var in listUsedHere)
+        //    {
+        //        TimeSeries ts = db.GetVariable(var);
+        //        if (ts == null)
+        //        {
+        //            G.Writeln2("*** ERROR: variable '" + var + "' not found");
+        //            throw new GekkoException();
+        //        }
+        //        GekkoTime tStartM1 = tStart.Add(-1);
+        //        double lastVal = ts.GetData(tStartM1);
+        //        foreach (GekkoTime t in new GekkoTimeIterator( tStart, tEnd))
+        //        {
+        //            if (zero)
+        //            {
+        //                ts.SetData(t, 0d);
+        //            }
+        //            else
+        //            {
+        //                ts.SetData(t, lastVal);
+        //            }
+        //        }
+        //    }
+        //}
 
         public static void CompareModelDatabankVarlist()
         {

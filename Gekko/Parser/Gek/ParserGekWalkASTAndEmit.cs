@@ -2755,8 +2755,7 @@ namespace Gekko.Parser.Gek
                             {
                                 //no bank indicator
                                 if (leftRight == 0) node.Code.A("(" + node[0].Code + ")");
-                                else node.Code.A("O.Replace(smpl, (" + node[0].Code + "))");
-                                
+                                else node.Code.A("O.Replace(smpl, (" + node[0].Code + "))");                                
                             }
                             else
                             {

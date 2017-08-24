@@ -75,7 +75,7 @@ namespace Gekko
         //Note the .isDirty field, so methods that change anything must set isDirty = true!
         //Remember new fields in Clear() method and also in G.CloneDatabank()        
         [ProtoMember(1)]
-        public GekkoDictionary<string, TimeSeries> storage;
+        public GekkoDictionary<string, IVariable> storage;
         public string aliasName = null;          
         private string fileNameWithPath = null;  //will be constructed when reading: do not protobuf it        
         public string FileNameWithPath
@@ -124,12 +124,12 @@ namespace Gekko
         private Databank()
         {
             //This is ONLY because protobuf-net needs it
-            this.storage = new GekkoDictionary<string, TimeSeries>(StringComparer.OrdinalIgnoreCase);            
+            this.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);            
         }
         
         public Databank(string aliasName)
         {
-            this.storage = new GekkoDictionary<string, TimeSeries>(StringComparer.OrdinalIgnoreCase);            
+            this.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);            
             this.aliasName = aliasName;
             //this.aliasNameOriginal = aliasName;
         }     
@@ -256,15 +256,15 @@ namespace Gekko
         public TimeSeries GetVariable(bool freqAddToName, string variable)
         {            
             if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
-            TimeSeries x = null; this.storage.TryGetValue(variable, out x);
-            return x;            
+            IVariable x = null; this.storage.TryGetValue(variable, out x);
+            return (TimeSeries)x;            
         }
 
         public TimeSeries GetVariable(EFreq eFreq, string variable)
         {
             if (eFreq != EFreq.Annual) variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);  //we do this IF here because it is speed critical code. Else a new string object will be created.
-            TimeSeries x = null; this.storage.TryGetValue(variable, out x);
-            return x;
+            IVariable x = null; this.storage.TryGetValue(variable, out x);
+            return (TimeSeries)x;
         }        
     }
 }

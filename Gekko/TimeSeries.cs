@@ -70,7 +70,7 @@ namespace Gekko
     /// <seealso cref="Databank"/>
     /// <seealso cref="Databanks"/>
     [ProtoContract]
-    public class TimeSeries
+    public class TimeSeries : IVariable
     {
         /// <summary>
         /// Indicates the frequency of the TimeSeries as a string ('a', 'q', 'm', 'u'). 
@@ -907,7 +907,92 @@ namespace Gekko
             }
             return hash;
         }
-                
+
+        public IVariable Add(GekkoSmpl smpl, IVariable x)
+        {
+            return null;
+        }
+
+        public IVariable Subtract(GekkoSmpl smpl, IVariable x)
+        {
+            return null;
+        }
+
+        public IVariable Multiply(GekkoSmpl smpl, IVariable x)
+        {
+            return null;
+        }
+
+        public IVariable Divide(GekkoSmpl smpl, IVariable x)
+        {
+            return null;
+        }
+
+        public IVariable Power(GekkoSmpl smpl, IVariable x)
+        {
+            return null;
+        }
+
+        public IVariable Negate(GekkoSmpl smpl)
+        {
+            return null;
+        }
+
+        public IVariable Indexer(GekkoSmpl smpl, bool isLhs, params IVariable[] index)
+        {
+            return null;
+        }
+
+        public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange index)
+        {
+            return null;
+        }
+
+        public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange index1, IVariablesFilterRange index2)
+        {
+            return null;
+        }
+
+        public IVariable Indexer(GekkoSmpl smpl, IVariable index, IVariablesFilterRange indexRange)
+        {
+            return null;
+        }
+
+        public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange indexRange, IVariable index)
+        {
+            return null;
+        }
+
+        public void InjectAdd(GekkoSmpl smpl, IVariable x, IVariable y)
+        {
+            return;
+        }
+
+        public double GetVal(GekkoSmpl smpl)
+        {
+            return double.NaN;
+        }
+
+        public string GetString()
+        {
+            return null;
+        }
+
+        public GekkoTime GetDate(O.GetDateChoices c)
+        {
+            return Globals.tNull;
+        }
+
+        public List<string> GetList()
+        {
+            return null;
+        }
+
+        public EVariableType Type()
+        {
+            return EVariableType.TimeSeries;
+        }
+
     }
 
     //[ProtoContract]
