@@ -196,7 +196,7 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        public static void WalkASTAndEmit(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p, int leftHandSide)
+        public static void WalkASTAndEmit(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p)
         {            
             if (node.Parent != null)
             {
@@ -295,9 +295,8 @@ namespace Gekko.Parser.Gek
                 astAssignment = true;
             
             foreach (ASTNode child in node.ChildrenIterator())
-            {                
-                if (astAssignment && child.Number == 0) leftHandSide = 1;
-                WalkASTAndEmit(child, absoluteDepth + 1, relativeDepth + 1, textInput, w, p, leftHandSide);
+            {                   
+                WalkASTAndEmit(child, absoluteDepth + 1, relativeDepth + 1, textInput, w, p);
                 //return; Globals.testing = true;
             }            
 
@@ -2768,16 +2767,19 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTBANKVARNAME":
                         {
+                            bool leftHandSide = false;
+                            if (node.Parent.Text == "ASTLEFTSIDE") leftHandSide = true;
+
                             if (node[1] == null)
                             {
                                 //no bank indicator
-                                if (leftHandSide == 1) node.Code.A("(" + node[0].Code + ")");
+                                if (leftHandSide) node.Code.A("(" + node[0].Code + ")");
                                 else node.Code.A("O.Lookup(smpl, (" + node[0].Code + "))");
                             }
                             else
                             {
                                 //bank indicator
-                                if (leftHandSide == 1) node.Code.A("(" + node[0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + ")");
+                                if (leftHandSide) node.Code.A("(" + node[0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + ")");
                                 else node.Code.A("O.Lookup(smpl, (" + node[0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "))");
                             }
                         }
@@ -2980,6 +2982,11 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.Open o" + Num(node) + " = new O.Open();" + G.NL);
                             GetCodeFromAllChildren(node);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
+                    case "ASTLEFTSIDE":
+                        {
+                            GetCodeFromAllChildren(node);  //only used as a marker
                         }
                         break;
                     case "ASTOPENHELPER":

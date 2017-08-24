@@ -31,6 +31,7 @@ options {
 tokens {
 
 	ASTDOLLAR;
+	ASTLEFTSIDE;
 	ASTASSIGNMENT;
 	ASTCNAME;
 	ASTDOTORINDEXER;
@@ -208,7 +209,9 @@ leftSideIndexerExpression : (leftSideValue -> leftSideValue)
 						    (lbla=dotOrIndexer -> ^(ASTDOTORINDEXER $leftSideIndexerExpression $lbla))*
 						  ;
 
-leftSideValue             : bankvarname												  
+leftSideValue             : leftSideValueHelper -> ^(ASTLEFTSIDE leftSideValueHelper);
+
+leftSideValueHelper       : bankvarname												  
 						  | indexerAlone
 						  | listFile												  
 						  | list

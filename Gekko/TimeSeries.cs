@@ -910,8 +910,41 @@ namespace Gekko
 
         public IVariable Add(GekkoSmpl smpl, IVariable x)
         {
-            G.Writeln2("Ts error 1");
-            return null;
+            IVariable rv = null;            
+
+            int n = GekkoTime.Observations(smpl.t1, smpl.t2);
+            double[] data = new double[n];            
+
+            if (x.Type() == EVariableType.TimeSeries)
+            {
+                TimeSeriesLight tsl = new TimeSeriesLight();
+
+                TimeSeries xx = x as TimeSeries;
+                if (xx != null)
+                {
+                    int counter = 0;
+                    foreach (GekkoTime gt in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                    {
+                        data[counter] = this.GetData(gt) + xx.GetData(gt);
+                        counter++;
+                    }
+                }
+                else
+                {
+                    TimeSeriesLight xx2 = x as TimeSeriesLight;
+                    int counter = 0;
+                    foreach (GekkoTime gt in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                    {
+                        data[counter] = this.GetData(gt) + xx2.GetData(gt);
+                        counter++;
+                    }
+                }
+                tsl.storage = data;
+                tsl.anchorPeriod = smpl.t1;
+                tsl.anchorPeriodPositionInArray = 0;
+                rv = tsl;            
+            }
+            return rv;
         }
 
         public IVariable Subtract(GekkoSmpl smpl, IVariable x)

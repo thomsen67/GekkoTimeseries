@@ -195,6 +195,8 @@ namespace Gekko
                 case EVariableType.TimeSeries:
                     {
 
+                        //FIXME: IF TimeSeries, not light
+
                         TimeSeriesLight x = this;
                         TimeSeriesLight y = (TimeSeriesLight)input;
                         TimeSeriesLight z = new TimeSeriesLight();

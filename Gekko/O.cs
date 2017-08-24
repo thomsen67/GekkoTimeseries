@@ -682,8 +682,30 @@ namespace Gekko
                                 break;
                             default:
                                 {
-                                    G.Writeln2("*** ERROR: You cannot assign a STRING to a SERIES.");
-                                    throw new GekkoException();
+                                    int n = GekkoTime.Observations(smpl.t1, smpl.t2);
+                                    MetaList m = (MetaList)x;
+                                    if (m.Count() > 1 && n != m.Count())
+                                    {
+                                        G.Writeln2("*** ERROR: Expected " + n + " observations, got " + m.Count());
+                                        throw new GekkoException();
+                                    }
+                                    TimeSeries ts = null;
+                                    if (iv == null)
+                                    {
+                                        ts = new TimeSeries(Program.options.freq, varName);
+                                        db.AddIVariable(ts.variableName, ts);  //always use this pattern: AddIVariable(x.variableName, x)
+                                    }
+                                    else
+                                    {
+                                        ts = (TimeSeries)iv;  //timeseries is already existing, we just change the contents                                        
+                                    }
+                                    int counter = 0;
+                                    foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                                    {
+                                        ts.SetData(t, O.GetVal(smpl, m.list[counter]));
+                                        if (m.Count() > 1) counter++;  //if only 1 list item, we keep using m.list[0]
+                                    }
+
                                 }
                                 break;
                         }
