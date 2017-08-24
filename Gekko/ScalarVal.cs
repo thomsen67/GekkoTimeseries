@@ -169,7 +169,8 @@ namespace Gekko
                     }
                 case EVariableType.TimeSeries:
                     {
-                        return Operators.ValTimeSeries.Add(this, (MetaTimeSeries)x, t);
+                        //LIGHTFIXME
+                        return null;
                     }
                 case EVariableType.String:                
                     {

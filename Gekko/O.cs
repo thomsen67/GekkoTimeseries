@@ -1134,7 +1134,7 @@ namespace Gekko
                     //GENR y = %s; <-- %s is a STRING
                     TimeSeries ts = Program.databanks.GetFirst().GetVariable(((ScalarString)a)._string2);
                     //a = new MetaTimeSeries(ts, null, null);
-                    a = new MetaTimeSeries(ts);
+                    a = ts;
                 }
                 else
                 {
@@ -1753,7 +1753,7 @@ namespace Gekko
                 //GENR y = %s[2000]; <-- %s is a STRING
                 TimeSeries ts = Program.databanks.GetFirst().GetVariable(((ScalarString)a)._string2);
                 //a = new MetaTimeSeries(ts, null, null);
-                a = new MetaTimeSeries(ts);
+                a = ts;
             }
             else
             {
@@ -2421,7 +2421,7 @@ namespace Gekko
         {
             if (a.Type() == EVariableType.TimeSeries)
             {
-                return ((MetaTimeSeries)a).ts;
+                return (TimeSeries)a;
             }
             else if (a.Type() == EVariableType.String)
             {

@@ -77,19 +77,6 @@ namespace Gekko
             }
         }
 
-        public static class ValTimeSeries
-        {
-            public static IVariable Add(ScalarVal x, MetaTimeSeries ats, GekkoSmpl t)
-            {
-                //no need to implement swap
-                if (t == null) throw new GekkoException();                
-                TimeSeries ts = ats.ts;
-                double val1 = x.val;
-                double val2 = ts.GetData(t.t1.Add(ats.offset));  //uuu
-                return new ScalarVal(val1 + val2);
-            }
-        }
-
         public static class StringList
         {
             public static IVariable Add(ScalarString s, MetaList l, bool swap)

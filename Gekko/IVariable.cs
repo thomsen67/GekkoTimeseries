@@ -12,6 +12,7 @@ namespace Gekko
         Date,
         Val,
         TimeSeries,
+        TimeSeriesLight,
         List,
         Matrix,         
         GekkoError

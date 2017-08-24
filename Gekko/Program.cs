@@ -18118,9 +18118,9 @@ namespace Gekko
                 }
             }
 
-            MetaTimeSeries mp = new MetaTimeSeries(p);
-            MetaTimeSeries mx = new MetaTimeSeries(x);
-            return new GekkoTuple.Tuple2(mp, mx);
+            //LIGHTFIXME
+                        
+            return new GekkoTuple.Tuple2(p, x);
         }
 
 

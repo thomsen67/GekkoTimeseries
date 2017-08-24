@@ -297,7 +297,7 @@ namespace Gekko
                 }
             }
                                   
-            return new MetaTimeSeries(lhs);            
+            return lhs;            
         }        
 
         // ====================== matrix stuff ===============================
@@ -347,7 +347,8 @@ namespace Gekko
                 }
                 else if (vars[j].Type() == EVariableType.TimeSeries)
                 {
-                    tss.Add(((MetaTimeSeries)vars[j]).ts);
+                    //LIGHTFIXME
+                    tss.Add((TimeSeries)vars[j]);
                 }       
                 else
                 {
@@ -1292,7 +1293,7 @@ namespace Gekko
 
         private static bool IsValOrTimeseries(IVariable x)
         {
-            return x.Type() == EVariableType.Val || x.Type() == EVariableType.TimeSeries;
+            return x.Type() == EVariableType.Val || x.Type() == EVariableType.TimeSeries || x.Type() == EVariableType.TimeSeriesLight;
         }
 
         public static IVariable pow(GekkoSmpl t, IVariable x1, IVariable x2)
@@ -1305,169 +1306,77 @@ namespace Gekko
         //ALL THESE SHOULD BE DELETED
         public static IVariable pch(GekkoSmpl t, IVariable x1)
         {
-            if (x1.Type() != EVariableType.TimeSeries)
+            if (x1.Type() == EVariableType.TimeSeries)
+            {
+
+
+            }
+            else if (x1.Type() == EVariableType.TimeSeriesLight)
+            {
+
+            }
+            else
             {
                 G.Writeln2("*** ERROR: pch() function only valid for time series arguments");
                 throw new GekkoException();
             }
-            MetaTimeSeries mts = (MetaTimeSeries)x1;
-            MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
-            mtsLag.offset = mts.offset - 1;
-            double d1 = O.GetVal(t, mts);
-            double d1Lag = O.GetVal(t, mtsLag);
-            return new ScalarVal((d1 / d1Lag - 1) * 100d);
+            return null;
         }
 
         //ALL THESE SHOULD BE DELETED
         public static IVariable dlog(GekkoSmpl t, IVariable x1)
         {
-            if (x1.Type() != EVariableType.TimeSeries)
-            {
-                G.Writeln2("*** ERROR: dlog() function only valid for time series arguments");
-                throw new GekkoException();
-            }
-            MetaTimeSeries mts = (MetaTimeSeries)x1;
-            MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
-            mtsLag.offset = mts.offset - 1;
-            double d1 = O.GetVal(t, mts);
-            double d1Lag = O.GetVal(t, mtsLag);
-            return new ScalarVal(Math.Log(d1 / d1Lag));
+            return null;
         }
 
         //ALL THESE SHOULD BE DELETED
         public static IVariable dif(GekkoSmpl t, IVariable x1)
         {
-            if (x1.Type() != EVariableType.TimeSeries)
-            {
-                G.Writeln2("*** ERROR: dif() function only valid for time series arguments");
-                throw new GekkoException();
-            }
-            MetaTimeSeries mts = (MetaTimeSeries)x1;
-            MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
-            mtsLag.offset = mts.offset - 1;
-            double d1 = O.GetVal(t, mts);
-            double d1Lag = O.GetVal(t, mtsLag);
-            return new ScalarVal(d1 - d1Lag);
+            return null;
         }
 
         //ALL THESE SHOULD BE DELETED
         public static IVariable lag(GekkoSmpl t, IVariable x, IVariable ilag)
-        {            
-            if (x.Type() != EVariableType.TimeSeries)
-            {
-                G.Writeln2("*** ERROR: lag() function only valid for time series arguments");
-                throw new GekkoException();
-            }
-            MetaTimeSeries mts = (MetaTimeSeries)x;
-            MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
-            mtsLag.offset = mts.offset - O.GetInt(ilag);
-            double d1Lag = O.GetVal(t, mtsLag);
-            return new ScalarVal(d1Lag);
+        {
+            return null;
         }
 
         //ALL THESE SHOULD BE DELETED
         public static IVariable movsum(GekkoSmpl smpl, IVariable x, IVariable ilags)
         {
-            double sum, n;
-            MovAvgSum(smpl, x, ilags, out sum, out n);
-            return new ScalarVal(sum);
+            return null;
         }
 
         //ALL THESE SHOULD BE DELETED
         public static IVariable movavg(GekkoSmpl smpl, IVariable x, IVariable ilags)
         {
-            double sum, n;
-            MovAvgSum(smpl, x, ilags, out sum, out n);
-            return new ScalarVal(sum / n);
+            return null;
         }
 
         //ALL THESE SHOULD BE DELETED
         private static void MovAvgSum(GekkoSmpl smpl, IVariable x, IVariable ilags, out double sum, out double n)
         {
-            sum = double.NaN;
-            n = double.NaN;
+            sum = 0;
+            n = 0;
             return;
-
-            //if (x.Type() != EVariableType.TimeSeries)
-            //{
-            //    if (x.Type() == EVariableType.Val)
-            //    {
-            //        //See the MEGA HACK and fix it there
-            //        G.Writeln2("*** ERROR: At the moment, movavg() and movsum() only work on pure timeseries, not expressions.");
-            //        G.Writeln("           So SERIES y = movavg(x1/x2, 2); will not work, whereas");
-            //        G.Writeln("           SERIES x = x1/x2; SERIES y = movavg(x, 2); is ok.");
-            //        G.Writeln("           This limitation will be addressed.");
-            //        throw new GekkoException();
-            //    }
-            //    else
-            //    {
-            //        G.Writeln2("*** ERROR: Function movavg() or movsum() expects a timeseries as first argument.");
-            //        throw new GekkoException();
-            //    }
-            //}
-            //int lags = O.GetInt(ilags);
-            //if (lags < 1)
-            //{
-            //    G.Writeln("*** ERROR: Expected second argument of movavg/movsum() to be > 0");
-            //    throw new GekkoException();
-            //}
-            //MetaTimeSeries mts = (MetaTimeSeries)x;
-
-            //sum = 0d;
-            //n = 0d;
-            //for (int i = 0; i < lags; i++)
-            //{
-            //    sum += mts.ts.GetData(t.Add(-i + mts.offset));
-            //    n++;
-            //}
         }
 
         //ALL THESE SHOULD BE DELETED
         public static IVariable pchy(GekkoSmpl t, IVariable x1)
         {
-            if (x1.Type() != EVariableType.TimeSeries)
-            {
-                G.Writeln2("*** ERROR: pchy() function only valid for time series arguments");
-                throw new GekkoException();
-            }
-            MetaTimeSeries mts = (MetaTimeSeries)x1;
-            MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
-            mtsLag.offset = mts.offset - O.CurrentSubperiods();
-            double d1 = O.GetVal(t, mts);
-            double d1Lag = O.GetVal(t, mtsLag);
-            return new ScalarVal((d1 / d1Lag - 1) * 100d);
+            return null;
         }
 
         //ALL THESE SHOULD BE DELETED
         public static IVariable dlogy(GekkoSmpl t, IVariable x1)
         {
-            if (x1.Type() != EVariableType.TimeSeries)
-            {
-                G.Writeln2("*** ERROR: dlogy() function only valid for time series arguments");
-                throw new GekkoException();
-            }
-            MetaTimeSeries mts = (MetaTimeSeries)x1;
-            MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
-            mtsLag.offset = mts.offset - O.CurrentSubperiods();
-            double d1 = O.GetVal(t, mts);
-            double d1Lag = O.GetVal(t, mtsLag);
-            return new ScalarVal(Math.Log(d1 / d1Lag));
+            return null;
         }
 
         //ALL THESE SHOULD BE DELETED
         public static IVariable dify(GekkoSmpl t, IVariable x1)
         {
-            if (x1.Type() != EVariableType.TimeSeries)
-            {
-                G.Writeln2("*** ERROR: dify() function only valid for time series arguments");
-                throw new GekkoException();
-            }
-            MetaTimeSeries mts = (MetaTimeSeries)x1;
-            MetaTimeSeries mtsLag = new MetaTimeSeries(mts.ts);
-            mtsLag.offset = mts.offset - O.CurrentSubperiods();
-            double d1 = O.GetVal(t, mts);
-            double d1Lag = O.GetVal(t, mtsLag);
-            return new ScalarVal(d1 - d1Lag);
+            return null;
         }
         
         public static IVariable format(GekkoSmpl t, IVariable x1, IVariable x2)

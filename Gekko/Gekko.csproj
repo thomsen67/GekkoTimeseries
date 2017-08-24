@@ -149,7 +149,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AList.cs" />
-    <Compile Include="ATimeSeries.cs" />
     <Compile Include="AutoComplete.cs">
       <SubType>Component</SubType>
     </Compile>
