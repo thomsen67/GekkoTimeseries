@@ -535,15 +535,7 @@ namespace Gekko
                                         ScalarVal v = iv as ScalarVal;
                                         if (v != null)
                                         {
-                                            //HMMMMMMMMMMMMMM
-                                            //HMMMMMMMMMMMMMM
-                                            //HMMMMMMMMMMMMMM
-                                            //HMMMMMMMMMMMMMM  can this have sideeffects?
-                                            //HMMMMMMMMMMMMMM
-                                            //HMMMMMMMMMMMMMM
-                                            //HMMMMMMMMMMMMMM
-                                            //HMMMMMMMMMMMMMM
-
+                                            //Should be ok regarding sideeffects
                                             v.val = ((ScalarVal)x).val;  //avoids object creation
                                         }
                                         else
@@ -587,18 +579,36 @@ namespace Gekko
                         {
                             case Globals.symbolMemvar:  //%
                                 {
-
+                                    if (iv == null)
+                                    {
+                                        db.AddIVariable(varName, x);
+                                    }
+                                    else
+                                    {
+                                        ScalarString v = iv as ScalarString;
+                                        if (v != null)
+                                        {
+                                            //Should be ok regarding sideeffects
+                                            v._string2 = ((ScalarString)x)._string2;  //avoids object creation
+                                        }
+                                        else
+                                        {
+                                            db.RemoveIVariable(varName);
+                                            db.AddIVariable(varName, x);
+                                        }
+                                    }
                                 }
                                 break;
                             case Globals.symbolList:  //#
                                 {
-                                    
+                                    G.Writeln2("*** ERROR: You cannot assign a STRING to a LIST or MATRIX.");
+                                    throw new GekkoException();
                                 }
                                 break;
                             default:
                                 {
-
-
+                                    G.Writeln2("*** ERROR: You cannot assign a STRING to a SERIES.");
+                                    throw new GekkoException();
                                 }
                                 break;
                         }
@@ -610,17 +620,36 @@ namespace Gekko
                         {
                             case Globals.symbolMemvar:  //%
                                 {
-
+                                    if (iv == null)
+                                    {
+                                        db.AddIVariable(varName, x);
+                                    }
+                                    else
+                                    {
+                                        ScalarDate v = iv as ScalarDate;
+                                        if (v != null)
+                                        {
+                                            //Should be ok regarding sideeffects
+                                            v.date = ((ScalarDate)x).date;  //avoids object creation
+                                        }
+                                        else
+                                        {
+                                            db.RemoveIVariable(varName);
+                                            db.AddIVariable(varName, x);
+                                        }
+                                    }
                                 }
                                 break;
                             case Globals.symbolList:  //#
                                 {
-
+                                    G.Writeln2("*** ERROR: You cannot assign a DATE to a LIST or MATRIX.");
+                                    throw new GekkoException();
                                 }
                                 break;
                             default:
                                 {
-
+                                    G.Writeln2("*** ERROR: You cannot assign a DATE to a SERIES.");
+                                    throw new GekkoException();
                                 }
                                 break;
                         }
@@ -634,7 +663,8 @@ namespace Gekko
                         {
                             case Globals.symbolMemvar:  //%
                                 {
-
+                                    G.Writeln2("*** ERROR: You cannot assign a LIST to a VAL, DATE or STRING.");
+                                    throw new GekkoException();
                                 }
                                 break;
                             case Globals.symbolList:  //#
@@ -648,13 +678,12 @@ namespace Gekko
                                         db.RemoveIVariable(varName);
                                         db.AddIVariable(varName, x);                                        
                                     }
-
-
                                 }
                                 break;
                             default:
                                 {
-
+                                    G.Writeln2("*** ERROR: You cannot assign a STRING to a SERIES.");
+                                    throw new GekkoException();
                                 }
                                 break;
                         }
@@ -669,13 +698,13 @@ namespace Gekko
                         {
                             case Globals.symbolMemvar:  //%
                                 {
-                                    G.Writeln2("*** ERROR: You are trying to put timeseries data into a scalar");
+                                    G.Writeln2("*** ERROR: You cannot assign a SERIES to a VAL, DATE or STRING.");
                                     throw new GekkoException();
                                 }
                                 break;
                             case Globals.symbolList:  //#
                                 {
-                                    G.Writeln2("*** ERROR: You are trying to put timeseries data into a list or matrix");
+                                    G.Writeln2("*** ERROR: You cannot assign a SERIES to a LIST or MATRIX.");
                                     throw new GekkoException();
                                 }
                                 break;
@@ -700,17 +729,27 @@ namespace Gekko
                         {
                             case Globals.symbolMemvar:  //%
                                 {
-
+                                    G.Writeln2("*** ERROR: You cannot assign a MATRIX to a VAL, DATE or STRING.");
+                                    throw new GekkoException();
                                 }
                                 break;
                             case Globals.symbolList:  //#
                                 {
-
+                                    if (iv == null)  //check if it exists or not
+                                    {
+                                        db.AddIVariable(varName, x);
+                                    }
+                                    else
+                                    {
+                                        db.RemoveIVariable(varName);
+                                        db.AddIVariable(varName, x);
+                                    }
                                 }
                                 break;
                             default:
                                 {
-
+                                    G.Writeln2("*** ERROR: You cannot assign a MATRIX to a SERIES.");
+                                    throw new GekkoException();
                                 }
                                 break;
                         }
