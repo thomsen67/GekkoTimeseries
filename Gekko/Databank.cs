@@ -281,6 +281,10 @@ namespace Gekko
                 }
             }
             this.storage.Add(name, x);
+            if (x.Type() == EVariableType.TimeSeries)
+            {
+                ((TimeSeries)x).parentDatabank = this;
+            }
         }
 
         public void RemoveIVariable(string name)

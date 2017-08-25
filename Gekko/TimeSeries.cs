@@ -163,9 +163,17 @@ namespace Gekko
         /// <param name="frequency">The frequency of the timeseries</param>
         /// <param name="variableName">The variable name of the timeseries</param>
         public TimeSeries(EFreq frequency, string variableName)
-        {
-            this.freq = frequency;            
-            this.variableName = variableName;
+        {            
+            this.freq = frequency;
+            this.variableName = variableName;  //Note: the variableName does contain a ~
+            //string[] ss = variableName.Split(Globals.symbolTilde);
+            //if (ss.Length > 2)
+            //{
+            //    G.Writeln2("*** ERROR: Timeseries name has two '~' symbols");
+            //    throw new GekkoException();
+            //}
+            //if (ss.Length == 1) this.variableName = variableName;
+            //else this.variableName = ss[0];
         }
 
         /// <summary>
@@ -1018,6 +1026,45 @@ namespace Gekko
             {
                 double d = this.GetData(((ScalarDate)index[0]).date);
                 rv = new ScalarVal(d);
+            }
+            else if (index[0].Type() == EVariableType.String)
+            {                
+                foreach (IVariable iv in index)
+                {
+                    if (iv.Type() != EVariableType.String)
+                    {
+                        G.Writeln2("*** ERROR: SERIES indexer with combined strings and non-strings");
+                        throw new GekkoException();
+                    }
+                }
+                string hash = GetHashCodeFromIvariables(index);
+                if (this.variableName == null)
+                {
+                    G.Writeln2("*** ERROR: SERIES string indexer on expression not allowed");
+                    throw new GekkoException();
+                }
+
+                string v = null;
+                string[] ss = this.variableName.Split(Globals.symbolTilde);
+                if (ss.Length == 1)
+                {
+                    v = ss[0];
+                }
+                else if (ss.Length == 2)
+                {
+                    v = ss[0];
+                }
+                else throw new GekkoException();
+
+                string varname = v + Globals.symbolTurtle + hash + Globals.symbolTilde + G.GetFreq(this.freq);
+                TimeSeries ts = this.parentDatabank.GetVariable(varname);
+                if (ts == null)
+                {
+                    G.Writeln2("*** ERROR: Could not find " + G.PrettifyTimeseriesHash(varname, true, false));
+                    throw new GekkoException();
+                }
+                rv = ts;
+
             }
             else
             {
