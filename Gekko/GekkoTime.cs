@@ -92,6 +92,11 @@ namespace Gekko
             return false;
         }
 
+        public static int Observations(GekkoSmpl smpl)
+        {
+            return Observations(smpl.t1, smpl.t2);
+        }
+
         public static int Observations(GekkoTime t1, GekkoTime t2)
         {
             //BEWARE: Can return a negative number!

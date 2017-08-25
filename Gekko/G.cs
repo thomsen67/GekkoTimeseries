@@ -1304,6 +1304,11 @@ namespace Gekko
             return GetFreqString(Program.options.freq);            
         }
 
+        public static GekkoTimeIterator Iterate(GekkoSmpl smpl)
+        {
+            return new GekkoTimeIterator(smpl.t1, smpl.t2);
+        }
+
         public static string GetFreqString(EFreq input)
         {
             string f = "";

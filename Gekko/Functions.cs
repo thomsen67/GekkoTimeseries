@@ -1340,27 +1340,51 @@ namespace Gekko
         {
             return null;
         }
-
-        //ALL THESE SHOULD BE DELETED
+                
         public static IVariable movsum(GekkoSmpl smpl, IVariable x, IVariable ilags)
         {
-            return null;
+            return MovAvgSum(smpl, x, ilags, false);            
         }
 
-        //ALL THESE SHOULD BE DELETED
         public static IVariable movavg(GekkoSmpl smpl, IVariable x, IVariable ilags)
         {
-            return null;
+            return MovAvgSum(smpl, x, ilags, true);
         }
 
-        //ALL THESE SHOULD BE DELETED
-        private static void MovAvgSum(GekkoSmpl smpl, IVariable x, IVariable ilags, out double sum, out double n)
+        private static IVariable MovAvgSum(GekkoSmpl smpl, IVariable x, IVariable ilags, bool avg)
         {
-            sum = 0;
-            n = 0;
-            return;
-        }
+            IVariable rv = null;
+            int d = O.GetInt(ilags);
+            double divide = 1d;
+            if (avg) divide = (double)d;
+            if (x.Type() == EVariableType.TimeSeries)
+            {
+                TimeSeries ts = (TimeSeries)x;
+                TimeSeries z = new TimeSeries(smpl.t1.freq, null);
+                foreach (GekkoTime gt in G.Iterate(smpl))
+                {
+                    double sum = 0d;
+                    for (int i = 0; i < d; i++)   //movsum(x, 2) is m + x[-1], so d is always the number of elements.
+                    {
+                        sum += ts.GetData(gt.Add(-i));
+                    }
+                    z.SetData(gt, sum / divide);
+                }
+                rv = z;
+            }
+            else if (x.Type() == EVariableType.Val)
+            {
+                rv = new ScalarVal(d / divide * ((ScalarVal)x).val);
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: movsum() only works for SERIES");
+                throw new GekkoException();
+            }
 
+            return rv;
+        }
+       
         //ALL THESE SHOULD BE DELETED
         public static IVariable pchy(GekkoSmpl t, IVariable x1)
         {

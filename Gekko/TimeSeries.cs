@@ -316,7 +316,7 @@ namespace Gekko
                 //So if Program.options.freq is quarterly, 'fy' will point to 'fy%q', and that
                 //timeseries should have .freqEnum = EFreq.Quarterly. This is basically what the above IF tests. It is for
                 //safety, and might be omitted at some point.
-                G.Writeln2("*** ERROR: Freq mismatch");
+                G.Writeln2("*** ERROR: Frequency mismatch: " + G.GetFreqString(this.freq) + " versus " + G.GetFreqString(t.freq));
                 throw new GekkoException();
             }
             if (this.dataArray == null)
@@ -928,37 +928,20 @@ namespace Gekko
             IVariable rv = null;            
 
             int n = GekkoTime.Observations(smpl.t1, smpl.t2);
-            double[] data = new double[n];            
+            double[] data = new double[n];
 
             if (x.Type() == EVariableType.TimeSeries)
             {
                 TimeSeries tsl = new TimeSeries();
-
                 TimeSeries xx = x as TimeSeries;
-                if (xx != null)
+
+                //LIGHTFIXME: speedup with arrays
+                foreach (GekkoTime gt in G.Iterate(smpl))
                 {
-                    int counter = 0;
-                    foreach (GekkoTime gt in new GekkoTimeIterator(smpl.t1, smpl.t2))
-                    {
-                        data[counter] = this.GetData(gt) + xx.GetData(gt);
-                        counter++;
-                    }
+                    tsl.SetData(gt, this.GetData(gt) + xx.GetData(gt));
                 }
-                else
-                {
-                    TimeSeries xx2 = x as TimeSeries;
-                    int counter = 0;
-                    foreach (GekkoTime gt in new GekkoTimeIterator(smpl.t1, smpl.t2))
-                    {
-                        data[counter] = this.GetData(gt) + xx2.GetData(gt);
-                        counter++;
-                    }
-                }
-                tsl.dataArray = data;                
-                tsl.anchorSubPeriod = smpl.t1.sub;
-                tsl.anchorSubPeriod = smpl.t1.super;
-                tsl.anchorPeriodPositionInArray = 0;
-                rv = tsl;            
+                
+                rv = tsl;
             }
             return rv;
         }
@@ -989,14 +972,58 @@ namespace Gekko
 
         public IVariable Negate(GekkoSmpl smpl)
         {
-            G.Writeln2("Ts error 6");
-            return null;
-        }
+            TimeSeries ts = new TimeSeries(this.freq, null);
+            foreach (GekkoTime t in G.Iterate(smpl))
+            {
+                ts.SetData(t, -this.GetData(t));
+            }
+            return ts;
+        }    
 
         public IVariable Indexer(GekkoSmpl smpl, bool isLhs, params IVariable[] index)
         {
-            G.Writeln2("Ts error 7");
-            return null;
+            IVariable rv = null;
+            if (index.Length == 1 && index[0].Type() == EVariableType.Val)
+            {
+                int i = O.GetInt(index[0]);
+
+                //TODO: Broken lags!!
+
+                if (i > -100 && i < 100)
+                {
+                    //must be a lag
+                    //LIGHTFIXME, speed it up... can offset be used????
+                    TimeSeries ts = new Gekko.TimeSeries(this.freq, null);
+                    foreach (GekkoTime t in G.Iterate(smpl))
+                    {
+                        ts.SetData(t, this.GetData(t.Add(i)));
+                    }
+                    rv = ts;
+                }
+                else
+                {
+                    if (this.freq == EFreq.Annual || this.freq == EFreq.Undated)
+                    {
+                        double d = this.GetData(new GekkoTime(this.freq, i, 1));
+                        rv = new ScalarVal(d);
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: You cannot index " + G.GetFreqString(this.freq) + " series with value " + i);
+                        throw new GekkoException();
+                    }
+                }
+            }
+            else if (index.Length == 1 && index[0].Type() == EVariableType.Date)
+            {
+                double d = this.GetData(((ScalarDate)index[0]).date);
+                rv = new ScalarVal(d);
+            }
+            else
+            {
+                G.Writeln2("Ts error 7");
+            }
+            return rv;
         }
 
         public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange index)

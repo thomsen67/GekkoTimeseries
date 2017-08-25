@@ -11,8 +11,7 @@ namespace Gekko
         String,
         Date,
         Val,
-        TimeSeries,
-        TimeSeriesLight,
+        TimeSeries,        
         List,
         Matrix,         
         GekkoError

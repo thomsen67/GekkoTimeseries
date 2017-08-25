@@ -474,7 +474,7 @@ namespace Gekko
                         {
                             TimeSeries tsl = x as TimeSeries;
                             G.Writeln2("SERIES = ");
-                            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                            foreach (GekkoTime t in G.Iterate(smpl))
                             {
                                 G.Writeln(t.ToString() + "    " + tsl.GetData(t));
                             }
@@ -482,7 +482,7 @@ namespace Gekko
                         else
                         {
                             G.Writeln2("SERIES = ");
-                            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                            foreach (GekkoTime t in G.Iterate(smpl))
                             {
                                 G.Writeln(t.ToString() + "    " + ts.GetData(t));
                             }
@@ -564,7 +564,7 @@ namespace Gekko
                                     {
                                         ts = (TimeSeries)iv;  //timeseries is already existing, we just change the contents                                        
                                     }
-                                    foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                                    foreach (GekkoTime t in G.Iterate(smpl))
                                     {
                                         ts.SetData(t, d);
                                     }
@@ -700,7 +700,7 @@ namespace Gekko
                                         ts = (TimeSeries)iv;  //timeseries is already existing, we just change the contents                                        
                                     }
                                     int counter = 0;
-                                    foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                                    foreach (GekkoTime t in G.Iterate(smpl))
                                     {
                                         ts.SetData(t, O.GetVal(smpl, m.list[counter]));
                                         if (m.Count() > 1) counter++;  //if only 1 list item, we keep using m.list[0]
@@ -734,7 +734,7 @@ namespace Gekko
                                 {
                                     TimeSeries ts = GetLeftSideVariable(dbName, varName);
                                     TimeSeries tsl = (TimeSeries)x;
-                                    foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                                    foreach (GekkoTime t in G.Iterate(smpl))
                                     {
                                         ts.SetData(t, tsl.GetData(t));
                                     }

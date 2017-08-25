@@ -1619,7 +1619,7 @@ namespace Gekko.Parser.Gek
                             string[] listNames = IsGamsLikeSumFunction1(node, functionName);
                             if (listNames != null) isGamsLikeSumFunction = true;
 
-                            if (Globals.lagFunctions.Contains(functionName) || isGamsLikeSumFunction)  //functionName is lower case
+                            if (isGamsLikeSumFunction)  //functionName is lower case
                             {
 
                                 if (Program.options.interface_lagfix)
@@ -2392,37 +2392,51 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.Indexer(t, null, false, " + node[0].Code + ")");  //null signals that it has nothing on the left
                         }
                         break;
+                    case "ASTDOTORINDEXER":
+                        {
+                            //LIGHTFIXME, isRhs
+                            node.Code.A("O.Indexer(smpl, ").A(node[0].Code).A(", ").A("false, ").A(node[1].Code).A(")");
+                        }
+                        break;
+                    case "ASTINDEXER":
+                        {
+                            GetCommaCodeFromAllChildren(node);
+                        }
+                        break;
                     case "ASTINDEXERELEMENT":  //For ASTINDEXER, see "["
                     case "ASTINDEXERELEMENTPLUS":
                         {
-                            if (node.ChildrenCount() == 2)
-                            {
-                                if (!node[0].Code.IsNull())
-                                {
-                                    node.Code.A("(" + node[0].Code + ")" + ".Add(smpl, new ScalarString(\":\")).Add(smpl, " + node[1].Code + ")");
-                                }
-                                else
-                                {
-                                    node.Code.A(node[1].Code);
-                                }
-                            }
-                            else if (node.ChildrenCount() == 3)
-                            {
-                                if (node.Text == "ASTINDEXERELEMENTPLUS")
-                                {
-                                    G.Writeln2("*** ERROR: You cannot use '+' as starting character in ranges");
-                                    throw new GekkoException();
-                                }
-                                if (!node[0].Code.IsNull())
-                                {
-                                    node.Code.A("new IVariablesFilterRange((" + node[0].Code + ")" + ".Add(smpl, new ScalarString(\":\")).Add(smpl, " + node[1].Code + "), " + node[2].Code + ")");
-                                }
-                                else
-                                {
-                                    node.Code.A("new IVariablesFilterRange(" + node[1].Code + ", " + node[2].Code + ")");
-                                }
-                            }
-                            else throw new GekkoException();
+                            //if (node.ChildrenCount() == 2)
+                            //{
+                            //    if (!node[0].Code.IsNull())
+                            //    {
+                            //        node.Code.A("(" + node[0].Code + ")" + ".Add(smpl, new ScalarString(\":\")).Add(smpl, " + node[1].Code + ")");
+                            //    }
+                            //    else
+                            //    {
+                            //        node.Code.A(node[1].Code);
+                            //    }
+                            //}
+                            //else if (node.ChildrenCount() == 3)
+                            //{
+                            //    if (node.Text == "ASTINDEXERELEMENTPLUS")
+                            //    {
+                            //        G.Writeln2("*** ERROR: You cannot use '+' as starting character in ranges");
+                            //        throw new GekkoException();
+                            //    }
+                            //    if (!node[0].Code.IsNull())
+                            //    {
+                            //        node.Code.A("new IVariablesFilterRange((" + node[0].Code + ")" + ".Add(smpl, new ScalarString(\":\")).Add(smpl, " + node[1].Code + "), " + node[2].Code + ")");
+                            //    }
+                            //    else
+                            //    {
+                            //        node.Code.A("new IVariablesFilterRange(" + node[1].Code + ", " + node[2].Code + ")");
+                            //    }
+                            //}
+                            //else throw new GekkoException();
+
+                            GetCodeFromAllChildren(node);
+
                         }
                         break;
                     case "ASTINDEXERELEMENTBANK":                    
@@ -2465,18 +2479,7 @@ namespace Gekko.Parser.Gek
                     case "ASTLISTDEF":
                         {
                             node.Code.A("O.ListDef(");
-                            for (int i = 0; i < node.ChildrenCount(); i++)
-                            {
-                                node.Code.A(node[i].Code);
-                                if (i < node.ChildrenCount() - 1) node.Code.A(", ");
-                            }                   
-                            
-                            
-                                                              
-                            //foreach (ASTNode child in node.ChildrenIterator())
-                            //{
-                            //    node.Code.A(child.Code).A(", "); //last trailing , is not a problem for C#
-                            //}
+                            GetCommaCodeFromAllChildren(node);                            
                             node.Code.A(")");
                         }
                         break;
@@ -2960,20 +2963,9 @@ namespace Gekko.Parser.Gek
                             node.Code.CA("new ScalarString(`no`)");
                         }
                         break;
-                    case "NEGATE":
-                        //HMMMMMMMMMMM, ASTNEGATE better name
+                    case "ASTNEGATE":
                         {
-
-                            if (node.IgnoreNegate)
-                            {
-                                //if marked as ignore-node, the after-stuff is not done for this node (typically a sub-node has signalled this).
-                                node.Code.CA(node.GetChildCode(0));
-                            }
-                            else
-                            {
-                                node.Code.A("O.Negate(smpl, " + node.GetChildCode(0) + ")");
-                            }
-
+                            node.Code.A("O.Negate(smpl, " + node.GetChildCode(0) + ")");
                         }
                         break;
                     case "ASTOPEN":
@@ -4356,6 +4348,15 @@ namespace Gekko.Parser.Gek
             }
         }
 
+        private static void GetCommaCodeFromAllChildren(ASTNode node)
+        {
+            for (int i = 0; i < node.ChildrenCount(); i++)
+            {
+                node.Code.A(node[i].Code);
+                if (i < node.ChildrenCount() - 1) node.Code.A(", ");
+            }
+        }
+
         private static string EmitListLoopingCode(ASTNode node, KeyValuePair<string, string> kvp)
         {
             string nameCs = GetLoopNameCs(node, kvp.Key);
@@ -4440,7 +4441,7 @@ namespace Gekko.Parser.Gek
 
         private static string GetFunctionName(ASTNode node)
         {
-            string functionName = node[0].Text.ToLower();  //no string composition allowed for functions.
+            string functionName = node[0][0].Text.ToLower();  //no string composition allowed for functions, it is simple ident.
             if (functionName == "string") functionName = "tostring";
             return functionName;
         }
