@@ -213,26 +213,26 @@ namespace Gekko
 
         public void AddVariable(TimeSeries ts)
         {             
-            AddVariable(true, null, ts, true);            
+            AddVariable(true, ts, true);            
         }
 
         public void AddVariable(TimeSeries ts, bool variableNameCheck)
         {
-            AddVariable(true, null, ts, variableNameCheck);
+            AddVariable(true, ts, variableNameCheck);
         }
 
-        public void AddVariable(string frequency, TimeSeries ts)
-        {
-            AddVariable(false, frequency, ts, true);
-        }
+        //public void AddVariable(string frequency, TimeSeries ts)
+        //{
+        //    AddVariable(false, frequency, ts, true);
+        //}
 
-        public void AddVariable(string frequency, TimeSeries ts, bool variableNameCheck)
-        {
-            AddVariable(false, frequency, ts, variableNameCheck);
-        }
+        //public void AddVariable(string frequency, TimeSeries ts, bool variableNameCheck)
+        //{
+        //    AddVariable(false, frequency, ts, variableNameCheck);
+        //}
 
         //generic method, not for outside use
-        private void AddVariable(bool freqAddToName, string frequency, TimeSeries ts, bool variableNameCheck)
+        private void AddVariable(bool freqAddToName, TimeSeries ts, bool variableNameCheck)
         {            
             if (this.protect) Program.ProtectError("You cannot add a timeseries to a non-editable databank, see OPEN<edit> or UNLOCK");
             string variable = ts.variableName;
@@ -242,7 +242,7 @@ namespace Gekko
                 throw new GekkoException();
             }
             if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable); 
-            else variable = Program.AddFreqAtEndOfVariableName(variable, frequency);                
+            else variable = Program.AddFreqAtEndOfVariableName(variable, G.GetFreq(ts.freq));                
             this.storage.Add(variable, ts);
             ts.parentDatabank = this;
             this.isDirty = true;

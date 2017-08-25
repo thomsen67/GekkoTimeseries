@@ -31,7 +31,7 @@ namespace Gekko
                 double[] dataArray = ts.GetDataSequence(out i1, out i2, smpl.t1, smpl.t2);                
                 this.storage = dataArray;
                 this.anchorPeriodPositionInArray = ts.anchorPeriodPositionInArray;
-                this.anchorPeriod = new GekkoTime(ts.freqEnum, ts.anchorSuperPeriod, ts.anchorSubPeriod);
+                this.anchorPeriod = new GekkoTime(ts.freq, ts.anchorSuperPeriod, ts.anchorSubPeriod);
             }
             else
             {

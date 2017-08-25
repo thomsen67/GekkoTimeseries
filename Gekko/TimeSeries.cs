@@ -76,13 +76,13 @@ namespace Gekko
         /// Indicates the frequency of the TimeSeries as a string ('a', 'q', 'm', 'u'). 
         /// May become obsolete, please use freqEnum instead.
         /// </summary>
-        [ProtoMember(1)]
-        public string frequency;
-        /// <summary>
-        /// Indicates the frequency of the TimeSeries.
-        /// </summary>
+        //[ProtoMember(1)]
+        //public string frequency;
+        ///// <summary>
+        ///// Indicates the frequency of the TimeSeries.
+        ///// </summary>
         [ProtoMember(2)]
-        public EFreq freqEnum;
+        public EFreq freq;
         /// <summary>
         /// The name of the variable. In a databank, this name corresponds to the key that the TimeSeries is stored under,
         /// except that non-annual frequencies have a '%q' (quarterly), '%m' (monthly) etc. appended to the key, in order
@@ -164,8 +164,7 @@ namespace Gekko
         /// <param name="variableName">The variable name of the timeseries</param>
         public TimeSeries(EFreq frequency, string variableName)
         {
-            this.freqEnum = frequency;
-            this.frequency = G.GetFreq(frequency);
+            this.freq = frequency;            
             this.variableName = variableName;
         }
 
@@ -177,7 +176,7 @@ namespace Gekko
         {
             //DimensionCheck();
             //Always make sure new fields are remembered in the Clone() method
-            TimeSeries tsCopy = new TimeSeries(this.freqEnum, this.variableName);
+            TimeSeries tsCopy = new TimeSeries(this.freq, this.variableName);
             if (this.dataArray == null)
             {
                 tsCopy.dataArray = null;
@@ -309,7 +308,7 @@ namespace Gekko
         public double GetData(GekkoTime t)
         {
             //DimensionCheck();
-            if (this.freqEnum != t.freq)
+            if (this.freq != t.freq)
             {
                 //t.freq will almost always correspond to the frequency setting in Gekko, that is, Program.options.freq.
                 //When getting the timeseries, a "%q" or "%m" is appended to the name, because that is the way other frequencies
@@ -388,7 +387,7 @@ namespace Gekko
             }
             if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             
-            if (this.freqEnum != t.freq)
+            if (this.freq != t.freq)
             {
                 //See comment to GetData()
                 G.Writeln2("*** ERROR: Freq mismatch");
@@ -462,7 +461,7 @@ namespace Gekko
                 return numbers;
             }
 
-            if (this.freqEnum != gt1.freq || gt1.freq != gt2.freq)
+            if (this.freq != gt1.freq || gt1.freq != gt2.freq)
             {
                 //This check: better safe than sorry!
                 //See comment to GetData()
@@ -532,7 +531,7 @@ namespace Gekko
             }
             if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot change observations in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             //Program.ErrorIfDatabanksSwapped(this);
-            if (this.freqEnum != gt1.freq || gt1.freq != gt2.freq)
+            if (this.freq != gt1.freq || gt1.freq != gt2.freq)
             {
                 //This check: better safe than sorry!
                 //See comment to GetData()
@@ -710,9 +709,9 @@ namespace Gekko
             //see also AddToPeriod()
             //DimensionCheck();
             int subPeriods = 1;
-            if (this.freqEnum == EFreq.Quarterly) subPeriods = 4;
-            else if (this.freqEnum == EFreq.Monthly) subPeriods = 12;
-            else if (this.freqEnum == EFreq.Undated) subPeriods = 1;
+            if (this.freq == EFreq.Quarterly) subPeriods = 4;
+            else if (this.freq == EFreq.Monthly) subPeriods = 12;
+            else if (this.freq == EFreq.Undated) subPeriods = 1;
 
             //Calculates the period by means of using the anchor. Uses integer division, so there is an
             //implicit modulo calculation here.
@@ -729,7 +728,7 @@ namespace Gekko
                 resultSuperPer -= 1;
                 resultSubPer += subPeriods;
             }
-            GekkoTime t = new GekkoTime(this.freqEnum, resultSuperPer, resultSubPer);
+            GekkoTime t = new GekkoTime(this.freq, resultSuperPer, resultSubPer);
             return t;
         }
 
@@ -752,7 +751,7 @@ namespace Gekko
         //Not intended for outside use
         private int GetArrayIndex(GekkoTime gt)
         {
-            int rv = FromGekkoTimeToArrayIndex(gt, new GekkoTime(this.freqEnum, this.anchorSuperPeriod, this.anchorSubPeriod), this.anchorPeriodPositionInArray);
+            int rv = FromGekkoTimeToArrayIndex(gt, new GekkoTime(this.freq, this.anchorSuperPeriod, this.anchorSubPeriod), this.anchorPeriodPositionInArray);
             return rv;
         }
 

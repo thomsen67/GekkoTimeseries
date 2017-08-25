@@ -592,7 +592,7 @@ namespace Gekko
             foreach (TimeSeries ts in originalDatabank.storage.Values) 
             {
                 TimeSeries tsCopy = ts.Clone();
-                newDatabank.AddVariable(ts.frequency, tsCopy, false);  //FIXME: what if already there. No variable name check -- just wastes time, and not good regarding GAMS variable names.
+                newDatabank.AddVariable(tsCopy, false);  //FIXME: what if already there. No variable name check -- just wastes time, and not good regarding GAMS variable names.
             }
         }
 

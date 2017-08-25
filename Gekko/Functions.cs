@@ -1764,7 +1764,7 @@ namespace Gekko
             }
             else if (G.equal(s2, "freq"))
             {
-                return new ScalarString(G.GetFreq(ts.freqEnum));
+                return new ScalarString(G.GetFreq(ts.freq));
             }
             else
             {

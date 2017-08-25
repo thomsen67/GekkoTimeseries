@@ -192,10 +192,10 @@ namespace Gekko
                 }
                 foreach (TimeSeries ts in bank.storage.Values)  
                 {
-                    if (ts.freqEnum == EFreq.Annual) a++;
-                    else if (ts.freqEnum == EFreq.Quarterly) q++;
-                    else if (ts.freqEnum == EFreq.Monthly) m++;
-                    else if (ts.freqEnum == EFreq.Undated) u++;                    
+                    if (ts.freq == EFreq.Annual) a++;
+                    else if (ts.freq == EFreq.Quarterly) q++;
+                    else if (ts.freq == EFreq.Monthly) m++;
+                    else if (ts.freq == EFreq.Undated) u++;                    
                 }
                 G.Writeln2("Databank " + bank.aliasName + ":");
                 if (a > 0) G.Writeln("  " + a + " annual timeseries");
@@ -3357,7 +3357,7 @@ namespace Gekko
                 //    ts3 = new TimeSeries(Program.options.freq, lhs);
                 //    Program.databanks.GetPrim().AddVariable(ts3);
                 //}
-                if (ts1.freqEnum != ts2.freqEnum)
+                if (ts1.freq != ts2.freq)
                 {
                     G.Writeln2("*** ERROR: Different freq for the two timerseries");
                     throw new GekkoException();
@@ -3378,7 +3378,7 @@ namespace Gekko
                 GekkoTime t2b = ts2.GetRealDataPeriodLast();
                 if (!date.IsNull())
                 {
-                    if (date.freq != ts1.freqEnum || date.freq != ts2.freqEnum)
+                    if (date.freq != ts1.freq || date.freq != ts2.freq)
                     {
                         G.Writeln2("*** ERROR: Wrong freq for indicated period");
                         throw new GekkoException();
@@ -4794,16 +4794,16 @@ namespace Gekko
                         GekkoTime ddate1 = date1;
                         GekkoTime ddate2 = date2;
 
-                        if (date1.freq == EFreq.Annual && (ts.freqEnum == EFreq.Quarterly || ts.freqEnum == EFreq.Monthly))
+                        if (date1.freq == EFreq.Annual && (ts.freq == EFreq.Quarterly || ts.freq == EFreq.Monthly))
                         {
                             //if a year is used for a quarterly series, q1-q4 is used.
-                            ddate1 = new GekkoTime(ts.freqEnum, date1.super, 1);
+                            ddate1 = new GekkoTime(ts.freq, date1.super, 1);
                             int end = -12345;
-                            if (ts.freqEnum == EFreq.Quarterly)
+                            if (ts.freq == EFreq.Quarterly)
                             {
                                 end = Globals.freqQSubperiods;
                             }
-                            else if (ts.freqEnum == EFreq.Monthly)
+                            else if (ts.freq == EFreq.Monthly)
                             {
                                 end = Globals.freqMSubperiods;
                             }
@@ -4812,10 +4812,10 @@ namespace Gekko
                                 G.Writeln2("*** ERROR: freq error #903853245");
                                 throw new GekkoException();
                             }
-                            ddate2 = new GekkoTime(ts.freqEnum, date1.super, end);
+                            ddate2 = new GekkoTime(ts.freq, date1.super, end);
                         }
 
-                        if (ddate1.freq != ts.freqEnum || ddate2.freq != ts.freqEnum)
+                        if (ddate1.freq != ts.freq || ddate2.freq != ts.freq)
                         {
                             G.Writeln2("*** ERROR: frequency of timeseries and frequency of period(s) do not match");
                             throw new GekkoException();

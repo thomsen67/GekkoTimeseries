@@ -2740,7 +2740,7 @@ namespace Gekko
                             if (nob > 0)
                             {
                                 //ignore if nob < 1. This means that the time limit window is outside the data window 
-                                TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, tsTemp.variableName, tsTemp.freqEnum);
+                                TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, tsTemp.variableName, tsTemp.freq);
                                 int index1;
                                 int index2;
                                 try
@@ -3698,7 +3698,7 @@ namespace Gekko
                 {
                     Program.databanks.GetFirst().RemoveVariable(G.GetFreq(freq), ts.variableName);
                 }
-                Program.databanks.GetFirst().AddVariable(freq, ts);
+                Program.databanks.GetFirst().AddVariable(ts);
             }
 
             for (int j = 0; j < codesCombi.Count; j++)
@@ -3781,7 +3781,7 @@ namespace Gekko
                 {
                     Program.databanks.GetFirst().RemoveVariable(G.GetFreq(freq), ts.variableName);
                 }
-                Program.databanks.GetFirst().AddVariable(freq, ts);
+                Program.databanks.GetFirst().AddVariable(ts);
 
             }
 
@@ -4481,14 +4481,14 @@ namespace Gekko
             string sub1 = "";
             string sub2 = "";
             string freq = "A";
-            if (ts.frequency == "a")
+            if (ts.freq == EFreq.Annual)
             {
                 sub1 = "0101";
                 sub2 = "0101";
             }
             else
             {
-                freq = ts.frequency.ToUpper();
+                freq = G.GetFreq(ts.freq).ToUpper();
                 sub1 = "" + per1.sub;
                 if (sub1.Length == 1) sub1 = "0" + sub1;
                 if (sub1.Length == 0 || sub1.Length >= 3)
@@ -4627,7 +4627,7 @@ namespace Gekko
             string varName = ts.variableName;
             if (isCaps) varName = varName.ToUpper();
 
-            if (!G.equal(ts.frequency, "a"))
+            if (ts.freq == EFreq.Annual)
             {
                 G.Writeln2("*** ERROR: WRITE <tsp> only implemented for annual data");
                 throw new GekkoException();
@@ -13096,23 +13096,9 @@ namespace Gekko
                             else if (type1 == EEndoOrExo.Endo) type = "Endogenous, ";
 
                             string freq = "[unknown frequency]";
-                            if (ts.frequency == "a")
-                            {
-                                freq = "Annual";
-                            }
-                            else if (ts.frequency == "q")
-                            {
-                                freq = "Quarterly";
-                            }
-                            else if (ts.frequency == "m")
-                            {
-                                freq = "Monthly";
-                            }
-                            else if (ts.frequency == "u")
-                            {
-                                freq = "Undated";
-                            }
 
+                            freq = G.GetFreqString(ts.freq);
+                                                        
                             bool noData = ts.IsNullPeriod(); //We are opening up to this possibility of 'empty' data                    
 
                             //GekkoTime first = ts.GetPeriodFirst();
@@ -13124,7 +13110,7 @@ namespace Gekko
                             G.Write(type);
                             string stamp = null;
                             if (ts.stamp != null && ts.stamp != "") stamp = " (updated: " + ts.stamp + ")";
-                            if (ts.frequency == "a" || ts.frequency == "u")
+                            if (ts.freq == EFreq.Annual || ts.freq == EFreq.Undated)
                             {
                                 if (noData || first.super == -12345 || last.super == -12345)
                                 {
@@ -13144,7 +13130,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    G.Writeln(freq + " data from " + first.super + ts.frequency + first.sub + " to " + last.super + ts.frequency + last.sub + stamp);
+                                    G.Writeln(freq + " data from " + first.super + G.GetFreq(ts.freq) + first.sub + " to " + last.super + G.GetFreq(ts.freq) + last.sub + stamp);
                                 }
                             }
 
@@ -13296,7 +13282,7 @@ namespace Gekko
                                 }
 
                                 if (Program.options.freq == EFreq.Annual) G.Write((gt.super) + " ");
-                                else G.Write(gt.super + ts.frequency + gt.sub + " ");
+                                else G.Write(gt.super + G.GetFreq(ts.freq) + gt.sub + " ");
 
                                 double n1 = ts.GetData(gt);
                                 double n0 = ts.GetData(gt.Add(-1));
@@ -19800,7 +19786,7 @@ namespace Gekko
             if (!databank.ContainsVariable(false, varName2))  //a little bit slack, but not much if databank is empty to start with
             {
                 ts = new TimeSeries(frequency, varName);
-                databank.AddVariable(G.GetFreq(frequency), ts);
+                databank.AddVariable(ts);
             }
             else
             {
@@ -19811,7 +19797,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR in findOrCreateTimeSeriesInDataBank(), name");  //safety, can be deleted for speed sometime
                 throw new GekkoException();  //safety, can be deleted for speed sometime
             }
-            if (!(frequency == ts.freqEnum))
+            if (!(frequency == ts.freq))
             {
                 G.Writeln2("*** ERROR in findOrCreateTimeSeriesInDataBank(), freq");  //safety, can be deleted for speed sometime
                 throw new GekkoException();  //safety, can be deleted for speed sometime
@@ -21643,7 +21629,7 @@ namespace Gekko
                 databank1.RemoveVariable(eFreq1, name1);
             }
             ts1 = new TimeSeries(eFreq1, name1);
-            databank1.AddVariable(G.GetFreq(eFreq1), ts1);  //hmmm a mess with all this freq stuff!
+            databank1.AddVariable(ts1);  //hmmm a mess with all this freq stuff!
 
             GekkoTime first = ts0.GetPeriodFirst(); //start of high-freq timeseries
             GekkoTime last = ts0.GetPeriodLast(); //end of high-freq timeseries
@@ -21787,7 +21773,7 @@ namespace Gekko
                 databank1.RemoveVariable(eFreq1, name1);
             }
             ts1 = new TimeSeries(eFreq1, name1);
-            databank1.AddVariable(G.GetFreq(eFreq1), ts1);  //hmmm a mess with all this freq stuff!
+            databank1.AddVariable(ts1);  //hmmm a mess with all this freq stuff!
 
             GekkoTime first = ts0.GetPeriodFirst(); //start of low-freq timeseries
             GekkoTime last = ts0.GetPeriodLast(); //end of low-freq timeseries
