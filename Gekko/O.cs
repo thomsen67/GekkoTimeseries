@@ -472,7 +472,7 @@ namespace Gekko
                         TimeSeries ts = x as TimeSeries;
                         if (ts == null)
                         {
-                            TimeSeriesLight tsl = x as TimeSeriesLight;
+                            TimeSeries tsl = x as TimeSeries;
                             G.Writeln2("SERIES = ");
                             foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
                             {
@@ -733,7 +733,7 @@ namespace Gekko
                             default:
                                 {
                                     TimeSeries ts = GetLeftSideVariable(dbName, varName);
-                                    TimeSeriesLight tsl = (TimeSeriesLight)x;
+                                    TimeSeries tsl = (TimeSeries)x;
                                     foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
                                     {
                                         ts.SetData(t, tsl.GetData(t));
@@ -1537,7 +1537,7 @@ namespace Gekko
                 //When quering Base databank, never use a pointer, and never change a pointer!
                 //The pointers are only for Work databank objects, and only those with simple names.
                 //So matrices will also be covered by that, and they should reside in Work to be fast.
-                TimeSeriesLight ats = GetTimeSeries(smpl, originalName, bankNumber, autoCreate);
+                TimeSeries ats = GetTimeSeries(smpl, originalName, bankNumber, autoCreate);
                 return ats;
             }
             else
@@ -1551,19 +1551,19 @@ namespace Gekko
                 else
                 {
                     //Should not happen too often...                
-                    TimeSeriesLight ats = GetTimeSeries(smpl, originalName, bankNumber, autoCreate);
+                    TimeSeries ats = GetTimeSeries(smpl, originalName, bankNumber, autoCreate);
                     a = ats;  //sets the pointer
                     return ats;
                 }
             }
         }        
 
-        public static TimeSeriesLight GetTimeSeriesFromList(GekkoSmpl smpl, IVariable list, IVariable index, int bankNumber)
+        public static TimeSeries GetTimeSeriesFromList(GekkoSmpl smpl, IVariable list, IVariable index, int bankNumber)
         {
             if (list.Type() == EVariableType.List)
             {
                 ScalarString x = (ScalarString)list.Indexer(smpl, false, new IVariable[] { index });  //will return ScalarString with .isName = true.
-                TimeSeriesLight mts = O.GetTimeSeries(smpl, x._string2, 1);  //always from work....
+                TimeSeries mts = O.GetTimeSeries(smpl, x._string2, 1);  //always from work....
                 return mts;
             }
             else
@@ -1576,12 +1576,12 @@ namespace Gekko
         public static IVariable GetValFromStringIndexer(GekkoSmpl smpl, string name, IVariable index, int bank)
         {
             //Used to pick out a value from a list item, like #m[2][2015], where index=2015
-            TimeSeriesLight mts = O.GetTimeSeries(smpl, name, bank);  //always from work....
+            TimeSeries mts = O.GetTimeSeries(smpl, name, bank);  //always from work....
             IVariable result = O.Indexer(smpl, mts, false, index);
             return result;
         }
 
-        public static TimeSeriesLight GetTimeSeries(GekkoSmpl smpl, string originalName, int bankNumber)
+        public static TimeSeries GetTimeSeries(GekkoSmpl smpl, string originalName, int bankNumber)
         {
             return GetTimeSeries(smpl, originalName, bankNumber, ECreatePossibilities.None);
         }
@@ -1591,11 +1591,11 @@ namespace Gekko
         //    return GetTimeSeries(originalName, bankNumber, ECreatePossibilities.None);
         //}
 
-        public static TimeSeriesLight GetTimeSeries(GekkoSmpl smpl, string originalName, int bankNumber, ECreatePossibilities canAutoCreate)
+        public static TimeSeries GetTimeSeries(GekkoSmpl smpl, string originalName, int bankNumber, ECreatePossibilities canAutoCreate)
         {
             TimeSeries ts = FindTimeSeries(originalName, bankNumber, canAutoCreate);
-            TimeSeriesLight mts = new TimeSeriesLight(smpl, ts);
-            return mts;
+            //TimeSeries mts = new TimeSeries(smpl, ts);
+            return ts;
         }
         
 
@@ -1890,20 +1890,20 @@ namespace Gekko
             return rv;
         }
 
-        public static TimeSeriesLight ConvertToTimeSeriesLight(GekkoSmpl smpl, IVariable x)
+        public static TimeSeries ConvertToTimeSeries(GekkoSmpl smpl, IVariable x)
         {
-            TimeSeriesLight tsl = null;
+            TimeSeries tsl = null;
             switch (x.Type())
             {
                 case EVariableType.TimeSeries:
                     {
-                        tsl = (TimeSeriesLight)x;
+                        tsl = (TimeSeries)x;
                     }
                     break;
                 case EVariableType.Val:
                     {
                         double d = ((ScalarVal)x).val;
-                        tsl = O.CreateTimeSeriesLightFromVal(smpl, d);
+                        tsl = O.CreateTimeSeriesFromVal(smpl, d);
                     }
                     break;
                 case EVariableType.Matrix:
@@ -1923,20 +1923,21 @@ namespace Gekko
             return tsl;
         }
 
-        public static TimeSeriesLight CreateTimeSeriesLightFromVal(GekkoSmpl smpl, double d)
+        public static TimeSeries CreateTimeSeriesFromVal(GekkoSmpl smpl, double d)
         {
-            TimeSeriesLight tsl = new TimeSeriesLight();
-            tsl.storage = new double[GekkoTime.Observations(smpl.t1, smpl.t2)];
-            tsl.anchorPeriod = smpl.t1;
+            TimeSeries tsl = new TimeSeries(smpl.t1.freq, null);
+            tsl.dataArray = new double[GekkoTime.Observations(smpl.t1, smpl.t2)];            
+            tsl.anchorSuperPeriod = smpl.t1.super;
+            tsl.anchorSubPeriod = smpl.t1.sub;
             tsl.anchorPeriodPositionInArray = 0;
-            for (int i = 0; i < tsl.storage.Length; i++)
+            for (int i = 0; i < tsl.dataArray.Length; i++)
             {
-                tsl.storage[i] = d;
+                tsl.dataArray[i] = d;
             }
             return tsl;
         }
 
-        public static TimeSeriesLight CreateTimeSeriesLightFromMatrix(GekkoSmpl smpl, Matrix m)
+        public static TimeSeries CreateTimeSeriesFromMatrix(GekkoSmpl smpl, Matrix m)
         {
             if (m.data.GetLength(1) != 1)
             {
@@ -1954,13 +1955,15 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Expected " + n + " rows in matrix");
                 throw new GekkoException();
             }
-            TimeSeriesLight tsl = new TimeSeriesLight();
-            tsl.storage = new double[n];
-            tsl.anchorPeriod = smpl.t1;
+            TimeSeries tsl = new TimeSeries(smpl.t1.freq, null);
+         
+            tsl.dataArray = new double[n];
+            tsl.anchorSuperPeriod = smpl.t1.super;
+            tsl.anchorSubPeriod = smpl.t1.sub;
             tsl.anchorPeriodPositionInArray = 0;
             for (int i = 0; i < n; i++)
             {
-                tsl.storage[i] = m.data[i, 0];
+                tsl.dataArray[i] = m.data[i, 0];
             }
             return tsl;
         }
@@ -2006,12 +2009,12 @@ namespace Gekko
             return l;
         }
 
-        public static TimeSeriesLight IndirectionHelper(GekkoSmpl smpl, string variable)
+        public static TimeSeries IndirectionHelper(GekkoSmpl smpl, string variable)
         {
             //In that case, we are inside a GENR/PRT implicit time loop                        
             //Code below implicitly calls Program.ExtractBankAndRest and Program.FindOrCreateTimeseries()
             //So stuff in banks down the list will be found in data mode
-            TimeSeriesLight ats = O.GetTimeSeries(smpl, variable, 0);            
+            TimeSeries ats = O.GetTimeSeries(smpl, variable, 0);            
             return ats;
         }        
 
@@ -4633,7 +4636,7 @@ namespace Gekko
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
             public string lhsFunction = null;
             public TimeSeries lhs = null;
-            public TimeSeriesLight rhs = null;
+            public TimeSeries rhs = null;
             public string meta = null;
             public P p = null;
             public void Exe()
@@ -4650,11 +4653,11 @@ namespace Gekko
                     //this.anchorPeriodPositionInArray = 0;
                     //this.anchorPeriod = smpl.t1;
 
-                    int i = TimeSeries.FromGekkoTimeToArrayIndex(this.t1, this.rhs.anchorPeriod, this.rhs.anchorPeriodPositionInArray);
+                    int i = TimeSeries.FromGekkoTimeToArrayIndex(this.t1, new GekkoTime(this.rhs.freq, this.rhs.anchorSubPeriod, this.rhs.anchorSuperPeriod), this.rhs.anchorPeriodPositionInArray);
                     int n = GekkoTime.Observations(this.t1, this.t2);
 
                     //TODO TODO TODO, should not be possible
-                    if (i < 0 || i >= this.rhs.storage.Length)
+                    if (i < 0 || i >= this.rhs.dataArray.Length)
                     {
                         G.Writeln2("*** ERROR: Sample error #9876201872");
                         throw new GekkoException();
@@ -4667,7 +4670,7 @@ namespace Gekko
                         G.Writeln2("*** ERROR: Sample error #9376201872");
                         throw new GekkoException();
                     }
-                    Array.Copy(this.rhs.storage, i, dataArray, index1, n);
+                    Array.Copy(this.rhs.dataArray, i, dataArray, index1, n);
                                        
 
                 }
@@ -5305,8 +5308,8 @@ namespace Gekko
             public class SubElement
             {
                 //Items that are unfolded via lists
-                public TimeSeriesLight tsWork = null;
-                public TimeSeriesLight tsBase = null;
+                public TimeSeries tsWork = null;
+                public TimeSeries tsBase = null;
                 public string label;
             }
         }

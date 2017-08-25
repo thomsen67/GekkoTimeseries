@@ -753,7 +753,7 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            return O.CreateTimeSeriesLightFromMatrix(new GekkoSmpl(gt1, gt2), m);
+            return O.CreateTimeSeriesFromMatrix(new GekkoSmpl(gt1, gt2), m);
 
             //GekkoTime gt1 = Globals.globalPeriodStart;
             //GekkoTime gt2 = Globals.globalPeriodEnd;
@@ -1293,7 +1293,7 @@ namespace Gekko
 
         private static bool IsValOrTimeseries(IVariable x)
         {
-            return x.Type() == EVariableType.Val || x.Type() == EVariableType.TimeSeries || x.Type() == EVariableType.TimeSeriesLight;
+            return x.Type() == EVariableType.Val || x.Type() == EVariableType.TimeSeries || x.Type() == EVariableType.TimeSeries;
         }
 
         public static IVariable pow(GekkoSmpl t, IVariable x1, IVariable x2)
@@ -1311,7 +1311,7 @@ namespace Gekko
 
 
             }
-            else if (x1.Type() == EVariableType.TimeSeriesLight)
+            else if (x1.Type() == EVariableType.TimeSeries)
             {
 
             }

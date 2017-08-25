@@ -304,21 +304,14 @@ namespace Gekko
         }
 
         public double GetVal(GekkoSmpl smpl)
-        {            
-            if (this._isName)
-            {
-                TimeSeriesLight ats = O.IndirectionHelper(smpl, this._string2);
-                double x = O.GetVal(smpl, ats);
-                return x;
-            }
-            else
-            {
-                //Conversion not allowed in for instance VAL x = %s, where s is a STRING pointing to a timeseries.
-                G.Writeln2("*** ERROR: You are trying to extract a numerical value from STRING '" + this._string2 + "'");
-                G.Writeln("           A STRING s ('" + this._string2 + "') can refer to a timeseries name (" + this._string2 + "), but in");
-                G.Writeln("           that case you must use {s} or {%s} instead of %s.");
-                throw new GekkoException();
-            }            
+        {
+
+            //Conversion not allowed in for instance VAL x = %s, where s is a STRING pointing to a timeseries.
+            G.Writeln2("*** ERROR: You are trying to extract a numerical value from STRING '" + this._string2 + "'");
+            G.Writeln("           A STRING s ('" + this._string2 + "') can refer to a timeseries name (" + this._string2 + "), but in");
+            G.Writeln("           that case you must use {s} or {%s} instead of %s.");
+            throw new GekkoException();
+
         }
         
         public string GetString()

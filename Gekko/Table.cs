@@ -1391,7 +1391,7 @@ namespace Gekko
             }
         }
 
-        public void Set(int row, int col, TimeSeriesLight tsWork, TimeSeriesLight tsBase, string varName, GekkoTime tStart, GekkoTime tEnd, string tableGlobalPrintCode, string printcode, double scale, string format)
+        public void Set(int row, int col, TimeSeries tsWork, TimeSeries tsBase, string varName, GekkoTime tStart, GekkoTime tEnd, string tableGlobalPrintCode, string printcode, double scale, string format)
         {
             if (tStart.IsNull() && tEnd.IsNull())
             {
@@ -1721,7 +1721,7 @@ namespace Gekko
             GekkoTime gt2 = G.FromStringToDate(date2);
             _table.Set(_row, col, name, gt1, gt2, printcodes, scale, format);
         }
-        public void SetValues(int col, TimeSeriesLight tsWork, TimeSeriesLight tsBase, string varName, GekkoTime gt1, GekkoTime gt2, string tableGlobalPrintCode, string printcode, double scale, string format)
+        public void SetValues(int col, TimeSeries tsWork, TimeSeries tsBase, string varName, GekkoTime gt1, GekkoTime gt2, string tableGlobalPrintCode, string printcode, double scale, string format)
         {
             //overload
             _table.Set(_row, col, tsWork, tsBase, varName, gt1, gt2, tableGlobalPrintCode, printcode, scale, format);

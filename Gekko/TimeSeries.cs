@@ -732,6 +732,22 @@ namespace Gekko
             return t;
         }
 
+        public static IVariable SmplCheck(GekkoSmpl smpl, IVariable input)
+        {
+            //Checks if the IVariable has data in the smpl range. If not, a GekkoError is returned.
+            //  Else the variable is returned untouched.
+            //If it is a TimeSeries, and the double[] data array is a pointer to the real TimeSeries array,
+            //  this method will never return a GekkoError.
+            if (input.Type() == EVariableType.TimeSeries)
+            {
+                TimeSeries x = (TimeSeries)input;
+                //LIGHTFIXME
+                int ix1, ix2; GekkoError ge; ge = null; //TimeSeries.SpmlCheck(smpl, x, out ix1, out ix2, out ge);
+                if (ge != null) return ge;
+            }
+            return input;
+        }
+
         // -----------------------------------------------------------------------------
         // ----------------- private methods -------------------------------------------
         // -----------------------------------------------------------------------------
@@ -916,7 +932,7 @@ namespace Gekko
 
             if (x.Type() == EVariableType.TimeSeries)
             {
-                TimeSeriesLight tsl = new TimeSeriesLight();
+                TimeSeries tsl = new TimeSeries();
 
                 TimeSeries xx = x as TimeSeries;
                 if (xx != null)
@@ -930,7 +946,7 @@ namespace Gekko
                 }
                 else
                 {
-                    TimeSeriesLight xx2 = x as TimeSeriesLight;
+                    TimeSeries xx2 = x as TimeSeries;
                     int counter = 0;
                     foreach (GekkoTime gt in new GekkoTimeIterator(smpl.t1, smpl.t2))
                     {
@@ -938,8 +954,9 @@ namespace Gekko
                         counter++;
                     }
                 }
-                tsl.storage = data;
-                tsl.anchorPeriod = smpl.t1;
+                tsl.dataArray = data;                
+                tsl.anchorSubPeriod = smpl.t1.sub;
+                tsl.anchorSubPeriod = smpl.t1.super;
                 tsl.anchorPeriodPositionInArray = 0;
                 rv = tsl;            
             }

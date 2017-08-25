@@ -14331,12 +14331,13 @@ namespace Gekko
         {
             //Checks if the IVariable has data in the smpl range. If not, a GekkoError is returned.
             //  Else the variable is returned untouched.
-            //If it is a TimeSeriesLight, and the double[] data array is a pointer to the real TimeSeries array,
+            //If it is a TimeSeries, and the double[] data array is a pointer to the real TimeSeries array,
             //  this method will never return a GekkoError.
             if (input.Type() == EVariableType.TimeSeries)
             {
-                TimeSeriesLight x = (TimeSeriesLight)input;
-                int ix1, ix2; GekkoError ge; TimeSeriesLight.SpmlCheck(smpl, x, out ix1, out ix2, out ge);
+                TimeSeries x = (TimeSeries)input;
+                //LIGHTFIXME
+                int ix1, ix2; GekkoError ge; ge = null; // TimeSeries.SpmlCheck(smpl, x, out ix1, out ix2, out ge);
                 if (ge != null) return ge;
             }
             return input;
@@ -14397,7 +14398,7 @@ namespace Gekko
             smpl.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
             smpl.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
 
-            TimeSeriesLight ts1 = new Gekko.TimeSeriesLight(smpl, ts1_);
+            TimeSeries ts1 = new Gekko.TimeSeries(EFreq.Annual, null);
 
             int deduct = 2;
 
@@ -14450,7 +14451,7 @@ namespace Gekko
                         G.Writeln2("*** ERROR: Expected SERIES or VAL");
                         throw new GekkoException();
                     }
-                    TimeSeriesLight tsl = (TimeSeriesLight)result;
+                    TimeSeries tsl = (TimeSeries)result;
 
 
 
@@ -14506,9 +14507,10 @@ namespace Gekko
 
         private static IVariable Expression1(GekkoSmpl smpl)
         {
-            TimeSeries ts = Program.databanks.GetDatabank("Work").GetVariable("xx");
-            TimeSeriesLight tsl = new TimeSeriesLight(smpl, ts);
-            return Functions.test(smpl, O.Add(smpl, tsl, tsl));
+            //TimeSeries ts = Program.databanks.GetDatabank("Work").GetVariable("xx");
+            //TimeSeries tsl = new TimeSeries(smpl, ts);
+            //return Functions.test(smpl, O.Add(smpl, tsl, tsl));
+            return null;
         }
 
         private static void AddHtmlToExistingHtml(ref string s1, ref string s2, string css, string s)
@@ -22932,8 +22934,8 @@ namespace Gekko
                         {
                             bool filter = timefilter && ShouldFilterPeriod(gt);
 
-                            TimeSeriesLight ts = subPe.tsWork;
-                            TimeSeriesLight tsGrund = subPe.tsBase;
+                            TimeSeries ts = subPe.tsWork;
+                            TimeSeries tsGrund = subPe.tsBase;
 
                             double var1;
                             double varPch;
@@ -26839,7 +26841,7 @@ namespace Gekko
             return;
         }
 
-        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string printCode2, GekkoTime gt, TimeSeriesLight tsWork, TimeSeriesLight tsBase, bool isLogTransform, bool isCalledFromTable)
+        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string printCode2, GekkoTime gt, TimeSeries tsWork, TimeSeries tsBase, bool isLogTransform, bool isCalledFromTable)
         {
             string printCode = printCode2.Trim();  //when it comes from for instance a table
 

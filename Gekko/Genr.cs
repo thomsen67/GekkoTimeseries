@@ -27,7 +27,7 @@ smpl = new GekkoSmpl(o0.t1, o0.t2);
 o0.p = p;
             IVariable xx = O.GetTimeSeries(smpl, O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("xx"))),1, O.ECreatePossibilities.Can);
             //o0.lhs = O.Indexer(smpl, xx, true, xxx);
-o0.rhs = O.ConvertToTimeSeriesLight(smpl, GekkoExpression1(smpl, 1, p));
+o0.rhs = O.ConvertToTimeSeries(smpl, GekkoExpression1(smpl, 1, p));
 o0.Exe();
 
 
