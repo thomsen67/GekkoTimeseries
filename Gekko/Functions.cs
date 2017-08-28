@@ -981,28 +981,45 @@ namespace Gekko
 
         public static IVariable sum(GekkoSmpl t, params IVariable[] items) //uuu
         {
+            IVariable rv = null;
             if (items.Length == 0)
             {
                 G.Writeln2("*** ERROR: sum() function must have > 0 arguments.");
                 throw new GekkoException();
             }
-            double v = 0d;
-            foreach (IVariable a in items)
+
+            if (true)
             {
-                if (a.Type() == EVariableType.List)
+                if (items.Length == 2 && items[0].Type() == EVariableType.List && items[1].Type() == EVariableType.TimeSeries)
                 {
-                    foreach (IVariable iv in ((MetaList)a).GetList())
+
+                }
+            }
+            else
+            {
+
+                G.Writeln2("*** ERROR: sum error");
+                throw new GekkoException();
+
+                double v = 0d;
+                foreach (IVariable a in items)
+                {
+                    if (a.Type() == EVariableType.List)
                     {
-                        string s = O.GetString(iv);
-                        v += O.IndirectionHelper(t, s).GetVal(t);
+                        foreach (IVariable iv in ((MetaList)a).GetList())
+                        {
+                            string s = O.GetString(iv);
+                            v += O.IndirectionHelper(t, s).GetVal(t);
+                        }
+                    }
+                    else
+                    {
+                        v += a.GetVal(t);
                     }
                 }
-                else
-                {
-                    v += a.GetVal(t);
-                }
-            }            
-            return new ScalarVal(v);
+                rv = new ScalarVal(v);
+            }
+            return rv;
         }
 
         public static IVariable avg(GekkoSmpl smpl, params IVariable[] items)//uuu
@@ -1361,7 +1378,7 @@ namespace Gekko
             {
                 TimeSeries ts = (TimeSeries)x;
                 TimeSeries z = new TimeSeries(smpl.t1.freq, null);
-                foreach (GekkoTime gt in G.Iterate(smpl))
+                foreach (GekkoTime gt in smpl.Iterate())
                 {
                     double sum = 0d;
                     for (int i = 0; i < d; i++)   //movsum(x, 2) is m + x[-1], so d is always the number of elements.

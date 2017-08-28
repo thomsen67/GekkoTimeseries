@@ -180,10 +180,7 @@ namespace Gekko.Parser.Gek
         {
             switch (node.Text)
             {
-                case "[":  //indexer
-                case Globals.symbolGlueChar6:  //indexer, '[_['
-                case Globals.symbolGlueChar6a: //indexer, '[_['
-                case Globals.symbolGlueChar7:  //indexer, '[¨['
+                case "ASTINDEXER":  //indexer
                     {
                         found[0] = 1;
                     }
@@ -1613,349 +1610,132 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTFUNCTION":
                         {
+
+
+
+
+                            if (false)
+                            {
+
+                                GekkoSmpl smpl = GekkoSmpl.Global();
+
+                                IVariable temp8 = O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("i", true, false)))));
+                                IVariable temp9 = O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("j", true, false)))));
+
+                                TimeSeries ghost888 = (TimeSeries)O.Lookup(smpl, ((new ScalarString("x", true, false))));
+
+                                TimeSeries temp777 = new TimeSeries(ghost888.freq, null); temp777.SetZero(smpl);                                
+
+                                foreach (IVariable listloop_i5 in new O.GekkoListIterator(temp8))
+                                {
+                                    foreach (IVariable listloop_j5 in new O.GekkoListIterator(temp9))
+                                    {
+                                        IVariable temp999 = O.Indexer(smpl, ghost888, false, listloop_i5, new ScalarString("m"), listloop_j5);
+                                        temp777.InjectAdd(smpl, temp777, temp999);
+                                    }
+                                }
+                            }
+
+
                             string functionName = GetFunctionName(node);
 
                             bool isGamsLikeSumFunction = false;
                             string[] listNames = IsGamsLikeSumFunction1(node, functionName);
                             if (listNames != null) isGamsLikeSumFunction = true;
 
-                            if (isGamsLikeSumFunction)  //functionName is lower case
+                            if (isGamsLikeSumFunction)
                             {
 
-                                if (Program.options.interface_lagfix)
+                                if (true)
                                 {
+                                    StringBuilder sb1 = new StringBuilder();
 
-                                    string lag1Code = null;  //for instance -1
-                                    string lag2Code = null;  //for instance 0
-                                    string code = null;
-
-                                    bool isAvgtOrSumt = false;
-
-                                    switch (functionName)
+                                    //string tempName = "temp" + ++Globals.counter;  //this is the name of the list
+                                    string listName = null;
+                                    if (node.listLoopAnchor == null)
                                     {
-                                        case "sum":                                   
-                                            {
-                                                //must be GAMS-like if we are here
-                                                if (node.ChildrenCount() != 2 + 1)
-                                                {
-                                                    G.Writeln2("*** ERROR: Expected 2 arguments for function " + functionName);
-                                                    throw new GekkoException();
-                                                }
-                                                lag1Code = null;  //not used
-                                                lag2Code = null;  //not used          
-                                                code = node[2].Code.ToString();
-                                            }
-                                            break;
-                                        case "movavg":
-                                        case "movsum":
-                                            {
-
-                                                if (node.ChildrenCount() != 2 + 1)
-                                                {
-                                                    G.Writeln2("*** ERROR: Expected 2 arguments for function " + functionName);
-                                                    throw new GekkoException();
-                                                }
-                                                lag1Code = "(-O.GetInt(" + node[2].Code.ToString() + ") + 1)";  //for instance -4, with movsum(..., 5)
-                                                lag2Code = "0";                                                 //for instance 0, with movsum(..., 5)
-                                                code = node[1].Code.ToString();
-                                            }
-                                            break;
-                                        case "avgt":
-                                        case "sumt":
-                                            {
-                                                isAvgtOrSumt = true;
-                                                if (node.ChildrenCount() != 1 + 1 && node.ChildrenCount() != 1 + 3)
-                                                {
-                                                    G.Writeln2("*** ERROR: Expected 1 or 3 arguments for function " + functionName);
-                                                    throw new GekkoException();
-                                                }
-
-                                                if (node.ChildrenCount() == 1 + 1)
-                                                {
-                                                    lag1Code = "Globals.globalPeriodStart";
-                                                    lag2Code = "Globals.globalPeriodEnd";
-                                                    code = node[1].Code.ToString();
-                                                }
-                                                else
-                                                {
-                                                    lag1Code = node[1].Code.ToString();
-                                                    lag2Code = node[2].Code.ToString();
-                                                    code = node[3].Code.ToString();
-                                                }
-                                            }
-                                            break;
-                                        case "lag":
-                                            {
-                                                if (node.ChildrenCount() != 2 + 1)
-                                                {
-                                                    G.Writeln2("*** ERROR: Expected 2 arguments for function " + functionName);
-                                                    throw new GekkoException();
-                                                }
-                                                lag1Code = "(-O.GetInt(" + node[2].Code.ToString() + "))";  //for instance -4, with lag(..., 4)
-                                                lag2Code = lag1Code;                                       //same
-                                                code = node[1].Code.ToString();
-                                            }
-                                            break;
-                                        case "dif":
-                                        case "diff":
-                                        case "dlog":
-                                        case "pch":
-                                            {
-
-                                                if (node.ChildrenCount() != 1 + 1)
-                                                {
-                                                    G.Writeln2("*** ERROR: Expected 1 argument for function " + functionName);
-                                                    throw new GekkoException();
-                                                }
-                                                lag1Code = "-1";
-                                                lag2Code = "0";
-                                                code = node[1].Code.ToString();
-                                            }
-                                            break;
-
-                                        case "dify":
-                                        case "diffy":
-                                        case "dlogy":
-                                        case "pchy":
-                                            {
-
-                                                if (node.ChildrenCount() != 1 + 1)
-                                                {
-                                                    G.Writeln2("*** ERROR: Expected 1 argument for function " + functionName);
-                                                    throw new GekkoException();
-                                                }
-                                                lag1Code = "(-O.CurrentSubperiods())";  //for instance -4 if freq is quarterly
-                                                lag2Code = "0";
-                                                code = node[1].Code.ToString();
-                                            }
-                                            break;
-
-                                        default:
-                                            {
-                                                G.Writeln2("*** ERROR: Function '" + functionName + "' not expected");
-                                                throw new GekkoException();
-                                            }
-                                            break;
+                                        G.Writeln2("*** ERROR: Internal error #98973422");
+                                        throw new GekkoException();
+                                    }
+                                    
+                                    foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
+                                    {
+                                        string tempName = "O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))))";                                        
+                                        sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(" + tempName + ")) {");
                                     }
 
-                                    W temp = w;
+                                    foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
+                                    {                                        
+                                        sb1.AppendLine("}");
+                                    }
 
-                                    //also remove parent if
-                                    //w.headerCs.AppendLine("public static IVariable helper123(GekkoTime t) { return " + code + ";" + "}");
+                                    node.Code.A(sb1.ToString());
 
-                                    int timeLoopDepth;
-                                    ASTNode parentTimeLoop;
-                                    SearchUpwardsInTree(node, out timeLoopDepth, out parentTimeLoop);
 
-                                    int tCounter = 2 + timeLoopDepth;
+                                    //GekkoSmpl smpl = GekkoSmpl.Global();
+                                    //IVariable temp8 = O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("i", true, false)))));
+                                    //IVariable temp9 = O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("j", true, false)))));
 
+                                    //TimeSeries ghost888 = (TimeSeries)O.Lookup(smpl, ((new ScalarString("x", true, false))));
+
+                                    //TimeSeries temp777 = new TimeSeries(ghost888.freq, null);
+                                    //foreach (GekkoTime t in smpl.Iterate())
+                                    //{
+                                    //    temp777.SetData(t, 0d);
+                                    //}
+
+                                    //foreach (IVariable listloop_i5 in new O.GekkoListIterator(temp8))
+                                    //{
+                                    //    foreach (IVariable listloop_j5 in new O.GekkoListIterator(temp9))
+                                    //    {
+                                    //        IVariable temp999 = O.Indexer(smpl, ghost888, false, listloop_i5, new ScalarString("m"), listloop_j5);
+                                    //        temp777.InjectAdd(smpl, temp777, temp999);
+                                    //    }
+                                    //}
+                                }
+
+                                else
+                                {
                                     string storageName = "storage" + ++Globals.counter;
                                     string counterName = "counter" + ++Globals.counter;
                                     string tempName = "temp" + ++Globals.counter;  //this is the name of the list
 
-
                                     StringBuilder sb1 = new StringBuilder();
-                                    if (isAvgtOrSumt)
+
+                                    sb1.AppendLine("IVariable " + tempName + " = " + node[1].Code.ToString() + ";" + G.NL);
+                                    sb1.AppendLine("double[] " + storageName + " = new double[((MetaList)" + tempName + ").Count()];");
+
+                                    string listName = null;
+                                    if (node.listLoopAnchor == null || node.listLoopAnchor.Count != 1)
                                     {
-                                        sb1.AppendLine("double[] " + storageName + " = new double[Math.Max(0, GekkoTime.Observations(O.GetDate(" + lag1Code + "), O.GetDate(" + lag2Code + ")))];");  //remember lag1 and lag2 are <= 0
-                                    }
-                                    else if (isGamsLikeSumFunction)
-                                    {
-                                        sb1.AppendLine("IVariable " + tempName + " = " + node[1].Code.ToString() + ";" + G.NL);
-                                        sb1.AppendLine("double[] " + storageName + " = new double[((MetaList)" + tempName + ").Count()];");
-                                    }
-                                    else
-                                    {
-                                        sb1.AppendLine("double[] " + storageName + " = new double[" + lag2Code + " - (" + lag1Code + ") + 1];");  //remember lag1 and lag2 are <= 0
-                                    }
-
-                                    sb1.AppendLine("int " + counterName + " = 0;");
-
-                                    sb1.AppendLine("{" + G.NL);  //#5839073458573, necessary when for instance doing sum(#i, ...) + sum(#i, ...). If scope not set, where will be a collision with the GekkoTime t... variable.
-
-                                    if (isAvgtOrSumt)
-                                    {
-                                        sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(O.GetDate(" + lag1Code + "), O.GetDate(" + lag2Code + ")))");
-                                    }
-                                    else if (isGamsLikeSumFunction)
-                                    {                                        
-                                        sb1.AppendLine("GekkoTime t" + tCounter + " = t" + (tCounter - 1) + ";" + G.NL);  //instead of the loop seen in the others. This way, we hook up the t's, even though the t's in this case are artificial                                        
-
-                                        string listName = null;
-                                        if (node.listLoopAnchor == null || node.listLoopAnchor.Count != 1)
-                                        {
-                                            G.Writeln2("*** ERROR: Internal error #98973422");
-                                            throw new GekkoException();
-                                        }
-
-                                        string listCode = null;
-
-                                        foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
-                                        {
-                                            //there is only 1!
-                                            listCode = kvp.Value;
-                                        }
-
-                                        sb1.AppendLine("foreach (IVariable " + listCode + " in new O.GekkoListIterator(" + tempName + "))"); 
-
-                                    }
-                                    else
-                                    {
-                                        sb1.AppendLine("foreach (GekkoTime t" + tCounter + " in new GekkoTimeIterator(t" + (tCounter - 1) + ".Add(" + lag1Code + "), t" + (tCounter - 1) + ".Add(" + lag2Code + ")))");
-                                    }
-                                    sb1.AppendLine("{");  //corresponds to #08745235230
-
-                                    sb1.AppendLine("t = t" + tCounter + ";");  //setting t, cf. #098745345
-                                    
-
-                                    if (node.timeLoopNestCode != null)
-                                    {
-                                        sb1.Append(node.timeLoopNestCode);
-                                    }
-
-                                    sb1.AppendLine("" + storageName + "[" + counterName + "] = O.GetVal(smpl, " + code + ");");
-                                    sb1.AppendLine("" + counterName + "++;");
-
-                                    if (parentTimeLoop != null && !isGamsLikeSumFunction) sb1.AppendLine("t = t" + (tCounter - 1) + ";");  //t may have been set, cf. #098745345, so we are setting it back
-                                    sb1.AppendLine("}");  //corresponds to #08745235230
-                                    sb1.AppendLine("}");  //corresponds to #5839073458573
-
-                                    if (parentTimeLoop == null)
-                                    {
-                                        //if (functionName != "avgt" && functionName != "sumt")
-                                        //{
-                                        G.Writeln2("*** ERROR: Lag function " + functionName + "() intended for SERIES/PRT/PLOT type commands");
-                                        throw new GekkoException();
-                                        //}
-                                        //node.Code.A(sb1.ToString());
-
-                                    }
-                                    else
-                                    {
-                                        parentTimeLoop.timeLoopNestCode += sb1.ToString();
-                                    }
-
-                                    node.Code.A("O.HandleSummations(`" + functionName + "`, " + storageName + ")");
-
-
-                                }
-                                else
-                                {
-                                    //This mega-hack is now switched off per default. Remove all of this at some point.
-                                    if (node.ChildrenCount() > 2)
-                                    {
-                                        G.Writeln2("*** ERROR: Expected 1 argument for " + functionName + "() function");
+                                        G.Writeln2("*** ERROR: Internal error #98973422");
                                         throw new GekkoException();
                                     }
-                                    string code = node[1].Code.ToString();
 
-                                    W temp = w;
+                                    string listCode = null;
 
-                                    //HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA
-                                    //HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA
-                                    //HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA
-                                    //HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA
-                                    //HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA HACK MEGA 
-                                    //How to know if a MetaTimeSeries or ScalarVal gets returned from code here...??
-                                    //Functions. is allowed, for instance dif(log(...))
-                                    if (code.StartsWith("Functions.") || code.StartsWith("O.Add(") || code.StartsWith("O.Divide(") || code.StartsWith("O.Multiply(") || code.StartsWith("O.Negate(") || code.StartsWith("O.Power(") || code.StartsWith("O.Subtract("))
+                                    foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                     {
-
-                                        //w.headerCs.AppendLine("public static IVariable helper123(GekkoTime t) { return " + code + ";" + "}");
-
-                                        //code is for instance:
-                                        //ser y = pch(x + 0);
-                                        // ==> O.Add(ts4, i5, t)
-
-                                        //Do this some more robust way....
-                                        //first one: ___(t___ --> ___(t.Add(-1)___
-                                        //next one: ___, t___ --> ___, t.Add(-1)___
-                                        //string codeLag = code.Replace("(" + Globals.functionT1Cs, "(" + Globals.functionT1Cs + ".Add(-1)");
-                                        //codeLag = codeLag.Replace(", " + Globals.functionT1Cs, ", " + Globals.functionT1Cs + ".Add(-1)");
-
-                                        //first one: ___(t)___ --> ___(t.Add(-1))___
-                                        //first one: ___(t,___ --> ___(t.Add(-1),___
-                                        //next one: ___, t,___ --> ___, t.Add(-1),___
-                                        //next one: ___, t)___ --> ___, t.Add(-1))___
-
-                                        int lag = 1;
-                                        if (G.equal(functionName, "dlogy") || G.equal(functionName, "dify") || G.equal(functionName, "diffy") || G.equal(functionName, "pchy"))
-                                        {
-                                            lag = O.CurrentSubperiods();
-                                        }
-
-                                        string codeLag = code.Replace("(" + Globals.functionT1Cs + ")", "(" + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ")");
-                                        codeLag = codeLag.Replace("(" + Globals.functionT1Cs + ",", "(" + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ",");
-                                        codeLag = codeLag.Replace(", " + Globals.functionT1Cs + ",", ", " + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ",");
-                                        codeLag = codeLag.Replace(", " + Globals.functionT1Cs + ")", ", " + Globals.functionT1Cs + ".Add(-" + lag.ToString() + ")" + ")");
-
-                                        if (functionName == "dlog" || functionName == "dlogy")
-                                        {
-                                            node.Code.A("Functions.log(" + Globals.functionT1Cs + ", " + code + ").Subtract(Functions.log(" + Globals.functionT1Cs + ", " + codeLag + "), " + Globals.functionT1Cs + ")");
-                                        }
-                                        else if (functionName == "dif" || functionName == "diff" || functionName == "dify" || functionName == "diffy")
-                                        {
-                                            node.Code.A("(" + code + ").Subtract(" + codeLag + " ," + Globals.functionT1Cs + ")");
-                                        }
-                                        else if (functionName == "pch" || functionName == "pchy")
-                                        {
-                                            node.Code.A("(" + code + ").Divide(" + codeLag + ", " + Globals.functionT1Cs + ").Subtract(new ScalarVal(1d), " + Globals.functionT1Cs + ").Multiply(new ScalarVal(100d), " + Globals.functionT1Cs + ")");
-                                        }
-                                        else throw new GekkoException();
-
+                                        //there is only 1!
+                                        listCode = kvp.Value;
                                     }
-                                    else
-                                    {
-                                        if (functionName == "dlog")
-                                        {
-                                            node.Code.A("Functions.dlog(" + Globals.functionT1Cs + ", " + code + ")");
-                                        }
-                                        else if (functionName == "dif" || functionName == "diff")
-                                        {
-                                            node.Code.A("Functions.dif(" + Globals.functionT1Cs + ", " + code + ")");
-                                        }
-                                        else if (functionName == "pch")
-                                        {
-                                            node.Code.A("Functions.pch(" + Globals.functionT1Cs + ", " + code + ")");
-                                        }
-                                        else if (functionName == "dlogy")
-                                        {
-                                            node.Code.A("Functions.dlogy(" + Globals.functionT1Cs + ", " + code + ")");
-                                        }
-                                        else if (functionName == "dify" || functionName == "diffy")
-                                        {
-                                            node.Code.A("Functions.dify(" + Globals.functionT1Cs + ", " + code + ")");
-                                        }
-                                        else if (functionName == "pchy")
-                                        {
-                                            node.Code.A("Functions.pchy(" + Globals.functionT1Cs + ", " + code + ")");
-                                        }
-                                    }
+
+                                    sb1.AppendLine("foreach (IVariable " + listCode + " in new O.GekkoListIterator(" + tempName + "))");
+
+                                    sb1.AppendLine("" + storageName + "[" + counterName + "] = " + node[2].Code + ";");
+                                    //sb1.AppendLine("" + counterName + "++;");
+
+                                    //sb1.AppendLine("}");  //corresponds to #08745235230
+                                    //sb1.AppendLine("}");  //corresponds to #5839073458573
+
+                                    sb1.AppendLine("O.HandleSummations(`" + functionName + "`, " + storageName + ")");
+
+                                    node.Code.A(sb1.ToString());
+
                                 }
                             }
-                            else
-                            {
-                                if (Globals.uFunctionStorageCs.ContainsKey(functionName))  //case-insensitive anyway
-                                {
-                                    node.Code.A(Globals.uProc).A(".").A(functionName).A("(").A(Globals.functionP1Cs).A(", ").A(Globals.functionT1Cs).A(", ");
-                                }
-                                else
-                                {
-                                    node.Code.A("Functions." + functionName + "(" + Globals.functionT1Cs + ", ");
-                                }
 
-                                for (int i = 1; i < node.ChildrenCount(); i++)
-                                {
-                                    node.Code.A(node[i].Code);
-                                    if (i < node.ChildrenCount() - 1) node.Code.A(", ");
-                                }
 
-                                if (node.Code.ToString().EndsWith(", "))
-                                {
-                                    node.Code.CA(node.Code.ToString().Substring(0, node.Code.ToString().Length - 2));
-                                }
-                                node.Code.A(")");
-                            }
                         }
                         break;
                     
@@ -2395,12 +2175,42 @@ namespace Gekko.Parser.Gek
                     case "ASTDOTORINDEXER":
                         {
                             //LIGHTFIXME, isRhs
-                            node.Code.A("O.Indexer(smpl, ").A(node[0].Code).A(", ").A("false, ").A(node[1].Code).A(")");
+
+                            string indexes = null;
+                            for (int i = 0; i < node[1].ChildrenCount(); i++)
+                            {
+
+                                ASTNode child = node[1][i];
+
+                                string listName = GetSimpleHashName(child[0]);
+
+                                string internalName = null;
+                                if (listName != null)
+                                {
+                                    ASTNode xx = null; SearchUpwardsInTree2(node, listName, out xx);
+                                    if (xx != null)
+                                    {
+                                        internalName = xx.listLoopAnchor[listName];  //must exist                                        
+                                    }
+                                }
+
+                                if (internalName != null)
+                                {
+                                    indexes += internalName;
+                                }
+                                else
+                                {
+                                    indexes += node[1][i].Code.ToString();
+                                }
+                                if (i < node[1].ChildrenCount() - 1) indexes += ", ";
+                            }
+                            node.Code.A("O.Indexer(smpl, ").A(node[0].Code).A(", ").A("false, ").A(indexes).A(")");
                         }
                         break;
                     case "ASTINDEXER":
                         {
-                            GetCommaCodeFromAllChildren(node);
+                            //handled in ASTDOTORINDEXER
+                            //GetCommaCodeFromAllChildren(node);
                         }
                         break;
                     case "ASTINDEXERELEMENT":  //For ASTINDEXER, see "["
@@ -4346,7 +4156,7 @@ namespace Gekko.Parser.Gek
                 }
                 node.Code.A(Globals.splitSTOP);
             }
-        }
+        }        
 
         private static void GetCommaCodeFromAllChildren(ASTNode node)
         {
@@ -4375,8 +4185,21 @@ namespace Gekko.Parser.Gek
             {
                 if (node.ChildrenCount() == 3)
                 {
-                    rv = new string[1];
-                    rv[0] = GetSimpleHashName(node[1]);
+                    if (node[1].Text == "ASTLISTDEF")
+                    {
+                        //TODO: CHECK types of rv[i], are they all simple #i, #j, ...?
+
+                        rv = new string[node[1].ChildrenCount()];
+                        for (int i = 0; i < node[1].ChildrenCount(); i++)
+                        {
+                            rv[i] = GetSimpleHashName(node[1][i]);
+                        }
+                    }
+                    else
+                    {
+                        rv = new string[1];
+                        rv[0] = GetSimpleHashName(node[1]);
+                    }
                 }
             }
 
@@ -4424,12 +4247,19 @@ namespace Gekko.Parser.Gek
         private static string GetSimpleHashName(ASTNode node)
         {
             string rv = null;
-            if (node != null && node.Text == "ASTHASH")
+            if (node != null && node.Text == "ASTBANKVARNAME")
             {
-                if (node[0].Text == "ASTHASHNAMESIMPLE")
+                if (node.ChildrenCount() == 1 && node[0].Text == "ASTVARNAME")
                 {
-                    rv = node[0][0].Text;
+                    if (node[0][0][0] != null && node[0][0][0].Text == "ASTHASH" && node[0][1][0] != null && node[0][1][0].Text == "ASTNAME" && node[0][2][0] == null)
+                    {
+                        if (node[0][1][0][0].Text == "ASTIDENT")
+                        {
+                            rv = node[0][1][0][0][0].Text;
+                        }
+                    }
                 }
+
             }
             return rv;
         }       
@@ -4479,17 +4309,18 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        private static void SearchUpwardsInTree2(ASTNode node, string listName, out ASTNode parentTimeLoop)
+        private static void SearchUpwardsInTree2(ASTNode node, string listName, out ASTNode parent)
         {            
             ASTNode tmp = node.Parent;
-            parentTimeLoop = null;
+            parent = null;
             while (tmp != null)
             {
                 bool ok = false;
                 if (tmp.listLoopAnchor != null && tmp.listLoopAnchor.ContainsKey(listName)) ok = true;
                 if (ok)
                 {                    
-                    if (parentTimeLoop == null) parentTimeLoop = tmp;  //only first one
+                    parent = tmp;
+                    break;
                 }
                 tmp = tmp.Parent;
             }

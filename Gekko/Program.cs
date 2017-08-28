@@ -77,6 +77,18 @@ namespace Gekko
             this.t1 = t1;
             this.t2 = t2;
         }
+
+        public GekkoTimeIterator Iterate()
+        {
+            return new GekkoTimeIterator(this.t1, this.t2);
+        }
+
+        public static GekkoSmpl Global()
+        {
+            GekkoSmpl smpl = new GekkoSmpl(Globals.globalPeriodStart, Globals.globalPeriodEnd);
+            return smpl;
+        }
+
     }
 
     public class GekkoList<T>

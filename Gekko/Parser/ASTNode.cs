@@ -96,6 +96,7 @@ namespace Gekko.Parser
             else return child.Code;            
         }
         
+
         //Prepares an AST node to have children
         public void CreateChildren(int n) {
             this.children = new List<ASTNode>(n);

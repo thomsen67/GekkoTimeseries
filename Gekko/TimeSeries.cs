@@ -150,7 +150,7 @@ namespace Gekko
         
         private bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf
-
+        
         private TimeSeries()
         {
             //This is ONLY because protobuf-net needs it! 
@@ -174,6 +174,14 @@ namespace Gekko
             //}
             //if (ss.Length == 1) this.variableName = variableName;
             //else this.variableName = ss[0];
+        }
+
+        public void SetZero(GekkoSmpl smpl)
+        {
+            foreach (GekkoTime t in smpl.Iterate())
+            {
+                this.SetData(t, 0d);
+            }
         }
 
         /// <summary>
@@ -944,7 +952,7 @@ namespace Gekko
                 TimeSeries xx = x as TimeSeries;
 
                 //LIGHTFIXME: speedup with arrays
-                foreach (GekkoTime gt in G.Iterate(smpl))
+                foreach (GekkoTime gt in smpl.Iterate())
                 {
                     tsl.SetData(gt, this.GetData(gt) + xx.GetData(gt));
                 }
@@ -981,7 +989,7 @@ namespace Gekko
         public IVariable Negate(GekkoSmpl smpl)
         {
             TimeSeries ts = new TimeSeries(this.freq, null);
-            foreach (GekkoTime t in G.Iterate(smpl))
+            foreach (GekkoTime t in smpl.Iterate())
             {
                 ts.SetData(t, -this.GetData(t));
             }
@@ -1002,7 +1010,7 @@ namespace Gekko
                     //must be a lag
                     //LIGHTFIXME, speed it up... can offset be used????
                     TimeSeries ts = new Gekko.TimeSeries(this.freq, null);
-                    foreach (GekkoTime t in G.Iterate(smpl))
+                    foreach (GekkoTime t in smpl.Iterate())
                     {
                         ts.SetData(t, this.GetData(t.Add(i)));
                     }
@@ -1028,7 +1036,7 @@ namespace Gekko
                 rv = new ScalarVal(d);
             }
             else if (index[0].Type() == EVariableType.String)
-            {                
+            {
                 foreach (IVariable iv in index)
                 {
                     if (iv.Type() != EVariableType.String)
@@ -1066,6 +1074,11 @@ namespace Gekko
                 rv = ts;
 
             }
+            else if (index.Length == 1 && index[0].Type() == EVariableType.List)
+            {
+                //stuff like x[#i]
+
+            }
             else
             {
                 G.Writeln2("Ts error 7");
@@ -1099,7 +1112,18 @@ namespace Gekko
 
         public void InjectAdd(GekkoSmpl smpl, IVariable x, IVariable y)
         {
-            G.Writeln2("Ts error 12");
+            if (x.Type() != EVariableType.TimeSeries || y.Type() != EVariableType.TimeSeries)
+            {
+                G.Writeln2("*** ERROR: Add error (type)");
+                throw new GekkoException();
+            }
+            TimeSeries xx = (TimeSeries)x;
+            TimeSeries yy = (TimeSeries)y;
+
+            foreach (GekkoTime t in smpl.Iterate())
+            {
+                this.SetData(t, xx.GetData(t) + yy.GetData(t));
+            }
             return;
         }
 
