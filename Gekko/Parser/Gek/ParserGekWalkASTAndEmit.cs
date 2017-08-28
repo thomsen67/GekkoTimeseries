@@ -1665,7 +1665,7 @@ namespace Gekko.Parser.Gek
                                         sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false))))))) {");
                                     }
 
-                                    sb1.AppendLine(node[2].Code.ToString() + ";" + G.NL);
+                                    sb1.AppendLine("temp777.InjectAdd(smpl, temp777, " + node[2].Code.ToString() + ");" + G.NL);
 
                                     foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                     {                                        
@@ -1680,13 +1680,6 @@ namespace Gekko.Parser.Gek
 
 
 
-
-
-
-
-
-                                    
-                                                                       
 
                                     //GekkoSmpl smpl = GekkoSmpl.Global();
                                     //IVariable temp8 = O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("i", true, false)))));
