@@ -635,7 +635,7 @@ namespace Gekko
                     Globals.screenOutput.Close();
                 }
 
-                if (track) MessageBox.Show("16.5");
+                if (track) MessageBox.Show("16.5"); 
                 if (File.Exists(Program.options.folder_working + "\\" + "delete_ksajrhdfjdssdj.txt"))
                 {
                     if (track) MessageBox.Show("16.6");
