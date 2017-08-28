@@ -1,5 +1,5 @@
 /*
-    Gekko Timeseries Software (www.t-t.dk/gekko).
+    Gekko Timeseries Software (www.t-t.dk/gekko)..
     Copyright (C) 2016, Thomas Thomsen, T-T Analyse.
 
     This program is free software: you can redistribute it and/or modify
