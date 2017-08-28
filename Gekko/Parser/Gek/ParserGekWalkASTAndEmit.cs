@@ -1657,12 +1657,15 @@ namespace Gekko.Parser.Gek
                                         G.Writeln2("*** ERROR: Internal error #98973422");
                                         throw new GekkoException();
                                     }
-                                    
+
+                                    sb1.AppendLine("TimeSeries temp777 = new TimeSeries(Program.options.freq, null); temp777.SetZero(smpl);" + G.NL);
+
                                     foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
-                                    {
-                                        string tempName = "O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))))";                                        
-                                        sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(" + tempName + ")) {");
+                                    {                                        
+                                        sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false))))))) {");
                                     }
+
+                                    sb1.AppendLine(node[2].Code.ToString() + ";" + G.NL);
 
                                     foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                     {                                        
@@ -1671,6 +1674,19 @@ namespace Gekko.Parser.Gek
 
                                     node.Code.A(sb1.ToString());
 
+
+
+
+
+
+
+
+
+
+
+
+                                    
+                                                                       
 
                                     //GekkoSmpl smpl = GekkoSmpl.Global();
                                     //IVariable temp8 = O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("i", true, false)))));
@@ -2598,8 +2614,12 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                         case "ASTPRINT":
-                        {                            
-                            node.Code.A("O.Print(smpl, (" + node[0].Code + "))").End();   
+                        {
+
+                            node.Code.A(node[0].Code).End();
+                            node.Code.A("O.Print(smpl, temp777)").End();
+
+                            //node.Code.A("O.Print(smpl, (" + node[0].Code + "))").End();   
                         }
                         break;
                     case "ASTVARNAME":
