@@ -1610,141 +1610,79 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTFUNCTION":
                         {
-                            
-
-                            if (false)
+                            string functionName = GetFunctionName(node);                            
+                            string[] listNames = IsGamsLikeSumFunction1(node, functionName);                            
+                            if (listNames == null)
                             {
-
-                                GekkoSmpl smpl = GekkoSmpl.Global();
-
-                                IVariable temp8 = O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("i", true, false)))));
-                                IVariable temp9 = O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("j", true, false)))));
-
-                                TimeSeries ghost888 = (TimeSeries)O.Lookup(smpl, ((new ScalarString("x", true, false))));
-
-                                TimeSeries temp777 = new TimeSeries(ghost888.freq, null); temp777.SetZero(smpl);                                
-
-                                foreach (IVariable listloop_i5 in new O.GekkoListIterator(temp8))
+                                //Not a GAMS-like sum function
+                                if (Globals.uFunctionStorageCs.ContainsKey(functionName))  //case-insensitive anyway
                                 {
-                                    foreach (IVariable listloop_j5 in new O.GekkoListIterator(temp9))
-                                    {
-                                        IVariable temp999 = O.Indexer(smpl, ghost888, false, listloop_i5, new ScalarString("m"), listloop_j5);
-                                        temp777.InjectAdd(smpl, temp777, temp999);
-                                    }
-                                } 
-                            }
-
-
-                            string functionName = GetFunctionName(node);
-
-                            bool isGamsLikeSumFunction = false;
-                            string[] listNames = IsGamsLikeSumFunction1(node, functionName);
-                            if (listNames != null) isGamsLikeSumFunction = true;
-
-                            if (isGamsLikeSumFunction)
-                            {
-
-                                if (true)
-                                {
-                                    string tempName = "temp" + ++Globals.counter;
-
-                                    StringBuilder sb1 = new StringBuilder();
-
-                                    //string tempName = "temp" + ++Globals.counter;  //this is the name of the list
-                                    string listName = null;
-                                    if (node.listLoopAnchor == null)
-                                    {
-                                        G.Writeln2("*** ERROR: Internal error #98973422");
-                                        throw new GekkoException();
-                                    }
-
-                                    sb1.AppendLine("TimeSeries " + tempName + " = new TimeSeries(Program.options.freq, null); " + tempName + ".SetZero(smpl);" + G.NL);
-
-                                    foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
-                                    {                                        
-                                        sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false))))))) {");
-                                    }
-
-                                    sb1.AppendLine(tempName + ".InjectAdd(smpl, " + tempName + ", " + node[2].Code.ToString() + ");" + G.NL);
-
-                                    foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
-                                    {                                        
-                                        sb1.AppendLine("}");
-                                    }
-
-                                    node.Code.A(sb1.ToString());
-
-
-
-
-
-
-
-
-                                    //GekkoSmpl smpl = GekkoSmpl.Global();
-                                    //IVariable temp8 = O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("i", true, false)))));
-                                    //IVariable temp9 = O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("j", true, false)))));
-
-                                    //TimeSeries ghost888 = (TimeSeries)O.Lookup(smpl, ((new ScalarString("x", true, false))));
-
-                                    //TimeSeries temp777 = new TimeSeries(ghost888.freq, null);
-                                    //foreach (GekkoTime t in smpl.Iterate())
-                                    //{
-                                    //    temp777.SetData(t, 0d);
-                                    //}
-
-                                    //foreach (IVariable listloop_i5 in new O.GekkoListIterator(temp8))
-                                    //{
-                                    //    foreach (IVariable listloop_j5 in new O.GekkoListIterator(temp9))
-                                    //    {
-                                    //        IVariable temp999 = O.Indexer(smpl, ghost888, false, listloop_i5, new ScalarString("m"), listloop_j5);
-                                    //        temp777.InjectAdd(smpl, temp777, temp999);
-                                    //    }
-                                    //}
+                                    node.Code.A(Globals.uProc).A(".").A(functionName).A("(").A(Globals.functionP1Cs).A(", ").A(Globals.functionT1Cs).A(", ");
                                 }
-
                                 else
                                 {
-                                    string storageName = "storage" + ++Globals.counter;
-                                    string counterName = "counter" + ++Globals.counter;
-                                    string tempName = "temp" + ++Globals.counter;  //this is the name of the list
-
-                                    StringBuilder sb1 = new StringBuilder();
-
-                                    sb1.AppendLine("IVariable " + tempName + " = " + node[1].Code.ToString() + ";" + G.NL);
-                                    sb1.AppendLine("double[] " + storageName + " = new double[((MetaList)" + tempName + ").Count()];");
-
-                                    string listName = null;
-                                    if (node.listLoopAnchor == null || node.listLoopAnchor.Count != 1)
-                                    {
-                                        G.Writeln2("*** ERROR: Internal error #98973422");
-                                        throw new GekkoException();
-                                    }
-
-                                    string listCode = null;
-
-                                    foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
-                                    {
-                                        //there is only 1!
-                                        listCode = kvp.Value;
-                                    }
-
-                                    sb1.AppendLine("foreach (IVariable " + listCode + " in new O.GekkoListIterator(" + tempName + "))");
-
-                                    sb1.AppendLine("" + storageName + "[" + counterName + "] = " + node[2].Code + ";");
-                                    //sb1.AppendLine("" + counterName + "++;");
-
-                                    //sb1.AppendLine("}");  //corresponds to #08745235230
-                                    //sb1.AppendLine("}");  //corresponds to #5839073458573
-
-                                    sb1.AppendLine("O.HandleSummations(`" + functionName + "`, " + storageName + ")");
-
-                                    node.Code.A(sb1.ToString());
-
+                                    node.Code.A("Functions." + functionName + "(" + Globals.functionT1Cs + ", ");
                                 }
+
+                                for (int i = 1; i < node.ChildrenCount(); i++)
+                                {
+                                    node.Code.A(node[i].Code);
+                                    if (i < node.ChildrenCount() - 1) node.Code.A(", ");
+                                }
+
+                                if (node.Code.ToString().EndsWith(", "))
+                                {
+                                    node.Code.CA(node.Code.ToString().Substring(0, node.Code.ToString().Length - 2));
+                                }
+                                node.Code.A(")");
                             }
+                            else
+                            {
+                                //GAMS-like sum function, for instance sum(#i, x[#i])
+
+                                string parentListLoopVars1 = null;
+                                string parentListLoopVars2 = null;
+
+                                ASTNode node2 = node;
+                                while (true)
+                                {
+                                    node2 = node2.Parent;
+                                    if (node2 == null) break;
+                                    if (node2.listLoopAnchor != null)
+                                    {
+                                        foreach (KeyValuePair<string, string> kvp in node2.listLoopAnchor)
+                                        {
+                                            parentListLoopVars1 += ", IVariable " + kvp.Value;
+                                            parentListLoopVars2 += ", " + kvp.Value;
+                                        }
+                                    }
+                                }
 
 
+                                string tempName = "temp" + ++Globals.counter;
+                                StringBuilder sb1 = new StringBuilder();                                
+                                string listName = null;
+                                if (node.listLoopAnchor == null)
+                                {
+                                    G.Writeln2("*** ERROR: Internal error #98973422");
+                                    throw new GekkoException();
+                                }
+                                sb1.AppendLine("public static IVariable " + tempName + "(GekkoSmpl smpl" + parentListLoopVars1 + ") {");
+                                sb1.AppendLine("TimeSeries " + tempName + " = new TimeSeries(Program.options.freq, null); " + tempName + ".SetZero(smpl);" + G.NL);
+                                foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
+                                {
+                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false))))))) {");
+                                }
+                                sb1.AppendLine(tempName + ".InjectAdd(smpl, " + tempName + ", " + node[2].Code.ToString() + ");" + G.NL);
+                                foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
+                                {
+                                    sb1.AppendLine("}");
+                                }
+                                sb1.AppendLine("return " + tempName + ";" + G.NL);
+                                sb1.AppendLine("}");  //method def
+                                w.headerCs.Append(sb1);
+                                node.Code.A(tempName + "(smpl" + parentListLoopVars2 + ")");  //functionname may be for instance temp27(smpl)
+                            }
                         }
                         break;
                     
@@ -2609,10 +2547,10 @@ namespace Gekko.Parser.Gek
                         case "ASTPRINT":
                         {
 
-                            node.Code.A(node[0].Code).End();
-                            node.Code.A("O.Print(smpl, temp777)").End();
+                            //node.Code.A(node[0].Code).End();
+                            //node.Code.A("O.Print(smpl, temp777)").End();
 
-                            //node.Code.A("O.Print(smpl, (" + node[0].Code + "))").End();   
+                            node.Code.A("O.Print(smpl, (" + node[0].Code + "))").End();   
                         }
                         break;
                     case "ASTVARNAME":

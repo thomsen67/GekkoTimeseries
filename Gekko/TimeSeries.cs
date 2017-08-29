@@ -1125,7 +1125,12 @@ namespace Gekko
 
         public void InjectAdd(GekkoSmpl smpl, IVariable x, IVariable y)
         {
+
+
             
+
+
+
 
             if (x.Type() == EVariableType.TimeSeries && y.Type() == EVariableType.TimeSeries)
             {

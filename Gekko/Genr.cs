@@ -9,26 +9,38 @@ namespace Gekko
 public class TranslatedCode
 {
 public static GekkoTime globalGekkoTimeIterator = Globals.tNull;
-public static readonly ScalarVal i1 = new ScalarVal(5d);
+public static IVariable temp17(GekkoSmpl smpl, IVariable listloop_j15) {
+TimeSeries temp17 = new TimeSeries(Program.options.freq, null); temp17.SetZero(smpl);
+
+foreach (IVariable listloop_i16 in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("i", true, false))))))) {
+temp17.InjectAdd(smpl, temp17, O.Indexer(smpl, O.Lookup(smpl, ((new ScalarString("x", true, false)))), false, listloop_i16, new ScalarString(@"m")
+, listloop_j15));
+
+}
+return temp17;
+
+}
+public static IVariable temp18(GekkoSmpl smpl) {
+TimeSeries temp18 = new TimeSeries(Program.options.freq, null); temp18.SetZero(smpl);
+
+foreach (IVariable listloop_j15 in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("j", true, false))))))) {
+temp18.InjectAdd(smpl, temp18, temp17(smpl, null));
+
+}
+return temp18;
+
+}
 public static void ClearTS(P p) {
 }
 public static void ClearScalar(P p) {
 }
 public static void C0(P p) {
 
-GekkoSmpl smpl = null;
+GekkoSmpl smpl = O.Smpl();
 
 
 p.SetText(@"¤1");
-smpl = null;O.Series o0 = new O.Series();
-o0.t1 = Globals.globalPeriodStart;o0.t2 = Globals.globalPeriodEnd;
-smpl = new GekkoSmpl(o0.t1, o0.t2);
-            IVariable xxx = new ScalarString(@"a");
-o0.p = p;
-            IVariable xx = O.GetTimeSeries(smpl, O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("xx"))),1, O.ECreatePossibilities.Can);
-            //o0.lhs = O.Indexer(smpl, xx, true, xxx);
-o0.rhs = O.ConvertToTimeSeries(smpl, GekkoExpression1(smpl, 1, p));
-o0.Exe();
+O.Print(smpl, (temp18(smpl)));
 
 
 
@@ -36,13 +48,9 @@ o0.Exe();
 }
 
 
-public static IVariable GekkoExpression1(GekkoSmpl smpl, int bankNumber, P p) {
-
-return i1;
-}
 public static void CodeLines(P p)
 {
-GekkoSmpl smpl = null;
+GekkoSmpl smpl = O.Smpl();
 
 C0(p);
 
