@@ -224,7 +224,12 @@ namespace Gekko
                 G.Writeln("           Did you forget []-brackets to pick out an observation, for instance x[2020]?");
                 throw new GekkoException();
             }
-            return this.ts.GetData(t.Add(this.offset));
+            double d = this.ts.GetData(t.Add(this.offset));
+            if (Program.options.series_array_ignoremissing && !this.ts.IsTimeless() && this.ts.variableName != null && this.ts.variableName.Contains(Globals.symbolTurtle))
+            {
+                if (double.IsNaN(d)) d = 0d;
+            }
+            return d;
         }
 
         public string GetString()

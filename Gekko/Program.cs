@@ -6215,8 +6215,10 @@ namespace Gekko
             TimeSeries ts;
             if (Program.options.series_array_ignoremissing && variable.Contains(Globals.symbolTurtle))
             {
-                //ignore if array-series does not exist (normal) and ignore if variable does not exist (table)
+                //ignore if array-series does not exist (normal) and ignore if variable does not exist (table)                
                 ts = new TimeSeries(Program.options.freq, "temp_timeseries_not_to_be_used_array");
+                ts.SetTimeless();
+                ts.SetTimelessData(0d);
             }
             else if (Program.options.table_ignoremissingvars && O.isTableCall)
             {

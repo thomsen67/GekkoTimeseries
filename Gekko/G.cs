@@ -695,7 +695,15 @@ namespace Gekko
                     if (i <= 0) return s;
                     string s1 = s.Substring(0, i);
                     string s2 = s.Substring(i + Globals.symbolTurtle.Length, s.Length - (i + Globals.symbolTurtle.Length));
-                    return s1 + "[" + PrettifyTimeseriesHash(s2, false, false) + "]";
+
+                    string s3 = PrettifyTimeseriesHash(s2, false, false);
+
+                    string[] ss = s3.Split(new string[] { "<LAGINDICATOR>" }, StringSplitOptions.None);
+                    if (ss.Length == 1) return s1 + "[" + s3 + "]";
+                    else
+                    {
+                        return s1 + "[" + ss[0] + "'][-" + ss[1].Substring(0, ss[1].Length - 1) + "]";
+                    }
                 }
                 else return "'" + s.Replace(Globals.symbolTurtle, "', '") + "'";
             }

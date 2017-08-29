@@ -36,8 +36,31 @@ namespace Gekko
                     int ival = O.GetInt(index);
                     if (ival < 0)
                     {
-                        G.Writeln2("*** ERROR: Illegal element access [" + ival + "]: negative number not allowed");
-                        throw new GekkoException();
+                        //HACK here!
+                        bool ok = true;
+                        for (int i = 0; i < this.list.Count; i++)
+                        {
+                            if (!this.list[i].Contains(Globals.symbolTurtle))
+                            {
+                                ok = false;
+                                break;
+                            }
+                        }
+
+                        if (ok)
+                        {
+                            for (int i = 0; i < this.list.Count; i++)
+                            {
+                                this.list[i] += "<LAGINDICATOR>" + (-ival);
+                            }
+                            return this;
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: Illegal element access [" + ival + "]: negative number not allowed");
+                            throw new GekkoException();
+                        }
+                        
                     }
                     else if (ival == 0)
                     {
