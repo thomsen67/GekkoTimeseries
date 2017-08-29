@@ -154,7 +154,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Add(GekkoSmpl t, IVariable x)
+        public IVariable Add(GekkoSmpl smpl, IVariable x)
         {
             switch (x.Type())
             {
@@ -169,10 +169,15 @@ namespace Gekko
                     }
                 case EVariableType.TimeSeries:
                     {
-                        //LIGHTFIXME
-                        return null;
+                        TimeSeries tsl = new TimeSeries(smpl.t1.freq, null);
+                        TimeSeries xx = x as TimeSeries;                                                
+                        foreach (GekkoTime t in smpl.Iterate())
+                        {
+                            tsl.SetData(t, this.val + xx.GetData(t));
+                        }
+                        return tsl;
                     }
-                case EVariableType.String:                
+                case EVariableType.String:
                     {
                         return Operators.StringVal.Add((ScalarString)x, this, true);
                     }
@@ -185,8 +190,8 @@ namespace Gekko
                     {
                         G.Writeln2("*** ERROR: Memory variable conversion error.");
                         throw new GekkoException();
-                    }                    
-            }            
+                    }
+            }
         }
 
         public IVariable Subtract(GekkoSmpl t, IVariable x)

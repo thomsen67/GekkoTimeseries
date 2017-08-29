@@ -956,7 +956,20 @@ namespace Gekko
                 {
                     tsl.SetData(gt, this.GetData(gt) + xx.GetData(gt));
                 }
-                
+
+                rv = tsl;
+            }
+            else if (x.Type() == EVariableType.Val)
+            {
+                TimeSeries tsl = new TimeSeries();
+                ScalarVal xx = x as ScalarVal;
+
+                //LIGHTFIXME: speedup with arrays
+                foreach (GekkoTime gt in smpl.Iterate())
+                {
+                    tsl.SetData(gt, this.GetData(gt) + xx.val);
+                }
+
                 rv = tsl;
             }
             return rv;
@@ -1112,17 +1125,33 @@ namespace Gekko
 
         public void InjectAdd(GekkoSmpl smpl, IVariable x, IVariable y)
         {
-            if (x.Type() != EVariableType.TimeSeries || y.Type() != EVariableType.TimeSeries)
-            {
-                G.Writeln2("*** ERROR: Add error (type)");
-                throw new GekkoException();
-            }
-            TimeSeries xx = (TimeSeries)x;
-            TimeSeries yy = (TimeSeries)y;
+            
 
-            foreach (GekkoTime t in smpl.Iterate())
+            if (x.Type() == EVariableType.TimeSeries && y.Type() == EVariableType.TimeSeries)
             {
-                this.SetData(t, xx.GetData(t) + yy.GetData(t));
+                foreach (GekkoTime t in smpl.Iterate())
+                {
+                    this.SetData(t, ((TimeSeries)x).GetData(t) + ((TimeSeries)y).GetData(t));
+                }
+            }
+            else if (x.Type() == EVariableType.Val && y.Type() == EVariableType.TimeSeries)
+            {
+                foreach (GekkoTime t in smpl.Iterate())
+                {
+                    this.SetData(t, ((ScalarVal)x).val + ((TimeSeries)y).GetData(t));
+                }
+            }
+            else if (x.Type() == EVariableType.TimeSeries && y.Type() == EVariableType.Val)
+            {
+                foreach (GekkoTime t in smpl.Iterate())
+                {
+                    this.SetData(t, ((TimeSeries)x).GetData(t) + ((ScalarVal)y).val);
+                }
+            }
+            else
+            {
+                G.Writeln("*** ERROR: Variables are of wrong type for summation");
+                throw new GekkoException();
             }
             return;
         }

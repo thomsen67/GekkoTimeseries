@@ -1610,9 +1610,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTFUNCTION":
                         {
-
-
-
+                            
 
                             if (false)
                             {
@@ -1648,6 +1646,8 @@ namespace Gekko.Parser.Gek
 
                                 if (true)
                                 {
+                                    string tempName = "temp" + ++Globals.counter;
+
                                     StringBuilder sb1 = new StringBuilder();
 
                                     //string tempName = "temp" + ++Globals.counter;  //this is the name of the list
@@ -1658,14 +1658,14 @@ namespace Gekko.Parser.Gek
                                         throw new GekkoException();
                                     }
 
-                                    sb1.AppendLine("TimeSeries temp777 = new TimeSeries(Program.options.freq, null); temp777.SetZero(smpl);" + G.NL);
+                                    sb1.AppendLine("TimeSeries " + tempName + " = new TimeSeries(Program.options.freq, null); " + tempName + ".SetZero(smpl);" + G.NL);
 
                                     foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                     {                                        
                                         sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false))))))) {");
                                     }
 
-                                    sb1.AppendLine("temp777.InjectAdd(smpl, temp777, " + node[2].Code.ToString() + ");" + G.NL);
+                                    sb1.AppendLine(tempName + ".InjectAdd(smpl, " + tempName + ", " + node[2].Code.ToString() + ");" + G.NL);
 
                                     foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                     {                                        
