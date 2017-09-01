@@ -482,10 +482,10 @@ namespace Gekko
                                         TimeSeries ts = iv as TimeSeries;
                                         G.Write("    " + ts.GetData(t));
                                     }
-                                    else if (iv.Type() == EVariableType.TimeSeries)
+                                    else if (iv.Type() == EVariableType.Val)
                                     {
-                                        TimeSeries ts = iv as TimeSeries;
-                                        G.Write("    " + ts.GetData(t));
+                                        ScalarVal sv = iv as ScalarVal;
+                                        G.Write("    " + sv.val);
                                     }
                                     else
                                     {

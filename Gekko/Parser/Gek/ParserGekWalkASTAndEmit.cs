@@ -182,7 +182,28 @@ namespace Gekko.Parser.Gek
             {
                 case "ASTINDEXER":  //indexer
                     {
-                        found[0] = 1;
+                        //ASTINDEXERELEMENT, x[#i] or x['a', #i]
+                        string s = null;
+                        for (int i = 0; i < node.ChildrenCount(); i++)
+                        {
+                            try
+                            {
+                                s = node[i][0][0][0][0].Text;
+                            }
+                            catch { };                            
+                        }
+                        if (s == "ASTHASH") found[0] = 1;
+                    }
+                    break;
+                case "ASTCURLY":  //indexer, x{#i}
+                    {                        
+                        string s = null;
+                        try
+                        {
+                            s = node[0][0][0][0].Text;
+                        }
+                        catch { };
+                        if (s == "ASTHASH") found[0] = 1;
                     }
                     break;
             }
@@ -883,8 +904,28 @@ namespace Gekko.Parser.Gek
                             break;
                         }
                     case "ASTCURLY":
-                        {
-                            node.Code.CA(node[0].Code);
+                        {                           
+                            
+                            string listName = GetSimpleHashName(node[0]);
+                            string internalName = null;
+                            if (listName != null)
+                            {
+                                ASTNode xx = null; SearchUpwardsInTree2(node, listName, out xx);
+                                if (xx != null)
+                                {
+                                    internalName = xx.listLoopAnchor[listName];  //must exist                                        
+                                }
+                            }
+
+                            if (internalName != null)
+                            {
+                                node.Code.CA(internalName);
+                            }
+                            else
+                            {
+                                node.Code.CA(node[0].Code);
+                            }
+                            
                         }
                         break;
                     case "ASTCURLYSIMPLE":
@@ -2145,11 +2186,9 @@ namespace Gekko.Parser.Gek
                             string indexes = null;
                             for (int i = 0; i < node[1].ChildrenCount(); i++)
                             {
-
                                 ASTNode child = node[1][i];
 
                                 string listName = GetSimpleHashName(child[0]);
-
                                 string internalName = null;
                                 if (listName != null)
                                 {
