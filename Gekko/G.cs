@@ -596,6 +596,13 @@ namespace Gekko
             }
         }
 
+        public static string RemoveFreqIndicator(string s)
+        {
+            int i = s.LastIndexOf(Globals.symbolTilde);
+            if (i < 0) return s;
+            return s.Substring(0, s.Length - i - 1);
+        }
+
         public static string ReplaceFirstOccurrence(string original, string oldValue, string newValue)
         {
             if (String.IsNullOrEmpty(original))

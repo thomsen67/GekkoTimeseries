@@ -6,56 +6,63 @@ using System.Drawing;
 using Gekko.Parser;
 namespace Gekko
 {
-public class TranslatedCode
-{
-public static GekkoTime globalGekkoTimeIterator = Globals.tNull;
-public static IVariable temp17(GekkoSmpl smpl, IVariable listloop_j15) {
-TimeSeries temp17 = new TimeSeries(Program.options.freq, null); temp17.SetZero(smpl);
+    public class TranslatedCode
+    {
+        public static GekkoTime globalGekkoTimeIterator = Globals.tNull;
+        public static IVariable temp7_XXX(GekkoSmpl smpl)
+        {
+            TimeSeries temp7 = new TimeSeries(Program.options.freq, null); temp7.SetZero(smpl);
 
-foreach (IVariable listloop_i16 in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("i", true, false))))))) {
-temp17.InjectAdd(smpl, temp17, O.Indexer(smpl, O.Lookup(smpl, ((new ScalarString("x", true, false)))), false, listloop_i16, new ScalarString(@"m")
-, listloop_j15));
+            foreach (IVariable listloop_i6 in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("i", true, false)))))))
+            {
+                temp7.InjectAdd(smpl, temp7, O.Add(smpl, O.Indexer(smpl, O.Lookup(smpl, ((new ScalarString("x", true, false)))), false, listloop_i6), O.Indexer(smpl, O.Lookup(smpl, ((new ScalarString("x", true, false)))), false, listloop_i6)));
 
-}
-return temp17;
+            }
+            return temp7;
 
-}
-public static IVariable temp18(GekkoSmpl smpl) {
-TimeSeries temp18 = new TimeSeries(Program.options.freq, null); temp18.SetZero(smpl);
+        }
 
-foreach (IVariable listloop_j15 in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("j", true, false))))))) {
-temp18.InjectAdd(smpl, temp18, temp17(smpl, null));
+        public static IVariable temp7(GekkoSmpl smpl)
+        {
+            MetaList temp7 = new MetaList();
+            
+            foreach (IVariable listloop_i6 in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("i", true, false)))))))
+            {
+                temp7.Add(O.Add(smpl, O.Indexer(smpl, O.Lookup(smpl, ((new ScalarString("x", true, false)))), false, listloop_i6), O.Indexer(smpl, O.Lookup(smpl, ((new ScalarString("x", true, false)))), false, listloop_i6)));
+            }
+            return temp7;
 
-}
-return temp18;
+        }
 
-}
-public static void ClearTS(P p) {
-}
-public static void ClearScalar(P p) {
-}
-public static void C0(P p) {
+        public static void ClearTS(P p)
+        {
+        }
+        public static void ClearScalar(P p)
+        {
+        }
+        public static void C0(P p)
+        {
 
-GekkoSmpl smpl = O.Smpl();
-
-
-p.SetText(@"¤1");
-O.Print(smpl, (temp18(smpl)));
-
-
-
-
-}
+            GekkoSmpl smpl = O.Smpl();
 
 
-public static void CodeLines(P p)
-{
-GekkoSmpl smpl = O.Smpl();
-
-C0(p);
+            p.SetText(@"¤1");
+            O.Print(smpl, (temp7(smpl)));
 
 
 
-}
-}
+
+        }
+
+
+        public static void CodeLines(P p)
+        {
+            GekkoSmpl smpl = O.Smpl();
+
+            C0(p);
+
+
+
+        }
+    }
 }

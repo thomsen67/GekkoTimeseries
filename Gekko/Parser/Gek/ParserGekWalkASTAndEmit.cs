@@ -268,8 +268,7 @@ namespace Gekko.Parser.Gek
                 case "ASTFUNCTION":  //kind of like ASTFUNCTIONDEF, but the difference is that these sum() functions may be nested, so the nodes themselves need to keep the anchor info
                     {
                         string functionName = GetFunctionName(node);
-                        string[] listNames = IsGamsLikeSumFunction1(node, functionName);
-                        //if (listNames != null) HandleGamsLikeSumFunction(listNames, true, w, null);                        
+                        string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionName);                                              
                         if (listNames != null)
                         {
                             if (node.listLoopAnchor == null) node.listLoopAnchor = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -277,7 +276,7 @@ namespace Gekko.Parser.Gek
                             {
                                 if (node.listLoopAnchor.ContainsKey(s))
                                 {
-                                    G.Writeln2("*** ERROR: The list " + Globals.symbolList + s + " is used several times for multidimensional looping in sum() function");
+                                    G.Writeln2("*** ERROR: The list " + Globals.symbolList + s + " is used several times for multidimensional looping in sum() or unfold() function");
                                     throw new GekkoException();
                                 }
                                 node.listLoopAnchor.Add(s, "listloop_" + s + ++Globals.counter);
@@ -1611,10 +1610,76 @@ namespace Gekko.Parser.Gek
                     case "ASTFUNCTION":
                         {
                             string functionName = GetFunctionName(node);                            
-                            string[] listNames = IsGamsLikeSumFunction1(node, functionName);                            
-                            if (listNames == null)
+                            string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionName);  //also checks that the name is "sum"
+
+                            if (listNames != null)
                             {
-                                //Not a GAMS-like sum function
+                                //GAMS-like sum function, for instance sum(#i, x[#i]+1),
+                                //or unfold()-function, for instance unfold(#i, x[#i]+1)
+
+                                string parentListLoopVars1 = null;
+                                string parentListLoopVars2 = null;
+
+                                ASTNode node2 = node;
+                                while (true)
+                                {
+                                    node2 = node2.Parent;
+                                    if (node2 == null) break;
+                                    if (node2.listLoopAnchor != null)
+                                    {
+                                        foreach (KeyValuePair<string, string> kvp in node2.listLoopAnchor)
+                                        {
+                                            parentListLoopVars1 += ", IVariable " + kvp.Value;
+                                            parentListLoopVars2 += ", " + kvp.Value;
+                                        }
+                                    }
+                                }
+
+                                string tempName = "temp" + ++Globals.counter;
+                                StringBuilder sb1 = new StringBuilder();
+                                string listName = null;
+                                if (node.listLoopAnchor == null)
+                                {
+                                    G.Writeln2("*** ERROR: Internal error #98973422");
+                                    throw new GekkoException();
+                                }
+                                //method def:
+                                sb1.AppendLine("public static IVariable " + tempName + "(GekkoSmpl smpl" + parentListLoopVars1 + ") {");
+                                if (G.equal(functionName, "sum"))
+                                {
+                                    sb1.AppendLine("TimeSeries " + tempName + " = new TimeSeries(Program.options.freq, null); " + tempName + ".SetZero(smpl);" + G.NL);
+                                }
+                                else
+                                {
+                                    sb1.AppendLine("MetaList " + tempName + " = new MetaList();" + G.NL);
+                                }
+                                foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
+                                {
+                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false))))))) {");
+                                }
+
+                                if (G.equal(functionName, "sum"))
+                                {
+                                    sb1.AppendLine(tempName + ".InjectAdd(smpl, " + tempName + ", " + node[2].Code.ToString() + ");" + G.NL);
+                                }
+                                else
+                                {
+                                    sb1.AppendLine(tempName + ".Add(" + node[2].Code.ToString() + ");" + G.NL);
+                                }
+
+                                foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
+                                {
+                                    sb1.AppendLine("}");
+                                }
+                                sb1.AppendLine("return " + tempName + ";" + G.NL);
+                                sb1.AppendLine("}");  //method def
+                                w.headerCs.Append(sb1);
+                                node.Code.A(tempName + "(smpl" + parentListLoopVars2 + ")");  //functionname may be for instance temp27(smpl)
+
+                            }
+                            else
+                            {
+                                //Not a GAMS-like sum function, or unfold()
                                 if (Globals.uFunctionStorageCs.ContainsKey(functionName))  //case-insensitive anyway
                                 {
                                     node.Code.A(Globals.uProc).A(".").A(functionName).A("(").A(Globals.functionP1Cs).A(", ").A(Globals.functionT1Cs).A(", ");
@@ -1636,53 +1701,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 node.Code.A(")");
                             }
-                            else
-                            {
-                                //GAMS-like sum function, for instance sum(#i, x[#i])
-
-                                string parentListLoopVars1 = null;
-                                string parentListLoopVars2 = null;
-
-                                ASTNode node2 = node;
-                                while (true)
-                                {
-                                    node2 = node2.Parent;
-                                    if (node2 == null) break;
-                                    if (node2.listLoopAnchor != null)
-                                    {
-                                        foreach (KeyValuePair<string, string> kvp in node2.listLoopAnchor)
-                                        {
-                                            parentListLoopVars1 += ", IVariable " + kvp.Value;
-                                            parentListLoopVars2 += ", " + kvp.Value;
-                                        }
-                                    }
-                                }
-
-
-                                string tempName = "temp" + ++Globals.counter;
-                                StringBuilder sb1 = new StringBuilder();                                
-                                string listName = null;
-                                if (node.listLoopAnchor == null)
-                                {
-                                    G.Writeln2("*** ERROR: Internal error #98973422");
-                                    throw new GekkoException();
-                                }
-                                sb1.AppendLine("public static IVariable " + tempName + "(GekkoSmpl smpl" + parentListLoopVars1 + ") {");
-                                sb1.AppendLine("TimeSeries " + tempName + " = new TimeSeries(Program.options.freq, null); " + tempName + ".SetZero(smpl);" + G.NL);
-                                foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
-                                {
-                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false))))))) {");
-                                }
-                                sb1.AppendLine(tempName + ".InjectAdd(smpl, " + tempName + ", " + node[2].Code.ToString() + ");" + G.NL);
-                                foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
-                                {
-                                    sb1.AppendLine("}");
-                                }
-                                sb1.AppendLine("return " + tempName + ";" + G.NL);
-                                sb1.AppendLine("}");  //method def
-                                w.headerCs.Append(sb1);
-                                node.Code.A(tempName + "(smpl" + parentListLoopVars2 + ")");  //functionname may be for instance temp27(smpl)
-                            }
+                            
                         }
                         break;
                     
@@ -4125,14 +4144,33 @@ namespace Gekko.Parser.Gek
             return nodeCode;
         }
 
-        private static string[] IsGamsLikeSumFunction1(ASTNode node, string functionName)
+        private static string[] IsGamsSumFunctionOrUnfoldFunction(ASTNode node, string functionName)
         {
             //returns null if it is NOT a GAMS-like sum() function
             string[] rv = null;
-            string firstArgumentListName = null;
-            //firstArgIsOneOrMoreLists = false;
-            bool isGamsLikeSumFunction = false;
-            if (functionName == "sum")
+            if (G.equal(functionName, "sum") || G.equal(functionName, "unfold")) rv = GetListnames(node);
+
+            if (rv == null)
+            {
+                //success, do nothing
+            }
+            else
+            {                
+                if (G.equal(functionName, "sum)"))
+                {
+                    //extra check, this may be, for instance, sum(#i, x) or sum(#i, #j) --> these are not GAMS-like sums
+                    int[] found = new int[1];
+                    WalkASTToCheckSumFunction(node[2], found);
+                    if (found[0] == 0) rv = null;  
+                }
+            }
+            return rv;
+        }
+
+        private static string[] GetListnames(ASTNode node)
+        {
+            string[] rv = null;
+            if (true)
             {
                 if (node.ChildrenCount() == 3)
                 {
@@ -4154,16 +4192,6 @@ namespace Gekko.Parser.Gek
                 }
             }
 
-            if (rv == null)
-            {
-                //do nothing
-            }
-            else
-            {
-                int[] found = new int[1];
-                WalkASTToCheckSumFunction(node[2], found);
-                if (found[0] == 0) rv = null;  //this may be, for instance, sum(#i, x) or sum(#i, #j) --> these are not GAMS-like sums
-            }
             return rv;
         }
 
@@ -4193,7 +4221,7 @@ namespace Gekko.Parser.Gek
 
         //}
 
-        
+
 
         private static string GetSimpleHashName(ASTNode node)
         {

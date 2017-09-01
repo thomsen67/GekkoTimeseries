@@ -15,6 +15,11 @@ namespace Gekko
 
         public List<IVariable> list = null;
 
+        public MetaList()
+        {
+            this.list = new List<IVariable>();
+        }
+
         public MetaList(List<IVariable> list)
         {
             this.list = list;
@@ -28,6 +33,14 @@ namespace Gekko
                 m.Add(new ScalarString(s));
             }
             this.list = m;
+        }
+
+        //!!!This has nothing to do #m1+#m2 etc., see Add(GekkoSmpl t, IVariable x) instead.
+        //   This method is just to avoid x.list.Add(...)
+        public void Add(IVariable x)
+        {
+            if (this.list == null) this.list = new List<IVariable>();
+            this.list.Add(x);
         }
 
         public int Count()

@@ -439,6 +439,12 @@ namespace Gekko
 
         public static void Print(GekkoSmpl smpl, IVariable x)
         {
+            if (x == null)
+            {
+                G.Writeln2("*** ERROR: Print of null object");
+                throw new GekkoException();
+            }
+
             switch (x.Type())
             {
                 case EVariableType.Val:
@@ -461,9 +467,41 @@ namespace Gekko
                     break;
                 case EVariableType.List:
                     {
-                        List<string> l = O.GetStringList(x);
-                        G.Writeln2("LIST = ");
-                        foreach (string s in l) G.Writeln(s);
+                        MetaList m = x as MetaList;
+
+                        if (m.list[0].Type() == EVariableType.TimeSeries || m.list[0].Type() == EVariableType.Val)
+                        {
+                            //List of values
+                            foreach (GekkoTime t in smpl.Iterate())
+                            {
+                                G.Write(t.ToString());
+                                foreach (IVariable iv in m.list)
+                                {
+                                    if (iv.Type() == EVariableType.TimeSeries)
+                                    {
+                                        TimeSeries ts = iv as TimeSeries;
+                                        G.Write("    " + ts.GetData(t));
+                                    }
+                                    else if (iv.Type() == EVariableType.TimeSeries)
+                                    {
+                                        TimeSeries ts = iv as TimeSeries;
+                                        G.Write("    " + ts.GetData(t));
+                                    }
+                                    else
+                                    {
+                                        G.Writeln2("*** ERROR: Type error 3243");
+                                    }                                    
+                                }
+                                G.Writeln();
+                                //
+                            }
+                        }
+                        else
+                        {
+                            List<string> l = O.GetStringList(x);
+                            G.Writeln2("LIST = ");
+                            foreach (string s in l) G.Writeln(s);
+                        }
                     }
                     break;
 
