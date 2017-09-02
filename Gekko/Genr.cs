@@ -9,19 +9,26 @@ namespace Gekko
     public class TranslatedCode
     {
         public static GekkoTime globalGekkoTimeIterator = Globals.tNull;
-        public static void FunctionDef3()
+        public static readonly ScalarVal i7 = new ScalarVal(12345d);
+        public static void FunctionDef8()
         {
 
 
             //[[splitSTOP]]
-                        
-            Globals.ufunctions1.Add("f", (GekkoSmpl smpl, IVariable i1) => { G.Writeln2("HEJSAN"); return null; });
+
+            Globals.ufunctions1.Add("f", (GekkoSmpl smpl, IVariable i1) =>
+            {
+                O.Print(smpl, (i7));
+
+                ; return null;
+            });
 
 
             //[[splitSTART]]
 
         }
 
+        public static readonly ScalarVal i9 = new ScalarVal(100d);
         public static void ClearTS(P p)
         {
         }
@@ -34,11 +41,27 @@ namespace Gekko
             GekkoSmpl smpl = O.Smpl();
 
 
-            p.SetText(@"¤1");
-            FunctionDef3();
+            p.SetText(@"¤0");
+            O.Reset o0 = new O.Reset();
+            o0.p = p; o0.Exe();
 
-            IVariable z1 = Globals.ufunctions1["f"](null, new ScalarVal(10));
-            
+
+
+
+            p.SetText(@"¤2");
+            FunctionDef8();
+
+
+
+
+
+            p.SetText(@"¤0");
+            O.Assignment(smpl, ((O.scalarStringPercent).Add(smpl, (new ScalarString("v", true, false))))
+            , Globals.ufunctions1["f"](smpl, i9));
+
+
+
+
         }
 
 

@@ -1214,25 +1214,18 @@ namespace Gekko.Parser.Gek
                     case "ASTRETURN":
                         {
                             node.Code.A(Globals.splitSTOP);
-
-                            if (w.uFunctionsHelper == null)
+                            if (true)
                             {
                                 if (node.ChildrenCount() > 0)
-                                {
-                                    G.Writeln2("*** ERROR: RETURN with values only allowed inside FUNCTION");
-                                    throw new GekkoException();
+                                {                                    
+                                    node.Code.A("return " + node[0].Code + ";" + G.NL);
                                 }
                                 else
                                 {
                                     //#9807235423 return problem, should it be return true?? C1(), C2(), ...
                                     node.Code.A("return;" + G.NL);  //probably the node[0].Code is always empty here (should be)
                                 }
-                            }
-                            else
-                            {
-                                node.Code.A("return (" + G.GetVariableType(w.uFunctionsHelper.lhsTypes.Count) + ")(" + node[0].Code + ");" + G.NL);
-                            }
-                            
+                            }                                                        
                             node.Code.A(Globals.splitSTART);
                         }
                         break;
@@ -1506,12 +1499,14 @@ namespace Gekko.Parser.Gek
                             
                             string internalName = "FunctionDef" + ++Globals.counter;
 
+                            GetCodeFromAllChildren(node[3]);  //it is a placeholder node that does not get code
+
                             sb.AppendLine(internalName + "();" + G.NL);
 
                             string vars = null; for (int i = 0; i < numberOfArguments; i++) vars += ", IVariable i" + (i + 1);
                             w.headerCs.AppendLine("public static void " + internalName + "() {" + G.NL);
                             w.headerCs.AppendLine(Globals.splitSTOP);
-                            w.headerCs.AppendLine("Globals.ufunctions" + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl smpl" + vars + ") => { G.Writeln2(`HEJSAN`); return null; });" + G.NL);
+                            w.headerCs.AppendLine("Globals.ufunctions" + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl smpl" + vars + ") => { " + node[3].Code.ToString() + " ; return null; });" + G.NL);
                             w.headerCs.AppendLine(Globals.splitSTART);
                             w.headerCs.AppendLine("}" + G.NL);
 

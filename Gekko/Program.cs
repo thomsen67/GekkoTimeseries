@@ -19933,10 +19933,22 @@ namespace Gekko
             //Program.lists.Clear();
             //Program.macros.Clear();
             Globals.commandMemory = new CommandMemory();  //these commands are only remembered up to last clearing of workspace
-            //Globals.prtCsSnippets.Clear();  //just to save ram  --> can induce bugs
-            //Globals.prtCsSnippetsHeaders.Clear(); //just to save ram --> can induce bugs
+                                                          //Globals.prtCsSnippets.Clear();  //just to save ram  --> can induce bugs
+                                                          //Globals.prtCsSnippetsHeaders.Clear(); //just to save ram --> can induce bugs
 
             //Globals.uFunctionStorageCs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);  //resetting user functions
+
+            //User functions: more can be added if necessary, or users can use LIST or DICT.
+            Globals.ufunctions1 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable>>();
+            Globals.ufunctions2 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable>>();
+            Globals.ufunctions3 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable>>();
+            Globals.ufunctions4 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+            Globals.ufunctions5 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+            Globals.ufunctions6 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+            Globals.ufunctions7 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+            Globals.ufunctions8 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+            Globals.ufunctions9 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+            Globals.ufunctions10 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
 
             Program.model = null; Program.unfoldedVariableList = null;
             Globals.modelFileName = "";

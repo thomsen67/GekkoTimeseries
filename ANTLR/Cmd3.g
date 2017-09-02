@@ -56,6 +56,7 @@ tokens {
 	ASTDOUBLE;
 	ASTDOLLARCONDITIONALVARIABLE;
 	ASTPRINT;
+	ASTFUNCTIONARGNAME;
 
 	ASTNAME;
 ASTNAME;
@@ -98,7 +99,8 @@ ASTIFOPERATOR7;
 ASTCOMPARE2;
 ASTRUN;
 ASTFUNCTIONDEF2;
-
+ASTRESET;
+ASTRETURN;
 
 	AND              = 'and';
 	NOT              = 'not';
@@ -107,7 +109,8 @@ ASTFUNCTIONDEF2;
 	P              = 'p';
 	RUN            = 'run';
 	VAL = 'val'; STRING = 'string'; DATE = 'date'; SERIES = 'series'; LIST = 'list'; DICT = 'dict'; MATRIX = 'matrix'; FUNCTION = 'function'; END = 'end';
-
+	RESET = 'reset';
+	RETURN2 = 'return';
 	LISTFILE = 'LISTFILE';
 }
 
@@ -144,16 +147,18 @@ ASTFUNCTIONDEF2;
 
 //expr                      : expression (SEMICOLON|NEWLINE2|NEWLINE3)* EOF;  //EOF is necessary in order to force the whole file to be parsed
 
-expr                      : expressions EOF;  //EOF is necessary in order to force the whole file to be parsed
+start                      : statements EOF;  //EOF is necessary in order to force the whole file to be parsed
 
-expressions               : expr2*;
+statements               : statements2*;
 
-expr2                     :
+statements2                     :
                             SEMICOLON -> //stray semicolon is ok, nothing is written
                           | assignment           SEMICOLON!
 						  | print                SEMICOLON!
-						  | run
-						  | functionDef
+						  | run                  SEMICOLON!
+						  | functionDef          SEMICOLON!
+						  | reset                SEMICOLON!
+						  | return2               SEMICOLON!
 						  ;
 
 assignment				  : leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression);
@@ -303,6 +308,8 @@ varname                   : nameOrCname freq? -> ^(ASTVARNAME ^(ASTPLACEHOLDER) 
 
 bankvarname               : (name COLON)? varname -> ^(ASTBANKVARNAME name? varname);
 
+functionArgName           : sigil? ident -> ^(ASTFUNCTIONARGNAME ^(ASTPLACEHOLDER sigil?) ident);
+
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- name END -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
@@ -354,9 +361,13 @@ print					  : P expression -> ^(ASTPRINT expression);
 
 run						  : RUN -> ^(ASTRUN);
 
-functionDef				  : FUNCTION type ident leftParenGlue functionArg? RIGHTPAREN SEMICOLON functionExpressions END -> ^(ASTFUNCTIONDEF2 type ident functionArg functionExpressions);
-functionArg               : (type expression (',' type expression)*)? -> ^(ASTPLACEHOLDER expression*);
-functionExpressions       : expressions -> ^(ASTPLACEHOLDER expressions);
+reset					  : RESET -> ^(ASTRESET);
+
+return2                    : RETURN2 expression -> ^({token("ASTRETURN", ASTRETURN, $RETURN2.Line)} expression); //used in functions
+
+functionDef				  : FUNCTION type ident leftParenGlue functionArg? RIGHTPAREN SEMICOLON functionStatements END -> ^(ASTFUNCTIONDEF2 type ident functionArg functionStatements);
+functionArg               : (type functionArgName (',' type functionArgName)*)? -> ^(ASTPLACEHOLDER functionArgName*);
+functionStatements       : statements2* -> ^(ASTPLACEHOLDER statements2*);
 type					  : VAL | STRING | DATE | SERIES | LIST | DICT | MATRIX ;
 
 // ------------------------------------------------------------------------------------------------------------------

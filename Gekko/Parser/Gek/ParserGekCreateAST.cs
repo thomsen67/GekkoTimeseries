@@ -46,11 +46,11 @@ namespace Gekko.Parser.Gek
             // Create a parser attached to the token stream
             parser3 = new Cmd3Parser(tokens3);
             // Invoke the program rule in get return value
-            Cmd3Parser.expr_return r3 = null;
+            Cmd3Parser.start_return r3 = null;
 
             try
             {
-                r3 = parser3.expr();
+                r3 = parser3.start();
             }
             catch (Exception e)
             {
@@ -265,11 +265,11 @@ namespace Gekko.Parser.Gek
                 // Create a parser attached to the token stream
                 parser3 = new Cmd3Parser(tokens3);
                 // Invoke the program rule in get return value
-                Cmd3Parser.expr_return r3 = null;
+                Cmd3Parser.start_return r3 = null;
 
                 try
                 {
-                    r3 = parser3.expr();
+                    r3 = parser3.start();
                 }
                 catch (Exception e)
                 {
