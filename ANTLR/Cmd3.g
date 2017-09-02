@@ -96,6 +96,8 @@ ASTIFOPERATOR;
 ASTIFOPERATOR6;
 ASTIFOPERATOR7;
 ASTCOMPARE2;
+ASTRUN;
+ASTFUNCTIONDEF2;
 
 
 	AND              = 'and';
@@ -103,6 +105,9 @@ ASTCOMPARE2;
 	OR              = 'or';
 	IN             = 'in';
 	P              = 'p';
+	RUN            = 'run';
+	VAL = 'val'; STRING = 'string'; DATE = 'date'; SERIES = 'series'; LIST = 'list'; DICT = 'dict'; MATRIX = 'matrix'; FUNCTION = 'function'; END = 'end';
+
 	LISTFILE = 'LISTFILE';
 }
 
@@ -147,6 +152,8 @@ expr2                     :
                             SEMICOLON -> //stray semicolon is ok, nothing is written
                           | assignment           SEMICOLON!
 						  | print                SEMICOLON!
+						  | run
+						  | functionDef
 						  ;
 
 assignment				  : leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression);
@@ -236,10 +243,12 @@ matrixCol                 : leftBracketNoGlue matrixRow (doubleVerticalBar matri
 matrixRow                 : expression (',' expression)*  -> ^(ASTMATRIXROW expression+);
 
 						  //trailing ',' is allowed, for instance ('a', 'b', ). This is Python style: ('a',) will then be a lists, not just a.
-list                      : leftParenNoGlue expression ',' listHelper RIGHTPAREN -> ^(ASTLISTDEF expression listHelper);
+list                      : leftParenNoGlue expression ',' listHelper RIGHTPAREN -> ^(ASTLISTDEF expression listHelper)
+                          | leftParenNoGlue expression ',' RIGHTPAREN -> ^(ASTLISTDEF expression)
+						  ;
 listHelper                : listHelper1 | listHelper2;
 listHelper1               : (expression ',')* expression -> expression+;
-listHelper2               : (expression ',')* -> expression*;
+listHelper2               : (expression ',')+ -> expression+;
 
 //FIXME
 //FIXME
@@ -343,9 +352,19 @@ ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
 
 print					  : P expression -> ^(ASTPRINT expression);
 
+run						  : RUN -> ^(ASTRUN);
+
+functionDef				  : FUNCTION type ident leftParenGlue functionArg? RIGHTPAREN SEMICOLON functionExpressions END -> ^(ASTFUNCTIONDEF2 type ident functionArg functionExpressions);
+functionArg               : (type expression (',' type expression)*)? -> ^(ASTPLACEHOLDER expression*);
+functionExpressions       : expressions -> ^(ASTPLACEHOLDER expressions);
+type					  : VAL | STRING | DATE | SERIES | LIST | DICT | MATRIX ;
+
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- logical END -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
+
+// Semi parser stuff here
+// ------------------------------------
 
 leftParen                 : (GLUE!)? LEFTPAREN;
 leftParenGlue             : GLUE! LEFTPAREN;

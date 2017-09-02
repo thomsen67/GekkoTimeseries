@@ -76,6 +76,18 @@ namespace Gekko
         public static string splitSTOP = G.NL + splitSTOP2 + G.NL;
         public static string functionParameterCode = "param_";
 
+        //User functions: more can be added if necessary, or users can use LIST or DICT.
+        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable>> ufunctions1 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable>> ufunctions2 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable>> ufunctions3 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions4 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions5 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions6 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions7 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions8 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions9 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions10 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+
         public static string databankformatUrl = @"www.t-t.dk/gekko/databankformat";
 
         public static System.Windows.Forms.Form mFrmDummyHost = new System.Windows.Forms.Form();

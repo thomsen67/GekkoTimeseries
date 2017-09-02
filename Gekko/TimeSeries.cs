@@ -1053,24 +1053,19 @@ namespace Gekko
             else
             {
                 //Not x[2] or x[2020q1]
-
-                int listCount = 0;
+                                
                 int stringCount = 0;
                 foreach (IVariable iv in indexes)
                 {
-                    if (iv.Type() == EVariableType.List)
-                    {
-                        listCount++;
-                    }
-                    else if (iv.Type() == EVariableType.String)
+                    if (iv.Type() == EVariableType.String)
                     {
                         stringCount++;
                     }
                 }
-                if ((listCount > 0 || stringCount > 0) && indexes.Length == listCount + stringCount)
+                if (indexes.Length == stringCount)
                 {
                     string s = G.RemoveFreqIndicator(this.variableName);
-                    if (listCount == 0)
+                    if (true)
                     {                        
                         string hash = GetHashCodeFromIvariables(indexes);
                         string varname = s + Globals.symbolTurtle + hash + Globals.symbolTilde + G.GetFreq(this.freq);
@@ -1081,64 +1076,7 @@ namespace Gekko
                             throw new GekkoException();
                         }
                         rv = ts;
-                    }
-                    else
-                    {
-                        if (listCount == 1)
-                        {
-                            MetaList rv2 = new MetaList(new List<IVariable>());
-                            int ii = -12345;
-                            int i = -1;
-                            foreach (IVariable iv in indexes)
-                            {
-                                i++;
-                                if (iv.Type() == EVariableType.List)
-                                {
-                                    ii = i;
-                                }                                                     
-                            }
-                            
-                            List<IVariable> l = ((MetaList)indexes[ii]).list;
-                            foreach (IVariable l2 in l)
-                            {
-                                string vname = null;
-                                ScalarString ss = l2 as ScalarString;
-                                if (ss == null) G.Writeln2("*** ERROR: Loop type");
-                                int i3 = -1;
-                                foreach (IVariable iv in indexes)
-                                {
-                                    i3++;
-                                    string turtle = null;
-                                    if (i3 < indexes.Length - 1) turtle = Globals.symbolTurtle;
-                                    
-                                    if (i3 == ii)
-                                    {
-                                        vname += ss._string2 + turtle;
-                                    }
-                                    else
-                                    {
-                                        ScalarString ss4 = iv as ScalarString;
-                                        if (ss4 == null) G.Writeln2("*** ERROR: Loop type");  //not possible
-                                        vname += ss4._string2 + turtle;
-                                    }
-                                }
-                                string varname = s + Globals.symbolTurtle + vname + Globals.symbolTilde + G.GetFreq(this.freq);
-                                TimeSeries ts = this.parentDatabank.GetVariable(varname);
-                                if (ts == null)
-                                {
-                                    G.Writeln2("*** ERROR: Could not find " + G.PrettifyTimeseriesHash(varname, true, false));
-                                    throw new GekkoException();
-                                }
-                                rv2.list.Add(ts);
-                                
-                            }
-                            return rv2;
-
-
-                        }
-                        else G.Writeln2("***ERROR: list recursion!");
-
-                    }
+                    }                    
                 }
                 else
                 {
@@ -1148,27 +1086,9 @@ namespace Gekko
                         s += iv.Type().ToString() + ", ";
                     }
                     G.Writeln2("*** ERROR: Timeseries []-index with these argument types: " + s.Substring(0, s.Length - (", ").Length));
+                    throw new GekkoException();
                 }
-            }
-            //else if (index[0].Type() == EVariableType.String)
-            //{
-            //    foreach (IVariable iv in index)
-            //    {
-            //        if (iv.Type() != EVariableType.String)
-            //        {
-            //            G.Writeln2("*** ERROR: SERIES indexer with combined strings and non-strings");
-            //            throw new GekkoException();
-            //        }
-            //    }
-            //    string hash = GetHashCodeFromIvariables(index);
-            //    if (this.variableName == null)
-            //    {
-            //        G.Writeln2("*** ERROR: SERIES string indexer on expression not allowed");
-            //        throw new GekkoException();
-            //    }
-
-            //    
-                                    
+            }                                  
             
             return rv;
         }

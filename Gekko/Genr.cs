@@ -9,28 +9,16 @@ namespace Gekko
     public class TranslatedCode
     {
         public static GekkoTime globalGekkoTimeIterator = Globals.tNull;
-        public static IVariable temp7_XXX(GekkoSmpl smpl)
+        public static void FunctionDef3()
         {
-            TimeSeries temp7 = new TimeSeries(Program.options.freq, null); temp7.SetZero(smpl);
 
-            foreach (IVariable listloop_i6 in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("i", true, false)))))))
-            {
-                temp7.InjectAdd(smpl, temp7, O.Add(smpl, O.Indexer(smpl, O.Lookup(smpl, ((new ScalarString("x", true, false)))), false, listloop_i6), O.Indexer(smpl, O.Lookup(smpl, ((new ScalarString("x", true, false)))), false, listloop_i6)));
 
-            }
-            return temp7;
+            //[[splitSTOP]]
+                        
+            Globals.ufunctions1.Add("f", (GekkoSmpl smpl, IVariable i1) => { G.Writeln2("HEJSAN"); return null; });
 
-        }
 
-        public static IVariable temp7(GekkoSmpl smpl)
-        {
-            MetaList temp7 = new MetaList();
-            
-            foreach (IVariable listloop_i6 in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString("i", true, false)))))))
-            {
-                temp7.Add(O.Add(smpl, O.Indexer(smpl, O.Lookup(smpl, ((new ScalarString("x", true, false)))), false, listloop_i6), O.Indexer(smpl, O.Lookup(smpl, ((new ScalarString("x", true, false)))), false, listloop_i6)));
-            }
-            return temp7;
+            //[[splitSTART]]
 
         }
 
@@ -47,11 +35,10 @@ namespace Gekko
 
 
             p.SetText(@"¤1");
-            O.Print(smpl, (temp7(smpl)));
+            FunctionDef3();
 
-
-
-
+            IVariable z1 = Globals.ufunctions1["f"](null, new ScalarVal(10));
+            
         }
 
 

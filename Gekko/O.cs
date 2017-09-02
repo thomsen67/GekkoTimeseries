@@ -3787,7 +3787,8 @@ namespace Gekko
             public P p = null;
             public void Exe()
             {
-                Program.Run(this.fileName, this.p);
+                if (Globals.runningOnTTComputer) Program.Run("tt.gcm", this.p);
+                else Program.Run(this.fileName, this.p);
             }
         }
 

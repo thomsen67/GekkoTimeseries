@@ -1496,6 +1496,39 @@ namespace Gekko.Parser.Gek
                             node.Code.A(Globals.splitSTART);
                         }
                         break;
+                    case "ASTFUNCTIONDEF2":
+                        {
+                            StringBuilder sb = new StringBuilder();
+                            
+                            string returnTypeLower = node[0].Text.ToLower();
+                            string functionNameLower = node[1][0].Text.ToLower();
+                            int numberOfArguments = node[2].ChildrenCount();
+                            
+                            string internalName = "FunctionDef" + ++Globals.counter;
+
+                            sb.AppendLine(internalName + "();" + G.NL);
+
+                            string vars = null; for (int i = 0; i < numberOfArguments; i++) vars += ", IVariable i" + (i + 1);
+                            w.headerCs.AppendLine("public static void " + internalName + "() {" + G.NL);
+                            w.headerCs.AppendLine(Globals.splitSTOP);
+                            w.headerCs.AppendLine("Globals.ufunctions" + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl smpl" + vars + ") => { G.Writeln2(`HEJSAN`); return null; });" + G.NL);
+                            w.headerCs.AppendLine(Globals.splitSTART);
+                            w.headerCs.AppendLine("}" + G.NL);
+
+                            if (false)
+                            {
+                                sb.AppendLine("{");                                
+                                GetCodeFromAllChildren(node[3]);  //it is a placeholder node that does not get code
+                                sb.AppendLine(node[3].Code.ToString());
+                                sb.AppendLine("}");
+                            }
+                            node.Code.A(sb.ToString());
+                            
+
+                        }
+                        break;
+
+
                     case "ASTFUNCTIONDEF":
                         {
                             //NOTE: Splitting
@@ -1650,8 +1683,8 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTFUNCTION":
                         {
-                            string functionName = GetFunctionName(node);                            
-                            string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionName);  //also checks that the name is "sum"
+                            string functionNameLower = GetFunctionName(node);                            
+                            string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionNameLower);  //also checks that the name is "sum"
 
                             if (listNames != null)
                             {
@@ -1686,7 +1719,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 //method def:
                                 sb1.AppendLine("public static IVariable " + tempName + "(GekkoSmpl smpl" + parentListLoopVars1 + ") {");
-                                if (G.equal(functionName, "sum"))
+                                if (G.equal(functionNameLower, "sum"))
                                 {
                                     sb1.AppendLine("TimeSeries " + tempName + " = new TimeSeries(Program.options.freq, null); " + tempName + ".SetZero(smpl);" + G.NL);
                                 }
@@ -1699,7 +1732,7 @@ namespace Gekko.Parser.Gek
                                     sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false))))))) {");
                                 }
 
-                                if (G.equal(functionName, "sum"))
+                                if (G.equal(functionNameLower, "sum"))
                                 {
                                     sb1.AppendLine(tempName + ".InjectAdd(smpl, " + tempName + ", " + node[2].Code.ToString() + ");" + G.NL);
                                 }
@@ -1720,27 +1753,39 @@ namespace Gekko.Parser.Gek
                             }
                             else
                             {
-                                //Not a GAMS-like sum function, or unfold()
-                                if (Globals.uFunctionStorageCs.ContainsKey(functionName))  //case-insensitive anyway
+                                //Not a sum() or unfold() function that is going to be looped                                
+
+                                string args = null;
+                                for (int i = 1; i < node.ChildrenCount(); i++)
                                 {
-                                    node.Code.A(Globals.uProc).A(".").A(functionName).A("(").A(Globals.functionP1Cs).A(", ").A(Globals.functionT1Cs).A(", ");
+                                    args += ", " + node[i].Code;
+                                }
+
+                                if (false)
+                                {
+                                    //inbuilt function, test for these
+                                    //maybe the names should be reserved
+                                    //but then maybe user functions should be marked with sigil?? 
+                                    //like @f(), ... ?
+                                    node.Code.A("Functions." + functionNameLower + "(" + Globals.functionT1Cs).A(args).A(")");
                                 }
                                 else
                                 {
-                                    node.Code.A("Functions." + functionName + "(" + Globals.functionT1Cs + ", ");
-                                }
 
-                                for (int i = 1; i < node.ChildrenCount(); i++)
-                                {
-                                    node.Code.A(node[i].Code);
-                                    if (i < node.ChildrenCount() - 1) node.Code.A(", ");
-                                }
+                                    int numberOfArguments = node.ChildrenCount() - 1;
+                                    if (numberOfArguments == 1)
+                                    {
+                                        //Access the ufunction1[...] so that it can fail with an error                                        
+                                        node.Code.A("Globals.ufunctions").A(numberOfArguments).A("[").A("`").A(functionNameLower).A("`").A("](" + Globals.functionT1Cs + "").A(args).A(")");
 
-                                if (node.Code.ToString().EndsWith(", "))
-                                {
-                                    node.Code.CA(node.Code.ToString().Substring(0, node.Code.ToString().Length - 2));
+                                    }
+                                    else if (numberOfArguments == 2)
+                                    {
+                                        //DO something
+                                    }
+                                    else G.Writeln2("*** ERROR: HOV ufunction");
                                 }
-                                node.Code.A(")");
+                                
                             }
                             
                         }
@@ -2181,6 +2226,20 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTDOTORINDEXER":
                         {
+                                                       
+                            
+                            Globals.ufunctions1.Add("f1", (GekkoSmpl smpl, IVariable iv) => { return ((ScalarVal)iv).Add(smpl, new ScalarVal(1)); });
+                            Globals.ufunctions1.Add("f2", (GekkoSmpl smpl, IVariable iv) => { return ((ScalarVal)iv).Add(smpl, new ScalarVal(2)); });
+                            Globals.ufunctions2.Add("f1", (GekkoSmpl smpl, IVariable iv1, IVariable iv2) => { return ((ScalarVal)iv1).Add(smpl, iv2); });
+                            
+                            IVariable z1 = Globals.ufunctions1["f1"](null, new ScalarVal(10));
+                            IVariable z2 = Globals.ufunctions1["f2"](null, new ScalarVal(10));
+                            IVariable z3 = Globals.ufunctions2["f1"](null, new ScalarVal(10), new ScalarVal(100));
+
+                            G.Writeln("Value of f1: " + ((ScalarVal)(z1)).val);
+                            G.Writeln("Value of f2: " + ((ScalarVal)(z2)).val);
+                            G.Writeln("Value of f1 two args: " + ((ScalarVal)(z3)).val);
+
                             //LIGHTFIXME, isRhs
 
                             string indexes = null;
@@ -3711,11 +3770,20 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.Run o" + Num(node) + " = new O.Run();" + G.NL);
                             //HMMM is this right:
-                            node.Code.A("o" + Num(node) + ".fileName = " + node[0].Code + ".GetString();" + G.NL);
+                            //node.Code.A("o" + Num(node) + ".fileName = " + node[0].Code + ".GetString();" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
+                    //case "ASTRUN":
+                    //    {
+                    //        node.Code.A("O.Run o" + Num(node) + " = new O.Run();" + G.NL);
+                    //        //HMMM is this right:
+                    //        node.Code.A("o" + Num(node) + ".fileName = " + node[0].Code + ".GetString();" + G.NL);
+                    //        node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
+                    //        node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                    //    }
+                    //    break;
                     case "ASTLIBRARY":
                         {
                             if(node.Number != 0)
