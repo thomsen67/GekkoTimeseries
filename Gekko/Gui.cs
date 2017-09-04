@@ -1456,7 +1456,7 @@ namespace Gekko
                     s += "Gekko editor in order to have the bug fixed/evalutated." + G.NL;
                     s += "-----------------------------------------------------------------------------------------------------------------------\n";
                     s += G.NL;
-                    s += "Version: " + Globals.gekkoVersion + G.NL;
+                    s += "Version: " + Globals.gekkoVersion + "  " + Globals.versionInternal + G.NL;
                     s += Globals.linkContainer[long.Parse(input)].s;
                     s += G.NL;
                     s += G.NL;

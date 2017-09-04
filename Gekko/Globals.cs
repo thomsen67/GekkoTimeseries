@@ -40,6 +40,8 @@ namespace Gekko
     /// </summary>
     public class Globals        
     {
+        public static string versionInternal = "d10";
+
         public static bool testFileChange = true;
 
         //public static bool megaHackFix = true;
