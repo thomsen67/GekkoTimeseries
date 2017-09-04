@@ -306,7 +306,7 @@ varname                   : nameOrCname freq? -> ^(ASTVARNAME ^(ASTPLACEHOLDER) 
 						  | sigil leftParen cname rightParen -> ^(ASTVARNAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER cname) ^(ASTPLACEHOLDER))						  
 						  ;
 
-bankvarname               : (name COLON)? varname -> ^(ASTBANKVARNAME name? varname);
+bankvarname               : (name COLON)? varname -> ^(ASTBANKVARNAME ^(ASTPLACEHOLDER name?) varname);
 
 functionArgName           : sigil? ident -> ^(ASTFUNCTIONARGNAME ^(ASTPLACEHOLDER sigil?) ident);
 
@@ -365,9 +365,10 @@ reset					  : RESET -> ^(ASTRESET);
 
 return2                    : RETURN2 expression -> ^({token("ASTRETURN", ASTRETURN, $RETURN2.Line)} expression); //used in functions
 
-functionDef				  : FUNCTION type ident leftParenGlue functionArg? RIGHTPAREN SEMICOLON functionStatements END -> ^(ASTFUNCTIONDEF2 type ident functionArg functionStatements);
-functionArg               : (type functionArgName (',' type functionArgName)*)? -> ^(ASTPLACEHOLDER functionArgName*);
-functionStatements       : statements2* -> ^(ASTPLACEHOLDER statements2*);
+functionDef				  : FUNCTION type ident leftParenGlue functionArg RIGHTPAREN SEMICOLON functionStatements END -> ^(ASTFUNCTIONDEF2 type ident functionArg functionStatements);
+functionArg               : (functionArgElement (',' functionArgElement)*)? -> ^(ASTPLACEHOLDER functionArgElement*);
+functionArgElement        : type functionArgName -> ^(ASTPLACEHOLDER type functionArgName);
+functionStatements        : statements2* -> ^(ASTPLACEHOLDER statements2*);
 type					  : VAL | STRING | DATE | SERIES | LIST | DICT | MATRIX ;
 
 // ------------------------------------------------------------------------------------------------------------------

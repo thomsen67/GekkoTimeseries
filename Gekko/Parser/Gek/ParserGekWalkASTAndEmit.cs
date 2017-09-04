@@ -286,6 +286,35 @@ namespace Gekko.Parser.Gek
                         w.wh.seriesHelper = WalkHelper.seriesType.SeriesRhs;
                     }
                     break;
+                case "ASTFUNCTIONDEF2":
+                    {
+                        string returnType = node[0].Text;
+                        string functionName = GetFunctionName2(node);  //node[1]
+                        foreach (ASTNode child in node[2].ChildrenIterator())
+                        {
+                            string type = child[0].Text;
+                            string sigil = child[1][0][0].Text;
+                            string name = child[1][1][0].Text;
+
+                            string s = null;
+                            if (sigil == "ASTPERCENT") s += Globals.symbolMemvar;
+                            else if (sigil == "ASTHASH") s += Globals.symbolList;
+
+                            s += name;
+
+                            if (node.functionDefAnchor == null) node.functionDefAnchor = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                            if (node.functionDefAnchor.ContainsKey(s))
+                            {
+                                G.Writeln2("*** ERROR: The variable name " + s + " is used several times in a FUNCTION definition");
+                                throw new GekkoException();
+                            }
+                            node.functionDefAnchor.Add(s, "functionarg_" + ++Globals.counter);
+                            if (node.functionDef == null) node.functionDef = new List<Tuple<string, string>>();
+                            node.functionDef.Add(new Tuple<string, string>("IVariable", "functionarg_" + Globals.counter));
+                        }                   
+                        
+                    }
+                    break;
                 case "ASTFUNCTION":  //kind of like ASTFUNCTIONDEF, but the difference is that these sum() functions may be nested, so the nodes themselves need to keep the anchor info
                     {
                         string functionName = GetFunctionName(node);
@@ -1503,7 +1532,11 @@ namespace Gekko.Parser.Gek
 
                             sb.AppendLine(internalName + "();" + G.NL);
 
-                            string vars = null; for (int i = 0; i < numberOfArguments; i++) vars += ", IVariable i" + (i + 1);
+                            //string vars = null; for (int i = 0; i < numberOfArguments; i++) vars += ", IVariable i" + (i + 1);
+                            string vars = null; for (int i = 0; i < node.functionDef.Count; i++)
+                            {
+                                vars += ", " + node.functionDef[i].Item1 + " " + node.functionDef[i].Item2;                                
+                            }
                             w.headerCs.AppendLine("public static void " + internalName + "() {" + G.NL);
                             w.headerCs.AppendLine(Globals.splitSTOP);
                             w.headerCs.AppendLine("Globals.ufunctions" + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl smpl" + vars + ") => { " + node[3].Code.ToString() + " ; return null; });" + G.NL);
@@ -2642,17 +2675,50 @@ namespace Gekko.Parser.Gek
                             bool leftHandSide = false;
                             if (node.Parent.Text == "ASTLEFTSIDE") leftHandSide = true;
 
-                            if (node[1] == null)
+                            //Check if it is a function variable
+
+
+                            bool functionHit = false;
+                            if (node[0][0] == null)
                             {
-                                //no bank indicator
-                                if (leftHandSide) node.Code.A("(" + node[0].Code + ")");
-                                else node.Code.A("O.Lookup(smpl, (" + node[0].Code + "))");
+                                if (node[1][1][0].Text == "ASTNAME" && node[1][1][0][0].Text == "ASTIDENT")
+                                {
+                                    string sigil = node[1][0][0].Text;
+                                    string ident = node[1][1][0][0][0].Text;
+                                    string s = null;
+                                    if (sigil == "ASTPERCENT") s += Globals.symbolMemvar;
+                                    else if (sigil == "ASTHASH") s += Globals.symbolList;
+                                    s += ident;
+
+                                    ASTNode xx = null; SearchUpwardsInTree3(node, s, out xx);
+                                    string internalName = null;
+                                    if (xx != null)
+                                    {
+                                        internalName = xx.functionDefAnchor[s];  //must exist                                        
+                                    }
+                                    if (internalName != null)
+                                    {
+                                        node.Code.CA(internalName);
+                                        functionHit = true;
+                                    }
+                                }
                             }
-                            else
+
+                            if (!functionHit)
                             {
-                                //bank indicator
-                                if (leftHandSide) node.Code.A("(" + node[0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + ")");
-                                else node.Code.A("O.Lookup(smpl, (" + node[0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "))");
+
+                                if (node[0][0] == null)
+                                {
+                                    //no bank indicator
+                                    if (leftHandSide) node.Code.A("(" + node[1].Code + ")");
+                                    else node.Code.A("O.Lookup(smpl, (" + node[1].Code + "))");
+                                }
+                                else
+                                {
+                                    //bank indicator
+                                    if (leftHandSide) node.Code.A("(" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + ")");
+                                    else node.Code.A("O.Lookup(smpl, (" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "))");
+                                }
                             }
                         }
                         break;
@@ -4330,21 +4396,21 @@ namespace Gekko.Parser.Gek
             string rv = null;
             if (node != null && node.Text == "ASTBANKVARNAME")
             {
-                if (node.ChildrenCount() == 1 && node[0].Text == "ASTVARNAME")
+                if (node[0][0] == null)
                 {
-                    if (node[0][0][0] != null && node[0][0][0].Text == "ASTHASH" && node[0][1][0] != null && node[0][1][0].Text == "ASTNAME" && node[0][2][0] == null)
+                    if (node[1][0][0] != null && node[1][0][0].Text == "ASTHASH" && node[1][1][0] != null && node[1][1][0].Text == "ASTNAME" && node[1][2][0] == null)
                     {
-                        if (node[0][1][0][0].Text == "ASTIDENT")
+                        if (node[1][1][0][0].Text == "ASTIDENT")
                         {
-                            rv = node[0][1][0][0][0].Text;
+                            rv = node[1][1][0][0][0].Text;
                         }
                     }
                 }
 
             }
             return rv;
-        }       
-
+        }
+        
         private static string GetLoopNameCs(ASTNode node, string i)
         {
             return "loop" + Num(node) + "_" + i;
@@ -4353,6 +4419,13 @@ namespace Gekko.Parser.Gek
         private static string GetFunctionName(ASTNode node)
         {
             string functionName = node[0][0].Text.ToLower();  //no string composition allowed for functions, it is simple ident.
+            if (functionName == "string") functionName = "tostring";
+            return functionName;
+        }
+
+        private static string GetFunctionName2(ASTNode node)
+        {
+            string functionName = node[1][0].Text.ToLower();  //no string composition allowed for functions, it is simple ident.
             if (functionName == "string") functionName = "tostring";
             return functionName;
         }
@@ -4406,6 +4479,24 @@ namespace Gekko.Parser.Gek
                 tmp = tmp.Parent;
             }
         }
+
+        private static void SearchUpwardsInTree3(ASTNode node, string varName, out ASTNode parent)
+        {
+            ASTNode tmp = node.Parent;
+            parent = null;
+            while (tmp != null)
+            {
+                bool ok = false;
+                if (tmp.functionDefAnchor != null && tmp.functionDefAnchor.ContainsKey(varName)) ok = true;
+                if (ok)
+                {
+                    parent = tmp;
+                    break;
+                }
+                tmp = tmp.Parent;
+            }
+        }
+
 
         private static void ResetUFunctionHelpers(W w)
         {
