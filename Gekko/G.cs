@@ -1154,11 +1154,11 @@ namespace Gekko
             else s += " (develop)";
             if (type != "large")  //i.e., == "small"
             {
-                sb.AppendLine(" Gekko version " + s);
+                sb.AppendLine(" Gekko version " + s + "  " + Globals.versionInternal);
             }
             else
             {
-                sb.AppendLine(" Gekko version " + s);
+                sb.AppendLine(" Gekko version " + s + "  " + Globals.versionInternal);
                 if (stable)
                 {
                     string ss = "";
