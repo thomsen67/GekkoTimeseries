@@ -286,14 +286,14 @@ namespace Gekko
 
         public void AddVariable(TimeSeries ts)
         {
-            G.Writeln2("*** ERROR: #74329732");
+            G.Writeln2("*** ERROR: #743297326");
             throw new GekkoException();
             AddVariable(true, ts, true);
         }
 
         public void AddVariable(TimeSeries ts, bool variableNameCheck)
         {
-            G.Writeln2("*** ERROR: #74329732");
+            G.Writeln2("*** ERROR: #743297325");
             throw new GekkoException();
             AddVariable(true, ts, variableNameCheck);
         }
@@ -301,7 +301,7 @@ namespace Gekko
         //generic method, not for outside use
         private void AddVariable(bool freqAddToName, TimeSeries ts, bool variableNameCheck)
         {
-            G.Writeln2("*** ERROR: #74329732");
+            G.Writeln2("*** ERROR: #743297324");
             throw new GekkoException();
             if (this.protect) Program.ProtectError("You cannot add a timeseries to a non-editable databank, see OPEN<edit> or UNLOCK");
             string variable = ts.name;
@@ -319,14 +319,14 @@ namespace Gekko
 
         public TimeSeries GetVariable(string variable)
         {
-            G.Writeln2("*** ERROR: #74329732");
+            G.Writeln2("*** ERROR: #743297321");
             throw new GekkoException();
             return GetVariable(true, variable);
         }
 
         public TimeSeries GetVariable(bool freqAddToName, string variable)
         {
-            G.Writeln2("*** ERROR: #74329732");
+            G.Writeln2("*** ERROR: #743297322");
             throw new GekkoException();
             if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
             IVariable x = GetIVariable(variable);
@@ -335,7 +335,7 @@ namespace Gekko
 
         public TimeSeries GetVariable(EFreq eFreq, string variable)
         {
-            G.Writeln2("*** ERROR: #74329732");
+            G.Writeln2("*** ERROR: #743297323");
             throw new GekkoException();
             if (eFreq != EFreq.Annual) variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);  //we do this IF here because it is speed critical code. Else a new string object will be created.
             IVariable x = GetIVariable(variable);

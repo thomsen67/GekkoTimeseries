@@ -1754,7 +1754,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                 {                                    
-                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(smpl, O.Lookup(((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))), null))) {");
+                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))), null))) {");
                                 }
 
                                 if (G.equal(functionNameLower, "sum"))
@@ -2252,18 +2252,7 @@ namespace Gekko.Parser.Gek
                     case "ASTDOTORINDEXER":
                         {
                                                        
-                            
-                            Globals.ufunctions1.Add("f1", (GekkoSmpl smpl, IVariable iv) => { return ((ScalarVal)iv).Add(smpl, new ScalarVal(1)); });
-                            Globals.ufunctions1.Add("f2", (GekkoSmpl smpl, IVariable iv) => { return ((ScalarVal)iv).Add(smpl, new ScalarVal(2)); });
-                            Globals.ufunctions2.Add("f1", (GekkoSmpl smpl, IVariable iv1, IVariable iv2) => { return ((ScalarVal)iv1).Add(smpl, iv2); });
-                            
-                            IVariable z1 = Globals.ufunctions1["f1"](null, new ScalarVal(10));
-                            IVariable z2 = Globals.ufunctions1["f2"](null, new ScalarVal(10));
-                            IVariable z3 = Globals.ufunctions2["f1"](null, new ScalarVal(10), new ScalarVal(100));
 
-                            G.Writeln("Value of f1: " + ((ScalarVal)(z1)).val);
-                            G.Writeln("Value of f2: " + ((ScalarVal)(z2)).val);
-                            G.Writeln("Value of f1 two args: " + ((ScalarVal)(z3)).val);
 
                             //LIGHTFIXME, isRhs
 

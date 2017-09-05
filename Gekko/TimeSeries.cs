@@ -1069,7 +1069,7 @@ namespace Gekko
                     {                        
                         string hash = GetHashCodeFromIvariables(indexes);
                         string varname = s + Globals.symbolTurtle + hash + Globals.symbolTilde + G.GetFreq(this.freq);
-                        TimeSeries ts = this.parentDatabank.GetVariable(varname);
+                        TimeSeries ts = this.parentDatabank.GetIVariable(varname) as TimeSeries;  //should not be able to return null, since no-sigil name is timeseries
                         if (ts == null)
                         {
                             G.Writeln2("*** ERROR: Could not find " + G.PrettifyTimeseriesHash(varname, true, false));

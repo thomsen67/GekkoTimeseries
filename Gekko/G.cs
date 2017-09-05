@@ -600,7 +600,7 @@ namespace Gekko
         {
             int i = s.LastIndexOf(Globals.symbolTilde);
             if (i < 0) return s;
-            return s.Substring(0, s.Length - i - 1);
+            return s.Substring(0, s.Length - i);
         }
 
         public static string ReplaceFirstOccurrence(string original, string oldValue, string newValue)

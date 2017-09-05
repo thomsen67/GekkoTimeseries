@@ -502,6 +502,14 @@ namespace Gekko
                     else if (varName[0] == Globals.symbolList)
                     {
                         //LIST, DICT, MATRIX
+                        if (rhs.Type() == EVariableType.List)
+                        {
+                            MetaList ml = new MetaList();
+                            //LIGHTFIXME, if the list if not "deep", no cloning is needed
+                            //List<IVariable> data = new List<IVariable>();
+                            ml.list.AddRange(((MetaList)rhs).list);                            
+                            db.AddIVariable(varName, ml);
+                        }
                     }
                     else
                     {
