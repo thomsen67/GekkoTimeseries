@@ -2725,7 +2725,7 @@ namespace Gekko
                         bool isGhost = tsTemp.IsGhost();
                         //looping through each timeseries to find databank start and end year (and to merge variables if we are merging)
 
-                        if (IsNonsenseVariableName(tsTemp.variableName))
+                        if (IsNonsenseVariableName(tsTemp.name))
                         {
                             emptyWarnings++;
                             continue;
@@ -2752,7 +2752,7 @@ namespace Gekko
                             if (nob > 0)
                             {
                                 //ignore if nob < 1. This means that the time limit window is outside the data window 
-                                TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, tsTemp.variableName, tsTemp.freq);
+                                TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, tsTemp.name, tsTemp.freq);
                                 int index1;
                                 int index2;
                                 try
@@ -3706,9 +3706,9 @@ namespace Gekko
             {
                 TimeSeries ts = new TimeSeries(G.GetFreq(freq), tableName);
                 ts.SetDirtyGhost(true, true);
-                if (Program.databanks.GetFirst().GetVariable(G.GetFreq(freq), ts.variableName) != null)
+                if (Program.databanks.GetFirst().GetVariable(G.GetFreq(freq), ts.name) != null)
                 {
-                    Program.databanks.GetFirst().RemoveVariable(G.GetFreq(freq), ts.variableName);
+                    Program.databanks.GetFirst().RemoveVariable(G.GetFreq(freq), ts.name);
                 }
                 Program.databanks.GetFirst().AddVariable(ts);
             }
@@ -3789,9 +3789,9 @@ namespace Gekko
                     }
                 }
 
-                if (Program.databanks.GetFirst().GetVariable(G.GetFreq(freq), ts.variableName) != null)
+                if (Program.databanks.GetFirst().GetVariable(G.GetFreq(freq), ts.name) != null)
                 {
-                    Program.databanks.GetFirst().RemoveVariable(G.GetFreq(freq), ts.variableName);
+                    Program.databanks.GetFirst().RemoveVariable(G.GetFreq(freq), ts.name);
                 }
                 Program.databanks.GetFirst().AddVariable(ts);
 
@@ -4487,7 +4487,7 @@ namespace Gekko
             string s = "";
             double oldValue = double.NaN;
             bool firstTime = true;
-            string varName = ts.variableName;
+            string varName = ts.name;
             if (isCaps) varName = varName.ToUpper();  //for use with AREMOS
 
             string sub1 = "";
@@ -4636,7 +4636,7 @@ namespace Gekko
 
             int count2 = 0;
             string s = "";
-            string varName = ts.variableName;
+            string varName = ts.name;
             if (isCaps) varName = varName.ToUpper();
 
             if (ts.freq == EFreq.Annual)
@@ -8012,7 +8012,7 @@ namespace Gekko
                         double v = ts.GetData(t);
                         if (G.isNumericalError(v))
                         {
-                            G.Writeln2("*** ERROR: Missing value in '" + ts.variableName + "', period " + G.FromDateToString(t));
+                            G.Writeln2("*** ERROR: Missing value in '" + ts.name + "', period " + G.FromDateToString(t));
                             throw new GekkoException();
                         }
                         //data += t.super + " " + t.sub + " " + v.ToString() + G.NL;
@@ -16360,8 +16360,8 @@ namespace Gekko
                 if (Program.options.solve_forward_dump)
                 {
                     //G.writeln();
-                    if (Program.databanks.GetFirst().ContainsVariable(ts.variableName)) Program.databanks.GetFirst().RemoveVariable(ts.variableName);
-                    if (Program.databanks.GetFirst().ContainsVariable(tsrel.variableName)) Program.databanks.GetFirst().RemoveVariable(tsrel.variableName);
+                    if (Program.databanks.GetFirst().ContainsVariable(ts.name)) Program.databanks.GetFirst().RemoveVariable(ts.name);
+                    if (Program.databanks.GetFirst().ContainsVariable(tsrel.name)) Program.databanks.GetFirst().RemoveVariable(tsrel.name);
                     Program.databanks.GetFirst().AddVariable(ts);
                     Program.databanks.GetFirst().AddVariable(tsrel);
                 }
@@ -16504,8 +16504,8 @@ namespace Gekko
                     if (Program.options.solve_forward_dump)
                     {
                         //G.writeln();
-                        if (Program.databanks.GetFirst().ContainsVariable(ts.variableName)) Program.databanks.GetFirst().RemoveVariable(ts.variableName);
-                        if (Program.databanks.GetFirst().ContainsVariable(tsrel.variableName)) Program.databanks.GetFirst().RemoveVariable(tsrel.variableName);
+                        if (Program.databanks.GetFirst().ContainsVariable(ts.name)) Program.databanks.GetFirst().RemoveVariable(ts.name);
+                        if (Program.databanks.GetFirst().ContainsVariable(tsrel.name)) Program.databanks.GetFirst().RemoveVariable(tsrel.name);
                         Program.databanks.GetFirst().AddVariable(ts);
                         Program.databanks.GetFirst().AddVariable(tsrel);
                     }
@@ -16935,7 +16935,7 @@ namespace Gekko
                 {
                     //This does not run fast, but is seldom used
                     //is also done for exogenous, maybe more safe only for lagged endo.
-                    TimeSeries tsUndoBank = Globals.undoBank.GetVariable(ts.variableName);
+                    TimeSeries tsUndoBank = Globals.undoBank.GetVariable(ts.name);
                     //overrides the value -- takes it from the undoBank -- if exo there should be no change
                     val = tsUndoBank.GetData(t.Add(lagPointers[i]));
                 }
@@ -17004,7 +17004,7 @@ namespace Gekko
                     //todo: break? like for exo part? now we get both warning and error regarding aaa in 2005 if it is set to M and we sim in 2006.
                     int lag = 0;
                     if (endoInitUsesLag) lag = 1;
-                    ec.simInitEndoMissingValueHelper.Add(ts.variableName + " has a missing value in " + (t.Add(-lag)) + "          " + "sim period: " + t.ToString());
+                    ec.simInitEndoMissingValueHelper.Add(ts.name + " has a missing value in " + (t.Add(-lag)) + "          " + "sim period: " + t.ToString());
                 }
 
                 //====================================
@@ -18277,8 +18277,8 @@ namespace Gekko
                 bool endo = false;
                 if (Program.model != null && Program.model.m2.endogenous != null)
                 {
-                    endo = Program.model.m2.endogenous.ContainsKey(ts.variableName);
-                    if (endo) G.Writeln("+++ NOTE: You are updating a left-hand side variable (" + ts.variableName + ")");
+                    endo = Program.model.m2.endogenous.ContainsKey(ts.name);
+                    if (endo) G.Writeln("+++ NOTE: You are updating a left-hand side variable (" + ts.name + ")");
                 }
 
                 //TimeSeries ts = work.GetVariable(var2);
@@ -18291,7 +18291,7 @@ namespace Gekko
                 if (o.data.Length > expectedNumberOfObservations)
                 {
                     //TODO: truncate it
-                    G.Writeln2("*** ERROR: UPD " + ts.variableName + ": There were " + o.data.Length + " numbers given for the period " + tStart + " to " + tEnd + " (= " + expectedNumberOfObservations + " periods)");
+                    G.Writeln2("*** ERROR: UPD " + ts.name + ": There were " + o.data.Length + " numbers given for the period " + tStart + " to " + tEnd + " (= " + expectedNumberOfObservations + " periods)");
                     throw new GekkoException();
                 }
 
@@ -18304,7 +18304,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: UPD " + ts.variableName + ": There were " + o.data.Length + " numbers given for the period " + tStart + " to " + tEnd + " (= " + expectedNumberOfObservations + " periods)");
+                        G.Writeln2("*** ERROR: UPD " + ts.name + ": There were " + o.data.Length + " numbers given for the period " + tStart + " to " + tEnd + " (= " + expectedNumberOfObservations + " periods)");
                         throw new GekkoException();
                     }
                 }
@@ -18313,7 +18313,7 @@ namespace Gekko
                 if (op == "%" || op == "^" || op == "#" || updType == ESeriesUpdTypes.p || updType == ESeriesUpdTypes.d || updType == ESeriesUpdTypes.mp)
                 {
                     double dataLag = ts.GetData(tStartM1);
-                    if (double.IsNaN(dataLag)) G.Writeln("+++ NOTE: variable '" + ts.variableName + "' is missing in period " + (tStartM1) + ", so the result will be missing values");
+                    if (double.IsNaN(dataLag)) G.Writeln("+++ NOTE: variable '" + ts.name + "' is missing in period " + (tStartM1) + ", so the result will be missing values");
                 }
 
                 int counter = 0;
@@ -19806,7 +19806,7 @@ namespace Gekko
             {
                 ts = databank.GetVariable(false, varName2);  //false: do not add options.freq at the end!
             }
-            if (!G.equal(varName, ts.variableName))
+            if (!G.equal(varName, ts.name))
             {
                 G.Writeln2("*** ERROR in findOrCreateTimeSeriesInDataBank(), name");  //safety, can be deleted for speed sometime
                 throw new GekkoException();  //safety, can be deleted for speed sometime
@@ -21594,9 +21594,9 @@ namespace Gekko
                         if (usedInCreateCommand == true)
                         {
                             //normally it shouldn't exist, but we check for safety
-                            if (!Globals.createdVariables.ContainsKey(AddFreqAtEndOfVariableName(ts.variableName)))
+                            if (!Globals.createdVariables.ContainsKey(AddFreqAtEndOfVariableName(ts.name)))
                             {
-                                Globals.createdVariables.Add(AddFreqAtEndOfVariableName(ts.variableName), "");
+                                Globals.createdVariables.Add(AddFreqAtEndOfVariableName(ts.name), "");
                             }
                         }
                         counter++;
@@ -21605,7 +21605,7 @@ namespace Gekko
                     {
                         if (usedInCreateCommand && Program.options.databank_create_message)
                         {
-                            G.Writeln2("+++ WARNING: CREATE: variable " + db.aliasName + ":" + ts.variableName + " already exists");
+                            G.Writeln2("+++ WARNING: CREATE: variable " + db.aliasName + ":" + ts.name + " already exists");
                         }
                     }
                 }
@@ -21942,7 +21942,7 @@ namespace Gekko
                     else
                     {
                         if (ts.parentDatabank.protect) Program.ProtectError("You cannot delete a timeseries in a non-editable databank (" + ts.parentDatabank + ")");
-                        ts.parentDatabank.RemoveVariable(ts.variableName);
+                        ts.parentDatabank.RemoveVariable(ts.name);
                         counter++;
                     }
                 }

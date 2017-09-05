@@ -398,43 +398,225 @@ namespace Gekko
             return new MetaList(m);
         }
 
-        public static IVariable Lookup(GekkoSmpl smpl, IVariable x)
+        public static IVariable Lookup(GekkoSmpl smpl, IVariable x, IVariable rhs)
         {
             ScalarString x2 = x as ScalarString;
-            if (x2 != null)
+            if (x2 == null)
             {
-                string dbName, varName, freq; char firstChar; Chop(x2, out dbName, out varName, out firstChar, out freq);                
-                IVariable iv = null;
+                G.Writeln2("*** ERROR: Var type error when looking up in databank");
+                throw new GekkoException();
+            }
+            else
+            {
+                string dbName, varName, freq; char firstChar; Chop(x2._string2, out dbName, out varName, out firstChar, out freq);
+                bool hasSigil = false;
+                if (firstChar == Globals.symbolMemvar || firstChar == Globals.symbolList) hasSigil = true;
+                IVariable iv = LookupHelper(smpl, dbName, varName, freq, hasSigil, rhs);
+                return iv;
+            }
+            return x;
+        }
+
+        public static IVariable Lookup(GekkoSmpl smpl, string dbName, string varName, string freq, bool hasSigil, IVariable rhs)
+        {
+            IVariable iv = LookupHelper(smpl, dbName, varName, freq, hasSigil, rhs);
+            return iv;
+        }
+
+        private static IVariable LookupHelper(GekkoSmpl smpl, string dbName, string varNameOrig, string freq, bool hasSigil, IVariable rhs)
+        {
+            //rhs means the value of the rhs variable, meaning that the present lookup is regarding the lhs variable if rhs=null
+            IVariable lhs = null;
+            string varName = varNameOrig;
+            if (!hasSigil)
+            {
+                //Timeseries has '~' added
+                if (freq != null) varName = varNameOrig + Globals.symbolTilde + freq;
+                else varName = varNameOrig + Globals.symbolTilde + G.GetFreq(Program.options.freq);
+            }
+
+            if (rhs == null)
+            {
+                //SIMPLE LOOKUP ON RIGHT-HAND SIDE
+                //SIMPLE LOOKUP ON RIGHT-HAND SIDE
+                //SIMPLE LOOKUP ON RIGHT-HAND SIDE
+                //SIMPLE LOOKUP ON RIGHT-HAND SIDE
+                //SIMPLE LOOKUP ON RIGHT-HAND SIDE
                 if (Program.options.databank_search && dbName == null)
                 {
+                    //Search if on the right-hand side (rhs), in data mode, and no bank is indicated
                     for (int i = 0; i < Program.databanks.storage.Count; i++)
                     {
                         if (i == 1) continue;  //The Ref databank IS NEVER SEARCHED!!
                         Databank db2 = Program.databanks.storage[i];
-                        iv = db2.GetIVariable(varName);                        
-                        if (iv != null) break;
+                        lhs = db2.GetIVariable(varName);
+                        if (lhs != null) break;
                     }
-                    if (iv == null)
+                    if (lhs == null)
                     {
-                        G.Writeln2("*** ERROR: Could not find variable '" + varName + "' in any open databank");
+                        G.Writeln2("*** ERROR: Could not find variable '" + varName + "' in any open databank (excluding Ref)");
                         throw new GekkoException();
                     }
                 }
                 else
                 {
                     Databank db = null;
-                    if (dbName != null) db = Program.databanks.GetDatabank(dbName);
-                    else db = Program.databanks.GetFirst();
-                    iv = db.GetIVariable(varName);                    
-                    if (iv == null)
+                    if (dbName == null) db = Program.databanks.GetFirst();
+                    else db = Program.databanks.GetDatabank(dbName);
+                    lhs = db.GetIVariable(varName);
+                    if (lhs == null)
                     {
                         G.Writeln2("*** ERROR: Could not find variable '" + varName + "' in databank '" + db.aliasName + "'");
                         throw new GekkoException();
                     }
                 }
-                return iv;
             }
-            return x;
+            else
+            {
+                //ASSIGNMENT OF LEFT-HAND SIDE
+                //ASSIGNMENT OF LEFT-HAND SIDE
+                //ASSIGNMENT OF LEFT-HAND SIDE
+                //ASSIGNMENT OF LEFT-HAND SIDE
+                //ASSIGNMENT OF LEFT-HAND SIDE
+                Databank db = null;
+                if (dbName == null) db = Program.databanks.GetFirst();
+                else db = Program.databanks.GetDatabank(dbName);
+                lhs = db.GetIVariable(varName);
+                if (lhs == null)
+                {
+                    //LEFT-HAND SIDE DOES NOT EXIST
+                    //LEFT-HAND SIDE DOES NOT EXIST
+                    //LEFT-HAND SIDE DOES NOT EXIST
+                    if (varName[0] == Globals.symbolMemvar)
+                    {
+                        //VAL, STRING, DATE
+                        //first, so that we can access scalars as fast as possible
+
+                        if (rhs.Type() == EVariableType.Val)
+                        {
+                            ScalarVal sv = new ScalarVal(((ScalarVal)rhs).val);
+                            db.AddIVariable(varName, sv);
+                        }
+
+                    }
+                    else if (varName[0] == Globals.symbolList)
+                    {
+                        //LIST, DICT, MATRIX
+                    }
+                    else
+                    {
+                        //SERIES
+                        //create it                            
+                        if (!Program.options.databank_create_auto && !varName.StartsWith("xx", StringComparison.OrdinalIgnoreCase))
+                        {
+                            G.Writeln2("*** ERROR: Cannot create timeseries '" + varName);
+                            G.Writeln("    You may use CREATE " + varName + ", or use MODE data, or use a name starting with 'xx'", Color.Red);
+                            throw new GekkoException();
+                        }
+
+                        EFreq lhsFreq = EFreq.Annual;
+                        if (freq == null) lhsFreq = Program.options.freq;
+                        else lhsFreq = G.GetFreq(freq);  //will fail with an error if not recognized
+
+                        if (rhs.Type() == EVariableType.TimeSeries)
+                        {
+                            TimeSeries tsRhs = rhs as TimeSeries;
+                            if (lhsFreq != tsRhs.freq)
+                            {
+                                G.Writeln2("***ERROR: Freq " + lhsFreq.ToString() + " on left-hand side, and freq " + tsRhs.freq + " on right-hand side");
+                                throw new GekkoException();
+                            }
+                            TimeSeries tsLhs = tsRhs.Clone();  //cannot just refer to it, since it may be y = x, and if we later on change x, y will change too (bad).
+                            tsLhs.name = varName;
+                            db.AddIVariable(tsLhs);
+                        }
+                        else if (rhs.Type() == EVariableType.Val)
+                        {
+                            ScalarVal sv = rhs as ScalarVal;
+                            TimeSeries tsLhs = new TimeSeries(lhsFreq, varName);
+                            //LIGHTFIX, speed
+                            foreach (GekkoTime t in smpl.Iterate())
+                            {
+                                tsLhs.SetData(t, sv.val);
+                            }
+                            db.AddIVariable(tsLhs);
+                        }
+                        else
+                        {
+                            //TODO: rhs as MATRIX (vector) should be possible if sample fits.
+                            G.Writeln2("*** ERROR: Could not convert right-hand side (" + rhs.Type().ToString() + ") to SERIES");
+                            throw new GekkoException();
+                        }
+                    }
+                }
+                else
+                {
+                    //LEFT-HAND SIDE EXISTS
+                    //LEFT-HAND SIDE EXISTS
+                    //LEFT-HAND SIDE EXISTS
+                    if (varName[0] == Globals.symbolMemvar)
+                    {
+                        //VAL, STRING, DATE
+                        //first, so that we can access scalars as fast as possible
+                        if (lhs.Type() == EVariableType.Val)
+                        {
+                            ScalarVal svRhs = rhs as ScalarVal;
+                            if (svRhs != null)
+                            {
+                                ScalarVal svLhs = lhs as ScalarVal;
+                                svLhs.val = svRhs.val;
+                            }
+                            else
+                            {
+                                //TODO TODO
+                            }
+                        }
+                        else if (lhs.Type() == EVariableType.String)
+                        {
+
+                        }
+                        else if (lhs.Type() == EVariableType.Date)
+                        {
+                            //DATE
+                        }
+                        else
+                        {
+                            //error..........
+                        }
+
+                    }
+                    else if (varName[0] == Globals.symbolList)
+                    {
+                        //LIST, DICT, MATRIX
+                    }
+                    else
+                    {
+                        //SERIES
+                        TimeSeries tsLhs = lhs as TimeSeries;
+                        if (rhs.Type() == EVariableType.TimeSeries)
+                        {
+                            TimeSeries ts = rhs as TimeSeries;
+                            //LIGHTFIX, speed                         
+                            foreach (GekkoTime t in smpl.Iterate())
+                            {
+                                tsLhs.SetData(t, ts.GetData(t));
+                            }
+                        }
+                        else if (rhs.Type() == EVariableType.Val)
+                        {
+                            ScalarVal sv = rhs as ScalarVal;                            
+                            //LIGHTFIX, speed
+                            foreach (GekkoTime t in smpl.Iterate())
+                            {
+                                tsLhs.SetData(t, sv.val);
+                            }                            
+                        }
+                        //TODO
+                    }
+                }
+            }
+
+            return lhs;
         }
 
         public static void Print(GekkoSmpl smpl, IVariable x)
@@ -549,10 +731,22 @@ namespace Gekko
 
         public static void Assignment(GekkoSmpl smpl, IVariable y, IVariable x)
         {
-            string dbName, varName, freq; char firstChar; Chop(y, out dbName, out varName, out firstChar, out freq);
+            string dbName, varName, freq; char firstChar; Chop(y.GetString(), out dbName, out varName, out firstChar, out freq);
+            bool hasSigil = false;
+            if (varName[0] == Globals.symbolMemvar || varName[0] == Globals.symbolList) hasSigil = true;
+            AssignmentHelper(smpl, x, dbName, varName, firstChar, hasSigil);
+        }
+
+        //public static void Assignment(GekkoSmpl smpl, string dbName, string varName, string freq, bool hasSigil, IVariable x)
+        //{
+        //    AssignmentHelper(smpl, x, dbName, varName, varName[0], hasSigil);            
+        //}
+
+        private static void AssignmentHelper(GekkoSmpl smpl, IVariable x, string dbName, string varName, char firstChar, bool hasSigil)
+        {
             Databank db = null;
             if (dbName == null) db = Program.databanks.GetFirst();
-            else db = Program.databanks.GetDatabank(dbName);            
+            else db = Program.databanks.GetDatabank(dbName);
             IVariable iv = db.GetIVariable(varName);  //may be null if the variable does not exist.
 
             switch (x.Type())  //RHS type
@@ -596,7 +790,7 @@ namespace Gekko
                                     if (iv == null)
                                     {
                                         ts = new TimeSeries(Program.options.freq, varName);
-                                        db.AddIVariable(ts.variableName, ts);  //always use this pattern: AddIVariable(x.variableName, x)
+                                        db.AddIVariable(ts.name, ts);  //always use this pattern: AddIVariable(x.variableName, x)
                                     }
                                     else
                                     {
@@ -714,7 +908,7 @@ namespace Gekko
                                     else
                                     {
                                         db.RemoveIVariable(varName);
-                                        db.AddIVariable(varName, x);                                        
+                                        db.AddIVariable(varName, x);
                                     }
                                 }
                                 break;
@@ -731,7 +925,7 @@ namespace Gekko
                                     if (iv == null)
                                     {
                                         ts = new TimeSeries(Program.options.freq, varName);
-                                        db.AddIVariable(ts.variableName, ts);  //always use this pattern: AddIVariable(x.variableName, x)
+                                        db.AddIVariable(ts.name, ts);  //always use this pattern: AddIVariable(x.variableName, x)
                                     }
                                     else
                                     {
@@ -855,12 +1049,13 @@ namespace Gekko
             return ts;
         }
 
-        private static void Chop(IVariable y, out string dbName, out string varName, out char firstChar, out string freq)
+        private static void Chop(string input, out string dbName, out string varName, out char firstChar, out string freq)
         {
-            string[] ss = O.GetString(y).Split(Globals.symbolBankColon2);
+            //When it returns, all returned strings are guaranteed not to contain colon or tilde.
+            string[] ss = input.Split(Globals.symbolBankColon2);
             if (ss.Length > 2)
             {
-                G.Writeln2("*** ERROR: More than 1 colons (':') in '" + O.GetString(y) + "'");
+                G.Writeln2("*** ERROR: More than 1 colons (':') in '" + input + "'");
                 throw new GekkoException();
             }            
             dbName = null;
@@ -875,7 +1070,7 @@ namespace Gekko
             string[] ss2 = varName.Split(Globals.symbolTilde);
             if (ss2.Length > 2)
             {
-                G.Writeln2("*** ERROR: More than 1 freq indicators ('~') in '" + O.GetString(y) + "'");
+                G.Writeln2("*** ERROR: More than 1 freq indicators ('~') in '" + input + "'");
                 throw new GekkoException();
             }
             if (ss2.Length == 2)
@@ -3506,7 +3701,7 @@ namespace Gekko
                     }                    
                 }
                 ts3.Stamp();
-                G.Writeln2("Spliced '" + ts3.variableName + "' by means of " + obs + " common observations");
+                G.Writeln2("Spliced '" + ts3.name + "' by means of " + obs + " common observations");
             }
         }
 
@@ -4125,7 +4320,7 @@ namespace Gekko
                         if (listItems1 == null)
                         {
                             //Stuff like "COPY adbk:fx*;"  (copies to first)                            
-                            newName = ts.variableName;  //same name is used
+                            newName = ts.name;  //same name is used
                         }
                         else
                         {
@@ -4134,7 +4329,7 @@ namespace Gekko
                                 //Stuff like "COPY #m TO simbk:a_*;"
                                 //here we use item #0 (there can only be 1 such item)
                                 ExtractBankAndRestHelper h = Program.ExtractBankAndRest(listItems1[0], EExtrackBankAndRest.GetDatabank);
-                                newName = placeholderPrefix + ts.variableName + placeholderSuffix;
+                                newName = placeholderPrefix + ts.name + placeholderSuffix;
                             }
                             else
                             {
@@ -4158,9 +4353,9 @@ namespace Gekko
                             {
                                 if (G.equal(ts.parentDatabank.aliasName, ts2.parentDatabank.aliasName))
                                 {
-                                    if (G.equal(ts.variableName, ts2.variableName))
+                                    if (G.equal(ts.name, ts2.name))
                                     {
-                                        G.Writeln2("*** ERROR: You are trying to copy the timeseries '" + ts.variableName + "' from databank '" + ts.parentDatabank.aliasName + "' to itself");
+                                        G.Writeln2("*** ERROR: You are trying to copy the timeseries '" + ts.name + "' from databank '" + ts.parentDatabank.aliasName + "' to itself");
                                         throw new GekkoException();
                                     }
                                 }
@@ -4188,7 +4383,7 @@ namespace Gekko
                                 //Type 2
                                 type2++;
                                 ts2 = ts.Clone();
-                                ts2.variableName = newName;
+                                ts2.name = newName;
                                 ts2.Truncate(this.t1, this.t2);
                                 toBank.AddVariable(ts2);
                             }
@@ -4199,7 +4394,7 @@ namespace Gekko
                             TimeSeries ts2 = ts.Clone();  //will inherit the date stamp                          
                             if (listItems1 != null)
                             {
-                                ts2.variableName = newName;
+                                ts2.name = newName;
                             }
                             if (toBank.ContainsVariable(newName))
                             {
@@ -4346,8 +4541,8 @@ namespace Gekko
                             G.Writeln2("*** ERROR: Databank " + ts.parentDatabank.aliasName + " already contains timeseries '" + s2 + "'");
                             throw new GekkoException();
                         }
-                        ts.parentDatabank.RemoveVariable(ts.variableName);                        
-                        ts.variableName = s2;
+                        ts.parentDatabank.RemoveVariable(ts.name);                        
+                        ts.name = s2;
                         ts.parentDatabank.AddVariable(ts);
                         counter++;
                     }
@@ -4376,10 +4571,10 @@ namespace Gekko
                 TimeSeries tlhs = O.GetTimeSeries(lhs);
 
                 Databank bankName = tlhs.parentDatabank;
-                string varName = tlhs.variableName;
+                string varName = tlhs.name;
 
                 TimeSeries trhs = O.GetTimeSeries(rhs);
-                trhs.variableName = varName;
+                trhs.name = varName;
 
                 bankName.RemoveVariable(varName);
                 bankName.AddVariable(trhs);
@@ -4873,12 +5068,12 @@ namespace Gekko
 
                         if (G.isNumericalError(sum))
                         {
-                            G.Writeln2("*** ERROR: Series " + ts.parentDatabank + ":" + ts.variableName + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " contains missing values");
+                            G.Writeln2("*** ERROR: Series " + ts.parentDatabank + ":" + ts.name + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " contains missing values");
                             throw new GekkoException();
                         }
                         if (sum == 0d)
                         {
-                            G.Writeln2("*** ERROR: Series " + ts.parentDatabank + ":" + ts.variableName + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " sums to 0, cannot rebase");
+                            G.Writeln2("*** ERROR: Series " + ts.parentDatabank + ":" + ts.name + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " sums to 0, cannot rebase");
                             throw new GekkoException();
                         }                                               
 
@@ -4886,7 +5081,7 @@ namespace Gekko
                         if (opt_prefix != null)
                         {
                             tsNew = ts.Clone();
-                            tsNew.variableName = opt_prefix + ts.variableName;
+                            tsNew.name = opt_prefix + ts.name;
                             if (ts.parentDatabank == null)
                             {
                                 G.Writeln2("*** ERROR: Internal error #8796357826435");
@@ -4894,9 +5089,9 @@ namespace Gekko
                             }
 
 
-                            if (ts.parentDatabank.ContainsVariable(tsNew.variableName))
+                            if (ts.parentDatabank.ContainsVariable(tsNew.name))
                             {
-                                ts.parentDatabank.RemoveVariable(tsNew.variableName);
+                                ts.parentDatabank.RemoveVariable(tsNew.name);
                                 counter++;
                             }
                             ts.parentDatabank.AddVariable(tsNew);

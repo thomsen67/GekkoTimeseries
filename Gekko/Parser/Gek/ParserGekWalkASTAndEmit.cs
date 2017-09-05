@@ -311,14 +311,14 @@ namespace Gekko.Parser.Gek
                             node.functionDefAnchor.Add(s, "functionarg_" + ++Globals.counter);
                             if (node.functionDef == null) node.functionDef = new List<Tuple<string, string>>();
                             node.functionDef.Add(new Tuple<string, string>("IVariable", "functionarg_" + Globals.counter));
-                        }                   
-                        
+                        }
+
                     }
                     break;
                 case "ASTFUNCTION":  //kind of like ASTFUNCTIONDEF, but the difference is that these sum() functions may be nested, so the nodes themselves need to keep the anchor info
                     {
                         string functionName = GetFunctionName(node);
-                        string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionName);                                              
+                        string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionName);
                         if (listNames != null)
                         {
                             if (node.listLoopAnchor == null) node.listLoopAnchor = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -334,11 +334,12 @@ namespace Gekko.Parser.Gek
                         }
                     }
                     break;
-            }
-
-            bool astAssignment = false;
-            if (node.Text == "ASTASSIGNMENT")
-                astAssignment = true;
+                case "ASTLEFTSIDE":
+                    {                        
+                        node.ivTempVarName = "ivTmpvar" + ++Globals.counter;  //we use the counter value to hook up the rhs with the lhs                        
+                    }
+                    break;
+            }                       
             
             foreach (ASTNode child in node.ChildrenIterator())
             {                   
@@ -385,7 +386,8 @@ namespace Gekko.Parser.Gek
             }
             else
             {
-                //After sub-nodes
+                //After sub-nodes                
+
                 switch (node.Text)
                 {
                     case "+":
@@ -510,10 +512,9 @@ namespace Gekko.Parser.Gek
 
                                             if (listName != null)
                                             {
-                                                ASTNode xx = null; SearchUpwardsInTree2(node[i], listName, out xx);
-                                                if (xx != null)
-                                                {
-                                                    string internalName = xx.listLoopAnchor[listName];  //must exist
+                                                string internalName = SearchUpwardsInTree2(node[i], listName);
+                                                if (internalName != null)
+                                                {                                                    
                                                     s += ", " + internalName;
                                                     success = true;
                                                 }
@@ -939,11 +940,7 @@ namespace Gekko.Parser.Gek
                             string internalName = null;
                             if (listName != null)
                             {
-                                ASTNode xx = null; SearchUpwardsInTree2(node, listName, out xx);
-                                if (xx != null)
-                                {
-                                    internalName = xx.listLoopAnchor[listName];  //must exist                                        
-                                }
+                                internalName = SearchUpwardsInTree2(node, listName);                                
                             }
 
                             if (internalName != null)
@@ -1756,8 +1753,8 @@ namespace Gekko.Parser.Gek
                                     sb1.AppendLine("MetaList " + tempName + " = new MetaList();" + G.NL);
                                 }
                                 foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
-                                {
-                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false))))))) {");
+                                {                                    
+                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(smpl, O.Lookup(((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))), null))) {");
                                 }
 
                                 if (G.equal(functionNameLower, "sum"))
@@ -2279,11 +2276,7 @@ namespace Gekko.Parser.Gek
                                 string internalName = null;
                                 if (listName != null)
                                 {
-                                    ASTNode xx = null; SearchUpwardsInTree2(node, listName, out xx);
-                                    if (xx != null)
-                                    {
-                                        internalName = xx.listLoopAnchor[listName];  //must exist                                        
-                                    }
+                                    internalName = SearchUpwardsInTree2(node, listName);                                    
                                 }
 
                                 if (internalName != null)
@@ -2656,8 +2649,10 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTASSIGNMENT":
-                        {
-                            node.Code.A("O.Assignment(smpl, ").A(node[0].Code).A(", ").A(node[1].Code).A(")").End();
+                        {                            
+                            node.Code.A("IVariable " + node[0].ivTempVarName + " = ").A(node[1].Code).End();
+                            node.Code.A(node[0].Code).End();
+
                         }
                         break;
                     case "ASTPERCENT":
@@ -2671,9 +2666,7 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTBANKVARNAME":
-                        {
-                            bool leftHandSide = false;
-                            if (node.Parent.Text == "ASTLEFTSIDE") leftHandSide = true;
+                        {                           
 
                             //Check if it is a function variable
 
@@ -2683,19 +2676,10 @@ namespace Gekko.Parser.Gek
                             {
                                 if (node[1][1][0].Text == "ASTNAME" && node[1][1][0][0].Text == "ASTIDENT")
                                 {
-                                    string sigil = node[1][0][0].Text;
+                                    string sigil = GetSigilAsString(node[1][0]);
                                     string ident = node[1][1][0][0][0].Text;
-                                    string s = null;
-                                    if (sigil == "ASTPERCENT") s += Globals.symbolMemvar;
-                                    else if (sigil == "ASTHASH") s += Globals.symbolList;
-                                    s += ident;
-
-                                    ASTNode xx = null; SearchUpwardsInTree3(node, s, out xx);
-                                    string internalName = null;
-                                    if (xx != null)
-                                    {
-                                        internalName = xx.functionDefAnchor[s];  //must exist                                        
-                                    }
+                                    string s = sigil + ident;
+                                    string internalName = SearchUpwardsInTree3(node, s);
                                     if (internalName != null)
                                     {
                                         node.Code.CA(internalName);
@@ -2707,17 +2691,97 @@ namespace Gekko.Parser.Gek
                             if (!functionHit)
                             {
 
+                                string ivTempVar = "null";
+                                if (node.Parent != null && node.Parent.ivTempVarName != null) ivTempVar = node.Parent.ivTempVarName;  //detects if a lhs variable
+                                   
+                                //Check for simple variable like b:x~q or b:%s
+                                //This is only for performance reasons, making lookup faster especially for VALs                            
+
+                                //Check bank
+                                string simpleBank = null;
                                 if (node[0][0] == null)
                                 {
-                                    //no bank indicator
-                                    if (leftHandSide) node.Code.A("(" + node[1].Code + ")");
-                                    else node.Code.A("O.Lookup(smpl, (" + node[1].Code + "))");
+                                    simpleBank = "";  //signals that it does not exist, so treated as ok
                                 }
                                 else
                                 {
-                                    //bank indicator
-                                    if (leftHandSide) node.Code.A("(" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + ")");
-                                    else node.Code.A("O.Lookup(smpl, (" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "))");
+                                    if (node[0][0].Text == "ASTNAME")
+                                    {
+                                        if (node[0][0][0].Text == "ASTIDENT")
+                                        {
+                                            simpleBank = node[0][0][0][0].Text;
+                                        }
+                                    }
+                                }
+
+                                //Check sigil
+                                string sigil = GetSigilAsString(node[1][0]);
+
+                                //Check name
+                                string simpleName = null;
+                                if (node[1][1][0].Text == "ASTNAME")
+                                {
+                                    if (node[1][1][0][0].Text == "ASTIDENT")
+                                    {
+                                        simpleName = node[1][1][0][0][0].Text;
+                                    }
+                                }
+
+                                //Check frequency
+                                string simpleFreq = null;
+                                if (node[1][2][0] == null)
+                                {
+                                    simpleFreq = "";  //signals that it does not exist, so treated as ok
+                                }
+                                else
+                                {
+                                    if (node[1][2][0].Text == "ASTNAME")
+                                    {
+                                        if (node[1][2][0][0].Text == "ASTIDENT")
+                                        {
+                                            simpleFreq = node[1][2][0][0][0].Text;
+                                        }
+                                    }
+                                }
+
+                                //int leftRight = SearchUpwardsInTree4(node);
+
+                                if (simpleBank != null && simpleName != null && simpleFreq != null)
+                                {
+                                    //Ok is simple stuff like b:ts~f, or b:%v
+                                    //We override anything in composed in sub-nodes...!
+
+                                    //For instance, b:x~q --> smpl, "b", "x", "q"
+                                    //For instance, b:%x --> smpl, "b", "%x", null
+                                    //For instance, x --> smpl, null, "x", null
+                                    //simpleName can never contain a '~', but if simpleFreq = null, a freq like "~a" will be added
+                                    //  when looking up.
+
+                                    string hasSigilText = "false";
+                                    if (sigil != null) hasSigilText = "true";
+                                    string simpleBankText = Globals.QT + simpleBank + Globals.QT;
+                                    if (simpleBank == "") simpleBankText = "null";
+                                    string simpleFreqText = Globals.QT + simpleFreq + Globals.QT;
+                                    if (simpleFreq == "") simpleFreqText = "null";
+
+                                    node.Code.CA("O.Lookup(smpl, " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + hasSigilText + ", " + ivTempVar + ")");
+                                }
+                                else
+                                {
+                                    //Complicated name, for instance
+                                    //{%s}, a%s, a{#m}, {%b}:a, b:a~{%f}, %(%s),  ...                                    
+                                    if (node[0][0] == null)
+                                    {
+                                        //no bank indicator
+                                        //if (leftHandSide) node.Code.A("(" + node[1].Code + ")");
+                                        node.Code.A("O.Lookup(smpl, " + node[1].Code + ", " + ivTempVar + ")");
+                                    }
+                                    else
+                                    {
+                                        //bank indicator
+                                        //if (leftHandSide) node.Code.A("(" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + ")");
+                                        node.Code.A("O.Lookup(smpl, (" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "), " + ivTempVar + ")");
+                                    }
                                 }
                             }
                         }
@@ -4294,7 +4358,19 @@ namespace Gekko.Parser.Gek
                 }
                 node.Code.A(Globals.splitSTOP);
             }
-        }        
+        }
+
+        private static string GetSigilAsString(ASTNode nn)
+        {
+            //returns null if not present
+            string sigil = null;
+            if (nn[0] != null)
+            {
+                if (nn[0].Text == "ASTPERCENT") sigil = Globals.symbolMemvar.ToString();
+                if (nn[0].Text == "ASTHASH") sigil = Globals.symbolList.ToString();
+            }
+            return sigil;
+        }
 
         private static void GetCommaCodeFromAllChildren(ASTNode node)
         {
@@ -4463,27 +4539,29 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        private static void SearchUpwardsInTree2(ASTNode node, string listName, out ASTNode parent)
+        private static string SearchUpwardsInTree2(ASTNode node, string listName)
         {            
             ASTNode tmp = node.Parent;
-            parent = null;
+            string rv = null;         
             while (tmp != null)
             {
                 bool ok = false;
                 if (tmp.listLoopAnchor != null && tmp.listLoopAnchor.ContainsKey(listName)) ok = true;
                 if (ok)
-                {                    
-                    parent = tmp;
+                {
+                    rv = tmp.listLoopAnchor[listName];
                     break;
                 }
                 tmp = tmp.Parent;
             }
+            return rv;
         }
 
-        private static void SearchUpwardsInTree3(ASTNode node, string varName, out ASTNode parent)
+        private static string SearchUpwardsInTree3(ASTNode node, string varName)
         {
             ASTNode tmp = node.Parent;
-            parent = null;
+            ASTNode parent = null;
+            string rv = null;
             while (tmp != null)
             {
                 bool ok = false;
@@ -4491,12 +4569,32 @@ namespace Gekko.Parser.Gek
                 if (ok)
                 {
                     parent = tmp;
+                    rv = tmp.functionDefAnchor[varName];
                     break;
                 }
                 tmp = tmp.Parent;
             }
+            return rv;
         }
 
+        //private static int SearchUpwardsInTree4(ASTNode node)
+        //{
+        //    //-12345=none, 0=left, 1=right
+        //    int rv = 0;
+        //    ASTNode tmp = node.Parent;
+        //    ASTNode parent = null;            
+        //    while (tmp != null)
+        //    {
+        //        bool ok = false;
+        //        if (tmp.Parent != null && tmp.Parent.Text == "ASTASSIGNMENT")
+        //        {
+        //            //#09873245325
+        //            rv = tmp.Number;
+        //            break;
+        //        }                
+        //    }
+        //    return rv;
+        //}
 
         private static void ResetUFunctionHelpers(W w)
         {

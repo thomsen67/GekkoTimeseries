@@ -90,7 +90,7 @@ namespace Gekko
         /// to be able to store the same variable name with different frequencies in the same databank.
         /// </summary>
         [ProtoMember(3)]
-        public string variableName;
+        public string name;
         /// <summary>
         /// The array containing the time series data. This array is initialized with NaN values, and the array may resize
         /// itself if necessary to store a particular observation.
@@ -166,7 +166,7 @@ namespace Gekko
         public TimeSeries(EFreq frequency, string variableName)
         {            
             this.freq = frequency;
-            this.variableName = variableName;  //Note: the variableName does contain a ~
+            this.name = variableName;  //Note: the variableName does contain a ~
             //string[] ss = variableName.Split(Globals.symbolTilde);
             //if (ss.Length > 2)
             //{
@@ -193,7 +193,7 @@ namespace Gekko
         {
             //DimensionCheck();
             //Always make sure new fields are remembered in the Clone() method
-            TimeSeries tsCopy = new TimeSeries(this.freq, this.variableName);
+            TimeSeries tsCopy = new TimeSeries(this.freq, this.name);
             if (this.dataArray == null)
             {
                 tsCopy.dataArray = null;
@@ -341,9 +341,9 @@ namespace Gekko
                 //If no data has been added to the timeseries, NaN will always be returned.
                 if (this.IsGhost())
                 {
-                    G.Writeln2("*** ERROR: The variable '" + this.variableName + "' is an array-timeseries,");
+                    G.Writeln2("*** ERROR: The variable '" + this.name + "' is an array-timeseries,");
                     G.Writeln("           but is used as a normal timeseries here (without []-indexer)", Color.Red);
-                    Program.ArrayTimeseriesTip(this.variableName);
+                    Program.ArrayTimeseriesTip(this.name);
                     throw new GekkoException();
                 }
                 else
@@ -1064,7 +1064,7 @@ namespace Gekko
                 }
                 if (indexes.Length == stringCount)
                 {
-                    string s = G.RemoveFreqIndicator(this.variableName);
+                    string s = G.RemoveFreqIndicator(this.name);
                     if (true)
                     {                        
                         string hash = GetHashCodeFromIvariables(indexes);

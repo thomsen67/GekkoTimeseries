@@ -318,7 +318,7 @@ namespace Gekko
         }
 
         //Maybe allowTurtle should be removed
-        private static bool IsSimpleToken(string varName, bool allowTurtle)
+        public static bool IsSimpleToken(string varName, bool allowTilde)
         {
             //must be like a38, f16, var2, _var3, x_y etc. Cannot start with digit.
             if (varName == null) return false;
@@ -326,7 +326,7 @@ namespace Gekko
             if (!G.IsLetterOrUnderscore(varName[0])) return false;
             for (int jj = 1; jj < varName.Length; jj++)
             {
-                if (!allowTurtle)
+                if (!allowTilde)
                 {
                     if (!G.IsLetterOrDigitOrUnderscore(varName[jj]))
                     {
@@ -335,7 +335,7 @@ namespace Gekko
                 }
                 else
                 {
-                    if (!G.IsLetterOrDigitOrUnderscoreOrTurtle(varName[jj]))
+                    if (!G.IsLetterOrDigitOrUnderscoreOrTilde(varName[jj]))
                     {
                         return false;
                     }
@@ -889,9 +889,9 @@ namespace Gekko
             else return false;
         }
 
-        public static bool IsLetterOrDigitOrUnderscoreOrTurtle(char c)
+        public static bool IsLetterOrDigitOrUnderscoreOrTilde(char c)
         {
-            if (G.IsEnglishLetter(c) || char.IsDigit(c) || c == '_' || c == '¤')
+            if (G.IsEnglishLetter(c) || char.IsDigit(c) || c == '_' || c == Globals.symbolTilde)
                 return true;
             else return false;
         }

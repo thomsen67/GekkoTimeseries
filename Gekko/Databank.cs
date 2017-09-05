@@ -209,49 +209,7 @@ namespace Gekko
             }
             G.WritelnGray("TRIM: " + G.Seconds(t0));
             //This does not change the databank, so this.hasBeenChanged is not touched!!
-        }        
-
-        public void AddVariable(TimeSeries ts)
-        {             
-            AddVariable(true, ts, true);            
-        }
-
-        public void AddVariable(TimeSeries ts, bool variableNameCheck)
-        {
-            AddVariable(true, ts, variableNameCheck);
-        }
-
-        //public void AddVariable(string frequency, TimeSeries ts)
-        //{
-        //    AddVariable(false, frequency, ts, true);
-        //}
-
-        //public void AddVariable(string frequency, TimeSeries ts, bool variableNameCheck)
-        //{
-        //    AddVariable(false, frequency, ts, variableNameCheck);
-        //}
-
-        //generic method, not for outside use
-        private void AddVariable(bool freqAddToName, TimeSeries ts, bool variableNameCheck)
-        {            
-            if (this.protect) Program.ProtectError("You cannot add a timeseries to a non-editable databank, see OPEN<edit> or UNLOCK");
-            string variable = ts.variableName;
-            if (variableNameCheck && !G.IsSimpleToken(variable))  //also checks for null and "" and '¤'
-            {
-                G.Writeln2("*** ERROR in databank: the name '" + variable + "' is not a simple variable name");
-                throw new GekkoException();
-            }
-            if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable); 
-            else variable = Program.AddFreqAtEndOfVariableName(variable, G.GetFreq(ts.freq));                
-            this.storage.Add(variable, ts);
-            ts.parentDatabank = this;
-            this.isDirty = true;
-        }
-
-        public TimeSeries GetVariable(string variable)
-        {            
-            return GetVariable(true, variable);
-        }
+        }               
 
         public IVariable GetIVariable(string variable)
         {
@@ -260,9 +218,22 @@ namespace Gekko
             return iv;
         }
 
+        public void AddIVariable(IVariable x)
+        {
+            TimeSeries ts = x as TimeSeries;
+            if (ts != null) AddIVariable(ts.name, x);
+            else
+            {
+                G.Writeln2("***ERROR: Internal error: please use AddIvariable(name, x)");
+                throw new GekkoException();
+            }
+        }
+
         public void AddIVariable(string name, IVariable x)
         {
-            //For TimeSeries, always use this pattern: AddIVariable(x.variableName, x)
+            if (this.protect) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
+            //For TimeSeries, use AddIVariable
+            bool hasTilde = false;
             foreach (char c in name)
             {
                 //The good thing is that this is only checked when putting stuff INTO the databank, and not
@@ -279,12 +250,20 @@ namespace Gekko
                     G.Writeln2("***ERROR: Malformed name: '" + name + "'");
                     throw new GekkoException();
                 }
+                if (c == Globals.symbolTilde) hasTilde = true;
+            }
+            TimeSeries ts = x as TimeSeries;
+            if (ts != null)
+            {
+                if (ts.name != name || !hasTilde)
+                {
+                    G.Writeln2("*** ERROR: #763209485");  //use AddIVariable(x), remember tilde in x.variableName.
+                    throw new GekkoException();
+                }
+                ts.parentDatabank = this;
+                ts.SetDirty(true);
             }
             this.storage.Add(name, x);
-            if (x.Type() == EVariableType.TimeSeries)
-            {
-                ((TimeSeries)x).parentDatabank = this;
-            }
         }
 
         public void RemoveIVariable(string name)
@@ -297,8 +276,58 @@ namespace Gekko
             return this.storage.ContainsKey(name);
         }
 
+
+        //OLD OLD OLD
+        //OLD OLD OLD
+        //OLD OLD OLD
+        //OLD OLD OLD
+        //OLD OLD OLD
+        //OLD OLD OLD
+
+        public void AddVariable(TimeSeries ts)
+        {
+            G.Writeln2("*** ERROR: #74329732");
+            throw new GekkoException();
+            AddVariable(true, ts, true);
+        }
+
+        public void AddVariable(TimeSeries ts, bool variableNameCheck)
+        {
+            G.Writeln2("*** ERROR: #74329732");
+            throw new GekkoException();
+            AddVariable(true, ts, variableNameCheck);
+        }
+
+        //generic method, not for outside use
+        private void AddVariable(bool freqAddToName, TimeSeries ts, bool variableNameCheck)
+        {
+            G.Writeln2("*** ERROR: #74329732");
+            throw new GekkoException();
+            if (this.protect) Program.ProtectError("You cannot add a timeseries to a non-editable databank, see OPEN<edit> or UNLOCK");
+            string variable = ts.name;
+            if (variableNameCheck && !G.IsSimpleToken(variable, true))  //also checks for null and "" and '¤'
+            {
+                G.Writeln2("*** ERROR in databank: the name '" + variable + "' is not a simple variable name");
+                throw new GekkoException();
+            }
+            //if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable); 
+            //else variable = Program.AddFreqAtEndOfVariableName(variable, G.GetFreq(ts.freq));                
+            this.storage.Add(variable, ts);
+            ts.parentDatabank = this;
+            this.isDirty = true;
+        }
+
+        public TimeSeries GetVariable(string variable)
+        {
+            G.Writeln2("*** ERROR: #74329732");
+            throw new GekkoException();
+            return GetVariable(true, variable);
+        }
+
         public TimeSeries GetVariable(bool freqAddToName, string variable)
-        {            
+        {
+            G.Writeln2("*** ERROR: #74329732");
+            throw new GekkoException();
             if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
             IVariable x = GetIVariable(variable);
             return (TimeSeries)x;            
@@ -306,6 +335,8 @@ namespace Gekko
 
         public TimeSeries GetVariable(EFreq eFreq, string variable)
         {
+            G.Writeln2("*** ERROR: #74329732");
+            throw new GekkoException();
             if (eFreq != EFreq.Annual) variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);  //we do this IF here because it is speed critical code. Else a new string object will be created.
             IVariable x = GetIVariable(variable);
             return (TimeSeries)x;

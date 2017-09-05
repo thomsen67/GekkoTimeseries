@@ -182,11 +182,11 @@ namespace Gekko
             TimeSeries tsp2 = O.GetTimeSeries(tuple.tuple0);
             TimeSeries tsq2 = O.GetTimeSeries(tuple.tuple1);
 
-            tsp2.variableName = tsp1.variableName;
-            tsq2.variableName = tsq1.variableName;
+            tsp2.name = tsp1.name;
+            tsq2.name = tsq1.name;
 
-            tsp1.parentDatabank.RemoveVariable(tsp1.variableName);
-            tsq1.parentDatabank.RemoveVariable(tsq1.variableName);
+            tsp1.parentDatabank.RemoveVariable(tsp1.name);
+            tsq1.parentDatabank.RemoveVariable(tsq1.name);
 
             tsp1.parentDatabank.AddVariable(tsp2);
             tsq1.parentDatabank.AddVariable(tsq2);
