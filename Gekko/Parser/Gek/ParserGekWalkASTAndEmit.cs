@@ -1276,6 +1276,83 @@ namespace Gekko.Parser.Gek
                         }
                         break;
 
+                    case "ASTFOR":
+                        {
+                            node.Code.A(Globals.splitSTOP);
+
+                            string varname = node[1][1][0].Text;
+
+                            if (node[1][0][0] != null)
+                            {
+                                if (node[1][0][0].Text == "ASTPERCENT") varname = Globals.symbolMemvar + varname;
+                                else if (node[1][0][0].Text == "ASTHASH") varname = Globals.symbolList + varname;
+                                else throw new GekkoException();
+                            }
+
+                            if (node[2].ChildrenCount() == 1)
+                            {
+                                string code = node[2][0][0].Code.ToString();
+
+                            }
+                            else
+                            {
+                                
+                                //for (int i = 0; i < node[2].ChildrenCount(); i++)
+                                //{
+                                //    //parallel loops will have i > 1
+                                //}
+
+                            }
+                            if (node[0].Text != "ASTFORLEFTSIDE" || node[1].Text != "ASTFORRIGHTSIDE" || node[2].Text != "ASTFORSTATEMENTS")
+                            {
+                                throw new GekkoException();
+                            }
+                            string nameSimpleIdent = node[0][0].nameSimpleIdent;
+                            if (nameSimpleIdent == null)
+                            {
+                                G.Writeln2("*** ERROR: Composed names not (yet) allowed for loop variables");
+                                throw new GekkoException();
+                            }
+                            string codeFrom = node[1][0].Code.ToString();
+                            string codeEnd = node[1][1].Code.ToString();
+                            string codeStep = null;
+                            ASTNode stepNode = node[1][2];
+                            if (stepNode == null) codeStep = "new ScalarVal(1d)";
+                            else codeStep = node[1][2].Code.ToString();
+                            string statements = node[2].Code.ToString();  //has been done in "ASTFORSTATEMENTS"
+                            string tempName = "temp" + ++Globals.counter;
+                            string startName = "start" + ++Globals.counter;
+                            string endName = "end" + ++Globals.counter;
+                            string stepName = "step" + ++Globals.counter;
+                            //NOTE this will mean that the end and step are fixed when seeing the FOR. Should be ok. Alternative is crazy.                            
+
+                            string loopVariable = null;
+                            string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.Val, "double.NaN", false, true, false);
+
+                            node.Code.A(setLoopStringCs + G.NL);
+                            node.Code.A("double " + stepName + " = " + codeStep + ".GetVal(" + Globals.smpl + ");" + G.NL);
+                            node.Code.A("double " + startName + " = " + codeFrom + ".GetVal(" + Globals.smpl + ");" + G.NL);
+                            node.Code.A("double " + endName + " = " + codeEnd + ".GetVal(" + Globals.smpl + ") + " + stepName + "/1000000d;" + G.NL);  //added a tiny bit of steplength, to guard against rounding errors
+                            node.Code.A("ScalarVal " + tempName + " = (ScalarVal)" + loopVariable + ";" + G.NL);
+                            node.Code.A("try {");
+                            node.Code.A("for (" + tempName + ".val = " + startName + " ; O.ContinueIterating(" + tempName + ".val, " + endName + ", " + stepName + "); " + tempName + ".val += " + stepName + ")");
+                            node.Code.A("{" + G.NL);
+
+                            node.Code.A(Globals.splitSTART);
+                            node.Code.A(statements);
+                            node.Code.A(Globals.splitSTOP);
+
+                            node.Code.A("}" + G.NL);
+                            node.Code.A("} //end of try" + G.NL);  //assign var is always removed, also in case of error
+                            node.Code.A("finally {" + G.NL);
+                            node.Code.A("O.RemoveScalar(`" + nameSimpleIdent + "`);" + G.NL);
+                            node.Code.A("}  //end of finally" + G.NL);  //end of finally   
+
+                            node.Code.A(Globals.splitSTART);
+                        }
+                        break;
+
+
                     case "ASTFORVAL":
                         {
                             node.Code.A(Globals.splitSTOP);
