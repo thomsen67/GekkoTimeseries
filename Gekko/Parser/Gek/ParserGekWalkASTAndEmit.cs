@@ -1291,14 +1291,19 @@ namespace Gekko.Parser.Gek
 
                             if (node[2].ChildrenCount() == 1)
                             {
+                                int i = 0;
+
                                 string codeStart = node[2][0][0].Code.ToString();
                                 string codeEnd2 = "null"; if (node[2][0][1][0] != null) codeEnd2 = node[2][0][1][0].Code.ToString();
                                 string codeStep = "null"; if (node[2][0][2][0] != null) codeStep = node[2][0][2][0].Code.ToString();
-                                
+
                                 //string tempName2 = "temp" + ++Globals.counter;
-                                int i = 0;
+
+                                string temp = "counter" + ++Globals.counter;
+
                                 node.Code.A(node.forLoop[i].Item1 + " " + node.forLoop[i].Item2 + " = null").End();
-                                node.Code.A("for (O.IterateStart(ref " + node.forLoop[i].Item2 + ", " + codeStart + "); O.IterateContinue(" + node.forLoop[i].Item2 + ", " + codeEnd2 + ", " + codeStep + "); O.IterateStep(" + node.forLoop[i].Item2 + ", " + codeStep + "))" + G.NL);
+                                node.Code.A("int " + temp + " = 0").End();
+                                node.Code.A("for (O.IterateStart(ref " + node.forLoop[i].Item2 + ", " + codeStart + "); O.IterateContinue(" + node.forLoop[i].Item2 + ", " + codeStart + ", " + codeEnd2 + ", " + codeStep + ", ref " + temp + "); O.IterateStep(" + node.forLoop[i].Item2 + ", " + codeStart + ", " + codeStep + ", " + temp + "))" + G.NL);
                                 node.Code.A("{").End();
                                 GetCodeFromAllChildren(node[3]);
                                 node.Code.A(node[3].Code);                              

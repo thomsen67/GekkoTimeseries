@@ -9,9 +9,6 @@ namespace Gekko
     public class TranslatedCode
     {
         public static GekkoTime globalGekkoTimeIterator = Globals.tNull;
-        public static readonly ScalarVal i2 = new ScalarVal(0d);
-        public static readonly ScalarVal i4 = new ScalarVal(1d);
-        public static readonly ScalarVal i5 = new ScalarVal(1000d);
         public static void ClearTS(P p)
         {
         }
@@ -25,8 +22,15 @@ namespace Gekko
 
 
             p.SetText(@"¤0");
-            IVariable ivTmpvar1 = i2;
-            O.Lookup(smpl, null, "%sum", null, true, ivTmpvar1)
+            O.Reset o0 = new O.Reset();
+            o0.p = p; o0.Exe();
+
+
+
+
+            p.SetText(@"¤0");
+            IVariable ivTmpvar16 = O.ListDef(new ScalarString(@"a"), new ScalarString(@"b"), new ScalarString(@"c"));
+            O.Lookup(smpl, null, "#m", null, true, ivTmpvar16)
             ;
 
 
@@ -46,13 +50,22 @@ namespace Gekko
 
 
             p.SetText(@"¤0");
-            O.Print(smpl, (O.Lookup(smpl, null, "%sum", null, true, null)));
+            IVariable ivTmpvar19 = O.ListDef(new ScalarString(@"a"), new ScalarString(@"b"), new ScalarString(@"c"));
+            O.Lookup(smpl, null, "#m", null, true, ivTmpvar19)
+            ;
 
 
 
 
             p.SetText(@"¤0");
-            O.Print(smpl, (O.Lookup(smpl, null, "%i", null, true, null)));
+
+        }
+
+        public static void C2(P p)
+        {
+
+            GekkoSmpl smpl = O.Smpl();
+
 
 
 
@@ -66,17 +79,29 @@ namespace Gekko
 
             C0(p);
 
-            IVariable forloop_3 = null;
-            for (O.IterateStart(ref forloop_3, i4); O.IterateContinue(forloop_3, i5, null); O.IterateStep(forloop_3, null))
+            IVariable forloop_17 = null;
+            int counter18 = 0;
+            for (O.IterateStart(ref forloop_17, O.Lookup(smpl, null, "#m", null, true, null)); O.IterateContinue(forloop_17, O.Lookup(smpl, null, "#m", null, true, null), null, null, ref counter18); O.IterateStep(forloop_17, O.Lookup(smpl, null, "#m", null, true, null), null, counter18))
             {
                 ;
-                IVariable ivTmpvar6 = O.Add(smpl, O.Lookup(smpl, null, "%sum", null, true, null), forloop_3);
-                O.Lookup(smpl, null, "%sum", null, true, ivTmpvar6)
-                ;
+                O.Print(smpl, (forloop_17));
 
             };
 
             C1(p);
+
+            IVariable forloop_20 = null;
+            int counter21 = 0;
+            for (O.IterateStart(ref forloop_20, O.Lookup(smpl, null, "#m", null, true, null)); O.IterateContinue(forloop_20, O.Lookup(smpl, null, "#m", null, true, null), null, null, ref counter21); O.IterateStep(forloop_20, O.Lookup(smpl, null, "#m", null, true, null), null, counter21))
+            {
+                ;
+                O.Print(smpl, (forloop_20));
+
+            };
+
+            C2(p);
+
+
 
         }
     }

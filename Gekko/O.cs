@@ -347,15 +347,35 @@ namespace Gekko
             return (ScalarDate)lhs;
         }
 
-        public static void IterateStep(IVariable x, IVariable step)
+        public static void IterateStep(IVariable x, IVariable start, IVariable step, int counter)
         {
             if (x.Type() == EVariableType.Val)
             {
-                ScalarVal svstep = null;
-                if (step == null) svstep = Globals.scalarVal1;
-                else svstep = step as ScalarVal;
-                ScalarVal svx = x as ScalarVal;
-                svx.val += svstep.val;
+                ScalarVal step_val = null;
+                if (step == null) step_val = Globals.scalarVal1;
+                else step_val = step as ScalarVal;
+                ScalarVal x_val = x as ScalarVal;
+                x_val.val += step_val.val;
+            }
+            else if (x.Type() == EVariableType.String)
+            {                
+                //it is tested previously that step = null and start is metalist
+                MetaList start_list = start as MetaList;
+                if (counter >= start_list.list.Count)
+                {
+                    //do nothing, this x will not be used
+                }
+                else
+                {
+                    ScalarString x_string = x as ScalarString;
+                    ScalarString item = start_list.list[counter] as ScalarString;
+                    if (item == null)
+                    {
+                        G.Writeln2("*** ERROR: list element " + (counter + 1) + " is not a STRING");
+                        throw new GekkoException();
+                    }
+                    x_string._string2 = item._string2;
+                }
             }
             else throw new GekkoException();
         }
@@ -376,42 +396,76 @@ namespace Gekko
                 {
                     x = new ScalarString(((ScalarString)start)._string2);
                 }
+                else if (start.Type() == EVariableType.List)
+                {
+                    MetaList start_list = start as MetaList;
+                    if (start_list.list.Count == 0)
+                    {
+                        G.Writeln2("*** ERROR: Empty list");
+                        throw new GekkoException();
+                    }
+                    ScalarString xx = start_list.list[0] as ScalarString;
+                    if (xx == null)
+                    {
+                        G.Writeln2("*** ERROR: list element 1 is not a STRING");
+                        throw new GekkoException();
+                    }
+                    x = new Gekko.ScalarString(xx._string2);
+                    //x = start_list.list[0];  ----------------> FAIL, sideeffect because then the first item in the list will change when x changes....!!!
+                }
                 else throw new GekkoException();
             }
         }
 
-        public static bool IterateContinue(IVariable x, IVariable max, IVariable step)
+        public static bool IterateContinue(IVariable x, IVariable start, IVariable max, IVariable step, ref int counter)
         {
+            counter++;
             bool rv = false;
             if (x.Type() == EVariableType.Val)
             {
-                ScalarVal svx = x as ScalarVal;
-                ScalarVal svmax = max as ScalarVal;
-                if (svmax == null)
+                ScalarVal x_val = x as ScalarVal;
+                ScalarVal max_val = max as ScalarVal;
+                if (max_val == null)
                 {
                     G.Writeln2("*** ERROR: Expected max value to be VAL type");
                     throw new GekkoException();
                 }
-                ScalarVal svstep = null;
-                if (step == null) svstep = Globals.scalarVal1;
-                else svstep = step as ScalarVal;
-                if (svstep == null)
+                ScalarVal step_val = null;
+                if (step == null) step_val = Globals.scalarVal1;
+                else step_val = step as ScalarVal;
+                if (step_val == null)
                 {
                     G.Writeln2("*** ERROR: Expected step value to be VAL type");
                     throw new GekkoException();
                 }
-                if (svstep.val > 0)
+                if (step_val.val > 0)
                 {
                     //for instance: FOR VAL i = 1 to 11 by 2; (1, 3, 5, 7, 9, 11)
                     //max typically has step/1000000 added, so it might be 11.000002
-                    rv = svx.val <= svmax.val + svstep.val / 1000000d;
+                    rv = x_val.val <= max_val.val + step_val.val / 1000000d;
                 }
                 else
                 {
-                    rv = svx.val >= svmax.val + svstep.val / 1000000;
+                    rv = x_val.val >= max_val.val + step_val.val / 1000000;
                     //for instance: FOR VAL i = 11 to 1 by -2; (11, 9, 7, 5, 3, 1)
                     //max typically has step/1000000 added, so it might be 0.999998
                 }
+            }
+            else if (x.Type() == EVariableType.String)
+            {
+                if (max != null)
+                {
+                    G.Writeln2("*** ERROR: string loops do not have TO argument");
+                    throw new GekkoException();
+                }
+                if (step != null)
+                {
+                    G.Writeln2("*** ERROR: string loops do not have STEP/BY argument");
+                    throw new GekkoException();
+                }
+                MetaList start_list = start as MetaList;
+                if (counter <= start_list.list.Count) rv = true;
+
             }
             else throw new GekkoException();
             return rv;        
