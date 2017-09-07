@@ -396,7 +396,7 @@ return2                    : RETURN2 expression -> ^({token("ASTRETURN", ASTRETU
 functionDef				  : FUNCTION type ident leftParenGlue functionArg RIGHTPAREN SEMICOLON functionStatements END -> ^(ASTFUNCTIONDEF2 type ident functionArg functionStatements);
 functionArg               : (functionArgElement (',' functionArgElement)*)? -> ^(ASTPLACEHOLDER functionArgElement*);
 functionArgElement        : type svarname -> ^(ASTPLACEHOLDER type svarname);
-functionStatements        : statements2* -> ^(ASTPLACEHOLDER statements2*);
+functionStatements        : statements* -> ^(ASTPLACEHOLDER statements*);
 type					  : VAL | STRING | DATE | SERIES | LIST | DICT | MATRIX ;
 
 // ------------------------------------------------------------------------------------------------------------------

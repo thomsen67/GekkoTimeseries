@@ -346,7 +346,77 @@ namespace Gekko
             }
             return (ScalarDate)lhs;
         }
-                               
+
+        public static void IterateStep(IVariable x, IVariable step)
+        {
+            if (x.Type() == EVariableType.Val)
+            {
+                ScalarVal svstep = null;
+                if (step == null) svstep = Globals.scalarVal1;
+                else svstep = step as ScalarVal;
+                ScalarVal svx = x as ScalarVal;
+                svx.val += svstep.val;
+            }
+            else throw new GekkoException();
+        }
+
+        public static void IterateStart(ref IVariable x, IVariable start)
+        {
+            if (x == null)
+            {
+                if (start.Type() == EVariableType.Val)
+                {
+                    x = new ScalarVal(((ScalarVal)start).val);
+                }
+                else if (start.Type() == EVariableType.Date)
+                {
+                    x = new ScalarDate(((ScalarDate)start).date);
+                }
+                else if (start.Type() == EVariableType.String)
+                {
+                    x = new ScalarString(((ScalarString)start)._string2);
+                }
+                else throw new GekkoException();
+            }
+        }
+
+        public static bool IterateContinue(IVariable x, IVariable max, IVariable step)
+        {
+            bool rv = false;
+            if (x.Type() == EVariableType.Val)
+            {
+                ScalarVal svx = x as ScalarVal;
+                ScalarVal svmax = max as ScalarVal;
+                if (svmax == null)
+                {
+                    G.Writeln2("*** ERROR: Expected max value to be VAL type");
+                    throw new GekkoException();
+                }
+                ScalarVal svstep = null;
+                if (step == null) svstep = Globals.scalarVal1;
+                else svstep = step as ScalarVal;
+                if (svstep == null)
+                {
+                    G.Writeln2("*** ERROR: Expected step value to be VAL type");
+                    throw new GekkoException();
+                }
+                if (svstep.val > 0)
+                {
+                    //for instance: FOR VAL i = 1 to 11 by 2; (1, 3, 5, 7, 9, 11)
+                    //max typically has step/1000000 added, so it might be 11.000002
+                    rv = svx.val <= svmax.val + svstep.val / 1000000d;
+                }
+                else
+                {
+                    rv = svx.val >= svmax.val + svstep.val / 1000000;
+                    //for instance: FOR VAL i = 11 to 1 by -2; (11, 9, 7, 5, 3, 1)
+                    //max typically has step/1000000 added, so it might be 0.999998
+                }
+            }
+            else throw new GekkoException();
+            return rv;        
+        }
+
 
         public static bool ContinueIterating(double i, double max, double step) {
             if (step > 0)

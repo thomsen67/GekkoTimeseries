@@ -286,6 +286,15 @@ namespace Gekko.Parser.Gek
                         w.wh.seriesHelper = WalkHelper.seriesType.SeriesRhs;
                     }
                     break;
+                case "ASTFOR":
+                    {
+                        string varname = GetForLoopVariable(node);  //TODO: more than 1...
+                        if (node.forLoopAnchor == null) node.forLoopAnchor = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                        node.forLoopAnchor.Add(varname, "forloop_" + ++Globals.counter);
+                        if (node.forLoop == null) node.forLoop = new List<Tuple<string, string>>();
+                        node.forLoop.Add(new Tuple<string, string>("IVariable", "forloop_" + Globals.counter));
+                    }
+                    break;
                 case "ASTFUNCTIONDEF2":
                     {
                         string returnType = node[0].Text;
@@ -507,8 +516,6 @@ namespace Gekko.Parser.Gek
                                         {
 
                                             string listName = GetSimpleHashName(node[i][1]);
-
-
 
                                             if (listName != null)
                                             {
@@ -1280,73 +1287,32 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A(Globals.splitSTOP);
 
-                            string varname = node[1][1][0].Text;
-
-                            if (node[1][0][0] != null)
-                            {
-                                if (node[1][0][0].Text == "ASTPERCENT") varname = Globals.symbolMemvar + varname;
-                                else if (node[1][0][0].Text == "ASTHASH") varname = Globals.symbolList + varname;
-                                else throw new GekkoException();
-                            }
+                            string varname = GetForLoopVariable(node);
 
                             if (node[2].ChildrenCount() == 1)
                             {
-                                string code = node[2][0][0].Code.ToString();
-
+                                string codeStart = node[2][0][0].Code.ToString();
+                                string codeEnd2 = "null"; if (node[2][0][1][0] != null) codeEnd2 = node[2][0][1][0].Code.ToString();
+                                string codeStep = "null"; if (node[2][0][2][0] != null) codeStep = node[2][0][2][0].Code.ToString();
+                                
+                                //string tempName2 = "temp" + ++Globals.counter;
+                                int i = 0;
+                                node.Code.A(node.forLoop[i].Item1 + " " + node.forLoop[i].Item2 + " = null").End();
+                                node.Code.A("for (O.IterateStart(ref " + node.forLoop[i].Item2 + ", " + codeStart + "); O.IterateContinue(" + node.forLoop[i].Item2 + ", " + codeEnd2 + ", " + codeStep + "); O.IterateStep(" + node.forLoop[i].Item2 + ", " + codeStep + "))" + G.NL);
+                                node.Code.A("{").End();
+                                GetCodeFromAllChildren(node[3]);
+                                node.Code.A(node[3].Code);                              
+                                node.Code.A("}").End();
                             }
                             else
                             {
-                                
+
                                 //for (int i = 0; i < node[2].ChildrenCount(); i++)
                                 //{
                                 //    //parallel loops will have i > 1
                                 //}
 
                             }
-                            if (node[0].Text != "ASTFORLEFTSIDE" || node[1].Text != "ASTFORRIGHTSIDE" || node[2].Text != "ASTFORSTATEMENTS")
-                            {
-                                throw new GekkoException();
-                            }
-                            string nameSimpleIdent = node[0][0].nameSimpleIdent;
-                            if (nameSimpleIdent == null)
-                            {
-                                G.Writeln2("*** ERROR: Composed names not (yet) allowed for loop variables");
-                                throw new GekkoException();
-                            }
-                            string codeFrom = node[1][0].Code.ToString();
-                            string codeEnd = node[1][1].Code.ToString();
-                            string codeStep = null;
-                            ASTNode stepNode = node[1][2];
-                            if (stepNode == null) codeStep = "new ScalarVal(1d)";
-                            else codeStep = node[1][2].Code.ToString();
-                            string statements = node[2].Code.ToString();  //has been done in "ASTFORSTATEMENTS"
-                            string tempName = "temp" + ++Globals.counter;
-                            string startName = "start" + ++Globals.counter;
-                            string endName = "end" + ++Globals.counter;
-                            string stepName = "step" + ++Globals.counter;
-                            //NOTE this will mean that the end and step are fixed when seeing the FOR. Should be ok. Alternative is crazy.                            
-
-                            string loopVariable = null;
-                            string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.Val, "double.NaN", false, true, false);
-
-                            node.Code.A(setLoopStringCs + G.NL);
-                            node.Code.A("double " + stepName + " = " + codeStep + ".GetVal(" + Globals.smpl + ");" + G.NL);
-                            node.Code.A("double " + startName + " = " + codeFrom + ".GetVal(" + Globals.smpl + ");" + G.NL);
-                            node.Code.A("double " + endName + " = " + codeEnd + ".GetVal(" + Globals.smpl + ") + " + stepName + "/1000000d;" + G.NL);  //added a tiny bit of steplength, to guard against rounding errors
-                            node.Code.A("ScalarVal " + tempName + " = (ScalarVal)" + loopVariable + ";" + G.NL);
-                            node.Code.A("try {");
-                            node.Code.A("for (" + tempName + ".val = " + startName + " ; O.ContinueIterating(" + tempName + ".val, " + endName + ", " + stepName + "); " + tempName + ".val += " + stepName + ")");
-                            node.Code.A("{" + G.NL);
-
-                            node.Code.A(Globals.splitSTART);
-                            node.Code.A(statements);
-                            node.Code.A(Globals.splitSTOP);
-
-                            node.Code.A("}" + G.NL);
-                            node.Code.A("} //end of try" + G.NL);  //assign var is always removed, also in case of error
-                            node.Code.A("finally {" + G.NL);
-                            node.Code.A("O.RemoveScalar(`" + nameSimpleIdent + "`);" + G.NL);
-                            node.Code.A("}  //end of finally" + G.NL);  //end of finally   
 
                             node.Code.A(Globals.splitSTART);
                         }
@@ -4426,6 +4392,23 @@ namespace Gekko.Parser.Gek
             }
         }
 
+        private static string GetForLoopVariable(ASTNode node)
+        {
+            string varname = node[1][1][0].Text;
+            if (node[1][0][0] != null)
+            {
+                if (node[1][0][0].Text == "ASTPERCENT") varname = Globals.symbolMemvar + varname;
+                else if (node[1][0][0].Text == "ASTHASH") varname = Globals.symbolList + varname;
+                else throw new GekkoException();
+            }
+            if (!varname.StartsWith(Globals.symbolMemvar.ToString()))
+            {
+                G.Writeln2("*** ERROR: Only scalar variables (%) allowed as FOR loop variablse");
+                throw new GekkoException();
+            }
+            return varname;
+        }
+
         private static string GetSigilAsString(ASTNode nn)
         {
             //returns null if not present
@@ -4629,13 +4612,17 @@ namespace Gekko.Parser.Gek
             ASTNode parent = null;
             string rv = null;
             while (tmp != null)
-            {
-                bool ok = false;
-                if (tmp.functionDefAnchor != null && tmp.functionDefAnchor.ContainsKey(varName)) ok = true;
-                if (ok)
+            {                
+                if (tmp.functionDefAnchor != null && tmp.functionDefAnchor.ContainsKey(varName))                
                 {
                     parent = tmp;
                     rv = tmp.functionDefAnchor[varName];
+                    break;
+                }
+                else if (tmp.forLoopAnchor != null && tmp.forLoopAnchor.ContainsKey(varName))
+                {
+                    parent = tmp;
+                    rv = tmp.forLoopAnchor[varName];
                     break;
                 }
                 tmp = tmp.Parent;
