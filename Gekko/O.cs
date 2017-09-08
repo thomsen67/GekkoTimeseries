@@ -569,13 +569,7 @@ namespace Gekko
                 if (Program.options.databank_search && dbName == null)
                 {
                     //Search if on the right-hand side (rhs), in data mode, and no bank is indicated
-                    for (int i = 0; i < Program.databanks.storage.Count; i++)
-                    {
-                        if (i == 1) continue;  //The Ref databank IS NEVER SEARCHED!!
-                        Databank db2 = Program.databanks.storage[i];
-                        lhs = db2.GetIVariable(varName);
-                        if (lhs != null) break;
-                    }
+                    lhs = GetVariableSearch(lhs, varName);
                     if (lhs == null)
                     {
                         G.Writeln2("*** ERROR: Could not find variable '" + varName + "' in any open databank (excluding Ref)");
@@ -584,9 +578,7 @@ namespace Gekko
                 }
                 else
                 {
-                    Databank db = null;
-                    if (dbName == null) db = Program.databanks.GetFirst();
-                    else db = Program.databanks.GetDatabank(dbName);
+                    Databank db = GetDatabankNoSearch(dbName);
                     lhs = db.GetIVariable(varName);
                     if (lhs == null)
                     {
@@ -620,6 +612,21 @@ namespace Gekko
                         {
                             ScalarVal sv = new ScalarVal(((ScalarVal)rhs).val);
                             db.AddIVariable(varName, sv);
+                        }
+                        else if (rhs.Type() == EVariableType.String)
+                        {
+                            ScalarString ss = new ScalarString(((ScalarString)rhs)._string2);
+                            db.AddIVariable(varName, ss);
+                        }
+                        else if (rhs.Type() == EVariableType.Date)
+                        {
+                            ScalarDate sd = new ScalarDate(((ScalarDate)rhs).date);
+                            db.AddIVariable(varName, sd);
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: A %-variable cannot be of type " + rhs.Type().ToString().ToUpper());
+                            throw new GekkoException();
                         }
 
                     }
@@ -700,20 +707,47 @@ namespace Gekko
                             }
                             else
                             {
-                                //TODO TODO
+                                Databank db2 = GetDatabankNoSearch(dbName);
+                                db2.RemoveIVariable(varName);
+                                db2.AddIVariable(varName, new ScalarVal(svRhs.val));
+
                             }
                         }
                         else if (lhs.Type() == EVariableType.String)
                         {
-
+                            ScalarString ssRhs = rhs as ScalarString;
+                            if (ssRhs != null)
+                            {
+                                ScalarString ssLhs = lhs as ScalarString;
+                                ssLhs._string2 = ssRhs._string2;
+                            }
+                            else
+                            {
+                                Databank db2 = GetDatabankNoSearch(dbName);
+                                db2.RemoveIVariable(varName);
+                                db2.AddIVariable(varName, new ScalarString(ssRhs._string2));
+                            }
                         }
                         else if (lhs.Type() == EVariableType.Date)
                         {
-                            //DATE
+                            ScalarDate sdRhs = rhs as ScalarDate;
+                            if (sdRhs != null)
+                            {
+                                ScalarDate svLhs = lhs as ScalarDate;
+                                svLhs.date = sdRhs.date;
+                            }
+                            else
+                            {
+                                Databank db2 = GetDatabankNoSearch(dbName);
+                                db2.RemoveIVariable(varName);
+                                db2.AddIVariable(varName, new ScalarDate(sdRhs.date));
+
+                            }
                         }
                         else
                         {
-                            //error..........
+                            G.Writeln2("*** ERROR: A %-variable cannot be of type " + rhs.Type().ToString().ToUpper());
+                            throw new GekkoException();
                         }
 
                     }
@@ -749,6 +783,27 @@ namespace Gekko
             }
 
             return lhs;
+        }
+
+        private static IVariable GetVariableSearch(IVariable lhs, string varName)
+        {
+            for (int i = 0; i < Program.databanks.storage.Count; i++)
+            {
+                if (i == 1) continue;  //The Ref databank IS NEVER SEARCHED!!
+                Databank db2 = Program.databanks.storage[i];
+                lhs = db2.GetIVariable(varName);
+                if (lhs != null) break;
+            }
+
+            return lhs;
+        }
+
+        private static Databank GetDatabankNoSearch(string dbName)
+        {
+            Databank db = null;
+            if (dbName == null) db = Program.databanks.GetFirst();
+            else db = Program.databanks.GetDatabank(dbName);
+            return db;
         }
 
         public static void Print(GekkoSmpl smpl, IVariable x)
@@ -1807,38 +1862,12 @@ namespace Gekko
                 input[i] = bank + ":" + input[i];
             }
             return input;
-        }
+        }               
 
-        public static void ForListCheck(List<string> names)
-        {            
-            if (names.Count == 2)
-            {
-                //speeding up the n=2 case. The other cases n>2 are rare.
-                if (G.equal(names[0], names[1]))
-                {
-                    G.Writeln2("*** ERROR: A parallel FOR loop must have different loop variable names.");
-                    throw new GekkoException();
-                }
-            }
-            else
-            {
-                GekkoDictionary<string, string> hashset = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                foreach (var name in names)
-                {
-                    if (hashset.ContainsKey(name))
-                    {
-                        G.Writeln2("*** ERROR: A parallel FOR loop must have different loop variable names.");
-                        throw new GekkoException();
-                    }
-                    else hashset.Add(name, "");
-                }
-            }
-        }
-
-        public static int ForListMax(List<List<string>> x)
+        public static int ForListMax(List<List<IVariable>> x)
         {
             int n = -1;
-            foreach (List<string> m in x)
+            foreach (List<IVariable> m in x)
             {
                 if (n == -1) n = m.Count;
                 else
@@ -1846,7 +1875,7 @@ namespace Gekko
                     if (n != m.Count)
                     {
                         string s = null;
-                        foreach (List<string> mm in x)
+                        foreach (List<IVariable> mm in x)
                         {
                             s += mm.Count + ", ";
                         }

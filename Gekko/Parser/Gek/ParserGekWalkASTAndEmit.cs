@@ -1290,30 +1290,55 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A(Globals.splitSTOP);
 
+                            GetCodeFromAllChildren(node[1]);
+
                             List<string> varnames = GetForLoopVariables(node);
 
                             if (node[0].ChildrenCount() == 1)
                             {
                                 int i = 0;
-                                string codeStart = node[0][i][2][0].Code.ToString();
-                                string codeEnd2 = "null"; if (node[0][i][3][0] != null) codeEnd2 = node[0][i][3][0].Code.ToString();
-                                string codeStep = "null"; if (node[0][i][4][0] != null) codeStep = node[0][i][4][0].Code.ToString();
-
-                                //string tempName2 = "temp" + ++Globals.counter;
-
+                                string codeStart, codeEnd2, codeStep;
+                                GetCodes(node, i, out codeStart, out codeEnd2, out codeStep);
                                 string temp = "counter" + ++Globals.counter;
-
                                 node.Code.A(node.forLoop[i].Item1 + " " + node.forLoop[i].Item2 + " = null").End();
                                 node.Code.A("int " + temp + " = 0").End();
                                 node.Code.A("for (O.IterateStart(ref " + node.forLoop[i].Item2 + ", " + codeStart + "); O.IterateContinue(" + node.forLoop[i].Item2 + ", " + codeStart + ", " + codeEnd2 + ", " + codeStep + ", ref " + temp + "); O.IterateStep(" + node.forLoop[i].Item2 + ", " + codeStart + ", " + codeStep + ", " + temp + "))" + G.NL);
-                                node.Code.A("{").End();
-                                GetCodeFromAllChildren(node[1]);
+                                node.Code.A("{").End();                                
                                 node.Code.A(node[1].Code);
                                 node.Code.A("}").End();
                             }
                             else
                             {
+                                string listsname = "lists" + ++Globals.counter;
+                                node.Code.A("List<List<IVariable>> " + listsname + " = new List<List<IVariable>>()").End();
+                                for (int i = 0; i < node[0].ChildrenCount(); i++)
+                                {
+                                    string codeStart, codeEnd2, codeStep;
+                                    GetCodes(node, i, out codeStart, out codeEnd2, out codeStep);
+                                    if (codeEnd2 != "null" || codeStep != "null")
+                                    {
+                                        G.Writeln2("*** ERROR: You cannot use TO or STEP/BY in a parallel loop");
+                                        throw new GekkoException();
+                                    }
+                                    node.Code.A(listsname + ".Add((" + codeStart + ").GetList())").End();
+                                }
+                                string maxname = "max" + ++Globals.counter;
+                                node.Code.A("int " + maxname + " = O.ForListMax(" + listsname + ")").End();
 
+                                string iname = "i" + ++Globals.counter;
+
+                                node.Code.A("for (int " + iname + " = 0; " + iname + " < " + maxname + "; " + iname + " ++) {").End();
+
+                                for (int i = 0; i < node[0].ChildrenCount(); i++)
+                                {
+                                    node.Code.A("IVariable ").A(node.forLoop[i].Item2).A(" = ").A(listsname).A("[" + i + "]").A("[" + iname + "]").End();
+                                }
+                                node.Code.A(node[1].Code);
+
+                                node.Code.A("}").End();
+
+                                //parallel loop
+                                
                             }
 
 
@@ -4393,6 +4418,15 @@ namespace Gekko.Parser.Gek
                 }
                 node.Code.A(Globals.splitSTOP);
             }
+        }
+
+        private static void GetCodes(ASTNode node, int i, out string codeStart, out string codeEnd2, out string codeStep)
+        {
+            codeStart = node[0][i][2][0].Code.ToString();
+            codeEnd2 = "null";
+            if (node[0][i][3][0] != null) codeEnd2 = node[0][i][3][0].Code.ToString();
+            codeStep = "null";
+            if (node[0][i][4][0] != null) codeStep = node[0][i][4][0].Code.ToString();
         }
 
         private static List<string> GetForLoopVariables(ASTNode node)

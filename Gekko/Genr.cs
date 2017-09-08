@@ -22,15 +22,16 @@ namespace Gekko
 
 
             p.SetText(@"¤0");
-            O.Reset o0 = new O.Reset();
-            o0.p = p; o0.Exe();
+            IVariable ivTmpvar1 = O.ListDef(new ScalarString(@"a"), new ScalarString(@"b"));
+            O.Lookup(smpl, null, "#m1", null, true, ivTmpvar1)
+            ;
 
 
 
 
             p.SetText(@"¤0");
-            IVariable ivTmpvar16 = O.ListDef(new ScalarString(@"a"), new ScalarString(@"b"), new ScalarString(@"c"));
-            O.Lookup(smpl, null, "#m", null, true, ivTmpvar16)
+            IVariable ivTmpvar2 = O.ListDef(new ScalarString(@"x"), new ScalarString(@"y"));
+            O.Lookup(smpl, null, "#m2", null, true, ivTmpvar2)
             ;
 
 
@@ -49,27 +50,6 @@ namespace Gekko
 
 
 
-            p.SetText(@"¤0");
-            IVariable ivTmpvar19 = O.ListDef(new ScalarString(@"a"), new ScalarString(@"b"), new ScalarString(@"c"));
-            O.Lookup(smpl, null, "#m", null, true, ivTmpvar19)
-            ;
-
-
-
-
-            p.SetText(@"¤0");
-
-        }
-
-        public static void C2(P p)
-        {
-
-            GekkoSmpl smpl = O.Smpl();
-
-
-
-
-
         }
 
 
@@ -79,27 +59,24 @@ namespace Gekko
 
             C0(p);
 
-            IVariable forloop_17 = null;
-            int counter18 = 0;
-            for (O.IterateStart(ref forloop_17, O.Lookup(smpl, null, "#m", null, true, null)); O.IterateContinue(forloop_17, O.Lookup(smpl, null, "#m", null, true, null), null, null, ref counter18); O.IterateStep(forloop_17, O.Lookup(smpl, null, "#m", null, true, null), null, counter18))
+            List<List<IVariable>> lists6 = new List<List<IVariable>>();
+            lists6.Add((O.Lookup(smpl, null, "#m1", null, true, null)).GetList());
+            lists6.Add((O.Lookup(smpl, null, "#m2", null, true, null)).GetList());
+            int max7 = O.ForListMax(lists6);
+            for (int i8 = 0; i8 < max7; i8++)
             {
                 ;
-                O.Print(smpl, (forloop_17));
+                IVariable forloop_3 = lists6[0][i8];
+                IVariable forloop_4 = lists6[1][i8];
+                IVariable ivTmpvar5 = O.Add(smpl, forloop_3, forloop_4);
+                O.Lookup(smpl, null, "%s", null, true, ivTmpvar5)
+                ;
+
+                O.Print(smpl, (O.Lookup(smpl, null, "%s", null, true, null)));
 
             };
 
             C1(p);
-
-            IVariable forloop_20 = null;
-            int counter21 = 0;
-            for (O.IterateStart(ref forloop_20, O.Lookup(smpl, null, "#m", null, true, null)); O.IterateContinue(forloop_20, O.Lookup(smpl, null, "#m", null, true, null), null, null, ref counter21); O.IterateStep(forloop_20, O.Lookup(smpl, null, "#m", null, true, null), null, counter21))
-            {
-                ;
-                O.Print(smpl, (forloop_20));
-
-            };
-
-            C2(p);
 
 
 
