@@ -361,29 +361,11 @@ ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
 
 // ----------------------------------------------------------------------------------------------------
 
-for2                     : FOR forHelper2 forHelper+ SEMICOLON functionStatements END -> ^(ASTFOR forHelper2 ^(ASTPLACEHOLDER forHelper+) functionStatements);
-forHelper2               : type? svarname -> ^(ASTPLACEHOLDER type?) svarname;
-forHelper                : EQUAL expression (TO expression2)? (BY expression3)? -> ^(ASTPLACEHOLDER expression ^(ASTPLACEHOLDER expression2?) ^(ASTPLACEHOLDER expression3?));
+for2                     : FOR           (forHelper2 ','?)+     SEMICOLON  functionStatements END -> ^(ASTFOR ^(ASTPLACEHOLDER forHelper2+) functionStatements)
+						 | FOR leftParen (forHelper2 ','?)+ ')' SEMICOLON? functionStatements END -> ^(ASTFOR ^(ASTPLACEHOLDER forHelper2+) functionStatements)
+						 ;
 
-/*
-
-for2                      : forValHelper
-						  | forNameHelper
-						  | forStringHelper
-						  | forDateHelper
-						  ;
-forStringHelper			  : FOR (STRING2 nameWithDot '=' listItems)+ SEMICOLON                expressions? END SEMICOLON        ->  ^({token("ASTFORSTRING", ASTFORSTRING, $FOR.Line)} ^(ASTFORLEFTSIDE2 nameWithDot+) ^(ASTFORRIGHTSIDE2 listItems+) ^(ASTFORSTATEMENTS expressions?))
-						  | FOR leftParen (STRING2 nameWithDot '=' listItems)+ rightParen SEMICOLON? expressions? END SEMICOLON ->  ^({token("ASTFORSTRING", ASTFORSTRING, $FOR.Line)} ^(ASTFORLEFTSIDE2 nameWithDot+) ^(ASTFORRIGHTSIDE2 listItems+) ^(ASTFORSTATEMENTS expressions?))
-                          ;
-forValHelper              : FOR VAL nameWithDot '=' expression to expression (BY expression)* SEMICOLON                expressions? END SEMICOLON        ->  ^({token("ASTFORVAL", ASTFORVAL, $FOR.Line)} ^(ASTFORLEFTSIDE nameWithDot) ^(ASTFORRIGHTSIDE expression expression expression*) ^(ASTFORSTATEMENTS expressions?))
-                          | FOR leftParen VAL nameWithDot '=' expression TO expression (BY expression)* rightParen SEMICOLON? expressions? END SEMICOLON ->  ^({token("ASTFORVAL", ASTFORVAL, $FOR.Line)} ^(ASTFORLEFTSIDE nameWithDot) ^(ASTFORRIGHTSIDE expression expression expression*) ^(ASTFORSTATEMENTS expressions?))
-						  ;
-forDateHelper             : FOR DATE nameWithDot '=' expression to expression (BY expression)* SEMICOLON                expressions? END SEMICOLON        ->  ^({token("ASTFORDATE", ASTFORDATE, $FOR.Line)} ^(ASTFORLEFTSIDE nameWithDot) ^(ASTFORRIGHTSIDE expression expression expression*) ^(ASTFORSTATEMENTS expressions?))
-                          | FOR leftParen DATE nameWithDot '=' expression TO expression (BY expression)* rightParen SEMICOLON? expressions? END SEMICOLON ->  ^({token("ASTFORDATE", ASTFORDATE, $FOR.Line)} ^(ASTFORLEFTSIDE nameWithDot) ^(ASTFORRIGHTSIDE expression expression expression*) ^(ASTFORSTATEMENTS expressions?))
-						  ;
-
-*/
-
+forHelper2               : type? svarname EQUAL expression (TO expression2)? (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2?) ^(ASTPLACEHOLDER expression3?));
 
 print					  : P expression -> ^(ASTPRINT expression);
 
@@ -396,7 +378,7 @@ return2                    : RETURN2 expression -> ^({token("ASTRETURN", ASTRETU
 functionDef				  : FUNCTION type ident leftParenGlue functionArg RIGHTPAREN SEMICOLON functionStatements END -> ^(ASTFUNCTIONDEF2 type ident functionArg functionStatements);
 functionArg               : (functionArgElement (',' functionArgElement)*)? -> ^(ASTPLACEHOLDER functionArgElement*);
 functionArgElement        : type svarname -> ^(ASTPLACEHOLDER type svarname);
-functionStatements        : statements* -> ^(ASTPLACEHOLDER statements*);
+functionStatements        : statements2* -> ^(ASTPLACEHOLDER statements2*);
 type					  : VAL | STRING | DATE | SERIES | LIST | DICT | MATRIX ;
 
 // ------------------------------------------------------------------------------------------------------------------
