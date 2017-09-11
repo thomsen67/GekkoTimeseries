@@ -64,16 +64,31 @@ namespace Gekko
                     }
                     else if (ival == 0)
                     {
-                        ScalarVal a = new ScalarVal(this.list.Count);
-                        return a;
+                        if (isLhs)
+                        {
+                            G.Writeln2("*** ERROR: You cannot use [" + ival + "] on the left-hand side");
+                            throw new GekkoException();
+                        }
+                        else
+                        {
+                            ScalarVal a = new ScalarVal(this.list.Count);
+                            return a;
+                        }
                     }
                     else if (ival > this.list.Count)
                     {
                         G.Writeln2("*** ERROR: Illegal element access [" + ival + "]: larger than length of list (" + this.list.Count + ")");
                         throw new GekkoException();
                     }
-                    IVariable ss = this.list[ival - 1];                    
-                    return ss;
+                    if (isLhs)
+                    {
+                        return this.list[ival - 1];
+                    }
+                    else
+                    {
+                        IVariable ss = O.DeepClone(this.list[ival - 1]);
+                        return ss;
+                    }
                 }
                 else if (index.Type() == EVariableType.String)
                 {
@@ -93,6 +108,7 @@ namespace Gekko
                 throw new GekkoException();
             }
         }
+               
 
         public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
         {

@@ -2310,8 +2310,13 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTDOTORINDEXER":
                         {
-                                                       
 
+                            string ivTempVar = SearchUpwardsInTree4(node);
+
+                            //isLhs is true if the indexer is on the left-hand side, and is the last indexer.
+                            //For instance #m[2][3] = 'a' -----> here the [3] indexer will get "true"
+                            string isLhs = "false";
+                            if (node.Parent.Text == "ASTLEFTSIDE") isLhs = "true";
 
                             //LIGHTFIXME, isRhs
 
@@ -2337,7 +2342,13 @@ namespace Gekko.Parser.Gek
                                 }
                                 if (i < node[1].ChildrenCount() - 1) indexes += ", ";
                             }
-                            node.Code.A("O.Indexer(smpl, ").A(node[0].Code).A(", ").A("false, ").A(indexes).A(")");
+                            if (ivTempVar == null) ivTempVar = "null";
+                            node.Code.A("O.Indexer(smpl, ").A(node[0].Code).A(", ").A("" + isLhs + ", " + ivTempVar + ", ").A(indexes).A(")");
+
+
+                          
+                            ;
+
                         }
                         break;
                     case "ASTINDEXER":
@@ -4670,7 +4681,7 @@ namespace Gekko.Parser.Gek
         private static string SearchUpwardsInTree4(ASTNode node)
         {
             //finds out if the variable is a LHS (left-side) variable
-            //returns null if RHS, else the name.
+            //returns null if RHS or (LHS and there is a ASTBANKVAR or ASTDOTORINDEXER above.
             ASTNode tmp = node;            
             string rv = null;
             while (tmp != null)
@@ -4681,11 +4692,11 @@ namespace Gekko.Parser.Gek
                     break;
                 }                
                 tmp = tmp.Parent;
+                if (tmp != null && (tmp.Text == "ASTBANKVAR" || tmp.Text == "ASTDOTORINDEXER")) return null;  //if any parent is like this, null is returned. We want to find the one highest in the tree.
             }
             return rv;
         }
-
-
+        
         private static void ResetUFunctionHelpers(W w)
         {
             w.uFunctionsHelper = null;  //do not remove this line: important!      

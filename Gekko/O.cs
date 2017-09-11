@@ -1283,7 +1283,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(GekkoSmpl smpl, IVariable x, bool isLhs, params IVariable[] indexes)
+        public static IVariable Indexer(GekkoSmpl smpl, IVariable x, bool isLhs, IVariable rhs, params IVariable[] indexes)
         {
             if (x == null)
             {
@@ -1307,7 +1307,30 @@ namespace Gekko
             //x['nz', 'w']           
             return x.Indexer(smpl, isLhs, indexes);
                         
-        }               
+        }
+
+        public static IVariable DeepClone(IVariable x)
+        {
+            if (x.Type() == EVariableType.Val)
+            {
+                return new ScalarVal(((ScalarVal)x).val);
+            }
+            else if (x.Type() == EVariableType.String)
+            {
+                return new ScalarString(((ScalarString)x)._string2);
+            }
+            else if (x.Type() == EVariableType.List)
+            {
+                MetaList m = x as MetaList;
+                List<IVariable> temp = new List<IVariable>();
+                foreach (IVariable iv in m.list)
+                {
+                    temp.Add(O.DeepClone(iv));
+                }
+                return new MetaList(temp);
+            }
+            else throw new GekkoException();
+        }
 
         public static IVariable IndexerPlus(GekkoSmpl smpl, IVariable x, bool isLhs, IVariable y)
         {
