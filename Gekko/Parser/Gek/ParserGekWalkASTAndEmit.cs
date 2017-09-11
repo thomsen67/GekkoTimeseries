@@ -1867,23 +1867,11 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
-
                                     int numberOfArguments = node.ChildrenCount() - 1;
-                                    if (numberOfArguments == 1)
-                                    {
-                                        //Access the ufunction1[...] so that it can fail with an error                                        
-                                        node.Code.A("Globals.ufunctions").A(numberOfArguments).A("[").A("`").A(functionNameLower).A("`").A("](" + Globals.functionT1Cs + "").A(args).A(")");
-
-                                    }
-                                    else if (numberOfArguments == 2)
-                                    {
-                                        //DO something
-                                    }
-                                    else G.Writeln2("*** ERROR: HOV ufunction");
-                                }
-                                
-                            }
-                            
+                                    //Access the ufunction1[...] so that it can fail with an error                                        
+                                    node.Code.A("Globals.ufunctions").A(numberOfArguments).A("[").A("`").A(functionNameLower).A("`").A("](" + Globals.functionT1Cs + "").A(args).A(")");
+                                }                                
+                            }                            
                         }
                         break;
                     
@@ -2709,8 +2697,16 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTASSIGNMENT":
-                        {                            
-                            node.Code.A("IVariable " + node[0].ivTempVarName + " = ").A(node[1].Code).End();
+                        {
+
+                            string ivTempVar = SearchUpwardsInTree4(node[0]);
+                            if (ivTempVar == null)
+                            {
+                                G.Writeln2("*** ERROR: Internal error #7698248427");
+                                throw new GekkoException();
+                            }
+
+                            node.Code.A("IVariable " + ivTempVar + " = ").A(node[1].Code).End();
                             node.Code.A(node[0].Code).End();
 
                         }
@@ -2749,11 +2745,10 @@ namespace Gekko.Parser.Gek
                             }
 
                             if (!functionHit)
-                            {
+                            {                                
+                                string ivTempVar = SearchUpwardsInTree4(node);
+                                if (ivTempVar == null) ivTempVar = "null";
 
-                                string ivTempVar = "null";
-                                if (node.Parent != null && node.Parent.ivTempVarName != null) ivTempVar = node.Parent.ivTempVarName;  //detects if a lhs variable
-                                   
                                 //Check for simple variable like b:x~q or b:%s
                                 //This is only for performance reasons, making lookup faster especially for VALs                            
 
@@ -4672,24 +4667,24 @@ namespace Gekko.Parser.Gek
             return rv;
         }
 
-        //private static int SearchUpwardsInTree4(ASTNode node)
-        //{
-        //    //-12345=none, 0=left, 1=right
-        //    int rv = 0;
-        //    ASTNode tmp = node.Parent;
-        //    ASTNode parent = null;            
-        //    while (tmp != null)
-        //    {
-        //        bool ok = false;
-        //        if (tmp.Parent != null && tmp.Parent.Text == "ASTASSIGNMENT")
-        //        {
-        //            //#09873245325
-        //            rv = tmp.Number;
-        //            break;
-        //        }                
-        //    }
-        //    return rv;
-        //}
+        private static string SearchUpwardsInTree4(ASTNode node)
+        {
+            //finds out if the variable is a LHS (left-side) variable
+            //returns null if RHS, else the name.
+            ASTNode tmp = node;            
+            string rv = null;
+            while (tmp != null)
+            {
+                if (tmp.ivTempVarName != null)
+                {
+                    rv = tmp.ivTempVarName;
+                    break;
+                }                
+                tmp = tmp.Parent;
+            }
+            return rv;
+        }
+
 
         private static void ResetUFunctionHelpers(W w)
         {

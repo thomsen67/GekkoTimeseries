@@ -76,6 +76,8 @@ ASTIDENTDIGIT;
 	ASTMATRIXCOL;
 	ASTMATRIXROW;
 	ASTLISTFILE;
+	ASTMAPDEF;
+	ASTMAPITEM;
 
 	ASTDOLLARCONDITIONAL;
 	ASTLISTDEF;
@@ -112,7 +114,7 @@ ASTFOR;
 	IN             = 'in';
 	P              = 'p';
 	RUN            = 'run';
-	VAL = 'val'; STRING = 'string'; DATE = 'date'; SERIES = 'series'; LIST = 'list'; DICT = 'dict'; MATRIX = 'matrix'; FUNCTION = 'function'; END = 'end';
+	VAL = 'val'; STRING = 'string'; DATE = 'date'; SERIES = 'series'; LIST = 'list'; MAP = 'map'; MATRIX = 'matrix'; FUNCTION = 'function'; END = 'end';
 	RESET = 'reset';
 	RETURN2 = 'return';
 	LISTFILE = 'LISTFILE';
@@ -151,7 +153,7 @@ ASTFOR;
 
 start                      : statements EOF;  //EOF is necessary in order to force the whole file to be parsed
 
-statements               : statements2*;
+statements                 : statements2*;
 
 statements2                     :
                             SEMICOLON -> //stray semicolon is ok, nothing is written
@@ -212,9 +214,10 @@ value                     : function //must be before varname
 						  | listFile						
 						  | matrix
 						  | list
+						  | map
 						  ;
 
-leftSide                  : leftSideDollarExpression;
+leftSide                  : leftSideDollarExpression -> ^(ASTLEFTSIDE leftSideDollarExpression);
 
 leftSideDollarExpression  : (leftSideIndexerExpression -> leftSideIndexerExpression)
 						    (DOLLAR lbla=dollarConditional -> ^(ASTDOLLAR $leftSideDollarExpression $lbla))*	
@@ -224,12 +227,13 @@ leftSideIndexerExpression : (leftSideValue -> leftSideValue)
 						    (lbla=dotOrIndexer -> ^(ASTDOTORINDEXER $leftSideIndexerExpression $lbla))*
 						  ;
 
-leftSideValue             : leftSideValueHelper -> ^(ASTLEFTSIDE leftSideValueHelper);
+leftSideValue             : leftSideValueHelper;
 
 leftSideValueHelper       : bankvarname												  
-						  | indexerAlone
-						  | listFile												  
-						  | list
+						  //| indexerAlone
+						  //| listFile												  
+						  //| list
+						  //| map
 						  ;
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -257,6 +261,14 @@ list                      : leftParenNoGlue expression ',' listHelper RIGHTPAREN
 listHelper                : listHelper1 | listHelper2;
 listHelper1               : (expression ',')* expression -> expression+;
 listHelper2               : (expression ',')+ -> expression+;
+
+map                       : leftParenNoGlue mapItem ',' mapHelper RIGHTPAREN -> ^(ASTMAPDEF mapItem mapHelper)
+                          | leftParenNoGlue mapItem ',' RIGHTPAREN -> ^(ASTMAPDEF mapItem)
+						  ;
+mapHelper                 : mapHelper1 | mapHelper2;
+mapHelper1                : (mapItem ',')* mapItem -> mapItem+;
+mapHelper2                : (mapItem ',')+ -> mapItem+;
+mapItem                   : assignment -> ^(ASTMAPITEM assignment);
 
 //FIXME
 //FIXME
@@ -379,7 +391,7 @@ functionDef				  : FUNCTION type ident leftParenGlue functionArg RIGHTPAREN SEMI
 functionArg               : (functionArgElement (',' functionArgElement)*)? -> ^(ASTPLACEHOLDER functionArgElement*);
 functionArgElement        : type svarname -> ^(ASTPLACEHOLDER type svarname);
 functionStatements        : statements2* -> ^(ASTPLACEHOLDER statements2*);
-type					  : VAL | STRING | DATE | SERIES | LIST | DICT | MATRIX ;
+type					  : VAL | STRING | DATE | SERIES | LIST | MAP | MATRIX ;
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- logical END -------------------------------------------------------------------------------

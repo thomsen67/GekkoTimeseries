@@ -9,6 +9,10 @@ namespace Gekko
     public class TranslatedCode
     {
         public static GekkoTime globalGekkoTimeIterator = Globals.tNull;
+        public static readonly ScalarVal i2 = new ScalarVal(5d);
+        public static readonly ScalarVal i4 = new ScalarVal(1d);
+        public static readonly ScalarVal i5 = new ScalarVal(2010d);
+        public static readonly ScalarVal i6 = new ScalarVal(6d);
         public static void ClearTS(P p)
         {
         }
@@ -22,30 +26,19 @@ namespace Gekko
 
 
             p.SetText(@"¤0");
-            IVariable ivTmpvar1 = O.ListDef(new ScalarString(@"a"), new ScalarString(@"b"));
-            O.Lookup(smpl, null, "#m1", null, true, ivTmpvar1)
+            IVariable ivTmpvar1 = i2;
+            O.Lookup(smpl, null, "xx", null, false, ivTmpvar1)
             ;
 
 
 
 
             p.SetText(@"¤0");
-            IVariable ivTmpvar2 = O.ListDef(new ScalarString(@"x"), new ScalarString(@"y"));
-            O.Lookup(smpl, null, "#m2", null, true, ivTmpvar2)
+            IVariable ivTmpvar3 = i6;
+            O.Indexer(smpl, O.Indexer(smpl, O.Lookup(smpl, null, "xx", null, false, ivTmpvar3), false, O.Negate(smpl, i4)
+            ), false, i5
+            )
             ;
-
-
-
-
-            p.SetText(@"¤0");
-
-        }
-
-        public static void C1(P p)
-        {
-
-            GekkoSmpl smpl = O.Smpl();
-
 
 
 
@@ -58,25 +51,6 @@ namespace Gekko
             GekkoSmpl smpl = O.Smpl();
 
             C0(p);
-
-            List<List<IVariable>> lists6 = new List<List<IVariable>>();
-            lists6.Add((O.Lookup(smpl, null, "#m1", null, true, null)).GetList());
-            lists6.Add((O.Lookup(smpl, null, "#m2", null, true, null)).GetList());
-            int max7 = O.ForListMax(lists6);
-            for (int i8 = 0; i8 < max7; i8++)
-            {
-                ;
-                IVariable forloop_3 = lists6[0][i8];
-                IVariable forloop_4 = lists6[1][i8];
-                IVariable ivTmpvar5 = O.Add(smpl, forloop_3, forloop_4);
-                O.Lookup(smpl, null, "%s", null, true, ivTmpvar5)
-                ;
-
-                O.Print(smpl, (O.Lookup(smpl, null, "%s", null, true, null)));
-
-            };
-
-            C1(p);
 
 
 
