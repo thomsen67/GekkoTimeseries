@@ -264,7 +264,11 @@ namespace Gekko
             }
         }
 
-
+        public void SetData(IVariable rhsExpression, params IVariable[] dims)
+        {
+            G.Writeln2("*** ERROR: You cannot use an indexer [] on the left-hand side");
+            throw new GekkoException();
+        }
         public IVariable DeepClone()
         {
             return new ScalarVal(this.val);

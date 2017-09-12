@@ -77,5 +77,7 @@ namespace Gekko
         EVariableType Type();
 
         IVariable DeepClone();
+
+        void SetData(IVariable rhsExpression, params IVariable[] dims);
     }
 }

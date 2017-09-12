@@ -1157,6 +1157,12 @@ namespace Gekko
             return EVariableType.TimeSeries;
         }
 
+        public void SetData(IVariable rhsExpression, params IVariable[] dims)
+        {
+            G.Writeln2("*** ERROR: You cannot use an indexer [] on the left-hand side");
+            throw new GekkoException();
+        }
+
         /// <summary>
         /// Creates a clone of the TimeSeries, copying all fields. Used for copying databanks in RAM.
         /// </summary>

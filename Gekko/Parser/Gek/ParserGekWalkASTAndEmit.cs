@@ -2329,7 +2329,7 @@ namespace Gekko.Parser.Gek
                                 string internalName = null;
                                 if (listName != null)
                                 {
-                                    internalName = SearchUpwardsInTree2(node, listName);                                    
+                                    internalName = SearchUpwardsInTree2(node, listName);
                                 }
 
                                 if (internalName != null)
@@ -2342,13 +2342,14 @@ namespace Gekko.Parser.Gek
                                 }
                                 if (i < node[1].ChildrenCount() - 1) indexes += ", ";
                             }
-                            if (ivTempVar == null) ivTempVar = "null";
-                            node.Code.A("O.Indexer(smpl, ").A(node[0].Code).A(", ").A("" + isLhs + ", " + ivTempVar + ", ").A(indexes).A(")");
-
-
-                          
-                            ;
-
+                            if (ivTempVar == null)
+                            {
+                                node.Code.A("O.Indexer(smpl, ").A(node[0].Code).A(", ").A("" + isLhs + ", " + "null" + ", ").A(indexes).A(")");
+                            }
+                            else
+                            {
+                                node.Code.A("(").A(node[0].Code).A(").SetData(").A(ivTempVar + ", ").A(indexes).A(")");
+                            }
                         }
                         break;
                     case "ASTINDEXER":
