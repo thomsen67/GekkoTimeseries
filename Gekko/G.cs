@@ -591,7 +591,7 @@ namespace Gekko
             //don't touch alias names: we are cloning the content of the databank, not altering its name.
             foreach (TimeSeries ts in originalDatabank.storage.Values) 
             {
-                TimeSeries tsCopy = ts.Clone();
+                TimeSeries tsCopy = ts.DeepClone() as TimeSeries;
                 newDatabank.AddVariable(tsCopy, false);  //FIXME: what if already there. No variable name check -- just wastes time, and not good regarding GAMS variable names.
             }
         }

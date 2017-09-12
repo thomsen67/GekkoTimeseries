@@ -87,122 +87,122 @@ namespace Gekko
         }
         
 
-        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange)
-        {
-            int d1 = this.data.GetLength(0);
-            int d2 = this.data.GetLength(1);
-            if (d2 == 1)
-            {
-                return Indexer(t, indexRange, new ScalarVal(1d));                
-            }
-            G.Writeln("*** ERROR: You are trying to use [ .. ] on a " + d1 + "x" + d2 + " matrix");
-            G.Writeln("           This notation can only be used regarding nx1 matrices (column vectors)");
-            throw new GekkoException();
-        }
+        ////public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange)
+        ////{
+        ////    int d1 = this.data.GetLength(0);
+        ////    int d2 = this.data.GetLength(1);
+        ////    if (d2 == 1)
+        ////    {
+        ////        return Indexer(t, indexRange, new ScalarVal(1d));                
+        ////    }
+        ////    G.Writeln("*** ERROR: You are trying to use [ .. ] on a " + d1 + "x" + d2 + " matrix");
+        ////    G.Writeln("           This notation can only be used regarding nx1 matrices (column vectors)");
+        ////    throw new GekkoException();
+        ////}
 
-        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
-        {
-            int i1 = 1;
-            int i2 = this.data.GetLength(0);
-            int j1 = 1;
-            int j2 = this.data.GetLength(1);
-            if (indexRange1.first != null) i1 = O.GetInt(indexRange1.first);
-            if (indexRange1.last != null) i2 = O.GetInt(indexRange1.last);
-            if (indexRange2.first != null) j1 = O.GetInt(indexRange2.first);
-            if (indexRange2.last != null) j2 = O.GetInt(indexRange2.last);
-            if (i1 > i2)
-            {
-                G.Writeln2("*** ERROR: Range " + i1 + ".." + i2 + " is descending");
-                throw new GekkoException();                
-            }
-            if (j1 > j2)
-            {
-                G.Writeln2("*** ERROR: Range " + j1 + ".." + j2 + " is descending");
-                throw new GekkoException();
-            }
-            try
-            {
-                Matrix m = new Matrix(i2 - i1 + 1, j2 - j1 + 1);
-                int ii1 = i1 - 1;
-                int jj1 = j1 - 1;
-                for (int i = i1 - 1; i <= i2 - 1; i++)
-                {
-                    for (int j = j1 - 1; j <= j2 - 1; j++)
-                    {
-                        m.data[i - ii1, j - jj1] = this.data[i, j];
-                    }
-                }
-                return m;
-            }
-            catch (System.IndexOutOfRangeException e)  // CS0168
-            {
-                G.Writeln("*** ERROR: Index out of range: [" + i1 + " .. " + i2 + ", " + j1 + " .. " + j2 + " ]");
-                if (i1 == 0 || i2 == 0 || j1 == 0 || j2 == 0) G.Writeln("           Please note that indicies are 1-based");
-                throw new GekkoException();
-            }
-        }
+        ////public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
+        ////{
+        ////    int i1 = 1;
+        ////    int i2 = this.data.GetLength(0);
+        ////    int j1 = 1;
+        ////    int j2 = this.data.GetLength(1);
+        ////    if (indexRange1.first != null) i1 = O.GetInt(indexRange1.first);
+        ////    if (indexRange1.last != null) i2 = O.GetInt(indexRange1.last);
+        ////    if (indexRange2.first != null) j1 = O.GetInt(indexRange2.first);
+        ////    if (indexRange2.last != null) j2 = O.GetInt(indexRange2.last);
+        ////    if (i1 > i2)
+        ////    {
+        ////        G.Writeln2("*** ERROR: Range " + i1 + ".." + i2 + " is descending");
+        ////        throw new GekkoException();                
+        ////    }
+        ////    if (j1 > j2)
+        ////    {
+        ////        G.Writeln2("*** ERROR: Range " + j1 + ".." + j2 + " is descending");
+        ////        throw new GekkoException();
+        ////    }
+        ////    try
+        ////    {
+        ////        Matrix m = new Matrix(i2 - i1 + 1, j2 - j1 + 1);
+        ////        int ii1 = i1 - 1;
+        ////        int jj1 = j1 - 1;
+        ////        for (int i = i1 - 1; i <= i2 - 1; i++)
+        ////        {
+        ////            for (int j = j1 - 1; j <= j2 - 1; j++)
+        ////            {
+        ////                m.data[i - ii1, j - jj1] = this.data[i, j];
+        ////            }
+        ////        }
+        ////        return m;
+        ////    }
+        ////    catch (System.IndexOutOfRangeException e)  // CS0168
+        ////    {
+        ////        G.Writeln("*** ERROR: Index out of range: [" + i1 + " .. " + i2 + ", " + j1 + " .. " + j2 + " ]");
+        ////        if (i1 == 0 || i2 == 0 || j1 == 0 || j2 == 0) G.Writeln("           Please note that indicies are 1-based");
+        ////        throw new GekkoException();
+        ////    }
+        ////}
         
-        public IVariable Indexer(GekkoSmpl t, IVariable index, IVariablesFilterRange indexRange)
-        {
-            int i0 = O.GetInt(index);            
-            int j1 = 1;
-            int j2 = this.data.GetLength(1);            
-            if (indexRange.first != null) j1 = O.GetInt(indexRange.first);
-            if (indexRange.last != null) j2 = O.GetInt(indexRange.last);
-            try
-            {
-                Matrix m = new Matrix(1, j2 - j1 + 1);
+        ////public IVariable Indexer(GekkoSmpl t, IVariable index, IVariablesFilterRange indexRange)
+        ////{
+        ////    int i0 = O.GetInt(index);            
+        ////    int j1 = 1;
+        ////    int j2 = this.data.GetLength(1);            
+        ////    if (indexRange.first != null) j1 = O.GetInt(indexRange.first);
+        ////    if (indexRange.last != null) j2 = O.GetInt(indexRange.last);
+        ////    try
+        ////    {
+        ////        Matrix m = new Matrix(1, j2 - j1 + 1);
 
-                int jj1 = j1 - 1;
-                int i = i0 - 1;
+        ////        int jj1 = j1 - 1;
+        ////        int i = i0 - 1;
 
-                for (int j = j1 - 1; j <= j2 - 1; j++)
-                {
-                    m.data[0, j - jj1] = this.data[i, j];
-                }
+        ////        for (int j = j1 - 1; j <= j2 - 1; j++)
+        ////        {
+        ////            m.data[0, j - jj1] = this.data[i, j];
+        ////        }
 
-                return m;
-            }
-            catch (System.IndexOutOfRangeException e)  // CS0168
-            {
-                G.Writeln("*** ERROR: Index out of range: [" + i0 + ", " + j1 + " .. " + j2 + " ]");
-                if (i0 == 0 || j1 == 0 || j2 == 0) G.Writeln("           Please note that indicies are 1-based");
-                throw new GekkoException();
-            }
-        }
+        ////        return m;
+        ////    }
+        ////    catch (System.IndexOutOfRangeException e)  // CS0168
+        ////    {
+        ////        G.Writeln("*** ERROR: Index out of range: [" + i0 + ", " + j1 + " .. " + j2 + " ]");
+        ////        if (i0 == 0 || j1 == 0 || j2 == 0) G.Writeln("           Please note that indicies are 1-based");
+        ////        throw new GekkoException();
+        ////    }
+        ////}
 
-        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange, IVariable index)
-        {
-            int i1 = 1;
-            int i2 = this.data.GetLength(0);            
-            if (indexRange.first != null) i1 = O.GetInt(indexRange.first);
-            if (indexRange.last != null) i2 = O.GetInt(indexRange.last);
-            if (i1 > i2)
-            {
-                G.Writeln2("*** ERROR: Range " + i1 + ".." + i2 + " is descending");
-                throw new GekkoException();
-            }
-            int j0 = O.GetInt(index);
-            try
-            {
-                Matrix m = new Matrix(i2 - i1 + 1, 1);
-                int ii1 = i1 - 1;
-                int j = j0 - 1;
-                for (int i = i1 - 1; i <= i2 - 1; i++)
-                {
+        ////public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange, IVariable index)
+        ////{
+        ////    int i1 = 1;
+        ////    int i2 = this.data.GetLength(0);            
+        ////    if (indexRange.first != null) i1 = O.GetInt(indexRange.first);
+        ////    if (indexRange.last != null) i2 = O.GetInt(indexRange.last);
+        ////    if (i1 > i2)
+        ////    {
+        ////        G.Writeln2("*** ERROR: Range " + i1 + ".." + i2 + " is descending");
+        ////        throw new GekkoException();
+        ////    }
+        ////    int j0 = O.GetInt(index);
+        ////    try
+        ////    {
+        ////        Matrix m = new Matrix(i2 - i1 + 1, 1);
+        ////        int ii1 = i1 - 1;
+        ////        int j = j0 - 1;
+        ////        for (int i = i1 - 1; i <= i2 - 1; i++)
+        ////        {
                     
-                        m.data[i - ii1, 0] = this.data[i, j];
+        ////                m.data[i - ii1, 0] = this.data[i, j];
                     
-                }
-                return m;
-            }
-            catch (System.IndexOutOfRangeException e)  // CS0168
-            {
-                G.Writeln("*** ERROR: Index out of range: [" + i1 + " .. " + i2 + ", " + j0 + "]");
-                if (i1 == 0 || i2 == 0 || j0 == 0) G.Writeln("           Please note that indicies are 1-based");
-                throw new GekkoException();
-            }
-        }
+        ////        }
+        ////        return m;
+        ////    }
+        ////    catch (System.IndexOutOfRangeException e)  // CS0168
+        ////    {
+        ////        G.Writeln("*** ERROR: Index out of range: [" + i1 + " .. " + i2 + ", " + j0 + "]");
+        ////        if (i1 == 0 || i2 == 0 || j0 == 0) G.Writeln("           Please note that indicies are 1-based");
+        ////        throw new GekkoException();
+        ////    }
+        ////}
 
         public IVariable Negate(GekkoSmpl t)
         {
@@ -483,21 +483,21 @@ namespace Gekko
             }
         }
 
-        public IVariable SetData(IVariable x1, IVariablesFilterRange indexRange2, IVariable x3)
+        public IVariable SetData(IVariable x1, Range indexRange2, IVariable x3)
         {
             //Does not need to be so fast, so we use this trick
-            IVariablesFilterRange range = new Gekko.IVariablesFilterRange(x1, x1);
+            Range range = new Range(x1, x1);
             return this.SetData(range, indexRange2, x3);            
         }
 
-        public IVariable SetData(IVariablesFilterRange indexRange1, IVariable x2, IVariable x3)
+        public IVariable SetData(Range indexRange1, IVariable x2, IVariable x3)
         {
             //Does not need to be so fast, so we use this trick
-            IVariablesFilterRange range = new Gekko.IVariablesFilterRange(x2, x2);
+            Range range = new Range(x2, x2);
             return this.SetData(indexRange1, range, x3);
         }
 
-        public IVariable SetData(IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2, IVariable x3)
+        public IVariable SetData(Range indexRange1, Range indexRange2, IVariable x3)
         {
             int i1 = 1;
             int i2 = this.data.GetLength(0);
@@ -595,5 +595,16 @@ namespace Gekko
             }            
         }
 
+        public IVariable DeepClone()
+        {
+            Matrix m = new Gekko.Matrix();
+            m.colnames = new List<string>();
+            m.colnames.AddRange(this.colnames);
+            m.rownames = new List<string>();
+            m.rownames.AddRange(this.rownames);
+            m.data = new double[this.data.GetLength(0), this.data.GetLength(1)];
+            Array.Copy(this.data, m.data, this.data.Length);            
+            return m;
+        }
     }
 }

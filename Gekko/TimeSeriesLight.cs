@@ -128,26 +128,26 @@ namespace Gekko
 
        
 
-        public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange indexRange)
-        {
-            G.Writeln2("*** ERROR: You are trying to use an [] index range on timeseries");
-            throw new GekkoException();
-        }
+        //public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange indexRange)
+        //{
+        //    G.Writeln2("*** ERROR: You are trying to use an [] index range on timeseries");
+        //    throw new GekkoException();
+        //}
 
-        public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
-        {
-            throw new GekkoException();
-        }
+        //public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
+        //{
+        //    throw new GekkoException();
+        //}
 
-        public IVariable Indexer(GekkoSmpl smpl, IVariable index, IVariablesFilterRange indexRange)
-        {
-            throw new GekkoException();
-        }
+        //public IVariable Indexer(GekkoSmpl smpl, IVariable index, IVariablesFilterRange indexRange)
+        //{
+        //    throw new GekkoException();
+        //}
 
-        public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange indexRange, IVariable index)
-        {
-            throw new GekkoException();
-        }
+        //public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange indexRange, IVariable index)
+        //{
+        //    throw new GekkoException();
+        //}
 
         public IVariable Negate(GekkoSmpl smpl)
         {
@@ -414,6 +414,13 @@ namespace Gekko
         {
             int rv = TimeSeries.FromGekkoTimeToArrayIndex(gt, this.anchorPeriod, this.anchorPeriodPositionInArray);
             return rv;
+        }
+
+        public IVariable DeepClone()
+        {
+            //why would we ever want to clone this, can it just return itself??
+            G.Writeln2("*** ERROR: Clone error");
+            throw new GekkoException();
         }
     }
 }

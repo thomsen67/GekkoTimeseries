@@ -598,6 +598,9 @@ namespace Gekko
                 if (dbName == null) db = Program.databanks.GetFirst();
                 else db = Program.databanks.GetDatabank(dbName);
                 lhs = db.GetIVariable(varName);
+
+                LookupTypeCheck(rhs, varName);
+
                 if (lhs == null)
                 {
                     //LEFT-HAND SIDE DOES NOT EXIST
@@ -605,42 +608,13 @@ namespace Gekko
                     //LEFT-HAND SIDE DOES NOT EXIST
                     if (varName[0] == Globals.symbolMemvar)
                     {
-                        //VAL, STRING, DATE
-                        //first, so that we can access scalars as fast as possible
-
-                        if (rhs.Type() == EVariableType.Val)
-                        {
-                            ScalarVal sv = new ScalarVal(((ScalarVal)rhs).val);
-                            db.AddIVariable(varName, sv);
-                        }
-                        else if (rhs.Type() == EVariableType.String)
-                        {
-                            ScalarString ss = new ScalarString(((ScalarString)rhs)._string2);
-                            db.AddIVariable(varName, ss);
-                        }
-                        else if (rhs.Type() == EVariableType.Date)
-                        {
-                            ScalarDate sd = new ScalarDate(((ScalarDate)rhs).date);
-                            db.AddIVariable(varName, sd);
-                        }
-                        else
-                        {
-                            G.Writeln2("*** ERROR: A %-variable cannot be of type " + rhs.Type().ToString().ToUpper());
-                            throw new GekkoException();
-                        }
-
+                        //VAL, STRING, DATE                                                
+                        db.AddIVariable(varName, rhs.DeepClone());
                     }
                     else if (varName[0] == Globals.symbolList)
                     {
-                        //LIST, DICT, MATRIX
-                        if (rhs.Type() == EVariableType.List)
-                        {
-                            MetaList ml = new MetaList();
-                            //LIGHTFIXME, if the list if not "deep", no cloning is needed
-                            //List<IVariable> data = new List<IVariable>();
-                            ml.list.AddRange(((MetaList)rhs).list);                            
-                            db.AddIVariable(varName, ml);
-                        }
+                        //LIST, DICT, MATRIX                                                
+                        db.AddIVariable(varName, rhs.DeepClone());
                     }
                     else
                     {
@@ -665,7 +639,7 @@ namespace Gekko
                                 G.Writeln2("***ERROR: Freq " + lhsFreq.ToString() + " on left-hand side, and freq " + tsRhs.freq + " on right-hand side");
                                 throw new GekkoException();
                             }
-                            TimeSeries tsLhs = tsRhs.Clone();  //cannot just refer to it, since it may be y = x, and if we later on change x, y will change too (bad).
+                            TimeSeries tsLhs = tsRhs.DeepClone() as TimeSeries;  //cannot just refer to it, since it may be y = x, and if we later on change x, y will change too (bad).
                             tsLhs.name = varName;
                             db.AddIVariable(tsLhs);
                         }
@@ -680,12 +654,6 @@ namespace Gekko
                             }
                             db.AddIVariable(tsLhs);
                         }
-                        else
-                        {
-                            //TODO: rhs as MATRIX (vector) should be possible if sample fits.
-                            G.Writeln2("*** ERROR: Could not convert right-hand side (" + rhs.Type().ToString() + ") to SERIES");
-                            throw new GekkoException();
-                        }
                     }
                 }
                 else
@@ -696,64 +664,30 @@ namespace Gekko
                     if (varName[0] == Globals.symbolMemvar)
                     {
                         //VAL, STRING, DATE
-                        //first, so that we can access scalars as fast as possible
-                        if (lhs.Type() == EVariableType.Val)
+                        if (lhs.Type() == rhs.Type())
                         {
-                            ScalarVal svRhs = rhs as ScalarVal;
-                            if (svRhs != null)
-                            {
-                                ScalarVal svLhs = lhs as ScalarVal;
-                                svLhs.val = svRhs.val;
-                            }
-                            else
-                            {
-                                Databank db2 = GetDatabankNoSearch(dbName);
-                                db2.RemoveIVariable(varName);
-                                db2.AddIVariable(varName, new ScalarVal(svRhs.val));
-
-                            }
-                        }
-                        else if (lhs.Type() == EVariableType.String)
-                        {
-                            ScalarString ssRhs = rhs as ScalarString;
-                            if (ssRhs != null)
-                            {
-                                ScalarString ssLhs = lhs as ScalarString;
-                                ssLhs._string2 = ssRhs._string2;
-                            }
-                            else
-                            {
-                                Databank db2 = GetDatabankNoSearch(dbName);
-                                db2.RemoveIVariable(varName);
-                                db2.AddIVariable(varName, new ScalarString(ssRhs._string2));
-                            }
-                        }
-                        else if (lhs.Type() == EVariableType.Date)
-                        {
-                            ScalarDate sdRhs = rhs as ScalarDate;
-                            if (sdRhs != null)
-                            {
-                                ScalarDate svLhs = lhs as ScalarDate;
-                                svLhs.date = sdRhs.date;
-                            }
-                            else
-                            {
-                                Databank db2 = GetDatabankNoSearch(dbName);
-                                db2.RemoveIVariable(varName);
-                                db2.AddIVariable(varName, new ScalarDate(sdRhs.date));
-
-                            }
+                            //fast, especially in loops!
+                            if (lhs.Type() == EVariableType.Val) ((ScalarVal)lhs).val = ((ScalarVal)rhs).val;
+                            else if (lhs.Type() == EVariableType.Date) ((ScalarDate)lhs).date = ((ScalarDate)rhs).date;
+                            else if (lhs.Type() == EVariableType.String) ((ScalarString)lhs)._string2 = ((ScalarString)rhs)._string2;
                         }
                         else
                         {
-                            G.Writeln2("*** ERROR: A %-variable cannot be of type " + rhs.Type().ToString().ToUpper());
-                            throw new GekkoException();
+                            db.RemoveIVariable(varName);
+                            db.AddIVariable(varName, rhs.DeepClone());
                         }
-
                     }
                     else if (varName[0] == Globals.symbolList)
                     {
-                        //LIST, DICT, MATRIX
+                        //LIST, MAP, MATRIX, variable already exists
+                        if (lhs.Type() == rhs.Type())
+                        {
+                            //TODO: Here we could copy the inside of the object, and put this inside into existing object
+                            //      Hence, it would not need to be removed and added to the dictionary, and a new object is not needed.
+                        }
+                        //this is safe, but a little slow in some cases --> see above
+                        db.RemoveIVariable(varName);
+                        db.AddIVariable(varName, rhs.DeepClone());
                     }
                     else
                     {
@@ -770,12 +704,12 @@ namespace Gekko
                         }
                         else if (rhs.Type() == EVariableType.Val)
                         {
-                            ScalarVal sv = rhs as ScalarVal;                            
+                            ScalarVal sv = rhs as ScalarVal;
                             //LIGHTFIX, speed
                             foreach (GekkoTime t in smpl.Iterate())
                             {
                                 tsLhs.SetData(t, sv.val);
-                            }                            
+                            }
                         }
                         //TODO
                     }
@@ -783,6 +717,37 @@ namespace Gekko
             }
 
             return lhs;
+        }
+
+        private static void LookupTypeCheck(IVariable rhs, string varName)
+        {
+            if (varName[0] == Globals.symbolMemvar)
+            {
+                //VAL, STRING, DATE                        
+                if (rhs.Type() != EVariableType.Val && rhs.Type() != EVariableType.String && rhs.Type() != EVariableType.Date)
+                {
+                    G.Writeln2("*** ERROR: A %-variable cannot be of type " + rhs.Type().ToString().ToUpper());
+                    throw new GekkoException();
+                }
+            }
+            else if (varName[0] == Globals.symbolList)
+            {
+                //LIST, DICT, MATRIX                        
+                if (rhs.Type() != EVariableType.Matrix && rhs.Type() != EVariableType.List && rhs.Type() != EVariableType.Map)
+                {
+                    G.Writeln2("*** ERROR: A #-variable cannot be of type " + rhs.Type().ToString().ToUpper());
+                    throw new GekkoException();
+                }
+            }
+            else
+            {
+                if (rhs.Type() != EVariableType.TimeSeries && rhs.Type() != EVariableType.Val)
+                {
+                    //TODO: rhs as MATRIX (vector) should be possible if sample fits.
+                    G.Writeln2("*** ERROR: Could not convert right-hand side (" + rhs.Type().ToString() + ") to SERIES");
+                    throw new GekkoException();
+                }
+            }
         }
 
         private static IVariable GetVariableSearch(IVariable lhs, string varName)
@@ -1307,30 +1272,7 @@ namespace Gekko
             //x['nz', 'w']           
             return x.Indexer(smpl, isLhs, indexes);
                         
-        }
-
-        public static IVariable DeepClone(IVariable x)
-        {
-            if (x.Type() == EVariableType.Val)
-            {
-                return new ScalarVal(((ScalarVal)x).val);
-            }
-            else if (x.Type() == EVariableType.String)
-            {
-                return new ScalarString(((ScalarString)x)._string2);
-            }
-            else if (x.Type() == EVariableType.List)
-            {
-                MetaList m = x as MetaList;
-                List<IVariable> temp = new List<IVariable>();
-                foreach (IVariable iv in m.list)
-                {
-                    temp.Add(O.DeepClone(iv));
-                }
-                return new MetaList(temp);
-            }
-            else throw new GekkoException();
-        }
+        }        
 
         public static IVariable IndexerPlus(GekkoSmpl smpl, IVariable x, bool isLhs, IVariable y)
         {
@@ -1348,64 +1290,64 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(GekkoSmpl smpl, IVariable x, bool isLhs, IVariablesFilterRange y)
-        {            
-            if (x == null)
-            {
-                //[y], where y is y1..y2
-                //['fx'..'fy']
-                ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);  //a bit cheating, but we save an interface method, and performance is not really an issue when indexing whole databanks
-                return ss.Indexer(smpl, y);
-            }
-            else
-            {
-                //x[y], where y is y1..y2
-                //a[1..3] or #a['fx'..'fy'] or #a[fx..fy]
-                return x.Indexer(smpl, y);
-            }
-        }
+        //public static IVariable Indexer(GekkoSmpl smpl, IVariable x, bool isLhs, IVariablesFilterRange y)
+        //{            
+        //    if (x == null)
+        //    {
+        //        //[y], where y is y1..y2
+        //        //['fx'..'fy']
+        //        ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);  //a bit cheating, but we save an interface method, and performance is not really an issue when indexing whole databanks
+        //        return ss.Indexer(smpl, y);
+        //    }
+        //    else
+        //    {
+        //        //x[y], where y is y1..y2
+        //        //a[1..3] or #a['fx'..'fy'] or #a[fx..fy]
+        //        return x.Indexer(smpl, y);
+        //    }
+        //}
 
-        public static IVariable Indexer(GekkoSmpl smpl, IVariable x, bool isLhs, IVariablesFilterRange y1, IVariablesFilterRange y2)
-        {
-            if (x == null)
-            {
-                G.Writeln2("*** ERROR: Invalid syntax");
-                throw new GekkoException();                
-            }
-            else
-            {                
-                //a[1..3, 2..5] or a[1..3, 5] or a[1, 2..5]                
-                return x.Indexer(smpl, y1, y2);
-            }
-        }
+        //public static IVariable Indexer(GekkoSmpl smpl, IVariable x, bool isLhs, IVariablesFilterRange y1, IVariablesFilterRange y2)
+        //{
+        //    if (x == null)
+        //    {
+        //        G.Writeln2("*** ERROR: Invalid syntax");
+        //        throw new GekkoException();                
+        //    }
+        //    else
+        //    {                
+        //        //a[1..3, 2..5] or a[1..3, 5] or a[1, 2..5]                
+        //        return x.Indexer(smpl, y1, y2);
+        //    }
+        //}
 
-        public static IVariable Indexer(GekkoSmpl smpl, IVariable x, bool isLhs, IVariable y1, IVariablesFilterRange y2)
-        {
-            if (x == null)
-            {
-                G.Writeln2("*** ERROR: Invalid syntax");
-                throw new GekkoException();
-            }
-            else
-            {
-                //a[1..3, 2..5] or a[1..3, 5] or a[1, 2..5]                
-                return x.Indexer(smpl, y1, y2);
-            }
-        }
+        //public static IVariable Indexer(GekkoSmpl smpl, IVariable x, bool isLhs, IVariable y1, IVariablesFilterRange y2)
+        //{
+        //    if (x == null)
+        //    {
+        //        G.Writeln2("*** ERROR: Invalid syntax");
+        //        throw new GekkoException();
+        //    }
+        //    else
+        //    {
+        //        //a[1..3, 2..5] or a[1..3, 5] or a[1, 2..5]                
+        //        return x.Indexer(smpl, y1, y2);
+        //    }
+        //}
 
-        public static IVariable Indexer(GekkoSmpl smpl, IVariable x, bool isLhs, IVariablesFilterRange y1, IVariable y2)
-        {
-            if (x == null)
-            {
-                G.Writeln2("*** ERROR: Invalid syntax");
-                throw new GekkoException();
-            }
-            else
-            {
-                //a[1..3, 2..5] or a[1..3, 5] or a[1, 2..5]                
-                return x.Indexer(smpl, y1, y2);
-            }
-        }        
+        //public static IVariable Indexer(GekkoSmpl smpl, IVariable x, bool isLhs, IVariablesFilterRange y1, IVariable y2)
+        //{
+        //    if (x == null)
+        //    {
+        //        G.Writeln2("*** ERROR: Invalid syntax");
+        //        throw new GekkoException();
+        //    }
+        //    else
+        //    {
+        //        //a[1..3, 2..5] or a[1..3, 5] or a[1, 2..5]                
+        //        return x.Indexer(smpl, y1, y2);
+        //    }
+        //}        
 
         //========================================
         //======================================== Z() variants start
@@ -3627,7 +3569,7 @@ namespace Gekko
                 TimeSeries oldSeries = O.FindTimeSeries(this.listItems1[0], 1);
                 TimeSeries lhs = O.FindTimeSeries(this.listItems0[0], 1);
                                 
-                TimeSeries newSeriesTemp = oldSeries.Clone();  //brand new object, not present in Work (yet)                
+                TimeSeries newSeriesTemp = oldSeries.DeepClone() as TimeSeries;  //brand new object, not present in Work (yet)                
 
                 ESmoothTypes type = ESmoothTypes.Spline;  //what is the default in AREMOS??
                 if (G.equal(opt_geometric, "yes")) type = ESmoothTypes.Geometric;
@@ -4566,7 +4508,7 @@ namespace Gekko
                             {
                                 //Type 2
                                 type2++;
-                                ts2 = ts.Clone();
+                                ts2 = ts.DeepClone() as TimeSeries;
                                 ts2.name = newName;
                                 ts2.Truncate(this.t1, this.t2);
                                 toBank.AddVariable(ts2);
@@ -4575,7 +4517,7 @@ namespace Gekko
                         else
                         {
                             //No truncate of time period
-                            TimeSeries ts2 = ts.Clone();  //will inherit the date stamp                          
+                            TimeSeries ts2 = ts.DeepClone() as TimeSeries;  //will inherit the date stamp                          
                             if (listItems1 != null)
                             {
                                 ts2.name = newName;
@@ -5264,7 +5206,7 @@ namespace Gekko
                         TimeSeries tsNew = null;
                         if (opt_prefix != null)
                         {
-                            tsNew = ts.Clone();
+                            tsNew = ts.DeepClone() as TimeSeries;
                             tsNew.name = opt_prefix + ts.name;
                             if (ts.parentDatabank == null)
                             {

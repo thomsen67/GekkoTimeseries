@@ -86,7 +86,7 @@ namespace Gekko
                     }
                     else
                     {
-                        IVariable ss = O.DeepClone(this.list[ival - 1]);
+                        IVariable ss = this.list[ival - 1].DeepClone();
                         return ss;
                     }
                 }
@@ -110,55 +110,55 @@ namespace Gekko
         }
                
 
-        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
-        {
-            throw new GekkoException();
-        }
+        //public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
+        //{
+        //    throw new GekkoException();
+        //}
 
-        public IVariable Indexer(GekkoSmpl t, IVariable index, IVariablesFilterRange indexRange)
-        {
-            throw new GekkoException();
-        }
+        //public IVariable Indexer(GekkoSmpl t, IVariable index, IVariablesFilterRange indexRange)
+        //{
+        //    throw new GekkoException();
+        //}
 
-        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange, IVariable index)
-        {
-            throw new GekkoException();
-        }
+        //public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange, IVariable index)
+        //{
+        //    throw new GekkoException();
+        //}
 
-        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange)
-        {            
-            IVariable iv1 = indexRange.first;
-            IVariable iv2 = indexRange.last;
+        //public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange)
+        //{            
+        //    IVariable iv1 = indexRange.first;
+        //    IVariable iv2 = indexRange.last;
 
-            if (iv1.Type() == EVariableType.String && iv2.Type() == EVariableType.String)
-            {                
-                string s1 = O.GetString(iv1);
-                string s2 = O.GetString(iv2);
-                List<string> temp = Program.MatchRange(s1, s2, this.list, null);
-                return new MetaList(temp);
-            }
-            else
-            {                
-                int i1 = O.GetInt(iv1);
-                int i2 = O.GetInt(iv2);
-                if (i1 < 1)
-                {
-                    G.Writeln2("*** ERROR: Starting index (" + i1 + ") cannot be < 1");
-                    throw new GekkoException();
-                }
-                if (i1 > this.list.Count)
-                {
-                    G.Writeln2("*** ERROR: Ending index (" + i2 + ") cannot be > length (" + this.list.Count + ")");
-                    throw new GekkoException();
-                }
-                if (i1 > i2)
-                {
-                    G.Writeln2("*** ERROR: Starting index (" + i1 + ") cannot be > than ending index (" + i2 + ")");
-                    throw new GekkoException();
-                }
-                return new MetaList(this.list.GetRange(i1 - 1, i2 - i1 + 1)); //GetRange() is a shallow copy, but that is okay since it contains immutable strings            
-            }
-        }
+        //    if (iv1.Type() == EVariableType.String && iv2.Type() == EVariableType.String)
+        //    {                
+        //        string s1 = O.GetString(iv1);
+        //        string s2 = O.GetString(iv2);
+        //        List<string> temp = Program.MatchRange(s1, s2, this.list, null);
+        //        return new MetaList(temp);
+        //    }
+        //    else
+        //    {                
+        //        int i1 = O.GetInt(iv1);
+        //        int i2 = O.GetInt(iv2);
+        //        if (i1 < 1)
+        //        {
+        //            G.Writeln2("*** ERROR: Starting index (" + i1 + ") cannot be < 1");
+        //            throw new GekkoException();
+        //        }
+        //        if (i1 > this.list.Count)
+        //        {
+        //            G.Writeln2("*** ERROR: Ending index (" + i2 + ") cannot be > length (" + this.list.Count + ")");
+        //            throw new GekkoException();
+        //        }
+        //        if (i1 > i2)
+        //        {
+        //            G.Writeln2("*** ERROR: Starting index (" + i1 + ") cannot be > than ending index (" + i2 + ")");
+        //            throw new GekkoException();
+        //        }
+        //        return new MetaList(this.list.GetRange(i1 - 1, i2 - i1 + 1)); //GetRange() is a shallow copy, but that is okay since it contains immutable strings            
+        //    }
+        //}
         
         public IVariable Negate(GekkoSmpl t)
         {
@@ -240,7 +240,16 @@ namespace Gekko
         {
             G.Writeln2("*** ERROR: You cannot use power function with lists");                
             throw new GekkoException();
-        }       
+        }
 
+        public IVariable DeepClone()
+        {            
+            List<IVariable> temp = new List<IVariable>();
+            foreach (IVariable iv in this.list)
+            {
+                temp.Add(iv.DeepClone());
+            }
+            return new MetaList(temp);
+        }
     }
 }

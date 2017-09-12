@@ -73,29 +73,7 @@ namespace Gekko
             throw new GekkoException();
         }
         
-        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange)
-        {
-            G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
-            throw new GekkoException();
-        }
-
-        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
-        {
-            G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
-            throw new GekkoException();
-        }
-
-        public IVariable Indexer(GekkoSmpl t, IVariable index, IVariablesFilterRange indexRange)
-        {
-            G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
-            throw new GekkoException();
-        }
-
-        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange, IVariable index)
-        {
-            G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
-            throw new GekkoException();
-        }        
+                
 
         public List<IVariable> GetList()
         {
@@ -285,5 +263,13 @@ namespace Gekko
                     }
             }
         }
+
+
+        public IVariable DeepClone()
+        {
+            return new ScalarVal(this.val);
+        }        
+
+
     }
 }

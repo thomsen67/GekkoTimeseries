@@ -256,40 +256,40 @@ namespace Gekko
 
         }
 
-        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
-        {
-            throw new GekkoException();
-        }
+        //public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
+        //{
+        //    throw new GekkoException();
+        //}
 
-        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange)
-        {
-            if (this._string2 == Globals.indexerAloneCheatString)
-            {
-                //corresponds to empty index range like ['fx'..'fy'], different from #a['fx'..'fy']
-                IVariable iv1 = indexRange.first;
-                IVariable iv2 = indexRange.last;
-                string s1 = O.GetString(iv1);
-                string s2 = O.GetString(iv2);                
-                ExtractBankAndRestHelper h = Program.ExtractBankAndRest(s1, EExtrackBankAndRest.GetDatabank);                
-                List<string> temp = Program.MatchRangeInDatabank(h.name, s2, h.databank);
-                return new MetaList(temp);
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: You cannot use []-index on string");
-                throw new GekkoException();
-            }            
-        }
+        //public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange)
+        //{
+        //    if (this._string2 == Globals.indexerAloneCheatString)
+        //    {
+        //        //corresponds to empty index range like ['fx'..'fy'], different from #a['fx'..'fy']
+        //        IVariable iv1 = indexRange.first;
+        //        IVariable iv2 = indexRange.last;
+        //        string s1 = O.GetString(iv1);
+        //        string s2 = O.GetString(iv2);                
+        //        ExtractBankAndRestHelper h = Program.ExtractBankAndRest(s1, EExtrackBankAndRest.GetDatabank);                
+        //        List<string> temp = Program.MatchRangeInDatabank(h.name, s2, h.databank);
+        //        return new MetaList(temp);
+        //    }
+        //    else
+        //    {
+        //        G.Writeln2("*** ERROR: You cannot use []-index on string");
+        //        throw new GekkoException();
+        //    }            
+        //}
 
-        public IVariable Indexer(GekkoSmpl t, IVariable index, IVariablesFilterRange indexRange)
-        {
-            throw new GekkoException();
-        }
+        //public IVariable Indexer(GekkoSmpl t, IVariable index, IVariablesFilterRange indexRange)
+        //{
+        //    throw new GekkoException();
+        //}
 
-        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange, IVariable index)
-        {
-            throw new GekkoException();
-        }
+        //public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange, IVariable index)
+        //{
+        //    throw new GekkoException();
+        //}
 
         public IVariable Negate(GekkoSmpl t)
         {
@@ -388,6 +388,12 @@ namespace Gekko
             G.Writeln2("*** ERROR: %x^%y or %x**%y (power) is not allowed if %x is a STRING scalar.");
             throw new GekkoException();            
         }
+
+        public IVariable DeepClone()
+        {
+            return new ScalarString(this._string2);
+        }
+
     }
 
 }

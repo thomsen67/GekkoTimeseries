@@ -245,6 +245,7 @@
     <Compile Include="Parser\Gek\ParserGekWalkASTAndEmit.cs" />
     <Compile Include="Parser\Gek\Tokens.cs" />
     <Compile Include="Parser\ParserCommon.cs" />
+    <Compile Include="Range.cs" />
     <Compile Include="RichTextBoxEx.cs">
       <SubType>Component</SubType>
     </Compile>

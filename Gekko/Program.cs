@@ -6092,7 +6092,7 @@ namespace Gekko
             {
                 string[] ss2 = varName.Split(new string[] { ".." }, StringSplitOptions.None);
                 ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);
-                IVariable xx = ss.Indexer(null, new IVariablesFilterRange(new ScalarString(bank + ":" + ss2[0]), new ScalarString(ss2[1])));
+                IVariable xx = ss.Indexer(null, false, new Range(new ScalarString(bank + ":" + ss2[0]), new ScalarString(ss2[1])));
                 Databank db = Program.databanks.GetDatabank(bank);
                 if (db == null)
                 {
@@ -18285,7 +18285,7 @@ namespace Gekko
                 TimeSeries tsOld = null;
                 if (op == "#" || updTypeDollar || o.opDollar || updType == ESeriesUpdTypes.mp)
                 {
-                    tsOld = ts.Clone();  //make a copy for use in # or $ or <mp> operator
+                    tsOld = ts.DeepClone() as TimeSeries;  //make a copy for use in # or $ or <mp> operator
                 }
 
                 if (o.data.Length > expectedNumberOfObservations)
@@ -18890,7 +18890,7 @@ namespace Gekko
                             TimeSeries ts = kvp.Value as TimeSeries;
                             if (ts != null)
                             {
-                                TimeSeries tsClone = ts.Clone();
+                                TimeSeries tsClone = ts.DeepClone() as TimeSeries;
                                 tsClone.Truncate(yr1, yr2);
                                 databankWithFewerPeriods.Add(kvp.Key, tsClone);
                             }

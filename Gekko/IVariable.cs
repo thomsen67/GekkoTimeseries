@@ -13,7 +13,9 @@ namespace Gekko
         Val,
         TimeSeries,        
         List,
-        Matrix,         
+        Map,
+        Matrix,   
+        Range,      
         GekkoError
     }
 
@@ -26,17 +28,17 @@ namespace Gekko
         OnRightHandSide
     }    
 
-    public class IVariablesFilterRange
-    {
-        //Used for a[1:4] or a[1:4, 2:3].        
-        public IVariable first = null;
-        public IVariable last = null;
-        public IVariablesFilterRange(IVariable v1, IVariable v2)
-        {        
-            this.first = v1;
-            this.last = v2;
-        }
-    }    
+    //public class IVariablesFilterRange
+    //{
+    //    //Used for a[1:4] or a[1:4, 2:3].        
+    //    public IVariable first = null;
+    //    public IVariable last = null;
+    //    public IVariablesFilterRange(IVariable v1, IVariable v2)
+    //    {        
+    //        this.first = v1;
+    //        this.last = v2;
+    //    }
+    //}    
 
     public interface IVariable
     {
@@ -61,15 +63,7 @@ namespace Gekko
         IVariable Negate(GekkoSmpl smpl); //returns a new object!
         
         IVariable Indexer(GekkoSmpl smpl, bool isLhs, params IVariable[] index); //returns a new object! t needs to be 1. argument.
-
-        IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange index); //x[2..3]: returns a new object with sub-items
-
-        IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange index1, IVariablesFilterRange index2); //x[2..3, 3..5]: returns a new object with sub-items
-
-        IVariable Indexer(GekkoSmpl smpl, IVariable index, IVariablesFilterRange indexRange);
-
-        IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange indexRange, IVariable index);
-
+                
         void InjectAdd(GekkoSmpl smpl, IVariable x, IVariable y); //z.InjectAdd(x,y) inserts the sum of x and y into the z object.        
 
         double GetVal(GekkoSmpl smpl);
@@ -81,5 +75,7 @@ namespace Gekko
         List<IVariable> GetList();
 
         EVariableType Type();
+
+        IVariable DeepClone();
     }
 }

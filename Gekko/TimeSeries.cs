@@ -185,36 +185,7 @@ namespace Gekko
             }
         }
 
-        /// <summary>
-        /// Creates a clone of the TimeSeries, copying all fields. Used for copying databanks in RAM.
-        /// </summary>
-        /// <returns>The cloned TimeSeries object.</returns>
-        public TimeSeries Clone()
-        {
-            //DimensionCheck();
-            //Always make sure new fields are remembered in the Clone() method
-            TimeSeries tsCopy = new TimeSeries(this.freq, this.name);
-            if (this.dataArray == null)
-            {
-                tsCopy.dataArray = null;
-            }
-            else
-            {
-                tsCopy.dataArray = new double[this.dataArray.Length];
-                System.Array.Copy(this.dataArray, tsCopy.dataArray, this.dataArray.Length);
-            }
-            tsCopy.anchorSuperPeriod = this.anchorSuperPeriod;
-            tsCopy.anchorSubPeriod = this.anchorSubPeriod;
-            tsCopy.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray;
-            tsCopy.firstPeriodPositionInArray = this.firstPeriodPositionInArray;
-            tsCopy.lastPeriodPositionInArray = this.lastPeriodPositionInArray;
-            if (this.label != null) tsCopy.label = string.Copy(this.label);  //using string.Copy() probably not be necessary, but we use it for extra safety
-            if (this.source != null) tsCopy.source = string.Copy(this.source); //using string.Copy() probably not be necessary, but we use it for extra safety                        
-            if (this.stamp != null) tsCopy.stamp = string.Copy(this.stamp); //using string.Copy() probably not be necessary, but we use it for extra safety                        
-            tsCopy.isGhost = this.isGhost;
-            tsCopy.isTimeless = this.isTimeless;            
-            return tsCopy;
-        }
+        
 
         /// <summary>
         /// Truncates the TimeSeries object, so that the starting period
@@ -1095,29 +1066,29 @@ namespace Gekko
 
        
 
-        public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange index)
-        {
-            G.Writeln2("Ts error 8");
-            return null;
-        }
+        //public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange index)
+        //{
+        //    G.Writeln2("Ts error 8");
+        //    return null;
+        //}
 
-        public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange index1, IVariablesFilterRange index2)
-        {
-            G.Writeln2("Ts error 9");
-            return null;
-        }
+        //public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange index1, IVariablesFilterRange index2)
+        //{
+        //    G.Writeln2("Ts error 9");
+        //    return null;
+        //}
 
-        public IVariable Indexer(GekkoSmpl smpl, IVariable index, IVariablesFilterRange indexRange)
-        {
-            G.Writeln2("Ts error 10");
-            return null;
-        }
+        //public IVariable Indexer(GekkoSmpl smpl, IVariable index, IVariablesFilterRange indexRange)
+        //{
+        //    G.Writeln2("Ts error 10");
+        //    return null;
+        //}
 
-        public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange indexRange, IVariable index)
-        {
-            G.Writeln2("Ts error 11");
-            return null;
-        }
+        //public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange indexRange, IVariable index)
+        //{
+        //    G.Writeln2("Ts error 11");
+        //    return null;
+        //}
 
         public void InjectAdd(GekkoSmpl smpl, IVariable x, IVariable y)
         {
@@ -1184,6 +1155,37 @@ namespace Gekko
         public EVariableType Type()
         {
             return EVariableType.TimeSeries;
+        }
+
+        /// <summary>
+        /// Creates a clone of the TimeSeries, copying all fields. Used for copying databanks in RAM.
+        /// </summary>
+        /// <returns>The cloned TimeSeries object.</returns>
+        public IVariable DeepClone()
+        {
+            //DimensionCheck();
+            //Always make sure new fields are remembered in the Clone() method
+            TimeSeries tsCopy = new TimeSeries(this.freq, this.name);
+            if (this.dataArray == null)
+            {
+                tsCopy.dataArray = null;
+            }
+            else
+            {
+                tsCopy.dataArray = new double[this.dataArray.Length];
+                System.Array.Copy(this.dataArray, tsCopy.dataArray, this.dataArray.Length);
+            }
+            tsCopy.anchorSuperPeriod = this.anchorSuperPeriod;
+            tsCopy.anchorSubPeriod = this.anchorSubPeriod;
+            tsCopy.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray;
+            tsCopy.firstPeriodPositionInArray = this.firstPeriodPositionInArray;
+            tsCopy.lastPeriodPositionInArray = this.lastPeriodPositionInArray;
+            if (this.label != null) tsCopy.label = string.Copy(this.label);  //using string.Copy() probably not be necessary, but we use it for extra safety
+            if (this.source != null) tsCopy.source = string.Copy(this.source); //using string.Copy() probably not be necessary, but we use it for extra safety                        
+            if (this.stamp != null) tsCopy.stamp = string.Copy(this.stamp); //using string.Copy() probably not be necessary, but we use it for extra safety                        
+            tsCopy.isGhost = this.isGhost;
+            tsCopy.isTimeless = this.isTimeless;
+            return tsCopy;
         }
 
     }

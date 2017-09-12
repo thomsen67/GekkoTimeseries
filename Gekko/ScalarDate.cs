@@ -54,29 +54,7 @@ namespace Gekko
             throw new GekkoException();
         }
         
-        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange)
-        {
-            G.Writeln2("*** ERROR: Cannot use []-indexer on DATE");
-            throw new GekkoException();
-        }
-
-        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
-        {
-            G.Writeln2("*** ERROR: Cannot use []-indexer on DATE");
-            throw new GekkoException();
-        }
-
-        public IVariable Indexer(GekkoSmpl t, IVariable index, IVariablesFilterRange indexRange)
-        {
-            G.Writeln2("*** ERROR: Cannot use []-indexer on DATE");
-            throw new GekkoException();
-        }
-
-        public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange, IVariable index)
-        {
-            G.Writeln2("*** ERROR: Cannot use []-indexer on DATE");
-            throw new GekkoException();
-        }        
+                
 
         public IVariable Negate(GekkoSmpl t)
         {
@@ -156,6 +134,11 @@ namespace Gekko
         {
             G.Writeln2("*** ERROR: %x^%y or %x**%y (power) is not allowed if %x is a DATE scalar.");
             throw new GekkoException();
+        }
+
+        public IVariable DeepClone()
+        {
+            return new ScalarDate(this.date);
         }
     }
 }
