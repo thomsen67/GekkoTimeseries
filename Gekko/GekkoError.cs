@@ -21,7 +21,7 @@ namespace Gekko
             this.overflow = overflow;
         }
 
-        public IVariable Indexer(GekkoSmpl t, bool isLhs, params IVariable[] indexes)
+        public IVariable Indexer(GekkoSmpl t, params IVariable[] indexes)
         {
             throw new GekkoException();
         }

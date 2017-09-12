@@ -24,7 +24,7 @@ GekkoSmpl smpl = O.Smpl();
 
 p.SetText(@"¤0");
 IVariable ivTmpvar47 = i51;
-(O.Indexer(smpl, O.Lookup(smpl, null, "#m", null, true, null), false, null, i48
+(O.Indexer(smpl, O.Lookup(smpl, null, "#m", null, true, null), null, i48
 )).SetData(ivTmpvar47, (new Range(i49, i50)))
 ;
 

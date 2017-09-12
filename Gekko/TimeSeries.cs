@@ -981,7 +981,7 @@ namespace Gekko
             return ts;
         }    
 
-        public IVariable Indexer(GekkoSmpl smpl, bool isLhs, params IVariable[] indexes)
+        public IVariable Indexer(GekkoSmpl smpl, params IVariable[] indexes)
         {
             IVariable rv = null;
 

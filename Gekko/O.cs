@@ -953,7 +953,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(GekkoSmpl smpl, IVariable x, bool isLhs, IVariable rhs, params IVariable[] indexes)
+        public static IVariable Indexer(GekkoSmpl smpl, IVariable x, params IVariable[] indexes)
         {
             if (x == null)
             {
@@ -962,7 +962,7 @@ namespace Gekko
                     //[y]
                     //['q*']
                     ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);  //a bit cheating, but we save an interface method, and performance is not really an issue when indexing whole databanks
-                    return ss.Indexer(smpl, false, indexes);
+                    return ss.Indexer(smpl, indexes);
                 }
                 else
                 {
@@ -975,7 +975,7 @@ namespace Gekko
             //a[1] or #a['q*']
             //#x[1, 2]                 
             //x['nz', 'w']           
-            return x.Indexer(smpl, isLhs, indexes);
+            return x.Indexer(smpl, indexes);
                         
         }        
 
@@ -991,7 +991,7 @@ namespace Gekko
             {
                 //x[+y], #a[+'q*'], hmmmmmmmmmmmmmmm
                 //a[+1] ok
-                return x.Indexer(smpl, isLhs, new IVariable[] { y });
+                return x.Indexer(smpl, new IVariable[] { y });
             }
         }
 
@@ -1626,7 +1626,7 @@ namespace Gekko
         {
             if (list.Type() == EVariableType.List)
             {
-                ScalarString x = (ScalarString)list.Indexer(smpl, false, new IVariable[] { index });  //will return ScalarString with .isName = true.
+                ScalarString x = (ScalarString)list.Indexer(smpl, new IVariable[] { index });  //will return ScalarString with .isName = true.
                 TimeSeries mts = O.GetTimeSeries(smpl, x._string2, 1);  //always from work....
                 return mts;
             }
@@ -1641,7 +1641,7 @@ namespace Gekko
         {
             //Used to pick out a value from a list item, like #m[2][2015], where index=2015
             TimeSeries mts = O.GetTimeSeries(smpl, name, bank);  //always from work....
-            IVariable result = O.Indexer(smpl, mts, false, index);
+            IVariable result = O.Indexer(smpl, mts, index);
             return result;
         }
 

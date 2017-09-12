@@ -209,7 +209,7 @@ namespace Gekko
             return EVariableType.String;
         }                       
 
-        public IVariable Indexer(GekkoSmpl smpl, bool isLhs, params IVariable[] indexes)
+        public IVariable Indexer(GekkoSmpl smpl, params IVariable[] indexes)
         {
             if (indexes.Length == 1)
             {

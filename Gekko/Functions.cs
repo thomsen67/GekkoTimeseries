@@ -128,7 +128,7 @@ namespace Gekko
 
         public static IVariable test(GekkoSmpl t, IVariable x1)
         {
-            return x1.Indexer(t, false, new ScalarVal(-2d));
+            return x1.Indexer(t, new ScalarVal(-2d));
         }
 
         public static IVariable concat(GekkoSmpl smpl, IVariable x1, IVariable x2)

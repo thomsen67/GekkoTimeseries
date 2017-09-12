@@ -2304,7 +2304,7 @@ namespace Gekko.Parser.Gek
                         {
                             //Only 1 dimension supported                        
                             if (node.ChildrenCount() > 1) throw new GekkoException();
-                            node.Code.A("O.Indexer(smpl, null, false, " + node[0].Code + ")");  //null signals that it has nothing on the left
+                            node.Code.A("O.Indexer(smpl, null, " + node[0].Code + ")");  //null signals that it has nothing on the left
                         }
                         break;
                     case "ASTDOTORINDEXER":
@@ -2314,8 +2314,8 @@ namespace Gekko.Parser.Gek
 
                             //isLhs is true if the indexer is on the left-hand side, and is the last indexer.
                             //For instance #m[2][3] = 'a' -----> here the [3] indexer will get "true"
-                            string isLhs = "false";
-                            if (node.Parent.Text == "ASTLEFTSIDE") isLhs = "true";
+                            //string isLhs = "false";
+                            //if (node.Parent.Text == "ASTLEFTSIDE") isLhs = "true";
 
                             //LIGHTFIXME, isRhs
 
@@ -2343,12 +2343,13 @@ namespace Gekko.Parser.Gek
                             }
                             if (ivTempVar == null)
                             {
-                                node.Code.A("O.Indexer(smpl, ").A(node[0].Code).A(", ").A("" + isLhs + ", " + "null" + ", ").A(indexes).A(")");
+                                node.Code.A("O.Indexer(smpl, ").A(node[0].Code).A(", ").A(indexes).A(")");
                             }
                             else
                             {
-                                node.Code.A("(").A(node[0].Code).A(").SetData(").A(ivTempVar + ", ").A(indexes).A(")");
+                                node.Code.A("(").A(node[0].Code).A(").SetData(").A(ivTempVar).A(", ").A(indexes).A(")");
                             }
+
                         }
                         break;
                     case "ASTINDEXER":

@@ -36,7 +36,7 @@ namespace Gekko
             }
         }
 
-        public IVariable Indexer(GekkoSmpl t, bool isLhs, params IVariable[] indexes)
+        public IVariable Indexer(GekkoSmpl t, params IVariable[] indexes)
         {
             if (indexes.Length == 1)
             {

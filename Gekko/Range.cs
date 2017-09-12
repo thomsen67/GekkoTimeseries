@@ -21,7 +21,7 @@ namespace Gekko
             this.last = xx2;
         }
 
-        public IVariable Indexer(GekkoSmpl t, bool isLhs, params IVariable[] indexes)
+        public IVariable Indexer(GekkoSmpl t, params IVariable[] indexes)
         {
             G.Writeln2("*** ERROR: Wrong use of Range class");
             throw new GekkoException();

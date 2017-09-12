@@ -6092,7 +6092,7 @@ namespace Gekko
             {
                 string[] ss2 = varName.Split(new string[] { ".." }, StringSplitOptions.None);
                 ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);
-                IVariable xx = ss.Indexer(null, false, new Range(new ScalarString(bank + ":" + ss2[0]), new ScalarString(ss2[1])));
+                IVariable xx = ss.Indexer(null, new Range(new ScalarString(bank + ":" + ss2[0]), new ScalarString(ss2[1])));
                 Databank db = Program.databanks.GetDatabank(bank);
                 if (db == null)
                 {
