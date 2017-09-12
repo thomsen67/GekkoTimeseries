@@ -90,6 +90,25 @@ namespace Gekko
                         return ss;
                     }
                 }
+                else if (index.Type() == EVariableType.Range)
+                {
+                    Range index_range = index as Range;
+                    int ival1 = O.GetInt(index_range.first);
+                    int ival2 = O.GetInt(index_range.last);
+                    if (ival1 > this.list.Count || ival2 > this.list.Count || ival2 < ival1 || ival1 < 1 || ival2 < 1)
+                    {
+                        G.Writeln2("*** ERROR: Invalid range, [" + ival1 + " .. " + ival2 + "]");
+                        throw new GekkoException();
+                    }
+                    List<IVariable> tmp = new List<Gekko.IVariable>();
+                    for (int i = ival1 - 1; i <= ival2 - 1; i++)
+                    {
+                        tmp.Add(this.list[i].DeepClone());
+                    }
+                    MetaList m = new MetaList(tmp);
+                    m.isNameList = this.isNameList;
+                    return m;
+                }
                 else if (index.Type() == EVariableType.String)
                 {
                     string s5 = ((ScalarString)index)._string2;

@@ -2388,9 +2388,11 @@ namespace Gekko.Parser.Gek
                             //    }
                             //}
                             //else throw new GekkoException();
-
-                            GetCodeFromAllChildren(node);
-
+                            if (node.ChildrenCount() == 1) GetCodeFromAllChildren(node);
+                            else
+                            {
+                                node.Code.A("(new Range(").A(node[0].Code).A(", ").A(node[1].Code).A("))");
+                            }
                         }
                         break;
                     case "ASTINDEXERELEMENTBANK":                    

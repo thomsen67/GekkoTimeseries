@@ -522,7 +522,7 @@ namespace Gekko
             return new MetaList(m);
         }
 
-        public static IVariable Lookup(GekkoSmpl smpl, IVariable x, IVariable rhs)
+        public static IVariable Lookup(GekkoSmpl smpl, IVariable x, IVariable rhsExpression)
         {
             ScalarString x2 = x as ScalarString;
             if (x2 == null)
@@ -535,31 +535,31 @@ namespace Gekko
                 string dbName, varName, freq; char firstChar; Chop(x2._string2, out dbName, out varName, out firstChar, out freq);
                 bool hasSigil = false;
                 if (firstChar == Globals.symbolMemvar || firstChar == Globals.symbolList) hasSigil = true;
-                IVariable iv = LookupHelper(smpl, dbName, varName, freq, hasSigil, rhs);
+                IVariable iv = LookupHelper(smpl, dbName, varName, freq, hasSigil, rhsExpression);
                 return iv;
             }
             return x;
         }
 
-        public static IVariable Lookup(GekkoSmpl smpl, string dbName, string varName, string freq, bool hasSigil, IVariable rhs)
+        public static IVariable Lookup(GekkoSmpl smpl, string dbName, string varname, string freq, bool hasSigil, IVariable rhsExpression)
         {
-            IVariable iv = LookupHelper(smpl, dbName, varName, freq, hasSigil, rhs);
+            IVariable iv = LookupHelper(smpl, dbName, varname, freq, hasSigil, rhsExpression);
             return iv;
         }
 
-        private static IVariable LookupHelper(GekkoSmpl smpl, string dbName, string varNameOrig, string freq, bool hasSigil, IVariable rhs)
+        private static IVariable LookupHelper(GekkoSmpl smpl, string dbName, string varname, string freq, bool hasSigil, IVariable rhrhsExpressions)
         {
             //rhs means the value of the rhs variable, meaning that the present lookup is regarding the lhs variable if rhs=null
             IVariable lhs = null;
-            string varName = varNameOrig;
+            string varnameWithTilde = varname;
             if (!hasSigil)
             {
                 //Timeseries has '~' added
-                if (freq != null) varName = varNameOrig + Globals.symbolTilde + freq;
-                else varName = varNameOrig + Globals.symbolTilde + G.GetFreq(Program.options.freq);
+                if (freq != null) varnameWithTilde = varname + Globals.symbolTilde + freq;
+                else varnameWithTilde = varname + Globals.symbolTilde + G.GetFreq(Program.options.freq);
             }
 
-            if (rhs == null)
+            if (rhrhsExpressions == null)
             {
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
@@ -569,20 +569,20 @@ namespace Gekko
                 if (Program.options.databank_search && dbName == null)
                 {
                     //Search if on the right-hand side (rhs), in data mode, and no bank is indicated
-                    lhs = GetVariableSearch(lhs, varName);
+                    lhs = GetVariableSearch(lhs, varnameWithTilde);
                     if (lhs == null)
                     {
-                        G.Writeln2("*** ERROR: Could not find variable '" + varName + "' in any open databank (excluding Ref)");
+                        G.Writeln2("*** ERROR: Could not find variable '" + varnameWithTilde + "' in any open databank (excluding Ref)");
                         throw new GekkoException();
                     }
                 }
                 else
                 {
                     Databank db = GetDatabankNoSearch(dbName);
-                    lhs = db.GetIVariable(varName);
+                    lhs = db.GetIVariable(varnameWithTilde);
                     if (lhs == null)
                     {
-                        G.Writeln2("*** ERROR: Could not find variable '" + varName + "' in databank '" + db.aliasName + "'");
+                        G.Writeln2("*** ERROR: Could not find variable '" + varnameWithTilde + "' in databank '" + db.aliasName + "'");
                         throw new GekkoException();
                     }
                 }
@@ -597,33 +597,33 @@ namespace Gekko
                 Databank db = null;
                 if (dbName == null) db = Program.databanks.GetFirst();
                 else db = Program.databanks.GetDatabank(dbName);
-                lhs = db.GetIVariable(varName);
+                lhs = db.GetIVariable(varnameWithTilde);
 
-                LookupTypeCheck(rhs, varName);
+                LookupTypeCheck(rhrhsExpressions, varnameWithTilde);
 
                 if (lhs == null)
                 {
                     //LEFT-HAND SIDE DOES NOT EXIST
                     //LEFT-HAND SIDE DOES NOT EXIST
                     //LEFT-HAND SIDE DOES NOT EXIST
-                    if (varName[0] == Globals.symbolMemvar)
+                    if (varnameWithTilde[0] == Globals.symbolMemvar)
                     {
                         //VAL, STRING, DATE                                                
-                        db.AddIVariable(varName, rhs.DeepClone());
+                        db.AddIVariable(varnameWithTilde, rhrhsExpressions.DeepClone());
                     }
-                    else if (varName[0] == Globals.symbolList)
+                    else if (varnameWithTilde[0] == Globals.symbolList)
                     {
                         //LIST, DICT, MATRIX                                                
-                        db.AddIVariable(varName, rhs.DeepClone());
+                        db.AddIVariable(varnameWithTilde, rhrhsExpressions.DeepClone());
                     }
                     else
                     {
                         //SERIES
                         //create it                            
-                        if (!Program.options.databank_create_auto && !varName.StartsWith("xx", StringComparison.OrdinalIgnoreCase))
+                        if (!Program.options.databank_create_auto && !varnameWithTilde.StartsWith("xx", StringComparison.OrdinalIgnoreCase))
                         {
-                            G.Writeln2("*** ERROR: Cannot create timeseries '" + varName);
-                            G.Writeln("    You may use CREATE " + varName + ", or use MODE data, or use a name starting with 'xx'", Color.Red);
+                            G.Writeln2("*** ERROR: Cannot create timeseries '" + varnameWithTilde);
+                            G.Writeln("    You may use CREATE " + varnameWithTilde + ", or use MODE data, or use a name starting with 'xx'", Color.Red);
                             throw new GekkoException();
                         }
 
@@ -631,22 +631,22 @@ namespace Gekko
                         if (freq == null) lhsFreq = Program.options.freq;
                         else lhsFreq = G.GetFreq(freq);  //will fail with an error if not recognized
 
-                        if (rhs.Type() == EVariableType.TimeSeries)
+                        if (rhrhsExpressions.Type() == EVariableType.TimeSeries)
                         {
-                            TimeSeries tsRhs = rhs as TimeSeries;
+                            TimeSeries tsRhs = rhrhsExpressions as TimeSeries;
                             if (lhsFreq != tsRhs.freq)
                             {
                                 G.Writeln2("***ERROR: Freq " + lhsFreq.ToString() + " on left-hand side, and freq " + tsRhs.freq + " on right-hand side");
                                 throw new GekkoException();
                             }
                             TimeSeries tsLhs = tsRhs.DeepClone() as TimeSeries;  //cannot just refer to it, since it may be y = x, and if we later on change x, y will change too (bad).
-                            tsLhs.name = varName;
+                            tsLhs.name = varnameWithTilde;
                             db.AddIVariable(tsLhs);
                         }
-                        else if (rhs.Type() == EVariableType.Val)
+                        else if (rhrhsExpressions.Type() == EVariableType.Val)
                         {
-                            ScalarVal sv = rhs as ScalarVal;
-                            TimeSeries tsLhs = new TimeSeries(lhsFreq, varName);
+                            ScalarVal sv = rhrhsExpressions as ScalarVal;
+                            TimeSeries tsLhs = new TimeSeries(lhsFreq, varnameWithTilde);
                             //LIGHTFIX, speed
                             foreach (GekkoTime t in smpl.Iterate())
                             {
@@ -661,50 +661,50 @@ namespace Gekko
                     //LEFT-HAND SIDE EXISTS
                     //LEFT-HAND SIDE EXISTS
                     //LEFT-HAND SIDE EXISTS
-                    if (varName[0] == Globals.symbolMemvar)
+                    if (varnameWithTilde[0] == Globals.symbolMemvar)
                     {
                         //VAL, STRING, DATE
-                        if (lhs.Type() == rhs.Type())
+                        if (lhs.Type() == rhrhsExpressions.Type())
                         {
                             //fast, especially in loops!
-                            if (lhs.Type() == EVariableType.Val) ((ScalarVal)lhs).val = ((ScalarVal)rhs).val;
-                            else if (lhs.Type() == EVariableType.Date) ((ScalarDate)lhs).date = ((ScalarDate)rhs).date;
-                            else if (lhs.Type() == EVariableType.String) ((ScalarString)lhs)._string2 = ((ScalarString)rhs)._string2;
+                            if (lhs.Type() == EVariableType.Val) ((ScalarVal)lhs).val = ((ScalarVal)rhrhsExpressions).val;
+                            else if (lhs.Type() == EVariableType.Date) ((ScalarDate)lhs).date = ((ScalarDate)rhrhsExpressions).date;
+                            else if (lhs.Type() == EVariableType.String) ((ScalarString)lhs)._string2 = ((ScalarString)rhrhsExpressions)._string2;
                         }
                         else
                         {
-                            db.RemoveIVariable(varName);
-                            db.AddIVariable(varName, rhs.DeepClone());
+                            db.RemoveIVariable(varnameWithTilde);
+                            db.AddIVariable(varnameWithTilde, rhrhsExpressions.DeepClone());
                         }
                     }
-                    else if (varName[0] == Globals.symbolList)
+                    else if (varnameWithTilde[0] == Globals.symbolList)
                     {
                         //LIST, MAP, MATRIX, variable already exists
-                        if (lhs.Type() == rhs.Type())
+                        if (lhs.Type() == rhrhsExpressions.Type())
                         {
                             //TODO: Here we could copy the inside of the object, and put this inside into existing object
                             //      Hence, it would not need to be removed and added to the dictionary, and a new object is not needed.
                         }
                         //this is safe, but a little slow in some cases --> see above
-                        db.RemoveIVariable(varName);
-                        db.AddIVariable(varName, rhs.DeepClone());
+                        db.RemoveIVariable(varnameWithTilde);
+                        db.AddIVariable(varnameWithTilde, rhrhsExpressions.DeepClone());
                     }
                     else
                     {
                         //SERIES
                         TimeSeries tsLhs = lhs as TimeSeries;
-                        if (rhs.Type() == EVariableType.TimeSeries)
+                        if (rhrhsExpressions.Type() == EVariableType.TimeSeries)
                         {
-                            TimeSeries ts = rhs as TimeSeries;
+                            TimeSeries ts = rhrhsExpressions as TimeSeries;
                             //LIGHTFIX, speed                         
                             foreach (GekkoTime t in smpl.Iterate())
                             {
                                 tsLhs.SetData(t, ts.GetData(t));
                             }
                         }
-                        else if (rhs.Type() == EVariableType.Val)
+                        else if (rhrhsExpressions.Type() == EVariableType.Val)
                         {
-                            ScalarVal sv = rhs as ScalarVal;
+                            ScalarVal sv = rhrhsExpressions as ScalarVal;
                             //LIGHTFIX, speed
                             foreach (GekkoTime t in smpl.Iterate())
                             {
@@ -881,302 +881,7 @@ namespace Gekko
             }
         }
 
-        public static void Assignment(GekkoSmpl smpl, IVariable y, IVariable x)
-        {
-            string dbName, varName, freq; char firstChar; Chop(y.GetString(), out dbName, out varName, out firstChar, out freq);
-            bool hasSigil = false;
-            if (varName[0] == Globals.symbolMemvar || varName[0] == Globals.symbolList) hasSigil = true;
-            AssignmentHelper(smpl, x, dbName, varName, firstChar, hasSigil);
-        }
-
-        //public static void Assignment(GekkoSmpl smpl, string dbName, string varName, string freq, bool hasSigil, IVariable x)
-        //{
-        //    AssignmentHelper(smpl, x, dbName, varName, varName[0], hasSigil);            
-        //}
-
-        private static void AssignmentHelper(GekkoSmpl smpl, IVariable x, string dbName, string varName, char firstChar, bool hasSigil)
-        {
-            Databank db = null;
-            if (dbName == null) db = Program.databanks.GetFirst();
-            else db = Program.databanks.GetDatabank(dbName);
-            IVariable iv = db.GetIVariable(varName);  //may be null if the variable does not exist.
-
-            switch (x.Type())  //RHS type
-            {
-                case EVariableType.Val:  //RHS is VAL
-                    {
-                        double d = O.GetVal(smpl, x);
-                        switch (firstChar)
-                        {
-                            case Globals.symbolMemvar:  //%
-                                {
-                                    if (iv == null)
-                                    {
-                                        db.AddIVariable(varName, x);
-                                    }
-                                    else
-                                    {
-                                        ScalarVal v = iv as ScalarVal;
-                                        if (v != null)
-                                        {
-                                            //Should be ok regarding sideeffects
-                                            v.val = ((ScalarVal)x).val;  //avoids object creation
-                                        }
-                                        else
-                                        {
-                                            db.RemoveIVariable(varName);
-                                            db.AddIVariable(varName, x);
-                                        }
-                                    }
-                                }
-                                break;
-                            case Globals.symbolList:  //#
-                                {
-                                    G.Writeln2("*** ERROR: You cannot assign a VAL to a LIST or MATRIX.");
-                                    throw new GekkoException();
-                                }
-                                break;
-                            default:
-                                {
-                                    TimeSeries ts = null;
-                                    if (iv == null)
-                                    {
-                                        ts = new TimeSeries(Program.options.freq, varName);
-                                        db.AddIVariable(ts.name, ts);  //always use this pattern: AddIVariable(x.variableName, x)
-                                    }
-                                    else
-                                    {
-                                        ts = (TimeSeries)iv;  //timeseries is already existing, we just change the contents                                        
-                                    }
-                                    foreach (GekkoTime t in smpl.Iterate())
-                                    {
-                                        ts.SetData(t, d);
-                                    }
-                                }
-                                break;
-                        }
-                    }
-                    break;
-                case EVariableType.String:  //RHS is STRING
-                    {
-                        switch (firstChar)
-                        {
-                            case Globals.symbolMemvar:  //%
-                                {
-                                    if (iv == null)
-                                    {
-                                        db.AddIVariable(varName, x);
-                                    }
-                                    else
-                                    {
-                                        ScalarString v = iv as ScalarString;
-                                        if (v != null)
-                                        {
-                                            //Should be ok regarding sideeffects
-                                            v._string2 = ((ScalarString)x)._string2;  //avoids object creation
-                                        }
-                                        else
-                                        {
-                                            db.RemoveIVariable(varName);
-                                            db.AddIVariable(varName, x);
-                                        }
-                                    }
-                                }
-                                break;
-                            case Globals.symbolList:  //#
-                                {
-                                    G.Writeln2("*** ERROR: You cannot assign a STRING to a LIST or MATRIX.");
-                                    throw new GekkoException();
-                                }
-                                break;
-                            default:
-                                {
-                                    G.Writeln2("*** ERROR: You cannot assign a STRING to a SERIES.");
-                                    throw new GekkoException();
-                                }
-                                break;
-                        }
-                        break;
-                    }
-                case EVariableType.Date:  //RHS is DATE
-                    {
-                        switch (firstChar)
-                        {
-                            case Globals.symbolMemvar:  //%
-                                {
-                                    if (iv == null)
-                                    {
-                                        db.AddIVariable(varName, x);
-                                    }
-                                    else
-                                    {
-                                        ScalarDate v = iv as ScalarDate;
-                                        if (v != null)
-                                        {
-                                            //Should be ok regarding sideeffects
-                                            v.date = ((ScalarDate)x).date;  //avoids object creation
-                                        }
-                                        else
-                                        {
-                                            db.RemoveIVariable(varName);
-                                            db.AddIVariable(varName, x);
-                                        }
-                                    }
-                                }
-                                break;
-                            case Globals.symbolList:  //#
-                                {
-                                    G.Writeln2("*** ERROR: You cannot assign a DATE to a LIST or MATRIX.");
-                                    throw new GekkoException();
-                                }
-                                break;
-                            default:
-                                {
-                                    G.Writeln2("*** ERROR: You cannot assign a DATE to a SERIES.");
-                                    throw new GekkoException();
-                                }
-                                break;
-                        }
-                        break;
-
-                    }
-                    break;
-                case EVariableType.List:  //RHS is LIST
-                    {
-                        switch (firstChar)
-                        {
-                            case Globals.symbolMemvar:  //%
-                                {
-                                    G.Writeln2("*** ERROR: You cannot assign a LIST to a VAL, DATE or STRING.");
-                                    throw new GekkoException();
-                                }
-                                break;
-                            case Globals.symbolList:  //#
-                                {
-                                    if (iv == null)  //check if it exists or not
-                                    {
-                                        db.AddIVariable(varName, x);
-                                    }
-                                    else
-                                    {
-                                        db.RemoveIVariable(varName);
-                                        db.AddIVariable(varName, x);
-                                    }
-                                }
-                                break;
-                            default:
-                                {
-                                    int n = GekkoTime.Observations(smpl.t1, smpl.t2);
-                                    MetaList m = (MetaList)x;
-                                    if (m.Count() > 1 && n != m.Count())
-                                    {
-                                        G.Writeln2("*** ERROR: Expected " + n + " observations, got " + m.Count());
-                                        throw new GekkoException();
-                                    }
-                                    TimeSeries ts = null;
-                                    if (iv == null)
-                                    {
-                                        ts = new TimeSeries(Program.options.freq, varName);
-                                        db.AddIVariable(ts.name, ts);  //always use this pattern: AddIVariable(x.variableName, x)
-                                    }
-                                    else
-                                    {
-                                        ts = (TimeSeries)iv;  //timeseries is already existing, we just change the contents                                        
-                                    }
-                                    int counter = 0;
-                                    foreach (GekkoTime t in smpl.Iterate())
-                                    {
-                                        ts.SetData(t, O.GetVal(smpl, m.list[counter]));
-                                        if (m.Count() > 1) counter++;  //if only 1 list item, we keep using m.list[0]
-                                    }
-
-                                }
-                                break;
-                        }
-                        break;
-
-                    }
-                    break;
-
-                case EVariableType.TimeSeries:  //RHS is SERIES
-                    {
-                        switch (firstChar)
-                        {
-                            case Globals.symbolMemvar:  //%
-                                {
-                                    G.Writeln2("*** ERROR: You cannot assign a SERIES to a VAL, DATE or STRING.");
-                                    throw new GekkoException();
-                                }
-                                break;
-                            case Globals.symbolList:  //#
-                                {
-                                    G.Writeln2("*** ERROR: You cannot assign a SERIES to a LIST or MATRIX.");
-                                    throw new GekkoException();
-                                }
-                                break;
-                            default:
-                                {
-                                    TimeSeries ts = GetLeftSideVariable(dbName, varName);
-                                    TimeSeries tsl = (TimeSeries)x;
-                                    foreach (GekkoTime t in smpl.Iterate())
-                                    {
-                                        ts.SetData(t, tsl.GetData(t));
-                                    }
-                                }
-                                break;
-                        }
-                        break;
-
-                    }
-                    break;
-                case EVariableType.Matrix:  //RHS is MATRIX
-                    {
-                        switch (firstChar)
-                        {
-                            case Globals.symbolMemvar:  //%
-                                {
-                                    G.Writeln2("*** ERROR: You cannot assign a MATRIX to a VAL, DATE or STRING.");
-                                    throw new GekkoException();
-                                }
-                                break;
-                            case Globals.symbolList:  //#
-                                {
-                                    if (iv == null)  //check if it exists or not
-                                    {
-                                        db.AddIVariable(varName, x);
-                                    }
-                                    else
-                                    {
-                                        db.RemoveIVariable(varName);
-                                        db.AddIVariable(varName, x);
-                                    }
-                                }
-                                break;
-                            default:
-                                {
-                                    G.Writeln2("*** ERROR: You cannot assign a MATRIX to a SERIES.");
-                                    throw new GekkoException();
-                                }
-                                break;
-                        }
-                        break;
-
-                    }
-                    break;
-                case EVariableType.GekkoError:  //RHS is ERROR
-                    {
-                        G.Writeln2("ERROR!");
-                    }
-                    break;
-                default:
-                    {
-                        G.Writeln2("*** ERROR: Assignment with unknown type");
-                        throw new GekkoException();
-                    }
-                    break;
-            }
-        }
-
+        
         private static string DecorateWithTilde(string varName, string freq, char firstChar)
         {
             if (firstChar != Globals.symbolMemvar && firstChar != Globals.symbolList)
