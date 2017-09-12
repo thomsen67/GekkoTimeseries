@@ -114,8 +114,7 @@ ASTFOR;
 	IN             = 'in';
 	P              = 'p';
 	RUN            = 'run';
-	VAL = 'val'; STRING = 'string'; DATE = 'date'; SERIES = 'series'; LIST = 'list'; MAP = 'map'; MATRIX = 'matrix'; FUNCTION = 'function'; END = 'end';
-	RESET = 'reset';
+	VAL = 'val'; STRING = 'string'; DATE = 'date'; SERIES = 'series'; LIST = 'list'; MAP = 'map'; MATRIX = 'matrix'; FUNCTION = 'function'; END = 'end'; RESET = 'reset';
 	RETURN2 = 'return';
 	LISTFILE = 'LISTFILE';
 }
@@ -251,7 +250,7 @@ dotHelper				  : varname | function | Integer;
 indexerExpressionHelper2  : (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper+;
 
 matrix                    : matrixCol;
-matrixCol                 : leftBracketNoGlue matrixRow (doubleVerticalBar matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
+matrixCol                 : leftBracketNoGlue matrixRow ((doubleVerticalBar|SEMICOLON) matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
 matrixRow                 : expression (',' expression)*  -> ^(ASTMATRIXROW expression+);
 
 						  //trailing ',' is allowed, for instance ('a', 'b', ). This is Python style: ('a',) will then be a lists, not just a.
@@ -385,7 +384,7 @@ run						  : RUN -> ^(ASTRUN);
 
 reset					  : RESET -> ^(ASTRESET);
 
-return2                    : RETURN2 expression -> ^({token("ASTRETURN", ASTRETURN, $RETURN2.Line)} expression); //used in functions
+return2                    : RETURN2 expression? -> ^({token("ASTRETURN", ASTRETURN, $RETURN2.Line)} expression?); //used in functions
 
 functionDef				  : FUNCTION type ident leftParenGlue functionArg RIGHTPAREN SEMICOLON functionStatements END -> ^(ASTFUNCTIONDEF2 type ident functionArg functionStatements);
 functionArg               : (functionArgElement (',' functionArgElement)*)? -> ^(ASTPLACEHOLDER functionArgElement*);

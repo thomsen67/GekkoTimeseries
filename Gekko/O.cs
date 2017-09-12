@@ -547,7 +547,7 @@ namespace Gekko
             return iv;
         }
 
-        private static IVariable LookupHelper(GekkoSmpl smpl, string dbName, string varname, string freq, bool hasSigil, IVariable rhrhsExpressions)
+        private static IVariable LookupHelper(GekkoSmpl smpl, string dbName, string varname, string freq, bool hasSigil, IVariable rhsExpression)
         {
             //rhs means the value of the rhs variable, meaning that the present lookup is regarding the lhs variable if rhs=null
             IVariable lhs = null;
@@ -559,7 +559,7 @@ namespace Gekko
                 else varnameWithTilde = varname + Globals.symbolTilde + G.GetFreq(Program.options.freq);
             }
 
-            if (rhrhsExpressions == null)
+            if (rhsExpression == null)
             {
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
@@ -599,7 +599,7 @@ namespace Gekko
                 else db = Program.databanks.GetDatabank(dbName);
                 lhs = db.GetIVariable(varnameWithTilde);
 
-                LookupTypeCheck(rhrhsExpressions, varnameWithTilde);
+                LookupTypeCheck(rhsExpression, varnameWithTilde);
 
                 if (lhs == null)
                 {
@@ -609,12 +609,12 @@ namespace Gekko
                     if (varnameWithTilde[0] == Globals.symbolMemvar)
                     {
                         //VAL, STRING, DATE                                                
-                        db.AddIVariable(varnameWithTilde, rhrhsExpressions.DeepClone());
+                        db.AddIVariable(varnameWithTilde, rhsExpression.DeepClone());
                     }
                     else if (varnameWithTilde[0] == Globals.symbolList)
                     {
                         //LIST, DICT, MATRIX                                                
-                        db.AddIVariable(varnameWithTilde, rhrhsExpressions.DeepClone());
+                        db.AddIVariable(varnameWithTilde, rhsExpression.DeepClone());
                     }
                     else
                     {
@@ -631,9 +631,9 @@ namespace Gekko
                         if (freq == null) lhsFreq = Program.options.freq;
                         else lhsFreq = G.GetFreq(freq);  //will fail with an error if not recognized
 
-                        if (rhrhsExpressions.Type() == EVariableType.TimeSeries)
+                        if (rhsExpression.Type() == EVariableType.TimeSeries)
                         {
-                            TimeSeries tsRhs = rhrhsExpressions as TimeSeries;
+                            TimeSeries tsRhs = rhsExpression as TimeSeries;
                             if (lhsFreq != tsRhs.freq)
                             {
                                 G.Writeln2("***ERROR: Freq " + lhsFreq.ToString() + " on left-hand side, and freq " + tsRhs.freq + " on right-hand side");
@@ -643,9 +643,9 @@ namespace Gekko
                             tsLhs.name = varnameWithTilde;
                             db.AddIVariable(tsLhs);
                         }
-                        else if (rhrhsExpressions.Type() == EVariableType.Val)
+                        else if (rhsExpression.Type() == EVariableType.Val)
                         {
-                            ScalarVal sv = rhrhsExpressions as ScalarVal;
+                            ScalarVal sv = rhsExpression as ScalarVal;
                             TimeSeries tsLhs = new TimeSeries(lhsFreq, varnameWithTilde);
                             //LIGHTFIX, speed
                             foreach (GekkoTime t in smpl.Iterate())
@@ -664,47 +664,47 @@ namespace Gekko
                     if (varnameWithTilde[0] == Globals.symbolMemvar)
                     {
                         //VAL, STRING, DATE
-                        if (lhs.Type() == rhrhsExpressions.Type())
+                        if (lhs.Type() == rhsExpression.Type())
                         {
                             //fast, especially in loops!
-                            if (lhs.Type() == EVariableType.Val) ((ScalarVal)lhs).val = ((ScalarVal)rhrhsExpressions).val;
-                            else if (lhs.Type() == EVariableType.Date) ((ScalarDate)lhs).date = ((ScalarDate)rhrhsExpressions).date;
-                            else if (lhs.Type() == EVariableType.String) ((ScalarString)lhs)._string2 = ((ScalarString)rhrhsExpressions)._string2;
+                            if (lhs.Type() == EVariableType.Val) ((ScalarVal)lhs).val = ((ScalarVal)rhsExpression).val;
+                            else if (lhs.Type() == EVariableType.Date) ((ScalarDate)lhs).date = ((ScalarDate)rhsExpression).date;
+                            else if (lhs.Type() == EVariableType.String) ((ScalarString)lhs)._string2 = ((ScalarString)rhsExpression)._string2;
                         }
                         else
                         {
                             db.RemoveIVariable(varnameWithTilde);
-                            db.AddIVariable(varnameWithTilde, rhrhsExpressions.DeepClone());
+                            db.AddIVariable(varnameWithTilde, rhsExpression.DeepClone());
                         }
                     }
                     else if (varnameWithTilde[0] == Globals.symbolList)
                     {
                         //LIST, MAP, MATRIX, variable already exists
-                        if (lhs.Type() == rhrhsExpressions.Type())
+                        if (lhs.Type() == rhsExpression.Type())
                         {
                             //TODO: Here we could copy the inside of the object, and put this inside into existing object
                             //      Hence, it would not need to be removed and added to the dictionary, and a new object is not needed.
                         }
                         //this is safe, but a little slow in some cases --> see above
                         db.RemoveIVariable(varnameWithTilde);
-                        db.AddIVariable(varnameWithTilde, rhrhsExpressions.DeepClone());
+                        db.AddIVariable(varnameWithTilde, rhsExpression.DeepClone());
                     }
                     else
                     {
                         //SERIES
                         TimeSeries tsLhs = lhs as TimeSeries;
-                        if (rhrhsExpressions.Type() == EVariableType.TimeSeries)
+                        if (rhsExpression.Type() == EVariableType.TimeSeries)
                         {
-                            TimeSeries ts = rhrhsExpressions as TimeSeries;
+                            TimeSeries ts = rhsExpression as TimeSeries;
                             //LIGHTFIX, speed                         
                             foreach (GekkoTime t in smpl.Iterate())
                             {
                                 tsLhs.SetData(t, ts.GetData(t));
                             }
                         }
-                        else if (rhrhsExpressions.Type() == EVariableType.Val)
+                        else if (rhsExpression.Type() == EVariableType.Val)
                         {
-                            ScalarVal sv = rhrhsExpressions as ScalarVal;
+                            ScalarVal sv = rhsExpression as ScalarVal;
                             //LIGHTFIX, speed
                             foreach (GekkoTime t in smpl.Iterate())
                             {

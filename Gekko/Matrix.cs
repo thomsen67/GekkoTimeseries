@@ -470,34 +470,53 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public void SetData(IVariable x1, IVariable x2, IVariable x3)
+        public void SetData(IVariable rhsExpression, params IVariable[] dims)
         {
-            try
+            if (dims.Length == 1 || dims.Length == 2)
             {
-                this.data[O.GetInt(x1) - 1, O.GetInt(x2) - 1] = O.GetVal(null, x3);
+                IVariable x1 = dims[0];
+
+                IVariable x2 = null;
+                if (dims.Length == 1)
+                {
+                    x2 = Globals.scalarVal1;  //set to 1
+                }
+                else
+                {
+                    x2 = dims[1];
+                }
+
+                if (x1.Type() == EVariableType.Val && x2.Type() == EVariableType.Val)
+                {
+                    try
+                    {
+                        this.data[O.GetInt(x1) - 1, O.GetInt(x2) - 1] = O.GetVal(null, rhsExpression);
+                    }
+                    catch (IndexOutOfRangeException e)
+                    {
+                        HandleIndexOutOfRange(x1, x2);
+                        throw new GekkoException();
+                    }
+                }
+                else
+                {
+                    //at least one of the indices is a range
+                    IVariable xx1 = x1;
+                    IVariable xx2 = x2;
+                    if (x1.Type() == EVariableType.Val) xx1 = new Range(x1, x1);
+                    if (x2.Type() == EVariableType.Val) xx2 = new Range(x2, x2);
+                    if (xx1.Type() != EVariableType.Range || xx1.Type() != EVariableType.Range)
+                    {
+                        G.Writeln2("*** ERROR: Matrix []-indexer on left-hand side has wrong type");
+                        throw new GekkoException();
+                    }
+                    SetDataHelper((Range)xx1, (Range)xx2, rhsExpression);
+                }
             }
-            catch (IndexOutOfRangeException e)
-            {
-                HandleIndexOutOfRange(x1, x2);
-                throw new GekkoException();
-            }
-        }
 
-        public IVariable SetData(IVariable x1, Range indexRange2, IVariable x3)
-        {
-            //Does not need to be so fast, so we use this trick
-            Range range = new Range(x1, x1);
-            return this.SetData(range, indexRange2, x3);            
-        }
+        }                
 
-        public IVariable SetData(Range indexRange1, IVariable x2, IVariable x3)
-        {
-            //Does not need to be so fast, so we use this trick
-            Range range = new Range(x2, x2);
-            return this.SetData(indexRange1, range, x3);
-        }
-
-        public IVariable SetData(Range indexRange1, Range indexRange2, IVariable x3)
+        public IVariable SetDataHelper(Range indexRange1, Range indexRange2, IVariable x3)
         {
             int i1 = 1;
             int i2 = this.data.GetLength(0);
@@ -594,20 +613,20 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Indexer [" + dim1 + ", " + dim2 + "]: indexers must be >= 1");                
             }            
         }
-
-        public void SetData(IVariable rhsExpression, params IVariable[] dims)
-        {
-            G.Writeln2("*** ERROR: You cannot use an indexer [] on the left-hand side");
-            throw new GekkoException();
-        }
-
+        
         public IVariable DeepClone()
         {
             Matrix m = new Gekko.Matrix();
-            m.colnames = new List<string>();
-            m.colnames.AddRange(this.colnames);
-            m.rownames = new List<string>();
-            m.rownames.AddRange(this.rownames);
+            if (this.colnames != null)
+            {
+                m.colnames = new List<string>();
+                m.colnames.AddRange(this.colnames);
+            }
+            if (this.rownames != null)
+            {
+                m.rownames = new List<string>();
+                m.rownames.AddRange(this.rownames);
+            }
             m.data = new double[this.data.GetLength(0), this.data.GetLength(1)];
             Array.Copy(this.data, m.data, this.data.Length);            
             return m;

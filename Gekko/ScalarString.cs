@@ -209,7 +209,7 @@ namespace Gekko
             return EVariableType.String;
         }                       
 
-        public IVariable Indexer(GekkoSmpl t, bool isLhs, params IVariable[] indexes)
+        public IVariable Indexer(GekkoSmpl smpl, bool isLhs, params IVariable[] indexes)
         {
             if (indexes.Length == 1)
             {
@@ -237,7 +237,7 @@ namespace Gekko
                 {
                     //#8932074324
                     //TODO: What about string 'jul05:fy' ??????
-                    IVariable result = O.GetValFromStringIndexer(t, this._string2, index, 1);
+                    IVariable result = O.GetValFromStringIndexer(smpl, this._string2, index, 1);
                     rv = result;
                 }
                 else

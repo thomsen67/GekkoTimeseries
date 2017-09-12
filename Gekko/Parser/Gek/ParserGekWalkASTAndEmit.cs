@@ -1250,18 +1250,17 @@ namespace Gekko.Parser.Gek
                     case "ASTRETURN":
                         {
                             node.Code.A(Globals.splitSTOP);
-                            if (true)
+
+                            if (node.ChildrenCount() > 0)
                             {
-                                if (node.ChildrenCount() > 0)
-                                {                                    
-                                    node.Code.A("return " + node[0].Code + ";" + G.NL);
-                                }
-                                else
-                                {
-                                    //#9807235423 return problem, should it be return true?? C1(), C2(), ...
-                                    node.Code.A("return;" + G.NL);  //probably the node[0].Code is always empty here (should be)
-                                }
-                            }                                                        
+                                node.Code.A("return " + node[0].Code + ";" + G.NL);
+                            }
+                            else
+                            {
+                                //#9807235423 return problem, should it be return true?? C1(), C2(), ...
+                                node.Code.A("return;" + G.NL);  //probably the node[0].Code is always empty here (should be)
+                            }
+
                             node.Code.A(Globals.splitSTART);
                         }
                         break;
@@ -2305,7 +2304,7 @@ namespace Gekko.Parser.Gek
                         {
                             //Only 1 dimension supported                        
                             if (node.ChildrenCount() > 1) throw new GekkoException();
-                            node.Code.A("O.Indexer(t, null, false, " + node[0].Code + ")");  //null signals that it has nothing on the left
+                            node.Code.A("O.Indexer(smpl, null, false, " + node[0].Code + ")");  //null signals that it has nothing on the left
                         }
                         break;
                     case "ASTDOTORINDEXER":

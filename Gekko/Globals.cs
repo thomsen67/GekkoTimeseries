@@ -224,6 +224,7 @@ namespace Gekko
         public const string symbolGlueChar6a = "ASTLEFTBRACKETGLUE";  //same as above
         public const string symbolGlueChar7 = "[¨["; //for [a1*b*c2] that must be interpreted as a wildcard, not 1x1 array
 
+        public static readonly ScalarVal scalarVal0 = new ScalarVal(0d);
         public static readonly ScalarVal scalarVal1 = new ScalarVal(1d);
 
         public static bool poolGenrLines = false;
