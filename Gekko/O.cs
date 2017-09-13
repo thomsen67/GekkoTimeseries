@@ -569,6 +569,9 @@ namespace Gekko
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
+
+
+
                 if (map != null)
                 {                    
                     lhs = map.GetIVariable(varnameWithTilde);
@@ -590,11 +593,14 @@ namespace Gekko
                 }
                 else
                 {
-                    Databank db = GetDatabankNoSearch(dbName);
-                    lhs = db.GetIVariable(varnameWithTilde);
+                    IBank ib = null;
+                    if (map != null) ib = map;
+                    else ib = GetDatabankNoSearch(dbName);
+
+                    lhs = ib.GetIVariable(varnameWithTilde);
                     if (lhs == null)
                     {
-                        G.Writeln2("*** ERROR: Could not find variable '" + varnameWithTilde + "' in databank '" + db.aliasName + "'");
+                        G.Writeln2("*** ERROR: Could not find variable '" + varnameWithTilde + "'" + "in " + ib.Message());
                         throw new GekkoException();
                     }
                 }
@@ -607,18 +613,21 @@ namespace Gekko
                 //ASSIGNMENT OF LEFT-HAND SIDE
                 //ASSIGNMENT OF LEFT-HAND SIDE
 
+                IBank ib = null;
                 if (map != null)
                 {
-                    lhs = map.GetIVariable(varnameWithTilde);
+                    ib = map;
                 }
                 else
                 {
                     Databank db = null;
                     if (dbName == null) db = Program.databanks.GetFirst();
                     else db = Program.databanks.GetDatabank(dbName);
-                    lhs = db.GetIVariable(varnameWithTilde);
+                    ib = db;
                 }
-
+                
+                lhs = ib.GetIVariable(varnameWithTilde);
+                
                 LookupTypeCheck(rhsExpression, varnameWithTilde);
 
                 if (lhs == null)
@@ -629,12 +638,12 @@ namespace Gekko
                     if (varnameWithTilde[0] == Globals.symbolMemvar)
                     {
                         //VAL, STRING, DATE                                                
-                        db.AddIVariable(varnameWithTilde, rhsExpression.DeepClone());
+                        ib.AddIVariable(varnameWithTilde, rhsExpression.DeepClone());
                     }
                     else if (varnameWithTilde[0] == Globals.symbolList)
                     {
                         //LIST, DICT, MATRIX                                                
-                        db.AddIVariable(varnameWithTilde, rhsExpression.DeepClone());
+                        ib.AddIVariable(varnameWithTilde, rhsExpression.DeepClone());
                     }
                     else
                     {
@@ -661,7 +670,7 @@ namespace Gekko
                             }
                             TimeSeries tsLhs = tsRhs.DeepClone() as TimeSeries;  //cannot just refer to it, since it may be y = x, and if we later on change x, y will change too (bad).
                             tsLhs.name = varnameWithTilde;
-                            db.AddIVariable(tsLhs);
+                            ib.AddIVariable(varnameWithTilde, tsLhs);
                         }
                         else if (rhsExpression.Type() == EVariableType.Val)
                         {
@@ -672,7 +681,7 @@ namespace Gekko
                             {
                                 tsLhs.SetData(t, sv.val);
                             }
-                            db.AddIVariable(tsLhs);
+                            ib.AddIVariable(varnameWithTilde, tsLhs);
                         }
                     }
                 }
@@ -693,8 +702,8 @@ namespace Gekko
                         }
                         else
                         {
-                            db.RemoveIVariable(varnameWithTilde);
-                            db.AddIVariable(varnameWithTilde, rhsExpression.DeepClone());
+                            ib.RemoveIVariable(varnameWithTilde);
+                            ib.AddIVariable(varnameWithTilde, rhsExpression.DeepClone());
                         }
                     }
                     else if (varnameWithTilde[0] == Globals.symbolList)
@@ -706,8 +715,8 @@ namespace Gekko
                             //      Hence, it would not need to be removed and added to the dictionary, and a new object is not needed.
                         }
                         //this is safe, but a little slow in some cases --> see above
-                        db.RemoveIVariable(varnameWithTilde);
-                        db.AddIVariable(varnameWithTilde, rhsExpression.DeepClone());
+                        ib.RemoveIVariable(varnameWithTilde);
+                        ib.AddIVariable(varnameWithTilde, rhsExpression.DeepClone());
                     }
                     else
                     {

@@ -351,6 +351,11 @@ namespace Gekko.Parser.Gek
                         node.ivTempVarName = "ivTmpvar" + ++Globals.counter;  //we use the counter value to hook up the rhs with the lhs                        
                     }
                     break;
+                case "ASTMAPDEF":
+                    {
+                        node.mapTempVarName = "mapTmpvar" + ++Globals.counter;  //we use the counter value to hook up in a map def
+                    }
+                    break;
             }                       
             
             foreach (ASTNode child in node.ChildrenIterator())
@@ -2735,6 +2740,26 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.scalarStringHash");
                         }
                         break;
+                    case "ASTMAPDEF":
+                        {                            
+                            node.Code.A("Map " + node.mapTempVarName + " = new Map()").End();
+                            GetCodeFromAllChildren(node);
+
+                            string s = "public static IVariable MapDef" + node.mapTempVarName + "(GekkoSmpl smpl) {" + G.NL + node.Code.ToString() + G.NL + "return " + node.mapTempVarName + ";" + G.NL + "}";
+
+                            w.headerCs.Append(s);
+
+                            node.Code.CA("");  //--------> IMPORTANT TO CLEAR HERE!!!
+
+                            node.Code.A("MapDef" + node.mapTempVarName + "(smpl)");
+
+                        }
+                        break;
+                    case "ASTMAPITEM":
+                        {
+                            GetCodeFromAllChildren(node);
+                        }
+                        break;
                     case "ASTBANKVARNAME":
                         {                           
 
@@ -2759,7 +2784,14 @@ namespace Gekko.Parser.Gek
                             }
 
                             if (!functionHit)
-                            {                                
+                            {
+                                string mapName = "null";
+                                if (node.Parent.Text == "ASTLEFTSIDE" && node.Parent.Parent.Text == "ASTASSIGNMENT" && node.Parent.Parent.Parent.Text == "ASTMAPITEM" && node.Parent.Parent.Parent.Parent.Text == "ASTMAPDEF")
+                                {
+                                    mapName = node.Parent.Parent.Parent.Parent.mapTempVarName;
+                                    if (mapName == null) throw new GekkoException();
+                                }
+
                                 string ivTempVar = SearchUpwardsInTree4(node);
                                 if (ivTempVar == null) ivTempVar = "null";
 
@@ -2814,9 +2846,7 @@ namespace Gekko.Parser.Gek
                                 }
 
                                 //int leftRight = SearchUpwardsInTree4(node);
-
-                                string map = "null";
-
+                                
                                 if (simpleBank != null && simpleName != null && simpleFreq != null)
                                 {
                                     //Ok is simple stuff like b:ts~f, or b:%v
@@ -2835,7 +2865,7 @@ namespace Gekko.Parser.Gek
                                     string simpleFreqText = Globals.QT + simpleFreq + Globals.QT;
                                     if (simpleFreq == "") simpleFreqText = "null";
 
-                                    node.Code.CA("O.Lookup(smpl, " + map + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + hasSigilText + ", " + ivTempVar + ")");
+                                    node.Code.CA("O.Lookup(smpl, " + mapName + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + hasSigilText + ", " + ivTempVar + ")");
                                 }
                                 else
                                 {
@@ -2845,13 +2875,13 @@ namespace Gekko.Parser.Gek
                                     {
                                         //no bank indicator
                                         //if (leftHandSide) node.Code.A("(" + node[1].Code + ")");
-                                        node.Code.A("O.Lookup(smpl, " + map + ", " + node[1].Code + ", " + ivTempVar + ")");
+                                        node.Code.A("O.Lookup(smpl, " + mapName + ", " + node[1].Code + ", " + ivTempVar + ")");
                                     }
                                     else
                                     {
                                         //bank indicator
                                         //if (leftHandSide) node.Code.A("(" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + ")");
-                                        node.Code.A("O.Lookup(smpl, " + map + ", (" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "), " + ivTempVar + ")");
+                                        node.Code.A("O.Lookup(smpl, " + mapName + ", (" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "), " + ivTempVar + ")");
                                     }
                                 }
                             }
@@ -4700,8 +4730,8 @@ namespace Gekko.Parser.Gek
                 if (tmp != null && (tmp.Text == "ASTBANKVAR" || tmp.Text == "ASTDOTORINDEXER")) return null;  //if any parent is like this, null is returned. We want to find the one highest in the tree.
             }
             return rv;
-        }
-        
+        }        
+
         private static void ResetUFunctionHelpers(W w)
         {
             w.uFunctionsHelper = null;  //do not remove this line: important!      

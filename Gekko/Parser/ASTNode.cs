@@ -62,6 +62,7 @@ namespace Gekko.Parser
         public List<Tuple<string, string>> functionDef = null;
         //public string listLoopNestCode = null; //code delivered from sub-tree
         public string ivTempVarName = null;
+        public string mapTempVarName = null;
 
         public ASTNode GetChild(string s)
         {

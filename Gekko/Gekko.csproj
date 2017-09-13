@@ -207,6 +207,7 @@
     <Compile Include="GuiDialogMakeBatfile.Designer.cs">
       <DependentUpon>GuiDialogMakeBatfile.cs</DependentUpon>
     </Compile>
+    <Compile Include="IBank.cs" />
     <Compile Include="InputBox.cs" />
     <Compile Include="Intelli.cs">
       <SubType>Form</SubType>

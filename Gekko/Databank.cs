@@ -25,7 +25,7 @@ using ProtoBuf;
 namespace Gekko
 {
     [ProtoContract]
-    public class Databank
+    public class Databank : IBank
     {
 
         /*
@@ -276,6 +276,10 @@ namespace Gekko
             return this.storage.ContainsKey(name);
         }
 
+        public string Message()
+        {
+            return "databank " + "'" + this.aliasName + "'";
+        }
 
         //OLD OLD OLD
         //OLD OLD OLD
