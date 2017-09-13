@@ -2741,18 +2741,15 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTMAPDEF":
-                        {                            
-                            node.Code.A("Map " + node.mapTempVarName + " = new Map()").End();
-                            GetCodeFromAllChildren(node);
+                        {
+                            string funcName = "MapDef_" + node.mapTempVarName;
+                            string s2 = "Map " + node.mapTempVarName + " = new Map();" + G.NL;
+                            foreach (ASTNode child in node.ChildrenIterator()) s2 += child.Code.ToString();
+                            string s = "public static IVariable " + funcName + "(GekkoSmpl smpl) {" + G.NL + s2 + G.NL + "return " + node.mapTempVarName + ";" + G.NL + "}";
 
-                            string s = "public static IVariable MapDef" + node.mapTempVarName + "(GekkoSmpl smpl) {" + G.NL + node.Code.ToString() + G.NL + "return " + node.mapTempVarName + ";" + G.NL + "}";
+                            w.headerCs.Append(s);                            
 
-                            w.headerCs.Append(s);
-
-                            node.Code.CA("");  //--------> IMPORTANT TO CLEAR HERE!!!
-
-                            node.Code.A("MapDef" + node.mapTempVarName + "(smpl)");
-
+                            node.Code.A(funcName + "(smpl)");
                         }
                         break;
                     case "ASTMAPITEM":

@@ -548,10 +548,10 @@ namespace Gekko
         //}
 
         public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, bool hasSigil, IVariable rhsExpression)
-        {
+        {            
             //if map != null, the variable is found in the MAP
             //otherwise, the variable is found in a databank
-            
+
             //rhsExpression means the value of the rhs variable, meaning that the present lookup is setting a value for the lhs variable
             IVariable lhs = null;
             string varnameWithTilde = varname;
@@ -612,6 +612,8 @@ namespace Gekko
                 //ASSIGNMENT OF LEFT-HAND SIDE
                 //ASSIGNMENT OF LEFT-HAND SIDE
                 //ASSIGNMENT OF LEFT-HAND SIDE
+
+                //TODO, merge with #8374257012
 
                 IBank ib = null;
                 if (map != null)
