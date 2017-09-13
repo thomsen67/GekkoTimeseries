@@ -2347,7 +2347,7 @@ namespace Gekko.Parser.Gek
                             }
                             else
                             {
-                                node.Code.A("(").A(node[0].Code).A(").SetData(").A(ivTempVar).A(", ").A(indexes).A(")");
+                                node.Code.A("O.IndexerSetData(smpl, ").A(node[0].Code).A(",  ").A(ivTempVar).A(", ").A(indexes).A(")");
                             }
 
                         }

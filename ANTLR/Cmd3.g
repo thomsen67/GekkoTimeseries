@@ -262,7 +262,7 @@ listHelper1               : (expression ',')* expression -> expression+;
 listHelper2               : (expression ',')+ -> expression+;
 
 map                       : leftParenNoGlue mapItem ',' mapHelper RIGHTPAREN -> ^(ASTMAPDEF mapItem mapHelper)
-                          | leftParenNoGlue mapItem ',' RIGHTPAREN -> ^(ASTMAPDEF mapItem)
+                          | leftParenNoGlue mapItem ','? RIGHTPAREN -> ^(ASTMAPDEF mapItem)   //the comma here is optional, not so for a list def.
 						  ;
 mapHelper                 : mapHelper1 | mapHelper2;
 mapHelper1                : (mapItem ',')* mapItem -> mapItem+;

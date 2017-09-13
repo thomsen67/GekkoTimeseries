@@ -549,7 +549,7 @@ namespace Gekko
 
         private static IVariable LookupHelper(GekkoSmpl smpl, string dbName, string varname, string freq, bool hasSigil, IVariable rhsExpression)
         {
-            //rhs means the value of the rhs variable, meaning that the present lookup is regarding the lhs variable if rhs=null
+            //rhsExpression means the value of the rhs variable, meaning that the present lookup is setting a value for the lhs variable
             IVariable lhs = null;
             string varnameWithTilde = varname;
             if (!hasSigil)
@@ -951,6 +951,11 @@ namespace Gekko
                 G.Writeln2(depth + " " + s);
                 HandleIndexerHelper(depth + 1, y, x);
             }
+        }
+
+        public static void IndexerSetData(GekkoSmpl smpl, IVariable x, IVariable y, params IVariable[] indexes)
+        {
+            x.IndexerSetData(smpl, y, indexes);
         }
 
         public static IVariable Indexer(GekkoSmpl smpl, IVariable x, params IVariable[] indexes)

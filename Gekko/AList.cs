@@ -59,7 +59,7 @@ namespace Gekko
                     int ival = O.GetInt(index);
                     if (ival < 0)
                     {
-                        G.Writeln2("*** ERROR: Illegal element access [" + ival + "]: negative number not allowed");
+                        G.Writeln2("*** ERROR: Illegal LIST indexer [" + ival + "]: negative number not allowed");
                         throw new GekkoException();
                     }
                     else if (ival == 0)
@@ -69,7 +69,7 @@ namespace Gekko
                     }
                     else if (ival > this.list.Count)
                     {
-                        G.Writeln2("*** ERROR: Illegal element access [" + ival + "]: larger than length of list (" + this.list.Count + ")");
+                        G.Writeln2("*** ERROR: Illegal LIST indexer [" + ival + "]: larger than length of list (" + this.list.Count + ")");
                         throw new GekkoException();
                     }
                     
@@ -248,10 +248,23 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public void SetData(IVariable rhsExpression, params IVariable[] dims)
+        public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] dims)
         {
-            G.Writeln2("*** ERROR: You cannot use an indexer [] on the left-hand side");
-            throw new GekkoException();
+            if (dims.Length == 1 && dims[0].Type() == EVariableType.Val)
+            {
+                int i = O.GetInt(dims[0]);
+                if (i < 1 || i > this.list.Count)
+                {
+                    G.Writeln2("*** ERROR: Illegal LIST indexer [" + i + "]");
+                    throw new GekkoException();
+                }
+                this.list[i - 1] = rhsExpression.DeepClone();
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Unexpected indexer type on LIST (left-hand side)");
+                throw new GekkoException();
+            }
         }
 
         public IVariable DeepClone()

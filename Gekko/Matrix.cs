@@ -470,7 +470,7 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public void SetData(IVariable rhsExpression, params IVariable[] dims)
+        public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] dims)
         {
             if (dims.Length == 1 || dims.Length == 2)
             {

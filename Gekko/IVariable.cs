@@ -78,6 +78,6 @@ namespace Gekko
 
         IVariable DeepClone();
 
-        void SetData(IVariable rhsExpression, params IVariable[] dims);
+        void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] dims);
     }
 }
