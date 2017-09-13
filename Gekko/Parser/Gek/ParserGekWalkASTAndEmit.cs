@@ -1824,7 +1824,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                 {                                    
-                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))), null))) {");
+                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))), null))) {");
                                 }
 
                                 if (G.equal(functionNameLower, "sum"))
@@ -2815,6 +2815,8 @@ namespace Gekko.Parser.Gek
 
                                 //int leftRight = SearchUpwardsInTree4(node);
 
+                                string map = "null";
+
                                 if (simpleBank != null && simpleName != null && simpleFreq != null)
                                 {
                                     //Ok is simple stuff like b:ts~f, or b:%v
@@ -2833,7 +2835,7 @@ namespace Gekko.Parser.Gek
                                     string simpleFreqText = Globals.QT + simpleFreq + Globals.QT;
                                     if (simpleFreq == "") simpleFreqText = "null";
 
-                                    node.Code.CA("O.Lookup(smpl, " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + hasSigilText + ", " + ivTempVar + ")");
+                                    node.Code.CA("O.Lookup(smpl, " + map + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + hasSigilText + ", " + ivTempVar + ")");
                                 }
                                 else
                                 {
@@ -2843,13 +2845,13 @@ namespace Gekko.Parser.Gek
                                     {
                                         //no bank indicator
                                         //if (leftHandSide) node.Code.A("(" + node[1].Code + ")");
-                                        node.Code.A("O.Lookup(smpl, " + node[1].Code + ", " + ivTempVar + ")");
+                                        node.Code.A("O.Lookup(smpl, " + map + ", " + node[1].Code + ", " + ivTempVar + ")");
                                     }
                                     else
                                     {
                                         //bank indicator
                                         //if (leftHandSide) node.Code.A("(" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + ")");
-                                        node.Code.A("O.Lookup(smpl, (" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "), " + ivTempVar + ")");
+                                        node.Code.A("O.Lookup(smpl, " + map + ", (" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "), " + ivTempVar + ")");
                                     }
                                 }
                             }

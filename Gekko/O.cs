@@ -522,7 +522,7 @@ namespace Gekko
             return new MetaList(m);
         }
 
-        public static IVariable Lookup(GekkoSmpl smpl, IVariable x, IVariable rhsExpression)
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression)
         {
             ScalarString x2 = x as ScalarString;
             if (x2 == null)
@@ -535,20 +535,23 @@ namespace Gekko
                 string dbName, varName, freq; char firstChar; Chop(x2._string2, out dbName, out varName, out firstChar, out freq);
                 bool hasSigil = false;
                 if (firstChar == Globals.symbolMemvar || firstChar == Globals.symbolList) hasSigil = true;
-                IVariable iv = LookupHelper(smpl, dbName, varName, freq, hasSigil, rhsExpression);
+                IVariable iv = Lookup(smpl, map, dbName, varName, freq, hasSigil, rhsExpression);
                 return iv;
             }
             return x;
         }
 
-        public static IVariable Lookup(GekkoSmpl smpl, string dbName, string varname, string freq, bool hasSigil, IVariable rhsExpression)
-        {
-            IVariable iv = LookupHelper(smpl, dbName, varname, freq, hasSigil, rhsExpression);
-            return iv;
-        }
+        //public static IVariable Lookup(GekkoSmpl smpl, string dbName, string varname, string freq, bool hasSigil, IVariable rhsExpression)
+        //{
+        //    IVariable iv = LookupHelper(smpl, dbName, varname, freq, hasSigil, rhsExpression);
+        //    return iv;
+        //}
 
-        private static IVariable LookupHelper(GekkoSmpl smpl, string dbName, string varname, string freq, bool hasSigil, IVariable rhsExpression)
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, bool hasSigil, IVariable rhsExpression)
         {
+            //if map != null, the variable is found in the MAP
+            //otherwise, the variable is found in a databank
+            
             //rhsExpression means the value of the rhs variable, meaning that the present lookup is setting a value for the lhs variable
             IVariable lhs = null;
             string varnameWithTilde = varname;
@@ -566,7 +569,16 @@ namespace Gekko
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
-                if (Program.options.databank_search && dbName == null)
+                if (map != null)
+                {                    
+                    lhs = map.GetIVariable(varnameWithTilde);
+                    if (lhs == null)
+                    {
+                        G.Writeln2("*** ERROR: Could not find variable '" + varnameWithTilde + "' in MAP");
+                        throw new GekkoException();
+                    }
+                }
+                else if (Program.options.databank_search && dbName == null)
                 {
                     //Search if on the right-hand side (rhs), in data mode, and no bank is indicated
                     lhs = GetVariableSearch(lhs, varnameWithTilde);
@@ -594,10 +606,18 @@ namespace Gekko
                 //ASSIGNMENT OF LEFT-HAND SIDE
                 //ASSIGNMENT OF LEFT-HAND SIDE
                 //ASSIGNMENT OF LEFT-HAND SIDE
-                Databank db = null;
-                if (dbName == null) db = Program.databanks.GetFirst();
-                else db = Program.databanks.GetDatabank(dbName);
-                lhs = db.GetIVariable(varnameWithTilde);
+
+                if (map != null)
+                {
+                    lhs = map.GetIVariable(varnameWithTilde);
+                }
+                else
+                {
+                    Databank db = null;
+                    if (dbName == null) db = Program.databanks.GetFirst();
+                    else db = Program.databanks.GetDatabank(dbName);
+                    lhs = db.GetIVariable(varnameWithTilde);
+                }
 
                 LookupTypeCheck(rhsExpression, varnameWithTilde);
 
