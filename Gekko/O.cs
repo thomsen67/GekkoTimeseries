@@ -793,12 +793,13 @@ namespace Gekko
         public static IVariable LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithTilde, string freq, IVariable rhsExpressionOriginal)
         {
             IVariable lhs = ib.GetIVariable(varnameWithTilde);
-
-            //first, if it is a SERIES on lhs (no sigil), we try to convert the RHS directly (so x = ... will work, not necessary with SERIES x = ...)
-            //IVariable 
-
-            IVariable rhsExpression = O.ConvertToTimeSeries(smpl, rhsExpressionOriginal);
-
+            
+            IVariable rhsExpression = rhsExpressionOriginal;
+            if (varnameWithTilde[0] != Globals.symbolMemvar && varnameWithTilde[0] != Globals.symbolList)
+            {
+                //first, if it is a SERIES on lhs (no sigil), we try to convert the RHS directly (so x = ... will work, not necessary with SERIES x = ...)
+                rhsExpression = O.ConvertToTimeSeries(smpl, rhsExpressionOriginal);
+            }            
 
             LookupTypeCheck(rhsExpression, varnameWithTilde);
 

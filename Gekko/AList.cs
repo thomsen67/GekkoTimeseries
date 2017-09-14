@@ -97,10 +97,27 @@ namespace Gekko
                     return m;
                 }
                 else if (index.Type() == EVariableType.String)
-                {
+                {                    
                     string s5 = ((ScalarString)index)._string2;
-                    List<string> found = Program.MatchWildcard(s5, this.list, null);
-                    return new MetaList(found);
+                    if(s5.Contains("?") || s5.Contains("*"))
+                    {
+                        //Wildcard: return a list of those
+                        List<string> found = Program.MatchWildcard(s5, this.list, null);
+                        return new MetaList(found);
+                    }
+                    else
+                    {
+                        //Request if the list has the item
+                        foreach (IVariable x in this.list)
+                        {
+                            ScalarString x_string = x as ScalarString;
+                            if (x_string != null)
+                            {
+                                if (G.equal(x_string._string2, s5)) return Globals.scalarVal1;
+                            }
+                        }
+                        return Globals.scalarVal0;
+                    }                    
                 }
                 else
                 {
