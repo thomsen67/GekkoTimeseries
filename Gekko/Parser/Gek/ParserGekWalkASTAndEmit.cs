@@ -1118,7 +1118,7 @@ namespace Gekko.Parser.Gek
                             }
                             else if (op == "ASTIFOPERATOR1") //"=="
                             {
-                                node.Code.A("O.Equals(smmpl, " + code1 + "," + code2 + ")");
+                                node.Code.A("O.Equals(smpl, " + code1 + "," + code2 + ")");
                             }
                             else if (op == "ASTIFOPERATOR5")  //">="
                             {
@@ -1138,6 +1138,11 @@ namespace Gekko.Parser.Gek
                     case "ASTDOLLARCONDITIONAL":
                         {
                             GetCodeFromAllChildren(node);
+                            break;
+                        }
+                    case "ASTDOLLAR":
+                        {                            
+                            node.Code.A("O.Dollar(smpl, " + node[0].Code + ", " + node[1].Code + ")");
                             break;
                         }
 
@@ -2757,6 +2762,7 @@ namespace Gekko.Parser.Gek
                             GetCodeFromAllChildren(node);
                         }
                         break;
+
                     case "ASTBANKVARNAME":
                         {                           
 
@@ -2862,7 +2868,7 @@ namespace Gekko.Parser.Gek
                                     string simpleFreqText = Globals.QT + simpleFreq + Globals.QT;
                                     if (simpleFreq == "") simpleFreqText = "null";
 
-                                    node.Code.CA("O.Lookup(smpl, " + mapName + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + hasSigilText + ", " + ivTempVar + ")");
+                                    node.Code.CA("O.Lookup(smpl, " + mapName + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + ivTempVar + ")");
                                 }
                                 else
                                 {

@@ -1339,6 +1339,11 @@ namespace Gekko
             return f;
         }
 
+        public static string GetTypeString(IVariable input)
+        {
+            return input.Type().ToString().ToUpper();
+        }
+
         static public string ReplaceString(string str, string oldValue, string newValue, bool onlyFirst)
         {            
             //Is always case-insensitive!

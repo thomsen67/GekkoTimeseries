@@ -11,7 +11,7 @@ namespace Gekko
         String,
         Date,
         Val,
-        TimeSeries,        
+        Series,        
         List,
         Map,
         Matrix,   

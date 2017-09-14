@@ -726,7 +726,7 @@ namespace Gekko
             //  Else the variable is returned untouched.
             //If it is a TimeSeries, and the double[] data array is a pointer to the real TimeSeries array,
             //  this method will never return a GekkoError.
-            if (input.Type() == EVariableType.TimeSeries)
+            if (input.Type() == EVariableType.Series)
             {
                 TimeSeries x = (TimeSeries)input;
                 //LIGHTFIXME
@@ -918,7 +918,7 @@ namespace Gekko
             int n = GekkoTime.Observations(smpl.t1, smpl.t2);
             double[] data = new double[n];
 
-            if (x.Type() == EVariableType.TimeSeries)
+            if (x.Type() == EVariableType.Series)
             {
                 TimeSeries tsl = new TimeSeries();
                 TimeSeries xx = x as TimeSeries;
@@ -1099,21 +1099,21 @@ namespace Gekko
 
 
 
-            if (x.Type() == EVariableType.TimeSeries && y.Type() == EVariableType.TimeSeries)
+            if (x.Type() == EVariableType.Series && y.Type() == EVariableType.Series)
             {
                 foreach (GekkoTime t in smpl.Iterate())
                 {
                     this.SetData(t, ((TimeSeries)x).GetData(t) + ((TimeSeries)y).GetData(t));
                 }
             }
-            else if (x.Type() == EVariableType.Val && y.Type() == EVariableType.TimeSeries)
+            else if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Series)
             {
                 foreach (GekkoTime t in smpl.Iterate())
                 {
                     this.SetData(t, ((ScalarVal)x).val + ((TimeSeries)y).GetData(t));
                 }
             }
-            else if (x.Type() == EVariableType.TimeSeries && y.Type() == EVariableType.Val)
+            else if (x.Type() == EVariableType.Series && y.Type() == EVariableType.Val)
             {
                 foreach (GekkoTime t in smpl.Iterate())
                 {
@@ -1154,7 +1154,7 @@ namespace Gekko
 
         public EVariableType Type()
         {
-            return EVariableType.TimeSeries;
+            return EVariableType.Series;
         }
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] dims)

@@ -14345,7 +14345,7 @@ namespace Gekko
             //  Else the variable is returned untouched.
             //If it is a TimeSeries, and the double[] data array is a pointer to the real TimeSeries array,
             //  this method will never return a GekkoError.
-            if (input.Type() == EVariableType.TimeSeries)
+            if (input.Type() == EVariableType.Series)
             {
                 TimeSeries x = (TimeSeries)input;
                 //LIGHTFIXME
@@ -14451,7 +14451,7 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                    if (!(result.Type() == EVariableType.TimeSeries))
+                    if (!(result.Type() == EVariableType.Series))
                     {
                         if (result.Type() == EVariableType.Val)
                         {

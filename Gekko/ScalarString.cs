@@ -344,7 +344,7 @@ namespace Gekko
                     {
                         return Operators.StringList.Add(this, (MetaList)x, false);
                     }                    
-                case EVariableType.TimeSeries:
+                case EVariableType.Series:
                     {
                         G.Writeln2("*** ERROR: You cannot add a string and a timeseries");
                         throw new GekkoException();

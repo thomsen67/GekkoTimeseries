@@ -185,14 +185,14 @@ namespace Gekko
 
         public EVariableType Type()
         {
-            return EVariableType.TimeSeries;
+            return EVariableType.Series;
         }
 
         public IVariable Add(GekkoSmpl smpl, IVariable input)
         {
             switch(input.Type())
             {
-                case EVariableType.TimeSeries:
+                case EVariableType.Series:
                     {
 
                         return null;

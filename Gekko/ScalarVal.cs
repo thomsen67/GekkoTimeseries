@@ -145,7 +145,7 @@ namespace Gekko
                         return new ScalarVal(this.val + ((ScalarVal)x).val);
 
                     }
-                case EVariableType.TimeSeries:
+                case EVariableType.Series:
                     {
                         TimeSeries tsl = new TimeSeries(smpl.t1.freq, null);
                         TimeSeries xx = x as TimeSeries;                                                
@@ -180,7 +180,7 @@ namespace Gekko
                     {                        
                         return new ScalarVal(this.val - ((ScalarVal)x).val);
                     }
-                case EVariableType.TimeSeries:
+                case EVariableType.Series:
                     {
                         return new ScalarVal(this.val - O.GetVal(t, x));
                     }                
@@ -200,7 +200,7 @@ namespace Gekko
                     {
                         return new ScalarVal(this.val * ((ScalarVal)x).val);
                     }
-                case EVariableType.TimeSeries:
+                case EVariableType.Series:
                     {
                         return new ScalarVal(this.val * O.GetVal(t, x));
                     }
@@ -232,7 +232,7 @@ namespace Gekko
                     {
                         return new ScalarVal(this.val / ((ScalarVal)x).val);
                     }
-                case EVariableType.TimeSeries:
+                case EVariableType.Series:
                     {
                         return new ScalarVal(this.val / O.GetVal(t, x));
                     }                
@@ -252,7 +252,7 @@ namespace Gekko
                     {
                         return new ScalarVal(Math.Pow(this.val, ((ScalarVal)x).val));
                     }
-                case EVariableType.TimeSeries:
+                case EVariableType.Series:
                     {
                         return new ScalarVal(Math.Pow(this.val, O.GetVal(t, x)));
                     }                

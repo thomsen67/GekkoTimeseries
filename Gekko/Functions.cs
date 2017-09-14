@@ -345,7 +345,7 @@ namespace Gekko
                         tss.Add(tmp);
                     }
                 }
-                else if (vars[j].Type() == EVariableType.TimeSeries)
+                else if (vars[j].Type() == EVariableType.Series)
                 {
                     //LIGHTFIXME
                     tss.Add((TimeSeries)vars[j]);
@@ -990,7 +990,7 @@ namespace Gekko
 
             if (true)
             {
-                if (items.Length == 2 && items[0].Type() == EVariableType.List && items[1].Type() == EVariableType.TimeSeries)
+                if (items.Length == 2 && items[0].Type() == EVariableType.List && items[1].Type() == EVariableType.Series)
                 {
 
                 }
@@ -1310,7 +1310,7 @@ namespace Gekko
 
         private static bool IsValOrTimeseries(IVariable x)
         {
-            return x.Type() == EVariableType.Val || x.Type() == EVariableType.TimeSeries || x.Type() == EVariableType.TimeSeries;
+            return x.Type() == EVariableType.Val || x.Type() == EVariableType.Series || x.Type() == EVariableType.Series;
         }
 
         public static IVariable pow(GekkoSmpl t, IVariable x1, IVariable x2)
@@ -1323,12 +1323,12 @@ namespace Gekko
         //ALL THESE SHOULD BE DELETED
         public static IVariable pch(GekkoSmpl t, IVariable x1)
         {
-            if (x1.Type() == EVariableType.TimeSeries)
+            if (x1.Type() == EVariableType.Series)
             {
 
 
             }
-            else if (x1.Type() == EVariableType.TimeSeries)
+            else if (x1.Type() == EVariableType.Series)
             {
 
             }
@@ -1374,7 +1374,7 @@ namespace Gekko
             int d = O.GetInt(ilags);
             double divide = 1d;
             if (avg) divide = (double)d;
-            if (x.Type() == EVariableType.TimeSeries)
+            if (x.Type() == EVariableType.Series)
             {
                 TimeSeries ts = (TimeSeries)x;
                 TimeSeries z = new TimeSeries(smpl.t1.freq, null);
@@ -1548,7 +1548,7 @@ namespace Gekko
                 }                
                 if (s.EndsWith(", ")) s = s.Substring(0, s.Length - 2);
             }
-            else if (x.Type() == EVariableType.TimeSeries)
+            else if (x.Type() == EVariableType.Series)
             {
                 G.Writeln2("*** ERROR: Cannot convert a SERIES to a STRING");
                 throw new GekkoException();
@@ -1577,7 +1577,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Cannot convert a LIST to a DATE");
                 throw new GekkoException();
             }
-            else if (x.Type() == EVariableType.TimeSeries)
+            else if (x.Type() == EVariableType.Series)
             {
                 G.Writeln2("*** ERROR: Cannot convert a SERIES to a DATE");
                 throw new GekkoException();
@@ -1630,7 +1630,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Cannot convert a LIST to a VAL");
                 throw new GekkoException();
             }
-            else if (x.Type() == EVariableType.TimeSeries)
+            else if (x.Type() == EVariableType.Series)
             {
                 G.Writeln2("*** ERROR: Cannot convert a SERIES to a DATE");
                 throw new GekkoException();

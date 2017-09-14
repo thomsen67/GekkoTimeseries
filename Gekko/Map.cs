@@ -165,16 +165,18 @@ namespace Gekko
         {
             if (dims.Length == 1 && dims[0].Type() == EVariableType.String)
             {
-                //TODO TODO TODO
-                //TODO TODO TODO
-                //TODO TODO TODO   this can be sped up, and also merged with #8374257012
-                //TODO TODO TODO
-                //TODO TODO TODO
-
                 string s = O.GetString(dims[0]);
-                IVariable iv = this.GetIVariable(s);
-                if (iv != null) this.RemoveIVariable(s);
-                this.AddIVariable(s, rhsExpression);                
+                string dbName, varName, freq; O.Chop(s, out dbName, out varName, out freq);        
+                if(dbName!=null)
+                {
+                    G.Writeln2("*** ERROR: You cannot state bank name (with colon) on the left-hand side in a MAP element");
+                    throw new GekkoException();
+                }        
+                O.LookupHelperLeftside(smpl, this, s, freq, rhsExpression);
+                
+                //IVariable iv = this.GetIVariable(s);
+                //if (iv != null) this.RemoveIVariable(s);
+                //this.AddIVariable(s, rhsExpression);                
             }
             else
             {
