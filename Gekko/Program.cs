@@ -9482,7 +9482,7 @@ namespace Gekko
                     else if (a.Type() == EVariableType.Val)
                     {
                         if (tpe != null && tpe != "val") continue;
-                        value = a.GetVal(null).ToString();
+                        value = a.GetValOLD(null).ToString();
                         if (value == "NaN") value = "M";
                     }
                     else if (a.Type() == EVariableType.List)
@@ -11236,7 +11236,7 @@ namespace Gekko
                         DateTime t1 = DateTime.Now;
                         double ms = (t1 - t0).TotalMilliseconds;
                         G.Writeln2("Speed1 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
-                        double x = Program.scalars["m"].GetVal(null);
+                        double x = Program.scalars["m"].GetValOLD(null);
                         G.Writeln("Difference from true: " + (x - (n * (n + 1) / 2)));
                         return "";  //no need for the parser to chew on this afterwards!
                     }

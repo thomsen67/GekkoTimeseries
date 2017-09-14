@@ -1128,10 +1128,15 @@ namespace Gekko
             return;
         }
 
-        public double GetVal(GekkoSmpl smpl)
+        public double GetValOLD(GekkoSmpl smpl)
         {
             G.Writeln2("Ts error 13");
             return double.NaN;
+        }
+
+        public double GetVal(GekkoTime t)
+        {
+            return this.GetData(t);
         }
 
         public string GetString()

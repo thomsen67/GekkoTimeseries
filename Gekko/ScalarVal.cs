@@ -14,7 +14,12 @@ namespace Gekko
             val = d;
         }
 
-        public double GetVal(GekkoSmpl t)
+        public double GetValOLD(GekkoSmpl t)
+        {
+            return this.val;
+        }
+
+        public double GetVal(GekkoTime t)
         {
             return this.val;
         }

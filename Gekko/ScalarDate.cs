@@ -14,11 +14,16 @@ namespace Gekko
             date = gt;
         }
 
-        public double GetVal(GekkoSmpl t)
+        public double GetValOLD(GekkoSmpl t)
         {
             G.Writeln2("*** ERROR: Could not convert the DATE " + this.date + " directly into a VAL.");
             G.Writeln("           You may try the date() conversion function.");
             throw new GekkoException();            
+        }
+        public double GetVal(GekkoTime t)
+        {
+            G.Writeln2("*** ERROR: Could not convert the DATE " + this.date + " directly into a VAL.");            
+            throw new GekkoException();
         }
 
         public string GetString()

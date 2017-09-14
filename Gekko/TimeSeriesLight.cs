@@ -160,9 +160,16 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public double GetVal(GekkoSmpl smpl)
+        public double GetValOLD(GekkoSmpl smpl)
         {
-            return double.NaN;
+            G.Writeln2("*** ERROR: error #734632321 regarding timeseries");
+            throw new GekkoException();
+        }
+
+        public double GetVal(GekkoTime smpl)
+        {
+            G.Writeln2("*** ERROR: error #734632321 regarding timeseries");
+            throw new GekkoException();
         }
 
         public string GetString()

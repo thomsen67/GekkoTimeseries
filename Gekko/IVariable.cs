@@ -66,8 +66,10 @@ namespace Gekko
                 
         void InjectAdd(GekkoSmpl smpl, IVariable x, IVariable y); //z.InjectAdd(x,y) inserts the sum of x and y into the z object.        
 
-        double GetVal(GekkoSmpl smpl);
+        double GetValOLD(GekkoSmpl smpl);
 
+        double GetVal(GekkoTime t);
+        
         string GetString();
 
         GekkoTime GetDate(O.GetDateChoices c);

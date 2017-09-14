@@ -258,7 +258,7 @@ namespace Gekko
         {
             //Returns the IVariable it finds here (or creates)            
             string name2 = name.GetString();            
-            double value = rhs.GetVal(smpl);
+            double value = rhs.GetValOLD(smpl);
             IVariable lhs = null;
             if (Program.scalars.TryGetValue(name2, out lhs))
             {
@@ -701,9 +701,47 @@ namespace Gekko
             return lhs;
         }
 
-        public static IVariable LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithTilde, string freq, IVariable rhsExpression)
+        public static IVariable ConvertToTimeSeries(GekkoSmpl smpl, IVariable x)
+        {
+            if (x.Type() == EVariableType.Series || x.Type() == EVariableType.Series) return x;
+            else if (x.Type() == EVariableType.Matrix)
+            {
+                int n = GekkoTime.Observations(smpl);
+                Matrix m = x as Matrix;
+                if (m.data.GetLength(0) == 1 && m.data.GetLength(1) == 1)
+                {
+                    return new ScalarVal(m.data[0, 0]);
+                }
+                else if (m.data.GetLength(0) == n && m.data.GetLength(1) == 1)
+                {
+                    TimeSeries rv_series = new TimeSeries(smpl.t1.freq, null);
+                    int counter = -1;
+                    foreach (GekkoTime t in smpl.Iterate())
+                    {
+                        counter++;
+                        rv_series.SetData(t, 0d);
+                    }
+                    return rv_series;
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Cannot convert " + m.data.GetLength(0) + "x" + m.data.GetLength(1) + " MATRIX to SERIES");
+                    throw new GekkoException();
+                }
+
+            }
+            throw new GekkoException();
+        }
+
+        public static IVariable LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithTilde, string freq, IVariable rhsExpressionOriginal)
         {
             IVariable lhs = ib.GetIVariable(varnameWithTilde);
+
+            //first, if it is a SERIES on lhs (no sigil), we try to convert the RHS directly (so x = ... will work, not necessary with SERIES x = ...)
+            //IVariable 
+
+            IVariable rhsExpression = O.ConvertToTimeSeries(smpl, rhsExpressionOriginal);
+
 
             LookupTypeCheck(rhsExpression, varnameWithTilde);
 
@@ -1958,7 +1996,7 @@ namespace Gekko
             }
             else if ((x.Type() == EVariableType.Series || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.Series || y.Type() == EVariableType.Val))
             {
-                if (x.GetVal(smpl) < y.GetVal(smpl)) rv = true;
+                if (x.GetValOLD(smpl) < y.GetValOLD(smpl)) rv = true;
             }
             else
             {
@@ -1978,7 +2016,7 @@ namespace Gekko
             }
             else if ((x.Type() == EVariableType.Series || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.Series || y.Type() == EVariableType.Val))
             {
-                if (x.GetVal(smpl) <= y.GetVal(smpl)) rv = true;
+                if (x.GetValOLD(smpl) <= y.GetValOLD(smpl)) rv = true;
             }
             else
             {
@@ -1991,11 +2029,12 @@ namespace Gekko
 
         public static IVariable Equals(GekkoSmpl smpl, IVariable x, IVariable y)
         {
+            //hmm, comparing two 1x1 matrices will fail
             IVariable rv = Globals.scalarVal0;            
             if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
             {
                 //must return a VAL, not a SERIES
-                double d1 = x.GetVal(smpl); double d2 = y.GetVal(smpl);
+                double d1 = ((ScalarVal)x).val; double d2 = ((ScalarVal)y).val;
                 if (G.isNumericalError(d1) && G.isNumericalError(d2))
                 {
                     rv = Globals.scalarVal1;
@@ -2005,15 +2044,15 @@ namespace Gekko
                     if (d1 == d2) rv = Globals.scalarVal1; ;
                 }
             }
-            if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
+            else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
             {
-                rv = CheckFreqAndCreateSeries(x, y);  //created, but still empty. Has the right frequency corresponding to x and y (or error will be reported)
-
+                TimeSeries rv_series = CheckFreqAndCreateSeries(x, y);  //created, but still empty. Has the right frequency corresponding to x and y (or error will be reported)
+                rv = rv_series;
                 foreach (GekkoTime t in smpl.Iterate())
                 {
                     //if x or y does not have frequency corresponding to t, we will get an error here
-                    
-
+                    if (x.GetVal(t) == y.GetVal(t)) rv_series.SetData(t, 1d);
+                    else rv_series.SetData(t, 0d);  //else it would be missing
                 }
             }
             else if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
@@ -2059,7 +2098,7 @@ namespace Gekko
             }
             else if ((x.Type() == EVariableType.Series || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.Series || y.Type() == EVariableType.Val))
             {
-                if (x.GetVal(smpl) >= y.GetVal(smpl)) rv = true;
+                if (x.GetValOLD(smpl) >= y.GetValOLD(smpl)) rv = true;
             }
             else
             {
@@ -2079,7 +2118,7 @@ namespace Gekko
             }
             else if ((x.Type() == EVariableType.Series || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.Series || y.Type() == EVariableType.Val))
             {
-                if (x.GetVal(smpl) > y.GetVal(smpl)) rv = true;
+                if (x.GetValOLD(smpl) > y.GetValOLD(smpl)) rv = true;
             }
             else
             {
@@ -2089,39 +2128,7 @@ namespace Gekko
             }
             return rv;
         }
-
-        public static TimeSeries ConvertToTimeSeries(GekkoSmpl smpl, IVariable x)
-        {
-            TimeSeries tsl = null;
-            switch (x.Type())
-            {
-                case EVariableType.Series:
-                    {
-                        tsl = (TimeSeries)x;
-                    }
-                    break;
-                case EVariableType.Val:
-                    {
-                        double d = ((ScalarVal)x).val;
-                        tsl = O.CreateTimeSeriesFromVal(smpl, d);
-                    }
-                    break;
-                case EVariableType.Matrix:
-                    {
-                        G.Writeln2("*** ERROR: Please use the unpack() function to transform matrix to series");
-                        throw new GekkoException();                        
-                    }
-                    break;
-                default:
-                    {
-                        G.Writeln2("*** ERROR: Could not convert right-hand side to SERIES");
-                        throw new GekkoException();
-                    }
-                    break;
-            }
-
-            return tsl;
-        }
+                
 
         public static TimeSeries CreateTimeSeriesFromVal(GekkoSmpl smpl, double d)
         {
@@ -2547,7 +2554,7 @@ namespace Gekko
 
         public static double GetVal(GekkoSmpl smpl, IVariable a) //uuu
         {
-            return a.GetVal(smpl);            
+            return a.GetValOLD(smpl);            
         }
 
         public static void GetVal777(GekkoSmpl smpl, IVariable a, int bankNumber, O.Prt.Element e)  //used in PRT and similar, can accept a list that will show itself as a being an integer with ._isName set.
@@ -2597,7 +2604,7 @@ namespace Gekko
                     e.subElements.Add(opeSub0);                    
                 }                                                
                 
-                double dd = a.GetVal(smpl);                
+                double dd = a.GetValOLD(smpl);                
 
                 if (bankNumber == 1)
                 {
@@ -2617,7 +2624,7 @@ namespace Gekko
 
         public static double GetVal(GekkoSmpl smpl, IVariable a, int bankNumber)  //used in PRT and similar, can accept a list that will show itself as a being an integer with ._isName set.
         {            
-            return a.GetVal(smpl);            
+            return a.GetValOLD(smpl);            
         }               
                 
         public static TimeSeries GetTimeSeries(IVariable a)
@@ -3199,7 +3206,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: VAL " + Globals.symbolMemvar.ToString() + s + " was not found");
                     throw new GekkoException();
                 }
-                string ss = a.GetVal(null).ToString();
+                string ss = a.GetValOLD(null).ToString();
                 if (ss == "NaN") ss = "M";
                 G.Writeln2("VAL " + s + " = " + ss);                
             }

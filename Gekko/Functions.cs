@@ -120,8 +120,8 @@ namespace Gekko
         //is this used at all???
         public static IVariable sum_test_method(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
-            double y1 = x1.GetVal(null);//uuu
-            double y2 = x2.GetVal(null);//uuu            
+            double y1 = x1.GetValOLD(null);//uuu
+            double y2 = x2.GetValOLD(null);//uuu            
             double y = y1 + y2;
             return new ScalarVal(y);
         }
@@ -543,7 +543,7 @@ namespace Gekko
 
         public static IVariable ismiss(GekkoSmpl smpl, IVariable x)
         {
-            double d = x.GetVal(smpl);
+            double d = x.GetValOLD(smpl);
             bool b = G.isNumericalError(d);
             if (b) return new ScalarVal(1d);
             return new ScalarVal(0d);
@@ -1009,12 +1009,12 @@ namespace Gekko
                         foreach (IVariable iv in ((MetaList)a).GetList())
                         {
                             string s = O.GetString(iv);
-                            v += O.IndirectionHelper(t, s).GetVal(t);
+                            v += O.IndirectionHelper(t, s).GetValOLD(t);
                         }
                     }
                     else
                     {
-                        v += a.GetVal(t);
+                        v += a.GetValOLD(t);
                     }
                 }
                 rv = new ScalarVal(v);
@@ -1038,13 +1038,13 @@ namespace Gekko
                     foreach (IVariable iv in ((MetaList)a).GetList())
                     {
                         string s = O.GetString(iv);
-                        v += O.IndirectionHelper(smpl, s).GetVal(smpl);
+                        v += O.IndirectionHelper(smpl, s).GetValOLD(smpl);
                         n++;
                     }
                 }
                 else
                 {
-                    v += a.GetVal(smpl);
+                    v += a.GetValOLD(smpl);
                     n++;
                 }
             }

@@ -178,12 +178,18 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public double GetVal(GekkoSmpl t)
+        public double GetValOLD(GekkoSmpl t)
         {
             G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a list.");
             G.Writeln("           Maybe you need an []-indexer on the list, for instance #mylist[2]?");
             throw new GekkoException();
-        }        
+        }
+
+        public double GetVal(GekkoTime t)
+        {
+            G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a list.");            
+            throw new GekkoException();
+        }
 
         public string GetString()
         {

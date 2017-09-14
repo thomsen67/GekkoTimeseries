@@ -36,7 +36,12 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public double GetVal(GekkoSmpl t)
+        public double GetValOLD(GekkoSmpl t)
+        {
+            throw new GekkoException();
+        }
+
+        public double GetVal(GekkoTime t)
         {
             throw new GekkoException();
         }

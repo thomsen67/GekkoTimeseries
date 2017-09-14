@@ -64,7 +64,13 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public double GetVal(GekkoSmpl t)
+        public double GetValOLD(GekkoSmpl t)
+        {
+            G.Writeln2("*** ERROR: Wrong use of Range class");
+            throw new GekkoException();
+        }
+
+        public double GetVal(GekkoTime t)
         {
             G.Writeln2("*** ERROR: Wrong use of Range class");
             throw new GekkoException();

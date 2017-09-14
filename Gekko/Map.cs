@@ -97,7 +97,13 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public double GetVal(GekkoSmpl t)
+        public double GetValOLD(GekkoSmpl t)
+        {
+            G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a MAP.");
+            throw new GekkoException();
+        }
+
+        public double GetVal(GekkoTime t)
         {
             G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a MAP.");
             throw new GekkoException();

@@ -36,7 +36,7 @@ namespace Gekko
         {
             public static IVariable Add(ScalarString s, ScalarVal d, bool invert)
             {
-                double dd = d.GetVal(null);
+                double dd = d.GetValOLD(null);
                 string i = null;
                 if (G.isNumericalError(dd))
                 {

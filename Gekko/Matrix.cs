@@ -225,7 +225,7 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public double GetVal(GekkoSmpl t)
+        public double GetValOLD(GekkoSmpl t)
         {
             if (this.data.GetLength(0) == 1 && this.data.GetLength(1) == 1)
             {
@@ -237,7 +237,20 @@ namespace Gekko
                 G.Writeln("           Maybe you need an [x, y]-indexer on the matrix, for instance #a[2, 3]?");
             }
             throw new GekkoException();
-        }        
+        }
+
+        public double GetVal(GekkoTime t)
+        {
+            if (this.data.GetLength(0) == 1 && this.data.GetLength(1) == 1)
+            {
+                return this.data[0, 0];
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a matrix.");                
+            }
+            throw new GekkoException();
+        }
 
         public string GetString()
         {            

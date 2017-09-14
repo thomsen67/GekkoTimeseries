@@ -303,7 +303,7 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public double GetVal(GekkoSmpl smpl)
+        public double GetValOLD(GekkoSmpl smpl)
         {
 
             //Conversion not allowed in for instance VAL x = %s, where s is a STRING pointing to a timeseries.
@@ -311,9 +311,16 @@ namespace Gekko
             G.Writeln("           A STRING s ('" + this._string2 + "') can refer to a timeseries name (" + this._string2 + "), but in");
             G.Writeln("           that case you must use {s} or {%s} instead of %s.");
             throw new GekkoException();
-
         }
-        
+
+        public double GetVal(GekkoTime smpl)
+        {
+
+            //Conversion not allowed in for instance VAL x = %s, where s is a STRING pointing to a timeseries.
+            G.Writeln2("*** ERROR: You are trying to extract a numerical value from STRING '" + this._string2 + "'");
+            throw new GekkoException();
+        }
+
         public string GetString()
         {
             return this._string2;
