@@ -179,7 +179,7 @@ namespace Gekko
 
         public void SetZero(GekkoSmpl smpl)
         {
-            foreach (GekkoTime t in smpl.Iterate())
+            foreach (GekkoTime t in smpl.Iterate03())
             {
                 this.SetData(t, 0d);
             }
@@ -915,7 +915,7 @@ namespace Gekko
         {
             IVariable rv = null;            
 
-            int n = GekkoTime.Observations(smpl.t1, smpl.t2);
+            int n = GekkoTime.Observations(smpl.t0, smpl.t3);
             double[] data = new double[n];
 
             if (x.Type() == EVariableType.Series)
@@ -924,7 +924,7 @@ namespace Gekko
                 TimeSeries xx = x as TimeSeries;
 
                 //LIGHTFIXME: speedup with arrays
-                foreach (GekkoTime gt in smpl.Iterate())
+                foreach (GekkoTime gt in smpl.Iterate03())
                 {
                     tsl.SetData(gt, this.GetData(gt) + xx.GetData(gt));
                 }
@@ -937,7 +937,7 @@ namespace Gekko
                 ScalarVal xx = x as ScalarVal;
 
                 //LIGHTFIXME: speedup with arrays
-                foreach (GekkoTime gt in smpl.Iterate())
+                foreach (GekkoTime gt in smpl.Iterate03())
                 {
                     tsl.SetData(gt, this.GetData(gt) + xx.val);
                 }
@@ -974,7 +974,7 @@ namespace Gekko
         public IVariable Negate(GekkoSmpl smpl)
         {
             TimeSeries ts = new TimeSeries(this.freq, null);
-            foreach (GekkoTime t in smpl.Iterate())
+            foreach (GekkoTime t in smpl.Iterate03())
             {
                 ts.SetData(t, -this.GetData(t));
             }
@@ -996,7 +996,7 @@ namespace Gekko
                     //must be a lag
                     //LIGHTFIXME, speed it up... can offset be used????
                     TimeSeries ts = new Gekko.TimeSeries(this.freq, null);
-                    foreach (GekkoTime t in smpl.Iterate())
+                    foreach (GekkoTime t in smpl.Iterate03())
                     {
                         ts.SetData(t, this.GetData(t.Add(i)));
                     }
@@ -1101,21 +1101,21 @@ namespace Gekko
 
             if (x.Type() == EVariableType.Series && y.Type() == EVariableType.Series)
             {
-                foreach (GekkoTime t in smpl.Iterate())
+                foreach (GekkoTime t in smpl.Iterate03())
                 {
                     this.SetData(t, ((TimeSeries)x).GetData(t) + ((TimeSeries)y).GetData(t));
                 }
             }
             else if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Series)
             {
-                foreach (GekkoTime t in smpl.Iterate())
+                foreach (GekkoTime t in smpl.Iterate03())
                 {
                     this.SetData(t, ((ScalarVal)x).val + ((TimeSeries)y).GetData(t));
                 }
             }
             else if (x.Type() == EVariableType.Series && y.Type() == EVariableType.Val)
             {
-                foreach (GekkoTime t in smpl.Iterate())
+                foreach (GekkoTime t in smpl.Iterate03())
                 {
                     this.SetData(t, ((TimeSeries)x).GetData(t) + ((ScalarVal)y).val);
                 }

@@ -558,7 +558,7 @@ namespace Gekko
                 if (logical.Type() == EVariableType.Series)
                 {
                     TimeSeries logical_series = logical as TimeSeries;
-                    foreach (GekkoTime t in smpl.Iterate())
+                    foreach (GekkoTime t in smpl.Iterate03())
                     {
                         if (logical_series.GetData(t) == 1d)
                         {
@@ -574,7 +574,7 @@ namespace Gekko
                 {
                     ScalarVal logical_val = logical as ScalarVal;
                     //LIGHTFIXME, could be array copy
-                    foreach (GekkoTime t in smpl.Iterate())
+                    foreach (GekkoTime t in smpl.Iterate03())
                     {
                         if (logical_val.val == 1d) rv_series.SetData(t, x_series.GetData(t));
                         else rv_series.SetData(t, 0d);
@@ -590,8 +590,16 @@ namespace Gekko
             {
                 if (logical.Type() == EVariableType.Series)
                 {
-                    G.Writeln2("*** ERROR: You cannot mix the types VAL and SERIES in a $-conditional");
-                    throw new GekkoException();
+                    //we have to convert the VAL to a SERIES here
+                    ScalarVal x_val = x as ScalarVal;
+                    TimeSeries logical_series = logical as TimeSeries;
+                    TimeSeries rv_series = new TimeSeries(smpl.t1.freq, null);
+                    rv = rv_series;
+                    foreach (GekkoTime t in smpl.Iterate03())
+                    {                        
+                        if (logical_series.GetData(t) == 1d) rv_series.SetData(t, x_val.val);
+                        else rv_series.SetData(t, 0d);
+                    }
                 }
                 else if (logical.Type() == EVariableType.Val)
                 {
@@ -703,10 +711,10 @@ namespace Gekko
 
         public static IVariable ConvertToTimeSeries(GekkoSmpl smpl, IVariable x)
         {
-            if (x.Type() == EVariableType.Series || x.Type() == EVariableType.Series) return x;
+            if (x.Type() == EVariableType.Series || x.Type() == EVariableType.Val) return x;
             else if (x.Type() == EVariableType.Matrix)
             {
-                int n = GekkoTime.Observations(smpl);
+                int n = smpl.Observations12();
                 Matrix m = x as Matrix;
                 if (m.data.GetLength(0) == 1 && m.data.GetLength(1) == 1)
                 {
@@ -714,22 +722,71 @@ namespace Gekko
                 }
                 else if (m.data.GetLength(0) == n && m.data.GetLength(1) == 1)
                 {
-                    TimeSeries rv_series = new TimeSeries(smpl.t1.freq, null);
+                    TimeSeries rv_series = new TimeSeries(smpl.t0.freq, null);
                     int counter = -1;
-                    foreach (GekkoTime t in smpl.Iterate())
+                    foreach (GekkoTime t in smpl.Iterate12())
                     {
                         counter++;
-                        rv_series.SetData(t, 0d);
+                        rv_series.SetData(t, m.data[counter, 0]);  //column vector
+                    }
+                    return rv_series;
+                }
+                else if (m.data.GetLength(0) == 1 && m.data.GetLength(1) == n)
+                {
+                    TimeSeries rv_series = new TimeSeries(smpl.t0.freq, null);
+                    int counter = -1;
+                    foreach (GekkoTime t in smpl.Iterate12())
+                    {
+                        counter++;
+                        rv_series.SetData(t, m.data[0, counter]);  //row vector
                     }
                     return rv_series;
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Cannot convert " + m.data.GetLength(0) + "x" + m.data.GetLength(1) + " MATRIX to SERIES");
+                    G.Writeln2("*** ERROR: Cannot convert " + m.data.GetLength(0) + "x" + m.data.GetLength(1) + " MATRIX to " + n + " obs SERIES");
+                    throw new GekkoException();
+                }
+            }
+            else if (x.Type() == EVariableType.List)
+            {
+                int n = smpl.Observations12();
+                MetaList m = x as MetaList;
+                if (m.list.Count() == 1)
+                {
+                    ScalarVal mi_val = m.list[0] as ScalarVal;
+                    if (mi_val == null)
+                    {
+                        G.Writeln2("*** ERROR: Expected item 1 in LIST to be VAL type");
+                        throw new GekkoException();
+                    }
+                    return new ScalarVal(mi_val.val);
+                }
+                else if(m.list.Count() == n)
+                {
+                    TimeSeries rv_series = new TimeSeries(smpl.t0.freq, null);
+                    int counter = -1;
+                    foreach (GekkoTime t in smpl.Iterate12())
+                    {
+                        counter++;
+                        ScalarVal mi_val = m.list[counter] as ScalarVal;
+                        if (mi_val == null)
+                        {
+                            G.Writeln2("*** ERROR: Expected item " + (counter + 1) + " in LIST to be VAL type");
+                            throw new GekkoException();
+                        }
+                        rv_series.SetData(t, mi_val.val);
+                    }
+                    return rv_series;
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Cannot convert " + m.list.Count() + " LIST elements to " + n + " obs SERIES");
                     throw new GekkoException();
                 }
 
             }
+            G.Writeln2("*** ERROR: Cannot convert " + G.GetTypeString(x) + " to SERIES");
             throw new GekkoException();
         }
 
@@ -792,7 +849,7 @@ namespace Gekko
                         ScalarVal sv = rhsExpression as ScalarVal;
                         TimeSeries tsLhs = new TimeSeries(lhsFreq, varnameWithTilde);
                         //LIGHTFIX, speed
-                        foreach (GekkoTime t in smpl.Iterate())
+                        foreach (GekkoTime t in smpl.Iterate03())
                         {
                             tsLhs.SetData(t, sv.val);
                         }
@@ -841,7 +898,7 @@ namespace Gekko
                     {
                         TimeSeries ts = rhsExpression as TimeSeries;
                         //LIGHTFIX, speed                         
-                        foreach (GekkoTime t in smpl.Iterate())
+                        foreach (GekkoTime t in smpl.Iterate03())
                         {
                             tsLhs.SetData(t, ts.GetData(t));
                         }
@@ -850,7 +907,7 @@ namespace Gekko
                     {
                         ScalarVal sv = rhsExpression as ScalarVal;
                         //LIGHTFIX, speed
-                        foreach (GekkoTime t in smpl.Iterate())
+                        foreach (GekkoTime t in smpl.Iterate03())
                         {
                             tsLhs.SetData(t, sv.val);
                         }
@@ -949,7 +1006,7 @@ namespace Gekko
                         if (m.list[0].Type() == EVariableType.Series || m.list[0].Type() == EVariableType.Val)
                         {
                             //List of values
-                            foreach (GekkoTime t in smpl.Iterate())
+                            foreach (GekkoTime t in smpl.Iterate03())
                             {
                                 G.Write(t.ToString());
                                 foreach (IVariable iv in m.list)
@@ -989,7 +1046,7 @@ namespace Gekko
                         {
                             TimeSeries tsl = x as TimeSeries;
                             G.Writeln2("SERIES = ");
-                            foreach (GekkoTime t in smpl.Iterate())
+                            foreach (GekkoTime t in smpl.Iterate03())
                             {
                                 G.Writeln(t.ToString() + "    " + tsl.GetData(t));
                             }
@@ -997,7 +1054,7 @@ namespace Gekko
                         else
                         {
                             G.Writeln2("SERIES = ");
-                            foreach (GekkoTime t in smpl.Iterate())
+                            foreach (GekkoTime t in smpl.Iterate03())
                             {
                                 G.Writeln(t.ToString() + "    " + ts.GetData(t));
                             }
@@ -2048,7 +2105,7 @@ namespace Gekko
             {
                 TimeSeries rv_series = CheckFreqAndCreateSeries(x, y);  //created, but still empty. Has the right frequency corresponding to x and y (or error will be reported)
                 rv = rv_series;
-                foreach (GekkoTime t in smpl.Iterate())
+                foreach (GekkoTime t in smpl.Iterate03())
                 {
                     //if x or y does not have frequency corresponding to t, we will get an error here
                     if (x.GetVal(t) == y.GetVal(t)) rv_series.SetData(t, 1d);
@@ -2132,10 +2189,10 @@ namespace Gekko
 
         public static TimeSeries CreateTimeSeriesFromVal(GekkoSmpl smpl, double d)
         {
-            TimeSeries tsl = new TimeSeries(smpl.t1.freq, null);
-            tsl.dataArray = new double[GekkoTime.Observations(smpl.t1, smpl.t2)];            
-            tsl.anchorSuperPeriod = smpl.t1.super;
-            tsl.anchorSubPeriod = smpl.t1.sub;
+            TimeSeries tsl = new TimeSeries(smpl.t0.freq, null);
+            tsl.dataArray = new double[GekkoTime.Observations(smpl.t0, smpl.t3)];            
+            tsl.anchorSuperPeriod = smpl.t0.super;
+            tsl.anchorSubPeriod = smpl.t0.sub;
             tsl.anchorPeriodPositionInArray = 0;
             for (int i = 0; i < tsl.dataArray.Length; i++)
             {
@@ -2156,17 +2213,17 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Expected > 0 rows in matrix");
                 throw new GekkoException();
             }
-            int n = GekkoTime.Observations(smpl.t1, smpl.t2);
+            int n = GekkoTime.Observations(smpl.t0, smpl.t3);
             if (n != m.data.GetLength(0))
             {
                 G.Writeln2("*** ERROR: Expected " + n + " rows in matrix");
                 throw new GekkoException();
             }
-            TimeSeries tsl = new TimeSeries(smpl.t1.freq, null);
+            TimeSeries tsl = new TimeSeries(smpl.t0.freq, null);
          
             tsl.dataArray = new double[n];
-            tsl.anchorSuperPeriod = smpl.t1.super;
-            tsl.anchorSubPeriod = smpl.t1.sub;
+            tsl.anchorSuperPeriod = smpl.t0.super;
+            tsl.anchorSubPeriod = smpl.t0.sub;
             tsl.anchorPeriodPositionInArray = 0;
             for (int i = 0; i < n; i++)
             {

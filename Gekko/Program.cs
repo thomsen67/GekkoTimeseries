@@ -64,8 +64,10 @@ namespace Gekko
 
     public class GekkoSmpl
     {
-        public GekkoTime t1 = Globals.tNull;
-        public GekkoTime t2 = Globals.tNull;
+        public GekkoTime t0 = Globals.tNull;  //start of the period for which the expressions are calculated (<= t1)
+        public GekkoTime t1 = Globals.tNull;  //start of real sample
+        public GekkoTime t2 = Globals.tNull;  //end of real sample  
+        public GekkoTime t3 = Globals.tNull;  //end of the period for which the expressions are calculated (<= t1)        
 
         public GekkoSmpl()
         {
@@ -74,11 +76,23 @@ namespace Gekko
 
         public GekkoSmpl(GekkoTime t1, GekkoTime t2)
         {
+            //FIXME
+            //FIXME
+            //FIXME
+            //FIXME
+            //FIXME
+            this.t0 = t1;
             this.t1 = t1;
             this.t2 = t2;
+            this.t3 = t2;
         }
 
-        public GekkoTimeIterator Iterate()
+        public GekkoTimeIterator Iterate03()
+        {
+            return new GekkoTimeIterator(this.t0, this.t3);
+        }
+
+        public GekkoTimeIterator Iterate12()
         {
             return new GekkoTimeIterator(this.t1, this.t2);
         }
@@ -87,6 +101,16 @@ namespace Gekko
         {
             GekkoSmpl smpl = new GekkoSmpl(Globals.globalPeriodStart, Globals.globalPeriodEnd);
             return smpl;
+        }
+
+        public int Observations03()
+        {
+            return GekkoTime.Observations(this.t0, this.t3);
+        }
+
+        public int Observations12()
+        {
+            return GekkoTime.Observations(this.t1, this.t2);
         }
 
     }
@@ -14407,15 +14431,15 @@ namespace Gekko
             ts1_.SetData(new GekkoTime(EFreq.Annual, 2002, 1), 3d);
                         
             GekkoSmpl smpl = new Gekko.GekkoSmpl();
-            smpl.t1 = new GekkoTime(EFreq.Annual, 2000, 1);
-            smpl.t2 = new GekkoTime(EFreq.Annual, 2002, 1);
+            smpl.t0 = new GekkoTime(EFreq.Annual, 2000, 1);
+            smpl.t3 = new GekkoTime(EFreq.Annual, 2002, 1);
 
             TimeSeries ts1 = new Gekko.TimeSeries(EFreq.Annual, null);
 
             int deduct = 2;
 
             //So that print can be with percentage growth
-            smpl.t1 = smpl.t1.Add(-deduct);  //this is standard!
+            smpl.t0 = smpl.t0.Add(-deduct);  //this is standard!
             
             O.Prt o5 = new O.Prt();
             o5.prtType = "prt";
@@ -14443,8 +14467,8 @@ namespace Gekko
                         result = SmplCheck(smpl2, Expression1(smpl));
                         if (result.Type() != EVariableType.GekkoError) break;
                         GekkoError ge = (GekkoError)result;
-                        smpl.t1 = smpl.t1.Add(-ge.underflow * (i + 1));  //Use a factor, 1 first time, 2 second, 3 third...
-                        smpl.t2 = smpl.t2.Add(ge.overflow * (i + 1));
+                        smpl.t0 = smpl.t0.Add(-ge.underflow * (i + 1));  //Use a factor, 1 first time, 2 second, 3 third...
+                        smpl.t3 = smpl.t3.Add(ge.overflow * (i + 1));
                         if (i > 10)
                         {
                             G.Writeln2("*** ERROR: Unexpected lag error #89032984325");

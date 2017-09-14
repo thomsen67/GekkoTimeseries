@@ -1377,8 +1377,8 @@ namespace Gekko
             if (x.Type() == EVariableType.Series)
             {
                 TimeSeries ts = (TimeSeries)x;
-                TimeSeries z = new TimeSeries(smpl.t1.freq, null);
-                foreach (GekkoTime gt in smpl.Iterate())
+                TimeSeries z = new TimeSeries(smpl.t0.freq, null);
+                foreach (GekkoTime gt in smpl.Iterate03())
                 {
                     double sum = 0d;
                     for (int i = 0; i < d; i++)   //movsum(x, 2) is m + x[-1], so d is always the number of elements.
