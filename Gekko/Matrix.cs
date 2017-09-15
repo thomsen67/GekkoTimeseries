@@ -40,20 +40,22 @@ namespace Gekko
         {
             if (indexes.Length == 1)
             {
-                IVariable index1 = indexes[0];
-                int i1 = O.GetInt(index1);
+                IVariable index = indexes[0];                
                 int d1 = this.data.GetLength(0);
                 int d2 = this.data.GetLength(1);
                 if (d2 == 1)
                 {
                     //1 col: column vector
-                    IVariable one = new ScalarVal(1d);
+                    IVariable one = Globals.scalarVal1;
                     IVariable[] newIndex = new IVariable[2];
-                    newIndex[0] = index1;
+                    newIndex[0] = index;
                     newIndex[1] = one;
                     return Handle2dIndexer(newIndex);  //we implicitly understand #a[3] as #a[3,1] here. But we cannot do the inverse on a row vector.
                 }
-                G.Writeln("*** ERROR: You are trying to use [" + i1 + "] on a " + d1 + "x" + d2 + " matrix");
+                string s = null;
+                if (index.Type() == EVariableType.Val) s += "" + O.GetInt(index);
+                else if (index.Type() == EVariableType.Range) s += "" + O.GetInt(((Range)index).first) + ".." + O.GetInt(((Range)index).first);
+                G.Writeln("*** ERROR: You are trying to use [" + s + "] on a " + d1 + "x" + d2 + " matrix");
                 G.Writeln("           This notation can only be used regarding nx1 matrices (column vectors)");
                 throw new GekkoException();
             }
@@ -70,22 +72,32 @@ namespace Gekko
 
         private IVariable Handle2dIndexer(IVariable[] indexes)
         {
+            
             IVariable index1 = indexes[0];
             IVariable index2 = indexes[1];
-            int i1 = O.GetInt(index1);
-            int i2 = O.GetInt(index2);
-            try
+
+            if (index1.Type() == EVariableType.Val && index2.Type() == EVariableType.Val)
             {
-                double d = this.data[i1 - 1, i2 - 1];
-                return new ScalarVal(d);
+                int i1 = O.GetInt(index1);
+                int i2 = O.GetInt(index2);
+                try
+                {
+                    double d = this.data[i1 - 1, i2 - 1];
+                    return new ScalarVal(d);
+                }
+                catch (System.IndexOutOfRangeException e)  // CS0168
+                {
+                    HandleIndexOutOfRange(index1, index2);
+                    throw new GekkoException();
+                }
             }
-            catch (System.IndexOutOfRangeException e)  // CS0168
+            else
             {
-                HandleIndexOutOfRange(index1, index2);
-                throw new GekkoException();
+                IVariable xx1; IVariable xx2;
+                RangeHelper(index1, index2, out xx1, out xx2);
+                return GetDataHelper((Range)xx1, (Range)xx2);
             }
-        }
-        
+        }        
 
         ////public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange)
         ////{
@@ -519,20 +531,73 @@ namespace Gekko
                 else
                 {
                     //at least one of the indices is a range
-                    IVariable xx1 = x1;
-                    IVariable xx2 = x2;
-                    if (x1.Type() == EVariableType.Val) xx1 = new Range(x1, x1);
-                    if (x2.Type() == EVariableType.Val) xx2 = new Range(x2, x2);
-                    if (xx1.Type() != EVariableType.Range || xx1.Type() != EVariableType.Range)
-                    {
-                        G.Writeln2("*** ERROR: Matrix []-indexer on left-hand side has wrong type");
-                        throw new GekkoException();
-                    }
+                    IVariable xx1, xx2;
+                    RangeHelper(x1, x2, out xx1, out xx2);
                     SetDataHelper((Range)xx1, (Range)xx2, rhsExpression);
                 }
             }
 
-        }                
+        }
+
+        private static void RangeHelper(IVariable x1, IVariable x2, out IVariable xx1, out IVariable xx2)
+        {
+            xx1 = x1;
+            xx2 = x2;
+            if (x1.Type() == EVariableType.Val) xx1 = new Range(x1, x1);
+            if (x2.Type() == EVariableType.Val) xx2 = new Range(x2, x2);
+            if (xx1.Type() != EVariableType.Range || xx1.Type() != EVariableType.Range)
+            {
+                G.Writeln2("*** ERROR: Matrix []-indexer on left-hand side has wrong type");
+                throw new GekkoException();
+            }
+        }
+
+        public IVariable GetDataHelper(Range indexRange1, Range indexRange2)
+        {
+            int i1 = 1;
+            int i2 = this.data.GetLength(0);
+            int j1 = 1;
+            int j2 = this.data.GetLength(1);
+            if (indexRange1.first != null) i1 = O.GetInt(indexRange1.first);
+            if (indexRange1.last != null) i2 = O.GetInt(indexRange1.last);
+            if (indexRange2.first != null) j1 = O.GetInt(indexRange2.first);
+            if (indexRange2.last != null) j2 = O.GetInt(indexRange2.last);
+            if (i1 > i2)
+            {
+                G.Writeln2("*** ERROR: Range " + i1 + ".." + i2 + " is descending");
+                throw new GekkoException();
+            }
+            if (j1 > j2)
+            {
+                G.Writeln2("*** ERROR: Range " + j1 + ".." + j2 + " is descending");
+                throw new GekkoException();
+            }
+
+            int dimI = i2 - i1 + 1;
+            int dimJ = j2 - j1 + 1;
+            Matrix m = new Matrix(dimI, dimJ);
+            double[,] data = m.data;
+
+            try
+            {
+                int ii1 = i1 - 1;
+                int jj1 = j1 - 1;
+                for (int i = i1 - 1; i <= i2 - 1; i++)
+                {
+                    for (int j = j1 - 1; j <= j2 - 1; j++)
+                    {
+                        data[i - ii1, j - jj1] = this.data[i, j];
+                    }
+                }
+                return m;
+            }
+            catch (System.IndexOutOfRangeException e)  // CS0168
+            {
+                G.Writeln("*** ERROR: Left-side index out of range: [" + i1 + " .. " + i2 + ", " + j1 + " .. " + j2 + " ]");
+                if (i1 == 0 || i2 == 0 || j1 == 0 || j2 == 0) G.Writeln("           Please note that indicies are 1-based");
+                throw new GekkoException();
+            }
+        }        
 
         public IVariable SetDataHelper(Range indexRange1, Range indexRange2, IVariable x3)
         {

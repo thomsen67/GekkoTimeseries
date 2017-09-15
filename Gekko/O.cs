@@ -610,7 +610,7 @@ namespace Gekko
                     }
                     else
                     {
-                        rv = new ScalarVal(0d);
+                        rv = Globals.scalarVal0;
                     }
                 }
                 else

@@ -206,12 +206,12 @@ namespace Gekko
 
         public static IVariable hpfilter(GekkoSmpl t, IVariable rightSide, IVariable ilambda)
         {
-            return hpfilter(t, null, null, rightSide, ilambda, new ScalarVal(0d));
+            return hpfilter(t, null, null, rightSide, ilambda, Globals.scalarVal0);
         }
 
         public static IVariable hpfilter(GekkoSmpl t, IVariable per1, IVariable per2, IVariable rightSide, IVariable ilambda)
         {
-            return hpfilter(t, per1, per2, rightSide, ilambda, new ScalarVal(0d));
+            return hpfilter(t, per1, per2, rightSide, ilambda, Globals.scalarVal0);
         }
 
         public static IVariable hpfilter(GekkoSmpl t, IVariable rightSide, IVariable ilambda, IVariable ilog)
@@ -545,8 +545,8 @@ namespace Gekko
         {
             double d = x.GetValOLD(smpl);
             bool b = G.isNumericalError(d);
-            if (b) return new ScalarVal(1d);
-            return new ScalarVal(0d);
+            if (b) return Globals.scalarVal1;
+            return Globals.scalarVal0;
         }
 
         public static IVariable maxc(GekkoSmpl smpl, IVariable x)
@@ -907,7 +907,7 @@ namespace Gekko
                 //https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Drawing_values_from_the_distribution
                 for (int i = 0; i < n; i++)
                 {
-                    double random = O.GetVal(t, rnorm(t, new ScalarVal(0d), new ScalarVal(1d))); //could be sped up by interfacing to the interior of the method
+                    double random = O.GetVal(t, rnorm(t, Globals.scalarVal0, Globals.scalarVal1)); //could be sped up by interfacing to the interior of the method
                     randoms[i, 0] = random;
                 }                
                 
@@ -1704,7 +1704,7 @@ namespace Gekko
             if (Globals.globalPeriodTimeFilters2.Count == 0)
             {
                 //for a quick return in most cases
-                z2 = new ScalarVal(0d);
+                z2 = Globals.scalarVal0;
             }
             else
             {
