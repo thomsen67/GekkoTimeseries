@@ -35,7 +35,7 @@ namespace Gekko.Parser.Gek
             CommonTree t = null;
 
 
-            G.Writeln2(ph.commandsText, Color.Green);
+            if (Globals.printAST) G.Writeln2(ph.commandsText, Color.Green);
             // Create a lexer attached to that input            
             Cmd3Parser parser3 = null;
             Cmd3Lexer lexer3 = new Cmd3Lexer(input);
@@ -71,9 +71,11 @@ namespace Gekko.Parser.Gek
                 throw new GekkoException();
             }
             t = (CommonTree)r3.Tree;
-            PrintAST(t, 0);
 
-
+            if (Globals.printAST)
+            {
+                PrintAST(t, 0);
+            }
 
             ////// Create a lexer attached to that input            
             ////Cmd3Parser parser3 = null;

@@ -22,6 +22,11 @@ namespace Gekko
         }
         public double GetVal(GekkoTime t)
         {
+            return GetVal();
+        }
+
+        public double GetVal()
+        {
             G.Writeln2("*** ERROR: Could not convert the DATE " + this.date + " directly into a VAL.");            
             throw new GekkoException();
         }
@@ -143,7 +148,7 @@ namespace Gekko
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] dims)
         {
-            G.Writeln2("*** ERROR: You cannot use an indexer [] on the left-hand side");
+            G.Writeln2("*** ERROR: You cannot use an indexer [] on a DATE");
             throw new GekkoException();
         }
 

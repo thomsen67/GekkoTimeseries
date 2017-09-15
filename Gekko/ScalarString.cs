@@ -315,9 +315,13 @@ namespace Gekko
 
         public double GetVal(GekkoTime smpl)
         {
+            G.Writeln2("*** ERROR: Cannot extract a scalar value from " + G.GetTypeString(this) + " type");
+            throw new GekkoException();
+        }
 
-            //Conversion not allowed in for instance VAL x = %s, where s is a STRING pointing to a timeseries.
-            G.Writeln2("*** ERROR: You are trying to extract a numerical value from STRING '" + this._string2 + "'");
+        public double GetVal()
+        {
+            G.Writeln2("*** ERROR: Cannot extract a scalar value from " + G.GetTypeString(this) + " type");
             throw new GekkoException();
         }
 
@@ -398,7 +402,7 @@ namespace Gekko
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] dims)
         {
-            G.Writeln2("*** ERROR: You cannot use an indexer [] on the left-hand side");
+            G.Writeln2("*** ERROR: You cannot use an indexer [] on a STRING");
             throw new GekkoException();
         }
 

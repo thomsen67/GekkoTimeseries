@@ -294,18 +294,10 @@ namespace Gekko
         /// <returns>The value (double.NaN if missing)</returns>
         /// <exception cref="GekkoException">Exception if frequency of timeseries and period do not match.</exception>
         public double GetData(GekkoTime t)
-        {
-            //DimensionCheck();
+        {            
             if (this.freq != t.freq)
-            {
-                //t.freq will almost always correspond to the frequency setting in Gekko, that is, Program.options.freq.
-                //When getting the timeseries, a "%q" or "%m" is appended to the name, because that is the way other frequencies
-                //are stored in the Dictionary. (Note that these '%' have nothing to do with scalar variables!).
-                //So if Program.options.freq is quarterly, 'fy' will point to 'fy%q', and that
-                //timeseries should have .freqEnum = EFreq.Quarterly. This is basically what the above IF tests. It is for
-                //safety, and might be omitted at some point.
-                G.Writeln2("*** ERROR: Frequency mismatch: " + G.GetFreqString(this.freq) + " versus " + G.GetFreqString(t.freq));
-                throw new GekkoException();
+            {                
+                FreqError(t);             
             }
             if (this.dataArray == null)
             {
@@ -340,7 +332,12 @@ namespace Gekko
             }
         }
 
-       
+        private void FreqError(GekkoTime t)
+        {
+            G.Writeln2("*** ERROR: Frequency mismatch: " + G.GetFreqString(this.freq) + " versus " + G.GetFreqString(t.freq));
+            throw new GekkoException();
+        }
+
 
         public void SetTimelessData(double value)
         {
@@ -378,8 +375,7 @@ namespace Gekko
             if (this.freq != t.freq)
             {
                 //See comment to GetData()
-                G.Writeln2("*** ERROR: Freq mismatch");
-                throw new GekkoException();
+                FreqError(t);                
             }
             if (this.dataArray == null)
             {
@@ -449,13 +445,19 @@ namespace Gekko
                 return numbers;
             }
 
-            if (this.freq != gt1.freq || gt1.freq != gt2.freq)
+            if (this.freq != gt1.freq)
             {
                 //This check: better safe than sorry!
-                //See comment to GetData()
-                G.Writeln2("*** ERROR: Freq mismatch");
-                throw new GekkoException();
+                //See comment to GetData()                
+                FreqError(gt1);                
             }
+
+            if (gt1.freq != gt2.freq)
+            {                
+                //See comment to GetData()                
+                throw new GekkoException();  //should be rare...
+            }
+
             if (this.dataArray == null)
             {
                 InitDataArray(gt1);
@@ -518,14 +520,20 @@ namespace Gekko
                 throw new GekkoException();
             }
             if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot change observations in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
-            //Program.ErrorIfDatabanksSwapped(this);
-            if (this.freq != gt1.freq || gt1.freq != gt2.freq)
+            
+            if (this.freq != gt1.freq)
             {
                 //This check: better safe than sorry!
-                //See comment to GetData()
-                G.Writeln2("*** ERROR: Freq mismatch");
-                throw new GekkoException();
+                //See comment to GetData()                
+                FreqError(gt1);
             }
+
+            if (gt1.freq != gt2.freq)
+            {
+                //See comment to GetData()                
+                throw new GekkoException();  //should be rare...
+            }
+
             if (this.dataArray == null)
             {
                 //slack: init could be more precise regarding size, for non-annual frequencies.
@@ -991,7 +999,7 @@ namespace Gekko
 
                 //TODO: Broken lags!!
 
-                if (i > -100 && i < 100)
+                if (IsLagOrLead(i))
                 {
                     //must be a lag
                     //LIGHTFIXME, speed it up... can offset be used????
@@ -1024,47 +1032,66 @@ namespace Gekko
             else
             {
                 //Not x[2] or x[2020q1]
-                                
-                int stringCount = 0;
-                foreach (IVariable iv in indexes)
+                rv = FindArrayTimeSeries(indexes, false);
+            }
+
+            return rv;
+        }
+
+        private TimeSeries FindArrayTimeSeries(IVariable[] indexes, bool isLhs)
+        {
+            TimeSeries ts = null;
+            int stringCount = 0;
+            foreach (IVariable iv in indexes)
+            {
+                if (iv.Type() == EVariableType.String)
                 {
-                    if (iv.Type() == EVariableType.String)
-                    {
-                        stringCount++;
-                    }
+                    stringCount++;
                 }
-                if (indexes.Length == stringCount)
+            }
+            if (indexes.Length == stringCount)
+            {
+                string s = G.RemoveFreqIndicator(this.name);
+                if (true)
                 {
-                    string s = G.RemoveFreqIndicator(this.name);
-                    if (true)
-                    {                        
-                        string hash = GetHashCodeFromIvariables(indexes);
-                        string varname = s + Globals.symbolTurtle + hash + Globals.symbolTilde + G.GetFreq(this.freq);
-                        TimeSeries ts = this.parentDatabank.GetIVariable(varname) as TimeSeries;  //should not be able to return null, since no-sigil name is timeseries
-                        if (ts == null)
+                    string hash = GetHashCodeFromIvariables(indexes);
+                    string varname = s + Globals.symbolTurtle + hash + Globals.symbolTilde + G.GetFreq(this.freq);
+                    ts = this.parentDatabank.GetIVariable(varname) as TimeSeries;  //should not be able to return null, since no-sigil name is timeseries                    
+                    if (ts == null)
+                    {
+                        if (!isLhs)
                         {
                             G.Writeln2("*** ERROR: Could not find " + G.PrettifyTimeseriesHash(varname, true, false));
                             throw new GekkoException();
                         }
-                        rv = ts;
+                        else
+                        {
+                            ts = new TimeSeries(this.freq, varname);
+                            this.parentDatabank.AddIVariable(ts);
+                        }
                     }                    
                 }
-                else
+            }
+            else
+            {
+                string s = null;
+                foreach (IVariable iv in indexes)
                 {
-                    string s = null;
-                    foreach (IVariable iv in indexes)
-                    {
-                        s += iv.Type().ToString() + ", ";
-                    }
-                    G.Writeln2("*** ERROR: Timeseries []-index with these argument types: " + s.Substring(0, s.Length - (", ").Length));
-                    throw new GekkoException();
+                    s += iv.Type().ToString() + ", ";
                 }
-            }                                  
-            
-            return rv;
+                G.Writeln2("*** ERROR: Timeseries []-index with these argument types: " + s.Substring(0, s.Length - (", ").Length));
+                throw new GekkoException();
+            }
+
+            return ts;
         }
 
-       
+        private static bool IsLagOrLead(int i)
+        {
+            return i > -100 && i < 100;
+        }
+
+
 
         //public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange index)
         //{
@@ -1139,6 +1166,12 @@ namespace Gekko
             return this.GetData(t);
         }
 
+        public double GetVal()
+        {
+            G.Writeln2("*** ERROR: Cannot extract a scalar value from " + G.GetTypeString(this) + " type");
+            throw new GekkoException();
+        }
+
         public string GetString()
         {
             G.Writeln2("Ts error 14");
@@ -1162,10 +1195,45 @@ namespace Gekko
             return EVariableType.Series;
         }
 
-        public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] dims)
+        public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] indexes)
         {
-            G.Writeln2("*** ERROR: You cannot use an indexer [] on the left-hand side");
-            throw new GekkoException();
+            if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Val)
+            {
+                int i = O.GetInt(indexes[0]);
+                if (IsLagOrLead(i))
+                {
+                    G.Writeln2("*** ERROR: You cannot use lags or lead on left-hand side of an expression");
+                    throw new GekkoException();
+                }
+                else
+                {
+                    if (this.freq == EFreq.Annual || this.freq == EFreq.Undated)
+                    {
+                        double d = rhsExpression.GetVal();  //will fail with an error unless VAL or 1x1 matrix
+                        GekkoTime t = new GekkoTime(this.freq, i, 1);
+                        this.SetData(t, d);
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: You cannot []-index a " + G.GetFreqString(this.freq) + " SERIES with [" + i + "]");
+                        throw new GekkoException();
+                    }
+                }
+            }
+            else if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Date)
+            {
+                double d = rhsExpression.GetVal();  //will fail with an error unless VAL or 1x1 matrix                
+                this.SetData(((ScalarDate)(indexes[0])).date, d);  //will fail with an error if freqs do not match
+            }
+            else 
+            {
+                //Will fail with an error if not all indexes are of STRING type
+                TimeSeries ts = FindArrayTimeSeries(indexes, true);
+                foreach (GekkoTime t in smpl.Iterate03())
+                {
+                    ts.SetData(t, rhsExpression.GetVal(t));  //will fail if expression is wrong type
+                }
+            }
         }
 
         /// <summary>

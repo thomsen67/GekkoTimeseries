@@ -172,6 +172,13 @@ namespace Gekko
             throw new GekkoException();
         }
 
+        public double GetVal()
+        {
+            G.Writeln2("*** ERROR: error #734632321 regarding timeseries");
+            throw new GekkoException();
+        }
+
+
         public string GetString()
         {
             G.Writeln2("*** ERROR: You are trying to extract STRING from timeseries");

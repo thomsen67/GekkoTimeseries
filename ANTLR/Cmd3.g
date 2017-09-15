@@ -56,16 +56,14 @@ tokens {
 	ASTDOUBLE;
 	ASTDOLLARCONDITIONALVARIABLE;
 	ASTPRINT;
-	
-
+	ASTIFSTATEMENTS;
+	ASTELSESTATEMENTS;
 	ASTNAME;
 ASTNAME;
 ASTIDENT;
-
 ASTCURLYSIMPLE;
 ASTCURLY;
-ASTIDENTDIGIT;
-	
+ASTIDENTDIGIT;	
 	ASTPLUS;
 	ASTMINUS;	
 	ASTSTAR;
@@ -104,6 +102,7 @@ ASTFUNCTIONDEF2;
 ASTRESET;
 ASTRETURN;
 ASTFOR;
+ASTIF;
 
 	TO              = 'to';
 	BY              = 'by';
@@ -115,6 +114,7 @@ ASTFOR;
 	P              = 'p';
 	RUN            = 'run';
 	VAL = 'val'; STRING = 'string'; DATE = 'date'; SERIES = 'series'; LIST = 'list'; MAP = 'map'; MATRIX = 'matrix'; FUNCTION = 'function'; END = 'end'; RESET = 'reset';
+	IF = 'if'; ELSE = 'else';
 	RETURN2 = 'return';
 	LISTFILE = 'LISTFILE';
 }
@@ -158,6 +158,7 @@ statements2                     :
                             SEMICOLON -> //stray semicolon is ok, nothing is written
                           | assignment           SEMICOLON!
 						  | for2
+						  | if2
 						  | print                SEMICOLON!
 						  | run                  SEMICOLON!
 						  | functionDef          SEMICOLON!
@@ -222,17 +223,8 @@ leftSideDollarExpression  : (leftSideIndexerExpression -> leftSideIndexerExpress
 						    (DOLLAR lbla=dollarConditional -> ^(ASTDOLLAR $leftSideDollarExpression $lbla))*	
 						  ; 						
 
-leftSideIndexerExpression : (leftSideValue -> leftSideValue)
+leftSideIndexerExpression : (bankvarname -> bankvarname)
 						    (lbla=dotOrIndexer -> ^(ASTDOTORINDEXER $leftSideIndexerExpression $lbla))*
-						  ;
-
-leftSideValue             : leftSideValueHelper;
-
-leftSideValueHelper       : bankvarname												  
-						  //| indexerAlone
-						  //| listFile												  
-						  //| list
-						  //| map
 						  ;
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -378,6 +370,8 @@ for2                     : FOR           (forHelper2 ','?)+     SEMICOLON  funct
 
 forHelper2               : type? svarname EQUAL expression (TO expression2)? (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2?) ^(ASTPLACEHOLDER expression3?));
 
+if2						  : IF leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIF", ASTIF, $IF.Line)} logical functionStatements functionStatements2);
+
 print					  : P expression -> ^(ASTPRINT expression);
 
 run						  : RUN -> ^(ASTRUN);
@@ -390,6 +384,7 @@ functionDef				  : FUNCTION type ident leftParenGlue functionArg RIGHTPAREN SEMI
 functionArg               : (functionArgElement (',' functionArgElement)*)? -> ^(ASTPLACEHOLDER functionArgElement*);
 functionArgElement        : type svarname -> ^(ASTPLACEHOLDER type svarname);
 functionStatements        : statements2* -> ^(ASTPLACEHOLDER statements2*);
+functionStatements2       : functionStatements;  //alias
 type					  : VAL | STRING | DATE | SERIES | LIST | MAP | MATRIX ;
 
 // ------------------------------------------------------------------------------------------------------------------

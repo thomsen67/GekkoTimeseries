@@ -46,6 +46,12 @@ namespace Gekko
             throw new GekkoException();
         }
 
+        public double GetVal()
+        {
+            G.Writeln2("*** ERROR: Cannot extract a scalar value from " + G.GetTypeString(this) + " type");
+            throw new GekkoException();
+        }
+
         public string GetString()
         {
             throw new GekkoException();
@@ -93,7 +99,7 @@ namespace Gekko
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] dims)
         {
-            G.Writeln2("*** ERROR: You cannot use an indexer [] on the left-hand side");
+            G.Writeln2("*** ERROR: You cannot use an indexer [] on an error");
             throw new GekkoException();
         }
 

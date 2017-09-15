@@ -24,6 +24,11 @@ namespace Gekko
             return this.val;
         }
 
+        public double GetVal()
+        {
+            return this.val;
+        }
+
         public string GetString()
         {
             G.Writeln2("*** ERROR: Could not convert the VAL " + this.val + " directly into STRING.");
@@ -271,9 +276,10 @@ namespace Gekko
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] dims)
         {
-            G.Writeln2("*** ERROR: You cannot use an indexer [] on the left-hand side");
+            G.Writeln2("*** ERROR: You cannot use an indexer [] on a VAL");
             throw new GekkoException();
         }
+
         public IVariable DeepClone()
         {
             return new ScalarVal(this.val);

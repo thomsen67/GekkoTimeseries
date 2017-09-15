@@ -69,6 +69,8 @@ namespace Gekko
         double GetValOLD(GekkoSmpl smpl);
 
         double GetVal(GekkoTime t);
+
+        double GetVal();
         
         string GetString();
 

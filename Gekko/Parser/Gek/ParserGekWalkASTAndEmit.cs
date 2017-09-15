@@ -1141,8 +1141,37 @@ namespace Gekko.Parser.Gek
                             break;
                         }
                     case "ASTDOLLAR":
-                        {                            
-                            node.Code.A("O.Dollar(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                        {
+
+                            string s = node[0].Code.ToString();
+                            if (node.Parent.Text == "ASTLEFTSIDE")
+                            {
+                                //This is a hack, but quite innocent.
+                                //Problem is, we have this ASTDOLLAR, with ASTBANKVARNAME and ASTDOLLARCONDITIONAL as children. 
+                                //Both of these produce an IVARIABLE, but ASTDOLLARCONDITIONAL is still empty when ASTBANKVARNAME is encountered. 
+                                //A solution could be to walk ASTDOLLARCONDITIONAL manually, and do the DollarLookup() from ASTBANKVARNAME. 
+                                //But the hack is not that bad. 
+
+                                if (s.StartsWith("O.Lookup("))
+                                {                                    
+                                    node.Code.A("O.DollarLookup(" + node[1].Code.ToString() + ", " + s.Substring("O.Lookup(".Length));
+                                }
+                                else if (s.StartsWith("O.IndexerSetData("))
+                                {                                    
+                                    node.Code.A("O.DollarIndexerSetData(" + node[1].Code.ToString() + ", " + s.Substring("O.IndexerSetData(".Length));
+                                }
+                                else
+                                {
+                                    G.Writeln2("*** ERROR: Internal error related to $ on left-hand side");
+                                    throw new GekkoException();
+                                }                              
+
+                            }
+                            else
+                            {
+                                //right-hand side, much easier
+                                node.Code.A("O.Dollar(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                            }
                             break;
                         }
 
@@ -1171,14 +1200,14 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTIFSTATEMENTS":
                         {
+                            GetCodeFromAllChildren(node[0]);
                             GetCodeFromAllChildren(node);
-                            //AddSplitMarkers(node);                        
                         }
                         break;
                     case "ASTELSESTATEMENTS":
                         {
+                            GetCodeFromAllChildren(node[0]);
                             GetCodeFromAllChildren(node);
-                            //AddSplitMarkers(node);                        
                         }
                         break;
                     case "ASTFUNCTIONDEFCODE":
@@ -1579,19 +1608,18 @@ namespace Gekko.Parser.Gek
                     case "ASTIF":
                         {
                             node.Code.A(Globals.splitSTOP);
-                            node.Code.A("if(" + node[0].Code + ") {");
+                            node.Code.A("if(O.IsTrue(smpl, " + node[0].Code + ")) {");
                             node.Code.A(Globals.splitSTART);
+                            GetCodeFromAllChildren(node[1]);
                             node.Code.A(node[1].Code);
-                            node.Code.A(Globals.splitSTOP);                                                        
+                            node.Code.A(Globals.splitSTOP);
                             node.Code.A("}");
-                            if (node[2] != null)
-                            {
-                                node.Code.A("else {");
-                                node.Code.A(Globals.splitSTART);
-                                node.Code.A(node[2].Code);
-                                node.Code.A(Globals.splitSTOP);                                
-                                node.Code.A("}");
-                            }
+                            node.Code.A("else {");
+                            node.Code.A(Globals.splitSTART);
+                            GetCodeFromAllChildren(node[2]);
+                            node.Code.A(node[2].Code);
+                            node.Code.A(Globals.splitSTOP);
+                            node.Code.A("}");
                             node.Code.A(Globals.splitSTART);
                         }
                         break;

@@ -560,7 +560,7 @@ namespace Gekko
                     TimeSeries logical_series = logical as TimeSeries;
                     foreach (GekkoTime t in smpl.Iterate03())
                     {
-                        if (logical_series.GetData(t) == 1d)
+                        if (IsTrue(logical_series.GetData(t)))
                         {
                             rv_series.SetData(t, x_series.GetData(t));
                         }
@@ -576,7 +576,7 @@ namespace Gekko
                     //LIGHTFIXME, could be array copy
                     foreach (GekkoTime t in smpl.Iterate03())
                     {
-                        if (logical_val.val == 1d) rv_series.SetData(t, x_series.GetData(t));
+                        if (IsTrue(logical_val.val)) rv_series.SetData(t, x_series.GetData(t));
                         else rv_series.SetData(t, 0d);
                     }
                 }
@@ -597,14 +597,14 @@ namespace Gekko
                     rv = rv_series;
                     foreach (GekkoTime t in smpl.Iterate03())
                     {                        
-                        if (logical_series.GetData(t) == 1d) rv_series.SetData(t, x_val.val);
+                        if (IsTrue(logical_series.GetData(t))) rv_series.SetData(t, x_val.val);
                         else rv_series.SetData(t, 0d);
                     }
                 }
                 else if (logical.Type() == EVariableType.Val)
                 {
                     ScalarVal logical_val = logical as ScalarVal;
-                    if (logical_val.val == 1d)
+                    if (IsTrue(logical_val.val))
                     {
                         rv = new ScalarVal(((ScalarVal)x).val);
                     }
@@ -625,6 +625,36 @@ namespace Gekko
                 throw new GekkoException();
             }
             return rv;
+        }
+
+        public static bool IsTrue(double d)
+        {
+            if (d != 0d) return true;
+            else return false;
+        }
+
+        public static void DollarLookup(IVariable logical, GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression)
+        {
+            //Only encountered on the LHS
+            if (logical == null)
+            {
+                Lookup(smpl, map, dbName, varname, freq, rhsExpression);
+            }
+            if (logical.Type() == EVariableType.Val)
+            {
+                if (IsTrue(((ScalarVal)logical).val))
+                {
+                    Lookup(smpl, map, dbName, varname, freq, rhsExpression);
+                }
+                else
+                {
+                    //skip it!
+                }
+            }
+            else
+            {
+                DollarLHSError();
+            }
         }
 
         public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression)
@@ -701,7 +731,7 @@ namespace Gekko
                 lhs = ib.GetIVariable(varnameWithTilde);
                 if (lhs == null)
                 {
-                    G.Writeln2("*** ERROR: Could not find variable '" + varnameWithTilde + "'" + "in " + ib.Message());
+                    G.Writeln2("*** ERROR: Could not find variable '" + varnameWithTilde + "'" + " in " + ib.Message());
                     throw new GekkoException();
                 }
             }
@@ -733,14 +763,8 @@ namespace Gekko
                 }
                 else if (m.data.GetLength(0) == 1 && m.data.GetLength(1) == n)
                 {
-                    TimeSeries rv_series = new TimeSeries(smpl.t0.freq, null);
-                    int counter = -1;
-                    foreach (GekkoTime t in smpl.Iterate12())
-                    {
-                        counter++;
-                        rv_series.SetData(t, m.data[0, counter]);  //row vector
-                    }
-                    return rv_series;
+                    G.Writeln2("*** ERROR: Please use a column vector to transform MATRIX to SERIES. Cf. the t() transpose function");
+                    throw new GekkoException();
                 }
                 else
                 {
@@ -1151,6 +1175,37 @@ namespace Gekko
                 G.Writeln2(depth + " " + s);
                 HandleIndexerHelper(depth + 1, y, x);
             }
+        }
+
+        public static void DollarIndexerSetData(IVariable logical, GekkoSmpl smpl, IVariable x, IVariable y, params IVariable[] indexes)
+        {
+            //Only encountered on the LHS
+            if (logical == null)
+            {
+                x.IndexerSetData(smpl, y, indexes);
+            }
+            if (logical.Type() == EVariableType.Val)
+            {
+                if (IsTrue(((ScalarVal)logical).val))
+                {
+                    x.IndexerSetData(smpl, y, indexes);
+                }
+                else
+                {
+                    //skip it!
+                }
+            }
+            else
+            {
+                DollarLHSError();
+                return;
+            }
+        }
+
+        private static void DollarLHSError()
+        {
+            G.Writeln2("*** ERROR: $-conditional on left-hand side only supports VAL type");
+            throw new GekkoException();
         }
 
         public static void IndexerSetData(GekkoSmpl smpl, IVariable x, IVariable y, params IVariable[] indexes)
@@ -2083,6 +2138,43 @@ namespace Gekko
                 throw new GekkoException();
             }
             return rv;
+        }
+
+        public static bool IsTrue(GekkoSmpl smpl, IVariable x)
+        {
+            if (x.Type() == EVariableType.Val)
+            {
+                if (IsTrue(((ScalarVal)x).val)) return true;
+            }
+            else if (x.Type() == EVariableType.Matrix)
+            {
+                //is this even possible??
+                Matrix m = x as Matrix;
+                if (m.data.GetLength(0) == 1 && m.data.GetLength(1) == 1)
+                {
+                    if (IsTrue(m.data[0, 0])) return true;
+                }
+            }
+            else if (x.Type() == EVariableType.Series)
+            {
+                TimeSeries ts = x as TimeSeries;
+                bool allOk = true;
+                foreach (GekkoTime t in smpl.Iterate12())
+                {
+                    if (IsTrue(ts.GetData(t)))
+                    {
+                        allOk = false;
+                        break;
+                    }
+                }
+                if (allOk) return true;
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Wrong type " + G.GetTypeString(x) + " for IF(...)");
+                throw new GekkoException();
+            }
+            return false;
         }
 
         public static IVariable Equals(GekkoSmpl smpl, IVariable x, IVariable y)

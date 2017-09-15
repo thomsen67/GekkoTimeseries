@@ -241,6 +241,11 @@ namespace Gekko
 
         public double GetVal(GekkoTime t)
         {
+            return GetVal();
+        }
+
+        public double GetVal()
+        {
             if (this.data.GetLength(0) == 1 && this.data.GetLength(1) == 1)
             {
                 return this.data[0, 0];

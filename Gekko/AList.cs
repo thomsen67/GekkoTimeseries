@@ -208,6 +208,12 @@ namespace Gekko
             throw new GekkoException();
         }
 
+        public double GetVal()
+        {
+            G.Writeln2("*** ERROR: Cannot extract a scalar value from " + G.GetTypeString(this) + " type");
+            throw new GekkoException();
+        }
+
         public string GetString()
         {
             G.Writeln2("*** ERROR: Trying to convert a LIST into a STRING.");            
