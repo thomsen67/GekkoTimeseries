@@ -522,30 +522,6 @@ namespace Gekko
             return new MetaList(m);
         }
 
-        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression)
-        {
-            ScalarString x2 = x as ScalarString;
-            if (x2 == null)
-            {
-                G.Writeln2("*** ERROR: Var type error when looking up in databank");
-                throw new GekkoException();
-            }
-            else
-            {
-                string dbName, varName, freq; char firstChar; Chop(x2._string2, out dbName, out varName, out freq);
-                bool hasSigil = false; if (varName[0] == Globals.symbolMemvar || varName[0] == Globals.symbolList) hasSigil = true;
-                IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression);
-                return iv;
-            }
-            return x;
-        }
-
-        //public static IVariable Lookup(GekkoSmpl smpl, string dbName, string varname, string freq, bool hasSigil, IVariable rhsExpression)
-        //{
-        //    IVariable iv = LookupHelper(smpl, dbName, varname, freq, hasSigil, rhsExpression);
-        //    return iv;
-        //}
-
         public static IVariable Dollar(GekkoSmpl smpl, IVariable x, IVariable logical)
         {
             //logical is 1 for true, and false otherwise
@@ -655,6 +631,24 @@ namespace Gekko
             {
                 DollarLHSError();
             }
+        }
+
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression)
+        {
+            ScalarString x2 = x as ScalarString;
+            if (x2 == null)
+            {
+                G.Writeln2("*** ERROR: Var type error when looking up in databank");
+                throw new GekkoException();
+            }
+            else
+            {
+                string dbName, varName, freq; char firstChar; Chop(x2._string2, out dbName, out varName, out freq);
+                //bool hasSigil = false; if (varName[0] == Globals.symbolMemvar || varName[0] == Globals.symbolList) hasSigil = true;
+                IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression);
+                return iv;
+            }
+            return x;
         }
 
         public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression)
@@ -1105,16 +1099,15 @@ namespace Gekko
                     break;
             }
         }
-
         
-        private static string DecorateWithTilde(string varName, string freq)
-        {
-            if (varName[0] != Globals.symbolMemvar && varName[0] != Globals.symbolList)
-            {
-                if (freq == null) varName += Globals.symbolTilde + G.GetFreq(Program.options.freq);
-            }
-            return varName;
-        }
+        //private static string DecorateWithTilde(string varName, string freq)
+        //{
+        //    if (varName[0] != Globals.symbolMemvar && varName[0] != Globals.symbolList)
+        //    {
+        //        if (freq == null) varName += Globals.symbolTilde + G.GetFreq(Program.options.freq);
+        //    }
+        //    return varName;
+        //}
 
         private static TimeSeries GetLeftSideVariable(string dbName, string varName)
         {
@@ -1159,7 +1152,7 @@ namespace Gekko
                 varName = ss2[0];
                 freq = ss2[1];
             }
-            varName = DecorateWithTilde(varName, freq);
+            //varName = DecorateWithTilde(varName, freq);
         }
 
         public static void HandleIndexerHelper(int depth, IVariable y, params IVariable[] x)

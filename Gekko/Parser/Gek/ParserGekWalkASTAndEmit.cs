@@ -969,14 +969,14 @@ namespace Gekko.Parser.Gek
                             
                         }
                         break;
-                    case "ASTCURLYSIMPLE":
-                        {                            
-                            //node[0].Code = null;  //clearing this
-                            node[0].Code = new GekkoSB();  //has a null inside as storage
-                            HandleScalar(node[0], true, w);
-                            node.Code.CA(node[0].Code);                         
-                        }
-                        break;
+                    //case "ASTCURLYSIMPLE":
+                    //    {                            
+                    //        //node[0].Code = null;  //clearing this
+                    //        node[0].Code = new GekkoSB();  //has a null inside as storage
+                    //        HandleScalar(node[0], true, w);
+                    //        node.Code.CA(node[0].Code);                         
+                    //    }
+                    //    break;
                     case "ASTEXPRESSION":
                         {
                             node.Code.CA(node[0].Code);
@@ -2542,68 +2542,68 @@ namespace Gekko.Parser.Gek
                             }
                         }
                         break;
-                    case "ASTLISTITEM":
-                        {                           
+                    //case "ASTLISTITEM":
+                    //    {                           
 
-                            List<string> ss = new List<string>();
-                            string number = "";
-                            if (node.Parent.Text == "ASTLISTITEMS0") number = "0";
-                            else if (node.Parent.Text == "ASTLISTITEMS1") number = "1";
-                            else if (node.Parent.Text == "ASTLISTITEMS2") number = "2";
-                            if (node.ChildrenCount() > 1)
-                            {
-                                G.Writeln2("*** ERROR: Unexpexted error #78963456");
-                                throw new GekkoException();
-                            }
+                    //        List<string> ss = new List<string>();
+                    //        string number = "";
+                    //        if (node.Parent.Text == "ASTLISTITEMS0") number = "0";
+                    //        else if (node.Parent.Text == "ASTLISTITEMS1") number = "1";
+                    //        else if (node.Parent.Text == "ASTLISTITEMS2") number = "2";
+                    //        if (node.ChildrenCount() > 1)
+                    //        {
+                    //            G.Writeln2("*** ERROR: Unexpexted error #78963456");
+                    //            throw new GekkoException();
+                    //        }
 
-                            ASTNode child = node[0];  //child is the variable, not the bank
+                    //        ASTNode child = node[0];  //child is the variable, not the bank
 
-                            string listNameCs = "o" + Num(child) + ".listItems" + number;
+                    //        string listNameCs = "o" + Num(child) + ".listItems" + number;
 
-                            if (child.Text == "ASTNAMEWITHBANK")
-                            {
-                                //a
-                                //b:a
-                                node.Code.CA(listNameCs + ".AddRange(O.GetList(" + AstBankHelper(child, w, 1) + "));" + G.NL);
-                            }
-                            else if (child.Text == "ASTLISTITEMWILDRANGE")
-                            {
-                                //f*nz
-                                node.Code.CA(listNameCs + ".Add(O.GetString(" + child.Code + "));" + G.NL);
-                            }
-                            else if ((child.Text == "NEGATE" && child.ChildrenCount() > 0 && child[0].Text == "ASTNAMEWITHBANK"))
-                            {
-                                //-a
-                                node.Code.CA(listNameCs + ".AddRange(O.GetList(" + AstBankHelper(child, w, 2) + "));" + G.NL);
-                            }
-                            else if (child.Text == "ASTLISTWITHBANK")
-                            {
-                                //bank2:#m, interpreted as bank2:m1, bank2:m2, bank2:m3, ...
-                                node.Code.CA(listNameCs + ".AddRange(O.GetList(" + AstBankHelperList(child, w) + "));" + G.NL);
-                            }
-                            else
-                            {
-                                //expression, for instance
-                                //'a'
-                                //'b:a'
-                                //#m[2]
-                                node.Code.CA(listNameCs + ".AddRange(O.GetList(" + child.Code + "));" + G.NL);
-                            }
+                    //        if (child.Text == "ASTNAMEWITHBANK")
+                    //        {
+                    //            //a
+                    //            //b:a
+                    //            node.Code.CA(listNameCs + ".AddRange(O.GetList(" + AstBankHelper(child, w, 1) + "));" + G.NL);
+                    //        }
+                    //        else if (child.Text == "ASTLISTITEMWILDRANGE")
+                    //        {
+                    //            //f*nz
+                    //            node.Code.CA(listNameCs + ".Add(O.GetString(" + child.Code + "));" + G.NL);
+                    //        }
+                    //        else if ((child.Text == "NEGATE" && child.ChildrenCount() > 0 && child[0].Text == "ASTNAMEWITHBANK"))
+                    //        {
+                    //            //-a
+                    //            node.Code.CA(listNameCs + ".AddRange(O.GetList(" + AstBankHelper(child, w, 2) + "));" + G.NL);
+                    //        }
+                    //        else if (child.Text == "ASTLISTWITHBANK")
+                    //        {
+                    //            //bank2:#m, interpreted as bank2:m1, bank2:m2, bank2:m3, ...
+                    //            node.Code.CA(listNameCs + ".AddRange(O.GetList(" + AstBankHelperList(child, w) + "));" + G.NL);
+                    //        }
+                    //        else
+                    //        {
+                    //            //expression, for instance
+                    //            //'a'
+                    //            //'b:a'
+                    //            //#m[2]
+                    //            node.Code.CA(listNameCs + ".AddRange(O.GetList(" + child.Code + "));" + G.NL);
+                    //        }
                                                         
-                            //Node always has one child here, so this is not used anymore
-                            //string cs = null;
-                            //if (node[0].Text == "ASTNAMEWITHBANK")
-                            //{
-                            //    cs = AstBankHelper(node[0], w, 1);
-                            //}
-                            //else
-                            //{
-                            //    cs = node[0].Code.ToString();
-                            //}
-                            //node.Code.A("o" + Num(node) + ".listItems" + number + " = O.AddBankToListItems(o" + Num(node) + ".listItems" + number + ", O.GetString(" + cs + "));" + G.NL);
+                    //        //Node always has one child here, so this is not used anymore
+                    //        //string cs = null;
+                    //        //if (node[0].Text == "ASTNAMEWITHBANK")
+                    //        //{
+                    //        //    cs = AstBankHelper(node[0], w, 1);
+                    //        //}
+                    //        //else
+                    //        //{
+                    //        //    cs = node[0].Code.ToString();
+                    //        //}
+                    //        //node.Code.A("o" + Num(node) + ".listItems" + number + " = O.AddBankToListItems(o" + Num(node) + ".listItems" + number + ", O.GetString(" + cs + "));" + G.NL);
                             
-                        }
-                        break;
+                    //    }
+                    //    break;
                     case "ASTLISTITEMS":
                         {
                             node.Code.A("o" + Num(node) + ".listItems = new List<string>();" + G.NL);
@@ -2630,11 +2630,11 @@ namespace Gekko.Parser.Gek
                         break;          
                     case "ASTLISTPREFIX":
                         {
-                            if (node.ChildrenCount() == 1 && node[0].Text == "ASTNAMEWITHBANK")
-                            {
-                                node.Code.CA("o" + Num(node[0]) + ".listPrefix = O.GetString(" + AstBankHelper(node[0], w, 1) + ");" + G.NL);
-                            }
-                            else
+                            //if (node.ChildrenCount() == 1 && node[0].Text == "ASTNAMEWITHBANK")
+                            //{
+                            //    node.Code.CA("o" + Num(node[0]) + ".listPrefix = O.GetString(" + AstBankHelper(node[0], w, 1) + ");" + G.NL);
+                            //}
+                            //else
                             {
                                 node.Code.A("o" + Num(node) + ".listPrefix = O.GetString(" + node[0].Code + ");" + G.NL);
                             }
@@ -2642,11 +2642,11 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTLISTSUFFIX":
                         {
-                            if (node.ChildrenCount() == 1 && node[0].Text == "ASTNAMEWITHBANK")
-                            {
-                                node.Code.CA("o" + Num(node[0]) + ".listSuffix = O.GetString(" + AstBankHelper(node[0], w, 1) + ");" + G.NL);
-                            }
-                            else
+                            //if (node.ChildrenCount() == 1 && node[0].Text == "ASTNAMEWITHBANK")
+                            //{
+                            //    node.Code.CA("o" + Num(node[0]) + ".listSuffix = O.GetString(" + AstBankHelper(node[0], w, 1) + ");" + G.NL);
+                            //}
+                            //else
                             {
                                 node.Code.A("o" + Num(node) + ".listSuffix = O.GetString(" + node[0].Code + ");" + G.NL);
                             }
@@ -2654,11 +2654,11 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTLISTSTRIP":
                         {
-                            if (node.ChildrenCount() == 1 && node[0].Text == "ASTNAMEWITHBANK")
-                            {
-                                node.Code.CA("o" + Num(node[0]) + ".listStrip = O.GetString(" + AstBankHelper(node[0], w, 1) + ");" + G.NL);
-                            }
-                            else
+                            //if (node.ChildrenCount() == 1 && node[0].Text == "ASTNAMEWITHBANK")
+                            //{
+                            //    node.Code.CA("o" + Num(node[0]) + ".listStrip = O.GetString(" + AstBankHelper(node[0], w, 1) + ");" + G.NL);
+                            //}
+                            //else
                             {
                                 node.Code.A("o" + Num(node) + ".listStrip = O.GetString(" + node[0].Code + ");" + G.NL);
                             }
@@ -2796,11 +2796,11 @@ namespace Gekko.Parser.Gek
 
                             //Check if it is a function variable
 
-
                             bool functionHit = false;
-                            if (node[0][0] == null)
+                            if (node[0][0] == null && node[1][2][0] == null)  //no bank and no freq indicator
                             {
-                                if (node[1][1][0].Text == "ASTNAME" && node[1][1][0][0].Text == "ASTIDENT")
+                                //#746384984 merge these in a method
+                                if (node[1][1][0].Text == "ASTNAME" && node[1][1][0].ChildrenCount() == 1 && node[1][1][0][0].Text == "ASTIDENT")
                                 {
                                     string sigil = GetSigilAsString(node[1][0]);
                                     string ident = node[1][1][0][0][0].Text;
@@ -2837,12 +2837,10 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
-                                    if (node[0][0].Text == "ASTNAME")
+                                    //#746384984 merge these in a method
+                                    if (node[0][0].Text == "ASTNAME" && node[0][0].ChildrenCount() == 1 && node[0][0][0].Text == "ASTIDENT")
                                     {
-                                        if (node[0][0][0].Text == "ASTIDENT")
-                                        {
-                                            simpleBank = node[0][0][0][0].Text;
-                                        }
+                                        simpleBank = node[0][0][0][0].Text;
                                     }
                                 }
 
@@ -2851,13 +2849,11 @@ namespace Gekko.Parser.Gek
 
                                 //Check name
                                 string simpleName = null;
-                                if (node[1][1][0].Text == "ASTNAME")
+                                //#746384984 merge these in a method
+                                if (node[1][1][0].Text == "ASTNAME" && node[1][1][0].ChildrenCount() == 1 && node[1][1][0][0].Text == "ASTIDENT")
                                 {
-                                    if (node[1][1][0][0].Text == "ASTIDENT")
-                                    {
-                                        simpleName = node[1][1][0][0][0].Text;
-                                    }
-                                }
+                                    simpleName = node[1][1][0][0][0].Text;
+                                }                                
 
                                 //Check frequency
                                 string simpleFreq = null;
@@ -2867,12 +2863,10 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
-                                    if (node[1][2][0].Text == "ASTNAME")
+                                    //#746384984 merge these in a method
+                                    if (node[1][2][0].Text == "ASTNAME" && node[1][2][0].ChildrenCount() == 1 && node[1][2][0][0].Text == "ASTIDENT")
                                     {
-                                        if (node[1][2][0][0].Text == "ASTIDENT")
-                                        {
-                                            simpleFreq = node[1][2][0][0][0].Text;
-                                        }
+                                        simpleFreq = node[1][2][0][0][0].Text;
                                     }
                                 }
 
@@ -3035,64 +3029,64 @@ namespace Gekko.Parser.Gek
                             }
                         }
                         break;
-                    case "ASTLISTWITHBANK":
-                        {
-                            node.Code.A(AstBankHelperList(node, w));
-                        }
-                        break;
-                    case "ASTNAMEWITHBANK":
-                        {
-                            if (Globals.version24)
-                            {
+                    //case "ASTLISTWITHBANK":
+                    //    {
+                    //        node.Code.A(AstBankHelperList(node, w));
+                    //    }
+                    //    break;
+                    //case "ASTNAMEWITHBANK":
+                    //    {
+                    //        if (Globals.version24)
+                    //        {
 
-                            }
-                            else
-                            {
+                    //        }
+                    //        else
+                    //        {
 
-                                //Must always have 2 children, ASTBANK and ASTNAMEWITHDOT
-                                string lagTypeCs = null;
-                                if (node[1].Text == "ASTNAMEWITHDOT")  //probably is always so, but we check it.
-                                {
-                                    if (Globals.useDotFunctionalityInParser)
-                                    {
-                                        lagTypeCs = node[1].dotNumber;
-                                    }
-                                }
+                    //            //Must always have 2 children, ASTBANK and ASTNAMEWITHDOT
+                    //            string lagTypeCs = null;
+                    //            if (node[1].Text == "ASTNAMEWITHDOT")  //probably is always so, but we check it.
+                    //            {
+                    //                if (Globals.useDotFunctionalityInParser)
+                    //                {
+                    //                    lagTypeCs = node[1].dotNumber;
+                    //                }
+                    //            }
 
-                                if (node[0].ChildrenCount() == 0 && node[1].ChildrenCount() == 1 && node[1][0].Text == "ASTNAME" && node[1][0].ChildrenCount() == 1 && node[1][0][0].Text == "ASTSCALAR")
-                                {
-                                    G.Writeln2("*** ERROR #24737643");
-                                    throw new GekkoException();
-                                    ////For instance this structure corresponding to "%b". This is interpreted as a VAL scalar even though it might be a STRING scalar pointing to a timeseries.
-                                    ////ASTNAMEWITHBANK
-                                    ////  ASTBANK
-                                    ////  ASTNAMEWITHDOT
-                                    ////    ASTNAME
-                                    ////      ASTSCALAR
-                                    ////        ASTPERCENTNAMESIMPLE
-                                    ////          b
-                                    //node[1][0][0].Code = null;  //sub-nodes have been visited: this result gets overridden
-                                    //HandleScalar(node[1][0][0], false, wh2);
-                                    //node.Code.CA(node[1][0][0].Code;                                
-                                }
-                                else
-                                {
+                    //            if (node[0].ChildrenCount() == 0 && node[1].ChildrenCount() == 1 && node[1][0].Text == "ASTNAME" && node[1][0].ChildrenCount() == 1 && node[1][0][0].Text == "ASTSCALAR")
+                    //            {
+                    //                G.Writeln2("*** ERROR #24737643");
+                    //                throw new GekkoException();
+                    //                ////For instance this structure corresponding to "%b". This is interpreted as a VAL scalar even though it might be a STRING scalar pointing to a timeseries.
+                    //                ////ASTNAMEWITHBANK
+                    //                ////  ASTBANK
+                    //                ////  ASTNAMEWITHDOT
+                    //                ////    ASTNAME
+                    //                ////      ASTSCALAR
+                    //                ////        ASTPERCENTNAMESIMPLE
+                    //                ////          b
+                    //                //node[1][0][0].Code = null;  //sub-nodes have been visited: this result gets overridden
+                    //                //HandleScalar(node[1][0][0], false, wh2);
+                    //                //node.Code.CA(node[1][0][0].Code;                                
+                    //            }
+                    //            else
+                    //            {
 
-                                    string code = AstBankHelper(node, w, 0);
-                                    if (Globals.useDotFunctionalityInParser && lagTypeCs != null)
-                                    {
-                                        //This is a fY.1 type of variable.
-                                        //Why does this work, and why is 'code' not used??
-                                        node.Code.CA("O.Indexer(smpl, " + node.Code + ", false, " + lagTypeCs + ")");
-                                    }
-                                    else
-                                    {
-                                        node.Code.A(code);
-                                    }
-                                }
-                            }
-                        }
-                        break;
+                    //                string code = AstBankHelper(node, w, 0);
+                    //                if (Globals.useDotFunctionalityInParser && lagTypeCs != null)
+                    //                {
+                    //                    //This is a fY.1 type of variable.
+                    //                    //Why does this work, and why is 'code' not used??
+                    //                    node.Code.CA("O.Indexer(smpl, " + node.Code + ", false, " + lagTypeCs + ")");
+                    //                }
+                    //                else
+                    //                {
+                    //                    node.Code.A(code);
+                    //                }
+                    //            }
+                    //        }
+                    //    }
+                    //    break;
                     case "ASTNO":
                         {
                             node.Code.CA("new ScalarString(`no`)");
@@ -3860,7 +3854,10 @@ namespace Gekko.Parser.Gek
                             if (child.Text == "ASTNAMEWITHBANK")
                             {
                                 //Same logic as ASTLISTITEMS, where "LIST a" is parsed as an expression but translated into 'a' in the parser.
-                                node.Code.A("o" + Num(node) + ".variable = O.GetString(" + AstBankHelper(child, w, 1) + ");" + G.NL);
+                                //node.Code.A("o" + Num(node) + ".variable = O.GetString(" + AstBankHelper(child, w, 1) + ");" + G.NL);
+
+                            //TODO: implement this
+
                             }
                             else
                             {
@@ -4055,11 +4052,11 @@ namespace Gekko.Parser.Gek
                             o.Exe();                            
                         }
                         break;
-                    case "ASTSCALAR":
-                        {
-                            HandleScalar(node, false, w);                            
-                        }
-                        break;
+                    //case "ASTSCALAR":
+                    //    {
+                    //        HandleScalar(node, false, w);                            
+                    //    }
+                    //    break;
                     case "ASTSTAMP":
                         {
                             node.Code.A("Program.Stamp();" + G.NL);
@@ -5061,110 +5058,110 @@ namespace Gekko.Parser.Gek
             return s;
         }
 
-        private static void HandleScalar(ASTNode node, bool isCurlyWithoutPercent, W w)
-        {
-            bool stringify = false;
-            if (node.ChildrenCount() > 0 && (node[0].Text == "ASTDOLLARPERCENTNAMESIMPLE" || node[0].Text == "ASTDOLLARPERCENTPAREN")) stringify = true;
+        //private static void HandleScalar(ASTNode node, bool isCurlyWithoutPercent, W w)
+        //{
+        //    bool stringify = false;
+        //    if (node.ChildrenCount() > 0 && (node[0].Text == "ASTDOLLARPERCENTNAMESIMPLE" || node[0].Text == "ASTDOLLARPERCENTPAREN")) stringify = true;
             
-            bool transformationAllowed = true;
-            bool isPartOfComposedName = false;
+        //    bool transformationAllowed = true;
+        //    bool isPartOfComposedName = false;
             
-            if ((node.Number == 1 && node.Parent.Text == "ASTNAMEWITHBANK") 
-                || node.Parent.Text == "ASTNAME"
-                || node.Parent.Text == "ASTCURLY"
-                || node.Parent.Text == "ASTCURLYSIMPLE")
-            {
-                //For instance base:%s. If %s is NAME 'fy', this would be equal to base:fy.                            
-                //In that case, O.GetScalar must not be allowed to transform the string/name into a timeseries,
-                //because we are going to look up the timeseries in the databank (in the example: base databank).
-                //Therefore we call an overload of O.GetScalar()
-                transformationAllowed = false;
-            }
+        //    if ((node.Number == 1 && node.Parent.Text == "ASTNAMEWITHBANK") 
+        //        || node.Parent.Text == "ASTNAME"
+        //        || node.Parent.Text == "ASTCURLY"
+        //        || node.Parent.Text == "ASTCURLYSIMPLE")
+        //    {
+        //        //For instance base:%s. If %s is NAME 'fy', this would be equal to base:fy.                            
+        //        //In that case, O.GetScalar must not be allowed to transform the string/name into a timeseries,
+        //        //because we are going to look up the timeseries in the databank (in the example: base databank).
+        //        //Therefore we call an overload of O.GetScalar()
+        //        transformationAllowed = false;
+        //    }
 
-            if (Globals.nameFix)
-            {
-                if (node.Parent.Text == "ASTLISTITEM")
-                {
-                    transformationAllowed = false;
-                }                
-            }
+        //    if (Globals.nameFix)
+        //    {
+        //        if (node.Parent.Text == "ASTLISTITEM")
+        //        {
+        //            transformationAllowed = false;
+        //        }                
+        //    }
 
-            if ((node.Parent.Text == "ASTNAME" && node.Parent.ChildrenCount() > 1)
-                || (node.Parent.Text == "ASTCURLY" && node.Parent.ChildrenCount() == 1))
-            {
-                isPartOfComposedName = true; //composed names cannot be looked up in cache                                            
-            }
+        //    if ((node.Parent.Text == "ASTNAME" && node.Parent.ChildrenCount() > 1)
+        //        || (node.Parent.Text == "ASTCURLY" && node.Parent.ChildrenCount() == 1))
+        //    {
+        //        isPartOfComposedName = true; //composed names cannot be looked up in cache                                            
+        //    }
             
-            string scalarSimpleIdent = null;
-            if (isCurlyWithoutPercent)
-            {
-                // {s}
-                scalarSimpleIdent = node.Text;
-            }
-            else
-            {
-                if (node[0].Text == "ASTPERCENTNAMESIMPLE" || node[0].Text == "ASTDOLLARPERCENTNAMESIMPLE")
-                {
-                    // %s, not %(...), the %s may be inside {} like {%s}
-                    scalarSimpleIdent = node[0][0].Text;
-                }
-            }
+        //    string scalarSimpleIdent = null;
+        //    if (isCurlyWithoutPercent)
+        //    {
+        //        // {s}
+        //        scalarSimpleIdent = node.Text;
+        //    }
+        //    else
+        //    {
+        //        if (node[0].Text == "ASTPERCENTNAMESIMPLE" || node[0].Text == "ASTDOLLARPERCENTNAMESIMPLE")
+        //        {
+        //            // %s, not %(...), the %s may be inside {} like {%s}
+        //            scalarSimpleIdent = node[0][0].Text;
+        //        }
+        //    }
 
-            if (scalarSimpleIdent != null)
-            {
-                //either {s} or %s
-                string fa = FindFunctionArguments(node, w, scalarSimpleIdent);
-                if (fa != null)
-                {
-                    node.Code.A(fa);  //????????? What is this????????
-                }
-                else
-                {                   
+        //    if (scalarSimpleIdent != null)
+        //    {
+        //        //either {s} or %s
+        //        string fa = FindFunctionArguments(node, w, scalarSimpleIdent);
+        //        if (fa != null)
+        //        {
+        //            node.Code.A(fa);  //????????? What is this????????
+        //        }
+        //        else
+        //        {                   
 
-                    //hmmm why do we have isPartOfComposedName and transformationAllowed at the same time
-                    //is it not the same thing?
+        //            //hmmm why do we have isPartOfComposedName and transformationAllowed at the same time
+        //            //is it not the same thing?
 
-                    if (!isPartOfComposedName && w.wh.localStatementCache != null)
-                    {
-                        //not for instance a%s or %(%s) but clean %s, and part of GENR statement                        
-                        //In that case, we look for the variable in the local GENR cache
-                        string refCode = "ts" + ++Globals.counter;
+        //            if (!isPartOfComposedName && w.wh.localStatementCache != null)
+        //            {
+        //                //not for instance a%s or %(%s) but clean %s, and part of GENR statement                        
+        //                //In that case, we look for the variable in the local GENR cache
+        //                string refCode = "ts" + ++Globals.counter;
 
-                        string fallBackCode = null;
+        //                string fallBackCode = null;
 
-                        string t = "false";
-                        if (transformationAllowed) t = "true";
-                        string s = "false";
-                        if (stringify) s = "true";
+        //                string t = "false";
+        //                if (transformationAllowed) t = "true";
+        //                string s = "false";
+        //                if (stringify) s = "true";
 
-                        fallBackCode = "O.GetScalar(`" + scalarSimpleIdent + "`, " + t + ", " + s + ")";
+        //                fallBackCode = "O.GetScalar(`" + scalarSimpleIdent + "`, " + t + ", " + s + ")";
                         
-                        string xx = null; w.wh.localStatementCache.TryGetValue(fallBackCode, out xx);
-                        if (xx != null)
-                        {
-                            //This complicated timeseries (or scalar) has been seen before in this particular GENR statement                        
-                            node.Code.CA(xx);
-                        }
-                        else
-                        {
-                            //has not been seen before
-                            w.wh.localStatementCache.Add(fallBackCode, refCode);
-                            node.Code.CA(refCode);
-                        }
-                    }
-                    else
-                    {
-                        string notUsed = null;
-                        node.Code.A(CacheRefScalarCs(out notUsed, scalarSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.OnRightHandSide, null, false, transformationAllowed, stringify));
-                    }
-                }
-            }
-            else
-            {
-                //not {s} or {%s}, but something like {%s1+%s2}
-                node.Code.A("O.ZScalar(" + node[0].Code + ")");
-            }
-        }
+        //                string xx = null; w.wh.localStatementCache.TryGetValue(fallBackCode, out xx);
+        //                if (xx != null)
+        //                {
+        //                    //This complicated timeseries (or scalar) has been seen before in this particular GENR statement                        
+        //                    node.Code.CA(xx);
+        //                }
+        //                else
+        //                {
+        //                    //has not been seen before
+        //                    w.wh.localStatementCache.Add(fallBackCode, refCode);
+        //                    node.Code.CA(refCode);
+        //                }
+        //            }
+        //            else
+        //            {
+        //                string notUsed = null;
+        //                node.Code.A(CacheRefScalarCs(out notUsed, scalarSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.OnRightHandSide, null, false, transformationAllowed, stringify));
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        //not {s} or {%s}, but something like {%s1+%s2}
+        //        node.Code.A("O.ZScalar(" + node[0].Code + ")");
+        //    }
+        //}
 
         //This method converts a simple scalar like '%s' into a reference to 'scalar117' (global IVariable), via the method O.GetScalarFromCache()
         private static string CacheRefScalarCs(out string scalarNameInGlobalCache, string scalarSimpleIdent, GekkoDictionary<string, string> scalarCache, StringBuilder headerCs, EScalarRefType type, string rhsCs, bool isName, bool transformationAllowed, bool stringify)
@@ -5235,165 +5232,165 @@ namespace Gekko.Parser.Gek
         }
 
 
-        private static string AstBankHelperList(ASTNode node, W wh2)
-        {
-            string bankNumberCode = null;
-            if (wh2.wh.currentCommand == "ASTPRT")
-            {
-                bankNumberCode = "bankNumber";
-            }
-            else
-            {
-                bankNumberCode = "1";  //default: Work
-            }
-            string code = "O.GetListWithBankPrefix(" + node[0].Code + ", " + node[1].Code + ", " + bankNumberCode + ")";            
-            return code;
-        }
+        //private static string AstBankHelperList(ASTNode node, W wh2)
+        //{
+        //    string bankNumberCode = null;
+        //    if (wh2.wh.currentCommand == "ASTPRT")
+        //    {
+        //        bankNumberCode = "bankNumber";
+        //    }
+        //    else
+        //    {
+        //        bankNumberCode = "1";  //default: Work
+        //    }
+        //    string code = "O.GetListWithBankPrefix(" + node[0].Code + ", " + node[1].Code + ", " + bankNumberCode + ")";            
+        //    return code;
+        //}
         
 
-        private static string AstBankHelper(ASTNode node, W wh2, int type)
-        {
-            string isLhsSoCanAutoCreate = null;
-            if ((node.Number == 1 && (node.Parent.Text == "ASTGENR" || node.Parent.Text == "ASTGENRLHSFUNCTION")) || node.Parent.Text == "ASTTUPLEITEM" ||  wh2.wh.seriesHelper == WalkHelper.seriesType.SeriesLhs)
-            {
-                isLhsSoCanAutoCreate = ", O.ECreatePossibilities.Can";
-            }
-            else if (node.Number == 0 && node.Parent.Text == "ASTCREATEEXPRESSION")
-            {
-                isLhsSoCanAutoCreate = ", O.ECreatePossibilities.Must";
-            }
+        //private static string AstBankHelper(ASTNode node, W wh2, int type)
+        //{
+        //    string isLhsSoCanAutoCreate = null;
+        //    if ((node.Number == 1 && (node.Parent.Text == "ASTGENR" || node.Parent.Text == "ASTGENRLHSFUNCTION")) || node.Parent.Text == "ASTTUPLEITEM" ||  wh2.wh.seriesHelper == WalkHelper.seriesType.SeriesLhs)
+        //    {
+        //        isLhsSoCanAutoCreate = ", O.ECreatePossibilities.Can";
+        //    }
+        //    else if (node.Number == 0 && node.Parent.Text == "ASTCREATEEXPRESSION")
+        //    {
+        //        isLhsSoCanAutoCreate = ", O.ECreatePossibilities.Must";
+        //    }
             
-            string bankNumberCode = null;
-            if (wh2.wh.currentCommand == "ASTPRT" || wh2.wh.currentCommand == "ASTTABLESETVALUES")
-            {
-                bankNumberCode = "bankNumber";
-            }
-            else
-            {
-                bankNumberCode = "1";  //default: Work
-            }
+        //    string bankNumberCode = null;
+        //    if (wh2.wh.currentCommand == "ASTPRT" || wh2.wh.currentCommand == "ASTTABLESETVALUES")
+        //    {
+        //        bankNumberCode = "bankNumber";
+        //    }
+        //    else
+        //    {
+        //        bankNumberCode = "1";  //default: Work
+        //    }
 
-            if (type == 1)
-            {
-                string listFallBackCode = null;
-                if (node[0].ChildrenCount() == 0)
-                {
-                    listFallBackCode = node[1].Code.ToString();  //this is a ScalarString already, and we want to avoid a superfluous 'Work:a' for an 'a' item. So this will run ok fast for simple items.
-                }
-                else
-                {
-                    listFallBackCode = "new ScalarString(O.GetString(" + node[0].Code + ") + `:` + O.GetString(" + node[1].Code + "))";
-                }
-                return listFallBackCode;
-            }
-            else if (type == 2) //minus
-            {
-                string listFallBackCode = null;
-                if (node[0][0].ChildrenCount() == 0)
-                {
-                    listFallBackCode = "O.Add(smpl, new ScalarString(`-`), " + node[0][1].Code + ")";  //this is a ScalarString already, and we want to avoid a superfluous 'Work:a' for an 'a' item. So this will run ok fast for simple items.
-                }
-                else
-                {
-                    listFallBackCode = "new ScalarString(O.GetString(" + node[0][0].Code + ") + `:-` + O.GetString(" + node[0][1].Code + "))";
-                }
-                return listFallBackCode;
-            }
+        //    if (type == 1)
+        //    {
+        //        string listFallBackCode = null;
+        //        if (node[0].ChildrenCount() == 0)
+        //        {
+        //            listFallBackCode = node[1].Code.ToString();  //this is a ScalarString already, and we want to avoid a superfluous 'Work:a' for an 'a' item. So this will run ok fast for simple items.
+        //        }
+        //        else
+        //        {
+        //            listFallBackCode = "new ScalarString(O.GetString(" + node[0].Code + ") + `:` + O.GetString(" + node[1].Code + "))";
+        //        }
+        //        return listFallBackCode;
+        //    }
+        //    else if (type == 2) //minus
+        //    {
+        //        string listFallBackCode = null;
+        //        if (node[0][0].ChildrenCount() == 0)
+        //        {
+        //            listFallBackCode = "O.Add(smpl, new ScalarString(`-`), " + node[0][1].Code + ")";  //this is a ScalarString already, and we want to avoid a superfluous 'Work:a' for an 'a' item. So this will run ok fast for simple items.
+        //        }
+        //        else
+        //        {
+        //            listFallBackCode = "new ScalarString(O.GetString(" + node[0][0].Code + ") + `:-` + O.GetString(" + node[0][1].Code + "))";
+        //        }
+        //        return listFallBackCode;
+        //    }
 
-            string fallBackCode = "O.GetString(" + node[0].Code + ") + `:` + O.GetString(" + node[1].Code + ")";
+        //    string fallBackCode = "O.GetString(" + node[0].Code + ") + `:` + O.GetString(" + node[1].Code + ")";
             
-            string simpleHash = null;
-            //node[1].ChildrenCount() is always > 0
-            if (node[0].ChildrenCount() > 0)
-            {
-                //there is a bank like a:b or %x:b or %x:%y
-                if (node[0][0].nameSimpleIdent != null && node[1][0].nameSimpleIdent != null)
-                {
-                    //simple names like a:b
-                    simpleHash = node[0][0].nameSimpleIdent + ":" + node[1][0].nameSimpleIdent;
-                }
-            }
-            else
-            {
-                //name like a or %x
-                if (node[1][0].nameSimpleIdent != null)
-                {
-                    //simple name like a
-                    simpleHash = node[1][0].nameSimpleIdent;
-                }
-            }
+        //    string simpleHash = null;
+        //    //node[1].ChildrenCount() is always > 0
+        //    if (node[0].ChildrenCount() > 0)
+        //    {
+        //        //there is a bank like a:b or %x:b or %x:%y
+        //        if (node[0][0].nameSimpleIdent != null && node[1][0].nameSimpleIdent != null)
+        //        {
+        //            //simple names like a:b
+        //            simpleHash = node[0][0].nameSimpleIdent + ":" + node[1][0].nameSimpleIdent;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        //name like a or %x
+        //        if (node[1][0].nameSimpleIdent != null)
+        //        {
+        //            //simple name like a
+        //            simpleHash = node[1][0].nameSimpleIdent;
+        //        }
+        //    }
 
-            bool isSimple = false; if (simpleHash != null) isSimple = true;
+        //    bool isSimple = false; if (simpleHash != null) isSimple = true;
                         
-            string code = null;
+        //    string code = null;
             
-            string fa;
-            int choice;
-            GetChoice(node, wh2, simpleHash, isSimple, out fa, out choice);
+        //    string fa;
+        //    int choice;
+        //    GetChoice(node, wh2, simpleHash, isSimple, out fa, out choice);
 
-            if (choice == 1)
-            {
-                node.Code.A(fa);
-            }
-            else if (choice == 2)
-            {
-                //isSimple means that the name is simple like a or b:a.
-                //Then we look for it in the global cache
+        //    if (choice == 1)
+        //    {
+        //        node.Code.A(fa);
+        //    }
+        //    else if (choice == 2)
+        //    {
+        //        //isSimple means that the name is simple like a or b:a.
+        //        //Then we look for it in the global cache
 
-                GekkoDictionary<string, string> tsCache = GetTsCache(wh2);
+        //        GekkoDictionary<string, string> tsCache = GetTsCache(wh2);
 
-                string s = null; tsCache.TryGetValue(simpleHash, out s);
-                if (s == null)
-                {
-                    //has not been seen before
-                    string ivWithNumber = "iv" + ++Globals.counter;
-                    tsCache.Add(simpleHash, ivWithNumber);
-                    GetHeaderCs(wh2).AppendLine("public static IVariable " + ivWithNumber + " = null;");  //cannot set it to ScalarVal since it may change type...                    
-                    node.Code.A("O.GetTimeSeriesFromCache(ref " + ivWithNumber + ", `" + simpleHash + "`, " + bankNumberCode + isLhsSoCanAutoCreate + ")");
-                }
-                else
-                {
-                    node.Code.A("O.GetTimeSeriesFromCache(ref " + s + ", `" + simpleHash + "`, " + bankNumberCode + isLhsSoCanAutoCreate + ")");
-                }
-            }
-            else if (choice == 3)
-            {
-                //This means that the name is complicated like %x or b:%x or %y:a or %x:%y (or fx%i)                
-                if (wh2.wh.seriesHelper != WalkHelper.seriesType.SeriesLhs && wh2.wh.localStatementCache != null)
-                {
-                    //GENR statement for instance, maybe also VAL if indexer fY[2010]??
-                    //This means there is a GENR statement at the top of the AST tree
-                    //In that case, we look for the variable in the local cache
-                    string fallBackCode2 = "O.GetTimeSeries(smpl, " + fallBackCode + ", " + bankNumberCode + isLhsSoCanAutoCreate + ")";  //here, bankNumberCode will always be = "1", since this is not a PRT statement
-                    string xx = null; wh2.wh.localStatementCache.TryGetValue(fallBackCode2, out xx);
-                    if (xx != null)
-                    {
-                        //This complicated timeseries (or scalar) has been seen before in this particular GENR/PRT statement                        
-                        code = xx;                                                
-                    }
-                    else
-                    {
-                        string refCode = "ts" + ++Globals.counter;
-                        wh2.wh.localStatementCache.Add(fallBackCode2, refCode);
-                        code = refCode;
-                    }
-                }
-                else
-                {
-                    if (wh2.wh.seriesHelper == WalkHelper.seriesType.SeriesLhs)
-                    {
-                        node.Code.A("O.FindTimeSeries(" + fallBackCode + ", " + bankNumberCode + isLhsSoCanAutoCreate + ")");
-                    }
-                    else
-                    {
-                        node.Code.A("O.GetTimeSeries(smpl, " + fallBackCode + ", " + bankNumberCode + isLhsSoCanAutoCreate + ")");
-                        //Complicated name, but not inside a GENR statement: just use the statement directly without use of any caches
-                    }
-                }
-            }
-            else throw new GekkoException();
-            return code;
-        }
+        //        string s = null; tsCache.TryGetValue(simpleHash, out s);
+        //        if (s == null)
+        //        {
+        //            //has not been seen before
+        //            string ivWithNumber = "iv" + ++Globals.counter;
+        //            tsCache.Add(simpleHash, ivWithNumber);
+        //            GetHeaderCs(wh2).AppendLine("public static IVariable " + ivWithNumber + " = null;");  //cannot set it to ScalarVal since it may change type...                    
+        //            node.Code.A("O.GetTimeSeriesFromCache(ref " + ivWithNumber + ", `" + simpleHash + "`, " + bankNumberCode + isLhsSoCanAutoCreate + ")");
+        //        }
+        //        else
+        //        {
+        //            node.Code.A("O.GetTimeSeriesFromCache(ref " + s + ", `" + simpleHash + "`, " + bankNumberCode + isLhsSoCanAutoCreate + ")");
+        //        }
+        //    }
+        //    else if (choice == 3)
+        //    {
+        //        //This means that the name is complicated like %x or b:%x or %y:a or %x:%y (or fx%i)                
+        //        if (wh2.wh.seriesHelper != WalkHelper.seriesType.SeriesLhs && wh2.wh.localStatementCache != null)
+        //        {
+        //            //GENR statement for instance, maybe also VAL if indexer fY[2010]??
+        //            //This means there is a GENR statement at the top of the AST tree
+        //            //In that case, we look for the variable in the local cache
+        //            string fallBackCode2 = "O.GetTimeSeries(smpl, " + fallBackCode + ", " + bankNumberCode + isLhsSoCanAutoCreate + ")";  //here, bankNumberCode will always be = "1", since this is not a PRT statement
+        //            string xx = null; wh2.wh.localStatementCache.TryGetValue(fallBackCode2, out xx);
+        //            if (xx != null)
+        //            {
+        //                //This complicated timeseries (or scalar) has been seen before in this particular GENR/PRT statement                        
+        //                code = xx;                                                
+        //            }
+        //            else
+        //            {
+        //                string refCode = "ts" + ++Globals.counter;
+        //                wh2.wh.localStatementCache.Add(fallBackCode2, refCode);
+        //                code = refCode;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (wh2.wh.seriesHelper == WalkHelper.seriesType.SeriesLhs)
+        //            {
+        //                node.Code.A("O.FindTimeSeries(" + fallBackCode + ", " + bankNumberCode + isLhsSoCanAutoCreate + ")");
+        //            }
+        //            else
+        //            {
+        //                node.Code.A("O.GetTimeSeries(smpl, " + fallBackCode + ", " + bankNumberCode + isLhsSoCanAutoCreate + ")");
+        //                //Complicated name, but not inside a GENR statement: just use the statement directly without use of any caches
+        //            }
+        //        }
+        //    }
+        //    else throw new GekkoException();
+        //    return code;
+        //}
 
         private static void GetChoice(ASTNode node, W wh2, string simpleHash, bool isSimple, out string fa, out int choice)
         {
