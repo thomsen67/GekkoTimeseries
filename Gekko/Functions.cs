@@ -185,11 +185,11 @@ namespace Gekko
             tsp2.name = tsp1.name;
             tsq2.name = tsq1.name;
 
-            tsp1.parentDatabank.RemoveVariable(tsp1.name);
-            tsq1.parentDatabank.RemoveVariable(tsq1.name);
+            tsp1.meta.parentDatabank.RemoveVariable(tsp1.name);
+            tsq1.meta.parentDatabank.RemoveVariable(tsq1.name);
 
-            tsp1.parentDatabank.AddVariable(tsp2);
-            tsq1.parentDatabank.AddVariable(tsq2);
+            tsp1.meta.parentDatabank.AddVariable(tsp2);
+            tsq1.meta.parentDatabank.AddVariable(tsq2);
         }
 
         public static GekkoTuple.Tuple2 laspchain(GekkoSmpl smpl, IVariable plist, IVariable xlist, IVariable date)
@@ -1777,15 +1777,15 @@ namespace Gekko
             
             if (G.equal(s2, "label"))
             {
-                return new ScalarString(ts.label);
+                return new ScalarString(ts.meta.label);
             }
             else if (G.equal(s2, "source"))
             {
-                return new ScalarString(ts.source);
+                return new ScalarString(ts.meta.source);
             }
             else if (G.equal(s2, "stamp"))
             {
-                return new ScalarString(ts.stamp);
+                return new ScalarString(ts.meta.stamp);
             }
             else if (G.equal(s2, "perStart"))
             {

@@ -259,8 +259,8 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: #763209485");  //use AddIVariable(x), remember tilde in x.variableName.
                     throw new GekkoException();
-                }
-                ts.parentDatabank = this;
+                }                
+                ts.meta.parentDatabank = this;
                 ts.SetDirty(true);
             }
             this.storage.Add(name, x);
@@ -317,7 +317,7 @@ namespace Gekko
             //if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable); 
             //else variable = Program.AddFreqAtEndOfVariableName(variable, G.GetFreq(ts.freq));                
             this.storage.Add(variable, ts);
-            ts.parentDatabank = this;
+            ts.meta.parentDatabank = this;
             this.isDirty = true;
         }
 

@@ -10895,13 +10895,13 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\meta';");
             I("import<tsd>meta;");
             I("DOC y label='' source='' stamp='';");
-            Assert.AreEqual(First().GetVariable("y").label, "");
-            Assert.AreEqual(First().GetVariable("y").source, "");
-            Assert.AreEqual(First().GetVariable("y").stamp, "");
+            Assert.AreEqual(First().GetVariable("y").meta.label, "");
+            Assert.AreEqual(First().GetVariable("y").meta.source, "");
+            Assert.AreEqual(First().GetVariable("y").meta.stamp, "");
             I("DOC y label='a' source='b' stamp='c';");
-            Assert.AreEqual(First().GetVariable("y").label, "a");
-            Assert.AreEqual(First().GetVariable("y").source, "b");
-            Assert.AreEqual(First().GetVariable("y").stamp, "c");
+            Assert.AreEqual(First().GetVariable("y").meta.label, "a");
+            Assert.AreEqual(First().GetVariable("y").meta.source, "b");
+            Assert.AreEqual(First().GetVariable("y").meta.stamp, "c");
 
             //Testing quarters
             I("RESET;");
@@ -10909,12 +10909,12 @@ namespace UnitTests
             I("CREATE x, y;");
             I("LIST m = x, y;");
             I("DOC work:#m label='a' source='b' stamp='c';");
-            Assert.AreEqual(First().GetVariable("x").label, "a");
-            Assert.AreEqual(First().GetVariable("x").source, "b");
-            Assert.AreEqual(First().GetVariable("x").stamp, "c");
-            Assert.AreEqual(First().GetVariable("y").label, "a");
-            Assert.AreEqual(First().GetVariable("y").source, "b");
-            Assert.AreEqual(First().GetVariable("y").stamp, "c");
+            Assert.AreEqual(First().GetVariable("x").meta.label, "a");
+            Assert.AreEqual(First().GetVariable("x").meta.source, "b");
+            Assert.AreEqual(First().GetVariable("x").meta.stamp, "c");
+            Assert.AreEqual(First().GetVariable("y").meta.label, "a");
+            Assert.AreEqual(First().GetVariable("y").meta.source, "b");
+            Assert.AreEqual(First().GetVariable("y").meta.stamp, "c");
         }
 
         [TestMethod]
@@ -10923,9 +10923,9 @@ namespace UnitTests
             I("reset;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\meta';");
             I("import<tsd>meta;");
-            Assert.AreEqual(First().GetVariable("y").label, "label");
-            Assert.AreEqual(First().GetVariable("y").source, "2/yyyy");
-            Assert.AreEqual(First().GetVariable("y").stamp, "25-12-2015");
+            Assert.AreEqual(First().GetVariable("y").meta.label, "label");
+            Assert.AreEqual(First().GetVariable("y").meta.source, "2/yyyy");
+            Assert.AreEqual(First().GetVariable("y").meta.stamp, "25-12-2015");
             AssertHelper(First(), "y", 1999, double.NaN, 0d);
             AssertHelper(First(), "y", 2000, 1d / 3d, 0.0000001d);
             AssertHelper(First(), "y", 2001, 1d / 3d, 0.0000001d);
@@ -10934,9 +10934,9 @@ namespace UnitTests
             I("export<tsd>metaTemp;");
             I("reset;");
             I("import<tsd>metaTemp;");
-            Assert.AreEqual(First().GetVariable("y").label, "label");
-            Assert.AreEqual(First().GetVariable("y").source, "2/yyyy");
-            Assert.AreEqual(First().GetVariable("y").stamp, "25-12-2015");
+            Assert.AreEqual(First().GetVariable("y").meta.label, "label");
+            Assert.AreEqual(First().GetVariable("y").meta.source, "2/yyyy");
+            Assert.AreEqual(First().GetVariable("y").meta.stamp, "25-12-2015");
             AssertHelper(First(), "y", 1999, double.NaN, 0d);
             AssertHelper(First(), "y", 2000, 1d / 3d, 0.0000001d);
             AssertHelper(First(), "y", 2001, 1d / 3d, 0.0000001d);
@@ -10946,55 +10946,55 @@ namespace UnitTests
 
         private static void MetaHelperLabel()
         {
-            Assert.AreEqual(First().GetVariable("q").label, null);
-            Assert.AreEqual(First().GetVariable("pxnk").label, null);
-            Assert.AreEqual(First().GetVariable("pxnk2").label, null);
-            Assert.AreEqual(First().GetVariable("tg").label, null);
-            Assert.AreEqual(First().GetVariable("Dpxnk").label, null);
-            Assert.AreEqual(First().GetVariable("JRpxnk").label, null);
-            Assert.AreEqual(First().GetVariable("Zpxnk").label, null);
-            Assert.AreEqual(First().GetVariable("extra1").label, null);
-            Assert.AreEqual(First().GetVariable("extra2").label, null);
+            Assert.AreEqual(First().GetVariable("q").meta.label, null);
+            Assert.AreEqual(First().GetVariable("pxnk").meta.label, null);
+            Assert.AreEqual(First().GetVariable("pxnk2").meta.label, null);
+            Assert.AreEqual(First().GetVariable("tg").meta.label, null);
+            Assert.AreEqual(First().GetVariable("Dpxnk").meta.label, null);
+            Assert.AreEqual(First().GetVariable("JRpxnk").meta.label, null);
+            Assert.AreEqual(First().GetVariable("Zpxnk").meta.label, null);
+            Assert.AreEqual(First().GetVariable("extra1").meta.label, null);
+            Assert.AreEqual(First().GetVariable("extra2").meta.label, null);
         }
 
         private static void MetaHelperSourceStamp(string stamp2)
         {
             // endo simul
 
-            Assert.AreEqual(First().GetVariable("q").source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
-            Assert.AreEqual(First().GetVariable("q").stamp, stamp2);  //might fail around midnight!!
+            Assert.AreEqual(First().GetVariable("q").meta.source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
+            Assert.AreEqual(First().GetVariable("q").meta.stamp, stamp2);  //might fail around midnight!!
 
-            Assert.AreEqual(First().GetVariable("pxnk").source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
-            Assert.AreEqual(First().GetVariable("pxnk").stamp, stamp2);  //might fail around midnight!!
+            Assert.AreEqual(First().GetVariable("pxnk").meta.source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
+            Assert.AreEqual(First().GetVariable("pxnk").meta.stamp, stamp2);  //might fail around midnight!!
 
             // endo tablevars
 
-            Assert.AreEqual(First().GetVariable("pxnk2").source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
-            Assert.AreEqual(First().GetVariable("pxnk2").stamp, stamp2);  //might fail around midnight!!
+            Assert.AreEqual(First().GetVariable("pxnk2").meta.source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
+            Assert.AreEqual(First().GetVariable("pxnk2").meta.stamp, stamp2);  //might fail around midnight!!
 
             // true exo
 
-            Assert.AreEqual(First().GetVariable("tg").source, "2000-2001: series tg = 0.25");  //is detected as GENR type, nothing to do about that
-            Assert.AreEqual(First().GetVariable("tg").stamp, stamp2);  //might fail around midnight!!
+            Assert.AreEqual(First().GetVariable("tg").meta.source, "2000-2001: series tg = 0.25");  //is detected as GENR type, nothing to do about that
+            Assert.AreEqual(First().GetVariable("tg").meta.stamp, stamp2);  //might fail around midnight!!
 
             // exo DJZ
 
-            Assert.AreEqual(First().GetVariable("Dpxnk").source, null);
-            Assert.AreEqual(First().GetVariable("Dpxnk").stamp, null);
+            Assert.AreEqual(First().GetVariable("Dpxnk").meta.source, null);
+            Assert.AreEqual(First().GetVariable("Dpxnk").meta.stamp, null);
 
-            Assert.AreEqual(First().GetVariable("JRpxnk").source, null);
-            Assert.AreEqual(First().GetVariable("JRpxnk").stamp, null);
+            Assert.AreEqual(First().GetVariable("JRpxnk").meta.source, null);
+            Assert.AreEqual(First().GetVariable("JRpxnk").meta.stamp, null);
 
-            Assert.AreEqual(First().GetVariable("Zpxnk").source, null);
-            Assert.AreEqual(First().GetVariable("Zpxnk").stamp, null);
+            Assert.AreEqual(First().GetVariable("Zpxnk").meta.source, null);
+            Assert.AreEqual(First().GetVariable("Zpxnk").meta.stamp, null);
 
             // Created vars
 
-            Assert.AreEqual(First().GetVariable("extra1").source, "2000-2001: series extra1 = 2, 3");
-            Assert.AreEqual(First().GetVariable("extra1").stamp, stamp2);  //might fail around midnight!!
+            Assert.AreEqual(First().GetVariable("extra1").meta.source, "2000-2001: series extra1 = 2, 3");
+            Assert.AreEqual(First().GetVariable("extra1").meta.stamp, stamp2);  //might fail around midnight!!
 
-            Assert.AreEqual(First().GetVariable("extra2").source, "2000-2001: series extra2 = 1/extra1 + 0.1*extra1[-1]");
-            Assert.AreEqual(First().GetVariable("extra2").stamp, stamp2);  //might fail around midnight!!
+            Assert.AreEqual(First().GetVariable("extra2").meta.source, "2000-2001: series extra2 = 1/extra1 + 0.1*extra1[-1]");
+            Assert.AreEqual(First().GetVariable("extra2").meta.stamp, stamp2);  //might fail around midnight!!
         }
 
         [TestMethod]

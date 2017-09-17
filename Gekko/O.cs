@@ -860,6 +860,7 @@ namespace Gekko
                             throw new GekkoException();
                         }
                         TimeSeries tsLhs = tsRhs.DeepClone() as TimeSeries;  //cannot just refer to it, since it may be y = x, and if we later on change x, y will change too (bad).
+                        if (tsLhs.meta == null) tsLhs.meta = new TimeSeriesMetaInformation();  //it may be cloned from a light TimeSeries
                         tsLhs.name = varnameWithTilde;
                         ib.AddIVariable(varnameWithTilde, tsLhs);
                     }
@@ -2276,9 +2277,8 @@ namespace Gekko
         public static TimeSeries CreateTimeSeriesFromVal(GekkoSmpl smpl, double d)
         {
             TimeSeries tsl = new TimeSeries(smpl.t0.freq, null);
-            tsl.dataArray = new double[GekkoTime.Observations(smpl.t0, smpl.t3)];            
-            tsl.anchorSuperPeriod = smpl.t0.super;
-            tsl.anchorSubPeriod = smpl.t0.sub;
+            tsl.dataArray = new double[GekkoTime.Observations(smpl.t0, smpl.t3)];
+            tsl.anchorPeriod = smpl.t0;
             tsl.anchorPeriodPositionInArray = 0;
             for (int i = 0; i < tsl.dataArray.Length; i++)
             {
@@ -2308,8 +2308,9 @@ namespace Gekko
             TimeSeries tsl = new TimeSeries(smpl.t0.freq, null);
          
             tsl.dataArray = new double[n];
-            tsl.anchorSuperPeriod = smpl.t0.super;
-            tsl.anchorSubPeriod = smpl.t0.sub;
+
+            tsl.anchorPeriod = smpl.t0;
+
             tsl.anchorPeriodPositionInArray = 0;
             for (int i = 0; i < n; i++)
             {
@@ -4125,9 +4126,9 @@ namespace Gekko
                 foreach (string s in listItems0)
                 {
                     ExtractBankAndRestHelper h = Program.ExtractBankAndRest(s, EExtrackBankAndRest.GetDatabankAndTimeSeries);
-                    if (opt_label != null) h.ts.label = opt_label;
-                    if (opt_source != null) h.ts.source = opt_source;
-                    if (opt_stamp != null) h.ts.stamp = opt_stamp;
+                    if (opt_label != null) h.ts.meta.label = opt_label;
+                    if (opt_source != null) h.ts.meta.source = opt_source;
+                    if (opt_stamp != null) h.ts.meta.stamp = opt_stamp;
                     h.ts.SetDirty(true);
                 }
             }         
@@ -4468,11 +4469,11 @@ namespace Gekko
                             TimeSeries ts2 = toBank.GetVariable(newName);
                             if (ts2 != null)
                             {
-                                if (G.equal(ts.parentDatabank.aliasName, ts2.parentDatabank.aliasName))
+                                if (G.equal(ts.meta.parentDatabank.aliasName, ts2.meta.parentDatabank.aliasName))
                                 {
                                     if (G.equal(ts.name, ts2.name))
                                     {
-                                        G.Writeln2("*** ERROR: You are trying to copy the timeseries '" + ts.name + "' from databank '" + ts.parentDatabank.aliasName + "' to itself");
+                                        G.Writeln2("*** ERROR: You are trying to copy the timeseries '" + ts.name + "' from databank '" + ts.meta.parentDatabank.aliasName + "' to itself");
                                         throw new GekkoException();
                                     }
                                 }
@@ -4653,14 +4654,14 @@ namespace Gekko
                     foreach (TimeSeries ts in tss)
                     {
                         //There is probably always only 1 here
-                        if (ts.parentDatabank.ContainsVariable(s2))
+                        if (ts.meta.parentDatabank.ContainsVariable(s2))
                         {
-                            G.Writeln2("*** ERROR: Databank " + ts.parentDatabank.aliasName + " already contains timeseries '" + s2 + "'");
+                            G.Writeln2("*** ERROR: Databank " + ts.meta.parentDatabank.aliasName + " already contains timeseries '" + s2 + "'");
                             throw new GekkoException();
                         }
-                        ts.parentDatabank.RemoveVariable(ts.name);                        
+                        ts.meta.parentDatabank.RemoveVariable(ts.name);                        
                         ts.name = s2;
-                        ts.parentDatabank.AddVariable(ts);
+                        ts.meta.parentDatabank.AddVariable(ts);
                         counter++;
                     }
                 }                
@@ -4687,7 +4688,7 @@ namespace Gekko
             {
                 TimeSeries tlhs = O.GetTimeSeries(lhs);
 
-                Databank bankName = tlhs.parentDatabank;
+                Databank bankName = tlhs.meta.parentDatabank;
                 string varName = tlhs.name;
 
                 TimeSeries trhs = O.GetTimeSeries(rhs);
@@ -4969,7 +4970,7 @@ namespace Gekko
                 {                    
                     //For instance, "SERIES y = 2 * x;" --> meta = "SERIES y = 2 * x" (without the semicolon)    
                     string s = ShowDatesAsString(this.t1, this.t2);
-                    lhs.source = s + this.meta;                    
+                    lhs.meta.source = s + this.meta;                    
                     lhs.SetDirtyGhost(true, false);
                 }
                 lhs.Stamp();
@@ -5004,7 +5005,7 @@ namespace Gekko
                     //this.anchorPeriodPositionInArray = 0;
                     //this.anchorPeriod = smpl.t1;
 
-                    int i = TimeSeries.FromGekkoTimeToArrayIndex(this.t1, new GekkoTime(this.rhs.freq, this.rhs.anchorSubPeriod, this.rhs.anchorSuperPeriod), this.rhs.anchorPeriodPositionInArray);
+                    int i = TimeSeries.FromGekkoTimeToArrayIndex(this.t1, new GekkoTime(this.rhs.freq, this.rhs.anchorPeriod.sub, this.rhs.anchorPeriod.super), this.rhs.anchorPeriodPositionInArray);
                     int n = GekkoTime.Observations(this.t1, this.t2);
 
                     //TODO TODO TODO, should not be possible
@@ -5030,7 +5031,7 @@ namespace Gekko
                 {
                     //For instance, "SERIES y = 2 * x;" --> meta = "SERIES y = 2 * x" (without the semicolon)    
                     string s = ShowDatesAsString(this.t1, this.t2);
-                    lhs.source = s + this.meta;                    
+                    lhs.meta.source = s + this.meta;                    
                     lhs.SetDirtyGhost(true, false);
                 }
                 lhs.Stamp();
@@ -5143,7 +5144,7 @@ namespace Gekko
                     List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(this.listItems[i], opt_bank);
                     foreach (TimeSeries ts in tss)
                     {
-                        if (ts.parentDatabank.protect) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + ts.parentDatabank + ")");
+                        if (ts.meta.parentDatabank.protect) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + ts.meta.parentDatabank + ")");
                         
                         GekkoTime ddate1 = date1;
                         GekkoTime ddate2 = date2;
@@ -5185,12 +5186,12 @@ namespace Gekko
 
                         if (G.isNumericalError(sum))
                         {
-                            G.Writeln2("*** ERROR: Series " + ts.parentDatabank + ":" + ts.name + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " contains missing values");
+                            G.Writeln2("*** ERROR: Series " + ts.meta.parentDatabank + ":" + ts.name + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " contains missing values");
                             throw new GekkoException();
                         }
                         if (sum == 0d)
                         {
-                            G.Writeln2("*** ERROR: Series " + ts.parentDatabank + ":" + ts.name + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " sums to 0, cannot rebase");
+                            G.Writeln2("*** ERROR: Series " + ts.meta.parentDatabank + ":" + ts.name + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " sums to 0, cannot rebase");
                             throw new GekkoException();
                         }                                               
 
@@ -5199,19 +5200,19 @@ namespace Gekko
                         {
                             tsNew = ts.DeepClone() as TimeSeries;
                             tsNew.name = opt_prefix + ts.name;
-                            if (ts.parentDatabank == null)
+                            if (ts.meta.parentDatabank == null)
                             {
                                 G.Writeln2("*** ERROR: Internal error #8796357826435");
                                 throw new GekkoException();
                             }
 
 
-                            if (ts.parentDatabank.ContainsVariable(tsNew.name))
+                            if (ts.meta.parentDatabank.ContainsVariable(tsNew.name))
                             {
-                                ts.parentDatabank.RemoveVariable(tsNew.name);
+                                ts.meta.parentDatabank.RemoveVariable(tsNew.name);
                                 counter++;
                             }
-                            ts.parentDatabank.AddVariable(tsNew);
+                            ts.meta.parentDatabank.AddVariable(tsNew);
                         }
                         else tsNew = ts;
                         

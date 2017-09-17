@@ -2384,7 +2384,7 @@ namespace Gekko
             foreach (TimeSeries ts in db.storage.Values) 
             {
                 if (!merge) ts.SetDirty(false);  //if we are not merging, the bank is comletely new, and the timeseries are all considered clean. When merging, dirt is all over.
-                ts.parentDatabank = db;                
+                ts.meta.parentDatabank = db;                
             }
         }
 
@@ -3085,9 +3085,9 @@ namespace Gekko
                             {
                                 ts = FindOrCreateTimeSeriesInDataBank(databank, varName, freq);
                             }
-                            if (label != null && label != "") ts.label = label;
-                            if (expr != null && expr != "") ts.source = expr;
-                            if (stamp != null && stamp != "") ts.stamp = stamp;
+                            if (label != null && label != "") ts.meta.label = label;
+                            if (expr != null && expr != "") ts.meta.source = expr;
+                            if (stamp != null && stamp != "") ts.meta.stamp = stamp;
                             //datalines = 0;
                             nextState = 3;
                         }
@@ -3746,18 +3746,18 @@ namespace Gekko
                 {
                     string name3 = GetArrayName(tableName, codesCombi[j]);
                     ts = new TimeSeries(G.GetFreq(freq), name3);
-                    ts.label = valuesCombi[j];
-                    ts.source = source;
-                    ts.stamp = Globals.dateStamp;
+                    ts.meta.label = valuesCombi[j];
+                    ts.meta.source = source;
+                    ts.meta.stamp = Globals.dateStamp;
                     ts.SetDirtyGhost(true, false);
                 }
                 else
                 {
                     string name2 = codesCombi[j];
                     ts = new TimeSeries(G.GetFreq(freq), name2);
-                    ts.label = valuesCombi[j];
-                    ts.source = source;
-                    ts.stamp = Globals.dateStamp;
+                    ts.meta.label = valuesCombi[j];
+                    ts.meta.source = source;
+                    ts.meta.stamp = Globals.dateStamp;
                     ts.SetDirtyGhost(true, false);
                 }                
 
@@ -4495,8 +4495,8 @@ namespace Gekko
             double[] dataArray = null;
             if (per1.IsNull() && per2.IsNull())
             {
-                index1 = ts.firstPeriodPositionInArray;
-                index2 = ts.lastPeriodPositionInArray;
+                index1 = ts.meta.firstPeriodPositionInArray;
+                index2 = ts.meta.lastPeriodPositionInArray;
                 dataArray = ts.dataArray;
                 per1 = ts.GetPeriodFirst();
                 per2 = ts.GetPeriodLast();
@@ -4543,9 +4543,9 @@ namespace Gekko
                 sub2 = sub2 + "01";
             }
 
-            if (varName.Length <= 16 && ts.label != null && ts.label.Length > 0)
+            if (varName.Length <= 16 && ts.meta.label != null && ts.meta.label.Length > 0)
             {
-                res.WriteLine(varName + G.Blanks(16 - varName.Length) + ts.label);
+                res.WriteLine(varName + G.Blanks(16 - varName.Length) + ts.meta.label);
             }
             else
             {
@@ -4554,14 +4554,14 @@ namespace Gekko
             }
 
             string stmp = "01/01/00";
-            if (ts.stamp != null && ts.stamp.Length == 10)
+            if (ts.meta.stamp != null && ts.meta.stamp.Length == 10)
             {
                 try
                 {
-                    int i = int.Parse(ts.stamp.Substring(6, 4));
+                    int i = int.Parse(ts.meta.stamp.Substring(6, 4));
                     if (i >= 2000) i = i - 2000;
                     else i = i - 1900;
-                    string temp = ts.stamp.Substring(3, 2) + "/" + ts.stamp.Substring(0, 2) + "/" + i;
+                    string temp = ts.meta.stamp.Substring(3, 2) + "/" + ts.meta.stamp.Substring(0, 2) + "/" + i;
                     if (temp.Length == 8) stmp = temp;
                 }
                 catch
@@ -4569,7 +4569,7 @@ namespace Gekko
                 }
             }
 
-            string src = ts.source;
+            string src = ts.meta.source;
             if (src == null) src = "";
             if (src.Length > 16) src = src.Substring(0, 16);
             else src = src + G.Blanks(16 - src.Length);
@@ -4646,8 +4646,8 @@ namespace Gekko
             double[] dataArray = null;
             if (per1.IsNull() && per2.IsNull())
             {
-                index1 = ts.firstPeriodPositionInArray;
-                index2 = ts.lastPeriodPositionInArray;
+                index1 = ts.meta.firstPeriodPositionInArray;
+                index2 = ts.meta.lastPeriodPositionInArray;
                 dataArray = ts.dataArray;
                 per1 = ts.GetPeriodFirst();
                 per2 = ts.GetPeriodLast();
@@ -8406,8 +8406,8 @@ namespace Gekko
                 TimeSeries ts = Program.databanks.GetFirst().GetVariable(variableNameWithoutLag);
                 if (ts != null)
                 {
-                    string label = ts.label;
-                    string source = ts.source;
+                    string label = ts.meta.label;
+                    string source = ts.meta.source;
                     if (label != null && label.Trim() != "")
                     {
                         ss += "Series label: " + label + "\n";
@@ -13145,7 +13145,7 @@ namespace Gekko
 
                             G.Write(type);
                             string stamp = null;
-                            if (ts.stamp != null && ts.stamp != "") stamp = " (updated: " + ts.stamp + ")";
+                            if (ts.meta.stamp != null && ts.meta.stamp != "") stamp = " (updated: " + ts.meta.stamp + ")";
                             if (ts.freq == EFreq.Annual || ts.freq == EFreq.Undated)
                             {
                                 if (noData || first.super == -12345 || last.super == -12345)
@@ -13185,12 +13185,12 @@ namespace Gekko
                         //ts.expression = "SERIES y = c + i + g;";
                         //ts.stamp = "20-1-2016 10:34";
 
-                        if (ts.label != null) G.Writeln("Series label: " + ts.label);
+                        if (ts.meta.label != null) G.Writeln("Series label: " + ts.meta.label);
 
-                        if (ts.source != null)
+                        if (ts.meta.source != null)
                         {
                             //We keep the SERIES (or SER), there may be options etc. But we capitalize it.
-                            string src2 = ts.source.Trim();
+                            string src2 = ts.meta.source.Trim();
                             if (src2 != "")
                             {
                                 G.Writeln("Series source: " + src2);
@@ -17111,7 +17111,7 @@ namespace Gekko
                     if(b!=-12345) {
                         if (endoNoLagPointers[b] == 1)
                         {
-                            ts.source = src;
+                            ts.meta.source = src;
                             ts.Stamp();                            
                             ts.SetDirtyGhost(true, false);
                         }
@@ -18371,7 +18371,7 @@ namespace Gekko
                 {
                     //For instance, "UPD <p> y = 5, 4, 5;" --> meta = "UPD <p> y = 5, 4, 5"
                     string s = O.ShowDatesAsString(tStart, tEnd);
-                    ts.source = s + o.meta;                    
+                    ts.meta.source = s + o.meta;                    
                     ts.SetDirtyGhost(true, false);
                 }
             }
@@ -21965,8 +21965,8 @@ namespace Gekko
                     }
                     else
                     {
-                        if (ts.parentDatabank.protect) Program.ProtectError("You cannot delete a timeseries in a non-editable databank (" + ts.parentDatabank + ")");
-                        ts.parentDatabank.RemoveVariable(ts.name);
+                        if (ts.meta.parentDatabank.protect) Program.ProtectError("You cannot delete a timeseries in a non-editable databank (" + ts.meta.parentDatabank + ")");
+                        ts.meta.parentDatabank.RemoveVariable(ts.name);
                         counter++;
                     }
                 }
