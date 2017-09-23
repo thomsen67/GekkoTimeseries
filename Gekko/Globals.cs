@@ -182,6 +182,11 @@ namespace Gekko
 
         public static bool patch_zvar = true;
 
+        public static GAMS.GAMSWorkspace gamsWorkspace = null;
+        public static string gamsWorkspaceHelper = null;
+
+        public static int useFastGdxRead = 1;
+
         //public const string symbolTurtle = "¤";
         public const string symbolTurtle = "___";
 
