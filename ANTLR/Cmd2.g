@@ -763,6 +763,7 @@ Y2                    = 'Y2'                       ;
 
     X = 'X';
 	Y = 'Y';
+	
 	MDATEFORMAT = 'MDATEFORMAT';
 	THOUSANDSSEPARATOR = 'THOUSANDSSEPARATOR';
 	XEDIT = 'XEDIT';
@@ -3186,6 +3187,7 @@ optionType :
 			 | GAMS TIME OFFSET '='? Integer -> GAMS TIME OFFSET ^(ASTINTEGER Integer)
 			 | GAMS TIME PREFIX '='? expression -> GAMS TIME PREFIX ^(ASTSTRINGSIMPLE expression)
 			 | GAMS TIME SET '='? expression -> GAMS TIME SET ^(ASTSTRINGSIMPLE expression)			 
+			 | GAMS FAST '='? yesNoSimple -> GAMS FAST ^(ASTBOOL yesNoSimple)
 
 			 | INTERFACE question -> INTERFACE question
              | INTERFACE CLIPBOARD DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CLIPBOARD DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)

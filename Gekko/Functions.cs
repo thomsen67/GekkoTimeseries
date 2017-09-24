@@ -1838,8 +1838,12 @@ namespace Gekko
                 G.Writeln2("*** ERROR: fromSeries(): TimeSeries '" + name + "' could not be found in '" + bank + "'.");
                 throw new GekkoException();
             }
-            
-            if (G.equal(s2, "label"))
+
+            if (G.equal(s2, "name"))
+            {
+                return new ScalarString(ts.variableName);
+            }
+            else if (G.equal(s2, "label"))
             {
                 return new ScalarString(ts.label);
             }
