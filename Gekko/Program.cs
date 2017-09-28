@@ -9661,9 +9661,62 @@ namespace Gekko
             return output;
         }
 
+        private static string ReadFromDb()
+        {
+            return "abcdefghijklmnopqrstuvyxz0123456789abcdefghijklmnopqrstuvyxz0123456789abcdefghijklmnopqrstuvyxz0123456789" + 1;
+        }
+
         public static void Mem(string tpe)
-        {           
-            
+        {
+            if (Globals.runningOnTTComputer)
+            {
+                bool intern = false;
+
+                //REMEMber TO STORE KEYS AS TOLOWER()!!!!!!!!
+                //REMEMber TO STORE KEYS AS TOLOWER()!!!!!!!!
+                //REMEMber TO STORE KEYS AS TOLOWER()!!!!!!!!
+
+                var list = new List<string>();
+
+                for (int i = 0; i < 5 * 1000 * 1000; i++)
+                {
+                    var s = ReadFromDb();
+                    if(intern)list.Add(string.Intern(s));
+                    else list.Add(s);
+                }
+
+                G.Writeln(Process.GetCurrentProcess().PrivateMemorySize64 / 1024 / 1024 + " MB");
+
+
+
+            string a = null;
+                string b = null;
+                if (intern)
+                {
+                    a = string.Intern(ReadFromDb());
+                    b = string.Intern(ReadFromDb());
+                }
+                else
+                {
+                    a = ReadFromDb();
+                    b = ReadFromDb();
+                }
+
+                int equals = 0;
+                var stopwatch = Stopwatch.StartNew();
+                for (int i = 0; i < 250 * 1000 * 1000; i++)
+                {
+                    if (a == b) equals++;
+                }
+                stopwatch.Stop();
+
+                G.Writeln(stopwatch.Elapsed + ", equals: " + equals);
+
+            }
+
+
+
+
             /*
             
             //y = 1 + sum(#i, 2 + b[#i] + sum(#j, 3 + a[#i, #j]))
