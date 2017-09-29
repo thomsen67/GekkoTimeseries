@@ -536,9 +536,9 @@ namespace Gekko
                     TimeSeries logical_series = logical as TimeSeries;
                     foreach (GekkoTime t in smpl.Iterate03())
                     {
-                        if (IsTrue(logical_series.GetData(t)))
+                        if (IsTrue(logical_series.GetData(smpl, t)))
                         {
-                            rv_series.SetData(t, x_series.GetData(t));
+                            rv_series.SetData(t, x_series.GetData(smpl, t));
                         }
                         else
                         {
@@ -552,7 +552,7 @@ namespace Gekko
                     //LIGHTFIXME, could be array copy
                     foreach (GekkoTime t in smpl.Iterate03())
                     {
-                        if (IsTrue(logical_val.val)) rv_series.SetData(t, x_series.GetData(t));
+                        if (IsTrue(logical_val.val)) rv_series.SetData(t, x_series.GetData(smpl, t));
                         else rv_series.SetData(t, 0d);
                     }
                 }
@@ -573,7 +573,7 @@ namespace Gekko
                     rv = rv_series;
                     foreach (GekkoTime t in smpl.Iterate03())
                     {                        
-                        if (IsTrue(logical_series.GetData(t))) rv_series.SetData(t, x_val.val);
+                        if (IsTrue(logical_series.GetData(smpl, t))) rv_series.SetData(t, x_val.val);
                         else rv_series.SetData(t, 0d);
                     }
                 }
@@ -653,8 +653,8 @@ namespace Gekko
 
         public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression)
         {
-            //if map != null, the variable is found in the MAP
-            //otherwise, the variable is found in a databank
+            //map != null:             the variable is found in the MAP, otherwise, the variable is found in a databank
+            //rhsExpression != null:   it is an assignment of the left-hand side
 
             bool hasSigil = false; if (varname[0] == Globals.symbolMemvar || varname[0] == Globals.symbolList) hasSigil = true;
 
@@ -920,7 +920,7 @@ namespace Gekko
                         //LIGHTFIX, speed                         
                         foreach (GekkoTime t in smpl.Iterate03())
                         {
-                            tsLhs.SetData(t, ts.GetData(t));
+                            tsLhs.SetData(t, ts.GetData(smpl, t));
                         }
                     }
                     else if (rhsExpression.Type() == EVariableType.Val)
@@ -1034,7 +1034,7 @@ namespace Gekko
                                     if (iv.Type() == EVariableType.Series)
                                     {
                                         TimeSeries ts = iv as TimeSeries;
-                                        G.Write("    " + ts.GetData(t));
+                                        G.Write("    " + ts.GetData(smpl, t));
                                     }
                                     else if (iv.Type() == EVariableType.Val)
                                     {
@@ -1068,7 +1068,7 @@ namespace Gekko
                             G.Writeln2("SERIES = ");
                             foreach (GekkoTime t in smpl.Iterate03())
                             {
-                                G.Writeln(t.ToString() + "    " + tsl.GetData(t));
+                                G.Writeln(t.ToString() + "    " + tsl.GetData(smpl, t));
                             }
                         }
                         else
@@ -1076,7 +1076,7 @@ namespace Gekko
                             G.Writeln2("SERIES = ");
                             foreach (GekkoTime t in smpl.Iterate03())
                             {
-                                G.Writeln(t.ToString() + "    " + ts.GetData(t));
+                                G.Writeln(t.ToString() + "    " + ts.GetData(smpl, t));
                             }
                         }
                     }
@@ -2155,7 +2155,7 @@ namespace Gekko
                 bool allOk = true;
                 foreach (GekkoTime t in smpl.Iterate12())
                 {
-                    if (IsTrue(ts.GetData(t)))
+                    if (IsTrue(ts.GetData(smpl, t)))
                     {
                         allOk = false;
                         break;
@@ -3571,14 +3571,14 @@ namespace Gekko
                     foreach (GekkoTime gt in new GekkoTimeIterator(realStart, realEnd))
                     {
                         counter++;
-                        double data = oldSeries.GetData(gt);
+                        double data = oldSeries.GetData(null, gt);
                         if (G.isNumericalError(data))
                         {
                             missings.Add(counter);
                             missingsDates.Add(gt);
                             continue;  //ignore this observation
                         }
-                        yy.Add(oldSeries.GetData(gt));
+                        yy.Add(oldSeries.GetData(null, gt));
                         xx.Add(counter);
                     }
 
@@ -3609,7 +3609,7 @@ namespace Gekko
                     bool recording = false;
                     foreach (GekkoTime gt in new GekkoTimeIterator(realStart, realEnd))
                     {
-                        double z = oldSeries.GetData(gt);
+                        double z = oldSeries.GetData(null, gt);
                         if (G.isNumericalError(z))
                         {
                             if (!recording)
@@ -3624,8 +3624,8 @@ namespace Gekko
                         {
                             GekkoTime t1 = missingStart.Add(-1);
                             GekkoTime t2 = gt;
-                            double z1 = oldSeries.GetData(t1);
-                            double z2 = oldSeries.GetData(t2);
+                            double z1 = oldSeries.GetData(null, t1);
+                            double z2 = oldSeries.GetData(null, t2);
                             double n = GekkoTime.Observations(t1, t2) - 1;
                             if (type == ESmoothTypes.Geometric)
                             {
@@ -3669,7 +3669,7 @@ namespace Gekko
                     //This is not terribly efficient, and we could use array copy etc.
                     //And we do create and clone a whole new timeseries (newSeriesTemp).
                     //But it works, and speed is probably not an issue with SMOOTH.
-                    lhs.SetData(gt, newSeriesTemp.GetData(gt));
+                    lhs.SetData(gt, newSeriesTemp.GetData(null, gt));
                 }
                 lhs.Stamp();
             }            
@@ -3756,8 +3756,8 @@ namespace Gekko
                 foreach (GekkoTime gt in new GekkoTimeIterator(t2a, t1b))
                 {
                     count++;
-                    sum1 += ts1.GetData(gt);
-                    sum2 += ts2.GetData(gt);
+                    sum1 += ts1.GetData(null, gt);
+                    sum2 += ts2.GetData(null, gt);
                 }
                 double avg1 = sum1 / count;
                 double avg2 = sum2 / count;
@@ -3778,11 +3778,11 @@ namespace Gekko
                     }
                     foreach (GekkoTime gt in new GekkoTimeIterator(t1a, t2a.Add(-1)))
                     {
-                        ts3.SetData(gt, ts1.GetData(gt) / relative);
+                        ts3.SetData(gt, ts1.GetData(null, gt) / relative);
                     }
                     foreach (GekkoTime gt in new GekkoTimeIterator(t2a, t2b))
                     {
-                        ts3.SetData(gt, ts2.GetData(gt));
+                        ts3.SetData(gt, ts2.GetData(null, gt));
                     }
                 }
                 else
@@ -3801,11 +3801,11 @@ namespace Gekko
                     }
                     foreach (GekkoTime gt in new GekkoTimeIterator(t1a, t1b))
                     {
-                        ts3.SetData(gt, ts1.GetData(gt));
+                        ts3.SetData(gt, ts1.GetData(null, gt));
                     }
                     foreach (GekkoTime gt in new GekkoTimeIterator(t1b.Add(1), t2b))
                     {
-                        ts3.SetData(gt, ts2.GetData(gt) * relative);
+                        ts3.SetData(gt, ts2.GetData(null, gt) * relative);
                     }                    
                 }
                 ts3.Stamp();
@@ -5175,7 +5175,7 @@ namespace Gekko
                         double n = 0d;
                         foreach (GekkoTime t in new GekkoTimeIterator(ddate1, ddate2))
                         {
-                            sum += ts.GetData(t);
+                            sum += ts.GetData(null, t);
                             n++;
                         }
 

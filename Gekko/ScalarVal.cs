@@ -161,7 +161,7 @@ namespace Gekko
                         TimeSeries xx = x as TimeSeries;                                                
                         foreach (GekkoTime t in smpl.Iterate03())
                         {
-                            tsl.SetData(t, this.val + xx.GetData(t));
+                            tsl.SetData(t, this.val + xx.GetData(smpl, t));
                         }
                         return tsl;
                     }

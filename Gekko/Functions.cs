@@ -272,11 +272,11 @@ namespace Gekko
                 counter++;
                 if (isLog)
                 {
-                    input[counter] = Math.Log(rhs.GetData(gt));
+                    input[counter] = Math.Log(rhs.GetData(smpl, gt));
                 }
                 else
                 {
-                    input[counter] = rhs.GetData(gt);
+                    input[counter] = rhs.GetData(smpl, gt);
                 }
             }
 
@@ -376,7 +376,7 @@ namespace Gekko
                 foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
                 {
                     counter++;
-                    m.data[counter, varcount] = ts.GetData(gt);
+                    m.data[counter, varcount] = ts.GetData(smpl, gt);
                 }
             }
             return m;
@@ -1383,7 +1383,7 @@ namespace Gekko
                     double sum = 0d;
                     for (int i = 0; i < d; i++)   //movsum(x, 2) is m + x[-1], so d is always the number of elements.
                     {
-                        sum += ts.GetData(gt.Add(-i));
+                        sum += ts.GetData(smpl, gt.Add(-i));
                     }
                     z.SetData(gt, sum / divide);
                 }

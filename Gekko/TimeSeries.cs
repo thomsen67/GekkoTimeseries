@@ -265,7 +265,7 @@ namespace Gekko
         /// <param name="t">The period.</param>
         /// <returns>The value (double.NaN if missing)</returns>
         /// <exception cref="GekkoException">Exception if frequency of timeseries and period do not match.</exception>
-        public double GetData(GekkoTime t)
+        public double GetData(GekkoSmpl smpl, GekkoTime t)
         {            
             if (this.freq != t.freq)
             {                
@@ -301,9 +301,8 @@ namespace Gekko
                         if (index >= 0)
                         {
                             ii = index - (this.dataArray.Length - 1);
-                        }
-                        G.Writeln2("OUT OF RANGE, UOVERFLOW: " + ii);
-                        throw new GekkoException();
+                        }                        
+                        smpl.gekkoError = new GekkoError(ii);                        
                     }
                     return double.NaN;  //out of bounds, we return a missing value (NaN)
                 }
@@ -620,7 +619,7 @@ namespace Gekko
             GekkoTime realStart = Globals.tNull;
             foreach (GekkoTime dt in new GekkoTimeIterator(GetPeriodFirst(), GetPeriodLast()))
             {
-                if (!G.isNumericalError(this.GetData(dt)))
+                if (!G.isNumericalError(this.GetData(null, dt)))
                 {
                     //a real number, not missing or infinite
                     realStart = dt;
@@ -643,7 +642,7 @@ namespace Gekko
             GekkoTime realEnd = Globals.tNull;
             foreach (GekkoTime dt in new GekkoTimeIteratorBackwards(GetPeriodLast(), GetPeriodFirst()))
             {
-                if (!G.isNumericalError(this.GetData(dt)))
+                if (!G.isNumericalError(this.GetData(null, dt)))
                 {
                     //a real number, not missing or infinite
                     realEnd = dt;
@@ -692,23 +691,7 @@ namespace Gekko
             GekkoTime t = new GekkoTime(this.freq, resultSuperPer, resultSubPer);
             return t;
         }
-
-        public static IVariable SmplCheck(GekkoSmpl smpl, IVariable input)
-        {
-            //Checks if the IVariable has data in the smpl range. If not, a GekkoError is returned.
-            //  Else the variable is returned untouched.
-            //If it is a TimeSeries, and the double[] data array is a pointer to the real TimeSeries array,
-            //  this method will never return a GekkoError.
-            if (input.Type() == EVariableType.Series)
-            {
-                TimeSeries x = (TimeSeries)input;
-                //LIGHTFIXME
-                int ix1, ix2; GekkoError ge; ge = null; //TimeSeries.SpmlCheck(smpl, x, out ix1, out ix2, out ge);
-                if (ge != null) return ge;
-            }
-            return input;
-        }
-
+         
         // -----------------------------------------------------------------------------
         // ----------------- private methods -------------------------------------------
         // -----------------------------------------------------------------------------
@@ -896,9 +879,9 @@ namespace Gekko
                 TimeSeries tsl = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
 
                 //LIGHTFIXME: speedup with arrays
-                foreach (GekkoTime gt in smpl.Iterate03())
+                foreach (GekkoTime t in smpl.Iterate03())
                 {
-                    tsl.SetData(gt, this.GetData(gt) + xx.GetData(gt));
+                    tsl.SetData(t, this.GetData(smpl, t) + xx.GetData(smpl, t));
                 }
 
                 rv = tsl;
@@ -911,7 +894,7 @@ namespace Gekko
                 //LIGHTFIXME: speedup with arrays
                 foreach (GekkoTime gt in smpl.Iterate03())
                 {
-                    tsl.SetData(gt, this.GetData(gt) + xx.val);
+                    tsl.SetData(gt, this.GetData(smpl, gt) + xx.val);
                 }
 
                 rv = tsl;
@@ -948,7 +931,7 @@ namespace Gekko
             TimeSeries ts = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
             foreach (GekkoTime t in smpl.Iterate03())
             {
-                ts.SetData(t, -this.GetData(t));
+                ts.SetData(t, -this.GetData(smpl, t));
             }
             return ts;
         }    
@@ -980,7 +963,7 @@ namespace Gekko
                         TimeSeries ts = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
                         foreach (GekkoTime t in smpl.Iterate03())
                         {
-                            ts.SetData(t, this.GetData(t.Add(i)));
+                            ts.SetData(t, this.GetData(smpl, t.Add(i)));
                         }
                         rv = ts;
                     }                    
@@ -989,7 +972,7 @@ namespace Gekko
                 {
                     if (this.freq == EFreq.Annual || this.freq == EFreq.Undated)
                     {
-                        double d = this.GetData(new GekkoTime(this.freq, i, 1));
+                        double d = this.GetData(smpl, new GekkoTime(this.freq, i, 1));
                         rv = new ScalarVal(d);
                     }
                     else
@@ -1001,7 +984,7 @@ namespace Gekko
             }
             else if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Date)
             {
-                double d = this.GetData(((ScalarDate)indexes[0]).date);
+                double d = this.GetData(smpl, ((ScalarDate)indexes[0]).date);
                 rv = new ScalarVal(d);
             }
             else
@@ -1111,21 +1094,21 @@ namespace Gekko
             {
                 foreach (GekkoTime t in smpl.Iterate03())
                 {
-                    this.SetData(t, ((TimeSeries)x).GetData(t) + ((TimeSeries)y).GetData(t));
+                    this.SetData(t, ((TimeSeries)x).GetData(smpl, t) + ((TimeSeries)y).GetData(smpl, t));
                 }
             }
             else if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Series)
             {
                 foreach (GekkoTime t in smpl.Iterate03())
                 {
-                    this.SetData(t, ((ScalarVal)x).val + ((TimeSeries)y).GetData(t));
+                    this.SetData(t, ((ScalarVal)x).val + ((TimeSeries)y).GetData(smpl, t));
                 }
             }
             else if (x.Type() == EVariableType.Series && y.Type() == EVariableType.Val)
             {
                 foreach (GekkoTime t in smpl.Iterate03())
                 {
-                    this.SetData(t, ((TimeSeries)x).GetData(t) + ((ScalarVal)y).val);
+                    this.SetData(t, ((TimeSeries)x).GetData(smpl, t) + ((ScalarVal)y).val);
                 }
             }
             else
@@ -1144,7 +1127,7 @@ namespace Gekko
 
         public double GetVal(GekkoTime t)
         {
-            return this.GetData(t);
+            return this.GetData(null, t);
         }
 
         public double GetVal()
