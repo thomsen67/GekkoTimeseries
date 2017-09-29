@@ -88,6 +88,11 @@ namespace Gekko
             this.t3 = t2;
         }
 
+        public bool HasError()
+        {
+            return this.gekkoError != null;
+        }
+
         public GekkoTimeIterator Iterate03()
         {
             return new GekkoTimeIterator(this.t0, this.t3);
@@ -22852,6 +22857,133 @@ namespace Gekko
             }
         }
 
+        public static void OPrint(GekkoSmpl smpl, IVariable x)
+        {
+            if (x == null)
+            {
+                G.Writeln2("*** ERROR: Print of null object");
+                throw new GekkoException();
+            }
+
+            Table tab = new Table();
+            tab.writeOnce = true;
+
+            switch (x.Type())
+            {
+                case EVariableType.Val:
+                    {
+                        double d = O.ConvertToVal(x);  //#875324397
+                        G.Writeln2("VAL = " + d);
+                    }
+                    break;
+                case EVariableType.String:
+                    {
+                        string s = O.ConvertToString(x);
+                        G.Writeln2("STRING = " + s);
+                    }
+                    break;
+                case EVariableType.Date:
+                    {
+                        string d = O.ConvertToDate(x).ToString();
+                        G.Writeln2("DATE = " + d);
+                    }
+                    break;
+                case EVariableType.List:
+                    {
+                        MetaList m = x as MetaList;
+                        if (m.list[0].Type() == EVariableType.Series || m.list[0].Type() == EVariableType.Val)
+                        {
+                            //List of values
+                            int ii1 = -1;
+                            foreach (GekkoTime t in smpl.Iterate12())
+                            {
+                                ii1++;
+                                tab.SetDate(ii1 + 1, 1, t.ToString());
+                                int ii2 = -1;
+                                foreach (IVariable iv in m.list)
+                                {
+                                    ii2++;
+                                    if (iv.Type() == EVariableType.Series)
+                                    {
+                                        TimeSeries ts = iv as TimeSeries;
+                                        tab.SetNumber(ii1 + 1, ii2 + 2, ts.GetData(smpl, t), "f12.4");
+                                    }
+                                    else if (iv.Type() == EVariableType.Val)
+                                    {
+                                        ScalarVal sv = iv as ScalarVal;
+                                        tab.SetNumber(ii1 + 1, ii2 + 2, sv.val, "f12.4");
+                                    }
+                                    else
+                                    {
+                                        G.Writeln2("*** ERROR: Type error 3243");
+                                    }
+                                }
+                                G.Writeln();
+                                //
+                            }
+                        }
+                        else
+                        {
+                            List<string> l = O.GetStringList(x);
+                            G.Writeln2("LIST = ");
+                            foreach (string s in l) G.Writeln(s);
+                        }
+                    }
+                    break;
+                case EVariableType.Series:
+                    {
+                        TimeSeries ts = x as TimeSeries;
+                        G.Writeln2("SERIES = ");
+                        int ii1 = -1;
+                        foreach (GekkoTime t in smpl.Iterate12())
+                        {
+                            ii1++;
+                            tab.SetDate(ii1 + 1, 1, t.ToString());
+                            tab.SetNumber(ii1 + 1, 2, ts.GetData(smpl, t), "f12.4");
+                        }
+                    }
+                    break;
+                case EVariableType.Matrix:
+                    {
+                        Matrix m = O.ConvertToMatrix(x);
+                        Program.ShowMatrix(m, "label...");
+                    }
+                    break;
+                case EVariableType.GekkoError:
+                    {
+                        G.Writeln2("ERROR!");
+                    }
+                    break;
+                default:
+                    {
+                        G.Writeln2("*** ERROR: Assignment with unknown type");
+                        throw new GekkoException();
+                    }
+                    break;
+            }
+
+            if (smpl.HasError())
+            {
+                return;
+            }
+
+            int widthRemember = Program.options.print_width;
+            int fileWidthRemember = Program.options.print_filewidth;
+            Program.options.print_width = int.MaxValue;
+            Program.options.print_filewidth = int.MaxValue;
+            try
+            {
+                List<string> ss = tab.Print();
+                foreach (string s in ss) G.Writeln(s);
+            }
+            finally
+            {
+                //resetting, also if there is an error
+                Program.options.print_width = widthRemember;
+                Program.options.print_filewidth = fileWidthRemember;
+            }
+
+        }
 
         public static int PrtNew2(O.Prt o)
         {
