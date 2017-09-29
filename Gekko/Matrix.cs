@@ -431,7 +431,7 @@ namespace Gekko
             {
                 //This is allowed in AREMOS, too
                 double[,] a = this.data;
-                double b = O.ConvertToVal(t, x);
+                double b = O.ConvertToVal(x);  //#875324397
                 int m = a.GetLength(0);                
                 int k = a.GetLength(1);
                 double[,] c = O.MultiplyMatrixScalar(a, b, m, k);
@@ -478,7 +478,7 @@ namespace Gekko
                 case EVariableType.Val:
                     {
                         double[,] a = this.data;
-                        double b = O.ConvertToVal(t, x);
+                        double b = O.ConvertToVal(x);  //#875324397
                         int m = a.GetLength(0);
                         int k = a.GetLength(1);
                         double[,] c = O.MultiplyMatrixScalar(a, 1d/b, m, k);
@@ -520,7 +520,7 @@ namespace Gekko
                 {
                     try
                     {
-                        this.data[O.ConvertToInt(x1) - 1, O.ConvertToInt(x2) - 1] = O.ConvertToVal(null, rhsExpression);
+                        this.data[O.ConvertToInt(x1) - 1, O.ConvertToInt(x2) - 1] = O.ConvertToVal(rhsExpression);  //#875324397
                     }
                     catch (IndexOutOfRangeException e)
                     {

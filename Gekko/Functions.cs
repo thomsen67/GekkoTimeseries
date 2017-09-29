@@ -236,8 +236,8 @@ namespace Gekko
             
             int obs = GekkoTime.Observations(tStart, tEnd);
 
-            double lambda = O.ConvertToVal(smpl, ilambda);
-            double log = O.ConvertToVal(smpl, ilog);
+            double lambda = O.ConvertToVal(ilambda);
+            double log = O.ConvertToVal(ilog);
             
             TimeSeries rhs = O.GetTimeSeries(rightSide);
 
@@ -871,9 +871,9 @@ namespace Gekko
             return rv;
         }
 
-        public static IVariable rseed(GekkoSmpl t, IVariable seed)
+        public static IVariable rseed(GekkoSmpl smpl, IVariable seed)
         {
-            double seed2 = O.ConvertToVal(t, seed);
+            double seed2 = O.ConvertToVal(seed);
             int i = (int)seed2;
             Globals.random = new Random(i);            
             return new ScalarVal(i);
@@ -912,7 +912,7 @@ namespace Gekko
                 //https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Drawing_values_from_the_distribution
                 for (int i = 0; i < n; i++)
                 {
-                    double random = O.ConvertToVal(t, rnorm(t, Globals.scalarVal0, Globals.scalarVal1)); //could be sped up by interfacing to the interior of the method
+                    double random = O.ConvertToVal(rnorm(t, Globals.scalarVal0, Globals.scalarVal1)); //could be sped up by interfacing to the interior of the method
                     randoms[i, 0] = random;
                 }                
                 
@@ -925,8 +925,8 @@ namespace Gekko
             }
             else
             {
-                double mean = O.ConvertToVal(t, means);
-                double stdDev = Math.Sqrt(O.ConvertToVal(t, vcov));
+                double mean = O.ConvertToVal(means);
+                double stdDev = Math.Sqrt(O.ConvertToVal(vcov));
                 Random rand = new Random(); //reuse this if you are generating many
                 double u1 = Globals.random.NextDouble(); //these are uniform(0,1) random doubles
                 double u2 = Globals.random.NextDouble();
@@ -1024,7 +1024,7 @@ namespace Gekko
             GekkoTime t2 = Globals.globalPeriodEnd;
 
             TimeSeries ts = O.GetTimeSeries(inputVar);
-            double percent2 = O.ConvertToVal(t, percent);
+            double percent2 = O.ConvertToVal(percent);
 
             int index1 = -12345;
             int index2 = -12345;
@@ -1047,8 +1047,8 @@ namespace Gekko
             IVariable rv = null;
             if (IsValOrTimeseries(x))
             {
-                double d = O.ConvertToVal(t, x);
-                rv = new ScalarVal(Math.Abs(d));
+                //double d = O.ConvertToVal(t, x); #875324397
+                //rv = new ScalarVal(Math.Abs(d));
             }
             else if (x.Type() == EVariableType.Matrix)
             {
@@ -1110,10 +1110,10 @@ namespace Gekko
                 G.Writeln2("*** ERROR: iif(): arg 5, type " + o2.Type().ToString() + " not supported");
                 throw new GekkoException();
             }
-            double di1 = O.ConvertToVal(t, i1);
-            double di2 = O.ConvertToVal(t, i2);
-            double do1 = O.ConvertToVal(t, o1);
-            double do2 = O.ConvertToVal(t, o2);
+            double di1 = O.ConvertToVal(i1); // #875324397
+            double di2 = O.ConvertToVal(i2);
+            double do1 = O.ConvertToVal(o1);
+            double do2 = O.ConvertToVal(o2);
             string x = O.ConvertToString(op).Trim();
 
             if (x == "==")
@@ -1195,8 +1195,8 @@ namespace Gekko
             IVariable rv = null;
             if (IsValOrTimeseries(x))
             {
-                double d = O.ConvertToVal(t, x);
-                rv = new ScalarVal(Math.Log(d));
+                //double d = O.ConvertToVal(t, x); //#875324397
+                //rv = new ScalarVal(Math.Log(d));
             }
             else if (x.Type() == EVariableType.Matrix)
             {
@@ -1223,8 +1223,8 @@ namespace Gekko
             IVariable rv = null;
             if (IsValOrTimeseries(x))
             {
-                double d = O.ConvertToVal(t, x);
-                rv = new ScalarVal(Math.Exp(d));
+                //double d = O.ConvertToVal(t, x); //#875324397
+                //rv = new ScalarVal(Math.Exp(d));
             }
             else if (x.Type() == EVariableType.Matrix)
             {
@@ -1251,8 +1251,8 @@ namespace Gekko
             IVariable rv = null;
             if (IsValOrTimeseries(x))
             {
-                double d = O.ConvertToVal(t, x);
-                rv = new ScalarVal(Math.Sqrt(d));
+                //double d = O.ConvertToVal(t, x);  #875324397
+                //rv = new ScalarVal(Math.Sqrt(d));
             }
             else if (x.Type() == EVariableType.Matrix)
             {
@@ -1281,9 +1281,10 @@ namespace Gekko
 
         public static IVariable pow(GekkoSmpl t, IVariable x1, IVariable x2)
         {
-            double d1 = O.ConvertToVal(t, x1);
-            double d2 = O.ConvertToVal(t, x2);
-            return new ScalarVal(Math.Pow(d1, d2));
+            //double d1 = O.ConvertToVal(t, x1);  #875324397
+            //double d2 = O.ConvertToVal(t, x2);
+            //return new ScalarVal(Math.Pow(d1, d2));
+            return null;
         }
 
         //ALL THESE SHOULD BE DELETED
@@ -1388,7 +1389,7 @@ namespace Gekko
         
         public static IVariable format(GekkoSmpl t, IVariable x1, IVariable x2)
         {
-            double d = O.ConvertToVal(t, x1);
+            double d = O.ConvertToVal(x1); //#875324397
             string format2 = O.ConvertToString(x2);
             string x = Program.NumberFormat(d, format2);
             ScalarString ss = new ScalarString(x);
@@ -1397,7 +1398,7 @@ namespace Gekko
 
         public static IVariable round(GekkoSmpl t, IVariable x1, IVariable x2)
         {            
-            double d2 = O.ConvertToVal(t, x2);            
+            double d2 = O.ConvertToVal(x2);             //#875324397
             int aaa1 = 0;
             if (!G.Round(out aaa1, d2))
             {
@@ -1413,7 +1414,7 @@ namespace Gekko
 
             if (IsValOrTimeseries(x1))
             {
-                double d1 = O.ConvertToVal(t, x1);
+                double d1 = O.ConvertToVal(x1);  //#875324397
                 double value2 = Math.Round(d1, decimals);
                 return new ScalarVal(value2);
             }

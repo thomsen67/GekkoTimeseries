@@ -1358,7 +1358,7 @@ namespace Gekko.Parser.Gek
                                         G.Writeln2("*** ERROR: You cannot use TO or STEP/BY in a parallel loop");
                                         throw new GekkoException();
                                     }
-                                    node.Code.A(listsname + ".Add((" + codeStart + ").ConvertToList())").End();
+                                    node.Code.A(listsname + ".Add(O.ConvertToList(" + codeStart + "))").End();
                                 }
                                 string maxname = "max" + ++Globals.counter;
                                 node.Code.A("int " + maxname + " = O.ForListMax(" + listsname + ")").End();

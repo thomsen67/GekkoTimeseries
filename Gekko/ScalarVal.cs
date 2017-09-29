@@ -192,7 +192,7 @@ namespace Gekko
                     }
                 case EVariableType.Series:
                     {
-                        return new ScalarVal(this.val - O.ConvertToVal(t, x));
+                        return new ScalarVal(this.val - O.ConvertToVal(x));  //#875324397
                     }                
                 default:
                     {
@@ -212,13 +212,13 @@ namespace Gekko
                     }
                 case EVariableType.Series:
                     {
-                        return new ScalarVal(this.val * O.ConvertToVal(t, x));
+                        return new ScalarVal(this.val * O.ConvertToVal(x));  //#875324397
                     }
                 case EVariableType.Matrix:
                     {
                         //This is allowed in AREMOS, too
                         double[,] a = O.ConvertToMatrix(x).data;
-                        double b = O.ConvertToVal(t, this);
+                        double b = O.ConvertToVal(this);
                         int m = a.GetLength(0);
                         int k = a.GetLength(1);
                         double[,] c = O.MultiplyMatrixScalar(a, b, m, k);
@@ -244,7 +244,7 @@ namespace Gekko
                     }
                 case EVariableType.Series:
                     {
-                        return new ScalarVal(this.val / O.ConvertToVal(t, x));
+                        return new ScalarVal(this.val / O.ConvertToVal(x));  //#875324397
                     }                
                 default:
                     {
@@ -264,7 +264,7 @@ namespace Gekko
                     }
                 case EVariableType.Series:
                     {
-                        return new ScalarVal(Math.Pow(this.val, O.ConvertToVal(t, x)));
+                        return new ScalarVal(Math.Pow(this.val, O.ConvertToVal(x)));  //#875324397
                     }                
                 default:
                     {

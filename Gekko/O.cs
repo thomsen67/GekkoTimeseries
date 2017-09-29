@@ -1003,7 +1003,7 @@ namespace Gekko
             {
                 case EVariableType.Val:
                     {
-                        double d = O.ConvertToVal(smpl, x);
+                        double d = O.ConvertToVal(x);  //#875324397
                         G.Writeln2("VAL = " + d);                   
                     }
                     break;
@@ -2686,9 +2686,14 @@ namespace Gekko
             return l;
         }
 
-        public static double ConvertToVal(GekkoSmpl smpl, IVariable a) //uuu
+        public static double ConvertToVal(GekkoTime t, IVariable a)
+        {            
+            return a.GetVal(t);
+        }
+
+        public static double ConvertToVal(IVariable a)
         {
-            return a.GetValOLD(smpl);            
+            return a.ConvertToVal();
         }
 
         public static void GetVal777(GekkoSmpl smpl, IVariable a, int bankNumber, O.Prt.Element e)  //used in PRT and similar, can accept a list that will show itself as a being an integer with ._isName set.
@@ -2713,7 +2718,7 @@ namespace Gekko
                 for (int i = 0; i < items.Count; i++)
                 {
                     string s = items[i];
-                    double dd = O.ConvertToVal(smpl, O.GetTimeSeries(smpl, s, bankNumber));                    
+                    double dd = O.ConvertToVal(O.GetTimeSeries(smpl, s, bankNumber)); //#875324397                     
                     if (bankNumber == 1)
                     {
                         //if (e.subElements[i].tsWork == null) e.subElements[i].tsWork = new TimeSeries(Program.options.freq, null);
@@ -2793,7 +2798,7 @@ namespace Gekko
                 G.Writeln("           Did you forget []-brackets to pick out an observation, for instance x[2020]?");
                 throw new GekkoException();
             }
-            double d = ConvertToVal(null, a);
+            double d = ConvertToVal(a);
             int intValue = -12345;
             if (!G.Round(out intValue, d))
             {
