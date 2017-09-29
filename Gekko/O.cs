@@ -529,7 +529,7 @@ namespace Gekko
             if (x.Type() == EVariableType.Series)
             {
                 TimeSeries x_series = x as TimeSeries;
-                TimeSeries rv_series = new TimeSeries(x_series.freq, null);
+                TimeSeries rv_series = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
                 rv = rv_series;
                 if (logical.Type() == EVariableType.Series)
                 {
@@ -569,7 +569,7 @@ namespace Gekko
                     //we have to convert the VAL to a SERIES here
                     ScalarVal x_val = x as ScalarVal;
                     TimeSeries logical_series = logical as TimeSeries;
-                    TimeSeries rv_series = new TimeSeries(smpl.t1.freq, null);
+                    TimeSeries rv_series = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
                     rv = rv_series;
                     foreach (GekkoTime t in smpl.Iterate03())
                     {                        
@@ -746,7 +746,7 @@ namespace Gekko
                 }
                 else if (m.data.GetLength(0) == n && m.data.GetLength(1) == 1)
                 {
-                    TimeSeries rv_series = new TimeSeries(smpl.t0.freq, null);
+                    TimeSeries rv_series = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
                     int counter = -1;
                     foreach (GekkoTime t in smpl.Iterate12())
                     {
@@ -782,7 +782,7 @@ namespace Gekko
                 }
                 else if(m.list.Count() == n)
                 {
-                    TimeSeries rv_series = new TimeSeries(smpl.t0.freq, null);
+                    TimeSeries rv_series = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
                     int counter = -1;
                     foreach (GekkoTime t in smpl.Iterate12())
                     {
@@ -2190,7 +2190,8 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
             {
-                TimeSeries rv_series = CheckFreqAndCreateSeries(x, y);  //created, but still empty. Has the right frequency corresponding to x and y (or error will be reported)
+                CheckFreqAndCreateSeries(x, y);  //checks freqs
+                TimeSeries rv_series = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
                 rv = rv_series;
                 foreach (GekkoTime t in smpl.Iterate03())
                 {
@@ -2216,7 +2217,7 @@ namespace Gekko
             return rv;
         }
 
-        private static TimeSeries CheckFreqAndCreateSeries(IVariable x, IVariable y)
+        private static void CheckFreqAndCreateSeries(IVariable x, IVariable y)
         {
             EFreq freq = EFreq.Annual;
             if (x.Type() == EVariableType.Series) freq = ((TimeSeries)x).freq;
@@ -2228,9 +2229,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: You cannot logically compare two timeseries with freqs " + G.GetFreqString(((TimeSeries)x).freq) + " and " + G.GetFreqString(((TimeSeries)y).freq));
                     throw new GekkoException();
                 }
-            }
-            TimeSeries rv_series = new TimeSeries(freq, null);
-            return rv_series;
+            }            
         }
 
         public static bool LargerThanOrEqual(GekkoSmpl smpl, IVariable x, IVariable y)
@@ -2276,10 +2275,7 @@ namespace Gekko
 
         public static TimeSeries CreateTimeSeriesFromVal(GekkoSmpl smpl, double d)
         {
-            TimeSeries tsl = new TimeSeries(smpl.t0.freq, null);
-            tsl.dataArray = new double[GekkoTime.Observations(smpl.t0, smpl.t3)];
-            tsl.anchorPeriod = smpl.t0;
-            tsl.anchorPeriodPositionInArray = 0;
+            TimeSeries tsl = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl); //will have small dataarray            
             for (int i = 0; i < tsl.dataArray.Length; i++)
             {
                 tsl.dataArray[i] = d;
@@ -2305,14 +2301,8 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Expected " + n + " rows in matrix");
                 throw new GekkoException();
             }
-            TimeSeries tsl = new TimeSeries(smpl.t0.freq, null);
-         
-            tsl.dataArray = new double[n];
-
-            tsl.anchorPeriod = smpl.t0;
-
-            tsl.anchorPeriodPositionInArray = 0;
-            for (int i = 0; i < n; i++)
+            TimeSeries tsl = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);            
+            for (int i = 0; i < tsl.dataArray.Length; i++)
             {
                 tsl.dataArray[i] = m.data[i, 0];
             }
@@ -4100,7 +4090,12 @@ namespace Gekko
             public P p = null;
             public void Exe()
             {
-                if (Globals.runningOnTTComputer) Program.Run("tt.gcm", this.p);
+                if (Globals.runningOnTTComputer)
+                {
+                    //Globals.globalPeriodStart = new GekkoTime(EFreq.Annual, 2007, 1);
+                    //Globals.globalPeriodEnd = new GekkoTime(EFreq.Annual, 2017, 1);
+                    Program.Run("tt.gcm", this.p);
+                }
                 else Program.Run(this.fileName, this.p);
             }
         }

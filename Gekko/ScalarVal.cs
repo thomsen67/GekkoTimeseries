@@ -157,7 +157,7 @@ namespace Gekko
                     }
                 case EVariableType.Series:
                     {
-                        TimeSeries tsl = new TimeSeries(smpl.t0.freq, null);
+                        TimeSeries tsl = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
                         TimeSeries xx = x as TimeSeries;                                                
                         foreach (GekkoTime t in smpl.Iterate03())
                         {

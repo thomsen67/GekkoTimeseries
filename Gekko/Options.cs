@@ -76,6 +76,7 @@ Additionally, there are model, solve, equation options.
 
         public EFreq freq = EFreq.Annual;
 
+        public bool gams_fast = true; //use low-level api
         public string gams_exe_folder = "";
         public string gams_time_set = "t";  //name of the time set in GAMS
         public string gams_time_prefix = "";  //prefix of time set elements, if 't' time can be for instance t0

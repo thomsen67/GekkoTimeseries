@@ -26,7 +26,10 @@ using System.Linq;
 
 namespace Gekko
 {
-       
+    public enum ETimeSeriesType
+    {
+        TimeSeriesLight
+    }
 
     /// <summary>
     /// The TimeSeries class is a class designed for storing and retrieving timeseries (vectors/arrays of consecutive time data) 
@@ -115,6 +118,23 @@ namespace Gekko
             //Empty timeseries should not be created that way.
             G.Writeln2("*** ERROR: Internal error: TimeSeries() constructor problem");
             throw new GekkoException();
+        }
+
+        public TimeSeries(ETimeSeriesType type, GekkoSmpl smpl)
+        {
+            // ------------------------------
+            //Constructing a TimeSeriesLight
+            //type is just a decorator (not used), so that it is easier to 
+            //see when a light timeseries is created.
+            // ------------------------------
+            this.freq = smpl.t0.freq;  //same as for t1, t2 or t3
+            this.name = null; //light
+            this.meta = null; //light
+            int n = smpl.Observations03();
+            this.dataArray = new double[n];  //we make the array as compact as possible --> faster
+            InitializeDataArray(this.dataArray);
+            this.anchorPeriod = smpl.t0;            
+            this.anchorPeriodPositionInArray = 0;
         }
 
         /// <summary>
@@ -275,6 +295,16 @@ namespace Gekko
                 int index = GetArrayIndex(t);
                 if (index < 0 || index >= this.dataArray.Length)
                 {
+                    if (this.Type(ETimeSeriesType.TimeSeriesLight))
+                    {
+                        int ii = index;
+                        if (index >= 0)
+                        {
+                            ii = index - (this.dataArray.Length - 1);
+                        }
+                        G.Writeln2("OUT OF RANGE, UOVERFLOW: " + ii);
+                        throw new GekkoException();
+                    }
                     return double.NaN;  //out of bounds, we return a missing value (NaN)
                 }
                 else
@@ -863,7 +893,7 @@ namespace Gekko
             if (x.Type() == EVariableType.Series)
             {                
                 TimeSeries xx = x as TimeSeries;
-                TimeSeries tsl = new TimeSeries(xx.freq, null);
+                TimeSeries tsl = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
 
                 //LIGHTFIXME: speedup with arrays
                 foreach (GekkoTime gt in smpl.Iterate03())
@@ -875,7 +905,7 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.Val)
             {
-                TimeSeries tsl = new TimeSeries(smpl.t1.freq, null);
+                TimeSeries tsl = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
                 ScalarVal xx = x as ScalarVal;
 
                 //LIGHTFIXME: speedup with arrays
@@ -915,7 +945,7 @@ namespace Gekko
 
         public IVariable Negate(GekkoSmpl smpl)
         {
-            TimeSeries ts = new TimeSeries(this.freq, null);
+            TimeSeries ts = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
             foreach (GekkoTime t in smpl.Iterate03())
             {
                 ts.SetData(t, -this.GetData(t));
@@ -936,13 +966,24 @@ namespace Gekko
                 if (IsLagOrLead(i))
                 {
                     //must be a lag
-                    //LIGHTFIXME, speed it up... can offset be used????
-                    TimeSeries ts = new Gekko.TimeSeries(this.freq, null);
-                    foreach (GekkoTime t in smpl.Iterate03())
+                    if (this.Type(ETimeSeriesType.TimeSeriesLight))
                     {
-                        ts.SetData(t, this.GetData(t.Add(i)));
+                        //just move the offset!
+                        //this object is not used in other places, and will soon be garbage collected anyway
+                        this.anchorPeriodPositionInArray += i;
+                        rv = this;
                     }
-                    rv = ts;
+                    else
+                    {
+                        //cannot offset, since this object lives in a databank, so that would
+                        //yield bad side-effects.
+                        TimeSeries ts = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
+                        foreach (GekkoTime t in smpl.Iterate03())
+                        {
+                            ts.SetData(t, this.GetData(t.Add(i)));
+                        }
+                        rv = ts;
+                    }                    
                 }
                 else
                 {
@@ -970,6 +1011,12 @@ namespace Gekko
             }
 
             return rv;
+        }
+
+        private bool Type(ETimeSeriesType type)
+        {
+            //type is not used here, just a decorator
+            return this.name == null;  //then this.meta will also be null, but we only test .name
         }
 
         private TimeSeries FindArrayTimeSeries(IVariable[] indexes, bool isLhs)

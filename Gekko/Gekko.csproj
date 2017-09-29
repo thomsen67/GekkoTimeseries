@@ -173,6 +173,7 @@
     </Compile>
     <Compile Include="DragAdorner.cs" />
     <Compile Include="Functions.cs" />
+    <Compile Include="Gdxcs.cs" />
     <Compile Include="GekkoError.cs" />
     <Compile Include="GekkoTime.cs" />
     <Compile Include="GekkoTuple.cs" />

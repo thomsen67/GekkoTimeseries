@@ -7,28 +7,29 @@ namespace Gekko
 {
     public class GekkoError : IVariable
     {
-        public int underflow = 0;
-        public int overflow = 0;        
+        public int uoverflow = 0;
+        //public int underflow = 0;
+        //public int overflow = 0;        
         
-        public GekkoError()
-        {
+        //public GekkoError()
+        //{
+        //}
 
-        }
-
-        public GekkoError(int underflow, int overflow)
+        public GekkoError(int uoverflow)
         {
-            this.underflow = underflow;
-            this.overflow = overflow;
+            //this.underflow = underflow;
+            //this.overflow = overflow;
+            this.uoverflow = uoverflow;
         }
 
         public IVariable Indexer(GekkoSmpl t, params IVariable[] indexes)
         {
-            throw new GekkoException();
+            return this;
         }
                 
         public IVariable Negate(GekkoSmpl t)
         {
-            return null;
+            return this;
         }
 
         public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
@@ -73,28 +74,28 @@ namespace Gekko
         }
 
         public IVariable Add(GekkoSmpl t, IVariable x)
-        {            
-            throw new GekkoException();
+        {
+            return this;
         }
 
         public IVariable Subtract(GekkoSmpl t, IVariable x)
         {
-            return null;
+            return this;
         }
 
         public IVariable Multiply(GekkoSmpl t, IVariable x)
         {
-            return null;
+            return this;
         }
 
         public IVariable Divide(GekkoSmpl t, IVariable x)
         {
-            return null;
+            return this;
         }
 
         public IVariable Power(GekkoSmpl t, IVariable x)
         {
-            return null;
+            return this;
         }
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] dims)

@@ -634,6 +634,9 @@ namespace Gekko
 
         public static bool noini = false;
 
+        public static GAMS.GAMSWorkspace gamsWorkspace = null;
+        public static string gamsWorkspaceHelper = null;
+
         public static int convertTableCounter = 0;
         public static int convertTableErrorCounter = 0;
                 

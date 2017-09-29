@@ -219,7 +219,7 @@ namespace Gekko
             return hpfilter(t, null, null, rightSide, ilambda, ilog);
         }
 
-        public static IVariable hpfilter(GekkoSmpl t, IVariable per1, IVariable per2, IVariable rightSide, IVariable ilambda, IVariable ilog) 
+        public static IVariable hpfilter(GekkoSmpl smpl, IVariable per1, IVariable per2, IVariable rightSide, IVariable ilambda, IVariable ilog) 
         {
             GekkoTime tStart = Globals.tNull;
             GekkoTime tEnd = Globals.tNull;
@@ -236,12 +236,12 @@ namespace Gekko
             
             int obs = GekkoTime.Observations(tStart, tEnd);
 
-            double lambda = O.GetVal(t, ilambda);
-            double log = O.GetVal(t, ilog);
+            double lambda = O.GetVal(smpl, ilambda);
+            double log = O.GetVal(smpl, ilog);
+            
+            TimeSeries rhs = O.GetTimeSeries(rightSide);
 
-            TimeSeries lhs = new TimeSeries(Program.options.freq, null);            
-
-            TimeSeries rhs = O.GetTimeSeries(rightSide);                        
+            TimeSeries lhs = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
 
             bool isLog = false;
             if (log == 0d)
@@ -1377,7 +1377,7 @@ namespace Gekko
             if (x.Type() == EVariableType.Series)
             {
                 TimeSeries ts = (TimeSeries)x;
-                TimeSeries z = new TimeSeries(smpl.t0.freq, null);
+                TimeSeries z = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
                 foreach (GekkoTime gt in smpl.Iterate03())
                 {
                     double sum = 0d;
@@ -1733,7 +1733,7 @@ namespace Gekko
             return v;
         }
 
-        public static IVariable fromseries(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        public static IVariable fromseries(GekkoTime t, IVariable x1, IVariable x2)
         {
             string s1 = O.GetString(x1);
             string s2 = O.GetString(x2);
@@ -1774,8 +1774,12 @@ namespace Gekko
                 G.Writeln2("*** ERROR: fromSeries(): TimeSeries '" + name + "' could not be found in '" + bank + "'.");
                 throw new GekkoException();
             }
-            
-            if (G.equal(s2, "label"))
+
+            if (G.equal(s2, "name"))
+            {
+                return new ScalarString(ts.name);
+            }
+            else if (G.equal(s2, "label"))
             {
                 return new ScalarString(ts.meta.label);
             }
@@ -1792,7 +1796,7 @@ namespace Gekko
                 return new ScalarDate(ts.GetPeriodFirst());
             }
             else if (G.equal(s2, "dataStart"))
-            {                
+            {
                 return new ScalarDate(ts.GetRealDataPeriodFirst());
             }
             else if (G.equal(s2, "perEnd"))
@@ -1811,7 +1815,7 @@ namespace Gekko
             {
                 G.Writeln2("*** ERROR: fromSeries(): Argument '" + s2 + "' not recognized.");
                 throw new GekkoException();
-            }            
+            }
         }
 
         // -----------------------------------
