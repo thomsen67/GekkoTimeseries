@@ -264,7 +264,6 @@
     <Compile Include="Table.cs" />
     <Compile Include="Task.cs" />
     <Compile Include="Timer.cs" />
-    <Compile Include="TimeSeriesLight.cs" />
     <Compile Include="Translator2.cs" />
     <Compile Include="Translators.cs" />
     <Compile Include="TspUtilitiesDataGui.cs">

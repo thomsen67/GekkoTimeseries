@@ -6339,7 +6339,7 @@ namespace Gekko
             {
                 foreach (IVariable iv in input)
                 {
-                    string s = O.GetString(iv);
+                    string s = O.ConvertToString(iv);
                     if (string.Compare(s, s1, true) >= 0 && string.Compare(s, s2, true) <= 0)
                     {
                         temp.Add(s);
@@ -6350,7 +6350,7 @@ namespace Gekko
             {
                 foreach (IVariable iv in input)
                 {
-                    string s = O.GetString(iv);
+                    string s = O.ConvertToString(iv);
                     if (!s.EndsWith(endsWith)) continue;
                     string ss = s.Substring(0, s.Length - endsWith.Length);
                     if (string.Compare(ss, s1, true) >= 0 && string.Compare(ss, s2, true) <= 0)
@@ -6453,10 +6453,10 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found");
                     throw new GekkoException();
                 }
-                List<IVariable> names = xx.GetList();
+                List<IVariable> names = xx.ConvertToList();
                 foreach (IVariable iv in names)
                 {
-                    string s2 = O.GetString(iv);
+                    string s2 = O.ConvertToString(iv);
                     BankNameVersion bnv = new BankNameVersion();
                     bnv.bank = bank;
                     bnv.name = s2;
@@ -6673,7 +6673,7 @@ namespace Gekko
             {
                 foreach (IVariable iv in input)
                 {
-                    string s = O.GetString(iv);
+                    string s = O.ConvertToString(iv);
                     if (s.Contains(Globals.freqIndicator)) continue;  //#09875230984, filters out fy=q, fy=m, etc. A bit of a hack. Could also check the second-last char to see if it is '='
                     if (wc.IsMatch(s)) found.Add(s);
                 }
@@ -6682,7 +6682,7 @@ namespace Gekko
             {
                 foreach (IVariable iv in input)
                 {
-                    string s = O.GetString(iv);
+                    string s = O.ConvertToString(iv);
                     if (!s.EndsWith(endsWith)) continue;
                     string s2 = s.Substring(0, s.Length - endsWith.Length);
                     if (wc.IsMatch(s2))
@@ -9881,11 +9881,11 @@ namespace Gekko
                     if (a.Type() == EVariableType.Date)
                     {
                         if (tpe != null && tpe != "date") continue;
-                        value = G.FromDateToString(O.GetDate(a));
+                        value = G.FromDateToString(O.ConvertToDate(a));
                     }
                     else if (a.Type() == EVariableType.String)
                     {
-                        value = "'" + a.GetString() + "'";
+                        value = "'" + a.ConvertToString() + "'";
                     }
                     else if (a.Type() == EVariableType.Val)
                     {
@@ -22316,7 +22316,7 @@ namespace Gekko
 
             if (o.impose != null)
             {
-                Matrix rr = O.GetMatrix(o.impose);
+                Matrix rr = O.ConvertToMatrix(o.impose);
                 k = rr.data.GetLength(0);
                 restrict = new double[rr.data.GetLength(0), rr.data.GetLength(1)];  //needs to be cloned, otherwise the IMPOSE matrix will be changed with scaling
                 for (int i = 0; i < rr.data.GetLength(0); i++)

@@ -53,8 +53,8 @@ namespace Gekko
                     return Handle2dIndexer(newIndex);  //we implicitly understand #a[3] as #a[3,1] here. But we cannot do the inverse on a row vector.
                 }
                 string s = null;
-                if (index.Type() == EVariableType.Val) s += "" + O.GetInt(index);
-                else if (index.Type() == EVariableType.Range) s += "" + O.GetInt(((Range)index).first) + ".." + O.GetInt(((Range)index).first);
+                if (index.Type() == EVariableType.Val) s += "" + O.ConvertToInt(index);
+                else if (index.Type() == EVariableType.Range) s += "" + O.ConvertToInt(((Range)index).first) + ".." + O.ConvertToInt(((Range)index).first);
                 G.Writeln("*** ERROR: You are trying to use [" + s + "] on a " + d1 + "x" + d2 + " matrix");
                 G.Writeln("           This notation can only be used regarding nx1 matrices (column vectors)");
                 throw new GekkoException();
@@ -78,8 +78,8 @@ namespace Gekko
 
             if (index1.Type() == EVariableType.Val && index2.Type() == EVariableType.Val)
             {
-                int i1 = O.GetInt(index1);
-                int i2 = O.GetInt(index2);
+                int i1 = O.ConvertToInt(index1);
+                int i2 = O.ConvertToInt(index2);
                 try
                 {
                     double d = this.data[i1 - 1, i2 - 1];
@@ -118,10 +118,10 @@ namespace Gekko
         ////    int i2 = this.data.GetLength(0);
         ////    int j1 = 1;
         ////    int j2 = this.data.GetLength(1);
-        ////    if (indexRange1.first != null) i1 = O.GetInt(indexRange1.first);
-        ////    if (indexRange1.last != null) i2 = O.GetInt(indexRange1.last);
-        ////    if (indexRange2.first != null) j1 = O.GetInt(indexRange2.first);
-        ////    if (indexRange2.last != null) j2 = O.GetInt(indexRange2.last);
+        ////    if (indexRange1.first != null) i1 = O.ConvertToInt(indexRange1.first);
+        ////    if (indexRange1.last != null) i2 = O.ConvertToInt(indexRange1.last);
+        ////    if (indexRange2.first != null) j1 = O.ConvertToInt(indexRange2.first);
+        ////    if (indexRange2.last != null) j2 = O.ConvertToInt(indexRange2.last);
         ////    if (i1 > i2)
         ////    {
         ////        G.Writeln2("*** ERROR: Range " + i1 + ".." + i2 + " is descending");
@@ -156,11 +156,11 @@ namespace Gekko
         
         ////public IVariable Indexer(GekkoSmpl t, IVariable index, IVariablesFilterRange indexRange)
         ////{
-        ////    int i0 = O.GetInt(index);            
+        ////    int i0 = O.ConvertToInt(index);            
         ////    int j1 = 1;
         ////    int j2 = this.data.GetLength(1);            
-        ////    if (indexRange.first != null) j1 = O.GetInt(indexRange.first);
-        ////    if (indexRange.last != null) j2 = O.GetInt(indexRange.last);
+        ////    if (indexRange.first != null) j1 = O.ConvertToInt(indexRange.first);
+        ////    if (indexRange.last != null) j2 = O.ConvertToInt(indexRange.last);
         ////    try
         ////    {
         ////        Matrix m = new Matrix(1, j2 - j1 + 1);
@@ -187,14 +187,14 @@ namespace Gekko
         ////{
         ////    int i1 = 1;
         ////    int i2 = this.data.GetLength(0);            
-        ////    if (indexRange.first != null) i1 = O.GetInt(indexRange.first);
-        ////    if (indexRange.last != null) i2 = O.GetInt(indexRange.last);
+        ////    if (indexRange.first != null) i1 = O.ConvertToInt(indexRange.first);
+        ////    if (indexRange.last != null) i2 = O.ConvertToInt(indexRange.last);
         ////    if (i1 > i2)
         ////    {
         ////        G.Writeln2("*** ERROR: Range " + i1 + ".." + i2 + " is descending");
         ////        throw new GekkoException();
         ////    }
-        ////    int j0 = O.GetInt(index);
+        ////    int j0 = O.ConvertToInt(index);
         ////    try
         ////    {
         ////        Matrix m = new Matrix(i2 - i1 + 1, 1);
@@ -253,10 +253,10 @@ namespace Gekko
 
         public double GetVal(GekkoTime t)
         {
-            return GetVal();
+            return ConvertToVal();
         }
 
-        public double GetVal()
+        public double ConvertToVal()
         {
             if (this.data.GetLength(0) == 1 && this.data.GetLength(1) == 1)
             {
@@ -264,24 +264,24 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a matrix.");                
-            }
-            throw new GekkoException();
+                G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a " + this.data.GetLength(0) + "x" + this.data.GetLength(1) + " matrix.");
+                throw new GekkoException();
+            }            
         }
 
-        public string GetString()
+        public string ConvertToString()
         {            
             G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a STRING from a matrix.");
             throw new GekkoException();
         }
 
-        public GekkoTime GetDate(O.GetDateChoices c)
+        public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
             G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a DATE from a matrix.");
             throw new GekkoException();
         }
 
-        public List<IVariable> GetList()
+        public List<IVariable> ConvertToList()
         {
             G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a LIST from a matrix.");
             throw new GekkoException();
@@ -431,7 +431,7 @@ namespace Gekko
             {
                 //This is allowed in AREMOS, too
                 double[,] a = this.data;
-                double b = O.GetVal(t, x);
+                double b = O.ConvertToVal(t, x);
                 int m = a.GetLength(0);                
                 int k = a.GetLength(1);
                 double[,] c = O.MultiplyMatrixScalar(a, b, m, k);
@@ -478,7 +478,7 @@ namespace Gekko
                 case EVariableType.Val:
                     {
                         double[,] a = this.data;
-                        double b = O.GetVal(t, x);
+                        double b = O.ConvertToVal(t, x);
                         int m = a.GetLength(0);
                         int k = a.GetLength(1);
                         double[,] c = O.MultiplyMatrixScalar(a, 1d/b, m, k);
@@ -520,7 +520,7 @@ namespace Gekko
                 {
                     try
                     {
-                        this.data[O.GetInt(x1) - 1, O.GetInt(x2) - 1] = O.GetVal(null, rhsExpression);
+                        this.data[O.ConvertToInt(x1) - 1, O.ConvertToInt(x2) - 1] = O.ConvertToVal(null, rhsExpression);
                     }
                     catch (IndexOutOfRangeException e)
                     {
@@ -558,10 +558,10 @@ namespace Gekko
             int i2 = this.data.GetLength(0);
             int j1 = 1;
             int j2 = this.data.GetLength(1);
-            if (indexRange1.first != null) i1 = O.GetInt(indexRange1.first);
-            if (indexRange1.last != null) i2 = O.GetInt(indexRange1.last);
-            if (indexRange2.first != null) j1 = O.GetInt(indexRange2.first);
-            if (indexRange2.last != null) j2 = O.GetInt(indexRange2.last);
+            if (indexRange1.first != null) i1 = O.ConvertToInt(indexRange1.first);
+            if (indexRange1.last != null) i2 = O.ConvertToInt(indexRange1.last);
+            if (indexRange2.first != null) j1 = O.ConvertToInt(indexRange2.first);
+            if (indexRange2.last != null) j2 = O.ConvertToInt(indexRange2.last);
             if (i1 > i2)
             {
                 G.Writeln2("*** ERROR: Range " + i1 + ".." + i2 + " is descending");
@@ -605,10 +605,10 @@ namespace Gekko
             int i2 = this.data.GetLength(0);
             int j1 = 1;
             int j2 = this.data.GetLength(1);
-            if (indexRange1.first != null) i1 = O.GetInt(indexRange1.first);
-            if (indexRange1.last != null) i2 = O.GetInt(indexRange1.last);
-            if (indexRange2.first != null) j1 = O.GetInt(indexRange2.first);
-            if (indexRange2.last != null) j2 = O.GetInt(indexRange2.last);
+            if (indexRange1.first != null) i1 = O.ConvertToInt(indexRange1.first);
+            if (indexRange1.last != null) i2 = O.ConvertToInt(indexRange1.last);
+            if (indexRange2.first != null) j1 = O.ConvertToInt(indexRange2.first);
+            if (indexRange2.last != null) j2 = O.ConvertToInt(indexRange2.last);
             if (i1 > i2)
             {
                 G.Writeln2("*** ERROR: Range " + i1 + ".." + i2 + " is descending");
@@ -683,8 +683,8 @@ namespace Gekko
 
         private void HandleIndexOutOfRange(IVariable x1, IVariable x2)
         {
-            int dim1 = O.GetInt(x1);
-            int dim2 = O.GetInt(x2);
+            int dim1 = O.ConvertToInt(x1);
+            int dim2 = O.ConvertToInt(x2);
             int maxDim1 = this.data.GetLength(0);
             int maxDim2 = this.data.GetLength(1);
             if (dim1 > maxDim1 || dim2 > maxDim2)

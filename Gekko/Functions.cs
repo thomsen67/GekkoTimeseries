@@ -35,7 +35,7 @@ namespace Gekko
         {
             if (x1.Type() == EVariableType.String)
             {
-                string s = x1.GetString();
+                string s = x1.ConvertToString();
                 if (G.equal(s, "first"))
                 {
                     return new ScalarString(Program.databanks.GetFirst().aliasName);
@@ -53,7 +53,7 @@ namespace Gekko
             else if (x1.Type() == EVariableType.Val)
             {
 
-                int x = O.GetInt(x1);
+                int x = O.ConvertToInt(x1);
                 Databank db = null;
                 if (x < 0)
                 {
@@ -95,7 +95,7 @@ namespace Gekko
 
         public static IVariable bankfilename(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
-            string y1 = x1.GetString();
+            string y1 = x1.ConvertToString();
             string rv = null;
             Databank db = Program.databanks.GetDatabank(y1);
             if (db == null)
@@ -104,7 +104,7 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            string y2 = x2.GetString();
+            string y2 = x2.ConvertToString();
             if (G.equal(y2, "fullpath"))
             {
                 rv = db.FileNameWithPath;
@@ -116,15 +116,15 @@ namespace Gekko
             return new ScalarString(rv);
         }
 
-        //just to test against user defined function
-        //is this used at all???
-        public static IVariable sum_test_method(GekkoSmpl smpl, IVariable x1, IVariable x2)
-        {
-            double y1 = x1.GetValOLD(null);//uuu
-            double y2 = x2.GetValOLD(null);//uuu            
-            double y = y1 + y2;
-            return new ScalarVal(y);
-        }
+        ////just to test against user defined function
+        ////is this used at all???
+        //public static IVariable sum_test_method(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        //{
+        //    double y1 = x1.GetValOLD(null);//uuu
+        //    double y2 = x2.GetValOLD(null);//uuu            
+        //    double y = y1 + y2;
+        //    return new ScalarVal(y);
+        //}
 
         public static IVariable test(GekkoSmpl t, IVariable x1)
         {
@@ -134,8 +134,8 @@ namespace Gekko
         public static IVariable concat(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             //same as %s1 + %s2 anyway.
-            string s1 = O.GetString(x1);
-            string s2 = O.GetString(x2);
+            string s1 = O.ConvertToString(x1);
+            string s2 = O.ConvertToString(x2);
             return new ScalarString(s1 + s2);            
         }        
 
@@ -143,9 +143,9 @@ namespace Gekko
         public static IVariable piece(GekkoSmpl smpl, IVariable x1, IVariable x2, IVariable x3)
         {
             string s = null;
-            string s1 = O.GetString(x1);
-            int i2 = O.GetInt(x2);
-            int i3 = O.GetInt(x3);
+            string s1 = O.ConvertToString(x1);
+            int i2 = O.ConvertToInt(x2);
+            int i3 = O.ConvertToInt(x3);
             if (i3 < 0)
             {
                 //AREMOS supports this...
@@ -194,13 +194,13 @@ namespace Gekko
 
         public static GekkoTuple.Tuple2 laspchain(GekkoSmpl smpl, IVariable plist, IVariable xlist, IVariable date)
         {            
-            GekkoTuple.Tuple2 tuple = Program.GenrTuple("laspchain", plist, xlist, date.GetDate(O.GetDateChoices.Strict), Globals.globalPeriodStart, Globals.globalPeriodEnd);           
+            GekkoTuple.Tuple2 tuple = Program.GenrTuple("laspchain", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), Globals.globalPeriodStart, Globals.globalPeriodEnd);           
             return tuple;
         }
 
         public static GekkoTuple.Tuple2 laspfixed(GekkoSmpl smpl, IVariable plist, IVariable xlist, IVariable date)
         {
-            GekkoTuple.Tuple2 tuple = Program.GenrTuple("laspfixed", plist, xlist, O.GetDate(date), Globals.globalPeriodStart, Globals.globalPeriodEnd);
+            GekkoTuple.Tuple2 tuple = Program.GenrTuple("laspfixed", plist, xlist, O.ConvertToDate(date), Globals.globalPeriodStart, Globals.globalPeriodEnd);
             return tuple;
         }
 
@@ -230,14 +230,14 @@ namespace Gekko
             }
             else
             {
-                tStart = O.GetDate(per1);
-                tEnd = O.GetDate(per2);
+                tStart = O.ConvertToDate(per1);
+                tEnd = O.ConvertToDate(per2);
             }           
             
             int obs = GekkoTime.Observations(tStart, tEnd);
 
-            double lambda = O.GetVal(smpl, ilambda);
-            double log = O.GetVal(smpl, ilog);
+            double lambda = O.ConvertToVal(smpl, ilambda);
+            double log = O.ConvertToVal(smpl, ilog);
             
             TimeSeries rhs = O.GetTimeSeries(rightSide);
 
@@ -340,7 +340,7 @@ namespace Gekko
                 {
                     foreach (IVariable iv in ((MetaList)vars[j]).list)
                     {
-                        string s = O.GetString(iv);
+                        string s = O.ConvertToString(iv);
                         TimeSeries tmp = Program.GetTimeSeriesFromString(s, O.ECreatePossibilities.None);
                         tss.Add(tmp);
                     }
@@ -384,20 +384,20 @@ namespace Gekko
 
         public static IVariable det(GekkoSmpl smpl, IVariable x)
         {
-            Matrix m = O.GetMatrix(x);
+            Matrix m = O.ConvertToMatrix(x);
             double d = alglib.rmatrixdet(m.data);
             return new ScalarVal(d);
         }
 
         public static IVariable rows(GekkoSmpl smpl, IVariable x1)
         {
-            Matrix m = O.GetMatrix(x1);
+            Matrix m = O.ConvertToMatrix(x1);
             return new ScalarVal(m.data.GetLength(0));            
         }
 
         public static IVariable cols(GekkoSmpl smpl, IVariable x1)
         {
-            Matrix m = O.GetMatrix(x1);
+            Matrix m = O.ConvertToMatrix(x1);
             return new ScalarVal(m.data.GetLength(1));
         }        
 
@@ -418,7 +418,7 @@ namespace Gekko
 
         public static IVariable i(GekkoSmpl smpl, IVariable x)
         {
-            int n = O.GetInt(x);
+            int n = O.ConvertToInt(x);
             Matrix m = new Matrix(n, n);
             for (int i = 0; i < n; i++)
             {
@@ -430,7 +430,7 @@ namespace Gekko
         public static IVariable diag(GekkoSmpl smpl, IVariable x)
         {
             Matrix m = null;
-            Matrix xx = O.GetMatrix(x);
+            Matrix xx = O.ConvertToMatrix(x);
             //for a 1x1 matrix, either of the two cases below yields the same!
             if (xx.data.GetLength(1) == 1)
             {
@@ -455,7 +455,7 @@ namespace Gekko
 
         public static IVariable trace(GekkoSmpl smpl, IVariable x)
         {
-            Matrix m = O.GetMatrix(x);
+            Matrix m = O.ConvertToMatrix(x);
             int n = CheckSquare(m);
             double d = 0d;
             for (int i = 0; i < n; i++)
@@ -477,7 +477,7 @@ namespace Gekko
 
         public static IVariable inv(GekkoSmpl smpl, IVariable x)
         {
-            Matrix m = O.GetMatrix(x);
+            Matrix m = O.ConvertToMatrix(x);
             int n = CheckSquare(m);
             Matrix clone = m.Clone();
             clone.data = Program.InvertMatrix(clone.data);
@@ -486,8 +486,8 @@ namespace Gekko
         
         public static IVariable zeros(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
-            int n1 = O.GetInt(x1);
-            int n2 = O.GetInt(x2);
+            int n1 = O.ConvertToInt(x1);
+            int n2 = O.ConvertToInt(x2);
             Matrix m = new Matrix(n1, n2);
             return m;
         }
@@ -535,15 +535,20 @@ namespace Gekko
 
         public static IVariable miss(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
-            int n1 = O.GetInt(x1);
-            int n2 = O.GetInt(x2);
+            int n1 = O.ConvertToInt(x1);
+            int n2 = O.ConvertToInt(x2);
             Matrix m = new Matrix(n1, n2, double.NaN);
             return m;
         }
 
         public static IVariable ismiss(GekkoSmpl smpl, IVariable x)
         {
-            double d = x.GetValOLD(smpl);
+            if (x.Type() == EVariableType.Series)
+            {
+                G.Writeln2("*** ERROR: SERIES not expected in ismiss()");
+                throw new GekkoException();
+            }
+            double d = x.ConvertToVal();
             bool b = G.isNumericalError(d);
             if (b) return Globals.scalarVal1;
             return Globals.scalarVal0;
@@ -556,7 +561,7 @@ namespace Gekko
         
         private static IVariable SumHelper(GekkoSmpl smpl, IVariable x, ESumDim dim, ESumType type)
         {
-            Matrix m = O.GetMatrix(x);
+            Matrix m = O.ConvertToMatrix(x);
             int rows = m.data.GetLength(0);
             int cols = m.data.GetLength(1);
 
@@ -663,8 +668,8 @@ namespace Gekko
 
         public static IVariable ones(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
-            int n1 = O.GetInt(x1);
-            int n2 = O.GetInt(x2);
+            int n1 = O.ConvertToInt(x1);
+            int n2 = O.ConvertToInt(x2);
             Matrix m = new Matrix(n1, n2, 1d);
             return m;
         }
@@ -672,8 +677,8 @@ namespace Gekko
         //Multiplication element by element
         private static IVariable ElementByElementHelper(EElementByElementType type, GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
-            Matrix m1 = O.GetMatrix(x1);
-            Matrix m2 = O.GetMatrix(x2);
+            Matrix m1 = O.ConvertToMatrix(x1);
+            Matrix m2 = O.ConvertToMatrix(x2);
             bool fixedRow1 = false;
             bool fixedCol1 = false;
             if (m1.data.GetLength(0) != m2.data.GetLength(0))
@@ -739,7 +744,7 @@ namespace Gekko
 
             int obs = GekkoTime.Observations(gt1, gt2);
                         
-            Matrix m = O.GetMatrix(x);
+            Matrix m = O.ConvertToMatrix(x);
 
             if (m.data.GetLength(1) > 1)
             {
@@ -803,8 +808,8 @@ namespace Gekko
                 {
                     //seems like two dates first
                     offset = 2;
-                    gt1 = O.GetDate(vars[0]);
-                    gt2 = O.GetDate(vars[1]);
+                    gt1 = O.ConvertToDate(vars[0]);
+                    gt2 = O.ConvertToDate(vars[1]);
                 }
             }
             int obs = GekkoTime.Observations(gt1, gt2);
@@ -818,7 +823,7 @@ namespace Gekko
 
         public static IVariable length(GekkoSmpl smpl, IVariable x1)
         {            
-            string s1 = O.GetString(x1);
+            string s1 = O.ConvertToString(x1);
             return new ScalarVal(s1.Length);
         }
 
@@ -868,7 +873,7 @@ namespace Gekko
 
         public static IVariable rseed(GekkoSmpl t, IVariable seed)
         {
-            double seed2 = O.GetVal(t, seed);
+            double seed2 = O.ConvertToVal(t, seed);
             int i = (int)seed2;
             Globals.random = new Random(i);            
             return new ScalarVal(i);
@@ -907,7 +912,7 @@ namespace Gekko
                 //https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Drawing_values_from_the_distribution
                 for (int i = 0; i < n; i++)
                 {
-                    double random = O.GetVal(t, rnorm(t, Globals.scalarVal0, Globals.scalarVal1)); //could be sped up by interfacing to the interior of the method
+                    double random = O.ConvertToVal(t, rnorm(t, Globals.scalarVal0, Globals.scalarVal1)); //could be sped up by interfacing to the interior of the method
                     randoms[i, 0] = random;
                 }                
                 
@@ -920,8 +925,8 @@ namespace Gekko
             }
             else
             {
-                double mean = O.GetVal(t, means);
-                double stdDev = Math.Sqrt(O.GetVal(t, vcov));
+                double mean = O.ConvertToVal(t, means);
+                double stdDev = Math.Sqrt(O.ConvertToVal(t, vcov));
                 Random rand = new Random(); //reuse this if you are generating many
                 double u1 = Globals.random.NextDouble(); //these are uniform(0,1) random doubles
                 double u2 = Globals.random.NextDouble();
@@ -1001,54 +1006,15 @@ namespace Gekko
                 G.Writeln2("*** ERROR: sum error");
                 throw new GekkoException();
 
-                double v = 0d;
-                foreach (IVariable a in items)
-                {
-                    if (a.Type() == EVariableType.List)
-                    {
-                        foreach (IVariable iv in ((MetaList)a).GetList())
-                        {
-                            string s = O.GetString(iv);
-                            v += O.IndirectionHelper(t, s).GetValOLD(t);
-                        }
-                    }
-                    else
-                    {
-                        v += a.GetValOLD(t);
-                    }
-                }
-                rv = new ScalarVal(v);
+                //fix #89043752438
             }
             return rv;
         }
 
         public static IVariable avg(GekkoSmpl smpl, params IVariable[] items)//uuu
         {
-            if (items.Length == 0)
-            {
-                G.Writeln2("*** ERROR: avg() function must have > 0 arguments.");
-                throw new GekkoException();
-            }
-            double v = 0d;
-            double n = 0d;
-            foreach (IVariable a in items)
-            {
-                if (a.Type() == EVariableType.List)
-                {
-                    foreach (IVariable iv in ((MetaList)a).GetList())
-                    {
-                        string s = O.GetString(iv);
-                        v += O.IndirectionHelper(smpl, s).GetValOLD(smpl);
-                        n++;
-                    }
-                }
-                else
-                {
-                    v += a.GetValOLD(smpl);
-                    n++;
-                }
-            }
-            return new ScalarVal(v / n);
+            ////fix #89043752438
+            return null;
         }
 
         public static IVariable percentile(GekkoSmpl t, IVariable inputVar, IVariable percent)
@@ -1058,7 +1024,7 @@ namespace Gekko
             GekkoTime t2 = Globals.globalPeriodEnd;
 
             TimeSeries ts = O.GetTimeSeries(inputVar);
-            double percent2 = O.GetVal(t, percent);
+            double percent2 = O.ConvertToVal(t, percent);
 
             int index1 = -12345;
             int index2 = -12345;
@@ -1081,12 +1047,12 @@ namespace Gekko
             IVariable rv = null;
             if (IsValOrTimeseries(x))
             {
-                double d = O.GetVal(t, x);
+                double d = O.ConvertToVal(t, x);
                 rv = new ScalarVal(Math.Abs(d));
             }
             else if (x.Type() == EVariableType.Matrix)
             {
-                Matrix m = O.GetMatrix(x);
+                Matrix m = O.ConvertToMatrix(x);
                 Matrix m2 = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
                 for (int i = 0; i < m.data.GetLength(0); i++)
                 {
@@ -1144,11 +1110,11 @@ namespace Gekko
                 G.Writeln2("*** ERROR: iif(): arg 5, type " + o2.Type().ToString() + " not supported");
                 throw new GekkoException();
             }
-            double di1 = O.GetVal(t, i1);
-            double di2 = O.GetVal(t, i2);
-            double do1 = O.GetVal(t, o1);
-            double do2 = O.GetVal(t, o2);
-            string x = O.GetString(op).Trim();
+            double di1 = O.ConvertToVal(t, i1);
+            double di2 = O.ConvertToVal(t, i2);
+            double do1 = O.ConvertToVal(t, o1);
+            double do2 = O.ConvertToVal(t, o2);
+            string x = O.ConvertToString(op).Trim();
 
             if (x == "==")
             {
@@ -1229,12 +1195,12 @@ namespace Gekko
             IVariable rv = null;
             if (IsValOrTimeseries(x))
             {
-                double d = O.GetVal(t, x);
+                double d = O.ConvertToVal(t, x);
                 rv = new ScalarVal(Math.Log(d));
             }
             else if (x.Type() == EVariableType.Matrix)
             {
-                Matrix m = O.GetMatrix(x);
+                Matrix m = O.ConvertToMatrix(x);
                 Matrix m2 = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
                 for (int i = 0; i < m.data.GetLength(0); i++)
                 {
@@ -1257,12 +1223,12 @@ namespace Gekko
             IVariable rv = null;
             if (IsValOrTimeseries(x))
             {
-                double d = O.GetVal(t, x);
+                double d = O.ConvertToVal(t, x);
                 rv = new ScalarVal(Math.Exp(d));
             }
             else if (x.Type() == EVariableType.Matrix)
             {
-                Matrix m = O.GetMatrix(x);
+                Matrix m = O.ConvertToMatrix(x);
                 Matrix m2 = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
                 for (int i = 0; i < m.data.GetLength(0); i++)
                 {
@@ -1285,12 +1251,12 @@ namespace Gekko
             IVariable rv = null;
             if (IsValOrTimeseries(x))
             {
-                double d = O.GetVal(t, x);
+                double d = O.ConvertToVal(t, x);
                 rv = new ScalarVal(Math.Sqrt(d));
             }
             else if (x.Type() == EVariableType.Matrix)
             {
-                Matrix m = O.GetMatrix(x);
+                Matrix m = O.ConvertToMatrix(x);
                 rv = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
                 for (int i = 0; i < m.data.GetLength(0); i++)
                 {
@@ -1315,8 +1281,8 @@ namespace Gekko
 
         public static IVariable pow(GekkoSmpl t, IVariable x1, IVariable x2)
         {
-            double d1 = O.GetVal(t, x1);
-            double d2 = O.GetVal(t, x2);
+            double d1 = O.ConvertToVal(t, x1);
+            double d2 = O.ConvertToVal(t, x2);
             return new ScalarVal(Math.Pow(d1, d2));
         }
 
@@ -1371,7 +1337,7 @@ namespace Gekko
         private static IVariable MovAvgSum(GekkoSmpl smpl, IVariable x, IVariable ilags, bool avg)
         {
             IVariable rv = null;
-            int d = O.GetInt(ilags);
+            int d = O.ConvertToInt(ilags);
             double divide = 1d;
             if (avg) divide = (double)d;
             if (x.Type() == EVariableType.Series)
@@ -1422,8 +1388,8 @@ namespace Gekko
         
         public static IVariable format(GekkoSmpl t, IVariable x1, IVariable x2)
         {
-            double d = O.GetVal(t, x1);
-            string format2 = O.GetString(x2);
+            double d = O.ConvertToVal(t, x1);
+            string format2 = O.ConvertToString(x2);
             string x = Program.NumberFormat(d, format2);
             ScalarString ss = new ScalarString(x);
             return ss;
@@ -1431,7 +1397,7 @@ namespace Gekko
 
         public static IVariable round(GekkoSmpl t, IVariable x1, IVariable x2)
         {            
-            double d2 = O.GetVal(t, x2);            
+            double d2 = O.ConvertToVal(t, x2);            
             int aaa1 = 0;
             if (!G.Round(out aaa1, d2))
             {
@@ -1447,13 +1413,13 @@ namespace Gekko
 
             if (IsValOrTimeseries(x1))
             {
-                double d1 = O.GetVal(t, x1);
+                double d1 = O.ConvertToVal(t, x1);
                 double value2 = Math.Round(d1, decimals);
                 return new ScalarVal(value2);
             }
             else if (x1.Type() == EVariableType.Matrix)
             {
-                Matrix m = O.GetMatrix(x1);
+                Matrix m = O.ConvertToMatrix(x1);
                 Matrix m2 = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
                 for (int i = 0; i < m.data.GetLength(0); i++)
                 {
@@ -1473,16 +1439,16 @@ namespace Gekko
 
         public static IVariable search(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
-            string s1 = O.GetString(x1);
-            string s2 = O.GetString(x2);
+            string s1 = O.ConvertToString(x1);
+            string s2 = O.ConvertToString(x2);
             int i = s1.IndexOf(s2);            
             return new ScalarVal(i + 1);
         }
 
         public static IVariable startswith(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
-            string s1 = O.GetString(x1);
-            string s2 = O.GetString(x2);
+            string s1 = O.ConvertToString(x1);
+            string s2 = O.ConvertToString(x2);
             int i = 0;
             if (s1.StartsWith(s2)) i = 1;
             return new ScalarVal(i);
@@ -1490,8 +1456,8 @@ namespace Gekko
 
         public static IVariable endswith(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
-            string s1 = O.GetString(x1);
-            string s2 = O.GetString(x2);
+            string s1 = O.ConvertToString(x1);
+            string s2 = O.ConvertToString(x2);
             int i = 0;
             if (s1.EndsWith(s2)) i = 1;
             return new ScalarVal(i);
@@ -1499,19 +1465,19 @@ namespace Gekko
 
         public static IVariable trim(GekkoSmpl smpl, IVariable x1)
         {
-            string s1 = O.GetString(x1);
+            string s1 = O.ConvertToString(x1);
             return new ScalarString(s1.Trim());
         }
 
         public static IVariable upper(GekkoSmpl smpl, IVariable x1)
         {
-            string s1 = O.GetString(x1);
+            string s1 = O.ConvertToString(x1);
             return new ScalarString(s1.ToUpper());
         }
 
         public static IVariable lower(GekkoSmpl smpl, IVariable x1)
         {
-            string s1 = O.GetString(x1);
+            string s1 = O.ConvertToString(x1);
             return new ScalarString(s1.ToLower());
         }
 
@@ -1543,7 +1509,7 @@ namespace Gekko
                 List<IVariable> l = ((MetaList)x).list;
                 foreach (IVariable iv in l)
                 {
-                    string ss = O.GetString(iv);
+                    string ss = O.ConvertToString(iv);
                     s += ss + ", ";
                 }                
                 if (s.EndsWith(", ")) s = s.Substring(0, s.Length - 2);
@@ -1561,7 +1527,7 @@ namespace Gekko
             GekkoTime d = Globals.tNull;
             if (x.Type() == EVariableType.Val)
             {
-                d = O.GetDate(x);  //already has auto-conversion from VAL to DATE
+                d = O.ConvertToDate(x);  //already has auto-conversion from VAL to DATE
             }
             else if (x.Type() == EVariableType.Date)
             {
@@ -1641,9 +1607,9 @@ namespace Gekko
         public static IVariable replace(GekkoSmpl smpl, IVariable x1, IVariable x2, IVariable x3)
         {
             //does not exist in AREMOS
-            string s1 = O.GetString(x1);
-            string s2 = O.GetString(x2);
-            string s3 = O.GetString(x3);
+            string s1 = O.ConvertToString(x1);
+            string s2 = O.ConvertToString(x2);
+            string s3 = O.ConvertToString(x3);
             string s4 = s1.Replace(s2, s3);
             return new ScalarString(s4);
         }
@@ -1690,8 +1656,8 @@ namespace Gekko
             GekkoTime t2 = Globals.tNull;
             try
             {
-                t1 = O.GetDate(x1);
-                t2 = O.GetDate(x2);
+                t1 = O.ConvertToDate(x1);
+                t2 = O.ConvertToDate(x2);
             }
             catch
             {
@@ -1721,7 +1687,7 @@ namespace Gekko
         public static IVariable exist(GekkoSmpl smpl, IVariable x1)
         {
             double d = 0d;
-            string s1 = O.GetString(x1);
+            string s1 = O.ConvertToString(x1);
             ExtractBankAndRestHelper h = Program.ExtractBankAndRest(s1, EExtrackBankAndRest.OnlyStrings);
             if (Program.databanks.GetDatabank(h.bank) == null)
             {
@@ -1735,8 +1701,8 @@ namespace Gekko
 
         public static IVariable fromseries(GekkoTime t, IVariable x1, IVariable x2)
         {
-            string s1 = O.GetString(x1);
-            string s2 = O.GetString(x2);
+            string s1 = O.ConvertToString(x1);
+            string s2 = O.ConvertToString(x2);
 
             //TODO TODO
             //TODO TODO

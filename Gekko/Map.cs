@@ -109,25 +109,25 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public double GetVal()
+        public double ConvertToVal()
         {
-            G.Writeln2("*** ERROR: Cannot extract a scalar value from " + G.GetTypeString(this) + " type");
+            G.Writeln2("*** ERROR: Cannot extract a VAL from " + G.GetTypeString(this) + " type");
             throw new GekkoException();
         }
 
-        public string GetString()
+        public string ConvertToString()
         {
             G.Writeln2("*** ERROR: Trying to convert a MAP into a STRING.");
             throw new GekkoException();
         }
 
-        public GekkoTime GetDate(O.GetDateChoices c)
+        public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
             G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a DATE from a MAP.");
             throw new GekkoException();
         }
 
-        public List<IVariable> GetList()
+        public List<IVariable> ConvertToList()
         {
             G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a LIST from a MAP.");
             throw new GekkoException();
@@ -177,7 +177,7 @@ namespace Gekko
         {
             if (dims.Length == 1 && dims[0].Type() == EVariableType.String)
             {
-                string s = O.GetString(dims[0]);
+                string s = O.ConvertToString(dims[0]);
                 string dbName, varName, freq; O.Chop(s, out dbName, out varName, out freq);        
                 if(dbName!=null)
                 {

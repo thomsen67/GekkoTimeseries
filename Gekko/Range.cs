@@ -76,25 +76,25 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public double GetVal()
+        public double ConvertToVal()
         {
-            G.Writeln2("*** ERROR: Cannot extract a scalar value from " + G.GetTypeString(this) + " type");
+            G.Writeln2("*** ERROR: Cannot extract a VAL from " + G.GetTypeString(this) + " type");
             throw new GekkoException();
         }
 
-        public string GetString()
-        {
-            G.Writeln2("*** ERROR: Wrong use of Range class");
-            throw new GekkoException();
-        }
-
-        public GekkoTime GetDate(O.GetDateChoices c)
+        public string ConvertToString()
         {
             G.Writeln2("*** ERROR: Wrong use of Range class");
             throw new GekkoException();
         }
 
-        public List<IVariable> GetList()
+        public GekkoTime ConvertToDate(O.GetDateChoices c)
+        {
+            G.Writeln2("*** ERROR: Wrong use of Range class");
+            throw new GekkoException();
+        }
+
+        public List<IVariable> ConvertToList()
         {
             G.Writeln2("*** ERROR: Wrong use of Range class");
             throw new GekkoException();

@@ -74,7 +74,7 @@ namespace Gekko
             {
                 foreach(IVariable iv in _ml.list)
                 {
-                    string s = O.GetString(iv);
+                    string s = O.ConvertToString(iv);
                     yield return new ScalarString(s);
                 }                                         
             }
@@ -88,8 +88,8 @@ namespace Gekko
 
         //public static void AssignVal(IVariable lhs, IVariable rhs)
         //{
-        //    string s = O.GetString(lhs);
-        //    double d = O.GetVal(null, rhs);
+        //    string s = O.ConvertToString(lhs);
+        //    double d = O.ConvertToVal(null, rhs);
         //    IVariable iv = null; Program.scalars.TryGetValue(s, out iv);
         //    if (iv != null)
         //    {
@@ -254,41 +254,41 @@ namespace Gekko
             FlexibleEnd
         }
 
-        public static ScalarVal SetValData(GekkoSmpl smpl, IVariable name, IVariable rhs)
-        {
-            //Returns the IVariable it finds here (or creates)            
-            string name2 = name.GetString();            
-            double value = rhs.GetValOLD(smpl);
-            IVariable lhs = null;
-            if (Program.scalars.TryGetValue(name2, out lhs))
-            {
-                //Scalar is already existing                
-                if (lhs.Type() == EVariableType.Val)
-                {
-                    //Already existing lhs is a VAL, inject into it. Injecting is faster than recreating an object.
-                    ((ScalarVal)lhs).val = value;                    
-                }
-                else
-                {                    
-                    Program.scalars.Remove(name2);
-                    lhs = new ScalarVal(value);
-                    Program.scalars.Add(name2, lhs);                    
-                }
-            }
-            else
-            {
-                //Scalar does not exist beforehand                   
-                lhs = new ScalarVal(value);
-                Program.scalars.Add(name2, lhs);                
-            }
-            return (ScalarVal)lhs;
-        }
+        //public static ScalarVal SetValData(GekkoSmpl smpl, IVariable name, IVariable rhs)
+        //{
+        //    //Returns the IVariable it finds here (or creates)            
+        //    string name2 = name.ConvertToString();            
+        //    double value = rhs.GetValOLD(smpl);
+        //    IVariable lhs = null;
+        //    if (Program.scalars.TryGetValue(name2, out lhs))
+        //    {
+        //        //Scalar is already existing                
+        //        if (lhs.Type() == EVariableType.Val)
+        //        {
+        //            //Already existing lhs is a VAL, inject into it. Injecting is faster than recreating an object.
+        //            ((ScalarVal)lhs).val = value;                    
+        //        }
+        //        else
+        //        {                    
+        //            Program.scalars.Remove(name2);
+        //            lhs = new ScalarVal(value);
+        //            Program.scalars.Add(name2, lhs);                    
+        //        }
+        //    }
+        //    else
+        //    {
+        //        //Scalar does not exist beforehand                   
+        //        lhs = new ScalarVal(value);
+        //        Program.scalars.Add(name2, lhs);                
+        //    }
+        //    return (ScalarVal)lhs;
+        //}
 
         public static ScalarString SetStringData(IVariable name, IVariable rhs, bool isName)
         {
             //Returns the IVariable it finds here (or creates)
-            string name2 = name.GetString();
-            string value = rhs.GetString();            
+            string name2 = name.ConvertToString();
+            string value = rhs.ConvertToString();            
             IVariable lhs = null;
             if (Program.scalars.TryGetValue(name2, out lhs))
             {
@@ -319,8 +319,8 @@ namespace Gekko
         public static ScalarDate SetDateData(IVariable name, IVariable rhs)
         {
             //Returns the IVariable it finds here (or creates)
-            string name2 = name.GetString();
-            GekkoTime value = O.GetDate(rhs);
+            string name2 = name.ConvertToString();
+            GekkoTime value = O.ConvertToDate(rhs);
             IVariable lhs = null;
             if (Program.scalars.TryGetValue(name2, out lhs))
             {
@@ -1003,19 +1003,19 @@ namespace Gekko
             {
                 case EVariableType.Val:
                     {
-                        double d = O.GetVal(smpl, x);
+                        double d = O.ConvertToVal(smpl, x);
                         G.Writeln2("VAL = " + d);                   
                     }
                     break;
                 case EVariableType.String:
                     {
-                        string s = O.GetString(x);                        
+                        string s = O.ConvertToString(x);                        
                         G.Writeln2("STRING = " + s);                        
                     }
                     break;
                 case EVariableType.Date:
                     {
-                        string d = O.GetDate(x).ToString();
+                        string d = O.ConvertToDate(x).ToString();
                         G.Writeln2("DATE = " + d);
                     }
                     break;
@@ -1083,7 +1083,7 @@ namespace Gekko
                     break;
                 case EVariableType.Matrix:
                     {
-                        Matrix m = O.GetMatrix(x);
+                        Matrix m = O.ConvertToMatrix(x);
                         Program.ShowMatrix(m, "label...");
                     }
                     break;
@@ -1165,7 +1165,7 @@ namespace Gekko
             MetaList m = (MetaList)x[depth];
             foreach (IVariable iv in m.list)
             {
-                string s = O.GetString(iv);
+                string s = O.ConvertToString(iv);
                 G.Writeln2(depth + " " + s);
                 HandleIndexerHelper(depth + 1, y, x);
             }
@@ -1455,7 +1455,7 @@ namespace Gekko
 
         public static IVariable ZList(IVariable iv)
         {
-            string name = GetString(iv);
+            string name = ConvertToString(iv);
             IVariable a = null;
             if (Program.scalars.TryGetValue(Globals.symbolList + name, out a))
             {
@@ -2052,7 +2052,7 @@ namespace Gekko
 
         public static IVariable GetListWithBankPrefix(IVariable x, IVariable y, int bankNumber)
         {
-            string bankName = O.GetString(x);
+            string bankName = O.ConvertToString(x);
             List<string> items = O.GetStringList(y);
             List<string> newList = new List<string>();
             foreach (string s in items)
@@ -2099,11 +2099,11 @@ namespace Gekko
             bool rv = false;
             if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
             {
-                if (O.GetDate(x).StrictlySmallerThan(O.GetDate(y))) rv = true;
+                if (O.ConvertToDate(x).StrictlySmallerThan(O.ConvertToDate(y))) rv = true;
             }
             else if ((x.Type() == EVariableType.Series || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.Series || y.Type() == EVariableType.Val))
             {
-                if (x.GetValOLD(smpl) < y.GetValOLD(smpl)) rv = true;
+                //if (x.GetValOLD(smpl) < y.GetValOLD(smpl)) rv = true; //#8097534320985
             }
             else
             {
@@ -2119,11 +2119,11 @@ namespace Gekko
             bool rv = false;
             if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
             {
-                if (O.GetDate(x).SmallerThanOrEqual(O.GetDate(y))) rv = true;
+                if (O.ConvertToDate(x).SmallerThanOrEqual(O.ConvertToDate(y))) rv = true;
             }
             else if ((x.Type() == EVariableType.Series || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.Series || y.Type() == EVariableType.Val))
             {
-                if (x.GetValOLD(smpl) <= y.GetValOLD(smpl)) rv = true;
+                //if (x.GetValOLD(smpl) <= y.GetValOLD(smpl)) rv = true;  // //#8097534320985
             }
             else
             {
@@ -2202,11 +2202,11 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
             {
-                if (O.GetDate(x).IsSamePeriod(O.GetDate(y))) rv = Globals.scalarVal1;
+                if (O.ConvertToDate(x).IsSamePeriod(O.ConvertToDate(y))) rv = Globals.scalarVal1;
             }
             else if (x.Type() == EVariableType.String && y.Type() == EVariableType.String)
             {
-                if (G.equal(x.GetString(), y.GetString())) rv = Globals.scalarVal1;
+                if (G.equal(x.ConvertToString(), y.ConvertToString())) rv = Globals.scalarVal1;
             }
             else
             {
@@ -2237,11 +2237,11 @@ namespace Gekko
             bool rv = false;
             if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
             {
-                if (O.GetDate(x).LargerThanOrEqual(O.GetDate(y))) rv = true;
+                if (O.ConvertToDate(x).LargerThanOrEqual(O.ConvertToDate(y))) rv = true;
             }
             else if ((x.Type() == EVariableType.Series || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.Series || y.Type() == EVariableType.Val))
             {
-                if (x.GetValOLD(smpl) >= y.GetValOLD(smpl)) rv = true;
+                //if (x.GetValOLD(smpl) >= y.GetValOLD(smpl)) rv = true;  // //#8097534320985
             }
             else
             {
@@ -2257,11 +2257,11 @@ namespace Gekko
             bool rv = false;
             if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
             {
-                if (O.GetDate(x).StrictlyLargerThan(O.GetDate(y))) rv = true;
+                if (O.ConvertToDate(x).StrictlyLargerThan(O.ConvertToDate(y))) rv = true;
             }
             else if ((x.Type() == EVariableType.Series || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.Series || y.Type() == EVariableType.Val))
             {
-                if (x.GetValOLD(smpl) > y.GetValOLD(smpl)) rv = true;
+                //if (x.GetValOLD(smpl) > y.GetValOLD(smpl)) rv = true;   //#8097534320985
             }
             else
             {
@@ -2323,7 +2323,7 @@ namespace Gekko
             bool b = false;
             foreach (IVariable iv in ml.list)
             {
-                string s = O.GetString(iv);
+                string s = O.ConvertToString(iv);
                 if(G.equal(ss._string2,s))
                 {
                     b = true;
@@ -2344,7 +2344,7 @@ namespace Gekko
         
         public static List<string> SearchWildcard(IVariable a)
         {
-            string s = O.GetString(a);
+            string s = O.ConvertToString(a);
             List<string> l = new List<string>();
             l = Program.MatchWildcardInDatabank(s, Program.databanks.GetFirst());            
             return l;
@@ -2392,19 +2392,19 @@ namespace Gekko
             return x;
         }
 
-        public static GekkoTime GetDate(IVariable x, GetDateChoices c)
+        public static GekkoTime ConvertToDate(IVariable x, GetDateChoices c)
         {            
-            return x.GetDate(c);                        
+            return x.ConvertToDate(c);                        
         }
 
-        public static GekkoTime GetDate(IVariable x)
+        public static GekkoTime ConvertToDate(IVariable x)
         {
-            return GetDate(x, GetDateChoices.Strict);
+            return ConvertToDate(x, GetDateChoices.Strict);
         }
 
-        public static string GetString(IVariable a)
+        public static string ConvertToString(IVariable a)
         {
-            return a.GetString();            
+            return a.ConvertToString();            
         }
 
         public static string GetString(string s)
@@ -2412,18 +2412,18 @@ namespace Gekko
             return s;
         }
 
-        public static List<IVariable> GetList(IVariable a)
+        public static List<IVariable> ConvertToList(IVariable a)
         {
-            return a.GetList();
+            return a.ConvertToList();
         }
 
         public static List<string> GetStringList(IVariable a)
         {
-            List<IVariable> m = a.GetList();
+            List<IVariable> m = a.ConvertToList();
             List<string> mm = new List<string>();
             foreach (IVariable iv in m)
             {
-                string s = O.GetString(iv);
+                string s = O.ConvertToString(iv);
                 mm.Add(s);
             }
             return mm;
@@ -2431,7 +2431,7 @@ namespace Gekko
 
         public static Matrix GetMatrixFromString(IVariable name)
         {
-            string name2 = name.GetString();
+            string name2 = name.ConvertToString();
             IVariable lhs = null;            
             if (Program.scalars.TryGetValue(Globals.symbolList + name2, out lhs))
             {
@@ -2455,7 +2455,7 @@ namespace Gekko
         }
 
 
-        public static Matrix GetMatrix(IVariable a)
+        public static Matrix ConvertToMatrix(IVariable a)
         {
             //O.GetListFromCache(
             if (a.Type() != EVariableType.Matrix)
@@ -2686,7 +2686,7 @@ namespace Gekko
             return l;
         }
 
-        public static double GetVal(GekkoSmpl smpl, IVariable a) //uuu
+        public static double ConvertToVal(GekkoSmpl smpl, IVariable a) //uuu
         {
             return a.GetValOLD(smpl);            
         }
@@ -2713,7 +2713,7 @@ namespace Gekko
                 for (int i = 0; i < items.Count; i++)
                 {
                     string s = items[i];
-                    double dd = O.GetVal(smpl, O.GetTimeSeries(smpl, s, bankNumber));                    
+                    double dd = O.ConvertToVal(smpl, O.GetTimeSeries(smpl, s, bankNumber));                    
                     if (bankNumber == 1)
                     {
                         //if (e.subElements[i].tsWork == null) e.subElements[i].tsWork = new TimeSeries(Program.options.freq, null);
@@ -2784,7 +2784,7 @@ namespace Gekko
             else throw new GekkoException();
         }
 
-        public static int GetInt(IVariable a)
+        public static int ConvertToInt(IVariable a)
         {
             //GetInt() is really just GetVal() converted to int afterwards.
             if (a.Type() == EVariableType.Series)
@@ -2793,7 +2793,7 @@ namespace Gekko
                 G.Writeln("           Did you forget []-brackets to pick out an observation, for instance x[2020]?");
                 throw new GekkoException();
             }
-            double d = GetVal(null, a);
+            double d = ConvertToVal(null, a);
             int intValue = -12345;
             if (!G.Round(out intValue, d))
             {
@@ -3360,7 +3360,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: STRING "+ Globals.symbolMemvar.ToString()  + s + " was not found");
                     throw new GekkoException();
                 }
-                G.Writeln2("STRING " + s + " = '" + a.GetString() + "'");
+                G.Writeln2("STRING " + s + " = '" + a.ConvertToString() + "'");
             }
             public static void Q()
             {
@@ -3382,7 +3382,7 @@ namespace Gekko
                 }
 
                 Matrix value = null;
-                if (rhs != null) value = O.GetMatrix(rhs);
+                if (rhs != null) value = O.ConvertToMatrix(rhs);
 
                 if (value != null)
                 {
@@ -3392,7 +3392,7 @@ namespace Gekko
 
                 IVariable lhs = null;
 
-                string name2 = name.GetString();
+                string name2 = name.ConvertToString();
                 if (Program.scalars.TryGetValue(Globals.symbolList + name2, out lhs))
                 {
                     //Matrix is already existing, may inherit the row/columnames               
@@ -3479,7 +3479,7 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: NAME " + Globals.symbolMemvar.ToString() + s + " was not found");
                 }
-                G.Writeln2("NAME " + s + " = '" + a.GetString() + "'");
+                G.Writeln2("NAME " + s + " = '" + a.ConvertToString() + "'");
             }
             public static void Q()
             {
@@ -3496,7 +3496,7 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: DATE " + Globals.symbolMemvar.ToString() + s + " was not found");
                 }
-                G.Writeln2("DATE " + s + " = " + G.FromDateToString(O.GetDate(a)));
+                G.Writeln2("DATE " + s + " = " + G.FromDateToString(O.ConvertToDate(a)));
             }
             public static void Q()
             {
@@ -4137,10 +4137,10 @@ namespace Gekko
             public void Exe()
             {
                 string value = "";
-                string msg = O.GetString(message);
+                string msg = O.ConvertToString(message);
                 if (Program.InputBox("Accept", msg, ref value) == DialogResult.OK)
                 {                    
-                    string nme = O.GetString(name);
+                    string nme = O.ConvertToString(name);
                     if (G.equal(type, "val"))
                     {                          
                         try
@@ -5947,7 +5947,7 @@ namespace Gekko
                 }
                 else
                 {
-                    string ss = O.GetString(s);
+                    string ss = O.ConvertToString(s);
                     Program.ExecuteShellCommand(ss, G.equal(this.opt_mute, "yes"));
                 }
             }

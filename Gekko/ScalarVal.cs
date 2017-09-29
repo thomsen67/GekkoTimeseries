@@ -24,22 +24,22 @@ namespace Gekko
             return this.val;
         }
 
-        public double GetVal()
+        public double ConvertToVal()
         {
             return this.val;
         }
 
-        public string GetString()
+        public string ConvertToString()
         {
             G.Writeln2("*** ERROR: Could not convert the VAL " + this.val + " directly into STRING.");
             G.Writeln("           You may try the string() conversion function.");            
             throw new GekkoException();
         }
 
-        public GekkoTime GetDate(O.GetDateChoices c)
+        public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
             GekkoTime gt = Globals.tNull;
-            int intValue = O.GetInt(this);  //will issue error if the VAL is not an integer
+            int intValue = O.ConvertToInt(this);  //will issue error if the VAL is not an integer
             int year = G.findYear(intValue);  //error is the year is crazy
             if (c == O.GetDateChoices.Strict || (c != O.GetDateChoices.Strict && (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)))
             {
@@ -85,7 +85,7 @@ namespace Gekko
         
                 
 
-        public List<IVariable> GetList()
+        public List<IVariable> ConvertToList()
         {
             //See similar comment: #slkfhas
             G.Writeln2("*** ERROR: You are trying to convert/use the value " + this.val + " as a STRING/NAME item in a list");
@@ -192,7 +192,7 @@ namespace Gekko
                     }
                 case EVariableType.Series:
                     {
-                        return new ScalarVal(this.val - O.GetVal(t, x));
+                        return new ScalarVal(this.val - O.ConvertToVal(t, x));
                     }                
                 default:
                     {
@@ -212,13 +212,13 @@ namespace Gekko
                     }
                 case EVariableType.Series:
                     {
-                        return new ScalarVal(this.val * O.GetVal(t, x));
+                        return new ScalarVal(this.val * O.ConvertToVal(t, x));
                     }
                 case EVariableType.Matrix:
                     {
                         //This is allowed in AREMOS, too
-                        double[,] a = O.GetMatrix(x).data;
-                        double b = O.GetVal(t, this);
+                        double[,] a = O.ConvertToMatrix(x).data;
+                        double b = O.ConvertToVal(t, this);
                         int m = a.GetLength(0);
                         int k = a.GetLength(1);
                         double[,] c = O.MultiplyMatrixScalar(a, b, m, k);
@@ -244,7 +244,7 @@ namespace Gekko
                     }
                 case EVariableType.Series:
                     {
-                        return new ScalarVal(this.val / O.GetVal(t, x));
+                        return new ScalarVal(this.val / O.ConvertToVal(t, x));
                     }                
                 default:
                     {
@@ -264,7 +264,7 @@ namespace Gekko
                     }
                 case EVariableType.Series:
                     {
-                        return new ScalarVal(Math.Pow(this.val, O.GetVal(t, x)));
+                        return new ScalarVal(Math.Pow(this.val, O.ConvertToVal(t, x)));
                     }                
                 default:
                     {

@@ -942,7 +942,7 @@ namespace Gekko
 
             if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Val)
             {
-                int i = O.GetInt(indexes[0]);
+                int i = O.ConvertToInt(indexes[0]);
 
                 //TODO: Broken lags!!
 
@@ -1130,25 +1130,25 @@ namespace Gekko
             return this.GetData(null, t);
         }
 
-        public double GetVal()
+        public double ConvertToVal()
         {
-            G.Writeln2("*** ERROR: Cannot extract a scalar value from " + G.GetTypeString(this) + " type");
+            G.Writeln2("*** ERROR: Cannot extract a VAL from " + G.GetTypeString(this) + " type");
             throw new GekkoException();
         }
 
-        public string GetString()
+        public string ConvertToString()
         {
             G.Writeln2("Ts error 14");
             return null;
         }
 
-        public GekkoTime GetDate(O.GetDateChoices c)
+        public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
             G.Writeln2("Ts error 15");
             return Globals.tNull;
         }
 
-        public List<IVariable> GetList()
+        public List<IVariable> ConvertToList()
         {
             G.Writeln2("Ts error 16");
             return null;
@@ -1163,7 +1163,7 @@ namespace Gekko
         {
             if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Val)
             {
-                int i = O.GetInt(indexes[0]);
+                int i = O.ConvertToInt(indexes[0]);
                 if (IsLagOrLead(i))
                 {
                     G.Writeln2("*** ERROR: You cannot use lags or lead on left-hand side of an expression");
@@ -1173,7 +1173,7 @@ namespace Gekko
                 {
                     if (this.freq == EFreq.Annual || this.freq == EFreq.Undated)
                     {
-                        double d = rhsExpression.GetVal();  //will fail with an error unless VAL or 1x1 matrix
+                        double d = rhsExpression.ConvertToVal();  //will fail with an error unless VAL or 1x1 matrix
                         GekkoTime t = new GekkoTime(this.freq, i, 1);
                         this.SetData(t, d);
                     }
@@ -1186,7 +1186,7 @@ namespace Gekko
             }
             else if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Date)
             {
-                double d = rhsExpression.GetVal();  //will fail with an error unless VAL or 1x1 matrix                
+                double d = rhsExpression.ConvertToVal();  //will fail with an error unless VAL or 1x1 matrix                
                 this.SetData(((ScalarDate)(indexes[0])).date, d);  //will fail with an error if freqs do not match
             }
             else 

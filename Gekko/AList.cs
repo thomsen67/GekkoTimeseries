@@ -56,7 +56,7 @@ namespace Gekko
                 //Indices run from 1, 2, 3, ... n. Element 0 is length of list.
                 if (index.Type() == EVariableType.Val)
                 {
-                    int ival = O.GetInt(index);
+                    int ival = O.ConvertToInt(index);
                     if (ival < 0)
                     {
                         G.Writeln2("*** ERROR: Illegal LIST indexer [" + ival + "]: negative number not allowed");
@@ -80,8 +80,8 @@ namespace Gekko
                 else if (index.Type() == EVariableType.Range)
                 {
                     Range index_range = index as Range;
-                    int ival1 = O.GetInt(index_range.first);
-                    int ival2 = O.GetInt(index_range.last);
+                    int ival1 = O.ConvertToInt(index_range.first);
+                    int ival2 = O.ConvertToInt(index_range.last);
                     if (ival1 > this.list.Count || ival2 > this.list.Count || ival2 < ival1 || ival1 < 1 || ival2 < 1)
                     {
                         G.Writeln2("*** ERROR: Invalid range, [" + ival1 + " .. " + ival2 + "]");
@@ -162,8 +162,8 @@ namespace Gekko
         //    }
         //    else
         //    {                
-        //        int i1 = O.GetInt(iv1);
-        //        int i2 = O.GetInt(iv2);
+        //        int i1 = O.ConvertToInt(iv1);
+        //        int i2 = O.ConvertToInt(iv2);
         //        if (i1 < 1)
         //        {
         //            G.Writeln2("*** ERROR: Starting index (" + i1 + ") cannot be < 1");
@@ -208,25 +208,25 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public double GetVal()
+        public double ConvertToVal()
         {
-            G.Writeln2("*** ERROR: Cannot extract a scalar value from " + G.GetTypeString(this) + " type");
+            G.Writeln2("*** ERROR: Cannot extract a VAL from " + G.GetTypeString(this) + " type");
             throw new GekkoException();
         }
 
-        public string GetString()
+        public string ConvertToString()
         {
             G.Writeln2("*** ERROR: Trying to convert a LIST into a STRING.");            
             throw new GekkoException();
         }
 
-        public GekkoTime GetDate(O.GetDateChoices c)
+        public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
             G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a DATE from a list.");            
             throw new GekkoException();
         }
 
-        public List<IVariable> GetList()
+        public List<IVariable> ConvertToList()
         {
             return this.list;
         }
@@ -281,7 +281,7 @@ namespace Gekko
         {
             if (dims.Length == 1 && dims[0].Type() == EVariableType.Val)
             {
-                int i = O.GetInt(dims[0]);
+                int i = O.ConvertToInt(dims[0]);
                 if (i < 1 || i > this.list.Count)
                 {
                     G.Writeln2("*** ERROR: Illegal LIST indexer [" + i + "]");

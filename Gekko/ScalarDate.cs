@@ -22,29 +22,29 @@ namespace Gekko
         }
         public double GetVal(GekkoTime t)
         {
-            return GetVal();
+            return ConvertToVal();
         }
 
-        public double GetVal()
+        public double ConvertToVal()
         {
             G.Writeln2("*** ERROR: Could not convert the DATE " + this.date + " directly into a VAL.");            
             throw new GekkoException();
         }
 
-        public string GetString()
+        public string ConvertToString()
         {
             G.Writeln2("*** ERROR: Could not convert the DATE " + this.date + " directly into a STRING.");
             G.Writeln("           You may try the string() conversion function.");            
             throw new GekkoException();
         }
 
-        public GekkoTime GetDate(O.GetDateChoices c)
+        public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
             //If the input is a date, the raw date is always returned here
             return this.date;
         }
 
-        public List<IVariable> GetList()
+        public List<IVariable> ConvertToList()
         {
             //See similar comment: #slkfhas
             G.Writeln2("*** ERROR: You are trying to convert/use the date " + this.date + " as a STRING item in a list");

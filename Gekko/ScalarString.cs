@@ -106,7 +106,7 @@ namespace Gekko
                                 {
                                     IVariable b = new ScalarString("");
                                     IVariable c = b.Add(null, a);
-                                    string s3 = c.GetString();
+                                    string s3 = c.ConvertToString();
                                     int x = 0;
                                     //if (isDollarPercent) x = 1;
                                     string s4 = s.Substring(lastEnd + 1, j - lastEnd - 1 - x);
@@ -152,7 +152,7 @@ namespace Gekko
                                 {
                                     IVariable b = new ScalarString("");
                                     IVariable c = b.Add(null, a);
-                                    string s3 = c.GetString();
+                                    string s3 = c.ConvertToString();
                                     string s4 = s.Substring(lastEnd + 1, j - lastEnd - 1);
                                     s2 += s4 + s3;
                                     hit = true;
@@ -268,8 +268,8 @@ namespace Gekko
         //        //corresponds to empty index range like ['fx'..'fy'], different from #a['fx'..'fy']
         //        IVariable iv1 = indexRange.first;
         //        IVariable iv2 = indexRange.last;
-        //        string s1 = O.GetString(iv1);
-        //        string s2 = O.GetString(iv2);                
+        //        string s1 = O.ConvertToString(iv1);
+        //        string s2 = O.ConvertToString(iv2);                
         //        ExtractBankAndRestHelper h = Program.ExtractBankAndRest(s1, EExtrackBankAndRest.GetDatabank);                
         //        List<string> temp = Program.MatchRangeInDatabank(h.name, s2, h.databank);
         //        return new MetaList(temp);
@@ -319,25 +319,25 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public double GetVal()
+        public double ConvertToVal()
         {
-            G.Writeln2("*** ERROR: Cannot extract a scalar value from " + G.GetTypeString(this) + " type");
+            G.Writeln2("*** ERROR: Cannot extract a VAL from " + G.GetTypeString(this) + " type");
             throw new GekkoException();
         }
 
-        public string GetString()
+        public string ConvertToString()
         {
             return this._string2;
         }
 
-        public GekkoTime GetDate(O.GetDateChoices c)
+        public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
             G.Writeln2("*** ERROR: Could not convert the STRING " + this._string2 + " directly into a DATE.");
             G.Writeln("           You may try the date() conversion function.");            
             throw new GekkoException();
         }
 
-        public List<IVariable> GetList()
+        public List<IVariable> ConvertToList()
         {
             //for instance for list elements, where a string is considered a 1-item list.
             return new List<IVariable>() { new ScalarString(this._string2) };  //always make a copy, so no risk of side effects

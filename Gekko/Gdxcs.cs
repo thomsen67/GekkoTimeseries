@@ -1,0 +1,2741 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System;
+using System.Text;
+using System.Runtime.InteropServices;
+using System.IO;
+
+namespace Gekko
+{
+    internal class Gdxcs : IDisposable
+    {
+        private IntPtr pgdx;
+        private bool extHandle;
+        private bool _disposed;
+
+#if __MonoCS__
+    private delegate IntPtr DelLoadLibrary (string dllName, int flag);
+    private delegate IntPtr DelGetProcAddress (IntPtr hModule, string procedureName);
+    private delegate bool DelFreeLibrary (IntPtr hModul);
+
+#if __APPLE__
+    [DllImport("libdl.dylib")]
+    internal static extern IntPtr dlopen(String dllname, int flags);
+
+    [DllImport("libdl.dylib")]
+    internal static extern IntPtr dlsym(IntPtr hModule, String procedureName);
+
+    [DllImport("libdl.dylib")] //int
+    internal static extern bool dlclose (IntPtr hModul);
+#else
+    [DllImport("libdl.so")]
+    internal static extern IntPtr dlopen(String dllname, int flags);
+
+    [DllImport("libdl.so")]
+    internal static extern IntPtr dlsym(IntPtr hModule, String procedureName);
+
+    [DllImport("libdl.so")]
+    internal static extern bool dlclose (IntPtr hModul);
+#endif
+
+    DelLoadLibrary LoadLibrary = new DelLoadLibrary(dlopen);
+    DelGetProcAddress GetProcAddress = new DelGetProcAddress (dlsym);
+    DelFreeLibrary FreeLibrary = new DelFreeLibrary (dlclose);
+#else
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr LoadLibrary(string dllToLoad);
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr GetProcAddress(IntPtr hModule, string procedureName);
+        [DllImport("kernel32.dll")]
+        public static extern bool FreeLibrary(IntPtr hModule);
+#endif
+
+
+        public delegate void TDataStoreProc(IntPtr Indx, IntPtr Vals);
+        public delegate int TDataStoreFiltProc(IntPtr Indx, IntPtr Vals, IntPtr Uptr);
+        public delegate void TDomainIndexProc(int RawIndex, int MappedIndex, IntPtr Uptr);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate void gdxSetLoadPath_t(string s);
+        private static gdxSetLoadPath_t dll_gdxSetLoadPath;
+        private static void d_gdxSetLoadPath(string s)
+        { }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate void gdxGetLoadPath_t(ref byte s);
+        private static gdxGetLoadPath_t dll_gdxGetLoadPath;
+        private static void d_gdxGetLoadPath(ref byte s)
+        { }
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxAcronymAdd_t(IntPtr pgdx, string AName, string Txt, int AIndx);
+        private static gdxAcronymAdd_t dll_gdxAcronymAdd;
+        private static int d_gdxAcronymAdd(IntPtr pgdx, string AName, string Txt, int AIndx)
+        { gdxErrorHandling("gdxAcronymAdd could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxAcronymCount_t(IntPtr pgdx);
+        private static gdxAcronymCount_t dll_gdxAcronymCount;
+        private static int d_gdxAcronymCount(IntPtr pgdx)
+        { gdxErrorHandling("gdxAcronymCount could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxAcronymGetInfo_t(IntPtr pgdx, int N, StringBuilder AName, StringBuilder Txt, ref int AIndx);
+        private static gdxAcronymGetInfo_t dll_gdxAcronymGetInfo;
+        private static int d_gdxAcronymGetInfo(IntPtr pgdx, int N, StringBuilder AName, StringBuilder Txt, ref int AIndx)
+        { gdxErrorHandling("gdxAcronymGetInfo could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxAcronymGetMapping_t(IntPtr pgdx, int N, ref int orgIndx, ref int newIndx, ref int autoIndex);
+        private static gdxAcronymGetMapping_t dll_gdxAcronymGetMapping;
+        private static int d_gdxAcronymGetMapping(IntPtr pgdx, int N, ref int orgIndx, ref int newIndx, ref int autoIndex)
+        { gdxErrorHandling("gdxAcronymGetMapping could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxAcronymIndex_t(IntPtr pgdx, double V);
+        private static gdxAcronymIndex_t dll_gdxAcronymIndex;
+        private static int d_gdxAcronymIndex(IntPtr pgdx, double V)
+        { gdxErrorHandling("gdxAcronymIndex could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxAcronymName_t(IntPtr pgdx, double V, StringBuilder AName);
+        private static gdxAcronymName_t dll_gdxAcronymName;
+        private static int d_gdxAcronymName(IntPtr pgdx, double V, StringBuilder AName)
+        { gdxErrorHandling("gdxAcronymName could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxAcronymNextNr_t(IntPtr pgdx, int NV);
+        private static gdxAcronymNextNr_t dll_gdxAcronymNextNr;
+        private static int d_gdxAcronymNextNr(IntPtr pgdx, int NV)
+        { gdxErrorHandling("gdxAcronymNextNr could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxAcronymSetInfo_t(IntPtr pgdx, int N, string AName, string Txt, int AIndx);
+        private static gdxAcronymSetInfo_t dll_gdxAcronymSetInfo;
+        private static int d_gdxAcronymSetInfo(IntPtr pgdx, int N, string AName, string Txt, int AIndx)
+        { gdxErrorHandling("gdxAcronymSetInfo could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate double gdxAcronymValue_t(IntPtr pgdx, int AIndx);
+        private static gdxAcronymValue_t dll_gdxAcronymValue;
+        private static double d_gdxAcronymValue(IntPtr pgdx, int AIndx)
+        { gdxErrorHandling("gdxAcronymValue could not be loaded"); return 0.0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxAddAlias_t(IntPtr pgdx, string Id1, string Id2);
+        private static gdxAddAlias_t dll_gdxAddAlias;
+        private static int d_gdxAddAlias(IntPtr pgdx, string Id1, string Id2)
+        { gdxErrorHandling("gdxAddAlias could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxAddSetText_t(IntPtr pgdx, string Txt, ref int TxtNr);
+        private static gdxAddSetText_t dll_gdxAddSetText;
+        private static int d_gdxAddSetText(IntPtr pgdx, string Txt, ref int TxtNr)
+        { gdxErrorHandling("gdxAddSetText could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxAutoConvert_t(IntPtr pgdx, int NV);
+        private static gdxAutoConvert_t dll_gdxAutoConvert;
+        private static int d_gdxAutoConvert(IntPtr pgdx, int NV)
+        { gdxErrorHandling("gdxAutoConvert could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxClose_t(IntPtr pgdx);
+        private static gdxClose_t dll_gdxClose;
+        private static int d_gdxClose(IntPtr pgdx)
+        { gdxErrorHandling("gdxClose could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataErrorCount_t(IntPtr pgdx);
+        private static gdxDataErrorCount_t dll_gdxDataErrorCount;
+        private static int d_gdxDataErrorCount(IntPtr pgdx)
+        { gdxErrorHandling("gdxDataErrorCount could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataErrorRecord_t(IntPtr pgdx, int RecNr, int[] KeyInt, double[] Values);
+        private static gdxDataErrorRecord_t dll_gdxDataErrorRecord;
+        private static int d_gdxDataErrorRecord(IntPtr pgdx, int RecNr, int[] KeyInt, double[] Values)
+        { gdxErrorHandling("gdxDataErrorRecord could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataErrorRecordX_t(IntPtr pgdx, int RecNr, int[] KeyInt, double[] Values);
+        private static gdxDataErrorRecordX_t dll_gdxDataErrorRecordX;
+        private static int d_gdxDataErrorRecordX(IntPtr pgdx, int RecNr, int[] KeyInt, double[] Values)
+        { gdxErrorHandling("gdxDataErrorRecordX could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataReadDone_t(IntPtr pgdx);
+        private static gdxDataReadDone_t dll_gdxDataReadDone;
+        private static int d_gdxDataReadDone(IntPtr pgdx)
+        { gdxErrorHandling("gdxDataReadDone could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataReadFilteredStart_t(IntPtr pgdx, int SyNr, int[] FilterAction, ref int NrRecs);
+        private static gdxDataReadFilteredStart_t dll_gdxDataReadFilteredStart;
+        private static int d_gdxDataReadFilteredStart(IntPtr pgdx, int SyNr, int[] FilterAction, ref int NrRecs)
+        { gdxErrorHandling("gdxDataReadFilteredStart could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataReadMap_t(IntPtr pgdx, int RecNr, int[] KeyInt, double[] Values, ref int DimFrst);
+        private static gdxDataReadMap_t dll_gdxDataReadMap;
+        private static int d_gdxDataReadMap(IntPtr pgdx, int RecNr, int[] KeyInt, double[] Values, ref int DimFrst)
+        { gdxErrorHandling("gdxDataReadMap could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataReadMapStart_t(IntPtr pgdx, int SyNr, ref int NrRecs);
+        private static gdxDataReadMapStart_t dll_gdxDataReadMapStart;
+        private static int d_gdxDataReadMapStart(IntPtr pgdx, int SyNr, ref int NrRecs)
+        { gdxErrorHandling("gdxDataReadMapStart could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataReadRaw_t(IntPtr pgdx, int[] KeyInt, double[] Values, ref int DimFrst);
+        private static gdxDataReadRaw_t dll_gdxDataReadRaw;
+        private static int d_gdxDataReadRaw(IntPtr pgdx, int[] KeyInt, double[] Values, ref int DimFrst)
+        { gdxErrorHandling("gdxDataReadRaw could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataReadRawFast_t(IntPtr pgdx, int SyNr, TDataStoreProc DP, ref int NrRecs);
+        private static gdxDataReadRawFast_t dll_gdxDataReadRawFast;
+        private static int d_gdxDataReadRawFast(IntPtr pgdx, int SyNr, TDataStoreProc DP, ref int NrRecs)
+        { gdxErrorHandling("gdxDataReadRawFast could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataReadRawFastFilt_t(IntPtr pgdx, int SyNr, string[] UelFilterStr, TDataStoreFiltProc DP);
+        private static gdxDataReadRawFastFilt_t dll_gdxDataReadRawFastFilt;
+        private static int d_gdxDataReadRawFastFilt(IntPtr pgdx, int SyNr, string[] UelFilterStr, TDataStoreFiltProc DP)
+        { gdxErrorHandling("gdxDataReadRawFastFilt could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataReadRawStart_t(IntPtr pgdx, int SyNr, ref int NrRecs);
+        private static gdxDataReadRawStart_t dll_gdxDataReadRawStart;
+        private static int d_gdxDataReadRawStart(IntPtr pgdx, int SyNr, ref int NrRecs)
+        { gdxErrorHandling("gdxDataReadRawStart could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataReadSlice_t(IntPtr pgdx, string[] UelFilterStr, ref int Dimen, TDataStoreProc DP);
+        private static gdxDataReadSlice_t dll_gdxDataReadSlice;
+        private static int d_gdxDataReadSlice(IntPtr pgdx, string[] UelFilterStr, ref int Dimen, TDataStoreProc DP)
+        { gdxErrorHandling("gdxDataReadSlice could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataReadSliceStart_t(IntPtr pgdx, int SyNr, int[] ElemCounts);
+        private static gdxDataReadSliceStart_t dll_gdxDataReadSliceStart;
+        private static int d_gdxDataReadSliceStart(IntPtr pgdx, int SyNr, int[] ElemCounts)
+        { gdxErrorHandling("gdxDataReadSliceStart could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataReadStr_t(IntPtr pgdx, byte[,] KeyStr, double[] Values, ref int DimFrst);
+        private static gdxDataReadStr_t dll_gdxDataReadStr;
+        private static int d_gdxDataReadStr(IntPtr pgdx, byte[,] KeyStr, double[] Values, ref int DimFrst)
+        { gdxErrorHandling("gdxDataReadStr could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataReadStrStart_t(IntPtr pgdx, int SyNr, ref int NrRecs);
+        private static gdxDataReadStrStart_t dll_gdxDataReadStrStart;
+        private static int d_gdxDataReadStrStart(IntPtr pgdx, int SyNr, ref int NrRecs)
+        { gdxErrorHandling("gdxDataReadStrStart could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataSliceUELS_t(IntPtr pgdx, int[] SliceKeyInt, byte[,] KeyStr);
+        private static gdxDataSliceUELS_t dll_gdxDataSliceUELS;
+        private static int d_gdxDataSliceUELS(IntPtr pgdx, int[] SliceKeyInt, byte[,] KeyStr)
+        { gdxErrorHandling("gdxDataSliceUELS could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataWriteDone_t(IntPtr pgdx);
+        private static gdxDataWriteDone_t dll_gdxDataWriteDone;
+        private static int d_gdxDataWriteDone(IntPtr pgdx)
+        { gdxErrorHandling("gdxDataWriteDone could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataWriteMap_t(IntPtr pgdx, int[] KeyInt, double[] Values);
+        private static gdxDataWriteMap_t dll_gdxDataWriteMap;
+        private static int d_gdxDataWriteMap(IntPtr pgdx, int[] KeyInt, double[] Values)
+        { gdxErrorHandling("gdxDataWriteMap could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataWriteMapStart_t(IntPtr pgdx, string SyId, string ExplTxt, int Dimen, int Typ, int UserInfo);
+        private static gdxDataWriteMapStart_t dll_gdxDataWriteMapStart;
+        private static int d_gdxDataWriteMapStart(IntPtr pgdx, string SyId, string ExplTxt, int Dimen, int Typ, int UserInfo)
+        { gdxErrorHandling("gdxDataWriteMapStart could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataWriteRaw_t(IntPtr pgdx, int[] KeyInt, double[] Values);
+        private static gdxDataWriteRaw_t dll_gdxDataWriteRaw;
+        private static int d_gdxDataWriteRaw(IntPtr pgdx, int[] KeyInt, double[] Values)
+        { gdxErrorHandling("gdxDataWriteRaw could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataWriteRawStart_t(IntPtr pgdx, string SyId, string ExplTxt, int Dimen, int Typ, int UserInfo);
+        private static gdxDataWriteRawStart_t dll_gdxDataWriteRawStart;
+        private static int d_gdxDataWriteRawStart(IntPtr pgdx, string SyId, string ExplTxt, int Dimen, int Typ, int UserInfo)
+        { gdxErrorHandling("gdxDataWriteRawStart could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataWriteStr_t(IntPtr pgdx, string[] KeyStr, double[] Values);
+        private static gdxDataWriteStr_t dll_gdxDataWriteStr;
+        private static int d_gdxDataWriteStr(IntPtr pgdx, string[] KeyStr, double[] Values)
+        { gdxErrorHandling("gdxDataWriteStr could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxDataWriteStrStart_t(IntPtr pgdx, string SyId, string ExplTxt, int Dimen, int Typ, int UserInfo);
+        private static gdxDataWriteStrStart_t dll_gdxDataWriteStrStart;
+        private static int d_gdxDataWriteStrStart(IntPtr pgdx, string SyId, string ExplTxt, int Dimen, int Typ, int UserInfo)
+        { gdxErrorHandling("gdxDataWriteStrStart could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxGetDLLVersion_t(IntPtr pgdx, StringBuilder V);
+        private static gdxGetDLLVersion_t dll_gdxGetDLLVersion;
+        private static int d_gdxGetDLLVersion(IntPtr pgdx, StringBuilder V)
+        { gdxErrorHandling("gdxGetDLLVersion could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxErrorCount_t(IntPtr pgdx);
+        private static gdxErrorCount_t dll_gdxErrorCount;
+        private static int d_gdxErrorCount(IntPtr pgdx)
+        { gdxErrorHandling("gdxErrorCount could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxErrorStr_t(IntPtr pgdx, int ErrNr, StringBuilder ErrMsg);
+        private static gdxErrorStr_t dll_gdxErrorStr;
+        private static int d_gdxErrorStr(IntPtr pgdx, int ErrNr, StringBuilder ErrMsg)
+        { gdxErrorHandling("gdxErrorStr could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxFileInfo_t(IntPtr pgdx, ref int FileVer, ref int ComprLev);
+        private static gdxFileInfo_t dll_gdxFileInfo;
+        private static int d_gdxFileInfo(IntPtr pgdx, ref int FileVer, ref int ComprLev)
+        { gdxErrorHandling("gdxFileInfo could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxFileVersion_t(IntPtr pgdx, StringBuilder FileStr, StringBuilder ProduceStr);
+        private static gdxFileVersion_t dll_gdxFileVersion;
+        private static int d_gdxFileVersion(IntPtr pgdx, StringBuilder FileStr, StringBuilder ProduceStr)
+        { gdxErrorHandling("gdxFileVersion could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxFilterExists_t(IntPtr pgdx, int FilterNr);
+        private static gdxFilterExists_t dll_gdxFilterExists;
+        private static int d_gdxFilterExists(IntPtr pgdx, int FilterNr)
+        { gdxErrorHandling("gdxFilterExists could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxFilterRegister_t(IntPtr pgdx, int UelMap);
+        private static gdxFilterRegister_t dll_gdxFilterRegister;
+        private static int d_gdxFilterRegister(IntPtr pgdx, int UelMap)
+        { gdxErrorHandling("gdxFilterRegister could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxFilterRegisterDone_t(IntPtr pgdx);
+        private static gdxFilterRegisterDone_t dll_gdxFilterRegisterDone;
+        private static int d_gdxFilterRegisterDone(IntPtr pgdx)
+        { gdxErrorHandling("gdxFilterRegisterDone could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxFilterRegisterStart_t(IntPtr pgdx, int FilterNr);
+        private static gdxFilterRegisterStart_t dll_gdxFilterRegisterStart;
+        private static int d_gdxFilterRegisterStart(IntPtr pgdx, int FilterNr)
+        { gdxErrorHandling("gdxFilterRegisterStart could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxFindSymbol_t(IntPtr pgdx, string SyId, ref int SyNr);
+        private static gdxFindSymbol_t dll_gdxFindSymbol;
+        private static int d_gdxFindSymbol(IntPtr pgdx, string SyId, ref int SyNr)
+        { gdxErrorHandling("gdxFindSymbol could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxGetElemText_t(IntPtr pgdx, int TxtNr, StringBuilder Txt, ref int Node);
+        private static gdxGetElemText_t dll_gdxGetElemText;
+        private static int d_gdxGetElemText(IntPtr pgdx, int TxtNr, StringBuilder Txt, ref int Node)
+        { gdxErrorHandling("gdxGetElemText could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxGetLastError_t(IntPtr pgdx);
+        private static gdxGetLastError_t dll_gdxGetLastError;
+        private static int d_gdxGetLastError(IntPtr pgdx)
+        { gdxErrorHandling("gdxGetLastError could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate Int64 gdxGetMemoryUsed_t(IntPtr pgdx);
+        private static gdxGetMemoryUsed_t dll_gdxGetMemoryUsed;
+        private static Int64 d_gdxGetMemoryUsed(IntPtr pgdx)
+        { gdxErrorHandling("gdxGetMemoryUsed could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxGetSpecialValues_t(IntPtr pgdx, double[] AVals);
+        private static gdxGetSpecialValues_t dll_gdxGetSpecialValues;
+        private static int d_gdxGetSpecialValues(IntPtr pgdx, double[] AVals)
+        { gdxErrorHandling("gdxGetSpecialValues could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxGetUEL_t(IntPtr pgdx, int UelNr, StringBuilder Uel);
+        private static gdxGetUEL_t dll_gdxGetUEL;
+        private static int d_gdxGetUEL(IntPtr pgdx, int UelNr, StringBuilder Uel)
+        { gdxErrorHandling("gdxGetUEL could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxMapValue_t(IntPtr pgdx, double D, ref int sv);
+        private static gdxMapValue_t dll_gdxMapValue;
+        private static int d_gdxMapValue(IntPtr pgdx, double D, ref int sv)
+        { gdxErrorHandling("gdxMapValue could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxOpenAppend_t(IntPtr pgdx, string FileName, string Producer, ref int ErrNr);
+        private static gdxOpenAppend_t dll_gdxOpenAppend;
+        private static int d_gdxOpenAppend(IntPtr pgdx, string FileName, string Producer, ref int ErrNr)
+        { gdxErrorHandling("gdxOpenAppend could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxOpenRead_t(IntPtr pgdx, string FileName, ref int ErrNr);
+        private static gdxOpenRead_t dll_gdxOpenRead;
+        private static int d_gdxOpenRead(IntPtr pgdx, string FileName, ref int ErrNr)
+        { gdxErrorHandling("gdxOpenRead could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxOpenWrite_t(IntPtr pgdx, string FileName, string Producer, ref int ErrNr);
+        private static gdxOpenWrite_t dll_gdxOpenWrite;
+        private static int d_gdxOpenWrite(IntPtr pgdx, string FileName, string Producer, ref int ErrNr)
+        { gdxErrorHandling("gdxOpenWrite could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxOpenWriteEx_t(IntPtr pgdx, string FileName, string Producer, int Compr, ref int ErrNr);
+        private static gdxOpenWriteEx_t dll_gdxOpenWriteEx;
+        private static int d_gdxOpenWriteEx(IntPtr pgdx, string FileName, string Producer, int Compr, ref int ErrNr)
+        { gdxErrorHandling("gdxOpenWriteEx could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxResetSpecialValues_t(IntPtr pgdx);
+        private static gdxResetSpecialValues_t dll_gdxResetSpecialValues;
+        private static int d_gdxResetSpecialValues(IntPtr pgdx)
+        { gdxErrorHandling("gdxResetSpecialValues could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxSetHasText_t(IntPtr pgdx, int SyNr);
+        private static gdxSetHasText_t dll_gdxSetHasText;
+        private static int d_gdxSetHasText(IntPtr pgdx, int SyNr)
+        { gdxErrorHandling("gdxSetHasText could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxSetReadSpecialValues_t(IntPtr pgdx, double[] AVals);
+        private static gdxSetReadSpecialValues_t dll_gdxSetReadSpecialValues;
+        private static int d_gdxSetReadSpecialValues(IntPtr pgdx, double[] AVals)
+        { gdxErrorHandling("gdxSetReadSpecialValues could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxSetSpecialValues_t(IntPtr pgdx, double[] AVals);
+        private static gdxSetSpecialValues_t dll_gdxSetSpecialValues;
+        private static int d_gdxSetSpecialValues(IntPtr pgdx, double[] AVals)
+        { gdxErrorHandling("gdxSetSpecialValues could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxSetTextNodeNr_t(IntPtr pgdx, int TxtNr, int Node);
+        private static gdxSetTextNodeNr_t dll_gdxSetTextNodeNr;
+        private static int d_gdxSetTextNodeNr(IntPtr pgdx, int TxtNr, int Node)
+        { gdxErrorHandling("gdxSetTextNodeNr could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxSetTraceLevel_t(IntPtr pgdx, int N, string s);
+        private static gdxSetTraceLevel_t dll_gdxSetTraceLevel;
+        private static int d_gdxSetTraceLevel(IntPtr pgdx, int N, string s)
+        { gdxErrorHandling("gdxSetTraceLevel could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxSymbIndxMaxLength_t(IntPtr pgdx, int SyNr, int[] LengthInfo);
+        private static gdxSymbIndxMaxLength_t dll_gdxSymbIndxMaxLength;
+        private static int d_gdxSymbIndxMaxLength(IntPtr pgdx, int SyNr, int[] LengthInfo)
+        { gdxErrorHandling("gdxSymbIndxMaxLength could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxSymbMaxLength_t(IntPtr pgdx);
+        private static gdxSymbMaxLength_t dll_gdxSymbMaxLength;
+        private static int d_gdxSymbMaxLength(IntPtr pgdx)
+        { gdxErrorHandling("gdxSymbMaxLength could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxSymbolAddComment_t(IntPtr pgdx, int SyNr, string Txt);
+        private static gdxSymbolAddComment_t dll_gdxSymbolAddComment;
+        private static int d_gdxSymbolAddComment(IntPtr pgdx, int SyNr, string Txt)
+        { gdxErrorHandling("gdxSymbolAddComment could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxSymbolGetComment_t(IntPtr pgdx, int SyNr, int N, StringBuilder Txt);
+        private static gdxSymbolGetComment_t dll_gdxSymbolGetComment;
+        private static int d_gdxSymbolGetComment(IntPtr pgdx, int SyNr, int N, StringBuilder Txt)
+        { gdxErrorHandling("gdxSymbolGetComment could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxSymbolGetDomain_t(IntPtr pgdx, int SyNr, int[] DomainSyNrs);
+        private static gdxSymbolGetDomain_t dll_gdxSymbolGetDomain;
+        private static int d_gdxSymbolGetDomain(IntPtr pgdx, int SyNr, int[] DomainSyNrs)
+        { gdxErrorHandling("gdxSymbolGetDomain could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxSymbolGetDomainX_t(IntPtr pgdx, int SyNr, byte[,] DomainIDs);
+        private static gdxSymbolGetDomainX_t dll_gdxSymbolGetDomainX;
+        private static int d_gdxSymbolGetDomainX(IntPtr pgdx, int SyNr, byte[,] DomainIDs)
+        { gdxErrorHandling("gdxSymbolGetDomainX could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxSymbolDim_t(IntPtr pgdx, int SyNr);
+        private static gdxSymbolDim_t dll_gdxSymbolDim;
+        private static int d_gdxSymbolDim(IntPtr pgdx, int SyNr)
+        { gdxErrorHandling("gdxSymbolDim could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxSymbolInfo_t(IntPtr pgdx, int SyNr, StringBuilder SyId, ref int Dimen, ref int Typ);
+        private static gdxSymbolInfo_t dll_gdxSymbolInfo;
+        private static int d_gdxSymbolInfo(IntPtr pgdx, int SyNr, StringBuilder SyId, ref int Dimen, ref int Typ)
+        { gdxErrorHandling("gdxSymbolInfo could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxSymbolInfoX_t(IntPtr pgdx, int SyNr, ref int RecCnt, ref int UserInfo, StringBuilder ExplTxt);
+        private static gdxSymbolInfoX_t dll_gdxSymbolInfoX;
+        private static int d_gdxSymbolInfoX(IntPtr pgdx, int SyNr, ref int RecCnt, ref int UserInfo, StringBuilder ExplTxt)
+        { gdxErrorHandling("gdxSymbolInfoX could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxSymbolSetDomain_t(IntPtr pgdx, string[] DomainIDs);
+        private static gdxSymbolSetDomain_t dll_gdxSymbolSetDomain;
+        private static int d_gdxSymbolSetDomain(IntPtr pgdx, string[] DomainIDs)
+        { gdxErrorHandling("gdxSymbolSetDomain could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxSymbolSetDomainX_t(IntPtr pgdx, int SyNr, string[] DomainIDs);
+        private static gdxSymbolSetDomainX_t dll_gdxSymbolSetDomainX;
+        private static int d_gdxSymbolSetDomainX(IntPtr pgdx, int SyNr, string[] DomainIDs)
+        { gdxErrorHandling("gdxSymbolSetDomainX could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxSystemInfo_t(IntPtr pgdx, ref int SyCnt, ref int UelCnt);
+        private static gdxSystemInfo_t dll_gdxSystemInfo;
+        private static int d_gdxSystemInfo(IntPtr pgdx, ref int SyCnt, ref int UelCnt)
+        { gdxErrorHandling("gdxSystemInfo could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxUELMaxLength_t(IntPtr pgdx);
+        private static gdxUELMaxLength_t dll_gdxUELMaxLength;
+        private static int d_gdxUELMaxLength(IntPtr pgdx)
+        { gdxErrorHandling("gdxUELMaxLength could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxUELRegisterDone_t(IntPtr pgdx);
+        private static gdxUELRegisterDone_t dll_gdxUELRegisterDone;
+        private static int d_gdxUELRegisterDone(IntPtr pgdx)
+        { gdxErrorHandling("gdxUELRegisterDone could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxUELRegisterMap_t(IntPtr pgdx, int UMap, string Uel);
+        private static gdxUELRegisterMap_t dll_gdxUELRegisterMap;
+        private static int d_gdxUELRegisterMap(IntPtr pgdx, int UMap, string Uel)
+        { gdxErrorHandling("gdxUELRegisterMap could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxUELRegisterMapStart_t(IntPtr pgdx);
+        private static gdxUELRegisterMapStart_t dll_gdxUELRegisterMapStart;
+        private static int d_gdxUELRegisterMapStart(IntPtr pgdx)
+        { gdxErrorHandling("gdxUELRegisterMapStart could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxUELRegisterRaw_t(IntPtr pgdx, string Uel);
+        private static gdxUELRegisterRaw_t dll_gdxUELRegisterRaw;
+        private static int d_gdxUELRegisterRaw(IntPtr pgdx, string Uel)
+        { gdxErrorHandling("gdxUELRegisterRaw could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxUELRegisterRawStart_t(IntPtr pgdx);
+        private static gdxUELRegisterRawStart_t dll_gdxUELRegisterRawStart;
+        private static int d_gdxUELRegisterRawStart(IntPtr pgdx)
+        { gdxErrorHandling("gdxUELRegisterRawStart could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxUELRegisterStr_t(IntPtr pgdx, string Uel, ref int UelNr);
+        private static gdxUELRegisterStr_t dll_gdxUELRegisterStr;
+        private static int d_gdxUELRegisterStr(IntPtr pgdx, string Uel, ref int UelNr)
+        { gdxErrorHandling("gdxUELRegisterStr could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxUELRegisterStrStart_t(IntPtr pgdx);
+        private static gdxUELRegisterStrStart_t dll_gdxUELRegisterStrStart;
+        private static int d_gdxUELRegisterStrStart(IntPtr pgdx)
+        { gdxErrorHandling("gdxUELRegisterStrStart could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxUMFindUEL_t(IntPtr pgdx, string Uel, ref int UelNr, ref int UelMap);
+        private static gdxUMFindUEL_t dll_gdxUMFindUEL;
+        private static int d_gdxUMFindUEL(IntPtr pgdx, string Uel, ref int UelNr, ref int UelMap)
+        { gdxErrorHandling("gdxUMFindUEL could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxUMUelGet_t(IntPtr pgdx, int UelNr, StringBuilder Uel, ref int UelMap);
+        private static gdxUMUelGet_t dll_gdxUMUelGet;
+        private static int d_gdxUMUelGet(IntPtr pgdx, int UelNr, StringBuilder Uel, ref int UelMap)
+        { gdxErrorHandling("gdxUMUelGet could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxUMUelInfo_t(IntPtr pgdx, ref int UelCnt, ref int HighMap);
+        private static gdxUMUelInfo_t dll_gdxUMUelInfo;
+        private static int d_gdxUMUelInfo(IntPtr pgdx, ref int UelCnt, ref int HighMap)
+        { gdxErrorHandling("gdxUMUelInfo could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxGetDomainElements_t(IntPtr pgdx, int SyNr, int DimPos, int FilterNr, TDomainIndexProc DP, ref int NrElem, IntPtr Uptr);
+        private static gdxGetDomainElements_t dll_gdxGetDomainElements;
+        private static int d_gdxGetDomainElements(IntPtr pgdx, int SyNr, int DimPos, int FilterNr, TDomainIndexProc DP, ref int NrElem, IntPtr Uptr)
+        { gdxErrorHandling("gdxGetDomainElements could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxCurrentDim_t(IntPtr pgdx);
+        private static gdxCurrentDim_t dll_gdxCurrentDim;
+        private static int d_gdxCurrentDim(IntPtr pgdx)
+        { gdxErrorHandling("gdxCurrentDim could not be loaded"); return 0; }
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int gdxRenameUEL_t(IntPtr pgdx, string OldName, string NewName);
+        private static gdxRenameUEL_t dll_gdxRenameUEL;
+        private static int d_gdxRenameUEL(IntPtr pgdx, string OldName, string NewName)
+        { gdxErrorHandling("gdxRenameUEL could not be loaded"); return 0; }
+
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate void xcreate_t(ref IntPtr pgdx);
+        private static xcreate_t xcreate;
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate void xfree_t(ref IntPtr pgdx);
+        private static xfree_t xfree;
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int xapiversion_t(int api, StringBuilder msg, ref int cl);
+        private static xapiversion_t dll_xapiversion;
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int xcheck_t(string ep, int nargs, int[] s, StringBuilder msg);
+        private static xcheck_t dll_xcheck;
+
+        public delegate bool gdxErrorCallback_t(int ErrCount, string Msg);
+
+        static bool isLoaded = false;
+        static IntPtr h;
+        static bool ScreenIndicator = true;
+        static bool ExceptionIndicator = false;
+        static bool ExitIndicator = true;
+        static gdxErrorCallback_t ErrorCallBack = null;
+        static int APIErrorCount = 0;
+
+        private bool XLibraryLoad(string dllName, ref string errBuf)
+        {
+            string symName;
+            int cl = 0;
+            IntPtr pAddressOfFunctionToCall;
+
+            if (isLoaded)
+                return true;
+
+#if __MonoCS__
+        h = LoadLibrary(@dllName,2);
+#else
+            h = LoadLibrary(@dllName);
+#endif
+
+            if (IntPtr.Zero == h)
+            {
+                errBuf = "Could not load shared library " + dllName;
+                return false;
+            }
+
+            pAddressOfFunctionToCall = GetProcAddress(h, "xcreate");
+            if (pAddressOfFunctionToCall != IntPtr.Zero)
+                xcreate = (xcreate_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(xcreate_t));
+            else
+            {
+                symName = "xcreate"; goto symMissing;
+            }
+            pAddressOfFunctionToCall = GetProcAddress(h, "xfree");
+            if (pAddressOfFunctionToCall != IntPtr.Zero)
+                xfree = (xfree_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(xfree_t));
+            else
+            {
+                symName = "xfree"; goto symMissing;
+            }
+
+            pAddressOfFunctionToCall = GetProcAddress(h, "cxcheck");
+            if (pAddressOfFunctionToCall != IntPtr.Zero)
+                dll_xcheck = (xcheck_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(xcheck_t));
+            else
+            {
+                symName = "cxcheck"; goto symMissing;
+            }
+            pAddressOfFunctionToCall = GetProcAddress(h, "cxapiversion");
+            if (pAddressOfFunctionToCall != IntPtr.Zero)
+                dll_xapiversion = (xapiversion_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(xapiversion_t));
+            else
+            {
+                symName = "cxapiversion"; goto symMissing;
+            }
+
+            if (xapiversion(7, ref errBuf, ref cl) == 0)
+                return false;
+
+            pAddressOfFunctionToCall = GetProcAddress(h, "cgdxsetloadpath");
+            if (pAddressOfFunctionToCall != IntPtr.Zero)
+                dll_gdxSetLoadPath = (gdxSetLoadPath_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSetLoadPath_t));
+            pAddressOfFunctionToCall = GetProcAddress(h, "cgdxgetloadpath");
+            if (pAddressOfFunctionToCall != IntPtr.Zero)
+                dll_gdxGetLoadPath = (gdxGetLoadPath_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxGetLoadPath_t));
+            {
+                int[] s = { 3, 11, 11, 3 };
+                if (xcheck("gdxAcronymAdd", 3, s, ref errBuf) == 0)
+                    dll_gdxAcronymAdd = d_gdxAcronymAdd;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxacronymadd");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxAcronymAdd = (gdxAcronymAdd_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxAcronymAdd_t));
+                    else
+                    {
+                        symName = "cgdxAcronymAdd"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3 };
+                if (xcheck("gdxAcronymCount", 0, s, ref errBuf) == 0)
+                    dll_gdxAcronymCount = d_gdxAcronymCount;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxacronymcount");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxAcronymCount = (gdxAcronymCount_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxAcronymCount_t));
+                    else
+                    {
+                        symName = "gdxAcronymCount"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 12, 12, 4 };
+                if (xcheck("gdxAcronymGetInfo", 4, s, ref errBuf) == 0)
+                    dll_gdxAcronymGetInfo = d_gdxAcronymGetInfo;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxacronymgetinfo");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxAcronymGetInfo = (gdxAcronymGetInfo_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxAcronymGetInfo_t));
+                    else
+                    {
+                        symName = "cgdxAcronymGetInfo"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 4, 4, 4 };
+                if (xcheck("gdxAcronymGetMapping", 4, s, ref errBuf) == 0)
+                    dll_gdxAcronymGetMapping = d_gdxAcronymGetMapping;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxacronymgetmapping");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxAcronymGetMapping = (gdxAcronymGetMapping_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxAcronymGetMapping_t));
+                    else
+                    {
+                        symName = "gdxAcronymGetMapping"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 13 };
+                if (xcheck("gdxAcronymIndex", 1, s, ref errBuf) == 0)
+                    dll_gdxAcronymIndex = d_gdxAcronymIndex;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxacronymindex");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxAcronymIndex = (gdxAcronymIndex_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxAcronymIndex_t));
+                    else
+                    {
+                        symName = "gdxAcronymIndex"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 13, 12 };
+                if (xcheck("gdxAcronymName", 2, s, ref errBuf) == 0)
+                    dll_gdxAcronymName = d_gdxAcronymName;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxacronymname");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxAcronymName = (gdxAcronymName_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxAcronymName_t));
+                    else
+                    {
+                        symName = "cgdxAcronymName"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3 };
+                if (xcheck("gdxAcronymNextNr", 1, s, ref errBuf) == 0)
+                    dll_gdxAcronymNextNr = d_gdxAcronymNextNr;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxacronymnextnr");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxAcronymNextNr = (gdxAcronymNextNr_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxAcronymNextNr_t));
+                    else
+                    {
+                        symName = "gdxAcronymNextNr"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 11, 11, 3 };
+                if (xcheck("gdxAcronymSetInfo", 4, s, ref errBuf) == 0)
+                    dll_gdxAcronymSetInfo = d_gdxAcronymSetInfo;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxacronymsetinfo");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxAcronymSetInfo = (gdxAcronymSetInfo_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxAcronymSetInfo_t));
+                    else
+                    {
+                        symName = "cgdxAcronymSetInfo"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 13, 3 };
+                if (xcheck("gdxAcronymValue", 1, s, ref errBuf) == 0)
+                    dll_gdxAcronymValue = d_gdxAcronymValue;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxacronymvalue");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxAcronymValue = (gdxAcronymValue_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxAcronymValue_t));
+                    else
+                    {
+                        symName = "gdxAcronymValue"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 11, 11 };
+                if (xcheck("gdxAddAlias", 2, s, ref errBuf) == 0)
+                    dll_gdxAddAlias = d_gdxAddAlias;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxaddalias");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxAddAlias = (gdxAddAlias_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxAddAlias_t));
+                    else
+                    {
+                        symName = "cgdxAddAlias"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 11, 4 };
+                if (xcheck("gdxAddSetText", 2, s, ref errBuf) == 0)
+                    dll_gdxAddSetText = d_gdxAddSetText;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxaddsettext");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxAddSetText = (gdxAddSetText_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxAddSetText_t));
+                    else
+                    {
+                        symName = "cgdxAddSetText"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3 };
+                if (xcheck("gdxAutoConvert", 1, s, ref errBuf) == 0)
+                    dll_gdxAutoConvert = d_gdxAutoConvert;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxautoconvert");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxAutoConvert = (gdxAutoConvert_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxAutoConvert_t));
+                    else
+                    {
+                        symName = "gdxAutoConvert"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3 };
+                if (xcheck("gdxClose", 0, s, ref errBuf) == 0)
+                    dll_gdxClose = d_gdxClose;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxclose");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxClose = (gdxClose_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxClose_t));
+                    else
+                    {
+                        symName = "gdxClose"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3 };
+                if (xcheck("gdxDataErrorCount", 0, s, ref errBuf) == 0)
+                    dll_gdxDataErrorCount = d_gdxDataErrorCount;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxdataerrorcount");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataErrorCount = (gdxDataErrorCount_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataErrorCount_t));
+                    else
+                    {
+                        symName = "gdxDataErrorCount"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 52, 54 };
+                if (xcheck("gdxDataErrorRecord", 3, s, ref errBuf) == 0)
+                    dll_gdxDataErrorRecord = d_gdxDataErrorRecord;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxdataerrorrecord");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataErrorRecord = (gdxDataErrorRecord_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataErrorRecord_t));
+                    else
+                    {
+                        symName = "gdxDataErrorRecord"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 52, 54 };
+                if (xcheck("gdxDataErrorRecordX", 3, s, ref errBuf) == 0)
+                    dll_gdxDataErrorRecordX = d_gdxDataErrorRecordX;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxdataerrorrecordx");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataErrorRecordX = (gdxDataErrorRecordX_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataErrorRecordX_t));
+                    else
+                    {
+                        symName = "gdxDataErrorRecordX"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3 };
+                if (xcheck("gdxDataReadDone", 0, s, ref errBuf) == 0)
+                    dll_gdxDataReadDone = d_gdxDataReadDone;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxdatareaddone");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataReadDone = (gdxDataReadDone_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataReadDone_t));
+                    else
+                    {
+                        symName = "gdxDataReadDone"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 51, 4 };
+                if (xcheck("gdxDataReadFilteredStart", 3, s, ref errBuf) == 0)
+                    dll_gdxDataReadFilteredStart = d_gdxDataReadFilteredStart;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxdatareadfilteredstart");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataReadFilteredStart = (gdxDataReadFilteredStart_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataReadFilteredStart_t));
+                    else
+                    {
+                        symName = "gdxDataReadFilteredStart"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 52, 54, 4 };
+                if (xcheck("gdxDataReadMap", 4, s, ref errBuf) == 0)
+                    dll_gdxDataReadMap = d_gdxDataReadMap;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxdatareadmap");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataReadMap = (gdxDataReadMap_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataReadMap_t));
+                    else
+                    {
+                        symName = "gdxDataReadMap"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 4 };
+                if (xcheck("gdxDataReadMapStart", 2, s, ref errBuf) == 0)
+                    dll_gdxDataReadMapStart = d_gdxDataReadMapStart;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxdatareadmapstart");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataReadMapStart = (gdxDataReadMapStart_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataReadMapStart_t));
+                    else
+                    {
+                        symName = "gdxDataReadMapStart"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 52, 54, 4 };
+                if (xcheck("gdxDataReadRaw", 3, s, ref errBuf) == 0)
+                    dll_gdxDataReadRaw = d_gdxDataReadRaw;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxdatareadraw");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataReadRaw = (gdxDataReadRaw_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataReadRaw_t));
+                    else
+                    {
+                        symName = "gdxDataReadRaw"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 59, 4 };
+                if (xcheck("gdxDataReadRawFast", 3, s, ref errBuf) == 0)
+                    dll_gdxDataReadRawFast = d_gdxDataReadRawFast;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxdatareadrawfast");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataReadRawFast = (gdxDataReadRawFast_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataReadRawFast_t));
+                    else
+                    {
+                        symName = "gdxDataReadRawFast"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 55, 59 };
+                if (xcheck("gdxDataReadRawFastFilt", 3, s, ref errBuf) == 0)
+                    dll_gdxDataReadRawFastFilt = d_gdxDataReadRawFastFilt;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxdatareadrawfastfilt");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataReadRawFastFilt = (gdxDataReadRawFastFilt_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataReadRawFastFilt_t));
+                    else
+                    {
+                        symName = "cgdxDataReadRawFastFilt"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 4 };
+                if (xcheck("gdxDataReadRawStart", 2, s, ref errBuf) == 0)
+                    dll_gdxDataReadRawStart = d_gdxDataReadRawStart;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxdatareadrawstart");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataReadRawStart = (gdxDataReadRawStart_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataReadRawStart_t));
+                    else
+                    {
+                        symName = "gdxDataReadRawStart"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 55, 4, 59 };
+                if (xcheck("gdxDataReadSlice", 3, s, ref errBuf) == 0)
+                    dll_gdxDataReadSlice = d_gdxDataReadSlice;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxdatareadslice");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataReadSlice = (gdxDataReadSlice_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataReadSlice_t));
+                    else
+                    {
+                        symName = "cgdxDataReadSlice"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 52 };
+                if (xcheck("gdxDataReadSliceStart", 2, s, ref errBuf) == 0)
+                    dll_gdxDataReadSliceStart = d_gdxDataReadSliceStart;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxdatareadslicestart");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataReadSliceStart = (gdxDataReadSliceStart_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataReadSliceStart_t));
+                    else
+                    {
+                        symName = "gdxDataReadSliceStart"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 56, 54, 4 };
+                if (xcheck("gdxDataReadStr", 3, s, ref errBuf) == 0)
+                    dll_gdxDataReadStr = d_gdxDataReadStr;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "bgdxdatareadstr");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataReadStr = (gdxDataReadStr_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataReadStr_t));
+                    else
+                    {
+                        symName = "bgdxDataReadStr"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 4 };
+                if (xcheck("gdxDataReadStrStart", 2, s, ref errBuf) == 0)
+                    dll_gdxDataReadStrStart = d_gdxDataReadStrStart;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxdatareadstrstart");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataReadStrStart = (gdxDataReadStrStart_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataReadStrStart_t));
+                    else
+                    {
+                        symName = "gdxDataReadStrStart"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 51, 56 };
+                if (xcheck("gdxDataSliceUELS", 2, s, ref errBuf) == 0)
+                    dll_gdxDataSliceUELS = d_gdxDataSliceUELS;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "bgdxdatasliceuels");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataSliceUELS = (gdxDataSliceUELS_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataSliceUELS_t));
+                    else
+                    {
+                        symName = "bgdxDataSliceUELS"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3 };
+                if (xcheck("gdxDataWriteDone", 0, s, ref errBuf) == 0)
+                    dll_gdxDataWriteDone = d_gdxDataWriteDone;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxdatawritedone");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataWriteDone = (gdxDataWriteDone_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataWriteDone_t));
+                    else
+                    {
+                        symName = "gdxDataWriteDone"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 51, 53 };
+                if (xcheck("gdxDataWriteMap", 2, s, ref errBuf) == 0)
+                    dll_gdxDataWriteMap = d_gdxDataWriteMap;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxdatawritemap");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataWriteMap = (gdxDataWriteMap_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataWriteMap_t));
+                    else
+                    {
+                        symName = "gdxDataWriteMap"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 11, 11, 3, 3, 3 };
+                if (xcheck("gdxDataWriteMapStart", 5, s, ref errBuf) == 0)
+                    dll_gdxDataWriteMapStart = d_gdxDataWriteMapStart;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxdatawritemapstart");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataWriteMapStart = (gdxDataWriteMapStart_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataWriteMapStart_t));
+                    else
+                    {
+                        symName = "cgdxDataWriteMapStart"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 51, 53 };
+                if (xcheck("gdxDataWriteRaw", 2, s, ref errBuf) == 0)
+                    dll_gdxDataWriteRaw = d_gdxDataWriteRaw;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxdatawriteraw");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataWriteRaw = (gdxDataWriteRaw_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataWriteRaw_t));
+                    else
+                    {
+                        symName = "gdxDataWriteRaw"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 11, 11, 3, 3, 3 };
+                if (xcheck("gdxDataWriteRawStart", 5, s, ref errBuf) == 0)
+                    dll_gdxDataWriteRawStart = d_gdxDataWriteRawStart;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxdatawriterawstart");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataWriteRawStart = (gdxDataWriteRawStart_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataWriteRawStart_t));
+                    else
+                    {
+                        symName = "cgdxDataWriteRawStart"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 55, 53 };
+                if (xcheck("gdxDataWriteStr", 2, s, ref errBuf) == 0)
+                    dll_gdxDataWriteStr = d_gdxDataWriteStr;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxdatawritestr");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataWriteStr = (gdxDataWriteStr_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataWriteStr_t));
+                    else
+                    {
+                        symName = "cgdxDataWriteStr"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 11, 11, 3, 3, 3 };
+                if (xcheck("gdxDataWriteStrStart", 5, s, ref errBuf) == 0)
+                    dll_gdxDataWriteStrStart = d_gdxDataWriteStrStart;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxdatawritestrstart");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxDataWriteStrStart = (gdxDataWriteStrStart_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxDataWriteStrStart_t));
+                    else
+                    {
+                        symName = "cgdxDataWriteStrStart"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 12 };
+                if (xcheck("gdxGetDLLVersion", 1, s, ref errBuf) == 0)
+                    dll_gdxGetDLLVersion = d_gdxGetDLLVersion;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxgetdllversion");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxGetDLLVersion = (gdxGetDLLVersion_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxGetDLLVersion_t));
+                    else
+                    {
+                        symName = "cgdxGetDLLVersion"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3 };
+                if (xcheck("gdxErrorCount", 0, s, ref errBuf) == 0)
+                    dll_gdxErrorCount = d_gdxErrorCount;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxerrorcount");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxErrorCount = (gdxErrorCount_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxErrorCount_t));
+                    else
+                    {
+                        symName = "gdxErrorCount"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 12 };
+                if (xcheck("gdxErrorStr", 2, s, ref errBuf) == 0)
+                    dll_gdxErrorStr = d_gdxErrorStr;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxerrorstr");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxErrorStr = (gdxErrorStr_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxErrorStr_t));
+                    else
+                    {
+                        symName = "cgdxErrorStr"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 4, 4 };
+                if (xcheck("gdxFileInfo", 2, s, ref errBuf) == 0)
+                    dll_gdxFileInfo = d_gdxFileInfo;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxfileinfo");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxFileInfo = (gdxFileInfo_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxFileInfo_t));
+                    else
+                    {
+                        symName = "gdxFileInfo"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 12, 12 };
+                if (xcheck("gdxFileVersion", 2, s, ref errBuf) == 0)
+                    dll_gdxFileVersion = d_gdxFileVersion;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxfileversion");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxFileVersion = (gdxFileVersion_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxFileVersion_t));
+                    else
+                    {
+                        symName = "cgdxFileVersion"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3 };
+                if (xcheck("gdxFilterExists", 1, s, ref errBuf) == 0)
+                    dll_gdxFilterExists = d_gdxFilterExists;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxfilterexists");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxFilterExists = (gdxFilterExists_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxFilterExists_t));
+                    else
+                    {
+                        symName = "gdxFilterExists"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3 };
+                if (xcheck("gdxFilterRegister", 1, s, ref errBuf) == 0)
+                    dll_gdxFilterRegister = d_gdxFilterRegister;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxfilterregister");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxFilterRegister = (gdxFilterRegister_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxFilterRegister_t));
+                    else
+                    {
+                        symName = "gdxFilterRegister"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3 };
+                if (xcheck("gdxFilterRegisterDone", 0, s, ref errBuf) == 0)
+                    dll_gdxFilterRegisterDone = d_gdxFilterRegisterDone;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxfilterregisterdone");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxFilterRegisterDone = (gdxFilterRegisterDone_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxFilterRegisterDone_t));
+                    else
+                    {
+                        symName = "gdxFilterRegisterDone"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3 };
+                if (xcheck("gdxFilterRegisterStart", 1, s, ref errBuf) == 0)
+                    dll_gdxFilterRegisterStart = d_gdxFilterRegisterStart;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxfilterregisterstart");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxFilterRegisterStart = (gdxFilterRegisterStart_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxFilterRegisterStart_t));
+                    else
+                    {
+                        symName = "gdxFilterRegisterStart"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 11, 4 };
+                if (xcheck("gdxFindSymbol", 2, s, ref errBuf) == 0)
+                    dll_gdxFindSymbol = d_gdxFindSymbol;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxfindsymbol");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxFindSymbol = (gdxFindSymbol_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxFindSymbol_t));
+                    else
+                    {
+                        symName = "cgdxFindSymbol"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 12, 4 };
+                if (xcheck("gdxGetElemText", 3, s, ref errBuf) == 0)
+                    dll_gdxGetElemText = d_gdxGetElemText;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxgetelemtext");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxGetElemText = (gdxGetElemText_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxGetElemText_t));
+                    else
+                    {
+                        symName = "cgdxGetElemText"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3 };
+                if (xcheck("gdxGetLastError", 0, s, ref errBuf) == 0)
+                    dll_gdxGetLastError = d_gdxGetLastError;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxgetlasterror");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxGetLastError = (gdxGetLastError_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxGetLastError_t));
+                    else
+                    {
+                        symName = "gdxGetLastError"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 23 };
+                if (xcheck("gdxGetMemoryUsed", 0, s, ref errBuf) == 0)
+                    dll_gdxGetMemoryUsed = d_gdxGetMemoryUsed;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxgetmemoryused");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxGetMemoryUsed = (gdxGetMemoryUsed_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxGetMemoryUsed_t));
+                    else
+                    {
+                        symName = "gdxGetMemoryUsed"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 58 };
+                if (xcheck("gdxGetSpecialValues", 1, s, ref errBuf) == 0)
+                    dll_gdxGetSpecialValues = d_gdxGetSpecialValues;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxgetspecialvalues");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxGetSpecialValues = (gdxGetSpecialValues_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxGetSpecialValues_t));
+                    else
+                    {
+                        symName = "gdxGetSpecialValues"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 12 };
+                if (xcheck("gdxGetUEL", 2, s, ref errBuf) == 0)
+                    dll_gdxGetUEL = d_gdxGetUEL;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxgetuel");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxGetUEL = (gdxGetUEL_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxGetUEL_t));
+                    else
+                    {
+                        symName = "cgdxGetUEL"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 13, 4 };
+                if (xcheck("gdxMapValue", 2, s, ref errBuf) == 0)
+                    dll_gdxMapValue = d_gdxMapValue;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxmapvalue");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxMapValue = (gdxMapValue_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxMapValue_t));
+                    else
+                    {
+                        symName = "gdxMapValue"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 11, 11, 4 };
+                if (xcheck("gdxOpenAppend", 3, s, ref errBuf) == 0)
+                    dll_gdxOpenAppend = d_gdxOpenAppend;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxopenappend");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxOpenAppend = (gdxOpenAppend_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxOpenAppend_t));
+                    else
+                    {
+                        symName = "cgdxOpenAppend"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 11, 4 };
+                if (xcheck("gdxOpenRead", 2, s, ref errBuf) == 0)
+                    dll_gdxOpenRead = d_gdxOpenRead;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxopenread");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxOpenRead = (gdxOpenRead_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxOpenRead_t));
+                    else
+                    {
+                        symName = "cgdxOpenRead"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 11, 11, 4 };
+                if (xcheck("gdxOpenWrite", 3, s, ref errBuf) == 0)
+                    dll_gdxOpenWrite = d_gdxOpenWrite;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxopenwrite");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxOpenWrite = (gdxOpenWrite_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxOpenWrite_t));
+                    else
+                    {
+                        symName = "cgdxOpenWrite"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 11, 11, 3, 4 };
+                if (xcheck("gdxOpenWriteEx", 4, s, ref errBuf) == 0)
+                    dll_gdxOpenWriteEx = d_gdxOpenWriteEx;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxopenwriteex");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxOpenWriteEx = (gdxOpenWriteEx_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxOpenWriteEx_t));
+                    else
+                    {
+                        symName = "cgdxOpenWriteEx"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3 };
+                if (xcheck("gdxResetSpecialValues", 0, s, ref errBuf) == 0)
+                    dll_gdxResetSpecialValues = d_gdxResetSpecialValues;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxresetspecialvalues");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxResetSpecialValues = (gdxResetSpecialValues_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxResetSpecialValues_t));
+                    else
+                    {
+                        symName = "gdxResetSpecialValues"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3 };
+                if (xcheck("gdxSetHasText", 1, s, ref errBuf) == 0)
+                    dll_gdxSetHasText = d_gdxSetHasText;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxsethastext");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxSetHasText = (gdxSetHasText_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSetHasText_t));
+                    else
+                    {
+                        symName = "gdxSetHasText"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 57 };
+                if (xcheck("gdxSetReadSpecialValues", 1, s, ref errBuf) == 0)
+                    dll_gdxSetReadSpecialValues = d_gdxSetReadSpecialValues;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxsetreadspecialvalues");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxSetReadSpecialValues = (gdxSetReadSpecialValues_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSetReadSpecialValues_t));
+                    else
+                    {
+                        symName = "gdxSetReadSpecialValues"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 57 };
+                if (xcheck("gdxSetSpecialValues", 1, s, ref errBuf) == 0)
+                    dll_gdxSetSpecialValues = d_gdxSetSpecialValues;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxsetspecialvalues");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxSetSpecialValues = (gdxSetSpecialValues_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSetSpecialValues_t));
+                    else
+                    {
+                        symName = "gdxSetSpecialValues"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 3 };
+                if (xcheck("gdxSetTextNodeNr", 2, s, ref errBuf) == 0)
+                    dll_gdxSetTextNodeNr = d_gdxSetTextNodeNr;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxsettextnodenr");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxSetTextNodeNr = (gdxSetTextNodeNr_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSetTextNodeNr_t));
+                    else
+                    {
+                        symName = "gdxSetTextNodeNr"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 11 };
+                if (xcheck("gdxSetTraceLevel", 2, s, ref errBuf) == 0)
+                    dll_gdxSetTraceLevel = d_gdxSetTraceLevel;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxsettracelevel");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxSetTraceLevel = (gdxSetTraceLevel_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSetTraceLevel_t));
+                    else
+                    {
+                        symName = "cgdxSetTraceLevel"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 52 };
+                if (xcheck("gdxSymbIndxMaxLength", 2, s, ref errBuf) == 0)
+                    dll_gdxSymbIndxMaxLength = d_gdxSymbIndxMaxLength;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxsymbindxmaxlength");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxSymbIndxMaxLength = (gdxSymbIndxMaxLength_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSymbIndxMaxLength_t));
+                    else
+                    {
+                        symName = "gdxSymbIndxMaxLength"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3 };
+                if (xcheck("gdxSymbMaxLength", 0, s, ref errBuf) == 0)
+                    dll_gdxSymbMaxLength = d_gdxSymbMaxLength;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxsymbmaxlength");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxSymbMaxLength = (gdxSymbMaxLength_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSymbMaxLength_t));
+                    else
+                    {
+                        symName = "gdxSymbMaxLength"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 11 };
+                if (xcheck("gdxSymbolAddComment", 2, s, ref errBuf) == 0)
+                    dll_gdxSymbolAddComment = d_gdxSymbolAddComment;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxsymboladdcomment");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxSymbolAddComment = (gdxSymbolAddComment_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSymbolAddComment_t));
+                    else
+                    {
+                        symName = "cgdxSymbolAddComment"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 3, 12 };
+                if (xcheck("gdxSymbolGetComment", 3, s, ref errBuf) == 0)
+                    dll_gdxSymbolGetComment = d_gdxSymbolGetComment;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxsymbolgetcomment");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxSymbolGetComment = (gdxSymbolGetComment_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSymbolGetComment_t));
+                    else
+                    {
+                        symName = "cgdxSymbolGetComment"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 52 };
+                if (xcheck("gdxSymbolGetDomain", 2, s, ref errBuf) == 0)
+                    dll_gdxSymbolGetDomain = d_gdxSymbolGetDomain;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxsymbolgetdomain");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxSymbolGetDomain = (gdxSymbolGetDomain_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSymbolGetDomain_t));
+                    else
+                    {
+                        symName = "gdxSymbolGetDomain"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 56 };
+                if (xcheck("gdxSymbolGetDomainX", 2, s, ref errBuf) == 0)
+                    dll_gdxSymbolGetDomainX = d_gdxSymbolGetDomainX;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "bgdxsymbolgetdomainx");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxSymbolGetDomainX = (gdxSymbolGetDomainX_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSymbolGetDomainX_t));
+                    else
+                    {
+                        symName = "bgdxSymbolGetDomainX"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3 };
+                if (xcheck("gdxSymbolDim", 1, s, ref errBuf) == 0)
+                    dll_gdxSymbolDim = d_gdxSymbolDim;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxsymboldim");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxSymbolDim = (gdxSymbolDim_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSymbolDim_t));
+                    else
+                    {
+                        symName = "gdxSymbolDim"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 12, 4, 4 };
+                if (xcheck("gdxSymbolInfo", 4, s, ref errBuf) == 0)
+                    dll_gdxSymbolInfo = d_gdxSymbolInfo;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxsymbolinfo");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxSymbolInfo = (gdxSymbolInfo_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSymbolInfo_t));
+                    else
+                    {
+                        symName = "cgdxSymbolInfo"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 4, 4, 12 };
+                if (xcheck("gdxSymbolInfoX", 4, s, ref errBuf) == 0)
+                    dll_gdxSymbolInfoX = d_gdxSymbolInfoX;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxsymbolinfox");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxSymbolInfoX = (gdxSymbolInfoX_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSymbolInfoX_t));
+                    else
+                    {
+                        symName = "cgdxSymbolInfoX"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 55 };
+                if (xcheck("gdxSymbolSetDomain", 1, s, ref errBuf) == 0)
+                    dll_gdxSymbolSetDomain = d_gdxSymbolSetDomain;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxsymbolsetdomain");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxSymbolSetDomain = (gdxSymbolSetDomain_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSymbolSetDomain_t));
+                    else
+                    {
+                        symName = "cgdxSymbolSetDomain"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 55 };
+                if (xcheck("gdxSymbolSetDomainX", 2, s, ref errBuf) == 0)
+                    dll_gdxSymbolSetDomainX = d_gdxSymbolSetDomainX;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxsymbolsetdomainx");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxSymbolSetDomainX = (gdxSymbolSetDomainX_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSymbolSetDomainX_t));
+                    else
+                    {
+                        symName = "cgdxSymbolSetDomainX"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 4, 4 };
+                if (xcheck("gdxSystemInfo", 2, s, ref errBuf) == 0)
+                    dll_gdxSystemInfo = d_gdxSystemInfo;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxsysteminfo");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxSystemInfo = (gdxSystemInfo_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxSystemInfo_t));
+                    else
+                    {
+                        symName = "gdxSystemInfo"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3 };
+                if (xcheck("gdxUELMaxLength", 0, s, ref errBuf) == 0)
+                    dll_gdxUELMaxLength = d_gdxUELMaxLength;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxuelmaxlength");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxUELMaxLength = (gdxUELMaxLength_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxUELMaxLength_t));
+                    else
+                    {
+                        symName = "gdxUELMaxLength"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3 };
+                if (xcheck("gdxUELRegisterDone", 0, s, ref errBuf) == 0)
+                    dll_gdxUELRegisterDone = d_gdxUELRegisterDone;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxuelregisterdone");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxUELRegisterDone = (gdxUELRegisterDone_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxUELRegisterDone_t));
+                    else
+                    {
+                        symName = "gdxUELRegisterDone"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 11 };
+                if (xcheck("gdxUELRegisterMap", 2, s, ref errBuf) == 0)
+                    dll_gdxUELRegisterMap = d_gdxUELRegisterMap;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxuelregistermap");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxUELRegisterMap = (gdxUELRegisterMap_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxUELRegisterMap_t));
+                    else
+                    {
+                        symName = "cgdxUELRegisterMap"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3 };
+                if (xcheck("gdxUELRegisterMapStart", 0, s, ref errBuf) == 0)
+                    dll_gdxUELRegisterMapStart = d_gdxUELRegisterMapStart;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxuelregistermapstart");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxUELRegisterMapStart = (gdxUELRegisterMapStart_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxUELRegisterMapStart_t));
+                    else
+                    {
+                        symName = "gdxUELRegisterMapStart"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 11 };
+                if (xcheck("gdxUELRegisterRaw", 1, s, ref errBuf) == 0)
+                    dll_gdxUELRegisterRaw = d_gdxUELRegisterRaw;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxuelregisterraw");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxUELRegisterRaw = (gdxUELRegisterRaw_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxUELRegisterRaw_t));
+                    else
+                    {
+                        symName = "cgdxUELRegisterRaw"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3 };
+                if (xcheck("gdxUELRegisterRawStart", 0, s, ref errBuf) == 0)
+                    dll_gdxUELRegisterRawStart = d_gdxUELRegisterRawStart;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxuelregisterrawstart");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxUELRegisterRawStart = (gdxUELRegisterRawStart_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxUELRegisterRawStart_t));
+                    else
+                    {
+                        symName = "gdxUELRegisterRawStart"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 11, 4 };
+                if (xcheck("gdxUELRegisterStr", 2, s, ref errBuf) == 0)
+                    dll_gdxUELRegisterStr = d_gdxUELRegisterStr;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxuelregisterstr");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxUELRegisterStr = (gdxUELRegisterStr_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxUELRegisterStr_t));
+                    else
+                    {
+                        symName = "cgdxUELRegisterStr"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3 };
+                if (xcheck("gdxUELRegisterStrStart", 0, s, ref errBuf) == 0)
+                    dll_gdxUELRegisterStrStart = d_gdxUELRegisterStrStart;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxuelregisterstrstart");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxUELRegisterStrStart = (gdxUELRegisterStrStart_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxUELRegisterStrStart_t));
+                    else
+                    {
+                        symName = "gdxUELRegisterStrStart"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 11, 4, 4 };
+                if (xcheck("gdxUMFindUEL", 3, s, ref errBuf) == 0)
+                    dll_gdxUMFindUEL = d_gdxUMFindUEL;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxumfinduel");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxUMFindUEL = (gdxUMFindUEL_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxUMFindUEL_t));
+                    else
+                    {
+                        symName = "cgdxUMFindUEL"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 12, 4 };
+                if (xcheck("gdxUMUelGet", 3, s, ref errBuf) == 0)
+                    dll_gdxUMUelGet = d_gdxUMUelGet;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxumuelget");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxUMUelGet = (gdxUMUelGet_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxUMUelGet_t));
+                    else
+                    {
+                        symName = "cgdxUMUelGet"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 4, 4 };
+                if (xcheck("gdxUMUelInfo", 2, s, ref errBuf) == 0)
+                    dll_gdxUMUelInfo = d_gdxUMUelInfo;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxumuelinfo");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxUMUelInfo = (gdxUMUelInfo_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxUMUelInfo_t));
+                    else
+                    {
+                        symName = "gdxUMUelInfo"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 3, 3, 3, 59, 4, 1 };
+                if (xcheck("gdxGetDomainElements", 6, s, ref errBuf) == 0)
+                    dll_gdxGetDomainElements = d_gdxGetDomainElements;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxgetdomainelements");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxGetDomainElements = (gdxGetDomainElements_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxGetDomainElements_t));
+                    else
+                    {
+                        symName = "gdxGetDomainElements"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3 };
+                if (xcheck("gdxCurrentDim", 0, s, ref errBuf) == 0)
+                    dll_gdxCurrentDim = d_gdxCurrentDim;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "gdxcurrentdim");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxCurrentDim = (gdxCurrentDim_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxCurrentDim_t));
+                    else
+                    {
+                        symName = "gdxCurrentDim"; goto symMissing;
+                    }
+                }
+            }
+            {
+                int[] s = { 3, 11, 11 };
+                if (xcheck("gdxRenameUEL", 2, s, ref errBuf) == 0)
+                    dll_gdxRenameUEL = d_gdxRenameUEL;
+                else
+                {
+                    pAddressOfFunctionToCall = GetProcAddress(h, "cgdxrenameuel");
+                    if (pAddressOfFunctionToCall != IntPtr.Zero)
+                        dll_gdxRenameUEL = (gdxRenameUEL_t)Marshal.GetDelegateForFunctionPointer(pAddressOfFunctionToCall, typeof(gdxRenameUEL_t));
+                    else
+                    {
+                        symName = "cgdxRenameUEL"; goto symMissing;
+                    }
+                }
+            }
+
+            return true;
+
+            symMissing:
+            errBuf = "Could not load symbol '" + symName + "'";
+            return false;
+
+        } /* XLibraryLoad */
+
+        private bool libloader(string dllPath, string dllName, ref string msgBuf)
+        {
+#if __MonoCS__
+#if __APPLE__
+        const string libStem = "libgdxdclib", libExt = ".dylib";
+#else
+        const string libStem = "libgdxdclib", libExt = ".so";
+#endif
+#else
+            const string libStem = "gdxdclib", libExt = ".dll";
+#endif
+            string dllNameBuf = string.Empty;
+            int myrc = 0;
+            string GMS_DLL_SUFFIX = string.Empty;
+
+            msgBuf = string.Empty;
+            if (!isLoaded)
+            {
+                if (string.Empty != dllPath)
+                {
+                    dllNameBuf = dllPath;
+                    if (Path.DirectorySeparatorChar != dllNameBuf[dllNameBuf.Length - 1]) dllNameBuf = dllNameBuf + Path.DirectorySeparatorChar;
+                }
+                if (string.Empty != dllName)
+                    dllNameBuf = dllNameBuf + dllName;
+                else
+                {
+                    if (8 == IntPtr.Size)
+                        GMS_DLL_SUFFIX = "64";
+                    dllNameBuf = dllNameBuf + libStem + GMS_DLL_SUFFIX + libExt;
+                }
+                isLoaded = XLibraryLoad(dllNameBuf, ref msgBuf);
+                if (isLoaded)
+                {
+                    if (null != dll_gdxSetLoadPath && string.Empty != dllPath)
+                    {
+                        gdxSetLoadPath(dllPath);
+                    }
+                    else
+                    {                            /* no setLoadPath call found */
+                        myrc |= 2;
+                    }
+                }
+                else                          /* library load failed */
+                    myrc |= 1;
+            }
+            return (myrc & 1) == 0;
+        } /* libloader */
+
+        public bool gdxGetReady(ref string msgBuf)
+        {
+            return libloader(string.Empty, string.Empty, ref msgBuf);
+        }
+        public bool gdxGetReadyD(string dirName, ref string msgBuf)
+        {
+            return libloader(dirName, string.Empty, ref msgBuf);
+        }
+        public bool gdxGetReadyL(string dirName, string libName, ref string msgBuf)
+        {
+            return libloader(dirName, libName, ref msgBuf);
+        }
+
+        public Gdxcs(ref string msgBuf)
+        {
+            bool gdxIsReady;
+
+            extHandle = false;
+            _disposed = false;
+            gdxIsReady = gdxGetReady(ref msgBuf);
+            if (!gdxIsReady) return;
+            xcreate(ref pgdx);
+            if (pgdx != IntPtr.Zero)
+            {
+                msgBuf = String.Empty;
+                return;
+            }
+            msgBuf = "Error while creating object";
+        }
+        public Gdxcs(string dirName, ref string msgBuf)
+        {
+            bool gdxIsReady;
+
+            extHandle = false;
+            _disposed = false;
+            gdxIsReady = gdxGetReadyD(dirName, ref msgBuf);
+            if (!gdxIsReady) return;
+            xcreate(ref pgdx);
+            if (pgdx != IntPtr.Zero)
+            {
+                msgBuf = String.Empty;
+                return;
+            }
+            msgBuf = "Error while creating object";
+        }
+        public Gdxcs(string dirName, string libName, ref string msgBuf)
+        {
+            bool gdxIsReady;
+
+            extHandle = false;
+            _disposed = false;
+            gdxIsReady = gdxGetReadyL(dirName, libName, ref msgBuf);
+            if (!gdxIsReady) return;
+            xcreate(ref pgdx);
+            if (pgdx != IntPtr.Zero)
+            {
+                msgBuf = String.Empty;
+                return;
+            }
+            msgBuf = "Error while creating object";
+        }
+        public Gdxcs(IntPtr gdxHandle, ref string msgBuf)
+        {
+            bool gdxIsReady;
+
+            if (gdxHandle == IntPtr.Zero)
+            {
+                msgBuf = "gdxHandle is empty";
+                return;
+            }
+            extHandle = true;
+            _disposed = false;
+            gdxIsReady = gdxGetReady(ref msgBuf);
+            if (!gdxIsReady) return;
+            pgdx = gdxHandle;
+        }
+        public Gdxcs(IntPtr gdxHandle, string dirName, ref string msgBuf)
+        {
+            bool gdxIsReady;
+
+            if (gdxHandle == IntPtr.Zero)
+            {
+                msgBuf = "gdxHandle is empty";
+                return;
+            }
+            extHandle = true;
+            _disposed = false;
+            gdxIsReady = gdxGetReadyD(dirName, ref msgBuf);
+            if (!gdxIsReady) return;
+            pgdx = gdxHandle;
+        }
+
+        ~Gdxcs()
+        {
+            Dispose(true);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+
+            // Use SupressFinalize in case a subclass
+            // of this type implements a finalizer.
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    if (pgdx != IntPtr.Zero)
+                        gdxFree();
+                }
+                // Indicate that the instance has been disposed.
+                _disposed = true;
+            }
+            GC.KeepAlive(this);
+        }
+
+        public int gdxFree()
+        {
+            if (!extHandle && pgdx != IntPtr.Zero) xfree(ref pgdx);
+            return 1;
+        }
+
+        public bool gdxLibraryUnload()
+        {
+            return FreeLibrary(h);
+        }
+
+        public IntPtr GetgdxPtr()
+        {
+            return pgdx;
+        }
+
+        public bool gdxGetScreenIndicator()
+        {
+            return ScreenIndicator;
+        }
+
+        public void gdxSetScreenIndicator(bool scrind)
+        {
+            ScreenIndicator = scrind;
+        }
+
+        public bool gdxGetExceptionIndicator()
+        {
+            return ExceptionIndicator;
+        }
+
+        public void gdxSetExceptionIndicator(bool excind)
+        {
+            ExceptionIndicator = excind;
+        }
+
+        public bool gdxGetExitIndicator()
+        {
+            return ExitIndicator;
+        }
+
+        public void gdxSetExitIndicator(bool extind)
+        {
+            ExitIndicator = extind;
+        }
+
+        public gdxErrorCallback_t gdxGetErrorCallback()
+        {
+            return ErrorCallBack;
+        }
+
+        public void gdxSetErrorCallback(gdxErrorCallback_t func)
+        {
+            ErrorCallBack = func;
+        }
+
+        public int gdxGetAPIErrorCount()
+        {
+            return APIErrorCount;
+        }
+
+        public void gdxSetAPIErrorCount(int ecnt)
+        {
+            APIErrorCount = ecnt;
+        }
+
+        private static void gdxErrorHandling(string Msg)
+        {
+            APIErrorCount++;
+            if (ScreenIndicator) Console.WriteLine(Msg);
+            if (ErrorCallBack != null)
+                if (ErrorCallBack(APIErrorCount, Msg)) Environment.Exit(123);
+            if (ExceptionIndicator) throw new ArgumentNullException();
+            if (ExitIndicator) Environment.Exit(123);
+        }
+
+        private void ConvertC2CS(byte[] b, ref string s)
+        {
+            int i;
+            s = "";
+            i = 0;
+            while (b[i] != 0)
+            {
+                s = s + (char)(b[i]);
+                i = i + 1;
+            }
+        }
+
+        private void ConvertArrayC2CS(byte[,] b, ref string s, int k)
+        {
+            int i;
+            s = "";
+            i = 0;
+            while (b[k, i] != 0)
+            {
+                s = s + (char)(b[k, i]);
+                i = i + 1;
+            }
+        }
+
+        private int xapiversion(int api, ref string msg, ref int cl)
+        {
+            int rc_xapiversion;
+            StringBuilder cpy_msg = new StringBuilder(gamsglobals.str_len);
+            rc_xapiversion = dll_xapiversion(api, cpy_msg, ref cl);
+            msg = cpy_msg.ToString();
+            return rc_xapiversion;
+        }
+
+        private int xcheck(string ep, int nargs, int[] s, ref string msg)
+        {
+            int rc_xcheck;
+            StringBuilder cpy_msg = new StringBuilder(gamsglobals.str_len);
+            rc_xcheck = dll_xcheck(ep, nargs, s, cpy_msg);
+            msg = cpy_msg.ToString();
+            return rc_xcheck;
+        }
+
+        public void gdxSetLoadPath(string s)
+        {
+            dll_gdxSetLoadPath(s);
+        }
+
+        public void gdxGetLoadPath(ref string s)
+        {
+            byte[] cpy_s = new byte[gamsglobals.str_len];
+            dll_gdxGetLoadPath(ref cpy_s[0]);
+            ConvertC2CS(cpy_s, ref s);
+        }
+
+        public int gdxAcronymAdd(string AName, string Txt, int AIndx)
+        {
+            return dll_gdxAcronymAdd(pgdx, AName, Txt, AIndx);
+        }
+
+        public int gdxAcronymCount()
+        {
+            return dll_gdxAcronymCount(pgdx);
+        }
+
+        public int gdxAcronymGetInfo(int N, ref string AName, ref string Txt, ref int AIndx)
+        {
+            int rc_gdxAcronymGetInfo;
+            StringBuilder cpy_AName = new StringBuilder(gamsglobals.str_len);
+            StringBuilder cpy_Txt = new StringBuilder(gamsglobals.str_len);
+            rc_gdxAcronymGetInfo = dll_gdxAcronymGetInfo(pgdx, N, cpy_AName, cpy_Txt, ref AIndx);
+            AName = cpy_AName.ToString();
+            Txt = cpy_Txt.ToString();
+            return rc_gdxAcronymGetInfo;
+        }
+
+        public int gdxAcronymGetMapping(int N, ref int orgIndx, ref int newIndx, ref int autoIndex)
+        {
+            return dll_gdxAcronymGetMapping(pgdx, N, ref orgIndx, ref newIndx, ref autoIndex);
+        }
+
+        public int gdxAcronymIndex(double V)
+        {
+            return dll_gdxAcronymIndex(pgdx, V);
+        }
+
+        public int gdxAcronymName(double V, ref string AName)
+        {
+            int rc_gdxAcronymName;
+            StringBuilder cpy_AName = new StringBuilder(gamsglobals.str_len);
+            rc_gdxAcronymName = dll_gdxAcronymName(pgdx, V, cpy_AName);
+            AName = cpy_AName.ToString();
+            return rc_gdxAcronymName;
+        }
+
+        public int gdxAcronymNextNr(int NV)
+        {
+            return dll_gdxAcronymNextNr(pgdx, NV);
+        }
+
+        public int gdxAcronymSetInfo(int N, string AName, string Txt, int AIndx)
+        {
+            return dll_gdxAcronymSetInfo(pgdx, N, AName, Txt, AIndx);
+        }
+
+        public double gdxAcronymValue(int AIndx)
+        {
+            return dll_gdxAcronymValue(pgdx, AIndx);
+        }
+
+        public int gdxAddAlias(string Id1, string Id2)
+        {
+            return dll_gdxAddAlias(pgdx, Id1, Id2);
+        }
+
+        public int gdxAddSetText(string Txt, ref int TxtNr)
+        {
+            return dll_gdxAddSetText(pgdx, Txt, ref TxtNr);
+        }
+
+        public int gdxAutoConvert(int NV)
+        {
+            return dll_gdxAutoConvert(pgdx, NV);
+        }
+
+        public int gdxClose()
+        {
+            return dll_gdxClose(pgdx);
+        }
+
+        public int gdxDataErrorCount()
+        {
+            return dll_gdxDataErrorCount(pgdx);
+        }
+
+        public int gdxDataErrorRecord(int RecNr, ref int[] KeyInt, ref double[] Values)
+        {
+            return dll_gdxDataErrorRecord(pgdx, RecNr, KeyInt, Values);
+        }
+
+        public int gdxDataErrorRecordX(int RecNr, ref int[] KeyInt, ref double[] Values)
+        {
+            return dll_gdxDataErrorRecordX(pgdx, RecNr, KeyInt, Values);
+        }
+
+        public int gdxDataReadDone()
+        {
+            return dll_gdxDataReadDone(pgdx);
+        }
+
+        public int gdxDataReadFilteredStart(int SyNr, int[] FilterAction, ref int NrRecs)
+        {
+            return dll_gdxDataReadFilteredStart(pgdx, SyNr, FilterAction, ref NrRecs);
+        }
+
+        public int gdxDataReadMap(int RecNr, ref int[] KeyInt, ref double[] Values, ref int DimFrst)
+        {
+            return dll_gdxDataReadMap(pgdx, RecNr, KeyInt, Values, ref DimFrst);
+        }
+
+        public int gdxDataReadMapStart(int SyNr, ref int NrRecs)
+        {
+            return dll_gdxDataReadMapStart(pgdx, SyNr, ref NrRecs);
+        }
+
+        public int gdxDataReadRaw(ref int[] KeyInt, ref double[] Values, ref int DimFrst)
+        {
+            return dll_gdxDataReadRaw(pgdx, KeyInt, Values, ref DimFrst);
+        }
+
+        public int gdxDataReadRawFast(int SyNr, TDataStoreProc DP, ref int NrRecs)
+        {
+            return dll_gdxDataReadRawFast(pgdx, SyNr, DP, ref NrRecs);
+        }
+
+        public int gdxDataReadRawFastFilt(int SyNr, string[] UelFilterStr, TDataStoreFiltProc DP)
+        {
+            return dll_gdxDataReadRawFastFilt(pgdx, SyNr, UelFilterStr, DP);
+        }
+
+        public int gdxDataReadRawStart(int SyNr, ref int NrRecs)
+        {
+            return dll_gdxDataReadRawStart(pgdx, SyNr, ref NrRecs);
+        }
+
+        public int gdxDataReadSlice(string[] UelFilterStr, ref int Dimen, TDataStoreProc DP)
+        {
+            return dll_gdxDataReadSlice(pgdx, UelFilterStr, ref Dimen, DP);
+        }
+
+        public int gdxDataReadSliceStart(int SyNr, ref int[] ElemCounts)
+        {
+            return dll_gdxDataReadSliceStart(pgdx, SyNr, ElemCounts);
+        }
+
+        public int gdxDataReadStr(ref string[] KeyStr, ref double[] Values, ref int DimFrst)
+        {
+            int rc_gdxDataReadStr;
+            byte[,] cpy_KeyStr = new byte[gamsglobals.maxdim, gamsglobals.str_len];
+            int i_KeyStr;
+            int sidim_KeyStr;
+            rc_gdxDataReadStr = dll_gdxDataReadStr(pgdx, cpy_KeyStr, Values, ref DimFrst);
+            sidim_KeyStr = dll_gdxCurrentDim(pgdx);
+            if (rc_gdxDataReadStr != 0)
+                for (i_KeyStr = 0; i_KeyStr < sidim_KeyStr; i_KeyStr++)
+                    ConvertArrayC2CS(cpy_KeyStr, ref KeyStr[i_KeyStr], i_KeyStr);
+            return rc_gdxDataReadStr;
+        }
+
+        public int gdxDataReadStrStart(int SyNr, ref int NrRecs)
+        {
+            return dll_gdxDataReadStrStart(pgdx, SyNr, ref NrRecs);
+        }
+
+        public int gdxDataSliceUELS(int[] SliceKeyInt, ref string[] KeyStr)
+        {
+            int rc_gdxDataSliceUELS;
+            byte[,] cpy_KeyStr = new byte[gamsglobals.maxdim, gamsglobals.str_len];
+            int i_KeyStr;
+            int sidim_KeyStr;
+            rc_gdxDataSliceUELS = dll_gdxDataSliceUELS(pgdx, SliceKeyInt, cpy_KeyStr);
+            sidim_KeyStr = dll_gdxCurrentDim(pgdx);
+            if (rc_gdxDataSliceUELS != 0)
+                for (i_KeyStr = 0; i_KeyStr < sidim_KeyStr; i_KeyStr++)
+                    ConvertArrayC2CS(cpy_KeyStr, ref KeyStr[i_KeyStr], i_KeyStr);
+            return rc_gdxDataSliceUELS;
+        }
+
+        public int gdxDataWriteDone()
+        {
+            return dll_gdxDataWriteDone(pgdx);
+        }
+
+        public int gdxDataWriteMap(int[] KeyInt, double[] Values)
+        {
+            return dll_gdxDataWriteMap(pgdx, KeyInt, Values);
+        }
+
+        public int gdxDataWriteMapStart(string SyId, string ExplTxt, int Dimen, int Typ, int UserInfo)
+        {
+            return dll_gdxDataWriteMapStart(pgdx, SyId, ExplTxt, Dimen, Typ, UserInfo);
+        }
+
+        public int gdxDataWriteRaw(int[] KeyInt, double[] Values)
+        {
+            return dll_gdxDataWriteRaw(pgdx, KeyInt, Values);
+        }
+
+        public int gdxDataWriteRawStart(string SyId, string ExplTxt, int Dimen, int Typ, int UserInfo)
+        {
+            return dll_gdxDataWriteRawStart(pgdx, SyId, ExplTxt, Dimen, Typ, UserInfo);
+        }
+
+        public int gdxDataWriteStr(string[] KeyStr, double[] Values)
+        {
+            return dll_gdxDataWriteStr(pgdx, KeyStr, Values);
+        }
+
+        public int gdxDataWriteStrStart(string SyId, string ExplTxt, int Dimen, int Typ, int UserInfo)
+        {
+            return dll_gdxDataWriteStrStart(pgdx, SyId, ExplTxt, Dimen, Typ, UserInfo);
+        }
+
+        public int gdxGetDLLVersion(ref string V)
+        {
+            int rc_gdxGetDLLVersion;
+            StringBuilder cpy_V = new StringBuilder(gamsglobals.str_len);
+            rc_gdxGetDLLVersion = dll_gdxGetDLLVersion(pgdx, cpy_V);
+            V = cpy_V.ToString();
+            return rc_gdxGetDLLVersion;
+        }
+
+        public int gdxErrorCount()
+        {
+            return dll_gdxErrorCount(pgdx);
+        }
+
+        public int gdxErrorStr(int ErrNr, ref string ErrMsg)
+        {
+            int rc_gdxErrorStr;
+            StringBuilder cpy_ErrMsg = new StringBuilder(gamsglobals.str_len);
+            rc_gdxErrorStr = dll_gdxErrorStr(pgdx, ErrNr, cpy_ErrMsg);
+            ErrMsg = cpy_ErrMsg.ToString();
+            return rc_gdxErrorStr;
+        }
+
+        public int gdxFileInfo(ref int FileVer, ref int ComprLev)
+        {
+            return dll_gdxFileInfo(pgdx, ref FileVer, ref ComprLev);
+        }
+
+        public int gdxFileVersion(ref string FileStr, ref string ProduceStr)
+        {
+            int rc_gdxFileVersion;
+            StringBuilder cpy_FileStr = new StringBuilder(gamsglobals.str_len);
+            StringBuilder cpy_ProduceStr = new StringBuilder(gamsglobals.str_len);
+            rc_gdxFileVersion = dll_gdxFileVersion(pgdx, cpy_FileStr, cpy_ProduceStr);
+            FileStr = cpy_FileStr.ToString();
+            ProduceStr = cpy_ProduceStr.ToString();
+            return rc_gdxFileVersion;
+        }
+
+        public int gdxFilterExists(int FilterNr)
+        {
+            return dll_gdxFilterExists(pgdx, FilterNr);
+        }
+
+        public int gdxFilterRegister(int UelMap)
+        {
+            return dll_gdxFilterRegister(pgdx, UelMap);
+        }
+
+        public int gdxFilterRegisterDone()
+        {
+            return dll_gdxFilterRegisterDone(pgdx);
+        }
+
+        public int gdxFilterRegisterStart(int FilterNr)
+        {
+            return dll_gdxFilterRegisterStart(pgdx, FilterNr);
+        }
+
+        public int gdxFindSymbol(string SyId, ref int SyNr)
+        {
+            return dll_gdxFindSymbol(pgdx, SyId, ref SyNr);
+        }
+
+        public int gdxGetElemText(int TxtNr, ref string Txt, ref int Node)
+        {
+            int rc_gdxGetElemText;
+            StringBuilder cpy_Txt = new StringBuilder(gamsglobals.str_len);
+            rc_gdxGetElemText = dll_gdxGetElemText(pgdx, TxtNr, cpy_Txt, ref Node);
+            Txt = cpy_Txt.ToString();
+            return rc_gdxGetElemText;
+        }
+
+        public int gdxGetLastError()
+        {
+            return dll_gdxGetLastError(pgdx);
+        }
+
+        public Int64 gdxGetMemoryUsed()
+        {
+            return dll_gdxGetMemoryUsed(pgdx);
+        }
+
+        public int gdxGetSpecialValues(ref double[] AVals)
+        {
+            return dll_gdxGetSpecialValues(pgdx, AVals);
+        }
+
+        public int gdxGetUEL(int UelNr, ref string Uel)
+        {
+            int rc_gdxGetUEL;
+            StringBuilder cpy_Uel = new StringBuilder(gamsglobals.str_len);
+            rc_gdxGetUEL = dll_gdxGetUEL(pgdx, UelNr, cpy_Uel);
+            Uel = cpy_Uel.ToString();
+            return rc_gdxGetUEL;
+        }
+
+        public int gdxMapValue(double D, ref int sv)
+        {
+            return dll_gdxMapValue(pgdx, D, ref sv);
+        }
+
+        public int gdxOpenAppend(string FileName, string Producer, ref int ErrNr)
+        {
+            return dll_gdxOpenAppend(pgdx, FileName, Producer, ref ErrNr);
+        }
+
+        public int gdxOpenRead(string FileName, ref int ErrNr)
+        {
+            return dll_gdxOpenRead(pgdx, FileName, ref ErrNr);
+        }
+
+        public int gdxOpenWrite(string FileName, string Producer, ref int ErrNr)
+        {
+            return dll_gdxOpenWrite(pgdx, FileName, Producer, ref ErrNr);
+        }
+
+        public int gdxOpenWriteEx(string FileName, string Producer, int Compr, ref int ErrNr)
+        {
+            return dll_gdxOpenWriteEx(pgdx, FileName, Producer, Compr, ref ErrNr);
+        }
+
+        public int gdxResetSpecialValues()
+        {
+            return dll_gdxResetSpecialValues(pgdx);
+        }
+
+        public int gdxSetHasText(int SyNr)
+        {
+            return dll_gdxSetHasText(pgdx, SyNr);
+        }
+
+        public int gdxSetReadSpecialValues(double[] AVals)
+        {
+            return dll_gdxSetReadSpecialValues(pgdx, AVals);
+        }
+
+        public int gdxSetSpecialValues(double[] AVals)
+        {
+            return dll_gdxSetSpecialValues(pgdx, AVals);
+        }
+
+        public int gdxSetTextNodeNr(int TxtNr, int Node)
+        {
+            return dll_gdxSetTextNodeNr(pgdx, TxtNr, Node);
+        }
+
+        public int gdxSetTraceLevel(int N, string s)
+        {
+            return dll_gdxSetTraceLevel(pgdx, N, s);
+        }
+
+        public int gdxSymbIndxMaxLength(int SyNr, ref int[] LengthInfo)
+        {
+            return dll_gdxSymbIndxMaxLength(pgdx, SyNr, LengthInfo);
+        }
+
+        public int gdxSymbMaxLength()
+        {
+            return dll_gdxSymbMaxLength(pgdx);
+        }
+
+        public int gdxSymbolAddComment(int SyNr, string Txt)
+        {
+            return dll_gdxSymbolAddComment(pgdx, SyNr, Txt);
+        }
+
+        public int gdxSymbolGetComment(int SyNr, int N, ref string Txt)
+        {
+            int rc_gdxSymbolGetComment;
+            StringBuilder cpy_Txt = new StringBuilder(gamsglobals.str_len);
+            rc_gdxSymbolGetComment = dll_gdxSymbolGetComment(pgdx, SyNr, N, cpy_Txt);
+            Txt = cpy_Txt.ToString();
+            return rc_gdxSymbolGetComment;
+        }
+
+        public int gdxSymbolGetDomain(int SyNr, ref int[] DomainSyNrs)
+        {
+            return dll_gdxSymbolGetDomain(pgdx, SyNr, DomainSyNrs);
+        }
+
+        public int gdxSymbolGetDomainX(int SyNr, ref string[] DomainIDs)
+        {
+            int rc_gdxSymbolGetDomainX;
+            byte[,] cpy_DomainIDs = new byte[gamsglobals.maxdim, gamsglobals.str_len];
+            int i_DomainIDs;
+            int sidim_DomainIDs;
+            rc_gdxSymbolGetDomainX = dll_gdxSymbolGetDomainX(pgdx, SyNr, cpy_DomainIDs);
+            sidim_DomainIDs = dll_gdxSymbolDim(pgdx, SyNr);
+            if (rc_gdxSymbolGetDomainX != 0)
+                for (i_DomainIDs = 0; i_DomainIDs < sidim_DomainIDs; i_DomainIDs++)
+                    ConvertArrayC2CS(cpy_DomainIDs, ref DomainIDs[i_DomainIDs], i_DomainIDs);
+            return rc_gdxSymbolGetDomainX;
+        }
+
+        public int gdxSymbolDim(int SyNr)
+        {
+            return dll_gdxSymbolDim(pgdx, SyNr);
+        }
+
+        public int gdxSymbolInfo(int SyNr, ref string SyId, ref int Dimen, ref int Typ)
+        {
+            int rc_gdxSymbolInfo;
+            StringBuilder cpy_SyId = new StringBuilder(gamsglobals.str_len);
+            rc_gdxSymbolInfo = dll_gdxSymbolInfo(pgdx, SyNr, cpy_SyId, ref Dimen, ref Typ);
+            SyId = cpy_SyId.ToString();
+            return rc_gdxSymbolInfo;
+        }
+
+        public int gdxSymbolInfoX(int SyNr, ref int RecCnt, ref int UserInfo, ref string ExplTxt)
+        {
+            int rc_gdxSymbolInfoX;
+            StringBuilder cpy_ExplTxt = new StringBuilder(gamsglobals.str_len);
+            rc_gdxSymbolInfoX = dll_gdxSymbolInfoX(pgdx, SyNr, ref RecCnt, ref UserInfo, cpy_ExplTxt);
+            ExplTxt = cpy_ExplTxt.ToString();
+            return rc_gdxSymbolInfoX;
+        }
+
+        public int gdxSymbolSetDomain(string[] DomainIDs)
+        {
+            return dll_gdxSymbolSetDomain(pgdx, DomainIDs);
+        }
+
+        public int gdxSymbolSetDomainX(int SyNr, string[] DomainIDs)
+        {
+            return dll_gdxSymbolSetDomainX(pgdx, SyNr, DomainIDs);
+        }
+
+        public int gdxSystemInfo(ref int SyCnt, ref int UelCnt)
+        {
+            return dll_gdxSystemInfo(pgdx, ref SyCnt, ref UelCnt);
+        }
+
+        public int gdxUELMaxLength()
+        {
+            return dll_gdxUELMaxLength(pgdx);
+        }
+
+        public int gdxUELRegisterDone()
+        {
+            return dll_gdxUELRegisterDone(pgdx);
+        }
+
+        public int gdxUELRegisterMap(int UMap, string Uel)
+        {
+            return dll_gdxUELRegisterMap(pgdx, UMap, Uel);
+        }
+
+        public int gdxUELRegisterMapStart()
+        {
+            return dll_gdxUELRegisterMapStart(pgdx);
+        }
+
+        public int gdxUELRegisterRaw(string Uel)
+        {
+            return dll_gdxUELRegisterRaw(pgdx, Uel);
+        }
+
+        public int gdxUELRegisterRawStart()
+        {
+            return dll_gdxUELRegisterRawStart(pgdx);
+        }
+
+        public int gdxUELRegisterStr(string Uel, ref int UelNr)
+        {
+            return dll_gdxUELRegisterStr(pgdx, Uel, ref UelNr);
+        }
+
+        public int gdxUELRegisterStrStart()
+        {
+            return dll_gdxUELRegisterStrStart(pgdx);
+        }
+
+        public int gdxUMFindUEL(string Uel, ref int UelNr, ref int UelMap)
+        {
+            return dll_gdxUMFindUEL(pgdx, Uel, ref UelNr, ref UelMap);
+        }
+
+        public int gdxUMUelGet(int UelNr, ref string Uel, ref int UelMap)
+        {
+            int rc_gdxUMUelGet;
+            StringBuilder cpy_Uel = new StringBuilder(gamsglobals.str_len);
+            rc_gdxUMUelGet = dll_gdxUMUelGet(pgdx, UelNr, cpy_Uel, ref UelMap);
+            Uel = cpy_Uel.ToString();
+            return rc_gdxUMUelGet;
+        }
+
+        public int gdxUMUelInfo(ref int UelCnt, ref int HighMap)
+        {
+            return dll_gdxUMUelInfo(pgdx, ref UelCnt, ref HighMap);
+        }
+
+        public int gdxGetDomainElements(int SyNr, int DimPos, int FilterNr, TDomainIndexProc DP, ref int NrElem, IntPtr Uptr)
+        {
+            return dll_gdxGetDomainElements(pgdx, SyNr, DimPos, FilterNr, DP, ref NrElem, Uptr);
+        }
+
+        public int gdxCurrentDim()
+        {
+            return dll_gdxCurrentDim(pgdx);
+        }
+
+        public int gdxRenameUEL(string OldName, string NewName)
+        {
+            return dll_gdxRenameUEL(pgdx, OldName, NewName);
+        }
+
+    }
+}

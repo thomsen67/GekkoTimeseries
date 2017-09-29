@@ -16,7 +16,7 @@ namespace Gekko
         {
             public static IVariable Add(ScalarDate t, ScalarVal d)
             {
-                int i = O.GetInt(d);
+                int i = O.ConvertToInt(d);
                 GekkoTime t2 = t.date.Add(i);
                 ScalarDate z = new ScalarDate(t2);
                 return z;
@@ -25,7 +25,7 @@ namespace Gekko
             public static IVariable Subtract(ScalarDate t, ScalarVal d)
             {
                 //HMMM, what about rounding up and down here??
-                int i = O.GetInt(d);
+                int i = O.ConvertToInt(d);
                 GekkoTime t2 = t.date.Add(-i);
                 ScalarDate z = new ScalarDate(t2);
                 return z;
@@ -63,7 +63,7 @@ namespace Gekko
         {
             public static IVariable Add(ScalarString s, ScalarDate d, bool invert)
             {
-                GekkoTime gt = O.GetDate(d);
+                GekkoTime gt = O.ConvertToDate(d);
                 string z = null;
                 if (invert)
                 {

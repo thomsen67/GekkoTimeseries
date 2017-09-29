@@ -70,13 +70,13 @@ namespace Gekko
 
         double GetVal(GekkoTime t);
 
-        double GetVal();
+        double ConvertToVal();
         
-        string GetString();
+        string ConvertToString();
 
-        GekkoTime GetDate(O.GetDateChoices c);
+        GekkoTime ConvertToDate(O.GetDateChoices c);
 
-        List<IVariable> GetList();
+        List<IVariable> ConvertToList();
 
         EVariableType Type();
 
