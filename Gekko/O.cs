@@ -2498,7 +2498,21 @@ namespace Gekko
             Matrix mat = new Matrix();
             mat.data = m;
             return mat;
-        }       
+        }
+
+        public static void TryNewSmpl(GekkoSmpl smpl, int iSmpl)
+        {
+            int uoverflow = smpl.gekkoError.uoverflow;
+            if (uoverflow < 0)
+            {
+                smpl.t0 = smpl.t0.Add(uoverflow * iSmpl);
+            }
+            else
+            {
+                smpl.t3 = smpl.t3.Add(uoverflow * iSmpl);
+            }
+            smpl.gekkoError = null;  //we try again
+        }
 
         public static double[,] SubtractMatrixMatrix(double[,] a, double[,] b, int m, int k)  //a - b
         {

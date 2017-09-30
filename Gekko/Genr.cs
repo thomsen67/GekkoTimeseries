@@ -41,36 +41,25 @@ namespace Gekko
 
 
             p.SetText(@"¤0");
-            IVariable ivTmpvar1 = O.ListDef(i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12);
-            O.Lookup(smpl, null, null, "xx", null, ivTmpvar1)
-            ;
-
-
-
+            for (int iSmpl = 0; iSmpl < int.MaxValue; iSmpl++)
+            {
+                IVariable ivTmpvar1 = O.ListDef(i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12);
+                O.Lookup(smpl, null, null, "xx", null, ivTmpvar1);
+                if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl);
+                else break;
+            }
 
             p.SetText(@"¤0");
-
             smpl = O.Smpl();
+
             for (int iSmpl = 0; iSmpl < int.MaxValue; iSmpl++)
-            {                
+            {
                 O.Print(smpl, (O.Indexer(smpl, O.Add(smpl, O.Lookup(smpl, null, null, "xx", null, null), O.Lookup(smpl, null, null, "xx", null, null)), O.Negate(smpl, i13))));
-                if (smpl.HasError())
-                {
-                    int uoverflow = smpl.gekkoError.uoverflow;
-                    smpl = O.Smpl();
-                    if (uoverflow < 0)
-                    {
-                        smpl.t0 = smpl.t0.Add(uoverflow);
-                    }
-                    else
-                    {
-                        smpl.t3 = smpl.t3.Add(uoverflow);
-                    }
-                }
+                if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl);
                 else break;
             }
         }
-
+        
 
         public static void CodeLines(P p)
         {

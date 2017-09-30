@@ -91,11 +91,22 @@ namespace Gekko.Parser.Gek
             this.storage.Insert(0, s);
         }
 
+
+
         public void Replace(string s1, string s2)
         {
             this.storage.Replace(s1, s2);
         }
-        
+
+        public void LoopSmplCode(string s)
+        {
+            this.A(Globals.startGekkoSmplIteratorCode);
+            this.A(s).End();            
+            this.A(Globals.endGekkoSmplIteratorCode);
+            this.Replace(Globals.gekkoSmplIteratorName, (++Globals.counter).ToString());
+        }
+
+
     }
 
     //public class GekkoStringBuilder
@@ -2913,12 +2924,8 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                         case "ASTPRINT":
-                        {
-
-                            //node.Code.A(node[0].Code).End();
-                            //node.Code.A("O.Print(smpl, temp777)").End();
-
-                            node.Code.A("O.Print(smpl, (" + node[0].Code + "))").End();   
+                        {                            
+                            node.Code.LoopSmplCode("O.Print(smpl, (" + node[0].Code + "))");
                         }
                         break;
                     case "ASTVARNAME":
@@ -3106,8 +3113,13 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTLEFTSIDE":
-                        {
-                            GetCodeFromAllChildren(node);  //only used as a marker
+                        {                            
+                            string s = null;
+                            foreach (ASTNode child in node.ChildrenIterator())
+                            {
+                                s += child.Code + G.NL;
+                            }
+                            node.Code.LoopSmplCode(s);                            
                         }
                         break;
                     case "ASTOPENHELPER":
