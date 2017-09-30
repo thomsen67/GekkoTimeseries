@@ -988,6 +988,11 @@ namespace Gekko.Parser.Gek
                     //        node.Code.CA(node[0].Code);                         
                     //    }
                     //    break;
+                    case "ASTEXPRESSIONNEW":
+                        {
+
+                        }
+                        break;
                     case "ASTEXPRESSION":
                         {
                             node.Code.CA(node[0].Code);

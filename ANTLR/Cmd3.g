@@ -59,6 +59,7 @@ tokens {
 	ASTIFSTATEMENTS;
 	ASTELSESTATEMENTS;
 	ASTNAME;
+	ASTEXPRESSIONNEW;
 ASTNAME;
 ASTIDENT;
 ASTCURLYSIMPLE;
@@ -172,7 +173,7 @@ assignment				  : leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expressi
 // ------------------- expression START -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-expression                : additiveExpression;
+expression                : additiveExpression -> ^(ASTEXPRESSIONNEW additiveExpression);
 
 additiveExpression        : (multiplicativeExpression -> multiplicativeExpression)
 							( (PLUS lbla=multiplicativeExpression -> ^(ASTPLUS $additiveExpression $lbla))
