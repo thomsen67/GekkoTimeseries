@@ -173,7 +173,8 @@ assignment				  : leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expressi
 // ------------------- expression START -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-expression                : additiveExpression -> ^(ASTEXPRESSIONNEW additiveExpression);
+//expression                : additiveExpression -> ^(ASTEXPRESSIONNEW additiveExpression);
+expression                : additiveExpression;
 
 additiveExpression        : (multiplicativeExpression -> multiplicativeExpression)
 							( (PLUS lbla=multiplicativeExpression -> ^(ASTPLUS $additiveExpression $lbla))
