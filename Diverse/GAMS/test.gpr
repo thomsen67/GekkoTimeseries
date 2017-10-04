@@ -1,11 +1,318 @@
-[RP:TEST]
-1=
-
 [GDXDISP: s Set 1]
 PlaneDim=0
 RowDim=1
 Squeeze=1
 SqTrail0=0
+Order=1
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: i Set 1]
+PlaneDim=0
+RowDim=1
+Squeeze=1
+SqTrail0=0
+Order=1
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: x Par 1]
+PlaneDim=0
+RowDim=1
+Squeeze=1
+SqTrail0=0
+Order=1
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: y Par 0]
+PlaneDim=0
+RowDim=0
+Squeeze=1
+SqTrail0=0
+Order=
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: y Par 1]
+PlaneDim=0
+RowDim=1
+Squeeze=1
+SqTrail0=0
+Order=1
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: j Set 1]
+PlaneDim=0
+RowDim=1
+Squeeze=1
+SqTrail0=0
+Order=1
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: d1 Par 1]
+PlaneDim=0
+RowDim=1
+Squeeze=1
+SqTrail0=0
+Order=1
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: d2 Par 1]
+PlaneDim=0
+RowDim=1
+Squeeze=1
+SqTrail0=0
+Order=1
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: p1 Par 1]
+PlaneDim=0
+RowDim=1
+Squeeze=1
+SqTrail0=0
+Order=1
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: p2 Par 1]
+PlaneDim=0
+RowDim=1
+Squeeze=1
+SqTrail0=0
+Order=1
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: p3 Par 1]
+PlaneDim=0
+RowDim=1
+Squeeze=1
+SqTrail0=0
+Order=1
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: test Par 1]
+PlaneDim=0
+RowDim=1
+Squeeze=1
+SqTrail0=0
+Order=1
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: test Par 0]
+PlaneDim=0
+RowDim=0
+Squeeze=1
+SqTrail0=0
+Order=
+Decim=7
+PlaneRownr=-1
+
+[RP:TEST]
+1=
+
+[GDXDISP: d Set 1]
+PlaneDim=0
+RowDim=1
+Squeeze=1
+SqTrail0=0
+Order=1
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: M Var 3]
+PlaneDim=2
+RowDim=1
+Squeeze=1
+SqTrail0=0
+Order=2,1,3,4
+Decim=7
+PlaneRownr=115
+PlaneFilter1=CHOU
+PlaneFilter2=t115
+
+[GDXDISP: xi Var 1]
+PlaneDim=0
+RowDim=1
+Squeeze=1
+SqTrail0=0
+Order=1,2
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: ADAM_ib Par 2]
+PlaneDim=0
+RowDim=2
+Squeeze=1
+SqTrail0=0
+Order=1,2
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: tvat_r_y Var 3]
+PlaneDim=0
+RowDim=3
+Squeeze=1
+SqTrail0=0
+Order=1,2,3,4
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: ti_m Var 3]
+PlaneDim=0
+RowDim=3
+Squeeze=1
+SqTrail0=0
+Order=1,2,3,4
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: sr_s Var 3]
+PlaneDim=0
+RowDim=3
+Squeeze=1
+SqTrail0=0
+Order=1,2,3,4
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: sr_y Var 3]
+PlaneDim=0
+RowDim=3
+Squeeze=1
+SqTrail0=0
+Order=1,2,3,4
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: j_qc_a Var 4]
+PlaneDim=0
+RowDim=4
+Squeeze=1
+SqTrail0=0
+Order=1,2,3,4,5
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: jr_qc_a Var 4]
+PlaneDim=0
+RowDim=4
+Squeeze=1
+SqTrail0=0
+Order=1,2,3,4,5
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: qc_a_m Var 3]
+PlaneDim=0
+RowDim=3
+Squeeze=1
+SqTrail0=0
+Order=1,2,3,4
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: qc_a_y Var 3]
+PlaneDim=0
+RowDim=3
+Squeeze=1
+SqTrail0=0
+Order=1,2,3,4
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: J_CI Var 5]
+PlaneDim=0
+RowDim=5
+Squeeze=1
+SqTrail0=0
+Order=1,2,3,4,5,6
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: CI Var 4]
+PlaneDim=0
+RowDim=4
+Squeeze=1
+SqTrail0=0
+Order=1,2,3,4,5
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: J_CID Var 4]
+PlaneDim=0
+RowDim=4
+Squeeze=1
+SqTrail0=0
+Order=1,2,3,4,5
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: J_CIF Var 4]
+PlaneDim=0
+RowDim=4
+Squeeze=1
+SqTrail0=0
+Order=1,2,3,4,5
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: io_X_m Par 2]
+PlaneDim=0
+RowDim=2
+Squeeze=1
+SqTrail0=0
+Order=1,2
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: io_X_y Par 2]
+PlaneDim=0
+RowDim=2
+Squeeze=1
+SqTrail0=0
+Order=1,2
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: ir Var 1]
+PlaneDim=0
+RowDim=1
+Squeeze=1
+SqTrail0=0
+Order=1,2
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: io_tY Par 2]
+PlaneDim=0
+RowDim=2
+Squeeze=1
+SqTrail0=0
+Order=1,2
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: CID Var 4]
+PlaneDim=0
+RowDim=4
+Squeeze=1
+SqTrail0=0
+Order=1,2,3,4,5
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: a Set 1]
+PlaneDim=0
+RowDim=1
+Squeeze=1
 Order=1
 Decim=7
 PlaneRownr=-1
@@ -18,860 +325,35 @@ Order=1,2
 Decim=7
 PlaneRownr=-1
 
-[GDXDISP: a Set 1]
+[GDXDISP: qfGDP_base Var 1]
+PlaneDim=0
+RowDim=1
+Squeeze=1
+Order=1,2
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: qfGDP_rob Var 2]
+PlaneDim=0
+RowDim=2
+Squeeze=1
+Order=1,2,3
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: qfGDP_rob_shock Var 2]
+PlaneDim=0
+RowDim=2
+Squeeze=1
+Order=1,2,3
+Decim=7
+PlaneRownr=-1
+
+[GDXDISP: scenarios Set 1]
 PlaneDim=0
 RowDim=1
 Squeeze=1
 Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: ADAM_tp Par 3]
-PlaneDim=1
-RowDim=1
-Squeeze=1
-Order=3,1,2
-Decim=7
-PlaneRownr=16
-PlaneFilter1=1982
-
-[GDXDISP: ADAM_tg Par 3]
-PlaneDim=0
-RowDim=3
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: vtransferunemployed Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: test Par 0]
-PlaneDim=0
-RowDim=0
-Squeeze=1
-Order=
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: u_a Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: vc_a Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: u_a0 Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: vdisp Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: vtransferoutsidelf Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: vh Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: ax0 Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: ax1 Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: vhtot Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: pqy0 Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: qk Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: vk Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: vktot Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: ql Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: vl Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: qltot Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: vltot Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: qkinstlcost Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: puk Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: psk Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: pskbook Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: tech Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: rdepr Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: rdeprbook Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: skinstlcost Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: sinventory Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: sfirmdebt Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: sinventory_y Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: sinventory_m Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: syh Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: syr Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: shk Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: shl Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: sr_s Var 3]
-PlaneDim=0
-RowDim=3
-Squeeze=1
-Order=1,2,3,4
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: sr_y Var 3]
-PlaneDim=0
-RowDim=3
-Squeeze=1
-Order=1,2,3,4
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: sr_m Var 3]
-PlaneDim=0
-RowDim=3
-Squeeze=1
-Order=1,2,3,4
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: si_s Var 3]
-PlaneDim=0
-RowDim=3
-Squeeze=1
-Order=1,2,3,4
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: si_y Var 3]
-PlaneDim=0
-RowDim=3
-Squeeze=1
-Order=1,2,3,4
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: si_m Var 3]
-PlaneDim=0
-RowDim=3
-Squeeze=1
-Order=1,2,3,4
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: einventory Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: ey Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: eh Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: er Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: er_ym Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: ei Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: ei_ym Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: ga Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: gr Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: gp Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: ggp Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: ggpa Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: ir Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: rr Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: pqy Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: pqys Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: numerp Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: denomp Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: pqm Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: pqyrigidity Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: eyy Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: markup Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: pql Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: u Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: xi Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: w Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: vwtot Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: vwtot_a Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: nemployed Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: semployed Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: nunemployed Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: sunemployed Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: slaborforce Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: noutsidelf Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: npop Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: nlaborforce Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: nretired Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: nnonretired Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: snrstay Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: u0 Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: productivity Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: prod_a Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: stransferunemployed Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: stransferoutsidelf Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: stransferretired Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: psi Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: w_0 Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: qcr Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: c_habit Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: qcir Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: qc_a Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: vc Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: vctot Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: qc Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: pqc Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: qctot Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: pqctot Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: qc_y Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: pqc_y Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: qc_m Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: pqc_m Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: vc_y Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: vc_m Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
 Decim=7
 PlaneRownr=-1
 
@@ -883,350 +365,6 @@ Order=1
 Decim=7
 PlaneRownr=-1
 
-[GDXDISP: aEnd Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: a1 Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: a0 Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: ax0E Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: ai Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: aib Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: aib1 Alias 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: aim Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: aim1 Alias 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: am Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: amv Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: amv1 Alias 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: as Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: asl Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: asp Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: av Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: ave Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: ave1 Alias 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: avm Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: ax Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: axm Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: axm1 Alias 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: banklending Var 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: CCON Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: CGOO Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: CHOU Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: CNON Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: consumption Par 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: COTH Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: CPRV Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: CPUB Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: CSER Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: d1C Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: d1C_m Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: d1C_y Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: d1G Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: d1G_m Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: d1G_y Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: d1I Set 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: d1Inventory Set 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: pnm Set 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: pqi Var 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2,3
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: pqi_s Var 3]
-PlaneDim=0
-RowDim=3
-Squeeze=1
-Order=1,2,3,4
-Decim=7
-PlaneRownr=-1
-
 [GDXDISP: tt Alias 1]
 PlaneDim=0
 RowDim=1
@@ -1235,39 +373,16 @@ Order=1
 Decim=7
 PlaneRownr=-1
 
-[GDXDISP: jr_qc_a Var 4]
-PlaneDim=0
-RowDim=4
-Squeeze=1
-Order=1,2,3,4,5
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: gnslon Par 1]
-PlaneDim=0
-RowDim=1
-Squeeze=1
-Order=1
-Decim=7
-PlaneRownr=-1
-
-[GDXDISP: hrindx Par 2]
-PlaneDim=0
-RowDim=2
-Squeeze=1
-Order=1,2
-Decim=7
-PlaneRownr=-1
-
 [OPENWINDOW_1]
-FILE0=C:\Thomas\Desktop\gekko\testing\calib.gdx
+FILE0=C:\Thomas\Desktop\gekko\testing\sensi.gdx
 FILE1=C:\Thomas\Gekko\GekkoCS\Diverse\GAMS\test.gdx
 FILE2=C:\Thomas\Gekko\GekkoCS\Diverse\GAMS\test.gms
 FILE3=C:\Thomas\Gekko\GekkoCS\Diverse\GAMS\test.lst
 FILE4=C:\Tools\decomp\calib.gdx
-FILE5=C:\Thomas\Desktop\gekko\testing\calib.gdx
-MAXIM=1
+FILE5=C:\Tools\decomp\report.gdx
+FILE6=C:\Thomas\Desktop\gekko\testing\sensi.gdx
+MAXIM=0
 TOP=50
 LEFT=50
-HEIGHT=400
-WIDTH=1064
+HEIGHT=505
+WIDTH=931

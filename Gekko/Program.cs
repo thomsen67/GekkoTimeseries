@@ -3936,7 +3936,7 @@ namespace Gekko
             int skippedSets = 0;
             int importedSets = 0;
             int counterVariables = 0;
-            int counterParameters = 0;
+            int counterParameters = 0;            
             int yearMax = int.MinValue;
             int yearMin = int.MaxValue;
             string gamsDir = Program.options.gams_exe_folder.Trim();
@@ -3985,6 +3985,7 @@ namespace Gekko
                     string[] indexString = new string[gamsglobals.maxdim];
                     double[] values = new double[gamsglobals.val_max];
                     int[] domainSyNrs = new int[gamsglobals.maxdim];
+                    string[] domainStrings = new string[gamsglobals.maxdim];
                     int varNr = 0;
                     int nrRecs = 0;
                     int n = 0;
@@ -4073,22 +4074,14 @@ namespace Gekko
                                 //       parameters and variables
                                 //  ======================================
                                 //
-                                int timeDimNr = -12345;
-                                gdx.gdxSymbolGetDomain(i, ref domainSyNrs);
-                                for (int d2 = dimensions - 1; d2 >= 0; d2--)  //backwards is faster since t is typically there
-                                {
-                                    if (domainSyNrs[d2] == timeIndex)
-                                    {
-                                        timeDimNr = d2;
-                                        break;
-                                    }
-                                }
+
+                                int timeDimNr = GdxGetTimeDimNumber(ref domainSyNrs, ref domainStrings, dimensions, gdx, timeIndex, i);
                                 if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0) xp_example1.ReportGDXError();
                                 //int[] indexOld = new int[dimensions];
                                 string oldHash = "    ";  //will not match anything
                                 TimeSeries ts2 = null;
                                 while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
-                                {                                    
+                                {
                                     int tt = -12345;
                                     StringBuilder sb = new StringBuilder();
                                     for (d = 0; d < dimensions; d++)
@@ -4128,8 +4121,8 @@ namespace Gekko
                                             }
                                             tt = tt + offset;
                                             continue;  //do not add it to the hash
-                                        }                                        
-                                        string s = uel[index[d]];                                       
+                                        }
+                                        string s = uel[index[d]];
                                         if (false)  //gnslon for instance
                                         {
                                             //
@@ -4144,9 +4137,9 @@ namespace Gekko
                                                 G.Writeln("GDX problem: " + s + "   " + xxxx + "  " + sb.ToString() + "   " + varName);
                                             }
                                         }
-                                        sb.Append(s + Globals.symbolTurtle);                                        
+                                        sb.Append(s + Globals.symbolTurtle);
                                     }
-                                    string hash = sb.ToString();                                    
+                                    string hash = sb.ToString();
                                     bool isDimensionless = false;
                                     string varNameTs = null;
                                     if (hash.Length > 0)
@@ -4181,9 +4174,10 @@ namespace Gekko
                                             ts2.SetTimeless();
                                         }
                                     }
+                                    double value = values[gamsglobals.val_level];
                                     if (tt == -12345)
                                     {
-                                        ts2.SetTimelessData(d);
+                                        ts2.SetTimelessData(value);
                                     }
                                     else
                                     {
@@ -4192,12 +4186,12 @@ namespace Gekko
                                         //TODO record data in an array, and use setDataSequence().
                                         //TODO
                                         //TODO
-                                        ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), values[gamsglobals.val_level]);
+                                        ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), value);
                                         yearMax = Math.Max(tt, yearMax);
                                         yearMin = Math.Min(tt, yearMin);
                                     }
                                     oldHash = hash;
-                                }                                
+                                }
                                 gdx.gdxDataReadDone();
                                 int hasTimeDimension = 0;
                                 if (timeDimNr != -12345) hasTimeDimension = 1;
@@ -4229,7 +4223,7 @@ namespace Gekko
                     throw;
                 }
                 G.Writeln2("Fast GDX read seemed to succeed, but please note that the fast GDX reader is still experimental.");
-                G.Writeln("You may use 'OPTION gams fast = no;' to revert to the normal GDX reader");
+                G.Writeln("You may use 'OPTION gams fast = no;' to revert to the normal GDX reader");                
             }
             else
             {
@@ -4518,6 +4512,49 @@ namespace Gekko
             //TODO: Maybe only do this on the gdx variables if possible
             //Anyway, the speed penalty is small anyway.
             databank.Trim();
+        }
+
+        private static int GdxGetTimeDimNumber(ref int[] domainSyNrs, ref string[] domainStrings, int dimensions, gdxcs gdx, int timeIndex, int i)
+        {
+            int timeDimNr = -12345;
+            gdx.gdxSymbolGetDomain(i, ref domainSyNrs);
+            //only way to check it properly:
+            int success = 1;
+            for (int d2 = 0; d2 < dimensions; d2++)
+            {
+                if (domainSyNrs[d2] == 0)
+                {
+                    success = 0;
+                    break;
+                }
+            }
+
+            if (success == 1)
+            {
+                for (int d2 = dimensions - 1; d2 >= 0; d2--)  //backwards is faster since t is typically there
+                {
+                    if (domainSyNrs[d2] == timeIndex)
+                    {
+                        timeDimNr = d2;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                //slower, but still not in the innermost loop
+                gdx.gdxSymbolGetDomainX(i, ref domainStrings);
+                for (int d2 = dimensions - 1; d2 >= 0; d2--)  //backwards is faster since t is typically there
+                {
+                    if (G.equal(domainStrings[d2], Program.options.gams_time_set))
+                    {
+                        timeDimNr = d2;
+                        break;
+                    }
+                }
+            }
+
+            return timeDimNr;
         }
 
         private static void GameErrorMessage()
@@ -11308,7 +11345,7 @@ namespace Gekko
                     if (G.equal(sub, "cge"))
                     {
                         CGE.Run();
-                        CGE.GamsReader();
+                        //CGE.GamsReader();
                         return "";   //no need for the parser to chew on this afterwards!
                     }
                 }
