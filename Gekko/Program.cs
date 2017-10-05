@@ -3997,7 +3997,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Import of gdx file (GAMS) failed. Could not locate GAMS (GAMSWorkspace problem).");
                     G.Writeln("           Technical error:");
                     G.Writeln("           " + e.Message);
-                    GameErrorMessage();
+                    GdxErrorMessage();
                     throw;
                 }
             }
@@ -4017,6 +4017,7 @@ namespace Gekko
                     string[] indexString = new string[gamsglobals.maxdim];
                     double[] values = new double[gamsglobals.val_max];
                     int[] domainSyNrs = new int[gamsglobals.maxdim];
+                    string[] domainStrings = new string[gamsglobals.maxdim];
                     int varNr = 0;
                     int nrRecs = 0;
                     int n = 0;
@@ -4030,7 +4031,7 @@ namespace Gekko
                     {
                         G.Writeln("*** ERROR: Could not load GDX library");
                         G.Writeln("*** ERROR: " + msg);
-                        GameErrorMessage();
+                        GdxErrorMessage();
                         throw new GekkoException();
                     }
                     if (true)
@@ -4115,16 +4116,7 @@ namespace Gekko
                                 //       parameters and variables
                                 //  ======================================
                                 //
-                                int timeDimNr = -12345;
-                                gdx.gdxSymbolGetDomain(i, ref domainSyNrs);
-                                for (int d2 = dimensions - 1; d2 >= 0; d2--)  //backwards is faster since t is typically there
-                                {
-                                    if (domainSyNrs[d2] == timeIndex)
-                                    {
-                                        timeDimNr = d2;
-                                        break;
-                                    }
-                                }
+                                int timeDimNr = GdxGetTimeDimNumber(ref domainSyNrs, ref domainStrings, dimensions, gdx, timeIndex, i);
                                 if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0)
                                 {
                                     string s = null;
@@ -4229,9 +4221,10 @@ namespace Gekko
                                             ts2.SetTimeless();
                                         }
                                     }
+                                    double value = values[gamsglobals.val_level];
                                     if (tt == -12345)
                                     {
-                                        ts2.SetTimelessData(d);
+                                        ts2.SetTimelessData(value);
                                     }
                                     else
                                     {
@@ -4240,7 +4233,7 @@ namespace Gekko
                                         //TODO record data in an array, and use setDataSequence().
                                         //TODO
                                         //TODO
-                                        ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), values[gamsglobals.val_level]);
+                                        ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), value);
                                         yearMax = Math.Max(tt, yearMax);
                                         yearMin = Math.Min(tt, yearMin);
                                     }
@@ -4738,7 +4731,50 @@ namespace Gekko
             if (timelessCounter > 0) G.Writeln("+++ NOTE: " + timelessCounter + " timeless timeseries skipped");            
         }
 
-        private static void GameErrorMessage()
+        private static int GdxGetTimeDimNumber(ref int[] domainSyNrs, ref string[] domainStrings, int dimensions, gdxcs gdx, int timeIndex, int i)
+        {
+            int timeDimNr = -12345;
+            gdx.gdxSymbolGetDomain(i, ref domainSyNrs);
+            //only way to check it properly:
+            int success = 1;
+            for (int d2 = 0; d2 < dimensions; d2++)
+            {
+                if (domainSyNrs[d2] == 0)
+                {
+                    success = 0;
+                    break;
+                }
+            }
+
+            if (success == 1)
+            {
+                for (int d2 = dimensions - 1; d2 >= 0; d2--)  //backwards is faster since t is typically there
+                {
+                    if (domainSyNrs[d2] == timeIndex)
+                    {
+                        timeDimNr = d2;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                //slower, but still not in the innermost loop
+                gdx.gdxSymbolGetDomainX(i, ref domainStrings);
+                for (int d2 = dimensions - 1; d2 >= 0; d2--)  //backwards is faster since t is typically there
+                {
+                    if (G.equal(domainStrings[d2], Program.options.gams_time_set))
+                    {
+                        timeDimNr = d2;
+                        break;
+                    }
+                }
+            }
+
+            return timeDimNr;
+        }
+
+        private static void GdxErrorMessage()
         {
             G.Writeln("+++ NOTE:  You may manually indicate the GAMS program folder with 'OPTION gams exe folder',");
             G.Writeln("           for instance 'OPTION gams exe folder = c:\\GAMS\\win32\\24.8;'. Note that you must");
