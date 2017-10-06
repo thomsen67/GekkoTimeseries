@@ -4037,6 +4037,10 @@ namespace Gekko
                         for (int i = 1; i < int.MaxValue; i++)
                         {
                             gdx.gdxSymbolInfo(i, ref varName, ref dimensions, ref varType);
+
+                            string label = null; int records = -12345; int userInfo = -12345;
+                            gdx.gdxSymbolInfoX(i, ref records, ref userInfo, ref label);
+
                             if (dimensions == -1)
                             {
                                 break;  //no more symbols
@@ -4079,7 +4083,7 @@ namespace Gekko
                                 if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0) xp_example1.ReportGDXError();
                                 //int[] indexOld = new int[dimensions];
                                 string oldHash = "    ";  //will not match anything
-                                TimeSeries ts2 = null;
+                                TimeSeries ts2 = null;                                
                                 while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
                                 {
                                     int tt = -12345;
@@ -4160,6 +4164,7 @@ namespace Gekko
                                     if (ts2 == null)
                                     {
                                         ts2 = new TimeSeries(EFreq.Annual, varNameTs);
+                                        //ts2.label = label; no, too bulky
                                         databank.AddVariable(ts2, false);
                                         if (varType == 1)
                                         {
@@ -4204,6 +4209,8 @@ namespace Gekko
                                     if (databank.ContainsVariable(varName)) databank.RemoveVariable(varName);
                                     TimeSeries ts = new TimeSeries(EFreq.Annual, varName);  //we wipe it out if it is alreay existing
                                     ts.SetGhost(true);  //only a placeholder, should not be counted etc.
+                                    ts.label = label;
+                                    if (timeDimNr == -12345) ts.SetTimeless();
                                     databank.AddVariable(ts);
                                 }
                             }
@@ -4566,9 +4573,8 @@ namespace Gekko
 
         public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2  ,  string file2, List<BankNameVersion> list, string writeOption, bool isCloseCommand)
         {
-            //TODO: try-catch if writing fails
-
-            //Hardcoded --------------
+            //TODO: try-catch if writing fails            
+                        
             bool usePrefix = false;
             if (Program.options.gams_time_prefix.Length > 0) usePrefix = true;
             int offset = (int)Program.options.gams_time_offset;
@@ -4619,72 +4625,51 @@ namespace Gekko
                     throw new GekkoException();
                 }
 
-                if (ts.IsGhost() && !ts.IsTimeless())
+                string label = ""; if (ts.label != null) label = ts.label;
+
+                int timeDimension = 1; if (ts.IsTimeless()) timeDimension = 0;
+                if (ts.IsGhost())
                 {
                     string match = nameWithoutFreq + Globals.symbolTurtle + "*";
-                    
                     List<string> names = MatchWildcardInDatabank(match, gdb);  //are sorted
                     if (names == null || names.Count == 0)
                     {
                         //G.Writeln2("Could not find any " + gdb + "[...] array-timeseries");
                         continue;
                     }
-
                     List<GekkoDictionary<string, string>> dimensions = GetDimensions(names);
-
-                    GAMSVariable gvar = db.AddVariable(nameWithoutFreq, dimensions.Count + 1, VarType.Free);  //+ 1 for time dimension
-
-                    foreach (string s in names)
+                    try
                     {
-                        string[] ss = GetArrayTimeseriesName(s);
-                        
-                        counterVariables++;
-
-                        TimeSeries ts2 = gdb.GetVariable(s);
-
-                        if (ts2.IsTimeless())
-                        {
-                            timelessCounter++;
-                            continue;
-                        }
-
-                        GekkoTime gt1 = t1;
-                        GekkoTime gt2 = t2;
-                        if (t1.IsNull())
-                        {
-                            gt1 = ts2.GetRealDataPeriodFirst();
-                            gt2 = ts2.GetRealDataPeriodLast();
-                        }
-
-                        foreach (GekkoTime t in new GekkoTimeIterator(gt1, gt2))
-                        {
-                            string[] ss2 = new string[ss.Length];
-                            Array.Copy(ss, 1, ss2, 0, ss.Length - 1);
-                            string date = null;
-
-                            if (usePrefix && t.freq == EFreq.Annual)
-                            {
-                                date =  Program.options.gams_time_prefix + (t.super - offset).ToString();
-                            }
-                            else
-                            {
-                                date = t.ToString();
-                            }
-
-                            ss2[ss2.Length - 1] = date;
-
-                            gvar.AddRecord(ss2).Level = ts2.GetData(t);
-                        }                        
+                        GAMSVariable gvar = db.AddVariable(nameWithoutFreq, dimensions.Count + timeDimension, VarType.Free, label); //+ 1 for time dimension
+                        counterVariables = WriteGdxHelper(t1, t2, usePrefix, offset, counterVariables, gdb, names, gvar);
                     }
+                    catch
+                    {
+                        throw;
+                    }
+                    
                 }
                 else
                 {
-                    
-                    //skip it, it may be either a variable with turtle, or a normal timeseries
-
-                    //G.Writeln2("*** ERROR: Gdx export only intended for array-timeseries");
-                    //G.Writeln("    Variable: " + bnv.name + "", Color.Red);
-                    //throw new GekkoException();
+                    //it is not a ghost, now we filter out vars with turtle and export non-turtles too.
+                    //so this is exporting "normal" kind of timeseries                        
+                    if (nameWithoutFreq.Contains(Globals.symbolTurtle))
+                    {
+                        //skip, this would have been written under ts.IsGhost()==true
+                    }
+                    else
+                    {
+                        List<string> names = new List<string> { nameWithoutFreq };
+                        try
+                        {
+                            GAMSVariable gvar = db.AddVariable(nameWithoutFreq, 0 + timeDimension, VarType.Free, label);
+                            counterVariables = WriteGdxHelper(t1, t2, usePrefix, offset, counterVariables, gdb, names, gvar);
+                        }
+                        catch
+                        {
+                            throw;
+                        }
+                    }
                 }
             }
 
@@ -4697,7 +4682,67 @@ namespace Gekko
             G.Writeln2("Exported " + counterVariables + " variables to " + pathAndFilename + " (" + G.SecondsFormat((DateTime.Now - t00).TotalMilliseconds) + ")");
             if (timelessCounter > 0) G.Writeln("+++ NOTE: " + timelessCounter + " timeless timeseries skipped");            
         }
-        
+
+        private static int WriteGdxHelper(GekkoTime t1, GekkoTime t2, bool usePrefix, int offset, int counterVariables, Databank gdb, List<string> names, GAMSVariable gvar)
+        {
+            foreach (string s in names)
+            {
+                string[] ss = GetArrayTimeseriesName(s);
+                counterVariables++;
+                TimeSeries ts2 = gdb.GetVariable(s);
+                if (ts2.IsTimeless())
+                {                    
+                    try
+                    {
+                        string[] ss2 = new string[ss.Length - 1];
+                        Array.Copy(ss, 1, ss2, 0, ss.Length - 1);
+                        //if (ss2.Length == 0) ss2 = null;  //no array-dim and timeless
+                        gvar.AddRecord(ss2).Level = ts2.dataArray[0];  //timeless data location                        
+                    }
+                    catch
+                    {
+                        throw;
+                    }
+                }
+                else
+                {
+                    GekkoTime gt1 = t1;
+                    GekkoTime gt2 = t2;
+                    if (t1.IsNull())
+                    {
+                        gt1 = ts2.GetRealDataPeriodFirst();
+                        gt2 = ts2.GetRealDataPeriodLast();
+                    }
+                    if (gt1.IsNull()) continue;  //do not write a weird record if the timeseries has no data
+                    foreach (GekkoTime t in new GekkoTimeIterator(gt1, gt2))
+                    {
+                        string[] ss2 = new string[ss.Length];
+                        Array.Copy(ss, 1, ss2, 0, ss.Length - 1);
+                        string date = null;
+                        if (usePrefix && t.freq == EFreq.Annual)
+                        {
+                            date = Program.options.gams_time_prefix + (t.super - offset).ToString();
+                        }
+                        else
+                        {
+                            date = t.ToString();
+                        }
+                        ss2[ss2.Length - 1] = date;
+                        try
+                        {
+                            gvar.AddRecord(ss2).Level = ts2.GetData(t);
+                        }
+                        catch
+                        {
+                            throw;
+                        }
+                    }
+                }
+            }
+
+            return counterVariables;
+        }
+
         private static void GamsGetHashAndTime(string prefix, int timeIndex, string[] keys, int offset, ref int tt, ref string hash)
         {
 
@@ -13371,7 +13416,14 @@ namespace Gekko
 
                             List<GekkoDictionary<string, string>> dimensions = GetDimensions(names);
 
-                            G.Writeln2("Array-timeseries '" + var + "' has " + names.Count + " subseries in the following dimensions:");
+                            G.Writeln2("==========================================================================================");                            
+                            G.Writeln("SERIES " + db.aliasName + Globals.symbolBankColon + var);
+                            if (ts.label != null && ts.label != "")
+                            {
+                                G.Writeln(ts.label);
+                            }
+                                                        
+                            G.Writeln2("Array-timeseries has " + names.Count + " subseries in the following dimensions:");
 
                             int counter = 0;
                             double product = 1d;
@@ -13395,7 +13447,7 @@ namespace Gekko
                             G.Writeln("Last element: " + G.PrettifyTimeseriesHash(last, true, false));
 
                             G.Writeln2("Dimension span: " + productString + " = " + product + ", density: " + names.Count + "/" + product + " = " + Program.NumberFormat(100d * (names.Count / product), "0.00") + "%");
-
+                            G.Writeln("==========================================================================================");
                             return;
 
                         }
