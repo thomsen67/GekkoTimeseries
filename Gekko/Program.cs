@@ -4625,7 +4625,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
 
-                string label = ""; if (ts.label != null) label = ts.label;
+                string label = ""; if (ts.label != null) label = ts.label;  //label = null will fail with weird error later on
 
                 int timeDimension = 1; if (ts.IsTimeless()) timeDimension = 0;
                 if (ts.IsGhost())
@@ -4638,16 +4638,11 @@ namespace Gekko
                         continue;
                     }
                     List<GekkoDictionary<string, string>> dimensions = GetDimensions(names);
-                    try
-                    {
-                        GAMSVariable gvar = db.AddVariable(nameWithoutFreq, dimensions.Count + timeDimension, VarType.Free, label); //+ 1 for time dimension
-                        counterVariables = WriteGdxHelper(t1, t2, usePrefix, offset, counterVariables, gdb, names, gvar);
-                    }
-                    catch
-                    {
-                        throw;
-                    }
-                    
+
+                    GAMSVariable gvar = db.AddVariable(nameWithoutFreq, dimensions.Count + timeDimension, VarType.Free, label); //+ 1 for time dimension
+                    counterVariables = WriteGdxHelper(t1, t2, usePrefix, offset, counterVariables, gdb, names, gvar);
+
+
                 }
                 else
                 {
@@ -4660,15 +4655,10 @@ namespace Gekko
                     else
                     {
                         List<string> names = new List<string> { nameWithoutFreq };
-                        try
-                        {
-                            GAMSVariable gvar = db.AddVariable(nameWithoutFreq, 0 + timeDimension, VarType.Free, label);
-                            counterVariables = WriteGdxHelper(t1, t2, usePrefix, offset, counterVariables, gdb, names, gvar);
-                        }
-                        catch
-                        {
-                            throw;
-                        }
+
+                        GAMSVariable gvar = db.AddVariable(nameWithoutFreq, 0 + timeDimension, VarType.Free, label);
+                        counterVariables = WriteGdxHelper(t1, t2, usePrefix, offset, counterVariables, gdb, names, gvar);
+
                     }
                 }
             }
@@ -4691,18 +4681,11 @@ namespace Gekko
                 counterVariables++;
                 TimeSeries ts2 = gdb.GetVariable(s);
                 if (ts2.IsTimeless())
-                {                    
-                    try
-                    {
-                        string[] ss2 = new string[ss.Length - 1];
-                        Array.Copy(ss, 1, ss2, 0, ss.Length - 1);
-                        //if (ss2.Length == 0) ss2 = null;  //no array-dim and timeless
-                        gvar.AddRecord(ss2).Level = ts2.dataArray[0];  //timeless data location                        
-                    }
-                    catch
-                    {
-                        throw;
-                    }
+                {
+                    string[] ss2 = new string[ss.Length - 1];
+                    Array.Copy(ss, 1, ss2, 0, ss.Length - 1);
+                    //if (ss2.Length == 0) ss2 = null;  //no array-dim and timeless
+                    gvar.AddRecord(ss2).Level = ts2.dataArray[0];  //timeless data location                        
                 }
                 else
                 {
@@ -4728,14 +4711,9 @@ namespace Gekko
                             date = t.ToString();
                         }
                         ss2[ss2.Length - 1] = date;
-                        try
-                        {
-                            gvar.AddRecord(ss2).Level = ts2.GetData(t);
-                        }
-                        catch
-                        {
-                            throw;
-                        }
+
+                        gvar.AddRecord(ss2).Level = ts2.GetData(t);
+
                     }
                 }
             }
