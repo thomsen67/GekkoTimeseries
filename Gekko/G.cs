@@ -514,7 +514,7 @@ namespace Gekko
 
         public static string Blanks(int count)
         {
-            if (count < 0) return "";
+            if (count <= 0) return "";
             return "".PadLeft(count);
         }
 
@@ -1924,51 +1924,40 @@ namespace Gekko
 
         private static void WriteAbstractClipHelper(string s, RichTextBoxEx textBox, bool newline)
         {
+            string start = "*** ERROR: ";
+            start = "";
+
             string NL2 = "\r\n" + Globals.blankUsedAsPadding;
             while (s != null)
             {
-                //int pos0 = textBox.GetFirstCharIndexOfCurrentLine();
-                //int pos = textBox.SelectionStart - pos0 - 1;  //seems SelectionStart is 1-based
-                //int rest = Program.options.print_width - pos;
-                
-                //Point pt;
-                //int line, col, index;
-                //// get the current line 
-                //index = textBox.SelectionStart; line = textBox.GetLineFromCharIndex(index);
-                //// get the caret position in pixel coordinates 
-                //pt = textBox.GetPositionFromCharIndex(index);
-                //// now get the character index at the start of the line, and 
-                //// subtract from the current index to get the column 
-                //pt.X = 0;
-                //col = index - textBox.GetCharIndexFromPosition(pt);
-
-
                 int col = Globals.guiMainLinePosition;
-                int rest = Program.options.print_width - col;
+                int indent2 = 0; if (col == 0) indent2 = start.Length;
+                string start2 = start; if (indent2 == 0) start2 = "";
+                int rest = Program.options.print_width - col - indent2;
                 if (rest < 0) rest = 0;
 
                 if (s.Length <= rest)
                 {
-
                     if (newline)
-                    {
-                        textBox.AppendText(s + NL2);
+                    {                        
+                        textBox.AppendText(start2 + s + NL2);
                         Globals.guiMainLinePosition = 0;
                     }
                     else
                     {
-                        textBox.AppendText(s);
-                        Globals.guiMainLinePosition += s.Length;
+                        textBox.AppendText(start2 + s);
+                        Globals.guiMainLinePosition += indent2 + s.Length;
                     }
                     s = null;
                 }
                 else
                 {
+                    //wrapping
                     for (int c = s.Length - 1; c >= 0; c--)
                     {
                         if (c == 0)
                         {
-                            textBox.AppendText(s + NL2);  //has to write it, even if too long. If newline=false, we impose a newline anyway
+                            textBox.AppendText(start2 + s + NL2);  //has to write it, even if too long. If newline=false, we impose a newline anyway
                             s = null;
                             Globals.guiMainLinePosition = 0;
                             break;
@@ -1979,7 +1968,7 @@ namespace Gekko
                             {
                                 string s1 = s.Substring(0, c + 1);
                                 s = s.Substring(c + 1, s.Length - c - 1);
-                                textBox.AppendText(s1 + NL2);  //If newline=false, we impose a newline anyway
+                                textBox.AppendText(start2 + s1 + NL2);  //If newline=false, we impose a newline anyway
                                 Globals.guiMainLinePosition = 0;
                                 break;
                             }

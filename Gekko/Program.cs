@@ -4731,7 +4731,7 @@ namespace Gekko
             if (timelessCounter > 0) G.Writeln("+++ NOTE: " + timelessCounter + " timeless timeseries skipped");            
         }
 
-        private static int GdxGetTimeDimNumber(ref int[] domainSyNrs, ref string[] domainStrings, int dimensions, gdxcs gdx, int timeIndex, int i)
+        private static int GdxGetTimeDimNumber(ref int[] domainSyNrs, ref string[] domainStrings, int dimensions, Gdxcs gdx, int timeIndex, int i)
         {
             int timeDimNr = -12345;
             gdx.gdxSymbolGetDomain(i, ref domainSyNrs);
@@ -9801,7 +9801,8 @@ namespace Gekko
         public static void Mem(string tpe)
         {
             if (Globals.runningOnTTComputer)
-            {
+            {                
+
                 bool intern = false;
 
                 //REMEMber TO STORE KEYS AS TOLOWER()!!!!!!!!
@@ -22895,6 +22896,12 @@ namespace Gekko
 
         public static void OPrint(GekkoSmpl smpl, IVariable x)
         {
+            if (Globals.runningOnTTComputer)
+            {
+                G.Writeln2("*** ERROR: Thlkadsf alkfdsj alks jfasdlkfj dsalkfj sadflkja dsflkjasd flkadsjf salkdæjf salkjf dsalkjf asdflkja dsfdsaflkja sdflkjæ");
+                throw new GekkoException();
+            }
+
             if (x == null)
             {
                 G.Writeln2("*** ERROR: Print of null object");
