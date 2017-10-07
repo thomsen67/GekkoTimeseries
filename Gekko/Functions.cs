@@ -520,11 +520,21 @@ namespace Gekko
             return SumHelper(t, x, ESumDim.Rows, ESumType.Max);
         }
 
+        public static IVariable m(GekkoTime t)
+        {
+            return miss(t);
+        }
+
         //missing value
         public static IVariable miss(GekkoTime t)
         {
             return new ScalarVal(double.NaN);
-        }                
+        }
+
+        public static IVariable m(GekkoTime t, IVariable x1, IVariable x2)
+        {
+            return miss(t, x1, x2);
+        }
 
         public static IVariable miss(GekkoTime t, IVariable x1, IVariable x2)
         {
@@ -1151,9 +1161,13 @@ namespace Gekko
             double do2 = O.GetVal(o2, t);
             string x = O.GetString(op).Trim();
 
-            if (x == "==")
+            if (x == "==")  
             {
-                if (di1 == di2)
+                if (G.isNumericalError(di1) && G.isNumericalError(di2))
+                {
+                    result = do1;  //#089743255398
+                }
+                else if (di1 == di2)
                 {
                     result = do1;
                 }
@@ -1164,7 +1178,11 @@ namespace Gekko
             }
             else if (x == "<>")
             {
-                if (di1 != di2)
+                if (G.isNumericalError(di1) && G.isNumericalError(di2))
+                {
+                    result = do2;  //#089743255398
+                }
+                else if (di1 != di2)
                 {
                     result = do1;
                 }

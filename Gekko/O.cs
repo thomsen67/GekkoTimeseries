@@ -1314,7 +1314,7 @@ namespace Gekko
             {
                 double d1 = x.GetVal(t);
                 double d2 = y.GetVal(t);
-                if (G.isNumericalError(d1) && G.isNumericalError(d2)) return true;
+                if (G.isNumericalError(d1) && G.isNumericalError(d2)) return true;  //#089743255398
                 if (d1 == d2) rv = true;
             }
             else if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
