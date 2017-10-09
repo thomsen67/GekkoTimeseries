@@ -22899,6 +22899,14 @@ namespace Gekko
             if (Globals.runningOnTTComputer)
             {
                 G.Writeln2("*** ERROR: Thlkadsf alkfdsj alks jfasdlkfj dsalkfj sadflkja dsflkjasd flkadsjf salkdæjf salkjf dsalkjf asdflkja dsfdsaflkja sdflkjæ");
+
+                if (Globals.runningOnTTComputer)
+                {
+                    GMap gm = new GMap();
+                    gm["a", "b"] = new ScalarVal(1d);
+                    IVariable iv = gm["a", "b"];
+                }
+
                 throw new GekkoException();
             }
 
