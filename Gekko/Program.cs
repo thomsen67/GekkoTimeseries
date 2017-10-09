@@ -20880,6 +20880,16 @@ namespace Gekko
                                     if (nextText != "")
                                     {
                                         nodeText = nextText;
+
+                                        if (nodeText.Contains("'"))
+                                        {                                            
+                                            nodeText = nodeText.Replace("'", "´");
+                                        }
+
+                                        if (nodeText.Contains("`"))
+                                        {
+                                            nodeText = nodeText.Replace("`", "´");
+                                        }
                                     }
                                 }
                             }
