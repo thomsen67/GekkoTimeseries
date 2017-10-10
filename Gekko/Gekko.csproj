@@ -153,6 +153,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="CGE.cs" />
+    <Compile Include="CGE2.cs" />
     <Compile Include="CompareUtility3Way.cs">
       <SubType>Form</SubType>
     </Compile>

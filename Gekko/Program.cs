@@ -11624,6 +11624,16 @@ namespace Gekko
                     }
                 }
 
+                if (s2.Length == 3)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "cge"))
+                    {
+                        CGE2.Run();
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }
+
                 if (s2.Length == 7)
                 {
                     string sub = s2;
@@ -20818,7 +20828,7 @@ namespace Gekko
 
                     if (nodeText.Contains("\""))
                     {
-                        nodeText = nodeText.Replace("\"", "´");
+                        //nodeText = nodeText.Replace("\"", "´");  NO!
                     }
 
                     //nodeText = nodeText.Trim();  //also removes blank lines if there are any by accident
@@ -22915,6 +22925,7 @@ namespace Gekko
                     GMap gm = new GMap();
                     gm["a", "b"] = new ScalarVal(1d);
                     IVariable iv = gm["a", "b"];
+                    gm = new GMap() { };
                 }
 
                 throw new GekkoException();
