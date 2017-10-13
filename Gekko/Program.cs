@@ -9809,6 +9809,8 @@ namespace Gekko
                 //REMEMber TO STORE KEYS AS TOLOWER()!!!!!!!!
                 //REMEMber TO STORE KEYS AS TOLOWER()!!!!!!!!
 
+                //#098q709q87543
+
                 var list = new List<string>();
 
                 for (int i = 0; i < 5 * 1000 * 1000; i++)
@@ -22922,6 +22924,7 @@ namespace Gekko
 
                 if (Globals.runningOnTTComputer)
                 {
+                    //#7098w7reeq98w7r
                     GMap gm = new GMap();
                     gm["a", "b"] = new ScalarVal(1d);
                     IVariable iv = gm["a", "b"];

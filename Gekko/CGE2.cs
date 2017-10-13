@@ -21,6 +21,8 @@ namespace Gekko
         public static List<string> prices;
         public static List<string> volumes;
         public static List<string> sigmas;
+        public static int counterh = 0;
+        public static int countere = 0;
 
         public static bool useFunctions = true;
 
@@ -61,7 +63,7 @@ namespace Gekko
 
             prices = new List<string>();
             volumes = new List<string>();
-            sigmas = new List<string>();
+            //sigmas = new List<string>();
 
             activityString = "u";
             priceString = "pc";
@@ -73,19 +75,39 @@ namespace Gekko
             CNode n2 = new CNode("pc2", "c2");
             CNode n3 = new CNode("pc3", "c3");
             CNode n4 = new CNode("pc4", "c4");
-            CNode n_agg1 = new CNode(n1, n2);
-            CNode n_agg2 = new CNode(n_agg1, n3);
-            CNode n_agg3 = new CNode(n_agg2, n4);
-            CNode n = n_agg3;
+            CNode n5 = new CNode("pc5", "c5");
+            CNode n6 = new CNode("pc6", "c6");
+            CNode n7 = new CNode("pc7", "c7");
+            //Careful with the sigma names, that they are distinct. Here they follow n_agg number.
+            CNode n_agg1 = new CNode(n1, n2, "sigmac1");
+            CNode n_agg2 = new CNode(n_agg1, n3, "sigmac2");
+            CNode n_agg4 = new CNode(n4, n5, "sigmac4");
+            CNode n_agg3 = new CNode(n_agg2, n_agg4, "sigmac3");
+            CNode n_agg6 = new CNode(n6, n7, "sigmac6");
+            CNode n_agg5 = new CNode(n_agg3, n_agg6, "sigmac5");            
+            CNode n = n_agg5;  //BEWARE: this must be the node at the top 
 
             idCounter = 0;
             Walk(n);
             Walk1(n);
             Walk2(n);
             ccCode = ccCode.Substring(0, ccCode.Length - 3);
-            
+
+            Writeln("dot 1-" + (2 * counterh) + ";");
+            for (int i = 1; i <= countere; i++) {
+                Writeln("  eqsub e" + i + " h1-h" + counterh + ";");
+            }
+            Writeln("enddot;");
+
+            Writeln("dot 1-" + countere + ";");
+            Writeln("  frml g. pc. = pc./eff.;");            
+            Writeln("enddot;");
+            Writeln("dot 1-" + countere + ";");            
+            Writeln("  eqsub e. g1-g" + countere + ";");
+            Writeln("enddot;");
+
             // ----------------------------------
-            
+
             sw1.Flush(); sw1.Close();
             
         }
@@ -113,13 +135,14 @@ namespace Gekko
                 string theta = costNum + " / " + costDen;
                 string sigma = node.sigma;
 
+                counterh++;
                 if (useFunctions)
                 {
-                    node.pCode = "" + node.priceId + " = " + "CES_UC(" + p1rel + ", " + theta + ", " + sigma + ");";
+                    node.pCode = "frml h" + counterh + " " + node.priceId + " = " + "CES_UC(" + p1rel + ", " + theta + ", " + sigma + ");";
                 }
                 else
                 {
-                    node.pCode = "" + node.priceId + " = " + Generate_CES_UC(p1rel, p2rel, theta, sigma) + ";";
+                    node.pCode = "frml h" + counterh + " " + node.priceId + " = " + Generate_CES_UC(p1rel, p2rel, theta, sigma) + ";";
                 }
             }
             else
@@ -162,23 +185,43 @@ namespace Gekko
                 string right = null;
                 if (useFunctions)
                 {
-                    right = "(" + zz + node.eff + ") * " + leftOrRight + "(" + yrel + " , " + p1rel + " , " + p2rel + " , " + theta + ", " + sigma + ");";
+                    right = "(" + zz + node.eff + ") * " + leftOrRight + "(" + yrel + " , " + p1rel + " , " + p2rel + " , " + theta + ", " + sigma + ")";
                 }
                 else
                 {
                     string ownPrice = p1rel;
                     if (!node.isLeftNode) ownPrice = p2rel;
-                    right = "(" + zz + node.eff + ") * " + "(" + yrel + ") * ((" + Generate_CES_UC(p1rel, p2rel, theta, sigma) + ")/(" + ownPrice + "))**(" + sigma + ");";
+                    right = "(" + zz + node.eff + ") * " + "(" + yrel + ") * ((" + Generate_CES_UC(p1rel, p2rel, theta, sigma) + ")/(" + ownPrice + "))**(" + sigma + ")";
+                }
+
+                string i = null;
+                string eff = null;
+                if (node.volumeId.Contains("_"))
+                {
+                    counterh++;
+                    i = "h" + counterh;
+                }
+                else
+                {
+                    countere++;
+                    i = "e" + countere;
+                    eff = " eff" + countere + " * ";
                 }
 
                 if (node.volumeId.StartsWith("d") && ww.StartsWith("y"))
                 {
-                    string uuu = node.volumeId.Replace("d", "y");  //HACK HACK
-                    node.xCode = "" + uuu + "=" + uuu + "+" + node.volumeId + " - " + right;
+                    throw new Exception();
                 }
                 else
                 {
-                    node.xCode = "" + node.volumeId + " = " + right;
+                    if (node.volumeId.Contains("_"))
+                    {
+                        node.xCode = "frml " + i + " " + node.volumeId + "" + " = " + eff + right + ";";
+                    }
+                    else
+                    {
+                        node.xCode = "frml " + i + " l" + node.volumeId + "w" + " = log(" + eff + right + " + gamma" + countere + ");";
+                    }                        
                 }
             }
         }
@@ -359,11 +402,11 @@ namespace Gekko
             Initialize(priceId, volumeId, eff);
         }
 
-        public CNode(CNode left, CNode right)
+        public CNode(CNode left, CNode right, string sigmaName)
         {
             CGE2.idCounter++;
-            this.sigma = "sigma" + CGE2.volumeString + CGE2.idCounter;
-            CGE2.sigmas.Add(this.sigma);
+            this.sigma = sigmaName;
+            //CGE2.sigmas.Add(this.sigma);
             this.nodeCounter = CGE2.idCounter;
             this.priceId = CGE2.priceString + "_" + CGE2.aggString + this.nodeCounter.ToString();
             this.volumeId = CGE2.volumeString + "_" + CGE2.aggString + this.nodeCounter.ToString();

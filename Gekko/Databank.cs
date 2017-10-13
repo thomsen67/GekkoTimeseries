@@ -28,50 +28,7 @@ namespace Gekko
     public class Databank : IBank
     {
 
-        /*
-         * 
-        This should be cleaned up at some point. In Add, the freq should be taken from the timeseries itself.
         
-        Regarding frequencies: in .storage hash, the vars are kept with %q, %m, %u suffix for Q, M and U, whereas A does not
-        have a suffix.
-
-        --------
-        
-        ContainsVariable(string variable)
-          adds global freq, for instance fy%q
-        
-        ContainsVariable(bool freqAddToName, string variable)
-          maybe adds global freq, for instance fy%q
-        
-        ----------
-        
-        GetVariable(string variable)        
-
-        GetVariable(bool freqAddToName, string variable)        
-
-        GetVariable(EFreq eFreq, string variable)
-        
-        -----------
-          
-        AddVariable(TimeSeries ts)
-          adds global freq, for instance fy%q
-        
-        AddVariable(string frequency, TimeSeries ts)   --> freq should be taken from ts!
-          adds given freq, for instance fy%q     
-         
-        --------  
-         
-        RemoveVariable(string variable)
-          adds global freq, for instance fy%q        
-
-        RemoveVariable(bool freqAddToName, string variable)
-          maybe add globals freq, for instance fy%q                             
-         
-        RemoveVariable(EFreq eFreq, string variable)
-          adds given freq, for instance fy%q        
-        
-        */
-
         //Note the .isDirty field, so methods that change anything must set isDirty = true!
         //Remember new fields in Clear() method and also in G.CloneDatabank()        
         [ProtoMember(1)]
