@@ -208,6 +208,22 @@ namespace Gekko
         }
     }
 
+    public enum EWriteType
+    {
+        Tsdx,
+        Gbk,
+        Gdx,
+        Gnuplot,
+        Tsd,
+        Prn,
+        Xlsx,
+        Xls,
+        Csv,
+        R,
+        Series,
+        Tsp   
+    }
+
     public enum EPrtCollapseTypes
     {
         Avg,
@@ -1454,7 +1470,7 @@ namespace Gekko
                                     else if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn)
                                     {
                                         string s3 = cell.text;
-                                        if (G.equal(Program.options.interface_csv_decimalseparator, "comma"))
+                                        if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
                                         {
                                             s3 = s3.Replace(",", ".");  //bit of a hack, will not handle 1.500,75   (--> 1500.75)
                                         }
@@ -1544,14 +1560,14 @@ namespace Gekko
             //the last ones are the Danish codes
             //the M is Gekko standard for missing value, NA is also allowed, both also with "".
             bool isNonAvailableText = false;
-            if (G.equal(text, "M") || G.equal(text, "\"M\"") || G.equal(text, "NA") || G.equal(text, "\"NA\"") || G.equal(text, "#N/A") || G.equal(text, "#NAME?") || G.equal(text, "#I/T") || G.equal(text, "#NAVN?")) isNonAvailableText = true;
+            if (G.Equal(text, "M") || G.Equal(text, "\"M\"") || G.Equal(text, "NA") || G.Equal(text, "\"NA\"") || G.Equal(text, "#N/A") || G.Equal(text, "#NAME?") || G.Equal(text, "#I/T") || G.Equal(text, "#NAVN?")) isNonAvailableText = true;
             return isNonAvailableText;
         }
 
         private static bool ShouldTranspose(ReadOpenMulbkHelper oRead, TableLight matrix2, int rowOffset, int colOffset)
         {
             bool transpose = false;
-            if (G.equal(oRead.Orientation, "cols")) transpose = true;  //we assume ROWS is default (logical for databanks with more series than observations)
+            if (G.Equal(oRead.Orientation, "cols")) transpose = true;  //we assume ROWS is default (logical for databanks with more series than observations)
             if (oRead.Type == EDataFormat.Prn)
             {
                 CellLight cellA1 = matrix2.Get(1 + rowOffset, 1 + colOffset);
@@ -1573,8 +1589,8 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Expected 'date' or 'name' as first element in prn file");
                 throw new GekkoException();
             }
-            if (G.equal(cell.text.Trim(), "date")) transpose = true; //corresponds to READ<csv cols>, timeseries are in columns.
-            else if (G.equal(cell.text.Trim(), "name")) transpose = false; //corresponds to READ<csv>, timeseries are in rows.
+            if (G.Equal(cell.text.Trim(), "date")) transpose = true; //corresponds to READ<csv cols>, timeseries are in columns.
+            else if (G.Equal(cell.text.Trim(), "name")) transpose = false; //corresponds to READ<csv>, timeseries are in rows.
             else
             {
                 G.Writeln2("*** ERROR: Expected 'date' or 'name' as first element in prn file");
@@ -1683,7 +1699,7 @@ namespace Gekko
 
                                 string perTemp = "";
                                 string subPerTemp = "";
-                                if (G.equal(freqHere, "a"))
+                                if (G.Equal(freqHere, "a"))
                                 {
                                     perTemp = date;
                                     subPerTemp = "1";
@@ -1803,11 +1819,11 @@ namespace Gekko
                                     else
                                     {
                                         string s3 = s;
-                                        if (G.equal(Program.options.interface_csv_decimalseparator, "period"))
+                                        if (G.Equal(Program.options.interface_csv_decimalseparator, "period"))
                                         {
                                             //do nothing
                                         }
-                                        else if (G.equal(Program.options.interface_csv_decimalseparator, "comma"))
+                                        else if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
                                         {
                                             s3 = s.Replace(",", ".");  //bit of a hack, will not handle 1.500,75   (--> 1500.75)
                                         }
@@ -1919,7 +1935,7 @@ namespace Gekko
         {
             Wildcard wildcard = new Wildcard(w, RegexOptions.IgnoreCase);
             List<string> found = new List<string>();
-            string end = Globals.freqIndicator + Program.options.freq;  //.freq is always lower key
+            string end = Globals.freqIndicator.ToString() + Program.options.freq;  //.freq is always lower key
             foreach (string s in databank.storage.Keys)
             {
                 if (s.StartsWith("_tmptmp")) continue;  //Hack: these are deleted after each command, but in for instance PRT command a _tmptmp var is created just before
@@ -1961,7 +1977,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                 }
-                if ((G.equal(options.databank_logic, "aremos") && Program.databanks.ShouldPutBankLastAREMOS(oRead.openType, oRead.openTypePosition)) || (G.equal(options.databank_logic, "default") && Program.databanks.ShouldPutBankLast(oRead.openType, oRead.openTypePosition)))
+                if ((G.Equal(options.databank_logic, "aremos") && Program.databanks.ShouldPutBankLastAREMOS(oRead.openType, oRead.openTypePosition)) || (G.Equal(options.databank_logic, "default") && Program.databanks.ShouldPutBankLast(oRead.openType, oRead.openTypePosition)))
                 {
                     for (int i = 0; i < n; i++)
                     {
@@ -2448,7 +2464,7 @@ namespace Gekko
         public static void SheetImport(O.SheetImport o)
         {
             string matrixName = null;
-            if (G.equal(o.opt_matrix, "yes"))
+            if (G.Equal(o.opt_matrix, "yes"))
             {
                 if(o.listItems.Count==0 || o.listItems.Count > 1)
                 {
@@ -2459,7 +2475,7 @@ namespace Gekko
             }
 
             bool isMissing = false;
-            if(G.equal(o.opt_missing,"yes"))
+            if(G.Equal(o.opt_missing,"yes"))
             {
                 isMissing = true;
             }                       
@@ -2471,7 +2487,7 @@ namespace Gekko
             TableLight matrix = ReadExcelWorkbook(fileName, Program.databanks.GetFirst(), o.opt_sheet);
 
             bool transpose = false;  //corresponding to row-wise reading
-            if (G.equal(o.opt_cols, "yes"))
+            if (G.Equal(o.opt_cols, "yes"))
             {
                 transpose = true;
                 if (matrixName != null) G.Writeln2("+++ NOTE: Because of <rows> option, the matrix #" + matrixName + " is transposed");
@@ -3119,7 +3135,7 @@ namespace Gekko
                             if (!success)
                             {
                                 string toParse = line.Substring(ii + i5 * width, width).Trim();
-                                if (G.equal(toParse, "NaN") || G.equal(toParse, "-NaN"))
+                                if (G.Equal(toParse, "NaN") || G.Equal(toParse, "-NaN"))
                                 {
                                     ss = 1e+15;  //signals missing value
                                     NaNCounter++;
@@ -3443,7 +3459,7 @@ namespace Gekko
         public static void ReadPx(string array, bool isDownload, ReadDatesHelper datesRestrict, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
         {
          
-            bool isArray = false; if (G.equal(array, "yes")) isArray = true;
+            bool isArray = false; if (G.Equal(array, "yes")) isArray = true;
 
             bool hyphenFound = false;
 
@@ -4368,7 +4384,7 @@ namespace Gekko
                             //    //continue;  //make filtering possible!
                             //}
 
-                            if (G.IsUnitTesting() && !(G.equal(gvar, "m") || G.equal(gvar, "myfm") || G.equal(gvar, "f") || G.equal(gvar, "pm") || G.equal(gvar, "pff") || G.equal(gvar, "ef") || G.equal(gvar, "qc_a_y") || G.equal(gvar, "adam_ib"))) continue;  //to not waste time on this when unit testing
+                            if (G.IsUnitTesting() && !(G.Equal(gvar, "m") || G.Equal(gvar, "myfm") || G.Equal(gvar, "f") || G.Equal(gvar, "pm") || G.Equal(gvar, "pff") || G.Equal(gvar, "ef") || G.Equal(gvar, "qc_a_y") || G.Equal(gvar, "adam_ib"))) continue;  //to not waste time on this when unit testing
 
                             int timeIndex = -12345;
                             //int scnsIndex = -12345;
@@ -4382,7 +4398,7 @@ namespace Gekko
                                 {
                                     GAMSSet gs = (GAMSSet)gamsSymbol.Domains.ElementAt(i);
                                     //dims[i] = gs.NumberRecords;
-                                    if (G.equal(gs.Name, Program.options.gams_time_set))
+                                    if (G.Equal(gs.Name, Program.options.gams_time_set))
                                     {
                                         timeIndex = i;
                                     }
@@ -4763,7 +4779,7 @@ namespace Gekko
                 gdx.gdxSymbolGetDomainX(i, ref domainStrings);
                 for (int d2 = dimensions - 1; d2 >= 0; d2--)  //backwards is faster since t is typically there
                 {
-                    if (G.equal(domainStrings[d2], Program.options.gams_time_set))
+                    if (G.Equal(domainStrings[d2], Program.options.gams_time_set))
                     {
                         timeDimNr = d2;
                         break;
@@ -4806,7 +4822,7 @@ namespace Gekko
                     }
                 }
 
-                if (i == scnsIndex && G.equal(keysi, cut2))
+                if (i == scnsIndex && G.Equal(keysi, cut2))
                 {
                     //skip it entirely, not to be part of name
                 }
@@ -5855,7 +5871,7 @@ namespace Gekko
             int eqEndo = -12345;
             foreach (EquationHelper eh in Program.model.equations)
             {
-                if (G.equal(eh.lhs, endo))
+                if (G.Equal(eh.lhs, endo))
                 {
                     eqEndo = eh.equationNumber;
                 }
@@ -6162,7 +6178,7 @@ namespace Gekko
             {
                 foreach (string rhsVar in eh.precedentsWithLagIndicator.Keys)
                 {
-                    if (G.equal(rhsVar, var1 + Globals.lagIndicator + "0"))
+                    if (G.Equal(rhsVar, var1 + Globals.lagIndicator + "0"))
                     {
                         eqs.Add(eh.equationNumber);
                     }
@@ -6225,7 +6241,7 @@ namespace Gekko
             if (!isLibrary) Globals.uFunctionStorageCs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             int max = 1;
-            if (G.equal(Program.options.interface_debug, "dialog")) max = int.MaxValue;  //should suffice as tries :-)
+            if (G.Equal(Program.options.interface_debug, "dialog")) max = int.MaxValue;  //should suffice as tries :-)
 
             for (int i = 0; i < max; i++)  //number of tries to run a cmd file that has parser/lexer errors
             {
@@ -6288,7 +6304,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    if (G.equal(Program.options.interface_debug, "dialog"))
+                    if (G.Equal(Program.options.interface_debug, "dialog"))
                     {
                         string eh = Program.ErrorHandling(islooping, p, false);
 
@@ -6324,7 +6340,14 @@ namespace Gekko
                 }
                 else
                 {
-                    Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+                    try
+                    {
+                        Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+                    }
+                    catch
+                    {
+                        if (!G.IsDebugSession) throw;
+                    }
                 }
 
                 break;  //if we get to here, everything is ok so break the file-trying loop
@@ -7271,7 +7294,7 @@ namespace Gekko
                 if (scnsIndex != -12345)
                 {
                     string scns = record.Keys[scnsIndex];
-                    if (filterScn != null && !G.equal(scns, filterScn)) continue;
+                    if (filterScn != null && !G.Equal(scns, filterScn)) continue;
                 }
                 counter++;
 
@@ -8304,7 +8327,7 @@ namespace Gekko
 
             r.WaitForExit();
 
-            if (!G.equal(o.opt_mute, "yes") && File.Exists(RFileName + ".txt"))
+            if (!G.Equal(o.opt_mute, "yes") && File.Exists(RFileName + ".txt"))
             {
                 string s3 = GetTextFromFileWithWait(RFileName + ".txt");
                 List<string> ss = G.ExtractLinesFromText(s3);
@@ -8492,7 +8515,7 @@ namespace Gekko
                         foreach (string e in ext)
                         {
                             string sss = Path.GetFileName(file);
-                            if (G.equal(sss, tempName + (i + 1) + "." + e))
+                            if (G.Equal(sss, tempName + (i + 1) + "." + e))
                             {
                                 string varName = bnv.name + "_" + e;
                                 TimeSeries ts = new TimeSeries(o.t1.freq, varName);
@@ -10572,36 +10595,36 @@ namespace Gekko
                             List<DecompHelper> data_ALT = null;
                             List<DecompHelper> dataLag_CUR = null;
                             List<DecompHelper> dataLag_ALT = null;
-                            if (G.equal(code2, "d") || G.equal(code2, "p"))
+                            if (G.Equal(code2, "d") || G.Equal(code2, "p"))
                             {
                                 data_CUR = data;
                                 data_ALT = data_lag;
                             }
-                            else if (G.equal(code2, "bd") || G.equal(code2, "bp"))
+                            else if (G.Equal(code2, "bd") || G.Equal(code2, "bp"))
                             {
                                 data_CUR = data_base;
                                 data_ALT = data_base_lag;
                             }
-                            else if (G.equal(code2, "m") || G.equal(code2, "q"))
+                            else if (G.Equal(code2, "m") || G.Equal(code2, "q"))
                             {
                                 data_CUR = data;
                                 data_ALT = data_base;
                             }
-                            else if (G.equal(code2, "dp"))
+                            else if (G.Equal(code2, "dp"))
                             {
                                 data_CUR = data;
                                 data_ALT = data_lag;
                                 dataLag_CUR = data_lag;
                                 dataLag_ALT = data_lag2;
                             }
-                            else if (G.equal(code2, "bdp"))
+                            else if (G.Equal(code2, "bdp"))
                             {
                                 data_CUR = data_base;
                                 data_ALT = data_base_lag;
                                 dataLag_CUR = data_base_lag;
                                 dataLag_ALT = data_base_lag2;
                             }
-                            else if (G.equal(code2, "mp"))
+                            else if (G.Equal(code2, "mp"))
                             {
                                 data_CUR = data;
                                 data_ALT = data_lag;
@@ -10614,11 +10637,11 @@ namespace Gekko
                                 throw new GekkoException();
                             }
                             bool isRelative = false; //will be divided with lagged or baseline level
-                            if (G.equal(code2, "p") || G.equal(code2, "bp") || G.equal(code2, "dp") || G.equal(code2, "bdp") || G.equal(code2, "q") || G.equal(code2, "mp"))
+                            if (G.Equal(code2, "p") || G.Equal(code2, "bp") || G.Equal(code2, "dp") || G.Equal(code2, "bdp") || G.Equal(code2, "q") || G.Equal(code2, "mp"))
                             {
                                 isRelative = true;
                             }
-                            if (G.equal(code2, "dp") || G.equal(code2, "bdp") || G.equal(code2, "mp"))
+                            if (G.Equal(code2, "dp") || G.Equal(code2, "bdp") || G.Equal(code2, "mp"))
                             {
                                 double sumNolag = double.NaN;
                                 double sumLag = double.NaN;
@@ -10662,7 +10685,7 @@ namespace Gekko
                             }
                         }
 
-                        if (G.equal(code1, "s"))
+                        if (G.Equal(code1, "s"))
                         {
                             double tableTemp0 = tableTemp[0];
                             for (int i = 0; i < data.Count + 1 + o; i++)
@@ -11298,7 +11321,7 @@ namespace Gekko
             //Remove null element, if only one (used for "LIST xx = null")                
             for (int i = 0; i < newList.Count; i++)
             {
-                if (G.equal(newList[i], "null"))
+                if (G.Equal(newList[i], "null"))
                 {
                     if (newList.Count == 1)
                     {
@@ -11357,14 +11380,14 @@ namespace Gekko
                 if (s2.Length == 8)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "rungenr1"))
+                    if (G.Equal(sub, "rungenr1"))
                     {
                         //typing "rungenr1" will put cs code in Genr.cs
                         G.Writeln2("Put code in Genr.cs. Now you should compile...");
                         Program.Rungenr(1);
                         return "";  //no need for the parser to chew on this afterwards!
                     }
-                    else if (G.equal(sub, "rungenr2"))
+                    else if (G.Equal(sub, "rungenr2"))
                     {
                         //typing "rungenr2" will run stuff in Genr.cs for debugging
                         G.Writeln2("Running Genr.cs for debugging:");
@@ -11375,7 +11398,7 @@ namespace Gekko
                 if (s2.Length == 6)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "ssplit"))
+                    if (G.Equal(sub, "ssplit"))
                     {
                         Globals.splitCsCodeIntoChunks = !Globals.splitCsCodeIntoChunks;
                         G.Writeln("SPLIT = " + Globals.splitCsCodeIntoChunks);
@@ -11385,7 +11408,7 @@ namespace Gekko
                 if (s2.Length == 7)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "ssimple"))
+                    if (G.Equal(sub, "ssimple"))
                     {
                         Globals.simpleCode = !Globals.simpleCode;
                         G.Writeln("SIMPLE (ast_upd()) = " + Globals.simpleCode);
@@ -11398,7 +11421,7 @@ namespace Gekko
                 if (s2.Length == 7)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "timings"))
+                    if (G.Equal(sub, "timings"))
                     {
                         Globals.showTimings = !Globals.showTimings;
                         G.Writeln("TIMINGS = " + Globals.showTimings);
@@ -11409,7 +11432,7 @@ namespace Gekko
                 if (s2.Length == 7)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "packsim"))
+                    if (G.Equal(sub, "packsim"))
                     {
                         Globals.alwaysEnablcPackForSimulation = true;
                         G.Writeln("alwaysEnablcPackForSimulation = " + Globals.alwaysEnablcPackForSimulation);
@@ -11419,7 +11442,7 @@ namespace Gekko
                 if (s2.Length == 6)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "aremos"))
+                    if (G.Equal(sub, "aremos"))
                     {
                         //typing "aremos" on the prompt opens the dialog for creating a wa.bat file.
                         //not intended for "normal" Gekko users.
@@ -11445,7 +11468,7 @@ namespace Gekko
 
                 if (s2.Length == 5)
                 {
-                    if (G.equal(s2, "eigen"))
+                    if (G.Equal(s2, "eigen"))
                     {
                         Eigen();
                         return "";  //no need for the parser to chew on this afterwards!
@@ -11456,7 +11479,7 @@ namespace Gekko
                 if (s2.Length == 5)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "flush"))
+                    if (G.Equal(sub, "flush"))
                     {
                         Flush();  //removes cached models
                         return "";
@@ -11467,7 +11490,7 @@ namespace Gekko
                 if (s2.Length == 11)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "randommodel"))
+                    if (G.Equal(sub, "randommodel"))
                     {
                         Randommodel();
                         return "";  //no need for the parser to chew on this afterwards!
@@ -11477,7 +11500,7 @@ namespace Gekko
                 if (s2.Length == 16)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "randommodelcheck"))
+                    if (G.Equal(sub, "randommodelcheck"))
                     {
                         Randommodelcheck();
                         return "";  //no need for the parser to chew on this afterwards!
@@ -11488,7 +11511,7 @@ namespace Gekko
                 if (s2.Length == 6)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "deploy"))
+                    if (G.Equal(sub, "deploy"))
                     {
                         //Deploy
                         if (Globals.runningOnTTComputer)
@@ -11506,7 +11529,7 @@ namespace Gekko
 
                     string sub = s2;
 
-                    if (G.equal(sub, "testsim"))
+                    if (G.Equal(sub, "testsim"))
                     {
                         int n = 1000;
                         double[] abs = new double[3000];  //years
@@ -11582,7 +11605,7 @@ namespace Gekko
                 if (s2.Length == 3)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "lex"))
+                    if (G.Equal(sub, "lex"))
                     {
                         //show raw tokens
                         //only for debugging
@@ -11605,7 +11628,7 @@ namespace Gekko
                 if (s2.Length == 5)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "histo"))
+                    if (G.Equal(sub, "histo"))
                     {
                         Globals.histo = !Globals.histo;
                         return "";  //no need for the parser to chew on this afterwards!
@@ -11615,7 +11638,7 @@ namespace Gekko
                 if (s2.Length == 3)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "ast"))
+                    if (G.Equal(sub, "ast"))
                     {
                         //typing "ast" on the prompt means AST tree is printed out on screen
                         //only for debugging
@@ -11629,7 +11652,7 @@ namespace Gekko
                 if (s2.Length == 3)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "cge"))
+                    if (G.Equal(sub, "cge"))
                     {
                         CGE2.Run();
                         return "";  //no need for the parser to chew on this afterwards!
@@ -11639,7 +11662,7 @@ namespace Gekko
                 if (s2.Length == 7)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "timings"))
+                    if (G.Equal(sub, "timings"))
                     {
                         Globals.showTimings = true;
                         G.Writeln("Timings shown...");
@@ -11650,7 +11673,7 @@ namespace Gekko
                 if (s2.Length == 5)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "cache"))
+                    if (G.Equal(sub, "cache"))
                     {
                         if (Globals.useCache == true)
                         {
@@ -11670,7 +11693,7 @@ namespace Gekko
                 if (s2.Length == 6)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "speed1"))
+                    if (G.Equal(sub, "speed1"))
                     {
                         double n = 10000000d;
                         string s = "val k   = 0; val m   = 0; val k1  = 1; val k2  = " + n + "; for val k=%k1 to %k2; val m=%m+%k; end;";
@@ -11683,7 +11706,7 @@ namespace Gekko
                         G.Writeln("Difference from true: " + (x - (n * (n + 1) / 2)));
                         return "";  //no need for the parser to chew on this afterwards!
                     }
-                    else if (G.equal(sub, "speed2"))
+                    else if (G.Equal(sub, "speed2"))
                     {
                         DateTime t0 = DateTime.Now;
 
@@ -11702,7 +11725,7 @@ namespace Gekko
                         G.Writeln("Difference from true: " + (x - (n * (n + 1) / 2)));
                         return "";  //no need for the parser to chew on this afterwards!
                     }
-                    else if (G.equal(sub, "speed3"))
+                    else if (G.Equal(sub, "speed3"))
                     {
                         double n = 100000d;
                         string s = "time 95 2020; create y1, y2, y3, x1; upd <95 2020> y1 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> y2 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> y3 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> x1 = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26; val k = 0; val x  = 1; val k1 = 0; val k2 = " + n + "; for val k = %k1 to %k2; GENR <2000 2020> x1 = y1 + y1[-1] + y2 + y2[-1] + y3[2000] + %x + 1 + 2; end;";
@@ -11718,7 +11741,7 @@ namespace Gekko
                 if (s2.Length == 5)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "proto"))
+                    if (G.Equal(sub, "proto"))
                     {
                         if (Globals.databanksAsProtobuffers == true) Globals.databanksAsProtobuffers = false;
                         else Globals.databanksAsProtobuffers = true;
@@ -11730,7 +11753,7 @@ namespace Gekko
                 if (s2.Length == 4)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "gray"))
+                    if (G.Equal(sub, "gray"))
                     {
                         if (Globals.printGrayLinesForDebugging == true) Globals.printGrayLinesForDebugging = false;
                         else Globals.printGrayLinesForDebugging = true;
@@ -11768,7 +11791,7 @@ namespace Gekko
 
                 if (s2.Length == "killexcel".Length)
                 {
-                    if (G.equal(s2, "killexcel"))
+                    if (G.Equal(s2, "killexcel"))
                     {
                         DialogResult result = MessageBox.Show("Delete all processes with 'excel' in their names? CLOSE EXCEL SHEETS BEFOREHAND!!", "Gekko helper", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);
                         if (result == DialogResult.Yes)
@@ -11796,7 +11819,7 @@ namespace Gekko
                 if (s2.Length == 6)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "locked"))
+                    if (G.Equal(sub, "locked"))
                     {
                         //typing "locked" on the prompt searches for locked files (sharing violation)
                         //in working folder and sub-dirs
@@ -12333,7 +12356,7 @@ namespace Gekko
         {
             foreach (FileInfo file in directoryInfo.GetFiles())
             {
-                if (omitType != null && G.equal("." + omitType, file.Extension)) continue;  //skip it
+                if (omitType != null && G.Equal("." + omitType, file.Extension)) continue;  //skip it
                 file.Delete();  //hmm probably best not to use WaitForFileDelete() here, exceptions are typically caught in a wrapper on this method, and not critical if it fails (used for cleanup)
             }
             foreach (DirectoryInfo subfolder in directoryInfo.GetDirectories())
@@ -13268,7 +13291,7 @@ namespace Gekko
 
             Program.EmitCodeFromANTLR("", fileName2, isLibrary, p);
 
-            if (G.equal(s, Globals.autoExecCmdFileName))
+            if (G.Equal(s, Globals.autoExecCmdFileName))
             {
                 G.Writeln();
                 G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from working folder");
@@ -13430,7 +13453,7 @@ namespace Gekko
                 
         public static void Disp(GekkoTime tStart, GekkoTime tEnd, List<string> list, bool showFrnEquation, bool showAllPeriods, bool clickedLink, O.Disp o)
         {
-            if (o != null && G.equal(o.opt_info, "yes"))
+            if (o != null && G.Equal(o.opt_info, "yes"))
             {
                 Info(tStart, tEnd, list);
                 return;
@@ -13875,7 +13898,7 @@ namespace Gekko
             if (Program.unfoldedVariableList == null) return explanation;
             foreach (Program.Item item in Program.unfoldedVariableList)
             {
-                if (G.equal(var, item.variable))
+                if (G.Equal(var, item.variable))
                 {
                     explanation = item.explanation;
                 }
@@ -14205,14 +14228,14 @@ namespace Gekko
                     foreach (string m in a4)
                     {
                         if (
-                        G.equal(m, "exod") ||
-                        G.equal(m, "exoj") ||
-                        G.equal(m, "exoz") ||
-                        G.equal(m, "exodjz") ||
-                        G.equal(m, "exo") ||
-                        G.equal(m, "exotrue") ||
-                        G.equal(m, "endo") ||
-                        G.equal(m, "all"))
+                        G.Equal(m, "exod") ||
+                        G.Equal(m, "exoj") ||
+                        G.Equal(m, "exoz") ||
+                        G.Equal(m, "exodjz") ||
+                        G.Equal(m, "exo") ||
+                        G.Equal(m, "exotrue") ||
+                        G.Equal(m, "endo") ||
+                        G.Equal(m, "all"))
                         {
                             system.Add(m);
                         }
@@ -14278,7 +14301,7 @@ namespace Gekko
                 {
                     List<string> unfoldedRightSide = rightSide;
 
-                    if (unfoldedRightSide.Count == 1 && G.equal(unfoldedRightSide[0], "null"))
+                    if (unfoldedRightSide.Count == 1 && G.Equal(unfoldedRightSide[0], "null"))
                     {
                         //LIST mylist = null; ---> empty list
                         unfoldedRightSide = new List<string>();
@@ -14612,11 +14635,11 @@ namespace Gekko
             //This is where we start when issuing a PIPE
             //We call the older version below, the PIPE interface mess should be cleaned up at some point...
             List<string> temp = new List<string>();
-            if (G.equal(o.opt_append, "yes")) temp.Add("append");
-            if (G.equal(o.opt_html, "yes")) temp.Add("html");
-            if (G.equal(o.opt_pause, "yes")) temp.Add("pause");
-            if (G.equal(o.opt_continue, "yes")) temp.Add("continue");
-            if (G.equal(o.opt_stop, "yes")) temp.Add("stop");
+            if (G.Equal(o.opt_append, "yes")) temp.Add("append");
+            if (G.Equal(o.opt_html, "yes")) temp.Add("html");
+            if (G.Equal(o.opt_pause, "yes")) temp.Add("pause");
+            if (G.Equal(o.opt_continue, "yes")) temp.Add("continue");
+            if (G.Equal(o.opt_stop, "yes")) temp.Add("stop");
             Pipe(o.fileName, temp);
         }
 
@@ -14637,11 +14660,11 @@ namespace Gekko
             {
                 foreach (string s in args)
                 {
-                    if (G.equal(s, "append")) append = true;
-                    else if (G.equal(s, "html")) html = true;
-                    else if (G.equal(s, "stop")) stop = true;
-                    else if (G.equal(s, "pause")) pause = true;
-                    else if (G.equal(s, "continue")) continue2 = true;
+                    if (G.Equal(s, "append")) append = true;
+                    else if (G.Equal(s, "html")) html = true;
+                    else if (G.Equal(s, "stop")) stop = true;
+                    else if (G.Equal(s, "pause")) pause = true;
+                    else if (G.Equal(s, "continue")) continue2 = true;
                 }
             }
 
@@ -14661,7 +14684,7 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            if (G.equal(fileName, "con") || stop)   //PIPE con, or PIPE<stop>
+            if (G.Equal(fileName, "con") || stop)   //PIPE con, or PIPE<stop>
             {
                 if (Globals.pipe == false)
                 {
@@ -14707,7 +14730,7 @@ namespace Gekko
 
                     if (Globals.pipe == true)
                     {
-                        if (G.equal(Globals.pipeFileHelper.pipeFileFileWithPath, fileName))
+                        if (G.Equal(Globals.pipeFileHelper.pipeFileFileWithPath, fileName))
                         {
                             //already pipe to present pipefile
                             //just ignore it with no message: the message will end up in the pipefile                            
@@ -14894,8 +14917,8 @@ namespace Gekko
                         string s3 = "";
                         if (first)
                         {
-                            if (G.equal(ss2, "date")) s3 = "";  //remove it
-                            if (G.equal(ss2, "name")) s3 = "";  //remove it
+                            if (G.Equal(ss2, "date")) s3 = "";  //remove it
+                            if (G.Equal(ss2, "name")) s3 = "";  //remove it
                         }
                         else s3 = ss2;
                         first = false;
@@ -15382,7 +15405,7 @@ namespace Gekko
 
         public static bool IsStacked()
         {
-            return G.equal(Program.options.solve_forward_method, "stacked");
+            return G.Equal(Program.options.solve_forward_method, "stacked");
         }        
 
         public static void Sim(O.Sim o)
@@ -15395,12 +15418,12 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            if (G.equal(o.opt_after, "yes"))
+            if (G.Equal(o.opt_after, "yes"))
             {
                 Program.Efter(o.t1, o.t2);
                 return;
             }
-            else if (G.equal(o.opt_res, "yes"))
+            else if (G.Equal(o.opt_res, "yes"))
             {
                 Program.Res(o.t1, o.t2);
                 return;
@@ -15417,7 +15440,7 @@ namespace Gekko
             if (!G.IsUnitTesting()) Gekko.Gui.gui.textBox1.SuspendLayout();
             SimOptions so = new SimOptions();
             so.method = Program.options.solve_method;
-            if (G.equal(o.opt_fix, "yes")) so.isFix = true;
+            if (G.Equal(o.opt_fix, "yes")) so.isFix = true;
 
             so.isStatic = GetYesNoNullLocalOption(o.opt_static);  //works faster as an enumeration
 
@@ -15434,8 +15457,8 @@ namespace Gekko
         {
             YesNoNull rv = YesNoNull.Null;
             if (opt == null) rv = YesNoNull.Null;
-            else if (G.equal(opt, "yes")) rv = YesNoNull.Yes;
-            else if (G.equal(opt, "no")) rv = YesNoNull.No;
+            else if (G.Equal(opt, "yes")) rv = YesNoNull.Yes;
+            else if (G.Equal(opt, "no")) rv = YesNoNull.No;
             else
             {
                 G.Writeln2("*** ERROR: Expected 'yes' or 'no', not '" + opt + "'");
@@ -15653,9 +15676,9 @@ namespace Gekko
             bool usingNewtonFairTaylor = false;
             if (model.largestLead > 0)
             {
-                if (G.equal(Program.options.solve_forward_method, "fair")) usingFairTaylor = true;
-                if (G.equal(Program.options.solve_forward_method, "nfair")) usingNewtonFairTaylor = true;
-                if ((usingFairTaylor || usingNewtonFairTaylor) && G.equal(Program.options.solve_forward_terminal, "growth"))
+                if (G.Equal(Program.options.solve_forward_method, "fair")) usingFairTaylor = true;
+                if (G.Equal(Program.options.solve_forward_method, "nfair")) usingNewtonFairTaylor = true;
+                if ((usingFairTaylor || usingNewtonFairTaylor) && G.Equal(Program.options.solve_forward_terminal, "growth"))
                 {
                     //#375204390457
                     G.Writeln2("*** ERROR: Terminal 'GROWTH' is not working at the moment, please use 'CONST'");
@@ -15663,7 +15686,7 @@ namespace Gekko
                 }
             }
 
-            if (G.equal(Program.options.solve_forward_method, "stacked"))
+            if (G.Equal(Program.options.solve_forward_method, "stacked"))
             {
                 G.Writeln2("*** ERROR: 'forward method = stacked' is not working -- please use 'forward method = nfair' instead");
                 throw new GekkoException();
@@ -15704,7 +15727,7 @@ namespace Gekko
                 }
             }
 
-            if (!(G.equal(so.method, "gauss") || G.equal(so.method, "newton") || G.equal(so.method, "res") || G.equal(so.method, "reverted") || G.equal(so.method, "eigen"))) G.Writeln("+++ WARNING: Seems to be a problem with model type");
+            if (!(G.Equal(so.method, "gauss") || G.Equal(so.method, "newton") || G.Equal(so.method, "res") || G.Equal(so.method, "reverted") || G.Equal(so.method, "eigen"))) G.Writeln("+++ WARNING: Seems to be a problem with model type");
             //isRes is true if called by Res(), isReverted if called by Efter()
 
             ErrorContainer ec = new ErrorContainer();
@@ -15732,7 +15755,7 @@ namespace Gekko
             //if (Globals.hasBeenEndoExoStatementsSinceLastSim == 1)
             if (so.isFix)
             {
-                if (hasEndoExo && !G.equal(so.method, "newton"))
+                if (hasEndoExo && !G.Equal(so.method, "newton"))
                 {
                     //G.Writeln("+++ NOTE: SIM uses Newton method when ENDO/EXO vars are set.");
                     //hasBeenAutoSetToNewton = true;
@@ -15928,9 +15951,9 @@ namespace Gekko
 
             List<int> leadedVarsList = new List<int>();
             ETerminalCondition terminal = ETerminalCondition.Exogenous;
-            if (G.equal(Program.options.solve_forward_terminal, "exo")) terminal = ETerminalCondition.Exogenous;
-            else if (G.equal(Program.options.solve_forward_terminal, "const")) terminal = ETerminalCondition.ConstantLevel;
-            else if (G.equal(Program.options.solve_forward_terminal, "growth")) terminal = ETerminalCondition.ConstantGrowthRate;
+            if (G.Equal(Program.options.solve_forward_terminal, "exo")) terminal = ETerminalCondition.Exogenous;
+            else if (G.Equal(Program.options.solve_forward_terminal, "const")) terminal = ETerminalCondition.ConstantLevel;
+            else if (G.Equal(Program.options.solve_forward_terminal, "growth")) terminal = ETerminalCondition.ConstantGrowthRate;
             int ftMax = 1;
             int ftMin = 1;
 
@@ -16204,7 +16227,7 @@ namespace Gekko
                         iterCounter += its;
                         if (its > iterMax) iterMax = its;
                         if (its < iterMin) iterMin = its;
-                        if ((G.equal(so.method, "gauss") && its >= Program.options.solve_gauss_itermax) || (G.equal(so.method, "newton") && its >= Program.options.solve_newton_itermax))
+                        if ((G.Equal(so.method, "gauss") && its >= Program.options.solve_gauss_itermax) || (G.Equal(so.method, "newton") && its >= Program.options.solve_newton_itermax))
                         {
                             iterNotSolved++;
                             iterConsecutiveNotSolvedHelper++;
@@ -16442,7 +16465,7 @@ namespace Gekko
         private static void SetTerminalType(ETerminalCondition terminal)
         {
             Program.model.simulateResults[8] = 0;
-            if (G.equal(Program.options.solve_forward_method, "stacked"))
+            if (G.Equal(Program.options.solve_forward_method, "stacked"))
             {
                 if (!(terminal == ETerminalCondition.Exogenous))
                 {
@@ -16451,7 +16474,7 @@ namespace Gekko
                 }
                 Program.model.simulateResults[8] = 0;
             }
-            if (G.equal(Program.options.solve_forward_method, "none"))
+            if (G.Equal(Program.options.solve_forward_method, "none"))
             {
                 Program.model.simulateResults[8] = 0;
             }
@@ -16466,7 +16489,7 @@ namespace Gekko
         private static void HandleTerminalHelper()
         {
             Program.model.terminalHelper = null;  //will stay like this if terminal feed=external or there are no leads
-            if (G.equal(Program.options.solve_forward_terminal_feed, "internal"))
+            if (G.Equal(Program.options.solve_forward_terminal_feed, "internal"))
             {
                 if (Program.model.largestLead > 0)
                 {
@@ -16644,8 +16667,8 @@ namespace Gekko
                         double vNew = ftVarsNew[lv, t3];
                         double vOld = ftVars[lv, t3];
                         int fairTaylorConvType = 1;
-                        if (usingFairTaylor && G.equal(Program.options.solve_forward_fair_conv, "conv2")) fairTaylorConvType = 2;
-                        if (usingNewtonFairTaylor && G.equal(Program.options.solve_forward_nfair_conv, "conv2")) fairTaylorConvType = 2;
+                        if (usingFairTaylor && G.Equal(Program.options.solve_forward_fair_conv, "conv2")) fairTaylorConvType = 2;
+                        if (usingNewtonFairTaylor && G.Equal(Program.options.solve_forward_nfair_conv, "conv2")) fairTaylorConvType = 2;
                         int bNumber = bNumberPointers[leadedVarsList[lv]];
                         double abs; double rel1; double rel2;
                         bool converged = GaussConvergenceOk(usingFairTaylor, usingNewtonFairTaylor, null, vNew, vOld, bNumber, false, fairTaylorConvType, out abs, out rel1, out rel2);  //first arg is null --> so that there is no Gauss damping correction (Fair-Taylor uses its own damping)
@@ -16842,12 +16865,12 @@ namespace Gekko
                 if (Program.options.solve_print_iter) G.Writeln();
             }
             if (culprit != "") culprit = G.ExtractOnlyVariableIgnoreLag(culprit);
-            if (G.equal(so.method, "res"))
+            if (G.Equal(so.method, "res"))
             {
                 s += "Period " + (t) + " " + " -- single equation static forecast ";
                 //G.Write(s);
             }
-            else if (G.equal(so.method, "reverted"))
+            else if (G.Equal(so.method, "reverted"))
             {
                 s += "Period " + (t) + " " + " -- reverted and after variables ";
                 //G.Write(s);
@@ -16864,7 +16887,7 @@ namespace Gekko
                     s += "Period " + (t) + " " + Program.model.simulateResults[0] + " iterations";
                     //G.Write(s);
                 }
-                if (G.equal(so.method, "gauss"))
+                if (G.Equal(so.method, "gauss"))
                 {
                     if (!isGaussConverged)
                     {
@@ -16875,12 +16898,12 @@ namespace Gekko
                         }
                     }
                 }
-                if (G.equal(so.method, "newton"))
+                if (G.Equal(so.method, "newton"))
                 {
                     s += ",   crit = " + string.Format("{0:0.00000E+00}", Program.model.simulateResults[1]);
                 }
             }
-            if (Program.options.solve_print_details && G.equal(so.method, "newton"))
+            if (Program.options.solve_print_details && G.Equal(so.method, "newton"))
             {
                 s += "\n";
                 s += "------------------------------------------------------------------\n";
@@ -17253,7 +17276,7 @@ namespace Gekko
                 val = a[yy, tInt];  //no lag, just plain value
             }
 
-            if (double.IsNaN(val) && (G.equal(so.method, "gauss") || G.equal(so.method, "newton")))  //if it is Res() or Efter() type, we should NEVER go here (where starting values for non-lagged endogenous are set to some arbitrary value
+            if (double.IsNaN(val) && (G.Equal(so.method, "gauss") || G.Equal(so.method, "newton")))  //if it is Res() or Efter() type, we should NEVER go here (where starting values for non-lagged endogenous are set to some arbitrary value
             {
                 if (options.solve_data_ignoremissing == false)
                 {
@@ -17599,7 +17622,7 @@ namespace Gekko
         private static ECompiledModelType GetModelTypeFromOptions(SimOptions so)
         {
             ECompiledModelType modelType = ECompiledModelType.Unknown;
-            if (G.equal(so.method, "gauss"))
+            if (G.Equal(so.method, "gauss"))
             {
                 if (Program.options.solve_failsafe)
                 {
@@ -17607,15 +17630,15 @@ namespace Gekko
                 }
                 else modelType = ECompiledModelType.Gauss;
             }
-            else if (G.equal(so.method, "res"))
+            else if (G.Equal(so.method, "res"))
             {
                 modelType = ECompiledModelType.Res;
             }
-            else if (G.equal(so.method, "newton"))
+            else if (G.Equal(so.method, "newton"))
             {
                 modelType = ECompiledModelType.Newton;
             }
-            else if (G.equal(so.method, "reverted"))
+            else if (G.Equal(so.method, "reverted"))
             {
                 modelType = ECompiledModelType.After;
             }
@@ -18099,7 +18122,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: The '#' operator is not supported in EXPORT<series>");
                 throw new GekkoException();
             }
-            if (G.equal(op, "mp"))
+            if (G.Equal(op, "mp"))
             {
                 G.Writeln2("*** ERROR: The 'mp' operator is not supported in EXPORT<series>");
                 throw new GekkoException();
@@ -18107,7 +18130,7 @@ namespace Gekko
 
             int type = 0;
             if (op == "=" || op == "^" || op == "%" || op == "+" || op == "*") type = 1;
-            if (G.equal(op, "n") || G.equal(op, "d") || G.equal(op, "p") || G.equal(op, "m") || G.equal(op, "q")) type = 2;
+            if (G.Equal(op, "n") || G.Equal(op, "d") || G.Equal(op, "p") || G.Equal(op, "m") || G.Equal(op, "q")) type = 2;
             if (type == 0)
             {
                 G.Writeln2("*** ERROR: Operator type '" + op + "' not recognized");
@@ -18144,7 +18167,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
 
-                    if (op == "*" || op == "+" || G.equal(op, "q") || G.equal(op, "m"))
+                    if (op == "*" || op == "+" || G.Equal(op, "q") || G.Equal(op, "m"))
                     {
                         if (!base2.ContainsVariable(var))
                         {
@@ -18156,7 +18179,7 @@ namespace Gekko
                     TimeSeries ts = db.GetVariable(var);
 
                     TimeSeries tsBase = null;
-                    if (op == "*" || op == "+" || G.equal(op, "q") || G.equal(op, "m"))
+                    if (op == "*" || op == "+" || G.Equal(op, "q") || G.Equal(op, "m"))
                     {
                         tsBase = base2.GetVariable(var);
                     }
@@ -18176,7 +18199,7 @@ namespace Gekko
                         double b = double.NaN;
                         double bLag = double.NaN;  //well, not use at the moment
 
-                        if (op == "*" || op == "+" || G.equal(op, "q") || G.equal(op, "m"))
+                        if (op == "*" || op == "+" || G.Equal(op, "q") || G.Equal(op, "m"))
                         {
                             b = tsBase.GetData(null, t);
                             bLag = tsBase.GetData(null, t.Add(-1));
@@ -18295,7 +18318,7 @@ namespace Gekko
             double[,] xx = new double[5, obs];
             //Seems [3, ...] is not used
 
-            if (G.equal(function, "laspchain"))
+            if (G.Equal(function, "laspchain"))
             {
                 double index = 1d;
                 xx[4, 0] = 1d;
@@ -18319,7 +18342,7 @@ namespace Gekko
                     }
                 }
             }
-            else if (G.equal(function, "laspfixed"))
+            else if (G.Equal(function, "laspfixed"))
             {
                 for (int i = 0; i < obs; i++)
                 {
@@ -18409,12 +18432,12 @@ namespace Gekko
             //We start with expansion of o.data (regarding REP n, REP *)
 
             ESeriesUpdTypes updType = ESeriesUpdTypes.none;
-            if (G.equal(o.opt_d, "yes")) updType = ESeriesUpdTypes.d;
-            else if (G.equal(o.opt_p, "yes")) updType = ESeriesUpdTypes.p;
-            else if (G.equal(o.opt_m, "yes")) updType = ESeriesUpdTypes.m;
-            else if (G.equal(o.opt_q, "yes")) updType = ESeriesUpdTypes.q;
-            else if (G.equal(o.opt_mp, "yes")) updType = ESeriesUpdTypes.mp;
-            else if (G.equal(o.opt_n, "yes")) updType = ESeriesUpdTypes.n;
+            if (G.Equal(o.opt_d, "yes")) updType = ESeriesUpdTypes.d;
+            else if (G.Equal(o.opt_p, "yes")) updType = ESeriesUpdTypes.p;
+            else if (G.Equal(o.opt_m, "yes")) updType = ESeriesUpdTypes.m;
+            else if (G.Equal(o.opt_q, "yes")) updType = ESeriesUpdTypes.q;
+            else if (G.Equal(o.opt_mp, "yes")) updType = ESeriesUpdTypes.mp;
+            else if (G.Equal(o.opt_n, "yes")) updType = ESeriesUpdTypes.n;
 
             if (o.op != "=" && updType != ESeriesUpdTypes.none)
             {
@@ -18424,7 +18447,7 @@ namespace Gekko
 
             bool updTypeDollar = false;
 
-            if (G.equal(o.opt_keep, "p"))
+            if (G.Equal(o.opt_keep, "p"))
             {
                 updTypeDollar = true;
             }
@@ -18633,7 +18656,9 @@ namespace Gekko
 
         public static int Write(O.Write o)
         {
-            if (G.equal(o.opt_tsdx, "yes"))
+            EWriteType writeType = GetWriteType(o);
+
+            if (writeType == EWriteType.Tsdx)
             {
                 G.Writeln2("*** ERROR: You cannot use <tsdx>. The extension name has changed to to ." + Globals.extensionDatabank + ".");
                 G.Writeln("           If you really need a .tsdx file, you can WRITE/EXPORT a ." + Globals.extensionDatabank + " file,", Color.Red);
@@ -18643,24 +18668,25 @@ namespace Gekko
             }
 
             bool isDefault = false;
-            if (o.opt_tsd == null && o.opt_gbk == null && o.opt_csv == null && o.opt_prn == null && o.opt_tsp == null && o.opt_xls == null && o.opt_xlsx == null && o.opt_gnuplot == null && o.opt_series == null && o.opt_gdx == null && o.opt_r == null)
+            if (writeType == EWriteType.Gbk)
             {
-                isDefault = true;  //implicitly GBK
+                isDefault = true;
             }
 
             string fileName = o.fileName;
             fileName = StripQuotes(fileName);
-            bool isCaps = true; if (G.equal(o.opt_caps, "no")) isCaps = false;
+            bool isCaps = true; if (G.Equal(o.opt_caps, "no")) isCaps = false;
             GekkoTime tStart = o.t1;
             GekkoTime tEnd = o.t2;
-                        
+
             List<BankNameVersion> list = GetInfoFromListOfWildcards(o.listItems);
-                        
+
             bool writeAllVariables = false;
             if (list == null) writeAllVariables = true;
 
-            if (G.equal(o.opt_r, "yes"))
+            if (writeType == EWriteType.R)
             {
+                //special treatment for the time being
                 ExportR(o);
                 return o.listItems.Count();
             }
@@ -18685,11 +18711,7 @@ namespace Gekko
                 }
             }
 
-            bool skipping = RemoveNullTimeseries(list);
-
-            if (skipping) writeAllVariables = false;  //signals to gbk format that it can not just clone existing bank
-
-            bool isRecordsFormat = isDefault || G.equal(o.opt_gbk, "yes") || G.equal(o.opt_tsd, "yes");
+            bool isRecordsFormat = isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes");
 
             //TODO TODO TODO
             //TODO TODO TODO
@@ -18700,16 +18722,18 @@ namespace Gekko
             List<BankNameVersion> listFilteredForCurrentFreq = null;
             if (isRecordsFormat)
             {
+                //can handle multiple frequencies
                 listFilteredForCurrentFreq = list;
             }
             else
             {
+                //2D format, only 1 frequency
                 listFilteredForCurrentFreq = FilterListForFrequency(list);
             }
 
             if (tStart.IsNull() && tEnd.IsNull())
             {
-                if (isDefault || G.equal(o.opt_gbk, "yes") || G.equal(o.opt_tsd, "yes") || G.equal(o.opt_gdx, "yes"))
+                if (isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes"))
                 {
                     //Do nothing, skip this, we do not need to know the timespan of the bank
                     //Not done for GBK or TSD, would just waste time. For these formats, a null period
@@ -18722,30 +18746,30 @@ namespace Gekko
             }
 
             string writeOption = "" + Globals.extensionDatabank + "";  //default
-            if (G.equal(o.opt_tsd, "yes")) writeOption = "tsd";
+            if (G.Equal(o.opt_tsd, "yes")) writeOption = "tsd";
 
-            if (G.equal(o.opt_csv, "yes") || G.equal(o.opt_prn, "yes"))
+            if (G.Equal(o.opt_csv, "yes") || G.Equal(o.opt_prn, "yes"))
             {
                 //2D format
                 EdataFormat format = EdataFormat.Csv;
-                if (G.equal(o.opt_csv, "yes")) format = EdataFormat.Csv;
-                else if (G.equal(o.opt_prn, "yes")) format = EdataFormat.Prn;
+                if (G.Equal(o.opt_csv, "yes")) format = EdataFormat.Csv;
+                else if (G.Equal(o.opt_prn, "yes")) format = EdataFormat.Prn;
                 CheckSomethingToWrite(listFilteredForCurrentFreq);
                 return CsvPrnWrite(listFilteredForCurrentFreq, fileName, tStart, tEnd, format);
             }
-            else if (G.equal(o.opt_gnuplot, "yes"))
+            else if (G.Equal(o.opt_gnuplot, "yes"))
             {
                 //2D format
                 CheckSomethingToWrite(listFilteredForCurrentFreq);
                 return GnuplotWrite(listFilteredForCurrentFreq, fileName, tStart, tEnd);
             }
-            else if (G.equal(o.opt_tsp, "yes"))
+            else if (G.Equal(o.opt_tsp, "yes"))
             {
                 //RECORDS
                 CheckSomethingToWrite(listFilteredForCurrentFreq);
                 return Tspwrite(listFilteredForCurrentFreq, fileName, tStart, tEnd, isCaps);
             }
-            else if (G.equal(o.opt_xls, "yes") || G.equal(o.opt_xlsx, "yes"))
+            else if (G.Equal(o.opt_xls, "yes") || G.Equal(o.opt_xlsx, "yes"))
             {
                 //2D format
                 CheckSomethingToWrite(listFilteredForCurrentFreq);
@@ -18782,13 +18806,42 @@ namespace Gekko
                 //tsd or gbk or unspecified format                
                 CheckSomethingToWrite(list);
                 //first argument (the databank) is only used if list = null
-                return Write(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
+                if (isDefault)
+                {
+                    return WriteGbk(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
+                }
+                if (writeType == EWriteType.Tsd)
+                {
+                    return WriteTsd(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Unknown databank format");
+                    throw new GekkoException();
+                }
             }
             else
             {
                 G.Writeln2("*** ERROR: Unknown databank format");
                 throw new GekkoException();
             }
+        }
+
+        private static EWriteType GetWriteType(O.Write o)
+        {
+            EWriteType writeType = EWriteType.Gbk;
+            if (G.Equal(o.opt_csv, "yes")) writeType = EWriteType.Csv;
+            else if (G.Equal(o.opt_gdx, "yes")) writeType = EWriteType.Gdx;
+            else if (G.Equal(o.opt_gnuplot, "yes")) writeType = EWriteType.Gnuplot;
+            else if (G.Equal(o.opt_prn, "yes")) writeType = EWriteType.Prn;
+            else if (G.Equal(o.opt_r, "yes")) writeType = EWriteType.R;
+            else if (G.Equal(o.opt_series, "yes")) writeType = EWriteType.Series;
+            else if (G.Equal(o.opt_tsd, "yes")) writeType = EWriteType.Tsd;
+            else if (G.Equal(o.opt_tsdx, "yes")) writeType = EWriteType.Tsdx;
+            else if (G.Equal(o.opt_tsp, "yes")) writeType = EWriteType.Tsp;
+            else if (G.Equal(o.opt_xls, "yes")) writeType = EWriteType.Xls;
+            else if (G.Equal(o.opt_xlsx, "yes")) writeType = EWriteType.Xlsx;
+            return writeType;
         }
 
         private static void ExportR(O.Write o)
@@ -18903,43 +18956,7 @@ namespace Gekko
         {
             G.Writeln("           Tip: try 'DISP " + name + ";' to see the dimensions.", Color.Red);
         }
-
-        private static bool RemoveNullTimeseries(List<BankNameVersion> newList)
-        {
-            Databank first = Program.databanks.GetFirst();
-            //The list must be with freq indicator
-            bool skipping = false;
-            List<BankNameVersion> remove = new List<BankNameVersion>();
-            foreach (BankNameVersion s in newList)
-            {
-                Databank db = first;
-                if (s.bank != null) db = Program.databanks.GetDatabank(s.bank);
-                if (db == null)
-                {
-                    G.Writeln2("*** ERROR: Databank '" + s.bank + "' not found");
-                    throw new GekkoException();
-                }
-                TimeSeries ts = db.GetVariable(false, s.name);
-                if (ts == null) continue;
-                if (ts.IsGhost()) continue;   //don't remove if it is an array-timeseries (which is kind of an empty shell)
-                if (ts.IsTimeless()) continue;  //keep timeless variables
-                if (ts.IsNullPeriod())
-                {
-                    remove.Add(s);
-                }
-            }
-            if (remove.Count > 0)
-            {
-                foreach (BankNameVersion s in remove)
-                {
-                    newList.Remove(s);
-                }
-                G.Writeln2("+++ NOTE: Skipped " + remove.Count + " timeseries with no data and no period");
-                skipping = true;
-            }
-            return skipping;
-        }
-
+        
         private static List<BankNameVersion> GetAllVariablesFromBank(Databank work)
         {
             List<BankNameVersion> list = new List<BankNameVersion>();
@@ -18960,19 +18977,21 @@ namespace Gekko
 
         private static List<BankNameVersion> FilterListForFrequency(List<BankNameVersion> list)
         {
-            //Returns a list where %q, %m at the end of each item is removed
+            //Returns a list where !q, !m at the end of each item is removed
             List<BankNameVersion> newList = new List<BankNameVersion>();
             Dictionary<string, double> skipped = new Dictionary<string, double>();
+            skipped.Add("u", 0d);
             skipped.Add("a", 0d);
             skipped.Add("q", 0d);
             skipped.Add("m", 0d);
             foreach (BankNameVersion var in list)
             {
+                if (G.StartsWithSigil(var.name)) continue;  //ignore these % and #
                 string freq = G.GetFreq(Program.options.freq);
                 string s2 = var.name;
-                if (!s2.Contains(Globals.freqIndicator)) s2 = s2 + Globals.freqIndicator + "a"; //because annual data does not have this indicator
-                string[] temp = s2.Split(new string[] { Globals.freqIndicator }, StringSplitOptions.None);
-                if (!G.equal(freq, temp[1]))
+                //if (!s2.Contains(Globals.freqIndicator)) s2 = s2 + Globals.freqIndicator + "a"; //because annual data does not have this indicator
+                string[] temp = s2.Split(new string[] { Globals.freqIndicator.ToString() }, StringSplitOptions.None);
+                if (!G.Equal(freq, temp[1]))
                 {
                     skipped[temp[1]]++;
                     continue;
@@ -18997,9 +19016,8 @@ namespace Gekko
             return newList;
         }
 
-        public static int Write(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<BankNameVersion> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
+        public static int WriteGbk(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<BankNameVersion> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
         {
-            //ErrorIfDatabanksSwapped();
             if (databank.storage.Count == 0)
             {
                 if (isCloseCommand)
@@ -19029,27 +19047,11 @@ namespace Gekko
 
             string tempTsdxPath = null;
 
-            bool isTsdx = false;
-            string extension = "tsd";
-            if (true)
-            {
-                isTsdx = true;
-                extension = "" + Globals.extensionDatabank + "";
-            }
-            if (G.equal(writeOption, "tsd"))
-            {
-                isTsdx = false;
-                extension = "tsd";
-            }
-            if (G.equal(writeOption, "" + Globals.extensionDatabank + ""))
-            {
-                isTsdx = true;
-                extension = "" + Globals.extensionDatabank + "";
-            }
+            bool isTsdx = true;
+            string extension = Globals.extensionDatabank;
 
             DateTime t = DateTime.Now;
 
-            //file = SubstituteAssignVarsInExpression(file);
             file = AddExtension(file, "." + extension);
 
             string path = null;
@@ -19063,138 +19065,164 @@ namespace Gekko
 
             int count = 0;
 
-            string tsdxVersion = "1.0";
+            string tsdxVersion = "1.2";
 
-            if (isTsdx)
+            //try to zip it to this local folder
+            tempTsdxPath = GetTempTsdxFolderPath();
+            if (!Directory.Exists(tempTsdxPath))  //should almost never exist, since name is random
             {
-                //try to zip it to this local folder
-                tempTsdxPath = GetTempTsdxFolderPath();
-                if (!Directory.Exists(tempTsdxPath))  //should almost never exist, since name is random
-                {
-                    Directory.CreateDirectory(tempTsdxPath);
-                }
-                else
-                {
-                    //in the very rare case, any files here will be overwritten
-                }
-                pathAndFilename = tempTsdxPath + "\\" + "databank" + ".tsd";
-
-                tsdxVersion = Program.options.databank_file_gbk_version;
-                if (!Globals.tsdxVersions.Contains(tsdxVersion))
-                {
-                    G.Writeln2("*** ERROR: 'OPTION databank file " + Globals.extensionDatabank + " version' have these legal values:");
-                    G.Write("            "); G.PrintListWithCommas(Globals.tsdxVersions, false);
-                    throw new GekkoException();
-                }
-                CreateDatabankXmlInfo(tempTsdxPath, tsdxVersion, isCloseCommand);
+                Directory.CreateDirectory(tempTsdxPath);
             }
-
-            if (isTsdx && tsdxVersion == "1.1")
+            else
             {
-                //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                RuntimeTypeModel serializer = TypeModel.Create();
-                serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-                string pathAndFilename2 = tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal; //changed from .bin to .data
-                databank.Trim();  //to make it smaller, slack removed from each TimeSeries
+                //in the very rare case, any files here will be overwritten
+            }
+            //pathAndFilename = tempTsdxPath + "\\" + "databank" + ".tsd";
 
-                //Note that if writeAllVariables=true, we don't make any list of the variables, the databank
-                //object is simply serialized directly. So any timeseries will be written in that case.
-                GekkoDictionary<string, IVariable> databankWithFewerVariables = null;
-                GekkoDictionary<string, IVariable> storageOriginal = databank.storage;  //for resetting back to this afterwards
+            CreateDatabankXmlInfo(tempTsdxPath, tsdxVersion, isCloseCommand);
 
-                try
+            //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
+            RuntimeTypeModel serializer = TypeModel.Create();
+            serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+            string pathAndFilename2 = tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal; //changed from .bin to .data
+            databank.Trim();  //to make it smaller, slack removed from each IVariable
+
+            //Note that if writeAllVariables=true, we don't make any list of the variables, the databank
+            //object is simply serialized directly. So any timeseries will be written in that case.
+            GekkoDictionary<string, IVariable> databankWithFewerVariables = null;
+            GekkoDictionary<string, IVariable> storageOriginal = databank.storage;  //for resetting back to this afterwards
+
+            try
+            {
+                if (writeAllVariables == false)
                 {
-                    if (writeAllVariables == false)
+                    //-----------------------
+                    // truncate the variables
+                    // here, databank variable is not used (this is actually only used for CLOSEing a bank)
+                    //-----------------------
+                    databankWithFewerVariables = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
+                    foreach (BankNameVersion var in list)
                     {
-                        //-----------------------
-                        // truncate the variables
-                        // here, databank variable is not used (this is actually only used for CLOSEing a bank)
-                        //-----------------------
-                        databankWithFewerVariables = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
-                        foreach (BankNameVersion var in list)
+                        Databank db = GetBankFromBankNameVersion(var.bank);
+                        IVariable xx = db.GetIVariable(var.name);
+                        if (xx == null)
                         {
-                            Databank db = GetBankFromBankNameVersion(var.bank);
-                            IVariable xx = db.GetIVariable(var.name);
-                            if (xx == null)
-                            {                                
-                                G.Writeln2("*** ERROR: Could not find variable '" + var + "' in databank '" + db.aliasName + "' for writing (" + Globals.extensionDatabank + ")");
-                                throw new GekkoException();
-                            }                            
-                            if (databankWithFewerVariables.ContainsKey(var.name))
-                            {
-                                G.Writeln();
-                                G.Writeln("*** ERROR: Gbk format does not allow duplicate variables ('" + var.name + "')");
-                                G.Writeln("           This is enforced for " + Globals.extensionDatabank + " version 1.1 and later.");
-                                throw new GekkoException();
-                            }
-                            else
-                            {
-                                databankWithFewerVariables.Add(var.name, xx);
-                            }
-                        }
-                    }
-
-                    if (databankWithFewerVariables != null) databank.storage = databankWithFewerVariables;  //will be set back later on --> to temp
-
-                    if (!yr1.IsNull() || !yr2.IsNull())
-                    {
-                        //----------------------
-                        // truncate the periods
-                        //----------------------
-                        GekkoDictionary<string, IVariable> databankWithFewerPeriods = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
-                        foreach (KeyValuePair<string, IVariable> kvp in databank.storage)  
-                        {
-                            TimeSeries ts = kvp.Value as TimeSeries;
-                            if (ts != null)
-                            {
-                                TimeSeries tsClone = ts.DeepClone() as TimeSeries;
-                                tsClone.Truncate(yr1, yr2);
-                                databankWithFewerPeriods.Add(kvp.Key, tsClone);
-                            }
-                        }
-                        databank.storage = databankWithFewerPeriods;
-                        databank.Trim();  //to make it smaller, slack removed from each TimeSeries
-                    }
-
-                    using (FileStream fs = WaitForFileStream(pathAndFilename2, GekkoFileReadOrWrite.Write))
-                    {
-                        try
-                        {
-                            DateTime dt0 = DateTime.Now;
-                            //ErrorIfDatabanksSwapped(); //for safety, this is also put here so that it is always near the protobuf serialize command.
-                            serializer.Serialize(fs, databank);
-                            G.WritelnGray("Protobuf serialize: " + G.Seconds(dt0));
-                            count = databank.storage.Count;
-                        }
-                        catch (Exception e)
-                        {                            
-                            G.Writeln2("*** ERROR: Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers)");
-                            G.Writeln("           Message: " + e.Message, Color.Red);
+                            G.Writeln2("*** ERROR: Could not find variable '" + var + "' in databank '" + db.aliasName + "' for writing (" + Globals.extensionDatabank + ")");
                             throw new GekkoException();
                         }
+                        if (databankWithFewerVariables.ContainsKey(var.name))
+                        {
+                            G.Writeln();
+                            G.Writeln("*** ERROR: Gbk format does not allow duplicate variables ('" + var.name + "')");
+                            G.Writeln("           This is enforced for " + Globals.extensionDatabank + " version 1.1 and later.");
+                            throw new GekkoException();
+                        }
+                        else
+                        {
+                            databankWithFewerVariables.Add(var.name, xx);
+                        }
                     }
                 }
-                finally
+
+                if (databankWithFewerVariables != null) databank.storage = databankWithFewerVariables;  //will be reset later on --> to storageOriginal
+
+                if (!yr1.IsNull() || !yr2.IsNull())
                 {
-                    //so we are sure it always gets pointed back to its real Dictionary<>!
-                    databank.storage = storageOriginal;
+                    //----------------------
+                    // truncate the periods
+                    //----------------------
+                    GekkoDictionary<string, IVariable> databankWithFewerPeriods = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
+                    foreach (KeyValuePair<string, IVariable> kvp in databank.storage)
+                    {
+                        TimeSeries ts = kvp.Value as TimeSeries;
+                        if (ts != null)
+                        {
+                            TimeSeries tsClone = ts.DeepClone() as TimeSeries;
+                            tsClone.Truncate(yr1, yr2);
+                            databankWithFewerPeriods.Add(kvp.Key, tsClone);
+                        }
+                    }
+                    databank.storage = databankWithFewerPeriods;
+                    databank.Trim();  //to make it smaller, slack removed from each TimeSeries
+                }
+
+                using (FileStream fs = WaitForFileStream(pathAndFilename2, GekkoFileReadOrWrite.Write))
+                {
+                    try
+                    {                        
+                        serializer.Serialize(fs, databank);                     
+                        count = databank.storage.Count;
+                    }
+                    catch (Exception e)
+                    {
+                        G.Writeln2("*** ERROR: Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers)");
+                        G.Writeln("           Message: " + e.Message, Color.Red);
+                        throw new GekkoException();
+                    }
                 }
             }
-
-            if (tsdxVersion != "1.1")
+            finally
             {
-                DateTime dt0 = DateTime.Now;
-                //ErrorIfDatabanksSwapped(); //for safety, this is also put here so that it is always near the tsd write command.
-                WriteTsdRecords(ref yr1, ref yr2, isCaps, list, databank, isTsdx, pathAndFilename, ref count);
-                G.WritelnGray("Writing tsd records took: " + G.Seconds(dt0));
+                //so we are sure it always gets pointed back to its real Dictionary<>!
+                databank.storage = storageOriginal;
             }
 
-            if (isTsdx)
+            DateTime dt0 = DateTime.Now;
+            WaitForZipWrite(tempTsdxPath, pathAndFileNameResultingFile);
+
+
+            if (!Globals.setPrintMute)
             {
-                DateTime dt0 = DateTime.Now;
-                WaitForZipWrite(tempTsdxPath, pathAndFileNameResultingFile);
-                G.WritelnGray("Zipping took: " + G.Seconds(dt0));
+                G.Writeln();
+                G.Writeln("Wrote " + count + " variables to " + pathAndFileNameResultingFile + " in " + G.Seconds(t));
+                if (isUsingOptionFolderBank)
+                {
+                    if (!file.Contains(":"))  //Don't write this message if it is a absolute path, for instance c:\mybank\myfile. Relative paths will get the message (that must be ok)
+                    {
+                        G.Writeln("+++ NOTE: Wrote to user-indicated folder (see 'option folder bank = ...')");
+                    }
+                }
             }
+            return count;
+        }
+
+        public static int WriteTsd(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<BankNameVersion> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
+        {            
+            if (databank.storage.Count == 0)
+            {
+                if (isCloseCommand)
+                {
+                    G.Writeln2("*** ERROR: Closed TSD databank was changed but cannot be written back");
+                    throw new GekkoException();
+                }                
+            }
+
+            file = StripQuotes(file);
+            bool isUsingOptionFolderBank = false;
+            if (Program.options.folder && Program.options.folder_bank != "") isUsingOptionFolderBank = true;
+
+            string tempTsdxPath = null;
+
+            bool isTsdx = false;
+            string extension = "tsd";
+            
+            DateTime t = DateTime.Now;
+            
+            file = AddExtension(file, "." + extension);
+
+            string path = null;
+            if (isUsingOptionFolderBank)
+            {
+                path = Program.options.folder_bank;
+            }
+            string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, path);
+
+            string pathAndFileNameResultingFile = pathAndFilename;
+
+            int count = 0;            
+            
+            DateTime dt0 = DateTime.Now;            
+            WriteTsdRecords(ref yr1, ref yr2, isCaps, list, databank, isTsdx, pathAndFilename, ref count);            
 
             if (!Globals.setPrintMute)
             {
@@ -19431,7 +19459,7 @@ namespace Gekko
             string tsdFile = "";
             bool isProtobuf = false;
             string ext = Path.GetExtension(zipFileName);
-            if (G.equal(ext, "." + Globals.extensionDatabank)) isProtobuf = true; //with .gbk files, the inside is always protobuf-files.
+            if (G.Equal(ext, "." + Globals.extensionDatabank)) isProtobuf = true; //with .gbk files, the inside is always protobuf-files.
             DirectoryInfo folderInfo = new DirectoryInfo(folder);
             for (int j = 0; j < repeats; j++)
             {
@@ -19469,7 +19497,7 @@ namespace Gekko
                         {
                             string fileName2 = tmp2.ArchiveFileNames[i];
 
-                            if (G.equal(fileName2, Globals.protobufFileName) || G.equal(fileName2, Globals.protobufFileName2) || G.equal(fileName2, Program.options.databank_file_gbk_internal))
+                            if (G.Equal(fileName2, Globals.protobufFileName) || G.Equal(fileName2, Globals.protobufFileName2) || G.Equal(fileName2, Program.options.databank_file_gbk_internal))
                             {
                                 //this is only relevant for the older .tsdx files, .gbk files always has isProtobuf = true.
                                 isProtobuf = true;
@@ -19510,7 +19538,7 @@ namespace Gekko
                         }
                         else
                         {
-                            if (tsdfilecounter == 2 && G.equal(inside, "databank.tsd"))
+                            if (tsdfilecounter == 2 && G.Equal(inside, "databank.tsd"))
                             {
                                 //the rare case where the databank file name is "databank"
                                 tsdfilecounter = 1;
@@ -19819,11 +19847,11 @@ namespace Gekko
                         else
                         {
                             string s = null;
-                            if (G.equal(Program.options.interface_csv_decimalseparator, "period"))
+                            if (G.Equal(Program.options.interface_csv_decimalseparator, "period"))
                             {
                                 s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0000000000E+00}", data);
                             }
-                            else if (G.equal(Program.options.interface_csv_decimalseparator, "comma"))
+                            else if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
                             {
                                 s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0,0000000000E+00}", data);
                             }
@@ -19862,10 +19890,12 @@ namespace Gekko
             int start = -12345;
             int end = -12345;
             foreach (BankNameVersion s in vars)
-            {                
+            {
+                if (G.StartsWithSigil(s.name)) continue;  //ignore % and #
                 Databank db = GetBankFromBankNameVersion(s.bank);
-                TimeSeries ts = db.GetVariable(s.name);  //gets it with the global frequency 
-                if (ts == null) continue;  //should not be possible
+                IVariable iv = db.GetIVariable(s.name);
+                if (iv.Type() != EVariableType.Series) continue;  //should never happen
+                TimeSeries ts = (TimeSeries)iv;
                 start = G.GekkoMin(start, ts.GetPeriodFirst().super);
                 end = G.GekkoMax(end, ts.GetPeriodLast().super);
             }
@@ -19970,7 +20000,7 @@ namespace Gekko
             string s = "";
             if (isCsv)
             {
-                if (G.equal(Program.options.interface_excel_language, "danish"))
+                if (G.Equal(Program.options.interface_excel_language, "danish"))
                 {
                     s = "#NAVN?";  //missing value indicator (M) -- SHEET uses na()
                 }
@@ -20063,7 +20093,7 @@ namespace Gekko
             {
                 ts = databank.GetVariable(false, varName2);  //false: do not add options.freq at the end!
             }
-            if (!G.equal(varName, ts.name))
+            if (!G.Equal(varName, ts.name))
             {
                 G.Writeln2("*** ERROR in findOrCreateTimeSeriesInDataBank(), name");  //safety, can be deleted for speed sometime
                 throw new GekkoException();  //safety, can be deleted for speed sometime
@@ -20125,19 +20155,19 @@ namespace Gekko
                 if (db1.aliasName == Globals.Work || db1.aliasName == Globals.Ref) db1.FileNameWithPath = null;
                 G.Writeln2("Cleared databank: " + o.name);
             }
-            if (G.equal(o.opt_first, "yes"))
+            if (G.Equal(o.opt_first, "yes"))
             {
                 Program.databanks.GetFirst().Clear();
                 if (Program.databanks.GetFirst().aliasName == Globals.Work || Program.databanks.GetFirst().aliasName == Globals.Ref) Program.databanks.GetFirst().FileNameWithPath = null;
                 G.Writeln2("Cleared first databank ('" + Program.databanks.GetFirst().aliasName + "')");
             }
-            if (G.equal(o.opt_ref, "yes"))
+            if (G.Equal(o.opt_ref, "yes"))
             {
                 Program.databanks.GetRef().Clear();
                 if (Program.databanks.GetRef().aliasName == Globals.Work || Program.databanks.GetRef().aliasName == Globals.Ref) Program.databanks.GetRef().FileNameWithPath = null;
                 G.Writeln2("Cleared ref databank ('" + Program.databanks.GetRef().aliasName + "')");
             }
-            if (o.name == null && !G.equal(o.opt_first, "yes") && !G.equal(o.opt_ref, "yes"))
+            if (o.name == null && !G.Equal(o.opt_first, "yes") && !G.Equal(o.opt_ref, "yes"))
             {
                 //Before: Cleared 'Work' and 'Ref' regardless of position
                 Program.databanks.GetFirst().Clear();
@@ -20309,8 +20339,8 @@ namespace Gekko
             for (int i = 0; i < Program.databanks.storage.Count; i++)
             {
                 //The avoids creating new databanks, better to keep the original ones and switch their places.
-                if (G.equal(Program.databanks.storage[i].aliasName, Globals.Work)) w = i;
-                else if (G.equal(Program.databanks.storage[i].aliasName, Globals.Ref)) b = i;
+                if (G.Equal(Program.databanks.storage[i].aliasName, Globals.Work)) w = i;
+                else if (G.Equal(Program.databanks.storage[i].aliasName, Globals.Ref)) b = i;
                 else
                 {
                     MaybeWriteOpenDatabank(Program.databanks.storage[i]);
@@ -20360,7 +20390,7 @@ namespace Gekko
                 }
             }
             int n = 0;
-            if (!skipWrite) n = Write(removed, tStart, tEnd, removed.FileNameWithPath, false, null, "" + Globals.extensionDatabank + "", true, true);
+            if (!skipWrite) n = WriteGbk(removed, tStart, tEnd, removed.FileNameWithPath, false, null, "" + Globals.extensionDatabank + "", true, true);
         }
         
         public static string ErrorHandling(string s, P p, bool noWindowShown)
@@ -20661,15 +20691,15 @@ namespace Gekko
             }
 
             bool isHtml = false;
-            if (G.equal(Program.options.table_type, "html")) isHtml = true;
-            if (G.equal(html, "yes")) isHtml = true;  //overrides if 'yes'
+            if (G.Equal(Program.options.table_type, "html")) isHtml = true;
+            if (G.Equal(html, "yes")) isHtml = true;  //overrides if 'yes'
 
             StringBuilder s3 = new StringBuilder();
-            if (isHtml && !G.equal(window, "main"))
+            if (isHtml && !G.Equal(window, "main"))
             {
                 s3.AppendLine("TABLE tab.Print('html');");
             }
-            else if (isHtml && G.equal(window, "main"))
+            else if (isHtml && G.Equal(window, "main"))
             {
                 s3.AppendLine("TABLE tab.Print('html_main');");
             }
@@ -21207,12 +21237,12 @@ namespace Gekko
             bool printRawCode = false;
 
             //TODO: table types are a bit messy: clean this up at some point
-            if (G.equal(printType, "html_main"))
+            if (G.Equal(printType, "html_main"))
             {
                 printType = "html";
                 printRawCode = true;
             }
-            if (printType == null && G.equal(Program.options.table_type, "html"))
+            if (printType == null && G.Equal(Program.options.table_type, "html"))
             {
                 printType = "html";  //overrides txt, so "TABLE s1" or calling from menu will -> html table
             }
@@ -21222,8 +21252,8 @@ namespace Gekko
             string fullFileNameAndPath = Globals.localTempFilesLocation + "\\" + "table.html";
 
             StampTypes type = StampTypes.Normal;
-            if (G.equal(Globals.tableOption, "m")) type = StampTypes.Multiplier;
-            else if (G.equal(Globals.tableOption, Globals.printCode_s)) type = StampTypes.Base;
+            if (G.Equal(Globals.tableOption, "m")) type = StampTypes.Multiplier;
+            else if (G.Equal(Globals.tableOption, Globals.printCode_s)) type = StampTypes.Base;
             List<string> lines = GetDatabankInfo(type);
             if (Program.options.table_stamp)
             {
@@ -21514,7 +21544,7 @@ namespace Gekko
         public static void Compare(O.Compare o)
         {
             string type = "COMPARE";
-            if (G.equal(o.opt_abs, "yes")) type = "COMPARE<abs>";
+            if (G.Equal(o.opt_abs, "yes")) type = "COMPARE<abs>";
             string file = o.fileName;
             file = StripQuotes(file);
             G.Writeln();
@@ -21668,7 +21698,7 @@ namespace Gekko
                     if (listOfDifferentVars.Count > 0)
                     {
                         bool showPchRemember = Program.options.print_mulprt_pch;
-                        if (G.equal(o.opt_abs, "yes")) Program.options.print_mulprt_pch = false;
+                        if (G.Equal(o.opt_abs, "yes")) Program.options.print_mulprt_pch = false;
 
                         GekkoTime t1tmp = Globals.globalPeriodStart;
                         GekkoTime t2tmp = Globals.globalPeriodEnd;
@@ -21764,11 +21794,7 @@ namespace Gekko
         // --------------------------------------------------------------------------------------
 
         public static void obeyCommandCalledFromGUI(string s, P p)
-        {
-            if (Globals.parser3)
-            {
-                if (s == " " || s.StartsWith("[[")) return;
-            }
+        {            
             //Globals.prtCsSnippets.Clear();  //to save RAM for long sessions, should be ok to delete it here (otherwise we will just get an exception)
             Program.EmitCodeFromANTLR(s, "", false, p);
             if (!G.IsUnitTesting()) ShowPeriodInStatusField("");
@@ -21937,21 +21963,21 @@ namespace Gekko
                     //Conversion from Q to A
                     if (t.sub == 1) vsum = 0d;
                     GekkoTime ttemp = new GekkoTime(eFreq1, t.super, 1);
-                    if (G.equal(method, "total"))
+                    if (G.Equal(method, "total"))
                     {
                         vsum += value;
                         if (t.sub == Globals.freqQSubperiods) ts1.SetData(ttemp, vsum);
                     }
-                    else if (G.equal(method, "avg"))
+                    else if (G.Equal(method, "avg"))
                     {
                         vsum += value;
                         if (t.sub == Globals.freqQSubperiods) ts1.SetData(ttemp, vsum / (double)Globals.freqQSubperiods);
                     }
-                    else if (G.equal(method, "first"))
+                    else if (G.Equal(method, "first"))
                     {
                         if (t.sub == 1) ts1.SetData(ttemp, value);
                     }
-                    else if (G.equal(method, "last"))
+                    else if (G.Equal(method, "last"))
                     {
                         if (t.sub == Globals.freqQSubperiods) ts1.SetData(ttemp, value);
                     }
@@ -21966,21 +21992,21 @@ namespace Gekko
                     //Conversion from M to A
                     if (t.sub == 1) vsum = 0d;
                     GekkoTime ttemp = new GekkoTime(eFreq1, t.super, 1);
-                    if (G.equal(method, "total"))
+                    if (G.Equal(method, "total"))
                     {
                         vsum += value;
                         if (t.sub == Globals.freqMSubperiods) ts1.SetData(ttemp, vsum);
                     }
-                    else if (G.equal(method, "avg"))
+                    else if (G.Equal(method, "avg"))
                     {
                         vsum += value;
                         if (t.sub == Globals.freqMSubperiods) ts1.SetData(ttemp, vsum / (double)Globals.freqMSubperiods);
                     }
-                    else if (G.equal(method, "first"))
+                    else if (G.Equal(method, "first"))
                     {
                         if (t.sub == 1) ts1.SetData(ttemp, value);
                     }
-                    else if (G.equal(method, "last"))
+                    else if (G.Equal(method, "last"))
                     {
                         if (t.sub == Globals.freqMSubperiods) ts1.SetData(ttemp, value);
                     }
@@ -21997,21 +22023,21 @@ namespace Gekko
                     int quarter = (t.sub - 1) / mPerQ + 1;
                     if (t.sub % mPerQ == 1) vsum = 0d;
                     GekkoTime ttemp = new GekkoTime(eFreq1, t.super, quarter);
-                    if (G.equal(method, "total"))
+                    if (G.Equal(method, "total"))
                     {
                         vsum += value;
                         if (t.sub % mPerQ == 0) ts1.SetData(ttemp, vsum);
                     }
-                    else if (G.equal(method, "avg"))
+                    else if (G.Equal(method, "avg"))
                     {
                         vsum += value;
                         if (t.sub % mPerQ == 0) ts1.SetData(ttemp, vsum / (double)mPerQ);
                     }
-                    else if (G.equal(method, "first"))
+                    else if (G.Equal(method, "first"))
                     {
                         if (t.sub % mPerQ == 1) ts1.SetData(ttemp, value);
                     }
-                    else if (G.equal(method, "last"))
+                    else if (G.Equal(method, "last"))
                     {
                         if (t.sub % mPerQ == 0) ts1.SetData(ttemp, value);
                     }
@@ -22080,7 +22106,7 @@ namespace Gekko
                 if (eFreq1 == EFreq.Quarterly && eFreq0 == EFreq.Annual)
                 {
                     //Conversion from A to Q                                        
-                    if (G.equal(method, "repeat"))
+                    if (G.Equal(method, "repeat"))
                     {
                         for (int i = 1; i < Globals.freqQSubperiods + 1; i++)
                         {
@@ -22088,7 +22114,7 @@ namespace Gekko
                             ts1.SetData(gt, value);
                         }
                     }
-                    else if (G.equal(method, "prorate"))
+                    else if (G.Equal(method, "prorate"))
                     {
                         for (int i = 1; i < Globals.freqQSubperiods + 1; i++)
                         {
@@ -22105,7 +22131,7 @@ namespace Gekko
                 else if (eFreq1 == EFreq.Monthly && eFreq0 == EFreq.Annual)
                 {
                     //Conversion from A to M
-                    if (G.equal(method, "repeat"))
+                    if (G.Equal(method, "repeat"))
                     {
                         for (int i = 1; i < Globals.freqMSubperiods + 1; i++)
                         {
@@ -22113,7 +22139,7 @@ namespace Gekko
                             ts1.SetData(gt, value);
                         }
                     }
-                    else if (G.equal(method, "prorate"))
+                    else if (G.Equal(method, "prorate"))
                     {
                         for (int i = 1; i < Globals.freqMSubperiods + 1; i++)
                         {
@@ -22132,7 +22158,7 @@ namespace Gekko
                     //Conversion from Q to M
                     int mInQ = Globals.freqMSubperiods / Globals.freqQSubperiods; //3
                     int startSub = (t.sub - 1) * mInQ + 1;  //1->1, 2->4, 3->7, 4->10
-                    if (G.equal(method, "repeat"))
+                    if (G.Equal(method, "repeat"))
                     {
                         for (int i = startSub; i < startSub + mInQ; i++)
                         {
@@ -22140,7 +22166,7 @@ namespace Gekko
                             ts1.SetData(gt, value);
                         }
                     }
-                    else if (G.equal(method, "prorate"))
+                    else if (G.Equal(method, "prorate"))
                     {
                         for (int i = startSub; i < startSub + mInQ; i++)
                         {
@@ -22315,7 +22341,7 @@ namespace Gekko
             int n = GekkoTime.Observations(t1, t2);
             List<O.Prt.Element> elements = o.prtElements;
             int constant = 1;
-            if (G.equal(o.opt_constant, "no")) constant = 0;
+            if (G.Equal(o.opt_constant, "no")) constant = 0;
             UnfoldVarsAndLabels(ref m2, ref tsData2, t1, t2, labels, n, elements, constant);
 
             int m = m2 - 1;  //explanatory vars including constant
@@ -22891,7 +22917,7 @@ namespace Gekko
 
             //==================================================================================
 
-            if (G.equal(o.prtType, "sheet") || G.equal(o.prtType, "plot") || G.equal(o.prtType, "clip"))
+            if (G.Equal(o.prtType, "sheet") || G.Equal(o.prtType, "plot") || G.Equal(o.prtType, "clip"))
             {
                 //do nothing, do not start pipe2
             }
@@ -23079,7 +23105,7 @@ namespace Gekko
             bool hasV = false;
             foreach (OptString ts in o.printCodes)
             {
-                if (G.equal(ts.s1, "v") && G.equal(ts.s2, "yes"))
+                if (G.Equal(ts.s1, "v") && G.Equal(ts.s2, "yes"))
                 {
                     hasV = true;  //could be more than one "v", so we keep looping to get the last one.
                 }
@@ -23091,7 +23117,7 @@ namespace Gekko
             }
 
             bool isVerbose = false;
-            if (G.equal(o.prtType, "gmulprt")) isVerbose = true;
+            if (G.Equal(o.prtType, "gmulprt")) isVerbose = true;
             if (IsMulprt(o) && hasV) isVerbose = true;
             if (IsMulprt(o) && Program.options.print_mulprt_v) isVerbose = true;
 
@@ -23145,20 +23171,20 @@ namespace Gekko
             bool timefilter = Program.options.timefilter;
             if (o.timefilter != null)
             {
-                if (G.equal(o.timefilter, "yes"))
+                if (G.Equal(o.timefilter, "yes"))
                 {
                     timefilter = true;
                 }
-                else if (G.equal(o.timefilter, "no"))
+                else if (G.Equal(o.timefilter, "no"))
                 {
                     timefilter = false;
                 }
-                else if (G.equal(o.timefilter, "avg"))
+                else if (G.Equal(o.timefilter, "avg"))
                 {
                     timefilter = true;
                     timefilterType = o.timefilter;
                 }
-                else if (G.equal(o.timefilter, "hide"))
+                else if (G.Equal(o.timefilter, "hide"))
                 {
                     timefilter = true;
                     timefilterType = o.timefilter;
@@ -23179,7 +23205,7 @@ namespace Gekko
             bool isCols;
             HandleRowsCols(o, out isRows, out isCols);
             bool transpose = isRows; //transpose=false -> timeseries running down in cols, transpose=true -> timeseries running out in rows
-            if (G.equal(o.prtType, "sheet"))
+            if (G.Equal(o.prtType, "sheet"))
             {
                 //TODO: the Excel emitter transposes itself, so we never transpose here. #89073253245
                 transpose = false;
@@ -23227,7 +23253,7 @@ namespace Gekko
                     PrintGetWithAndDecimals(o, elementCounter, printCodes, widths, decs);
 
                     int widthSum = 0; foreach (int w in widths) widthSum += w + 2;  //2 chars padding
-                    if (!(G.equal(o.prtType, "plot") || G.equal(o.prtType, "sheet") || G.equal(o.prtType, "clip")) && !transpose && blocksWidthRest - (widthSum + 6) < 0)  //these 6 chars represent the date column. The wrapping is only approximate, but that is probably ok (that was also the case in the old PRT command)
+                    if (!(G.Equal(o.prtType, "plot") || G.Equal(o.prtType, "sheet") || G.Equal(o.prtType, "clip")) && !transpose && blocksWidthRest - (widthSum + 6) < 0)  //these 6 chars represent the date column. The wrapping is only approximate, but that is probably ok (that was also the case in the old PRT command)
                     {
                         //new block
                         virtualRowsMaxSeen = PrintPrettify(o, tab, numberOfLabelsLinesMax, transpose, maxLabelsLinesFound, identicalCodes, onePrintCodeLabel, virtualRowsStart, virtualRowsMaxSeen);
@@ -23246,8 +23272,8 @@ namespace Gekko
                     int printCodesCounter = -1;
 
                     bool isSimplePrtOrMulprt = false;
-                    if (printCodes.Count == 2 && G.equal(printCodes[0], "n") && G.equal(printCodes[1], "p")) isSimplePrtOrMulprt = true;
-                    if (printCodes.Count == 2 && G.equal(printCodes[0], "m") && G.equal(printCodes[1], "q")) isSimplePrtOrMulprt = true;
+                    if (printCodes.Count == 2 && G.Equal(printCodes[0], "n") && G.Equal(printCodes[1], "p")) isSimplePrtOrMulprt = true;
+                    if (printCodes.Count == 2 && G.Equal(printCodes[0], "m") && G.Equal(printCodes[1], "q")) isSimplePrtOrMulprt = true;
 
                     foreach (string printCode in printCodes)
                     {
@@ -23294,7 +23320,7 @@ namespace Gekko
                                 label += " " + printCodeLabelLong;
                             }
                             int width2 = width;
-                            if (G.equal(o.prtType, "sheet") || G.equal(o.prtType, "clip")) width2 = int.MaxValue;
+                            if (G.Equal(o.prtType, "sheet") || G.Equal(o.prtType, "clip")) width2 = int.MaxValue;
                             int numberOfLabelsLines = PrintCreateLabelsArrayNew(label, width2, numberOfLabelsLinesMax, maxLength, labelsArray);
                             maxLabelsLinesFound = Math.Max(maxLabelsLinesFound, numberOfLabelsLines);
                             labelsNonBroken.Add(originalLabel);
@@ -23380,7 +23406,7 @@ namespace Gekko
 
                             string date = G.FromDateToString(gt);
 
-                            if (timefilter && G.equal(timefilterType, "avg"))
+                            if (timefilter && G.Equal(timefilterType, "avg"))
                             {
                                 if (filter)
                                 {
@@ -23409,7 +23435,7 @@ namespace Gekko
 
                             //don't do pretty printing of Q and M if there is timefilter or if it is transposed
                             bool doAremosStuff = false; if (Program.options.print_freq == "pretty" && !timefilter && !transpose && (gt.freq == EFreq.Quarterly || gt.freq == EFreq.Monthly)) doAremosStuff = true;
-                            if (G.equal(o.prtType, "plot") || G.equal(o.prtType, "clip") || G.equal(o.prtType, "sheet")) doAremosStuff = false;
+                            if (G.Equal(o.prtType, "plot") || G.Equal(o.prtType, "clip") || G.Equal(o.prtType, "sheet")) doAremosStuff = false;
                             //Note: the method below only puts stuff into table for virtualCols == 1. Else it is only used
                             //      to correct virtualRows when pretty-printing frequencies Q and M.
                             PrintInsertDate(doAremosStuff, virtualCols, date, gt, o.t1, tab, numberOfLabelsLinesMax, transpose, ref virtualRows, o);
@@ -23445,7 +23471,7 @@ namespace Gekko
                 //----------------- actually printing the stuff start -------------------------------
                 //tab.PrintCellsForDebug();
 
-                if (G.equal(o.prtType, "plot"))
+                if (G.Equal(o.prtType, "plot"))
                 {
                     //tab.PrintCellsForDebug();
                     if (Program.options.plot_new)
@@ -23472,7 +23498,7 @@ namespace Gekko
                     Globals.unitTestTablePointer = tab;  //to be able to inspect it in unit tests
                 }
 
-                if (G.equal(o.prtType, "sheet"))
+                if (G.Equal(o.prtType, "sheet"))
                 {
                     //tab2 = tab.Transpose();
                     //TODO: we need a counter regarding the first rows/cols of the table, how many??
@@ -23533,7 +23559,7 @@ namespace Gekko
                     CreateExcelWorkbook2(eo, o, IsMulprt(o));
                     return 0;
                 }
-                else if (G.equal(o.prtType, "clip"))
+                else if (G.Equal(o.prtType, "clip"))
                 {
                     //maybe better to "record" into tablelight from CreateExcelWorkbook2?
                     PrtClipboard(tab, false);
@@ -23633,7 +23659,7 @@ namespace Gekko
             else
             {
                 //percent print codes
-                if (G.equal(printCode, "p") || G.equal(printCode, Globals.printCode_sp))
+                if (G.Equal(printCode, "p") || G.Equal(printCode, Globals.printCode_sp))
                 {
                     if (n == -12345)
                     {
@@ -23680,8 +23706,8 @@ namespace Gekko
         private static bool IsMulprt(O.Prt o)
         {
             bool isMulprt = false;
-            if (G.equal(o.prtType, "mulprt")) isMulprt = true;
-            if (G.equal(o.prtType, "gmulprt")) isMulprt = true;
+            if (G.Equal(o.prtType, "mulprt")) isMulprt = true;
+            if (G.Equal(o.prtType, "gmulprt")) isMulprt = true;
             return isMulprt;
         }
 
@@ -23689,21 +23715,21 @@ namespace Gekko
         {
             bool isGraph = false;
             bool isSheet = false;
-            if (G.equal(o.prtType, "plot")) isGraph = true;
-            else if (G.equal(o.prtType, "sheet")) isSheet = true;
-            else if (G.equal(o.prtType, "clip")) isSheet = true;
+            if (G.Equal(o.prtType, "plot")) isGraph = true;
+            else if (G.Equal(o.prtType, "sheet")) isSheet = true;
+            else if (G.Equal(o.prtType, "clip")) isSheet = true;
 
             bool isMulprt = IsMulprt(o);
             List<string> printCodes = new List<string>();
             printCodes.AddRange(GetSuperPrintCodes(o)); //start with a fresh copy of super-printcodes
 
-            if (!isMulprt && printCodes.Count == 1 && G.equal(printCodes[0], "lev"))
+            if (!isMulprt && printCodes.Count == 1 && G.Equal(printCodes[0], "lev"))
             {
                 G.Writeln2("*** ERROR: PRT<lev> is not legal: use PRT<abs> to print absolute levels");
                 throw new GekkoException();
             }
 
-            if (isMulprt && printCodes.Count == 1 && (G.equal(printCodes[0], "dif") || G.equal(printCodes[0], "diff")))
+            if (isMulprt && printCodes.Count == 1 && (G.Equal(printCodes[0], "dif") || G.Equal(printCodes[0], "diff")))
             {
                 G.Writeln2("*** ERROR: MULPRT<dif> is not legal: use MULPRT<abs> to print multiplier differences");
                 throw new GekkoException();
@@ -23716,8 +23742,8 @@ namespace Gekko
                 foreach (OptString ts in ope.printCodes)
                 {
                     //hmmm, what if there is a no after a yes for the same code????
-                    if (G.equal(ts.s2, "yes")) printCodes.Add(ts.s1);
-                    else if (G.equal(ts.s2, "no"))
+                    if (G.Equal(ts.s2, "yes")) printCodes.Add(ts.s1);
+                    else if (G.Equal(ts.s2, "no"))
                     {
                         //do not add
                     }
@@ -23738,15 +23764,15 @@ namespace Gekko
             foreach (OptString ts in o.printCodes)
             {
                 //hmmm, what if there is a no after a yes for the same code????
-                if (G.equal(ts.s2, "yes"))
+                if (G.Equal(ts.s2, "yes"))
                 {
                     printCodesGlobal.Add(ts.s1);
                 }
-                else if (G.equal(ts.s2, "no"))
+                else if (G.Equal(ts.s2, "no"))
                 {
                     printCodesGlobal.Add("no" + ts.s1);  //for instance 'nopch'
                 }
-                else if (G.equal(ts.s2, "append"))
+                else if (G.Equal(ts.s2, "append"))
                 {
                     printCodesGlobal.Add("_" + ts.s1);  //for instance '_lev'
                 }
@@ -23811,13 +23837,13 @@ namespace Gekko
         private static EPrtCollapseTypes GetCollapseType(O.Prt o)
         {
             EPrtCollapseTypes collapse = EPrtCollapseTypes.None;
-            if (G.equal(Program.options.print_collapse, "avg")) collapse = EPrtCollapseTypes.Avg;
-            else if (G.equal(Program.options.print_collapse, "total")) collapse = EPrtCollapseTypes.Total;
-            if (G.equal(o.opt_collapse, "avg")) collapse = EPrtCollapseTypes.Avg;  //overrides global options
-            else if (G.equal(o.opt_collapse, "total")) collapse = EPrtCollapseTypes.Total;  //overrides global options
-            else if (G.equal(o.opt_collapse, "yes"))
+            if (G.Equal(Program.options.print_collapse, "avg")) collapse = EPrtCollapseTypes.Avg;
+            else if (G.Equal(Program.options.print_collapse, "total")) collapse = EPrtCollapseTypes.Total;
+            if (G.Equal(o.opt_collapse, "avg")) collapse = EPrtCollapseTypes.Avg;  //overrides global options
+            else if (G.Equal(o.opt_collapse, "total")) collapse = EPrtCollapseTypes.Total;  //overrides global options
+            else if (G.Equal(o.opt_collapse, "yes"))
             {
-                if (G.equal(Program.options.print_collapse, "none")) collapse = EPrtCollapseTypes.Total;  //default for PRT<collapse>, if no global option
+                if (G.Equal(Program.options.print_collapse, "none")) collapse = EPrtCollapseTypes.Total;  //default for PRT<collapse>, if no global option
             }
             return collapse;
         }
@@ -23860,7 +23886,7 @@ namespace Gekko
 
         private static void NonExistenceError(List<string> nonExistenceErrors, string variableLabel, string variableName, string ss)
         {
-            if (variableLabel != null && !G.equal(variableName, variableLabel)) ss += ":   " + variableLabel;
+            if (variableLabel != null && !G.Equal(variableName, variableLabel)) ss += ":   " + variableLabel;
             if (!nonExistenceErrors.Contains(ss)) nonExistenceErrors.Add(ss);
         }
 
@@ -24073,7 +24099,7 @@ namespace Gekko
             }
             else
             {
-                if (!isMulprt && !isGraph && printCodes.Count == 1 && G.equal(printCodes[0], "r"))
+                if (!isMulprt && !isGraph && printCodes.Count == 1 && G.Equal(printCodes[0], "r"))
                 {
                     //PRT<r> or SHEET/CLIP<r>
                     PrintGetPrintCodesHelper2(isSheet, ref mul_lev, ref mul_abs, ref mul_pch, ref mul_gdif, ref abs, ref dif, ref pch, ref gdif);
@@ -24341,7 +24367,7 @@ namespace Gekko
                     }
                     printCodeType = EPrintCodeTypes.ShortVersion;
                 }
-                else if (G.equal(printCode, "v"))
+                else if (G.Equal(printCode, "v"))
                 {
                     //in that case, all other print options are suppressed, so you can write MULPRT<v gdif> and only a MULPRT<v> will be issued (this makes it easier to quickly put a 'v' in the optionfield to get a GMULPRT)
                     isVerbose = true;
@@ -24369,37 +24395,37 @@ namespace Gekko
 
         public static bool IsPrintCodeShort(string printCode)
         {
-            return G.equal(printCode, "n") || G.equal(printCode, "d") || G.equal(printCode, "p") || G.equal(printCode, "dp") || G.equal(printCode, Globals.printCode_s) || G.equal(printCode, Globals.printCode_sn) || G.equal(printCode, Globals.printCode_sd) || G.equal(printCode, Globals.printCode_sp) || G.equal(printCode, Globals.printCode_sdp) || G.equal(printCode, "m") || G.equal(printCode, "q") || G.equal(printCode, "mp");
+            return G.Equal(printCode, "n") || G.Equal(printCode, "d") || G.Equal(printCode, "p") || G.Equal(printCode, "dp") || G.Equal(printCode, Globals.printCode_s) || G.Equal(printCode, Globals.printCode_sn) || G.Equal(printCode, Globals.printCode_sd) || G.Equal(printCode, Globals.printCode_sp) || G.Equal(printCode, Globals.printCode_sdp) || G.Equal(printCode, "m") || G.Equal(printCode, "q") || G.Equal(printCode, "mp");
         }
 
         public static bool IsPrintCodeShortMultiplier(string printCode)
         {
-            return G.equal(printCode, "m") || G.equal(printCode, "q") || G.equal(printCode, "mp") || G.equal(printCode, "v");
+            return G.Equal(printCode, "m") || G.Equal(printCode, "q") || G.Equal(printCode, "mp") || G.Equal(printCode, "v");
         }
 
         public static bool IsPrintCodeShortBase(string printCode)
         {
-            return G.equal(printCode, Globals.printCode_s) || G.equal(printCode, Globals.printCode_sn) || G.equal(printCode, Globals.printCode_sd) || G.equal(printCode, Globals.printCode_sp) || G.equal(printCode, Globals.printCode_sdp);
+            return G.Equal(printCode, Globals.printCode_s) || G.Equal(printCode, Globals.printCode_sn) || G.Equal(printCode, Globals.printCode_sd) || G.Equal(printCode, Globals.printCode_sp) || G.Equal(printCode, Globals.printCode_sdp);
         }
 
         public static bool IsPrintCodeShortWork(string printCode)
         {
-            return printCode == null || G.equal(printCode, "") || G.equal(printCode, "n") || G.equal(printCode, "d") || G.equal(printCode, "p") || G.equal(printCode, "dp");
+            return printCode == null || G.Equal(printCode, "") || G.Equal(printCode, "n") || G.Equal(printCode, "d") || G.Equal(printCode, "p") || G.Equal(printCode, "dp");
         }
 
         private static bool IsPrintCodeLongNo(string printCode)
         {
-            return G.equal(printCode, "nolev") || G.equal(printCode, "noabs") || G.equal(printCode, "nodif") || G.equal(printCode, "nopch") || G.equal(printCode, "nogdif");
+            return G.Equal(printCode, "nolev") || G.Equal(printCode, "noabs") || G.Equal(printCode, "nodif") || G.Equal(printCode, "nopch") || G.Equal(printCode, "nogdif");
         }
 
         private static bool IsPrintCodeLongAppend(string printCode)
         {
-            return G.equal(printCode, "_lev") || G.equal(printCode, "_abs") || G.equal(printCode, "_dif") || G.equal(printCode, "_pch") || G.equal(printCode, "_gdif");
+            return G.Equal(printCode, "_lev") || G.Equal(printCode, "_abs") || G.Equal(printCode, "_dif") || G.Equal(printCode, "_pch") || G.Equal(printCode, "_gdif");
         }
 
         private static bool IsPrintCodeLong(string printCode)
         {
-            return G.equal(printCode, "lev") || G.equal(printCode, "abs") || G.equal(printCode, "dif") || G.equal(printCode, "pch") || G.equal(printCode, "gdif");
+            return G.Equal(printCode, "lev") || G.Equal(printCode, "abs") || G.Equal(printCode, "dif") || G.Equal(printCode, "pch") || G.Equal(printCode, "gdif");
         }
 
         private static void WritePrintCodeMismatchError()
@@ -24474,7 +24500,7 @@ namespace Gekko
 
             //now s2 should be with "." if there is a decimal (and no thousand grouping)
 
-            if (G.equal(Program.options.interface_clipboard_decimalseparator, "comma"))
+            if (G.Equal(Program.options.interface_clipboard_decimalseparator, "comma"))
             {
                 s2 = s2.Replace(".", ",");
             }
@@ -24482,7 +24508,7 @@ namespace Gekko
                 || G.isNumericalError(d2) || d2 == 3e300d )  //NumericalError is 'M', and the number 3e300 is a signal from a table that variable is non-existing ('N')
             {
                 s2 = "=na()";
-                if (G.equal(Program.options.interface_excel_language, "danish"))
+                if (G.Equal(Program.options.interface_excel_language, "danish"))
                 {
                     s2 = "=ikke.tilgængelig()";
                 }
@@ -24497,19 +24523,19 @@ namespace Gekko
             string[,] x = new string[rows + 1, cols + 1]; //hmmm what if not there...
 
             bool hasDates = true;
-            if (G.equal(dates, "no"))
+            if (G.Equal(dates, "no"))
             {
                 hasDates = false;
             }
 
             bool hasLabels = true;
-            if (G.equal(labels, "no"))
+            if (G.Equal(labels, "no"))
             {
                 hasLabels = false;
             }
 
             bool isTranspose = false;
-            if (G.equal(transpose, "yes"))
+            if (G.Equal(transpose, "yes"))
             {
                 isTranspose = true;
             }
@@ -24733,7 +24759,7 @@ namespace Gekko
                         else
                         {
                             G.ExtractVariableAndLag(prec, out variable2, out lag);
-                            if (G.equal(variable, variable2) && lag != 0)
+                            if (G.Equal(variable, variable2) && lag != 0)
                             {
                                 G.Writeln("+++ WARNING: The non-existing variable " + variable + " appears with lag or leads on right hand side -- so this will produce missing values");
                                 break;
@@ -24765,7 +24791,7 @@ namespace Gekko
 
         public static EMissingType CheckVariableExistence(List<string> variablesLabelsForPrtCommand, List<Dictionary<string, string>> precedents, bool isMultiplier, bool isCalledFromGenr, bool isBaseline, bool isCalledFromTable)
         {
-            if (!(G.equal(Program.databanks.GetFirst().aliasName, Globals.Work) && G.equal(Program.databanks.GetRef().aliasName, Globals.Ref)))
+            if (!(G.Equal(Program.databanks.GetFirst().aliasName, Globals.Work) && G.Equal(Program.databanks.GetRef().aliasName, Globals.Ref)))
             {
                 G.Writeln2("*** ERROR: Please use Work and " + Globals.Ref + " as first and reference databanks");
                 throw new GekkoException();
@@ -24862,7 +24888,7 @@ namespace Gekko
                             {
                                 problem.Add(varWithBaseBankIndicator, "");
                                 string ss = "";
-                                if (variablesLabelsForPrtCommand != null && !G.equal(variableName, variablesLabelsForPrtCommand[i])) ss = " -- " + variablesLabelsForPrtCommand[i];
+                                if (variablesLabelsForPrtCommand != null && !G.Equal(variableName, variablesLabelsForPrtCommand[i])) ss = " -- " + variablesLabelsForPrtCommand[i];
                                 if (isCalledFromTable && Program.options.table_ignoremissingvars)
                                 {
                                 }
@@ -25590,12 +25616,12 @@ namespace Gekko
             if (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)
             {
                 //annual
-                if (G.equal(Program.options.plot_xlabels_annual, "between")) isInside = true;
+                if (G.Equal(Program.options.plot_xlabels_annual, "between")) isInside = true;
             }
             else
             {
                 //nonannual
-                if (G.equal(Program.options.plot_xlabels_nonannual, "between")) isInside = true;
+                if (G.Equal(Program.options.plot_xlabels_nonannual, "between")) isInside = true;
             }
 
             //https://groups.google.com/forum/#!topic/comp.graphics.apps.gnuplot/csbgSFAbIv4
@@ -25839,7 +25865,7 @@ namespace Gekko
 
             double linewidthCorrection = 1d;
             double pointsizeCorrection = 1d;
-            if (G.equal(pplotType, "svg") || G.equal(pplotType, "png"))
+            if (G.Equal(pplotType, "svg") || G.Equal(pplotType, "png"))
             {
                 linewidthCorrection = 2d / 3d;
                 pointsizeCorrection = 0.8d / 0.5d;
@@ -25886,7 +25912,7 @@ namespace Gekko
             }            
 
             string enhanced = null;
-            if (G.equal(pplotType, "emf"))
+            if (G.Equal(pplotType, "emf"))
             {
                 enhanced = " enhanced";
                 fontsize = 0.95 * fontsize;
@@ -25900,20 +25926,20 @@ namespace Gekko
             txt.AppendLine("set output \"" + file2 + "\"");
             txt.AppendLine("set key " + key);            
 
-            if (G.equal(Program.options.plot_decimalseparator, "comma"))
+            if (G.Equal(Program.options.plot_decimalseparator, "comma"))
             {
                 txt.AppendLine("set decimalsign ','");
             }
             
-            if (G.equal(pplotType, "emf"))
+            if (G.Equal(pplotType, "emf"))
             {
                 fontfactor = 1.4d / 1.2d;
             }
-            else if (G.equal(pplotType, "svg"))
+            else if (G.Equal(pplotType, "svg"))
             {
                 fontfactor = 1.4d / 1.2d;
             }
-            else if (G.equal(pplotType, "png"))
+            else if (G.Equal(pplotType, "png"))
             {
                 fontfactor = 1.0d / 1.2d;
             }
@@ -26118,18 +26144,18 @@ namespace Gekko
                 }
             }
 
-            if (G.equal(grid, "yes"))  //it can be an empty <grid/>
+            if (G.Equal(grid, "yes"))  //it can be an empty <grid/>
             {
                 //txt.AppendLine("set style line 102 lc rgb '#d3d3d3' dt 3 lw 1.5");  //line width looks ok in Gekko window, with lw 1 it looks bad there.
                 txt.AppendLine("set style line 102 " + gridstyle);  //lt 0 or dt 3 gives ugly lines when viewed in Gekko
                 txt.AppendLine("set grid back ls 102");                
             }
-            else if (G.equal(grid, "yline"))
+            else if (G.Equal(grid, "yline"))
             {
                 txt.AppendLine("set style line 102 " + gridstyle);  //lt 0 or dt 3 gives ugly lines when viewed in Gekko
                 txt.AppendLine("set grid ytics back ls 102");                
             }
-            else if (G.equal(grid, "xline")) 
+            else if (G.Equal(grid, "xline")) 
             {
                 txt.AppendLine("set style line 102 " + gridstyle);  //lt 0 or dt 3 gives ugly lines when viewed in Gekko                
                 txt.AppendLine("set grid xtics back ls 102");
@@ -26301,7 +26327,7 @@ namespace Gekko
             }
 
 
-            if (G.equal(o.opt_dump, "yes"))
+            if (G.Equal(o.opt_dump, "yes"))
             {
                 try
                 {
@@ -26478,7 +26504,7 @@ namespace Gekko
                 y2 = GetText(y2s[i], null, line3 == null ? null : line3.SelectSingleNode("y2"), null, "no"); //default: no, #23475432985
                 label = HandleLabel(line3, isExplicit, labelCleaned);
 
-                if (G.equal(linetype, "boxes"))
+                if (G.Equal(linetype, "boxes"))
                 {
                     if (isSeparated) y2 = "yes";  //set y for all lines, and y2 for all boxes --> this overrides other settings
                 }
@@ -26495,7 +26521,7 @@ namespace Gekko
                 // ---------------------------------------------
 
 
-                if (G.equal(linetype, "boxes") && fillstyle.Contains("solid"))
+                if (G.Equal(linetype, "boxes") && fillstyle.Contains("solid"))
                 {
                     linewidth = "1";  //otherwise the borders of these get blurred
                 }
@@ -26505,7 +26531,7 @@ namespace Gekko
                 string s = null;
                 if (!NullOrEmpty(linetype))
                 {
-                    if (G.equal(linetype, "filledcurve") || G.equal(linetype, "filledcurves"))
+                    if (G.Equal(linetype, "filledcurve") || G.Equal(linetype, "filledcurves"))
                     {
                         s += " with " + linetype + " y1=0";  //so the area is towards the x-axis
                     }
@@ -26549,7 +26575,7 @@ namespace Gekko
                 //box: fillstyle empty|solid|pattern, border|noborder
 
                 string xAdjustment = null;
-                if (G.equal(linetype, "boxes"))
+                if (G.Equal(linetype, "boxes"))
                 {
                     if (firstPass)
                     {
@@ -26622,7 +26648,7 @@ namespace Gekko
                         }                        
                     }
                 }
-                else if (G.equal(linetype, "filledcurve") || G.equal(linetype, "filledcurves"))
+                else if (G.Equal(linetype, "filledcurve") || G.Equal(linetype, "filledcurves"))
                 {
                     if (firstPass)
                     {
@@ -26723,7 +26749,7 @@ namespace Gekko
         private static bool NotNullAndNotNo(string s)
         {
             //#23475432985
-            return s != null && !G.equal(s, "no");
+            return s != null && !G.Equal(s, "no");
         }
 
         private static string HandleLabel(XmlNode line3, bool isExplicit, string labelCleaned)
@@ -26994,12 +27020,12 @@ namespace Gekko
             // [  yminhard < * < yminsoft  : ymaxsoft < * < ymaxhard ] 
             // TODO: it would be nice to test the inequalities above, because if they are violated, they have no effect --> free borders, even if ymin/ymax is set.
 
-            if (G.equal(ymin, "NaN")) ymin = null;
-            if (G.equal(yminsoft, "NaN")) yminsoft = null;
-            if (G.equal(yminhard, "NaN")) yminhard = null;
-            if (G.equal(ymax, "NaN")) ymax = null;
-            if (G.equal(ymaxsoft, "NaN")) ymaxsoft = null;
-            if (G.equal(ymaxhard, "NaN")) ymaxhard = null;
+            if (G.Equal(ymin, "NaN")) ymin = null;
+            if (G.Equal(yminsoft, "NaN")) yminsoft = null;
+            if (G.Equal(yminhard, "NaN")) yminhard = null;
+            if (G.Equal(ymax, "NaN")) ymax = null;
+            if (G.Equal(ymaxsoft, "NaN")) ymaxsoft = null;
+            if (G.Equal(ymaxhard, "NaN")) ymaxhard = null;
 
             string left = null;
             string right = null;
@@ -27280,157 +27306,157 @@ namespace Gekko
         {
             string printCode = printCode2.Trim();  //when it comes from for instance a table
 
-            if (isCalledFromTable && !G.equal(Globals.tableOption, "n"))
+            if (isCalledFromTable && !G.Equal(Globals.tableOption, "n"))
             {
-                if (G.equal(Globals.tableOption, "d"))
+                if (G.Equal(Globals.tableOption, "d"))
                 {
-                    if (G.equal(printCode, "n")) printCode = "d";
-                    else if (G.equal(printCode, "d")) printCode = "";
-                    else if (G.equal(printCode, "p")) printCode = "";
-                    else if (G.equal(printCode, "dp")) printCode = "";
-                    else if (G.equal(printCode, "r")) printCode = "rd";
-                    else if (G.equal(printCode, "rn")) printCode = "rd";
-                    else if (G.equal(printCode, "rd")) printCode = "";
-                    else if (G.equal(printCode, "rp")) printCode = "";
-                    else if (G.equal(printCode, "rdp")) printCode = "";
-                    else if (G.equal(printCode, "m")) printCode = "";
-                    else if (G.equal(printCode, "q")) printCode = "";
-                    else if (G.equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(printCode, "n")) printCode = "d";
+                    else if (G.Equal(printCode, "d")) printCode = "";
+                    else if (G.Equal(printCode, "p")) printCode = "";
+                    else if (G.Equal(printCode, "dp")) printCode = "";
+                    else if (G.Equal(printCode, "r")) printCode = "rd";
+                    else if (G.Equal(printCode, "rn")) printCode = "rd";
+                    else if (G.Equal(printCode, "rd")) printCode = "";
+                    else if (G.Equal(printCode, "rp")) printCode = "";
+                    else if (G.Equal(printCode, "rdp")) printCode = "";
+                    else if (G.Equal(printCode, "m")) printCode = "";
+                    else if (G.Equal(printCode, "q")) printCode = "";
+                    else if (G.Equal(printCode, "mp")) printCode = "";
                 }
-                else if (G.equal(Globals.tableOption, "p"))
+                else if (G.Equal(Globals.tableOption, "p"))
                 {
-                    if (G.equal(printCode, "n")) printCode = "p";
-                    else if (G.equal(printCode, "d")) printCode = "";
-                    else if (G.equal(printCode, "p")) printCode = "";
-                    else if (G.equal(printCode, "dp")) printCode = "";
-                    else if (G.equal(printCode, "r")) printCode = "rp";
-                    else if (G.equal(printCode, "rn")) printCode = "rp";
-                    else if (G.equal(printCode, "rd")) printCode = "";
-                    else if (G.equal(printCode, "rp")) printCode = "";
-                    else if (G.equal(printCode, "rdp")) printCode = "";
-                    else if (G.equal(printCode, "m")) printCode = "";
-                    else if (G.equal(printCode, "q")) printCode = "";
-                    else if (G.equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(printCode, "n")) printCode = "p";
+                    else if (G.Equal(printCode, "d")) printCode = "";
+                    else if (G.Equal(printCode, "p")) printCode = "";
+                    else if (G.Equal(printCode, "dp")) printCode = "";
+                    else if (G.Equal(printCode, "r")) printCode = "rp";
+                    else if (G.Equal(printCode, "rn")) printCode = "rp";
+                    else if (G.Equal(printCode, "rd")) printCode = "";
+                    else if (G.Equal(printCode, "rp")) printCode = "";
+                    else if (G.Equal(printCode, "rdp")) printCode = "";
+                    else if (G.Equal(printCode, "m")) printCode = "";
+                    else if (G.Equal(printCode, "q")) printCode = "";
+                    else if (G.Equal(printCode, "mp")) printCode = "";
                 }
-                else if (G.equal(Globals.tableOption, "dp"))
+                else if (G.Equal(Globals.tableOption, "dp"))
                 {
-                    if (G.equal(printCode, "n")) printCode = "dp";
-                    else if (G.equal(printCode, "d")) printCode = "";
-                    else if (G.equal(printCode, "p")) printCode = "";
-                    else if (G.equal(printCode, "dp")) printCode = "";
-                    else if (G.equal(printCode, "r")) printCode = "rdp";
-                    else if (G.equal(printCode, "rn")) printCode = "rdp";
-                    else if (G.equal(printCode, "rd")) printCode = "";
-                    else if (G.equal(printCode, "rp")) printCode = "";
-                    else if (G.equal(printCode, "rdp")) printCode = "";
-                    else if (G.equal(printCode, "m")) printCode = "";
-                    else if (G.equal(printCode, "q")) printCode = "";
-                    else if (G.equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(printCode, "n")) printCode = "dp";
+                    else if (G.Equal(printCode, "d")) printCode = "";
+                    else if (G.Equal(printCode, "p")) printCode = "";
+                    else if (G.Equal(printCode, "dp")) printCode = "";
+                    else if (G.Equal(printCode, "r")) printCode = "rdp";
+                    else if (G.Equal(printCode, "rn")) printCode = "rdp";
+                    else if (G.Equal(printCode, "rd")) printCode = "";
+                    else if (G.Equal(printCode, "rp")) printCode = "";
+                    else if (G.Equal(printCode, "rdp")) printCode = "";
+                    else if (G.Equal(printCode, "m")) printCode = "";
+                    else if (G.Equal(printCode, "q")) printCode = "";
+                    else if (G.Equal(printCode, "mp")) printCode = "";
                 }
-                else if (G.equal(Globals.tableOption, "r") || G.equal(Globals.tableOption, "rn"))
+                else if (G.Equal(Globals.tableOption, "r") || G.Equal(Globals.tableOption, "rn"))
                 {
-                    if (G.equal(printCode, "n")) printCode = "r";
-                    else if (G.equal(printCode, "d")) printCode = "rd";
-                    else if (G.equal(printCode, "p")) printCode = "rp";
-                    else if (G.equal(printCode, "dp")) printCode = "rdp";
-                    else if (G.equal(printCode, "r")) printCode = "";
-                    else if (G.equal(printCode, "rn")) printCode = "";
-                    else if (G.equal(printCode, "rd")) printCode = "";
-                    else if (G.equal(printCode, "rp")) printCode = "";
-                    else if (G.equal(printCode, "rdp")) printCode = "";
-                    else if (G.equal(printCode, "m")) printCode = "";
-                    else if (G.equal(printCode, "q")) printCode = "";
-                    else if (G.equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(printCode, "n")) printCode = "r";
+                    else if (G.Equal(printCode, "d")) printCode = "rd";
+                    else if (G.Equal(printCode, "p")) printCode = "rp";
+                    else if (G.Equal(printCode, "dp")) printCode = "rdp";
+                    else if (G.Equal(printCode, "r")) printCode = "";
+                    else if (G.Equal(printCode, "rn")) printCode = "";
+                    else if (G.Equal(printCode, "rd")) printCode = "";
+                    else if (G.Equal(printCode, "rp")) printCode = "";
+                    else if (G.Equal(printCode, "rdp")) printCode = "";
+                    else if (G.Equal(printCode, "m")) printCode = "";
+                    else if (G.Equal(printCode, "q")) printCode = "";
+                    else if (G.Equal(printCode, "mp")) printCode = "";
                 }
-                else if (G.equal(Globals.tableOption, "rd"))
+                else if (G.Equal(Globals.tableOption, "rd"))
                 {
-                    if (G.equal(printCode, "n")) printCode = "rd";
-                    else if (G.equal(printCode, "d")) printCode = "";
-                    else if (G.equal(printCode, "p")) printCode = "";
-                    else if (G.equal(printCode, "dp")) printCode = "";
-                    else if (G.equal(printCode, "r")) printCode = "";
-                    else if (G.equal(printCode, "rn")) printCode = "";
-                    else if (G.equal(printCode, "rd")) printCode = "";
-                    else if (G.equal(printCode, "rp")) printCode = "";
-                    else if (G.equal(printCode, "rdp")) printCode = "";
-                    else if (G.equal(printCode, "m")) printCode = "";
-                    else if (G.equal(printCode, "q")) printCode = "";
-                    else if (G.equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(printCode, "n")) printCode = "rd";
+                    else if (G.Equal(printCode, "d")) printCode = "";
+                    else if (G.Equal(printCode, "p")) printCode = "";
+                    else if (G.Equal(printCode, "dp")) printCode = "";
+                    else if (G.Equal(printCode, "r")) printCode = "";
+                    else if (G.Equal(printCode, "rn")) printCode = "";
+                    else if (G.Equal(printCode, "rd")) printCode = "";
+                    else if (G.Equal(printCode, "rp")) printCode = "";
+                    else if (G.Equal(printCode, "rdp")) printCode = "";
+                    else if (G.Equal(printCode, "m")) printCode = "";
+                    else if (G.Equal(printCode, "q")) printCode = "";
+                    else if (G.Equal(printCode, "mp")) printCode = "";
                 }
-                else if (G.equal(Globals.tableOption, "rp"))
+                else if (G.Equal(Globals.tableOption, "rp"))
                 {
-                    if (G.equal(printCode, "n")) printCode = "rp";
-                    else if (G.equal(printCode, "d")) printCode = "";
-                    else if (G.equal(printCode, "p")) printCode = "";
-                    else if (G.equal(printCode, "dp")) printCode = "";
-                    else if (G.equal(printCode, "r")) printCode = "";
-                    else if (G.equal(printCode, "rn")) printCode = "";
-                    else if (G.equal(printCode, "rd")) printCode = "";
-                    else if (G.equal(printCode, "rp")) printCode = "";
-                    else if (G.equal(printCode, "rdp")) printCode = "";
-                    else if (G.equal(printCode, "m")) printCode = "";
-                    else if (G.equal(printCode, "q")) printCode = "";
-                    else if (G.equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(printCode, "n")) printCode = "rp";
+                    else if (G.Equal(printCode, "d")) printCode = "";
+                    else if (G.Equal(printCode, "p")) printCode = "";
+                    else if (G.Equal(printCode, "dp")) printCode = "";
+                    else if (G.Equal(printCode, "r")) printCode = "";
+                    else if (G.Equal(printCode, "rn")) printCode = "";
+                    else if (G.Equal(printCode, "rd")) printCode = "";
+                    else if (G.Equal(printCode, "rp")) printCode = "";
+                    else if (G.Equal(printCode, "rdp")) printCode = "";
+                    else if (G.Equal(printCode, "m")) printCode = "";
+                    else if (G.Equal(printCode, "q")) printCode = "";
+                    else if (G.Equal(printCode, "mp")) printCode = "";
                 }
-                else if (G.equal(Globals.tableOption, "rdp"))
+                else if (G.Equal(Globals.tableOption, "rdp"))
                 {
-                    if (G.equal(printCode, "n")) printCode = "rdp";
-                    else if (G.equal(printCode, "d")) printCode = "";
-                    else if (G.equal(printCode, "p")) printCode = "";
-                    else if (G.equal(printCode, "dp")) printCode = "";
-                    else if (G.equal(printCode, "r")) printCode = "";
-                    else if (G.equal(printCode, "rn")) printCode = "";
-                    else if (G.equal(printCode, "rd")) printCode = "";
-                    else if (G.equal(printCode, "rp")) printCode = "";
-                    else if (G.equal(printCode, "rdp")) printCode = "";
-                    else if (G.equal(printCode, "m")) printCode = "";
-                    else if (G.equal(printCode, "q")) printCode = "";
-                    else if (G.equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(printCode, "n")) printCode = "rdp";
+                    else if (G.Equal(printCode, "d")) printCode = "";
+                    else if (G.Equal(printCode, "p")) printCode = "";
+                    else if (G.Equal(printCode, "dp")) printCode = "";
+                    else if (G.Equal(printCode, "r")) printCode = "";
+                    else if (G.Equal(printCode, "rn")) printCode = "";
+                    else if (G.Equal(printCode, "rd")) printCode = "";
+                    else if (G.Equal(printCode, "rp")) printCode = "";
+                    else if (G.Equal(printCode, "rdp")) printCode = "";
+                    else if (G.Equal(printCode, "m")) printCode = "";
+                    else if (G.Equal(printCode, "q")) printCode = "";
+                    else if (G.Equal(printCode, "mp")) printCode = "";
                 }
-                else if (G.equal(Globals.tableOption, "m"))
+                else if (G.Equal(Globals.tableOption, "m"))
                 {
-                    if (G.equal(printCode, "n")) printCode = "m";
-                    else if (G.equal(printCode, "d")) printCode = "";
-                    else if (G.equal(printCode, "p")) printCode = "mp";
-                    else if (G.equal(printCode, "dp")) printCode = "";
-                    else if (G.equal(printCode, "r")) printCode = "";
-                    else if (G.equal(printCode, "rn")) printCode = "";
-                    else if (G.equal(printCode, "rd")) printCode = "";
-                    else if (G.equal(printCode, "rp")) printCode = "";
-                    else if (G.equal(printCode, "rdp")) printCode = "";
-                    else if (G.equal(printCode, "m")) printCode = "";
-                    else if (G.equal(printCode, "q")) printCode = "";
-                    else if (G.equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(printCode, "n")) printCode = "m";
+                    else if (G.Equal(printCode, "d")) printCode = "";
+                    else if (G.Equal(printCode, "p")) printCode = "mp";
+                    else if (G.Equal(printCode, "dp")) printCode = "";
+                    else if (G.Equal(printCode, "r")) printCode = "";
+                    else if (G.Equal(printCode, "rn")) printCode = "";
+                    else if (G.Equal(printCode, "rd")) printCode = "";
+                    else if (G.Equal(printCode, "rp")) printCode = "";
+                    else if (G.Equal(printCode, "rdp")) printCode = "";
+                    else if (G.Equal(printCode, "m")) printCode = "";
+                    else if (G.Equal(printCode, "q")) printCode = "";
+                    else if (G.Equal(printCode, "mp")) printCode = "";
                 }
-                else if (G.equal(Globals.tableOption, "q"))
+                else if (G.Equal(Globals.tableOption, "q"))
                 {
-                    if (G.equal(printCode, "n")) printCode = "q";
-                    else if (G.equal(printCode, "d")) printCode = "";
-                    else if (G.equal(printCode, "p")) printCode = "";
-                    else if (G.equal(printCode, "dp")) printCode = "";
-                    else if (G.equal(printCode, "r")) printCode = "";
-                    else if (G.equal(printCode, "rn")) printCode = "";
-                    else if (G.equal(printCode, "rd")) printCode = "";
-                    else if (G.equal(printCode, "rp")) printCode = "";
-                    else if (G.equal(printCode, "rdp")) printCode = "";
-                    else if (G.equal(printCode, "m")) printCode = "";
-                    else if (G.equal(printCode, "q")) printCode = "";
-                    else if (G.equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(printCode, "n")) printCode = "q";
+                    else if (G.Equal(printCode, "d")) printCode = "";
+                    else if (G.Equal(printCode, "p")) printCode = "";
+                    else if (G.Equal(printCode, "dp")) printCode = "";
+                    else if (G.Equal(printCode, "r")) printCode = "";
+                    else if (G.Equal(printCode, "rn")) printCode = "";
+                    else if (G.Equal(printCode, "rd")) printCode = "";
+                    else if (G.Equal(printCode, "rp")) printCode = "";
+                    else if (G.Equal(printCode, "rdp")) printCode = "";
+                    else if (G.Equal(printCode, "m")) printCode = "";
+                    else if (G.Equal(printCode, "q")) printCode = "";
+                    else if (G.Equal(printCode, "mp")) printCode = "";
                 }
-                else if (G.equal(Globals.tableOption, "mp"))
+                else if (G.Equal(Globals.tableOption, "mp"))
                 {
-                    if (G.equal(printCode, "n")) printCode = "mp";
-                    else if (G.equal(printCode, "d")) printCode = "";
-                    else if (G.equal(printCode, "p")) printCode = "";
-                    else if (G.equal(printCode, "dp")) printCode = "";
-                    else if (G.equal(printCode, "r")) printCode = "";
-                    else if (G.equal(printCode, "rn")) printCode = "";
-                    else if (G.equal(printCode, "rd")) printCode = "";
-                    else if (G.equal(printCode, "rp")) printCode = "";
-                    else if (G.equal(printCode, "rdp")) printCode = "";
-                    else if (G.equal(printCode, "m")) printCode = "";
-                    else if (G.equal(printCode, "q")) printCode = "";
-                    else if (G.equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(printCode, "n")) printCode = "mp";
+                    else if (G.Equal(printCode, "d")) printCode = "";
+                    else if (G.Equal(printCode, "p")) printCode = "";
+                    else if (G.Equal(printCode, "dp")) printCode = "";
+                    else if (G.Equal(printCode, "r")) printCode = "";
+                    else if (G.Equal(printCode, "rn")) printCode = "";
+                    else if (G.Equal(printCode, "rd")) printCode = "";
+                    else if (G.Equal(printCode, "rp")) printCode = "";
+                    else if (G.Equal(printCode, "rdp")) printCode = "";
+                    else if (G.Equal(printCode, "m")) printCode = "";
+                    else if (G.Equal(printCode, "q")) printCode = "";
+                    else if (G.Equal(printCode, "mp")) printCode = "";
                 }
                 if (printCode == "")
                 {
@@ -28910,7 +28936,7 @@ namespace Gekko
             int iterCounter = 0;
 
             int convType = 1;
-            if (G.equal(Program.options.solve_gauss_conv, "conv2")) convType = 2;
+            if (G.Equal(Program.options.solve_gauss_conv, "conv2")) convType = 2;
 
             int culprit2 = -12345;
             if (iterCounter < Program.options.solve_gauss_itermax && (Globals.solveUseStrictCrits || varId == -12345))
@@ -29709,7 +29735,7 @@ namespace Gekko
                 if (file.Peek() < 0) break;
                 string line = file.ReadLine();
                 line = line.Trim();  //removes all blanks at start or end
-                if (G.equal(line, "varlist$") || G.equal(line, "varlist;"))
+                if (G.Equal(line, "varlist$") || G.Equal(line, "varlist;"))
                 {
                     varlistFound = true;
                     continue;
@@ -30164,11 +30190,11 @@ namespace Gekko
             Excel.Range range = null;
             Excel.Worksheet newSheet = null;
 
-            bool isStamp = false; if (oPrt != null && G.equal(oPrt.opt_stamp, "yes")) isStamp = true;
-            bool isDates = true; if (oPrt != null && G.equal(oPrt.opt_dates, "no")) isDates = false;
-            bool isNames = true; if (oPrt != null && G.equal(oPrt.opt_names, "no")) isNames = false;
-            bool isColors = true; if (oPrt != null && G.equal(oPrt.opt_colors, "no")) isColors = false;
-            bool isAppend = false; if (oPrt != null && G.equal(oPrt.opt_append, "yes")) isAppend = true;
+            bool isStamp = false; if (oPrt != null && G.Equal(oPrt.opt_stamp, "yes")) isStamp = true;
+            bool isDates = true; if (oPrt != null && G.Equal(oPrt.opt_dates, "no")) isDates = false;
+            bool isNames = true; if (oPrt != null && G.Equal(oPrt.opt_names, "no")) isNames = false;
+            bool isColors = true; if (oPrt != null && G.Equal(oPrt.opt_colors, "no")) isColors = false;
+            bool isAppend = false; if (oPrt != null && G.Equal(oPrt.opt_append, "yes")) isAppend = true;
             string sheet = null; if (oPrt != null) sheet = oPrt.opt_sheet;
 
 
@@ -30377,7 +30403,7 @@ namespace Gekko
                 }
 
                 string na = "na()";
-                if (G.equal(Program.options.interface_excel_language, "danish")) na = "ikke.tilgængelig()";
+                if (G.Equal(Program.options.interface_excel_language, "danish")) na = "ikke.tilgængelig()";
 
                 if (!eo.isCplot)
                 {
@@ -30699,7 +30725,7 @@ namespace Gekko
             bool match = false;
             foreach (Excel.Worksheet xx in objSheets)
             {
-                if (G.equal(xx.Name.Trim(), sheet.Trim()))
+                if (G.Equal(xx.Name.Trim(), sheet.Trim()))
                 {
                     match = true;
                 }
@@ -30714,7 +30740,7 @@ namespace Gekko
             isCols = false;
             if (oPrt != null)
             {
-                if (G.equal(oPrt.prtType, "sheet") || G.equal(oPrt.prtType, "clip"))
+                if (G.Equal(oPrt.prtType, "sheet") || G.Equal(oPrt.prtType, "clip"))
                 {
                     isRows = Program.options.sheet_rows;
                     isCols = Program.options.sheet_cols;
@@ -30730,17 +30756,17 @@ namespace Gekko
                     G.Writeln2("*** ERROR: It seems that OPTION sheet rows/cols are both set to 'yes'");
                     throw new GekkoException();
                 }
-                if (G.equal(oPrt.opt_rows, "yes") && G.equal(oPrt.opt_cols, "yes"))
+                if (G.Equal(oPrt.opt_rows, "yes") && G.Equal(oPrt.opt_cols, "yes"))
                 {
                     G.Writeln2("*** ERROR: It seems that options <rows> and <cols> are used at the same time");
                     throw new GekkoException();
                 }
-                if (G.equal(oPrt.opt_rows, "yes"))
+                if (G.Equal(oPrt.opt_rows, "yes"))
                 {
                     isRows = true;
                     isCols = false;
                 }
-                else if (G.equal(oPrt.opt_cols, "yes"))
+                else if (G.Equal(oPrt.opt_cols, "yes"))
                 {
                     isRows = false;
                     isCols = true;
@@ -31646,17 +31672,17 @@ namespace Gekko
 
             foreach (EquationHelper eh in Program.model.equations)
             {
-                if (block != null && !G.equal(block, eh.modelBlock)) continue; //out-filtering those that are not in chosen block
+                if (block != null && !G.Equal(block, eh.modelBlock)) continue; //out-filtering those that are not in chosen block
                 string var = eh.lhs;
                 string code = eh.equationCode;
 
                 if (true)
                 {
-                    if (G.equal(code.Substring(0, 1), "i"))
+                    if (G.Equal(code.Substring(0, 1), "i"))
                     {
                         after_i_type.Add(var);
                     }
-                    else if (G.equal(code.Substring(0, 1), "d"))  //in frml file, it starts with "y" and typically var name (yEnly)
+                    else if (G.Equal(code.Substring(0, 1), "d"))  //in frml file, it starts with "y" and typically var name (yEnly)
                     {
                         after_d_type.Add(var);
                     }
@@ -32292,7 +32318,7 @@ namespace Gekko
             bool success = false;
             foreach (EquationHelper eh in Program.model.equations)
             {
-                if (G.equal(eh.lhs, var1))
+                if (G.Equal(eh.lhs, var1))
                 {
                     PrintEquationVariables(t, eh);
                     success = true;

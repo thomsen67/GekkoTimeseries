@@ -54,7 +54,7 @@ Additionally, there are model, solve, equation options.
         public double databank_compare_trel = 0.0001d;
         public bool databank_file_copylocal = true;
         public bool databank_file_gbk_compress = true;
-        public string databank_file_gbk_version = "1.1";  //decides what kind of .gbk file is written  
+        public string databank_file_gbk_version = "1.2";  //decides what kind of .gbk file is written  
         public string databank_file_gbk_internal = "databank.data"; //change to "databank.data" in Gekko 2.2
         public string databank_logic = "default";  //default | aremos
         public bool databank_search = false;
@@ -276,7 +276,7 @@ Additionally, there are model, solve, equation options.
                 {
                     line += name + " = ???;";
                 }
-                if (G.equal(Program.options.interface_mode, "data") && line.StartsWith("option solve ", StringComparison.OrdinalIgnoreCase))
+                if (G.Equal(Program.options.interface_mode, "data") && line.StartsWith("option solve ", StringComparison.OrdinalIgnoreCase))
                 {
                     //do nothing
                 }
@@ -293,7 +293,7 @@ Additionally, there are model, solve, equation options.
                 G.Writeln(s);
             }
             G.Writeln();
-            if (G.equal(Program.options.interface_mode, "data"))
+            if (G.Equal(Program.options.interface_mode, "data"))
             {
                 G.Writeln("+++ NOTE: option solve... are not listed in data-mode");
             }

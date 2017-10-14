@@ -48,7 +48,7 @@ namespace Gekko
             }
             set
             {
-                if (G.equal(this.aliasName, Globals.Work) || G.equal(this.aliasName, Globals.Ref))
+                if (G.Equal(this.aliasName, Globals.Work) || G.Equal(this.aliasName, Globals.Ref))
                 {
                     this.fileNameWithPath = value;  //overwrite filename with latest bank read or merged into Work/Ref
                 }
@@ -198,7 +198,7 @@ namespace Gekko
                 //if inside a loop.
                 //The name may still be strange, but that will be caught in the Chop() method.
                 //it seems "SER {'1x'} = ... " will be legal, but never mind. It can never be called with "PRT 1x" anyway.
-                if (G.IsLetterOrDigitOrUnderscore(c) || c == Globals.symbolMemvar || c == Globals.symbolList || c == Globals.symbolTilde)
+                if (G.IsLetterOrDigitOrUnderscore(c) || c == Globals.symbolMemvar || c == Globals.symbolList || c == Globals.freqIndicator)
                 {
                     //good
                 }
@@ -207,7 +207,7 @@ namespace Gekko
                     G.Writeln2("***ERROR: Malformed name: '" + name + "'");
                     throw new GekkoException();
                 }
-                if (c == Globals.symbolTilde) hasTilde = true;
+                if (c == Globals.freqIndicator) hasTilde = true;
             }
             TimeSeries ts = x as TimeSeries;
             if (ts != null)

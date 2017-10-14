@@ -152,22 +152,22 @@ namespace Gekko
             }
             else
             {
-                if (G.equal(text, "main"))
+                if (G.Equal(text, "main"))
                 {
                     Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage1;
                     if (refreshArrows) Gui.gui.GuiBrowseArrowsStuff(null, false, ETabs.Main);
                 }
-                if (G.equal(text, "output"))
+                if (G.Equal(text, "output"))
                 {
                     Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
                     if (refreshArrows) Gui.gui.GuiBrowseArrowsStuff(null, false, ETabs.Output);
                 }
-                if (G.equal(text, "help"))
+                if (G.Equal(text, "help"))
                 {
                     Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage3;
                     if (refreshArrows) Gui.gui.GuiBrowseArrowsStuff(null, false, ETabs.Help);
                 }
-                if (G.equal(text, "menu"))
+                if (G.Equal(text, "menu"))
                 {
                     Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage4;
                     if (refreshArrows) Gui.gui.GuiBrowseArrowsStuff(null, false, ETabs.Menu);
@@ -191,7 +191,7 @@ namespace Gekko
             else
             {
 
-                if (G.equal(Program.options.interface_mode, "sim"))
+                if (G.Equal(Program.options.interface_mode, "sim"))
                 {
                     //double r = 191; double g = 221; double b = 162; double alpha = 0.00d;
                     //a little more fresh color
@@ -199,12 +199,12 @@ namespace Gekko
                     double r = 191; double g = 234; double b = 154; double alpha = 0.00d;
                     Gui.gui.statusStrip1.BackColor = System.Drawing.Color.FromArgb((int)(r * (1d - alpha) + 255d * alpha), (int)(g * (1d - alpha) + 255d * alpha), (int)(b * (1d - alpha) + 255d * alpha));
                 }
-                else if (G.equal(Program.options.interface_mode, "data"))
+                else if (G.Equal(Program.options.interface_mode, "data"))
                 {
                     double r = 191; double g = 205; double b = 219; double alpha = 0.00d;                    
                     Gui.gui.statusStrip1.BackColor = System.Drawing.Color.FromArgb((int)(r * (1d - alpha) + 255d * alpha), (int)(g * (1d - alpha) + 255d * alpha), (int)(b * (1d - alpha) + 255d * alpha));
                 }
-                else if (G.equal(Program.options.interface_mode, "mixed"))
+                else if (G.Equal(Program.options.interface_mode, "mixed"))
                 {
                     //double r = 255; double g = 232; double b = 166; double alpha = 0.20d;                    
                     //double r = 251; double g = 229; double b = 58; double alpha = 0.60d;

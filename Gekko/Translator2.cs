@@ -46,7 +46,7 @@ namespace Gekko
             }
             else
             {
-                if (G.equal(node.Text, "cmd") && node.GetPrevious() != null && node.GetPrevious().Text == ".")
+                if (G.Equal(node.Text, "cmd") && node.GetPrevious() != null && node.GetPrevious().Text == ".")
                 {
                     node.Text = Globals.extensionCommand;
                 }
@@ -198,14 +198,14 @@ namespace Gekko
 
         private static void HandleCommand3(ASTNode2 node, GekkoDictionary<string, string> listMemory, GekkoDictionary<string, string> matrixMemory, GekkoDictionary<string, string> scalarMemory)
         {
-            if (GetCommandType(node) == "delete" && G.equal(node.Text, "series"))
+            if (GetCommandType(node) == "delete" && G.Equal(node.Text, "series"))
             {
                 ASTNode2 xx = node.GetCommand2();
                 node.GetCommand2().AddOptionAfterVisitor("series");
                 node.Text = "";         
             }
 
-            if (GetCommandType(node) == "delete" && G.equal(node.Text, "*"))
+            if (GetCommandType(node) == "delete" && G.Equal(node.Text, "*"))
             {
                 if (node.Parent.ChildrenCount() == 1)
                 {
@@ -266,7 +266,7 @@ namespace Gekko
             }           
 
 
-            if (G.equal(node.Text, "#"))
+            if (G.Equal(node.Text, "#"))
             {
                 // #
                 bool isLeftHandSideOfEquals = false;
@@ -321,17 +321,17 @@ namespace Gekko
                 }
             }
 
-            if (G.equal(node.Text, "+"))
+            if (G.Equal(node.Text, "+"))
             {
                 if (GetCommandType(node) == "list") node.Text = "&+";  //                        
             }
 
-            if (G.equal(node.Text, "*"))
+            if (G.Equal(node.Text, "*"))
             {
                 if (GetCommandType(node) == "list") node.Text = "&*";  //                        
             }
 
-            if (G.equal(node.Text, "-"))
+            if (G.Equal(node.Text, "-"))
             {
                 if (GetCommandType(node) == "list") node.Text = "&-";  //                        
             }
@@ -385,7 +385,7 @@ namespace Gekko
                 if (node.Text == "." && G.IsIdentTranslate(node.GetNext().Text) && node.GetNext().leftBlanks == "")
                 {
                     // .tot etc.
-                    if (G.equal(node.GetNext().Text, "a") || G.equal(node.GetNext().Text, "q") || G.equal(node.GetNext().Text, "m"))
+                    if (G.Equal(node.GetNext().Text, "a") || G.Equal(node.GetNext().Text, "q") || G.Equal(node.GetNext().Text, "m"))
                     {
                         //do nothing
                     }
@@ -415,7 +415,7 @@ namespace Gekko
                 node.Text = node.Text.Replace("#", "%");
             }
 
-            if (G.equal(node.Text, "repeat"))
+            if (G.Equal(node.Text, "repeat"))
             {
                 node.Text = Cap("rep", node.Text);
             }
@@ -440,7 +440,7 @@ namespace Gekko
                                 if (G.IsIntegerTranslate(node.GetChild(2).Text))
                                 {
                                     //is like this: abc(-12) or abc(+5), seems like a lag/lead
-                                    if (G.equal(node.GetPrevious().Text, "log") || G.equal(node.GetPrevious().Text, "exp"))
+                                    if (G.Equal(node.GetPrevious().Text, "log") || G.Equal(node.GetPrevious().Text, "exp"))
                                     {
                                         //do nothing
                                     }
@@ -482,8 +482,8 @@ namespace Gekko
                 int count2 = 0;
                 foreach (ASTNode2 xx in node.ChildrenIterator())
                 {
-                    if (G.equal(xx.Text, "if")) count1++;
-                    if (G.equal(xx.Text, "then")) count2++;
+                    if (G.Equal(xx.Text, "if")) count1++;
+                    if (G.Equal(xx.Text, "then")) count2++;
                 }
                 if (count1 > 0 && count2 > 0)
                 {
@@ -501,7 +501,7 @@ namespace Gekko
                     if (temp2 != null && G.IsIdentTranslate(temp2.Text))
                     {
                         ASTNode2 temp3 = temp2.GetPrevious();
-                        if (temp3 != null && G.equal(temp3.Text, "to"))
+                        if (temp3 != null && G.Equal(temp3.Text, "to"))
                         {
                             temp.AddToRightTextExtra("*");
                         }
@@ -524,8 +524,8 @@ namespace Gekko
                 bool comma = false;
                 foreach (ASTNode2 xx in node.ChildrenIterator())
                 {
-                    if (G.equal(xx.Text, "by")) by = true;
-                    if (G.equal(xx.Text, "to")) to = true;
+                    if (G.Equal(xx.Text, "by")) by = true;
+                    if (G.Equal(xx.Text, "to")) to = true;
                     if (xx.Text == "=") equal = true;
                     if (xx.Text == ",") comma = true;
                     if (equal && !by)
@@ -593,7 +593,7 @@ namespace Gekko
         private static void HandleCommand2(ASTNode2 node)
         {
             //options
-            if (G.equal(node.Text, "#"))
+            if (G.Equal(node.Text, "#"))
             {
                 //Always transformed to %, we do not expect list or matrix in option field!
                 ASTNode2 next = node.Parent.GetChild(node.id + 1);
@@ -687,7 +687,7 @@ namespace Gekko
                 ASTNode2 xx = node.GetCommand3();
                 foreach (ASTNode2 child in xx.ChildrenIterator())
                 {
-                    if (G.equal(child.Text, "as")) child.Text = Cap("to", child.Text);
+                    if (G.Equal(child.Text, "as")) child.Text = Cap("to", child.Text);
                 }
             }
 

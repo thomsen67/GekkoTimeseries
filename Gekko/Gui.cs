@@ -207,17 +207,23 @@ namespace Gekko
 
         static void CrashHandler(object sender, UnhandledExceptionEventArgs args)
         {
-            Exception e = (Exception)args.ExceptionObject;
-            MessageBox.Show("Unexpected Gekko crash: " + e.Message + G.NL + "Terminating: " + args.IsTerminating);
+           
+            {
+                Exception e = (Exception)args.ExceptionObject;
+                MessageBox.Show("Unexpected Gekko crash: " + e.Message + G.NL + "Terminating: " + args.IsTerminating);
+            }
         }
 
         ///
         [STAThread]
         public static void Main(string[] args)
         {
-            //Code to handle unexpected crashes, for instance after hibernation
-            AppDomain currentDomain = AppDomain.CurrentDomain;
-            currentDomain.UnhandledException += new UnhandledExceptionEventHandler(CrashHandler);
+            if (!G.IsDebugSession)
+            {
+                //Code to handle unexpected crashes, for instance after hibernation
+                AppDomain currentDomain = AppDomain.CurrentDomain;
+                currentDomain.UnhandledException += new UnhandledExceptionEventHandler(CrashHandler);
+            }
             
             //args can be tested in VS, see Gekko project options, debug.
             string noini = null;
@@ -306,39 +312,7 @@ namespace Gekko
             this.StartThread(" ", true);  //to get a worker thread started
             CrossThreadStuff.SetTab("main", false);
             G.WriteDirs("small", false);
-
-            if (Globals.isGammaVersion)
-            {
-                G.Writeln();
-                G.Writeln("+-------------------------------------------+", Color.Red);
-                G.Writeln("|   This is a GAMMA VERSION intended for    |", Color.Red);
-                G.Writeln("|      imminent release as Gekko 2.0.       |", Color.Red);
-                G.Writeln("+-------------------------------------------+", Color.Red);
-                G.Writeln("                                             ", Color.Red);
-                G.Writeln("NOTE: This gamma version has some new code", Color.Red);
-                G.Writeln("      to handle long non-looping command files.", Color.Red);
-                G.Writeln("      If this poses problems, try setting", Color.Red);
-                G.Writeln("      OPTION system code split = 0.", Color.Red);
-                G.Writeln();
-                G.Writeln("NOTE: See the TRANSLATE command regarding", Color.Red);
-                G.Writeln("      files in Gekko 1.8 or AREMOS format.", Color.Red);
-                G.Writeln();
-                //Program.Pause("This is an untested BETA VERSION" + G.NL + "Please do not use it for serious purposes");
-                if (Globals.runningOnTTComputer)
-                {
-                    G.Writeln("GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA ", Color.Red);
-                    G.Writeln("GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA ", Color.Red);
-                    G.Writeln("GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA ", Color.Red);
-                    G.Writeln("GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA ", Color.Red);
-                    G.Writeln("GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA ", Color.Red);
-                    G.Writeln("GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA GAMMA ", Color.Red);
-                    G.Writeln();
-                }
-                else
-                {
-                    Program.Pause("GAMMA VERSION -- bugs can still appear: no guarantees");
-                }
-            }
+                        
 
             if (Globals.isBetaVersion)
             {
@@ -362,46 +336,7 @@ namespace Gekko
                 {
                     Program.Pause("BETA VERSION -- no guarantees");
                 }
-            }
-
-            if (Globals.isAlphaVersion)
-            {
-                G.Writeln();
-                G.Writeln("+-------------------------------------------+", Color.Red);
-                G.Writeln("|  This is a not fully tested ALPHA VERSION |", Color.Red);
-                G.Writeln("| Please do not use it for serious purposes |", Color.Red);
-                G.Writeln("+-------------------------------------------+", Color.Red);
-                G.Writeln();
-                //Program.Pause("This is an untested BETA VERSION" + G.NL + "Please do not use it for serious purposes");
-                if (Globals.runningOnTTComputer)
-                {
-                    G.Writeln("ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ", Color.Red);
-                    G.Writeln("ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ", Color.Red);
-                    G.Writeln("ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ", Color.Red);
-                    G.Writeln("ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ", Color.Red);
-                    G.Writeln("ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ", Color.Red);
-                    G.Writeln("ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ", Color.Red);
-                    G.Writeln("ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ", Color.Red);
-                    G.Writeln();
-                }
-                else
-                {
-                    Program.Pause("ALPHA VERSION -- no guarantees");
-                }
-            }
-
-            if (Globals.isPreviewVersion)
-            {
-                G.Writeln();
-                G.Writeln("+-------------------------------------------+", Color.Red);
-                G.Writeln("|     This is a BETA of Gekko 2.0           |", Color.Red);
-                G.Writeln("| Please do NOT use it for serious purposes.|", Color.Red);
-                G.Writeln("|  The input window is blue to remind you   |", Color.Red);
-                G.Writeln("|  that this is not an ordinary version.    |", Color.Red);
-                G.Writeln("+-------------------------------------------+", Color.Red);
-                G.Writeln();
-                //Program.Pause("This is an untested BETA VERSION" + G.NL + "Please do not use it for serious purposes");                
-            }
+            }            
 
             Program.CreateLocalCopyHelpChm();
             CrossThreadStuff.Zoom();
@@ -582,7 +517,7 @@ namespace Gekko
             if (track) MessageBox.Show("15.1");
             if (folder == null)
             {
-                if (G.equal(s1, s2))  //It happens that the we get c:\\... in one of them, and C:\\ in the other, so we use case-insensitive compare
+                if (G.Equal(s1, s2))  //It happens that the we get c:\\... in one of them, and C:\\ in the other, so we use case-insensitive compare
                 {
                     try
                     {
@@ -841,7 +776,7 @@ namespace Gekko
                 List<DateTimeHelper> ddd = new List<DateTimeHelper>();
                 foreach (FileInfo file in files)
                 {
-                    if (G.equal(file.Extension, ".mdl"))
+                    if (G.Equal(file.Extension, ".mdl"))
                     {
                         sum += file.Length;
                         ddd.Add(new DateTimeHelper() { dt = file.LastWriteTime, s = file.FullName, size = file.Length });
@@ -1480,7 +1415,7 @@ namespace Gekko
                 }
                 else if (type == "undosim")
                 {
-                    if (!G.equal(Globals.undoSim.id.ToString(), input))
+                    if (!G.Equal(Globals.undoSim.id.ToString(), input))
                     {
                         G.Writeln();
                         G.Writeln("*** ERROR: You can only undo the last simulation, not previous ones");
@@ -1495,7 +1430,7 @@ namespace Gekko
                 }
                 else if (type == "packsim")
                 {
-                    if (!G.equal(Globals.packSim.id.ToString(), input))
+                    if (!G.Equal(Globals.packSim.id.ToString(), input))
                     {
                         G.Writeln();
                         G.Writeln("*** ERROR: You can only pack the last simulation, not previous ones");
@@ -1509,7 +1444,7 @@ namespace Gekko
                         Program.FromAToDatabank(Globals.packSim.tStart, Globals.packSim.tEnd, false, Program.databanks.GetFirst(), Globals.packSim.obsWithLags, Globals.packSim.obsSimPeriod, Globals.packSim.a, null, null);
                         Zipper zipper = new Zipper("gekko_sim_error.zip");
 
-                        Program.Write(Program.databanks.GetFirst(), Globals.packSim.tStart0, Globals.packSim.tEnd, zipper.tempFolder + "\\bank", false, new List<BankNameVersion>(), "" + Globals.extensionDatabank + "", true, false);
+                        Program.WriteGbk(Program.databanks.GetFirst(), Globals.packSim.tStart0, Globals.packSim.tEnd, zipper.tempFolder + "\\bank", false, new List<BankNameVersion>(), "" + Globals.extensionDatabank + "", true, false);
                         Program.WaitForFileCopy(Globals.modelPathAndFileName, zipper.tempFolder + "\\model.frm"); ;
                         Program.Pipe(zipper.tempFolder + "\\simerror.txt", null);
                         G.Writeln(Globals.packSim.tStart.ToString() + " " + Globals.packSim.tEnd.ToString());
@@ -1759,10 +1694,13 @@ namespace Gekko
 
             {
                 string commandLine = longProcess.gekkoGui.threadInput;
-
-                if (true)
+                
+                if (G.IsDebugSession)
                 {
-
+                    longProcess.Run(p);
+                }
+                else
+                {
                     try
                     {
                         longProcess.Run(p);
@@ -1778,6 +1716,7 @@ namespace Gekko
                             toolStripButton3.Enabled = false;
                         }
                         Program.GekkoExceptionCleanup(p);
+                        if (G.IsDebugSession) throw;
                     }
                 }
             }
@@ -1947,7 +1886,7 @@ namespace Gekko
                     }
                     else
                     {
-                        if (link && G.equal(var, Program.guiBrowseHistory[Program.guiBrowseNumber]))
+                        if (link && G.Equal(var, Program.guiBrowseHistory[Program.guiBrowseNumber]))
                         {
                             //retracing old history, but only if link (otherwise it will be treated as a DISP command, starting from scratch)
                         }
@@ -1984,7 +1923,7 @@ namespace Gekko
                     }
                     else
                     {
-                        if (G.equal(var, Program.guiBrowseHelpHistory[Program.guiBrowseHelpNumber]))
+                        if (G.Equal(var, Program.guiBrowseHelpHistory[Program.guiBrowseHelpNumber]))
                         {
                         }
                         else
@@ -2565,7 +2504,7 @@ namespace Gekko
                     Gui.gui.StartThread("menutable " + file + ";", true);  //to get a worker thread started
                     Globals.lastCalledMenuTable = file; //TODO: THIS CAN BE DELETED!!
                     //A bit hacky: but if table type is 'html' we should stay in Menu tab.
-                    if (!G.equal(Program.options.table_type, "html")) CrossThreadStuff.SetTab("main", true);
+                    if (!G.Equal(Program.options.table_type, "html")) CrossThreadStuff.SetTab("main", true);
                     e.Cancel = true;
                 }
             }

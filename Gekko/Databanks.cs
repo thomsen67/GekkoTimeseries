@@ -53,7 +53,7 @@ namespace Gekko
             {
                 foreach (Databank db in this.storage)
                 {
-                    if (G.equal(db.aliasName, databank)) return db;
+                    if (G.Equal(db.aliasName, databank)) return db;
                 }
             }
             return null;            
@@ -78,7 +78,7 @@ namespace Gekko
             bool readFromFile = false;
             //Does not read the actual bank, but just arranges for the bank to be read into the right 'slot'
             //If <first/edit> or <ref>, the bank in the [0] or [1] slot is pushed down to [2].
-            if (G.equal(databank.aliasName, Globals.Work))
+            if (G.Equal(databank.aliasName, Globals.Work))
             {
                 if (openType == EOpenType.Normal || openType == EOpenType.Last)
                 {
@@ -109,7 +109,7 @@ namespace Gekko
                     throw new GekkoException();
                 }     
             }
-            else if (G.equal(databank.aliasName, Globals.Ref))  //Ref
+            else if (G.Equal(databank.aliasName, Globals.Ref))  //Ref
             {
                 if (openType == EOpenType.Normal)
                 {
@@ -148,7 +148,7 @@ namespace Gekko
             else  //the databank name does not exist, so it is new and will be read from file later on
             {
                 readFromFile = true;
-                if (G.equal(Program.options.databank_logic, "aremos"))
+                if (G.Equal(Program.options.databank_logic, "aremos"))
                 {
                     DatabankLogicAREMOS(databank, openType, openPosition, name, m);
                 }
@@ -403,15 +403,15 @@ namespace Gekko
             BaseI = -12345;
             for (int i = 0; i < Program.databanks.storage.Count; i++)
             {
-                if (G.equal(Program.databanks.storage[i].aliasName, name))
+                if (G.Equal(Program.databanks.storage[i].aliasName, name))
                 {
                     existI = i;
                 }
-                if (G.equal(Program.databanks.storage[i].aliasName, Globals.Work))
+                if (G.Equal(Program.databanks.storage[i].aliasName, Globals.Work))
                 {
                     WorkI = i;
                 }
-                if (G.equal(Program.databanks.storage[i].aliasName, Globals.Ref))
+                if (G.Equal(Program.databanks.storage[i].aliasName, Globals.Ref))
                 {
                     BaseI = i;
                 }
@@ -423,7 +423,7 @@ namespace Gekko
             bool ok = true;
             for (int i = 0; i < this.storage.Count; i++)
             {
-                if (G.equal(db1.aliasName, this.storage[i].aliasName))
+                if (G.Equal(db1.aliasName, this.storage[i].aliasName))
                 {
                     this.storage[i] = db2; break;
                 }
@@ -437,12 +437,12 @@ namespace Gekko
 
         public Databank RemoveDatabank(string name)
         {
-            if (G.equal(name, Globals.Work))
+            if (G.Equal(name, Globals.Work))
             {
                 G.Writeln2("*** ERROR: " + Globals.Work + " databank cannot be closed");
                 throw new GekkoException();
             }
-            if (G.equal(name, Globals.Ref))
+            if (G.Equal(name, Globals.Ref))
             {
                 G.Writeln2("*** ERROR: " + Globals.Ref + " databank cannot be closed");
                 throw new GekkoException();
@@ -460,7 +460,7 @@ namespace Gekko
             List<Databank> m = new List<Databank>(this.storage.Count - 1);
             if (existI == 0) //found as first
             {
-                if (G.equal(Program.options.databank_logic, "aremos"))
+                if (G.Equal(Program.options.databank_logic, "aremos"))
                 {
                     //AREMOS jumping
                     m.Add(this.storage[WorkI]);  //[0]: Work is put back
@@ -525,16 +525,16 @@ namespace Gekko
             List<Databank> dbList = new List<Databank>();
             foreach (Databank databank in Program.databanks.storage)
             {
-                if (G.equal(databank.aliasName, Globals.Work)) dbList.Add(databank);
+                if (G.Equal(databank.aliasName, Globals.Work)) dbList.Add(databank);
             }
             foreach (Databank databank in Program.databanks.storage)
             {
-                if (G.equal(databank.aliasName, Globals.Ref)) dbList.Add(databank);
+                if (G.Equal(databank.aliasName, Globals.Ref)) dbList.Add(databank);
             }
             foreach (Databank databank in Program.databanks.storage)
             {
-                if (G.equal(databank.aliasName, Globals.Work)) continue;
-                if (G.equal(databank.aliasName, Globals.Ref)) continue;
+                if (G.Equal(databank.aliasName, Globals.Work)) continue;
+                if (G.Equal(databank.aliasName, Globals.Ref)) continue;
                 dbList.Add(databank);
             }
             Program.databanks.storage = dbList;

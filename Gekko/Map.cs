@@ -207,5 +207,13 @@ namespace Gekko
             }
             return temp;
         }
+
+        public void DeepTrim()
+        {            
+            foreach (KeyValuePair<string, IVariable> kvp in this.storage)
+            {
+                kvp.Value.DeepTrim();
+            }            
+        }        
     }
 }

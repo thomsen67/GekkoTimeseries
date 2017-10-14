@@ -40,7 +40,7 @@ namespace Gekko
         {
             if (indexes.Length == 1)
             {
-                IVariable index = indexes[0];                
+                IVariable index = indexes[0];
                 int d1 = this.data.GetLength(0);
                 int d2 = this.data.GetLength(1);
                 if (d2 == 1)
@@ -72,7 +72,7 @@ namespace Gekko
 
         private IVariable Handle2dIndexer(IVariable[] indexes)
         {
-            
+
             IVariable index1 = indexes[0];
             IVariable index2 = indexes[1];
 
@@ -97,7 +97,7 @@ namespace Gekko
                 RangeHelper(index1, index2, out xx1, out xx2);
                 return GetDataHelper((Range)xx1, (Range)xx2);
             }
-        }        
+        }
 
         ////public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange)
         ////{
@@ -153,7 +153,7 @@ namespace Gekko
         ////        throw new GekkoException();
         ////    }
         ////}
-        
+
         ////public IVariable Indexer(GekkoSmpl t, IVariable index, IVariablesFilterRange indexRange)
         ////{
         ////    int i0 = O.ConvertToInt(index);            
@@ -202,9 +202,9 @@ namespace Gekko
         ////        int j = j0 - 1;
         ////        for (int i = i1 - 1; i <= i2 - 1; i++)
         ////        {
-                    
+
         ////                m.data[i - ii1, 0] = this.data[i, j];
-                    
+
         ////        }
         ////        return m;
         ////    }
@@ -219,7 +219,7 @@ namespace Gekko
         public IVariable Negate(GekkoSmpl t)
         {
             int ni = this.data.GetLength(0);
-            int nj = this.data.GetLength(1);            
+            int nj = this.data.GetLength(1);
             Matrix m = new Matrix(ni, nj);
             for (int i = 0; i < ni; i++)
             {
@@ -228,7 +228,7 @@ namespace Gekko
                     m.data[i, j] = -this.data[i, j];
                 }
             }
-            return m;               
+            return m;
         }
 
         public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
@@ -266,11 +266,11 @@ namespace Gekko
             {
                 G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a " + this.data.GetLength(0) + "x" + this.data.GetLength(1) + " matrix.");
                 throw new GekkoException();
-            }            
+            }
         }
 
         public string ConvertToString()
-        {            
+        {
             G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a STRING from a matrix.");
             throw new GekkoException();
         }
@@ -336,7 +336,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                 default:
-                    {                        
+                    {
                         G.Writeln2("*** ERROR: You are trying to add a MATRIX and a " + x.Type().ToString().ToUpper());
                         throw new GekkoException();
                     }
@@ -364,7 +364,7 @@ namespace Gekko
                 z.data = c;
                 return z;
             }
-            else             
+            else
             {
                 //subtraction of a scalar is not legal, this is like AREMOS
                 G.Writeln2("*** ERROR: You are trying to add a MATRIX and a " + type.ToString().ToUpper());
@@ -380,7 +380,7 @@ namespace Gekko
                 double[,] a = this.data;
                 double[,] b = ((Matrix)x).data;
                 // m x k  *  p x n
-                int m = a.GetLength(0);                
+                int m = a.GetLength(0);
                 int k = a.GetLength(1);
                 int p = b.GetLength(0);
                 int n = b.GetLength(1);
@@ -432,7 +432,7 @@ namespace Gekko
                 //This is allowed in AREMOS, too
                 double[,] a = this.data;
                 double b = O.ConvertToVal(x);  //#875324397
-                int m = a.GetLength(0);                
+                int m = a.GetLength(0);
                 int k = a.GetLength(1);
                 double[,] c = O.MultiplyMatrixScalar(a, b, m, k);
                 Matrix z = new Matrix();
@@ -464,7 +464,7 @@ namespace Gekko
                         if (p == 1 && n == 1)
                         {
                             //Special case
-                            double[,] c = O.MultiplyMatrixScalar(a, 1d/b[0, 0], m, k);
+                            double[,] c = O.MultiplyMatrixScalar(a, 1d / b[0, 0], m, k);
                             Matrix z = new Matrix();
                             z.data = c;
                             return z;
@@ -472,7 +472,7 @@ namespace Gekko
                         else
                         {
                             G.Writeln2("*** ERROR: You can only divide a matrix with a scalar or 1x1 matrix.");
-                            throw new GekkoException();                            
+                            throw new GekkoException();
                         }
                     }
                 case EVariableType.Val:
@@ -481,7 +481,7 @@ namespace Gekko
                         double b = O.ConvertToVal(x);  //#875324397
                         int m = a.GetLength(0);
                         int k = a.GetLength(1);
-                        double[,] c = O.MultiplyMatrixScalar(a, 1d/b, m, k);
+                        double[,] c = O.MultiplyMatrixScalar(a, 1d / b, m, k);
                         Matrix z = new Matrix();
                         z.data = c;
                         return z;
@@ -597,7 +597,7 @@ namespace Gekko
                 if (i1 == 0 || i2 == 0 || j1 == 0 || j2 == 0) G.Writeln("           Please note that indicies are 1-based");
                 throw new GekkoException();
             }
-        }        
+        }
 
         public IVariable SetDataHelper(Range indexRange1, Range indexRange2, IVariable x3)
         {
@@ -625,7 +625,7 @@ namespace Gekko
                 Matrix m = (Matrix)x3;
                 int dimI = i2 - i1 + 1;
                 int dimJ = j2 - j1 + 1;
-                if(dimI != m.data.GetLength(0) || dimJ != m.data.GetLength(1))
+                if (dimI != m.data.GetLength(0) || dimJ != m.data.GetLength(1))
                 {
                     G.Writeln2("*** ERROR: Left-hand side selection is " + dimI + "x" + dimJ + ", but right-hand matrix is " + m.data.GetLength(0) + "x" + m.data.GetLength(1));
                     throw new GekkoException();
@@ -651,7 +651,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            else if(x3.Type() == EVariableType.Val)
+            else if (x3.Type() == EVariableType.Val)
             {
                 ScalarVal v = (ScalarVal)x3;
                 try
@@ -689,14 +689,14 @@ namespace Gekko
             int maxDim2 = this.data.GetLength(1);
             if (dim1 > maxDim1 || dim2 > maxDim2)
             {
-                G.Writeln2("*** ERROR: Indexer [" + dim1 + ", " + dim2 + "] on a matrix with dimensions " + maxDim1 + " x " + maxDim2);                
+                G.Writeln2("*** ERROR: Indexer [" + dim1 + ", " + dim2 + "] on a matrix with dimensions " + maxDim1 + " x " + maxDim2);
             }
             if (dim1 < 1 || dim2 < 1)
             {
-                G.Writeln2("*** ERROR: Indexer [" + dim1 + ", " + dim2 + "]: indexers must be >= 1");                
-            }            
+                G.Writeln2("*** ERROR: Indexer [" + dim1 + ", " + dim2 + "]: indexers must be >= 1");
+            }
         }
-        
+
         public IVariable DeepClone()
         {
             Matrix m = new Gekko.Matrix();
@@ -711,8 +711,13 @@ namespace Gekko
                 m.rownames.AddRange(this.rownames);
             }
             m.data = new double[this.data.GetLength(0), this.data.GetLength(1)];
-            Array.Copy(this.data, m.data, this.data.Length);            
+            Array.Copy(this.data, m.data, this.data.Length);
             return m;
+        }
+
+        public void DeepTrim()
+        {
+            //do nothing, nothing to trim
         }
     }
 }

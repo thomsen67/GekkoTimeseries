@@ -1019,7 +1019,7 @@ namespace Gekko
                 if (true)
                 {
                     string hash = GetHashCodeFromIvariables(indexes);
-                    string varname = s + Globals.symbolTurtle + hash + Globals.symbolTilde + G.GetFreq(this.freq);
+                    string varname = s + Globals.symbolTurtle + hash + Globals.freqIndicator + G.GetFreq(this.freq);
                     ts = this.meta.parentDatabank.GetIVariable(varname) as TimeSeries;  //should not be able to return null, since no-sigil name is timeseries                    
                     if (ts == null)
                     {
@@ -1254,6 +1254,12 @@ namespace Gekko
                 tsCopy.SetGhost(this.IsGhost());                
             }
             return tsCopy;
+        }
+
+        public void DeepTrim()
+        {
+            //Handle sub-series!!! #987539875
+            this.Trim();
         }
 
     }

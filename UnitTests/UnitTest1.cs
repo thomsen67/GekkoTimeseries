@@ -12654,7 +12654,7 @@ namespace UnitTests
         {
             EFreq eFreq = G.GetFreq(freq);
 
-            if (!G.equal(freq, "a") && !s.Contains(Globals.freqIndicator))
+            if (!G.Equal(freq, "a") && !s.Contains(Globals.freqIndicator.ToString()))
             {
                 //For this method, we do not want to use the global Program.options.freq, but the local one given here
                 //A hack: freq stuff and iterations should be cleaned up! See hack: false below
@@ -12739,7 +12739,7 @@ namespace UnitTests
             {
                 foreach (string ss in ignore)
                 {
-                    if (G.equal(s, ss)) goto Flag;
+                    if (G.Equal(s, ss)) goto Flag;
                 }
                 TimeSeries tsW = First().GetVariable(s);
                 TimeSeries tsB = Program.databanks.GetRef().GetVariable(s);

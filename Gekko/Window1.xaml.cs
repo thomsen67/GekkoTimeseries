@@ -159,19 +159,19 @@ namespace Gekko
             else
             {
                 //All these buttons are in the "Decomp" columns, codes are from e.g. UDVALG<p> or UDVALG<q> calls from command lines/files.
-                if (G.equal(decompOptions.prtOption, "d"))
+                if (G.Equal(decompOptions.prtOption, "d"))
                 {
                     radioButton6.IsChecked = true;
                 }
-                if (G.equal(decompOptions.prtOption, "p"))
+                if (G.Equal(decompOptions.prtOption, "p"))
                 {
                     radioButton8.IsChecked = true;
                 }
-                if (G.equal(decompOptions.prtOption, "m"))
+                if (G.Equal(decompOptions.prtOption, "m"))
                 {
                     radioButton26.IsChecked = true;
                 }
-                if (G.equal(decompOptions.prtOption, "q"))
+                if (G.Equal(decompOptions.prtOption, "q"))
                 {
                     radioButton28.IsChecked = true;
                 }
@@ -915,7 +915,7 @@ namespace Gekko
 
                             string var2 = G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator);
 
-                            if (G.equal(var2, Globals.decompText0))
+                            if (G.Equal(var2, Globals.decompText0))
                             {
                                 if (decompOptions.expression != null)
                                 {
@@ -926,7 +926,7 @@ namespace Gekko
                                     this.equation.Text = "This value corresponds to evaluating the right-hand side of the equation.";
                                 }
                             }
-                            else if (G.equal(var2, Globals.decompText1))
+                            else if (G.Equal(var2, Globals.decompText1))
                             {
                                 if (decompOptions.expression != null)
                                 {
@@ -938,7 +938,7 @@ namespace Gekko
                                 }
 
                             }
-                            else if (G.equal(var2, Globals.decompText1a))  //raw
+                            else if (G.Equal(var2, Globals.decompText1a))  //raw
                             {
                                 if (decompOptions.expression != null)
                                 {
@@ -950,7 +950,7 @@ namespace Gekko
                                 }
 
                             }
-                            else if (G.equal(var2, Globals.decompText2))
+                            else if (G.Equal(var2, Globals.decompText2))
                             {
                                 if (decompOptions.expression != null)
                                 {
@@ -961,7 +961,7 @@ namespace Gekko
                                     this.equation.Text = "This value is the result of evaluating the right-hand side of the equation minus the sum of decomposed contributions." + G.NL + "If the equation is linear, this number is very small (in principle: zero).";
                                 }
                             }
-                            else if (G.equal(var2, Globals.decompText2a))  //raw
+                            else if (G.Equal(var2, Globals.decompText2a))  //raw
                             {
                                 if (decompOptions.expression != null)
                                 {
@@ -1128,7 +1128,7 @@ namespace Gekko
                     flowText.Visibility = Visibility.Collapsed;
                 }
 
-                if (G.equal(transformationCodeAugmented, "m") || G.equal(transformationCodeAugmented, "xm") || G.equal(transformationCodeAugmented, "q") || G.equal(transformationCodeAugmented, "xq") || G.equal(transformationCodeAugmented, "mp") || G.equal(transformationCodeAugmented, "xmp"))
+                if (G.Equal(transformationCodeAugmented, "m") || G.Equal(transformationCodeAugmented, "xm") || G.Equal(transformationCodeAugmented, "q") || G.Equal(transformationCodeAugmented, "xq") || G.Equal(transformationCodeAugmented, "mp") || G.Equal(transformationCodeAugmented, "xmp"))
                 {
                     checkBox2.IsEnabled = false;  //baseline, not meaningful for multiplier types
                     checkBox2.Opacity = 0.5;

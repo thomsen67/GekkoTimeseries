@@ -29,7 +29,6 @@ options {
 }
 
 tokens {
-
 	ASTDOLLAR;
 	ASTLEFTSIDE;
 	ASTASSIGNMENT;
@@ -1246,8 +1245,7 @@ Y2                    = 'Y2'                       ;
     ZERO             = 'ZERO'            ;
     ZOOM = 'ZOOM';
     ZVAR             = 'ZVAR'            ;
-	// --- tokens1 end ---
- 
+	// --- tokens1 end --- 
 }
 
                               @parser::namespace { Gekko }
@@ -1284,7 +1282,7 @@ Y2                    = 'Y2'                       ;
                                 {
                                         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 										
-// --- tokens2 start ---
+										// --- tokens2 start ---
             			
 d.Add("REMOTE", REMOTE);
             d.Add("GRIDSTYLE", GRIDSTYLE);
@@ -1815,90 +1813,43 @@ d.Add("Y" ,Y);
                               }
 
 
-/*------------------------------------------------------------------
- * PARSER RULES
- *------------------------------------------------------------------*/
-
-/*
-
-start                      : statements EOF;  //EOF is necessary in order to force the whole file to be parsed
-
-statements                 : statements2*;
-
-statements2                     :
-                            //SEMICOLON -> //stray semicolon is ok, nothing is written                          
-							
-
-						    assignment           SEMICOLON!
-						  | for2
-						  | if2
-						  | print                SEMICOLON!
-						  | reset                SEMICOLON!
-						  | run                  SEMICOLON!
-						  | functionDef          SEMICOLON!
-						  
-						  | return2               SEMICOLON!
-						  
-						 ;
-*/
-						  
-
-start                      : statements EOF;  //EOF is necessary in order to force the whole file to be parsed
-
-statements                 : statements2*;
-
-statements2                     :
-                            SEMICOLON -> //stray semicolon is ok, nothing is written
-                          | assignment           SEMICOLON!
-						  | for2
-						  | print                SEMICOLON!
-						  | run                  SEMICOLON!
-						  | functionDef          SEMICOLON!
-						  | reset                SEMICOLON!
-						  | return2               SEMICOLON!
-						  ;
-
-
-assignment				  : leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression);  //careful: see #09873245325 if changed
-
-// ------------------------------------------------------------------------------------------------------------------
+							  // ------------------------------------------------------------------------------------------------------------------
 // ------------------- expression START -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-//expression                : additiveExpression -> ^(ASTEXPRESSIONNEW additiveExpression);
-expression                : additiveExpression;
+expression:                 additiveExpression;
 
-additiveExpression        : (multiplicativeExpression -> multiplicativeExpression)
+additiveExpression:         (multiplicativeExpression -> multiplicativeExpression)
 							( (PLUS lbla=multiplicativeExpression -> ^(ASTPLUS $additiveExpression $lbla))
 							| (MINUS lblb=multiplicativeExpression -> ^(ASTMINUS $additiveExpression  $lblb)) )*
-						  ;
+						    ;
 
-multiplicativeExpression  : (powerExpression -> powerExpression)
+multiplicativeExpression:   (powerExpression -> powerExpression)
 						    ( (star lbla=powerExpression -> ^(ASTSTAR $multiplicativeExpression $lbla))
 						    | (DIV lblb=powerExpression -> ^(ASTDIV $multiplicativeExpression  $lblb)) )*
-						  ;
+						    ;
 
-powerExpression			  : (unaryExpression -> unaryExpression)
+powerExpression:			(unaryExpression -> unaryExpression)
 						    (pow lbla=unaryExpression -> ^(ASTPOWER $powerExpression $lbla))*	
-						  ;
+						    ;
 
-unaryExpression           : dollarExpression -> dollarExpression
+unaryExpression:            dollarExpression -> dollarExpression
 					      | MINUS dollarExpression -> ^(ASTNEGATE dollarExpression)
-						  ;						
+						    ;						
 
-dollarExpression		  : (indexerExpression -> indexerExpression)
+dollarExpression:		    (indexerExpression -> indexerExpression)
 						    (DOLLAR lbla=dollarConditional -> ^(ASTDOLLAR $dollarExpression $lbla))*	
-						  ; 						
+						    ; 						
 
-indexerExpression         : (primaryExpression -> primaryExpression)
+indexerExpression:          (primaryExpression -> primaryExpression)
 						    (lbla=dotOrIndexer -> ^(ASTDOTORINDEXER $indexerExpression $lbla))*
-						  ;
+						    ;
 
-primaryExpression         : leftParen! expression RIGHTPAREN!
+primaryExpression:          leftParen! expression RIGHTPAREN!
                           | value
-						  ;
+						    ;
 
-value                     : function //must be before varname
+value:                      function //must be before varname
 						  | bankvarname						
 						  | Integer -> ^(ASTINTEGER Integer)
 						  | indexerAlone
@@ -1909,174 +1860,196 @@ value                     : function //must be before varname
 						  | matrix
 						  | list
 						  | map
-						  ;
+						    ;
 
-leftSide                  : leftSideDollarExpression -> ^(ASTLEFTSIDE leftSideDollarExpression);
+leftSide:                   leftSideDollarExpression -> ^(ASTLEFTSIDE leftSideDollarExpression);
 
-leftSideDollarExpression  : (leftSideIndexerExpression -> leftSideIndexerExpression)
+leftSideDollarExpression:   (leftSideIndexerExpression -> leftSideIndexerExpression)
 						    (DOLLAR lbla=dollarConditional -> ^(ASTDOLLAR $leftSideDollarExpression $lbla))*	
-						  ; 						
+						    ; 						
 
-leftSideIndexerExpression : (bankvarname -> bankvarname)
+leftSideIndexerExpression:  (bankvarname -> bankvarname)
 						    (lbla=dotOrIndexer -> ^(ASTDOTORINDEXER $leftSideIndexerExpression $lbla))*
-						  ;
+						    ;
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- expression END -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 	
-indexerAlone			  : (leftBracketNoGlue|leftBracketNoGlueWild) indexerExpressionHelper RIGHTBRACKET -> ^(ASTINDEXERALONE indexerExpressionHelper); //also see rule indexerExpression
+indexerAlone:			    (leftBracketNoGlue|leftBracketNoGlueWild) indexerExpressionHelper RIGHTBRACKET -> ^(ASTINDEXERALONE indexerExpressionHelper); //also see rule indexerExpression
 						
-dotOrIndexer              : GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
+dotOrIndexer:               GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
 						  | leftBracketGlue indexerExpressionHelper2 RIGHTBRACKET -> ^(ASTINDEXER indexerExpressionHelper2)
-						  ;
+						    ;
 
-						  //just like b1:fy~q, we can use #m.fy~q, where fy~q is the varname.
-dotHelper				  : varname | function | Integer;
-indexerExpressionHelper2  : (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper+;
+						    //just like b1:fy~q, we can use #m.fy~q, where fy~q is the varname.
+dotHelper:				    varname | function | Integer;
+indexerExpressionHelper2:   (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper+;
 
-matrix                    : matrixCol;
-matrixCol                 : leftBracketNoGlue matrixRow ((doubleVerticalBar|SEMICOLON) matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
-matrixRow                 : expression (',' expression)*  -> ^(ASTMATRIXROW expression+);
+matrix:                     matrixCol;
+matrixCol:                  leftBracketNoGlue matrixRow ((doubleVerticalBar|SEMICOLON) matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
+matrixRow:                  expression (',' expression)*  -> ^(ASTMATRIXROW expression+);
 
-						  //trailing ',' is allowed, for instance ('a', 'b', ). This is Python style: ('a',) will then be a lists, not just a.
-list                      : leftParenNoGlue expression ',' listHelper RIGHTPAREN -> ^(ASTLISTDEF expression listHelper)
+						    //trailing ',' is allowed, for instance ('a', 'b', ). This is Python style: ('a',) will then be a lists, not just a.
+list:                       leftParenNoGlue expression ',' listHelper RIGHTPAREN -> ^(ASTLISTDEF expression listHelper)
                           | leftParenNoGlue expression ',' RIGHTPAREN -> ^(ASTLISTDEF expression)
-						  ;
-listHelper                : listHelper1 | listHelper2;
-listHelper1               : (expression ',')* expression -> expression+;
-listHelper2               : (expression ',')+ -> expression+;
+						    ;
+listHelper:                 listHelper1 | listHelper2;
+listHelper1:                (expression ',')* expression -> expression+;
+listHelper2:                (expression ',')+ -> expression+;
 
-map                       : leftParenNoGlue mapItem ',' mapHelper RIGHTPAREN -> ^(ASTMAPDEF mapItem mapHelper)
+map:                        leftParenNoGlue mapItem ',' mapHelper RIGHTPAREN -> ^(ASTMAPDEF mapItem mapHelper)
                           | leftParenNoGlue mapItem ','? RIGHTPAREN -> ^(ASTMAPDEF mapItem)   //the comma here is optional, not so for a list def.
-						  ;
-mapHelper                 : mapHelper1 | mapHelper2;
-mapHelper1                : (mapItem ',')* mapItem -> mapItem+;
-mapHelper2                : (mapItem ',')+ -> mapItem+;
-mapItem                   : assignment -> ^(ASTMAPITEM assignment);
+						    ;
+mapHelper:                  mapHelper1 | mapHelper2;
+mapHelper1:                 (mapItem ',')* mapItem -> mapItem+;
+mapHelper2:                 (mapItem ',')+ -> mapItem+;
+mapItem:                    assignment -> ^(ASTMAPITEM assignment);
 
-//FIXME
-//FIXME
-//FIXME ident -> fileName
-//FIXME
-//FIXME
-listFile                  : HASH leftParenGlue LISTFILE ident RIGHTPAREN -> ^(ASTLISTFILE ident);
+listFile:                   HASH leftParenGlue LISTFILE ident RIGHTPAREN -> ^(ASTLISTFILE ident);
 
-function                  : ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTFUNCTION ident expression*);
+function:                   ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTFUNCTION ident expression*);
 					
-dollarConditional         : LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)  //logicalOr can contain a listWithIndexer
+dollarConditional:          LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)  //logicalOr can contain a listWithIndexer
 						  | bankvarnameindex -> ^(ASTDOLLARCONDITIONALVARIABLE bankvarnameindex)  //does not need parenthesis						
-						  ;
+						    ;
 
-bankvarnameindex          : bankvarname ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 bankvarname expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!  //should catch #i0[#i], does not need a parenthesis!						
+bankvarnameindex:           bankvarname ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 bankvarname expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!  //should catch #i0[#i], does not need a parenthesis!						
 					
-indexerExpressionHelper   : expressionOrNothing doubleDot expressionOrNothing -> ^(ASTINDEXERELEMENT expressionOrNothing expressionOrNothing)     //'fm1'..'fm5'
+indexerExpressionHelper:    expressionOrNothing doubleDot expressionOrNothing -> ^(ASTINDEXERELEMENT expressionOrNothing expressionOrNothing)     //'fm1'..'fm5'
 						  | expression -> ^(ASTINDEXERELEMENT expression)                                     //'fm*' or -2 or 2000 or 2010q3
 						  | PLUS expression -> ^(ASTINDEXERELEMENTPLUS expression)                            //+1
-                          ;
+                            ;
 
-expressionOrNothing       : expression -> expression
+expressionOrNothing:        expression -> expression
 						  | -> ASTEMPTYRANGEELEMENT
-						  ;
+						    ;
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- name START -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-name                      : name2 -> ^(ASTNAME name2);
+name:                       name2 -> ^(ASTNAME name2);
 
-						  //name is without sigil, name is in principle just like characters, excluding sigils. Kind of like an advanced ident.
-name2                     : (ident | nameCurlyStart) (GLUE! identDigit | nameCurly)* ;
+						    //name is without sigil, name is in principle just like characters, excluding sigils. Kind of like an advanced ident.
+name2:                      (ident | nameCurlyStart) (GLUE! identDigit | nameCurly)* ;
 
-nameCurlyStart            : leftCurlyNoGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
+nameCurlyStart:             leftCurlyNoGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
 					      | leftCurlyNoGlue expression RIGHTCURLY -> ^(ASTCURLY expression)
-						  ;
+						    ;
 
-nameCurly                 : leftCurlyGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
+nameCurly:                  leftCurlyGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
 					      | leftCurlyGlue expression RIGHTCURLY -> ^(ASTCURLY expression)
-						  ;
+						    ;
 
-cname                     : name cnameHelper+ -> ^(ASTCNAME name cnameHelper+);
-cnameHelper               : GLUE sigilOrVertical name -> sigilOrVertical name;
+cname:                      name cnameHelper+ -> ^(ASTCNAME name cnameHelper+);
+cnameHelper:                GLUE sigilOrVertical name -> sigilOrVertical name;
 
-nameOrCname               : cname | name;  //cname must be before name
+nameOrCname:                cname | name;  //cname must be before name
 
-varname                   : nameOrCname freq? -> ^(ASTVARNAME ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER nameOrCname) ^(ASTPLACEHOLDER freq?))
+varname:                    nameOrCname freq? -> ^(ASTVARNAME ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER nameOrCname) ^(ASTPLACEHOLDER freq?))
 						  | sigil name -> ^(ASTVARNAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER name) ^(ASTPLACEHOLDER))
 						  | sigil leftParen cname rightParen -> ^(ASTVARNAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER cname) ^(ASTPLACEHOLDER))						  
-						  ;
+						    ;
 
-bankvarname               : (name COLON)? varname -> ^(ASTBANKVARNAME ^(ASTPLACEHOLDER name?) varname);
+bankvarname:                (name COLON)? varname -> ^(ASTBANKVARNAME ^(ASTPLACEHOLDER name?) varname);
 
-svarname                  : sigil? ident -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER sigil?) ident);
+svarname:                   sigil? ident -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER sigil?) ident);
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- name END -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-sigil                     : HASH GLUE -> ASTHASH
+sigil:                      HASH GLUE -> ASTHASH
 						  | PERCENT GLUE -> ASTPERCENT
-						  ;
+						    ;
 
-sigilOrVertical           : sigil
+sigilOrVertical:            sigil
 						  | VERTICALBAR -> ASTVERTICALBAR  //does not have glue after
-						  ;
+						    ;
 
-freq			   		  : GLUE TILDE GLUE name -> name;
+freq:			   		   GLUE TILDE GLUE name -> name;
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- logical START -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-logical                   : logicalOr;
+logical:                    logicalOr;
 
-logicalOr				  : (logicalAnd -> logicalAnd)
+logicalOr:				    (logicalAnd -> logicalAnd)
 							(OR lbla=logicalAnd -> ^(ASTOR $logicalOr $lbla))*
 						  ;
 
-logicalAnd				  : (logicalNot -> logicalNot)
+logicalAnd:				    (logicalNot -> logicalNot)
 							(AND lbla=logicalNot -> ^(ASTAND $logicalAnd $lbla))*
 						  ;
 
-logicalNot				  :  NOT logicalAtom     -> ^(ASTNOT logicalAtom)
-						  |  logicalAtom
+logicalNot:				    NOT logicalAtom     -> ^(ASTNOT logicalAtom)
+						  | logicalAtom
 						  ;
 
-logicalAtom				  :  expression ifOperator expression -> ^(ASTCOMPARE ifOperator expression expression)
-						  |  leftParen! logicalOr rightParen!           // omit both '(' and ')'
-						  |  bankvarnameindex						
+logicalAtom:				expression ifOperator expression -> ^(ASTCOMPARE ifOperator expression expression)
+						  | leftParen! logicalOr rightParen!           // omit both '(' and ')'
+						  | bankvarnameindex						
 						  ;
 
-ifOperator		          :  ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
-						  |  ISNOTQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR2)
-						  |  RIGHTANGLE -> ^(ASTIFOPERATOR ASTIFOPERATOR3)
-						  |  leftAngle -> ^(ASTIFOPERATOR ASTIFOPERATOR4)
-			              |  ISLARGEROREQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR5)
-						  |  ISSMALLEROREQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR6)
-						  |  IN -> ^(ASTIFOPERATOR ASTIFOPERATOR7)
+ifOperator:		            ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
+						  | ISNOTQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR2)
+						  | RIGHTANGLE -> ^(ASTIFOPERATOR ASTIFOPERATOR3)
+						  | leftAngle -> ^(ASTIFOPERATOR ASTIFOPERATOR4)
+			              | ISLARGEROREQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR5)
+						  | ISSMALLEROREQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR6)
+						  | IN -> ^(ASTIFOPERATOR ASTIFOPERATOR7)
 			              ;
+						  
+/*------------------------------------------------------------------
+ * PARSER RULES
+ *------------------------------------------------------------------*/
+
+start:                      statements EOF;  //EOF is necessary in order to force the whole file to be parsed
+
+statements:                 statements2*;
+
+statements2:                SEMICOLON -> //stray semicolon is ok, nothing is written
+                          | assignment           SEMICOLON!
+						  | for2
+						  | functionDef          SEMICOLON!
+						  | if2
+						  | ini                  SEMICOLON!
+						  | print                SEMICOLON!
+						  | read                 SEMICOLON!
+						  | reset                SEMICOLON!
+						  | return2              SEMICOLON!
+						  | run                  SEMICOLON!
+						  | write                SEMICOLON!
+						    ;
+
+
+assignment:				    leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression);  //careful: see #09873245325 if changed
 
 // ----------------------------------------------------------------------------------------------------
 
-for2                     : FOR           (forHelper2 ','?)+     SEMICOLON  functionStatements END -> ^(ASTFOR ^(ASTPLACEHOLDER forHelper2+) functionStatements)
-						 | FOR leftParen (forHelper2 ','?)+ ')' SEMICOLON? functionStatements END -> ^(ASTFOR ^(ASTPLACEHOLDER forHelper2+) functionStatements)
-						 ;
+for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  functionStatements END -> ^(ASTFOR ^(ASTPLACEHOLDER forHelper2+) functionStatements)
+						  | FOR leftParen (forHelper2 ','?)+ ')' SEMICOLON? functionStatements END -> ^(ASTFOR ^(ASTPLACEHOLDER forHelper2+) functionStatements)
+						    ;
 
-forHelper2               : type? svarname EQUAL expression (TO expression2)? (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2?) ^(ASTPLACEHOLDER expression3?));
+forHelper2:                 type? svarname EQUAL expression (TO expression2)? (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2?) ^(ASTPLACEHOLDER expression3?));
 
-if2						  : IF leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIF", ASTIF, $IF.Line)} logical functionStatements functionStatements2);
+if2:						IF leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIF", ASTIF, $IF.Line)} logical functionStatements functionStatements2);
 
-print					  : P expression -> ^(ASTPRINT expression);
+ini:					    INI -> ^({token("ASTINI", ASTINI, $INI.Line)});
 
-						  //!!!Two identical lines ONLY because of token stuff
-read                      : READ   readOpt1? fileNameStar (TO identOrStar)? -> ^({token("ASTREAD", ASTREAD, $READ.Line)}   READ   readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?))
+print:					    P expression -> ^(ASTPRINT expression);
+
+						    //!!!Two identical lines ONLY because of token stuff
+read:                       READ   readOpt1? fileNameStar (TO identOrStar)? -> ^({token("ASTREAD", ASTREAD, $READ.Line)}   READ   readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?))
                           | IMPORT readOpt1? fileNameStar (TO identOrStar)? -> ^({token("ASTREAD", ASTREAD, $IMPORT.Line)} IMPORT readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?))
-						  ;
-readOpt1                  : ISNOTQUAL
+						    ;
+readOpt1:                   ISNOTQUAL
 						  | leftAngle        readOpt1h* RIGHTANGLE -> readOpt1h*						
 						  | leftAngle dates? readOpt1h* RIGHTANGLE -> ^(ASTDATES dates?) readOpt1h*
-                          ;
-readOpt1h                 : MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?)
+                            ;
+readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?)
 						  | PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)  //obsolete
 						  | FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)
 						  | REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_REF yesNo?)												
@@ -2094,97 +2067,222 @@ readOpt1h                 : MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
   						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)
 						  | ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)
-						  ;
-identOrStar               : ident -> ident
-						  | star -> ASTBANKISSTARCHEATCODE
-						  ;
+						    ;
 
 
+						    //!!!2x2 identical lines ONLY because of token stuff
+write:					    WRITE  writeOpt1? listItemsWildRange? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE  writeOpt1?  ^(ASTHANDLEFILENAME fileName?) listItemsWildRange?)
+						  | EXPORT writeOpt1? listItemsWildRange? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT writeOpt1?  ^(ASTHANDLEFILENAME fileName?) listItemsWildRange?)
+						  | WRITE  writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE  writeOpt1?  ^(ASTHANDLEFILENAME fileName))
+						  | EXPORT writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT writeOpt1?  ^(ASTHANDLEFILENAME fileName))
+						    ;
+writeOpt1:                  ISNOTQUAL
+						  | leftAngle        writeOpt1h* RIGHTANGLE -> writeOpt1h*
+						  | leftAngle dates? writeOpt1h* RIGHTANGLE ->  ^(ASTDATES dates?) writeOpt1h*
+						    ;
+writeOpt1h:                 TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  //all these will fail, just to provide better error messages for WRITE<csv> etc.
+						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
+						  | GBK (EQUAL yesNo)? -> ^(ASTOPT_STRING_GBK yesNo?)
+						  | GDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_GDX yesNo?)
+						  | GDXOPT EQUAL expression -> ^(ASTOPT_STRING_GDXOPT expression)
+						  | TSP (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSP yesNo?)
+						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
+						  | PRN (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRN yesNo?)
+						  | R (EQUAL yesNo)? -> ^(ASTOPT_STRING_R yesNo?)
+						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
+  						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)						
+						  | CAPS (EQUAL yesNo)? -> ^(ASTOPT_STRING_CAPS yesNo?)		
+						  | GNUPLOT (EQUAL yesNo)? -> ^(ASTOPT_STRING_GNUPLOT yesNo?)
+						  | SERIES EQUAL exportType -> ^(ASTOPT_STRING_SERIES exportType)												
+						  | SERIES -> ^(ASTOPT_STRING_SERIES ASTOPN)												  				
+						    ;
 
+run:						RUN -> ^(ASTRUN);
 
-run						  : RUN -> ^(ASTRUN);
+reset:					    RESET -> ^(ASTRESET);
 
-reset					  : RESET -> ^(ASTRESET);
+return2:                    RETURN2 expression? -> ^({token("ASTRETURN", ASTRETURN, $RETURN2.Line)} expression?); //used in functions
 
-return2                    : RETURN2 expression? -> ^({token("ASTRETURN", ASTRETURN, $RETURN2.Line)} expression?); //used in functions
-
-functionDef				  : FUNCTION type ident leftParenGlue functionArg RIGHTPAREN SEMICOLON functionStatements END -> ^(ASTFUNCTIONDEF2 type ident functionArg functionStatements);
-functionArg               : (functionArgElement (',' functionArgElement)*)? -> ^(ASTPLACEHOLDER functionArgElement*);
-functionArgElement        : type svarname -> ^(ASTPLACEHOLDER type svarname);
-functionStatements        : statements2* -> ^(ASTPLACEHOLDER statements2*);
-functionStatements2       : functionStatements;  //alias
-type					  : VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX ;
+functionDef:				FUNCTION type ident leftParenGlue functionArg RIGHTPAREN SEMICOLON functionStatements END -> ^(ASTFUNCTIONDEF2 type ident functionArg functionStatements);
+functionArg:                (functionArgElement (',' functionArgElement)*)? -> ^(ASTPLACEHOLDER functionArgElement*);
+functionArgElement:         type svarname -> ^(ASTPLACEHOLDER type svarname);
+functionStatements:         statements2* -> ^(ASTPLACEHOLDER statements2*);
+functionStatements2:        functionStatements;  //alias
+type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX ;
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- logical END -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
+// ------------------------------------
 // Semi lexer stuff here
 // ------------------------------------
 
-fileNameStar:ident;
+listItems:                  listItem (COMMA2 listItem)*                   -> ^(ASTLISTITEMS (^(ASTLISTITEM listItem))+);   //puts in o.listItems
+listItems0:                 listItem (COMMA2 listItem)*                   -> ^(ASTLISTITEMS0 (^(ASTLISTITEM listItem))+);  //puts in o.listItems0
+listItems1:                 listItem (COMMA2 listItem)*                   -> ^(ASTLISTITEMS1 (^(ASTLISTITEM listItem))+);  //puts in o.listItems1
+listItems2:                 listItem (COMMA2 listItem)*                   -> ^(ASTLISTITEMS2 (^(ASTLISTITEM listItem))+);  //puts in o.listItems2
+listItemsWildRange:         listItemWildRange (COMMA2 listItemWildRange)* -> ^(ASTLISTITEMS (^(ASTLISTITEM listItemWildRange))+);   //puts in o.listItems
+listItemsWildRange0:        listItemWildRange (COMMA2 listItemWildRange)* -> ^(ASTLISTITEMS0 (^(ASTLISTITEM listItemWildRange))+);  //puts in o.listItems0
+listItemsWildRange1:        listItemWildRange (COMMA2 listItemWildRange)* -> ^(ASTLISTITEMS1 (^(ASTLISTITEM listItemWildRange))+);  //puts in o.listItems1
+listItemsWildRange2:        listItemWildRange (COMMA2 listItemWildRange)* -> ^(ASTLISTITEMS2 (^(ASTLISTITEM listItemWildRange))+);  //puts in o.listItems2
+
+                            //expression catches a, b:a, %s, 'a', 'b:a', the first two as nameWithBank, but cannot catch for instance 'b':'a' or %b:%a
+						    //not much sense in allowing @ here
+listItem:                   expression ->							   expression						
+						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)            //accepts stuff like 0e. Integers are caught via expression.												
+						    ;
+						    //generalizes listItem
+listItemWildRange:          wildcardWithBank ->                        wildcardWithBank
+						  | rangeWithBank ->                           rangeWithBank							 
+						  | expression ->						       expression
+						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)   //accepts stuff like 0e. Integers are caught via expression.												
+						    ;
+
+						    //If æøåÆØÅ then you need to put inside ''. Also with blanks. And parts beginning with a digit will not work either (5file.7z)
+fileName:                   fileNameFirstPart (GLUEBACKSLASH fileNamePart)* -> ^(ASTFILENAME fileNameFirstPart fileNamePart*)
+						  | expression
+						    ;
+fileNameFirstPart:          fileNameFirstPart1  //   c:\xx
+						  | fileNameFirstPart2  //   \xx
+						  | fileNameFirstPart3  //   xx
+						    ;
+						    //For instance READ c:\a.b\c.d, cannot be c:a.b\c.d
+						    //ok to use name before colon, drive indicator should start with a letter.
+fileNameFirstPart1:         name ':' GLUEBACKSLASH fileNamePart -> ^(ASTFILENAMEFIRST1 name fileNamePart);
+                            //For instance READ \a.b\c.d, cannot be READ\a.b\c.d
+fileNameFirstPart2:         BACKSLASH fileNamePart -> ^(ASTFILENAMEFIRST2 fileNamePart);
+                            //For instance READ a.b
+fileNameFirstPart3:         fileNamePart -> ^(ASTFILENAMEFIRST3 fileNamePart);
+							//stuff like 'a.7z' or 'a b.doc' or 'æøå.doc' must be in quotes.
+fileNamePart:               fileNamePartHelper (GLUEDOT DOT fileNamePartHelper)* -> ^(ASTFILENAMEPART fileNamePartHelper+);
+
+fileNamePartHelper:         varname;  //has to be restricted later on: do not allow a!b or #a.
+
+fileNameStar:               fileName
+						  | star -> ASTFILENAMESTAR
+						    ;
+
+wildcardWithBank:           name COLON wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK name) ^(ASTWILDCARD wildcard))
+						  | AT GLUE wildcard ->  ^(ASTWILDCARDWITHBANK ^(ASTBANK ASTAT) ^(ASTWILDCARD wildcard))
+						  | wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK) ^(ASTWILDCARD wildcard))
+						    ; 	
+
+rangeWithBank:              name COLON range -> ^(ASTRANGEWITHBANK ^(ASTBANK name) range)
+						  | AT GLUE range -> ^(ASTRANGEWITHBANK ^(ASTBANK ASTAT) range)
+						  | range -> ^(ASTRANGEWITHBANK ^(ASTBANK) range)
+						    ;
+
+range:                      name doubleDot name -> name name;
+
+wildcard:                   identDigit wildSymbolEnd  //a?						  	
+						  | identDigit (wildSymbolMiddle identDigit)+ wildSymbolEnd?  //a?b a?b?, a?b?c a?b?c?, etc.
+						  | wildSymbolStart identDigit (wildSymbolMiddle identDigit)* wildSymbolEnd?  //?a ?a? ?a?b ?a?b?, etc.
+						  | wildSymbolFree //?
+						    ;
+
+wildSymbolFree:             star -> ASTWILDSTAR
+						  | question -> ASTWILDQUESTION
+						    ;
+
+wildSymbolStart:            starGlueRight -> ASTWILDSTAR
+						  | questionGlueRight -> ASTWILDQUESTION
+						    ;
+
+wildSymbolEnd:              starGlueLeft -> ASTWILDSTAR
+                          | questionGlueLeft -> ASTWILDQUESTION
+						    ;
+
+wildSymbolMiddle:           starGlueBoth -> ASTWILDSTAR
+                          | questionGlueBoth -> ASTWILDQUESTION
+						    ;
+
+exportType:                 D -> ASTOPD
+						  | P  -> ASTOPP
+						  | M  -> ASTOPM
+						  | Q  -> ASTOPQ
+						  | MP -> ASTOPMP
+						  | N -> ASTOPN
+						  | expression  //will handle quotes etc.
+						    ;
+
+identOrStar:                ident -> ident
+						  | star -> ASTBANKISSTARCHEATCODE
+						    ;
+
 
 dates: expression expression;
 
-yesNo					  : yes
+yesNo:					    yes
 						  | no
-						  | expression;
-yesNoSimple					  : yes
+						  | expression
+						    ;
+yesNoSimple:			    yes
 						  | no
-;
-yes                       : YES -> ASTYES;
-no                        : NO -> ASTNO;
+						    ;
+yes:                        YES -> ASTYES;
+no:                         NO -> ASTNO;
 
 
-leftParen                 : (GLUE!)? LEFTPAREN;
-leftParenGlue             : GLUE! LEFTPAREN;
-leftParenNoGlue           : LEFTPAREN;
+leftParen:                  (GLUE!)? LEFTPAREN;
+leftParenGlue:              GLUE! LEFTPAREN;
+leftParenNoGlue:            LEFTPAREN;
 
-leftBracketGlue           : LEFTBRACKETGLUE;
-star                      : (GLUESTAR!)? STAR (GLUESTAR!)?;
-pow                       : stars -> ASTPOW
+leftBracketGlue:            LEFTBRACKETGLUE;
+
+pow:                        stars -> ASTPOW
                           | HAT -> ASTPOW
-                          ;
+                            ;
 
-leftAngle                 : leftAngle2 | leftAngleNo2;
-leftAngle2				  : LEFTANGLESPECIAL;
-leftAngleNo2	          : LEFTANGLESIMPLE;
+leftAngle:                  leftAngle2 | leftAngleNo2;
+leftAngle2:				    LEFTANGLESPECIAL;
+leftAngleNo2:	            LEFTANGLESIMPLE;
 
-rightParen                : RIGHTPAREN (GLUE!)?;
+rightParen:                 RIGHTPAREN (GLUE!)?;
 
-stars                     : (GLUESTAR!)? STARS (GLUESTAR!)?;
+leftBracketNoGlue:          LEFTBRACKET;
+leftBracketNoGlueWild:      LEFTBRACKETWILD;
 
-leftBracketNoGlue         : LEFTBRACKET;
-leftBracketNoGlueWild     : LEFTBRACKETWILD;
-
-identDigit                : identDigitHelper -> ^(ASTIDENTDIGIT identDigitHelper);
-identDigitHelper
-						  : ident                 //for instance ab27
+identDigit:                 identDigitHelper -> ^(ASTIDENTDIGIT identDigitHelper);
+identDigitHelper:		    ident                 //for instance ab27
 						  | Integer               //for instance 0123
 						  | DigitsEDigits         //for instance 25e12 (will end here, not in IdentStartingWithInt)
 						  | DateDef               //for instance 2012q3 (will end here, not in IdentStartingWithInt)						  						
 						  | IdentStartingWithInt  //for instance 0123ab27 (catches the rest of these cases)						  						
-						  ;			
+						    ;			
 						
-leftCurly                 : (GLUE!)? LEFTCURLY;
-leftCurlyGlue             : GLUE! LEFTCURLY;
-leftCurlyNoGlue           : LEFTCURLY;
+leftCurly:                  (GLUE!)? LEFTCURLY;
+leftCurlyGlue:              GLUE! LEFTCURLY;
+leftCurlyNoGlue:            LEFTCURLY;
 
-doubleVerticalBar         : GLUE? (DOUBLEVERTICALBAR1 | DOUBLEVERTICALBAR2);
+doubleVerticalBar:          GLUE? (DOUBLEVERTICALBAR1 | DOUBLEVERTICALBAR2);
 
-doubleDot                 : GLUEDOT? DOT GLUEDOT DOT;
+doubleDot:                  GLUEDOT? DOT GLUEDOT DOT;
 
-double2                   : double2Helper -> ^(ASTDOUBLE double2Helper);
-double2Helper             : Double            //0.123 or 25e+12
+double2:                    double2Helper -> ^(ASTDOUBLE double2Helper);
+double2Helper:              Double            //0.123 or 25e+12
 						  | DigitsEDigits     //for instance 25e12 which can also be a name chunk.
-						  ;
+						    ;
 
-date2                     : Integer | DateDef;
+star:                       (GLUESTAR!)? STAR (GLUESTAR!)?;
+starGlueBoth:               GLUESTAR! STAR GLUESTAR!;
+starGlueLeft:               GLUESTAR! STAR;
+starGlueRight:              STAR GLUESTAR!;
+starNoGlue:                 STAR;
+stars:                      (GLUESTAR!)? STARS (GLUESTAR!)?;
 
-ident                     : ident2 -> ^(ASTIDENT ident2);
+question:                   (GLUESTAR!)? QUESTION (GLUESTAR!)?;
+questionGlueBoth:           GLUESTAR! QUESTION GLUESTAR!;
+questionGlueLeft:           GLUESTAR! QUESTION;
+questionGlueRight:          QUESTION GLUESTAR!;
+questionNoGlue:             QUESTION;
 
-ident2 					  : Ident|
-					// --- tokens3 start ---						     
+date2:                      Integer | DateDef;
+
+ident:                      ident2 -> ^(ASTIDENT ident2);
+
+ident2: 					Ident|
+					        // --- tokens3 start ---						     
             GRIDSTYLE|
             BOLD|
             ITALIC|			
@@ -2687,102 +2785,100 @@ ident2 					  : Ident|
  * LEXER RULES
  *------------------------------------------------------------------*/
 
-expression2               : expression;  //just an alias
-expression3               : expression;  //just an alias
+expression2:                expression;  //just an alias
+expression3:                expression;  //just an alias
 
  //TODO: Clean up what is fragments and tokens. Stuff used inside lexer rules should be fragments for sure.
  //      Maybe special names for fragments like F_digit etc. And have for instance a F_glue for '¨' that the
  //      GLUE token is defined from.
 
-fragment NEWLINE2         : '\n' ;
-fragment NEWLINE3         : '\r\n' ;
-fragment DIGIT            : '0'..'9' ;
-fragment LETTER           : 'a'..'z'|'A'..'Z';
+fragment NEWLINE2:          '\n' ;
+fragment NEWLINE3:          '\r\n' ;
+fragment DIGIT:             '0'..'9' ;
+fragment LETTER:            'a'..'z'|'A'..'Z';
 
-HTTP                      : H_ T_ T_ P_  ':' ('//');  // 'catch HTTP://' before COMMENT interferes with the '//'
+HTTP:                       H_ T_ T_ P_  ':' ('//');  // 'catch HTTP://' before COMMENT interferes with the '//'
 
-WHITESPACE                : ( '\t' | ' ' | '\u000C'| NEWLINE2 | NEWLINE3)+ { $channel=HIDDEN; } ;  //u000C is form feed
+WHITESPACE:                 ( '\t' | ' ' | '\u000C'| NEWLINE2 | NEWLINE3)+ { $channel=HIDDEN; } ;  //u000C is form feed
 
-COMMENT                   : ('//') (~ (NEWLINE2|NEWLINE3))* { $channel=HIDDEN; };
-COMMENT_MULTILINE         : '/*' (options {greedy=false;}: COMMENT_MULTILINE | . )* '*/' {$channel=HIDDEN;};
+COMMENT:                    ('//') (~ (NEWLINE2|NEWLINE3))* { $channel=HIDDEN; };
+COMMENT_MULTILINE:          '/*' (options {greedy=false;}: COMMENT_MULTILINE | . )* '*/' {$channel=HIDDEN;};
 
                             //for instance a38x
-Ident                     : (LETTER|'_') (DIGIT|LETTER|'_')*  { $type = CheckKeywordsTable(Text); };
+Ident:                      (LETTER|'_') (DIGIT|LETTER|'_')*  { $type = CheckKeywordsTable(Text); };
                             //for instance 12345
-Integer                   : DIGIT+  ;
+Integer:                    DIGIT+  ;
                             //for instance 25e12
-DigitsEDigits             : DIGIT+  ( E_ )  DIGIT+;  //for instance 25e12, problem is this can also be a name chunk!
+DigitsEDigits:              DIGIT+  ( E_ )  DIGIT+;  //for instance 25e12, problem is this can also be a name chunk!
                             //for instance 2012q3
-DateDef                   : DIGIT+  ( A_ | Q_ | M_ ) DIGIT+;  //for instance 2000q2 or 2003m11
+DateDef:                    DIGIT+  ( A_ | Q_ | M_ ) DIGIT+;  //for instance 2000q2 or 2003m11
                             //for instance 05a, everything not captured by Ident, Integer, DigitsEDigits, Datedef.
-IdentStartingWithInt      : (DIGIT|LETTER|'_')+;
+IdentStartingWithInt:       (DIGIT|LETTER|'_')+;
 
 //It would not be practical to construct Double in the parser. We would like 2012q3 and 7e12 to be recognized as dates and number,
 //and this seems hard to do without having the parser work on really small tokens. Would probably be confusing and slow, and we would need glue around + and - (think 1.2e+34...).
 //Drawback is that we cannot handle a filenames like xx.7z, 01.txt, 12.13, but they can be put inside ''.
-Double                    : DIGIT+ GLUEDOTNUMBER DOT DIGIT* Exponent?   //1.2e+12  Can be without the +
+Double:                     DIGIT+ GLUEDOTNUMBER DOT DIGIT* Exponent?   //1.2e+12  Can be without the +
                           | DIGIT+ Exponent                             //25e12    DigitsEDigits captures the 25e12 (that is, not 25e+12) case before it could end here
-						  | GLUEDOTNUMBER DOT DIGIT+ Exponent?          //.2e-13   Can be "x=.23" or "x= .23", so glue is not known. Will not read the .23 in a.23 because it will be 'a' GLUEDOT DOT '23'.
-						  //| DIGIT+ GLUEDOT DOT                          //1234.    Ends with a dot
-                          ;
+						  | GLUEDOTNUMBER DOT DIGIT+ Exponent?          //.2e-13   Can be "x=.23" or "x= .23", so glue is not known. Will not read the .23 in a.23 because it will be 'a' GLUEDOT DOT '23'.						  
+                            ;
 
-fragment Exponent         : E_ ( '+' | '-' )? DIGIT+;
+fragment Exponent:          E_ ( '+' | '-' )? DIGIT+;
 
 //Use ANTLR to resolve %x or %() inside a string
-StringInQuotes            : ('\'' (~'\'')* '\'');
+StringInQuotes:             ('\'' (~'\'')* '\'');
 
 // --- These are done in Program.HandleObeyFilesNew() -------------------------------------------
-GLUE                      : '¨';
-GLUEDOT                   : '£';  //only relevant for '.', for instance a.b becomes a£.b, and x.1 becomes x£.1
-GLUEDOTNUMBER             : '§';  //only relevant for '.', for instance 12.34 becomes 12§.34
-GLUESTAR                  : '½';  //only relevant for '*' and '?', for instance a*b --> a½*½b
-LEFTANGLESPECIAL          : '<=<';  //indicates that there are two idents following the '<' in the text input.
+GLUE:                       '¨';
+GLUEDOT:                    '£';  //only relevant for '.', for instance a.b becomes a£.b, and x.1 becomes x£.1
+GLUEDOTNUMBER:              '§';  //only relevant for '.', for instance 12.34 becomes 12§.34
+GLUESTAR:                   '½';  //only relevant for '*' and '?', for instance a*b --> a½*½b
+LEFTANGLESPECIAL:           '<=<';  //indicates that there are two idents following the '<' in the text input.
                                     // using <_< is not good, since it stumbles on mulprt<_lev>xx
-//MOD                       : '¤';  //does not work with '%¨%' ================> NOT DONE YET!!
-GLUEBACKSLASH             : '¨\\';
+//MOD                       '¤';  //does not work with '%¨%' ================> NOT DONE YET!!
+GLUEBACKSLASH:              '¨\\';
 // -----------------------------------------------------------------------------------------------
 
-ISEQUAL                   : '==';
-ISNOTQUAL                 : '<>';
-ISLARGEROREQUAL			  : '>=';			
-ISSMALLEROREQUAL          : '<=';
+ISEQUAL:                    '==';
+ISNOTQUAL:                  '<>';
+ISLARGEROREQUAL:			'>=';			
+ISSMALLEROREQUAL:           '<=';
 
-TILDE					  : '~';
-AT                        : '@';
-HAT                       : '^';
-SEMICOLON                 : ';';
-COLONGLUE                 : ':|';
-COLON                     : ':';
-COMMA2                    : ',';
-DOT                       : '.';
-HASH                      : '#';
-PERCENT                   : '%';
-DOLLAR                    : '$';
-LEFTCURLY                 : '{';
-RIGHTCURLY                : '}';
-LEFTPAREN                 : '(';
-RIGHTPAREN                : ')';
-LEFTBRACKETGLUE           : '[_[';
-LEFTBRACKETWILD           : '[¨[';  //indicates that this is probably a wildcard, not a 1x1 matrix
-LEFTBRACKET               : '[';
-RIGHTBRACKET              : ']';
+TILDE:					    '~';
+AT:                         '@';
+HAT:                        '^';
+SEMICOLON:                  ';';
+COLONGLUE:                  ':|';
+COLON:                      ':';
+COMMA2:                     ',';
+DOT:                        '.';
+HASH:                       '#';
+PERCENT:                    '%';
+DOLLAR:                     '$';
+LEFTCURLY:                  '{';
+RIGHTCURLY:                 '}';
+LEFTPAREN:                  '(';
+RIGHTPAREN:                 ')';
+LEFTBRACKETGLUE:            '[_[';
+LEFTBRACKETWILD:            '[¨[';  //indicates that this is probably a wildcard, not a 1x1 matrix
+LEFTBRACKET:                '[';
+RIGHTBRACKET:               ']';
 
 
-LEFTANGLESIMPLE           : '<';
-RIGHTANGLE                : '>';
-STAR                      : '*';
-DOUBLEVERTICALBAR1        : '||';
-DOUBLEVERTICALBAR2        : '|¨|';
-//GLUEDOUBLEVERTICALBAR     : '¨|¨|';
-VERTICALBAR               : '|';
-PLUS                      : '+';
-MINUS                     : '-';
-DIV                       : '/';
-STARS                     : '**';
-EQUAL                     : '=';
-BACKSLASH                 : '\\';
-QUESTION                  : '?';
-
+LEFTANGLESIMPLE:            '<';
+RIGHTANGLE:                 '>';
+STAR:                       '*';
+DOUBLEVERTICALBAR1:         '||';
+DOUBLEVERTICALBAR2:         '|¨|';
+//GLUEDOUBLEVERTICALBAR:    '¨|¨|';
+VERTICALBAR:                '|';
+PLUS:                       '+';
+MINUS:                      '-';
+DIV:                        '/';
+STARS:                      '**';
+EQUAL:                      '=';
+BACKSLASH:                  '\\';
+QUESTION:                   '?';
 
 fragment A_:('a'|'A');
 fragment B_:('b'|'B');

@@ -411,6 +411,11 @@ namespace Gekko
             return new ScalarString(this._string2);
         }
 
+        public void DeepTrim()
+        {
+            //do nothing, nothing to trim
+        }
+
     }
 
 }

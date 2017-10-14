@@ -25,7 +25,7 @@ namespace Gekko
 
         public static ScalarString scalarStringPercent = new ScalarString(Globals.symbolMemvar.ToString());
         public static ScalarString scalarStringHash = new ScalarString(Globals.symbolList.ToString());
-        public static ScalarString scalarStringTilde = new ScalarString(Globals.symbolTilde.ToString());
+        public static ScalarString scalarStringTilde = new ScalarString(Globals.freqIndicator.ToString());
         public static ScalarString scalarStringColon = new ScalarString(Globals.symbolBankColon.ToString());
 
         public enum LagType
@@ -664,8 +664,8 @@ namespace Gekko
             if (!hasSigil)
             {
                 //Timeseries has '~' added
-                if (freq != null) varnameWithTilde = varname + Globals.symbolTilde + freq;
-                else varnameWithTilde = varname + Globals.symbolTilde + G.GetFreq(Program.options.freq);
+                if (freq != null) varnameWithTilde = varname + Globals.freqIndicator + freq;
+                else varnameWithTilde = varname + Globals.freqIndicator + G.GetFreq(Program.options.freq);
             }
 
             if (rhsExpression == null)
@@ -1039,7 +1039,7 @@ namespace Gekko
                 dbName = ss[0]; varName = ss[1];
             }
             //firstChar = varName[0];
-            string[] ss2 = varName.Split(Globals.symbolTilde);
+            string[] ss2 = varName.Split(Globals.freqIndicator);
             if (ss2.Length > 2)
             {
                 G.Writeln2("*** ERROR: More than 1 freq indicators ('~') in '" + input + "'");
@@ -1243,7 +1243,7 @@ namespace Gekko
             List<string> result = new List<string>();
 
             GetRawListElements(fileName, input, result);
-            if (result.Count == 1 && G.equal(result[0], "null"))
+            if (result.Count == 1 && G.Equal(result[0], "null"))
             {
                 //LIST mylist = null; ---> empty list
                 result = new List<string>();
@@ -2103,7 +2103,7 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.String && y.Type() == EVariableType.String)
             {
-                if (G.equal(x.ConvertToString(), y.ConvertToString())) rv = Globals.scalarVal1;
+                if (G.Equal(x.ConvertToString(), y.ConvertToString())) rv = Globals.scalarVal1;
             }
             else
             {
@@ -2221,7 +2221,7 @@ namespace Gekko
             foreach (IVariable iv in ml.list)
             {
                 string s = O.ConvertToString(iv);
-                if(G.equal(ss._string2,s))
+                if(G.Equal(ss._string2,s))
                 {
                     b = true;
                     break;
@@ -2757,7 +2757,7 @@ namespace Gekko
                 hlp.t1 = this.t1;
                 hlp.t2 = this.t2;
                 
-                bool isRead = false; if (G.equal(this.type, "read")) isRead = true;
+                bool isRead = false; if (G.Equal(this.type, "read")) isRead = true;
 
                 if (this.opt_prim != null)
                 {
@@ -2791,18 +2791,18 @@ namespace Gekko
                 
                 bool isTo = false; if (this.readTo != null) isTo = true;                
                 hlp.FileName = this.fileName;                
-                if (G.equal(this.opt_csv, "yes")) hlp.Type = EDataFormat.Csv;
-                if (G.equal(this.opt_prn, "yes")) hlp.Type = EDataFormat.Prn;
-                if (G.equal(this.opt_pcim, "yes")) hlp.Type = EDataFormat.Pcim;
-                if (G.equal(this.opt_tsd, "yes")) hlp.Type = EDataFormat.Tsd;
-                if (G.equal(this.opt_gbk, "yes")) hlp.Type = EDataFormat.Gbk;
-                if (G.equal(this.opt_tsdx, "yes")) hlp.Type = EDataFormat.Tsdx;
-                if (G.equal(this.opt_tsp, "yes")) hlp.Type = EDataFormat.Tsp;
-                if (G.equal(this.opt_xls, "yes")) hlp.Type = EDataFormat.Xls;
-                if (G.equal(this.opt_xlsx, "yes")) hlp.Type = EDataFormat.Xlsx;
-                if (G.equal(this.opt_gdx, "yes")) hlp.Type = EDataFormat.Gdx;
-                if (G.equal(this.opt_px, "yes")) hlp.Type = EDataFormat.Px;
-                if (G.equal(this.opt_cols, "yes")) hlp.Orientation = "cols";
+                if (G.Equal(this.opt_csv, "yes")) hlp.Type = EDataFormat.Csv;
+                if (G.Equal(this.opt_prn, "yes")) hlp.Type = EDataFormat.Prn;
+                if (G.Equal(this.opt_pcim, "yes")) hlp.Type = EDataFormat.Pcim;
+                if (G.Equal(this.opt_tsd, "yes")) hlp.Type = EDataFormat.Tsd;
+                if (G.Equal(this.opt_gbk, "yes")) hlp.Type = EDataFormat.Gbk;
+                if (G.Equal(this.opt_tsdx, "yes")) hlp.Type = EDataFormat.Tsdx;
+                if (G.Equal(this.opt_tsp, "yes")) hlp.Type = EDataFormat.Tsp;
+                if (G.Equal(this.opt_xls, "yes")) hlp.Type = EDataFormat.Xls;
+                if (G.Equal(this.opt_xlsx, "yes")) hlp.Type = EDataFormat.Xlsx;
+                if (G.Equal(this.opt_gdx, "yes")) hlp.Type = EDataFormat.Gdx;
+                if (G.Equal(this.opt_px, "yes")) hlp.Type = EDataFormat.Px;
+                if (G.Equal(this.opt_cols, "yes")) hlp.Orientation = "cols";
 
                 hlp.gdxopt = this.opt_gdxopt;                
 
@@ -2827,9 +2827,9 @@ namespace Gekko
                 else
                 {
                     //READ or IMPORT
-                    if (G.equal(this.opt_merge, "yes")) hlp.Merge = true;
-                    if (G.equal(this.opt_first, "yes")) hlp.openType = EOpenType.First;
-                    if (G.equal(this.opt_ref, "yes")) hlp.openType = EOpenType.Ref;
+                    if (G.Equal(this.opt_merge, "yes")) hlp.Merge = true;
+                    if (G.Equal(this.opt_first, "yes")) hlp.openType = EOpenType.First;
+                    if (G.Equal(this.opt_ref, "yes")) hlp.openType = EOpenType.Ref;
                     if (hlp.openType == EOpenType.Normal) isSimple = true;  //in that case, a CLONE is done afterwards
                     if (isRead)
                     {
@@ -2874,7 +2874,7 @@ namespace Gekko
                     }
                 }                
 
-                if (G.equal(Program.options.interface_mode, "data"))
+                if (G.Equal(Program.options.interface_mode, "data"))
                 {
                     if (isRead && isSimple)
                     {
@@ -2926,7 +2926,7 @@ namespace Gekko
 
                 if (readInfo.abortedStar) return;  //an aborted READ *
 
-                if (G.equal(opt_ref, "yes"))
+                if (G.Equal(opt_ref, "yes"))
                 {
                     readInfo.dbName = Program.databanks.GetRef().aliasName;
                 }
@@ -2951,7 +2951,7 @@ namespace Gekko
                     //isSimple can never be true with READ ... TO ...
                     //Do not do this with READ<first> or READ<ref>, only with READ.                    
                     Program.MulbkClone();
-                    if (Program.model != null && (G.equal(Program.options.interface_mode, "sim") || G.equal(Program.options.interface_mode, "mixed")))
+                    if (Program.model != null && (G.Equal(Program.options.interface_mode, "sim") || G.Equal(Program.options.interface_mode, "mixed")))
                     {
                         //only in sim or mixed mode, if a model is existing
                         CreateMissingModelVariables();
@@ -2983,7 +2983,7 @@ namespace Gekko
                 {                    
                     if (!Program.databanks.GetFirst().ContainsVariable(s)) onlyModelNotDatabank.Add(s);
                 }
-                if (G.equal(Program.options.interface_mode, "sim"))
+                if (G.Equal(Program.options.interface_mode, "sim"))
                 {
                     //See #8904327598432
                     if (onlyDatabankNotModel.Count > 0)
@@ -3174,7 +3174,7 @@ namespace Gekko
                 int number = first.storage.Count;
                 G.Writeln();
                 G.Writeln("Cleared reference databank ('" + Program.databanks.GetRef().aliasName + "') and copied " + number + " variables from first-position ('" + Program.databanks.GetFirst().aliasName + "') to reference ('" + Program.databanks.GetRef().aliasName + "') databank");
-                if (G.equal(Program.options.interface_mode, "data"))
+                if (G.Equal(Program.options.interface_mode, "data"))
                 {
                     G.Writeln2("+++ WARNING: CLONE is not intended for data-mode (cf. MODE)");
                 }
@@ -3470,10 +3470,10 @@ namespace Gekko
                 TimeSeries newSeriesTemp = oldSeries.DeepClone() as TimeSeries;  //brand new object, not present in Work (yet)                
 
                 ESmoothTypes type = ESmoothTypes.Spline;  //what is the default in AREMOS??
-                if (G.equal(opt_geometric, "yes")) type = ESmoothTypes.Geometric;
-                if (G.equal(opt_linear, "yes")) type = ESmoothTypes.Linear;
-                if (G.equal(opt_spline, "yes")) type = ESmoothTypes.Spline;
-                if (G.equal(opt_repeat, "yes")) type = ESmoothTypes.Repeat;                
+                if (G.Equal(opt_geometric, "yes")) type = ESmoothTypes.Geometric;
+                if (G.Equal(opt_linear, "yes")) type = ESmoothTypes.Linear;
+                if (G.Equal(opt_spline, "yes")) type = ESmoothTypes.Spline;
+                if (G.Equal(opt_repeat, "yes")) type = ESmoothTypes.Repeat;                
 
                 GekkoTime realStart = oldSeries.GetRealDataPeriodFirst();
                 GekkoTime realEnd = oldSeries.GetRealDataPeriodLast();
@@ -3734,12 +3734,12 @@ namespace Gekko
             public string bank = null;
             public void Exe()
             {
-                if (G.equal(bank, Globals.Work))
+                if (G.Equal(bank, Globals.Work))
                 {
                     G.Writeln2("*** ERROR: Work databank cannot be set non-editable");
                     throw new GekkoException();
                 }
-                if (G.equal(bank, Globals.Ref))
+                if (G.Equal(bank, Globals.Ref))
                 {
                     G.Writeln2("*** ERROR: Ref databank cannot be set non-editable");
                     throw new GekkoException();
@@ -3800,7 +3800,7 @@ namespace Gekko
                     {
                         foreach (Databank db in Program.databanks.storage)
                         {
-                            if (G.equal(db.aliasName, Globals.Work) || G.equal(db.aliasName, Globals.Ref))
+                            if (G.Equal(db.aliasName, Globals.Work) || G.Equal(db.aliasName, Globals.Ref))
                             {
                                 //skip it
                             }
@@ -3817,7 +3817,7 @@ namespace Gekko
                 {
                     foreach (string dbName in this.listItems)
                     {
-                        if (G.equal(dbName, Globals.Work) || G.equal(dbName, Globals.Ref))
+                        if (G.Equal(dbName, Globals.Work) || G.Equal(dbName, Globals.Ref))
                         {
                             G.Writeln2("*** ERROR: Databanks '" + Globals.Work + "' or '" + Globals.Ref + "' cannot be closed (see CLEAR command)");
                             throw new GekkoException();
@@ -3833,7 +3833,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     Databank removed = Program.databanks.RemoveDatabank(databank);
-                    if (G.equal(opt_save, "no"))
+                    if (G.Equal(opt_save, "no"))
                     {
                         //do nothing, a CLOSE<save=no>
                     }
@@ -3853,7 +3853,7 @@ namespace Gekko
                         G.Writeln2("Closed " + databanks.Count + " databanks: ");
                         G.PrintListWithCommas(databanks, false);
                     }
-                    if (G.equal(opt_save, "no"))
+                    if (G.Equal(opt_save, "no"))
                     {
                         G.Writeln("+++ NOTE: CLOSE<save=no> was used.");
                     }
@@ -3895,7 +3895,7 @@ namespace Gekko
             public double opt_pos = double.NaN;
             public void Exe()
             {
-                if (G.equal(opt_prot, "yes"))
+                if (G.Equal(opt_prot, "yes"))
                 {
                     G.Writeln2("*** ERROR: OPEN<prot> is obsolete. In Gekko 2.1.1 and onwards, databanks");
                     G.Writeln("           are always opened as 'protected' by default, unless you use", Color.Red);
@@ -3904,7 +3904,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
 
-                if (G.equal(opt_prim, "yes"))
+                if (G.Equal(opt_prim, "yes"))
                 {
                     G.Writeln2("*** ERROR: OPEN<prim> is obsolete. In Gekko 2.1.1 and onwards, you should");
                     G.Writeln("           use OPEN<edit> instead of OPEN<prim>, if you intend to change", Color.Red);
@@ -3930,9 +3930,9 @@ namespace Gekko
                 hlp.gdxopt = this.opt_gdxopt;
 
                 int posCounter = 0;
-                if (G.equal(opt_first, "yes")) posCounter++;
-                if (G.equal(opt_ref, "yes")) posCounter++;
-                if (G.equal(opt_last, "yes")) posCounter++;
+                if (G.Equal(opt_first, "yes")) posCounter++;
+                if (G.Equal(opt_ref, "yes")) posCounter++;
+                if (G.Equal(opt_last, "yes")) posCounter++;
                 if (!G.isNumericalError(this.opt_pos)) posCounter++;
                 
                 if (posCounter > 1)
@@ -3940,29 +3940,29 @@ namespace Gekko
                     G.Writeln2("*** ERROR: You are using > 1 of first/last/pos/ref designations inside <>-field");
                     throw new GekkoException();
                 }
-                if (G.equal(opt_edit, "yes") && posCounter > 0)
+                if (G.Equal(opt_edit, "yes") && posCounter > 0)
                 {
                     G.Writeln2("*** ERROR: You cannot mix 'edit' with first/last/pos/ref designations inside <>-field");
                     throw new GekkoException();
                 }
-                if (G.equal(opt_first, "yes"))
+                if (G.Equal(opt_first, "yes"))
                 {
                     hlp.openType = EOpenType.First;
                 }
-                if (G.equal(opt_last, "yes"))
+                if (G.Equal(opt_last, "yes"))
                 {
                     hlp.openType = EOpenType.Last;
                 }
-                if (G.equal(opt_edit, "yes"))
+                if (G.Equal(opt_edit, "yes"))
                 {
                     hlp.openType = EOpenType.Edit;
                     hlp.protect = false;  //will override the born true value of the field
                 }
-                if (G.equal(opt_ref, "yes"))
+                if (G.Equal(opt_ref, "yes"))
                 {
                     hlp.openType = EOpenType.Ref;
                 }
-                if (G.equal(opt_sec, "yes"))
+                if (G.Equal(opt_sec, "yes"))
                 {
                     hlp.openType = EOpenType.Sec;
                 }
@@ -3984,7 +3984,7 @@ namespace Gekko
                     readInfo.open = true;
                     if (readInfo.abortedStar) return;  //an aborted OPEN *
 
-                    if (G.equal(opt_save, "no"))
+                    if (G.Equal(opt_save, "no"))
                     {
                         readInfo.databank.save = false;
                     }                    
@@ -3992,7 +3992,7 @@ namespace Gekko
                     readInfo.Print();
                 }
 
-                if (G.equal(Program.options.interface_mode, "sim"))
+                if (G.Equal(Program.options.interface_mode, "sim"))
                 {
                     G.Writeln2("+++ WARNING: READ ... TO ... is recommended instead of OPEN in sim-mode (cf. MODE).");
                     G.Writeln("             For instance, 'READ databk TO *;' instead of 'OPEN databk;'", Globals.warningColor);
@@ -4057,7 +4057,7 @@ namespace Gekko
                 if (Program.InputBox("Accept", msg, ref value) == DialogResult.OK)
                 {                    
                     string nme = O.ConvertToString(name);
-                    if (G.equal(type, "val"))
+                    if (G.Equal(type, "val"))
                     {                          
                         try
                         {
@@ -4072,7 +4072,7 @@ namespace Gekko
                             throw new GekkoException();
                         }                        
                     }
-                    else if (G.equal(type, "string"))
+                    else if (G.Equal(type, "string"))
                     {                                               
                         
                         try
@@ -4089,7 +4089,7 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                    else if (G.equal(type, "name"))
+                    else if (G.Equal(type, "name"))
                     {
                         try
                         {
@@ -4105,7 +4105,7 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                    else if (G.equal(type, "date"))
+                    else if (G.Equal(type, "date"))
                     {
                         try
                         {
@@ -4120,7 +4120,7 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                    else if (G.equal(type, "list"))
+                    else if (G.Equal(type, "list"))
                     {
                         try
                         {
@@ -4320,7 +4320,7 @@ namespace Gekko
                     string bankName = null;
                     if (localOptionFromBank != null) bankName = localOptionFromBank.aliasName;
 
-                    bool ignoreErrors = false; if (G.equal(opt_error, "no")) ignoreErrors = true;
+                    bool ignoreErrors = false; if (G.Equal(opt_error, "no")) ignoreErrors = true;
 
                     List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(listItems0[i], bankName, ignoreErrors);  //gets these from the 'fromBank', so ExtractBankAndRest() gets called two times, but never mind
 
@@ -4380,9 +4380,9 @@ namespace Gekko
                             TimeSeries ts2 = toBank.GetVariable(newName);
                             if (ts2 != null)
                             {
-                                if (G.equal(ts.meta.parentDatabank.aliasName, ts2.meta.parentDatabank.aliasName))
+                                if (G.Equal(ts.meta.parentDatabank.aliasName, ts2.meta.parentDatabank.aliasName))
                                 {
-                                    if (G.equal(ts.name, ts2.name))
+                                    if (G.Equal(ts.name, ts2.name))
                                     {
                                         G.Writeln2("*** ERROR: You are trying to copy the timeseries '" + ts.name + "' from databank '" + ts.meta.parentDatabank.aliasName + "' to itself");
                                         throw new GekkoException();
@@ -4391,7 +4391,7 @@ namespace Gekko
                             }
                         }
 
-                        if (G.equal(this.opt_respect, "yes"))
+                        if (G.Equal(this.opt_respect, "yes"))
                         {
                             //Truncate time period
                             TimeSeries ts2 = toBank.GetVariable(newName);
@@ -4619,7 +4619,7 @@ namespace Gekko
             public string opt_nonmodel = null;
             public void Exe()
             {
-                if (G.equal(opt_nonmodel, "yes"))
+                if (G.Equal(opt_nonmodel, "yes"))
                 {
                     if (this.listItems != null)
                     {
@@ -4824,14 +4824,14 @@ namespace Gekko
                     }
                 }                
 
-                if (G.equal(listSort, "yes"))  //listSort = null is okay in G.equal()
+                if (G.Equal(listSort, "yes"))  //listSort = null is okay in G.equal()
                 {
                     //TODO: What about strings starting with "-"?
                     //TODO: What about æøå strings, what happens??
                     this.listItems.Sort(StringComparer.OrdinalIgnoreCase);
                 }
 
-                if (G.equal(listTrim, "yes"))  //listTrim = null is okay in G.equal()
+                if (G.Equal(listTrim, "yes"))  //listTrim = null is okay in G.equal()
                 {
                     //Todo: if it has just been sorted, trimming is easy. But we do it the general way here.
                     GekkoDictionary<string, bool> xx = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -4966,10 +4966,10 @@ namespace Gekko
             public string listFile = null;
             public void Exe()
             {
-                bool addbank = false; if (G.equal(this.opt_addbank, "yes")) addbank = true;
+                bool addbank = false; if (G.Equal(this.opt_addbank, "yes")) addbank = true;
                 List<string> names = new List<string>();
 
-                if (G.equal(this.opt_bank, "yes"))
+                if (G.Equal(this.opt_bank, "yes"))
                 {
                     //For safety, remove in Gekko 2.4 or 2.6
                     G.Writeln2("+++ ERROR: In Gekko 2.2, INDEX<bank=yes> is INDEX<addbank=yes>.");
@@ -4992,7 +4992,7 @@ namespace Gekko
                     }
                 }
 
-                if (!G.equal(this.opt_mute, "yes"))
+                if (!G.Equal(this.opt_mute, "yes"))
                 {
                     G.Writeln();
                     if (names.Count > 0)
@@ -5259,7 +5259,7 @@ namespace Gekko
                     
                     foreach (OptString os in this.printCodes)
                     {
-                        if (G.equal(os.s2, "yes"))
+                        if (G.Equal(os.s2, "yes"))
                         {
                             Globals.tableOption = os.s1;
                             break;
@@ -5391,7 +5391,7 @@ namespace Gekko
             public void Exe()
             {                                
                 Program.PrtNew(this);
-                if (G.equal(prtType, "mulprt") && G.equal(Program.options.interface_mode, "data"))
+                if (G.Equal(prtType, "mulprt") && G.Equal(Program.options.interface_mode, "data"))
                 {
                     G.Writeln2("+++ WARNING: MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
                 }
@@ -5403,51 +5403,51 @@ namespace Gekko
                 List<int> rv = new List<int>();
 
                 //TODO: CLEAN THIS UP!!                                                
-                if (G.equal(tableOrGraphGlobalPrintCode, "n"))
+                if (G.Equal(tableOrGraphGlobalPrintCode, "n"))
                 {
                     rv = new List<int>(); rv.Add(1);
                 }
-                else if (G.equal(tableOrGraphGlobalPrintCode, "d"))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, "d"))
                 {
                     rv = new List<int>(); rv.Add(1);
                 }
-                else if (G.equal(tableOrGraphGlobalPrintCode, "p"))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, "p"))
                 {
                     rv = new List<int>(); rv.Add(1);
                 }
-                else if (G.equal(tableOrGraphGlobalPrintCode, "dp"))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, "dp"))
                 {
                     rv = new List<int>(); rv.Add(1);
                 }
-                else if (G.equal(tableOrGraphGlobalPrintCode, Globals.printCode_s))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_s))
                 {
                     rv = new List<int>(); rv.Add(2);
                 }
-                else if (G.equal(tableOrGraphGlobalPrintCode, Globals.printCode_sn))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_sn))
                 {
                     rv = new List<int>(); rv.Add(2);
                 }
-                else if (G.equal(tableOrGraphGlobalPrintCode, Globals.printCode_sd))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_sd))
                 {
                     rv = new List<int>(); rv.Add(2);
                 }
-                else if (G.equal(tableOrGraphGlobalPrintCode, Globals.printCode_sp))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_sp))
                 {
                     rv = new List<int>(); rv.Add(2);
                 }
-                else if (G.equal(tableOrGraphGlobalPrintCode, Globals.printCode_sdp))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_sdp))
                 {
                     rv = new List<int>(); rv.Add(2);
                 }
-                else if (G.equal(tableOrGraphGlobalPrintCode, "m"))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, "m"))
                 {
                     rv = new List<int>(); rv.Add(1); rv.Add(2);
                 }
-                else if (G.equal(tableOrGraphGlobalPrintCode, "q"))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, "q"))
                 {
                     rv = new List<int>(); rv.Add(1); rv.Add(2);
                 }
-                else if (G.equal(tableOrGraphGlobalPrintCode, "mp"))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, "mp"))
                 {
                     rv = new List<int>(); rv.Add(1); rv.Add(2);
                 }                
@@ -5602,7 +5602,7 @@ namespace Gekko
             public void Exe()
             {                
                 Program.Sim(this);
-                if (G.equal(Program.options.interface_mode, "data"))
+                if (G.Equal(Program.options.interface_mode, "data"))
                 {
                     G.Writeln2("+++ WARNING: SIM is not intended for data-mode (cf. MODE).");
                 }
@@ -5627,7 +5627,7 @@ namespace Gekko
             public void Exe()
             {                
                 Program.Model(this);
-                if (G.equal(Program.options.interface_mode, "data"))
+                if (G.Equal(Program.options.interface_mode, "data"))
                 {
                     G.Writeln2("+++ WARNING: MODEL is not intended for data-mode (cf. MODE).");
                 }
@@ -5715,7 +5715,7 @@ namespace Gekko
             public string mode = null;            
             public void Exe()
             {                
-                if (G.equal(mode, "sim"))
+                if (G.Equal(mode, "sim"))
                 {
                     Program.options.interface_mode = "sim";
                     Program.options.databank_search = false;
@@ -5726,7 +5726,7 @@ namespace Gekko
                     G.Writeln("OPTION databank create auto = no;");
                     G.Writeln("OPTION solve data create auto = yes;");
                 }
-                else if (G.equal(mode, "data"))
+                else if (G.Equal(mode, "data"))
                 {
                     Program.options.interface_mode = "data";
                     Program.options.databank_search = true;
@@ -5737,7 +5737,7 @@ namespace Gekko
                     G.Writeln("OPTION databank create auto = yes;");
                     G.Writeln("OPTION solve data create auto = no;");
                 }
-                else if (G.equal(mode, "mixed"))
+                else if (G.Equal(mode, "mixed"))
                 {
                     Program.options.interface_mode = "mixed";
                     Program.options.databank_search = true;
@@ -5825,7 +5825,7 @@ namespace Gekko
                                 if (G.IsIdent(ss[1]))
                                 {
                                     string foundBlock = ss[1];
-                                    if(G.equal(this.opt_target,foundBlock)) {
+                                    if(G.Equal(this.opt_target,foundBlock)) {
                                         l2.Add(all);
                                         hit = true;
                                     }
@@ -5864,7 +5864,7 @@ namespace Gekko
                 else
                 {
                     string ss = O.ConvertToString(s);
-                    Program.ExecuteShellCommand(ss, G.equal(this.opt_mute, "yes"));
+                    Program.ExecuteShellCommand(ss, G.Equal(this.opt_mute, "yes"));
                 }
             }
         }
@@ -5936,7 +5936,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: The destination file '" + zz + "' already exists:");                    
                     throw new GekkoException();
                 }                
-                if (G.equal(opt_gekko18, "yes"))
+                if (G.Equal(opt_gekko18, "yes"))
                 {                    
                     string ss = Translators.Translate1(true, xxx);
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
@@ -5948,7 +5948,7 @@ namespace Gekko
                     }
                     G.Writeln2("Translated file into: " + zz);
                 }
-                else if (G.equal(opt_aremos, "yes"))
+                else if (G.Equal(opt_aremos, "yes"))
                 {
                     string ss = Translator2.Translate2(true, xxx);
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))

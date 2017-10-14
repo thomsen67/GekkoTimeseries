@@ -156,5 +156,10 @@ namespace Gekko
         {
             return new ScalarDate(this.date);
         }
+
+        public void DeepTrim()
+        {
+            //do nothing, nothing to trim
+        }
     }
 }

@@ -49,7 +49,7 @@ namespace Gekko
         /// <param name="s1">First string</param>
         /// <param name="s2">Second string</param>
         /// <returns>True if equal</returns>
-        public static bool equal(string s1, string s2)
+        public static bool Equal(string s1, string s2)
         {
             //s1 or s2 may be null
             return (string.Compare(s1, s2, true) == 0);  //true for ignoreCase                
@@ -67,6 +67,27 @@ namespace Gekko
                 }
             }
             return rv;
+        }
+
+//        public static bool IsDebugSession
+//        {
+//            get
+//            {
+//#if DEBUG
+//                return true;
+//#else
+//            return false;
+//#endif
+//            }
+//        }
+
+         public static bool IsDebugSession
+        {
+            //Cannot get this to work...
+            get
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -203,19 +224,19 @@ namespace Gekko
         public static EFreq GetFreq(string freq)
         {
             EFreq eFreq = EFreq.Annual;
-            if (G.equal(freq, "a"))
+            if (G.Equal(freq, "a"))
             {
                 //do nothing
             }
-            else if (G.equal(freq, "q"))
+            else if (G.Equal(freq, "q"))
             {
                 eFreq = EFreq.Quarterly;
             }
-            else if (G.equal(freq, "m"))
+            else if (G.Equal(freq, "m"))
             {
                 eFreq = EFreq.Monthly;
             }
-            else if (G.equal(freq, "u"))
+            else if (G.Equal(freq, "u"))
             {
                 eFreq = EFreq.Undated;
             }
@@ -598,7 +619,7 @@ namespace Gekko
 
         public static string RemoveFreqIndicator(string s)
         {
-            int i = s.LastIndexOf(Globals.symbolTilde);
+            int i = s.LastIndexOf(Globals.freqIndicator);
             if (i < 0) return s;
             return s.Substring(0, s.Length - i);
         }
@@ -891,9 +912,20 @@ namespace Gekko
 
         public static bool IsLetterOrDigitOrUnderscoreOrTilde(char c)
         {
-            if (G.IsEnglishLetter(c) || char.IsDigit(c) || c == '_' || c == Globals.symbolTilde)
+            if (G.IsEnglishLetter(c) || char.IsDigit(c) || c == '_' || c == Globals.freqIndicator)
                 return true;
             else return false;
+        }
+
+        public static bool StartsWithSigil(string s)
+        {
+            if (s == null) return false;
+            if (s.Length == 0) return false;
+            if (s[0] == Globals.symbolMemvar || s[0] == Globals.symbolList)
+            {
+                return true;
+            }
+            return false;
         }
 
         public static bool IsLetterOrUnderscore(char c)

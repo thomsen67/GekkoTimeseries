@@ -119,7 +119,7 @@ namespace Gekko
                 Databank databank = Program.databanks.GetDatabank(s);
                 if (i == 1)
                 {
-                    if (G.equal(databank.aliasName, Globals.Ref))
+                    if (G.Equal(databank.aliasName, Globals.Ref))
                     {
                         if (databank.storage.Count == 0) continue; //skip it, so that Ref is not shown in the list when it is empty
                     }
@@ -205,7 +205,7 @@ namespace Gekko
                 Program.databanks.storage[lowerIdx] = higher;
                 Program.databanks.storage[higherIdx] = lower;
                 //remember that higher is at lowerIdx and vice versa!
-                if ((lowerIdx == 0 || lowerIdx == 1) && !(G.equal(higher.aliasName, Globals.Work) || G.equal(higher.aliasName, Globals.Ref)))
+                if ((lowerIdx == 0 || lowerIdx == 1) && !(G.Equal(higher.aliasName, Globals.Work) || G.Equal(higher.aliasName, Globals.Ref)))
                 {
                     if (!higher.protect)
                     {
@@ -216,7 +216,7 @@ namespace Gekko
                     
                 }
                 //remember that higher is at lowerIdx and vice versa!
-                if ((higherIdx == 0 || higherIdx == 1) && !(G.equal(lower.aliasName, Globals.Work) || G.equal(lower.aliasName, Globals.Ref)))
+                if ((higherIdx == 0 || higherIdx == 1) && !(G.Equal(lower.aliasName, Globals.Work) || G.Equal(lower.aliasName, Globals.Ref)))
                 {
                     if (!lower.protect)
                     {

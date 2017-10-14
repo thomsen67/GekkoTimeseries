@@ -514,7 +514,7 @@ namespace Gekko
                         format = format.Substring(0, format.Length - "-lower".Length);
                         lower = true;
                     }
-                    if (G.equal(format, "danish-short"))
+                    if (G.Equal(format, "danish-short"))
                     {
                         if (x2 == 1) s = "jan. " + x1;
                         else if (x2 == 2) s = "feb. " + x1;
@@ -534,7 +534,7 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                    else if (G.equal(format, "danish-long"))
+                    else if (G.Equal(format, "danish-long"))
                     {
                         if (x2 == 1) s = "januar " + x1;
                         else if (x2 == 2) s = "februar " + x1;
@@ -554,7 +554,7 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                    else if (G.equal(format, "english-short"))
+                    else if (G.Equal(format, "english-short"))
                     {
                         if (x2 == 1) s = "jan. " + x1;
                         else if (x2 == 2) s = "feb. " + x1;
@@ -574,7 +574,7 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                    else if (G.equal(format, "english-long"))
+                    else if (G.Equal(format, "english-long"))
                     {
                         if (x2 == 1) s = "january " + x1;
                         else if (x2 == 2) s = "february " + x1;
@@ -609,7 +609,7 @@ namespace Gekko
 
         private static string GetStringFromNumber(Cell cell, string format, Table table)
         {
-            bool isTable = G.equal(table.type, "table");
+            bool isTable = G.Equal(table.type, "table");
 
             int maxLength = 15; //default
             int decimals = 4; //default
@@ -663,7 +663,7 @@ namespace Gekko
 
             if (isTable)
             {
-                if (G.equal(Program.options.table_decimalseparator, "comma"))
+                if (G.Equal(Program.options.table_decimalseparator, "comma"))
                 {
                     nfi.NumberGroupSeparator = ".";
                     nfi.NumberDecimalSeparator = ",";
@@ -712,7 +712,7 @@ namespace Gekko
         public List<string> Print(string ptype)
         {
             ETablePrintType type = ETablePrintType.Txt;
-            if (G.equal(ptype, "html")) type = ETablePrintType.Html;
+            if (G.Equal(ptype, "html")) type = ETablePrintType.Html;
             if (type == ETablePrintType.Html)
             {
                 return PrintHtml();
@@ -1344,22 +1344,22 @@ namespace Gekko
                 throw new GekkoException();
             }
             string db = Globals.Work;
-            if (G.equal(Globals.tableOption, Globals.printCode_s)) db = Globals.Ref;
+            if (G.Equal(Globals.tableOption, Globals.printCode_s)) db = Globals.Ref;
             int counter = 0;
             foreach (GekkoTime t in new GekkoTimeIterator( tStart, tEnd))
             {
                 if (Program.ShouldFilterPeriod(t)) continue;
-                if (G.equal(Globals.tableOption, "m"))
+                if (G.Equal(Globals.tableOption, "m"))
                 {
-                    if (G.equal(option, "n"))
+                    if (G.Equal(option, "n"))
                     {
                         this.SetNumber(row, col + counter, scale * Program.MulLevel(name, t), format);
                     }
-                    else if (G.equal(option, "p"))
+                    else if (G.Equal(option, "p"))
                     {
                         this.SetNumber(row, col + counter, scale * Program.MulPch(name, t), format);
                     }
-                    else if (G.equal(option, "d"))
+                    else if (G.Equal(option, "d"))
                     {
                         this.SetNumber(row, col + counter, scale * Program.MulDif(name, t), format);
                     }
@@ -1370,15 +1370,15 @@ namespace Gekko
                 }
                 else
                 {
-                    if (G.equal(option, "n"))
+                    if (G.Equal(option, "n"))
                     {
                         this.SetNumber(row, col + counter, scale * Program.Level(db, name, t), format);
                     }
-                    else if (G.equal(option, "p"))
+                    else if (G.Equal(option, "p"))
                     {
                         this.SetNumber(row, col + counter, scale * Program.Pch(db, name, t), format);
                     }
-                    else if (G.equal(option, "d"))
+                    else if (G.Equal(option, "d"))
                     {
                         this.SetNumber(row, col + counter, scale * Program.Dif(db, name, t), format);
                     }

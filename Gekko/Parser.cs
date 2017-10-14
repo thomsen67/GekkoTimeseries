@@ -591,7 +591,7 @@ namespace Gekko
             ss.Remove(ss.Length - 1, 1);
             ss.Append(". ");
             string stacked = "false";
-            if (G.equal(Program.options.solve_forward_method, "stacked")) stacked = "true";
+            if (G.Equal(Program.options.solve_forward_method, "stacked")) stacked = "true";
             ss.Append("Stacked: " + stacked);            
             return ss.ToString();
         }
@@ -653,7 +653,7 @@ namespace Gekko
                     string value = child.GetChild(1).Text;
                     if (child.GetChild(2) != null)
                     {
-                        if (G.equal(child.GetChild(2).Text, "-"))
+                        if (G.Equal(child.GetChild(2).Text, "-"))
                         {
                             value = "-" + value;
                         }
@@ -1228,7 +1228,7 @@ namespace Gekko
 
                 string folder = Program.GetModelInfoPath();  //always a <modelname>__info subfolder to local temp files folder
 
-                if (G.equal(Program.options.model_infofile, "yes"))
+                if (G.Equal(Program.options.model_infofile, "yes"))
                 {
                     string zipFileNameInput = Program.CreateFullPathAndFileName(Globals.modelFileName.Replace(".frm", "") + "__info.zip");
                     Program.WaitForZipWrite(folder, zipFileNameInput);
@@ -1924,7 +1924,7 @@ namespace Gekko
 
                         bool recognized = false;
 
-                        if (G.equal(function, "log"))
+                        if (G.Equal(function, "log"))
                         {
                             if (arguments != 1)
                             {
@@ -1936,7 +1936,7 @@ namespace Gekko
                             wh2.rightHandSideCsCode.Append("Log(", EEmitType.humanReadable);
                             numberOfRightParentheses++;
                         }
-                        else if (G.equal(function, "exp"))
+                        else if (G.Equal(function, "exp"))
                         {
                             if (arguments != 1)
                             {
@@ -1948,7 +1948,7 @@ namespace Gekko
                             wh2.rightHandSideCsCode.Append("Exp(", EEmitType.humanReadable);
                             numberOfRightParentheses++;
                         }
-                        else if (G.equal(function, "abs"))
+                        else if (G.Equal(function, "abs"))
                         {
                             if (arguments != 1)
                             {
@@ -1960,10 +1960,10 @@ namespace Gekko
                             wh2.rightHandSideCsCode.Append("Abs(", EEmitType.humanReadable);
                             numberOfRightParentheses++;
                         }
-                        else if (G.equal(function, "dlog") || G.equal(function, "dlogy"))
+                        else if (G.Equal(function, "dlog") || G.Equal(function, "dlogy"))
                         {
                             int lag = 1;
-                            if (G.equal(function, "dlogy"))
+                            if (G.Equal(function, "dlogy"))
                             {
                                 lag = O.CurrentSubperiods();
                                 Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
@@ -2020,10 +2020,10 @@ namespace Gekko
                             d.Add(e);
                             d.Add(subTree);
                         }
-                        else if (G.equal(function, "pch") || G.equal(function, "pchy"))
+                        else if (G.Equal(function, "pch") || G.Equal(function, "pchy"))
                         {
                             int lag = 1;
-                            if (G.equal(function, "pchy"))
+                            if (G.Equal(function, "pchy"))
                             {
                                 lag = O.CurrentSubperiods();
                                 Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
@@ -2086,7 +2086,7 @@ namespace Gekko
                             c.Add(c1);
                             c.Add(c2);
                         }
-                        else if (G.equal(function, "lag"))
+                        else if (G.Equal(function, "lag"))
                         {
                             if (arguments != 2)
                             {
@@ -2133,10 +2133,10 @@ namespace Gekko
                             c.Add(c1);
                             c.Add(c2);
                         }
-                        else if (G.equal(function, "dif") || G.equal(function, "diff") || G.equal(function, "dify") || G.equal(function, "diffy"))
+                        else if (G.Equal(function, "dif") || G.Equal(function, "diff") || G.Equal(function, "dify") || G.Equal(function, "diffy"))
                         {
                             int lag = 1;
-                            if (G.equal(function, "dify") || G.equal(function, "diffy"))
+                            if (G.Equal(function, "dify") || G.Equal(function, "diffy"))
                             {
                                 lag = O.CurrentSubperiods();
                                 Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
@@ -2189,7 +2189,7 @@ namespace Gekko
                             c.Add(c1);
                             c.Add(c2);
                         }
-                        else if (G.equal(function, "movavg") || G.equal(function, "movsum"))
+                        else if (G.Equal(function, "movavg") || G.Equal(function, "movsum"))
                         {
 
                             if (arguments != 2)
@@ -2271,7 +2271,7 @@ namespace Gekko
                                 cRightOld = cRightNew;
                             }
 
-                            if (G.equal(function, "movsum"))
+                            if (G.Equal(function, "movsum"))
                             {
                                 equationNode.Add(container);
                             }
@@ -2284,7 +2284,7 @@ namespace Gekko
                                 equationNode.Add(temp);
                             }
                         }
-                        else if (G.equal(function, "pow"))
+                        else if (G.Equal(function, "pow"))
                         {
                             if (arguments != 2)
                             {
@@ -2295,7 +2295,7 @@ namespace Gekko
                             HandlePowFunction(eh, equationNode, depth, wh2, model, subTreeLag, isModel, true);
                             visitChildren = false;
                         }
-                        else if (G.equal(function, "CES_UC") || G.equal(function, "CES_XL") || G.equal(function, "CES_XR") || G.equal(function, "CES_COSTS") || G.equal(function, "CES_FACTOR1") || G.equal(function, "CES_FACTOR2") || G.equal(function, "CES_AC"))
+                        else if (G.Equal(function, "CES_UC") || G.Equal(function, "CES_XL") || G.Equal(function, "CES_XR") || G.Equal(function, "CES_COSTS") || G.Equal(function, "CES_FACTOR1") || G.Equal(function, "CES_FACTOR2") || G.Equal(function, "CES_AC"))
                         {
                             //See #09875209837532
                             recognized = true;
@@ -2337,11 +2337,11 @@ namespace Gekko
                         string namedBank = null;
                         if (!isModel)
                         {
-                            if (G.equal(equationNode.GetChild(1).Text, "true"))
+                            if (G.Equal(equationNode.GetChild(1).Text, "true"))
                             {
                                 isBaseBank = true;
                             }
-                            else if (G.equal(equationNode.GetChild(1).Text, "ASTBANK"))
+                            else if (G.Equal(equationNode.GetChild(1).Text, "ASTBANK"))
                             {
                                 namedBank = equationNode.GetChild(1).GetChild(0).Text;
                             }
@@ -2390,11 +2390,11 @@ namespace Gekko
                             bool isBaseBank2 = false;
                             if (!isModel)
                             {
-                                if (G.equal(equationNode.GetChild(3).Text, "true"))
+                                if (G.Equal(equationNode.GetChild(3).Text, "true"))
                                 {
                                     isBaseBank2 = true;
                                 }
-                                else if (G.equal(equationNode.GetChild(3).Text, "ASTBANK"))
+                                else if (G.Equal(equationNode.GetChild(3).Text, "ASTBANK"))
                                 {
                                     namedBank = equationNode.GetChild(3).GetChild(0).Text;
                                 }
@@ -2539,15 +2539,15 @@ namespace Gekko
                          *
                          * */
                         //These are left-hand side functions
-                        if (G.equal(wh2.leftSideFunction, "log"))
+                        if (G.Equal(wh2.leftSideFunction, "log"))
                         {
                             root1 = new ASTNode("ASTFUNCTION", "exp");
                             root1.Add(root0);
                         }
-                        else if (G.equal(wh2.leftSideFunction, "dlog") || G.equal(wh2.leftSideFunction, "dlogy"))
+                        else if (G.Equal(wh2.leftSideFunction, "dlog") || G.Equal(wh2.leftSideFunction, "dlogy"))
                         {
                             int lag = 1;
-                            if (G.equal(wh2.leftSideFunction, "dlogy"))
+                            if (G.Equal(wh2.leftSideFunction, "dlogy"))
                             {
                                 lag = O.CurrentSubperiods();
                                 Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
@@ -2565,10 +2565,10 @@ namespace Gekko
                             child2.Add(new ASTNode("exp"));
                             child2.Add(root0);
                         }
-                        else if (G.equal(wh2.leftSideFunction, "pch") || G.equal(wh2.leftSideFunction, "pchy"))
+                        else if (G.Equal(wh2.leftSideFunction, "pch") || G.Equal(wh2.leftSideFunction, "pchy"))
                         {
                             int lag = 1;
-                            if (G.equal(wh2.leftSideFunction, "pchy"))
+                            if (G.Equal(wh2.leftSideFunction, "pchy"))
                             {
                                 lag = O.CurrentSubperiods();
                                 Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
@@ -2590,10 +2590,10 @@ namespace Gekko
                             child2.Add(child21);
                             child2.Add(child22);
                         }                        
-                        else if (G.equal(wh2.leftSideFunction, "dif") || G.equal(wh2.leftSideFunction, "diff") || G.equal(wh2.leftSideFunction, "dify") || G.equal(wh2.leftSideFunction, "diffy"))
+                        else if (G.Equal(wh2.leftSideFunction, "dif") || G.Equal(wh2.leftSideFunction, "diff") || G.Equal(wh2.leftSideFunction, "dify") || G.Equal(wh2.leftSideFunction, "diffy"))
                         {
                             int lag = 1;
-                            if (G.equal(wh2.leftSideFunction, "dify") || G.equal(wh2.leftSideFunction, "diffy"))
+                            if (G.Equal(wh2.leftSideFunction, "dify") || G.Equal(wh2.leftSideFunction, "diffy"))
                             {
                                 lag = O.CurrentSubperiods();
                                 Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
@@ -2674,18 +2674,18 @@ namespace Gekko
                     if (!(eh.equationType == EEquationType.RevertedAutoGenerated || eh.equationType == EEquationType.RevertedY))
                     {
                         //adding J-variables
-                        if (G.equal(eh.equationCodeJ, "j_") || G.equal(eh.equationCodeJ, "jd"))
+                        if (G.Equal(eh.equationCodeJ, "j_") || G.Equal(eh.equationCodeJ, "jd"))
                         {
                             eh.equationCodeJadditive = true;
                         }
-                        else if (G.equal(eh.equationCodeJ, "jr"))
+                        else if (G.Equal(eh.equationCodeJ, "jr"))
                         {
                             eh.equationCodeJmultiplicative = true;
                         }
                         else if (eh.equationCodeJ != "" && eh.equationCodeJ != "__") codeError += "Expected 'J_' or 'JD' or 'JR' in position 3-4 in equation code\n";
 
                         string jled2 = eh.equationCodeJ.ToUpper();
-                        if (G.equal(jled2, "j_")) jled2 = "J";  //stripping the "_"
+                        if (G.Equal(jled2, "j_")) jled2 = "J";  //stripping the "_"
                         eh.Jname = jled2 + eh.lhs;
                         //at this point, jled2 may be = "", so eh.Jname is same as eh.lhs.
                         if (eh.equationCodeJmultiplicative)
@@ -2712,7 +2712,7 @@ namespace Gekko
                     if (!(eh.equationType == EEquationType.RevertedAutoGenerated || eh.equationType == EEquationType.RevertedY))
                     {
                         //D- and Z-vars, including reverted equations
-                        if (G.equal(eh.equationCodeD, "d"))
+                        if (G.Equal(eh.equationCodeD, "d"))
                         {
                             root3 = new ASTNode("+", true);
                             eh.Dname = "D" + eh.lhs;
@@ -2879,7 +2879,7 @@ namespace Gekko
                         }
                     }
 
-                    if (G.equal(eh.equationCodeZ, "z"))
+                    if (G.Equal(eh.equationCodeZ, "z"))
                     {
                         //damping should not be done in generated code, not necessary (and dangerous)
                     }
@@ -2960,7 +2960,7 @@ namespace Gekko
                         }
 
                         bool isTimeDifferenceFunction = true;
-                        if (equationNodeChild.Text == "ASTFUNCTION" && (G.equal(equationNodeChild.GetChild(0).Text, "exp") || G.equal(equationNodeChild.GetChild(0).Text, "log") || G.equal(equationNodeChild.GetChild(0).Text, "pow")))
+                        if (equationNodeChild.Text == "ASTFUNCTION" && (G.Equal(equationNodeChild.GetChild(0).Text, "exp") || G.Equal(equationNodeChild.GetChild(0).Text, "log") || G.Equal(equationNodeChild.GetChild(0).Text, "pow")))
                         {
                             isTimeDifferenceFunction = false;
                         }
@@ -3165,12 +3165,12 @@ namespace Gekko
             }
             string var = eh.lhsWithLagIndicator;
 
-            if (G.equal(code.Substring(0, 1), "y"))
+            if (G.Equal(code.Substring(0, 1), "y"))
             {
                 eh.equationType = EEquationType.RevertedY;  //for instance "Y"-type eqs, with J- or Z-vars on left side
                 return;
             }
-            else if (G.equal(code.Substring(0, 1), "i"))
+            else if (G.Equal(code.Substring(0, 1), "i"))
             {
                 //Probably, this could just be EEquationType.I instead. After model equations are marked in another way and
                 //not identified per this code.
@@ -3178,7 +3178,7 @@ namespace Gekko
                 eh.equationType = EEquationType.AfterModelI;  //for instance "I"-type eqs in after model
                 return;
             }
-            else if (G.equal(code.Substring(0, 1), "d"))
+            else if (G.Equal(code.Substring(0, 1), "d"))
             {
                 //Probably, this could just be EEquationType.D instead. After model equations are marked in another way and
                 //not identified per this code.
@@ -3208,11 +3208,11 @@ namespace Gekko
             }
 
             string type = code.Substring(1, 1);
-            if (G.equal(type, "d")) eh.equationType = EEquationType.D;
-            else if (G.equal(type, "i")) eh.equationType = EEquationType.I;
-            else if (G.equal(type, "g")) eh.equationType = EEquationType.G;
-            else if (G.equal(type, "k")) eh.equationType = EEquationType.K;
-            else if (G.equal(type, "s")) eh.equationType = EEquationType.S;
+            if (G.Equal(type, "d")) eh.equationType = EEquationType.D;
+            else if (G.Equal(type, "i")) eh.equationType = EEquationType.I;
+            else if (G.Equal(type, "g")) eh.equationType = EEquationType.G;
+            else if (G.Equal(type, "k")) eh.equationType = EEquationType.K;
+            else if (G.Equal(type, "s")) eh.equationType = EEquationType.S;
             else
             {
                 eh.equationType = EEquationType.I;
@@ -3239,7 +3239,7 @@ namespace Gekko
             {
                 //1 char, if dummy
                 eh.equationCodeZ = code.Substring(6, 1);
-                if (G.equal(eh.equationCodeZ, "Z"))
+                if (G.Equal(eh.equationCodeZ, "Z"))
                 {
                     //variable is to be damped in Gauss-Seidel
                     if (model.dampVariables.ContainsKey(var))
@@ -3444,7 +3444,7 @@ namespace Gekko
 
         private static void CheckCurrow(string cr)
         {
-            if (!G.equal(cr, "currow"))
+            if (!G.Equal(cr, "currow"))
             {
                 G.Writeln2("*** ERROR: Expected .CurRow");
             }

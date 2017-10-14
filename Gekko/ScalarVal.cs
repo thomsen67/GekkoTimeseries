@@ -283,7 +283,12 @@ namespace Gekko
         public IVariable DeepClone()
         {
             return new ScalarVal(this.val);
-        }        
+        }
+
+        public void DeepTrim()
+        {
+            //do nothing, nothing to trim
+        }
 
 
     }

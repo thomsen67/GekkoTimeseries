@@ -147,6 +147,12 @@ namespace Gekko
             throw new GekkoException();
         }
 
+        public void DeepTrim()
+        {
+            G.Writeln2("*** ERROR: Trim error");
+            throw new GekkoException();
+        }
+
     }
 }
 

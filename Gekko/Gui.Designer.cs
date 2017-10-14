@@ -1467,11 +1467,11 @@ namespace Gekko
             if (keyword == "space") s2 += " ";
             else if (keyword == "less") s2 += "<";
 
-            if (G.equal(type, "none"))
+            if (G.Equal(type, "none"))
             {
                 return;
             }
-            else if (G.equal(type, "option"))
+            else if (G.Equal(type, "option"))
             {
                 if (keyword == "space")
                 {
@@ -1487,7 +1487,7 @@ namespace Gekko
                     return;
                 }
             }
-            else if (G.equal(type, "some"))
+            else if (G.Equal(type, "some"))
             {
                 if (keyword == "space")
                 {
@@ -1503,7 +1503,7 @@ namespace Gekko
                     if (ok == false) return;
                 }
             }
-            else if (G.equal(type, "all"))
+            else if (G.Equal(type, "all"))
             {
                 //do nothing
             }

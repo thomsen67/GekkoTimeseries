@@ -231,7 +231,7 @@ namespace Gekko.Parser.Gek
                 }
             }
             Program.WriteCallStack(false, p);  //will only be performed once
-            throw e;
+            if(!G.IsDebugSession)throw e;
         }
 
         private static void HandleCompileErrors(P p, CompilerResults cr)
@@ -240,12 +240,12 @@ namespace Gekko.Parser.Gek
 
             foreach (CompilerError ce in cr.Errors)
             {
-                if (G.equal(ce.ErrorNumber, "CS0159") || G.equal(ce.ErrorNumber, "CS0140"))
+                if (G.Equal(ce.ErrorNumber, "CS0159") || G.Equal(ce.ErrorNumber, "CS0140"))
                 {
                     G.Writeln2("*** ERROR: Problem with GOTO and TARGET");
                     G.Writeln2(ce.ErrorText);
                 }
-                else if (G.equal(ce.ErrorNumber, "CS1501"))
+                else if (G.Equal(ce.ErrorNumber, "CS1501"))
                 {
                     //Se also #09835742345
                     G.Writeln2("*** ERROR: A function is called with the wrong number of parameters");
@@ -262,7 +262,7 @@ namespace Gekko.Parser.Gek
                         else G.Writeln("*** Problem with the function  " + q[0] + "", Color.Red);
                     }
                 }
-                else if (G.equal(ce.ErrorNumber, "CS0117"))
+                else if (G.Equal(ce.ErrorNumber, "CS0117"))
                 {                    
                     //Se also #09835742345                        
                     List<string> q = new List<string>();
@@ -293,7 +293,7 @@ namespace Gekko.Parser.Gek
                         G.Writeln2("*** ERROR: A function could not be found");
                     }
                 }
-                else if (G.equal(ce.ErrorNumber, "CS0161"))
+                else if (G.Equal(ce.ErrorNumber, "CS0161"))
                 {
                     G.Writeln2("*** ERROR: Problem with return values from user defined function");
 

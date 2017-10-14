@@ -113,7 +113,7 @@ namespace Gekko
                             ScalarString x_string = x as ScalarString;
                             if (x_string != null)
                             {
-                                if (G.equal(x_string._string2, s5)) return Globals.scalarVal1;
+                                if (G.Equal(x_string._string2, s5)) return Globals.scalarVal1;
                             }
                         }
                         return Globals.scalarVal0;
@@ -304,6 +304,14 @@ namespace Gekko
                 temp.Add(iv.DeepClone());
             }
             return new MetaList(temp);
+        }
+
+        public void DeepTrim()
+        {            
+            foreach (IVariable iv in this.list)
+            {
+                iv.DeepClone();
+            }         
         }
     }
 }

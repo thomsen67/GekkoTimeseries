@@ -1044,7 +1044,7 @@ namespace Gekko.Parser.Gek
             string translated = null;
             bool isGekko18 = false;
 
-            if (G.equal(Program.options.interface_mode, "sim"))
+            if (G.Equal(Program.options.interface_mode, "sim"))
             {
                 translated = Translators.Translate1(false, xxxx);
                 isGekko18 = true;
@@ -1130,16 +1130,16 @@ namespace Gekko.Parser.Gek
         {
             if (firstWord == null || firstWord == "") return;
 
-            if (G.equal(firstWord, "p")) firstWord = "prt";  //synonym
-            if (G.equal(firstWord, "pri")) firstWord = "prt";  //synonym
-            if (G.equal(firstWord, "print")) firstWord = "prt";  //synonym            
-            if (G.equal(firstWord, "ser")) firstWord = "series";  //synonym   
+            if (G.Equal(firstWord, "p")) firstWord = "prt";  //synonym
+            if (G.Equal(firstWord, "pri")) firstWord = "prt";  //synonym
+            if (G.Equal(firstWord, "print")) firstWord = "prt";  //synonym            
+            if (G.Equal(firstWord, "ser")) firstWord = "series";  //synonym   
             //TODO: should check keyword list
 
             bool flag = false;
             foreach (string s in Globals.helpTopics)
             {
-                if (G.equal(s, firstWord))
+                if (G.Equal(s, firstWord))
                 {
                     flag = true;
                     break;

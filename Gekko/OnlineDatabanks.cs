@@ -89,7 +89,7 @@ namespace Gekko
                 format = (string)jsonTree["format"];
             }
             catch { }
-            if (format == null || !G.equal(format, "px"))
+            if (format == null || !G.Equal(format, "px"))
             {
                 G.Writeln2("*** ERROR: You should use \"format\": \"px\", in the .json file");
                 throw new GekkoException();

@@ -55,11 +55,11 @@ namespace Gekko
             if (x1.Type() == EVariableType.String)
             {
                 string s = x1.ConvertToString();
-                if (G.equal(s, "first"))
+                if (G.Equal(s, "first"))
                 {
                     return new ScalarString(Program.databanks.GetFirst().aliasName);
                 }
-                else if (G.equal(s, "ref"))
+                else if (G.Equal(s, "ref"))
                 {
                     return new ScalarString(Program.databanks.GetRef().aliasName);
                 }
@@ -124,7 +124,7 @@ namespace Gekko
             }
 
             string y2 = x2.ConvertToString();
-            if (G.equal(y2, "fullpath"))
+            if (G.Equal(y2, "fullpath"))
             {
                 rv = db.FileNameWithPath;
             }
@@ -870,11 +870,11 @@ namespace Gekko
             string s = ((ScalarString)type)._string2;
 
             bool upper = true;
-            if(G.equal(s,"upper"))
+            if(G.Equal(s,"upper"))
             {
 
             }
-            else if (G.equal(s, "lower"))
+            else if (G.Equal(s, "lower"))
             {
                 upper = false;
             }
@@ -1594,7 +1594,7 @@ namespace Gekko
             else if (x.Type() == EVariableType.String)
             {
                 string s = ((ScalarString)x)._string2;
-                if (G.equal(s, "m"))
+                if (G.Equal(s, "m"))
                 {
                     v = double.NaN;
                 }
@@ -1761,39 +1761,39 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            if (G.equal(s2, "name"))
+            if (G.Equal(s2, "name"))
             {
                 return new ScalarString(ts.name);
             }
-            else if (G.equal(s2, "label"))
+            else if (G.Equal(s2, "label"))
             {
                 return new ScalarString(ts.meta.label);
             }
-            else if (G.equal(s2, "source"))
+            else if (G.Equal(s2, "source"))
             {
                 return new ScalarString(ts.meta.source);
             }
-            else if (G.equal(s2, "stamp"))
+            else if (G.Equal(s2, "stamp"))
             {
                 return new ScalarString(ts.meta.stamp);
             }
-            else if (G.equal(s2, "perStart"))
+            else if (G.Equal(s2, "perStart"))
             {
                 return new ScalarDate(ts.GetPeriodFirst());
             }
-            else if (G.equal(s2, "dataStart"))
+            else if (G.Equal(s2, "dataStart"))
             {
                 return new ScalarDate(ts.GetRealDataPeriodFirst());
             }
-            else if (G.equal(s2, "perEnd"))
+            else if (G.Equal(s2, "perEnd"))
             {
                 return new ScalarDate(ts.GetPeriodLast());
             }
-            else if (G.equal(s2, "dataEnd"))
+            else if (G.Equal(s2, "dataEnd"))
             {
                 return new ScalarDate(ts.GetRealDataPeriodLast());
             }
-            else if (G.equal(s2, "freq"))
+            else if (G.Equal(s2, "freq"))
             {
                 return new ScalarString(G.GetFreq(ts.freq));
             }

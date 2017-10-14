@@ -215,10 +215,11 @@ namespace Gekko
 
         public const string symbolBankColon = ":";
         public const char symbolBankColon2 = ':';
-        public const char symbolTilde = '~';
+        //public const char symbolTilde = '!';
         public const char symbolList = '#';
         public const char symbolMemvar = '%';
         public const string symbolDollar = "$";
+        public const char symbolTilde = '~';
         public const char symbolConcatenation = '|';
         public const char symbolGlueChar1 = '¨';
         public const string symbolGlueChar2 = "£";  //for '.'
@@ -423,14 +424,14 @@ namespace Gekko
         public static Databank undoBank = null;
         public static int hasBeenEndoExoStatementsSinceLastSim = 0;
         
-        public static List<string> tsdxVersions = new List<string> { "1.0", "1.1" };
+        public static List<string> tsdxVersions = new List<string> { "1.0", "1.1", "1.2" };
 
         public static int removeAllLags = 0;
         public static char parserErrorSeparator = '¤';
         public static string lagIndicator = "¤";
         public static string leftParenthesisIndicator = "[";
         public static string rightParenthesisIndicator = "]";
-        public static string freqIndicator = "%";  //see also #09832752
+        public const char freqIndicator = '!';  //see also #09832752
         public static string afterModelJIndicator = "Y";
         public static string reverseIndicator1 = "REVERSE1";
         public static string reverseIndicator2 = "REVERSE2";

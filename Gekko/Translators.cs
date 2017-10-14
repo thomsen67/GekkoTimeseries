@@ -400,7 +400,7 @@ namespace Gekko
             {
                 
                 //change soft parens
-                if (i > 0 && G.equal(all3[i], "cmd") && G.equal(all3[i - 1], "."))
+                if (i > 0 && G.Equal(all3[i], "cmd") && G.Equal(all3[i - 1], "."))
                 {
                     all3[i] = Globals.extensionCommand;
                 }

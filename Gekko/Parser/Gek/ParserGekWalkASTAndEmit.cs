@@ -1868,7 +1868,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 //method def:
                                 sb1.AppendLine("public static IVariable " + tempName + "(GekkoSmpl smpl" + parentListLoopVars1 + ") {");
-                                if (G.equal(functionNameLower, "sum"))
+                                if (G.Equal(functionNameLower, "sum"))
                                 {
                                     sb1.AppendLine("TimeSeries " + tempName + " = new TimeSeries(Program.options.freq, null); " + tempName + ".SetZero(smpl);" + G.NL);
                                 }
@@ -1881,7 +1881,7 @@ namespace Gekko.Parser.Gek
                                     sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))), null))) {");
                                 }
 
-                                if (G.equal(functionNameLower, "sum"))
+                                if (G.Equal(functionNameLower, "sum"))
                                 {
                                     sb1.AppendLine(tempName + ".InjectAdd(smpl, " + tempName + ", " + node[2].Code.ToString() + ");" + G.NL);
                                 }
@@ -4299,7 +4299,7 @@ namespace Gekko.Parser.Gek
                         {
                             string rhsCode = node[1].Code.ToString();
 
-                            if (node[1].Text == "ASTFUNCTION" && (G.equal(node[1][0].Text.ToLower(), "laspchain") || G.equal(node[1][0].Text.ToLower(), "laspfixed")))
+                            if (node[1].Text == "ASTFUNCTION" && (G.Equal(node[1][0].Text.ToLower(), "laspchain") || G.Equal(node[1][0].Text.ToLower(), "laspfixed")))
                             {
                                 //hack to make it work. Problem is that method cannot run year-by-year.
                                 if (node[0].ChildrenCount() != 2)
@@ -4569,7 +4569,7 @@ namespace Gekko.Parser.Gek
         {
             //returns null if it is NOT a GAMS-like sum() function
             string[] rv = null;
-            if (G.equal(functionName, "sum") || G.equal(functionName, "unfold")) rv = GetListnames(node);
+            if (G.Equal(functionName, "sum") || G.Equal(functionName, "unfold")) rv = GetListnames(node);
 
             if (rv == null)
             {
@@ -4577,7 +4577,7 @@ namespace Gekko.Parser.Gek
             }
             else
             {                
-                if (G.equal(functionName, "sum)"))
+                if (G.Equal(functionName, "sum)"))
                 {
                     //extra check, this may be, for instance, sum(#i, x) or sum(#i, #j) --> these are not GAMS-like sums
                     int[] found = new int[1];
@@ -4703,7 +4703,7 @@ namespace Gekko.Parser.Gek
                     || tmp.Text == "ASTGENRLHSFUNCTION"
                     || tmp.Text == "ASTGENRLISTINDEXER"
                     || tmp.Text == "ASTRETURNTUPLE"
-                    || (G.equal(tmp.Text, "series") && (tmp.Parent != null && tmp.Text == "ASTTUPLEITEM") && (tmp.Parent.Parent != null && tmp.Parent.Text == "ASTTUPLE"))
+                    || (G.Equal(tmp.Text, "series") && (tmp.Parent != null && tmp.Text == "ASTTUPLEITEM") && (tmp.Parent.Parent != null && tmp.Parent.Text == "ASTTUPLE"))
 
                     ) ok = true;
 
@@ -4975,19 +4975,19 @@ namespace Gekko.Parser.Gek
             {
                 nodeCode += "o" + numNode + ".lhs.SetData(t, data);" + G.NL;
             }
-            else if (G.equal(lhsFunction, "log"))
+            else if (G.Equal(lhsFunction, "log"))
             {
                 nodeCode += "o" + numNode + ".lhs.SetData(t, Math.Exp(data));" + G.NL;
             }
-            else if (G.equal(lhsFunction, "dlog"))
+            else if (G.Equal(lhsFunction, "dlog"))
             {
                 nodeCode += "o" + numNode + ".lhs.SetData(t, o" + numNode + ".lhs.GetData(t.Add(-1)) * Math.Exp(data));" + G.NL;
             }
-            else if (G.equal(lhsFunction, "pch"))
+            else if (G.Equal(lhsFunction, "pch"))
             {
                 nodeCode += "o" + numNode + ".lhs.SetData(t, o" + numNode + ".lhs.GetData(t.Add(-1)) * (data/100d + 1));" + G.NL;
             }
-            else if (G.equal(lhsFunction, "dif") || G.equal(lhsFunction, "diff"))
+            else if (G.Equal(lhsFunction, "dif") || G.Equal(lhsFunction, "diff"))
             {
                 nodeCode += "o" + numNode + ".lhs.SetData(t, o" + numNode + ".lhs.GetData(t.Add(-1)) + data);" + G.NL;
             }
@@ -5230,7 +5230,7 @@ namespace Gekko.Parser.Gek
             {
                 foreach (FunctionArgumentsHelperElements fah in wh2.uFunctionsHelper.storage)
                 {
-                    if (G.equal(fah.parameterName, simpleIdent))
+                    if (G.Equal(fah.parameterName, simpleIdent))
                     {
                         //this list is a function argument, use that                        
                         return fah.parameterCode;
@@ -5649,11 +5649,11 @@ namespace Gekko.Parser.Gek
                     else if (child.Text == "ASTBOOL")
                     {
                         type = "string";
-                        if (G.equal(child.GetChild(0).Text, "astyes") || G.equal(child.GetChild(0).Text, "true"))
+                        if (G.Equal(child.GetChild(0).Text, "astyes") || G.Equal(child.GetChild(0).Text, "true"))
                         {
                             s1a.Append("true");
                         }
-                        else if (G.equal(child.GetChild(0).Text, "astno") || G.equal(child.GetChild(0).Text, "false"))
+                        else if (G.Equal(child.GetChild(0).Text, "astno") || G.Equal(child.GetChild(0).Text, "false"))
                         {
                             s1a.Append("false");
                         }
@@ -5697,7 +5697,7 @@ namespace Gekko.Parser.Gek
                         {
                             s7 = "O.ConvertToString(" + child[0].Code + ")";
                         }
-                        if (G.equal(node[0].Text, "freq"))  //OPTION freq = ...
+                        if (G.Equal(node[0].Text, "freq"))  //OPTION freq = ...
                         {
                             s7 = "G.GetFreq(" + s7 + ")";
                         }
@@ -5809,11 +5809,11 @@ namespace Gekko.Parser.Gek
                     }
                     else if (child.Text == "ASTBOOL")
                     {
-                        if (G.equal(child.GetChild(0).Text, "yes") || G.equal(child.GetChild(0).Text, "true"))
+                        if (G.Equal(child.GetChild(0).Text, "yes") || G.Equal(child.GetChild(0).Text, "true"))
                         {
                             s1a.Append("true");
                         }
-                        else if (G.equal(child.GetChild(0).Text, "no") || G.equal(child.GetChild(0).Text, "false"))
+                        else if (G.Equal(child.GetChild(0).Text, "no") || G.Equal(child.GetChild(0).Text, "false"))
                         {
                             s1a.Append("false");
                         }
@@ -5851,7 +5851,7 @@ namespace Gekko.Parser.Gek
                         {
                             s7 = "O.ConvertToString(" + child[0].Code + ")";                            
                         }
-                        if (G.equal(node[0].Text, "freq"))  //OPTION freq = ...
+                        if (G.Equal(node[0].Text, "freq"))  //OPTION freq = ...
                         {
                             s7 = "G.GetFreq(" + s7 + ")";
                         }
