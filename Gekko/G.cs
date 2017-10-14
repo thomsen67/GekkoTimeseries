@@ -610,10 +610,10 @@ namespace Gekko
             newDatabank.date = originalDatabank.date;
             newDatabank.isDirty = true;
             //don't touch alias names: we are cloning the content of the databank, not altering its name.
-            foreach (TimeSeries ts in originalDatabank.storage.Values) 
+            foreach (KeyValuePair<string, IVariable> kvp in originalDatabank.storage)
             {
-                TimeSeries tsCopy = ts.DeepClone() as TimeSeries;
-                newDatabank.AddVariable(tsCopy, false);  //FIXME: what if already there. No variable name check -- just wastes time, and not good regarding GAMS variable names.
+                IVariable ivCopy = kvp.Value.DeepClone();
+                newDatabank.AddIVariable(kvp.Key, ivCopy);
             }
         }
 

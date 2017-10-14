@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ProtoBuf;
 using System.Text;
 
 namespace Gekko
@@ -26,7 +27,7 @@ namespace Gekko
         Val,
         Matrix,
         OnRightHandSide
-    }    
+    }
 
     //public class IVariablesFilterRange
     //{
@@ -39,6 +40,16 @@ namespace Gekko
     //        this.last = v2;
     //    }
     //}    
+
+    [ProtoContract]    
+    [ProtoInclude(1, typeof(TimeSeries))]
+    [ProtoInclude(2, typeof(ScalarVal))]
+    [ProtoInclude(3, typeof(ScalarDate))]
+    [ProtoInclude(4, typeof(ScalarString))]
+    [ProtoInclude(5, typeof(Map))]
+    [ProtoInclude(6, typeof(Matrix))]
+    [ProtoInclude(7, typeof(MetaList))]
+    [ProtoInclude(8, typeof(Range))]            //HMMM is an IVariable, but could never be protobuffed
 
     public interface IVariable
     {

@@ -81,21 +81,21 @@ namespace Gekko
         ///// <summary>
         ///// Indicates the frequency of the TimeSeries.
         ///// </summary>
-        [ProtoMember(2)]
+        [ProtoMember(1)]
         public EFreq freq;
         /// <summary>
         /// The name of the variable. In a databank, this name corresponds to the key that the TimeSeries is stored under,
         /// including frequency (for instance x~q for x with quarterly freq).        
         /// </summary>
-        [ProtoMember(3)]
+        [ProtoMember(2)]
         public string name;
         /// <summary>
         /// The array containing the time series data. This array is initialized with NaN values, and the array may resize
         /// itself if necessary to store a particular observation.
         /// </summary>
-        [ProtoMember(4, IsPacked = true)]  //a bit faster, and a bit smaller file (also when zipped)        
+        [ProtoMember(3, IsPacked = true)]  //a bit faster, and a bit smaller file (also when zipped)        
         public double[] dataArray;  //BEWARE: if altering directly, make sure that .protect in the databank is not set!!
-        [ProtoMember(5)]
+        [ProtoMember(4)]
         /// <summary>
         /// The 'super' period (year) corresponding to the anchor date.
         /// </summary>
@@ -104,20 +104,18 @@ namespace Gekko
         /// <summary>
         /// The index corresponding to the anchor date.
         /// </summary>
-        [ProtoMember(7)]
+        [ProtoMember(5)]
         public int anchorPeriodPositionInArray;
-        [ProtoMember(8)]
+        [ProtoMember(6)]
         private bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]
-        [ProtoMember(9)]
+        [ProtoMember(7)]
         public TimeSeriesMetaInformation meta = null;
                
         
         private TimeSeries()
         {
             //This is ONLY because protobuf-net needs it! 
-            //Empty timeseries should not be created that way.
-            G.Writeln2("*** ERROR: Internal error: TimeSeries() constructor problem");
-            throw new GekkoException();
+            //Empty timeseries should not be created that way.            
         }
 
         public TimeSeries(ETimeSeriesType type, GekkoSmpl smpl)
@@ -1264,41 +1262,43 @@ namespace Gekko
 
     }
 
+
+    [ProtoContract]
     public class TimeSeriesMetaInformation
     {
         /// <summary>
         /// The label of the timeseries (meta-data), for instance 'GDP in current prices'.
         /// </summary>
-        [ProtoMember(8)]
+        [ProtoMember(1)]
         public string label;
         /// <summary>
         /// The source of the timeseries (meta-data), for instance 'Statistics Denmark, National Accounts'.
         /// </summary>
-        [ProtoMember(9)]
+        [ProtoMember(2)]
         public string source;
         /// <summary>
         /// First data in timeseries: points to the index in the data array.
         /// </summary>        
-        [ProtoMember(10)]
+        [ProtoMember(3)]
         public int firstPeriodPositionInArray = int.MaxValue;
         /// <summary>
         /// Last data in timeseries: points to the index in the data array.
         /// </summary>        
-        [ProtoMember(11)]
+        [ProtoMember(4)]
         public int lastPeriodPositionInArray = int.MinValue;
         /// <summary>
         /// This field is only used when CLOSEing an OPEN bank, to see if
         /// the bank needs to be rewritten. Should not be put into protobuffer.
         /// </summary>        
-        [ProtoMember(12)]
+        [ProtoMember(5)]
         public string stamp;
         /// <summary>
         /// The time of the last last change in the timeseries
         /// </summary>
         /// 
-        [ProtoMember(13)]
+        [ProtoMember(6)]
         private bool isGhost = false; //A ghost variable x is a placeholder for x['a', 'b'] for example. This x variable should not be used for anything.
-        [ProtoMember(14)]        
+        [ProtoMember(7)]        
         private bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf
 

@@ -22946,18 +22946,18 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
-                G.Writeln2("*** ERROR: Thlkadsf alkfdsj alks jfasdlkfj dsalkfj sadflkja dsflkjasd flkadsjf salkdæjf salkjf dsalkjf asdflkja dsfdsaflkja sdflkjæ");
+                //G.Writeln2("*** ERROR: Thlkadsf alkfdsj alks jfasdlkfj dsalkfj sadflkja dsflkjasd flkadsjf salkdæjf salkjf dsalkjf asdflkja dsfdsaflkja sdflkjæ");
 
-                if (Globals.runningOnTTComputer)
-                {
-                    //#7098w7reeq98w7r
-                    GMap gm = new GMap();
-                    gm["a", "b"] = new ScalarVal(1d);
-                    IVariable iv = gm["a", "b"];
-                    gm = new GMap() { };
-                }
+                //if (Globals.runningOnTTComputer)
+                //{
+                //    //#7098w7reeq98w7r
+                //    GMap gm = new GMap();
+                //    gm["a", "b"] = new ScalarVal(1d);
+                //    IVariable iv = gm["a", "b"];
+                //    gm = new GMap() { };
+                //}
 
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             if (x == null)

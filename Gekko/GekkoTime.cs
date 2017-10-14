@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ProtoBuf;
 using System.Linq;
 using System.Text;
 
@@ -17,14 +18,20 @@ namespace Gekko
     {
         public static readonly int numberOfQuarters = 4;
         public static readonly int numberOfMonths = 12;
-    }  
-    
+    }
+
+    [ProtoContract]
     //GekkoTime is an immutable struct for fast looping. Structs should be < 16 bytes to be effective (we have 3 x 4 = 12 bytes here)
     public struct GekkoTime
-    {        
-        //use IsNull() to check for null.
-        public readonly int super; //year, null object is emulated by setting super to -12345
-        public readonly int sub;  //quarter or month     
+    {
+        //use IsNull() to check for null. The fields are short, to reduce size since this is a struct (that also gets saved in GBK files).
+        [ProtoMember(1)]
+        public readonly short super;   //year, null object is emulated by setting super to -12345
+        [ProtoMember(2)]
+        public readonly short sub;     //quarter, month, week, etc. (not day)
+        [ProtoMember(3)]
+        public readonly short subsub;  //day, if sub is month
+        [ProtoMember(4)]
         public readonly EFreq freq;
 
         //Note: using "new GekkoTime()" without arguments is not intended to be used, even
@@ -33,8 +40,8 @@ namespace Gekko
         public GekkoTime(EFreq freq2, int super2, int sub2)
         {
             freq = freq2;
-            super = super2;
-            sub = sub2;
+            super = (short)super2;
+            sub = (short)sub2;
             //Sanity checks to follow
             //Problem is that TIME 2010m13 2012m0 can probably parse. If not, the check below is not necessary.            
             if (sub < 1)
@@ -74,6 +81,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
+            subsub = 0;
         }
 
         private GekkoTime(EFreq freq2, int super2, int sub2, bool check)
@@ -82,8 +90,9 @@ namespace Gekko
             //This method is only used for looping and adding internally, not for creating
             //a fresh new GekkoTime from command input. Hence the method is private.
             freq = freq2;
-            super = super2;
-            sub = sub2;
+            super = (short)super2;
+            sub = (short)sub2;
+            subsub = 0;
         }
 
         public bool IsNull()

@@ -160,9 +160,9 @@ namespace Gekko
         {
             //Used to save some RAM, or just before serializing the databank via protobuf-net.
             DateTime t0 = DateTime.Now;
-            foreach (TimeSeries ts in this.storage.Values) 
+            foreach (IVariable iv in this.storage.Values) 
             {                
-                ts.Trim();                
+                iv.DeepTrim();                
             }
             G.WritelnGray("TRIM: " + G.Seconds(t0));
             //This does not change the databank, so this.hasBeenChanged is not touched!!
