@@ -104,20 +104,1150 @@ ASTRESET;
 ASTRETURN;
 ASTFOR;
 ASTIF;
+ASTCOMPARE2;
+	ASTLEFTBRACKETGLUE;
+	ASTSERIESOPERATOR;
+	ASTSERIESDOLLARCONDITION;
+	ASTSERIES;
+	ASTSERIESLHS;
+	ASTSERIESRHS;
+	ASTOPT_STRING_PX;
+	ASTOPT_STRING_BOLD;
+	ASTOPT_STRING_ITALIC;
+	ASTOPT_STRING_GRIDSTYLE;
+	ASTOPT_STRING_PREFIX;
+	ASTOPT_STRING_GDX;
+	ASTOPT_STRING_GDXOPT;
+	ASTOPT_STRING_R;
+	ASTOPT_VAL_INDEX;
+	ASTOPT_STRING_FILE;
+	ASTOPT_STRING_ARRAY;
+	ASTXLINE;
+	ASTYLINE;
+	ASTREBASE;
+    ASTLINESPOINTS;
+	ASTLINES;
+	ASTBOXES;
+	ASTFILLEDCURVES;
+	ASTSTEPS;
+	ASTPOINTS;
+	ASTDOTS;
+	ASTIMPULSES;
+    ASTLIBRARY;
+	ASTIMPOSE;
+	ASTNAMEHELPER;
+	ASTINTERPOLATE;
+	ASTTABLEMAIN;
+	ASTLISTTRIM;
+	ASTPRTUSING;
+	ASTOR;
+	ASTAND;
+	ASTNOT;
+	ASTABS;
+    ASTACCEPT;
+    ASTADD;
+    ASTANALYZE;
+    ASTAPPEND;
+    ASTAS;
+    ASTASSIGNSTATEMENT;
+    ASTASSIGNVARIABLE;
+    ASTAT;
+    ASTAVG;
+    ASTBANK;
+    ASTBANK;
+    ASTBANKISSTARCHEATCODE;
+    ASTBASEBANK;
+    ASTBOOL;
+    ASTBRACKET;
+    ASTCAPS;
+    ASTCELL;
+    ASTCHECKOFF;
+    ASTCLEAR2;
+    ASTCLEAR;
+    ASTCLEARALL;
+    ASTCLONE;
+    ASTCLOSE;
+    ASTCLOSEALL;
+    ASTCLOSEBANKS;
+    ASTCLOSESTAR;
+    ASTCLS;
+    ASTCOLLAPSE;
+    ASTCOLORS;
+    ASTCOMPARE;
+    ASTCOMPARECOMMAND;
+    ASTCOPY;
+    ASTCOPYWILDCARD1;
+    ASTCOPYWILDCARD2;
+    ASTCOPYWILDCARD3;
+    ASTCOPYWILDCARD4;
+    ASTCOPYWILDCARD;
+    ASTCOUNT;
+    ASTCREATE;
+    ASTCREATEEXPRESSION;
+    ASTCREATEQUESTION;
+    ASTCURLY;
+    ASTCURLYSIMPLE;
+    ASTD;
+    ASTDATA;
+    ASTDATAADVANCED;
+    ASTDATAFORMAT;
+    ASTDATAORIENTATION;
+    ASTDATE2;
+    ASTDATE;
+    ASTDATE;
+    ASTDATES;
+    ASTDATES;
+    ASTDATESSTATEMENT;
+    ASTDATESTATEMENT;
+    ASTDECOMP;
+    ASTDECOMPITEMS;
+    ASTDECOMPTYPE;
+    ASTDELETE;
+    ASTDELETEALL;
+    ASTDIF;
+    ASTDIFPRT;
+    ASTDIRECT;
+    ASTDISP;
+    ASTDISPLAY;
+    ASTDISPSEARCH;
+    ASTDOC;
+    ASTDOLLARHASHNAMESIMPLE;
+    ASTDOLLARHASHPAREN;
+    ASTDOLLARPERCENTNAMESIMPLE;
+    ASTDOLLARPERCENTPAREN;
+	ASTDOLLARCONDITIONAL;
+    ASTDOTINDEXER;
+    ASTDOUBLE;
+    ASTDOUBLE;
+    ASTDOUBLENEGATIVE;
+    ASTDOWNLOAD;
+    ASTDP;
+    ASTDUMOF;
+    ASTDUMON;
+    ASTEDIT;
+    ASTEFTER;
+    ASTELSESTATEMENTS;
+    ASTEMPTY;
+    ASTEMPTYRANGEELEMENT;
+    ASTENDO;
+    ASTENDOQUESTION;
+    ASTEXIT;
+    ASTEXO;
+    ASTEXOQUESTION;
+    ASTEXPRESSION;
+    ASTEXPRESSIONTUPLE;
+    ASTFILENAME1;
+    ASTFILENAME2;
+    ASTFILENAME;
+    ASTFILENAME;
+    ASTFILENAMEFIRST1;
+    ASTFILENAMEFIRST2;
+    ASTFILENAMEFIRST3;
+    ASTFILENAMEPART;
+    ASTFILENAMEPART;
+    ASTFILENAMEPART;
+    ASTFILENAMEPARTBACKSLASH;
+    ASTFILENAMEQUOTES;
+    ASTFILENAMESTAR;
+    ASTFINDMISSINGDATA;
+    ASTFLAT;
+    ASTFOR;
+    ASTFORDATE;
+    ASTFORLEFTSIDE2;
+    ASTFORLEFTSIDE;
+    ASTFORNAME;
+    ASTFORRIGHTSIDE2;
+	ASTEXPORTR;
+    ASTFORRIGHTSIDE;
+    ASTFORSTATEMENTS;
+    ASTFORSTRING;
+    ASTFORVAL;
+    ASTFREQ;
+    ASTFRML;
+    ASTFRMLCODE;
+    ASTFRMLTUPLE;
+    ASTFUNCTION;
+    ASTFUNCTION;
+    ASTFUNCTIONDEF;
+    ASTFUNCTIONDEFARG;
+    ASTFUNCTIONDEFARGS;
+    ASTFUNCTIONDEFCODE;
+    ASTFUNCTIONDEFLHSTUPLE;
+    ASTFUNCTIONDEFNAME;
+    ASTFUNCTIONDEFRHSSIMPLE;
+    ASTFUNCTIONDEFRHSTUPLE;
+    ASTFUNCTIONDEFTYPE;
+    ASTFUNCTIONSCALAR;
+    ASTGDIF;
+    ASTGDIFF;
+    ASTGEKKOLABEL;
+    ASTGENERIC1;
+    ASTGENR;
+    ASTGENR;
+    ASTGENRINDEXER;
+    ASTGENRLHSFUNCTION;
+    ASTGENRLISTINDEXER2;
+    ASTGENRLISTINDEXER;
+    ASTGOTO;
+    ASTHANDLEFILENAME;
+	ASTHANDLEFILENAME2;
+    ASTHASH;
+    ASTHASHNAMESIMPLE;
+    ASTHASHPAREN;
+    ASTHDG;
+    ASTHELP;
+    ASTHPFILTER;
+    ASTHPFILTERLAMBDA;
+    ASTHPFILTERLOG;
+    ASTHTTP;
+    ASTIDENT;
+    ASTIDENTADVANCEDDOT;
+    ASTIDENTDIGIT;
+    ASTIDENTITYCODE;
+    ASTIF;
+    ASTIFCONDITION;
+    ASTIFFALSE;
+    ASTIFOPERATOR1;
+    ASTIFOPERATOR2;
+    ASTIFOPERATOR3;
+    ASTIFOPERATOR4;
+    ASTIFOPERATOR5;
+    ASTIFOPERATOR6;
+    ASTIFOPERATOR;
+    ASTIFSTATEMENTS;
+    ASTIFTRUE;
+    ASTINDEX;
+    ASTINDEXER;
+    ASTINDEXERALONE;
+    ASTINDEXERELEMENT;
+    ASTINDEXERELEMENTBANK;
+    ASTINDEXERELEMENTPLUS;
+    ASTINFO;
+    ASTINI;
+    ASTINTEGER;
+    ASTINTEGER;
+    ASTINTEGERNEGATIVE;
+    ASTITERSHOW;
+    ASTLABEL1;
+    ASTLABEL2;
+    ASTLABELS;
+    ASTLABELS;
+    ASTLAGORLEAD;
+    ASTLEFTSIDE;
+    ASTLEV;
+    ASTLIST2;
+    ASTLIST2OLD;
+    ASTLIST3;
+    ASTLIST4;
+    ASTLIST;
+    ASTLISTCONCATENATION;
+    ASTLISTDIFFERENCE;
+    ASTLISTFILE;
+    ASTLISTINTERSECTION;
+    ASTLISTITEM;
+    ASTLISTITEMS0;
+    ASTLISTITEMS1;
+    ASTLISTITEMS2;
+    ASTLISTITEMS;
+    ASTLISTITEMSNEW;
+    ASTLISTITEMWILDRANGE;
+    ASTLISTITEMWILDRANGEBANK;
+    ASTLISTPREFIX;
+    ASTLISTSORT;
+    ASTLISTSTRIP;
+    ASTLISTSUFFIX;
+    ASTLISTUNION;
+    ASTLISTWITHBANK;
+	ASTLOCK;
+	ASTUNLOCK;
+    ASTM;
+    ASTMACRO;
+    ASTMACROPLUS;
+	ASTOPT_LIST_ROWNAMES;
+	ASTOPT_LIST_COLNAMES;
+    ASTMATRIX;
+    ASTMATRIXCOL;
+    ASTMATRIXINDEXER;
+    ASTMATRIXROW;
+    ASTMEM;
+    ASTMENUTABLE;
+    ASTMERGE;
+    ASTMETA;
+    ASTMISSING;
+    ASTMODE;
+    ASTMODEL;
+    ASTMODELFILE;
+    ASTMODEQUESTION;
+    ASTMP;
+    ASTMULBK;
+    ASTN;
+    ASTNAME2;
+    ASTNAME;
+    ASTNAMEDIGIT;
+    ASTNAMESLIST;
+    ASTNAMESTATEMENT;
+    ASTNAMESUBSIMPLE;
+    ASTNAMEWITHBANK;
+    ASTNAMEWITHDOT;
+    ASTNEW;
+    ASTNEWTABLE;
+    ASTNO;
+    ASTNULL;
+    ASTNUMBER;
+    ASTOBJFUNCTION;
+    ASTOLS;
+    ASTOLSELEMENT;
+    ASTOLSELEMENTS;
+    ASTOPD;
+    ASTOPEN;
+    ASTOPENHELPER;
+    ASTOPERATOR;
+    ASTOPERATORDOLLAR;
+    ASTOPERATORNODOLLAR;
+    ASTOPM;
+    ASTOPMP;
+    ASTOPN;
+    ASTOPP;
+    ASTOPQ;
+    ASTOPT1;
+    ASTOPT2;
+    ASTOPT_;
+	ASTOPT_STRING_SIZE;
+	ASTOPT_STRING_PAUSE;
+	ASTOPT_STRING_CONTINUE;
+	ASTOPT_STRING_STOP;
+ASTOPT_STRING_TITLE;
+ASTOPT_STRING_SUBTITLE;
+ASTOPT_STRING_FONT;
+ASTOPT_VAL_FONTSIZE;
+ASTOPT_STRING_TICS;
+ASTOPT_STRING_GRID;
+ASTOPT_STRING_KEY;
+ASTOPT_STRING_PALETTE;
+ASTOPT_STRING_STACK;
+ASTOPT_VAL_BOXWIDTH;
+ASTOPT_VAL_BOXGAP;
+ASTOPT_STRING_SEPARATE;
+ASTOPT_DATE_XLINE;
+ASTOPT_DATE_XLINEBEFORE;
+ASTOPT_DATE_XLINEAFTER;
+ASTOPT_STRING_YMIRROR;
+ASTOPT_STRING_YTITLE;
+ASTOPT_VAL_YLINE;
+ASTOPT_VAL_YMAX;
+ASTOPT_VAL_YMAXHARD;
+ASTOPT_VAL_YMAXSOFT;
+ASTOPT_VAL_YMIN;
+ASTOPT_VAL_YMINHARD;
+ASTOPT_VAL_YMINSOFT;
+ASTOPT_STRING_XZEROAXIS;
+ASTOPT_STRING_Y2TITLE;
+ASTOPT_VAL_Y2LINE;
+ASTOPT_VAL_Y2MAX;
+ASTOPT_VAL_Y2MAXHARD;
+ASTOPT_VAL_Y2MAXSOFT;
+ASTOPT_VAL_Y2MIN;
+ASTOPT_VAL_Y2MINHARD;
+ASTOPT_VAL_Y2MINSOFT;
+ASTOPT_STRING_X2ZEROAXIS;
+ASTOPT_STRING_LABEL;
+ASTOPT_STRING_ARROW;
+ASTOPT_STRING_LINETYPE;
+ASTOPT_STRING_DASHTYPE;
+ASTOPT_VAL_LINEWIDTH;
+ASTOPT_STRING_LINECOLOR;
+ASTOPT_STRING_POINTTYPE;
+ASTOPT_VAL_POINTSIZE;
+ASTOPT_STRING_FILLSTYLE;
+ASTOPT_STRING_LABEL;
+ASTOPT_STRING_Y2;
 
-	TO              = 'to';
-	BY              = 'by';
-	FOR              = 'for';
-	AND              = 'and';
-	NOT              = 'not';
-	OR              = 'or';
-	IN             = 'in';
-	P              = 'p';
-	RUN            = 'run';
-	VAL = 'val'; STRING = 'string'; DATE = 'date'; SERIES = 'series'; LIST = 'list'; MAP = 'map'; MATRIX = 'matrix'; FUNCTION = 'function'; END = 'end'; RESET = 'reset';
-	IF = 'if'; ELSE = 'else';
-	RETURN2 = 'return';
-	LISTFILE = 'LISTFILE';
+	ASTOPT_STRING_DUMP;
+	ASTOPT_STRING_BANK;
+	ASTOPT_STRING_ADDBANK;
+	ASTOPT_STRING_ERROR;
+	ASTOPT_STRING_USING;
+    ASTOPT_STRING_ABS ;
+    ASTOPT_STRING_AFTER;
+    ASTOPT_STRING_APPEND;
+    ASTOPT_STRING_AREMOS;
+    ASTOPT_STRING_CAPS;
+    ASTOPT_STRING_CELL;
+	ASTOPT_STRING_CONSTANT;
+    ASTOPT_STRING_COLLAPSE;
+    ASTOPT_STRING_COLORS;
+    ASTOPT_STRING_COLS;
+    ASTOPT_STRING_CSV;
+    ASTOPT_STRING_D;
+    ASTOPT_STRING_DATES;
+    ASTOPT_STRING_DIRECT;
+	ASTOPT_STRING_EDIT;
+	ASTOPT_STRING_FIRST;
+	ASTOPT_STRING_LAST;
+	ASTOPT_STRING_FILENAME;
+    ASTOPT_STRING_FIX;
+    ASTOPT_STRING_FROM;
+    ASTOPT_STRING_GBK;
+    ASTOPT_STRING_GEKKO18;
+    ASTOPT_STRING_GEOMETRIC;
+    ASTOPT_STRING_GNUPLOT;
+    ASTOPT_STRING_TITLE;
+    ASTOPT_STRING_HTML;
+    ASTOPT_STRING_INFO;
+    ASTOPT_STRING_KEEP;
+    ASTOPT_STRING_LABEL;
+    ASTOPT_STRING_LABELS;
+    ASTOPT_STRING_LINEAR;
+    ASTOPT_STRING_M;
+    ASTOPT_STRING_M;
+    ASTOPT_STRING_MERGE;
+    ASTOPT_STRING_MP;
+    ASTOPT_STRING_MUTE ;
+    ASTOPT_STRING_MUTE;
+    ASTOPT_STRING_N;
+    ASTOPT_STRING_NAMES;
+    ASTOPT_STRING_NONMODEL;
+    ASTOPT_STRING_P;
+    ASTOPT_STRING_PARAM;
+    ASTOPT_STRING_PCIM;
+    ASTOPT_STRING_PLOTCODE;
+    ASTOPT_STRING_PRESERVE;
+	ASTOPT_STRING_MISSING;
+    ASTOPT_STRING_PRIM;
+    ASTOPT_STRING_PRN;
+	ASTOPT_STRING_MATRIX;
+    ASTOPT_STRING_PROT;
+    ASTOPT_STRING_Q;
+    ASTOPT_STRING_REPEAT;
+    ASTOPT_STRING_RES;
+    ASTOPT_STRING_RESPECT;
+    ASTOPT_STRING_ROWS;
+    ASTOPT_STRING_S;
+	ASTOPT_STRING_SAVE;
+	ASTOPT_STRING_SEC;
+    ASTOPT_STRING_REF;
+    ASTOPT_STRING_SERIES;
+    ASTOPT_STRING_SHEET;
+    ASTOPT_STRING_SOURCE;
+    ASTOPT_STRING_SPLINE;
+    ASTOPT_STRING_STAMP;
+    ASTOPT_STRING_STATIC ;
+    ASTOPT_STRING_TARGET ;
+    ASTOPT_STRING_TO;
+    ASTOPT_STRING_TSD;
+    ASTOPT_STRING_TSDX;
+    ASTOPT_STRING_TSP;
+    ASTOPT_STRING_WINDOW;
+    ASTOPT_STRING_XLS;
+    ASTOPT_STRING_XLSX;
+	
+	ASTOPT_VAL_WIDTH;
+	ASTOPT_VAL_DEC;
+	ASTOPT_VAL_NWIDTH;
+	ASTOPT_VAL_PWIDTH;
+	ASTOPT_VAL_NDEC;
+	ASTOPT_VAL_PDEC;
+
+    ASTOPT_VAL_LAG;
+    ASTOPT_VAL_REPLACE;
+    ASTOPT_VAL_YMAX;
+    ASTOPT_VAL_YMIN;
+	ASTOPT_VAL_Y2MAX;
+    ASTOPT_VAL_Y2MIN;
+	ASTOPT_VAL_POS;
+    ASTOPTION;
+    ASTP;
+    ASTPAUSE;
+    ASTPCH;
+    ASTPERCENT;
+    ASTPERCENTNAMESIMPLE;
+    ASTPERCENTPAREN;
+    ASTPIPE;
+    ASTPLACEHOLDER;  //does nothing
+    ASTPOW;
+    ASTPOW;
+    ASTPRT2;
+    ASTPRT;
+    ASTPRTELEMENT;
+    ASTPRTELEMENTDEC;
+    ASTPRTELEMENTNDEC;
+    ASTPRTELEMENTNWIDTH;
+    ASTPRTELEMENTOPTIONFIELD;
+    ASTPRTELEMENTPDEC;
+    ASTPRTELEMENTPWIDTH;
+    ASTPRTELEMENTS;
+    ASTPRTELEMENTWIDTH;
+	ASTPRTELEMENTLINETYPE;
+	ASTPRTELEMENTDASHTYPE;
+	ASTPRTELEMENTLINEWIDTH;
+	ASTPRTELEMENTLINECOLOR;
+	ASTPRTELEMENTPOINTTYPE;
+	ASTPRTELEMENTPOINTSIZE;
+	ASTPRTELEMENTFILLSTYLE;
+	ASTPRTELEMENTY2;
+    ASTPRTITEMS;
+    ASTPRTOPTION;
+    ASTPRTOPTIONFIELD2;
+    ASTPRTOPTIONFIELD3;
+    ASTPRTOPTIONFIELD;
+    ASTPRTROWS;
+    ASTPRTSTAMP;
+    ASTPRTTIMEFILTER;
+    ASTPRTTYPE;
+    ASTPRTTYPE;
+    ASTQ;
+    ASTR_EXPORT;
+    ASTR_EXPORTITEMS ;
+    ASTR_FILE;
+    ASTR_RUN;
+    ASTRANGEWITHBANK;
+    ASTREAD;
+    ASTREAD;
+    ASTREADTO;
+    ASTREADWITHOPTIONS;
+    ASTRENAME;
+    ASTREPLACE;
+    ASTRES;
+    ASTRESET;
+    ASTRESTART;
+    ASTRETURN;
+    ASTRETURNTUPLE;
+    ASTRUN;
+    ASTS;
+    ASTSCALAR;
+    ASTSD;
+    ASTSDP;
+    ASTSERIESQUESTION;
+    ASTSHEET;
+    ASTSHEETIMPORT;
+    ASTSHOW;
+    ASTSIGN;
+    ASTSIM;
+    ASTSIMPLEFUNCTION;
+    ASTSMOOTH;
+    ASTSN;
+    ASTSP;
+    ASTSPLICE;
+    ASTSTAMP;
+    ASTSTAR;
+    ASTSTAR;
+    ASTSTOP;
+    ASTSTRING;
+    ASTSTRING;
+    ASTSTRINGINQUOTES;
+    ASTSTRINGSIMPLE;
+    ASTSTRINGSTATEMENT;
+    ASTSYS;
+    ASTTABLE;
+    ASTTABLEALIGNCENTER;
+    ASTTABLEALIGNLEFT;
+    ASTTABLEALIGNRIGHT;
+    ASTTABLEHIDELEFTBORDER;
+    ASTTABLEHIDERIGHTBORDER;
+    ASTTABLEINPUTFILE;
+    ASTTABLEINPUTFILE;
+    ASTTABLEMERGECOLS;
+    ASTTABLENEXT;
+    ASTTABLEOLD;
+    ASTTABLEOPTIONFIELD;
+    ASTTABLEOPTIONFIELDWINDOW;
+    ASTTABLEOUTPUTFILE;
+    ASTTABLEOUTPUTTYPE;
+    ASTTABLEPRINT;
+    ASTTABLESETBORDER;
+    ASTTABLESETBOTTOMBORDER;
+    ASTTABLESETDATES;
+    ASTTABLESETLEFTBORDER;
+    ASTTABLESETRIGHTBORDER;
+    ASTTABLESETTEXT;
+    ASTTABLESETTOPBORDER;
+    ASTTABLESETVALUES;
+    ASTTABLESETVALUESELEMENT;
+    ASTTABLESHOWBORDERS;
+    ASTTARGET;
+    ASTTARGET;
+    ASTTELL;
+    ASTTEST;
+    ASTTESTRANDOMMODEL;
+    ASTTESTRANDOMMODELCHECK;
+    ASTTIME;
+    ASTTIMEFILTER;
+    ASTTIMEFILTERPERIOD;
+    ASTTIMEFILTERPERIODS;
+    ASTTIMEOPTIONFIELD;
+    ASTTIMEPERIOD;
+    ASTTIMEQUESTION;
+    ASTTIMESPAN;
+    ASTTOTAL;
+    ASTTRANSLATE;
+    ASTTRANSPOSE;
+    ASTTRUNCATE;
+    ASTTUPLE;
+    ASTTUPLEFUNCTIONSIMPLE;
+    ASTTUPLEITEM;
+    ASTTUPLEITEMS;
+    ASTTUPLESIMPLE;
+    ASTUNDOSIM;
+    ASTUNFIX;
+    ASTUNSWAP;
+    ASTUPD;
+    ASTUPD;
+    ASTUPDADVANCED;
+    ASTUPDDATA;
+    ASTUPDOPERATOR;
+    ASTUPDOPERATOREQUAL;
+    ASTUPDOPERATOREQUALDOLLAR;
+    ASTUPDOPERATORHASH;
+    ASTUPDOPERATORHASHDOLLAR;
+    ASTUPDOPERATORHAT;
+    ASTUPDOPERATORHATDOLLAR;
+    ASTUPDOPERATORPERCENT;
+    ASTUPDOPERATORPERCENTDOLLAR;
+    ASTUPDOPERATORPLUS;
+    ASTUPDOPERATORPLUSDOLLAR;
+    ASTUPDOPERATORSTAR;
+    ASTUPDOPERATORSTARDOLLAR;
+    ASTUPDX;
+    ASTURL;
+    ASTURLFIRST1;
+    ASTURLFIRST2;
+    ASTURLFIRST3;
+    ASTURLPART;
+    ASTV;
+    ASTVAL;
+    ASTVALSTATEMENT;
+    ASTVARIABLE;
+    ASTVARIABLELAGLEAD;
+    ASTVARNAMEORLIST;
+    ASTVERS;
+    ASTWILDCARD;
+    ASTWILDCARDWITHBANK;
+    ASTWILDQUESTION;
+    ASTWILDSTAR;
+    ASTWRITE;
+    ASTWRITEOPTION;
+    ASTWRITEWITHOPTIONS;
+    ASTX12A;
+    ASTYES;
+    ASTYMAX;
+    ASTYMIN;
+    ASTZERO;
+	ASTXEDIT;
+
+	// --- tokens1 start ---
+	RETURN2 = 'RETURN';
+	IN = 'IN';
+	MAP = 'MAP';
+	STRING2 = 'STRING';
+		     REMOTE = 'REMOTE';
+			 OFFSET = 'OFFSET';
+			 DETECT = 'DETECT';
+			 GRIDSTYLE = 'GRIDSTYLE';
+            BOLD = 'BOLD';
+            ITALIC = 'ITALIC';
+	            ASER = 'ASER';
+            ASERIES = 'ASERIES';
+	            XLABELS = 'XLABELS';
+				YLABELS = 'YLABELS';
+            ANNUAL = 'ANNUAL';
+            AT2 = 'AT';
+            BETWEEN = 'BETWEEN';
+            NONANNUAL = 'NONANNUAL';
+            DIGITS = 'DIGITS';
+			GAMS = 'GAMS';
+			GDX = 'GDX';
+			GDXOPT = 'GDXOPT';
+	LAGFIX = 'LAGFIX';
+	ADDBANK = 'ADDBANK';
+	REBASE = 'REBASE';
+	LINESPOINTS = 'LINESPOINTS';
+//LINES = 'LINES';
+			BOXES = 'BOXES';
+		FILLEDCURVES = 'FILLEDCURVES';
+		STEPS = 'STEPS';
+		//POINTS = 'POINTS';
+		DOTS = 'DOTS';
+		IMPULSES = 'IMPULSES';
+CONTINUE              = 'CONTINUE';
+SIZE                  = 'SIZE'                     ;
+//TITLE                 = 'TITLE'                    ;
+SUBTITLE              = 'SUBTITLE'                 ;
+//FONT                  = 'FONT'                     ;
+//FONTSIZE              = 'FONTSIZE'                 ;
+TICS                  = 'TICS'                     ;
+GRID                  = 'GRID'                     ;
+KEY                   = 'KEY'                      ;
+PALETTE               = 'PALETTE'                  ;
+STACK                 = 'STACK'                    ;
+BOXWIDTH              = 'BOXWIDTH'                 ;
+BOXGAP                = 'BOXGAP'                   ;
+SEPARATE              = 'SEPARATE'                 ;
+XLINE                 = 'XLINE'                    ;
+XLINEBEFORE           = 'XLINEBEFORE'              ;
+XLINEAFTER            = 'XLINEAFTER'               ;
+YMIRROR               = 'YMIRROR'                  ;
+YTITLE                = 'YTITLE'                   ;
+YLINE                 = 'YLINE'                    ;
+//YMAX                  = 'YMAX'                     ;
+YMAXHARD              = 'YMAXHARD'                 ;
+YMAXSOFT              = 'YMAXSOFT'                 ;
+//YMIN                  = 'YMIN'                     ;
+YMINHARD              = 'YMINHARD'                 ;
+YMINSOFT              = 'YMINSOFT'                 ;
+XZEROAXIS             = 'XZEROAXIS'                ;
+Y2TITLE               = 'Y2TITLE'                  ;
+Y2LINE                = 'Y2LINE'                   ;
+//Y2MAX                 = 'Y2MAX'                    ;
+Y2MAXHARD             = 'Y2MAXHARD'                ;
+Y2MAXSOFT             = 'Y2MAXSOFT'                ;
+//Y2MIN                 = 'Y2MIN'                    ;
+Y2MINHARD             = 'Y2MINHARD'                ;
+Y2MINSOFT             = 'Y2MINSOFT'                ;
+X2ZEROAXIS            = 'X2ZEROAXIS'               ;
+//LABEL                 = 'LABEL'                    ;
+ARROW                 = 'ARROW'                    ;
+//LINETYPE              = 'LINETYPE'                 ;
+DASHTYPE              = 'DASHTYPE'                 ;
+LINEWIDTH             = 'LINEWIDTH'                ;
+LINECOLOR             = 'LINECOLOR'                ;
+POINTTYPE             = 'POINTTYPE'                ;
+POINTSIZE             = 'POINTSIZE'                ;
+FILLSTYLE             = 'FILLSTYLE'                ;
+LABEL                 = 'LABEL'                    ;
+Y2                    = 'Y2'                       ;
+
+    X = 'X';
+	Y = 'Y';
+	MDATEFORMAT = 'MDATEFORMAT';
+	THOUSANDSSEPARATOR = 'THOUSANDSSEPARATOR';
+	XEDIT = 'XEDIT';
+	IMPOSE = 'IMPOSE';
+	CONSTANT = 'CONSTANT';
+	INTERPOLATE = 'INTERPOLATE';
+	PRORATE = 'PRORATE';
+	TRIM = 'TRIM';
+    USING = 'USING';
+	A= 'A'               ;
+	DEFAULT = 'DEFAULT';
+	LOGIC = 'LOGIC';
+    ABS              = 'ABS';
+    ABSOLUTE = 'absolute';  //used to indicate fixed date, eg. fY(2005) or tg(2001q3)
+    ACCEPT = 'ACCEPT';
+    ADD              = 'ADD'             ;
+    AFTER            = 'AFTER'           ;
+    AFTER2           = 'AFTER2'          ;
+    ALIGNCENTER      = 'ALIGNCENTER';
+    ALIGNLEFT      = 'ALIGNLEFT';
+    ALIGNRIGHT      = 'ALIGNRIGHT';
+    ALL              = 'ALL'          ;
+    ANALYZE = 'ANALYZE';
+    AND              = 'AND';
+    APPEND           = 'APPEND'          ;
+    AREMOS = 'AREMOS';
+    AS               = 'AS';
+    AUTO = 'AUTO';
+    AVG          = 'AVG';
+    BACKTRACK        = 'BACKTRACK'       ;
+    BANK             = 'BANK'            ;
+    BANK1            = 'BANK1'           ;
+    BANK2            = 'BANK2'           ;
+    BOWL             = 'BOWL';
+    BY               = 'BY';
+    CACHE            = 'CACHE';
+    CALC             = 'CALC';
+    CAPS             = 'CAPS'            ;
+    CELL             = 'CELL'            ;
+    CHANGE           = 'CHANGE'            ;
+    CHECKOFF         = 'CHECKOFF'            ;
+    CLEAR            = 'CLEAR'            ;
+    CLEAR2 = 'CLEAR2';
+    CLIP            = 'CLIP'           ;
+    CLIPBOARD            = 'CLIPBOARD'           ;
+    CLONE = 'CLONE';
+    CLOSE            = 'CLOSE';
+    CLOSEALL         = 'CLOSEALL'        ;
+    CLOSEBANKS       = 'CLOSEBANKS'        ;
+    CLS              = 'CLS'             ;
+    CODE = 'CODE';
+    COLLAPSE         = 'COLLAPSE';
+	PX = 'PX';
+	ARRAY = 'ARRAY';
+	BUGFIX = 'BUGFIX';
+    COLORS           = 'COLORS'          ;
+    COLS             = 'COLS';
+    COMMA            = 'COMMA';
+    COMMAND              = 'COMMAND'             ;
+    COMMAND1             = 'COMMAND1'            ;
+    COMMAND2             = 'COMMAND2'            ;
+    COMPARE          = 'COMPARE'         ;
+    COMPRESS         = 'COMPRESS';
+    CONST             = 'CONST';
+    CONV             = 'CONV';
+    CONV1            = 'CONV1';
+    CONV2            = 'CONV2';
+    COPY = 'COPY';
+    COPYLOCAL        = 'COPYLOCAL'       ;
+    COUNT = 'COUNT';
+    CPLOT            = 'CPLOT'       ;
+    CREATE           = 'CREATE'          ;
+    CREATEVARS       = 'CREATEVARS'      ;
+    CSV              = 'CSV'             ;
+    CURROW           = 'CURROW';
+    D             = 'D'            ;
+    DAMP             = 'DAMP'            ;
+    DANISH           = 'DANISH';
+    DATA             = 'DATA'            ;
+    DATABANK         = 'DATABANK'        ;
+    DATAWIDTH             = 'DATAWIDTH'            ;
+    DATE             = 'DATE'            ;
+    DATES            = 'DATES'           ;
+    DEBUG            = 'DEBUG'     ;
+    DEC              = 'DEC';
+    DECIMALSEPARATOR = 'DECIMALSEPARATOR';
+    DECOMP           = 'DECOMP'          ;
+    DELETE           = 'DELETE'          ;
+    DETAILS          = 'DETAILS';
+    DIALOG           = 'DIALOG'          ;
+    DIF              = 'DIF';
+    DIFF              = 'DIFF';
+    DIFPRT           = 'DIFPRT'          ;
+    DING             = 'DING';
+    DIRECT = 'DIRECT';
+    DISP             = 'DISP'            ;
+    DISPLAY          = 'DISPLAY'         ;
+    DOC = 'DOC';
+    DOWNLOAD = 'DOWNLOAD';
+    DP               = 'DP'         ;
+    DUMOF            = 'DUMOF'           ;
+    DUMOFF           = 'DUMOFF'          ;
+    DUMON            = 'DUMON'           ;
+    DUMP             = 'DUMP'            ;
+    EDIT = 'EDIT';
+    EFTER            = 'EFTER'           ;
+    ELSE             = 'ELSE'            ;
+    END              = 'END'             ;
+    ENDO             = 'ENDO'            ;
+    ENGLISH          = 'ENGLISH';
+	ERROR            = 'ERROR';
+    EXCEL            = 'EXCEL'           ;
+	EXE            = 'EXE'           ;
+    EXIT             = 'EXIT';
+    EXO              = 'EXO'             ;
+    EXP              = 'EXP';
+    EXPORT = 'EXPORT';
+    EXTERNAL = 'EXTERNAL';
+    FAILSAFE         = 'FAILSAFE'        ;
+    FAIR         = 'FAIR'        ;
+    FALSE = 'false' ;
+    FAST             = 'FAST';
+    FEED = 'FEED';
+    FEEDBACK         = 'FEEDBACK'        ;
+    FIELDS             = 'FIELDS'            ;
+    FILE             = 'FILE'            ;
+    FILEWIDTH        = 'FILEWIDTH'       ;
+    FILTER        = 'FILTER'       ;
+    FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;
+    FIRST            = 'FIRST';
+    FIRSTCOLWIDTH = 'FIRSTCOLWIDTH';
+    FIX = 'FIX';
+    FLAT             = 'FLAT'            ;
+    FOLDER           = 'FOLDER'          ;
+    FONT           = 'FONT'          ;
+    FONTSIZE           = 'FONTSIZE'          ;
+    FOR              = 'FOR'             ;
+    FORMAT           = 'FORMAT'          ;
+    FORWARD          = 'FORWARD';
+    FREQ             = 'FREQ'            ;
+    FRML             = 'FRML'            ;
+    FROM = 'FROM';
+    FUNCTION = 'FUNCTION';
+    GAUSS            = 'GAUSS'           ;
+    GBK = 'GBK';
+    GDIF           = 'GDIF';
+    GDIFF           = 'GDIFF';
+    GEKKO18 = 'GEKKO18';
+    GENR             = 'GENR'            ;
+    GEOMETRIC = 'GEOMETRIC';
+    GMULPRT          = 'GMULPRT'         ;
+    GNUPLOT = 'GNUPLOT';
+    GOAL             = 'GOAL';
+    GOTO = 'GOTO';
+    GRAPH            = 'GRAPH';
+    GROWTH           = 'GROWTH';
+    HDG = 'HDG';
+    HEADING          = 'HEADING'         ;
+    HELP             = 'HELP'            ;
+    HIDE             = 'HIDE';
+    HIDELEFTBORDER   = 'HIDELEFTBORDER';
+    HIDERIGHTBORDER   = 'HIDERIGHTBORDER';
+    HORIZON = 'HORIZON';
+    HPFILTER         = 'HPFILTER';
+    HTML             = 'HTML';
+    IF               = 'IF'              ;
+    IGNOREMISSING    = 'IGNOREMISSING'   ;
+    IGNOREMISSINGVARS = 'IGNOREMISSINGVARS';
+    IGNOREVARS       = 'IGNOREVARS'      ;
+    IMPORT='IMPORT';
+    INDEX            = 'INDEX'           ;
+    INFO             = 'INFO'            ;
+	INFOFILE             = 'INFOFILE'            ;
+    INI             = 'INI'            ;
+    INIT             = 'INIT'            ;
+    INTERFACE        = 'INTERFACE'       ;
+    INTERNAL = 'INTERNAL';
+    INVERT           = 'INVERT';
+    ITER             = 'ITER'         ;
+    ITERMAX          = 'ITERMAX'         ;
+    ITERMIN          = 'ITERMIN'         ;
+    ITERSHOW          = 'ITERSHOW'         ;
+    KEEP = 'KEEP';
+    LABEL = 'LABEL';
+    LABELS           = 'LABELS'          ;
+    LAG = 'LAG';
+    LANGUAGE         = 'LANGUAGE';
+    LAST             = 'LAST';
+    LEV              = 'LEV';
+    LINEAR ='LINEAR';
+    LINES            = 'LINES';
+    LIST             = 'LIST'            ;
+    LISTFILE='LISTFILE';
+    LOG              = 'LOG';
+	LOCK_             = 'LOCK';
+	UNLOCK_           = 'UNLOCK';
+    LU               = 'LU';
+    M= 'M'               ;
+    MACRO2           = 'MACRO2'          ;
+    MAIN             = 'MAIN';  //alternative could be 'table' (table tab) or 'new' (floating window)
+    MAT = 'MAT';
+    MATRIX = 'MATRIX';
+	ROWNAMES = 'ROWNAMES';
+	COLNAMES = 'COLNAMES';
+    MAX              = 'MAX'               ;
+    MAXLINES         = 'MAXLINES';
+    MEM              = 'MEM'          ;
+    MENU             = 'MENU'          ;
+    MENUTABLE              = 'MENUTABLE'               ;
+    MERGE            = 'MERGE'          ;
+    MERGECOLS     = 'MERGECOLS'          ;
+    MESSAGE = 'MESSAGE';
+    METHOD           = 'METHOD'          ;
+    MIN              = 'MIN'               ;
+    MIXED = 'MIXED';
+	MISSING = 'MISSING';
+    MODE = 'MODE';
+    MODEL            = 'MODEL'           ;
+    MODERNLOOK       = 'MODERNLOOK'      ;
+    MP               = 'MP'               ;
+    MULBK            = 'MULBK'           ;
+    MULPCT           = 'MULPCT'          ;
+    MULPRT           = 'MULPRT'          ;
+    MUTE = 'MUTE';
+    N= 'N';
+    NAME             = 'NAME';
+    NAMES             = 'NAMES';
+    NDEC             = 'NDEC';
+    NDIFPRT          = 'NDIFPRT'         ;
+    NEGATE;
+    NEGATE;
+    NEW              = 'NEW'          ;
+    NEWTON           = 'NEWTON'          ;
+    NEXT          = 'NEXT'         ;
+    NFAIR = 'NFAIR';
+    NO               = 'no'              ;
+    NOABS            = 'NOABS'              ;
+    NOCR             = 'NOCR';
+    NODIF            = 'NODIF'              ;
+    NODIFF            = 'NODIFF'              ;
+    NOFILTER         = 'NOFILTER';
+    NOGDIF      = 'NOGDIF';
+    NOGDIFF      = 'NOGDIFF';
+    NOLEV            = 'NOLEV'              ;
+    NONE             = 'NONE'              ;
+    NONMODEL = 'NONMODEL';
+    NOPCH            = 'NOPCH'              ;
+	SAVE            = 'SAVE'              ;
+    NOT              = 'NOT';
+    NOTIFY           = 'NOTIFY';
+    NOV              = 'NOV'              ;
+    NWIDTH           = 'NWIDTH';
+    NYTVINDU         = 'NYTVINDU'        ;
+    OLS = 'OLS';
+    OPEN             = 'OPEN';
+    OPTION           = 'OPTION'          ;
+    OR               = 'OR';
+    P= 'P'               ;
+    PARAM = 'PARAM';
+    PARAM;
+    PATCH        = 'PATCH';
+	PATH        = 'PATH';
+    PAUSE            = 'PAUSE';
+    PCH              = 'PCH'             ;     //  --> don't activate this function --> will give problems (DLOG etc. are not stated either, they are recognized as idents)
+    PCIM             = 'PCIM'       ;
+    PCIMSTYLE        = 'PCIMSTYLE'       ;
+    PCTPRT           = 'PCTPRT'          ;
+    PDEC             = 'PDEC';
+    PERIOD           = 'PERIOD'          ;
+    PIPE             = 'PIPE'            ;
+    PLOT            = 'PLOT'           ;
+    PLOTCODE = 'PLOTCODE';
+    POINTS           = 'POINTS';
+	POS           = 'POS';
+    PREFIX = 'PREFIX';
+    PRETTY = 'PRETTY';
+    PRI              = 'PRI'             ;
+    PRIM = 'PRIM';
+    PRINT            = 'PRINT'           ;
+    PRINTCODES = 'PRINTCODES';
+    PRN = 'PRN';
+    PROT = 'PROT';
+    PRT              = 'PRT'             ;
+    PRTX             = 'PRTX'             ;
+    PUDVALG          = 'PUDVALG';
+    PWIDTH           = 'PWIDTH';
+    Q= 'Q'               ;
+    R= 'R'       ;
+    R_EXPORT = 'R_EXPORT';
+    R_FILE = 'R_FILE';
+    R_RUN = 'R_RUN';
+    RD= 'RD'       ;
+    RDP= 'RDP'       ;
+    READ             = 'READ'            ;
+    REF = 'REF';
+    REL              = 'REL'            ;
+    RENAME = 'RENAME';
+    REORDER          = 'REORDER'            ;
+    REP = 'REP';
+    REPEAT = 'REPEAT';
+    REPLACE = 'REPLACE';
+    RES              = 'RES'             ;
+    RESET = 'RESET';
+    RESPECT = 'RESPECT';
+    RESTART = 'RESTART';
+    //RETURN           = 'RETURN'          ;
+    RING             = 'RING';
+    RN= 'RN'       ;
+    ROWS             = 'ROWS';
+    RP= 'RP'       ;
+    RUN              = 'RUN'             ;
+	LIBRARY = 'LIBRARY';
+    SEARCH = 'SEARCH';
+    SEC = 'SEC';
+	SECONDCOLWIDTH = 'SECONDCOLWIDTH';
+    SER2 = 'S___ER';
+	SER3 = 'S____ER';
+    SER='SER';
+    SERIES2 = 'S___ERIES';
+	SERIES3 = 'S____ERIES';
+    SERIES='SERIES';
+    SET              = 'SET'             ;  //not used?
+    SETBORDER        = 'SETBORDER';
+    SETBOTTOMBORDER     = 'SETBOTTOMBORDER';
+    SETDATES      = 'SETDATES';
+    SETLEFTBORDER     = 'SETLEFTBORDER';
+    SETRIGHTBORDER     = 'SETRIGHTBORDER';
+    SETTEXT       = 'SETTEXT';
+    SETTOPBORDER     = 'SETTOPBORDER';
+    SETVALUES    = 'SETVALUES';
+    SHEET            = 'SHEET'           ;
+    SHOW          = 'SHOW'         ;
+    SHOWBORDERS     = 'SHOWBORDERS';
+    SHOWPCH          = 'SHOWPCH'         ;
+    SIGN             = 'SIGN';
+    SIM              = 'SIM'             ;
+    SIMPLE = 'SIMPLE';
+    SKIP            = 'SKIP';
+    SMOOTH = 'SMOOTH';
+    SOLVE            = 'SOLVE'           ;
+    SOME            = 'SOME'           ;
+    SORT = 'SORT';
+    SOUND            = 'SOUND'           ;
+    SOURCE = 'SOURCE';
+    SPECIALMINUS = 'SPECIALMINUS';
+    SPLICE = 'SPLICE';
+    SPLINE = 'SPLINE';
+    SPLIT = 'SPLIT';
+    STACKED = 'STACKED';
+    STAMP            = 'STAMP'           ;
+    STARTFILE        = 'STARTFILE'           ;
+    STATIC           = 'STATIC'          ;
+    STEP             = 'STEP';
+    STOP             = 'STOP'            ;
+    STRING2          = 'STRING'         ;
+    STRIP = 'STRIP';
+    SUFFIX = 'SUFFIX';
+    SUGGESTIONS      = 'SUGGESTIONS'     ;
+    SWAP           = 'SWAP';
+    SYS              = 'SYS'             ;
+    SYSTEM = 'SYSTEM';
+    TABLE            = 'TABLE'           ;
+    TABLE1            = 'TABLE1'           ;
+    TABLE2            = 'TABLE2'           ;
+    TABLEOLD            = 'TABLEOLD'           ;
+    TABS             = 'TABS'            ;
+    TARGET = 'TARGET';
+    TELL             = 'TELL';
+	TEMP             = 'TEMP';
+    TERMINAL         = 'TERMINAL';
+    TEST             = 'TEST';
+    TESTRANDOMMODEL  = 'TESTRANDOMMODEL'         ;
+    TESTRANDOMMODELCHECK  = 'TESTRANDOMMODELCHECK'         ;
+    TESTSIM          = 'TESTSIM'         ;
+    TIME             = 'TIME'            ;
+    TIMEFILTER         = 'TIMEFILTER'        ;
+    TIMESPAN         = 'TIMESPAN'        ;
+    TITLE         = 'TITLE'        ;
+    TO               = 'TO'            ;
+    TOTAL            = 'TOTAL';
+    TRANSLATE = 'TRANSLATE';
+    TRANSPOSE        = 'TRANSPOSE'       ;
+    TREL             = 'TREL'            ;
+    TRUE = 'true' ;
+    TRUNCATE         = 'TRUNCATE';
+    TSD              = 'TSD'            ;
+    TSDX             = 'TSDX'            ;
+    TSP              = 'TSP'            ;
+    TXT             = 'TXT';
+    TYPE             = 'TYPE';
+    U= 'U'               ;
+    UABS             = '_ABS';
+    UDIF             = '_DIF';
+    UDIFF             = '_DIFF';
+    UDVALG           = 'UDVALG'          ;
+    UGDIF       = '_GDIF';
+    UGDIFF       = '_GDIFF';
+    ULEV             = '_LEV';
+    UNDO             = 'UNDO'            ;
+    UNFIX             = 'UNFIX'            ;
+    UNSWAP           = 'UNSWAP';
+    UPCH             = '_PCH';
+    UPDATEFREQ       = 'UPDATEFREQ'      ;
+    UPDX             = 'UPDX'             ;
+    V= 'V'             ;
+    VAL              = 'VAL'             ;
+    VALUE            = 'VALUE'             ;
+    VERS             = 'VERS'            ;
+    VERSION             = 'VERSION'            ;
+    VPRT             = 'VPRT'            ;
+    WAIT             = 'WAIT';
+    WIDTH            = 'WIDTH'           ;
+    WINDOW           = 'WINDOW';
+    WORKING          = 'WORKING';
+    WPLOT            = 'WPLOT'           ;
+    WRITE            = 'WRITE'           ;
+    WUDVALG          = 'WUDVALG'         ;
+    X12A = 'X12A';
+    XLS              = 'XLS'             ;
+    XLSX             = 'XLSX'            ;
+    YES              = 'yes'             ;
+    YMAX = 'YMAX';
+    YMIN = 'YMIN';
+	Y2MAX = 'Y2MAX';
+    Y2MIN = 'Y2MIN';
+    ZERO             = 'ZERO'            ;
+    ZOOM = 'ZOOM';
+    ZVAR             = 'ZVAR'            ;
+	// --- tokens1 end ---
+ 
 }
 
                               @parser::namespace { Gekko }
@@ -146,10 +1276,572 @@ ASTIF;
 
                               }
 
+							  @lexer::members {
+
+                                public static System.Collections.Generic.Dictionary<string, int> kw = GetKw();
+
+                                public static System.Collections.Generic.Dictionary<string, int> GetKw()
+                                {
+                                        System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+										
+// --- tokens2 start ---
+            			
+d.Add("REMOTE", REMOTE);
+            d.Add("GRIDSTYLE", GRIDSTYLE);
+            d.Add("BOLD", BOLD);
+            d.Add("ITALIC", ITALIC);
+            			
+			d.Add("ASER", ASER);
+            d.Add("ASERIES", ASERIES);
+		    d.Add("XLABELS", XLABELS);
+			d.Add("YLABELS", YLABELS);
+            d.Add("ANNUAL", ANNUAL);
+            d.Add("AT", AT2);
+            d.Add("BETWEEN", BETWEEN);
+            d.Add("NONANNUAL", NONANNUAL);
+            d.Add("DIGITS", DIGITS);            
+d.Add("X" ,X);
+d.Add("Y" ,Y);
+		d.Add("LAGFIX" ,LAGFIX);
+		d.Add("ADDBANK" ,ADDBANK);
+		d.Add("LINESPOINTS" ,LINESPOINTS);
+		d.Add("REBASE", REBASE);
+//d.Add("LINES" , LINES);
+			d.Add("BOXES" , BOXES);
+		d.Add("FILLEDCURVES" , FILLEDCURVES);
+		d.Add("STEPS" , STEPS);
+		//d.Add("POINTS" , POINTS);
+		d.Add("DOTS" , DOTS);
+		d.Add("IMPULSES" , IMPULSES);
+		d.Add("OFFSET" , OFFSET);
+		d.Add("DETECT" , DETECT);
+		
+										d.Add("SIZE",SIZE);
+										d.Add("CONTINUE",CONTINUE);
+										//d.Add("TITLE",TITLE);
+										d.Add("SUBTITLE",SUBTITLE);
+										//d.Add("FONT",FONT);
+										//d.Add("FONTSIZE",FONTSIZE);
+										d.Add("TICS",TICS);
+										d.Add("GRID",GRID);
+										d.Add("KEY",KEY);
+										d.Add("PALETTE",PALETTE);
+										d.Add("STACK",STACK);
+										d.Add("BOXWIDTH",BOXWIDTH);
+										d.Add("BOXGAP",BOXGAP);
+										d.Add("SEPARATE",SEPARATE);
+										d.Add("XLINE",XLINE);
+										d.Add("XLINEBEFORE",XLINEBEFORE);
+										d.Add("XLINEAFTER",XLINEAFTER);
+										d.Add("YMIRROR",YMIRROR);
+										d.Add("YTITLE",YTITLE);
+										d.Add("YLINE",YLINE);
+										//d.Add("YMAX",YMAX);
+										d.Add("YMAXHARD",YMAXHARD);
+										d.Add("YMAXSOFT",YMAXSOFT);
+										//d.Add("YMIN",YMIN);
+										d.Add("YMINHARD",YMINHARD);
+										d.Add("YMINSOFT",YMINSOFT);
+										d.Add("XZEROAXIS",XZEROAXIS);
+										d.Add("Y2TITLE",Y2TITLE);
+										d.Add("Y2LINE",Y2LINE);
+										//d.Add("Y2MAX",Y2MAX);
+										d.Add("Y2MAXHARD",Y2MAXHARD);
+										d.Add("Y2MAXSOFT",Y2MAXSOFT);
+										//d.Add("Y2MIN",Y2MIN);
+										d.Add("Y2MINHARD",Y2MINHARD);
+										d.Add("Y2MINSOFT",Y2MINSOFT);
+										d.Add("X2ZEROAXIS",X2ZEROAXIS);
+										//d.Add("LABEL",LABEL);
+										d.Add("ARROW",ARROW);
+										//d.Add("LINETYPE",LINETYPE);
+										d.Add("DASHTYPE",DASHTYPE);
+										d.Add("LINEWIDTH",LINEWIDTH);
+										d.Add("LINECOLOR",LINECOLOR);
+										d.Add("POINTTYPE",POINTTYPE);
+										d.Add("POINTSIZE",POINTSIZE);
+										d.Add("FILLSTYLE",FILLSTYLE);
+										//d.Add("LABEL",LABEL);
+										d.Add("Y2",Y2);
+																				
+										d.Add("INTERPOLATE"    ,   INTERPOLATE     );
+										d.Add("XEDIT"    ,   XEDIT     );
+
+										d.Add("MDATEFORMAT"    ,   MDATEFORMAT     );
+										d.Add("THOUSANDSSEPARATOR"    ,   THOUSANDSSEPARATOR     );
+											
+										d.Add("MISSING"    ,   MISSING     );
+										d.Add("CONSTANT", CONSTANT);
+										d.Add("IMPOSE", IMPOSE);
+										d.Add("PRORATE"    ,   PRORATE     );
+										d.Add("TRIM"    ,   TRIM     );
+										d.Add("USING"    ,   USING     );
+										d.Add("ERROR"    ,   ERROR     );
+										d.Add("_ABS"    ,   UABS     );
+                                        d.Add("_DIF"    ,   UDIF     );
+                                        d.Add("_DIFF"   ,   UDIFF     );
+                                        d.Add("_GDIF"              ,   UGDIF     );
+                                        d.Add("_GDIFF"             ,   UGDIFF     );
+                                        d.Add("_LEV"    ,   ULEV     );
+                                        d.Add("_PCH"    ,   UPCH     );
+                                        d.Add("a"       , A       );
+										d.Add("DEFAULT"       , DEFAULT       );
+										d.Add("LOGIC"       , LOGIC       );
+                                        d.Add("abs"     , ABS       );
+                                        d.Add("ACCEPT" ,ACCEPT);
+                                        d.Add("add"     , ADD       );
+                                        d.Add("after"   , AFTER     );
+                                        d.Add("after2"  , AFTER2    );
+                                        d.Add("ALIGNCENTER"             , ALIGNCENTER              );
+                                        d.Add("ALIGNLEFT"             , ALIGNLEFT              );
+                                        d.Add("ALIGNRIGHT"             , ALIGNRIGHT              );
+                                        d.Add("all"  , ALL    );
+                                        d.Add("ANALYZE" ,ANALYZE);
+                                        d.Add("and"  , AND    );
+                                        d.Add("append"  , APPEND     );
+                                        d.Add("AREMOS", AREMOS);
+                                        d.Add("as"  , AS    );
+                                        d.Add("AUTO", AUTO);
+                                        d.Add("avg"  , AVG    );
+                                        d.Add("backtrack"               , BACKTRACK );
+                                        d.Add("bank"    , BANK );
+                                        d.Add("bank1"    , BANK1 );
+                                        d.Add("bank2"    , BANK2 );
+                                        d.Add("bowl"    , BOWL );
+                                        d.Add("by"    , BY );
+                                        d.Add("cache"    , CACHE );
+                                        d.Add("calc"    , CALC );
+                                        d.Add("caps"    , CAPS );
+                                        d.Add("cell"    , CELL );
+                                        d.Add("change"    , CHANGE );
+                                        d.Add("checkoff"    , CHECKOFF );
+                                        d.Add("clear"   , CLEAR  );
+                                        d.Add("clear2"   , CLEAR2  );
+                                        d.Add("clip"   , CLIP       );
+                                        d.Add("clipboard"   , CLIPBOARD       );
+                                        d.Add("CLONE", CLONE);
+                                        d.Add("close"  , CLOSE );
+                                        d.Add("closeall", CLOSEALL  );
+                                        d.Add("closebanks", CLOSEBANKS  );
+                                        d.Add("cls"     , CLS       );
+                                        d.Add("CODE" ,CODE);
+										d.Add("px"  , PX );
+										d.Add("array"  , ARRAY );
+										d.Add("bugfix"  , BUGFIX );
+                                        d.Add("collapse"  , COLLAPSE );										
+                                        d.Add("colors"  , COLORS );
+                                        d.Add("cols"  , COLS );
+                                        d.Add("comma"   , COMMA               );
+                                        d.Add("command"     , COMMAND       );
+                                        d.Add("command1"     , COMMAND1       );
+                                        d.Add("command2"     , COMMAND2       );
+                                        d.Add("compare" , COMPARE );
+                                        d.Add("compress" , COMPRESS );
+                                        d.Add("const" , CONST );
+                                        d.Add("conv"    , CONV );
+                                        d.Add("conv1"    , CONV1 );
+                                        d.Add("conv2"    , CONV2 );
+                                        d.Add("copy",COPY);
+                                        d.Add("copylocal"               , COPYLOCAL               );
+                                        d.Add("COUNT", COUNT);
+                                        d.Add("cplot"   , CPLOT               );
+                                        d.Add("create"  , CREATE    );
+                                        d.Add("createvars"              , CREATEVARS);
+                                        d.Add("csv"     , CSV       );
+                                        d.Add("currow"  , CURROW       );
+                                        d.Add("d"    , D      );
+                                        d.Add("damp"    , DAMP      );
+                                        d.Add("danish"    , DANISH      );
+                                        d.Add("data"    , DATA      );
+                                        d.Add("databank", DATABANK      );
+                                        d.Add("datawidth"    , DATAWIDTH      );
+                                        d.Add("date"    , DATE      );
+                                        d.Add("dates"   , DATES      );
+                                        d.Add("debug"   , DEBUG     );
+                                        d.Add("dec"     , DEC );
+                                        d.Add("decimalseparator"       , DECIMALSEPARATOR    );
+                                        d.Add("decomp"  , DECOMP    );
+                                        d.Add("delete"  , DELETE    );
+                                        d.Add("details"  , DETAILS   );
+                                        d.Add("dialog"  , DIALOG      );
+                                        d.Add("dif"  , DIF      );
+                                        d.Add("diff"  , DIFF      );
+                                        d.Add("difprt"  , DIFPRT      );
+                                        d.Add("ding"    , DING      );
+                                        d.Add("DIRECT", DIRECT);
+                                        d.Add("disp"    , DISP      );
+                                        d.Add("display" , DISPLAY   );
+                                        d.Add("DOC" ,DOC);
+                                        d.Add("DOWNLOAD" ,DOWNLOAD);
+                                        d.Add("dp"      , DP   );
+                                        d.Add("dumof"   , DUMOF     );
+                                        d.Add("dumoff"  , DUMOFF    );
+                                        d.Add("dumon"   , DUMON     );
+                                        d.Add("dump"    , DUMP      );
+                                        d.Add("EDIT" ,EDIT);
+                                        d.Add("efter"   , EFTER     );
+                                        d.Add("else"    , ELSE);
+                                        d.Add("end"     , END      );
+                                        d.Add("endo"    , ENDO      );
+                                        d.Add("english"              , ENGLISH);
+                                        d.Add("excel"   , EXCEL     );
+										d.Add("exe"   , EXE     );
+                                        d.Add("exit"    , EXIT       );
+                                        d.Add("exo"     , EXO       );
+                                        d.Add("exp"     , EXP       );
+                                        d.Add("EXPORT", EXPORT);
+                                        d.Add("EXTERNAL", EXTERNAL);
+                                        d.Add("failsafe", FAILSAFE  );
+                                        d.Add("fair", FAIR  );
+                                        d.Add("fast", FAST  );
+                                        d.Add("FEED", FEED);
+                                        d.Add("feedback", FEEDBACK  );
+                                        d.Add("fields"  , FIELDS  );
+                                        d.Add("file"    , FILE  );
+                                        d.Add("filewidth"               , FILEWIDTH  );
+                                        d.Add("filter"               , FILTER  );
+                                        d.Add("findmissingdata"         , FINDMISSINGDATA);
+                                        d.Add("first"    , FIRST  );
+                                        d.Add("FIRSTCOLWIDTH" ,FIRSTCOLWIDTH);
+                                        d.Add("FIX", FIX);
+                                        d.Add("flat"    , FLAT      );
+                                        d.Add("folder"  , FOLDER  );
+                                        d.Add("font"  , FONT  );
+                                        d.Add("fontsize"  , FONTSIZE  );
+                                        d.Add("for"    , FOR       );
+                                        d.Add("format"  , FORMAT  );
+                                        d.Add("forward"  , FORWARD  );
+                                        d.Add("freq"    , FREQ      );
+                                        d.Add("frml"    , FRML      );
+                                        d.Add("FROM", FROM);
+                                        d.Add("function", FUNCTION);
+                                        d.Add("gauss"   , GAUSS     );
+                                        d.Add("GBK" ,GBK);
+										d.Add("GAMS", GAMS);	
+										d.Add("GDX", GDX);
+										d.Add("GDXOPT", GDXOPT);
+                                        d.Add("gdif"    , GDIF   );
+                                        d.Add("gdiff"    , GDIFF   );
+                                        d.Add("GEKKO18", GEKKO18);
+                                        d.Add("genr"    , GENR      );
+                                        d.Add("GEOMETRIC", GEOMETRIC);
+                                        d.Add("gmulprt" , GMULPRT   );
+                                        d.Add("GNUPLOT" ,GNUPLOT);
+                                        d.Add("goal"    , GOAL   );
+                                        d.Add("GOTO", GOTO);
+                                        d.Add("graph"    , GRAPH   );
+                                        d.Add("growth"    , GROWTH   );
+                                        d.Add("HDG",HDG);
+                                        d.Add("heading" , HEADING   );
+                                        d.Add("help"    , HELP      );
+                                        d.Add("hide"    , HIDE      );
+                                        d.Add("hideleftborder"          , HIDELEFTBORDER      );
+                                        d.Add("hiderightborder"          , HIDERIGHTBORDER      );
+                                        d.Add("HORIZON", HORIZON);
+                                        d.Add("hpfilter"    , HPFILTER      );
+                                        d.Add("html"    , HTML      );
+                                        d.Add("if"      , IF      );
+                                        d.Add("ignoremissing"           , IGNOREMISSING             );
+                                        d.Add("IGNOREMISSINGVARS"           , IGNOREMISSINGVARS              );
+                                        d.Add("ignorevars"              , IGNOREVARS             );
+                                        d.Add("import", IMPORT);
+                                        d.Add("index"   , INDEX      );
+                                        d.Add("info"    , INFO      );
+										d.Add("infofile"    , INFOFILE      );
+                                        d.Add("ini"    , INI      );
+                                        d.Add("init"    , INIT      );
+                                        d.Add("interface"               , INTERFACE );
+                                        d.Add("INTERNAL", INTERNAL);
+                                        d.Add("INVERT"    , INVERT      );
+                                        d.Add("iter"    , ITER   );
+                                        d.Add("itermax" , ITERMAX   );
+                                        d.Add("itermin" , ITERMIN   );
+                                        d.Add("itershow" , ITERSHOW   );
+                                        d.Add("KEEP", KEEP);
+                                        d.Add("LABEL" ,LABEL);
+                                        d.Add("labels"  , LABELS      );
+                                        d.Add("LAG" ,LAG);
+                                        d.Add("language"  , LANGUAGE      );
+                                        d.Add("last"  , LAST      );
+                                        d.Add("lev"  , LEV      );
+                                        d.Add("LINEAR",LINEAR);
+                                        d.Add("lines"    , LINES   );
+                                        d.Add("list"    , LIST      );
+                                        d.Add("listfile",LISTFILE);
+                                        d.Add("log"  , LOG      );
+										d.Add("lock"  , LOCK_      );
+										d.Add("unlock"  , UNLOCK_      );
+                                        d.Add("lu"    , LU      );
+                                        d.Add("m"       , M    );
+                                        d.Add("macro"   , MACRO2     );
+                                        d.Add("main"   , MAIN     );
+                                        d.Add("mat",MAT);
+                                        d.Add("matrix",MATRIX);
+										d.Add("colnames",COLNAMES);
+										d.Add("rownames",ROWNAMES);
+                                        d.Add("max"   , MAX    );
+                                        d.Add("maxlines", MAXLINES    );
+                                        d.Add("mem"     , MEM     );
+                                        d.Add("menu"     , MENU     );
+                                        d.Add("menutable"     , MENUTABLE     );
+                                        d.Add("merge"   , MERGE     );
+                                        d.Add("MERGECOLS"            , MERGECOLS);
+                                        d.Add("MESSAGE", MESSAGE);
+                                        d.Add("method"  , METHOD    );
+                                        d.Add("min"   , MIN    );
+                                        d.Add("MIXED" ,MIXED);
+                                        d.Add("MODE" ,MODE);
+                                        d.Add("model"   , MODEL     );
+                                        d.Add("modernlook"              , MODERNLOOK);
+                                        d.Add("mp" , MP);
+                                        d.Add("mulbk"   , MULBK     );
+                                        d.Add("mulpct"  , MULPCT    );
+                                        d.Add("mulprt"  , MULPRT    );
+                                        d.Add("MUTE" , MUTE);
+                                        d.Add("n"       , N    );
+                                        d.Add("NAME",NAME);
+                                        d.Add("NAMES",NAMES);
+                                        d.Add("ndec"    , NDEC    );
+                                        d.Add("ndifprt" , NDIFPRT    );
+                                        d.Add("new"     , NEW       );
+                                        d.Add("newton"  , NEWTON    );
+                                        d.Add("NEXT" , NEXT    );
+                                        d.Add("NFAIR", NFAIR);
+                                        d.Add("no"      , NO        );
+                                        d.Add("noabs"      , NOABS        );
+                                        d.Add("nocr"      , NOCR        );
+                                        d.Add("nodif"      , NODIF        );
+                                        d.Add("nodiff"      , NODIFF        );
+                                        d.Add("nofilter"      , NOFILTER        );
+                                        d.Add("nogdif"      , NOGDIF        );
+                                        d.Add("nogdiff"      , NOGDIFF        );
+                                        d.Add("nolev"      , NOLEV        );
+                                        d.Add("none"    , NONE        );
+                                        d.Add("NONMODEL" ,NONMODEL);
+                                        d.Add("nopch"      , NOPCH        );
+										d.Add("save"      , SAVE        );
+                                        d.Add("not"  , NOT        );
+                                        d.Add("notify"  , NOTIFY        );
+                                        d.Add("nov"      , NOV        );
+                                        d.Add("nwidth"  , NWIDTH    );
+                                        d.Add("nytvindu", NYTVINDU  );
+                                        d.Add("ols", OLS);
+                                        d.Add("open", OPEN  );
+                                        d.Add("option"  , OPTION    );
+                                        d.Add("or", OR  );
+                                        d.Add("p"       , P        );
+                                        d.Add("PARAM", PARAM);
+                                        d.Add("PATCH"       , PATCH        );
+										d.Add("PATH"       , PATH        );
+                                        d.Add("pause"   , PAUSE        );
+                                        d.Add("pch"     , PCH        );
+                                        d.Add("pcim"    , PCIM );
+                                        d.Add("pcimstyle"               , PCIMSTYLE );
+                                        d.Add("pctprt"  , PCTPRT    );
+                                        d.Add("pdec"    , PDEC    );
+                                        d.Add("period"  , PERIOD    );
+                                        d.Add("pipe"    , PIPE      );
+                                        d.Add("plot"   , PLOT     );
+                                        d.Add("PLOTCODE" ,PLOTCODE);
+                                        d.Add("points"    , POINTS   );
+										d.Add("pos"    , POS   );
+                                        d.Add("prefix"    , PREFIX   );
+                                        d.Add("PRETTY" ,PRETTY);
+                                        d.Add("pri"     , PRI     );
+                                        d.Add("PRIM", PRIM);
+                                        d.Add("print"   , PRINT     );
+                                        d.Add("PRINTCODES" ,PRINTCODES);
+                                        d.Add("PRN", PRN);
+                                        d.Add("PROT", PROT);
+                                        d.Add("prt"     , PRT       );
+                                        d.Add("prtx"    , PRTX       );
+                                        d.Add("pudvalg" , PUDVALG       );
+                                        d.Add("pwidth"  , PWIDTH    );
+                                        d.Add("q"       , Q     );
+                                        d.Add("r"               , R );
+                                        d.Add("R_EXPORT" , R_EXPORT);
+                                        d.Add("R_FILE" ,R_FILE);
+                                        d.Add("R_RUN" , R_RUN);
+                                        d.Add("rd"               , RD );
+                                        d.Add("rdp"               , RDP );
+                                        d.Add("read"    , READ      );
+                                        d.Add("REF", REF);
+                                        d.Add("rel"     , REL      );
+                                        d.Add("rename",RENAME);
+                                        d.Add("reorder" , REORDER      );
+                                        d.Add("rep", REP);
+                                        d.Add("REPEAT", REPEAT);
+                                        d.Add("REPLACE"    , REPLACE     );
+                                        d.Add("res"     , RES       );
+                                        d.Add("RESET", RESET);
+                                        d.Add("respect",RESPECT);
+                                        d.Add("RESTART", RESTART);
+                                        d.Add("return"  , RETURN2    );
+                                        d.Add("ring"    , RING    );
+                                        d.Add("rn"               , RN );
+                                        d.Add("rows"    , ROWS    );
+                                        d.Add("rp"               , RP );
+                                        d.Add("run"     , RUN       );
+										d.Add("library"     , LIBRARY       );
+                                        d.Add("S___ER" ,SER2);
+                                        d.Add("S___ERIES" ,SERIES2);
+										d.Add("S____ER" ,SER3);
+                                        d.Add("S____ERIES" ,SERIES3);
+                                        d.Add("SEARCH", SEARCH);
+                                        d.Add("SECONDCOLWIDTH" ,SECONDCOLWIDTH);
+										d.Add("SEC" ,SEC);
+                                        d.Add("ser",SER);
+                                        d.Add("series",SERIES);
+                                        d.Add("set"     , SET       );
+                                        d.Add("setborder"               , SETBORDER               );
+                                        d.Add("SETBOTTOMBORDER"            , SETBOTTOMBORDER               );
+                                        d.Add("SETDATES"             , SETDATES               );
+                                        d.Add("SETLEFTBORDER"            , SETLEFTBORDER               );
+                                        d.Add("SETRIGHTBORDER"            , SETRIGHTBORDER               );
+                                        d.Add("SETTEXT"              , SETTEXT               );
+                                        d.Add("SETTOPBORDER"            , SETTOPBORDER               );
+                                        d.Add("SETVALUES"           , SETVALUES               );
+                                        d.Add("sheet"   , SHEET       );
+                                        d.Add("SHOW", SHOW);
+                                        d.Add("showborders"          , SHOWBORDERS      );
+                                        d.Add("showpch" , SHOWPCH   );
+                                        d.Add("sign"     , SIGN       );
+                                        d.Add("sim"     , SIM       );
+                                        d.Add("SIMPLE" ,SIMPLE);
+                                        d.Add("skip"          , SKIP      );
+                                        d.Add("smooth", SMOOTH);
+                                        d.Add("solve"   , SOLVE     );
+                                        d.Add("some"   , SOME     );
+                                        d.Add("sort"    , SORT   );
+                                        d.Add("sound"   , SOUND     );
+                                        d.Add("SOURCE" ,SOURCE);
+                                        d.Add("SPECIALMINUS" ,SPECIALMINUS);
+                                        d.Add("splice", SPLICE);
+                                        d.Add("SPLINE", SPLINE);
+                                        d.Add("SPLIT" ,SPLIT);
+                                        d.Add("STACKED", STACKED);
+                                        d.Add("stamp"   , STAMP    );
+                                        d.Add("startfile"  , STARTFILE    );
+                                        d.Add("static"  , STATIC    );
+                                        d.Add("step"   , STEP    );
+                                        d.Add("stop"    , STOP      );
+                                        d.Add("string"    , STRING2      );
+                                        d.Add("strip"    , STRIP   );
+                                        d.Add("suffix"    , SUFFIX   );
+                                        d.Add("suggestions"             , SUGGESTIONS               );
+                                        d.Add("swap"  , SWAP      );
+                                        d.Add("sys"     , SYS       );
+                                        d.Add("SYSTEM" ,SYSTEM);
+                                        d.Add("table"     , TABLE       );
+                                        d.Add("table1"     , TABLE1       );
+                                        d.Add("table2"     , TABLE2       );
+                                        d.Add("tableold"     , TABLEOLD       );
+                                        d.Add("tabs"     , TABS       );
+                                        d.Add("TARGET" ,TARGET);
+                                        d.Add("tell"     , TELL       );
+										d.Add("temp"     , TEMP       );
+                                        d.Add("terminal"     , TERMINAL       );
+                                        d.Add("test"               , TEST               );
+                                        d.Add("TESTRANDOMMODEL", TESTRANDOMMODEL);
+                                        d.Add("TESTRANDOMMODELCHECK", TESTRANDOMMODELCHECK);
+                                        d.Add("testsim" , TESTSIM   );
+                                        d.Add("time"    , TIME      );
+                                        d.Add("timefilter", TIMEFILTER      );
+                                        d.Add("timespan", TIMESPAN      );
+                                        d.Add("title"              , TITLE      );
+                                        d.Add("to"      , TO        );
+                                        d.Add("total"      , TOTAL        );
+                                        d.Add("TRANSLATE", TRANSLATE);
+                                        d.Add("transpose"               , TRANSPOSE       );
+                                        d.Add("trel"     , TREL       );
+                                        d.Add("truncate", TRUNCATE);
+                                        d.Add("tsd"     , TSD       );
+                                        d.Add("tsdx"    , TSDX       );
+                                        d.Add("tsp"    , TSP       );
+                                        d.Add("txt"    , TXT       );
+                                        d.Add("type"    , TYPE       );
+                                        d.Add("u"  , U   );
+                                        d.Add("udvalg"  , UDVALG    );
+                                        d.Add("undo"    , UNDO      );
+                                        d.Add("unfix"    , UNFIX      );
+                                        d.Add("unswap"  , UNSWAP      );
+                                        d.Add("updatefreq"              , UPDATEFREQ);
+                                        d.Add("updx"    , UPDX       );
+                                        d.Add("v"    , V    );
+                                        d.Add("val"     , VAL    );
+                                        d.Add("value"   , VALUE    );
+                                        d.Add("vers"    , VERS    );
+                                        d.Add("version"    , VERSION    );
+                                        d.Add("vprt"    , VPRT     );
+                                        d.Add("wait"    , WAIT     );
+                                        d.Add("width"   , WIDTH     );
+                                        d.Add("window"   , WINDOW     );
+                                        d.Add("working"   , WORKING     );
+                                        d.Add("wplot"   , WPLOT     );
+                                        d.Add("write"   , WRITE     );
+                                        d.Add("wudvalg" , WUDVALG   );
+                                        d.Add("X12A", X12A);
+                                        d.Add("xls"     , XLS       );
+                                        d.Add("xlsx"    , XLSX      );
+                                        d.Add("yes"     , YES       );
+                                        d.Add("ymax",YMAX);
+                                        d.Add("ymin",YMIN);
+										d.Add("y2max",Y2MAX);
+                                        d.Add("y2min",Y2MIN);
+                                        d.Add("zero"    , ZERO      );
+                                        d.Add("ZOOM", ZOOM);
+                                        d.Add("ZVAR"    , ZVAR     );
+										// --- tokens2 end ---
+                                        return d;
+                                }
+
+                                public override void ReportError(RecognitionException e) {
+                                  string hdr = GetErrorHeader(e);
+                                  string msg = "Cmd lexer error: " + e.Message;
+                                  throw new Exception(e.Line + "¤" + e.CharPositionInLine + "¤" + hdr + "¤" + msg);
+                                }
+
+
+                                    public int CheckKeywordsTable(string s)
+                                    {
+
+                                        int rv = Ident;
+                                        if(kw.ContainsKey(s)) {
+                                          rv = kw[s];
+                                        }
+                                        return rv;
+
+                                    }
+                              }
+
 
 /*------------------------------------------------------------------
  * PARSER RULES
  *------------------------------------------------------------------*/
+
+/*
+
+start                      : statements EOF;  //EOF is necessary in order to force the whole file to be parsed
+
+statements                 : statements2*;
+
+statements2                     :
+                            //SEMICOLON -> //stray semicolon is ok, nothing is written                          
+							
+
+						    assignment           SEMICOLON!
+						  | for2
+						  | if2
+						  | print                SEMICOLON!
+						  | reset                SEMICOLON!
+						  | run                  SEMICOLON!
+						  | functionDef          SEMICOLON!
+						  
+						  | return2               SEMICOLON!
+						  
+						 ;
+*/
+						  
 
 start                      : statements EOF;  //EOF is necessary in order to force the whole file to be parsed
 
@@ -159,13 +1851,13 @@ statements2                     :
                             SEMICOLON -> //stray semicolon is ok, nothing is written
                           | assignment           SEMICOLON!
 						  | for2
-						  | if2
 						  | print                SEMICOLON!
 						  | run                  SEMICOLON!
 						  | functionDef          SEMICOLON!
 						  | reset                SEMICOLON!
 						  | return2               SEMICOLON!
 						  ;
+
 
 assignment				  : leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression);  //careful: see #09873245325 if changed
 
@@ -376,6 +2068,40 @@ if2						  : IF leftParen logical rightParen functionStatements (ELSE functionSt
 
 print					  : P expression -> ^(ASTPRINT expression);
 
+						  //!!!Two identical lines ONLY because of token stuff
+read                      : READ   readOpt1? fileNameStar (TO identOrStar)? -> ^({token("ASTREAD", ASTREAD, $READ.Line)}   READ   readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?))
+                          | IMPORT readOpt1? fileNameStar (TO identOrStar)? -> ^({token("ASTREAD", ASTREAD, $IMPORT.Line)} IMPORT readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?))
+						  ;
+readOpt1                  : ISNOTQUAL
+						  | leftAngle        readOpt1h* RIGHTANGLE -> readOpt1h*						
+						  | leftAngle dates? readOpt1h* RIGHTANGLE -> ^(ASTDATES dates?) readOpt1h*
+                          ;
+readOpt1h                 : MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?)
+						  | PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)  //obsolete
+						  | FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)
+						  | REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_REF yesNo?)												
+						  | TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
+						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
+						  | GBK (EQUAL yesNo)? -> ^(ASTOPT_STRING_GBK yesNo?)
+						  | GDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_GDX yesNo?)
+						  | GDXOPT EQUAL expression -> ^(ASTOPT_STRING_GDXOPT expression)
+						  | TSP (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSP yesNo?)
+						  | PCIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PCIM yesNo?)
+						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
+						  | PRN (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRN yesNo?)
+						  | PX (EQUAL yesNo)? -> ^(ASTOPT_STRING_PX yesNo?)
+						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
+  						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)
+						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)
+						  | ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)
+						  ;
+identOrStar               : ident -> ident
+						  | star -> ASTBANKISSTARCHEATCODE
+						  ;
+
+
+
+
 run						  : RUN -> ^(ASTRUN);
 
 reset					  : RESET -> ^(ASTRESET);
@@ -387,14 +2113,28 @@ functionArg               : (functionArgElement (',' functionArgElement)*)? -> ^
 functionArgElement        : type svarname -> ^(ASTPLACEHOLDER type svarname);
 functionStatements        : statements2* -> ^(ASTPLACEHOLDER statements2*);
 functionStatements2       : functionStatements;  //alias
-type					  : VAL | STRING | DATE | SERIES | LIST | MAP | MATRIX ;
+type					  : VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX ;
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- logical END -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-// Semi parser stuff here
+// Semi lexer stuff here
 // ------------------------------------
+
+fileNameStar:ident;
+
+dates: expression expression;
+
+yesNo					  : yes
+						  | no
+						  | expression;
+yesNoSimple					  : yes
+						  | no
+;
+yes                       : YES -> ASTYES;
+no                        : NO -> ASTNO;
+
 
 leftParen                 : (GLUE!)? LEFTPAREN;
 leftParenGlue             : GLUE! LEFTPAREN;
@@ -443,15 +2183,504 @@ date2                     : Integer | DateDef;
 
 ident                     : ident2 -> ^(ASTIDENT ident2);
 
-//fixme
-//fixme
-//fixme
-//fixme
-//fixme
-ident2 					  : Ident
-						  | NOT
-						  | P
-						  ;
+ident2 					  : Ident|
+					// --- tokens3 start ---						     
+            GRIDSTYLE|
+            BOLD|
+            ITALIC|			
+			ASER|
+            ASERIES|
+			XLABELS|
+			YLABELS|
+            ANNUAL|
+            AT2|
+            BETWEEN|
+            NONANNUAL|
+            DIGITS|
+			REMOTE|
+			OFFSET|
+			DETECT|
+							X|
+							Y|
+							REBASE|
+							LAGFIX|
+							ADDBANK|
+							THOUSANDSSEPARATOR|
+							MDATEFORMAT|
+                            LINESPOINTS|
+							CONTINUE|
+							//LINES|
+							BOXES|
+							FILLEDCURVES|
+							STEPS|
+							//POINTS|
+							DOTS|
+							IMPULSES|
+							SIZE|
+							//TITLE|
+							SUBTITLE|
+							//FONT|
+							//FONTSIZE|
+							TICS|
+							GRID|
+							KEY|
+							PALETTE|
+							STACK|
+							BOXWIDTH|
+							BOXGAP|
+							SEPARATE|
+							XLINE|
+							XLINEBEFORE|
+							XLINEAFTER|
+							YMIRROR|
+							YTITLE|
+							YLINE|
+							//YMAX|
+							YMAXHARD|
+							YMAXSOFT|
+							//YMIN|
+							YMINHARD|
+							YMINSOFT|
+							XZEROAXIS|
+							Y2TITLE|
+							Y2LINE|
+							//Y2MAX|
+							Y2MAXHARD|
+							Y2MAXSOFT|
+							//Y2MIN|
+							Y2MINHARD|
+							Y2MINSOFT|
+							X2ZEROAXIS|
+							//LABEL|
+							ARROW|
+							//LINETYPE|
+							DASHTYPE|
+							LINEWIDTH|
+							LINECOLOR|
+							POINTTYPE|
+							POINTSIZE|
+							FILLSTYLE|
+							//LABEL|
+							Y2|							
+							USING|
+							MISSING|
+							IMPOSE|
+							CONSTANT|
+							INTERPOLATE|
+							PRORATE|
+							TRIM|
+							ERROR|
+                            ABS|
+							DEFAULT|
+							LOGIC|
+                            ACCEPT|
+                            ADD|
+                            AFTER2|
+                            AFTER|
+                            ALIGNCENTER|
+                            ALIGNLEFT|
+                            ALIGNRIGHT|
+                            ALL|
+                            ANALYZE|
+                            AND|
+                            APPEND|
+                            AREMOS|
+                            AS|
+                            AUTO|
+                            AVG|
+                            A|
+                            BACKTRACK|
+                            BANK1|
+                            BANK2|
+                            BANK|
+                            BOWL|
+                            BY|
+                            CACHE|
+                            CALC|
+                            CAPS|
+                            CELL|
+                            CHANGE|
+                            CHECKOFF|
+                            CLEAR2|
+                            CLEAR|
+                            CLIPBOARD|
+                            CLIP|
+                            CLONE|
+                            CLOSEALL|
+                            CLOSEBANKS|
+                            CLOSE|
+                            CLS|
+                            CODE|
+                            COLLAPSE|
+							PX|
+							ARRAY|
+							BUGFIX|
+                            COLORS|
+                            COLS|
+                            COMMAND1|
+                            COMMAND2|
+                            COMMAND|
+                            COMMA|
+                            COMPARE|
+                            COMPRESS|
+                            CONST|
+                            CONV1|
+                            CONV2|
+                            CONV|
+                            COPYLOCAL|
+                            COPY|
+                            COUNT|
+                            CPLOT|
+                            CREATEVARS|
+                            CREATE|
+                            CSV|
+                            CURROW|
+                            DAMP|
+                            DANISH|
+                            DATABANK|
+                            DATAWIDTH|
+                            DATA|
+                            DATES|
+                            DATE|
+                            DEBUG|
+                            DECIMALSEPARATOR|
+                            DECOMP|
+                            DEC|
+                            DELETE|
+                            DETAILS|
+                            DIALOG|
+                            DIFF|
+                            DIFPRT|
+                            DIF|
+                            DING|
+                            DIRECT|
+                            DISPLAY|
+                            DISP|
+                            DOC|
+                            DOWNLOAD|
+                            DP|
+                            DUMOFF|
+                            DUMOF|
+                            DUMON|
+                            DUMP|
+                            D|
+                            EDIT|
+                            EFTER|
+                            ELSE|
+                            ENDO|
+                            END|
+                            ENGLISH|
+                            EXCEL|
+							EXE|
+                            EXIT|
+                            EXO|
+                            EXPORT|
+                            EXP|
+                            EXTERNAL|
+                            FAILSAFE|
+                            FAIR|
+                            FAST|
+                            FEEDBACK|
+                            FEED|
+                            FIELDS|
+                            FILEWIDTH|
+                            FILE|
+                            FILTER|
+                            FINDMISSINGDATA|
+                            FIRSTCOLWIDTH|
+                            FIRST|
+                            FIX|
+                            FLAT|
+                            FOLDER|
+                            FONTSIZE|
+                            FONT|
+                            FORMAT|
+                            FORWARD|
+                            FOR|
+                            FREQ|
+                            FRML|
+                            FROM|
+                            FUNCTION|
+                            GAUSS|
+							GAMS|
+                            GBK|
+							GDX|
+							GDXOPT|
+                            GDIFF|
+                            GDIF|
+                            GEKKO18|
+                            GENR|
+                            GMULPRT|
+                            GNUPLOT|
+                            GOAL|
+                            GOTO|
+                            GRAPH|
+                            GROWTH|
+                            HDG|
+                            HEADING|
+                            HELP|
+                            HIDELEFTBORDER|
+                            HIDERIGHTBORDER|
+                            HIDE|
+                            HORIZON|
+                            HPFILTER|
+                            HTML|
+                            IF|
+                            IGNOREMISSINGVARS|
+                            IGNOREMISSING|
+                            IGNOREVARS|
+                            IMPORT|
+                            INDEX|
+                            INFO|
+							INFOFILE|
+                            INIT|
+                            INI|
+                            INTERFACE|
+                            INTERNAL|
+                            INVERT|
+                            ITERMAX|
+                            ITERMIN|
+                            ITERSHOW|
+                            ITER|
+                            KEEP|
+                            LABELS|
+                            LABEL|
+                            LAG|
+                            LANGUAGE|
+                            LAST|
+                            LEV|
+                            LINES|
+                            LISTFILE|
+                            LIST|
+                            LOG|
+							LOCK_|
+							UNLOCK_|
+                            LU|
+                            MACRO2|
+                            MAIN|
+                            MATRIX|
+							COLNAMES|
+							ROWNAMES|
+                            MAXLINES|
+                            MAX|
+                            MEM|
+                            MENUTABLE|
+                            MENU|
+                            MERGECOLS|
+                            MERGE|
+                            MESSAGE|
+                            METHOD|
+                            MIN|
+                            MIXED|
+                            MODEL|
+                            MODERNLOOK|
+                            MODE|
+                            MP|
+                            MULBK|
+                            MULPCT|
+                            MULPRT|
+                            MUTE|
+                            M|
+                            NAMES|
+                            NAME|
+                            NDEC|
+                            NDIFPRT|
+                            NEWTON|
+                            NEW|
+                            NEXT|
+                            NFAIR|
+                            NOABS|
+                            NOCR|
+                            NODIFF|
+                            NODIF|
+                            NOFILTER|
+                            NOGDIFF|
+                            NOGDIF|
+                            NOLEV|
+                            NONE|
+                            NONMODEL|
+                            NOPCH|
+							SAVE|
+                            NOTIFY|
+                            NOT|
+                            NOV|
+                            NO|
+                            NWIDTH|
+                            NYTVINDU|
+                            N|
+                            OLS|
+                            OPEN|
+                            OPTION|
+                            OR|
+                            PARAM|
+                            PATCH|
+							PATH|
+                            PAUSE|
+                            PCH|
+                            PCIMSTYLE|
+                            PCIM|
+                            PCTPRT|
+                            PDEC|
+                            PERIOD|
+                            PIPE|
+                            PLOTCODE|
+                            PLOT|
+                            POINTS|
+							POS|
+                            PREFIX|
+                            PRETTY|
+                            PRIM|
+                            PRINTCODES|
+                            PRINT|
+                            PRI|
+                            PRN|
+                            PROT|
+                            PRTX|
+                            PRT|
+                            PUDVALG|
+                            PWIDTH|
+                            P|
+                            Q|
+                            R_EXPORT|
+                            R_FILE|
+                            R_RUN|
+                            RDP|
+                            RD|
+                            READ|
+                            REF|
+                            REL|
+                            RENAME|
+                            REORDER|
+                            REPLACE|
+                            REP|
+                            RESET|
+                            RESPECT|
+                            RESTART|
+                            RES|
+                            RETURN2|
+                            RING|
+                            RN|
+                            ROWS|
+                            RP|
+                            RUN|
+                            R|
+                            SEARCH|
+                            SECONDCOLWIDTH|
+							SEC|
+                            SER2|
+                            SERIES2|
+							SER3|
+                            SERIES3|
+                            SERIES|
+                            SER|
+                            SETBORDER|
+                            SETBOTTOMBORDER|
+                            SETDATES|
+                            SETLEFTBORDER|
+                            SETRIGHTBORDER|
+                            SETTEXT|
+                            SETTOPBORDER|
+                            SETVALUES|
+                            SET|
+                            SHEET|
+                            SHOWBORDERS|
+                            SHOWPCH|
+                            SHOW|
+                            SIGN|
+                            SIMPLE|
+                            SIM|
+                            SKIP|
+                            SMOOTH|
+                            SOLVE|
+                            SOME|
+                            SORT|
+                            SOUND|
+                            SOURCE|
+                            SPECIALMINUS|
+                            SPLICE|
+                            SPLIT|
+                            STACKED|
+                            STAMP|
+                            STARTFILE|
+                            STATIC|
+                            STEP|
+                            STOP|
+                            STRING2|
+                            STRIP|
+                            SUFFIX|
+                            SUGGESTIONS|
+                            SWAP|
+                            SYSTEM|
+                            SYS|
+                            TABLE1|
+                            TABLE2|
+                            TABLEOLD|
+                            TABLE|
+                            TABS|
+                            TARGET|
+                            TELL|
+							TEMP|
+                            TERMINAL|
+                            TESTRANDOMMODELCHECK|
+                            TESTRANDOMMODEL|
+                            TESTSIM|
+                            TEST|
+                            TIMEFILTER|
+                            TIMESPAN|
+                            TIME|
+                            TITLE|
+                            TOTAL|
+                            TO|
+                            TRANSLATE|
+                            TRANSPOSE|
+                            TREL|
+                            TRUNCATE|
+                            TSDX|
+                            TSD|
+                            TSP|
+                            TXT|
+                            TYPE|
+                            UABS|
+                            UDIFF|
+                            UDIF|
+                            UDVALG|
+                            UGDIFF|
+                            UGDIF|
+                            ULEV|
+                            UNDO|
+                            UNFIX|
+                            UNSWAP|
+                            UPCH|
+                            UPDATEFREQ|
+                            UPDX|
+                            U|
+                            VALUE|
+                            VAL|
+                            VERSION|
+                            VERS|
+                            VPRT|
+                            V|
+                            WAIT|
+                            WIDTH|
+                            WINDOW|
+                            WORKING|
+                            WPLOT|
+                            WRITE|
+                            WUDVALG|
+                            X12A|
+                            XLSX|
+                            XLS|
+                            YES|
+                            YMAX|
+                            YMIN|
+							Y2MAX|
+                            Y2MIN|
+                            ZERO|
+                            ZOOM|
+							XEDIT|	
+                            ZVAR
+							// --- tokens3 end ---
+							;
 
 
 /*------------------------------------------------------------------
@@ -478,7 +2707,7 @@ COMMENT                   : ('//') (~ (NEWLINE2|NEWLINE3))* { $channel=HIDDEN; }
 COMMENT_MULTILINE         : '/*' (options {greedy=false;}: COMMENT_MULTILINE | . )* '*/' {$channel=HIDDEN;};
 
                             //for instance a38x
-Ident                     : (LETTER|'_') (DIGIT|LETTER|'_')* ;
+Ident                     : (LETTER|'_') (DIGIT|LETTER|'_')*  { $type = CheckKeywordsTable(Text); };
                             //for instance 12345
 Integer                   : DIGIT+  ;
                             //for instance 25e12
