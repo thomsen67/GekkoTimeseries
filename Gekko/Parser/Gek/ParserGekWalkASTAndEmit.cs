@@ -1925,12 +1925,15 @@ namespace Gekko.Parser.Gek
 
                                     //node.Code.A("Globals.ufunctions").A(numberOfArguments).A("[").A("`").A(functionNameLower).A("`").A("](" + Globals.functionT1Cs + "").A(args).A(")");
 
+                                    if (functionNameLower != "series")
+                                    {
+                                        node.Code.A("O.FunctionLookup").A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionT1Cs + "").A(args).A(")");
+                                    }
+                                    else
+                                    {
+                                        node.Code.A("Functions."+functionNameLower).A("(" + Globals.functionT1Cs + "").A(args).A(")");
+                                    }                                    
                                     
-                                    node.Code.A("O.FunctionLookup").A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionT1Cs + "").A(args).A(")");
-                                    
-
-
-
                                 }                                
                             }                            
                         }

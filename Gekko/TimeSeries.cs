@@ -113,7 +113,7 @@ namespace Gekko
         [ProtoMember(8)]
         public GMap storage = null;  //only active if it is an array-timeseries
         [ProtoMember(9)]
-        public int storageDim = 0;  //default is 0 which is same as normal timeseries
+        public int storageDim = 0;  //default is 0 which is same as normal timeseries, also used in IsArrayTimeseries()
 
         private TimeSeries()
         {
@@ -275,7 +275,7 @@ namespace Gekko
             if (this.dataArray == null)
             {
                 //If no data has been added to the timeseries, NaN will always be returned.
-                if (this.IsGhost())
+                if (this.IsArrayTimeseries())
                 {
                     G.Writeln2("*** ERROR: The variable '" + this.name + "' is an array-timeseries,");
                     G.Writeln("           but is used as a normal timeseries here (without []-indexer)", Color.Red);
@@ -387,7 +387,7 @@ namespace Gekko
                         this.meta.firstPeriodPositionInArray = index;
                     }
                 }
-                this.SetDirtyGhost(true, false);
+                this.SetDirty(true);
             }
         }
 
@@ -544,15 +544,15 @@ namespace Gekko
             {
                 this.meta.firstPeriodPositionInArray = index1;
             }
-            this.SetDirtyGhost(true, false);
+            this.SetDirty(true);
 
         }
 
-        public void SetDirtyGhost(bool b1, bool b2)
-        {
-            this.SetDirty(b1);
-            this.SetGhost(b2);
-        }        
+        //public void SetDirtyGhost(bool b1, bool b2)
+        //{
+        //    this.SetDirty(b1);
+        //    this.SetGhost(b2);
+        //}        
 
         public bool IsTimeless()
         {
@@ -1037,11 +1037,8 @@ namespace Gekko
                     throw new GekkoException();
                 }
 
-                IVariable iv = null;
-                if (this.storage != null)
-                {
-                    iv = null; this.storage.TryGetValue(keys, out iv);
-                }                             
+                IVariable iv = null;                
+                this.storage.TryGetValue(keys, out iv);
 
                 if (iv == null)
                 {
@@ -1054,15 +1051,24 @@ namespace Gekko
                     }
                     else
                     {
-                        if (this.storage == null) this.storage = new GMap();
                         ts = new TimeSeries(this.freq, "[[array-timeseries]]");
-                        this.storage[keys] = ts;
+                        this.storage.AddIVariableWithOverwrite(keys, ts);
                     }
-                }                    
+                }
+                else
+                {
+                    ts = iv as TimeSeries;
+                    if (ts == null)
+                    {
+                        G.Writeln2("*** ERROR: Array-timeseries element is non-series.");
+                        throw new GekkoException();
+                    }
+                }                   
                 
             }
             else
             {
+                //FAIL
                 string s = null;
                 foreach (IVariable iv in indexes)
                 {
@@ -1278,10 +1284,10 @@ namespace Gekko
             if (meta != null) this.meta.SetDirty(b1);
         }
 
-        public void SetGhost(bool b2)
-        {
-            if (meta != null) this.meta.SetGhost(b2);
-        }
+        //public void SetGhost(bool b2)
+        //{
+        //    if (meta != null) this.meta.SetGhost(b2);
+        //}
 
         public bool IsDirty()
         {
@@ -1289,10 +1295,9 @@ namespace Gekko
             return this.meta.IsDirty();
         }
 
-        public bool IsGhost()
+        public bool IsArrayTimeseries()
         {
-            if (meta == null) return false; //not used for light TimeSeries
-            return this.meta.IsGhost();
+            return this.storageDim > 0;
         }
 
         /// <summary>
@@ -1315,6 +1320,8 @@ namespace Gekko
             tsCopy.anchorPeriod = this.anchorPeriod;
             tsCopy.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray;
             tsCopy.isTimeless = this.isTimeless;
+            tsCopy.storage = this.storage;
+            tsCopy.storageDim = this.storageDim;
 
             if (this.meta != null)
             {
@@ -1324,7 +1331,7 @@ namespace Gekko
                 if (this.meta.label != null) tsCopy.meta.label = this.meta.label;
                 if (this.meta.source != null) tsCopy.meta.source = this.meta.source;
                 if (this.meta.stamp != null) tsCopy.meta.stamp = this.meta.stamp;
-                tsCopy.SetGhost(this.IsGhost());                
+                //tsCopy.SetGhost(this.IsArrayTimeseries());                
             }
             return tsCopy;
         }
@@ -1368,8 +1375,8 @@ namespace Gekko
         /// The time of the last last change in the timeseries
         /// </summary>
         /// 
-        [ProtoMember(6)]
-        private bool isGhost = false; //A ghost variable x is a placeholder for x['a', 'b'] for example. This x variable should not be used for anything.
+        //[ProtoMember(6)]
+        //private bool isGhost = false; //A ghost variable x is a placeholder for x['a', 'b'] for example. This x variable should not be used for anything.
         [ProtoMember(7)]        
         private bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf
@@ -1379,20 +1386,20 @@ namespace Gekko
             this.isDirty = b1;
         }
 
-        public void SetGhost(bool b2)
-        {
-            this.isGhost = b2;
-        }
+        //public void SetGhost(bool b2)
+        //{
+        //    this.isGhost = b2;
+        //}
 
         public bool IsDirty()
         {
             return this.isDirty;
         }
 
-        public bool IsGhost()
-        {
-            return this.isGhost;
-        }
+        //public bool IsGhost()
+        //{
+        //    return this.isGhost;
+        //}
     }
 
     

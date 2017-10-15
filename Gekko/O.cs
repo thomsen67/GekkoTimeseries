@@ -941,12 +941,34 @@ namespace Gekko
                     TimeSeries tsLhs = lhs as TimeSeries;
                     if (rhsExpression.Type() == EVariableType.Series)
                     {
-                        TimeSeries ts = rhsExpression as TimeSeries;
-                        //LIGHTFIX, speed                         
-                        foreach (GekkoTime t in smpl.Iterate03())
+                        TimeSeries tsRhs = rhsExpression as TimeSeries;
+                        //LIGHTFIX, speed   
+
+                        //NOW, we have xx2 = xx1, where these may be different as regards whether they are array-timeseries.
+
+                        if (!tsLhs.IsArrayTimeseries() && !tsRhs.IsArrayTimeseries())
                         {
-                            tsLhs.SetData(t, ts.GetData(smpl, t));
+                            //Inject the data, only for the current
+                            //This must run fast
+                            //LIGHTFIX, speed
+                            foreach (GekkoTime t in smpl.Iterate12())
+                            {
+                                tsLhs.SetData(t, tsRhs.GetData(smpl, t));
+                            }
                         }
+                        else
+                        {
+                            //types are differnet (array and non-array), or both are array (not likely...). In these cases, we wipe out the existing timeseries
+                            ib.RemoveIVariable(varnameWithTilde);
+                            TimeSeries tsTmp = (TimeSeries)rhsExpression.DeepClone();
+                            tsTmp.name = varnameWithTilde;
+                            if (ib.GetType() == typeof(Databank))
+                            {
+                                if (tsTmp.meta == null) tsTmp.meta = new TimeSeriesMetaInformation();  //so that parentDatabank can be put in in ib.AddIVariable                               
+                            }
+                            ib.AddIVariable(tsTmp.name, tsTmp);
+                        }                                             
+                        
                     }
                     else if (rhsExpression.Type() == EVariableType.Val)
                     {
@@ -4933,7 +4955,7 @@ namespace Gekko
                     //For instance, "SERIES y = 2 * x;" --> meta = "SERIES y = 2 * x" (without the semicolon)    
                     string s = ShowDatesAsString(this.t1, this.t2);
                     lhs.meta.source = s + this.meta;                    
-                    lhs.SetDirtyGhost(true, false);
+                    lhs.SetDirty(true);
                 }
                 lhs.Stamp();
                 if (this.p.IsSimple())
@@ -4994,7 +5016,7 @@ namespace Gekko
                     //For instance, "SERIES y = 2 * x;" --> meta = "SERIES y = 2 * x" (without the semicolon)    
                     string s = ShowDatesAsString(this.t1, this.t2);
                     lhs.meta.source = s + this.meta;                    
-                    lhs.SetDirtyGhost(true, false);
+                    lhs.SetDirty(true);
                 }
                 lhs.Stamp();
                 if (this.p.IsSimple())

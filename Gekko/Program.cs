@@ -85,6 +85,13 @@ namespace Gekko
             GMapItem gmi = new GMapItem(s);
             return this.storage.TryGetValue(gmi, out iv);
         }
+
+        public void AddIVariableWithOverwrite(string[] s, IVariable iv)
+        {
+            GMapItem gmi = new GMapItem(s);
+            if (this.storage.ContainsKey(gmi)) this.storage.Remove(gmi);
+            this.storage.Add(gmi, iv);
+        }
     }
 
     [ProtoContract]
@@ -2828,7 +2835,7 @@ namespace Gekko
                     int emptyWarnings = 0;
                     foreach (TimeSeries tsTemp in temp.storage.Values)  //for each timeseries in temp (deserialized) databank 
                     {
-                        bool isGhost = tsTemp.IsGhost();
+                        bool isGhost = tsTemp.IsArrayTimeseries();
                         //looping through each timeseries to find databank start and end year (and to merge variables if we are merging)
 
                         if (IsNonsenseVariableName(tsTemp.name))
@@ -3811,7 +3818,7 @@ namespace Gekko
             if (isArray)
             {
                 TimeSeries ts = new TimeSeries(G.GetFreq(freq), tableName);
-                ts.SetDirtyGhost(true, true);
+                ts.SetDirty(true);
                 if (Program.databanks.GetFirst().GetVariable(G.GetFreq(freq), ts.name) != null)
                 {
                     Program.databanks.GetFirst().RemoveVariable(G.GetFreq(freq), ts.name);
@@ -3831,7 +3838,7 @@ namespace Gekko
                     ts.meta.label = valuesCombi[j];
                     ts.meta.source = source;
                     ts.meta.stamp = Globals.dateStamp;
-                    ts.SetDirtyGhost(true, false);
+                    ts.SetDirty(true);
                 }
                 else
                 {
@@ -3840,7 +3847,7 @@ namespace Gekko
                     ts.meta.label = valuesCombi[j];
                     ts.meta.source = source;
                     ts.meta.stamp = Globals.dateStamp;
-                    ts.SetDirtyGhost(true, false);
+                    ts.SetDirty(true);
                 }                
 
                 if (Program.options.bugfix_px)  //can be switched off
@@ -4326,7 +4333,7 @@ namespace Gekko
                                 {
                                     if (databank.ContainsVariable(varName)) databank.RemoveVariable(varName);
                                     TimeSeries ts = new TimeSeries(EFreq.Annual, varName);  //we wipe it out if it is alreay existing
-                                    ts.SetGhost(true);  //only a placeholder, should not be counted etc.
+                                    //ts.SetGhost(true);  //only a placeholder, should not be counted etc.
                                     databank.AddVariable(ts);
                                 }
                             }
@@ -4588,7 +4595,7 @@ namespace Gekko
                             {
                                 if (databank.ContainsVariable(gvar)) databank.RemoveVariable(gvar);
                                 TimeSeries ts = new TimeSeries(EFreq.Annual, gvar);  //we wipe it out if it is alreay existing
-                                ts.SetGhost(true);  //only a placeholder, should not be counted etc.
+                                //ts.SetGhost(true);  //only a placeholder, should not be counted etc.
                                 databank.AddVariable(ts);
                             }
 
@@ -4728,7 +4735,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
 
-                if (ts.IsGhost() && !ts.IsTimeless())
+                if (ts.IsArrayTimeseries() && !ts.IsTimeless())
                 {
                     string match = nameWithoutFreq + Globals.symbolTurtle + "*";
                     
@@ -6826,7 +6833,7 @@ namespace Gekko
             //input.AddRange(db.storage.Keys);
             foreach (KeyValuePair<string, IVariable> kvp in db.storage)
             {
-                TimeSeries xx = kvp.Value as TimeSeries; if (xx != null && xx.IsGhost()) continue;  //ignore ghosts
+                TimeSeries xx = kvp.Value as TimeSeries; if (xx != null && xx.IsArrayTimeseries()) continue;  //ignore ghosts
                 input.Add(new ScalarString(kvp.Key));
             }
 
@@ -7403,7 +7410,7 @@ namespace Gekko
             if (ts == null)
             {
                 ts = new TimeSeries(EFreq.Annual, gvar);
-                ts.SetGhost(true);  //only a placeholder, should not be counted etc.
+                //ts.SetGhost(true);  //only a placeholder, should not be counted etc.
                 Program.databanks.GetFirst().AddVariable(ts);
             }
 
@@ -13573,7 +13580,7 @@ namespace Gekko
                         existenceCheck++;
                         varCounter++;
 
-                        if (ts.IsGhost())
+                        if (ts.IsArrayTimeseries())
                         {
                             //show info on array-timeseries
                             List<string> names = MatchWildcardInDatabank(var + Globals.symbolTurtle + "*", db);  //are sorted
@@ -15363,7 +15370,7 @@ namespace Gekko
                     if (!filter.ContainsKey(s)) continue;  //ignore this
                 }
                 TimeSeries ts = work.GetVariable(s);  //can this not be moved before loop??
-                if (ts.IsGhost()) continue;  //ignore it
+                if (ts.IsArrayTimeseries()) continue;  //ignore it
                 foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
                 {                    
                     double value = ts.GetData(null, t);
@@ -17419,7 +17426,7 @@ namespace Gekko
                 double[] x = ts.GetDataSequence(out index1, out index2, tStart, tEnd, true);
                 //#98726527
                 //we have to indicate this manually here: normally GetDataSequence() is only for getting, but here stuff is put into it (to keep the method speedy)
-                ts.SetDirtyGhost(true, false);
+                ts.SetDirty(true);
                 int length = index2 - index1 + 1;  //only done for sim period, not from tStart0 (i.e. lags)
                 Buffer.BlockCopy(a, 8 * id * obsWithLags + 8 * (obsWithLags - obsSimPeriod), x, 8 * (index1), 8 * length); //TODO: what if out of bounds regarding x???
                 if(bNumberPointers!=null) {
@@ -17429,7 +17436,7 @@ namespace Gekko
                         {
                             ts.meta.source = src;
                             ts.Stamp();                            
-                            ts.SetDirtyGhost(true, false);
+                            ts.SetDirty(true);
                         }
                         else
                         {
@@ -18688,7 +18695,7 @@ namespace Gekko
                     //For instance, "UPD <p> y = 5, 4, 5;" --> meta = "UPD <p> y = 5, 4, 5"
                     string s = O.ShowDatesAsString(tStart, tEnd);
                     ts.meta.source = s + o.meta;                    
-                    ts.SetDirtyGhost(true, false);
+                    ts.SetDirty(true);
                 }
             }
         }
