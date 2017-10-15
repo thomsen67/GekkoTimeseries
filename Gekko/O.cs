@@ -2205,6 +2205,32 @@ namespace Gekko
             return tsl;
         }
 
+        public static Func<GekkoSmpl, IVariable, IVariable> FunctionLookup1(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, IVariable, IVariable> rv = null;
+            Globals.ufunctions1.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 1 argument");
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, IVariable, IVariable, IVariable> FunctionLookup2(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, IVariable, IVariable, IVariable> rv = null;
+            Globals.ufunctions2.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 2 arguments");
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
         public static TimeSeries CreateTimeSeriesFromMatrix(GekkoSmpl smpl, Matrix m)
         {
             if (m.data.GetLength(1) != 1)

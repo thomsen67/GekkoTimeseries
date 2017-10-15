@@ -1878,7 +1878,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                 {                                    
-                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))), null))) {");
+                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))), null, false))) {");  //false is regarding isLeftSide
                                 }
 
                                 if (G.Equal(functionNameLower, "sum"))
@@ -1922,7 +1922,15 @@ namespace Gekko.Parser.Gek
                                 {
                                     int numberOfArguments = node.ChildrenCount() - 1;
                                     //Access the ufunction1[...] so that it can fail with an error                                        
-                                    node.Code.A("Globals.ufunctions").A(numberOfArguments).A("[").A("`").A(functionNameLower).A("`").A("](" + Globals.functionT1Cs + "").A(args).A(")");
+
+                                    //node.Code.A("Globals.ufunctions").A(numberOfArguments).A("[").A("`").A(functionNameLower).A("`").A("](" + Globals.functionT1Cs + "").A(args).A(")");
+
+                                    
+                                    node.Code.A("O.FunctionLookup").A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionT1Cs + "").A(args).A(")");
+                                    
+
+
+
                                 }                                
                             }                            
                         }

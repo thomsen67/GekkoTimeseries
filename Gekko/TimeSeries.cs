@@ -112,7 +112,8 @@ namespace Gekko
         private bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]        
         [ProtoMember(8)]
         public GMap storage = null;  //only active if it is an array-timeseries
-
+        [ProtoMember(9)]
+        public int storageDim = 0;  //default is 0 which is same as normal timeseries
 
         private TimeSeries()
         {

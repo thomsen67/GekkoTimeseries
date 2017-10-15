@@ -419,6 +419,58 @@ namespace Gekko
             return zeros(smpl, x1, x2);
         }
 
+        public static IVariable series(GekkoSmpl smpl, params IVariable[] x)
+        {
+            TimeSeries ts = null;
+            if (x.Length == 0)
+            {
+                ts = new TimeSeries(Program.options.freq, null);                
+            }
+            else if (x.Length == 1)
+            {
+                if (x[0].Type() == EVariableType.String)
+                {
+                    //frequency
+                    EFreq freq = G.GetFreq(O.ConvertToString(x[0]));
+                    ts = new TimeSeries(freq, null);                    
+                }
+                else if (x[0].Type() == EVariableType.Val)
+                {
+                    ts = new TimeSeries(Program.options.freq, null);
+                    ts.storage = new GMap();
+                    ts.storageDim = O.ConvertToInt(x[0]);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Expected argument 1 in series() to be VAL or STRING");
+                    throw new GekkoException();
+                }
+            }
+            else if (x.Length == 2)
+            {
+                if (x[0].Type() == EVariableType.String)
+                {
+                    //frequency
+                    EFreq freq = G.GetFreq(O.ConvertToString(x[0]));
+                    ts = new TimeSeries(freq, null);
+                    ts.storageDim = O.ConvertToInt(x[1]);                    
+                }
+                else 
+                {
+                    G.Writeln2("*** ERROR: series() with 2 arguments must have STRING as first argument");
+                    throw new GekkoException();
+                }
+            }
+            else
+            {
+
+                G.Writeln2("*** ERROR: series() does not accept > 2 arguments");
+                throw new GekkoException();
+
+            }
+            return ts;
+        }
+
         public static IVariable i(GekkoSmpl smpl, IVariable x)
         {
             int n = O.ConvertToInt(x);
