@@ -44,7 +44,7 @@ namespace Gekko
             for (int iSmpl = 0; iSmpl < int.MaxValue; iSmpl++)
             {
                 IVariable ivTmpvar1 = O.ListDef(i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12);
-                O.Lookup(smpl, null, null, "xx", null, ivTmpvar1);
+                O.Lookup(smpl, null, null, "xx", null, ivTmpvar1, false);
                 if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl);
                 else break;
             }
@@ -54,7 +54,7 @@ namespace Gekko
 
             for (int iSmpl = 0; iSmpl < int.MaxValue; iSmpl++)
             {
-                O.Print(smpl, (O.Indexer(smpl, O.Add(smpl, O.Lookup(smpl, null, null, "xx", null, null), O.Lookup(smpl, null, null, "xx", null, null)), O.Negate(smpl, i13))));
+                O.Print(smpl, (O.Indexer(smpl, O.Add(smpl, O.Lookup(smpl, null, null, "xx", null, null, false), O.Lookup(smpl, null, null, "xx", null, null, false)), O.Negate(smpl, i13))));
                 if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl);
                 else break;
             }

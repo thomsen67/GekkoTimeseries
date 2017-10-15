@@ -1026,15 +1026,13 @@ namespace Gekko
                 {
                     ScalarString ss = indexes[i] as ScalarString;
                     keys[i] = ss._string2;
-                }
-
-                FIXME FIXME, how is arrayts created??
+                }               
 
                 if (this.storage == null)
                 {
                     string txt = null; foreach (string ss in keys) txt += "'" + ss + "', ";
                     G.Writeln2("*** ERROR: The variable '" + this.name + "' is not an array-timeseries.");
-                    G.Writeln2("*** ERROR: Indexer used: [" + txt.Substring(0, txt.Length - 2) + "]");
+                    G.Writeln("*** ERROR: Indexer used: [" + txt.Substring(0, txt.Length - 2) + "]");
                     throw new GekkoException();
                 }
 

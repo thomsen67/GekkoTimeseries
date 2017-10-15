@@ -609,18 +609,19 @@ namespace Gekko
             else return false;
         }
 
-        public static void DollarLookup(IVariable logical, GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression)
+        //NOTE: Must have same signature as Lookup(), #89075234532
+        public static void DollarLookup(IVariable logical, GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable)
         {
             //Only encountered on the LHS
             if (logical == null)
             {
-                Lookup(smpl, map, dbName, varname, freq, rhsExpression);
+                Lookup(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable);
             }
             if (logical.Type() == EVariableType.Val)
             {
                 if (IsTrue(((ScalarVal)logical).val))
                 {
-                    Lookup(smpl, map, dbName, varname, freq, rhsExpression);
+                    Lookup(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable);
                 }
                 else
                 {
@@ -633,8 +634,10 @@ namespace Gekko
             }
         }
 
-        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression)
+        //NOTE: Must have same signature as DollarLookup(), #89075234532
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, bool isLeftSideVariable)
         {
+            //This calls the more general Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression)
             ScalarString x2 = x as ScalarString;
             if (x2 == null)
             {
@@ -645,13 +648,13 @@ namespace Gekko
             {
                 string dbName, varName, freq; char firstChar; Chop(x2._string2, out dbName, out varName, out freq);
                 //bool hasSigil = false; if (varName[0] == Globals.symbolMemvar || varName[0] == Globals.symbolList) hasSigil = true;
-                IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression);
+                IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable);
                 return iv;
             }
             return x;
         }
 
-        public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression)
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable)
         {
             //map != null:             the variable is found in the MAP, otherwise, the variable is found in a databank
             //rhsExpression != null:   it is an assignment of the left-hand side
@@ -668,24 +671,14 @@ namespace Gekko
                 else varnameWithTilde = varname + Globals.freqIndicator + G.GetFreq(Program.options.freq);
             }
 
-            if (rhsExpression == null)
+            if (isLeftSideVariable)
             {
-                //SIMPLE LOOKUP ON RIGHT-HAND SIDE
-                //SIMPLE LOOKUP ON RIGHT-HAND SIDE
-                //SIMPLE LOOKUP ON RIGHT-HAND SIDE
-                //SIMPLE LOOKUP ON RIGHT-HAND SIDE
-                //SIMPLE LOOKUP ON RIGHT-HAND SIDE
+                //ASSIGNMENT OF LEFT-HAND SIDE
+                //ASSIGNMENT OF LEFT-HAND SIDE
+                //ASSIGNMENT OF LEFT-HAND SIDE
+                //ASSIGNMENT OF LEFT-HAND SIDE
+                //ASSIGNMENT OF LEFT-HAND SIDE
 
-                return LookupHelperRightside(map, dbName, varnameWithTilde);
-            }
-            else
-            {
-                //ASSIGNMENT OF LEFT-HAND SIDE
-                //ASSIGNMENT OF LEFT-HAND SIDE
-                //ASSIGNMENT OF LEFT-HAND SIDE
-                //ASSIGNMENT OF LEFT-HAND SIDE
-                //ASSIGNMENT OF LEFT-HAND SIDE
-                                                
                 IBank ib = null;
                 if (map != null)
                 {
@@ -694,13 +687,45 @@ namespace Gekko
                 else
                 {
                     Databank db = null;
-                    if (dbName == null) db = Program.databanks.GetFirst();
+                    if (dbName == null) db = Program.databanks.GetFirst();  //on the LHS, we can only look in the first databank, if databank is not stated
                     else db = Program.databanks.GetDatabank(dbName);
                     ib = db;
                 }
 
-                LookupHelperLeftside(smpl, ib, varnameWithTilde, freq, rhsExpression);
-                return null;
+                if (rhsExpression != null)
+                {
+                    //direct assignment, like x = 5, or %s = 'a'
+                    //in these cases, the LHS can be created if it is not already existing
+                    LookupHelperLeftside(smpl, ib, varnameWithTilde, freq, rhsExpression);
+                    return null;
+                }
+                else
+                {
+                    //indexers on lhs, for instance x['a'] = ... or x[2000] = 5 or #x.%s = ...
+                    //in this case, the x variable must exist
+                    //NOTE: no databank search is allowed!
+                    IVariable ivar2 = ib.GetIVariable(varnameWithTilde);
+                    if (ivar2 == null)
+                    {
+                        G.Writeln2("*** ERROR: Could not find variable '" + varnameWithTilde + "' for use in dot- or []-indexing");
+                        throw new GekkoException();
+                    }
+                    else
+                    {
+                        return ivar2;
+                    }
+                }
+            }
+            else
+            {
+                //SIMPLE LOOKUP ON RIGHT-HAND SIDE
+                //SIMPLE LOOKUP ON RIGHT-HAND SIDE
+                //SIMPLE LOOKUP ON RIGHT-HAND SIDE
+                //SIMPLE LOOKUP ON RIGHT-HAND SIDE
+                //SIMPLE LOOKUP ON RIGHT-HAND SIDE
+                
+                //NOTE: databank search may be allowed!
+                return LookupHelperRightside(map, dbName, varnameWithTilde);
             }            
         }
 

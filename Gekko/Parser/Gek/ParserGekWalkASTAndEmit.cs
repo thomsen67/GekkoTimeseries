@@ -2808,7 +2808,9 @@ namespace Gekko.Parser.Gek
                         break;
 
                     case "ASTBANKVARNAME":
-                        {                           
+                        {
+                            bool isLeftSideVariable = CheckIfLeftSide(node);  //In x[%s1, %s2][%date] = ... this will only be true for x, not for the other vars
+                            string isLeftSideVariableString = "false"; if (isLeftSideVariable) isLeftSideVariableString = "true";
 
                             //Check if it is a function variable
 
@@ -2869,7 +2871,7 @@ namespace Gekko.Parser.Gek
                                 if (node[1][1][0].Text == "ASTNAME" && node[1][1][0].ChildrenCount() == 1 && node[1][1][0][0].Text == "ASTIDENT")
                                 {
                                     simpleName = node[1][1][0][0][0].Text;
-                                }                                
+                                }
 
                                 //Check frequency
                                 string simpleFreq = null;
@@ -2887,7 +2889,7 @@ namespace Gekko.Parser.Gek
                                 }
 
                                 //int leftRight = SearchUpwardsInTree4(node);
-                                
+
                                 if (simpleBank != null && simpleName != null && simpleFreq != null)
                                 {
                                     //Ok is simple stuff like b:ts~f, or b:%v
@@ -2906,7 +2908,7 @@ namespace Gekko.Parser.Gek
                                     string simpleFreqText = Globals.QT + simpleFreq + Globals.QT;
                                     if (simpleFreq == "") simpleFreqText = "null";
 
-                                    node.Code.CA("O.Lookup(smpl, " + mapName + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + ivTempVar + ")");
+                                    node.Code.CA("O.Lookup(smpl, " + mapName + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + ivTempVar + ", " + isLeftSideVariableString + ")");
                                 }
                                 else
                                 {
@@ -2916,13 +2918,13 @@ namespace Gekko.Parser.Gek
                                     {
                                         //no bank indicator
                                         //if (leftHandSide) node.Code.A("(" + node[1].Code + ")");
-                                        node.Code.A("O.Lookup(smpl, " + mapName + ", " + node[1].Code + ", " + ivTempVar + ")");
+                                        node.Code.A("O.Lookup(smpl, " + mapName + ", " + node[1].Code + ", " + ivTempVar + ", " + isLeftSideVariableString + ")");
                                     }
                                     else
                                     {
                                         //bank indicator
                                         //if (leftHandSide) node.Code.A("(" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + ")");
-                                        node.Code.A("O.Lookup(smpl, " + mapName + ", (" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "), " + ivTempVar + ")");
+                                        node.Code.A("O.Lookup(smpl, " + mapName + ", (" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "), " + ivTempVar + ", " + isLeftSideVariableString + ")");
                                     }
                                 }
                             }
@@ -4504,6 +4506,55 @@ namespace Gekko.Parser.Gek
                 }
                 node.Code.A(Globals.splitSTOP);
             }
+        }
+
+        private static bool CheckIfLeftSide(ASTNode node)
+        {
+            //We must detect x in these (will also cover dots):
+            //x = 5
+            //x[2000] = 5
+            //x['a'] = 5
+            //x['a'][2000] = 5
+            //Could be for instance:
+            //ASTASSIGNMENT
+            //  ASTLEFTSIDE
+            //   ASTDOTORINDEXER
+            //     ASTDOTORINDEXER
+            //       ASTBANKVARNAME -- node is here
+            //--> beware that these most be the first children!
+            bool isLeftSideVariable = true;
+            if (node.Number != 0)
+            {
+                isLeftSideVariable = false;
+            }
+            else
+            {
+                ASTNode parent = node.Parent;  //cannot be null
+                while (true)
+                {
+                    if (node.Parent == null) break;  //just for ultra safety, will not happen
+                    if (parent.Number != 0)
+                    {
+                        isLeftSideVariable = false;
+                        break;
+                    }
+                    if (parent.Text == "ASTDOTORINDEXER")
+                    {
+                        //ok
+                    }
+                    else if (parent.Text == "ASTLEFTSIDE")
+                    {
+                        break;  //then isLeftSideVariable will be true
+                    }
+                    else
+                    {
+                        isLeftSideVariable = false;
+                        break;
+                    }
+                    parent = parent.Parent;
+                }
+            }
+            return isLeftSideVariable;
         }
 
         private static void GetCodes(ASTNode node, int i, out string codeStart, out string codeEnd2, out string codeStep)
