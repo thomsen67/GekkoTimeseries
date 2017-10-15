@@ -4,25 +4,9 @@ using System.Linq;
 using System.Text;
 
 namespace Gekko
-{
+{    
 
-    public class GMap
-    {
-        public Dictionary<string, IVariable> storage = new Dictionary<string, IVariable>();
-        public IVariable this[ params string[] s]
-        {
-            get {
-                string s2 = null;
-                foreach (string s3 in s) s2 += s3;
-                return storage[s2];
-            }
-            set {
-                string s2 = null;
-                foreach (string s3 in s) s2 += s3;
-                storage[s2] = value;
-            }
-        }
-    }
+    
 
     public class Functions
     {

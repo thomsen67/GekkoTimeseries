@@ -61,6 +61,66 @@ using System.Linq;
 
 namespace Gekko
 {
+    [ProtoContract]
+    public class GMap
+    {
+        [ProtoMember(1)]
+        public Dictionary<GMapItem, IVariable> storage = new Dictionary<GMapItem, IVariable>();
+        public IVariable this[params string[] s]
+        {
+            get
+            {
+                GMapItem gmi = new GMapItem(s);
+                return storage[gmi];
+            }
+            set
+            {
+                GMapItem gmi = new GMapItem(s);
+                storage[gmi] = value;
+            }
+        }
+
+        public bool TryGetValue(string[] s, out IVariable iv)
+        {
+            GMapItem gmi = new GMapItem(s);
+            return this.storage.TryGetValue(gmi, out iv);
+        }
+    }
+
+    [ProtoContract]
+    public class GMapItem
+    {
+        [ProtoMember(1)]
+        public string[] storage = null;
+
+        public GMapItem(string[] s)
+        {
+            this.storage = s;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 17;
+            for (int i = 0; i < storage.Length; i++)
+            {
+                hash = hash * 31 + storage[i].GetHashCode();
+            }
+            return hash;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || obj.GetType() != typeof(GMapItem))
+                return false;
+            GMapItem other = (GMapItem)obj;
+            if (this.storage.Length != other.storage.Length) return false;
+            for (int i = 0; i < this.storage.Length; i++)
+            {
+                if (!G.Equal(this.storage[i], other.storage[i])) return false;
+            }
+            return true;
+        }
+    }
 
     public class GekkoSmpl
     {

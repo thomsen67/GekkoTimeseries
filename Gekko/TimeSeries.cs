@@ -77,25 +77,27 @@ namespace Gekko
     /// <seealso cref="Databanks"/>
     [ProtoContract]
     public class TimeSeries : IVariable
-    {        
+    {
+        [ProtoMember(1)]
+        public TimeSeriesMetaInformation meta = null;
         ///// <summary>
         ///// Indicates the frequency of the TimeSeries.
         ///// </summary>
-        [ProtoMember(1)]
+        [ProtoMember(2)]
         public EFreq freq;
         /// <summary>
         /// The name of the variable. In a databank, this name corresponds to the key that the TimeSeries is stored under,
         /// including frequency (for instance x~q for x with quarterly freq).        
         /// </summary>
-        [ProtoMember(2)]
+        [ProtoMember(3)]
         public string name;
         /// <summary>
         /// The array containing the time series data. This array is initialized with NaN values, and the array may resize
         /// itself if necessary to store a particular observation.
         /// </summary>
-        [ProtoMember(3, IsPacked = true)]  //a bit faster, and a bit smaller file (also when zipped)        
+        [ProtoMember(4, IsPacked = true)]  //a bit faster, and a bit smaller file (also when zipped)        
         public double[] dataArray;  //BEWARE: if altering directly, make sure that .protect in the databank is not set!!
-        [ProtoMember(4)]
+        [ProtoMember(5)]
         /// <summary>
         /// The 'super' period (year) corresponding to the anchor date.
         /// </summary>
@@ -104,14 +106,14 @@ namespace Gekko
         /// <summary>
         /// The index corresponding to the anchor date.
         /// </summary>
-        [ProtoMember(5)]
-        public int anchorPeriodPositionInArray;
         [ProtoMember(6)]
-        private bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]
+        public int anchorPeriodPositionInArray;
         [ProtoMember(7)]
-        public TimeSeriesMetaInformation meta = null;
-               
-        
+        private bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]        
+        [ProtoMember(8)]
+        public GMap storage = null;  //only active if it is an array-timeseries
+
+
         private TimeSeries()
         {
             //This is ONLY because protobuf-net needs it! 
@@ -1002,6 +1004,80 @@ namespace Gekko
 
         private TimeSeries FindArrayTimeSeries(IVariable[] indexes, bool isLhs)
         {
+            if (indexes.Length == 0)
+            {
+                G.Writeln2("*** ERROR: Indexer has 0 length");
+                throw new GekkoException();
+            }
+            TimeSeries ts = null;
+            int stringCount = 0;
+            foreach (IVariable iv in indexes)
+            {
+                if (iv.Type() == EVariableType.String)
+                {
+                    stringCount++;
+                }
+            }
+            if (indexes.Length == stringCount)
+            {
+                
+                string[] keys = new string[indexes.Length];
+                for (int i = 0; i < indexes.Length; i++)
+                {
+                    ScalarString ss = indexes[i] as ScalarString;
+                    keys[i] = ss._string2;
+                }
+
+                FIXME FIXME, how is arrayts created??
+
+                if (this.storage == null)
+                {
+                    string txt = null; foreach (string ss in keys) txt += "'" + ss + "', ";
+                    G.Writeln2("*** ERROR: The variable '" + this.name + "' is not an array-timeseries.");
+                    G.Writeln2("*** ERROR: Indexer used: [" + txt.Substring(0, txt.Length - 2) + "]");
+                    throw new GekkoException();
+                }
+
+                IVariable iv = null;
+                if (this.storage != null)
+                {
+                    iv = null; this.storage.TryGetValue(keys, out iv);
+                }                             
+
+                if (iv == null)
+                {
+                    if (!isLhs)
+                    {
+                        string txt = null; foreach (string ss in keys) txt += "'" + ss + "', ";
+                        G.Writeln2("*** ERROR: The series '" + this.name + "' did not contain this element:");
+                        G.Writeln2("*** ERROR: [" + txt.Substring(0, txt.Length - 2) + "]");
+                        throw new GekkoException();
+                    }
+                    else
+                    {
+                        if (this.storage == null) this.storage = new GMap();
+                        ts = new TimeSeries(this.freq, "[[array-timeseries]]");
+                        this.storage[keys] = ts;
+                    }
+                }                    
+                
+            }
+            else
+            {
+                string s = null;
+                foreach (IVariable iv in indexes)
+                {
+                    s += iv.Type().ToString() + ", ";
+                }
+                G.Writeln2("*** ERROR: Timeseries []-index with these argument types: " + s.Substring(0, s.Length - (", ").Length));
+                throw new GekkoException();
+            }
+
+            return ts;
+        }
+
+        private TimeSeries FindArrayTimeSeriesOLDDELETE(IVariable[] indexes, bool isLhs)
+        {
             TimeSeries ts = null;
             int stringCount = 0;
             foreach (IVariable iv in indexes)
@@ -1031,7 +1107,7 @@ namespace Gekko
                             ts = new TimeSeries(this.freq, varname);
                             this.meta.parentDatabank.AddIVariable(ts);
                         }
-                    }                    
+                    }
                 }
             }
             else
@@ -1265,10 +1341,7 @@ namespace Gekko
 
     [ProtoContract]
     public class TimeSeriesMetaInformation
-    {
-        /// <summary>
-        /// The label of the timeseries (meta-data), for instance 'GDP in current prices'.
-        /// </summary>
+    {        
         [ProtoMember(1)]
         public string label;
         /// <summary>
