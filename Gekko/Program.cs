@@ -61,73 +61,7 @@ using System.Linq;
 
 namespace Gekko
 {
-    [ProtoContract]
-    public class GMap
-    {
-        [ProtoMember(1)]
-        public Dictionary<GMapItem, IVariable> storage = new Dictionary<GMapItem, IVariable>();
-        public IVariable this[params string[] s]
-        {
-            get
-            {
-                GMapItem gmi = new GMapItem(s);
-                return storage[gmi];
-            }
-            set
-            {
-                GMapItem gmi = new GMapItem(s);
-                storage[gmi] = value;
-            }
-        }
-
-        public bool TryGetValue(GMapItem gmi, out IVariable iv)
-        {
-            //GMapItem gmi = new GMapItem(s);
-            return this.storage.TryGetValue(gmi, out iv);
-        }
-
-        public void AddIVariableWithOverwrite(GMapItem gmi, IVariable iv)
-        {
-            //GMapItem gmi = new GMapItem(s);
-            if (this.storage.ContainsKey(gmi)) this.storage.Remove(gmi);
-            this.storage.Add(gmi, iv);
-        }
-    }
-
-    [ProtoContract]
-    public class GMapItem
-    {
-        [ProtoMember(1)]
-        public string[] storage = null;
-
-        public GMapItem(string[] s)
-        {
-            this.storage = s;
-        }
-
-        public override int GetHashCode()
-        {
-            int hash = 17;
-            for (int i = 0; i < storage.Length; i++)
-            {
-                hash = hash * 31 + storage[i].GetHashCode();
-            }
-            return hash;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj == null || obj.GetType() != typeof(GMapItem))
-                return false;
-            GMapItem other = (GMapItem)obj;
-            if (this.storage.Length != other.storage.Length) return false;
-            for (int i = 0; i < this.storage.Length; i++)
-            {
-                if (!G.Equal(this.storage[i], other.storage[i])) return false;
-            }
-            return true;
-        }
-    }
+    
 
     public class GekkoSmpl
     {
@@ -2465,8 +2399,18 @@ namespace Gekko
         public static void HandleCleanAndParentForTimeseries(Databank db, bool merge)
         {
             db.isDirty = false;
-            foreach (TimeSeries ts in db.storage.Values) 
+            foreach (IVariable iv in db.storage.Values)
             {
+                TimeSeries ts = iv as TimeSeries;
+                if (ts == null) continue;
+                if (ts.IsArrayTimeseries())
+                {
+                    foreach (TimeSeries tsSub in ts.storage.storage.Values)
+                    {
+                        tsSub.meta.parentDatabank = db;
+                        if (!merge) tsSub.SetDirty(false);
+                    }
+                } 
                 if (!merge) ts.SetDirty(false);  //if we are not merging, the bank is comletely new, and the timeseries are all considered clean. When merging, dirt is all over.
                 ts.meta.parentDatabank = db;                
             }
@@ -2882,12 +2826,12 @@ namespace Gekko
                                     if (tsExisting.storageDim == tsProtobuf.storageDim)
                                     {
                                         //now, we have same-name and same-dim array-timeseries in both Work and protobuf file.
-                                        GMap gmapExisting = tsExisting.storage;
-                                        GMap gmapProtobuf = tsProtobuf.storage;
+                                        MapMultidim gmapExisting = tsExisting.storage;
+                                        MapMultidim gmapProtobuf = tsProtobuf.storage;
 
-                                        foreach (KeyValuePair<GMapItem, IVariable> kvpGmap in gmapProtobuf.storage)
+                                        foreach (KeyValuePair<MapMultidimItem, IVariable> kvpGmap in gmapProtobuf.storage)
                                         {
-                                            GMapItem nameDimProtobuf = kvpGmap.Key;
+                                            MapMultidimItem nameDimProtobuf = kvpGmap.Key;
                                             TimeSeries tsDimProtobuf = kvp.Value as TimeSeries;  //must be timeseries, no need to check that the type is so
 
                                             IVariable ivDimExisting = null;  gmapExisting.TryGetValue(nameDimProtobuf, out ivDimExisting);
@@ -2910,7 +2854,6 @@ namespace Gekko
                                                 MergeTwoTimeseriesWithDateWindowHelper(dates, gmapExisting, nameDimProtobuf, tsProtobuf, wipeExistingOut);
                                             }
                                         }
-
                                     }
                                     else
                                     {
@@ -2987,7 +2930,7 @@ namespace Gekko
             }
         }
 
-        private static void MergeTwoTimeseriesWithDateWindowHelper(ReadDatesHelper dates, GMap gmap, GMapItem gmapItem, TimeSeries tsProtobuf, bool wipeExistingOut)
+        private static void MergeTwoTimeseriesWithDateWindowHelper(ReadDatesHelper dates, MapMultidim gmap, MapMultidimItem gmapItem, TimeSeries tsProtobuf, bool wipeExistingOut)
         {
             if (wipeExistingOut)
             {
@@ -3019,7 +2962,7 @@ namespace Gekko
                 else
                 {
                     //already exists: now we must merge the observations
-                    //There are 3 time-windows in play: Work window, file window and dates window:
+                    //There are 3 time-windows in play: Work bank window, file window and dates window:
                     //  Work window: the window of the existing timeseries (will not have any effect on the merging)
                     //  file window: the window of the series from the deflated file
                     //  dates window: time-truncation of the file window

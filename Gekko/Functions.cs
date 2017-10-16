@@ -437,7 +437,7 @@ namespace Gekko
                 else if (x[0].Type() == EVariableType.Val)
                 {
                     ts = new TimeSeries(Program.options.freq, null);
-                    ts.storage = new GMap();
+                    ts.storage = new MapMultidim();
                     ts.storageDim = O.ConvertToInt(x[0]);
                 }
                 else

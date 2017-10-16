@@ -2,12 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ProtoBuf;
 
 namespace Gekko
 {
+    [ProtoContract]
     public class ScalarDate : IVariable
     {
+        [ProtoMember(1)]
         public GekkoTime date;
+
+        private ScalarDate()
+        {
+            //only because protobuf needs it, not for outside use
+        }
 
         public ScalarDate(GekkoTime gt)
         {

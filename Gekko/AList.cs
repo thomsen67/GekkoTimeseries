@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using ProtoBuf;
 
 namespace Gekko
 {
+    [ProtoContract]
     public class MetaList : IVariable
     {
         //Abstract class containing a List
@@ -13,11 +15,12 @@ namespace Gekko
 
         public bool isNameList = true;
 
+        [ProtoMember(1)]
         public List<IVariable> list = null;
 
-        public MetaList()
+        private MetaList()
         {
-            this.list = new List<IVariable>();
+            //only because protobuf needs it, not for outside use
         }
 
         public MetaList(List<IVariable> list)

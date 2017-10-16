@@ -2,12 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ProtoBuf;
 
 namespace Gekko
 {
+    [ProtoContract]
     public class ScalarVal : IVariable
     {
+        [ProtoMember(1)]
         public double val;
+
+        private ScalarVal()
+        {
+            //only because protobuf needs it, not for outside use
+        }
 
         public ScalarVal(double d)
         {

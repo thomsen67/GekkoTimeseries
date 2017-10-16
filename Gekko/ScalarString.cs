@@ -3,14 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using ProtoBuf;
 
 namespace Gekko
 {
+    [ProtoContract]
     public class ScalarString : IVariable
     {
+        [ProtoMember(1)]
         public string _string2;
         //public IVariable pointerTo = null;  //used in case the string points to for instance a timeseries. Only used inside a GENR/PRT statement, inside the implicit timeloop (where we can be sure that the string itself does not change value). Is set to null again after the time loop.
         public bool _isName = false;
+        
+        private ScalarString()
+        {
+            //only because protobuf needs it, not for outside use
+        }
 
         public ScalarString(string s)
         {

@@ -3,20 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using ProtoBuf;
 
 namespace Gekko
 {
+    [ProtoContract]
     public class Map : IVariable, IBank
     {
         //Abstract class containing a List
         //Used for pointing to Lists without having to create/clone them.      
-               
 
+        [ProtoMember(1)]
         public GekkoDictionary<string, IVariable> storage = null;
 
-        public Map()
+        private Map()
         {
-            this.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
+            //only because protobuf needs it, not for outside use
         }
 
         public Map(GekkoDictionary<string, IVariable> map)
@@ -213,7 +215,7 @@ namespace Gekko
 
         public IVariable DeepClone()
         {
-            Map temp = new Map();
+            Map temp = new Map();            
             temp.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
             {

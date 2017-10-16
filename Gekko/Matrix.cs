@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using ProtoBuf;
 
 namespace Gekko
 {
+    [ProtoContract]
     public class Matrix : IVariable
     {
         //Abstract class containing a Matrix                
 
+        //[ProtoMember(1)]
         public double[,] data = null;
+        [ProtoMember(2)]
         public List<string> colnames = null;
-        public List<string> rownames = null;
+        [ProtoMember(3)]
+        public List<string> rownames = null;     
 
         public Matrix()
         {

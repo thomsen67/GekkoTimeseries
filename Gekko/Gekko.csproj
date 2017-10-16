@@ -222,6 +222,7 @@
     <Compile Include="LongProcess.cs" />
     <Compile Include="LruCache.cs" />
     <Compile Include="Map.cs" />
+    <Compile Include="MapMultidim.cs" />
     <Compile Include="Matrix.cs" />
     <Compile Include="Menu.xaml.cs">
       <DependentUpon>Menu.xaml</DependentUpon>

@@ -111,7 +111,7 @@ namespace Gekko
         [ProtoMember(7)]
         private bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]        
         [ProtoMember(8)]
-        public GMap storage = null;  //only active if it is an array-timeseries
+        public MapMultidim storage = null;  //only active if it is an array-timeseries
         [ProtoMember(9)]
         public int storageDim = 0;  //default is 0 which is same as normal timeseries, also used in IsArrayTimeseries()
 
@@ -1057,7 +1057,7 @@ namespace Gekko
                 }
 
                 IVariable iv = null;                
-                this.storage.TryGetValue(new GMapItem(keys), out iv);
+                this.storage.TryGetValue(new MapMultidimItem(keys), out iv);
 
                 if (iv == null)
                 {
@@ -1071,7 +1071,7 @@ namespace Gekko
                     else
                     {
                         ts = new TimeSeries(this.freq, "[[array-timeseries]]");
-                        this.storage.AddIVariableWithOverwrite(new GMapItem(keys), ts);
+                        this.storage.AddIVariableWithOverwrite(new MapMultidimItem(keys), ts);
                     }
                 }
                 else
