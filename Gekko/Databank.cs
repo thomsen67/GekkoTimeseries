@@ -81,6 +81,7 @@ namespace Gekko
         private Databank()
         {
             //This is ONLY because protobuf-net needs it
+            //without line below, protobuf probably crashes
             this.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
         }
 

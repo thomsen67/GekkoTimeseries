@@ -10,13 +10,54 @@ namespace Gekko
     [ProtoContract]
     public class Matrix : IVariable
     {
+        //Because protobuf only handles 1d arrays
+        [ProtoBeforeSerialization]
+        public void BeforeProtobufWrite()
+        {            
+            this.dataProtobufHelper0___NOTOUCH = this.data.GetLength(0);
+            this.dataProtobufHelper1___NOTOUCH = this.data.GetLength(1);
+            this.dataProtobufHelper___NOTOUCH = new double[this.data.Length];
+            int counter = 0;
+            foreach(double d in this.data)
+            {
+                //this iterator will will take it col-wise, first running the j's in [i, j]
+                this.dataProtobufHelper___NOTOUCH[counter] = d;
+                counter++;
+            }            
+        }
+
+        //Because protobuf only handles 1d arrays
+        [ProtoAfterDeserialization]
+        public void AfterProtobufRead()
+        {
+            this.data = new double[this.dataProtobufHelper0___NOTOUCH, this.dataProtobufHelper1___NOTOUCH];
+            int counter = 0;
+            for (int i = 0; i < this.dataProtobufHelper0___NOTOUCH; i++)
+            {
+                for (int j = 0; j < this.dataProtobufHelper1___NOTOUCH; j++)
+                {
+                    this.data[i, j] = this.dataProtobufHelper___NOTOUCH[counter];
+                    counter++;
+                }                
+            }
+            this.dataProtobufHelper___NOTOUCH = null;
+            this.dataProtobufHelper0___NOTOUCH = 0;
+            this.dataProtobufHelper1___NOTOUCH = 0;
+        }
+
         //Abstract class containing a Matrix                
 
-        //[ProtoMember(1)]
         public double[,] data = null;
+        [ProtoMember(1)]        
+        private double[] dataProtobufHelper___NOTOUCH = null; //only because protobuf does not handle 2d arrays
         [ProtoMember(2)]
-        public List<string> colnames = null;
+        private int dataProtobufHelper0___NOTOUCH = 0; //only because protobuf does not handle 2d arrays
         [ProtoMember(3)]
+        private int dataProtobufHelper1___NOTOUCH = 0; //only because protobuf does not handle 2d arrays
+
+        [ProtoMember(4)]
+        public List<string> colnames = null;
+        [ProtoMember(5)]
         public List<string> rownames = null;     
 
         public Matrix()

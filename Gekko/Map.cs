@@ -16,9 +16,11 @@ namespace Gekko
         [ProtoMember(1)]
         public GekkoDictionary<string, IVariable> storage = null;
 
-        private Map()
+        public Map()
         {
             //only because protobuf needs it, not for outside use
+            //without below, we get protobuf errore
+            storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
         }
 
         public Map(GekkoDictionary<string, IVariable> map)
@@ -215,8 +217,7 @@ namespace Gekko
 
         public IVariable DeepClone()
         {
-            Map temp = new Map();            
-            temp.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
+            Map temp = new Map();
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
             {
                 temp.storage.Add(kvp.Key, kvp.Value.DeepClone());

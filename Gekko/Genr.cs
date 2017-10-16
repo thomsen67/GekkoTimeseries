@@ -9,29 +9,48 @@ namespace Gekko
 public class TranslatedCode
 {
 public static GekkoTime globalGekkoTimeIterator = Globals.tNull;
-public static readonly ScalarVal i630 = new ScalarVal(1d);
-public static void FunctionDef631() {
+public static readonly ScalarVal i3 = new ScalarVal(100d);
+public static IVariable MapDef_mapTmpvar11(GekkoSmpl smpl) {
+Map mapTmpvar11 = new Map();
+IVariable ivTmpvar12 = new ScalarString(@"b");
+for (int iSmpl13 = 0; iSmpl13 < int.MaxValue; iSmpl13++) {
+O.Lookup(smpl, mapTmpvar11, null, "%i1", null, ivTmpvar12, true)
+;
+
+if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl13); else break;
+};
+
+IVariable ivTmpvar14 = new ScalarString(@"c");
+for (int iSmpl15 = 0; iSmpl15 < int.MaxValue; iSmpl15++) {
+O.Lookup(smpl, mapTmpvar11, null, "%i2", null, ivTmpvar14, true)
+;
+
+if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl15); else break;
+};
 
 
-//[[splitSTOP]]
+return mapTmpvar11;
+}public static IVariable MapDef_mapTmpvar6(GekkoSmpl smpl) {
+            Map mapTmpvar6 = new Map();
+IVariable ivTmpvar7 = new ScalarString(@"a");
+for (int iSmpl8 = 0; iSmpl8 < int.MaxValue; iSmpl8++) {
+O.Lookup(smpl, mapTmpvar6, null, "%i1", null, ivTmpvar7, true)
+;
 
-Globals.ufunctions1.Add("add1", (GekkoSmpl smpl, IVariable functionarg_629) => { 
-//[[splitSTOP]]
-return O.Add(smpl, functionarg_629, i630);
+if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl8); else break;
+};
 
-//[[splitSTART]]
+IVariable ivTmpvar9 = MapDef_mapTmpvar11(smpl);
+for (int iSmpl10 = 0; iSmpl10 < int.MaxValue; iSmpl10++) {
+O.Lookup(smpl, mapTmpvar6, null, "#m", null, ivTmpvar9, true)
+;
 
- ; return null; });
+if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl10); else break;
+};
 
 
-//[[splitSTART]]
-
-}
-
-public static readonly ScalarVal i634 = new ScalarVal(0d);
-public static readonly ScalarVal i636 = new ScalarVal(1d);
-public static readonly ScalarVal d637 = new ScalarVal(1e3d);
-public static void ClearTS(P p) {
+return mapTmpvar6;
+}public static void ClearTS(P p) {
 }
 public static void ClearScalar(P p) {
 }
@@ -40,26 +59,93 @@ public static void C0(P p) {
 GekkoSmpl smpl = O.Smpl();
 
 
-p.SetText(@"¤1");
-FunctionDef631();
-
+p.SetText(@"¤0");
+O.Reset o0 = new O.Reset();
+o0.p = p;o0.Exe();
 
 
 
 
 p.SetText(@"¤0");
-IVariable ivTmpvar632 = i634;
-for (int iSmpl633 = 0; iSmpl633 < int.MaxValue; iSmpl633++) {
-O.Lookup(smpl, null, null, "%sum", null, ivTmpvar632, true)
+IVariable ivTmpvar1 = i3;
+for (int iSmpl2 = 0; iSmpl2 < int.MaxValue; iSmpl2++) {
+O.Lookup(smpl, null, null, "xx", null, ivTmpvar1, true)
 ;
 
-if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl633); else break;
+if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl2); else break;
 };
 
 
 
 
 p.SetText(@"¤0");
+IVariable ivTmpvar4 = MapDef_mapTmpvar6(smpl);
+for (int iSmpl5 = 0; iSmpl5 < int.MaxValue; iSmpl5++) {
+O.Lookup(smpl, null, null, "#m", null, ivTmpvar4, true)
+;
+
+if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl5); else break;
+};
+
+
+
+
+p.SetText(@"¤0");
+for (int iSmpl16 = 0; iSmpl16 < int.MaxValue; iSmpl16++) {
+O.Print(smpl, (O.Indexer(smpl, O.Lookup(smpl, null, null, "#m", null, null, false), (O.scalarStringPercent).Add(smpl, (new ScalarString("i1", true, false))))));
+
+if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl16); else break;
+}
+
+
+
+p.SetText(@"¤0");
+for (int iSmpl17 = 0; iSmpl17 < int.MaxValue; iSmpl17++) {
+O.Print(smpl, (O.Indexer(smpl, O.Indexer(smpl, O.Lookup(smpl, null, null, "#m", null, null, false), (O.scalarStringHash).Add(smpl, (new ScalarString("m", true, false)))), (O.scalarStringPercent).Add(smpl, (new ScalarString("i1", true, false))))));
+
+if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl17); else break;
+}
+
+
+
+p.SetText(@"¤0");
+for (int iSmpl18 = 0; iSmpl18 < int.MaxValue; iSmpl18++) {
+O.Print(smpl, (O.Indexer(smpl, O.Indexer(smpl, O.Lookup(smpl, null, null, "#m", null, null, false), (O.scalarStringHash).Add(smpl, (new ScalarString("m", true, false)))), (O.scalarStringPercent).Add(smpl, (new ScalarString("i2", true, false))))));
+
+if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl18); else break;
+}
+
+
+
+p.SetText(@"¤43");
+O.Write o6 = new O.Write();
+
+o6.fileName = O.ConvertToString((new ScalarString("slet", true, false)));
+
+o6.type = @"write";o6.Exe();
+
+
+
+
+p.SetText(@"¤0");
+O.Reset o7 = new O.Reset();
+o7.p = p;o7.Exe();
+
+
+
+
+p.SetText(@"¤45");
+ClearTS(p);
+O.Read o8 = new O.Read();
+o8.p = p;
+o8.type = @"read";
+o8.fileName = O.ConvertToString((new ScalarString("slet", true, false)));
+
+
+o8.Exe();
+
+
+
 
 }
 
@@ -67,15 +153,38 @@ public static void C1(P p) {
 
 GekkoSmpl smpl = O.Smpl();
 
+p.SetText(@"¤0");
+for (int iSmpl19 = 0; iSmpl19 < int.MaxValue; iSmpl19++) {
+O.Print(smpl, (O.Indexer(smpl, O.Lookup(smpl, null, null, "#m", null, null, false), (O.scalarStringPercent).Add(smpl, (new ScalarString("i1", true, false))))));
 
+if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl19); else break;
+}
 
 
 
 p.SetText(@"¤0");
-for (int iSmpl641 = 0; iSmpl641 < int.MaxValue; iSmpl641++) {
-O.Print(smpl, (O.Lookup(smpl, null, null, "%sum", null, null, false)));
+for (int iSmpl20 = 0; iSmpl20 < int.MaxValue; iSmpl20++) {
+O.Print(smpl, (O.Indexer(smpl, O.Indexer(smpl, O.Lookup(smpl, null, null, "#m", null, null, false), (O.scalarStringHash).Add(smpl, (new ScalarString("m", true, false)))), (O.scalarStringPercent).Add(smpl, (new ScalarString("i1", true, false))))));
 
-if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl641); else break;
+if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl20); else break;
+}
+
+
+
+p.SetText(@"¤0");
+for (int iSmpl21 = 0; iSmpl21 < int.MaxValue; iSmpl21++) {
+O.Print(smpl, (O.Indexer(smpl, O.Indexer(smpl, O.Lookup(smpl, null, null, "#m", null, null, false), (O.scalarStringHash).Add(smpl, (new ScalarString("m", true, false)))), (O.scalarStringPercent).Add(smpl, (new ScalarString("i2", true, false))))));
+
+if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl21); else break;
+}
+
+
+
+p.SetText(@"¤0");
+for (int iSmpl22 = 0; iSmpl22 < int.MaxValue; iSmpl22++) {
+O.Print(smpl, (O.Lookup(smpl, null, null, "xx", null, null, false)));
+
+if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl22); else break;
 }
 
 
@@ -88,20 +197,6 @@ public static void CodeLines(P p)
 GekkoSmpl smpl = O.Smpl();
 
 C0(p);
-
-IVariable forloop_635 = null;
-int counter640 = 0;
-for (O.IterateStart(ref forloop_635, i636); O.IterateContinue(forloop_635, i636, d637, null, ref counter640); O.IterateStep(forloop_635, i636, null, counter640))
-{;
-IVariable ivTmpvar638 = O.FunctionLookup1("add1")(smpl, O.Lookup(smpl, null, null, "%sum", null, null, false));
-for (int iSmpl639 = 0; iSmpl639 < int.MaxValue; iSmpl639++) {
-O.Lookup(smpl, null, null, "%sum", null, ivTmpvar638, true)
-;
-
-if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl639); else break;
-};
-
-};
 
 C1(p);
 
