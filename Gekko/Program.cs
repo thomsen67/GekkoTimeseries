@@ -2858,20 +2858,67 @@ namespace Gekko
                     {
                         string name = kvp.Key;
                         IVariable iv = kvp.Value;
-
+                        
                         if (iv.Type() == EVariableType.Series)
                         {
-                            //looping through each timeseries to find databank start and end year (and to merge variables if we are merging)
                             //NOTE: we only time-truncate series and array-series at the direct level, not series inside lists, maps etc.
 
-                            TimeSeries tsProtobuf = iv as TimeSeries;
+                            TimeSeries tsExisting = GetTsExisting(databank, name);  //may be null
+                            TimeSeries tsProtobuf = iv as TimeSeries;  //cannot be null
 
                             if (tsProtobuf.IsArrayTimeseries())
                             {
+                                if (tsExisting == null)
+                                {
+                                    databank.AddIVariable(name, tsProtobuf);
+                                }
+                                else
+                                {
+                                    if (tsExisting.storageDim == tsProtobuf.storageDim)
+                                    {
+                                        //now, we have same-name and same-dim array-timeseries in both Work and protobuf file.
+                                        GMap gmapExisting = tsExisting.storage;
+                                        GMap gmapProtobuf = tsProtobuf.storage;
+
+                                        foreach (KeyValuePair<GMapItem, IVariable> kvpGmap in gmapProtobuf.storage)
+                                        {
+                                            GMapItem nameDimProtobuf = kvpGmap.Key;
+                                            TimeSeries tsDimProtobuf = kvp.Value as TimeSeries;  //must be timeseries, no need to check that the type is so
+
+                                            IVariable ivDimExisting = null;  gmapExisting.TryGetValue(nameDimProtobuf.storage, out ivDimExisting);
+                                            TimeSeries tsDimExisting = null; if (ivDimExisting != null) tsDimExisting = ivDimExisting as TimeSeries;
+
+                                            //now we have a tsDimProtobuf, and if tsDimExisting != null, we merge the data
+
+                                            if (tsDimExisting == null)
+                                            {
+                                                //just add it
+                                            }
+                                            else
+                                            {
+
+                                            }
+
+
+
+
+
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        //dimensions do not match, wipt existing out!
+                                        databank.AddIVariableWithOverwrite(name, tsProtobuf);
+                                    }
+                                }
+
+                                databank.AddIVariableWithOverwrite(name, iv);  //overwrite existing no matter what
+
                                 foreach (TimeSeries tsTemp2 in tsProtobuf.storage.storage.Values)
                                 {
                                     //handle tsTemp2
-                                    
+
                                 }
                             }
                             else
@@ -2886,14 +2933,7 @@ namespace Gekko
                                 else
                                 {
                                     //non-timeless
-                                    IVariable ivExisting = databank.GetIVariable(name);
-                                    TimeSeries tsExisting = ivExisting as TimeSeries;
-                                    if (tsExisting == null)
-                                    {
-                                        //should not be possible since the name has no sigil
-                                        G.Writeln2("*** ERROR: Internal error #8974325235");
-                                        throw new GekkoException();
-                                    }
+
                                     if (databank.ContainsIVariable(name))
                                     {
                                         //already exists: now we must merge the observations
@@ -2933,7 +2973,7 @@ namespace Gekko
                                                 int nob = GekkoTime.Observations(firstTruncated, lastTruncated);
                                                 if (nob > 0)  //can be 0 or negative, if the windows do not overlap at all
                                                 {
-                                                                                                        
+
                                                     int index1;
                                                     int index2;
                                                     try
@@ -2972,15 +3012,15 @@ namespace Gekko
                             }
 
                             int counter = 0;
-                            
 
-                            
 
-                            
 
-                             
 
-                            
+
+
+
+
+
                         }
                         else
                         {
@@ -3025,7 +3065,25 @@ namespace Gekko
             }  //end of using
 
 
-        }        
+        }
+
+        private static TimeSeries GetTsExisting(Databank databank, string name)
+        {
+            IVariable ivExisting = databank.GetIVariable(name);
+            TimeSeries tsExisting = null;
+            if (ivExisting != null)
+            {
+                tsExisting = ivExisting as TimeSeries;
+                if (tsExisting == null)
+                {
+                    //should not be possible since the name has no sigil
+                    G.Writeln2("*** ERROR: Internal error #8974325235");
+                    throw new GekkoException();
+                }
+            }
+
+            return tsExisting;
+        }
 
         private static void ReadTsd(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref int NaNCounter)
         {

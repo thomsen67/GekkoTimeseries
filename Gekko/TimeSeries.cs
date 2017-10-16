@@ -609,48 +609,46 @@ namespace Gekko
 
         public GekkoTime GetRealDataPeriodFirst()
         {
+            //Takes some time for large non-trimmed arrays, but is more precise than GetPeriodFirst()
+            GekkoTime rv = Globals.tNull;
             if (this.isTimeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #6");
-                throw new GekkoException();
+                //do nothing
             }
-            //Could be sped up by means of looping through dataaraay with GetDataSequence, but oh well...
-            //returns tNull if all missing
-            //DimensionCheck();
-            GekkoTime realStart = Globals.tNull;
-            foreach (GekkoTime dt in new GekkoTimeIterator(GetPeriodFirst(), GetPeriodLast()))
+            else
             {
-                if (!G.isNumericalError(this.GetData(null, dt)))
+                for (int i = 0; i < this.dataArray.Length; i++)
                 {
-                    //a real number, not missing or infinite
-                    realStart = dt;
-                    break;
+                    if (!G.isNumericalError(this.dataArray[i]))
+                    {
+                        rv = GetPeriod(i);
+                        break;
+                    }
                 }
             }
-            return realStart;
+            return rv;            
         }
 
         public GekkoTime GetRealDataPeriodLast()
         {
+            //Takes some time for large non-trimmed arrays, but is more precise than GetPeriodLast()
+            GekkoTime rv = Globals.tNull;
             if (this.isTimeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #7");
-                throw new GekkoException();
+                //do nothing
             }
-            //Could be sped up by means of looping through dataaraay with GetDataSequence, but oh well...
-            //returns tNull if all missing
-            //DimensionCheck();
-            GekkoTime realEnd = Globals.tNull;
-            foreach (GekkoTime dt in new GekkoTimeIteratorBackwards(GetPeriodLast(), GetPeriodFirst()))
+            else
             {
-                if (!G.isNumericalError(this.GetData(null, dt)))
+                for (int i = this.dataArray.Length - 1; i >= 0; i--)
                 {
-                    //a real number, not missing or infinite
-                    realEnd = dt;
-                    break;
+                    if (!G.isNumericalError(this.dataArray[i]))
+                    {
+                        rv = GetPeriod(i);
+                        break;
+                    }
                 }
             }
-            return realEnd;
+            return rv;
         }
         
         /// <summary>
