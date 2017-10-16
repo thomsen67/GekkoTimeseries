@@ -28,12 +28,12 @@ namespace Gekko
     public class Databank : IBank
     {
 
-        
+
         //Note the .isDirty field, so methods that change anything must set isDirty = true!
         //Remember new fields in Clear() method and also in G.CloneDatabank()        
         [ProtoMember(1)]
         public GekkoDictionary<string, IVariable> storage;
-        public string aliasName = null;          
+        public string aliasName = null;
         private string fileNameWithPath = null;  //will be constructed when reading: do not protobuf it        
         public string FileNameWithPath
         {
@@ -64,7 +64,7 @@ namespace Gekko
                         //do nothing, keep the first filename encountered. This is the filename that the OPEN databank
                         //is tied to, and that it will be trying to write to when the bank is closed.
                     }
-                }                
+                }
             }
         }
         public bool save = true;  //Don't use protobuffer on this field.
@@ -81,16 +81,16 @@ namespace Gekko
         private Databank()
         {
             //This is ONLY because protobuf-net needs it
-            this.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);            
+            this.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
         }
-        
+
         public Databank(string aliasName)
         {
-            this.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);            
+            this.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
             this.aliasName = aliasName;
             //this.aliasNameOriginal = aliasName;
-        }     
-        
+        }
+
         public void Clear() {
             if (this.protect) Program.ProtectError("You cannot clear a non-editable databank, see OPEN<edit> or UNLOCK");
             //aliasName = null; --> keep that name when clearing
@@ -102,34 +102,34 @@ namespace Gekko
             this.storage.Clear();
             //this.fileNameWithPath = null;  --> NO! This would be ok regarding READ, but not regarding OPEN<edit/first> for instance --> we need a bank to write back to!
             //this.readInfo = null;  //must be ok to remove, just contains stuff for printing --> but let us keep it for ultra safety for now
-            this.isDirty = true;            
-        }        
-        
+            this.isDirty = true;
+        }
+
         public bool ContainsVariable(string variable) {
             return ContainsVariable(true, variable);
         }
         public bool ContainsVariable(bool freqAddToName, string variable)
-        {            
+        {
             if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
             return this.storage.ContainsKey(variable);
         }
 
         public void RemoveVariable(string variable)
         {
-            RemoveVariable(true, variable);            
-        }      
+            RemoveVariable(true, variable);
+        }
 
         public void RemoveVariable(EFreq eFreq, string variable)
         {
             if (this.protect) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
-            variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);            
+            variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);
             if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
             {
                 this.storage.Remove(variable);
             }
             this.isDirty = true;
             return;
-        }        
+        }
 
         public void RemoveVariable(bool freqAddToName, string variable)
         {
@@ -160,13 +160,13 @@ namespace Gekko
         {
             //Used to save some RAM, or just before serializing the databank via protobuf-net.
             DateTime t0 = DateTime.Now;
-            foreach (IVariable iv in this.storage.Values) 
-            {                
-                iv.DeepTrim();                
+            foreach (IVariable iv in this.storage.Values)
+            {
+                iv.DeepTrim();
             }
             G.WritelnGray("TRIM: " + G.Seconds(t0));
             //This does not change the databank, so this.hasBeenChanged is not touched!!
-        }               
+        }
 
         public IVariable GetIVariable(string variable)
         {
@@ -183,6 +183,16 @@ namespace Gekko
             {
                 G.Writeln2("***ERROR: Internal error: please use AddIvariable(name, x)");
                 throw new GekkoException();
+            }
+        }
+
+        public void AddIVariableWithOverwrite(string name, IVariable x)
+        {
+            if (this.protect) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (this.ContainsIVariable(name))
+            {
+                this.RemoveIVariable(name);
+                this.AddIVariable(name, x);
             }
         }
 

@@ -2084,69 +2084,64 @@ namespace Gekko
                 }
 
                 string originalFileName = file;
-                bool isTsdx = false;
+                bool isGbk = true;
                 bool isProtobuf = false;
-
-                string extension = "tsd";
-                if (true)
-                {
-                    isTsdx = true;
-                    extension = "" + Globals.extensionDatabank + "";
-                }
+                string extension = "" + Globals.extensionDatabank + "";
+              
                 if (oRead.Type == EDataFormat.Tsd)  //overrules any global settings
                 {
-                    isTsdx = false;
+                    isGbk = false;
                     extension = "tsd";
                 }
                 if (oRead.Type == EDataFormat.Gbk)  //overrules any global settings
                 {
-                    isTsdx = true;
+                    isGbk = true;
                     extension = "" + Globals.extensionDatabank + "";
                 }
                 if (oRead.Type == EDataFormat.Tsdx)  //overrules any global settings
                 {
-                    isTsdx = true;
+                    isGbk = true;
                     extension = "tsdx";
                 }
                 if (oRead.Type == EDataFormat.Tsp)  //overrules any global settings
                 {
-                    isTsdx = false;
+                    isGbk = false;
                     extension = "tsp";
                 }
                 if (oRead.Type == EDataFormat.Csv)
                 {
                     extension = "csv";
-                    isTsdx = false;
+                    isGbk = false;
                 }
                 if (oRead.Type == EDataFormat.Prn)
                 {
                     extension = "prn";
-                    isTsdx = false;
+                    isGbk = false;
                 }
                 if (oRead.Type == EDataFormat.Xls)
                 {
                     extension = "xls";
-                    isTsdx = false;
+                    isGbk = false;
                 }
                 if (oRead.Type == EDataFormat.Xlsx)
                 {
                     extension = "xlsx";
-                    isTsdx = false;
+                    isGbk = false;
                 }
                 if (oRead.Type == EDataFormat.Pcim)
                 {
                     extension = "bnk";
-                    isTsdx = false;
+                    isGbk = false;
                 }
                 if (oRead.Type == EDataFormat.Gdx)
                 {
                     extension = "gdx";
-                    isTsdx = false;
+                    isGbk = false;
                 }
                 if (oRead.Type == EDataFormat.Px)
                 {
                     extension = "px";
-                    isTsdx = false;
+                    isGbk = false;
                 }
 
                 bool cancel = false;
@@ -2235,9 +2230,13 @@ namespace Gekko
                     {
                         ReadSheet(dates, oRead, readInfo, file, databank, originalFilePath);
                     }
+                    else if (oRead.Type == EDataFormat.Tsd)
+                    {
+                        ReadTsd(dates, oRead, readInfo, ref file, ref databank, originalFilePath, ref NaNCounter);
+                    }
                     else if (oRead.Type == EDataFormat.Tsd || oRead.Type == EDataFormat.Tsdx || oRead.Type == EDataFormat.Gbk || oRead.Type == EDataFormat.None)
                     {
-                        ReadTsdOrTsdx(dates, oRead, readInfo, ref file, isTsdx, ref isProtobuf, ref databank, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+                        ReadGbk(dates, oRead, readInfo, ref file, ref databank, originalFilePath, ref tsdxFile, ref tempTsdxPath);
                     }
                     else if (oRead.Type == EDataFormat.Tsp)
                     {
@@ -2297,7 +2296,7 @@ namespace Gekko
                             }
                         }
 
-                        if (isTsdx)
+                        if (isGbk)
                         {
                             try
                             {
@@ -2326,16 +2325,11 @@ namespace Gekko
 
                     readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
 
-                    if (isTsdx && !isProtobuf)
-                    {
-                        readInfo.conversionMessage = true;
-                    }
-
                     readInfo.databank.info1 = readInfo.info1;
                     readInfo.databank.date = readInfo.date;
                     readInfo.databank.FileNameWithPath = readInfo.fileName;
 
-                    if (open && !isTsdx && !oRead.protect)
+                    if (open && !isGbk && !oRead.protect)
                     {
                         if (readInfo.databank.protect != true)
                         {
@@ -2661,322 +2655,429 @@ namespace Gekko
             return v;
         }
 
-        private static void ReadTsdOrTsdx(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, bool isTsdx, ref bool isProtobuf, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
+        private static void ReadGbk(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath)
         {
+            //NOTE: time-truncation is only done at the uppermost level: series or array-series. Stuff inside LIST or MAP is not time-truncated.
+
             bool mergeOrTimeLimit = oRead.Merge || dates != null;
 
-            if (isTsdx)
+            readInfo.databankVersion = "";
+            //try to unzip it here
+            tempTsdxPath = GetTempTsdxFolderPath();
+            if (!Directory.Exists(tempTsdxPath))  //should almost never exist, since name is random
             {
-                readInfo.databankVersion = "";
-                //try to unzip it here
-                tempTsdxPath = GetTempTsdxFolderPath();
-                if (!Directory.Exists(tempTsdxPath))  //should almost never exist, since name is random
+                Directory.CreateDirectory(tempTsdxPath);
+            }
+            else
+            {
+                //in the very rare case, any files here will be overwritten
+            }
+            string unzippedFile = Path.GetFileNameWithoutExtension(originalFilePath) + ".tsd";
+
+            DateTime dt2 = DateTime.Now;
+            string foundTsdFile = WaitForZipRead_TSDX(tempTsdxPath, file, unzippedFile, originalFilePath);
+            G.WritelnGray("Unzipping took: " + G.Seconds(dt2));
+            
+            //both protobuffers and tsd files
+
+            tsdxFile = file;
+            //file = tempTsdxPath + "\\" + unzippedFile;
+            file = tempTsdxPath + "\\" + foundTsdFile;
+
+            XmlDocument doc = new XmlDocument();
+            //We can presume that DatabankInfo.xml is in UTF-8, since it is typically written by Gekko
+            //So no need to use GetTextFromFile()
+            string fileXml = tempTsdxPath + "\\" + "DatabankInfo.xml";
+            using (FileStream fs = WaitForFileStream(fileXml, GekkoFileReadOrWrite.Read))
+            {
+                try
                 {
-                    Directory.CreateDirectory(tempTsdxPath);
+                    doc.Load(fs);
                 }
-                else
+                catch (Exception e)
                 {
-                    //in the very rare case, any files here will be overwritten
+                    G.Writeln2("*** ERROR: XML file 'DatabankInfo.xml' inside " + Globals.extensionDatabank + " file.");
+                    WriteXmlError(e, fileXml);
+                    throw new GekkoException();
                 }
-                string unzippedFile = Path.GetFileNameWithoutExtension(originalFilePath) + ".tsd";
 
-                DateTime dt2 = DateTime.Now;
-                string foundTsdFile = WaitForZipRead_TSDX(tempTsdxPath, file, unzippedFile, originalFilePath);
-                G.WritelnGray("Unzipping took: " + G.Seconds(dt2));
+                XmlElement root = doc.DocumentElement; //"DatabankInfo"
 
-                if (foundTsdFile == "Is_a_protobuffer_file") isProtobuf = true;
+                string databankVersion = root.GetAttribute("databankVersion");
+                if (databankVersion == "") databankVersion = "1.0";
+                string gekkoVersion = root.GetAttribute("gekkoVersion");
+                if (databankVersion != "") readInfo.databankVersion = "(vers: " + databankVersion + ")";
 
-                //both protobuffers and tsd files
-
-                tsdxFile = file;
-                //file = tempTsdxPath + "\\" + unzippedFile;
-                file = tempTsdxPath + "\\" + foundTsdFile;
-
-                XmlDocument doc = new XmlDocument();
-                //We can presume that DatabankInfo.xml is in UTF-8, since it is typically written by Gekko
-                //So no need to use GetTextFromFile()
-                string fileXml = tempTsdxPath + "\\" + "DatabankInfo.xml";
-                using (FileStream fs = WaitForFileStream(fileXml, GekkoFileReadOrWrite.Read))
+                if (!Globals.tsdxVersions.Contains(databankVersion))
                 {
-                    try
-                    {
-                        doc.Load(fs);
-                    }
-                    catch (Exception e)
-                    {
-                        G.Writeln2("*** ERROR: XML file 'DatabankInfo.xml' inside " + Globals.extensionDatabank + " file.");
-                        WriteXmlError(e, fileXml);
-                        throw new GekkoException();
-                    }
-
-                    XmlElement root = doc.DocumentElement; //"DatabankInfo"
-
-                    string databankVersion = root.GetAttribute("databankVersion");
-                    if (databankVersion == "") databankVersion = "1.0";
-                    string gekkoVersion = root.GetAttribute("gekkoVersion");
-                    if (databankVersion != "") readInfo.databankVersion = "(vers: " + databankVersion + ")";
-
-                    if (!Globals.tsdxVersions.Contains(databankVersion))
-                    {
-                        G.Writeln2("*** ERROR: The databank version is unknown to this Gekko version (" + Globals.gekkoVersion + ")");
-                        G.Write("           Known databank versions: "); G.PrintListWithCommas(Globals.tsdxVersions, false);
-                        G.Writeln("           The databank seems to have been written by Gekko version " + gekkoVersion);
-                        throw new GekkoException();
-                    }
-
-                    XmlNodeList descriptions = doc.GetElementsByTagName("Info1");
-                    foreach (XmlNode description in descriptions)  //should be only 1 in this loop
-                    {
-                        readInfo.info1 = description.InnerText;
-                    }
-
-                    XmlNodeList dates5 = doc.GetElementsByTagName("Date");
-                    foreach (XmlNode date in dates5) //should be only 1 in this loop
-                    {
-                        readInfo.date = date.InnerText;
-                    }
-
-                    XmlNodeList modelNames = doc.GetElementsByTagName("ModelName");
-                    foreach (XmlNode modelName in modelNames) //should be only 1 in this loop
-                    {
-                        readInfo.modelName = modelName.InnerText;
-                    }
-
-                    XmlNodeList modelInfos = doc.GetElementsByTagName("ModelInfo");
-                    foreach (XmlNode modelInfo in modelInfos) //should be only 1 in this loop
-                    {
-                        readInfo.modelInfo = modelInfo.InnerText;
-                    }
-
-                    XmlNodeList modelDates = doc.GetElementsByTagName("ModelDate");
-                    foreach (XmlNode modelDate in modelDates) //should be only 1 in this loop
-                    {
-                        readInfo.modelDate = modelDate.InnerText;
-                    }
-
-                    XmlNodeList modelSignatures = doc.GetElementsByTagName("ModelSignature");
-                    foreach (XmlNode modelSignature in modelSignatures) //should be only 1 in this loop
-                    {
-                        readInfo.modelSignature = modelSignature.InnerText;
-                    }
-
-                    XmlNodeList modelHashs = doc.GetElementsByTagName("ModelHash");
-                    foreach (XmlNode modelHash in modelHashs) //should be only 1 in this loop
-                    {
-                        readInfo.modelHash = modelHash.InnerText;
-                    }
-
-                    XmlNodeList modelLastSimPeriods = doc.GetElementsByTagName("ModelLastSimPeriod");
-                    foreach (XmlNode modelLastSimPeriod in modelLastSimPeriods) //should be only 1 in this loop
-                    {
-                        readInfo.modelLastSimPeriod = modelLastSimPeriod.InnerText;
-                    }
-
-                    XmlNodeList modelLastSimStamps = doc.GetElementsByTagName("ModelLastSimStamp");
-                    foreach (XmlNode modelLastSimStamp in modelLastSimStamps) //should be only 1 in this loop
-                    {
-                        readInfo.modelLastSimStamp = modelLastSimStamp.InnerText;
-                    }
-
-                    XmlNodeList modelLargestLags = doc.GetElementsByTagName("ModelLargestLag");
-                    foreach (XmlNode modelLargestLag in modelLargestLags) //should be only 1 in this loop
-                    {
-                        readInfo.modelLargestLag = modelLargestLag.InnerText;
-                    }
-
-                    XmlNodeList modelLargestLeads = doc.GetElementsByTagName("ModelLargestLead");
-                    foreach (XmlNode modelLargestLead in modelLargestLeads) //should be only 1 in this loop
-                    {
-                        readInfo.modelLargestLead = modelLargestLead.InnerText;
-                    }
+                    G.Writeln2("*** ERROR: The databank version is unknown to this Gekko version (" + Globals.gekkoVersion + ")");
+                    G.Write("           Known databank versions: "); G.PrintListWithCommas(Globals.tsdxVersions, false);
+                    G.Writeln("           The databank seems to have been written by Gekko version " + gekkoVersion);
+                    throw new GekkoException();
                 }
-                if (!isProtobuf) readInfo.databankVersion = "(vers: 1.0)";  //default value if databankVersion attribute is not found inside DatabankInfo.xml
+
+                XmlNodeList descriptions = doc.GetElementsByTagName("Info1");
+                foreach (XmlNode description in descriptions)  //should be only 1 in this loop
+                {
+                    readInfo.info1 = description.InnerText;
+                }
+
+                XmlNodeList dates5 = doc.GetElementsByTagName("Date");
+                foreach (XmlNode date in dates5) //should be only 1 in this loop
+                {
+                    readInfo.date = date.InnerText;
+                }
+
+                XmlNodeList modelNames = doc.GetElementsByTagName("ModelName");
+                foreach (XmlNode modelName in modelNames) //should be only 1 in this loop
+                {
+                    readInfo.modelName = modelName.InnerText;
+                }
+
+                XmlNodeList modelInfos = doc.GetElementsByTagName("ModelInfo");
+                foreach (XmlNode modelInfo in modelInfos) //should be only 1 in this loop
+                {
+                    readInfo.modelInfo = modelInfo.InnerText;
+                }
+
+                XmlNodeList modelDates = doc.GetElementsByTagName("ModelDate");
+                foreach (XmlNode modelDate in modelDates) //should be only 1 in this loop
+                {
+                    readInfo.modelDate = modelDate.InnerText;
+                }
+
+                XmlNodeList modelSignatures = doc.GetElementsByTagName("ModelSignature");
+                foreach (XmlNode modelSignature in modelSignatures) //should be only 1 in this loop
+                {
+                    readInfo.modelSignature = modelSignature.InnerText;
+                }
+
+                XmlNodeList modelHashs = doc.GetElementsByTagName("ModelHash");
+                foreach (XmlNode modelHash in modelHashs) //should be only 1 in this loop
+                {
+                    readInfo.modelHash = modelHash.InnerText;
+                }
+
+                XmlNodeList modelLastSimPeriods = doc.GetElementsByTagName("ModelLastSimPeriod");
+                foreach (XmlNode modelLastSimPeriod in modelLastSimPeriods) //should be only 1 in this loop
+                {
+                    readInfo.modelLastSimPeriod = modelLastSimPeriod.InnerText;
+                }
+
+                XmlNodeList modelLastSimStamps = doc.GetElementsByTagName("ModelLastSimStamp");
+                foreach (XmlNode modelLastSimStamp in modelLastSimStamps) //should be only 1 in this loop
+                {
+                    readInfo.modelLastSimStamp = modelLastSimStamp.InnerText;
+                }
+
+                XmlNodeList modelLargestLags = doc.GetElementsByTagName("ModelLargestLag");
+                foreach (XmlNode modelLargestLag in modelLargestLags) //should be only 1 in this loop
+                {
+                    readInfo.modelLargestLag = modelLargestLag.InnerText;
+                }
+
+                XmlNodeList modelLargestLeads = doc.GetElementsByTagName("ModelLargestLead");
+                foreach (XmlNode modelLargestLead in modelLargestLeads) //should be only 1 in this loop
+                {
+                    readInfo.modelLargestLead = modelLargestLead.InnerText;
+                }
             }
 
             readInfo.fileName = originalFilePath;
 
-            if (isTsdx && isProtobuf)
+
+            string fileName = null;
+            if (File.Exists(tempTsdxPath + "\\" + Globals.protobufFileName)) fileName = tempTsdxPath + "\\" + Globals.protobufFileName;  //legacy
+            else if (File.Exists(tempTsdxPath + "\\" + Globals.protobufFileName2)) fileName = tempTsdxPath + "\\" + Globals.protobufFileName2;  //usual name
+            else if (File.Exists(tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal)) fileName = tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal;  //IF the usual name is changed
+            else
             {
-                string name = null;
-                if (File.Exists(tempTsdxPath + "\\" + Globals.protobufFileName)) name = tempTsdxPath + "\\" + Globals.protobufFileName;  //legacy
-                else if (File.Exists(tempTsdxPath + "\\" + Globals.protobufFileName2)) name = tempTsdxPath + "\\" + Globals.protobufFileName2;  //usual name
-                else if (File.Exists(tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal)) name = tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal;  //IF the usual name is changed
-                else
+                G.Writeln2("*** ERROR: Could not find data storage file inside zipped databank file");
+                G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
+                throw new GekkoException();
+            }
+
+            using (FileStream fs = WaitForFileStream(fileName, GekkoFileReadOrWrite.Read))
+            {
+
+                Databank deserializedDatabank = null;
+                ////May take a little time to create: so use static serializer if doing serialize on a lot of small objects
+                //RuntimeTypeModel serializer = TypeModel.Create();
+                //serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+                try
                 {
-                    G.Writeln2("*** ERROR: Could not find data storage file inside zipped databank file");
+                    DateTime dt3 = DateTime.Now;
+                    deserializedDatabank = Serializer.Deserialize<Databank>(fs);
+                    readInfo.variables = deserializedDatabank.storage.Count;
+                    G.WritelnGray("Protobuf deserialize took: " + G.Seconds(dt3));
+                }
+                catch (Exception e)
+                {
+                    G.Writeln2("*** ERROR: Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version 1.1 format (protobuffers)");
+                    G.Writeln("           Message: " + e.Message, Color.Red);
                     G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
                     throw new GekkoException();
                 }
 
-                using (FileStream fs = WaitForFileStream(name, GekkoFileReadOrWrite.Read))
+                int maxYearInProtobufFile = int.MinValue;
+                int minYearInProtobufFile = int.MaxValue;
+                //int emptyWarnings = 0;
+
+                if (mergeOrTimeLimit)
                 {
+                    //Cannot do a simple deflate in this case: has to move stuff from deflated file into existing first databank
+                    
+                    //
+                    // ------ WORK ----------            ------ FILE ---------
+                    //
+                    //           x1     x2                  x1      x3
+                    //
+                    // 2000       2                                1000
+                    // 2001       3     100                 10     2000
+                    // 2002       4     200                 11
+                    // 2003             300                 12
+                    //                    
+                    // We merge in the two dimensions:
+                    //
+                    // ------ WORK ----------        
+                    //
+                    //           x1     x2     x3       
+                    //
+                    // 2000       2            1000     
+                    // 2001      10     100    2000  
+                    // 2002      11     200          
+                    // 2003      12     300          
+                    //
+                    // If non-series or array-series, just replace any File object already in Work (never mind time truncation)
+                    // SERIES: Easy copy if series is not in Work (x3)
+                    // SERIES: If in Work, only inject over the overlap of date period and series data period)
+                    // ARRAYSERIES: do as above, just for these subseries
+                    //                  
 
-                    Databank temp = null;
-                    ////May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                    //RuntimeTypeModel serializer = TypeModel.Create();
-                    //serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-                    try
+                    foreach (KeyValuePair<string, IVariable> kvp in deserializedDatabank.storage)  //for each ivar in temp (deserialized) databank 
                     {
-                        DateTime dt3 = DateTime.Now;
-                        temp = Serializer.Deserialize<Databank>(fs);
-                        readInfo.variables = temp.storage.Count;  
-                        G.WritelnGray("Protobuf deserialize took: " + G.Seconds(dt3));
-                    }
-                    catch (Exception e)
-                    {
-                        G.Writeln2("*** ERROR: Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version 1.1 format (protobuffers)");
-                        G.Writeln("           Message: " + e.Message, Color.Red);
-                        G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
-                        throw new GekkoException();
-                    }
+                        string name = kvp.Key;
+                        IVariable iv = kvp.Value;
 
-                    int maxYearInProtobufFile = int.MinValue;
-                    int minYearInProtobufFile = int.MaxValue;
-                    int emptyWarnings = 0;
-                    foreach (TimeSeries tsTemp in temp.storage.Values)  //for each timeseries in temp (deserialized) databank 
-                    {
-                        bool isGhost = tsTemp.IsArrayTimeseries();
-                        //looping through each timeseries to find databank start and end year (and to merge variables if we are merging)
-
-                        if (IsNonsenseVariableName(tsTemp.name))
+                        if (iv.Type() == EVariableType.Series)
                         {
-                            emptyWarnings++;
-                            continue;
-                        }
+                            //looping through each timeseries to find databank start and end year (and to merge variables if we are merging)
+                            //NOTE: we only time-truncate series and array-series at the direct level, not series inside lists, maps etc.
 
-                        int counter = 0;
-                        GekkoTime first = Globals.tNull;
-                        GekkoTime last = Globals.tNull;
+                            TimeSeries tsProtobuf = iv as TimeSeries;
 
-                        if (!tsTemp.IsTimeless())
-                        {
-                            first = tsTemp.GetPeriodFirst();
-                            last = tsTemp.GetPeriodLast();
-                        }                                                
-
-                        if (mergeOrTimeLimit)  //doing tsdx-protobuf merge (or time limits), get data into Work from deserialized temp databank
-                        {
-                            if (dates != null)
+                            if (tsProtobuf.IsArrayTimeseries())
                             {
-                                GetFirstLastDates(dates, ref first, ref last);
-                            }
-
-                            int nob = GekkoTime.Observations(first, last);
-                            if (nob > 0)
-                            {
-                                //ignore if nob < 1. This means that the time limit window is outside the data window 
-                                TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, tsTemp.name, tsTemp.freq);
-                                int index1;
-                                int index2;
-                                try
+                                foreach (TimeSeries tsTemp2 in tsProtobuf.storage.storage.Values)
                                 {
-                                    double[] data = tsTemp.GetDataSequence(out index1, out index2, first, last, true);
-                                    ts.SetDataSequence(first, last, data, index1);
-                                }
-                                catch (Exception e)
-                                {
-                                    G.Writeln2("*** ERROR: Unexpected technical error while merging databanks");
-                                    throw new GekkoException();
-                                }
-
-                                GekkoTime firstX = ts.GetPeriodFirst();
-                                GekkoTime lastX = ts.GetPeriodLast();
-
-                                if (!isGhost)
-                                {
-                                    maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, lastX.super);
-                                    minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, firstX.super);
+                                    //handle tsTemp2
+                                    
                                 }
                             }
+                            else
+                            {
+                                //handle normal timeseries
+                                if (tsProtobuf.IsTimeless())
+                                {
+                                    //easy
+                                    //handle it like non-series
+                                    databank.AddIVariableWithOverwrite(name, iv);
+                                }
+                                else
+                                {
+                                    //non-timeless
+                                    IVariable ivExisting = databank.GetIVariable(name);
+                                    TimeSeries tsExisting = ivExisting as TimeSeries;
+                                    if (tsExisting == null)
+                                    {
+                                        //should not be possible since the name has no sigil
+                                        G.Writeln2("*** ERROR: Internal error #8974325235");
+                                        throw new GekkoException();
+                                    }
+                                    if (databank.ContainsIVariable(name))
+                                    {
+                                        //already exists: now we must merge the observations
+                                        //There are 3 time-windows in play: Work window, file window and dates window:
+                                        //  Work window: the window of the existing timeseries (will not have any effect on the merging)
+                                        //  file window: the window of the series from the deflated file
+                                        //  dates window: time-truncation of the file window
+                                        //So we find the overlap of the file window and the date window (if it is active at all)
+                                        //Then we put that overlap into the Work databank
+
+                                        //Find the overlap of the file window (tsExisting) and the date window
+
+                                        //Time consumption on the two lines below is ok, if the databank is trimmed (which is is for gbk files)
+                                        GekkoTime firstExisting = tsExisting.GetRealDataPeriodFirst(); //takes a bit of time, but then we get the real period 
+                                        GekkoTime lastExisting = tsExisting.GetRealDataPeriodLast(); //takes a bit of time, but then we get the real period
+
+                                        maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, lastExisting.super);
+                                        minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, firstExisting.super);
+
+                                        if (firstExisting.IsNull())
+                                        {
+                                            //no real data at all (lastX will be null, too)
+                                            //do not write anything, no matter if dates = null or not.
+                                        }
+                                        else
+                                        {
+                                            //We have a data window in tsExisting. Truncate the window with dates window (if it exists)
+                                            if (dates != null)
+                                            {
+                                                //this will adjust first and last to comply with the dates window
+                                                var tuple = GetFirstLastDates(dates, firstExisting, lastExisting);
+
+                                                GekkoTime firstTruncated = tuple.Item1;
+                                                GekkoTime lastTruncated = tuple.Item2;
+                                                //offset is not used
+
+                                                int nob = GekkoTime.Observations(firstTruncated, lastTruncated);
+                                                if (nob > 0)  //can be 0 or negative, if the windows do not overlap at all
+                                                {
+                                                                                                        
+                                                    int index1;
+                                                    int index2;
+                                                    try
+                                                    {
+                                                        double[] data = tsProtobuf.GetDataSequence(out index1, out index2, firstTruncated, lastTruncated, true);
+                                                        tsExisting.SetDataSequence(firstTruncated, lastTruncated, data, index1);
+                                                    }
+                                                    catch (Exception e)
+                                                    {
+                                                        G.Writeln2("*** ERROR: Unexpected technical error while merging databanks");
+                                                        throw new GekkoException();
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    //does not get written, since there is no window overlap
+                                                }
+                                            }
+                                            else
+                                            {
+                                                //firstExisting is guaranteed to be != tNull, so lastExisting is so too
+                                                int index1;
+                                                int index2;
+                                                double[] data = tsProtobuf.GetDataSequence(out index1, out index2, firstExisting, lastExisting, true);
+                                                tsExisting.SetDataSequence(firstExisting, lastExisting, data, index1);
+                                            }
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        //Does not exist already: just put it in
+                                        databank.AddIVariable(name, iv);
+                                    }
+                                }
+                            }
+
+                            int counter = 0;
+                            
+
+                            
+
+                            
+
+                             
+
+                            
                         }
                         else
                         {
-                            if (!isGhost)
-                            {
-                                maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, last.super);
-                                minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, first.super);
-                            }
+                            //Non-series
+                            //Easy: string, val, date, list, map, matrix
+                            databank.AddIVariableWithOverwrite(name, iv);
                         }
                     }
-                    if (emptyWarnings > 0) G.Writeln("+++ WARNING: " + emptyWarnings + " variables with empty string as name in ." + Globals.extensionDatabank + " file (skipped)");
-
-                    if (!mergeOrTimeLimit)
-                    {
-                        try
-                        {
-                            //discarding the old bank completely, and replacing with the new one
-                            temp.aliasName = databank.aliasName;
-                            Program.databanks.ReplaceDatabank(databank, temp);
-                            readInfo.databank = temp;  //since this pointer is altered
-                            databank = temp;  //since this pointer is altered
-                        }
-                        catch (Exception e)
-                        {
-                            G.Writeln2("*** ERROR: Unexpected technical error while reading " + Globals.extensionDatabank + " databank");
-                            throw new GekkoException();
-                        }
-                    }
-
-                    //See almost identical code below, and in readCsv()
-                    if (mergeOrTimeLimit)
-                    {
-                        readInfo.startPerInFile = minYearInProtobufFile;
-                        readInfo.endPerInFile = maxYearInProtobufFile;
-                        readInfo.startPerResultingBank = G.GekkoMin(minYearInProtobufFile, databank.yearStart);
-                        readInfo.endPerResultingBank = G.GekkoMax(maxYearInProtobufFile, databank.yearEnd);
-                    }
-                    else
-                    {
-                        readInfo.startPerInFile = minYearInProtobufFile;
-                        readInfo.endPerInFile = maxYearInProtobufFile;
-                        readInfo.startPerResultingBank = readInfo.startPerInFile;
-                        readInfo.endPerResultingBank = readInfo.endPerInFile;
-                    }
-
-                    Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
-                    currentBank.yearStart = readInfo.startPerResultingBank;
-                    currentBank.yearEnd = readInfo.endPerResultingBank;
-
-                }  //end of using
-            }
-            else  // not(isTsdx && isProtobuf), that is, a tsd file (possibly packed inside tsdx):
-            {
-                //also deals with merging (not clearing the databank first if merging)
-
-                ReadAllTsdRecords(dates, file, oRead.Merge, isTsdx, databank, ref NaNCounter, readInfo);
-
-                readInfo.nanCounter = NaNCounter;
-
-                //See almost identical code above and in readCsv()
-                if (mergeOrTimeLimit)
-                {
-                    readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
-                    readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
+                    readInfo.startPerInFile = minYearInProtobufFile;
+                    readInfo.endPerInFile = maxYearInProtobufFile;
+                    readInfo.startPerResultingBank = G.GekkoMin(minYearInProtobufFile, databank.yearStart);
+                    readInfo.endPerResultingBank = G.GekkoMax(maxYearInProtobufFile, databank.yearEnd);
                 }
                 else
                 {
+                    //Can do it fast, just swapping the deserialized bank instead of the current, with no copying around
+                    try
+                    {
+                        //discarding the old bank completely, and replacing with the new one
+                        deserializedDatabank.aliasName = databank.aliasName;
+                        Program.databanks.ReplaceDatabank(databank, deserializedDatabank);
+                        readInfo.databank = deserializedDatabank;  //since this pointer is altered
+                        databank = deserializedDatabank;  //since this pointer is altered
+                    }
+                    catch (Exception e)
+                    {
+                        G.Writeln2("*** ERROR: Unexpected technical error while reading " + Globals.extensionDatabank + " databank");
+                        throw new GekkoException();
+                    }
+                    readInfo.startPerInFile = minYearInProtobufFile;
+                    readInfo.endPerInFile = maxYearInProtobufFile;
                     readInfo.startPerResultingBank = readInfo.startPerInFile;
                     readInfo.endPerResultingBank = readInfo.endPerInFile;
                 }
+                
+                //if (emptyWarnings > 0) G.Writeln("+++ WARNING: " + emptyWarnings + " variables with empty string as name in ." + Globals.extensionDatabank + " file (skipped)");
+                
                 Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
                 currentBank.yearStart = readInfo.startPerResultingBank;
                 currentBank.yearEnd = readInfo.endPerResultingBank;
+
+            }  //end of using
+
+
+        }        
+
+        private static void ReadTsd(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref int NaNCounter)
+        {
+            bool isTsdx = false;
+            bool mergeOrTimeLimit = oRead.Merge || dates != null;
+            readInfo.fileName = originalFilePath;
+            //also deals with merging (not clearing the databank first if merging)
+            ReadAllTsdRecords(dates, file, oRead.Merge, isTsdx, databank, ref NaNCounter, readInfo);
+            readInfo.nanCounter = NaNCounter;
+
+            //See almost identical code in readCsv() and others
+            if (mergeOrTimeLimit)
+            {
+                readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
+                readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
             }
+            else
+            {
+                readInfo.startPerResultingBank = readInfo.startPerInFile;
+                readInfo.endPerResultingBank = readInfo.endPerInFile;
+            }
+            Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
+            currentBank.yearStart = readInfo.startPerResultingBank;
+            currentBank.yearEnd = readInfo.endPerResultingBank;
         }
 
-        private static int GetFirstLastDates(ReadDatesHelper dates, ref GekkoTime first, ref GekkoTime last)
+        private static Tuple<GekkoTime, GekkoTime, int> GetFirstLastDates(ReadDatesHelper dates, GekkoTime first, GekkoTime last)
         {
+            //offset is the distance from first to dates.t1. If dates.t1 < first, offset will be 0.
+            //So offset tells us when to start taking data in the array of the existing timeseries, as counted from the first date.
+            //BEWARE: offset is the distance counted from the INPUT of first, not the OUTPUT of first
+            //All in all, offset is a bit dangerous
+
+            //If the dates window and the first/last window do not overlap, we will get a timeperiod returned
+            //where first > last. This means that GekkoTime.Observations(first, last) will be <= 0. So test
+            //that GekkoTime.Observations(first, last) > 0 before putting any data in.
+            //
+
+            GekkoTime firstRv = Globals.tNull;
+            GekkoTime lastRv = Globals.tNull;
+
             int offset = 0;
             if (first.freq == EFreq.Annual)
             {
                 if (first.SmallerThanOrEqual(dates.t1Annual))
                 {
                     offset = GekkoTime.Observations(first, dates.t1Annual) - 1;
-                    first = dates.t1Annual;
+                    firstRv = dates.t1Annual;
                 }
                 if (last.LargerThanOrEqual(dates.t2Annual))
                 {
-                    last = dates.t2Annual;
+                    lastRv = dates.t2Annual;
                 }
             }
             else if (first.freq == EFreq.Quarterly)
@@ -2984,11 +3085,11 @@ namespace Gekko
                 if (first.SmallerThanOrEqual(dates.t1Quarterly))
                 {                    
                     offset = GekkoTime.Observations(first, dates.t1Quarterly) - 1;
-                    first = dates.t1Quarterly;
+                    firstRv = dates.t1Quarterly;
                 }
                 if (last.LargerThanOrEqual(dates.t2Quarterly))
                 {
-                    last = dates.t2Quarterly;
+                    lastRv = dates.t2Quarterly;
                 }
             }
             else if (first.freq == EFreq.Monthly)
@@ -2996,14 +3097,14 @@ namespace Gekko
                 if (first.SmallerThanOrEqual(dates.t1Monthly))
                 {
                     offset = GekkoTime.Observations(first, dates.t1Monthly) - 1;
-                    first = dates.t1Monthly;                    
+                    firstRv = dates.t1Monthly;                    
                 }
                 if (last.LargerThanOrEqual(dates.t2Monthly))
                 {
-                    last = dates.t2Monthly;
+                    lastRv = dates.t2Monthly;
                 }
             }
-            return offset;
+            return new Tuple<GekkoTime, GekkoTime, int>(firstRv, lastRv, offset);
         }
 
         private static void ReadAllTsdRecords(ReadDatesHelper dates, string file, bool merge, bool isTsdx, Databank databank, ref int NaNCounter, ReadInfo readInfo)
@@ -3243,7 +3344,10 @@ namespace Gekko
                             //See similar code in px reader
                             if (dates != null)
                             {
-                                offset = GetFirstLastDates(dates, ref gt1, ref gt2);
+                                var tuple = GetFirstLastDates(dates, gt1, gt2);
+                                gt1 = tuple.Item1;
+                                gt2 = tuple.Item2;
+                                offset = tuple.Item3;
                             }
 
                             int nob = GekkoTime.Observations(gt1, gt2);
@@ -3874,7 +3978,10 @@ namespace Gekko
                     int offset = 0;
                     if (datesRestrict != null)
                     {
-                        offset = GetFirstLastDates(datesRestrict, ref gt_start, ref gt_end);
+                        var tuple = GetFirstLastDates(datesRestrict, gt_start, gt_end);
+                        gt_start = tuple.Item1;
+                        gt_end = tuple.Item2;
+                        offset = tuple.Item3;
                     }
 
                     int obs = GekkoTime.Observations(gt_start, gt_end);

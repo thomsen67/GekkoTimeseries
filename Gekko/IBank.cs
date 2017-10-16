@@ -11,6 +11,8 @@ namespace Gekko
 
         void AddIVariable(string name, IVariable x);
 
+        bool ContainsIVariable(string name);
+
         void RemoveIVariable(string name);
 
         string Message();

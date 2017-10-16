@@ -44,6 +44,20 @@ namespace Gekko
             return iv;
         }
 
+        public bool ContainsIVariable(string variable)
+        {            
+            return storage.ContainsKey(variable);         
+        }
+
+        public void AddIVariableWithOverwrite(string name, IVariable x)
+        {            
+            if (this.ContainsIVariable(name))
+            {
+                this.RemoveIVariable(name);
+                this.AddIVariable(name, x);
+            }
+        }
+
         public void AddIVariable(string name, IVariable x)
         {
             //Much simpler than the corresponding method in Databank.cs
