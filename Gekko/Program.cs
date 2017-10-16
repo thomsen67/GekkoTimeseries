@@ -80,15 +80,15 @@ namespace Gekko
             }
         }
 
-        public bool TryGetValue(string[] s, out IVariable iv)
+        public bool TryGetValue(GMapItem gmi, out IVariable iv)
         {
-            GMapItem gmi = new GMapItem(s);
+            //GMapItem gmi = new GMapItem(s);
             return this.storage.TryGetValue(gmi, out iv);
         }
 
-        public void AddIVariableWithOverwrite(string[] s, IVariable iv)
+        public void AddIVariableWithOverwrite(GMapItem gmi, IVariable iv)
         {
-            GMapItem gmi = new GMapItem(s);
+            //GMapItem gmi = new GMapItem(s);
             if (this.storage.ContainsKey(gmi)) this.storage.Remove(gmi);
             this.storage.Add(gmi, iv);
         }
@@ -2357,6 +2357,7 @@ namespace Gekko
 
         private static ReadDatesHelper GetReadDatesHelper(ReadOpenMulbkHelper oRead)
         {
+            //Also see #345632473
             if (oRead.t1.IsNull()) return null;
             ReadDatesHelper readDatesHelper = new Gekko.ReadDatesHelper();
             if (oRead.t1.freq != oRead.t2.freq)
@@ -2868,9 +2869,13 @@ namespace Gekko
 
                             if (tsProtobuf.IsArrayTimeseries())
                             {
+                                //---------------------------
+                                // handle array-timeseries
+                                //---------------------------
+
                                 if (tsExisting == null)
                                 {
-                                    databank.AddIVariable(name, tsProtobuf);
+                                    databank.AddIVariable(name, tsProtobuf); //the sub-timeseries will follow automatically!
                                 }
                                 else
                                 {
@@ -2885,141 +2890,46 @@ namespace Gekko
                                             GMapItem nameDimProtobuf = kvpGmap.Key;
                                             TimeSeries tsDimProtobuf = kvp.Value as TimeSeries;  //must be timeseries, no need to check that the type is so
 
-                                            IVariable ivDimExisting = null;  gmapExisting.TryGetValue(nameDimProtobuf.storage, out ivDimExisting);
+                                            IVariable ivDimExisting = null;  gmapExisting.TryGetValue(nameDimProtobuf, out ivDimExisting);
                                             TimeSeries tsDimExisting = null; if (ivDimExisting != null) tsDimExisting = ivDimExisting as TimeSeries;
 
                                             //now we have a tsDimProtobuf, and if tsDimExisting != null, we merge the data
 
                                             if (tsDimExisting == null)
                                             {
-                                                //just add it
+                                                //add this sub-series to the array-timeseries                                   
+                                                tsProtobuf.Truncate(dates);
+                                                gmapProtobuf.AddIVariableWithOverwrite(nameDimProtobuf, tsProtobuf);
                                             }
                                             else
                                             {
-
+                                                //now we need to merge the two series
+                                                //also see #98520983
+                                                bool wipeExistingOut = false;
+                                                MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsProtobuf, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref wipeExistingOut);
+                                                MergeTwoTimeseriesWithDateWindowHelper(dates, gmapExisting, nameDimProtobuf, tsProtobuf, wipeExistingOut);
                                             }
-
-
-
-
-
                                         }
 
                                     }
                                     else
                                     {
                                         //dimensions do not match, wipt existing out!
-                                        databank.AddIVariableWithOverwrite(name, tsProtobuf);
+                                        databank.AddIVariableWithOverwrite(name, tsProtobuf);  //the sub-timeseries will follow automatically!
                                     }
-                                }
-
-                                databank.AddIVariableWithOverwrite(name, iv);  //overwrite existing no matter what
-
-                                foreach (TimeSeries tsTemp2 in tsProtobuf.storage.storage.Values)
-                                {
-                                    //handle tsTemp2
-
                                 }
                             }
                             else
                             {
-                                //handle normal timeseries
-                                if (tsProtobuf.IsTimeless())
-                                {
-                                    //easy
-                                    //handle it like non-series
-                                    databank.AddIVariableWithOverwrite(name, iv);
-                                }
-                                else
-                                {
-                                    //non-timeless
+                                //---------------------------
+                                // handle normal timeseries
+                                //---------------------------
 
-                                    if (databank.ContainsIVariable(name))
-                                    {
-                                        //already exists: now we must merge the observations
-                                        //There are 3 time-windows in play: Work window, file window and dates window:
-                                        //  Work window: the window of the existing timeseries (will not have any effect on the merging)
-                                        //  file window: the window of the series from the deflated file
-                                        //  dates window: time-truncation of the file window
-                                        //So we find the overlap of the file window and the date window (if it is active at all)
-                                        //Then we put that overlap into the Work databank
-
-                                        //Find the overlap of the file window (tsExisting) and the date window
-
-                                        //Time consumption on the two lines below is ok, if the databank is trimmed (which is is for gbk files)
-                                        GekkoTime firstExisting = tsExisting.GetRealDataPeriodFirst(); //takes a bit of time, but then we get the real period 
-                                        GekkoTime lastExisting = tsExisting.GetRealDataPeriodLast(); //takes a bit of time, but then we get the real period
-
-                                        maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, lastExisting.super);
-                                        minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, firstExisting.super);
-
-                                        if (firstExisting.IsNull())
-                                        {
-                                            //no real data at all (lastX will be null, too)
-                                            //do not write anything, no matter if dates = null or not.
-                                        }
-                                        else
-                                        {
-                                            //We have a data window in tsExisting. Truncate the window with dates window (if it exists)
-                                            if (dates != null)
-                                            {
-                                                //this will adjust first and last to comply with the dates window
-                                                var tuple = GetFirstLastDates(dates, firstExisting, lastExisting);
-
-                                                GekkoTime firstTruncated = tuple.Item1;
-                                                GekkoTime lastTruncated = tuple.Item2;
-                                                //offset is not used
-
-                                                int nob = GekkoTime.Observations(firstTruncated, lastTruncated);
-                                                if (nob > 0)  //can be 0 or negative, if the windows do not overlap at all
-                                                {
-
-                                                    int index1;
-                                                    int index2;
-                                                    try
-                                                    {
-                                                        double[] data = tsProtobuf.GetDataSequence(out index1, out index2, firstTruncated, lastTruncated, true);
-                                                        tsExisting.SetDataSequence(firstTruncated, lastTruncated, data, index1);
-                                                    }
-                                                    catch (Exception e)
-                                                    {
-                                                        G.Writeln2("*** ERROR: Unexpected technical error while merging databanks");
-                                                        throw new GekkoException();
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    //does not get written, since there is no window overlap
-                                                }
-                                            }
-                                            else
-                                            {
-                                                //firstExisting is guaranteed to be != tNull, so lastExisting is so too
-                                                int index1;
-                                                int index2;
-                                                double[] data = tsProtobuf.GetDataSequence(out index1, out index2, firstExisting, lastExisting, true);
-                                                tsExisting.SetDataSequence(firstExisting, lastExisting, data, index1);
-                                            }
-                                        }
-
-                                    }
-                                    else
-                                    {
-                                        //Does not exist already: just put it in
-                                        databank.AddIVariable(name, iv);
-                                    }
-                                }
+                                //also see #98520983
+                                bool wipeExistingOut = false;
+                                MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsProtobuf, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref wipeExistingOut);
+                                MergeTwoTimeseriesWithDateWindowHelper(dates, databank, name, tsProtobuf, wipeExistingOut);
                             }
-
-                            int counter = 0;
-
-
-
-
-
-
-
-
 
                         }
                         else
@@ -3064,6 +2974,118 @@ namespace Gekko
 
             }  //end of using
 
+
+        }
+
+        private static void MergeTwoTimeseriesWithDateWindowHelper(ReadDatesHelper dates, Databank databank, string name, TimeSeries tsProtobuf, bool wipeExistingOut)
+        {
+            if (wipeExistingOut)
+            {
+                //better to keep this outside of MergeTwoTimeseriesWithDateWindow()                                     
+                tsProtobuf.Truncate(dates);
+                databank.AddIVariableWithOverwrite(name, tsProtobuf);
+            }
+        }
+
+        private static void MergeTwoTimeseriesWithDateWindowHelper(ReadDatesHelper dates, GMap gmap, GMapItem gmapItem, TimeSeries tsProtobuf, bool wipeExistingOut)
+        {
+            if (wipeExistingOut)
+            {
+                //better to keep this outside of MergeTwoTimeseriesWithDateWindow()                                     
+                tsProtobuf.Truncate(dates);
+                gmap.AddIVariableWithOverwrite(gmapItem, tsProtobuf);
+            }
+        }
+
+        private static void MergeTwoTimeseriesWithDateWindow(ReadDatesHelper dates, TimeSeries tsExisting, TimeSeries tsProtobuf, ref int maxYearInProtobufFile, ref int minYearInProtobufFile, ref bool wipeExistingOut)
+        {
+            if (tsProtobuf.IsTimeless() || (tsExisting != null && tsExisting.IsTimeless()))
+            {
+                //!!! BEWARE: remember to truncate and add it to container outside of this method
+                //if either is timeless, just wipe existing out
+                //handle it like non-series
+                wipeExistingOut = true;
+            }
+            else
+            {
+                //non-timeless
+
+                if (tsExisting == null)
+                {
+                    //!!! BEWARE: remember to truncate and add it to container outside of this method
+                    //Does not exist already: just put it in, but remember to truncate dates                    
+                    wipeExistingOut = true;
+                }
+                else
+                {
+                    //already exists: now we must merge the observations
+                    //There are 3 time-windows in play: Work window, file window and dates window:
+                    //  Work window: the window of the existing timeseries (will not have any effect on the merging)
+                    //  file window: the window of the series from the deflated file
+                    //  dates window: time-truncation of the file window
+                    //So we find the overlap of the file window and the date window (if it is active at all)
+                    //Then we put that overlap into the Work databank
+
+                    //Find the overlap of the file window (tsExisting) and the date window
+
+                    //Time consumption on the two lines below is ok, if the databank is trimmed (which is is for gbk files)
+                    GekkoTime firstExisting = tsExisting.GetRealDataPeriodFirst(); //takes a bit of time, but then we get the real period 
+                    GekkoTime lastExisting = tsExisting.GetRealDataPeriodLast(); //takes a bit of time, but then we get the real period
+
+                    maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, lastExisting.super);
+                    minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, firstExisting.super);
+
+                    if (firstExisting.IsNull())
+                    {
+                        //no real data at all (lastX will be null, too)
+                        //do not write anything, no matter if dates = null or not.
+                    }
+                    else
+                    {
+                        //We have a data window in tsExisting. Truncate the window with dates window (if it exists)
+                        if (dates != null)
+                        {
+                            //this will adjust first and last to comply with the dates window
+                            var tuple = GetFirstLastDates(dates, firstExisting, lastExisting);
+
+                            GekkoTime firstTruncated = tuple.Item1;
+                            GekkoTime lastTruncated = tuple.Item2;
+                            //offset is not used
+
+                            int nob = GekkoTime.Observations(firstTruncated, lastTruncated);
+                            if (nob > 0)  //can be 0 or negative, if the windows do not overlap at all
+                            {
+
+                                int index1;
+                                int index2;
+                                try
+                                {
+                                    double[] data = tsProtobuf.GetDataSequence(out index1, out index2, firstTruncated, lastTruncated, true);
+                                    tsExisting.SetDataSequence(firstTruncated, lastTruncated, data, index1);
+                                }
+                                catch (Exception e)
+                                {
+                                    G.Writeln2("*** ERROR: Unexpected technical error while merging databanks");
+                                    throw new GekkoException();
+                                }
+                            }
+                            else
+                            {
+                                //does not get written, since there is no window overlap
+                            }
+                        }
+                        else
+                        {
+                            //firstExisting is guaranteed to be != tNull, so lastExisting is so too
+                            int index1;
+                            int index2;
+                            double[] data = tsProtobuf.GetDataSequence(out index1, out index2, firstExisting, lastExisting, true);
+                            tsExisting.SetDataSequence(firstExisting, lastExisting, data, index1);
+                        }
+                    }
+
+                }
+            }
 
         }
 

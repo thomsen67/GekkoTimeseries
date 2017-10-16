@@ -158,7 +158,28 @@ namespace Gekko
             }
         }
 
-        
+        public void Truncate(ReadDatesHelper dates)
+        {
+            //Also see #345632473
+            if (dates == null) return;
+            if (this.freq == EFreq.Annual)
+            {
+                this.Truncate(dates.t1Annual, dates.t2Annual);
+            }
+            else if (this.freq == EFreq.Quarterly)
+            {
+                this.Truncate(dates.t1Quarterly, dates.t2Quarterly);
+            }
+            else if (this.freq == EFreq.Monthly)
+            {
+                this.Truncate(dates.t1Monthly, dates.t2Monthly);
+            }
+            else
+            {
+                G.Writeln2("***: Freq error");
+                throw new GekkoException();
+            }
+        }
 
         /// <summary>
         /// Truncates the TimeSeries object, so that the starting period
@@ -171,7 +192,7 @@ namespace Gekko
         /// </exception>
         public void Truncate(GekkoTime start, GekkoTime end)
         {
-            //DimensionCheck();
+            if (this.IsTimeless()) return;
             if (this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot truncate a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             int indexStart = this.GetArrayIndex(start);
             int indexEnd = this.GetArrayIndex(end);
@@ -1036,7 +1057,7 @@ namespace Gekko
                 }
 
                 IVariable iv = null;                
-                this.storage.TryGetValue(keys, out iv);
+                this.storage.TryGetValue(new GMapItem(keys), out iv);
 
                 if (iv == null)
                 {
@@ -1050,7 +1071,7 @@ namespace Gekko
                     else
                     {
                         ts = new TimeSeries(this.freq, "[[array-timeseries]]");
-                        this.storage.AddIVariableWithOverwrite(keys, ts);
+                        this.storage.AddIVariableWithOverwrite(new GMapItem(keys), ts);
                     }
                 }
                 else
