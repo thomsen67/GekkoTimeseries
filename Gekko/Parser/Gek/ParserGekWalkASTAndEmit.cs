@@ -4098,7 +4098,7 @@ namespace Gekko.Parser.Gek
                             //for instance, @"this is a ""word"" shown", where "" are kind of @-escaped.
                             //but @ will keep backslashes.
                             s = s.Replace("\"", "\"\"");
-                            node.Code.CA("new ScalarString(@`" + s + "`)");                            
+                            node.Code.CA("new ScalarString(ScalarString.SubstituteScalarsInString(@`" + s + "`, true, false))");
                         }
                         break;
                     case "ASTSTRING":

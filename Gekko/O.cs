@@ -686,6 +686,7 @@ namespace Gekko
                 {
                     //direct assignment, like x = 5, or %s = 'a'
                     //in these cases, the LHS can be created if it is not already existing
+                    ScalarString ss = rhsExpression as ScalarString;                    
                     LookupHelperLeftside(smpl, ib, varnameWithFreq, freq, rhsExpression);
                     return null;
                 }

@@ -22,7 +22,7 @@ namespace Gekko
 
         public ScalarString(string s)
         {
-            Initialize(s, false, true);  //Changed so that it always in-substitutes now
+            Initialize(s, false, false);  //last arg cannot be true --> too many errors regarding varnames etc.
         }
 
         public ScalarString(string s, bool isName)
@@ -206,9 +206,7 @@ namespace Gekko
             //This means that PRT f|e will be fe, but show [1 || 2] keeps the '||'.
             s = s.Replace(concat + concat, "[<{2concats}>]");
             s = s.Replace(concat, "");
-            s = s.Replace("[<{2concats}>]", concat + concat);
-
-            
+            s = s.Replace("[<{2concats}>]", concat + concat);            
 
             return s;
         }
