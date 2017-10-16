@@ -1882,7 +1882,7 @@ dotOrIndexer:               GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
 						  | leftBracketGlue indexerExpressionHelper2 RIGHTBRACKET -> ^(ASTINDEXER indexerExpressionHelper2)
 						    ;
 
-						    //just like b1:fy~q, we can use #m.fy~q, where fy~q is the varname.
+						    //just like b1:fy!q, we can use #m.fy!q, where fy!q is the varname.
 dotHelper:				    varname | function | Integer;
 indexerExpressionHelper2:   (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper+;
 
@@ -1968,7 +1968,7 @@ sigilOrVertical:            sigil
 						  | VERTICALBAR -> ASTVERTICALBAR  //does not have glue after
 						    ;
 
-freq:			   		   GLUE TILDE GLUE name -> name;
+freq:			   		   GLUE EXCLAMATION GLUE name -> name;
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- logical START -------------------------------------------------------------------------------
@@ -2826,7 +2826,8 @@ Double:                     DIGIT+ GLUEDOTNUMBER DOT DIGIT* Exponent?   //1.2e+1
 fragment Exponent:          E_ ( '+' | '-' )? DIGIT+;
 
 //Use ANTLR to resolve %x or %() inside a string
-StringInQuotes:             ('\'' (~'\'')* '\'');
+//StringInQuotes:             ('\'' (~'\'')* '\'');
+StringInQuotes:             ('\'' ('~\'' | ~'\'')* '\'');
 
 // --- These are done in Program.HandleObeyFilesNew() -------------------------------------------
 GLUE:                       '¨';
@@ -2844,6 +2845,7 @@ ISNOTQUAL:                  '<>';
 ISLARGEROREQUAL:			'>=';			
 ISSMALLEROREQUAL:           '<=';
 
+EXCLAMATION:                '!';
 TILDE:					    '~';
 AT:                         '@';
 HAT:                        '^';

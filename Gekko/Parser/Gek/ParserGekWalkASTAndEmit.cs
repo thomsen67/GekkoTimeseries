@@ -2855,7 +2855,7 @@ namespace Gekko.Parser.Gek
                                 string ivTempVar = SearchUpwardsInTree4(node);
                                 if (ivTempVar == null) ivTempVar = "null";
 
-                                //Check for simple variable like b:x~q or b:%s
+                                //Check for simple variable like b:x!q or b:%s
                                 //This is only for performance reasons, making lookup faster especially for VALs                            
 
                                 //Check bank
@@ -2903,13 +2903,13 @@ namespace Gekko.Parser.Gek
 
                                 if (simpleBank != null && simpleName != null && simpleFreq != null)
                                 {
-                                    //Ok is simple stuff like b:ts~f, or b:%v
+                                    //Ok is simple stuff like b:ts!f, or b:%v
                                     //We override anything in composed in sub-nodes...!
 
-                                    //For instance, b:x~q --> smpl, "b", "x", "q"
+                                    //For instance, b:x!q --> smpl, "b", "x", "q"
                                     //For instance, b:%x --> smpl, "b", "%x", null
                                     //For instance, x --> smpl, null, "x", null
-                                    //simpleName can never contain a '~', but if simpleFreq = null, a freq like "~a" will be added
+                                    //simpleName can never contain a '!', but if simpleFreq = null, a freq like "!a" will be added
                                     //  when looking up.
 
                                     string hasSigilText = "false";
@@ -2924,7 +2924,7 @@ namespace Gekko.Parser.Gek
                                 else
                                 {
                                     //Complicated name, for instance
-                                    //{%s}, a%s, a{#m}, {%b}:a, b:a~{%f}, %(%s),  ...                                    
+                                    //{%s}, a%s, a{#m}, {%b}:a, b:a!{%f}, %(%s),  ...                                    
                                     if (node[0][0] == null)
                                     {
                                         //no bank indicator
@@ -2949,13 +2949,13 @@ namespace Gekko.Parser.Gek
                     case "ASTVARNAME":
                         {
                             bool s0 = false; if (node[0][0] != null) s0 = true;  //sigil % or #
-                            bool s2 = false; if (node[2][0] != null) s2 = true;  //tilde ~
+                            bool s2 = false; if (node[2][0] != null) s2 = true;  //freq !
                             
                             if (s0)
                             {
                                 if(s2)
                                 {
-                                    //%a~q, does not make sense...
+                                    //%a!q, does not make sense...
                                     node.Code.A("(" + node[0][0].Code + ")").A(".Add(smpl, " + node[1][0].Code + ")").A(".Add(smpl, O.scalarStringTilde)").A(".Add(smpl, " + node[2][0].Code + ")");
                                 }   
                                 else
@@ -2968,7 +2968,7 @@ namespace Gekko.Parser.Gek
                             {
                                 if(s2)
                                 {
-                                    //a~q
+                                    //a!q
                                     node.Code.A("(" + node[1][0].Code + ")").A(".Add(smpl, O.scalarStringTilde)").A(".Add(smpl, " + node[2][0].Code + ")");
                                 }
                                 else

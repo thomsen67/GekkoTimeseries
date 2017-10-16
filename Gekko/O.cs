@@ -659,17 +659,7 @@ namespace Gekko
             //map != null:             the variable is found in the MAP, otherwise, the variable is found in a databank
             //rhsExpression != null:   it is an assignment of the left-hand side
 
-            bool hasSigil = false; if (varname[0] == Globals.symbolMemvar || varname[0] == Globals.symbolList) hasSigil = true;
-
-            //rhsExpression means the value of the rhs variable, meaning that the present lookup is setting a value for the lhs variable
-            //IVariable lhs = null;
-            string varnameWithTilde = varname;
-            if (!hasSigil)
-            {
-                //Timeseries has '~' added
-                if (freq != null) varnameWithTilde = varname + Globals.freqIndicator + freq;
-                else varnameWithTilde = varname + Globals.freqIndicator + G.GetFreq(Program.options.freq);
-            }
+            string varnameWithFreq = HandleSigilAndFreq(varname, freq);
 
             if (isLeftSideVariable)
             {
@@ -696,7 +686,7 @@ namespace Gekko
                 {
                     //direct assignment, like x = 5, or %s = 'a'
                     //in these cases, the LHS can be created if it is not already existing
-                    LookupHelperLeftside(smpl, ib, varnameWithTilde, freq, rhsExpression);
+                    LookupHelperLeftside(smpl, ib, varnameWithFreq, freq, rhsExpression);
                     return null;
                 }
                 else
@@ -704,10 +694,10 @@ namespace Gekko
                     //indexers on lhs, for instance x['a'] = ... or x[2000] = 5 or #x.%s = ...
                     //in this case, the x variable must exist
                     //NOTE: no databank search is allowed!
-                    IVariable ivar2 = ib.GetIVariable(varnameWithTilde);
+                    IVariable ivar2 = ib.GetIVariable(varnameWithFreq);
                     if (ivar2 == null)
                     {
-                        G.Writeln2("*** ERROR: Could not find variable '" + varnameWithTilde + "' for use in dot- or []-indexing");
+                        G.Writeln2("*** ERROR: Could not find variable '" + varnameWithFreq + "' for use in dot- or []-indexing");
                         throw new GekkoException();
                     }
                     else
@@ -723,10 +713,27 @@ namespace Gekko
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
-                
+
                 //NOTE: databank search may be allowed!
-                return LookupHelperRightside(map, dbName, varnameWithTilde);
-            }            
+                return LookupHelperRightside(map, dbName, varnameWithFreq);
+            }
+        }
+
+        public static string HandleSigilAndFreq(string varname, string freq)
+        {
+            bool hasSigil = false; if (varname[0] == Globals.symbolMemvar || varname[0] == Globals.symbolList) hasSigil = true;
+
+            //rhsExpression means the value of the rhs variable, meaning that the present lookup is setting a value for the lhs variable
+            //IVariable lhs = null;
+            string varnameWithTilde = varname;
+            if (!hasSigil)
+            {
+                //Timeseries has '!' added
+                if (freq != null) varnameWithTilde = varname + Globals.freqIndicator + freq;
+                else varnameWithTilde = varname + Globals.freqIndicator + G.GetFreq(Program.options.freq);
+            }
+
+            return varnameWithTilde;
         }
 
         private static IVariable LookupHelperRightside(Map map, string dbName, string varnameWithTilde)
@@ -865,7 +872,7 @@ namespace Gekko
                 {
                     //SERIES
                     //create it                            
-                    if (!Program.options.databank_create_auto && !varnameWithTilde.StartsWith("xx", StringComparison.OrdinalIgnoreCase))
+                    if (ib.BankType() == EBankType.Normal && !Program.options.databank_create_auto && !varnameWithTilde.StartsWith("xx", StringComparison.OrdinalIgnoreCase))
                     {
                         G.Writeln2("*** ERROR: Cannot create timeseries '" + varnameWithTilde);
                         G.Writeln("    You may use CREATE " + varnameWithTilde + ", or use MODE data, or use a name starting with 'xx'", Color.Red);
@@ -1089,7 +1096,7 @@ namespace Gekko
             string[] ss2 = varName.Split(Globals.freqIndicator);
             if (ss2.Length > 2)
             {
-                G.Writeln2("*** ERROR: More than 1 freq indicators ('~') in '" + input + "'");
+                G.Writeln2("*** ERROR: More than 1 freq indicators ('!') in '" + input + "'");
                 throw new GekkoException();
             }
             if (ss2.Length == 2)

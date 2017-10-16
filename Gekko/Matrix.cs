@@ -46,19 +46,21 @@ namespace Gekko
         }
 
         //Abstract class containing a Matrix                
-
+        
         public double[,] data = null;
-        [ProtoMember(1)]        
+        [ProtoMember(4)]
+        public List<string> colnames = null;
+        [ProtoMember(5)]
+        public List<string> rownames = null;
+
+        // ====================== DO NOT TOUCH THESE! =======================================================
+        [ProtoMember(1)]
         private double[] dataProtobufHelper___NOTOUCH = null; //only because protobuf does not handle 2d arrays
         [ProtoMember(2)]
         private int dataProtobufHelper0___NOTOUCH = 0; //only because protobuf does not handle 2d arrays
         [ProtoMember(3)]
         private int dataProtobufHelper1___NOTOUCH = 0; //only because protobuf does not handle 2d arrays
-
-        [ProtoMember(4)]
-        public List<string> colnames = null;
-        [ProtoMember(5)]
-        public List<string> rownames = null;     
+        // ============================================ =====================================================
 
         public Matrix()
         {

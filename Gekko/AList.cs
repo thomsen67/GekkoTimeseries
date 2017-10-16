@@ -18,9 +18,8 @@ namespace Gekko
         [ProtoMember(1)]
         public List<IVariable> list = null;
 
-        private MetaList()
+        public MetaList()
         {
-            //only because protobuf needs it, not for outside use
         }
 
         public MetaList(List<IVariable> list)

@@ -87,7 +87,7 @@ namespace Gekko
         public EFreq freq;
         /// <summary>
         /// The name of the variable. In a databank, this name corresponds to the key that the TimeSeries is stored under,
-        /// including frequency (for instance x~q for x with quarterly freq).        
+        /// including frequency (for instance x!q for x with quarterly freq).        
         /// </summary>
         [ProtoMember(3)]
         public string name;
@@ -146,7 +146,7 @@ namespace Gekko
         public TimeSeries(EFreq frequency, string variableName)
         {            
             this.freq = frequency;
-            this.name = variableName;  //Note: the variableName does contain a '~'. If the name is null, it is a light TimeSeries.
+            this.name = variableName;  //Note: the variableName does contain a '!'. If the name is null, it is a light TimeSeries.
             if (this.name != null) this.meta = new TimeSeriesMetaInformation();  //do not create this object if this.name = null, that is, a light TimeSeries.
         }
 

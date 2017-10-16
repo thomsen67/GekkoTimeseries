@@ -312,6 +312,11 @@ namespace Gekko
             if (eFreq != EFreq.Annual) variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);  //we do this IF here because it is speed critical code. Else a new string object will be created.
             IVariable x = GetIVariable(variable);
             return (TimeSeries)x;
-        }        
+        }      
+        
+        public EBankType BankType()
+        {
+            return EBankType.Normal;
+        }  
     }
 }

@@ -82,10 +82,11 @@ namespace Gekko
                 if (index.Type() == EVariableType.String)
                 {
                     string s = (index as ScalarString)._string2;
-                    IVariable rv = null; this.storage.TryGetValue(s, out rv);
+                    string varnameWithFreq = O.HandleSigilAndFreq(s, null);  //we do not know the freq. So if s has no '!', current freq will be added.
+                    IVariable rv = null; this.storage.TryGetValue(varnameWithFreq, out rv);
                     if (rv == null)
                     {
-                        G.Writeln2("*** ERROR: The MAP does not contain the name '" + s + "'");
+                        G.Writeln2("*** ERROR: The MAP does not contain the name '" + varnameWithFreq + "'");
                         throw new GekkoException();
                     }
                     return rv;
@@ -231,6 +232,11 @@ namespace Gekko
             {
                 kvp.Value.DeepTrim();
             }            
-        }        
+        }
+
+        public EBankType BankType()
+        {
+            return EBankType.Map;
+        }
     }
 }

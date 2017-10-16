@@ -22,7 +22,7 @@ namespace Gekko
 
         public ScalarString(string s)
         {
-            Initialize(s, false, false);
+            Initialize(s, false, true);  //Changed so that it always in-substitutes now
         }
 
         public ScalarString(string s, bool isName)
@@ -90,7 +90,7 @@ namespace Gekko
                     {
                         try
                         {
-                            IVariable a = O.GetScalar(variable, false);
+                            IVariable a = O.Lookup(null, null, null, Globals.symbolMemvar + variable, null, null, false);
                             if (a.Type() == EVariableType.String || a.Type() == EVariableType.Date || a.Type() == EVariableType.Val)
                             {
                                 bool valfail = false;
@@ -155,7 +155,8 @@ namespace Gekko
                         {
                             try
                             {
-                                IVariable a = O.GetScalar(variable, false);
+                                IVariable a = O.Lookup(null, null, null, Globals.symbolMemvar + variable, null, null, false);
+
                                 if (a.Type() == EVariableType.String || a.Type() == EVariableType.Date || a.Type() == EVariableType.Val)
                                 {
                                     IVariable b = new ScalarString("");
@@ -194,16 +195,20 @@ namespace Gekko
             string tp3 = new string(new char[] { '{', Globals.symbolTilde });  //a{~n}b
             string p3 = new string('{', 1);
             s = s.Replace(tp3, p3);
+
+            s = s.Replace("~'", "'");
+
             //Hmmm, in 'Hej~%s|du', this will become 'Hej%sdu', not 'Hej%s|du'
             //This is maybe not too good, but never mind            
             string concat = new string(Globals.symbolConcatenation, 1);
-
             //The following 3 lines remove single '|', but not double '||'.
             //Could use regex, but this is ok.
             //This means that PRT f|e will be fe, but show [1 || 2] keeps the '||'.
             s = s.Replace(concat + concat, "[<{2concats}>]");
             s = s.Replace(concat, "");
             s = s.Replace("[<{2concats}>]", concat + concat);
+
+            
 
             return s;
         }

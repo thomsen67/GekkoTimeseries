@@ -12646,7 +12646,7 @@ namespace Gekko
                     List<char> glued4 = new List<char> { '@' };  //only checked if no blank right of this
                     List<char> glued5 = new List<char> { '.' };  //only checked if no blank right of this
                     List<char> glued6 = new List<char> { '*', '?' };  //wildcards: a*b and a?b cannot have blanks.
-                    List<char> glued7 = new List<char> { '~' };
+                    List<char> glued7 = new List<char> { Globals.freqIndicator };
 
                     //=========== note =========================
                     // [c1] [c2] [c3], where c2 is the char analyzed.
@@ -13148,11 +13148,11 @@ namespace Gekko
                         }
 
                         // -------------------------------------------------------------
-                        // Handle tilde (~)  --> if no spaces --> ¨~¨
+                        // Handle exclamation (!)  --> if no spaces --> ¨!¨
                         // -------------------------------------------------------------
                         if (glued7.Contains(c2))
                         {
-                            //c2 is a '~'
+                            //c2 is a '!'
                             if (c1 != '\n' && c3 != '\n')
                             {
                                 if (c1 != ' ' && c3 != ' ')

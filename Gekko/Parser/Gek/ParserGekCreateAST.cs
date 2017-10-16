@@ -986,29 +986,29 @@ namespace Gekko.Parser.Gek
             }
             if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");
 
-            if (Globals.runningOnTTComputer)
-            {                
-                List<string> xxxx = new List<string>();                
-                if (ph.isOneLinerFromGui == false)
-                {
-                    //xxxx.Add(lineTemp2);
-                    for (int i = 0; i < lineTemp2.Count; i++)
-                    {
-                        string s = G.ReplaceGlueNew(lineTemp2[i]);
-                        List<string> yy = new List<string>();
-                        yy.Add(s);
-                        TranslateLine(yy, lineTemp2Numbers[i]);
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < inputFileLines.Count; i++)
-                    {
-                        xxxx.Add(G.ReplaceGlueNew(inputFileLines[i]));
-                    }
-                    TranslateLine(xxxx, null);
-                }                
-            }                       
+            //if (Globals.runningOnTTComputer)
+            //{                
+            //    List<string> xxxx = new List<string>();                
+            //    if (ph.isOneLinerFromGui == false)
+            //    {
+            //        //xxxx.Add(lineTemp2);
+            //        for (int i = 0; i < lineTemp2.Count; i++)
+            //        {
+            //            string s = G.ReplaceGlueNew(lineTemp2[i]);
+            //            List<string> yy = new List<string>();
+            //            yy.Add(s);
+            //            TranslateLine(yy, lineTemp2Numbers[i]);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        for (int i = 0; i < inputFileLines.Count; i++)
+            //        {
+            //            xxxx.Add(G.ReplaceGlueNew(inputFileLines[i]));
+            //        }
+            //        TranslateLine(xxxx, null);
+            //    }                
+            //}                       
         }
 
         private static void CheckForBadDouble(string lineTemp)

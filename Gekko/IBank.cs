@@ -5,6 +5,12 @@ using System.Text;
 
 namespace Gekko
 {
+    public enum EBankType
+    {
+        Normal,
+        Map
+    }
+
     public interface IBank
     {
         IVariable GetIVariable(string variable);
@@ -14,6 +20,8 @@ namespace Gekko
         bool ContainsIVariable(string name);
 
         void RemoveIVariable(string name);
+
+        EBankType BankType();
 
         string Message();
     }
