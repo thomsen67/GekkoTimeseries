@@ -1248,10 +1248,13 @@ namespace Gekko
         public static IVariable log(GekkoSmpl t, IVariable x)
         {
             IVariable rv = null;
-            if (IsValOrTimeseries(x))
+            if (x.Type() == EVariableType.Val)
             {
-                //double d = O.ConvertToVal(t, x); //#875324397
-                //rv = new ScalarVal(Math.Log(d));
+                rv = new ScalarVal(Math.Log(x.ConvertToVal()));
+            }
+            else if (x.Type() == EVariableType.Series)
+            {
+                throw new GekkoException();
             }
             else if (x.Type() == EVariableType.Matrix)
             {

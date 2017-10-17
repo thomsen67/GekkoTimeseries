@@ -46,6 +46,75 @@ namespace Gekko
 
         public static string SubstituteScalarsInString(string s, bool reportError, bool avoidVal)
         {
+            //UPDATE: we will no longer replace %animal in 'the %animal ran', only 'the {%animal} ran' or 'the {animal} ran'
+            //UPDATE: also replaces $ and $%, for instance $n or $%n. NOTE!! -> $ scalars are removed not
+
+            //New logic: we just look for {...}, and try to find a %-variable inside. To avoid, use ~{...
+            //Concatenation is not used anymore
+
+            //Tilde is used for ~{ and ~'
+
+            //We may have a problem with labels, when the user does this: PRT x%i instead of x{%i}
+            //What to do about this? Also x#i and x[#i]. Fix it. 
+
+            if (s == null) return null;
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < s.Length; i++)
+            {
+                Flag1:
+                if (IsLeftCurly(s, i))
+                {
+                    //search for matching
+                    for (int j = i + 1; j < s.Length; j++)
+                    {
+                        if (IsLeftCurly(s, j)) break;  //nested tilde, no good --> we abort
+                        if (IsRightCurly(s, j))
+                        {
+                            //now we have left curly at i, and right curly at j
+                            string ss = s.Substring(i + 1, j - i - 1).Trim();
+                            if (ss.StartsWith(Globals.symbolMemvar.ToString()))
+                            {
+                                ss = ss.Substring(1);  //remove it
+                            }
+                            if (G.IsSimpleToken(ss, false))
+                            {
+                                //look up the scalar
+                                IVariable a = O.Lookup(null, null, null, Globals.symbolMemvar + ss, null, null, false);
+                                string s2 = a.ConvertToString();
+                                sb.Append(s2);
+                                i = j + 1;  //to jump forwards
+                                goto Flag1;
+
+                            }
+                            else
+                            {
+                                //just ignore it
+                            }
+                        }
+                    }
+                }
+                sb.Append(s[i]);
+            }
+
+            sb.Replace("~'", "'");
+            sb.Replace("~{", "{");
+
+            return sb.ToString();
+        }
+
+        private static bool IsLeftCurly(string s, int i)
+        {
+            return s[i] == Globals.symbolLeftCurly && !(i > 0 && s[i - 1] == Globals.symbolTilde);
+        }
+
+        private static bool IsRightCurly(string s, int i)
+        {
+            return s[i] == Globals.symbolRightCurly && !(i > 0 && s[i - 1] == Globals.symbolTilde);
+        }
+
+        public static string SubstituteScalarsInStringOLDDELETE(string s, bool reportError, bool avoidVal)
+        {
             //UPDATE: also replaces $ and $%, for instance $n or $%n. NOTE!! -> $ scalars are removed not
             //Will look for '%' and find alphanumeric + underscore after that, to construct a scalar name.
             //So STRING s = 'abc%de,%f' will find two scalars. If tilde is used, scalars are not found:
@@ -206,11 +275,11 @@ namespace Gekko
             //This means that PRT f|e will be fe, but show [1 || 2] keeps the '||'.
             s = s.Replace(concat + concat, "[<{2concats}>]");
             s = s.Replace(concat, "");
-            s = s.Replace("[<{2concats}>]", concat + concat);            
+            s = s.Replace("[<{2concats}>]", concat + concat);
 
             return s;
         }
-        
+
         public bool IsName() {
             return _isName;
         }

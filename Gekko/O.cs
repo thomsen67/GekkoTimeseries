@@ -2235,6 +2235,56 @@ namespace Gekko
             return tsl;
         }
 
+        public static void PrepareUfunction(int number, string name)
+        {
+            if (Globals.gekkoInbuiltFunctions.ContainsKey(name))
+            {
+                G.Writeln2("*** ERROR: Loading of user function '" + name + "' failed, since this is also the name of an");
+                G.Writeln("           in-built Gekko function. Please rename your user function.", Color.Red);
+                throw new GekkoException();
+            }
+            if (number == 1)
+            {
+                if (Globals.ufunctions1.ContainsKey(name)) Globals.ufunctions1.Remove(name);
+            }
+            else if (number == 2)
+            {
+                if (Globals.ufunctions2.ContainsKey(name)) Globals.ufunctions2.Remove(name);
+            }
+            else if (number == 3)
+            {
+                if (Globals.ufunctions3.ContainsKey(name)) Globals.ufunctions3.Remove(name);
+            }
+            else if (number == 4)
+            {
+                if (Globals.ufunctions4.ContainsKey(name)) Globals.ufunctions4.Remove(name);
+            }
+            else if (number == 5)
+            {
+                if (Globals.ufunctions5.ContainsKey(name)) Globals.ufunctions5.Remove(name);
+            }
+            else if (number == 6)
+            {
+                if (Globals.ufunctions6.ContainsKey(name)) Globals.ufunctions6.Remove(name);
+            }
+            else if (number == 7)
+            {
+                if (Globals.ufunctions7.ContainsKey(name)) Globals.ufunctions7.Remove(name);
+            }
+            else if (number == 8)
+            {
+                if (Globals.ufunctions8.ContainsKey(name)) Globals.ufunctions8.Remove(name);
+            }
+            else if (number == 9)
+            {
+                if (Globals.ufunctions9.ContainsKey(name)) Globals.ufunctions9.Remove(name);
+            }
+            else if (number == 10)
+            {
+                if (Globals.ufunctions10.ContainsKey(name)) Globals.ufunctions10.Remove(name);
+            }
+        }
+
         public static Func<GekkoSmpl, IVariable, IVariable> FunctionLookup1(string name)
         {
             //NOTE: the number of args is hardcoded two places below

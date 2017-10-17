@@ -220,6 +220,8 @@ namespace Gekko
         public const char symbolMemvar = '%';
         public const string symbolDollar = "$";
         public const char symbolTilde = '~';
+        public const char symbolLeftCurly = '{';
+        public const char symbolRightCurly = '}';
         public const char symbolConcatenation = '|';
         public const char symbolGlueChar1 = '¨';
         public const string symbolGlueChar2 = "£";  //for '.'

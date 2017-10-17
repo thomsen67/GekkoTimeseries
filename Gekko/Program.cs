@@ -10021,7 +10021,8 @@ namespace Gekko
         public static void Mem(string tpe)
         {
             if (Globals.runningOnTTComputer)
-            {                
+            {
+                
 
                 bool intern = false;
 
@@ -20423,16 +20424,16 @@ namespace Gekko
             //Globals.uFunctionStorageCs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);  //resetting user functions
 
             //User functions: more can be added if necessary, or users can use LIST or DICT.
-            Globals.ufunctions1 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable>>();
-            Globals.ufunctions2 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable>>();
-            Globals.ufunctions3 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable>>();
-            Globals.ufunctions4 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-            Globals.ufunctions5 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-            Globals.ufunctions6 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-            Globals.ufunctions7 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-            Globals.ufunctions8 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-            Globals.ufunctions9 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-            Globals.ufunctions10 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+            Globals.ufunctions1 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions2 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions3 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions4 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions5 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions6 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions7 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions8 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions9 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions10 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
 
             Program.model = null; Program.unfoldedVariableList = null;
             Globals.modelFileName = "";
@@ -23143,18 +23144,7 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
-                //G.Writeln2("*** ERROR: Thlkadsf alkfdsj alks jfasdlkfj dsalkfj sadflkja dsflkjasd flkadsjf salkdæjf salkjf dsalkjf asdflkja dsfdsaflkja sdflkjæ");
-
-                //if (Globals.runningOnTTComputer)
-                //{
-                //    //#7098w7reeq98w7r
-                //    GMap gm = new GMap();
-                //    gm["a", "b"] = new ScalarVal(1d);
-                //    IVariable iv = gm["a", "b"];
-                //    gm = new GMap() { };
-                //}
-
-                //throw new GekkoException();
+                
             }
 
             if (x == null)
@@ -23177,7 +23167,7 @@ namespace Gekko
                 case EVariableType.String:
                     {
                         string s = O.ConvertToString(x);
-                        G.Writeln2("STRING = " + s);
+                        G.Writeln2("STRING = '" + s + "'");
                     }
                     break;
                 case EVariableType.Date:

@@ -1660,6 +1660,7 @@ namespace Gekko.Parser.Gek
                             }
                             w.headerCs.AppendLine("public static void " + internalName + "() {" + G.NL);
                             w.headerCs.AppendLine(Globals.splitSTOP);
+                            w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfArguments + ", `" + functionNameLower + "`);" + G.NL);
                             w.headerCs.AppendLine("Globals.ufunctions" + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl smpl" + vars + ") => { " + node[3].Code.ToString() + " ; return null; });" + G.NL);
                             w.headerCs.AppendLine(Globals.splitSTART);
                             w.headerCs.AppendLine("}" + G.NL);
@@ -1877,7 +1878,7 @@ namespace Gekko.Parser.Gek
                                     sb1.AppendLine("MetaList " + tempName + " = new MetaList();" + G.NL);
                                 }
                                 foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
-                                {                                    
+                                {
                                     sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))), null, false))) {");  //false is regarding isLeftSide
                                 }
 
@@ -1910,32 +1911,18 @@ namespace Gekko.Parser.Gek
                                     args += ", " + node[i].Code;
                                 }
 
-                                if (false)
+                                int numberOfArguments = node.ChildrenCount() - 1;
+
+                                if (Globals.gekkoInbuiltFunctions.ContainsKey(functionNameLower))
                                 {
-                                    //inbuilt function, test for these
-                                    //maybe the names should be reserved
-                                    //but then maybe user functions should be marked with sigil?? 
-                                    //like @f(), ... ?
-                                    node.Code.A("Functions." + functionNameLower + "(" + Globals.functionT1Cs).A(args).A(")");
+                                    node.Code.A("Functions." + functionNameLower).A("(" + Globals.functionT1Cs + "").A(args).A(")");
                                 }
                                 else
                                 {
-                                    int numberOfArguments = node.ChildrenCount() - 1;
-                                    //Access the ufunction1[...] so that it can fail with an error                                        
+                                    node.Code.A("O.FunctionLookup").A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionT1Cs + "").A(args).A(")");
+                                }
 
-                                    //node.Code.A("Globals.ufunctions").A(numberOfArguments).A("[").A("`").A(functionNameLower).A("`").A("](" + Globals.functionT1Cs + "").A(args).A(")");
-
-                                    if (functionNameLower != "series")
-                                    {
-                                        node.Code.A("O.FunctionLookup").A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionT1Cs + "").A(args).A(")");
-                                    }
-                                    else
-                                    {
-                                        node.Code.A("Functions."+functionNameLower).A("(" + Globals.functionT1Cs + "").A(args).A(")");
-                                    }                                    
-                                    
-                                }                                
-                            }                            
+                            }                         
                         }
                         break;
                     

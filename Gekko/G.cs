@@ -339,7 +339,7 @@ namespace Gekko
         }
 
         //Maybe allowTurtle should be removed
-        public static bool IsSimpleToken(string varName, bool allowTilde)
+        public static bool IsSimpleToken(string varName, bool allowFreqIndicator)
         {
             //must be like a38, f16, var2, _var3, x_y etc. Cannot start with digit.
             if (varName == null) return false;
@@ -347,7 +347,7 @@ namespace Gekko
             if (!G.IsLetterOrUnderscore(varName[0])) return false;
             for (int jj = 1; jj < varName.Length; jj++)
             {
-                if (!allowTilde)
+                if (!allowFreqIndicator)
                 {
                     if (!G.IsLetterOrDigitOrUnderscore(varName[jj]))
                     {
