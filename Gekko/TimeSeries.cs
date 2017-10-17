@@ -1052,7 +1052,9 @@ namespace Gekko
                 {
                     string txt = null; foreach (string ss in keys) txt += "'" + ss + "', ";
                     G.Writeln2("*** ERROR: The variable '" + this.name + "' is not an array-timeseries.");
-                    G.Writeln("*** ERROR: Indexer used: [" + txt.Substring(0, txt.Length - 2) + "]");
+                    G.Writeln("           Indexer used: [" + txt.Substring(0, txt.Length - 2) + "]", Color.Red);
+                    G.Writeln("           You may use '" + this.name + " = series(" + keys.Length + ");' to create it,", Color.Red);
+                    G.Writeln("           perhaps with 'CREATE " + this.name + ";' first.", Color.Red);
                     throw new GekkoException();
                 }
 
