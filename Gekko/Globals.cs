@@ -77,8 +77,9 @@ namespace Gekko
         public static string splitSTART = G.NL + splitSTART2 + G.NL;        
         public static string splitSTOP = G.NL + splitSTOP2 + G.NL;
         public static string functionParameterCode = "param_";
-                
+
         //User functions: more can be added if necessary, or users can use LIST or DICT.
+        public static Dictionary<string, Func<GekkoSmpl, IVariable>> ufunctions0 = new Dictionary<string, Func<GekkoSmpl, IVariable>>();
         public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable>> ufunctions1 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable>>();
         public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable>> ufunctions2 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable>>();
         public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable>> ufunctions3 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable>>();

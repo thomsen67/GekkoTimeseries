@@ -19,7 +19,11 @@ GekkoSmpl smpl = O.Smpl();
 
 
 p.SetText(@"¤1");
-Program.Ini(p);
+for (int iSmpl439 = 0; iSmpl439 < int.MaxValue; iSmpl439++) {
+O.Print(smpl, (O.FunctionLookup1("add1")(smpl)));
+
+if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl439); else break;
+}
 
 
 

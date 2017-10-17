@@ -1654,9 +1654,18 @@ namespace Gekko.Parser.Gek
                             sb.AppendLine(internalName + "();" + G.NL);
 
                             //string vars = null; for (int i = 0; i < numberOfArguments; i++) vars += ", IVariable i" + (i + 1);
-                            string vars = null; for (int i = 0; i < node.functionDef.Count; i++)
+                            string vars = null;
+
+                            if (node.functionDef == null)
                             {
-                                vars += ", " + node.functionDef[i].Item1 + " " + node.functionDef[i].Item2;                                
+                                //do nothing
+                            }
+                            else
+                            {
+                                for (int i = 0; i < node.functionDef.Count; i++)
+                                {
+                                    vars += ", " + node.functionDef[i].Item1 + " " + node.functionDef[i].Item2;
+                                }
                             }
                             w.headerCs.AppendLine("public static void " + internalName + "() {" + G.NL);
                             w.headerCs.AppendLine(Globals.splitSTOP);

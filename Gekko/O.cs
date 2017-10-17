@@ -2237,13 +2237,23 @@ namespace Gekko
 
         public static void PrepareUfunction(int number, string name)
         {
+            if (number > 10)
+            {
+                G.Writeln2("*** ERROR: More than 10 user function arguments is not allowed at the moment.");
+                G.Writeln("           You may consider using a MAP argument to work around this restriction.", Color.Red);
+                throw new GekkoException();
+            }
             if (Globals.gekkoInbuiltFunctions.ContainsKey(name))
             {
                 G.Writeln2("*** ERROR: Loading of user function '" + name + "' failed, since this is also the name of an");
                 G.Writeln("           in-built Gekko function. Please rename your user function.", Color.Red);
                 throw new GekkoException();
             }
-            if (number == 1)
+            if (number == 0)
+            {
+                if (Globals.ufunctions0.ContainsKey(name)) Globals.ufunctions0.Remove(name);
+            }
+            else if (number == 1)
             {
                 if (Globals.ufunctions1.ContainsKey(name)) Globals.ufunctions1.Remove(name);
             }
@@ -2285,6 +2295,27 @@ namespace Gekko
             }
         }
 
+        // USER FUNCTION STUFF START
+        // USER FUNCTION STUFF START
+        // USER FUNCTION STUFF START
+        // USER FUNCTION STUFF START ------------------------------------------------------------------------------------------
+        // USER FUNCTION STUFF START
+        // USER FUNCTION STUFF START
+        // USER FUNCTION STUFF START
+
+        public static Func<GekkoSmpl, IVariable> FunctionLookup0(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, IVariable> rv = null;
+            Globals.ufunctions0.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 0 arguments");
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
         public static Func<GekkoSmpl, IVariable, IVariable> FunctionLookup1(string name)
         {
             //NOTE: the number of args is hardcoded two places below
@@ -2310,6 +2341,118 @@ namespace Gekko
             }
             return rv;
         }
+
+        public static Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable> FunctionLookup3(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Globals.ufunctions3.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 3 arguments");
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup4(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Globals.ufunctions4.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 4 arguments");
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup5(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Globals.ufunctions5.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 5 arguments");
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup6(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Globals.ufunctions6.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 6 arguments");
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup7(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Globals.ufunctions7.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 7 arguments");
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup8(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Globals.ufunctions8.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 8 arguments");
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup9(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Globals.ufunctions9.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 9 arguments");
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup10(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Globals.ufunctions10.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 10 arguments");
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        // USER FUNCTION STUFF END
+        // USER FUNCTION STUFF END
+        // USER FUNCTION STUFF END
+        // USER FUNCTION STUFF END -------------------------------------------------------------------------------------------------
+        // USER FUNCTION STUFF END
+        // USER FUNCTION STUFF END
+        // USER FUNCTION STUFF END
 
         public static TimeSeries CreateTimeSeriesFromMatrix(GekkoSmpl smpl, Matrix m)
         {
