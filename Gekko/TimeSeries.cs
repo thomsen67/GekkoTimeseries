@@ -358,6 +358,20 @@ namespace Gekko
             this.dataArray[0] = value;
         }
 
+        public double GetTimelessData()
+        {
+            if (!this.isTimeless)
+            {
+                G.Writeln2("*** ERROR: Timeless variable error #1009");
+                throw new GekkoException();
+            }
+            if (this.dataArray == null)
+            {
+                return double.NaN;
+            }
+            return this.dataArray[0];
+        }
+
         /// <summary>
         /// This sets the observation (period) to the given value.
         /// </summary>

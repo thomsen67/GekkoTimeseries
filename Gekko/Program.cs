@@ -4745,10 +4745,10 @@ namespace Gekko
         {            
             if (ts2.IsTimeless())
             {
-                string[] ss2 = new string[ss.Length - 1];
-                Array.Copy(ss, 1, ss2, 0, ss.Length - 1);
+                //string[] ss2 = new string[ss.Length - 1];
+                //Array.Copy(ss, 1, ss2, 0, ss.Length - 1);
                 //if (ss2.Length == 0) ss2 = null;  //no array-dim and timeless
-                gvar.AddRecord(ss2).Level = ts2.dataArray[0];  //timeless data location                        
+                gvar.AddRecord(ss).Level = ts2.GetTimelessData();  //timeless data location                        
             }
             else
             {
@@ -23067,7 +23067,8 @@ namespace Gekko
                 case EVariableType.Series:
                     {
                         TimeSeries ts = x as TimeSeries;
-                        G.Writeln2("SERIES = ");
+                        string tl = null; if (ts.IsTimeless()) tl = " (timeless)";
+                        G.Writeln2("SERIES = " + tl);
                         int ii1 = -1;
                         foreach (GekkoTime t in smpl.Iterate12())
                         {

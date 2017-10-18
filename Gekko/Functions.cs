@@ -419,6 +419,15 @@ namespace Gekko
             return zeros(smpl, x1, x2);
         }
 
+        public static IVariable timeless(GekkoSmpl smpl, IVariable x1)
+        {
+            double d = x1.ConvertToVal();
+            TimeSeries ts = new TimeSeries(Program.options.freq, null);
+            ts.SetTimeless();
+            ts.SetTimelessData(d);
+            return ts;
+        }
+
         public static IVariable series(GekkoSmpl smpl, params IVariable[] x)
         {
             TimeSeries ts = null;
