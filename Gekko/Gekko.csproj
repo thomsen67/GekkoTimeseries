@@ -257,6 +257,7 @@
     <Compile Include="ScalarDate.cs" />
     <Compile Include="ScalarString.cs" />
     <Compile Include="ScalarVal.cs" />
+    <Compile Include="Series.cs" />
     <Compile Include="SimpleUnitTestWindow.xaml.cs">
       <DependentUpon>SimpleUnitTestWindow.xaml</DependentUpon>
     </Compile>
@@ -323,9 +324,6 @@
     </Compile>
     <Compile Include="Settings.cs" />
     <Compile Include="StringTokenizer2.cs" />
-    <Compile Include="TimeSeries.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Token.cs" />
     <Compile Include="TspUtilities.cs" />
     <Compile Include="TspUtilitiesGui.cs">

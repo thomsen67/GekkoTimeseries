@@ -179,11 +179,11 @@ namespace Gekko
         public static void HELPER_HandleLasp(GekkoTuple.Tuple2 tuple, IVariable p, IVariable q) {
             //This is pretty bad style, but the content of the tuple is put into p and q...
 
-            TimeSeries tsp1 = O.GetTimeSeries(p);
-            TimeSeries tsq1 = O.GetTimeSeries(q);
+            Series tsp1 = O.GetTimeSeries(p);
+            Series tsq1 = O.GetTimeSeries(q);
 
-            TimeSeries tsp2 = O.GetTimeSeries(tuple.tuple0);
-            TimeSeries tsq2 = O.GetTimeSeries(tuple.tuple1);
+            Series tsp2 = O.GetTimeSeries(tuple.tuple0);
+            Series tsq2 = O.GetTimeSeries(tuple.tuple1);
 
             tsp2.name = tsp1.name;
             tsq2.name = tsq1.name;
@@ -242,9 +242,9 @@ namespace Gekko
             double lambda = O.ConvertToVal(ilambda);
             double log = O.ConvertToVal(ilog);
             
-            TimeSeries rhs = O.GetTimeSeries(rightSide);
+            Series rhs = O.GetTimeSeries(rightSide);
 
-            TimeSeries lhs = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
+            Series lhs = new Series(ETimeSeriesType.TimeSeriesLight, smpl);
 
             bool isLog = false;
             if (log == 0d)
@@ -336,7 +336,7 @@ namespace Gekko
             int offset = 0;
             int obs = PackHelper(vars, ref gt1, ref gt2, ref offset);            
                         
-            List<TimeSeries> tss = new List<TimeSeries>();
+            List<Series> tss = new List<Series>();
             for (int j = offset; j < vars.Length; j++)
             {
                 if (vars[j].Type() == EVariableType.List)
@@ -344,14 +344,14 @@ namespace Gekko
                     foreach (IVariable iv in ((MetaList)vars[j]).list)
                     {
                         string s = O.ConvertToString(iv);
-                        TimeSeries tmp = Program.GetTimeSeriesFromString(s, O.ECreatePossibilities.None);
+                        Series tmp = Program.GetTimeSeriesFromString(s, O.ECreatePossibilities.None);
                         tss.Add(tmp);
                     }
                 }
                 else if (vars[j].Type() == EVariableType.Series)
                 {
                     //LIGHTFIXME
-                    tss.Add((TimeSeries)vars[j]);
+                    tss.Add((Series)vars[j]);
                 }       
                 else
                 {
@@ -369,10 +369,10 @@ namespace Gekko
 
             Matrix m = new Matrix(obs, n);
 
-            //    List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(s);
+            //    List<Series> tss = Program.GetTimeSeriesFromStringWildcard(s);
 
             int varcount = -1;
-            foreach(TimeSeries ts in tss)
+            foreach(Series ts in tss)
             {
                 varcount++;
                 int counter = -1;
@@ -422,7 +422,7 @@ namespace Gekko
         //public static IVariable timeless(GekkoSmpl smpl, IVariable x1)
         //{
         //    double d = x1.ConvertToVal();
-        //    TimeSeries ts = new TimeSeries(Program.options.freq, null);
+        //    Series ts = new Series(Program.options.freq, null);
         //    ts.SetTimeless();
         //    ts.SetTimelessData(d);
         //    return ts;
@@ -435,7 +435,7 @@ namespace Gekko
             //series('a') normal annual series
             //series(3) 3-dim series with current freq
             //series('a', 3) 3-dim annual series            
-            TimeSeries ts = HELPER_seriesAndTimeless("series", x);
+            Series ts = HELPER_seriesAndTimeless("series", x);
             return ts;
         }
 
@@ -446,16 +446,16 @@ namespace Gekko
             //timeless('a') normal annual timeless
             //timeless(3) 3-dim timeless with current freq
             //timeless('a', 3) 3-dim annual timeless
-            TimeSeries ts = HELPER_seriesAndTimeless("timeless", x);
+            Series ts = HELPER_seriesAndTimeless("timeless", x);
             return ts;
         }
 
-        private static TimeSeries HELPER_seriesAndTimeless(string type, IVariable[] x)
+        private static Series HELPER_seriesAndTimeless(string type, IVariable[] x)
         {
-            TimeSeries ts = null;
+            Series ts = null;
             if (x.Length == 0)
             {
-                ts = new TimeSeries(Program.options.freq, null);
+                ts = new Series(Program.options.freq, null);
             }
             else if (x.Length == 1)
             {
@@ -463,11 +463,11 @@ namespace Gekko
                 {
                     //frequency
                     EFreq freq = G.GetFreq(O.ConvertToString(x[0]));
-                    ts = new TimeSeries(freq, null);
+                    ts = new Series(freq, null);
                 }
                 else if (x[0].Type() == EVariableType.Val)
                 {
-                    ts = new TimeSeries(Program.options.freq, null);
+                    ts = new Series(Program.options.freq, null);
                     ts.storage = new MapMultidim();
                     ts.storageDim = O.ConvertToInt(x[0]);
                 }
@@ -483,7 +483,7 @@ namespace Gekko
                 {
                     //frequency
                     EFreq freq = G.GetFreq(O.ConvertToString(x[0]));
-                    ts = new TimeSeries(freq, null);
+                    ts = new Series(freq, null);
                     ts.storageDim = O.ConvertToInt(x[1]);
                 }
                 else
@@ -881,7 +881,7 @@ namespace Gekko
             //    throw new GekkoException();
             //}
 
-            //TimeSeries ts = new TimeSeries(Program.options.freq, null);
+            //Series ts = new Series(Program.options.freq, null);
             //int counter = -1;
             //foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
             //{
@@ -1114,7 +1114,7 @@ namespace Gekko
             GekkoTime t1 = Globals.globalPeriodStart;
             GekkoTime t2 = Globals.globalPeriodEnd;
 
-            TimeSeries ts = O.GetTimeSeries(inputVar);
+            Series ts = O.GetTimeSeries(inputVar);
             double percent2 = O.ConvertToVal(percent);
 
             int index1 = -12345;
@@ -1386,8 +1386,8 @@ namespace Gekko
         {
             if (x1.Type() == EVariableType.Series)
             {
-                TimeSeries x1_ts = x1 as TimeSeries;
-                TimeSeries ts = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
+                Series x1_ts = x1 as Series;
+                Series ts = new Series(ETimeSeriesType.TimeSeriesLight, smpl);
                 foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0, smpl.t3))
                 {
                     ts.SetData(t, (x1_ts.GetData(smpl, t) / x1_ts.GetData(smpl, t.Add(-1)) - 1d) * 100d);
@@ -1438,8 +1438,8 @@ namespace Gekko
             if (avg) divide = (double)d;
             if (x.Type() == EVariableType.Series)
             {
-                TimeSeries ts = (TimeSeries)x;
-                TimeSeries z = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
+                Series ts = (Series)x;
+                Series z = new Series(ETimeSeriesType.TimeSeriesLight, smpl);
                 foreach (GekkoTime gt in smpl.Iterate03())
                 {
                     double sum = 0d;
@@ -1830,10 +1830,10 @@ namespace Gekko
                 G.Writeln2("*** ERROR: fromSeries(): Databank '" + db + "' could not be found.");
                 throw new GekkoException();
             }
-            TimeSeries ts = db.GetVariable(name);
+            Series ts = db.GetVariable(name);
             if (ts == null)
             {
-                G.Writeln2("*** ERROR: fromSeries(): TimeSeries '" + name + "' could not be found in '" + bank + "'.");
+                G.Writeln2("*** ERROR: fromSeries(): Series '" + name + "' could not be found in '" + bank + "'.");
                 throw new GekkoException();
             }
 

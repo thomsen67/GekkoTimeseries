@@ -46,7 +46,7 @@ namespace Gekko.Parser
         public ASTNode Parent = null;
         public string Text = null;  //ANTLR decoration of the node (for instance 'ASTPRT' or '1.45').        
         public bool IgnoreNegate = false;  //can be set true in some case
-        public string nameSimpleIdent = null; //used to make fast pointers to VALs. Same idea could be used for TimeSeries, but the name of these are often composed (unsimple), and TimeSeries is put outside time loop in GENR, so that helps anyway.
+        public string nameSimpleIdent = null; //used to make fast pointers to VALs. Same idea could be used for Series, but the name of these are often composed (unsimple), and Series is put outside time loop in GENR, so that helps anyway.
         public string dotNumber = null;  //indicator as to whether a fY.1 is present        
         public int Line = 0;
         public int Number = 0;  //used to check position among siblings

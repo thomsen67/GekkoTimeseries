@@ -42,7 +42,7 @@ namespace Gekko
     //}    
 
     [ProtoContract]    
-    [ProtoInclude(1, typeof(TimeSeries))]
+    [ProtoInclude(1, typeof(Series))]
     [ProtoInclude(2, typeof(ScalarVal))]
     [ProtoInclude(3, typeof(ScalarDate))]
     [ProtoInclude(4, typeof(ScalarString))]

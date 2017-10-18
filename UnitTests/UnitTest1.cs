@@ -2695,8 +2695,8 @@ namespace UnitTests
             I("STRING param = 'save=(d10, d11, saa) mode=mult sigmalim=(1.50,2.50) seasonalma=msr force=totals print=alltables';");
             I("LIST m = y;");
             I("X12A <2000q1 2009q2 param = %param> work:#m;");
-            TimeSeries ts1 = First().GetVariable("ytrue");
-            TimeSeries ts2 = First().GetVariable("y_saa");
+            Series ts1 = First().GetVariable("ytrue");
+            Series ts2 = First().GetVariable("y_saa");
             foreach (GekkoTime gt in new GekkoTimeIterator(new GekkoTime(EFreq.Quarterly, 2000, 1), new GekkoTime(EFreq.Quarterly, 2009, 2)))
             {
                 Assert.AreEqual(ts1.GetData(null, gt), ts2.GetData(null, gt), 0.005d);
@@ -4123,14 +4123,14 @@ namespace UnitTests
 
             if (indexes != null)
             {
-                name = s + Globals.symbolTurtle + TimeSeries.GetHashCodeFromIvariables(indexes);
+                name = s + Globals.symbolTurtle + Series.GetHashCodeFromIvariables(indexes);
             }
             else
             {
                 name = s;
             }
 
-            TimeSeries ts = db.GetVariable(freq, name);
+            Series ts = db.GetVariable(freq, name);
 
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
@@ -6304,13 +6304,13 @@ namespace UnitTests
             }
 
             //----------------------------------------------------------------------
-            //Test of GetPeriod() from TimeSeries (converts an index back to GekkoTime)
+            //Test of GetPeriod() from Series (converts an index back to GekkoTime)
             //----------------------------------------------------------------------
 
             //Testing annual
             for (int ii = 1; ii <= 1; ii++)
             {
-                TimeSeries ts = new TimeSeries(EFreq.Annual, "testing");
+                Series ts = new Series(EFreq.Annual, "testing");
                 ts.SetData(new GekkoTime(EFreq.Annual, 2000, ii), 12345d);  //2000q1 will usually have index 100 then.
                 int index = 100;
                 GekkoTime gt0 = ts.GetPeriod(index);
@@ -6328,7 +6328,7 @@ namespace UnitTests
             //Testing quarterly (more fragile)
             for (int ii = 1; ii <= 4; ii++)
             {
-                TimeSeries ts = new TimeSeries(EFreq.Quarterly, "testing");
+                Series ts = new Series(EFreq.Quarterly, "testing");
                 ts.SetData(new GekkoTime(EFreq.Quarterly, 2000, ii), 12345d);  //2000q1 will usually have index 100 then.
                 int index = 100;
                 GekkoTime gt0 = ts.GetPeriod(index);
@@ -6345,7 +6345,7 @@ namespace UnitTests
             //Testing monthly (more fragile)
             for (int ii = 1; ii <= 12; ii++)
             {
-                TimeSeries ts = new TimeSeries(EFreq.Monthly, "testing");
+                Series ts = new Series(EFreq.Monthly, "testing");
                 ts.SetData( new GekkoTime(EFreq.Monthly, 2000, ii), 12345d);  //2000q1 will usually have index 100 then.
                 int index = 100;
                 GekkoTime gt0 = ts.GetPeriod(index);
@@ -6517,12 +6517,12 @@ namespace UnitTests
             //For putting data in: testing both SetData() and GetDataSequence() and setting the array value.
             //Testing that the data reads out correctly, both with GetData() and GetDataSequence()
             //Puts in 1500 / 1501 etc. for 'a', 1500.01 / 1500.02 / 1500.03 / 1500.04 / 1501.01 etc. for 'q'
-            TimeSeries tsA1 = new TimeSeries(EFreq.Annual, "test");
-            TimeSeries tsQ1 = new TimeSeries(EFreq.Quarterly, "test");
-            TimeSeries tsM1 = new TimeSeries(EFreq.Monthly, "test");
-            TimeSeries tsA2 = new TimeSeries(EFreq.Annual, "test");
-            TimeSeries tsQ2 = new TimeSeries(EFreq.Quarterly, "test");
-            TimeSeries tsM2 = new TimeSeries(EFreq.Monthly, "test");
+            Series tsA1 = new Series(EFreq.Annual, "test");
+            Series tsQ1 = new Series(EFreq.Quarterly, "test");
+            Series tsM1 = new Series(EFreq.Monthly, "test");
+            Series tsA2 = new Series(EFreq.Annual, "test");
+            Series tsQ2 = new Series(EFreq.Quarterly, "test");
+            Series tsM2 = new Series(EFreq.Monthly, "test");
             int start = 1500;
             int end = 3000;
             //writing data to timeseries
@@ -6598,10 +6598,10 @@ namespace UnitTests
             Assert.IsTrue(double.IsNaN(tsM2.GetData(null, (new GekkoTime(EFreq.Monthly, end, 12)).Add(1))));
 
             //testing getting data with GetDataSequence()
-            List<TimeSeries> listA = new List<TimeSeries>();
+            List<Series> listA = new List<Series>();
             listA.Add(tsA1);
             listA.Add(tsA2);
-            foreach (TimeSeries tsA in listA)
+            foreach (Series tsA in listA)
             {
                 int index1 = 0;
                 int index2 = 0;
@@ -6619,10 +6619,10 @@ namespace UnitTests
                 }
             }
 
-            List<TimeSeries> listQ = new List<TimeSeries>();
+            List<Series> listQ = new List<Series>();
             listQ.Add(tsQ1);
             listQ.Add(tsQ2);
-            foreach (TimeSeries tsQ in listQ)
+            foreach (Series tsQ in listQ)
             {
                 int index1 = 0;
                 int index2 = 0;
@@ -6640,10 +6640,10 @@ namespace UnitTests
                 }
             }
 
-            List<TimeSeries> listM = new List<TimeSeries>();
+            List<Series> listM = new List<Series>();
             listM.Add(tsM1);
             listM.Add(tsM2);
-            foreach (TimeSeries tsM in listM)
+            foreach (Series tsM in listM)
             {
                 int index1 = 0;
                 int index2 = 0;
@@ -6769,7 +6769,7 @@ namespace UnitTests
 
             I("RESET;");
             I("TIME 2005 2010;");
-            First().AddVariable(new TimeSeries(EFreq.Annual, "tsA1"));
+            First().AddVariable(new Series(EFreq.Annual, "tsA1"));
 
             int start = 1500;
             int end = 3000;
@@ -6807,7 +6807,7 @@ namespace UnitTests
             end = 3000;
             counter = 0;
 
-            First().AddVariable(new TimeSeries(EFreq.Annual, "tsA1"));
+            First().AddVariable(new Series(EFreq.Annual, "tsA1"));
 
             //1.2345 set at start, growing at 0.12345% per period
             I("SERIES<" + start + " " + start + "> tsA1 = 1.2345;");
@@ -6886,7 +6886,7 @@ namespace UnitTests
             end = 3000;
             counter = 0;
 
-            First().AddVariable(new TimeSeries(EFreq.Annual, "tsA1"));
+            First().AddVariable(new Series(EFreq.Annual, "tsA1"));
 
             //1.2345 set at start, growing at 0.12345 per period
             I("SERIES<" + start + " " + start + "> tsA1 = 1.2345;");
@@ -6923,7 +6923,7 @@ namespace UnitTests
             end = 3000;
             counter = 0;
 
-            First().AddVariable(new TimeSeries(EFreq.Annual, "tsA1"));
+            First().AddVariable(new Series(EFreq.Annual, "tsA1"));
 
             //1.2345 set at start, growing at 0.12345% per period
             I("SERIES<" + start + " " + start + "> tsA1 = 1.2345;");
@@ -6957,7 +6957,7 @@ namespace UnitTests
             end = 3000;
             counter = 0;
 
-            First().AddVariable(new TimeSeries(EFreq.Annual, "tsA1"));
+            First().AddVariable(new Series(EFreq.Annual, "tsA1"));
 
             //1.2345 set at start, growing at 0.12345 per period
             I("SERIES<" + start + " " + end + "> tsA1 = 1.2345;");
@@ -7000,7 +7000,7 @@ namespace UnitTests
                 end = 3000;
                 counter = 0;
 
-                First().AddVariable(new TimeSeries(EFreq.Annual, "tsA1"));
+                First().AddVariable(new Series(EFreq.Annual, "tsA1"));
 
                 //1.2345 set at start, growing at 0.12345% per period
                 I("SERIES<" + start + " " + start + "> tsA1 = 1.2345;");
@@ -7812,7 +7812,7 @@ namespace UnitTests
             Assert.AreEqual(nWork, 2);
             UData u;
             //just testing start/end for one of the timeseris (must be enough)
-            TimeSeries ts = First().GetVariable("a");
+            Series ts = First().GetVariable("a");
             GekkoTime gt = ts.GetPeriodFirst();
             Assert.AreEqual(gt.super, 2002);
             Assert.AreEqual(gt.sub, 1);
@@ -7833,7 +7833,7 @@ namespace UnitTests
             Assert.AreEqual(nWork, 3);
             UData u;
             //just testing start/end for one of the timeseris (must be enough)
-            TimeSeries ts = First().GetVariable("a");
+            Series ts = First().GetVariable("a");
             GekkoTime gt = ts.GetPeriodFirst();
             Assert.AreEqual(gt.super, 2002);
             Assert.AreEqual(gt.sub, 1);
@@ -7857,7 +7857,7 @@ namespace UnitTests
             Assert.AreEqual(nWork, 3);
             UData u;
             //just testing start/end for one of the timeseris (must be enough)
-            TimeSeries ts = First().GetVariable("a");
+            Series ts = First().GetVariable("a");
             GekkoTime gt = ts.GetPeriodFirst();
             Assert.AreEqual(gt.super, 2001);
             Assert.AreEqual(gt.sub, 1);
@@ -7890,7 +7890,7 @@ namespace UnitTests
             u = Data("one", 1999, "a"); Assert.AreEqual(u.w, 1.11d);
             u = Data("one", 2000, "a"); Assert.AreEqual(u.w, 2.22d);
             u = Data("one", 2001, "a"); Assert.AreEqual(u.w, 3.33d);
-            TimeSeries ts = First().GetVariable("one");
+            Series ts = First().GetVariable("one");
             GekkoTime gt = ts.GetPeriodFirst();
             Assert.AreEqual(gt.super, 1999);
             Assert.AreEqual(gt.sub, 1);
@@ -12682,12 +12682,12 @@ namespace UnitTests
 
         private static void CheckDatabankSample(double[] limits, int t1, int t2, bool useBank)
         {
-            TimeSeries fy = First().GetVariable("fy");
-            TimeSeries cp = First().GetVariable("cp");
-            TimeSeries enl = First().GetVariable("enl");
-            TimeSeries xx_fy = null;
-            TimeSeries xx_cp = null;
-            TimeSeries xx_enl = null;
+            Series fy = First().GetVariable("fy");
+            Series cp = First().GetVariable("cp");
+            Series enl = First().GetVariable("enl");
+            Series xx_fy = null;
+            Series xx_cp = null;
+            Series xx_enl = null;
             if (useBank)
             {
                 xx_fy = Program.databanks.GetRef().GetVariable("fy");
@@ -12741,8 +12741,8 @@ namespace UnitTests
                 {
                     if (G.Equal(s, ss)) goto Flag;
                 }
-                TimeSeries tsW = First().GetVariable(s);
-                TimeSeries tsB = Program.databanks.GetRef().GetVariable(s);
+                Series tsW = First().GetVariable(s);
+                Series tsB = Program.databanks.GetRef().GetVariable(s);
 
                 if (tsW == null || tsB == null)
                 {

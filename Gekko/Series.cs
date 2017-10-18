@@ -32,18 +32,18 @@ namespace Gekko
     }
 
     /// <summary>
-    /// The TimeSeries class is a class designed for storing and retrieving timeseries (vectors/arrays of consecutive time data) 
+    /// The Series class is a class designed for storing and retrieving timeseries (vectors/arrays of consecutive time data) 
     /// in a fast and reliable way. Timeseries can be of different frequencies (for instance annual, quarterly or monthly). 
     /// The internal representation of the data is an auto-resizing double[] array for speed and compactness.
     /// </summary>
     /// <remarks>
-    /// The TimeSeries class is typically used in conjunction with a Databank, which can be thought of as a container that
+    /// The Series class is typically used in conjunction with a Databank, which can be thought of as a container that
     /// stores the individual timeseries by their string names. Several databanks may be open at the same time (in RAM).
     /// </remarks>
     /// <example>
-    /// A stand-alone TimeSeries may be created and filled with data like this:
+    /// A stand-alone Series may be created and filled with data like this:
     /// <code>
-    /// TimeSeries ts = new TimeSeries(EFreq.Quarterly, "gdp");
+    /// Series ts = new Series(EFreq.Quarterly, "gdp");
     /// GekkoTime t1 = new GekkoTime(EFreq.Quarterly, 2000, 1);
     /// GekkoTime t2 = new GekkoTime(EFreq.Quarterly, 2002, 4);
     /// ts.SetData(t1.Add(-1), 323490d);
@@ -53,7 +53,7 @@ namespace Gekko
     ///     ts.SetData(t, 1.01d * lagValue);
     /// }    
     /// </code>
-    /// The code first creates a new TimeSeries 'ts' with quarterly frequency and the name 'gdp' (this name is used if the
+    /// The code first creates a new Series 'ts' with quarterly frequency and the name 'gdp' (this name is used if the
     /// timeseries is later put into a databank). Next, start and end periods are defined (2000q1 and 2002q4), and the period
     /// before the start period has its value set to 323490 (that is, for the quarter 1999q4). Next, all the
     /// quarters are looped via the iterator in the next line (that is, t = 2000q1, 2000q2, ... , 2002q4 = 12 observations
@@ -62,31 +62,31 @@ namespace Gekko
     /// the 'gdp' timeseries will obtain a quarterly growth rate of 1% for the period 2000q1-2002q4.
     /// </example>
     /// <example>
-    /// A TimeSeries object can be put into a Databank object and retrieved again by name (builds upon the previous example):    
+    /// A Series object can be put into a Databank object and retrieved again by name (builds upon the previous example):    
     /// <code>    
     /// Databanks databanks = new Databanks();
     /// databanks.AddDatabank(new Databank("Work");    
     /// databanks.GetDatabank("Work").AddVariable(ts);
-    /// TimeSeries ts1 = databanks.GetDatabank("Work").GetVariable("gdp");
+    /// Series ts1 = databanks.GetDatabank("Work").GetVariable("gdp");
     /// </code>
     /// The 'Work' databank will contain the 'gdp' time series (the name indicated when the timeseries was created), 
-    /// and 'ts' and 'ts1' will point to the same TimeSeries object. 
+    /// and 'ts' and 'ts1' will point to the same Series object. 
     /// You may consult the Databanks and Databank classes for more info on storing timeseries.
     /// </example>    
     /// <seealso cref="Databank"/>
     /// <seealso cref="Databanks"/>
     [ProtoContract]
-    public class TimeSeries : IVariable
+    public class Series : IVariable
     {
         [ProtoMember(1)]
         public TimeSeriesMetaInformation meta = null;
         ///// <summary>
-        ///// Indicates the frequency of the TimeSeries.
+        ///// Indicates the frequency of the Series.
         ///// </summary>
         [ProtoMember(2)]
         public EFreq freq;
         /// <summary>
-        /// The name of the variable. In a databank, this name corresponds to the key that the TimeSeries is stored under,
+        /// The name of the variable. In a databank, this name corresponds to the key that the Series is stored under,
         /// including frequency (for instance x!q for x with quarterly freq).        
         /// </summary>
         [ProtoMember(3)]
@@ -115,13 +115,13 @@ namespace Gekko
         [ProtoMember(9)]
         public int storageDim = 0;  //default is 0 which is same as normal timeseries, also used in IsArrayTimeseries()
 
-        private TimeSeries()
+        private Series()
         {
             //This is ONLY because protobuf-net needs it! 
             //Empty timeseries should not be created that way.            
         }
 
-        public TimeSeries(ETimeSeriesType type, GekkoSmpl smpl)
+        public Series(ETimeSeriesType type, GekkoSmpl smpl)
         {
             // ------------------------------
             //Constructing a TimeSeriesLight
@@ -139,15 +139,15 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Constructor that creates a new TimeSeries object with a particular frequency and variable name.
+        /// Constructor that creates a new Series object with a particular frequency and variable name.
         /// </summary>
         /// <param name="frequency">The frequency of the timeseries</param>
         /// <param name="variableName">The variable name of the timeseries</param>
-        public TimeSeries(EFreq frequency, string variableName)
+        public Series(EFreq frequency, string variableName)
         {
             //Will add freq in name, if it is missing
             this.freq = frequency;
-            this.name = variableName;  //Note: the variableName does contain a '!'. If the name is null, it is a light TimeSeries.
+            this.name = variableName;  //Note: the variableName does contain a '!'. If the name is null, it is a light Series.
             if (this.name != null)
             {
                 if (!this.name.Contains(Globals.freqIndicator))
@@ -155,7 +155,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Missing freq indicator, see G.AddFreqToName()");
                     throw new GekkoException();
                 }
-                this.meta = new TimeSeriesMetaInformation(); //do not create this object if this.name = null, that is, a light TimeSeries.
+                this.meta = new TimeSeriesMetaInformation(); //do not create this object if this.name = null, that is, a light Series.
             }
         }
 
@@ -191,7 +191,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Truncates the TimeSeries object, so that the starting period
+        /// Truncates the Series object, so that the starting period
         /// and ending period are as given. Beware: this will usually mean that data is deleted. Used to truncate
         /// a databank to a particular time period. Note: You may wish to use Trim() after a Truncate(). Note: only works for annual timeseries.
         /// </summary>
@@ -929,8 +929,8 @@ namespace Gekko
 
             if (x.Type() == EVariableType.Series)
             {                
-                TimeSeries xx = x as TimeSeries;
-                TimeSeries tsl = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
+                Series xx = x as Series;
+                Series tsl = new Series(ETimeSeriesType.TimeSeriesLight, smpl);
 
                 //LIGHTFIXME: speedup with arrays
                 foreach (GekkoTime t in smpl.Iterate03())
@@ -942,7 +942,7 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.Val)
             {
-                TimeSeries tsl = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
+                Series tsl = new Series(ETimeSeriesType.TimeSeriesLight, smpl);
                 ScalarVal xx = x as ScalarVal;
 
                 //LIGHTFIXME: speedup with arrays
@@ -982,7 +982,7 @@ namespace Gekko
 
         public IVariable Negate(GekkoSmpl smpl)
         {
-            TimeSeries ts = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
+            Series ts = new Series(ETimeSeriesType.TimeSeriesLight, smpl);
             foreach (GekkoTime t in smpl.Iterate03())
             {
                 ts.SetData(t, -this.GetData(smpl, t));
@@ -1014,7 +1014,7 @@ namespace Gekko
                     {
                         //cannot offset, since this object lives in a databank, so that would
                         //yield bad side-effects.
-                        TimeSeries ts = new TimeSeries(ETimeSeriesType.TimeSeriesLight, smpl);
+                        Series ts = new Series(ETimeSeriesType.TimeSeriesLight, smpl);
                         foreach (GekkoTime t in smpl.Iterate03())
                         {
                             ts.SetData(t, this.GetData(smpl, t.Add(i)));
@@ -1056,14 +1056,14 @@ namespace Gekko
             return this.name == null;  //then this.meta will also be null, but we only test .name
         }
 
-        private TimeSeries FindArrayTimeSeries(IVariable[] indexes, bool isLhs)
+        private Series FindArrayTimeSeries(IVariable[] indexes, bool isLhs)
         {
             if (indexes.Length == 0)
             {
                 G.Writeln2("*** ERROR: Indexer has 0 length");
                 throw new GekkoException();
             }
-            TimeSeries ts = null;
+            Series ts = null;
             int stringCount = 0;
             foreach (IVariable iv in indexes)
             {
@@ -1106,14 +1106,14 @@ namespace Gekko
                     }
                     else
                     {
-                        ts = new TimeSeries(this.freq, null);
+                        ts = new Series(this.freq, null);
                         if (this.IsTimeless()) ts.SetTimeless();  //inherits from ghost
                         this.storage.AddIVariableWithOverwrite(new MapMultidimItem(keys), ts);                        
                     }
                 }
                 else
                 {
-                    ts = iv as TimeSeries;
+                    ts = iv as Series;
                     if (ts == null)
                     {
                         G.Writeln2("*** ERROR: Array-timeseries element is non-series.");
@@ -1130,16 +1130,16 @@ namespace Gekko
                 {
                     s += iv.Type().ToString() + ", ";
                 }
-                G.Writeln2("*** ERROR: Timeseries []-index with these argument types: " + s.Substring(0, s.Length - (", ").Length));
+                G.Writeln2("*** ERROR: Series []-index with these argument types: " + s.Substring(0, s.Length - (", ").Length));
                 throw new GekkoException();
             }
 
             return ts;
         }
 
-        private TimeSeries FindArrayTimeSeriesOLDDELETE(IVariable[] indexes, bool isLhs)
+        private Series FindArrayTimeSeriesOLDDELETE(IVariable[] indexes, bool isLhs)
         {
-            TimeSeries ts = null;
+            Series ts = null;
             int stringCount = 0;
             foreach (IVariable iv in indexes)
             {
@@ -1155,7 +1155,7 @@ namespace Gekko
                 {
                     string hash = GetHashCodeFromIvariables(indexes);
                     string varname = s + Globals.symbolTurtle + hash + Globals.freqIndicator + G.GetFreq(this.freq);
-                    ts = this.meta.parentDatabank.GetIVariable(varname) as TimeSeries;  //should not be able to return null, since no-sigil name is timeseries                    
+                    ts = this.meta.parentDatabank.GetIVariable(varname) as Series;  //should not be able to return null, since no-sigil name is timeseries                    
                     if (ts == null)
                     {
                         if (!isLhs)
@@ -1165,7 +1165,7 @@ namespace Gekko
                         }
                         else
                         {
-                            ts = new TimeSeries(this.freq, varname);
+                            ts = new Series(this.freq, varname);
                             this.meta.parentDatabank.AddIVariable(ts);
                         }
                     }
@@ -1178,7 +1178,7 @@ namespace Gekko
                 {
                     s += iv.Type().ToString() + ", ";
                 }
-                G.Writeln2("*** ERROR: Timeseries []-index with these argument types: " + s.Substring(0, s.Length - (", ").Length));
+                G.Writeln2("*** ERROR: Series []-index with these argument types: " + s.Substring(0, s.Length - (", ").Length));
                 throw new GekkoException();
             }
 
@@ -1229,21 +1229,21 @@ namespace Gekko
             {
                 foreach (GekkoTime t in smpl.Iterate03())
                 {
-                    this.SetData(t, ((TimeSeries)x).GetData(smpl, t) + ((TimeSeries)y).GetData(smpl, t));
+                    this.SetData(t, ((Series)x).GetData(smpl, t) + ((Series)y).GetData(smpl, t));
                 }
             }
             else if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Series)
             {
                 foreach (GekkoTime t in smpl.Iterate03())
                 {
-                    this.SetData(t, ((ScalarVal)x).val + ((TimeSeries)y).GetData(smpl, t));
+                    this.SetData(t, ((ScalarVal)x).val + ((Series)y).GetData(smpl, t));
                 }
             }
             else if (x.Type() == EVariableType.Series && y.Type() == EVariableType.Val)
             {
                 foreach (GekkoTime t in smpl.Iterate03())
                 {
-                    this.SetData(t, ((TimeSeries)x).GetData(smpl, t) + ((ScalarVal)y).val);
+                    this.SetData(t, ((Series)x).GetData(smpl, t) + ((ScalarVal)y).val);
                 }
             }
             else
@@ -1327,7 +1327,7 @@ namespace Gekko
             else 
             {
                 //Will fail with an error if not all indexes are of STRING type                
-                TimeSeries ts = this.FindArrayTimeSeries(indexes, true);  //if not found, it will inherit the timeless status from this timeseries.
+                Series ts = this.FindArrayTimeSeries(indexes, true);  //if not found, it will inherit the timeless status from this timeseries.
                 if (ts.IsTimeless())
                 {
                     double d = rhsExpression.ConvertToVal();
@@ -1355,7 +1355,7 @@ namespace Gekko
 
         public bool IsDirty()
         {
-            if (meta == null) return false; //not used for light TimeSeries
+            if (meta == null) return false; //not used for light Series
             return this.meta.IsDirty();
         }
 
@@ -1365,13 +1365,13 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Creates a clone of the TimeSeries, copying all fields. Used for copying databanks in RAM.
+        /// Creates a clone of the Series, copying all fields. Used for copying databanks in RAM.
         /// </summary>
-        /// <returns>The cloned TimeSeries object.</returns>
+        /// <returns>The cloned Series object.</returns>
         public IVariable DeepClone()
         {            
             //Always make sure new fields are remembered in the DeepClone() method
-            TimeSeries tsCopy = new TimeSeries(this.freq, this.name);
+            Series tsCopy = new Series(this.freq, this.name);
             if (this.dataArray == null)
             {
                 tsCopy.dataArray = null;

@@ -1271,7 +1271,7 @@ namespace Gekko.Parser.Gek
                                     if (w.uFunctionsHelper.lhsTypes[counter] == "series")
                                     {
                                         string tempName = "temp" + ++Globals.counter;
-                                        s += "TimeSeries " + tempName + " = new TimeSeries(Program.options.freq, null);" + G.NL;
+                                        s += "Series " + tempName + " = new Series(Program.options.freq, null);" + G.NL;
                                         s += "foreach (GekkoTime t2 in new GekkoTimeIterator(Globals.globalPeriodStart, Globals.globalPeriodEnd))" + G.NL;
                                         s += GekkoTimeIteratorStartCode(w, node);  //node is where this text is put below
                                         s += "    double data = O.ConvertToVal(" + child.Code + ", t);" + G.NL;  //uuu
@@ -1880,7 +1880,7 @@ namespace Gekko.Parser.Gek
                                 sb1.AppendLine("public static IVariable " + tempName + "(GekkoSmpl smpl" + parentListLoopVars1 + ") {");
                                 if (G.Equal(functionNameLower, "sum"))
                                 {
-                                    sb1.AppendLine("TimeSeries " + tempName + " = new TimeSeries(Program.options.freq, null); " + tempName + ".SetZero(smpl);" + G.NL);
+                                    sb1.AppendLine("Series " + tempName + " = new Series(Program.options.freq, null); " + tempName + ".SetZero(smpl);" + G.NL);
                                 }
                                 else
                                 {
@@ -2049,7 +2049,7 @@ namespace Gekko.Parser.Gek
                                 }
                             }                            
 
-                            nodeCode += "O.Series o" + numNode + " = new O.Series();" + G.NL;
+                            nodeCode += "O.SeriesDef o" + numNode + " = new O.SeriesDef();" + G.NL;
 
                             nodeCode += "o" + numNode + ".t1 = Globals.globalPeriodStart;";
                             nodeCode += "o" + numNode + ".t2 = Globals.globalPeriodEnd;";
@@ -5557,7 +5557,7 @@ namespace Gekko.Parser.Gek
 
         //private static void SendTimeSeriesUpwardsInTree(ASTNode node, string hash, string tsWithNumber, string refCode, bool isSimple, WalkHelper2 wh2)
         //{
-        //    //This TimeSeries is not known, seen for the first time in the file.
+        //    //This Series is not known, seen for the first time in the file.
         //    string[] split = hash.Split(',');
         //    string bank = split[0].Trim();
         //    string variable = split[1].Trim();
@@ -5962,7 +5962,7 @@ namespace Gekko.Parser.Gek
         public GekkoDictionary<string, string> listCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public GekkoDictionary<string, string> tsCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public StringBuilder headerCs = new StringBuilder(); //stuff to be put at the very start.
-        public StringBuilder headerMethodTsCs = new StringBuilder(); //stuff to clear TimeSeries pointers
+        public StringBuilder headerMethodTsCs = new StringBuilder(); //stuff to clear Series pointers
         public StringBuilder headerMethodScalarCs = new StringBuilder(); //stuff to clear scalar pointers   
         public StringBuilder headerExpressions = new StringBuilder();
 

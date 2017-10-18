@@ -1270,7 +1270,7 @@ namespace Gekko
             int matrixMaxCol = matrix.GetColMaxNumber();
             for (int row = 1 + rowOffset; row <= matrixMaxRow; row++)
             {
-                TimeSeries ts = null;
+                Series ts = null;
                 for (int col = 1 + colOffset; col <= matrixMaxCol; col++)
                 {
                     if (row - rowOffset == 1 && col - colOffset == 1)
@@ -1440,7 +1440,7 @@ namespace Gekko
                             variableCounter++;
                             if (!databank.ContainsVariable(varName))
                             {
-                                TimeSeries data2 = new TimeSeries(freqHere, varName);
+                                Series data2 = new Series(freqHere, varName);
                                 databank.AddVariable(data2);
                                 ts = data2;
                             }
@@ -1766,7 +1766,7 @@ namespace Gekko
                             }
                             //G.Writeln("---");
                             //double[] ts = null;
-                            TimeSeries dataArray = null;
+                            Series dataArray = null;
                             String varName = "";
                             endOfLineEncountered = false;
                             bool firstItem = true;
@@ -1791,11 +1791,11 @@ namespace Gekko
                                     varName = s;
                                     firstItem = false;
 
-                                    //TimeSeries ts=findOrCreateTimeSeriesInDataBank(
+                                    //Series ts=findOrCreateTimeSeriesInDataBank(
 
                                     if (!databank.ContainsVariable(varName))
                                     {
-                                        TimeSeries data2 = new TimeSeries(G.GetFreq(freqHere), varName);  //TODO, FIX
+                                        Series data2 = new Series(G.GetFreq(freqHere), varName);  //TODO, FIX
                                         databank.AddVariable(data2);
                                         dataArray = data2;
                                     }
@@ -2399,7 +2399,7 @@ namespace Gekko
             if (removed.isDirty) isDirty = true;
             else
             {
-                foreach (TimeSeries ts in removed.storage.Values)  
+                foreach (Series ts in removed.storage.Values)  
                 {
                     if (ts.IsDirty())
                     {
@@ -2416,11 +2416,11 @@ namespace Gekko
             db.isDirty = false;
             foreach (IVariable iv in db.storage.Values)
             {
-                TimeSeries ts = iv as TimeSeries;
+                Series ts = iv as Series;
                 if (ts == null) continue;
                 if (ts.IsArrayTimeseries())
                 {
-                    foreach (TimeSeries tsSub in ts.storage.storage.Values)
+                    foreach (Series tsSub in ts.storage.storage.Values)
                     {
                         if (tsSub.meta == null) tsSub.meta = new Gekko.TimeSeriesMetaInformation();
                         tsSub.meta.parentDatabank = db;
@@ -2546,7 +2546,7 @@ namespace Gekko
             {
                 for (int row = 1 + rowOffset; row < 1 + rowOffset + n; row++)
                 {
-                    TimeSeries ts = Program.GetTimeSeriesFromString(o.listItems[row - 1 - rowOffset], O.ECreatePossibilities.Must); //O
+                    Series ts = Program.GetTimeSeriesFromString(o.listItems[row - 1 - rowOffset], O.ECreatePossibilities.Must); //O
                     for (int col = 1 + colOffset; col < 1 + colOffset + obs; col++)
                     {
                         double v = double.NaN;
@@ -2824,8 +2824,8 @@ namespace Gekko
                         {
                             //NOTE: we only time-truncate series and array-series at the direct level, not series inside lists, maps etc.
 
-                            TimeSeries tsExisting = GetTsExisting(databank, name);  //may be null
-                            TimeSeries tsProtobuf = iv as TimeSeries;  //cannot be null
+                            Series tsExisting = GetTsExisting(databank, name);  //may be null
+                            Series tsProtobuf = iv as Series;  //cannot be null
 
                             if (tsProtobuf.IsArrayTimeseries())
                             {
@@ -2848,10 +2848,10 @@ namespace Gekko
                                         foreach (KeyValuePair<MapMultidimItem, IVariable> kvpGmap in gmapProtobuf.storage)
                                         {
                                             MapMultidimItem nameDimProtobuf = kvpGmap.Key;
-                                            TimeSeries tsDimProtobuf = kvp.Value as TimeSeries;  //must be timeseries, no need to check that the type is so
+                                            Series tsDimProtobuf = kvp.Value as Series;  //must be timeseries, no need to check that the type is so
 
                                             IVariable ivDimExisting = null;  gmapExisting.TryGetValue(nameDimProtobuf, out ivDimExisting);
-                                            TimeSeries tsDimExisting = null; if (ivDimExisting != null) tsDimExisting = ivDimExisting as TimeSeries;
+                                            Series tsDimExisting = null; if (ivDimExisting != null) tsDimExisting = ivDimExisting as Series;
 
                                             //now we have a tsDimProtobuf, and if tsDimExisting != null, we merge the data
 
@@ -2936,7 +2936,7 @@ namespace Gekko
 
         }
 
-        private static void MergeTwoTimeseriesWithDateWindowHelper(ReadDatesHelper dates, Databank databank, string name, TimeSeries tsProtobuf, bool wipeExistingOut)
+        private static void MergeTwoTimeseriesWithDateWindowHelper(ReadDatesHelper dates, Databank databank, string name, Series tsProtobuf, bool wipeExistingOut)
         {
             if (wipeExistingOut)
             {
@@ -2946,7 +2946,7 @@ namespace Gekko
             }
         }
 
-        private static void MergeTwoTimeseriesWithDateWindowHelper(ReadDatesHelper dates, MapMultidim gmap, MapMultidimItem gmapItem, TimeSeries tsProtobuf, bool wipeExistingOut)
+        private static void MergeTwoTimeseriesWithDateWindowHelper(ReadDatesHelper dates, MapMultidim gmap, MapMultidimItem gmapItem, Series tsProtobuf, bool wipeExistingOut)
         {
             if (wipeExistingOut)
             {
@@ -2956,7 +2956,7 @@ namespace Gekko
             }
         }
 
-        private static void MergeTwoTimeseriesWithDateWindow(ReadDatesHelper dates, TimeSeries tsExisting, TimeSeries tsProtobuf, ref int maxYearInProtobufFile, ref int minYearInProtobufFile, ref bool wipeExistingOut)
+        private static void MergeTwoTimeseriesWithDateWindow(ReadDatesHelper dates, Series tsExisting, Series tsProtobuf, ref int maxYearInProtobufFile, ref int minYearInProtobufFile, ref bool wipeExistingOut)
         {
             if (tsProtobuf.IsTimeless() || (tsExisting != null && tsExisting.IsTimeless()))
             {
@@ -3048,13 +3048,13 @@ namespace Gekko
 
         }
 
-        private static TimeSeries GetTsExisting(Databank databank, string name)
+        private static Series GetTsExisting(Databank databank, string name)
         {
             IVariable ivExisting = databank.GetIVariable(name);
-            TimeSeries tsExisting = null;
+            Series tsExisting = null;
             if (ivExisting != null)
             {
-                tsExisting = ivExisting as TimeSeries;
+                tsExisting = ivExisting as Series;
                 if (tsExisting == null)
                 {
                     //should not be possible since the name has no sigil
@@ -3180,7 +3180,7 @@ namespace Gekko
                 int obs = 0;
                 int obsLeft = 0;
                 //int datalines = 0;
-                TimeSeries ts = null;
+                Series ts = null;
 
                 while ((line = sr.ReadLine()) != null)
                 {
@@ -3308,7 +3308,7 @@ namespace Gekko
                             if (IsNonsenseVariableName(varName))
                             {
                                 emptyWarnings++;
-                                ts = new TimeSeries(freq, varName);  //completely phoney, will not live after exit of this method: just so that we can continue
+                                ts = new Series(freq, varName);  //completely phoney, will not live after exit of this method: just so that we can continue
                             }
                             else
                             {
@@ -3599,7 +3599,7 @@ namespace Gekko
                             continue;
                         }
 
-                        TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, varName, EFreq.Annual);
+                        Series ts = FindOrCreateTimeSeriesInDataBank(databank, varName, EFreq.Annual);
 
                         if (oRead.t1.IsNull())
                         {
@@ -3968,7 +3968,7 @@ namespace Gekko
 
                 //put in the array-timeseries ghost
                 string varNameWithFreq = G.AddFreqToName(tableName, G.GetFreq(freq));
-                TimeSeries tsGhost = new TimeSeries(G.GetFreq(freq), varNameWithFreq);
+                Series tsGhost = new Series(G.GetFreq(freq), varNameWithFreq);
                 tsGhost.SetArrayTimeseries(dimensionsWithoutTime, true);
                 Databank databank = Program.databanks.GetFirst();
                 databank.AddIVariable(tsGhost.name, tsGhost);
@@ -3976,10 +3976,10 @@ namespace Gekko
 
                 for (int j = 0; j < codesCombi.Count; j++)
                 {
-                    TimeSeries ts = null;
+                    Series ts = null;
 
                     string name3 = GetArrayName(tableName, codesCombi[j]);
-                    ts = new TimeSeries(G.GetFreq(freq), G.AddFreqToName(name3, G.GetFreq(freq)));
+                    ts = new Series(G.GetFreq(freq), G.AddFreqToName(name3, G.GetFreq(freq)));
                     ts.meta.label = valuesCombi[j];
                     ts.meta.source = source;
                     ts.meta.stamp = Globals.dateStamp;
@@ -4036,12 +4036,12 @@ namespace Gekko
                 for (int j = 0; j < codesCombi.Count; j++)
                 {
 
-                    TimeSeries ts = null;
+                    Series ts = null;
 
                     if (true)
                     {
                         string name2 = codesCombi[j];
-                        ts = new TimeSeries(G.GetFreq(freq), name2);
+                        ts = new Series(G.GetFreq(freq), name2);
                         ts.meta.label = valuesCombi[j];
                         ts.meta.source = source;
                         ts.meta.stamp = Globals.dateStamp;
@@ -4419,12 +4419,12 @@ namespace Gekko
                                     isMultiDim = false;
                                 }
 
-                                TimeSeries ts = null;
+                                Series ts = null;
                                 if (isMultiDim)
                                 {
                                     //Multi-dim timeseries
                                     if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
-                                    ts = new TimeSeries(EFreq.Annual, varNameWithFreq);                                    
+                                    ts = new Series(EFreq.Annual, varNameWithFreq);                                    
                                     ts.meta.label = label;
                                     if (timeDimNr == -12345) ts.SetTimeless();  //not really relevant, since the timeseries is only a ghost
                                     ts.SetArrayTimeseries(gdxDimensions, hasTimeDimension == 1);                                    
@@ -4436,7 +4436,7 @@ namespace Gekko
                                     //A zero-dim timeseries in the Gekko sense can be timeless (scalar) or non-timeless (normal timeseries)
                                     //in this case, we just construct a normal timeseries
                                     if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
-                                    ts = new TimeSeries(EFreq.Annual, varNameWithFreq);
+                                    ts = new Series(EFreq.Annual, varNameWithFreq);
                                     ts.meta.label = label;
                                     if (timeDimNr == -12345) ts.SetTimeless();
                                     //ts.name = varName + Globals.freqIndicator + "a";
@@ -4454,7 +4454,7 @@ namespace Gekko
 
                                 List<string> oldDims = new List<string>() { "     " }; //will not match anything
                                 
-                                TimeSeries ts2 = null;  //the subseries in one of the dimension coordinates
+                                Series ts2 = null;  //the subseries in one of the dimension coordinates
 
                                 while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
                                 {
@@ -4528,13 +4528,13 @@ namespace Gekko
                                             IVariable iv = null; ts.storage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
                                             if (iv == null)
                                             {
-                                                ts2 = new TimeSeries(EFreq.Annual, null);  //has no name,  but will it be understood as TimeSeriesLight??                                           
+                                                ts2 = new Series(EFreq.Annual, null);  //has no name,  but will it be understood as TimeSeriesLight??                                           
                                                 if (timeDimNr == -12345) ts2.SetTimeless();
                                                 ts.storage.AddIVariableWithOverwrite(mmi, ts2);
                                             }
                                             else
                                             {
-                                                ts2 = iv as TimeSeries;
+                                                ts2 = iv as Series;
                                             }
                                         }
                                         else
@@ -4736,7 +4736,7 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: Cannot find variable '" + name + "' in databank '" + bnv.bank + "'");
                 }
-                TimeSeries ts = iv as TimeSeries;
+                Series ts = iv as Series;
                 if (ts == null) continue;  //only write timeseries at the moment
 
                 string label = ""; if (ts.meta?.label != null) label = ts.meta.label;  //label = null will fail with weird error later on
@@ -4761,7 +4761,7 @@ namespace Gekko
             if (timelessCounter > 0) G.Writeln("+++ NOTE: " + timelessCounter + " timeless timeseries skipped");
         }        
 
-        private static int WriteGdxHelper(GekkoTime t1, GekkoTime t2, bool usePrefix, int counterVariables, Databank gdb, TimeSeries ts, GAMSVariable gvar)
+        private static int WriteGdxHelper(GekkoTime t1, GekkoTime t2, bool usePrefix, int counterVariables, Databank gdb, Series ts, GAMSVariable gvar)
         {
 
             if (ts.IsArrayTimeseries())
@@ -4770,7 +4770,7 @@ namespace Gekko
                 {
                     string[] ss = kvp.Key.storage;
                     counterVariables++;
-                    WriteGdxHelper2(t1, t2, usePrefix, gvar, kvp.Value as TimeSeries, ss);
+                    WriteGdxHelper2(t1, t2, usePrefix, gvar, kvp.Value as Series, ss);
                 }
             }
             else
@@ -4783,7 +4783,7 @@ namespace Gekko
             return counterVariables;
         }
 
-        private static void WriteGdxHelper2(GekkoTime t1, GekkoTime t2, bool usePrefix, GAMSVariable gvar, TimeSeries ts2, string[] ss)
+        private static void WriteGdxHelper2(GekkoTime t1, GekkoTime t2, bool usePrefix, GAMSVariable gvar, Series ts2, string[] ss)
         {            
             if (ts2.IsTimeless())
             {                
@@ -4953,7 +4953,7 @@ namespace Gekko
         }
 
 
-        private static void WriteTsdRecord(GekkoTime per1, GekkoTime per2, StreamWriter res, TimeSeries ts, bool isCaps, bool isTsdx)
+        private static void WriteTsdRecord(GekkoTime per1, GekkoTime per2, StreamWriter res, Series ts, bool isCaps, bool isTsdx)
         {
             int index1 = -12345;
             int index2 = -12345;
@@ -5104,7 +5104,7 @@ namespace Gekko
         }
 
 
-        private static void WriteTspRecord(GekkoTime per1, GekkoTime per2, StreamWriter res, TimeSeries ts, bool isCaps)
+        private static void WriteTspRecord(GekkoTime per1, GekkoTime per2, StreamWriter res, Series ts, bool isCaps)
         {
             int index1 = -12345;
             int index2 = -12345;
@@ -6269,7 +6269,7 @@ namespace Gekko
             return eqs;
         }
 
-        private static void UpdHelper(TimeSeries ts, String op, GekkoTime per, double inputVal, TimeSeries tsOld, ESeriesUpdTypes updType)
+        private static void UpdHelper(Series ts, String op, GekkoTime per, double inputVal, Series tsOld, ESeriesUpdTypes updType)
         {
             GekkoTime PerMinusOne = per.Add(-1);
             //todo: also do updprt here.
@@ -6509,12 +6509,12 @@ namespace Gekko
             return temp;
         }
 
-        public static List<TimeSeries> GetTimeSeriesFromStringWildcard(string s)
+        public static List<Series> GetTimeSeriesFromStringWildcard(string s)
         {
             return GetTimeSeriesFromStringWildcard(s, null);
         }
 
-        public static List<TimeSeries> GetTimeSeriesFromStringWildcard(string s, string defaultBank)
+        public static List<Series> GetTimeSeriesFromStringWildcard(string s, string defaultBank)
         {
             return GetTimeSeriesFromStringWildcard(s, defaultBank, false);  //no ignore per default
         }
@@ -6522,9 +6522,9 @@ namespace Gekko
         //Can be "adambk:fX*2"
         //May return 0 items if wildcard does not exist
         //May be used without wildcard: "adambk:fy", then it is similar to GetTimeSeriesFromString() -> will return empty list if variable does not exist.
-        public static List<TimeSeries> GetTimeSeriesFromStringWildcard(string s, string defaultBank, bool ignoreNonExistingSeries)
+        public static List<Series> GetTimeSeriesFromStringWildcard(string s, string defaultBank, bool ignoreNonExistingSeries)
         {
-            List<TimeSeries> listTs = new List<TimeSeries>();
+            List<Series> listTs = new List<Series>();
             List<BankNameVersion> list = GetInfoFromStringWildcard(s, defaultBank);
             //See #89052349875, maybe merge it
             foreach (BankNameVersion bnv in list)
@@ -6540,7 +6540,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                 }
-                TimeSeries ts = db.GetVariable(bnv.name);
+                Series ts = db.GetVariable(bnv.name);
                 if (ts == null && !ignoreNonExistingSeries)
                 {                    
                     G.Writeln2("*** ERROR: Could not find timeseries '" + bnv.name + "' in databank '" + bnv.bank + "'");
@@ -6577,7 +6577,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found");
                     throw new GekkoException();
                 }
-                //This could be sped up if we returned List<TimeSeries> from MatchWildcardInDatabank().
+                //This could be sped up if we returned List<Series> from MatchWildcardInDatabank().
                 //We do too many lookups here, but never mind...
                 List<string> names = Program.MatchWildcardInDatabank(varName, db);
                 foreach (string s2 in names)
@@ -6617,7 +6617,7 @@ namespace Gekko
                 //    G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found");
                 //    throw new GekkoException();
                 //}
-                //TimeSeries temp = db.GetVariable(varName);
+                //Series temp = db.GetVariable(varName);
                 //if (temp != null) list.Add(temp);  //returns 0-item list, not null list.
 
                 BankNameVersion bnv = new BankNameVersion();
@@ -6642,7 +6642,7 @@ namespace Gekko
             return bank;
         }
 
-        public static TimeSeries FindOrCreateTimeseries(string bank, string variable, O.ECreatePossibilities isLhsSoCanAutoCreate, bool hasColon, bool isReadingDatabank)
+        public static Series FindOrCreateTimeseries(string bank, string variable, O.ECreatePossibilities isLhsSoCanAutoCreate, bool hasColon, bool isReadingDatabank)
         {
             //Looks for the timeseries, and if not existing it will be created if starting with 'xx'
             //Has an overload used for reading tsd and PCIM files etc.
@@ -6654,7 +6654,7 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            TimeSeries ts = null;
+            Series ts = null;
 
             if (isLhsSoCanAutoCreate == O.ECreatePossibilities.Can || isLhsSoCanAutoCreate == O.ECreatePossibilities.Must)
             {
@@ -6674,7 +6674,7 @@ namespace Gekko
                     if (isLhsSoCanAutoCreate == O.ECreatePossibilities.Must || isReadingDatabank || Program.options.databank_create_auto || variable.ToLower().StartsWith("xx"))
                     {
                         //See also similar code regarding CREATE
-                        ts = new TimeSeries(Program.options.freq, variable);
+                        ts = new Series(Program.options.freq, variable);
                         //ts.dimensions = 0;  //to start with, else it is -12345. May later on be changed to > 0 via an indexer.
                         //if (!Globals.globalPeriodStart.IsNull())
                         //{
@@ -6690,7 +6690,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: Timeseries '" + variable + "' could not be auto-created in '" + bank + "' databank");                        
+                        G.Writeln2("*** ERROR: Series '" + variable + "' could not be auto-created in '" + bank + "' databank");                        
                         G.Writeln("           You should use CREATE to create the timeseries first, or alternatively use");
                         G.Writeln("           'MODE data', or set 'OPTION databank create auto = yes'");
                         throw new GekkoException();
@@ -6743,18 +6743,18 @@ namespace Gekko
 
         }
 
-        private static TimeSeries HandleMissingVariable(string bank, string variable)
+        private static Series HandleMissingVariable(string bank, string variable)
         {
-            TimeSeries ts;
+            Series ts;
             if (Program.options.series_array_ignoremissing && variable.Contains(Globals.symbolTurtle))
             {
                 //ignore if array-series does not exist (normal) and ignore if variable does not exist (table)
-                ts = new TimeSeries(Program.options.freq, "temp_timeseries_not_to_be_used_array");
+                ts = new Series(Program.options.freq, "temp_timeseries_not_to_be_used_array");
             }
             else if (Program.options.table_ignoremissingvars && O.isTableCall)
             {
                 //ignore if array-series does not exist (normal) and ignore if variable does not exist (table)
-                ts = new TimeSeries(Program.options.freq, "temp_timeseries_not_to_be_used");
+                ts = new Series(Program.options.freq, "temp_timeseries_not_to_be_used");
             }
             else
             {
@@ -6779,7 +6779,7 @@ namespace Gekko
                 List<string> found = new List<string>();                
                 foreach (Databank db in Program.databanks.storage)
                 {
-                    TimeSeries ts = db.GetVariable(freq, variable);
+                    Series ts = db.GetVariable(freq, variable);
                     if (ts != null)
                     {
                         found.Add("'" + db.aliasName + "'");
@@ -6802,10 +6802,10 @@ namespace Gekko
         }
 
         //See also O.GetTimeSeries()
-        public static TimeSeries GetTimeSeriesFromString(string s, O.ECreatePossibilities isLhsSoCanAutoCreate)
+        public static Series GetTimeSeriesFromString(string s, O.ECreatePossibilities isLhsSoCanAutoCreate)
         {
             ExtractBankAndRestHelper h = ExtractBankAndRest(s, EExtrackBankAndRest.OnlyStrings);
-            TimeSeries ts = FindOrCreateTimeseries(h.bank, h.name, isLhsSoCanAutoCreate, h.hasColon, false);
+            Series ts = FindOrCreateTimeseries(h.bank, h.name, isLhsSoCanAutoCreate, h.hasColon, false);
             return ts;
         }
 
@@ -6848,7 +6848,7 @@ namespace Gekko
             //input.AddRange(db.storage.Keys);
             foreach (KeyValuePair<string, IVariable> kvp in db.storage)
             {
-                TimeSeries xx = kvp.Value as TimeSeries; if (xx != null && xx.IsArrayTimeseries()) continue;  //ignore ghosts
+                Series xx = kvp.Value as Series; if (xx != null && xx.IsArrayTimeseries()) continue;  //ignore ghosts
                 input.Add(new ScalarString(kvp.Key));
             }
 
@@ -7365,7 +7365,7 @@ namespace Gekko
                 }
             }
 
-            TimeSeries ts2 = null;
+            Series ts2 = null;
             int counter = 0;
             string oldHash = "";
 
@@ -7402,7 +7402,7 @@ namespace Gekko
 
                 if (ts2 == null)
                 {
-                    ts2 = new TimeSeries(EFreq.Annual, gvar + Globals.symbolTurtle + hash);
+                    ts2 = new Series(EFreq.Annual, gvar + Globals.symbolTurtle + hash);
                     Program.databanks.GetFirst().AddVariable(ts2);
                     if (timeIndex == -12345)
                     {
@@ -7421,10 +7421,10 @@ namespace Gekko
                 oldHash = hash;
             }
 
-            TimeSeries ts = Program.databanks.GetFirst().GetVariable(EFreq.Annual, gvar);
+            Series ts = Program.databanks.GetFirst().GetVariable(EFreq.Annual, gvar);
             if (ts == null)
             {
-                ts = new TimeSeries(EFreq.Annual, gvar);
+                ts = new Series(EFreq.Annual, gvar);
                 //ts.SetGhost(true);  //only a placeholder, should not be counted etc.
                 Program.databanks.GetFirst().AddVariable(ts);
             }
@@ -8502,8 +8502,8 @@ namespace Gekko
             for (int i = 0; i < o.listItems.Count; i++)
             {
                 //GetTimeSeriesFromStringWildcard() implicitly calls GetInfoFromStringWildcard() which we will call again later.
-                List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(o.listItems[i], o.opt_bank);
-                foreach (TimeSeries ts in tss)
+                List<Series> tss = Program.GetTimeSeriesFromStringWildcard(o.listItems[i], o.opt_bank);
+                foreach (Series ts in tss)
                 {
                     counter++;
                     string data = null;
@@ -8600,7 +8600,7 @@ namespace Gekko
                             if (G.Equal(sss, tempName + (i + 1) + "." + e))
                             {
                                 string varName = bnv.name + "_" + e;
-                                TimeSeries ts = new TimeSeries(o.t1.freq, varName);
+                                Series ts = new Series(o.t1.freq, varName);
                                 string s = Program.GetTextFromFileWithWait(file);
                                 List<string> lines = G.ExtractLinesFromText(s);
                                 foreach (string line in lines)
@@ -8879,7 +8879,7 @@ namespace Gekko
             }
             try
             {
-                TimeSeries ts = Program.databanks.GetFirst().GetVariable(variableNameWithoutLag);
+                Series ts = Program.databanks.GetFirst().GetVariable(variableNameWithoutLag);
                 if (ts != null)
                 {
                     string label = ts.meta.label;
@@ -9018,7 +9018,7 @@ namespace Gekko
             Databank base2 = Program.databanks.GetRef();
             foreach (string tsString in work.storage.Keys)
             {
-                TimeSeries tsGrund = base2.GetVariable(tsString);
+                Series tsGrund = base2.GetVariable(tsString);
                 if (tsGrund != null)
                 {
                     both.Add(tsString);
@@ -9032,8 +9032,8 @@ namespace Gekko
                 if (s.ToLower().StartsWith("j")) continue;
                 if (s.ToLower().StartsWith("z")) continue;
 
-                TimeSeries tsWork = work.GetVariable(s);
-                TimeSeries tsBase = base2.GetVariable(s);
+                Series tsWork = work.GetVariable(s);
+                Series tsBase = base2.GetVariable(s);
                 bool ok2 = true;
 
                 double maxVariance = 0d;
@@ -9081,7 +9081,7 @@ namespace Gekko
 
         public static void Randommodelcheck()
         {
-            TimeSeries ts = Program.databanks.GetFirst().GetVariable("sum");
+            Series ts = Program.databanks.GetFirst().GetVariable("sum");
             foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime((Program.options.freq), 2002, 1), new GekkoTime((Program.options.freq), 2100, 1)))
             {
                 if (Math.Abs(ts.GetData(null, t)) > 3 * 1.0e-4)  //hmmm seems error can be a little > 0.0001
@@ -9236,7 +9236,7 @@ namespace Gekko
                     negative = true;
                 }
 
-                TimeSeries ts = O.FindTimeSeries(var2, 0);
+                Series ts = O.FindTimeSeries(var2, 0);
 
                 if (ts == null)
                 {
@@ -9278,8 +9278,8 @@ namespace Gekko
             //So it seems we have to keep the loop inside f1(), which is also ok.
 
             List<string> el = null;
-            TimeSeries tg = WG("tg", ref el);
-            TimeSeries fy = WG("fy", ref el);
+            Series tg = WG("tg", ref el);
+            Series fy = WG("fy", ref el);
             if (el != null && el.Count > 0)
             {
                 //report, and remove dublets, in method + throw
@@ -9297,9 +9297,9 @@ namespace Gekko
 
         public static Databank w = null;
 
-        public static TimeSeries WG(string s, ref List<string> errorList)
+        public static Series WG(string s, ref List<string> errorList)
         {
-            TimeSeries ts = w.GetVariable(s);
+            Series ts = w.GetVariable(s);
             if (ts == null)
             {
                 if (errorList == null) errorList = new List<string>();
@@ -9308,13 +9308,13 @@ namespace Gekko
             return ts;
         }
 
-        public static double W(TimeSeries ts, GekkoTime t)
+        public static double W(Series ts, GekkoTime t)
         {
             //return ts.GetData(null, t);
             return ts.GetData(null, t);
         }
 
-        public static void WW(TimeSeries ts, GekkoTime t, double d)
+        public static void WW(Series ts, GekkoTime t, double d)
         {
             //ts.SetData(Program.options.freq, t, d);
             ts.SetData(t, d);
@@ -9982,8 +9982,8 @@ namespace Gekko
             List<string> ii = new List<string>(new string[] { "m", "b" });
             List<string> jj = new List<string>(new string[] { "nm", "nk" });
 
-            TimeSeries ts2 = Program.databanks.GetFirst().GetVariable("fk");
-            TimeSeries ts1 = Program.databanks.GetFirst().GetVariable("fim");
+            Series ts2 = Program.databanks.GetFirst().GetVariable("fk");
+            Series ts1 = Program.databanks.GetFirst().GetVariable("fim");
 
             for (int t = 2001; t <= 2002; t++)
             {
@@ -13590,7 +13590,7 @@ namespace Gekko
 
                     foreach (Databank db in dbList) {                        
 
-                        TimeSeries ts = db.GetVariable(var);
+                        Series ts = db.GetVariable(var);
                         if (ts == null) continue;
 
                         existenceCheck++;
@@ -13638,7 +13638,7 @@ namespace Gekko
                         }
 
                         //MetaTimeSeries ats = O.GetTimeSeries(var, 0, O.ECreatePossibilities.None);
-                        //TimeSeries ts = ats.ts;                    
+                        //Series ts = ats.ts;                    
 
 
                         if (ts == null)
@@ -15385,7 +15385,7 @@ namespace Gekko
                 {
                     if (!filter.ContainsKey(s)) continue;  //ignore this
                 }
-                TimeSeries ts = work.GetVariable(s);  //can this not be moved before loop??
+                Series ts = work.GetVariable(s);  //can this not be moved before loop??
                 if (ts.IsArrayTimeseries()) continue;  //ignore it
                 foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
                 {                    
@@ -15893,7 +15893,7 @@ namespace Gekko
             Program.model.simulateResults = new double[10];  //fix
 
             Databank work = Program.databanks.GetFirst();
-            TimeSeries[] timeSeriesPointers = new TimeSeries[Program.model.varsBType.Count];
+            Series[] timeSeriesPointers = new Series[Program.model.varsBType.Count];
             int[] extraWritebackPointers = new int[Program.model.varsBType.Count]; //will probably become obsolete at some point
             int[] revertedPointers = new int[Program.model.varsBType.Count];
             int[] lagPointers = new int[Program.model.varsBType.Count];
@@ -15921,7 +15921,7 @@ namespace Gekko
                 }
                 varNamePointers[value.bNumber] = value.variable;
                 //TODO: should make a check here that all slots are filled in from b[min] to b[max]
-                TimeSeries ts = work.GetVariable(value.variable);  //may be null
+                Series ts = work.GetVariable(value.variable);  //may be null
                 timeSeriesPointers[value.bNumber] = ts;
                 lagPointers[value.bNumber] = value.lag;
                 aNumberPointers[value.bNumber] = value.aNumber;
@@ -16684,12 +16684,12 @@ namespace Gekko
 
             for (int lv = 0; lv < leadedVarsList.Count; lv++)
             {
-                TimeSeries ts = null;
-                TimeSeries tsrel = null;
+                Series ts = null;
+                Series tsrel = null;
                 if (Program.options.solve_forward_dump)
                 {
-                    ts = new TimeSeries(Program.options.freq, "ftabs" + (lv + 1) + "_" + ft);
-                    tsrel = new TimeSeries(Program.options.freq, "ftrel" + (lv + 1) + "_" + ft);
+                    ts = new Series(Program.options.freq, "ftabs" + (lv + 1) + "_" + ft);
+                    tsrel = new Series(Program.options.freq, "ftrel" + (lv + 1) + "_" + ft);
                 }
                 int t3 = -1;
                 for (int t2 = -largestLag; t2 < -largestLag + obsSimPeriod; t2++)
@@ -16838,12 +16838,12 @@ namespace Gekko
                 {
                     int t3 = -1;
 
-                    TimeSeries ts = null;
-                    TimeSeries tsrel = null;
+                    Series ts = null;
+                    Series tsrel = null;
                     if (Program.options.solve_forward_dump)
                     {
-                        ts = new TimeSeries(Program.options.freq, "ftabs" + (lv + 1) + "_" + ft);
-                        tsrel = new TimeSeries(Program.options.freq, "ftrel" + (lv + 1) + "_" + ft);
+                        ts = new Series(Program.options.freq, "ftabs" + (lv + 1) + "_" + ft);
+                        tsrel = new Series(Program.options.freq, "ftrel" + (lv + 1) + "_" + ft);
                     }
 
                     for (int t2 = -largestLag; t2 < -largestLag + obsSimPeriod; t2++)
@@ -17077,7 +17077,7 @@ namespace Gekko
             return hasIssuedSeedWarning;
         }
 
-        private static void FromAToB(bool usingFairTaylor, bool usingNewtonFairTaylor, NewtonFairTaylorHelper1 shock, int ft, ErrorContainer ec, Databank work, TimeSeries[] timeSeriesPointers, int[] extraWritebackPointers, int[] lagPointers, int[] aNumberPointers, int[] endoNoLagPointers, int[] endoLeadPointers, int[] endoPointers, string[] varNamePointers, int[] isDJZvarPointers, double[,] a, int tInt, GekkoTime t, GekkoTime tStart, GekkoTime tEnd, SimOptions so)
+        private static void FromAToB(bool usingFairTaylor, bool usingNewtonFairTaylor, NewtonFairTaylorHelper1 shock, int ft, ErrorContainer ec, Databank work, Series[] timeSeriesPointers, int[] extraWritebackPointers, int[] lagPointers, int[] aNumberPointers, int[] endoNoLagPointers, int[] endoLeadPointers, int[] endoPointers, string[] varNamePointers, int[] isDJZvarPointers, double[,] a, int tInt, GekkoTime t, GekkoTime tStart, GekkoTime tEnd, SimOptions so)
         {
             bool ftOrNft = usingFairTaylor || usingNewtonFairTaylor;
             if (IsStacked())
@@ -17127,7 +17127,7 @@ namespace Gekko
 
 
                     double val = double.NaN;
-                    TimeSeries ts = timeSeriesPointers[i];
+                    Series ts = timeSeriesPointers[i];
                     string variable = varNamePointers[i];
                     if (ts == null)
                     {
@@ -17135,7 +17135,7 @@ namespace Gekko
                         {
                             val = 0d;  //DJZ set to 0 --> will end up in b[]
                             //J-factor or D or Z variable
-                            TimeSeries tsNew = new TimeSeries(Program.options.freq, variable);
+                            Series tsNew = new Series(Program.options.freq, variable);
                             work.AddVariable(tsNew);
                             timeSeriesPointers[i] = tsNew;
                             extraWritebackPointers[i] = 1;  //to make sure it gets written back from b[] to a[,] array
@@ -17222,7 +17222,7 @@ namespace Gekko
             return;
         }
 
-        private static void InitEndoLaggedOrExo(int[] extraWritebackPointers, int[] lagPointers, int[] endoPointers, int[] isDJZvarPointers, double[,] a, int tInt, ref GekkoTime t, ref GekkoTime tStart, ref GekkoTime tEnd, int i, ref double val, TimeSeries ts, string variable, int yy, YesNoNull isStaticLocalOption)
+        private static void InitEndoLaggedOrExo(int[] extraWritebackPointers, int[] lagPointers, int[] endoPointers, int[] isDJZvarPointers, double[,] a, int tInt, ref GekkoTime t, ref GekkoTime tStart, ref GekkoTime tEnd, int i, ref double val, Series ts, string variable, int yy, YesNoNull isStaticLocalOption)
         {
             //not a nolag-endogenous or lead-endogenous, so lagged endo or exogenous (may in principle be leaded exogenous)
             //these are just copied into b[] raw
@@ -17298,7 +17298,7 @@ namespace Gekko
                 {
                     //This does not run fast, but is seldom used
                     //is also done for exogenous, maybe more safe only for lagged endo.
-                    TimeSeries tsUndoBank = Globals.undoBank.GetVariable(ts.name);
+                    Series tsUndoBank = Globals.undoBank.GetVariable(ts.name);
                     //overrides the value -- takes it from the undoBank -- if exo there should be no change
                     val = tsUndoBank.GetData(null, t.Add(lagPointers[i]));
                 }
@@ -17328,7 +17328,7 @@ namespace Gekko
             return val;
         }
 
-        private static void InitEndoNoLag(ErrorContainer ec, double[,] a, int tInt, ref GekkoTime t, SimOptions so, ref double val, TimeSeries ts, int yy)
+        private static void InitEndoNoLag(ErrorContainer ec, double[,] a, int tInt, ref GekkoTime t, SimOptions so, ref double val, Series ts, int yy)
         {
             bool endoInitUsesLag = false;
             //we know that lagPointers are always 0 here!
@@ -17386,7 +17386,7 @@ namespace Gekko
                 int index1 = -12345;
                 int index2 = -12345;
                 double[] x = null;
-                TimeSeries ts = work.GetVariable(var);  //Could have an A-array with TimeSeries...
+                Series ts = work.GetVariable(var);  //Could have an A-array with Series...
                 if (ts == null)
                 {
                     if (IsDjz(var))
@@ -17415,7 +17415,7 @@ namespace Gekko
 
         public static void FromAToDatabank(GekkoTime tStart, GekkoTime tEnd, bool debug, Databank work, int obsWithLags, int obsSimPeriod, double[,] a, int[] bNumberPointers, int[] endoNoLagPointers)
         {
-            //TODO: this loop could be speed-optimized. Having the list of TimeSeries pre-done would help,
+            //TODO: this loop could be speed-optimized. Having the list of Series pre-done would help,
             //      instead of this looping. Maybe even a list of pointers to x[]-arrays pre-done.
             //      But still, reading in and out of a[] is not that costly.
             //      HMM, is the loop also writing back exogenous vars?
@@ -17435,7 +17435,7 @@ namespace Gekko
             {
                 string var = atd.varName;
                 int id = atd.aNumber;
-                TimeSeries ts = work.GetVariable(var);  //Could have an A-array with TimeSeries...
+                Series ts = work.GetVariable(var);  //Could have an A-array with Series...
                 //??? what if above is null??? << create it if djz?
                 int index1 = -12345;
                 int index2 = -12345;
@@ -17469,7 +17469,7 @@ namespace Gekko
             return Program.model.varsDTypeAutoGenerated.ContainsKey(variable) || Program.model.varsJTypeAutoGenerated.ContainsKey(variable) || Program.model.varsZTypeAutoGenerated.ContainsKey(variable);
         }
 
-        private static void SimCheckFirstPeriodForMissingStuff(bool usingFairTaylor, GekkoTime tStart, ErrorContainer ec, TimeSeries[] timeSeriesPointers, int[] lagPointers, int[] endoNoLagPointers, int[] endoLeadPointers, string[] varNamePointers, int[] isDJZvarPointers)
+        private static void SimCheckFirstPeriodForMissingStuff(bool usingFairTaylor, GekkoTime tStart, ErrorContainer ec, Series[] timeSeriesPointers, int[] lagPointers, int[] endoNoLagPointers, int[] endoLeadPointers, string[] varNamePointers, int[] isDJZvarPointers)
         {
             if (true)  //for a period like 2006-2079, this check hardly consumes any time
             {
@@ -17487,7 +17487,7 @@ namespace Gekko
 
                 for (int i = 0; i < Program.model.varsBType.Count; i++)
                 {
-                    TimeSeries ts = timeSeriesPointers[i];
+                    Series ts = timeSeriesPointers[i];
 
                     string variable = varNamePointers[i];
 
@@ -18259,9 +18259,9 @@ namespace Gekko
                         }
                     }
 
-                    TimeSeries ts = db.GetVariable(var);
+                    Series ts = db.GetVariable(var);
 
-                    TimeSeries tsBase = null;
+                    Series tsBase = null;
                     if (op == "*" || op == "+" || G.Equal(op, "q") || G.Equal(op, "m"))
                     {
                         tsBase = base2.GetVariable(var);
@@ -18446,8 +18446,8 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            TimeSeries p = new TimeSeries(EFreq.Annual, null);  //all this should be deleted, but the code will run like this...
-            TimeSeries x = new TimeSeries(EFreq.Annual, null);
+            Series p = new Series(EFreq.Annual, null);  //all this should be deleted, but the code will run like this...
+            Series x = new Series(EFreq.Annual, null);
 
             //List<string> vars = new List<string>();
             //vars.Add(var1);
@@ -18458,8 +18458,8 @@ namespace Gekko
             //    CreateXxVariableOrIssueError(work, var);
             //}
 
-            //TimeSeries p = work.GetVariable(var1);
-            //TimeSeries x = work.GetVariable(var2);
+            //Series p = work.GetVariable(var1);
+            //Series x = work.GetVariable(var2);
 
             double priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];
             counter = -1;
@@ -18494,7 +18494,7 @@ namespace Gekko
                 if (var.ToLower().StartsWith("xx", true, null))
                 {
                     //only vars beginning with "xx"
-                    TimeSeries tsNew = new TimeSeries(Program.options.freq, var);
+                    Series tsNew = new Series(Program.options.freq, var);
                     work.AddVariable(tsNew);
                 }
                 else
@@ -18612,7 +18612,7 @@ namespace Gekko
             foreach(string name in o.listItems)
             {
                 string var = name;
-                TimeSeries ts = GetTimeSeriesFromString(var, O.ECreatePossibilities.Can);
+                Series ts = GetTimeSeriesFromString(var, O.ECreatePossibilities.Can);
                 if (ts == null)
                 {
                     if (op != "=")
@@ -18626,7 +18626,7 @@ namespace Gekko
                         {
                             //only vars beginning with "xx", and only "="-operator
                             //G.Writeln("+++ NOTE: upd: variable " + var + " not found in databank -- is created");
-                            ts = new TimeSeries(Program.options.freq, var);
+                            ts = new Series(Program.options.freq, var);
                             first.AddVariable(ts);
                         }
                         else
@@ -18644,11 +18644,11 @@ namespace Gekko
                     if (endo) G.Writeln("+++ NOTE: You are updating a left-hand side variable (" + ts.name + ")");
                 }
 
-                //TimeSeries ts = work.GetVariable(var2);
-                TimeSeries tsOld = null;
+                //Series ts = work.GetVariable(var2);
+                Series tsOld = null;
                 if (op == "#" || updTypeDollar || o.opDollar || updType == ESeriesUpdTypes.mp)
                 {
-                    tsOld = ts.DeepClone() as TimeSeries;  //make a copy for use in # or $ or <mp> operator
+                    tsOld = ts.DeepClone() as Series;  //make a copy for use in # or $ or <mp> operator
                 }
 
                 if (o.data.Length > expectedNumberOfObservations)
@@ -19009,8 +19009,8 @@ namespace Gekko
                 string varLabel = (string)newList[i].name;
                 eo.excelRowLabels[i, 0] = varLabel;
 
-                TimeSeries ts = db.GetVariable(var);
-                //TimeSeries tsGrund = base2.GetVariable(var);
+                Series ts = db.GetVariable(var);
+                //Series tsGrund = base2.GetVariable(var);
                 if (ts == null)
                 {
                     //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
@@ -19217,16 +19217,16 @@ namespace Gekko
                     GekkoDictionary<string, IVariable> databankWithFewerPeriods = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
                     foreach (KeyValuePair<string, IVariable> kvp in databank.storage)
                     {
-                        TimeSeries ts = kvp.Value as TimeSeries;
+                        Series ts = kvp.Value as Series;
                         if (ts != null)
                         {
-                            TimeSeries tsClone = ts.DeepClone() as TimeSeries;
+                            Series tsClone = ts.DeepClone() as Series;
                             tsClone.Truncate(yr1, yr2);
                             databankWithFewerPeriods.Add(kvp.Key, tsClone);
                         }
                     }
                     databank.storage = databankWithFewerPeriods;
-                    databank.Trim();  //to make it smaller, slack removed from each TimeSeries
+                    databank.Trim();  //to make it smaller, slack removed from each Series
                 }
 
                 using (FileStream fs = WaitForFileStream(pathAndFilename2, GekkoFileReadOrWrite.Write))
@@ -19339,7 +19339,7 @@ namespace Gekko
                     }
                     else
                     {
-                        TimeSeries ts = iv as TimeSeries;
+                        Series ts = iv as Series;
                         {
                             if (ts == null) continue;  //skip                            
                             count++;
@@ -19360,7 +19360,7 @@ namespace Gekko
             doc.AppendChild(dec);// Create the root element
             //Using PascalCase for elements, and camelCase for attributes.
             XmlElement root = doc.CreateElement("DatabankInfo");
-            root.SetAttribute("databankVersion", tsdxVersion);  //needs to be changed if Databank/TimeSeries change
+            root.SetAttribute("databankVersion", tsdxVersion);  //needs to be changed if Databank/Series change
             root.SetAttribute("gekkoVersion", Globals.gekkoVersion);
             doc.AppendChild(root);
 
@@ -19895,7 +19895,7 @@ namespace Gekko
                 {
                     string s3 = var.name;
                     Databank db = GetBankFromBankNameVersion(var.bank);
-                    TimeSeries ts = db.GetVariable(s3);
+                    Series ts = db.GetVariable(s3);
                     if (ts == null)
                     {
                         //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
@@ -19978,7 +19978,7 @@ namespace Gekko
                 Databank db = GetBankFromBankNameVersion(s.bank);
                 IVariable iv = db.GetIVariable(s.name);
                 if (iv.Type() != EVariableType.Series) continue;  //should never happen
-                TimeSeries ts = (TimeSeries)iv;
+                Series ts = (Series)iv;
                 start = G.GekkoMin(start, ts.GetPeriodFirst().super);
                 end = G.GekkoMax(end, ts.GetPeriodLast().super);
             }
@@ -20038,7 +20038,7 @@ namespace Gekko
                 {
                     string s3 = var.name;
                     Databank db = GetBankFromBankNameVersion(var.bank);
-                    TimeSeries ts = db.GetVariable(s3);
+                    Series ts = db.GetVariable(s3);
                     if (ts == null)
                     {
                         G.Writeln2("*** ERROR: Writing gnuplot file: variable " + s3 + " in '" + db.aliasName + "' with freq '" + Program.options.freq + "' does not exist");
@@ -20055,7 +20055,7 @@ namespace Gekko
                     {
                         string s3 = var.name;
                         Databank db = GetBankFromBankNameVersion(var.bank);
-                        TimeSeries ts = db.GetVariable(s3);  //existence has been checked
+                        Series ts = db.GetVariable(s3);  //existence has been checked
                         double data = ts.GetData(null, t);
                         if (G.isNumericalError(data))
                         {
@@ -20131,7 +20131,7 @@ namespace Gekko
                 foreach (BankNameVersion var in vars)
                 {
                     Databank db = GetBankFromBankNameVersion(var.bank);                    
-                    TimeSeries ts = db.GetVariable(var.name);
+                    Series ts = db.GetVariable(var.name);
                     if (ts == null)
                     {
                         //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
@@ -20160,16 +20160,16 @@ namespace Gekko
         /// <param name="databank">The databank</param>
         /// <param name="varName">The variable name</param>
         /// <returns></returns>
-        private static TimeSeries FindOrCreateTimeSeriesInDataBank(Databank databank, string varName, EFreq frequency)
+        private static Series FindOrCreateTimeSeriesInDataBank(Databank databank, string varName, EFreq frequency)
         {
             //This auto-creates timeseries for use when reading for example tsd or PCIM files
             //Has an overload used for UPD statements etc.
-            TimeSeries ts = null;
+            Series ts = null;
             string varName2 = Program.AddFreqAtEndOfVariableName(varName, frequency);
 
             if (!databank.ContainsVariable(false, varName2))  //a little bit slack, but not much if databank is empty to start with
             {
-                ts = new TimeSeries(frequency, varName);
+                ts = new Series(frequency, varName);
                 databank.AddVariable(ts);
             }
             else
@@ -21665,7 +21665,7 @@ namespace Gekko
                         foreach (string tsString in work.storage.Keys) 
                         {
                             if (G.GetFreqFromKey(tsString) != Program.options.freq) continue;  //filter out other freqs
-                            TimeSeries tsGrund = base2.GetVariable(false, tsString);
+                            Series tsGrund = base2.GetVariable(false, tsString);
                             if (tsGrund == null)
                             {
                                 onlyWork.Add(G.RemoveFreqFromKey(tsString));
@@ -21678,7 +21678,7 @@ namespace Gekko
                         foreach (string tsString in base2.storage.Keys)  
                         {
                             if (G.GetFreqFromKey(tsString) != Program.options.freq) continue;  //filter out other freqs
-                            TimeSeries tsWork = work.GetVariable(false, tsString);
+                            Series tsWork = work.GetVariable(false, tsString);
                             if (tsWork == null)
                             {
                                 onlyGrund.Add(G.RemoveFreqFromKey(tsString));
@@ -21704,8 +21704,8 @@ namespace Gekko
                         //There is a little bit unnecessary overhead here, if compareType is "alphabetical". But never mind.
                         foreach (string tsString in both)
                         {
-                            TimeSeries ts = work.GetVariable(tsString);
-                            TimeSeries tsGrund = base2.GetVariable(tsString);
+                            Series ts = work.GetVariable(tsString);
+                            Series tsGrund = base2.GetVariable(tsString);
                             if (ts == null)
                             {
                                 G.Writeln("+++ WARNING: variable '" + tsString + "' not found in " + work.aliasName + " databank");
@@ -21949,11 +21949,11 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                    TimeSeries ts = db.GetVariable(bnv.name);
+                    Series ts = db.GetVariable(bnv.name);
                     if (ts == null)
                     {
                         //#642842749283
-                        ts = new TimeSeries(Program.options.freq, bnv.name);
+                        ts = new Series(Program.options.freq, bnv.name);
                         if (!Globals.globalPeriodStart.IsNull())
                         {
                             //WHY is this done. For efficiency afterwards??
@@ -22014,14 +22014,14 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            TimeSeries ts0 = databank0.GetVariable(eFreq0, name0);
+            Series ts0 = databank0.GetVariable(eFreq0, name0);
             if (ts0 == null)
             {
                 G.Writeln2("*** ERROR: Could not find variable '" + name0 + "' with frequency '" + eFreq0 + "' in '" + databank0.aliasName + "' databank");
                 throw new GekkoException();
             }
 
-            TimeSeries ts1 = databank1.GetVariable(eFreq1, name1);
+            Series ts1 = databank1.GetVariable(eFreq1, name1);
             if (ts1 == null)
             {
                 G.Writeln("+++ NOTE: Created new variable '" + name1 + "' with frequency '" + G.GetFreq(eFreq1) + "'");
@@ -22031,7 +22031,7 @@ namespace Gekko
                 //We wipe it completely out if it already exists!
                 databank1.RemoveVariable(eFreq1, name1);
             }
-            ts1 = new TimeSeries(eFreq1, name1);
+            ts1 = new Series(eFreq1, name1);
             databank1.AddVariable(ts1);  //hmmm a mess with all this freq stuff!
 
             GekkoTime first = ts0.GetPeriodFirst(); //start of high-freq timeseries
@@ -22158,14 +22158,14 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            TimeSeries ts0 = databank0.GetVariable(eFreq0, name0);
+            Series ts0 = databank0.GetVariable(eFreq0, name0);
             if (ts0 == null)
             {
                 G.Writeln2("*** ERROR: Could not find variable '" + name0 + "' with frequency '" + eFreq0 + "' in '" + databank0.aliasName + "' databank");
                 throw new GekkoException();
             }
 
-            TimeSeries ts1 = databank1.GetVariable(eFreq1, name1);
+            Series ts1 = databank1.GetVariable(eFreq1, name1);
             if (ts1 == null)
             {
                 G.Writeln("+++ NOTE: Created new variable '" + name1 + "' with frequency '" + G.GetFreq(eFreq1) + "'");
@@ -22175,7 +22175,7 @@ namespace Gekko
                 //We wipe it completely out if it already exists!
                 databank1.RemoveVariable(eFreq1, name1);
             }
-            ts1 = new TimeSeries(eFreq1, name1);
+            ts1 = new Series(eFreq1, name1);
             databank1.AddVariable(ts1);  //hmmm a mess with all this freq stuff!
 
             GekkoTime first = ts0.GetPeriodFirst(); //start of low-freq timeseries
@@ -22309,8 +22309,8 @@ namespace Gekko
             for (int i = 0; i < vars.Count; i++)
             {
                 //may contain nulls if ts not found in bank
-                List<TimeSeries> tss = Program.GetTimeSeriesFromStringWildcard(vars[i], null, true);
-                foreach (TimeSeries ts in tss)
+                List<Series> tss = Program.GetTimeSeriesFromStringWildcard(vars[i], null, true);
+                foreach (Series ts in tss)
                 {
                     if (ts == null)
                     {
@@ -22441,8 +22441,8 @@ namespace Gekko
             Matrix name_stats = new Matrix(9, 1, double.NaN);
             Matrix name_covar = new Matrix(m, m, double.NaN);
             Matrix name_corr = new Matrix(m, m, double.NaN);
-            TimeSeries name_predict = new TimeSeries(t1.freq, name + "_predict");
-            TimeSeries name_residual = new TimeSeries(t1.freq, name + "_residual");
+            Series name_predict = new Series(t1.freq, name + "_predict");
+            Series name_residual = new Series(t1.freq, name + "_residual");
 
             double[] y = new double[n];
             double[,] x = new double[n, m];
@@ -23078,7 +23078,7 @@ namespace Gekko
                                     ii2++;
                                     if (iv.Type() == EVariableType.Series)
                                     {
-                                        TimeSeries ts = iv as TimeSeries;
+                                        Series ts = iv as Series;
                                         tab.SetNumber(ii1 + 1, ii2 + 2, ts.GetData(smpl, t), "f12.4");
                                     }
                                     else if (iv.Type() == EVariableType.Val)
@@ -23105,7 +23105,7 @@ namespace Gekko
                     break;
                 case EVariableType.Series:
                     {
-                        TimeSeries ts = x as TimeSeries;
+                        Series ts = x as Series;
                         string tl = null; if (ts.IsTimeless()) tl = " (timeless)";
                         G.Writeln2("SERIES = " + tl);
                         int ii1 = -1;
@@ -23468,8 +23468,8 @@ namespace Gekko
                         {
                             bool filter = timefilter && ShouldFilterPeriod(gt);
 
-                            TimeSeries ts = subPe.tsWork;
-                            TimeSeries tsGrund = subPe.tsBase;
+                            Series ts = subPe.tsWork;
+                            Series tsGrund = subPe.tsBase;
 
                             double var1;
                             double varPch;
@@ -24364,7 +24364,7 @@ namespace Gekko
             return identicalCodes;
         }
 
-        private static bool HasIdenticalCodesNew(List<TimeSeries> graphVars, PrtHelper ph)
+        private static bool HasIdenticalCodesNew(List<Series> graphVars, PrtHelper ph)
         {
             bool identicalCodes = true;
             for (int varI = 0; varI < graphVars.Count; varI++)  //varI 0-based
@@ -24813,7 +24813,7 @@ namespace Gekko
                     IssueCreateWarning(variable);
                 }
                 G.Writeln("+++ NOTE: Variable " + variable + " not found in databank -- is created");
-                TimeSeries tempTs = new TimeSeries(Program.options.freq, variable);
+                Series tempTs = new Series(Program.options.freq, variable);
                 Program.databanks.GetFirst().AddVariable(tempTs);
 
                 for (int i = 0; i < precedentsWithLagIndicator.Count; i++)
@@ -27337,7 +27337,7 @@ namespace Gekko
 
 
 
-        private static void ComputeValueForVprt(out double var1, out double varPch, PrtOptionsHelper po, GekkoTime gt0, GekkoTime gt1, TimeSeries tsWork, TimeSeries tsBase)
+        private static void ComputeValueForVprt(out double var1, out double varPch, PrtOptionsHelper po, GekkoTime gt0, GekkoTime gt1, Series tsWork, Series tsBase)
         {
 
             GekkoTime gt0MinusOne = gt0.Add(-1);
@@ -27345,7 +27345,7 @@ namespace Gekko
             varPch = 0;
             if (po.isLevel == true)
             {
-                TimeSeries ts = tsWork; if (po.isBaseline) ts = tsBase;
+                Series ts = tsWork; if (po.isBaseline) ts = tsBase;
 
                 double sum = 0d;
                 double count = 0d;
@@ -27375,7 +27375,7 @@ namespace Gekko
             return;
         }
 
-        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string printCode2, GekkoTime gt, TimeSeries tsWork, TimeSeries tsBase, bool isLogTransform, bool isCalledFromTable)
+        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string printCode2, GekkoTime gt, Series tsWork, Series tsBase, bool isLogTransform, bool isCalledFromTable)
         {
             string printCode = printCode2.Trim();  //when it comes from for instance a table
 
@@ -27643,7 +27643,7 @@ namespace Gekko
             return z;
         }
 
-        private static void ComputeValueForPrintPlot(out double var1, out double varPch, PrtOptionsHelper po, GekkoTime gt, TimeSeries tsWork, TimeSeries tsBase)
+        private static void ComputeValueForPrintPlot(out double var1, out double varPch, PrtOptionsHelper po, GekkoTime gt, Series tsWork, Series tsBase)
         {
             GekkoTime tMinusOneOrTwo = gt.Add(-1);
             var1 = 0;
@@ -27651,7 +27651,7 @@ namespace Gekko
 
             if (po.isDp)
             {
-                TimeSeries ts = tsWork; if (po.isBaseline) ts = tsBase;
+                Series ts = tsWork; if (po.isBaseline) ts = tsBase;
                 double var = ts.GetData(null, gt);
                 double varLag = ts.GetData(null, gt.Add(-1));
                 double varLag2 = ts.GetData(null, gt.Add(-2));
@@ -27675,14 +27675,14 @@ namespace Gekko
             }
             else if (po.isLevel == true)
             {
-                TimeSeries ts = tsWork; if (po.isBaseline) ts = tsBase;
+                Series ts = tsWork; if (po.isBaseline) ts = tsBase;
                 var1 = ts.GetData(null, gt);
                 varPch = ((ts.GetData(null, gt) / ts.GetData(null, tMinusOneOrTwo) - 1d) * 100d);
                 if (ts.GetData(null, gt) == ts.GetData(null, tMinusOneOrTwo)) varPch = 0d;    //0 and 0 gives 0%
             }
             else if (po.isLog == true)
             {
-                TimeSeries ts = tsWork; if (po.isBaseline) ts = tsBase;
+                Series ts = tsWork; if (po.isBaseline) ts = tsBase;
                 var1 = Math.Log(ts.GetData(null, gt));
             }
             else if (po.isPch == true)
@@ -27699,7 +27699,7 @@ namespace Gekko
                 }
                 else
                 {
-                    TimeSeries ts = tsWork; if (po.isBaseline) ts = tsBase;
+                    Series ts = tsWork; if (po.isBaseline) ts = tsBase;
                     var1 = ((ts.GetData(null, gt) / ts.GetData(null, tMinusOneOrTwo) - 1d) * 100d);
                     if (ts.GetData(null, gt) == ts.GetData(null, tMinusOneOrTwo)) var1 = 0d;     //0 and 0 gives 0%
                 }
@@ -27719,7 +27719,7 @@ namespace Gekko
                 }
                 else
                 {
-                    TimeSeries ts = tsWork; if (po.isBaseline) ts = tsBase;
+                    Series ts = tsWork; if (po.isBaseline) ts = tsBase;
                     var1 = ts.GetData(null, gt) - ts.GetData(null, tMinusOneOrTwo);
                 }
             }
@@ -27736,7 +27736,7 @@ namespace Gekko
                 }
                 else
                 {
-                    TimeSeries ts = tsWork; if (po.isBaseline) ts = tsBase;
+                    Series ts = tsWork; if (po.isBaseline) ts = tsBase;
                     var1 = Math.Log(ts.GetData(null, gt) / ts.GetData(null, tMinusOneOrTwo));
                 }
             }
@@ -31256,18 +31256,18 @@ namespace Gekko
             }
         }
 
-        public static void CreateBVariance(TimeSeries[] timeSeriesPointers, GekkoTime t0)
+        public static void CreateBVariance(Series[] timeSeriesPointers, GekkoTime t0)
         {
             foreach (int i in Program.model.endogenousBNumbersOriginalInModelList)
             {
-                TimeSeries ts = timeSeriesPointers[i];
+                Series ts = timeSeriesPointers[i];
                 //string variable = varNamePointers[i];
                 double d = CalculateHistoricalVarianceForVariable(ts, t0);
                 Program.model.bVariance[i] = d;
             }
         }
 
-        public static double CalculateHistoricalVarianceForVariable(TimeSeries ts, GekkoTime year0)
+        public static double CalculateHistoricalVarianceForVariable(Series ts, GekkoTime year0)
         {
             //only abs calc is used
             if (ts == null) return double.NaN;
@@ -31351,7 +31351,7 @@ namespace Gekko
         //    List<string> listUsedHere = new List<string>();
         //    if (list.Count == 0)
         //    {
-        //        Dictionary<string, TimeSeries> vars = db.storage;
+        //        Dictionary<string, Series> vars = db.storage;
         //        foreach (string var in vars.Keys)
         //        {
         //            listUsedHere.Add(var);
@@ -31364,7 +31364,7 @@ namespace Gekko
 
         //    foreach (string var in listUsedHere)
         //    {
-        //        TimeSeries ts = db.GetVariable(var);
+        //        Series ts = db.GetVariable(var);
         //        if (ts == null)
         //        {
         //            G.Writeln2("*** ERROR: variable '" + var + "' not found");
@@ -32004,7 +32004,7 @@ namespace Gekko
                     {
                         if (G.GetFreqFromKey(tsString) != Program.options.freq) continue;  //filter other freqs
                         string s = G.RemoveFreqFromKey(tsString);
-                        TimeSeries tsGrund = base2.GetVariable(s);
+                        Series tsGrund = base2.GetVariable(s);
                         if (tsGrund == null)
                         {
                             onlyWork.Add(s);
@@ -32018,7 +32018,7 @@ namespace Gekko
                     {
                         if (G.GetFreqFromKey(tsString) != Program.options.freq) continue;  //filter other freqs
                         string s = G.RemoveFreqFromKey(tsString);
-                        TimeSeries tsWork = work.GetVariable(s);
+                        Series tsWork = work.GetVariable(s);
                         if (tsWork == null)
                         {
                             onlyGrund.Add(s);
@@ -32069,8 +32069,8 @@ namespace Gekko
                 //There is a little bit unnecessary overhead here, if compareType is "alphabetical". But never mind.
                 foreach (string tsString in both)
                 {
-                    TimeSeries ts = work.GetVariable(tsString);
-                    TimeSeries tsGrund = base2.GetVariable(tsString);
+                    Series ts = work.GetVariable(tsString);
+                    Series tsGrund = base2.GetVariable(tsString);
 
                     if (ts == null || tsGrund == null)
                     {
@@ -32184,8 +32184,8 @@ namespace Gekko
                     {
                         number = (double)key.Key;
                     }
-                    TimeSeries ts = work.GetVariable(tsString);
-                    TimeSeries tsGrund = base2.GetVariable(tsString);
+                    Series ts = work.GetVariable(tsString);
+                    Series tsGrund = base2.GetVariable(tsString);
 
                     if (variables == null)
                     {
@@ -32428,7 +32428,7 @@ namespace Gekko
             Dictionary<string, string> precedents = eh.precedentsWithLagIndicator;
             string period = t.ToString();
 
-            TimeSeries tsls = Program.databanks.GetFirst().GetVariable(lhs);
+            Series tsls = Program.databanks.GetFirst().GetVariable(lhs);
 
             if (tsls == null)
             {
@@ -32464,7 +32464,7 @@ namespace Gekko
                     var2 = variable;
                 }
                 G.Write(var2 + G.Blanks(14 - var2.Length));
-                TimeSeries ts = Program.databanks.GetFirst().GetVariable(variable);
+                Series ts = Program.databanks.GetFirst().GetVariable(variable);
 
                 if (variable == null)
                 {
@@ -32507,7 +32507,7 @@ namespace Gekko
                 if (work.ContainsVariable(var))  //use tryGet for speedup
                 {
                     G.Writeln();
-                    TimeSeries ts = work.GetVariable(var);
+                    Series ts = work.GetVariable(var);
 
                     G.Write(extra + "upd " + var + " " + tStart.super + " " + tEnd.super + " " + op + " ");
                     int counter = 0;
@@ -32528,7 +32528,7 @@ namespace Gekko
                         {
                             if (base2.ContainsVariable(var))
                             {
-                                TimeSeries tsgrund = base2.GetVariable(var);
+                                Series tsgrund = base2.GetVariable(var);
                                 data = ts.GetData(null, t) - tsgrund.GetData(null, t);
                             }
                             else
@@ -34274,7 +34274,7 @@ namespace Gekko
         public string bank;
         public string name;
         public Databank databank;
-        public TimeSeries ts;
+        public Series ts;
         public bool hasColon = false;
     }
 }

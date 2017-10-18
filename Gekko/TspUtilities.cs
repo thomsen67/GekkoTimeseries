@@ -155,7 +155,7 @@ namespace Gekko
                 int counter = 0;
                 //bool firstTime = true;
                 bool minus = false;
-                TimeSeries ts = null;
+                Series ts = null;
                 for (int i = 0; i < al.Count - Globals.extra; i++)
                 {
                     if ((string)alType[i] == "Symbol" && (string)al[i] == "-")
