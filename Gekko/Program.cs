@@ -4648,11 +4648,10 @@ namespace Gekko
 
         public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2  ,  string file2, List<BankNameVersion> list, string writeOption, bool isCloseCommand)
         {
-            //TODO: try-catch if writing fails            
-
+            //TODO: try-catch if writing fails    
+            
             bool usePrefix = false;
-            if (Program.options.gams_time_prefix.Length > 0) usePrefix = true;
-            int offset = (int)Program.options.gams_time_offset;
+            if (Program.options.gams_time_prefix.Length > 0) usePrefix = true;            
 
             DateTime t00 = DateTime.Now;
             int counterVariables = 0;
@@ -4707,9 +4706,15 @@ namespace Gekko
 
                 int timeDimension = 1; if (ts.IsTimeless()) timeDimension = 0;
 
+                //GAMSVariable gvar = db.AddVariable(nameWithoutFreq, ts.storageDim + timeDimension, VarType.Free, label);
+                
+                string[] domains = new string[ts.storageDim + timeDimension];
+                for (int i = 0; i < domains.Length; i++) domains[i] = "*";
+                if (timeDimension == 1) domains[domains.Length - 1] = Program.options.gams_time_set;
 
-                GAMSVariable gvar = db.AddVariable(nameWithoutFreq, ts.storageDim + timeDimension, VarType.Free, label); //+ 1 for time dimension
-                counterVariables = WriteGdxHelper(t1, t2, usePrefix, offset, counterVariables, gdb, ts, gvar);
+                GAMSVariable gvar = db.AddVariable(nameWithoutFreq, VarType.Free, label, domains);
+
+                counterVariables = WriteGdxHelper(t1, t2, usePrefix, counterVariables, gdb, ts, gvar);
 
             }                     
 
@@ -4719,7 +4724,7 @@ namespace Gekko
             if (timelessCounter > 0) G.Writeln("+++ NOTE: " + timelessCounter + " timeless timeseries skipped");
         }        
 
-        private static int WriteGdxHelper(GekkoTime t1, GekkoTime t2, bool usePrefix, int offset, int counterVariables, Databank gdb, TimeSeries ts, GAMSVariable gvar)
+        private static int WriteGdxHelper(GekkoTime t1, GekkoTime t2, bool usePrefix, int counterVariables, Databank gdb, TimeSeries ts, GAMSVariable gvar)
         {
 
             if (ts.IsArrayTimeseries())
@@ -4728,27 +4733,24 @@ namespace Gekko
                 {
                     string[] ss = kvp.Key.storage;
                     counterVariables++;
-                    WriteGdxHelper2(t1, t2, usePrefix, offset, gvar, kvp.Value as TimeSeries, ss);
+                    WriteGdxHelper2(t1, t2, usePrefix, gvar, kvp.Value as TimeSeries, ss);
                 }
             }
             else
             {
                 //normal timeseries
-                WriteGdxHelper2(t1, t2, usePrefix, offset, gvar, ts, new string[0]);
+                WriteGdxHelper2(t1, t2, usePrefix, gvar, ts, new string[0]);
                 counterVariables++;
             }
 
             return counterVariables;
         }
 
-        private static void WriteGdxHelper2(GekkoTime t1, GekkoTime t2, bool usePrefix, int offset, GAMSVariable gvar, TimeSeries ts2, string[] ss)
+        private static void WriteGdxHelper2(GekkoTime t1, GekkoTime t2, bool usePrefix, GAMSVariable gvar, TimeSeries ts2, string[] ss)
         {            
             if (ts2.IsTimeless())
-            {
-                //string[] ss2 = new string[ss.Length - 1];
-                //Array.Copy(ss, 1, ss2, 0, ss.Length - 1);
-                //if (ss2.Length == 0) ss2 = null;  //no array-dim and timeless
-                gvar.AddRecord(ss).Level = ts2.GetTimelessData();  //timeless data location                        
+            {                
+                gvar.AddRecord(ss).Level = ts2.GetTimelessData();  //timeless data location   
             }
             else
             {
@@ -4772,7 +4774,7 @@ namespace Gekko
                         string date = null;
                         if (usePrefix && t.freq == EFreq.Annual)
                         {
-                            date = Program.options.gams_time_prefix + (t.super - offset).ToString();
+                            date = Program.options.gams_time_prefix + (t.super - (int)Program.options.gams_time_offset).ToString();
                         }
                         else
                         {

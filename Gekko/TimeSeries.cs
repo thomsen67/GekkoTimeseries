@@ -1082,8 +1082,8 @@ namespace Gekko
                     if (!isLhs)
                     {
                         string txt = null; foreach (string ss in keys) txt += "'" + ss + "', ";
-                        G.Writeln2("*** ERROR: The series '" + this.name + "' did not contain this element:");
-                        G.Writeln2("*** ERROR: [" + txt.Substring(0, txt.Length - 2) + "]");
+                        G.Writeln2("*** ERROR: The arrayseries '" + this.name + "' did not contain this element:");
+                        G.Writeln("*** ERROR: [" + txt.Substring(0, txt.Length - 2) + "]");
                         throw new GekkoException();
                     }
                     else
