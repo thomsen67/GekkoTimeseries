@@ -60,7 +60,7 @@ namespace Gekko
             int hash = 17;
             for (int i = 0; i < storage.Length; i++)
             {
-                hash = hash * 31 + storage[i].GetHashCode();  //the 17 and 31 is a trick (primes) to get the hashcodes as distinct as possible
+                hash = hash * 31 + storage[i].ToLower().GetHashCode();  //the 17 and 31 is a trick (primes) to get the hashcodes as distinct as possible. We need ToLower() so that 'aB' and 'Ab' are equal
             }
             return hash;
         }
@@ -69,9 +69,11 @@ namespace Gekko
         {
             //This will run fastest if the strings are interned (cf. string.Intern). But it seems they are so when getting deflated
             //from protobuf file anyway.
+            //Hmmm maybe not se important, since the strings will have mixed cases. Maybe in principle we should store all of them as
+            //lower-case..... ??
 
             if (obj == null || obj.GetType() != typeof(MapMultidimItem)) return false;
-            MapMultidimItem other = (MapMultidimItem)obj;
+            MapMultidimItem other = (MapMultidimItem)obj;            
             if (this.storage.Length != other.storage.Length) return false;
             for (int i = 0; i < this.storage.Length; i++)
             {

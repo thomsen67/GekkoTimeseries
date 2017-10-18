@@ -251,6 +251,8 @@ namespace Gekko
         // #09832752
         public static string RemoveFreqFromKey(string s)
         {
+            //OBSOLETE: DELETE SOON!!
+            
             //This will become faster when A freq has %a attached!
             int i = s.IndexOf(Globals.freqIndicator);
             if (i == 0)
@@ -281,6 +283,42 @@ namespace Gekko
             }
             return EFreq.Annual;  //annual            
         }
+
+        public static string AddCurrentFreqToName(string name)
+        {
+            //If freq is a, it transforms x into x!a
+            //But x!q will stay x!q.
+            if (!name.Contains(Globals.freqIndicator.ToString()))
+            {
+                name = name + Globals.freqIndicator + G.GetFreq(Program.options.freq);
+            }
+            return name;
+        }
+
+        public static string RemoveFreqFromName(string name)
+        {
+            string name2 = null;
+            string freq2 = null;
+            ChopFreq(name, ref freq2, ref name2);
+            return name2;
+        }
+        public static void ChopFreq(string input, ref string freq, ref string varName)
+        {
+            if (input == null) return;
+            string[] ss2 = input.Split(Globals.freqIndicator);
+            if (ss2.Length > 2)
+            {
+                G.Writeln2("*** ERROR: More than 1 freq indicators ('!') in '" + input + "'");
+                throw new GekkoException();
+            }
+            if (ss2.Length == 2)
+            {
+                varName = ss2[0];
+                freq = ss2[1];
+            }
+            return;
+        }
+
 
         public static string GetFreq(EFreq eFreq)
         {

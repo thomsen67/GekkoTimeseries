@@ -2185,13 +2185,28 @@ namespace Gekko
                     {
                         if (dates != null)
                         {
-                            G.Writeln2("*** ERROR: You cannot use period truncation in GDX data import");
+                            G.Writeln2("*** ERROR: At the moment, you cannot use period truncation in GDX data import");
+                            throw new GekkoException();
+                        }
+                        if (oRead.Merge)
+                        {
+                            G.Writeln2("*** ERROR: At the moment, you cannot merge in GDX data import");
                             throw new GekkoException();
                         }
                         Program.ReadGdx(databank, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
                     }
                     else if (oRead.Type == EDataFormat.Px)
                     {
+                        if (dates != null)
+                        {
+                            G.Writeln2("*** ERROR: At the moment, you cannot use period truncation in PX data import");
+                            throw new GekkoException();
+                        }
+                        if (oRead.Merge)
+                        {
+                            G.Writeln2("*** ERROR: At the moment, you cannot merge in PX data import");
+                            throw new GekkoException();
+                        }
                         Program.ReadPxHelper(databank, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
                     }
                     else
@@ -2407,6 +2422,7 @@ namespace Gekko
                 {
                     foreach (TimeSeries tsSub in ts.storage.storage.Values)
                     {
+                        if (tsSub.meta == null) tsSub.meta = new Gekko.TimeSeriesMetaInformation();
                         tsSub.meta.parentDatabank = db;
                         if (!merge) tsSub.SetDirty(false);
                     }
@@ -3394,7 +3410,9 @@ namespace Gekko
         }
 
         public static void ReadPxHelper(Databank databank, ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
-        {           
+        {
+            //merge and date truncation:
+            //do this by first reading into a Gekko databank, and then merge that with the merge facilities from gbk read
 
             DateTime dt1 = DateTime.Now;
 
@@ -4173,7 +4191,429 @@ namespace Gekko
 
         public static void ReadGdx(Databank databank, ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file2, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
         {
+            //merge and date truncation:
+            //do this by first reading into a Gekko databank, and then merge that with the merge facilities from gbk read
             
+            string prefix = Program.options.gams_time_prefix.Trim().ToLower();
+            bool hasPrefix = prefix.Length > 0;
+            string file = AddExtension(file2, "." + "gdx");
+            int offset = (int)Program.options.gams_time_offset;
+            DateTime dt1 = DateTime.Now;
+            int skippedSets = 0;
+            int importedSets = 0;
+            int counterVariables = 0;
+            int counterParameters = 0;
+            int yearMax = int.MinValue;
+            int yearMin = int.MaxValue;
+            string gamsDir = Program.options.gams_exe_folder.Trim();
+            if (gamsDir.EndsWith("\\")) gamsDir = gamsDir.Substring(0, gamsDir.Length - "\\".Length);
+            if (gamsDir.Trim() == "") gamsDir = null;  //must be so and not an empty string in the GAMSWorkspace call later on            
+            GAMSWorkspace ws = null;
+            if (Program.options.gams_fast && gamsDir != null)
+            {
+                //do nothing
+            }
+            else
+            {
+                try
+                {
+                    if (Globals.gamsWorkspace == null || Globals.gamsWorkspaceHelper != gamsDir)
+                    {
+                        ws = new GAMSWorkspace(workingDirectory: Program.options.folder_working, systemDirectory: gamsDir);
+                        Globals.gamsWorkspace = ws;
+                        Globals.gamsWorkspaceHelper = gamsDir;  //record the param it was called with
+                    }
+                    else ws = Globals.gamsWorkspace;
+                    gamsDir = ws.SystemDirectory;
+                }
+                catch (Exception e)
+                {
+                    G.Writeln2("*** ERROR: Import of gdx file (GAMS) failed. Could not locate GAMS (GAMSWorkspace problem).");
+                    G.Writeln("           Technical error:");
+                    G.Writeln("           " + e.Message);
+                    GdxErrorMessage();
+                    throw;
+                }
+            }
+            if (Program.options.gams_fast)
+            {
+                if (Program.options.gams_time_detect_auto)
+                {
+                    G.Writeln2("+++ NOTE: 'OPTION gams time detect_auto = yes' ignored in 'OPTION gams fast = yes' mode");
+                }
+                try
+                {
+                    string msg = string.Empty;
+                    string producer = string.Empty;
+                    int errNr = 0;
+                    int rc;
+                    int[] index = new int[gamsglobals.maxdim];
+                    string[] indexString = new string[gamsglobals.maxdim];
+                    double[] values = new double[gamsglobals.val_max];
+                    int[] domainSyNrs = new int[gamsglobals.maxdim];
+                    string[] domainStrings = new string[gamsglobals.maxdim];
+                    int varNr = 0;
+                    int nrRecs = 0;
+                    int n = 0;
+                    int dimensions = 0;
+                    string varName = string.Empty;
+                    int varType = 0;
+                    int d;
+                    if (gamsDir == null) gamsDir = "";
+                    Gdxcs gdx = new Gdxcs(gamsDir, ref msg);  //it seems ok if gamsSysDir = "", then it will autolocate it (but there may be a 64-bit problem...)
+                    if (msg != string.Empty)
+                    {
+                        G.Writeln("*** ERROR: Could not load GDX library");
+                        G.Writeln("*** ERROR: " + msg);
+                        GdxErrorMessage();
+                        throw new GekkoException();
+                    }
+                    if (true)
+                    {
+                        rc = gdx.gdxOpenRead(file, ref errNr);
+                        if (errNr != 0)
+                        {
+                            {
+                                G.Writeln2("*** ERROR: gdx io error");
+                                throw new GekkoException();
+                            }
+                        }
+                        int timeIndex = -12345;
+                        int uelCount = -1; int uelHighest = -1;
+                        gdx.gdxUMUelInfo(ref uelCount, ref uelHighest);
+                        if (uelHighest != 0)
+                        {
+                            G.Writeln2("*** ERROR: Internal UEL problem (GDX)");
+                            throw new GekkoException();
+                        }
+                        string[] uel = new string[uelCount + 1];
+                        for (int u = 1; u <= uelCount; u++)
+                        {
+                            string s = null;
+                            int error = -1;
+                            int error2 = gdx.gdxUMUelGet(u, ref s, ref error);
+                            uel[u] = s;  //remember that uel[0] is empty an not meaningful                     
+                        }
+
+                        timeIndex = -12345; gdx.gdxFindSymbol(Program.options.gams_time_set, ref timeIndex);
+                        if (timeIndex == 0 || Program.options.gams_time_set == "")
+                        {
+                            G.Writeln2("*** ERROR: Could not find the time set ('" + Program.options.gams_time_set + "')");
+                            throw new GekkoException();
+                        }
+
+                        //varType = 0: SET
+                        //varType = 1: PARAM
+                        //varType = 2: VARIABLE
+                        //varType = 4: ALIAS
+                        for (int i = 1; i < int.MaxValue; i++)
+                        {
+                            gdx.gdxSymbolInfo(i, ref varName, ref dimensions, ref varType);
+                            
+                            string label = null; int records = -12345; int userInfo = -12345;
+                            gdx.gdxSymbolInfoX(i, ref records, ref userInfo, ref label);
+
+                            if (dimensions == -1)
+                            {
+                                break;  //no more symbols
+                            }
+                            if (varType == 0 || varType == 4)
+                            {
+                                //
+                                //  ======================================
+                                //              sets
+                                //  ======================================
+                                //
+                                if (dimensions != 1)
+                                {
+                                    skippedSets++;
+                                    continue;
+                                }
+                                List<string> setData = new List<string>();  //contains names of sets (entryNr --> symbolName)
+                                if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0)
+                                {
+                                    G.Writeln2("*** ERROR: gdx error");
+                                    throw new GekkoException();
+                                }
+                                while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
+                                {
+                                    string s = null;
+                                    s = uel[index[0]];
+                                    setData.Add(s);
+                                }
+                                gdx.gdxDataReadDone();
+
+                                //add the list to databank
+                                string name = Globals.symbolList + varName;
+                                if (databank.ContainsIVariable(name))
+                                {
+                                    databank.RemoveIVariable(name);
+                                }
+                                MetaList ml = new MetaList(setData);
+                                databank.AddIVariable(name, ml);
+                                
+                                importedSets++;
+                            }
+                            else if (varType == 1 || varType == 2) //parameter or variable
+                            {
+                                //
+                                //  ======================================
+                                //       parameters and variables
+                                //  ======================================
+                                //
+
+                                string varNameWithFreq = varName + Globals.freqIndicator + "a";
+                                
+                                int timeDimNr = GdxGetTimeDimNumber(ref domainSyNrs, ref domainStrings, dimensions, gdx, timeIndex, i);
+                                if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0)
+                                {
+                                    G.Writeln2("*** ERROR: gdx error");
+                                    throw new GekkoException();
+                                }
+                                
+                                int hasTimeDimension = 0;
+                                if (timeDimNr != -12345) hasTimeDimension = 1;
+                                bool isMultiDim = true;
+                                if (dimensions - hasTimeDimension == 0)
+                                {
+                                    isMultiDim = false;
+                                }
+
+                                TimeSeries ts = null;
+                                if (isMultiDim)
+                                {
+                                    //Multi-dim timeseries
+                                    if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
+                                    ts = new TimeSeries(EFreq.Annual, varNameWithFreq);
+                                    //ts.SetGhost(true);  //only a placeholder, should not be counted etc.
+                                    ts.meta.label = label;
+                                    if (timeDimNr == -12345) ts.SetTimeless();  //not really relevant, since the timeseries is only a ghost
+                                    ts.storage = new MapMultidim();
+                                    ts.storageDim = dimensions - hasTimeDimension;
+                                    //ts.name = varName + Globals.freqIndicator + "a";
+                                    databank.AddIVariable(ts.name, ts);
+                                }
+                                else
+                                {
+                                    //Zero-dimensional timeseries (that is, normal timeseries)                                    
+                                    //A zero-dim timeseries in the Gekko sense can be timeless (scalar) or non-timeless (normal timeseries)
+                                    //in this case, we just construct a normal timeseries
+                                    if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
+                                    ts = new TimeSeries(EFreq.Annual, varNameWithFreq);
+                                    ts.meta.label = label;
+                                    if (timeDimNr == -12345) ts.SetTimeless();
+                                    //ts.name = varName + Globals.freqIndicator + "a";
+                                    databank.AddIVariable(ts.name, ts);
+                                }
+
+                                if (varType == 1)
+                                {
+                                    counterParameters++;
+                                }
+                                if (varType == 2)
+                                {
+                                    counterVariables++;
+                                }
+
+                                List<string> oldDims = new List<string>() { "     " }; //will not match anything
+                                
+                                TimeSeries ts2 = null;  //the subseries in one of the dimension coordinates
+
+                                while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
+                                {
+                                    //Reading the dimension coordinates
+
+                                    int tt = -12345;
+                                    //StringBuilder sb = new StringBuilder();
+                                    List<string> dims = new List<string>();
+                                    for (d = 0; d < dimensions; d++)
+                                    {
+                                        if (d == timeDimNr)
+                                        {
+                                            //FIXME
+                                            //FIXME
+                                            //FIXME
+                                            //FIXME pre-construct an uel_time with uel --> GekkoTime.
+                                            //FIXME if there is a prefix and offset, handle that too!
+                                            //FIXME
+                                            //FIXME
+
+                                            string timeElement = uel[index[d]];
+                                            if (hasPrefix)
+                                            {
+                                                if (!timeElement.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    G.Writeln2("*** ERROR: GAMS variable/parameter " + varName + " has element '" + timeElement + "' in the time dimension (" + Program.options.gams_time_set + ")");
+                                                    G.Writeln("    The time elements are expected to start with '" + prefix + "'", Color.Red);
+                                                    G.Writeln("    See 'OPTION gams time set' and 'OPTION gams time prefix", Color.Red);
+                                                    throw new GekkoException();
+                                                }
+                                                timeElement = timeElement.Substring(prefix.Length);
+                                            }
+
+                                            tt = G.IntParse(timeElement);
+                                            if (tt == -12345)
+                                            {
+                                                G.Writeln2("*** ERROR: Could not convert '" + timeElement + "' into an annual time period");
+                                                if (hasPrefix)
+                                                {
+                                                    G.Writeln("           Original time element name: '" + uel[index[d]] + "'", Color.Red);
+                                                }
+                                                throw new GekkoException();
+                                            }
+                                            tt = tt + offset;
+                                            continue;  //do not add it to the dims
+                                        }
+                                        string s = uel[index[d]];
+
+                                        //if (false)  //gnslon for instance
+                                        //{
+                                        //    TestOfStrayT(varName, sb, s);                                            
+                                        //}
+                                                                                
+                                        dims.Add(s);
+                                    }
+                                                                        
+                                    bool equal = CompareDims(oldDims, dims);
+
+                                    if (equal)
+                                    {
+                                        //keep the same ts2
+                                        //if time is the last dimension, the hash is the same for all periods
+                                        //this avoids getting the same Gekko variable over and over
+                                    }
+                                    else
+                                    {
+                                        //create it
+                                        if (isMultiDim)
+                                        {
+                                            MapMultidimItem mmi = new MapMultidimItem(dims.ToArray());
+                                            IVariable iv = null; ts.storage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
+                                            if (iv == null)
+                                            {
+                                                ts2 = new TimeSeries(EFreq.Annual, null);  //has no name,  but will it be understood as TimeSeriesLight??                                           
+                                                if (timeDimNr == -12345) ts2.SetTimeless();
+                                                ts.storage.AddIVariableWithOverwrite(mmi, ts2);
+                                            }
+                                            else
+                                            {
+                                                ts2 = iv as TimeSeries;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            //zero-dimensional series
+                                            ts2 = ts;  //just use that for this purpose
+                                        }
+                                    }
+                                                                        
+                                    double value = values[gamsglobals.val_level];
+                                    if (tt == -12345)
+                                    {
+                                        ts2.SetTimelessData(value);
+                                    }
+                                    else
+                                    {
+                                        //TODO
+                                        //TODO
+                                        //TODO record data in an array, and use setDataSequence().
+                                        //TODO
+                                        //TODO
+                                        ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), value);
+                                        yearMax = Math.Max(tt, yearMax);
+                                        yearMin = Math.Min(tt, yearMin);
+                                    }
+
+                                    oldDims = dims; //ok to point, dims will be created from scratch at beginning of loop                                 
+                                }  //end of records/dimensions for the variable or parameter
+
+                                gdx.gdxDataReadDone();
+                                
+                            }
+                            else
+                            {
+                                //do nothing, skip this symbol
+                            }
+                        }
+                    }
+                    errNr = gdx.gdxClose();
+                    if (errNr != 0)
+                    {
+                        G.Writeln2("*** ERROR: gdx io error");
+                        throw new GekkoException();
+                    }
+                }
+                catch (Exception e)
+                {
+                    G.Writeln2("*** ERROR: GDX import failed with an unexpected error.");                    
+                    throw;
+                }                
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: The slow gdx reader is not maintained, try the faster GDX reader with:");
+                G.Writeln("           OPTION gams fast = yes;", Color.Red);
+                throw new GekkoException();
+            }
+            G.Writeln2("Finished GAMS import of " + counterVariables + " variables, " + counterParameters + " parameters and " + importedSets + " sets (" + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds) + ")");
+            if (skippedSets > 0) G.Writeln("+++ NOTE: " + skippedSets + " sets with dim > 1 were not imported");
+
+            readInfo.startPerInFile = yearMin;
+            readInfo.endPerInFile = yearMax;
+            readInfo.nanCounter = 0;
+
+            readInfo.variables = counterVariables + counterParameters;
+            readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
+
+            //See almost identical code in readTsd and readCsv
+            if (merge)
+            {
+                readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
+                readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
+            }
+            else
+            {
+                readInfo.startPerResultingBank = readInfo.startPerInFile;
+                readInfo.endPerResultingBank = readInfo.endPerInFile;
+            }
+            Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
+            currentBank.yearStart = readInfo.startPerResultingBank;
+            currentBank.yearEnd = readInfo.endPerResultingBank;
+
+            readInfo.databank.info1 = readInfo.info1;
+            readInfo.databank.date = readInfo.date;
+            readInfo.databank.FileNameWithPath = readInfo.fileName;
+
+            //TODO: Maybe only do this on the gdx variables if possible
+            //Anyway, the speed penalty is small anyway.
+            databank.Trim();
+
+        }
+
+        private static bool CompareDims(List<string> oldDims, List<string> dims)
+        {
+            //no test if they are null            
+            if (dims.Count != oldDims.Count) return false;
+            for (int i = 0; i < dims.Count; i++)
+            {
+                if (!G.Equal(dims[i], oldDims[i])) return false;
+            }
+            return true;
+        }
+
+        private static void TestOfStrayT(string varName, StringBuilder sb, string s)
+        {
+            //
+            //
+            //  TEST OF STRAY T's
+            //
+            //
+            int xxxx = -12345;
+            bool xxxxx = int.TryParse(s, out xxxx);
+            if (xxxxx && Globals.runningOnTTComputer && xxxx != -12345 && (xxxx >= 1990 && xxxx <= 2150))
+            {
+                G.Writeln("GDX problem: " + s + "   " + xxxx + "  " + sb.ToString() + "   " + varName);
+            }
         }
 
         private static void GamsGetHashAndTime(string prefix, int timeIndex, string[] keys, int offset, ref int tt, ref string hash)
@@ -4208,8 +4648,147 @@ namespace Gekko
 
         public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2  ,  string file2, List<BankNameVersion> list, string writeOption, bool isCloseCommand)
         {
-            
+            //TODO: try-catch if writing fails            
+
+            bool usePrefix = false;
+            if (Program.options.gams_time_prefix.Length > 0) usePrefix = true;
+            int offset = (int)Program.options.gams_time_offset;
+
+            DateTime t00 = DateTime.Now;
+            int counterVariables = 0;
+            int timelessCounter = 0;
+
+            string file = AddExtension(file2, "." + "gdx");
+            string pathAndFilename = CreateFullPathAndFileName(file);
+
+            DateTime dt1 = DateTime.Now;
+
+            string gamsDir = Program.options.gams_exe_folder.Trim();
+            if (gamsDir.EndsWith("\\")) gamsDir = gamsDir.Substring(0, gamsDir.Length - "\\".Length);
+            if (gamsDir.Trim() == "") gamsDir = null;  //must be so and not an empty string in the GAMSWorkspace call later on
+
+            GAMSWorkspace ws = null;
+            try
+            {
+                ws = new GAMSWorkspace(workingDirectory: Program.options.folder_working, systemDirectory: gamsDir);
+            }
+            catch (Exception e)
+            {
+
+                G.Writeln2("*** ERROR: Import of gdx file (GAMS) failed. GAMSWorkspace problem.");
+                G.Writeln("           Technical error:");
+                G.Writeln("           " + e.Message);
+                G.Writeln("+++ NOTE:  You may manually indicate the GAMS program folder with 'OPTION gams exe folder = ...;'");
+                throw;
+            }
+
+            GAMSDatabase db = ws.AddDatabase();
+
+            foreach (BankNameVersion bnv in list)
+            {
+                string name = bnv.name;
+                if (!G.StartsWithSigil(bnv.name))
+                {
+                    name = G.AddCurrentFreqToName(name);
+                }
+                string nameWithoutFreq = G.RemoveFreqFromName(name);
+
+                Databank gdb = GetBankFromBankNameVersion(bnv.bank);
+                IVariable iv = gdb.GetIVariable(name);
+
+                if (iv == null)
+                {
+                    G.Writeln2("*** ERROR: Cannot find variable '" + name + "' in databank '" + bnv.bank + "'");
+                }
+                TimeSeries ts = iv as TimeSeries;
+                if (ts == null) continue;  //only write timeseries at the moment
+
+                string label = ""; if (ts.meta?.label != null) label = ts.meta.label;  //label = null will fail with weird error later on
+
+                int timeDimension = 1; if (ts.IsTimeless()) timeDimension = 0;
+
+
+                GAMSVariable gvar = db.AddVariable(nameWithoutFreq, ts.storageDim + timeDimension, VarType.Free, label); //+ 1 for time dimension
+                counterVariables = WriteGdxHelper(t1, t2, usePrefix, offset, counterVariables, gdb, ts, gvar);
+
+            }                     
+
+            db.Export(pathAndFilename);
+
+            G.Writeln2("Exported " + counterVariables + " variables to " + pathAndFilename + " (" + G.SecondsFormat((DateTime.Now - t00).TotalMilliseconds) + ")");
+            if (timelessCounter > 0) G.Writeln("+++ NOTE: " + timelessCounter + " timeless timeseries skipped");
+        }        
+
+        private static int WriteGdxHelper(GekkoTime t1, GekkoTime t2, bool usePrefix, int offset, int counterVariables, Databank gdb, TimeSeries ts, GAMSVariable gvar)
+        {
+
+            if (ts.IsArrayTimeseries())
+            {
+                foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.storage.storage)
+                {
+                    string[] ss = kvp.Key.storage;
+                    counterVariables++;
+                    WriteGdxHelper2(t1, t2, usePrefix, offset, gvar, kvp.Value as TimeSeries, ss);
+                }
+            }
+            else
+            {
+                //normal timeseries
+                WriteGdxHelper2(t1, t2, usePrefix, offset, gvar, ts, new string[0]);
+                counterVariables++;
+            }
+
+            return counterVariables;
         }
+
+        private static void WriteGdxHelper2(GekkoTime t1, GekkoTime t2, bool usePrefix, int offset, GAMSVariable gvar, TimeSeries ts2, string[] ss)
+        {            
+            if (ts2.IsTimeless())
+            {
+                string[] ss2 = new string[ss.Length - 1];
+                Array.Copy(ss, 1, ss2, 0, ss.Length - 1);
+                //if (ss2.Length == 0) ss2 = null;  //no array-dim and timeless
+                gvar.AddRecord(ss2).Level = ts2.dataArray[0];  //timeless data location                        
+            }
+            else
+            {
+                GekkoTime gt1 = t1;
+                GekkoTime gt2 = t2;
+                if (t1.IsNull())
+                {
+                    gt1 = ts2.GetRealDataPeriodFirst();
+                    gt2 = ts2.GetRealDataPeriodLast();
+                }
+                if (gt1.IsNull())
+                {
+                    //do not write a weird record if the timeseries has no data
+                }
+                else
+                {
+                    foreach (GekkoTime t in new GekkoTimeIterator(gt1, gt2))
+                    {
+                        string[] ss2 = new string[ss.Length + 1];
+                        Array.Copy(ss, 0, ss2, 0, ss.Length);
+                        string date = null;
+                        if (usePrefix && t.freq == EFreq.Annual)
+                        {
+                            date = Program.options.gams_time_prefix + (t.super - offset).ToString();
+                        }
+                        else
+                        {
+                            date = t.ToString();
+                        }
+                        ss2[ss2.Length - 1] = date;
+
+                        gvar.AddRecord(ss2).Level = ts2.GetData(null, t);
+
+                    }
+                }
+            }
+
+            return;
+        }
+
 
         private static int GdxGetTimeDimNumber(ref int[] domainSyNrs, ref string[] domainStrings, int dimensions, Gdxcs gdx, int timeIndex, int i)
         {

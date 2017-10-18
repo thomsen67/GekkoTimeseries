@@ -1078,35 +1078,27 @@ namespace Gekko
 
         public static void Chop(string input, out string dbName, out string varName, out string freq)
         {
-            //When it returns, all returned strings are guaranteed not to contain colon or tilde.
+            //When it returns, all returned strings are guaranteed not to contain colon or !.
             string[] ss = input.Split(Globals.symbolBankColon2);
             if (ss.Length > 2)
             {
                 G.Writeln2("*** ERROR: More than 1 colons (':') in '" + input + "'");
                 throw new GekkoException();
-            }            
+            }
             dbName = null;
             varName = null;
-            freq = null;
+
             if (ss.Length == 1) varName = ss[0];
             else if (ss.Length == 2)
             {
                 dbName = ss[0]; varName = ss[1];
             }
             //firstChar = varName[0];
-            string[] ss2 = varName.Split(Globals.freqIndicator);
-            if (ss2.Length > 2)
-            {
-                G.Writeln2("*** ERROR: More than 1 freq indicators ('!') in '" + input + "'");
-                throw new GekkoException();
-            }
-            if (ss2.Length == 2)
-            {
-                varName = ss2[0];
-                freq = ss2[1];
-            }
+
+            freq = null;
+            G.ChopFreq(input, ref freq, ref varName);
             //varName = DecorateWithTilde(varName, freq);
-        }
+        }        
 
         public static void HandleIndexerHelper(int depth, IVariable y, params IVariable[] x)
         {

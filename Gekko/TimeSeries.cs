@@ -323,8 +323,8 @@ namespace Gekko
                         if (index >= 0)
                         {
                             ii = index - (this.dataArray.Length - 1);
-                        }                        
-                        smpl.gekkoError = new GekkoError(ii);                        
+                        }
+                        if (smpl != null) smpl.gekkoError = new GekkoError(ii);  //GetData() can be called with smpl=null, where out-of-window is not signalled back. Typically because we take the timeseries directly from a databank, so they are not light.
                     }
                     return double.NaN;  //out of bounds, we return a missing value (NaN)
                 }
@@ -349,7 +349,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Timeless variable error #100");
                 throw new GekkoException();
             }
-            if (this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (this.meta != null && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
                         
             if (this.dataArray == null)
             {
