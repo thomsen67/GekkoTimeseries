@@ -79,7 +79,7 @@ namespace Gekko
 
         public static class StringList
         {
-            public static IVariable Add(ScalarString s, MetaList l, bool swap)
+            public static IVariable Add(ScalarString s, List l, bool swap)
             {
                 List<string> m = O.GetStringList(l);
                 List<string> newList = new List<string>();
@@ -93,7 +93,7 @@ namespace Gekko
                     newList.AddRange(m);
                     newList.Add(s._string2);
                 }
-                return new MetaList(newList);
+                return new List(newList);
             }
         }
     

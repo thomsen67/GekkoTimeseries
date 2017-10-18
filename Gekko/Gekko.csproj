@@ -148,7 +148,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AList.cs" />
     <Compile Include="AutoComplete.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -218,6 +217,7 @@
       <DependentUpon>Intelli.cs</DependentUpon>
     </Compile>
     <Compile Include="IVariable.cs" />
+    <Compile Include="List.cs" />
     <Compile Include="ListViewDragDropManager.cs" />
     <Compile Include="LongProcess.cs" />
     <Compile Include="LruCache.cs" />

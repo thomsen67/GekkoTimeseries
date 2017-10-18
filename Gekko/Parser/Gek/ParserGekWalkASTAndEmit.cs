@@ -1884,7 +1884,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
-                                    sb1.AppendLine("MetaList " + tempName + " = new MetaList();" + G.NL);
+                                    sb1.AppendLine("List " + tempName + " = new List();" + G.NL);
                                 }
                                 foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                 {
@@ -2496,7 +2496,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTLISTDEF":
                         {
-                            node.Code.A("O.ListDef(");
+                            node.Code.A("O.ListDefHelper(");
                             GetCommaCodeFromAllChildren(node);                            
                             node.Code.A(")");
                         }

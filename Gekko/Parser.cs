@@ -1247,15 +1247,15 @@ namespace Gekko
             {
                 //use tryget...: faster
                 storedList = Program.scalars[Globals.symbolList + listName];
-                MetaList x = O.GetMetaList(storedList);
+                List x = O.GetList(storedList);
                 x.list.Clear();
             }
             else
             {
-                storedList = new MetaList(new List<string>());
+                storedList = new List(new List<string>());
                 Program.scalars.Add(Globals.symbolList + listName, storedList);
             }
-            return O.GetStringList((MetaList)storedList);
+            return O.GetStringList((List)storedList);
         }
 
         private static void EmitCsCodeAndCompileModel(ECompiledModelType modelType, bool isCalledFromModelStatement)

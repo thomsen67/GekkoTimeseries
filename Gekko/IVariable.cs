@@ -48,13 +48,13 @@ namespace Gekko
     [ProtoInclude(4, typeof(ScalarString))]
     [ProtoInclude(5, typeof(Map))]
     [ProtoInclude(6, typeof(Matrix))]
-    [ProtoInclude(7, typeof(MetaList))]
+    [ProtoInclude(7, typeof(List))]
     [ProtoInclude(8, typeof(Range))]            //HMMM is an IVariable, but could never be protobuffed
 
     public interface IVariable
     {
         //The following classes implement this interface:
-        // ScalarVal, ScalarString, ScalarDate, MetaList, MetaTimeSeries. (matrix/vector will come...)
+        // ScalarVal, ScalarString, ScalarDate, List, MetaTimeSeries. (matrix/vector will come...)
         //
         //NOTE: At some point we need to create a lot of overloads, InjectAdd() with double as 1. or 2. or both arguments,
         //      same for InjectMinus() etc. etc. Maybe also with dates and strings.

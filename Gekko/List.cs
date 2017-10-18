@@ -8,26 +8,26 @@ using ProtoBuf;
 namespace Gekko
 {
     [ProtoContract]
-    public class MetaList : IVariable
+    public class List : IVariable
     {
         //Abstract class containing a List
         //Used for pointing to Lists without having to create/clone them.      
 
-        public bool isNameList = true;
+        public bool isNameList = true;        
 
         [ProtoMember(1)]
         public List<IVariable> list = null;
 
-        public MetaList()
+        public List()
         {
         }
 
-        public MetaList(List<IVariable> list)
+        public List(List<IVariable> list)
         {
             this.list = list;
         }
 
-        public MetaList(List<string> list)
+        public List(List<string> list)
         {
             List<IVariable> m = new List<Gekko.IVariable>();
             foreach (string s in list)
@@ -94,7 +94,7 @@ namespace Gekko
                     {
                         tmp.Add(this.list[i].DeepClone());
                     }
-                    MetaList m = new MetaList(tmp);
+                    List m = new List(tmp);
                     m.isNameList = this.isNameList;
                     return m;
                 }
@@ -105,7 +105,7 @@ namespace Gekko
                     {
                         //Wildcard: return a list of those
                         List<string> found = Program.MatchWildcard(s5, this.list, null);
-                        return new MetaList(found);
+                        return new List(found);
                     }
                     else
                     {
@@ -160,7 +160,7 @@ namespace Gekko
         //        string s1 = O.GetString(iv1);
         //        string s2 = O.GetString(iv2);
         //        List<string> temp = Program.MatchRange(s1, s2, this.list, null);
-        //        return new MetaList(temp);
+        //        return new List(temp);
         //    }
         //    else
         //    {                
@@ -181,7 +181,7 @@ namespace Gekko
         //            G.Writeln2("*** ERROR: Starting index (" + i1 + ") cannot be > than ending index (" + i2 + ")");
         //            throw new GekkoException();
         //        }
-        //        return new MetaList(this.list.GetRange(i1 - 1, i2 - i1 + 1)); //GetRange() is a shallow copy, but that is okay since it contains immutable strings            
+        //        return new List(this.list.GetRange(i1 - 1, i2 - i1 + 1)); //GetRange() is a shallow copy, but that is okay since it contains immutable strings            
         //    }
         //}
         
@@ -305,7 +305,7 @@ namespace Gekko
             {
                 temp.Add(iv.DeepClone());
             }
-            return new MetaList(temp);
+            return new List(temp);
         }
 
         public void DeepTrim()

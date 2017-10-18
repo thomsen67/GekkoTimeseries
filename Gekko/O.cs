@@ -58,7 +58,7 @@ namespace Gekko
 
         public class GekkoListIterator : IEnumerable<ScalarString>
         {            
-            private MetaList _ml = null;
+            private List _ml = null;
 
             public GekkoListIterator(IVariable list)
             {
@@ -67,7 +67,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Expected a list in iterator");
                     throw new GekkoException();
                 }
-                _ml = (MetaList)list;
+                _ml = (List)list;
             }
 
             public IEnumerator<ScalarString> GetEnumerator()
@@ -360,7 +360,7 @@ namespace Gekko
             else if (x.Type() == EVariableType.String)
             {                
                 //it is tested previously that step = null and start is metalist
-                MetaList start_list = start as MetaList;
+                List start_list = start as List;
                 if (counter >= start_list.list.Count)
                 {
                     //do nothing, this x will not be used
@@ -398,7 +398,7 @@ namespace Gekko
                 }
                 else if (start.Type() == EVariableType.List)
                 {
-                    MetaList start_list = start as MetaList;
+                    List start_list = start as List;
                     if (start_list.list.Count == 0)
                     {
                         G.Writeln2("*** ERROR: Empty list");
@@ -463,7 +463,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: string loops do not have STEP/BY argument");
                     throw new GekkoException();
                 }
-                MetaList start_list = start as MetaList;
+                List start_list = start as List;
                 if (counter <= start_list.list.Count) rv = true;
 
             }
@@ -512,14 +512,14 @@ namespace Gekko
             return new GekkoSmpl(Globals.globalPeriodStart, Globals.globalPeriodEnd);
         }
 
-        public static IVariable ListDef(params IVariable[] x)
+        public static IVariable ListDefHelper(params IVariable[] x)
         {
             List<IVariable> m = new List<Gekko.IVariable>();
             foreach (IVariable iv in x)
             {
                 m.Add(iv);
             }
-            return new MetaList(m);
+            return new List(m);
         }
 
         public static IVariable Dollar(GekkoSmpl smpl, IVariable x, IVariable logical)
@@ -802,7 +802,7 @@ namespace Gekko
             else if (x.Type() == EVariableType.List)
             {
                 int n = smpl.Observations12();
-                MetaList m = x as MetaList;
+                List m = x as List;
                 if (m.list.Count() == 1)
                 {
                     ScalarVal mi_val = m.list[0] as ScalarVal;
@@ -1106,7 +1106,7 @@ namespace Gekko
             {
                 //HandleIndexerHelper2()
             }          
-            MetaList m = (MetaList)x[depth];
+            List m = (List)x[depth];
             foreach (IVariable iv in m.list)
             {
                 string s = O.ConvertToString(iv);
@@ -1295,7 +1295,7 @@ namespace Gekko
                 //LIST mylist = null; ---> empty list
                 result = new List<string>();
             }
-            MetaList ml = new MetaList(result);
+            List ml = new List(result);
             ml.isNameList = true;
             return ml;
         }
@@ -1713,8 +1713,8 @@ namespace Gekko
                 }
                 else if (x.Type() == EVariableType.List)
                 {
-                    MetaList ml = (MetaList)x;
-                    MetaList ml2 = new MetaList(ml.list);
+                    List ml = (List)x;
+                    List ml2 = new List(ml.list);
                     ml2.isNameList = false;
                     rv = ml2;
                 }
@@ -1768,7 +1768,7 @@ namespace Gekko
             //if (a != null) a = null;
         }        
 
-        public static MetaList GetMetaList(IVariable a)
+        public static List GetList(IVariable a)
         {
             if (a == null)
             {
@@ -1780,7 +1780,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: List of strings expected");
                 throw new GekkoException();
             }
-            return (MetaList)a;
+            return (List)a;
         }
         
         public static IVariable GetTimeSeriesFromCache(GekkoSmpl smpl, ref IVariable a, string originalName, int bankNumber)
@@ -2003,7 +2003,7 @@ namespace Gekko
             {
                 newList.Add(bankName + ":" + s);
             }
-            return new MetaList(newList);
+            return new List(newList);
         }
 
         public static IVariable ZIndexer(string name)
@@ -2480,7 +2480,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Expected syntax like ... $ #a['b'], with list and string");
                 throw new GekkoException();
             }
-            MetaList ml = (MetaList)x;
+            List ml = (List)x;
             ScalarString ss = (ScalarString)y;
 
             bool b = false;
@@ -2879,7 +2879,7 @@ namespace Gekko
             throw new GekkoException();
             if (a.Type() == EVariableType.List)
             {
-                List<string> items = O.GetStringList((MetaList)a);
+                List<string> items = O.GetStringList((List)a);
                 double[] d = new double[items.Count];
                 
                 if (e.subElements == null)
@@ -4406,7 +4406,7 @@ namespace Gekko
                             }
 
                             if (Program.scalars.ContainsKey(Globals.symbolList + nme)) Program.scalars.Remove(Globals.symbolList + nme);
-                            Program.scalars.Add(Globals.symbolList + nme, new MetaList(xx));
+                            Program.scalars.Add(Globals.symbolList + nme, new List(xx));
                             G.Writeln2("LIST " + nme + " = " + G.GetListWithCommas(xx));
                         }
                         catch
@@ -5038,7 +5038,7 @@ namespace Gekko
         }
              
 
-        public class List
+        public class ListDef
         {
             public string name = null;
             public string listFile = null;

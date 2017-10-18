@@ -341,7 +341,7 @@ namespace Gekko
             {
                 if (vars[j].Type() == EVariableType.List)
                 {
-                    foreach (IVariable iv in ((MetaList)vars[j]).list)
+                    foreach (IVariable iv in ((List)vars[j]).list)
                     {
                         string s = O.ConvertToString(iv);
                         Series tmp = Program.GetTimeSeriesFromString(s, O.ECreatePossibilities.None);
@@ -1602,7 +1602,7 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.List)
             {
-                List<IVariable> l = ((MetaList)x).list;
+                List<IVariable> l = ((List)x).list;
                 foreach (IVariable iv in l)
                 {
                     string ss = O.ConvertToString(iv);
@@ -1905,7 +1905,7 @@ namespace Gekko
                 }
             }
             //union.Sort(StringComparer.InvariantCulture);  //or maybe only sort when printing/reporting/iterating?
-            return new MetaList(union);
+            return new List(union);
         }               
 
         public static IVariable difference(GekkoSmpl t, IVariable x1, IVariable x2)
@@ -1927,7 +1927,7 @@ namespace Gekko
                 }
             }
             //difference.Sort(StringComparer.InvariantCulture);  //or maybe only sort when printing/reporting/iterating?
-            return new MetaList(difference);
+            return new List(difference);
         }
 
         public static IVariable intersect(GekkoSmpl t, IVariable x1, IVariable x2)
@@ -1945,7 +1945,7 @@ namespace Gekko
                 ListMultiplyHelper(lx2, lx1, intersection);
             }
             //intersection.Sort(StringComparer.InvariantCulture);  //or maybe only sort when printing/reporting/iterating?
-            return new MetaList(intersection);
+            return new List(intersection);
         }
 
         private static void ListMultiplyHelper(List<string> x1, List<string> x2, List<string> intersection)

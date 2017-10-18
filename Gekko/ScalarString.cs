@@ -303,7 +303,7 @@ namespace Gekko
                         //string vars = null;                    
                         ExtractBankAndRestHelper h = Program.ExtractBankAndRest(((ScalarString)index)._string2, EExtrackBankAndRest.GetDatabank);
                         List<string> output = Program.MatchWildcardInDatabank(h.name, h.databank);
-                        rv = new MetaList(output);
+                        rv = new List(output);
                     }
                     else
                     {
@@ -352,7 +352,7 @@ namespace Gekko
         //        string s2 = O.ConvertToString(iv2);                
         //        ExtractBankAndRestHelper h = Program.ExtractBankAndRest(s1, EExtrackBankAndRest.GetDatabank);                
         //        List<string> temp = Program.MatchRangeInDatabank(h.name, s2, h.databank);
-        //        return new MetaList(temp);
+        //        return new List(temp);
         //    }
         //    else
         //    {
@@ -433,7 +433,7 @@ namespace Gekko
                     }                    
                 case EVariableType.List:
                     {
-                        return Operators.StringList.Add(this, (MetaList)x, false);
+                        return Operators.StringList.Add(this, (List)x, false);
                     }                    
                 case EVariableType.Series:
                     {

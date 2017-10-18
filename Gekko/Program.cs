@@ -1925,9 +1925,9 @@ namespace Gekko
                 if (listName != "")
                 {
                     if (Program.scalars.ContainsKey(Globals.symbolList + listName)) Program.scalars.Remove(Globals.symbolList + listName);
-                    Program.scalars.Add(Globals.symbolList + listName, new MetaList(found));
+                    Program.scalars.Add(Globals.symbolList + listName, new List(found));
                     if (found.Count == 0) G.Writeln("+++ NOTE: The list #" + listName + " contains zero elements");
-                    else G.Writeln("The list #" + listName + " contains the above list of variables");
+                    else G.Writeln("The list #" + listName + " contains the above list of variables");                    
                 }
             }
         }
@@ -2223,8 +2223,8 @@ namespace Gekko
                         if (!open && (oRead.openType == EOpenType.First || oRead.openType == EOpenType.Normal))
                         {
                             IVariable all2 = null; Program.scalars.TryGetValue(Globals.symbolList + "all", out all2);
-                            if (all2 == null) all2 = new MetaList(new List<string>());
-                            List<string> all = O.GetStringList(O.GetMetaList(all2));
+                            if (all2 == null) all2 = new List(new List<string>());
+                            List<string> all = O.GetStringList(O.GetList(all2));
                             readInfo.createdVars = Program.CreateVariables(all, false);
                         }
                     }
@@ -4389,7 +4389,7 @@ namespace Gekko
                                 {
                                     databank.RemoveIVariable(name);
                                 }
-                                MetaList ml = new MetaList(setData);
+                                List ml = new List(setData);
                                 databank.AddIVariable(name, ml);
                                 
                                 importedSets++;
@@ -6450,7 +6450,7 @@ namespace Gekko
 
             if (temp2 == null)
             {
-                Program.scalars.Add(Globals.symbolList + name2, new MetaList(listItems2));
+                Program.scalars.Add(Globals.symbolList + name2, new List(listItems2));
                 newList = listItems2;
             }
             else
@@ -14402,7 +14402,7 @@ namespace Gekko
                         {
                             Program.scalars.Remove(Globals.symbolList + leftSide);
                         }
-                        Program.scalars.Add(Globals.symbolList + leftSide, new MetaList(unfoldedRightSide));
+                        Program.scalars.Add(Globals.symbolList + leftSide, new List(unfoldedRightSide));
                     }
                 }
                 else if (type == "-")
@@ -14427,7 +14427,7 @@ namespace Gekko
             bool hasLargeModel = false;
             if (Program.scalars.ContainsKey(Globals.symbolList + "all"))
             {
-                if ((O.GetMetaList(Program.scalars[Globals.symbolList + "all"])).list.Count > 100) hasLargeModel = true;  //more then 100 vars --> no printing of model lists here
+                if ((O.GetList(Program.scalars[Globals.symbolList + "all"])).list.Count > 100) hasLargeModel = true;  //more then 100 vars --> no printing of model lists here
             }
             return hasLargeModel;
         }
@@ -14694,7 +14694,7 @@ namespace Gekko
             }
             foreach (string s in lists)
             {
-                Program.scalars.Add(Globals.symbolList + s, new MetaList(new List<string>()));
+                Program.scalars.Add(Globals.symbolList + s, new List(new List<string>()));
             }
             if (Program.model.modelInfo.modelListHelper.all != null) O.GetStringList(Program.scalars[Globals.symbolList + "all"]).AddRange(Program.model.modelInfo.modelListHelper.all);
             if (Program.model.modelInfo.modelListHelper.endo != null) O.GetStringList(Program.scalars[Globals.symbolList + "endo"]).AddRange(Program.model.modelInfo.modelListHelper.endo);
@@ -15464,7 +15464,7 @@ namespace Gekko
                             Program.scalars.Remove(Globals.symbolList + listname);
                         }
                         list.Sort();
-                        Program.scalars.Add(Globals.symbolList + listname, new MetaList(list));
+                        Program.scalars.Add(Globals.symbolList + listname, new List(list));
                         if (list.Count > 0)
                         {
                             string v = "variables";
@@ -18366,8 +18366,8 @@ namespace Gekko
                 throw new GekkoException();
             }                      
 
-            List<string> varsP = O.GetStringList((MetaList)list1);
-            List<string> varsX = O.GetStringList((MetaList)list2);
+            List<string> varsP = O.GetStringList((List)list1);
+            List<string> varsX = O.GetStringList((List)list2);
 
             if (varsP.Count == 0 || varsX.Count == 0)
             {
@@ -21793,7 +21793,7 @@ namespace Gekko
 
                         try
                         {
-                            MetaList temp = new MetaList(listOfDifferentVars);
+                            List temp = new List(listOfDifferentVars);
                             Program.scalars.Add("#delete_me_12345", temp);
                             //This is somewhat of a hack, calling a MULPRT command indirectly like that
                             //But it really saves a lot of work, instead of wiring up to the Prt() method!
@@ -23063,7 +23063,7 @@ namespace Gekko
                     break;
                 case EVariableType.List:
                     {
-                        MetaList m = x as MetaList;
+                        List m = x as List;
                         if (m.list[0].Type() == EVariableType.Series || m.list[0].Type() == EVariableType.Val)
                         {
                             //List of values
