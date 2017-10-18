@@ -2771,11 +2771,11 @@ namespace Gekko
             int uoverflow = smpl.gekkoError.uoverflow;
             if (uoverflow < 0)
             {
-                smpl.t0 = smpl.t0.Add(uoverflow * iSmpl);
+                smpl.t0 = smpl.t0.Add(uoverflow * (iSmpl + 1));
             }
             else
             {
-                smpl.t3 = smpl.t3.Add(uoverflow * iSmpl);
+                smpl.t3 = smpl.t3.Add(uoverflow * (iSmpl + 1));
             }
             smpl.gekkoError = null;  //we try again
         }

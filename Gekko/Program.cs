@@ -4089,13 +4089,12 @@ namespace Gekko
                         if (gt_end.StrictlyLargerThan(gt1)) gt1 = gt_end;
                     }
 
-
-                    if (Program.databanks.GetFirst().GetVariable(G.GetFreq(freq), ts.name) != null)
-                    {
-                        Program.databanks.GetFirst().RemoveVariable(G.GetFreq(freq), ts.name);
-                    }
-                    Program.databanks.GetFirst().AddVariable(ts);
-
+                    //put in the timeseries
+                    string varNameWithFreq = G.AddFreqToName(tableName, G.GetFreq(freq));                    
+                    Databank databank = Program.databanks.GetFirst();
+                    databank.AddIVariableWithOverwrite(ts.name, ts);
+                    ts.SetDirty(true);
+                    
                 }
             }
             

@@ -17,7 +17,7 @@ namespace Gekko
 
         public GekkoError(int uoverflow)
         {
-            G.Writeln2("+++ UOVERFLOW constructed: " + uoverflow);
+            //G.Writeln2("+++ UOVERFLOW constructed: " + uoverflow);
             this.uoverflow = uoverflow;
         }        
     }
