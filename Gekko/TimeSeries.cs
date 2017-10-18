@@ -1090,8 +1090,7 @@ namespace Gekko
                     {
                         ts = new TimeSeries(this.freq, "[[array-timeseries]]");
                         if (this.IsTimeless()) ts.SetTimeless();  //inherits from ghost
-                        this.storage.AddIVariableWithOverwrite(new MapMultidimItem(keys), ts);
-                        didCreateLhsArrayTimeseries = true;
+                        this.storage.AddIVariableWithOverwrite(new MapMultidimItem(keys), ts);                        
                     }
                 }
                 else

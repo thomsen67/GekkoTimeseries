@@ -427,15 +427,25 @@ namespace Gekko
         //    ts.SetTimelessData(d);
         //    return ts;
         //}
-
+        
         public static IVariable series(GekkoSmpl smpl, params IVariable[] x)
         {
+            //series() normal series with current freq
+            //series(0) normal series with current freq
+            //series('a') normal annual series
+            //series(3) 3-dim series with current freq
+            //series('a', 3) 3-dim annual series            
             TimeSeries ts = HELPER_seriesAndTimeless("series", x);
             return ts;
         }
 
         public static IVariable timeless(GekkoSmpl smpl, params IVariable[] x)
         {
+            //timeless() normal timeless with current freq
+            //timeless(0) normal timeless with current freq
+            //timeless('a') normal annual timeless
+            //timeless(3) 3-dim timeless with current freq
+            //timeless('a', 3) 3-dim annual timeless
             TimeSeries ts = HELPER_seriesAndTimeless("timeless", x);
             return ts;
         }
