@@ -286,11 +286,16 @@ namespace Gekko
 
         public static string AddCurrentFreqToName(string name)
         {
+            return AddFreqToName(name, Program.options.freq);
+        }
+
+        public static string AddFreqToName(string name, EFreq freq)
+        {
             //If freq is a, it transforms x into x!a
             //But x!q will stay x!q.
             if (!name.Contains(Globals.freqIndicator.ToString()))
             {
-                name = name + Globals.freqIndicator + G.GetFreq(Program.options.freq);
+                name = name + Globals.freqIndicator + G.GetFreq(freq);
             }
             return name;
         }

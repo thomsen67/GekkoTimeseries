@@ -726,15 +726,15 @@ namespace Gekko
 
             //rhsExpression means the value of the rhs variable, meaning that the present lookup is setting a value for the lhs variable
             //IVariable lhs = null;
-            string varnameWithTilde = varname;
+            string varnameWithFreq = varname;
             if (!hasSigil)
             {
                 //Timeseries has '!' added
-                if (freq != null) varnameWithTilde = varname + Globals.freqIndicator + freq;
-                else varnameWithTilde = varname + Globals.freqIndicator + G.GetFreq(Program.options.freq);
+                if (freq != null) varnameWithFreq = varname + Globals.freqIndicator + freq;
+                else varnameWithFreq = varname + Globals.freqIndicator + G.GetFreq(Program.options.freq);
             }
 
-            return varnameWithTilde;
+            return varnameWithFreq;
         }
 
         private static IVariable LookupHelperRightside(Map map, string dbName, string varnameWithTilde)

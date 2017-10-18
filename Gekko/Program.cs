@@ -3958,45 +3958,32 @@ namespace Gekko
 
             }  //for each line
 
-            G.Writeln("    All data read, now putting into array-timeseries");
+            G.Writeln("    All data read, now putting into series");
 
             if (isArray)
             {
-                TimeSeries ts = new TimeSeries(G.GetFreq(freq), tableName);
-                ts.SetDirty(true);
-                if (Program.databanks.GetFirst().GetVariable(G.GetFreq(freq), ts.name) != null)
+                // ------------------------------ array-series ---------------------------------------
+
+                int dimensionsWithoutTime = codesCombi.Count;
+
+                //put in the array-timeseries ghost
+                string varNameWithFreq = G.AddFreqToName(tableName, G.GetFreq(freq));
+                TimeSeries tsGhost = new TimeSeries(G.GetFreq(freq), varNameWithFreq);
+                tsGhost.SetArrayTimeseries(dimensionsWithoutTime, true);
+                Databank databank = Program.databanks.GetFirst();
+                databank.AddIVariable(tsGhost.name, tsGhost);
+                tsGhost.SetDirty(true);
+
+                for (int j = 0; j < codesCombi.Count; j++)
                 {
-                    Program.databanks.GetFirst().RemoveVariable(G.GetFreq(freq), ts.name);
-                }
-                Program.databanks.GetFirst().AddVariable(ts);
-            }
+                    TimeSeries ts = null;
 
-            for (int j = 0; j < codesCombi.Count; j++)
-            {
-
-                TimeSeries ts = null;
-
-                if (isArray)
-                {
                     string name3 = GetArrayName(tableName, codesCombi[j]);
-                    ts = new TimeSeries(G.GetFreq(freq), name3);
+                    ts = new TimeSeries(G.GetFreq(freq), G.AddFreqToName(name3, G.GetFreq(freq)));
                     ts.meta.label = valuesCombi[j];
                     ts.meta.source = source;
                     ts.meta.stamp = Globals.dateStamp;
                     ts.SetDirty(true);
-                }
-                else
-                {
-                    string name2 = codesCombi[j];
-                    ts = new TimeSeries(G.GetFreq(freq), name2);
-                    ts.meta.label = valuesCombi[j];
-                    ts.meta.source = source;
-                    ts.meta.stamp = Globals.dateStamp;
-                    ts.SetDirty(true);
-                }                
-
-                if (Program.options.bugfix_px)  //can be switched off
-                {
 
                     GekkoTime gt_start = G.FromStringToDate(dates[0], true);
                     GekkoTime gt_end = G.FromStringToDate(dates[dates.Count - 1], true);
@@ -4034,30 +4021,84 @@ namespace Gekko
                     if (gt1.IsNull()) gt1 = gt_end;
                     if (gt_start.StrictlySmallerThan(gt0)) gt0 = gt_start;
                     if (gt_end.StrictlyLargerThan(gt1)) gt1 = gt_end;
-                }
-                else
-                {
-                    //does not handle datesRestrict
-                    for (int i = 0; i < dates.Count; i++)  //periods
-                    {
-                        GekkoTime gt = G.FromStringToDate(dates[i], true);
-                        ts.SetData(gt, data[i + j * dates.Count]);
-                        allCcounter++;
-                        if (gt0.IsNull()) gt0 = gt;
-                        if (gt1.IsNull()) gt1 = gt;
-                        if (gt.StrictlySmallerThan(gt0)) gt0 = gt;
-                        if (gt.StrictlyLargerThan(gt1)) gt1 = gt;
-                    }
-                }
 
-                if (Program.databanks.GetFirst().GetVariable(G.GetFreq(freq), ts.name) != null)
-                {
-                    Program.databanks.GetFirst().RemoveVariable(G.GetFreq(freq), ts.name);
-                }
-                Program.databanks.GetFirst().AddVariable(ts);
+                    string[] split = codesCombi[j].Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
 
+                    tsGhost.storage.AddIVariableWithOverwrite(new MapMultidimItem(split), ts);
+                }
             }
 
+            else
+            {
+
+                // ------------------------------ normal series ---------------------------------------
+
+                for (int j = 0; j < codesCombi.Count; j++)
+                {
+
+                    TimeSeries ts = null;
+
+                    if (true)
+                    {
+                        string name2 = codesCombi[j];
+                        ts = new TimeSeries(G.GetFreq(freq), name2);
+                        ts.meta.label = valuesCombi[j];
+                        ts.meta.source = source;
+                        ts.meta.stamp = Globals.dateStamp;
+                        ts.SetDirty(true);
+                    }
+
+                    if (true)  //can be switched off
+                    {
+
+                        GekkoTime gt_start = G.FromStringToDate(dates[0], true);
+                        GekkoTime gt_end = G.FromStringToDate(dates[dates.Count - 1], true);
+
+                        if (gt_start.freq != gt_end.freq)
+                        {
+                            G.Writeln2("*** ERROR: Frequency mismatch problem in px file");
+                            throw new GekkoException();
+                        }
+
+                        if (GekkoTime.Observations(gt_start, gt_end) != dates.Count)
+                        {
+                            //Guards against holes in the date sequence
+                            //Note that gt_start and gt_end may be changed with datesRestrict below
+                            G.Writeln2("*** ERROR: Expected " + dates.Count + " obs between " + dates[0] + " and " + dates[dates.Count - 1]);
+                            throw new GekkoException();
+                        }
+
+                        //See similar code in the tsd reader
+                        int offset = 0;
+                        if (datesRestrict != null)
+                        {
+                            var tuple = GetFirstLastDates(datesRestrict, gt_start, gt_end);
+                            gt_start = tuple.Item1;
+                            gt_end = tuple.Item2;
+                            offset = tuple.Item3;
+                        }
+
+                        int obs = GekkoTime.Observations(gt_start, gt_end);
+
+                        ts.SetDataSequence(gt_start, gt_end, data, j * dates.Count + offset);  //the last is the offset
+                        ts.Trim();  //to save ram
+                        allCcounter += obs;
+                        if (gt0.IsNull()) gt0 = gt_start;
+                        if (gt1.IsNull()) gt1 = gt_end;
+                        if (gt_start.StrictlySmallerThan(gt0)) gt0 = gt_start;
+                        if (gt_end.StrictlyLargerThan(gt1)) gt1 = gt_end;
+                    }
+
+
+                    if (Program.databanks.GetFirst().GetVariable(G.GetFreq(freq), ts.name) != null)
+                    {
+                        Program.databanks.GetFirst().RemoveVariable(G.GetFreq(freq), ts.name);
+                    }
+                    Program.databanks.GetFirst().AddVariable(ts);
+
+                }
+            }
+            
 
 
 
@@ -4255,7 +4296,7 @@ namespace Gekko
                     int varNr = 0;
                     int nrRecs = 0;
                     int n = 0;
-                    int dimensions = 0;
+                    int gdxDimensions = 0;
                     string varName = string.Empty;
                     int varType = 0;
                     int d;
@@ -4308,12 +4349,12 @@ namespace Gekko
                         //varType = 4: ALIAS
                         for (int i = 1; i < int.MaxValue; i++)
                         {
-                            gdx.gdxSymbolInfo(i, ref varName, ref dimensions, ref varType);
+                            gdx.gdxSymbolInfo(i, ref varName, ref gdxDimensions, ref varType);
                             
                             string label = null; int records = -12345; int userInfo = -12345;
                             gdx.gdxSymbolInfoX(i, ref records, ref userInfo, ref label);
 
-                            if (dimensions == -1)
+                            if (gdxDimensions == -1)
                             {
                                 break;  //no more symbols
                             }
@@ -4324,7 +4365,7 @@ namespace Gekko
                                 //              sets
                                 //  ======================================
                                 //
-                                if (dimensions != 1)
+                                if (gdxDimensions != 1)
                                 {
                                     skippedSets++;
                                     continue;
@@ -4364,7 +4405,7 @@ namespace Gekko
 
                                 string varNameWithFreq = varName + Globals.freqIndicator + "a";
                                 
-                                int timeDimNr = GdxGetTimeDimNumber(ref domainSyNrs, ref domainStrings, dimensions, gdx, timeIndex, i);
+                                int timeDimNr = GdxGetTimeDimNumber(ref domainSyNrs, ref domainStrings, gdxDimensions, gdx, timeIndex, i);
                                 if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0)
                                 {
                                     G.Writeln2("*** ERROR: gdx error");
@@ -4374,7 +4415,7 @@ namespace Gekko
                                 int hasTimeDimension = 0;
                                 if (timeDimNr != -12345) hasTimeDimension = 1;
                                 bool isMultiDim = true;
-                                if (dimensions - hasTimeDimension == 0)
+                                if (gdxDimensions - hasTimeDimension == 0)
                                 {
                                     isMultiDim = false;
                                 }
@@ -4384,13 +4425,10 @@ namespace Gekko
                                 {
                                     //Multi-dim timeseries
                                     if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
-                                    ts = new TimeSeries(EFreq.Annual, varNameWithFreq);
-                                    //ts.SetGhost(true);  //only a placeholder, should not be counted etc.
+                                    ts = new TimeSeries(EFreq.Annual, varNameWithFreq);                                    
                                     ts.meta.label = label;
                                     if (timeDimNr == -12345) ts.SetTimeless();  //not really relevant, since the timeseries is only a ghost
-                                    ts.storage = new MapMultidim();
-                                    ts.storageDim = dimensions - hasTimeDimension;
-                                    //ts.name = varName + Globals.freqIndicator + "a";
+                                    ts.SetArrayTimeseries(gdxDimensions, hasTimeDimension == 1);                                    
                                     databank.AddIVariable(ts.name, ts);
                                 }
                                 else
@@ -4426,7 +4464,7 @@ namespace Gekko
                                     int tt = -12345;
                                     //StringBuilder sb = new StringBuilder();
                                     List<string> dims = new List<string>();
-                                    for (d = 0; d < dimensions; d++)
+                                    for (d = 0; d < gdxDimensions; d++)
                                     {
                                         if (d == timeDimNr)
                                         {
@@ -4588,7 +4626,7 @@ namespace Gekko
             //Anyway, the speed penalty is small anyway.
             databank.Trim();
 
-        }
+        }       
 
         private static bool CompareDims(List<string> oldDims, List<string> dims)
         {
@@ -4710,7 +4748,7 @@ namespace Gekko
                 
                 string[] domains = new string[ts.storageDim + timeDimension];
                 for (int i = 0; i < domains.Length; i++) domains[i] = "*";
-                if (timeDimension == 1) domains[domains.Length - 1] = Program.options.gams_time_set;
+                if (timeDimension == 1) domains[domains.Length - 1] = Program.options.gams_time_set;  //we alway put the t domain last
 
                 GAMSVariable gvar = db.AddVariable(nameWithoutFreq, VarType.Free, label, domains);
 

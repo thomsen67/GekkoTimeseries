@@ -144,10 +144,19 @@ namespace Gekko
         /// <param name="frequency">The frequency of the timeseries</param>
         /// <param name="variableName">The variable name of the timeseries</param>
         public TimeSeries(EFreq frequency, string variableName)
-        {            
+        {
+            //Will add freq in name, if it is missing
             this.freq = frequency;
             this.name = variableName;  //Note: the variableName does contain a '!'. If the name is null, it is a light TimeSeries.
-            if (this.name != null) this.meta = new TimeSeriesMetaInformation();  //do not create this object if this.name = null, that is, a light TimeSeries.
+            if (this.name != null)
+            {
+                if (!this.name.Contains(Globals.freqIndicator))
+                {
+                    G.Writeln2("*** ERROR: Missing freq indicator, see G.AddFreqToName()");
+                    throw new GekkoException();
+                }
+                this.meta = new TimeSeriesMetaInformation(); //do not create this object if this.name = null, that is, a light TimeSeries.
+            }
         }
 
         public void SetZero(GekkoSmpl smpl)
@@ -247,6 +256,15 @@ namespace Gekko
         public bool IsNullPeriod()
         {
             return this.meta.firstPeriodPositionInArray == Globals.firstPeriodPositionInArrayNull && this.meta.lastPeriodPositionInArray == Globals.lastPeriodPositionInArrayNull;
+        }
+
+        public void SetArrayTimeseries(int dimensions, bool hasTimeDimension)
+        {
+            int tDim = 0;
+            if (hasTimeDimension) tDim = 1;
+            this.storage = new MapMultidim();
+            this.storageDim = dimensions - tDim;
+            if (!hasTimeDimension) this.SetTimeless();
         }
 
         /// <summary>
