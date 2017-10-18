@@ -638,18 +638,42 @@ namespace Gekko
         public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, bool isLeftSideVariable)
         {
             //This calls the more general Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression)
-            ScalarString x2 = x as ScalarString;
-            if (x2 == null)
+
+            if (x.Type() == EVariableType.String)
+            {                
+                string dbName, varName, freq; char firstChar; Chop((x as ScalarString)._string2, out dbName, out varName, out freq);                
+                IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable);
+                return iv;
+
+            }
+            else if (x.Type() == EVariableType.List)
             {
-                G.Writeln2("*** ERROR: Var type error when looking up in databank");
-                throw new GekkoException();
+                List x_list = x as List;
+                string[] items = Program.GetListOfStringsFromListOfIvariables(x_list.list.ToArray());
+                if (items == null)
+                {
+                    G.Writeln2("*** ERROR: The list contains non-string elements");
+                    throw new GekkoException();
+                }
+                else
+                {
+                    List<IVariable> rv = new List<IVariable>();
+                    foreach(string s in items)
+                    {
+                        string dbName, varName, freq; char firstChar; Chop(s, out dbName, out varName, out freq);
+                        IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable);
+                        rv.Add(iv);
+                    }
+                    List m = new List(rv);
+                    return m;
+                }
             }
             else
             {
-                string dbName, varName, freq; char firstChar; Chop(x2._string2, out dbName, out varName, out freq);
-                //bool hasSigil = false; if (varName[0] == Globals.symbolMemvar || varName[0] == Globals.symbolList) hasSigil = true;
-                IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable);
-                return iv;
+
+                G.Writeln2("*** ERROR: Var type error when looking up in databank");
+                throw new GekkoException();
+
             }
             return x;
         }

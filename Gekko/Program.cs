@@ -10172,6 +10172,31 @@ namespace Gekko
                 Decomp(decompOptions);
             }
         }
+        public static string[] GetListOfStringsFromListOfIvariables(IVariable[] indexes)
+        {
+            string[] keys = null;
+            int stringCount = 0;
+            foreach (IVariable iv in indexes)
+            {
+                if (iv.Type() == EVariableType.String)
+                {
+                    stringCount++;
+                }
+            }
+            if (indexes.Length == stringCount)
+            {
+
+                keys = new string[indexes.Length];
+                for (int i = 0; i < indexes.Length; i++)
+                {
+                    ScalarString ss = indexes[i] as ScalarString;
+                    keys[i] = ss._string2;
+                }
+            }
+
+            return keys;
+        }
+
 
         public static void Decomp(DecompOptions decompOptions)
         {
@@ -34112,7 +34137,7 @@ namespace Gekko
 
         public TableLight Transpose()
         {
-            TableLight ttable = new TableLight();
+            TableLight ttable = new  TableLight();
             foreach (KeyValuePair<long, CellLight> kvp in this.storage)
             {
                 int row = (int)(kvp.Key % int.MaxValue);

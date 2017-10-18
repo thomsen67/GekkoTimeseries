@@ -1064,23 +1064,11 @@ namespace Gekko
                 throw new GekkoException();
             }
             Series ts = null;
-            int stringCount = 0;
-            foreach (IVariable iv in indexes)
-            {
-                if (iv.Type() == EVariableType.String)
-                {
-                    stringCount++;
-                }
-            }
-            if (indexes.Length == stringCount)
-            {
-                
-                string[] keys = new string[indexes.Length];
-                for (int i = 0; i < indexes.Length; i++)
-                {
-                    ScalarString ss = indexes[i] as ScalarString;
-                    keys[i] = ss._string2;
-                }               
+
+            string[] keys = Program.GetListOfStringsFromListOfIvariables(indexes);
+
+            if (keys != null)
+            {              
 
                 if (this.storage == null)
                 {
@@ -1092,7 +1080,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
 
-                IVariable iv = null;                
+                IVariable iv = null;
                 this.storage.TryGetValue(new MapMultidimItem(keys), out iv);
 
                 if (iv == null)
@@ -1108,7 +1096,7 @@ namespace Gekko
                     {
                         ts = new Series(this.freq, null);
                         if (this.IsTimeless()) ts.SetTimeless();  //inherits from ghost
-                        this.storage.AddIVariableWithOverwrite(new MapMultidimItem(keys), ts);                        
+                        this.storage.AddIVariableWithOverwrite(new MapMultidimItem(keys), ts);
                     }
                 }
                 else
@@ -1119,8 +1107,8 @@ namespace Gekko
                         G.Writeln2("*** ERROR: Array-timeseries element is non-series.");
                         throw new GekkoException();
                     }
-                }                   
-                
+                }
+
             }
             else
             {
@@ -1136,6 +1124,8 @@ namespace Gekko
 
             return ts;
         }
+
+        
 
         private Series FindArrayTimeSeriesOLDDELETE(IVariable[] indexes, bool isLhs)
         {
