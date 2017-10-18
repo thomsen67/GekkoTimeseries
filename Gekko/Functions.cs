@@ -419,21 +419,33 @@ namespace Gekko
             return zeros(smpl, x1, x2);
         }
 
-        public static IVariable timeless(GekkoSmpl smpl, IVariable x1)
+        //public static IVariable timeless(GekkoSmpl smpl, IVariable x1)
+        //{
+        //    double d = x1.ConvertToVal();
+        //    TimeSeries ts = new TimeSeries(Program.options.freq, null);
+        //    ts.SetTimeless();
+        //    ts.SetTimelessData(d);
+        //    return ts;
+        //}
+
+        public static IVariable series(GekkoSmpl smpl, params IVariable[] x)
         {
-            double d = x1.ConvertToVal();
-            TimeSeries ts = new TimeSeries(Program.options.freq, null);
-            ts.SetTimeless();
-            ts.SetTimelessData(d);
+            TimeSeries ts = HELPER_seriesAndTimeless("series", x);
             return ts;
         }
 
-        public static IVariable series(GekkoSmpl smpl, params IVariable[] x)
+        public static IVariable timeless(GekkoSmpl smpl, params IVariable[] x)
+        {
+            TimeSeries ts = HELPER_seriesAndTimeless("timeless", x);
+            return ts;
+        }
+
+        private static TimeSeries HELPER_seriesAndTimeless(string type, IVariable[] x)
         {
             TimeSeries ts = null;
             if (x.Length == 0)
             {
-                ts = new TimeSeries(Program.options.freq, null);                
+                ts = new TimeSeries(Program.options.freq, null);
             }
             else if (x.Length == 1)
             {
@@ -441,7 +453,7 @@ namespace Gekko
                 {
                     //frequency
                     EFreq freq = G.GetFreq(O.ConvertToString(x[0]));
-                    ts = new TimeSeries(freq, null);                    
+                    ts = new TimeSeries(freq, null);
                 }
                 else if (x[0].Type() == EVariableType.Val)
                 {
@@ -462,9 +474,9 @@ namespace Gekko
                     //frequency
                     EFreq freq = G.GetFreq(O.ConvertToString(x[0]));
                     ts = new TimeSeries(freq, null);
-                    ts.storageDim = O.ConvertToInt(x[1]);                    
+                    ts.storageDim = O.ConvertToInt(x[1]);
                 }
-                else 
+                else
                 {
                     G.Writeln2("*** ERROR: series() with 2 arguments must have STRING as first argument");
                     throw new GekkoException();
@@ -475,8 +487,13 @@ namespace Gekko
 
                 G.Writeln2("*** ERROR: series() does not accept > 2 arguments");
                 throw new GekkoException();
-
             }
+
+            if (G.Equal(type, "timeless"))
+            {
+                ts.SetTimeless();  //dataarray will be set with 1 NaN element, this is never used. But .isTimeless is set.
+            }
+
             return ts;
         }
 

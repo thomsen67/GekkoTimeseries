@@ -597,6 +597,8 @@ namespace Gekko
         public void SetTimeless()
         {
             this.isTimeless = true;
+            this.dataArray = new double[1];  //wipe anything existing out
+            this.dataArray[0] = double.NaN;
         }
 
         /// <summary>
@@ -1023,8 +1025,8 @@ namespace Gekko
             }
             else
             {
-                //Not x[2] or x[2020q1]
-                rv = FindArrayTimeSeries(indexes, false);
+                //Not x[2] or x[2020q1]                
+                rv = this.FindArrayTimeSeries(indexes, false);
             }
 
             return rv;
@@ -1087,7 +1089,9 @@ namespace Gekko
                     else
                     {
                         ts = new TimeSeries(this.freq, "[[array-timeseries]]");
+                        if (this.IsTimeless()) ts.SetTimeless();  //inherits from ghost
                         this.storage.AddIVariableWithOverwrite(new MapMultidimItem(keys), ts);
+                        didCreateLhsArrayTimeseries = true;
                     }
                 }
                 else
@@ -1305,11 +1309,19 @@ namespace Gekko
             }
             else 
             {
-                //Will fail with an error if not all indexes are of STRING type
-                TimeSeries ts = FindArrayTimeSeries(indexes, true);
-                foreach (GekkoTime t in smpl.Iterate03())
+                //Will fail with an error if not all indexes are of STRING type                
+                TimeSeries ts = this.FindArrayTimeSeries(indexes, true);  //if not found, it will inherit the timeless status from this timeseries.
+                if (ts.IsTimeless())
                 {
-                    ts.SetData(t, rhsExpression.GetVal(t));  //will fail if expression is wrong type
+                    double d = rhsExpression.ConvertToVal();
+                    ts.SetTimelessData(d);
+                }
+                else
+                {
+                    foreach (GekkoTime t in smpl.Iterate03())
+                    {
+                        ts.SetData(t, rhsExpression.GetVal(t));  //will fail if expression is wrong type
+                    }
                 }
             }
         }
