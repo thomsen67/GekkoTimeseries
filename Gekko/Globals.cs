@@ -102,7 +102,7 @@ namespace Gekko
 
         public const string brandNewFile = "brand new file";
 
-        public const string bankNumberiName = "iBankNumber";
+        public const string bankNumberiName = "bankNumber";
 
         public static bool showTimings = false;  //use comand TIMINGS
         

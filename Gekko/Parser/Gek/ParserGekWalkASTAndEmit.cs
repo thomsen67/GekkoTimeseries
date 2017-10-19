@@ -1888,7 +1888,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                 {
-                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))), null, false, 0))) {");  //false is regarding isLeftSide, 0 means look normally in banks (not use Ref)
+                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))), null, false))) {");  //false is regarding isLeftSide
                                 }
 
                                 if (G.Equal(functionNameLower, "sum"))
@@ -2818,7 +2818,7 @@ namespace Gekko.Parser.Gek
                             string isLeftSideVariableString = "false"; if (isLeftSideVariable) isLeftSideVariableString = "true";
                             bool isInsidePrintStatement = SearchUpwardsInTree5(node);
                                                         
-                            string bankNumber = "0"; if (isInsidePrintStatement) bankNumber = Globals.bankNumberiName;
+                            //string bankNumber = "0"; if (isInsidePrintStatement) bankNumber = Globals.bankNumberiName;
 
                             bool functionHit = false;
                             if (node[0][0] == null && node[1][2][0] == null)  //no bank and no freq indicator
@@ -2915,7 +2915,7 @@ namespace Gekko.Parser.Gek
 
                             
 
-                                    string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + ivTempVar + ", " + isLeftSideVariableString + ", " + bankNumber + ")";
+                                    string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + ivTempVar + ", " + isLeftSideVariableString + ")";
                                                                         
                                     node.Code.CA(lookupCode);
                                                                         
@@ -2937,7 +2937,7 @@ namespace Gekko.Parser.Gek
                                         nameAndBankCode = "(" + node[0][0].Code + ")" + ".Add(smpl, O.scalarStringColon)" + ".Add(smpl, " + node[1].Code + ")";                                        
                                     }
 
-                                    node.Code.A("O.Lookup(smpl, " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + isLeftSideVariableString + ", " + bankNumber + ")");
+                                    node.Code.A("O.Lookup(smpl, " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + isLeftSideVariableString + ")");
                                     
                                 }
                             }
@@ -2945,22 +2945,43 @@ namespace Gekko.Parser.Gek
                         break;
                         case "ASTPRINT":
                         {
-                            
+                            if (true)
+                            {
+                                string listName = "m" + ++Globals.counter;  //for ultra-safety
+                                string code = "List " + listName + " = null; try { " + listName + " = new List();" + G.NL;
+                                code += "for (smpl." + Globals.bankNumberiName + " = 0; smpl." + Globals.bankNumberiName + " < 1; smpl." + Globals.bankNumberiName + "++) {" + G.NL;
+                                //code += node[0].Code + ";" + G.NL;
+                                code += listName + ".Add(" + node[0].Code + ");" + G.NL;
+                                code += "}" + G.NL;  //end of for
+                                code += "}" + G.NL;  //end of try
+                                code += "finally" + G.NL;  //end of try
+                                code += "{" + G.NL;
+                                code += "smpl." + Globals.bankNumberiName + " = 0;" + G.NL;
+                                code += "}" + G.NL;
+                                node.Code.A(code);
+                                node.Code.LoopSmplCode("O.Print(smpl, " + listName + ")");
+                            }
+                            else { 
 
-                            string code = null;
-                            string funcName = "PrintHelper_" + ++Globals.counter;
-                            string listName = "m" + ++Globals.counter;  //for ultra-safety
-                            string methodCode = "public static List " + funcName + "(GekkoSmpl smpl) {List " + listName + " = new List(); for (int " + Globals.bankNumberiName + " = 0; " + Globals.bankNumberiName + " < 2; " + Globals.bankNumberiName + "++)";
-                            methodCode += "{" + G.NL;
-                            methodCode += "" + listName + ".Add(" + node[0].Code + ");" + G.NL;
-                            methodCode += "}" + G.NL;
-                            methodCode += "return " + listName + ";" + G.NL;
-                            methodCode += "}" + G.NL;
-                            w.headerCs.Append(methodCode);
-                            
+                                string code = null;
+                                string funcName = "PrintHelper_" + ++Globals.counter;
+                                string listName = "m" + ++Globals.counter;  //for ultra-safety
+                                string methodCode = "public static List " + funcName + "(GekkoSmpl smpl) { try { List " + listName + " = new List(); for (smpl." + Globals.bankNumberiName + " = 0; smpl." + Globals.bankNumberiName + " < 2; smpl." + Globals.bankNumberiName + "++)";
+                                methodCode += "{" + G.NL;
+                                methodCode += "" + listName + ".Add(" + node[0].Code + ");" + G.NL;
+                                methodCode += "}" + G.NL;
+                                methodCode += "return " + listName + ";" + G.NL;
+                                methodCode += "}" + G.NL;  //end of try
+                                methodCode += "finally" + G.NL;  //end of try
+                                methodCode += "{" + G.NL;
+                                methodCode += "smpl." + Globals.bankNumberiName + " = 0;" + G.NL;
+                                methodCode += "}" + G.NL;
+                                methodCode += "}" + G.NL;  //end of method
+                                w.headerCs.Append(methodCode);
 
-                            node.Code.LoopSmplCode("O.Print(smpl, (" + funcName + "(smpl)" + "))");
 
+                                node.Code.LoopSmplCode("O.Print(smpl, (" + funcName + "(smpl)" + "))");
+                            }
                         }
                         break;
                     case "ASTVARNAME":
