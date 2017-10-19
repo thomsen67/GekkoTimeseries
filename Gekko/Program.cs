@@ -1237,7 +1237,7 @@ namespace Gekko
             return matrix;
         }
 
-        private static void GetTimeseriesFromWorkbookMatrix(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, Databank databank, TableLight matrix2, ReadInfo readInfo)
+        private static void GetTimeseriesFromWorkbookMatrix(AllFreqsHelper dates, ReadOpenMulbkHelper oRead, Databank databank, TableLight matrix2, ReadInfo readInfo)
         {
 
             //TODO: gaps, READ<gap>
@@ -2153,7 +2153,7 @@ namespace Gekko
                         file = tempPath;
                     }
 
-                    ReadDatesHelper dates = GetReadDatesHelper(oRead);
+                    AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(oRead.t1, oRead.t2);
 
                     if (wipeDatabankBeforeInsertingData) databank.Clear();  //Reading gbk may point to a whole new databank, this is ok. Wipe will only be for READ, no READ<merge> or READ ... TO ... . IMPORT is never wiped.
 
@@ -2305,59 +2305,7 @@ namespace Gekko
             return;
         }
 
-        private static ReadDatesHelper GetReadDatesHelper(ReadOpenMulbkHelper oRead)
-        {
-            //Also see #345632473
-            if (oRead.t1.IsNull()) return null;
-            ReadDatesHelper readDatesHelper = new Gekko.ReadDatesHelper();
-            if (oRead.t1.freq != oRead.t2.freq)
-            {
-                G.Writeln2("*** ERROR: The two date frequencies do not match");
-                throw new GekkoException();
-            }
-
-            if (oRead.t1.freq == EFreq.Undated)
-            {
-                G.Writeln2("*** ERROR: Undated frequency does not work for READ/IMPORT");
-                throw new GekkoException();
-            }
-
-            if (GekkoTime.Observations(oRead.t1, oRead.t2) < 1)
-            {
-                G.Writeln2("*** ERROR: Start period must be <= end period");
-                throw new GekkoException();
-            }
-
-            if (oRead.t1.freq == EFreq.Annual)
-            {
-                readDatesHelper.t1Annual = oRead.t1;
-                readDatesHelper.t2Annual = oRead.t2;
-                readDatesHelper.t1Quarterly = new GekkoTime(EFreq.Quarterly, oRead.t1.super, 1);  //first q
-                readDatesHelper.t2Quarterly = new GekkoTime(EFreq.Quarterly, oRead.t2.super, GekkoTimeStuff.numberOfQuarters);  //last q
-                readDatesHelper.t1Monthly = new GekkoTime(EFreq.Monthly, oRead.t1.super, 1);  //first m
-                readDatesHelper.t2Monthly = new GekkoTime(EFreq.Monthly, oRead.t2.super, GekkoTimeStuff.numberOfMonths);  //last m
-            }
-            else if (oRead.t1.freq == EFreq.Quarterly)
-            {
-                readDatesHelper.t1Annual = new GekkoTime(EFreq.Annual, oRead.t1.super, 1);
-                readDatesHelper.t2Annual = new GekkoTime(EFreq.Annual, oRead.t2.super, 1);
-                readDatesHelper.t1Quarterly = oRead.t1;
-                readDatesHelper.t2Quarterly = oRead.t2;
-                readDatesHelper.t1Monthly = new GekkoTime(EFreq.Monthly, oRead.t1.super, GekkoTime.FromQuarterToMonthStart(oRead.t1.sub));  //first m
-                readDatesHelper.t2Monthly = new GekkoTime(EFreq.Monthly, oRead.t2.super, GekkoTime.FromQuarterToMonthEnd(oRead.t2.sub));  //last m                            
-            }
-            else if (oRead.t1.freq == EFreq.Monthly)
-            {
-                readDatesHelper.t1Annual = new GekkoTime(EFreq.Annual, oRead.t1.super, 1);
-                readDatesHelper.t2Annual = new GekkoTime(EFreq.Annual, oRead.t2.super, 1);
-                readDatesHelper.t1Quarterly = new GekkoTime(EFreq.Quarterly, oRead.t1.super, GekkoTime.FromMonthToQuarter(oRead.t1.sub));
-                readDatesHelper.t2Quarterly = new GekkoTime(EFreq.Quarterly, oRead.t2.super, GekkoTime.FromMonthToQuarter(oRead.t2.sub));
-                readDatesHelper.t1Monthly = oRead.t1;
-                readDatesHelper.t2Monthly = oRead.t2;
-            }
-
-            return readDatesHelper;
-        }
+        
 
         private static void CheckOpenSyntax(ReadOpenMulbkHelper oRead)
         {
@@ -2433,7 +2381,7 @@ namespace Gekko
             }
         }
 
-        private static void ReadSheet(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, Databank databank, string originalFilePath)
+        private static void ReadSheet(AllFreqsHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, Databank databank, string originalFilePath)
         {
             //TODO:
             //For speedup:
@@ -2617,7 +2565,7 @@ namespace Gekko
             return v;
         }
 
-        private static void ReadGbk(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath)
+        private static void ReadGbk(AllFreqsHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath)
         {
             //NOTE: time-truncation is only done at the uppermost level: series or array-series. Stuff inside LIST or MAP is not time-truncated.
 
@@ -2937,7 +2885,7 @@ namespace Gekko
 
         }
 
-        private static void MergeTwoTimeseriesWithDateWindowHelper(ReadDatesHelper dates, Databank databank, string name, Series tsProtobuf, bool wipeExistingOut)
+        private static void MergeTwoTimeseriesWithDateWindowHelper(AllFreqsHelper dates, Databank databank, string name, Series tsProtobuf, bool wipeExistingOut)
         {
             if (wipeExistingOut)
             {
@@ -2947,7 +2895,7 @@ namespace Gekko
             }
         }
 
-        private static void MergeTwoTimeseriesWithDateWindowHelper(ReadDatesHelper dates, MapMultidim gmap, MapMultidimItem gmapItem, Series tsProtobuf, bool wipeExistingOut)
+        private static void MergeTwoTimeseriesWithDateWindowHelper(AllFreqsHelper dates, MapMultidim gmap, MapMultidimItem gmapItem, Series tsProtobuf, bool wipeExistingOut)
         {
             if (wipeExistingOut)
             {
@@ -2957,7 +2905,7 @@ namespace Gekko
             }
         }
 
-        private static void MergeTwoTimeseriesWithDateWindow(ReadDatesHelper dates, Series tsExisting, Series tsProtobuf, ref int maxYearInProtobufFile, ref int minYearInProtobufFile, ref bool wipeExistingOut)
+        private static void MergeTwoTimeseriesWithDateWindow(AllFreqsHelper dates, Series tsExisting, Series tsProtobuf, ref int maxYearInProtobufFile, ref int minYearInProtobufFile, ref bool wipeExistingOut)
         {
             if (tsProtobuf.IsTimeless() || (tsExisting != null && tsExisting.IsTimeless()))
             {
@@ -3067,7 +3015,7 @@ namespace Gekko
             return tsExisting;
         }
 
-        private static void ReadTsd(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref int NaNCounter)
+        private static void ReadTsd(AllFreqsHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref int NaNCounter)
         {
             bool isTsdx = false;
             bool mergeOrTimeLimit = oRead.Merge || dates != null;
@@ -3092,7 +3040,7 @@ namespace Gekko
             currentBank.yearEnd = readInfo.endPerResultingBank;
         }
 
-        private static Tuple<GekkoTime, GekkoTime, int> GetFirstLastDates(ReadDatesHelper dates, GekkoTime first, GekkoTime last)
+        private static Tuple<GekkoTime, GekkoTime, int> GetFirstLastDates(AllFreqsHelper dates, GekkoTime first, GekkoTime last)
         {
             //offset is the distance from first to dates.t1. If dates.t1 < first, offset will be 0.
             //So offset tells us when to start taking data in the array of the existing timeseries, as counted from the first date.
@@ -3147,7 +3095,7 @@ namespace Gekko
             return new Tuple<GekkoTime, GekkoTime, int>(firstRv, lastRv, offset);
         }
 
-        private static void ReadAllTsdRecords(ReadDatesHelper dates, string file, bool merge, bool isTsdx, Databank databank, ref int NaNCounter, ReadInfo readInfo)
+        private static void ReadAllTsdRecords(AllFreqsHelper dates, string file, bool merge, bool isTsdx, Databank databank, ref int NaNCounter, ReadInfo readInfo)
         {
             int smallWarnings = 0;
             int emptyWarnings = 0;
@@ -3410,7 +3358,7 @@ namespace Gekko
             }
         }
 
-        public static void ReadPxHelper(Databank databank, ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
+        public static void ReadPxHelper(Databank databank, AllFreqsHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
         {
             //merge and date truncation:
             //do this by first reading into a Gekko databank, and then merge that with the merge facilities from gbk read
@@ -3457,7 +3405,7 @@ namespace Gekko
 
         }
 
-        public static void ReadPCIM(Databank databank, ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
+        public static void ReadPCIM(Databank databank, AllFreqsHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
         {
 
             //try
@@ -3669,7 +3617,7 @@ namespace Gekko
         }
 
 
-        public static void ReadPx(string array, bool isDownload, ReadDatesHelper datesRestrict, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
+        public static void ReadPx(string array, bool isDownload, AllFreqsHelper datesRestrict, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
         {
          
             bool isArray = false; if (G.Equal(array, "yes")) isArray = true;
@@ -4230,7 +4178,7 @@ namespace Gekko
 
         }
 
-        public static void ReadGdx(Databank databank, ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file2, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
+        public static void ReadGdx(Databank databank, AllFreqsHelper dates, ReadOpenMulbkHelper oRead, string file2, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
         {
             //merge and date truncation:
             //do this by first reading into a Gekko databank, and then merge that with the merge facilities from gbk read
@@ -23053,21 +23001,117 @@ namespace Gekko
 
         public static void OPrint(GekkoSmpl smpl, IVariable x)
         {
-            string[] printcode = new string[] { "m" };  //1 element
+            string[] printcode = new string[] { "m", "m", "m" };  //1 element
             List inputList = x as List;  //will always be a list
 
             //print always receives a List with 1 or 2 elements (Work and Ref so to say)
 
-            if (false)
+            if (true)
             {                
                 IVariable[] ivs = PrintHelperConvertToList(inputList); //ivs has 1 or 2 elements. The sub-elements of these are now lists (of things to print, like x1, x2, x3)
+                
+                List workList = ivs[0] as List;  //the elements here correspond to comma-separated argumentsIVariable workList = ivs[0];  //the elements here correspond to comma-separated arguments
+                List refList = ivs[1] as List;  //same as above
 
+                bool[] freqs = new bool[3];
+                List<IVariable> explode = new List<IVariable>();
+                List<string> explodePrintcodes = new List<string>();
 
-                IVariable workList = ivs[0];
+                AllFreqsHelper allFreqs = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);  //converts between A, Q, M, so all are given. Also used in IMPORT<per1 per2> etc.
 
+                explode.Add(null);  //signals to do a column of dates later on
+                int counter = -1;
+                foreach (IVariable iv in workList.list)
+                {
+                    counter++;
+                    if (iv.Type() == EVariableType.Series)
+                    {
+                        PrintFreqHelper(freqs, iv);
+                        explode.Add(iv);
+                        explodePrintcodes.Add(printcode[counter]);
+                    }
+                    else if (iv.Type() == EVariableType.List)
+                    {
+                        foreach (IVariable iv2 in ((List)iv).list)
+                        {
+                            if (iv2.Type() == EVariableType.Series)
+                            {
+                                PrintFreqHelper(freqs, iv2);                                
+                                explode.Add(iv2);
+                                explodePrintcodes.Add(printcode[counter]);  //list items will get same code
+                            }
+                        }
+                    }
+                }
 
-                TableLight table = new TableLight();
+                EFreq sameFreq = EFreq.None;
+                if (freqs[0] && !freqs[1] && !freqs[2]) sameFreq = EFreq.Annual;
+                else if (!freqs[0] && freqs[1] && !freqs[2]) sameFreq = EFreq.Quarterly;
+                else if (!freqs[0] && !freqs[1] && freqs[2]) sameFreq = EFreq.Monthly;
+                else sameFreq = EFreq.None;  //superflous, just to state the obvious
 
+                Table table = new Table();
+
+                GekkoTime t1 = smpl.t1;
+                GekkoTime t2 = smpl.t2;
+
+                int y1 = t1.super;
+                int y2 = t2.super;
+
+                //TIMEFILTER!!!!!!! with avg
+
+                //timefilter removes items hitted. If avg/sum timefilter, track the omitted and print them instead of non-hitted
+
+                //2003 (label)       
+                //2003q1            Q         
+                //2003m1                 M
+                //2003m2                 M      
+                //2003m3                 M
+                //SUM3M                  Msum (only when 3 M above else empty)
+                //2003q2            Q           
+                //2003m4                 M
+                //2003m5                 M
+                //2003m6                 M
+                //SUM3M                  Msum           
+                //2003q3            Q
+                //2003m7                 M
+                //2003m8                 M                 <--------- if timefilter is 2003m2..2003m7, we consolidate in 2003m8:  "2003m2-2003m8    123.45"
+                //2003m9                 M                            Msum is only shown if not touched by timefilter
+                //SUM3M                  Msum           
+                //2003q4            Q          
+                //2003m10                M
+                //2003m11                M
+                //2003m12                M
+                //SUM3M                  Msum
+                //SUM12M                 Msum                                 
+                //SUM4Q             Qsum           
+                //ANNUAL     A
+
+                int rowsPerYear = 24;  //beware, if they layout is changed
+                int i = 0;
+                int j = 0;                
+                foreach (IVariable iv in explode)
+                {
+                    j++;  //remember there is a label column which gets number 1
+                    for (int year = y1; year <= y2; year++)
+                    {
+                        i = (year - y1) * rowsPerYear;
+                        //for each year in smpl
+                        if (j == 1)  //then iv == null
+                        {
+                            table.Set(i + 1, j, year.ToString());
+                        }                        
+                    }
+                }
+
+                bool filter = ShouldFilterPeriod(new GekkoTime());
+
+                List<string> print = table.Print();
+                foreach (string s in print)
+                {
+                    G.Writeln(s);
+                }
+                PrtClipboard(table, false);
 
 
             }
@@ -23207,6 +23251,13 @@ namespace Gekko
 
             }
 
+        }
+
+        private static void PrintFreqHelper(bool[] freqs, IVariable iv)
+        {
+            if (((Series)iv).freq == EFreq.Annual) freqs[0] = true;
+            else if (((Series)iv).freq == EFreq.Quarterly) freqs[1] = true;
+            else if (((Series)iv).freq == EFreq.Monthly) freqs[2] = true;
         }
 
         private static IVariable[] PrintHelperConvertToList(List inputList)

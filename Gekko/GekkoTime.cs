@@ -11,7 +11,8 @@ namespace Gekko
         Annual,
         Quarterly,
         Monthly,
-        Undated      //also called 'u' in Eviews, called 'n' in TSP, but undated has no name in AREMOS (uses 'periodic')        
+        Undated,      //also called 'u' in Eviews, called 'n' in TSP, but undated has no name in AREMOS (uses 'periodic')     
+        None          //used to signal non-freq variable, for instance a VAL   
     }  
     
     public class GekkoTimeStuff
@@ -300,7 +301,7 @@ namespace Gekko
         }
     }
 
-    public class ReadDatesHelper
+    public class AllFreqsHelper
     {
         public GekkoTime t1Annual;
         public GekkoTime t2Annual;

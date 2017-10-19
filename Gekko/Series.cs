@@ -167,7 +167,7 @@ namespace Gekko
             }
         }
 
-        public void Truncate(ReadDatesHelper dates)
+        public void Truncate(AllFreqsHelper dates)
         {
             //Also see #345632473
             if (dates == null) return;

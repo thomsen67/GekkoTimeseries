@@ -1813,7 +1813,7 @@ d.Add("Y" ,Y);
                               }
 
 
-							  // ------------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------
 // ------------------- expression START -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
@@ -2016,11 +2016,13 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | functionDef          SEMICOLON!
 						  | if2
 						  | ini                  SEMICOLON!
+						  | option				 SEMICOLON!
 						  | print                SEMICOLON!
 						  | read                 SEMICOLON!
 						  | reset                SEMICOLON!
 						  | return2              SEMICOLON!
 						  | run                  SEMICOLON!
+						  | time                 SEMICOLON!
 						  | write                SEMICOLON!
 						    ;
 
@@ -2038,6 +2040,8 @@ forHelper2:                 type? svarname EQUAL expression (TO expression2)? (B
 if2:						IF leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIF", ASTIF, $IF.Line)} logical functionStatements functionStatements2);
 
 ini:					    INI -> ^({token("ASTINI", ASTINI, $INI.Line)});
+
+option:                     OPTION optionType -> ^({token("ASTOPTION", ASTOPTION, $OPTION.Line)} optionType);
 
 print:					    P expression -> ^(ASTPRINT expression);
 
@@ -2069,6 +2073,11 @@ readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)
 						    ;
 
+time:                       TIME dates -> ^({token("ASTTIME", ASTTIME, $TIME.Line)} ^(ASTDATES dates))
+						  | TIME question -> ^({token("ASTTIMEQUESTION", ASTTIMEQUESTION, $TIME.Line)})		
+						  | TIME oneDate -> ^({token("ASTTIME", ASTTIME, $TIME.Line)} ^(ASTDATES oneDate oneDate))  //duplicating, TIME 2015 ==> TIME 2015 2015
+						    ;
+oneDate:                    expression;
 
 						    //!!!2x2 identical lines ONLY because of token stuff
 write:					    WRITE  writeOpt1? listItemsWildRange? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE  writeOpt1?  ^(ASTHANDLEFILENAME fileName?) listItemsWildRange?)
@@ -2110,6 +2119,12 @@ functionStatements:         statements2* -> ^(ASTPLACEHOLDER statements2*);
 functionStatements2:        functionStatements;  //alias
 type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX ;
 
+
+optionType :	
+                            FREQ '='? optionFreq -> FREQ ^(ASTSTRINGSIMPLE optionFreq);
+
+
+
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- logical END -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
@@ -2117,6 +2132,12 @@ type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX ;
 // ------------------------------------
 // Semi lexer stuff here
 // ------------------------------------
+
+optionFreq:                 a | q | m | u;
+a:                          A;
+q:                          Q;
+m:                          M;
+u:                          U;
 
 listItems:                  listItem (COMMA2 listItem)*                   -> ^(ASTLISTITEMS (^(ASTLISTITEM listItem))+);   //puts in o.listItems
 listItems0:                 listItem (COMMA2 listItem)*                   -> ^(ASTLISTITEMS0 (^(ASTLISTITEM listItem))+);  //puts in o.listItems0

@@ -2949,7 +2949,7 @@ namespace Gekko.Parser.Gek
                             {
                                 string listName = "m" + ++Globals.counter;  //for ultra-safety
                                 string code = "List " + listName + " = null; try { " + listName + " = new List();" + G.NL;
-                                code += "for (smpl." + Globals.bankNumberiName + " = 0; smpl." + Globals.bankNumberiName + " < 1; smpl." + Globals.bankNumberiName + "++) {" + G.NL;
+                                code += "for (smpl." + Globals.bankNumberiName + " = 0; smpl." + Globals.bankNumberiName + " < 2; smpl." + Globals.bankNumberiName + "++) {" + G.NL;
                                 //code += node[0].Code + ";" + G.NL;
                                 code += listName + ".Add(" + node[0].Code + ");" + G.NL;
                                 code += "}" + G.NL;  //end of for
