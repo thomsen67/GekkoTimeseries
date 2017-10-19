@@ -23024,24 +23024,7 @@ namespace Gekko
                 foreach (IVariable iv in workList.list)
                 {
                     counter++;
-                    if (iv.Type() == EVariableType.Series)
-                    {
-                        PrintFreqHelper(freqs, iv);
-                        explode.Add(iv);
-                        explodePrintcodes.Add(printcode[counter]);
-                    }
-                    else if (iv.Type() == EVariableType.List)
-                    {
-                        foreach (IVariable iv2 in ((List)iv).list)
-                        {
-                            if (iv2.Type() == EVariableType.Series)
-                            {
-                                PrintFreqHelper(freqs, iv2);                                
-                                explode.Add(iv2);
-                                explodePrintcodes.Add(printcode[counter]);  //list items will get same code
-                            }
-                        }
-                    }
+                    PrintHelper2(printcode, freqs, explode, explodePrintcodes, counter, iv, true);
                 }
 
                 EFreq sameFreq = EFreq.None;
@@ -23062,45 +23045,80 @@ namespace Gekko
 
                 //timefilter removes items hitted. If avg/sum timefilter, track the omitted and print them instead of non-hitted
 
-                //2003 (label)       
-                //2003q1            Q         
-                //2003m1                 M
-                //2003m2                 M      
-                //2003m3                 M
-                //SUM3M                  Msum (only when 3 M above else empty)
-                //2003q2            Q           
-                //2003m4                 M
-                //2003m5                 M
-                //2003m6                 M
-                //SUM3M                  Msum           
-                //2003q3            Q
-                //2003m7                 M
-                //2003m8                 M                 <--------- if timefilter is 2003m2..2003m7, we consolidate in 2003m8:  "2003m2-2003m8    123.45"
-                //2003m9                 M                            Msum is only shown if not touched by timefilter
-                //SUM3M                  Msum           
-                //2003q4            Q          
-                //2003m10                M
-                //2003m11                M
-                //2003m12                M
-                //SUM3M                  Msum
-                //SUM12M                 Msum                                 
-                //SUM4Q             Qsum           
-                //ANNUAL     A
+                // 1. 2003 (label)       
+                // 2. 2003q1            Q         
+                // 3. 2003m1                 M
+                // 4. 2003m2                 M      
+                // 5. 2003m3                 M
+                // 6. SUM3M                  Msum (only when 3 M above else empty)
+                // 7. 2003q2            Q           
+                // 8. 2003m4                 M
+                // 9. 2003m5                 M
+                //10. 2003m6                 M
+                //11. SUM3M                  Msum           
+                //12. 2003q3            Q
+                //13. 2003m7                 M
+                //14. 2003m8                 M                 <--------- if timefilter is 2003m2..2003m7, we consolidate in 2003m8:  "2003m2-2003m8    123.45"
+                //15. 2003m9                 M                            Msum is only shown if not touched by timefilter
+                //16. SUM3M                  Msum           
+                //17. 2003q4            Q          
+                //18. 2003m10                M
+                //19. 2003m11                M
+                //20. 2003m12                M
+                //21. SUM3M                  Msum
+                //22. SUM12M                 Msum                                 
+                //23. SUM4Q             Qsum           
+                //24. ANNUAL     A
 
                 int rowsPerYear = 24;  //beware, if they layout is changed
                 int i = 0;
                 int j = 0;                
                 foreach (IVariable iv in explode)
                 {
+                    Series ts = iv as Series;
+                    double scalarValue = double.NaN;
+                    if (ts == null) scalarValue = iv.GetVal(Globals.tNull);
+
                     j++;  //remember there is a label column which gets number 1
                     for (int year = y1; year <= y2; year++)
-                    {
+                    {                        
                         i = (year - y1) * rowsPerYear;
-                        //for each year in smpl
-                        if (j == 1)  //then iv == null
+                        if (true) // ------------------------------------------------------------- (1)
                         {
-                            table.Set(i + 1, j, year.ToString());
-                        }                        
+                            //for each year in smpl
+                            if (j == 1)  //then iv == null
+                            {
+                                table.Set(i + 1, j, year.ToString());
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (2)
+                        {
+                            //for each year in smpl
+                            if (j > 1)  //then iv == null
+                            {
+                                EFreq freqHere = EFreq.Quarterly;
+                                int subHere = 1;
+                                // --------------------------
+                                GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                                double? d = null;
+                                if (ts == null)
+                                {
+                                    if (sameFreq == freqHere) d = scalarValue;
+                                }
+                                else
+                                {
+                                    if (ts.freq == freqHere)
+                                    {
+                                        d = ts.GetData(smpl, t);                                        
+                                    }
+                                }
+                                if (d != null)
+                                {
+                                    table.SetNumber(i, j, (double)d, "");
+                                }
+
+                            }
+                        }
                     }
                 }
 
@@ -23251,6 +23269,41 @@ namespace Gekko
 
             }
 
+        }
+
+        private static void PrintHelper2(string[] printcode, bool[] freqs, List<IVariable> explode, List<string> explodePrintcodes, int counter, IVariable iv, bool root)
+        {
+            if (iv.Type() == EVariableType.Series)
+            {
+                PrintFreqHelper(freqs, iv);
+                explode.Add(iv);
+                explodePrintcodes.Add(printcode[counter]);
+            }
+            else if (iv.Type() == EVariableType.Val)
+            {
+                explode.Add(iv);
+                explodePrintcodes.Add(printcode[counter]);
+            }
+            else if (iv.Type() == EVariableType.Matrix && ((Matrix)iv).data.Length == 1)  //an 1x1 matrix
+            {
+                explode.Add(iv);
+                explodePrintcodes.Add(printcode[counter]);
+            }
+            else if (iv.Type() == EVariableType.List)
+            {
+                if (root)
+                {
+                    foreach (IVariable iv2 in ((List)iv).list)
+                    {
+                        PrintHelper2(printcode, freqs, explode, explodePrintcodes, counter, iv2, false);  //the counter is fixed
+                    }
+                }
+            }
+            else
+            {
+                G.Writeln2("ERROR: Can only print SERIES, VAL, 1x1 MATRIX, or a LIST with the same");
+                throw new GekkoException();
+            }
         }
 
         private static void PrintFreqHelper(bool[] freqs, IVariable iv)

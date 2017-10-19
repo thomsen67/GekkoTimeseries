@@ -850,6 +850,20 @@ namespace Gekko
             return rv;
         }
 
+        public static void InitSmpl(GekkoSmpl smpl)
+        {
+            //called before each command is run
+            if (smpl != null)
+            {
+                smpl.t0 = Globals.globalPeriodStart.Add(-0);
+                smpl.t1 = Globals.globalPeriodStart;
+                smpl.t2 = Globals.globalPeriodEnd;
+                smpl.t3 = Globals.globalPeriodEnd.Add(0);
+                smpl.gekkoError = null;
+                smpl.bankNumber = 0;
+            }
+        }        
+
         public static IVariable ConvertToTimeSeries(GekkoSmpl smpl, IVariable x)
         {
             if (x.Type() == EVariableType.Series || x.Type() == EVariableType.Val) return x;
