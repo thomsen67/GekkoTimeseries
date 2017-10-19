@@ -9,14 +9,11 @@ namespace Gekko
 public class TranslatedCode
 {
 public static GekkoTime globalGekkoTimeIterator = Globals.tNull;
-        public static List PrintHelper_31(GekkoSmpl smpl)
-        {
-            List m32 = new List(); for (int iBankNumber = 0; iBankNumber < 2; iBankNumber++)
-            {
-                m32.Add(O.Lookup(smpl, null, null, "xx", null, null, false, iBankNumber));
-            }
-            return m32;
-        }
+public static List PrintHelper_112(GekkoSmpl smpl) {List m113 = new List(); for (int iBankNumber = 0; iBankNumber < 2; iBankNumber++){
+m113.Add(O.Lookup(smpl, null, null, "#xx", null, null, false, iBankNumber));
+}
+return m113;
+}
 public static void ClearTS(P p) {
 }
 public static void ClearScalar(P p) {
@@ -27,10 +24,10 @@ GekkoSmpl smpl = O.Smpl();
 
 
 p.SetText(@"¤0");
-for (int iSmpl33 = 0; iSmpl33 < int.MaxValue; iSmpl33++) {
-O.Print(smpl, (PrintHelper_31(smpl)));
+for (int iSmpl114 = 0; iSmpl114 < int.MaxValue; iSmpl114++) {
+O.Print(smpl, (O.Lookup(smpl, null, (PrintHelper_112(smpl)), null, false, iBankNumber)));
 
-if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl33); else break;
+if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl114); else break;
 }
 
 

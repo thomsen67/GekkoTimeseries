@@ -2929,8 +2929,7 @@ namespace Gekko.Parser.Gek
                                         methodCode += "return " + listName + ";" + G.NL;
                                         methodCode += "}" + G.NL;
                                         w.headerCs.Append(methodCode);
-                                        node.Code.A(funcName + "(smpl)");
-                                        
+                                        node.Code.A(funcName + "(smpl)");                                        
                                     }
                                     else
                                     {
