@@ -23057,7 +23057,7 @@ namespace Gekko
 
             //print always receives a List with 1 or 2 elements (Work and Ref so to say)
 
-            if (true)
+            if (false)
             {                
                 IVariable[] ivs = PrintHelperConvertToList(inputList); //ivs has 1 or 2 elements. The sub-elements of these are now lists (of things to print, like x1, x2, x3)
 
@@ -23072,6 +23072,8 @@ namespace Gekko
             }
             else
             {
+
+                x = inputList.list[0];  //HAXKKKCCCK!!!
 
                 if (x == null)
                 {
@@ -23129,7 +23131,7 @@ namespace Gekko
                                         }
                                         else
                                         {
-                                            G.Writeln2("*** ERROR: Type error 3243");
+                                            G.Writeln("*** ERROR: Type error 3243");
                                         }
                                     }
                                     G.Writeln();
@@ -23212,10 +23214,12 @@ namespace Gekko
             for (int i = 0; i < 2; i++)
             {
                 ivs[i] = inputList.list[i];
+                if (ivs[i] == null) continue;
                 if (ivs[i].Type() != EVariableType.List)
                 {
                     //transform it into a list: much easier afterwards
                     List temp = new Gekko.List();
+                    temp.list = new List<IVariable>();
                     temp.list.Add(ivs[i]);
                     ivs[i] = temp;
                 }

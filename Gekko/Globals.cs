@@ -101,7 +101,9 @@ namespace Gekko
         public static string splitCommandBlockEnd = "//[[commandEnd]]";
 
         public const string brandNewFile = "brand new file";
-        
+
+        public const string bankNumberiName = "iBankNumber";
+
         public static bool showTimings = false;  //use comand TIMINGS
         
         //public static int stackedTimePeriods = 5;

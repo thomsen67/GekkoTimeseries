@@ -2817,9 +2817,8 @@ namespace Gekko.Parser.Gek
                             bool isLeftSideVariable = CheckIfLeftSide(node);  //In x[%s1, %s2][%date] = ... this will only be true for x, not for the other vars
                             string isLeftSideVariableString = "false"; if (isLeftSideVariable) isLeftSideVariableString = "true";
                             bool isInsidePrintStatement = SearchUpwardsInTree5(node);
-
-                            string bankNumberiName = "iBankNumber";
-                            string bankNumber = "0"; if (isInsidePrintStatement) bankNumber = bankNumberiName;
+                                                        
+                            string bankNumber = "0"; if (isInsidePrintStatement) bankNumber = Globals.bankNumberiName;
 
                             bool functionHit = false;
                             if (node[0][0] == null && node[1][2][0] == null)  //no bank and no freq indicator
@@ -2914,28 +2913,12 @@ namespace Gekko.Parser.Gek
                                     string simpleFreqText = Globals.QT + simpleFreq + Globals.QT;
                                     if (simpleFreq == "") simpleFreqText = "null";
 
-                                    string code = null;
-                                    string funcName = "PrintHelper_" + ++Globals.counter;
-                                    string listName = "m" + ++Globals.counter;  //for ultra-safety
+                            
 
                                     string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + ivTempVar + ", " + isLeftSideVariableString + ", " + bankNumber + ")";
-
-                                    if (isInsidePrintStatement)
-                                    {
-                                        string methodCode = "public static List " + funcName + "(GekkoSmpl smpl) {List " + listName + " = new List(); for (int " + bankNumberiName + " = 0; " + bankNumberiName + " < 2; " + bankNumberiName + "++)";
-                                        methodCode += "{" + G.NL;
-                                        methodCode += "" + listName + ".Add(" + lookupCode + ");" + G.NL;
-                                        methodCode += "}" + G.NL;
-                                        methodCode += "return " + listName + ";" + G.NL;
-                                        methodCode += "}" + G.NL;
-                                        w.headerCs.Append(methodCode);
-                                        node.Code.A(funcName + "(smpl)");                                        
-                                    }
-                                    else
-                                    {
-                                        node.Code.CA(lookupCode);
-                                    }                                   
-                                    
+                                                                        
+                                    node.Code.CA(lookupCode);
+                                                                        
                                 }
                                 else
                                 {
@@ -2961,8 +2944,23 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                         case "ASTPRINT":
-                        {                            
-                            node.Code.LoopSmplCode("O.Print(smpl, (" + node[0].Code + "))");
+                        {
+                            
+
+                            string code = null;
+                            string funcName = "PrintHelper_" + ++Globals.counter;
+                            string listName = "m" + ++Globals.counter;  //for ultra-safety
+                            string methodCode = "public static List " + funcName + "(GekkoSmpl smpl) {List " + listName + " = new List(); for (int " + Globals.bankNumberiName + " = 0; " + Globals.bankNumberiName + " < 2; " + Globals.bankNumberiName + "++)";
+                            methodCode += "{" + G.NL;
+                            methodCode += "" + listName + ".Add(" + node[0].Code + ");" + G.NL;
+                            methodCode += "}" + G.NL;
+                            methodCode += "return " + listName + ";" + G.NL;
+                            methodCode += "}" + G.NL;
+                            w.headerCs.Append(methodCode);
+                            
+
+                            node.Code.LoopSmplCode("O.Print(smpl, (" + funcName + "(smpl)" + "))");
+
                         }
                         break;
                     case "ASTVARNAME":

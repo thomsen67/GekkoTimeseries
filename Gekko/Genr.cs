@@ -9,10 +9,10 @@ namespace Gekko
 public class TranslatedCode
 {
 public static GekkoTime globalGekkoTimeIterator = Globals.tNull;
-public static List PrintHelper_112(GekkoSmpl smpl) {List m113 = new List(); for (int iBankNumber = 0; iBankNumber < 2; iBankNumber++){
-m113.Add(O.Lookup(smpl, null, null, "#xx", null, null, false, iBankNumber));
+public static List PrintHelper_493(GekkoSmpl smpl) {List m494 = new List(); for (int iBankNumber = 0; iBankNumber < 2; iBankNumber++){
+m494.Add(O.ListDefHelper(O.Lookup(smpl, null, null, "xx1", null, null, false, iBankNumber), O.Lookup(smpl, null, null, "xx2", null, null, false, iBankNumber), O.Lookup(smpl, null, (O.Lookup(smpl, null, null, "#m", null, null, false, iBankNumber)), null, false, iBankNumber)));
 }
-return m113;
+return m494;
 }
 public static void ClearTS(P p) {
 }
@@ -24,10 +24,10 @@ GekkoSmpl smpl = O.Smpl();
 
 
 p.SetText(@"¤0");
-for (int iSmpl114 = 0; iSmpl114 < int.MaxValue; iSmpl114++) {
-O.Print(smpl, (O.Lookup(smpl, null, (PrintHelper_112(smpl)), null, false, iBankNumber)));
+for (int iSmpl495 = 0; iSmpl495 < int.MaxValue; iSmpl495++) {
+O.Print(smpl, (PrintHelper_493(smpl)));
 
-if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl114); else break;
+if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl495); else break;
 }
 
 
