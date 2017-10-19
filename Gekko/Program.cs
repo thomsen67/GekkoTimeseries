@@ -23120,6 +23120,10 @@ namespace Gekko
                                 //
                             }
                         }
+                        else if (m.list[0].Type() == EVariableType.List)
+                        {
+                            G.Writeln2("Two lists to be handled (work/base)");
+                        }
                         else
                         {
                             List<string> l = O.GetStringList(x);

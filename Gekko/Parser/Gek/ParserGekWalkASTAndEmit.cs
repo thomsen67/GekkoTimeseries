@@ -1888,7 +1888,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                 {
-                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))), null, false))) {");  //false is regarding isLeftSide
+                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))), null, false, 0))) {");  //false is regarding isLeftSide, 0 means look normally in banks (not use Ref)
                                 }
 
                                 if (G.Equal(functionNameLower, "sum"))
@@ -2818,8 +2818,9 @@ namespace Gekko.Parser.Gek
                         {
                             bool isLeftSideVariable = CheckIfLeftSide(node);  //In x[%s1, %s2][%date] = ... this will only be true for x, not for the other vars
                             string isLeftSideVariableString = "false"; if (isLeftSideVariable) isLeftSideVariableString = "true";
-
-                            //Check if it is a function variable
+                            bool isInsidePrintStatement = SearchUpwardsInTree5(node);
+                                                        
+                            string bankNumber = "0"; //if (isInsidePrintStatement) bankNumber = "iBankNumber";
 
                             bool functionHit = false;
                             if (node[0][0] == null && node[1][2][0] == null)  //no bank and no freq indicator
@@ -2893,9 +2894,7 @@ namespace Gekko.Parser.Gek
                                     {
                                         simpleFreq = node[1][2][0][0][0].Text;
                                     }
-                                }
-
-                                //int leftRight = SearchUpwardsInTree4(node);
+                                }                                
 
                                 if (simpleBank != null && simpleName != null && simpleFreq != null)
                                 {
@@ -2915,7 +2914,9 @@ namespace Gekko.Parser.Gek
                                     string simpleFreqText = Globals.QT + simpleFreq + Globals.QT;
                                     if (simpleFreq == "") simpleFreqText = "null";
 
-                                    node.Code.CA("O.Lookup(smpl, " + mapName + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + ivTempVar + ", " + isLeftSideVariableString + ")");
+
+                                    node.Code.CA("O.Lookup(smpl, " + mapName + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + ivTempVar + ", " + isLeftSideVariableString + ", " + bankNumber + ")");
+                                    
                                 }
                                 else
                                 {
@@ -2925,13 +2926,13 @@ namespace Gekko.Parser.Gek
                                     {
                                         //no bank indicator
                                         //if (leftHandSide) node.Code.A("(" + node[1].Code + ")");
-                                        node.Code.A("O.Lookup(smpl, " + mapName + ", " + node[1].Code + ", " + ivTempVar + ", " + isLeftSideVariableString + ")");
+                                        node.Code.A("O.Lookup(smpl, " + mapName + ", " + node[1].Code + ", " + ivTempVar + ", " + isLeftSideVariableString + ", " + bankNumber + ")");
                                     }
                                     else
                                     {
                                         //bank indicator
                                         //if (leftHandSide) node.Code.A("(" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + ")");
-                                        node.Code.A("O.Lookup(smpl, " + mapName + ", (" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "), " + ivTempVar + ", " + isLeftSideVariableString + ")");
+                                        node.Code.A("O.Lookup(smpl, " + mapName + ", (" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "), " + ivTempVar + ", " + isLeftSideVariableString + ", " + bankNumber + ")");
                                     }
                                 }
                             }
@@ -4833,7 +4834,20 @@ namespace Gekko.Parser.Gek
                 if (tmp != null && (tmp.Text == "ASTBANKVAR" || tmp.Text == "ASTDOTORINDEXER")) return null;  //if any parent is like this, null is returned. We want to find the one highest in the tree.
             }
             return rv;
-        }        
+        }
+
+        private static bool SearchUpwardsInTree5(ASTNode node)
+        {
+            //finds out if the variable is inside a PRINT statement         
+            ASTNode tmp = node;
+            string rv = null;
+            while (tmp != null)
+            {
+                if (tmp.Text == "ASTPRINT") return true;
+                tmp = tmp.Parent;
+            }
+            return false;
+        }
 
         private static void ResetUFunctionHelpers(W w)
         {

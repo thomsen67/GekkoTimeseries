@@ -610,18 +610,18 @@ namespace Gekko
         }
 
         //NOTE: Must have same signature as Lookup(), #89075234532
-        public static void DollarLookup(IVariable logical, GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable)
+        public static void DollarLookup(IVariable logical, GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable, int bankNumber)
         {
             //Only encountered on the LHS
             if (logical == null)
             {
-                Lookup(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable);
+                Lookup(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable, bankNumber);
             }
             if (logical.Type() == EVariableType.Val)
             {
                 if (IsTrue(((ScalarVal)logical).val))
                 {
-                    Lookup(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable);
+                    Lookup(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable, bankNumber);
                 }
                 else
                 {
@@ -635,14 +635,14 @@ namespace Gekko
         }
 
         //NOTE: Must have same signature as DollarLookup(), #89075234532
-        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, bool isLeftSideVariable)
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, bool isLeftSideVariable, int bankNumber)
         {
             //This calls the more general Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression)
 
             if (x.Type() == EVariableType.String)
             {                
                 string dbName, varName, freq; char firstChar; Chop((x as ScalarString)._string2, out dbName, out varName, out freq);                
-                IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable);
+                IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable, bankNumber);
                 return iv;
 
             }
@@ -663,7 +663,7 @@ namespace Gekko
                     foreach(string s in items)
                     {
                         string dbName, varName, freq; char firstChar; Chop(s, out dbName, out varName, out freq);
-                        IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable);
+                        IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable, bankNumber);
                         rv.Add(iv);
                     }
                     List m = new List(rv);
@@ -680,7 +680,7 @@ namespace Gekko
             return x;
         }
 
-        public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable)
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable, int bankNumber)
         {
             //map != null:             the variable is found in the MAP, otherwise, the variable is found in a databank
             //rhsExpression != null:   it is an assignment of the left-hand side
