@@ -2802,9 +2802,7 @@ namespace Gekko.Parser.Gek
                             string s2 = "Map " + node.mapTempVarName + " = new Map();" + G.NL;
                             foreach (ASTNode child in node.ChildrenIterator()) s2 += child.Code.ToString();
                             string s = "public static IVariable " + funcName + "(GekkoSmpl smpl) {" + G.NL + s2 + G.NL + "return " + node.mapTempVarName + ";" + G.NL + "}";
-
                             w.headerCs.Append(s);                            
-
                             node.Code.A(funcName + "(smpl)");
                         }
                         break;
@@ -2819,8 +2817,9 @@ namespace Gekko.Parser.Gek
                             bool isLeftSideVariable = CheckIfLeftSide(node);  //In x[%s1, %s2][%date] = ... this will only be true for x, not for the other vars
                             string isLeftSideVariableString = "false"; if (isLeftSideVariable) isLeftSideVariableString = "true";
                             bool isInsidePrintStatement = SearchUpwardsInTree5(node);
-                                                        
-                            string bankNumber = "0"; //if (isInsidePrintStatement) bankNumber = "iBankNumber";
+
+                            string bankNumberiName = "iBankNumber";
+                            string bankNumber = "0"; if (isInsidePrintStatement) bankNumber = bankNumberiName;
 
                             bool functionHit = false;
                             if (node[0][0] == null && node[1][2][0] == null)  //no bank and no freq indicator
@@ -2900,6 +2899,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     //Ok is simple stuff like b:ts!f, or b:%v
                                     //We override anything in composed in sub-nodes...!
+                                    //We do this for speed, in all these simple cases, to avoid IVariables etc.
 
                                     //For instance, b:x!q --> smpl, "b", "x", "q"
                                     //For instance, b:%x --> smpl, "b", "%x", null
@@ -2914,26 +2914,49 @@ namespace Gekko.Parser.Gek
                                     string simpleFreqText = Globals.QT + simpleFreq + Globals.QT;
                                     if (simpleFreq == "") simpleFreqText = "null";
 
+                                    string code = null;
+                                    string funcName = "PrintHelper_" + ++Globals.counter;
+                                    string listName = "m" + ++Globals.counter;  //for ultra-safety
 
-                                    node.Code.CA("O.Lookup(smpl, " + mapName + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + ivTempVar + ", " + isLeftSideVariableString + ", " + bankNumber + ")");
+                                    string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + ivTempVar + ", " + isLeftSideVariableString + ", " + bankNumber + ")";
+
+                                    if (isInsidePrintStatement)
+                                    {
+                                        string methodCode = "public static List " + funcName + "(GekkoSmpl smpl) {List " + listName + " = new List(); for (int " + bankNumberiName + " = 0; " + bankNumberiName + " < 2; " + bankNumberiName + "++)";
+                                        methodCode += "{" + G.NL;
+                                        methodCode += "" + listName + ".Add(" + lookupCode + ");" + G.NL;
+                                        methodCode += "}" + G.NL;
+                                        methodCode += "return " + listName + ";" + G.NL;
+                                        methodCode += "}" + G.NL;
+                                        w.headerCs.Append(methodCode);
+                                        node.Code.A(funcName + "(smpl)");
+                                        
+                                    }
+                                    else
+                                    {
+                                        node.Code.CA(lookupCode);
+                                    }                                   
                                     
                                 }
                                 else
                                 {
                                     //Complicated name, for instance
-                                    //{%s}, a%s, a{#m}, {%b}:a, b:a!{%f}, %(%s),  ...                                    
+                                    //{%s}, a%s, a{#m}, {%b}:a, b:a!{%f}, %(%s),  ... 
+
+                                    string nameAndBankCode = null;                                    
                                     if (node[0][0] == null)
                                     {
-                                        //no bank indicator
-                                        //if (leftHandSide) node.Code.A("(" + node[1].Code + ")");
-                                        node.Code.A("O.Lookup(smpl, " + mapName + ", " + node[1].Code + ", " + ivTempVar + ", " + isLeftSideVariableString + ", " + bankNumber + ")");
+                                        //no bank indicator        
+                                        nameAndBankCode = node[1].Code.ToString();                                        
                                     }
                                     else
                                     {
-                                        //bank indicator
-                                        //if (leftHandSide) node.Code.A("(" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + ")");
-                                        node.Code.A("O.Lookup(smpl, " + mapName + ", (" + node[0][0].Code + ")").A(".Add(smpl, O.scalarStringColon)").A(".Add(smpl, " + node[1].Code + "), " + ivTempVar + ", " + isLeftSideVariableString + ", " + bankNumber + ")");
+                                        //bank indicator   
+                                        nameAndBankCode = "(" + node[0][0].Code + ")" + ".Add(smpl, O.scalarStringColon)" + ".Add(smpl, " + node[1].Code + ")";                                        
                                     }
+
+                                    node.Code.A("O.Lookup(smpl, " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + isLeftSideVariableString + ", " + bankNumber + ")");
+                                    
                                 }
                             }
                         }
