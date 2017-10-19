@@ -20256,7 +20256,7 @@ namespace Gekko
             }
         }
 
-        public static void Re(string s, P p)
+        public static void Re(GekkoSmpl smpl, string s, P p)
         {
             //s may be "reset" or "restart"
             bool ini = false;
@@ -20300,9 +20300,11 @@ namespace Gekko
 
             string workingFolder = Program.options.folder_working;
             Program.options = new Options();  //resetting these, but letting working folder live on.
+            
             CrossThreadStuff.Mode();  //to show default color
 
             Program.GetStartingPeriod();
+            O.InitSmpl(smpl);  //Uses the method above. Just for ultra-safety, so that the smpl does not live on unadjusted after af RESET/RESTART
 
             Globals.globalPeriodTimeSpans = new GekkoTimeSpans();  //Probably not used anymore
             Globals.globalPeriodTimeFilters = new GekkoTimeSpans();  //nothing in .data yet.
@@ -20344,6 +20346,8 @@ namespace Gekko
             RemoteInit();
 
             StartPulse();
+
+            
 
         }
 
@@ -23075,11 +23079,18 @@ namespace Gekko
                 int j = 0;                
                 foreach (IVariable iv in explode)
                 {
-                    Series ts = iv as Series;
+                    j++;
                     double scalarValue = double.NaN;
-                    if (ts == null) scalarValue = iv.GetVal(Globals.tNull);
+                    Series ts = null;
+                    if (iv != null)
+                    {
+                        ts = iv as Series;  //remember that the first col has phoney null IVariable
+                        if (ts == null) scalarValue = iv.GetVal(Globals.tNull);
+                    }
+                    
+                    //if (iv != null && ts == null) scalarValue = iv.GetVal(Globals.tNull);
 
-                    j++;  //remember there is a label column which gets number 1
+                    //remember there is a label column which gets number 1
                     for (int year = y1; year <= y2; year++)
                     {                        
                         i = (year - y1) * rowsPerYear;
@@ -23088,7 +23099,10 @@ namespace Gekko
                             //for each year in smpl
                             if (j == 1)  //then iv == null
                             {
-                                table.Set(i + 1, j, year.ToString());
+                                // --------------------------
+                                int iOffset = 1;
+                                // --------------------------
+                                table.Set(i + iOffset, j, year.ToString());
                             }
                         }
                         if (true)  // ------------------------------------------------------------- (2)
@@ -23096,8 +23110,10 @@ namespace Gekko
                             //for each year in smpl
                             if (j > 1)  //then iv == null
                             {
+                                // --------------------------
                                 EFreq freqHere = EFreq.Quarterly;
                                 int subHere = 1;
+                                int iOffset = 2;
                                 // --------------------------
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 double? d = null;
@@ -23114,7 +23130,7 @@ namespace Gekko
                                 }
                                 if (d != null)
                                 {
-                                    table.SetNumber(i, j, (double)d, "");
+                                    table.SetNumber(i + iOffset, j, (double)d, "");
                                 }
 
                             }

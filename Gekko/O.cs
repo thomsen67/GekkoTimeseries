@@ -3787,18 +3787,18 @@ namespace Gekko
         public class Restart
         {
             public P p = null;
-            public void Exe()
+            public void Exe(GekkoSmpl smpl)
             {
-                Program.Re("restart", p);
+                Program.Re(smpl, "restart", p);
             }
         }
 
         public class Reset
         {
             public P p = null;
-            public void Exe()
+            public void Exe(GekkoSmpl smpl)
             {
-                Program.Re("reset", p);
+                Program.Re(smpl, "reset", p);
             }
         }
 

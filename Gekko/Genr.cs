@@ -37,7 +37,7 @@ namespace Gekko
 
             p.SetText(@"¤0"); O.InitSmpl(smpl);
             O.Reset o0 = new O.Reset();
-            o0.p = p; o0.Exe();
+            o0.p = p; o0.Exe(null);
 
 
 

@@ -731,14 +731,14 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.Reset o" + Num(node) + " = new O.Reset();" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;");
-                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe(smpl);" + G.NL);
                         }
                         break;
                     case "ASTRESTART":
                         {
                             node.Code.A("O.Restart o" + Num(node) + " = new O.Restart();" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;");
-                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe(smpl);" + G.NL);
                         }
                         break;
 
