@@ -742,7 +742,7 @@ namespace Gekko
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
 
                 //NOTE: databank search may be allowed!
-                return LookupHelperRightside(map, dbName, varnameWithFreq);
+                return LookupHelperRightside(map, dbName, varnameWithFreq, bankNumber);
             }
         }
 
@@ -763,33 +763,91 @@ namespace Gekko
             return varnameWithFreq;
         }
 
-        private static IVariable LookupHelperRightside(Map map, string dbName, string varnameWithTilde)
+        private static IVariable LookupHelperRightside(Map map, string dbName, string varnameWithFreq, int bankNumber)
         {
-            IVariable lhs = null;
-            if (map == null && Program.options.databank_search && dbName == null)
+            //Can either look up stuff in a Map, or in a databank
+                       
+            IVariable rv = null;
+            if (map == null)
             {
-                //Search if on the right-hand side (rhs), in data mode, and no bank is indicated
-                lhs = GetVariableSearch(lhs, varnameWithTilde);
-                if (lhs == null)
+                //It must be a databank then
+                if (dbName == null)
                 {
-                    G.Writeln2("*** ERROR: Could not find variable '" + varnameWithTilde + "' in any open databank (excluding Ref)");
-                    throw new GekkoException();
+                    //databank name not given, for instance "PRT x"
+                    if (Program.options.databank_search)
+                    {
+                        //DATA mode
+                        //Search if on the right-hand side (rhs), in data mode, and no bank is indicated
+                        if (bankNumber == 1)
+                        {
+                            //at the moment, this logic also includes VALs etc. !!!!!!!!!!!!!!!!!!!! (why not, really?)
+                            rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
+                        }
+                        else
+                        {
+                            rv = GetVariableSearch(rv, varnameWithFreq);
+                            if (rv == null)
+                            {
+                                G.Writeln2("*** ERROR: Could not find variable '" + varnameWithFreq + "' in any open databank (excluding Ref)");
+                                throw new GekkoException();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //SIM mode, can only fetch it in the primary databank (unless bankNumber is active)
+                        if (bankNumber == 1)
+                        {
+                            //at the moment, this logic also includes VALs etc. !!!!!!!!!!!!!!!!!!!! (why not, really?)
+                            rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
+                        }
+                        else
+                        {
+                            rv = Program.databanks.GetFirst().GetIVariable(varnameWithFreq);
+                        }
+                    }
+                }
+                else
+                {
+                    //We have an explicit databank given, like "PRT bank1:x"
+                    //If we have bankNumber = 1 (Ref bank, used for PRT), we put in the Ref bank instead
+                    //In that way, "MULPRT x" and "MULPRT work:x" will give the same (as it should).
+                    if (bankNumber == 1)
+                    {
+                        //at the moment, this logic also includes VALs etc. !!!!!!!!!!!!!!!!!!!! (why not, really?)
+                        rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
+                    }
+                    else
+                    {
+                        //databank name is given explicitly, and we are not doing bankNumber stuff
+                        //We use the IBank interface here
+                        rv = LookupHelperRightside2(map, dbName, varnameWithFreq);
+                    }
                 }
             }
             else
             {
-                IBank ib = null;
-                if (map != null) ib = map;
-                else ib = GetDatabankNoSearch(dbName);
-                lhs = ib.GetIVariable(varnameWithTilde);
-                if (lhs == null)
-                {
-                    G.Writeln2("*** ERROR: Could not find variable '" + varnameWithTilde + "'" + " in " + ib.Message());
-                    throw new GekkoException();
-                }
+                //We use the IBank interface here
+                rv = LookupHelperRightside2(map, dbName, varnameWithFreq);
+            }
+            
+            return rv;
+        }
+
+        private static IVariable LookupHelperRightside2(Map map, string dbName, string varnameWithFreq)
+        {
+            IVariable rv;
+            IBank ib = null;
+            if (map != null) ib = map;
+            else ib = GetDatabankNoSearch(dbName);
+            rv = ib.GetIVariable(varnameWithFreq);
+            if (rv == null)
+            {
+                G.Writeln2("*** ERROR: Could not find variable '" + varnameWithFreq + "'" + " in " + ib.Message());
+                throw new GekkoException();
             }
 
-            return lhs;
+            return rv;
         }
 
         public static IVariable ConvertToTimeSeries(GekkoSmpl smpl, IVariable x)
