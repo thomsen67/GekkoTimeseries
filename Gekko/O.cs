@@ -648,6 +648,8 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.List)
             {
+                //for instance PRT {#m}, where #m is a list of strings. Then #m will already have been looked up, when {} is called,
+                //so Lookup is called again, this time with a list as "key"
                 List x_list = x as List;
                 string[] items = Program.GetListOfStringsFromListOfIvariables(x_list.list.ToArray());
                 if (items == null)
