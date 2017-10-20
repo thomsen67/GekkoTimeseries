@@ -23211,15 +23211,466 @@ namespace Gekko
                             int iOffset = 6;
                             int sumOver = 3;
                             // --------------------------
+
+                            bool skip = false;
+                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            {
+                                if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                {
+                                    skip = true;
+                                    break;
+                                }
+                            }
+
+                            if (!skip)
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i + iOffset, j, "mSUM");
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                                }
+                            }
+                        }
+
+
+
+
+
+
+
+
+
+                        if (true)  // ------------------------------------------------------------- (7)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Quarterly;
+                            int subHere = 2;
+                            int iOffset = 7;
+                            int sumOver = 1;
+                            // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i + iOffset, j, "mSUM");
+                                table.Set(i + iOffset, j, "q2");
                             }
                             else
-                            {                               
+                            {
                                 PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
                             }
                         }
+                        if (true)  // ------------------------------------------------------------- (8)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 4;
+                            int iOffset = 8;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i + iOffset, j, "m4");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (9)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 5;
+                            int iOffset = 9;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i + iOffset, j, "m5");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (10)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 6;
+                            int iOffset = 10;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i + iOffset, j, "m6");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (11)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 6;
+                            int iOffset = 11;
+                            int sumOver = 3;
+                            // --------------------------
+
+                            bool skip = false;
+                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            {
+                                if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                {
+                                    skip = true;
+                                    break;
+                                }
+                            }
+
+                            if (!skip)
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i + iOffset, j, "mSUM");
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                                }
+                            }
+                        }
+                        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        if (true)  // ------------------------------------------------------------- (12)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Quarterly;
+                            int subHere = 3;
+                            int iOffset = 12;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i + iOffset, j, "q3");
+                            }
+                            else
+                            {
+                                PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (13)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 7;
+                            int iOffset = 13;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i + iOffset, j, "m7");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (14)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 8;
+                            int iOffset = 14;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i + iOffset, j, "m8");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (15)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 9;
+                            int iOffset = 15;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i + iOffset, j, "m9");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (16)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 9;
+                            int iOffset = 16;
+                            int sumOver = 3;
+                            // --------------------------
+
+                            bool skip = false;
+                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            {
+                                if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                {
+                                    skip = true;
+                                    break;
+                                }
+                            }
+
+                            if (!skip)
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i + iOffset, j, "mSUM");
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                                }
+                            }
+                        }
+
+
+
+
+
+
+
+
+
+
+
+
+                        if (true)  // ------------------------------------------------------------- (17)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Quarterly;
+                            int subHere = 4;
+                            int iOffset = 17;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i + iOffset, j, "q4");
+                            }
+                            else
+                            {
+                                PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (18)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 10;
+                            int iOffset = 18;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i + iOffset, j, "m10");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (19)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 11;
+                            int iOffset = 19;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i + iOffset, j, "m11");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (20)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 12;
+                            int iOffset = 20;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i + iOffset, j, "m12");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (21)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 12;
+                            int iOffset = 21;
+                            int sumOver = 3;
+                            // --------------------------
+
+                            bool skip = false;
+                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            {
+                                if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                {
+                                    skip = true;
+                                    break;
+                                }
+                            }
+
+                            if (!skip)
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i + iOffset, j, "mSUM");
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                                }
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (22)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 12;
+                            int iOffset = 22;
+                            int sumOver = 12;
+                            // --------------------------
+
+                            bool skip = false;
+                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            {
+                                if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                {
+                                    skip = true;
+                                    break;
+                                }
+                            }
+
+                            if (!skip)
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i + iOffset, j, "mSUM12");
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                                }
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (23)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Quarterly;
+                            int subHere = 4;
+                            int iOffset = 23;
+                            int sumOver = 4;
+                            // --------------------------
+
+                            bool skip = false;
+                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            {
+                                if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                {
+                                    skip = true;
+                                    break;
+                                }
+                            }
+
+                            if (!skip)
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i + iOffset, j, "qSUM");
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                                }
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (24)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Annual;
+                            int subHere = 1;
+                            int iOffset = 24;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i + iOffset, j, "a");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                            }
+                        }
+                        
                     }
                 }
 
