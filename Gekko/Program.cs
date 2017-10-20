@@ -23005,7 +23005,10 @@ namespace Gekko
 
         public static void OPrint(GekkoSmpl smpl, IVariable x)
         {
-            string[] printcode = new string[] { "m", "m", "m" };  //1 element
+
+            Globals.globalPeriodTimeFilters2 = new List<GekkoTime> { new GekkoTime(EFreq.Monthly, 2003, 1), new GekkoTime(EFreq.Monthly, 2003, 2) };
+            string[] printCodes = new string[] { "n", "n", "n" };  //1 element
+            string format = "f14.4";
             List inputList = x as List;  //will always be a list
 
             //print always receives a List with 1 or 2 elements (Work and Ref so to say)
@@ -23018,17 +23021,27 @@ namespace Gekko
                 List refList = ivs[1] as List;  //same as above
 
                 bool[] freqs = new bool[3];
-                List<IVariable> explode = new List<IVariable>();
+                List<IVariable> explodeWork = new List<IVariable>();
+                List<IVariable> explodeRef = new List<IVariable>();
                 List<string> explodePrintcodes = new List<string>();
 
                 AllFreqsHelper allFreqs = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);  //converts between A, Q, M, so all are given. Also used in IMPORT<per1 per2> etc.
 
-                explode.Add(null);  //signals to do a column of dates later on
+                explodeWork.Add(null);  //signals to do a column of dates later on
+                explodeRef.Add(null); 
+                explodePrintcodes.Add(null);
+
                 int counter = -1;
                 foreach (IVariable iv in workList.list)
                 {
                     counter++;
-                    PrintHelper2(printcode, freqs, explode, explodePrintcodes, counter, iv, true);
+                    PrintHelper2(printCodes, freqs, explodeWork, explodePrintcodes, counter, iv, true, false);
+                }
+                counter = -1;
+                foreach (IVariable iv in refList.list)
+                {
+                    counter++;
+                    PrintHelper2(printCodes, freqs, explodeRef, explodePrintcodes, counter, iv, true, true);
                 }
 
                 EFreq sameFreq = EFreq.None;
@@ -23076,23 +23089,37 @@ namespace Gekko
 
                 int rowsPerYear = 24;  //beware, if they layout is changed
                 int i = 0;
-                int j = 0;                
-                foreach (IVariable iv in explode)
+                int j = 0;
+
+                for (int iVarCounter = 0; iVarCounter < explodeWork.Count; iVarCounter++)
                 {
+                    IVariable ivWork = explodeWork[iVarCounter];
+                    IVariable ivRef = explodeRef[iVarCounter];
+                    string printCode = explodePrintcodes[iVarCounter];
+
                     j++;
-                    double scalarValue = double.NaN;
-                    Series ts = null;
-                    if (iv != null)
+                    double scalarValueWork = double.NaN;
+                    Series tsWork = null;
+                    if (ivWork != null)
                     {
-                        ts = iv as Series;  //remember that the first col has phoney null IVariable
-                        if (ts == null) scalarValue = iv.GetVal(Globals.tNull);
+                        tsWork = ivWork as Series;  //remember that the first col has phoney null IVariable
+                        if (tsWork == null) scalarValueWork = ivWork.GetVal(Globals.tNull);
                     }
-                    
+                    double scalarValueRef = double.NaN;
+                    Series tsRef = null;
+                    if (ivRef != null)
+                    {
+                        tsRef = ivRef as Series;  //remember that the first col has phoney null IVariable
+                        if (tsRef == null) scalarValueRef = ivRef.GetVal(Globals.tNull);
+                    }
+
                     //if (iv != null && ts == null) scalarValue = iv.GetVal(Globals.tNull);
+
+                    int[] skipCounter = new int[3];
 
                     //remember there is a label column which gets number 1
                     for (int year = y1; year <= y2; year++)
-                    {                        
+                    {
                         i = (year - y1) * rowsPerYear;
                         if (true) // ------------------------------------------------------------- (1)
                         {
@@ -23107,32 +23134,90 @@ namespace Gekko
                         }
                         if (true)  // ------------------------------------------------------------- (2)
                         {
-                            //for each year in smpl
-                            if (j > 1)  //then iv == null
+                            // --------------------------
+                            EFreq freqHere = EFreq.Quarterly;
+                            int subHere = 1;
+                            int iOffset = 2;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
                             {
-                                // --------------------------
-                                EFreq freqHere = EFreq.Quarterly;
-                                int subHere = 1;
-                                int iOffset = 2;
-                                // --------------------------
-                                GekkoTime t = new GekkoTime(freqHere, year, subHere);
-                                double? d = null;
-                                if (ts == null)
-                                {
-                                    if (sameFreq == freqHere) d = scalarValue;
-                                }
-                                else
-                                {
-                                    if (ts.freq == freqHere)
-                                    {
-                                        d = ts.GetData(smpl, t);                                        
-                                    }
-                                }
-                                if (d != null)
-                                {
-                                    table.SetNumber(i + iOffset, j, (double)d, "");
-                                }
-
+                                table.Set(i + iOffset, j, "q1");
+                            }
+                            else
+                            {                                
+                                PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);                                
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (3)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 1;
+                            int iOffset = 3;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i + iOffset, j, "m1");
+                            }
+                            else
+                            {
+                                
+                                PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (4)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 2;
+                            int iOffset = 4;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i + iOffset, j, "m2");
+                            }
+                            else
+                            {
+                               
+                                PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (5)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 3;
+                            int iOffset = 5;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i + iOffset, j, "m3");
+                            }
+                            else
+                            {
+                           
+                                PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
+                            }
+                        }
+                        if (true)  // ------------------------------------------------------------- (6)
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 3;
+                            int iOffset = 6;
+                            int sumOver = 3;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i + iOffset, j, "mSUM");
+                            }
+                            else
+                            {                               
+                                PrintHelper3(smpl, format, sameFreq, table, i, j, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, iOffset, sumOver, skipCounter);
                             }
                         }
                     }
@@ -23287,23 +23372,81 @@ namespace Gekko
 
         }
 
-        private static void PrintHelper2(string[] printcode, bool[] freqs, List<IVariable> explode, List<string> explodePrintcodes, int counter, IVariable iv, bool root)
+        private static void PrintHelper3(GekkoSmpl smpl, string format, EFreq sameFreq, Table table, int i, int j, string printCode, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqHere, int subHere, int iOffset, int sumOver, int[] skipCounter)
+        {
+            GekkoTime t = new GekkoTime(freqHere, year, subHere);
+
+            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+            {
+                if (t.freq == tFilter.freq && t.Equals(tFilter))
+                {
+                    if (t.freq == EFreq.Annual) skipCounter[0]++;
+                    else if (t.freq == EFreq.Quarterly) skipCounter[1]++;
+                    else if (t.freq == EFreq.Monthly) skipCounter[2]++;
+                    return;
+                }
+            }
+
+            double? d = null;
+            if (tsWork == null)
+            {
+                if (sameFreq == freqHere) d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, printCode, sumOver, skipCounter);
+            }
+            else
+            {
+                if (tsWork.freq == freqHere) d = PrintHelperTransform(smpl, tsWork, tsRef, t, printCode, sumOver, skipCounter);
+            }
+            if (d != null) table.SetNumber(i + iOffset, j, (double)d, format);
+
+            if (t.freq == EFreq.Annual) skipCounter[0] = 0;
+            else if (t.freq == EFreq.Quarterly) skipCounter[1] = 0;
+            else if (t.freq == EFreq.Monthly) skipCounter[2] = 0;
+
+        }
+
+        private static double PrintHelperTransform(GekkoSmpl smpl, Series tsWork, Series tsRef, GekkoTime t, string printcode, int sumOver, int[] skipCounter)
+        {
+            int filterSkip = 0;
+            if (t.freq == EFreq.Annual) filterSkip = skipCounter[0];
+            else if (t.freq == EFreq.Quarterly) filterSkip = skipCounter[1];
+            else if (t.freq == EFreq.Monthly) filterSkip = skipCounter[2];
+
+            double dWork = 0d;
+            double dRef = 0d;
+            for (int i = 0; i < sumOver + filterSkip; i++)
+            {
+                dWork += tsWork.GetData(smpl, t.Add(-i));
+                dRef += tsRef.GetData(smpl, t.Add(-i));
+            }
+            if (G.Equal(printcode, "n")) return dWork;
+            else if (G.Equal(printcode, "q")) return (dWork / dRef - 1d) * 100d;
+            return 123454321d;
+        }
+
+        private static double PrintHelperTransformScalar(double scalarWork, double scalarRef, string printcode, int sumOver, int[] skipCounter)
+        {
+            if (G.Equal(printcode, "n")) return (sumOver * scalarWork);
+            else if (G.Equal(printcode, "q")) return ((sumOver * scalarWork) / (sumOver * scalarRef) - 1d) * 100d;
+            return 123454321d;
+        }
+
+        private static void PrintHelper2(string[] printcode, bool[] freqs, List<IVariable> explode, List<string> explodePrintcodes, int counter, IVariable iv, bool root, bool isRef)
         {
             if (iv.Type() == EVariableType.Series)
             {
-                PrintFreqHelper(freqs, iv);
                 explode.Add(iv);
-                explodePrintcodes.Add(printcode[counter]);
+                if (!isRef) PrintFreqHelper(freqs, iv);                
+                if (!isRef) explodePrintcodes.Add(printcode[counter]);
             }
             else if (iv.Type() == EVariableType.Val)
             {
                 explode.Add(iv);
-                explodePrintcodes.Add(printcode[counter]);
+                if (!isRef) explodePrintcodes.Add(printcode[counter]);
             }
             else if (iv.Type() == EVariableType.Matrix && ((Matrix)iv).data.Length == 1)  //an 1x1 matrix
             {
                 explode.Add(iv);
-                explodePrintcodes.Add(printcode[counter]);
+                if (!isRef) explodePrintcodes.Add(printcode[counter]);
             }
             else if (iv.Type() == EVariableType.List)
             {
@@ -23311,7 +23454,7 @@ namespace Gekko
                 {
                     foreach (IVariable iv2 in ((List)iv).list)
                     {
-                        PrintHelper2(printcode, freqs, explode, explodePrintcodes, counter, iv2, false);  //the counter is fixed
+                        PrintHelper2(printcode, freqs, explode, explodePrintcodes, counter, iv2, false, isRef);  //the counter is fixed
                     }
                 }
             }
