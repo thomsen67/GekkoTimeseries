@@ -17,6 +17,15 @@
     Else, see <http://www.gnu.org/licenses/>.        
 */
 
+//The idea behind SeriesLight is the following. First, remember that all Series operations are either binary or unary: for instance adding two
+//Series (the first), or taking log (the last). Next, remember that a lag on a Series or SeriesLight will just be represented as a 
+//new SeriesLight with with dataArray pointing to the existing dataArray in the Series/SeriesLight, and with anchorPeriodPositionInArray decreased.
+//Next, other operations will be performed on the overlap window of the two Series/SeriesLight, except if both are Series type. In that case, the 
+//smpl t0-t3 period is used for the constructed SeriesLight.
+//At the end, when data is going to be used (for t1-t2), it is checked that the resulting Series/SeriesLight covers that sample. If not, t0 and/or t3 
+//are adjusted, and the expression is run again.
+
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -28,7 +37,7 @@ namespace Gekko
 {
     public enum ETimeSeriesType
     {
-        TimeSeriesLight
+        SeriesLight //just a marker so that calling this type is easier to see
     }
 
     /// <summary>
@@ -124,7 +133,7 @@ namespace Gekko
         public Series(ETimeSeriesType type, GekkoSmpl smpl)
         {
             // ------------------------------
-            //Constructing a TimeSeriesLight
+            //Constructing a SeriesLight
             //type is just a decorator (not used), so that it is easier to 
             //see when a light timeseries is created.
             // ------------------------------
@@ -335,7 +344,7 @@ namespace Gekko
                 int index = GetArrayIndex(t);
                 if (index < 0 || index >= this.dataArray.Length)
                 {
-                    if (this.Type(ETimeSeriesType.TimeSeriesLight))
+                    if (this.Type(ETimeSeriesType.SeriesLight))
                     {
                         int ii = index;
                         if (index >= 0)
@@ -930,7 +939,7 @@ namespace Gekko
             if (x.Type() == EVariableType.Series)
             {                
                 Series xx = x as Series;
-                Series tsl = new Series(ETimeSeriesType.TimeSeriesLight, smpl);
+                Series tsl = new Series(ETimeSeriesType.SeriesLight, smpl);
 
                 //LIGHTFIXME: speedup with arrays
                 foreach (GekkoTime t in smpl.Iterate03())
@@ -942,7 +951,7 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.Val)
             {
-                Series tsl = new Series(ETimeSeriesType.TimeSeriesLight, smpl);
+                Series tsl = new Series(ETimeSeriesType.SeriesLight, smpl);
                 ScalarVal xx = x as ScalarVal;
 
                 //LIGHTFIXME: speedup with arrays
@@ -982,7 +991,7 @@ namespace Gekko
 
         public IVariable Negate(GekkoSmpl smpl)
         {
-            Series ts = new Series(ETimeSeriesType.TimeSeriesLight, smpl);
+            Series ts = new Series(ETimeSeriesType.SeriesLight, smpl);
             foreach (GekkoTime t in smpl.Iterate03())
             {
                 ts.SetData(t, -this.GetData(smpl, t));
@@ -1003,7 +1012,7 @@ namespace Gekko
                 if (IsLagOrLead(i))
                 {
                     //must be a lag
-                    if (this.Type(ETimeSeriesType.TimeSeriesLight))
+                    if (this.Type(ETimeSeriesType.SeriesLight))
                     {
                         //just move the offset!
                         //this object is not used in other places, and will soon be garbage collected anyway
@@ -1014,7 +1023,7 @@ namespace Gekko
                     {
                         //cannot offset, since this object lives in a databank, so that would
                         //yield bad side-effects.
-                        Series ts = new Series(ETimeSeriesType.TimeSeriesLight, smpl);
+                        Series ts = new Series(ETimeSeriesType.SeriesLight, smpl);
                         foreach (GekkoTime t in smpl.Iterate03())
                         {
                             ts.SetData(t, this.GetData(smpl, t.Add(i)));

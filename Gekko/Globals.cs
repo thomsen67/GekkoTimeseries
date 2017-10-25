@@ -64,7 +64,7 @@ namespace Gekko
         
         public static bool readImportFilter = false;
 
-        public const bool timeSeriesLightShallowCopy = true;
+        //public const bool timeSeriesLightShallowCopy = true;
 
         public static bool excelFix = true;
 

@@ -205,7 +205,7 @@ namespace Gekko
                 {
                     countere++;
                     i = "e" + countere;
-                    eff = " eff" + countere + " * ";
+                    eff = " (1/eff" + countere + ") * ";
                 }
 
                 if (node.volumeId.StartsWith("d") && ww.StartsWith("y"))

@@ -4477,7 +4477,7 @@ namespace Gekko
                                             IVariable iv = null; ts.storage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
                                             if (iv == null)
                                             {
-                                                ts2 = new Series(EFreq.Annual, null);  //has no name,  but will it be understood as TimeSeriesLight??                                           
+                                                ts2 = new Series(EFreq.Annual, null);  //has no name,  but will it be understood as SeriesLight??                                           
                                                 if (timeDimNr == -12345) ts2.SetTimeless();
                                                 ts.storage.AddIVariableWithOverwrite(mmi, ts2);
                                             }
@@ -27428,6 +27428,8 @@ namespace Gekko
 
         private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, int quarterFix, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<string> linetypes, List<string> dashtypes, List<double> linewidths, List<string> linecolors, List<string> pointtypes, List<double> pointsizes, List<string> fillstyles, List<string> y2s, double linewidthCorrection, double pointsizeCorrection, bool isInside)
         {
+            int manyXValues = 0;  //0 or 1
+
             string plotline = "plot ";
 
             int boxesYCounter = 0;
