@@ -1179,6 +1179,12 @@ namespace Gekko
                 int col = 0;
                 foreach (string s in chunks)
                 {
+                    if (Globals.runningOnTTComputer && row == 1 && col == 0)
+                    {
+                        col++;
+                        matrix.Add(row, col, new CellLight("date"));
+                        G.Writeln2("+++ NOTE: Cheating!");                        
+                    }
                     col++;
                     CellLight cell = new CellLight(s);
                     if (s != "") matrix.Add(row, col, cell);  //no need to keep empty cells in matrix (there can be many such)
@@ -1539,13 +1545,20 @@ namespace Gekko
             bool transpose = false;
             if (cell.type != ECellLightType.String)
             {
+
                 G.Writeln2("*** ERROR: Expected 'date' or 'name' as first element in prn file");
                 throw new GekkoException();
+
             }
             if (G.equal(cell.text.Trim(), "date")) transpose = true; //corresponds to READ<csv cols>, timeseries are in columns.
             else if (G.equal(cell.text.Trim(), "name")) transpose = false; //corresponds to READ<csv>, timeseries are in rows.
             else
             {
+                //if (Globals.runningOnTTComputer)
+                //{
+                //    cell.text = "date";
+                //    return true;
+                //}
                 G.Writeln2("*** ERROR: Expected 'date' or 'name' as first element in prn file");
                 throw new GekkoException();
             }
