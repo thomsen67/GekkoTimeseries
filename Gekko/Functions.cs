@@ -224,8 +224,8 @@ namespace Gekko
 
         public static IVariable hpfilter(GekkoSmpl smpl, IVariable per1, IVariable per2, IVariable rightSide, IVariable ilambda, IVariable ilog) 
         {
-            GekkoTime tStart = Globals.tNull;
-            GekkoTime tEnd = Globals.tNull;
+            GekkoTime tStart = GekkoTime.tNull;
+            GekkoTime tEnd = GekkoTime.tNull;
             if (per1 == null && per2 == null)
             {
                 tStart = Globals.globalPeriodStart;
@@ -244,7 +244,7 @@ namespace Gekko
             
             Series rhs = O.GetTimeSeries(rightSide);
 
-            Series lhs = new Series(ETimeSeriesType.SeriesLight, smpl);
+            Series lhs = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
 
             bool isLog = false;
             if (log == 0d)
@@ -468,8 +468,8 @@ namespace Gekko
                 else if (x[0].Type() == EVariableType.Val)
                 {
                     ts = new Series(Program.options.freq, null);
-                    ts.storage = new MapMultidim();
-                    ts.storageDim = O.ConvertToInt(x[0]);
+                    ts.dimensionsStorage = new MapMultidim();
+                    ts.dimensions = O.ConvertToInt(x[0]);
                 }
                 else
                 {
@@ -484,7 +484,7 @@ namespace Gekko
                     //frequency
                     EFreq freq = G.GetFreq(O.ConvertToString(x[0]));
                     ts = new Series(freq, null);
-                    ts.storageDim = O.ConvertToInt(x[1]);
+                    ts.dimensions = O.ConvertToInt(x[1]);
                 }
                 else
                 {
@@ -1387,7 +1387,7 @@ namespace Gekko
             if (x1.Type() == EVariableType.Series)
             {
                 Series x1_ts = x1 as Series;
-                Series ts = new Series(ETimeSeriesType.SeriesLight, smpl);
+                Series ts = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
                 foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0, smpl.t3))
                 {
                     ts.SetData(t, (x1_ts.GetData(smpl, t) / x1_ts.GetData(smpl, t.Add(-1)) - 1d) * 100d);
@@ -1439,7 +1439,7 @@ namespace Gekko
             if (x.Type() == EVariableType.Series)
             {
                 Series ts = (Series)x;
-                Series z = new Series(ETimeSeriesType.SeriesLight, smpl);
+                Series z = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
                 foreach (GekkoTime gt in smpl.Iterate03())
                 {
                     double sum = 0d;
@@ -1620,7 +1620,7 @@ namespace Gekko
 
         public static IVariable date(GekkoSmpl smpl, IVariable x)  //'string' not allowed as method name
         {
-            GekkoTime d = Globals.tNull;
+            GekkoTime d = GekkoTime.tNull;
             if (x.Type() == EVariableType.Val)
             {
                 d = O.ConvertToDate(x);  //already has auto-conversion from VAL to DATE
@@ -1748,8 +1748,8 @@ namespace Gekko
 
         public static IVariable filteredperiods(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
-            GekkoTime t1 = Globals.tNull;
-            GekkoTime t2 = Globals.tNull;
+            GekkoTime t1 = GekkoTime.tNull;
+            GekkoTime t2 = GekkoTime.tNull;
             try
             {
                 t1 = O.ConvertToDate(x1);

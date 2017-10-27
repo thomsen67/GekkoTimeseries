@@ -529,7 +529,7 @@ namespace Gekko
             if (x.Type() == EVariableType.Series)
             {
                 Series x_series = x as Series;
-                Series rv_series = new Series(ETimeSeriesType.SeriesLight, smpl);
+                Series rv_series = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
                 rv = rv_series;
                 if (logical.Type() == EVariableType.Series)
                 {
@@ -569,7 +569,7 @@ namespace Gekko
                     //we have to convert the VAL to a SERIES here
                     ScalarVal x_val = x as ScalarVal;
                     Series logical_series = logical as Series;
-                    Series rv_series = new Series(ETimeSeriesType.SeriesLight, smpl);
+                    Series rv_series = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
                     rv = rv_series;
                     foreach (GekkoTime t in smpl.Iterate03())
                     {                        
@@ -877,7 +877,7 @@ namespace Gekko
                 }
                 else if (m.data.GetLength(0) == n && m.data.GetLength(1) == 1)
                 {
-                    Series rv_series = new Series(ETimeSeriesType.SeriesLight, smpl);
+                    Series rv_series = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
                     int counter = -1;
                     foreach (GekkoTime t in smpl.Iterate12())
                     {
@@ -913,7 +913,7 @@ namespace Gekko
                 }
                 else if(m.list.Count() == n)
                 {
-                    Series rv_series = new Series(ETimeSeriesType.SeriesLight, smpl);
+                    Series rv_series = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
                     int counter = -1;
                     foreach (GekkoTime t in smpl.Iterate12())
                     {
@@ -990,8 +990,17 @@ namespace Gekko
                             G.Writeln2("***ERROR: Freq " + lhsFreq.ToString() + " on left-hand side, and freq " + tsRhs.freq + " on right-hand side");
                             throw new GekkoException();
                         }
-                        Series tsLhs = tsRhs.DeepClone() as Series;  //cannot just refer to it, since it may be y = x, and if we later on change x, y will change too (bad).
-                        if (tsLhs.meta == null) tsLhs.meta = new TimeSeriesMetaInformation();  //it may be cloned from a light Series
+
+                        Series tsLhs = null; 
+                        if (tsRhs.IsLight())
+                        {
+                            tsLhs = tsRhs;                           
+                            tsLhs.meta = new TimeSeriesMetaInformation();  //transforms it into a non-light series   
+                        }
+                        else
+                        {
+                            tsLhs = tsRhs.DeepClone() as Series;  //cannot just refer to it, since it may be y = x, and if we later on change x, y will change too (bad).
+                        }
                         tsLhs.name = varnameWithTilde;
                         ib.AddIVariable(varnameWithTilde, tsLhs);
                     }
@@ -1070,7 +1079,7 @@ namespace Gekko
                             tsTmp.name = varnameWithTilde;
                             if (ib.GetType() == typeof(Databank))
                             {
-                                if (tsTmp.meta == null) tsTmp.meta = new TimeSeriesMetaInformation();  //so that parentDatabank can be put in in ib.AddIVariable                               
+                                if (tsTmp.IsLight() == null) tsTmp.meta = new TimeSeriesMetaInformation();  //so that parentDatabank can be put in in ib.AddIVariable                               
                             }
                             ib.AddIVariable(tsTmp.name, tsTmp);
                         }                                             
@@ -2233,7 +2242,7 @@ namespace Gekko
             else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
             {
                 CheckFreqAndCreateSeries(x, y);  //checks freqs
-                Series rv_series = new Series(ETimeSeriesType.SeriesLight, smpl);
+                Series rv_series = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
                 rv = rv_series;
                 foreach (GekkoTime t in smpl.Iterate03())
                 {
@@ -2317,7 +2326,7 @@ namespace Gekko
 
         public static Series CreateTimeSeriesFromVal(GekkoSmpl smpl, double d)
         {
-            Series tsl = new Series(ETimeSeriesType.SeriesLight, smpl); //will have small dataarray            
+            Series tsl = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3); //will have small dataarray            
             for (int i = 0; i < tsl.dataArray.Length; i++)
             {
                 tsl.dataArray[i] = d;
@@ -2562,7 +2571,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Expected " + n + " rows in matrix");
                 throw new GekkoException();
             }
-            Series tsl = new Series(ETimeSeriesType.SeriesLight, smpl);            
+            Series tsl = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);            
             for (int i = 0; i < tsl.dataArray.Length; i++)
             {
                 tsl.dataArray[i] = m.data[i, 0];
@@ -3090,8 +3099,8 @@ namespace Gekko
         public class Read
         {
             //also covers IMPORT
-            public GekkoTime t1 = Globals.tNull;
-            public GekkoTime t2 = Globals.tNull;
+            public GekkoTime t1 = GekkoTime.tNull;
+            public GekkoTime t2 = GekkoTime.tNull;
             public string fileName = null;
             public string readTo = null;
             public string opt_px = null; //pc-axis
@@ -3885,7 +3894,7 @@ namespace Gekko
                 }
                 else if (type == ESmoothTypes.Linear || type == ESmoothTypes.Repeat || type == ESmoothTypes.Geometric)
                 {
-                    GekkoTime missingStart = Globals.tNull;
+                    GekkoTime missingStart = GekkoTime.tNull;
                     bool recording = false;
                     foreach (GekkoTime gt in new GekkoTimeIterator(realStart, realEnd))
                     {
@@ -3939,7 +3948,7 @@ namespace Gekko
                                 else throw new GekkoException();
                             }
                             recording = false;
-                            missingStart = Globals.tNull;
+                            missingStart = GekkoTime.tNull;
                         }
                     }
                 }
@@ -3962,7 +3971,7 @@ namespace Gekko
             public List<string> listItems1;
             public List<string> listItems2;
 
-            public GekkoTime date = Globals.tNull;
+            public GekkoTime date = GekkoTime.tNull;
             public void Exe()
             {
                 bool useSecondPartLevels = true;  //like aremos
@@ -5298,8 +5307,6 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     Array.Copy(this.rhs.dataArray, i, dataArray, index1, n);
-                                       
-
                 }
 
                 if (this.meta != null)
@@ -5386,8 +5393,8 @@ namespace Gekko
         public class Rebase
         {
             public List<string> listItems = null;
-            public GekkoTime date1 = Globals.tNull;
-            public GekkoTime date2 = Globals.tNull;
+            public GekkoTime date1 = GekkoTime.tNull;
+            public GekkoTime date2 = GekkoTime.tNull;
             public string opt_prefix = null;
             public string opt_bank = null;
             public double opt_index = 100d;
@@ -5552,8 +5559,8 @@ namespace Gekko
 
         public class Time
         {
-            public GekkoTime t1 = Globals.tNull;
-            public GekkoTime t2 = Globals.tNull;
+            public GekkoTime t1 = GekkoTime.tNull;
+            public GekkoTime t2 = GekkoTime.tNull;
             public void Exe()
             {
                 Program.Time(t1, t2);
@@ -5581,8 +5588,8 @@ namespace Gekko
 
         public class TimeFilterHelper
         {
-            public GekkoTime from = Globals.tNull;
-            public GekkoTime to = Globals.tNull;
+            public GekkoTime from = GekkoTime.tNull;
+            public GekkoTime to = GekkoTime.tNull;
             public int step = 1;
         }
 
@@ -5720,9 +5727,9 @@ namespace Gekko
             public double opt_boxwidth = double.NaN;
             public double opt_boxgap = double.NaN;
             public string opt_separate = null;
-            public GekkoTime opt_xline = Globals.tNull;
-            public GekkoTime opt_xlinebefore = Globals.tNull;
-            public GekkoTime opt_xlineafter = Globals.tNull;
+            public GekkoTime opt_xline = GekkoTime.tNull;
+            public GekkoTime opt_xlinebefore = GekkoTime.tNull;
+            public GekkoTime opt_xlineafter = GekkoTime.tNull;
             public string opt_ymirror = null;
             public string opt_ytitle = null;
             public string opt_y2title = null;
@@ -6249,8 +6256,8 @@ namespace Gekko
 
         public class Write
         {
-            public GekkoTime t1 = Globals.tNull; //default, if not explicitely set
-            public GekkoTime t2 = Globals.tNull; //default, if not explicitely set
+            public GekkoTime t1 = GekkoTime.tNull; //default, if not explicitely set
+            public GekkoTime t2 = GekkoTime.tNull; //default, if not explicitely set
             public string fileName = null;
             public List<string> listItems = null;
             

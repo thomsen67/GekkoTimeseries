@@ -46,7 +46,7 @@ namespace Gekko
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
-            GekkoTime gt = Globals.tNull;
+            GekkoTime gt = GekkoTime.tNull;
             int intValue = O.ConvertToInt(this);  //will issue error if the VAL is not an integer
             int year = G.findYear(intValue);  //error is the year is crazy
             if (c == O.GetDateChoices.Strict || (c != O.GetDateChoices.Strict && (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)))
@@ -165,7 +165,7 @@ namespace Gekko
                     }
                 case EVariableType.Series:
                     {
-                        Series tsl = new Series(ETimeSeriesType.SeriesLight, smpl);
+                        Series tsl = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
                         Series xx = x as Series;                                                
                         foreach (GekkoTime t in smpl.Iterate03())
                         {

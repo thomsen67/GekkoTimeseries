@@ -33,7 +33,7 @@ namespace Gekko.Parser.Gek
                 s3.AppendLine("{");
                 s3.AppendLine("public class UProc");
                 s3.AppendLine("{");
-                s3.AppendLine("public static GekkoTime globalGekkoTimeIterator = Globals.tNull;");
+                s3.AppendLine("public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;");
                 s3.Append(ch.codeUFunctions);
                 s3.AppendLine("}");  //class UProc
                 s3.AppendLine("}");  //namespace Gekko

@@ -35,6 +35,8 @@ namespace Gekko
         [ProtoMember(4)]
         public readonly EFreq freq;
 
+        public static GekkoTime tNull = new GekkoTime(EFreq.Annual, -12345, 1);  //think of it as a 'null' object (but it is a struct)
+
         //Note: using "new GekkoTime()" without arguments is not intended to be used, even
         //      though it is valid to do. Such a struct cannot have its fields changed anyway, so
         //      it will be unusable.
@@ -132,6 +134,68 @@ namespace Gekko
                 //This should not normally be possible, maybe with PRT<2010 2009> or the like?
             }
             return obs;
+        }
+
+        public static void ConvertFreqs(EFreq freq, GekkoTime t1, GekkoTime t2, ref GekkoTime tt1, ref GekkoTime tt2)
+        {
+            tt1 = t1;
+            tt2 = t2;
+
+            if (t1.freq != t2.freq)
+            {
+                G.Writeln2("*** ERROR: Frequencies do not match: " + G.GetFreqString(t1.freq) + " vs. " + G.GetFreqString(t2.freq));
+                throw new GekkoException();
+            }
+
+            if (freq == t1.freq)
+            {
+                //do nothing
+            }
+            else
+            {
+
+                if (freq == EFreq.Annual)
+                {
+                    if (t1.freq == EFreq.Quarterly)
+                    {
+                        tt1 = new GekkoTime(EFreq.Quarterly, t1.super, 1);  //first q
+                        tt2 = new GekkoTime(EFreq.Quarterly, t2.super, GekkoTimeStuff.numberOfQuarters);  //last q
+                    }
+                    else if (t1.freq == EFreq.Monthly)
+                    {
+                        tt1 = new GekkoTime(EFreq.Monthly, t1.super, 1);  //first m
+                        tt2 = new GekkoTime(EFreq.Monthly, t2.super, GekkoTimeStuff.numberOfMonths);  //last m
+                    }
+
+                }
+                else if (freq == EFreq.Quarterly)
+                {
+                    if (t1.freq == EFreq.Annual)
+                    {
+                        tt1 = new GekkoTime(EFreq.Annual, t1.super, 1);
+                        tt2 = new GekkoTime(EFreq.Annual, t2.super, 1);
+                    }
+
+                    else if (t1.freq == EFreq.Monthly)
+                    {
+                        tt1 = new GekkoTime(EFreq.Monthly, t1.super, GekkoTime.FromQuarterToMonthStart(t1.sub));  //first m
+                        tt2 = new GekkoTime(EFreq.Monthly, t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub));  //last m                 
+                    }
+                }
+                else if (freq == EFreq.Monthly)
+                {                    
+                    if (t1.freq == EFreq.Annual)
+                    {
+                        tt1 = new GekkoTime(EFreq.Annual, t1.super, 1);
+                        tt2 = new GekkoTime(EFreq.Annual, t2.super, 1);
+                    }
+                    else if (t1.freq == EFreq.Quarterly)
+                    {
+                        tt1 = new GekkoTime(EFreq.Quarterly, t1.super, GekkoTime.FromMonthToQuarter(t1.sub));
+                        tt2 = new GekkoTime(EFreq.Quarterly, t2.super, GekkoTime.FromMonthToQuarter(t2.sub));
+                    }
+                }
+            }
         }
 
         public bool StrictlyLargerThan(GekkoTime gt2)
@@ -300,6 +364,8 @@ namespace Gekko
             throw new GekkoException();
         }
     }
+
+    
 
     public class AllFreqsHelper
     {

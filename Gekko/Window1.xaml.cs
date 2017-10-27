@@ -1473,8 +1473,8 @@ namespace Gekko
         public List<Dictionary<string, string>> precedents;  //only != null for expressions
         public string type;  //not used yet (UDVALG or DECOMP)
         //public GekkoParserTimePeriod tp;
-        public GekkoTime t1 = Globals.tNull;
-        public GekkoTime t2 = Globals.tNull;
+        public GekkoTime t1 = GekkoTime.tNull;
+        public GekkoTime t2 = GekkoTime.tNull;
         public string prtOption;  //only used at first call of UDVALG (e.g. UDVALG<p>): when isSubWindow is false.
         //public List<string> vars;
         public bool isSubWindow = false;  //when browsing/clicking, opening a new window

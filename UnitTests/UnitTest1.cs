@@ -4080,6 +4080,73 @@ namespace UnitTests
             if (b) throw new GekkoException();
         }
 
+
+
+
+        private static void AssertSeries(Databank db, string s, int year, double x, double delta)
+        {
+            AssertSeries(db, s, null, EFreq.Annual, year, 1, year, 1, x, delta);
+        }
+
+        private static void AssertSeries(Databank db, string s, int year1, int year2, double x, double delta)
+        {
+            AssertSeries(db, s, null, EFreq.Annual, year1, 1, year2, 1, x, delta);
+        }
+
+        private static void AssertSeries(Databank db, string s, EFreq freq, int year, int subper, double x, double delta)
+        {
+            AssertSeries(db, s, null, freq, year, subper, year, subper, x, delta);
+        }
+
+        private static void AssertSeries(Databank db, string s, string[] indexes, int year, double x, double delta)
+        {
+            AssertSeries(db, s, indexes, EFreq.Annual, year, 1, year, 1, x, delta);
+        }
+
+        private static void AssertSeries(Databank db, string s, string[] indexes, int year1, int year2, double x, double delta)
+        {
+            AssertSeries(db, s, indexes, EFreq.Annual, year1, 1, year2, 1, x, delta);
+        }
+
+        private static void AssertSeries(Databank db, string s, string[] indexes, EFreq freq, int year, int subper, double x, double delta)
+        {
+            AssertSeries(db, s, indexes, freq, year, subper, year, subper, x, delta);
+        }
+
+        private static void AssertSeries(Databank db, string s2, string[] indexes, EFreq freq, int year1, int sub1, int year2, int sub2, double x, double delta)
+        {
+            string s = G.AddCurrentFreqToName(s2);
+
+            GekkoTime t1 = new GekkoTime(freq, year1, sub1);
+            GekkoTime t2 = new GekkoTime(freq, year2, sub2);
+
+            if (t1.StrictlyLargerThan(t2)) throw new GekkoException();
+            
+            Series ts = null;
+            
+            if (indexes != null)
+            {
+                Series tsGhost = db.GetIVariable(s) as Series;
+                if (!tsGhost.IsArrayTimeseries()) throw new GekkoException();
+                if (tsGhost.dimensions == 0) throw new GekkoException();
+                IVariable iv = null; tsGhost.dimensionsStorage.TryGetValue(new MapMultidimItem(indexes), out iv);
+                ts = iv as Series;
+            }
+            else
+            {
+                ts = db.GetIVariable(s) as Series;
+                if (ts.IsArrayTimeseries()) throw new GekkoException();
+                if (ts.dimensions != 0) throw new GekkoException();                
+            }            
+
+            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+            {
+                double y = ts.GetData(null, t);
+                AssertHelperTwoDoubles(x, y, delta);
+            }
+        }
+
+
         private static void AssertHelper(Databank db, string s, int year, double x, double delta)
         {
             AssertHelper(db, s, null, EFreq.Annual, year, 1, year, 1, x, delta);
@@ -7419,7 +7486,7 @@ namespace UnitTests
                 if (i == 1) First().Trim();
                 I("IMPORT<tsd>small2; CLONE;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper();
+                DatabanksTestHelper();
 
                 //TSDX
                 I("RESET;");
@@ -7428,7 +7495,7 @@ namespace UnitTests
                 if (i == 1) First().Trim();
                 I("READ <merge> temp\\small2_old;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper();
+                DatabanksTestHelper();
 
                 //TSDX
                 I("RESET;");
@@ -7437,7 +7504,7 @@ namespace UnitTests
                 if (i == 1) First().Trim();
                 I("READ <merge> temp\\small2_new;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper();
+                DatabanksTestHelper();
 
                 //Testing WRITE and WRITE of subset for three databanks (we don't test write of tsdx 1.0 format from Gekko 1.4, not relevant anymore)
 
@@ -7447,17 +7514,17 @@ namespace UnitTests
                 if (i == 1) First().Trim();
                 I("IMPORT<tsd>small2; CLONE;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper();
+                DatabanksTestHelper();
                 if (i == 1) First().Trim();
                 I("EXPORT <tsd> temp\\all;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper();
+                DatabanksTestHelper();
                 if (i == 1) First().Trim();
                 I("RESET;");
                 if (i == 1) First().Trim();
                 I("CLEAR<first>; IMPORT<tsd>temp\\all; CLONE;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper();
+                DatabanksTestHelper();
 
                 //TSD
                 //only subset written
@@ -7469,7 +7536,7 @@ namespace UnitTests
                 if (i == 1) First().Trim();
                 I("EXPORT <tsd> fy1, one file=temp\\subset;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper();
+                DatabanksTestHelper();
                 if (i == 1) First().Trim();
                 I("RESET;");
                 if (i == 1) First().Trim();
@@ -7484,17 +7551,17 @@ namespace UnitTests
                 if (i == 1) First().Trim();
                 I("READ <merge> temp\\small2_new;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper();
+                DatabanksTestHelper();
                 if (i == 1) First().Trim();
                 I("WRITE temp\\all_new;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper();
+                DatabanksTestHelper();
                 if (i == 1) First().Trim();
                 I("RESET;");
                 if (i == 1) First().Trim();
                 I("READ temp\\all_new;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper();
+                DatabanksTestHelper();
 
                 //TSDX
                 //tsdx 1.1: only subset written
@@ -7504,11 +7571,11 @@ namespace UnitTests
                 if (i == 1) First().Trim();
                 I("READ <merge> temp\\small2_new;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper();
+                DatabanksTestHelper();
                 if (i == 1) First().Trim();
                 I("WRITE fy1, one file=temp\\subset_new;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper();
+                DatabanksTestHelper();
                 if (i == 1) First().Trim();
                 I("RESET;");
                 if (i == 1) First().Trim();
@@ -7526,13 +7593,13 @@ namespace UnitTests
                 I("SERIES b = 2;");
                 I("SERIES c = 3;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper2();
+                DatabanksTestHelper2();
                 I("EXPORT<2002 2002 tsd> temp\\timetrunc;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper2();
+                DatabanksTestHelper2();
                 I("CLEAR<first>; IMPORT<tsd>temp\\timetrunc; CLONE;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper3();
+                DatabanksTestHelper3();
 
                 //TSDX
                 //tsdx 1.1: only part of period written
@@ -7543,13 +7610,13 @@ namespace UnitTests
                 I("SERIES b = 2;");
                 I("SERIES c = 3;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper2();
+                DatabanksTestHelper2();
                 I("WRITE<2002 2002> temp\\timetrunc;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper2();
+                DatabanksTestHelper2();
                 I("READ temp\\timetrunc;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper3();
+                DatabanksTestHelper3();
 
                 //TSDX
                 //tsdx 1.1: only part of vars and part of period written
@@ -7560,13 +7627,13 @@ namespace UnitTests
                 I("SERIES b = 2;");
                 I("SERIES c = 3;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper2();
+                DatabanksTestHelper2();
                 I("WRITE<2002 2002> a, c file=temp\\timetrunc2;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper2();
+                DatabanksTestHelper2();
                 I("READ temp\\timetrunc2;");
                 if (i == 1) First().Trim();
-                Test_Databanks_Helper4();
+                DatabanksTestHelper4();
 
                 Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
 
@@ -7605,7 +7672,7 @@ namespace UnitTests
                 I("IMPORT<csv>temp\\small2_m; CLONE;");
 
                 I("OPTION freq a;");
-                Test_Databanks_Helper();
+                DatabanksTestHelper();
                 Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
 
                 //PRN
@@ -7643,7 +7710,7 @@ namespace UnitTests
                 I("IMPORT<prn>temp\\small2_m; CLONE;");
 
                 I("OPTION freq a;");
-                Test_Databanks_Helper();
+                DatabanksTestHelper();
                 Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
 
                 if (true)
@@ -7806,7 +7873,7 @@ namespace UnitTests
             }
         }
 
-        private static void Test_Databanks_Helper4()
+        private static void DatabanksTestHelper4()
         {
             int nWork = First().storage.Count;
             Assert.AreEqual(nWork, 2);
@@ -7827,7 +7894,7 @@ namespace UnitTests
             u = Data("c", 2003, "a"); Assert.AreEqual(u.w, double.NaN);
         }
 
-        private static void Test_Databanks_Helper3()
+        private static void DatabanksTestHelper3()
         {
             int nWork = First().storage.Count;
             Assert.AreEqual(nWork, 3);
@@ -7851,7 +7918,7 @@ namespace UnitTests
             u = Data("c", 2003, "a"); Assert.AreEqual(u.w, double.NaN);
         }
 
-        private static void Test_Databanks_Helper2()
+        private static void DatabanksTestHelper2()
         {
             int nWork = First().storage.Count;
             Assert.AreEqual(nWork, 3);
@@ -7881,7 +7948,7 @@ namespace UnitTests
             u = Data("c", 2004, "a"); Assert.AreEqual(u.w, double.NaN);
         }
 
-        private static void Test_Databanks_Helper()
+        private static void DatabanksTestHelper()
         {
             int nWork = First().storage.Count;
             Assert.AreEqual(nWork, 7);
@@ -9134,6 +9201,51 @@ namespace UnitTests
             Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 12d);
             Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.Annual, 2002, 1)), 12d);
             Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.Annual, 2003, 1)), double.NaN);
+        }
+
+        [TestMethod]
+        public void _Test_Gekko30()
+        {
+            I("RESET;");
+            I("TIME 2001 2005;");
+            I("xx1 = (1, 2, 3, 4, 5);");
+            AssertSeries(First(), "xx1", 2000, double.NaN, sharedDelta);
+            AssertSeries(First(), "xx1", 2001, 1d, sharedDelta);
+            AssertSeries(First(), "xx1", 2002, 2d, sharedDelta);
+            AssertSeries(First(), "xx1", 2003, 3d, sharedDelta);
+            AssertSeries(First(), "xx1", 2004, 4d, sharedDelta);
+            AssertSeries(First(), "xx1", 2005, 5d, sharedDelta);
+            AssertSeries(First(), "xx1", 2006, double.NaN, sharedDelta);
+
+            I("xx3 = xx1[-1];");
+            AssertSeries(First(), "xx3", 2000, double.NaN, sharedDelta);
+            AssertSeries(First(), "xx3", 2001, double.NaN, sharedDelta);
+            AssertSeries(First(), "xx3", 2002, 1d, sharedDelta);
+            AssertSeries(First(), "xx3", 2003, 2d, sharedDelta);
+            AssertSeries(First(), "xx3", 2004, 3d, sharedDelta);
+            AssertSeries(First(), "xx3", 2005, 4d, sharedDelta);
+            AssertSeries(First(), "xx3", 2006, double.NaN, sharedDelta);
+
+            I("xx3 = (xx1+xx1)[-1];");
+            AssertSeries(First(), "xx3", 2000, double.NaN, sharedDelta);
+            AssertSeries(First(), "xx3", 2001, double.NaN, sharedDelta);
+            AssertSeries(First(), "xx3", 2002, 2d, sharedDelta);
+            AssertSeries(First(), "xx3", 2003, 4d, sharedDelta);
+            AssertSeries(First(), "xx3", 2004, 6d, sharedDelta);
+            AssertSeries(First(), "xx3", 2005, 8d, sharedDelta);
+            AssertSeries(First(), "xx3", 2006, double.NaN, sharedDelta);
+
+            I("xx2 = series(2);");
+            I("xx2['a', 'b'] = (1, 2, 3, 4, 5);");            
+            AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2000, double.NaN, sharedDelta);
+            AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2001, 1d, sharedDelta);
+            AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2002, 2d, sharedDelta);
+            AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2003, 3d, sharedDelta);
+            AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2004, 4d, sharedDelta);
+            AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2005, 5d, sharedDelta);
+            AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2006, double.NaN, sharedDelta);
+            
+
         }
 
         [TestMethod]
@@ -11041,7 +11153,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test_HPFilter()
+        public void Test__HPFilter()
         {
             UData u = null;
 

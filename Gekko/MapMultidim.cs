@@ -26,8 +26,7 @@ namespace Gekko
         }
 
         public bool TryGetValue(MapMultidimItem gmi, out IVariable iv)
-        {
-            //GMapItem gmi = new GMapItem(s);
+        {            
             return this.storage.TryGetValue(gmi, out iv);
         }
 

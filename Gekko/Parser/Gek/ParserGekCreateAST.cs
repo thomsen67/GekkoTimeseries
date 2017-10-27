@@ -189,7 +189,7 @@ namespace Gekko.Parser.Gek
             s2.AppendLine("public class TranslatedCode");
             s2.AppendLine("{");
 
-            s2.AppendLine("public static GekkoTime globalGekkoTimeIterator = Globals.tNull;");
+            s2.AppendLine("public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;");
             s2.Append(wh2.headerCs);
 
             s2.AppendLine("public static void ClearTS(P p) {");
@@ -411,7 +411,7 @@ namespace Gekko.Parser.Gek
             s2.AppendLine("public class TranslatedCode");
             s2.AppendLine("{");
 
-            s2.AppendLine("public static GekkoTime globalGekkoTimeIterator = Globals.tNull;");
+            s2.AppendLine("public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;");
             s2.Append(wh2.headerCs);
 
             s2.AppendLine("public static void ClearTS(P p) {");

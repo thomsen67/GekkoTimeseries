@@ -65,10 +65,10 @@ namespace Gekko
 
     public class GekkoSmpl
     {
-        public GekkoTime t0 = Globals.tNull;  //start of the period for which the expressions are calculated (<= t1)
-        public GekkoTime t1 = Globals.tNull;  //start of real sample
-        public GekkoTime t2 = Globals.tNull;  //end of real sample  
-        public GekkoTime t3 = Globals.tNull;  //end of the period for which the expressions are calculated (<= t1) 
+        public GekkoTime t0 = GekkoTime.tNull;  //start of the period for which the expressions are calculated (<= t1)
+        public GekkoTime t1 = GekkoTime.tNull;  //start of real sample
+        public GekkoTime t2 = GekkoTime.tNull;  //end of real sample  
+        public GekkoTime t3 = GekkoTime.tNull;  //end of the period for which the expressions are calculated (<= t1) 
         public GekkoError gekkoError = null; //only set to something, if the sample .t0 to .t3 is too tight       
         public int bankNumber = 0;  //0 is inactive, 1 is Ref databank
 
@@ -1257,8 +1257,8 @@ namespace Gekko
                 matrix = matrix2.Transpose();
             }
 
-            GekkoTime per1 = Globals.tNull;
-            GekkoTime per2 = Globals.tNull;
+            GekkoTime per1 = GekkoTime.tNull;
+            GekkoTime per2 = GekkoTime.tNull;
 
             int variableCounter = 0;
             string annualIndicator1 = "Y";
@@ -1666,8 +1666,8 @@ namespace Gekko
                         int pcounter = 0;
                         bool endOfLineEncountered = false;
                         bool firstPeriod = true;
-                        GekkoTime per1 = Globals.tNull;
-                        GekkoTime per2 = Globals.tNull;
+                        GekkoTime per1 = GekkoTime.tNull;
+                        GekkoTime per2 = GekkoTime.tNull;
                         for (pcounter = 0; pcounter < int.MaxValue; pcounter++)
                         {
                             if (c[ii] != delimiter)
@@ -2369,9 +2369,9 @@ namespace Gekko
                 if (ts == null) continue;
                 if (ts.IsArrayTimeseries())
                 {
-                    foreach (Series tsSub in ts.storage.storage.Values)
+                    foreach (Series tsSub in ts.dimensionsStorage.storage.Values)
                     {
-                        if (tsSub.meta == null) tsSub.meta = new Gekko.TimeSeriesMetaInformation();
+                        if (tsSub.IsLight()) tsSub.meta = new Gekko.TimeSeriesMetaInformation();
                         tsSub.meta.parentDatabank = db;
                         if (!merge) tsSub.SetDirty(false);
                     }
@@ -2788,11 +2788,11 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    if (tsExisting.storageDim == tsProtobuf.storageDim)
+                                    if (tsExisting.dimensions == tsProtobuf.dimensions)
                                     {
                                         //now, we have same-name and same-dim array-timeseries in both Work and protobuf file.
-                                        MapMultidim gmapExisting = tsExisting.storage;
-                                        MapMultidim gmapProtobuf = tsProtobuf.storage;
+                                        MapMultidim gmapExisting = tsExisting.dimensionsStorage;
+                                        MapMultidim gmapProtobuf = tsProtobuf.dimensionsStorage;
 
                                         foreach (KeyValuePair<MapMultidimItem, IVariable> kvpGmap in gmapProtobuf.storage)
                                         {
@@ -3052,8 +3052,8 @@ namespace Gekko
             //that GekkoTime.Observations(first, last) > 0 before putting any data in.
             //
 
-            GekkoTime firstRv = Globals.tNull;
-            GekkoTime lastRv = Globals.tNull;
+            GekkoTime firstRv = GekkoTime.tNull;
+            GekkoTime lastRv = GekkoTime.tNull;
 
             int offset = 0;
             if (first.freq == EFreq.Annual)
@@ -3663,8 +3663,8 @@ namespace Gekko
 
             G.Writeln2("Starting to read " + lines2.Count + " data lines from data file");
 
-            GekkoTime gt0 = Globals.tNull;
-            GekkoTime gt1 = Globals.tNull;
+            GekkoTime gt0 = GekkoTime.tNull;
+            GekkoTime gt1 = GekkoTime.tNull;
 
             long allCcounter = 0;
 
@@ -3973,7 +3973,7 @@ namespace Gekko
 
                     string[] split = codesCombi[j].Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
 
-                    tsGhost.storage.AddIVariableWithOverwrite(new MapMultidimItem(split), ts);
+                    tsGhost.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(split), ts);
                 }
             }
 
@@ -4474,12 +4474,12 @@ namespace Gekko
                                         if (isMultiDim)
                                         {
                                             MapMultidimItem mmi = new MapMultidimItem(dims.ToArray());
-                                            IVariable iv = null; ts.storage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
+                                            IVariable iv = null; ts.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
                                             if (iv == null)
                                             {
                                                 ts2 = new Series(EFreq.Annual, null);  //has no name,  but will it be understood as SeriesLight??                                           
                                                 if (timeDimNr == -12345) ts2.SetTimeless();
-                                                ts.storage.AddIVariableWithOverwrite(mmi, ts2);
+                                                ts.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts2);
                                             }
                                             else
                                             {
@@ -4694,7 +4694,7 @@ namespace Gekko
 
                 //GAMSVariable gvar = db.AddVariable(nameWithoutFreq, ts.storageDim + timeDimension, VarType.Free, label);
                 
-                string[] domains = new string[ts.storageDim + timeDimension];
+                string[] domains = new string[ts.dimensions + timeDimension];
                 for (int i = 0; i < domains.Length; i++) domains[i] = "*";
                 if (timeDimension == 1) domains[domains.Length - 1] = Program.options.gams_time_set;  //we alway put the t domain last
 
@@ -4715,7 +4715,7 @@ namespace Gekko
 
             if (ts.IsArrayTimeseries())
             {
-                foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.storage.storage)
+                foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
                 {
                     string[] ss = kvp.Key.storage;
                     counterVariables++;
@@ -16574,7 +16574,7 @@ namespace Gekko
             NewtonFairTaylorHelper helper = new NewtonFairTaylorHelper();
             helper.shocks = new List<NewtonFairTaylorHelper1>();
             NewtonFairTaylorHelper1 h2 = new NewtonFairTaylorHelper1();
-            h2.gt = Globals.tNull;
+            h2.gt = GekkoTime.tNull;
             h2.varNumber = -12345;
             h2.isFirstBaseline = true;
             helper.shocks.Add(h2);
@@ -17875,7 +17875,7 @@ namespace Gekko
             }
             List<string> chosen = new List<string>();
             List<string> filtered = new List<string>();
-            GekkoTime gtLag = Globals.tNull;
+            GekkoTime gtLag = GekkoTime.tNull;
 
             foreach (GekkoTime gt in positiveFilter)
             {
@@ -20414,8 +20414,8 @@ namespace Gekko
             if (removed == null) return;  //See TKD mail 6/6 2016, this should not be possible, but just in case
             if (removed.FileNameWithPath == null) return; //See TKD mail 6/6 2016, this should not be possible, but just in case
             bool skipWrite = false;
-            GekkoTime tStart = Globals.tNull;
-            GekkoTime tEnd = Globals.tNull;            
+            GekkoTime tStart = GekkoTime.tNull;
+            GekkoTime tEnd = GekkoTime.tNull;            
             if (!removed.FileNameWithPath.EndsWith("." + Globals.extensionDatabank + ""))
             {                
                 G.Writeln2("*** ERROR: The databank '" + removed.aliasName + "' was opened with the OPEN command.");
@@ -23014,8 +23014,36 @@ namespace Gekko
 
             //print always receives a List with 1 or 2 elements (Work and Ref so to say)
 
-            if (true)
-            {                
+            if (false)
+            {
+
+                /*
+                 * 
+                 * reset;
+time 2001 2003;
+xx1 = (1,2,3);
+xx2 = (4,5,6);
+option freq q;
+xx3 = (1,2,3,4,5,6,7,8,9,10,11,12);
+option freq m;
+xx4 = (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,18,29,30,31,32,33,34,35,36);
+
+#m = ('xx3!q', 'xx4!m');
+write slet;
+read slet;
+option freq a;
+xx1 = xx1 + 1000;
+xx2 = xx2 + 1000;
+option freq q;
+xx3 = xx3 + 1000;       //why not just xx3!q = xx3!q + 100; without freq change???
+option freq m;
+xx4 = xx4 + 1000;
+option freq a;
+p (xx1,{#m});
+                 * 
+                 * 
+                 * */
+
                 IVariable[] ivs = PrintHelperConvertToList(inputList); //ivs has 1 or 2 elements. The sub-elements of these are now lists (of things to print, like x1, x2, x3)
                 
                 List workList = ivs[0] as List;  //the elements here correspond to comma-separated argumentsIVariable workList = ivs[0];  //the elements here correspond to comma-separated arguments
@@ -23130,17 +23158,17 @@ namespace Gekko
                         if (ivWork != null)
                         {
                             tsWork = ivWork as Series;  //remember that the first col has phoney null IVariable
-                            if (tsWork == null) scalarValueWork = ivWork.GetVal(Globals.tNull);
+                            if (tsWork == null) scalarValueWork = ivWork.GetVal(GekkoTime.tNull);
                         }
                         double scalarValueRef = double.NaN;
                         Series tsRef = null;
                         if (ivRef != null)
                         {
                             tsRef = ivRef as Series;  //remember that the first col has phoney null IVariable
-                            if (tsRef == null) scalarValueRef = ivRef.GetVal(Globals.tNull);
+                            if (tsRef == null) scalarValueRef = ivRef.GetVal(GekkoTime.tNull);
                         }
 
-                        //if (iv != null && ts == null) scalarValue = iv.GetVal(Globals.tNull);
+                        //if (iv != null && ts == null) scalarValue = iv.GetVal(GekkoTime.tNull);
 
                         int[] skipCounter = new int[3];
 
@@ -33644,8 +33672,8 @@ namespace Gekko
         [ProtoContract]
         public class ReadInfo
         {
-            public static GekkoTime tStart = Globals.tNull;
-            public static GekkoTime tEnd = Globals.tNull;
+            public static GekkoTime tStart = GekkoTime.tNull;
+            public static GekkoTime tEnd = GekkoTime.tNull;
             public EReadInfoTypes type = EReadInfoTypes.Normal;
             public string fileName = null;
             //public bool copiedIntoBaseMessage = false;
@@ -34172,8 +34200,8 @@ namespace Gekko
 
     public class ReadOpenMulbkHelper: O_OLD
     {
-        public GekkoTime t1 = Globals.tNull;
-        public GekkoTime t2 = Globals.tNull;
+        public GekkoTime t1 = GekkoTime.tNull;
+        public GekkoTime t2 = GekkoTime.tNull;
         public List<List<string>> openFileNames = null;
         private string fileName = null;
         private EDataFormat type = EDataFormat.None;  //type of data(bank)

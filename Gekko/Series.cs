@@ -111,7 +111,7 @@ namespace Gekko
         /// The 'super' period (year) corresponding to the anchor date.
         /// </summary>
         /// 
-        public GekkoTime anchorPeriod = Globals.tNull;
+        public GekkoTime anchorPeriod = GekkoTime.tNull;
         /// <summary>
         /// The index corresponding to the anchor date.
         /// </summary>
@@ -120,9 +120,9 @@ namespace Gekko
         [ProtoMember(7)]
         private bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]        
         [ProtoMember(8)]
-        public MapMultidim storage = null;  //only active if it is an array-timeseries
+        public MapMultidim dimensionsStorage = null;  //only active if it is an array-timeseries
         [ProtoMember(9)]
-        public int storageDim = 0;  //default is 0 which is same as normal timeseries, also used in IsArrayTimeseries()
+        public int dimensions = 0;  //default is 0 which is same as normal timeseries, also used in IsArrayTimeseries()
 
         private Series()
         {
@@ -130,20 +130,43 @@ namespace Gekko
             //Empty timeseries should not be created that way.            
         }
 
-        public Series(ETimeSeriesType type, GekkoSmpl smpl)
+        //public Series(ETimeSeriesType type, GekkoSmpl smpl)
+        //{
+        //    // ------------------------------
+        //    //Constructing a SeriesLight
+        //    //type is just a decorator (not used), so that it is easier to 
+        //    //see when a light timeseries is created.
+        //    // ------------------------------
+        //    this.freq = smpl.t0.freq;  //same as for t1, t2 or t3
+        //    this.name = null; //light
+        //    this.meta = null; //light
+        //    int n = smpl.Observations03();
+        //    this.dataArray = new double[n];  //we make the array as compact as possible --> faster
+        //    InitializeDataArray(this.dataArray);
+        //    this.anchorPeriod = smpl.t0;            
+        //    this.anchorPeriodPositionInArray = 0;
+        //}
+
+        public Series(ETimeSeriesType type, GekkoTime t0, GekkoTime t3)
         {
             // ------------------------------
             //Constructing a SeriesLight
             //type is just a decorator (not used), so that it is easier to 
             //see when a light timeseries is created.
             // ------------------------------
-            this.freq = smpl.t0.freq;  //same as for t1, t2 or t3
+            this.freq =  t0.freq;  //same as for t1, t2 or t3
             this.name = null; //light
             this.meta = null; //light
-            int n = smpl.Observations03();
+            int n = GekkoTime.Observations(t0, t3);
+            if (n < 1)
+            {
+                G.Writeln2("*** ERROR: Attempt to create SERIES with " + n + " observation");
+                throw new GekkoException();
+            }
+
             this.dataArray = new double[n];  //we make the array as compact as possible --> faster
             InitializeDataArray(this.dataArray);
-            this.anchorPeriod = smpl.t0;            
+            this.anchorPeriod = t0;
             this.anchorPeriodPositionInArray = 0;
         }
 
@@ -271,8 +294,8 @@ namespace Gekko
         {
             int tDim = 0;
             if (hasTimeDimension) tDim = 1;
-            this.storage = new MapMultidim();
-            this.storageDim = dimensions - tDim;
+            this.dimensionsStorage = new MapMultidim();
+            this.dimensions = dimensions - tDim;
             if (!hasTimeDimension) this.SetTimeless();
         }
 
@@ -344,7 +367,7 @@ namespace Gekko
                 int index = GetArrayIndex(t);
                 if (index < 0 || index >= this.dataArray.Length)
                 {
-                    if (this.Type(ETimeSeriesType.SeriesLight))
+                    if (this.IsLight())
                     {
                         int ii = index;
                         if (index >= 0)
@@ -376,7 +399,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Timeless variable error #100");
                 throw new GekkoException();
             }
-            if (this.meta != null && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (!this.IsLight() && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
                         
             if (this.dataArray == null)
             {
@@ -414,7 +437,7 @@ namespace Gekko
                 //Normally timeless variables should be called via the SetData(double value) method
                 this.dataArray[0] = value;
             }
-            if (this.meta != null && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (!this.IsLight() && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             
             if (this.freq != t.freq)
             {
@@ -438,7 +461,7 @@ namespace Gekko
                 this.dataArray[index] = value;
                 //Start and end date for observations are adjusted.
                 //for the first obs put into a new timeseries, both the if's should trigger.
-                if (this.meta != null)
+                if (!this.IsLight())
                 {
                     if (index > this.meta.lastPeriodPositionInArray)
                     {
@@ -448,9 +471,9 @@ namespace Gekko
                     {
                         this.meta.firstPeriodPositionInArray = index;
                     }
-                }
-                this.SetDirty(true);
+                }                
             }
+            if (!this.IsLight()) this.SetDirty(true);
         }
 
         /// <summary>
@@ -674,7 +697,7 @@ namespace Gekko
         public GekkoTime GetRealDataPeriodFirst()
         {
             //Takes some time for large non-trimmed arrays, but is more precise than GetPeriodFirst()
-            GekkoTime rv = Globals.tNull;
+            GekkoTime rv = GekkoTime.tNull;
             if (this.isTimeless)
             {
                 //do nothing
@@ -696,7 +719,7 @@ namespace Gekko
         public GekkoTime GetRealDataPeriodLast()
         {
             //Takes some time for large non-trimmed arrays, but is more precise than GetPeriodLast()
-            GekkoTime rv = Globals.tNull;
+            GekkoTime rv = GekkoTime.tNull;
             if (this.isTimeless)
             {
                 //do nothing
@@ -929,40 +952,101 @@ namespace Gekko
             return hash;
         }
 
-        public IVariable Add(GekkoSmpl smpl, IVariable x)
+        //public Tuple<GekkoTime, GekkoTime> CommonPeriod(GekkoSmpl smpl, Series x1, Series x2)
+        //{
+        //    GekkoTime t1 = GekkoTime.tNull;
+        //    GekkoTime t2 = GekkoTime.tNull;
+
+        //    Tuple<GekkoTime, GekkoTime> common = new Tuple<GekkoTime, GekkoTime>(smpl.t0, smpl.t3);
+        //    if (x1.IsLight())
+        //    {
+
+        //        //will be fast if x1.freq == smpl.t0.freq (and will also test that smpl.t0.freq == smpl.t3.freq)
+        //        GekkoTime.ConvertFreqs(x1.freq, smpl.t0, smpl.t3, ref t1, ref t2);
+
+
+
+        //    }
+        //    else
+        //    {
+
+        //    }
+
+        //    return common;
+        //}
+
+        public IVariable Add(GekkoSmpl smpl, IVariable input)
         {
-            IVariable rv = null;            
+            //Incoming is this --> x1 and input --> x2
+            Series x1 = this;  //born as series
+            IVariable x2 = input;  //inknown type
+            double x2_val = double.NaN;
+            Series x2_series = input as Series;
 
-            int n = GekkoTime.Observations(smpl.t0, smpl.t3);
-            double[] data = new double[n];
+            IVariable rv = null;  //return value              
+            Series rv_series = null;
 
-            if (x.Type() == EVariableType.Series)
-            {                
-                Series xx = x as Series;
-                Series tsl = new Series(ETimeSeriesType.SeriesLight, smpl);
-
-                //LIGHTFIXME: speedup with arrays
-                foreach (GekkoTime t in smpl.Iterate03())
-                {
-                    tsl.SetData(t, this.GetData(smpl, t) + xx.GetData(smpl, t));
-                }
-
-                rv = tsl;
-            }
-            else if (x.Type() == EVariableType.Val)
+            if (x2_series == null)
             {
-                Series tsl = new Series(ETimeSeriesType.SeriesLight, smpl);
-                ScalarVal xx = x as ScalarVal;
-
-                //LIGHTFIXME: speedup with arrays
-                foreach (GekkoTime gt in smpl.Iterate03())
-                {
-                    tsl.SetData(gt, this.GetData(smpl, gt) + xx.val);
-                }
-
-                rv = tsl;
+                x2_val = x2_series.ConvertToVal();  //VAL or 1x1 MATRIX is ok
             }
+            else
+            {
+                if (x1.freq != x2_series.freq)
+                {
+                    G.Writeln2("*** ERROR: Frequencies do not match: " + G.GetFreqString(x1.freq) + " vs " + G.GetFreqString(x2_series.freq));
+                    throw new GekkoException();
+                }
+            }
+
+            GekkoTime windowT1 = GekkoTime.tNull;
+            GekkoTime windowT2 = GekkoTime.tNull;
+            GekkoTime x2T1 = GekkoTime.tNull;
+            GekkoTime x2T2 = GekkoTime.tNull;
+
+            GetStartEndPeriod(smpl, x1, ref windowT1, ref windowT2); //if light series, the returned period corresponds to array size, else smpl window is used
+
+            if (x2_series != null)
+            {
+                GetStartEndPeriod(smpl, x2_series, ref x2T1, ref x2T2); //if light series, the returned period corresponds to array size, else smpl window is used
+                if (x2T1.StrictlySmallerThan(windowT1)) windowT1 = x2T1;
+                if (x2T2.StrictlyLargerThan(windowT2)) windowT2 = x2T2;
+            }
+
+            rv_series = new Series(ETimeSeriesType.SeriesLight, windowT1, windowT2);  //also checks that nobs > 0
+
+            int newi = 0;
+            int i1 = Series.FromGekkoTimeToArrayIndex(windowT1, x1.anchorPeriod, x1.anchorPeriodPositionInArray);
+            int i2 = -12345;
+            if (x2_series != null) i2 = Series.FromGekkoTimeToArrayIndex(windowT1, x2_series.anchorPeriod, x2_series.anchorPeriodPositionInArray);
+            
+            for (int i = 0; i < rv_series.dataArray.Length; i++)
+            {
+                if (x2_series == null)
+                {
+                    rv_series.dataArray[i] = x1.dataArray[i + i1] + x2_val;
+                }
+                else
+                {
+                    rv_series.dataArray[i] = x1.dataArray[i + i1] + x2_series.dataArray[i + i2];
+                }
+            }            
+
+            rv = rv_series;
             return rv;
+        }
+
+        private static void GetStartEndPeriod(GekkoSmpl smpl, Series x1, ref GekkoTime x1t0, ref GekkoTime x1t3)
+        {
+            if (x1.IsLight())
+            {
+                x1t0 = x1.anchorPeriod.Add(-x1.anchorPeriodPositionInArray);
+                x1t3 = x1.anchorPeriod.Add(-x1.anchorPeriodPositionInArray + x1.dataArray.Length - 1);
+            }
+            else
+            {
+                GekkoTime.ConvertFreqs(x1.freq, smpl.t0, smpl.t3, ref x1t0, ref x1t3);
+            }
         }
 
         public IVariable Subtract(GekkoSmpl smpl, IVariable x)
@@ -991,7 +1075,7 @@ namespace Gekko
 
         public IVariable Negate(GekkoSmpl smpl)
         {
-            Series ts = new Series(ETimeSeriesType.SeriesLight, smpl);
+            Series ts = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
             foreach (GekkoTime t in smpl.Iterate03())
             {
                 ts.SetData(t, -this.GetData(smpl, t));
@@ -1012,7 +1096,7 @@ namespace Gekko
                 if (IsLagOrLead(i))
                 {
                     //must be a lag
-                    if (this.Type(ETimeSeriesType.SeriesLight))
+                    if (this.IsLight())
                     {
                         //just move the offset!
                         //this object is not used in other places, and will soon be garbage collected anyway
@@ -1023,7 +1107,7 @@ namespace Gekko
                     {
                         //cannot offset, since this object lives in a databank, so that would
                         //yield bad side-effects.
-                        Series ts = new Series(ETimeSeriesType.SeriesLight, smpl);
+                        Series ts = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
                         foreach (GekkoTime t in smpl.Iterate03())
                         {
                             ts.SetData(t, this.GetData(smpl, t.Add(i)));
@@ -1079,7 +1163,7 @@ namespace Gekko
             if (keys != null)
             {              
 
-                if (this.storage == null)
+                if (this.dimensionsStorage == null)
                 {
                     string txt = null; foreach (string ss in keys) txt += "'" + ss + "', ";
                     G.Writeln2("*** ERROR: The variable '" + this.name + "' is not an array-timeseries.");
@@ -1090,7 +1174,7 @@ namespace Gekko
                 }
 
                 IVariable iv = null;
-                this.storage.TryGetValue(new MapMultidimItem(keys), out iv);
+                this.dimensionsStorage.TryGetValue(new MapMultidimItem(keys), out iv);
 
                 if (iv == null)
                 {
@@ -1105,7 +1189,7 @@ namespace Gekko
                     {
                         ts = new Series(this.freq, null);
                         if (this.IsTimeless()) ts.SetTimeless();  //inherits from ghost
-                        this.storage.AddIVariableWithOverwrite(new MapMultidimItem(keys), ts);
+                        this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys), ts);
                     }
                 }
                 else
@@ -1279,7 +1363,7 @@ namespace Gekko
         public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
             G.Writeln2("Ts error 15");
-            return Globals.tNull;
+            return GekkoTime.tNull;
         }
 
         public List<IVariable> ConvertToList()
@@ -1334,9 +1418,10 @@ namespace Gekko
                 }
                 else
                 {
+                    IVariable tsExpression = O.ConvertToTimeSeries(smpl, rhsExpression);
                     foreach (GekkoTime t in smpl.Iterate03())
                     {
-                        ts.SetData(t, rhsExpression.GetVal(t));  //will fail if expression is wrong type
+                        ts.SetData(t, tsExpression.GetVal(t));  //will fail if expression is wrong type
                     }
                 }
             }
@@ -1344,7 +1429,15 @@ namespace Gekko
 
         public void SetDirty(bool b1)
         {
-            if (meta != null) this.meta.SetDirty(b1);
+            if (this.IsLight())
+            {
+                G.Writeln2("*** ERROR: Light series cannot be set dirty");
+                throw new GekkoException();
+            }
+            else
+            {
+                this.meta.SetDirty(b1);
+            }
         }
 
         //public void SetGhost(bool b2)
@@ -1358,9 +1451,14 @@ namespace Gekko
             return this.meta.IsDirty();
         }
 
+        public bool IsLight()
+        {
+            return this.meta == null;
+        }
+
         public bool IsArrayTimeseries()
         {
-            return this.storageDim > 0;
+            return this.dimensions > 0;
         }
 
         /// <summary>
@@ -1383,10 +1481,10 @@ namespace Gekko
             tsCopy.anchorPeriod = this.anchorPeriod;
             tsCopy.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray;
             tsCopy.isTimeless = this.isTimeless;
-            tsCopy.storage = this.storage;
-            tsCopy.storageDim = this.storageDim;
+            tsCopy.dimensionsStorage = this.dimensionsStorage;
+            tsCopy.dimensions = this.dimensions;
 
-            if (this.meta != null)
+            if (!this.IsLight())
             {
                 tsCopy.meta = new TimeSeriesMetaInformation();
                 tsCopy.meta.firstPeriodPositionInArray = this.meta.firstPeriodPositionInArray;

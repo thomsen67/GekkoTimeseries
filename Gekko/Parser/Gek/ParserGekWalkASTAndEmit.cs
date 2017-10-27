@@ -1482,7 +1482,7 @@ namespace Gekko.Parser.Gek
                             //NOTE this will mean that the end and step are fixed when seeing the FOR. Should be ok. Alternative is crazy.                            
 
                             string loopVariable = null;
-                            string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.Date, "Globals.tNull", false, true, false);                            
+                            string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.Date, "GekkoTime.tNull", false, true, false);                            
                             
                             node.Code.A(setLoopStringCs + G.NL);
                             node.Code.A("int " + stepName + " = O.ConvertToInt(" + codeStep + ");" + G.NL);
@@ -3577,7 +3577,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTPRTELEMENTLINEWIDTH":
                         {
-                            node.Code.A("ope" + Num(node) + ".linewidth = O.ConvertToVal(" + node[0].Code + ", Globals.tNull);" + G.NL);
+                            node.Code.A("ope" + Num(node) + ".linewidth = O.ConvertToVal(" + node[0].Code + ", GekkoTime.tNull);" + G.NL);
                         }
                         break;
                     case "ASTPRTELEMENTLINECOLOR":
@@ -3592,7 +3592,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTPRTELEMENTPOINTSIZE":
                         {
-                            node.Code.A("ope" + Num(node) + ".pointsize = O.ConvertToVal(" + node[0].Code + ", Globals.tNull);" + G.NL);
+                            node.Code.A("ope" + Num(node) + ".pointsize = O.ConvertToVal(" + node[0].Code + ", GekkoTime.tNull);" + G.NL);
                         }
                         break;
                     case "ASTPRTELEMENTFILLSTYLE":

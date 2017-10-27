@@ -211,8 +211,8 @@ namespace Gekko
         public Model stackedModel = null; //used when doing stacked time
         public List<Dictionary<int, int>> terminalHelper = null;
 
-        public GekkoTime lastSimPer1 = Globals.tNull;
-        public GekkoTime lastSimPer2 = Globals.tNull;
+        public GekkoTime lastSimPer1 = GekkoTime.tNull;
+        public GekkoTime lastSimPer2 = GekkoTime.tNull;
         public string lastSimStamp = null;
 
         [ProtoMember(29)]

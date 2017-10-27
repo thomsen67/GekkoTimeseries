@@ -169,11 +169,11 @@ namespace Gekko
         public static string clearTsCsCode = "ClearTS(p);";  //so it is easier to track the location of these
 
         //Must be near the top of Globals.cs
-        public static GekkoTime tNull = new GekkoTime(EFreq.Annual, -12345, 1);  //think of it as a 'null' object (but it is a struct)
+        
         public static int counter = 0;  //used when emitting C# code to avoid name collisions
                 
         public static string startGekkoTimeIteratorCode = "{" + G.NL + "  t = t2; " + G.NL;
-        public static string endGekkoTimeIteratorCode = "}" + G.NL + "t = Globals.tNull; " + G.NL;
+        public static string endGekkoTimeIteratorCode = "}" + G.NL + "t = GekkoTime.tNull; " + G.NL;
 
         public static string gekkoSmplIteratorName = "{__GekkoCounter__}";
         public static string startGekkoSmplIteratorCode = "for (int iSmpl" + gekkoSmplIteratorName + " = 0; iSmpl" + gekkoSmplIteratorName + " < int.MaxValue; iSmpl" + gekkoSmplIteratorName + "++) {" + G.NL;
@@ -306,8 +306,8 @@ namespace Gekko
         
         //global time settings
 
-        public static GekkoTime globalPeriodStart = Globals.tNull;
-        public static GekkoTime globalPeriodEnd = Globals.tNull;
+        public static GekkoTime globalPeriodStart = GekkoTime.tNull;
+        public static GekkoTime globalPeriodEnd = GekkoTime.tNull;
         public static GekkoTimeSpans globalPeriodTimeSpans = new GekkoTimeSpans();  //nothing in .data yet.
         public static GekkoTimeSpans globalPeriodTimeFilters = new GekkoTimeSpans();  //nothing in .data yet.
         public static List<GekkoTime> globalPeriodTimeFilters2 = new List<GekkoTime>();        
@@ -693,7 +693,7 @@ namespace Gekko
         public static Dictionary<long, string> prtCsSnippetsHeaders = new Dictionary<long, string>();
         public static long prtCsSnippetsCounter = 0;
         
-        //public static string gekkoTimeIniCs = "GekkoTime t = Globals.tNull;";
+        //public static string gekkoTimeIniCs = "GekkoTime t = GekkoTime.tNull;";
         //public static string gekkoSmplInit = "GekkoSmpl smpl = O.Smpl();";
         public static string gekkoSmplInit = "GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl);";
         public static string gekkoSmplInitCommand = "O.InitSmpl(smpl);";
