@@ -110,11 +110,11 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
-        {
-            G.Writeln2("*** ERROR: #8703458724");
-            throw new GekkoException();
-        }
+        //public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
+        //{
+        //    G.Writeln2("*** ERROR: #8703458724");
+        //    throw new GekkoException();
+        //}
 
         public double GetValOLD(GekkoSmpl t)
         {

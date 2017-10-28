@@ -80,11 +80,11 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
-        {
-            G.Writeln2("*** ERROR: You cannot use add on DATE");                
-            throw new GekkoException();
-        }
+        //public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
+        //{
+        //    G.Writeln2("*** ERROR: You cannot use add on DATE");                
+        //    throw new GekkoException();
+        //}
 
         public IVariable Add(GekkoSmpl t, IVariable x)
         {

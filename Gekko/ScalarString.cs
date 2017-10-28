@@ -377,11 +377,11 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
-        {
-            G.Writeln2("*** ERROR: You cannot use add on string");
-            throw new GekkoException();
-        }
+        //public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
+        //{
+        //    G.Writeln2("*** ERROR: You cannot use add on string");
+        //    throw new GekkoException();
+        //}
 
         public double GetValOLD(GekkoSmpl smpl)
         {

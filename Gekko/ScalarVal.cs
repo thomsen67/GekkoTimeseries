@@ -113,42 +113,42 @@ namespace Gekko
             return new ScalarVal(-this.val);
         }        
 
-        public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
-        {
-            if (x.Type() == EVariableType.Val)
-            {
-                if (y.Type() == EVariableType.Val)
-                {
-                    //Probably good to have this case first, to speed up the (VAL, VAL) combination
+        //public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
+        //{
+        //    if (x.Type() == EVariableType.Val)
+        //    {
+        //        if (y.Type() == EVariableType.Val)
+        //        {
+        //            //Probably good to have this case first, to speed up the (VAL, VAL) combination
 
-                    //We have to inject the value into the object. If we were to return a new object (or use the Add()
-                    //method), the Dictionary holding the %-names would point to an old object with an old value.
-                    //And this way, we also save 1 object creation which is good for performance.
-                    this.val = ((ScalarVal)x).val + ((ScalarVal)y).val;
-                }
-                else if (y.Type() == EVariableType.Date)
-                {
-                }
-                else if (y.Type() == EVariableType.String)
-                {
-                }
-            }
-            else if (x.Type() == EVariableType.Date)
-            {
-                G.Writeln("*** ERROR: Cannot convert from date to value");
-                throw new GekkoException();
-            }
-            else if (x.Type() == EVariableType.String)
-            {
-                G.Writeln("*** ERROR: Cannot convert from string to value");
-                throw new GekkoException();
-            }
-            else
-            {
-                G.Writeln("*** ERROR: Internal Gekko error #98734543");
-                throw new GekkoException();
-            }
-        }
+        //            //We have to inject the value into the object. If we were to return a new object (or use the Add()
+        //            //method), the Dictionary holding the %-names would point to an old object with an old value.
+        //            //And this way, we also save 1 object creation which is good for performance.
+        //            this.val = ((ScalarVal)x).val + ((ScalarVal)y).val;
+        //        }
+        //        else if (y.Type() == EVariableType.Date)
+        //        {
+        //        }
+        //        else if (y.Type() == EVariableType.String)
+        //        {
+        //        }
+        //    }
+        //    else if (x.Type() == EVariableType.Date)
+        //    {
+        //        G.Writeln("*** ERROR: Cannot convert from date to value");
+        //        throw new GekkoException();
+        //    }
+        //    else if (x.Type() == EVariableType.String)
+        //    {
+        //        G.Writeln("*** ERROR: Cannot convert from string to value");
+        //        throw new GekkoException();
+        //    }
+        //    else
+        //    {
+        //        G.Writeln("*** ERROR: Internal Gekko error #98734543");
+        //        throw new GekkoException();
+        //    }
+        //}
 
         public IVariable Add(GekkoSmpl smpl, IVariable x)
         {
@@ -165,7 +165,7 @@ namespace Gekko
                     }
                 case EVariableType.Series:
                     {
-                        Series tsl = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
+                        Series tsl = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                         Series xx = x as Series;                                                
                         foreach (GekkoTime t in smpl.Iterate03())
                         {

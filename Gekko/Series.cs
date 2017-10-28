@@ -17,14 +17,6 @@
     Else, see <http://www.gnu.org/licenses/>.        
 */
 
-//The idea behind SeriesLight is the following. First, remember that all Series operations are either binary or unary: for instance adding two
-//Series (the first), or taking log (the last). Next, remember that a lag on a Series or SeriesLight will just be represented as a 
-//new SeriesLight with with dataArray pointing to the existing dataArray in the Series/SeriesLight, and with anchorPeriodPositionInArray decreased.
-//Next, other operations will be performed on the overlap window of the two Series/SeriesLight, except if both are Series type. In that case, the 
-//smpl t0-t3 period is used for the constructed SeriesLight.
-//At the end, when data is going to be used (for t1-t2), it is checked that the resulting Series/SeriesLight covers that sample. If not, t0 and/or t3 
-//are adjusted, and the expression is run again.
-
 
 using System;
 using System.Collections.Generic;
@@ -35,10 +27,24 @@ using System.Linq;
 
 namespace Gekko
 {
-    public enum ETimeSeriesType
+    public enum ESeriesType
     {
-        SeriesLight //just a marker so that calling this type is easier to see
+        Normal,
+        Light,
+        Timeless,
+        ArraySuper,
+        ArraySub
     }
+
+    //                 name        meta        dataArray     dimensions      dimensionsArray
+    // ---------------------------------------------------------------------------------------------
+    // Normal             x           x                x             0               null
+    // Light           null        null          small x             0               null
+    // Timeless           x           x              1 x             0               null
+    // ArraySuper         x           x             null             n                  x
+    // ArraySub        null           x                x             0               null
+    // ---------------------------------------------------------------------------------------------
+    //
 
     /// <summary>
     /// The Series class is a class designed for storing and retrieving timeseries (vectors/arrays of consecutive time data) 
@@ -99,7 +105,7 @@ namespace Gekko
         /// including frequency (for instance x!q for x with quarterly freq).        
         /// </summary>
         [ProtoMember(3)]
-        public string name;
+        public string name = null;
         /// <summary>
         /// The array containing the time series data. This array is initialized with NaN values, and the array may resize
         /// itself if necessary to store a particular observation.
@@ -123,6 +129,8 @@ namespace Gekko
         public MapMultidim dimensionsStorage = null;  //only active if it is an array-timeseries
         [ProtoMember(9)]
         public int dimensions = 0;  //default is 0 which is same as normal timeseries, also used in IsArrayTimeseries()
+        [ProtoMember(10)]
+        public ESeriesType type = ESeriesType.Normal;  //default
 
         private Series()
         {
@@ -147,27 +155,77 @@ namespace Gekko
         //    this.anchorPeriodPositionInArray = 0;
         //}
 
-        public Series(ETimeSeriesType type, GekkoTime t0, GekkoTime t3)
+        public Series(ESeriesType type, GekkoTime t1, GekkoTime t2)
         {
-            // ------------------------------
-            //Constructing a SeriesLight
-            //type is just a decorator (not used), so that it is easier to 
-            //see when a light timeseries is created.
-            // ------------------------------
-            this.freq =  t0.freq;  //same as for t1, t2 or t3
-            this.name = null; //light
-            this.meta = null; //light
-            int n = GekkoTime.Observations(t0, t3);
-            if (n < 1)
+            // --------------------------------------------
+            // ONLY for Light
+            // --------------------------------------------
+
+            this.type = type;
+            if (type == ESeriesType.Light)
+            {                
+                this.freq = t1.freq;  //same as for t1, t2 or t3                               
+                int n = GekkoTime.Observations(t1, t2);
+                if (n < 1)
+                {
+                    G.Writeln2("*** ERROR: Attempt to create SERIES with " + n + " observation");
+                    throw new GekkoException();
+                }
+                this.dataArray = new double[n];  //we make the array as compact as possible --> faster
+                InitializeDataArray(this.dataArray);
+                this.anchorPeriod = t1;
+                this.anchorPeriodPositionInArray = 0;
+            }
+            else
             {
-                G.Writeln2("*** ERROR: Attempt to create SERIES with " + n + " observation");
+                G.Writeln2("*** ERROR: SERIES constructor 1");
                 throw new GekkoException();
             }
+        }
 
-            this.dataArray = new double[n];  //we make the array as compact as possible --> faster
-            InitializeDataArray(this.dataArray);
-            this.anchorPeriod = t0;
-            this.anchorPeriodPositionInArray = 0;
+        public Series(ESeriesType type, EFreq freq, string variableName, int dimensions)
+        {
+            // --------------------------------------------
+            // ONLY for ArraySuper
+            // --------------------------------------------
+
+            this.type = type;
+            if (type == ESeriesType.ArraySuper)
+            {
+                this.freq = freq;
+                this.name = variableName;
+                this.meta = new TimeSeriesMetaInformation();                
+                this.dimensions = dimensions;
+                this.dimensionsStorage = new MapMultidim();
+                //ok that dataArray is null
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: SERIES constructor 2");
+                throw new GekkoException();
+            }
+        }
+
+        public Series(ESeriesType type, EFreq freq, string variableName, double val)
+        {
+            // --------------------------------------------
+            // ONLY for Timeless
+            // --------------------------------------------
+
+            this.type = type;
+            if (type == ESeriesType.Timeless)
+            {
+                this.freq = freq;
+                this.name = variableName;
+                this.meta = new TimeSeriesMetaInformation();
+                this.dataArray = new double[1];
+                this.dataArray[0] = val;                
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: SERIES constructor 4");
+                throw new GekkoException();
+            }
         }
 
         /// <summary>
@@ -189,6 +247,43 @@ namespace Gekko
                 }
                 this.meta = new TimeSeriesMetaInformation(); //do not create this object if this.name = null, that is, a light Series.
             }
+        }
+
+        public Series(ESeriesType type, EFreq frequency, string variableName)
+        {
+            // --------------------------------------------
+            // ONLY for Normal and ArraySub
+            // --------------------------------------------
+
+            if (this.type != ESeriesType.Normal && this.type != ESeriesType.ArraySub)
+            {
+                G.Writeln2("*** ERROR: SERIES constructor 3");
+                throw new GekkoException();
+            }
+
+            this.type = type;
+            //Will add freq in name, if it is missing
+            this.freq = frequency;
+            if (type == ESeriesType.ArraySub && variableName != null)
+            {
+                G.Writeln2("*** ERROR: Series name not allowed");
+                throw new GekkoException();
+            }
+            else
+            {
+                this.name = variableName;  //Note: the variableName does contain a '!'. If the name is null, it is a light Series.                       
+            }
+
+            if (this.name != null)
+            {
+                if (!this.name.Contains(Globals.freqIndicator))
+                {
+                    G.Writeln2("*** ERROR: Missing freq indicator, see G.AddFreqToName()");
+                    throw new GekkoException();
+                }                
+            }
+            this.meta = new TimeSeriesMetaInformation();
+            //ok that dataArray is null to start out with
         }
 
         public void SetZero(GekkoSmpl smpl)
@@ -1043,7 +1138,7 @@ namespace Gekko
                 if (x2T2.StrictlyLargerThan(windowT2)) windowT2 = x2T2;
             }
 
-            rv_series = new Series(ETimeSeriesType.SeriesLight, windowT1, windowT2);  //also checks that nobs > 0
+            rv_series = new Series(ESeriesType.Light, windowT1, windowT2);  //also checks that nobs > 0
 
             int newi = 0;
             int i1 = Series.FromGekkoTimeToArrayIndex(windowT1, x1.anchorPeriod, x1.anchorPeriodPositionInArray);
@@ -1105,7 +1200,7 @@ namespace Gekko
 
         public IVariable Negate(GekkoSmpl smpl)
         {
-            Series ts = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
+            Series ts = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
             foreach (GekkoTime t in smpl.Iterate03())
             {
                 ts.SetData(t, -this.GetData(smpl, t));
@@ -1137,7 +1232,7 @@ namespace Gekko
                     {
                         //cannot offset, since this object lives in a databank, so that would
                         //yield bad side-effects.
-                        Series ts = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
+                        Series ts = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                         foreach (GekkoTime t in smpl.Iterate03())
                         {
                             ts.SetData(t, this.GetData(smpl, t.Add(i)));
@@ -1173,7 +1268,7 @@ namespace Gekko
             return rv;
         }
 
-        private bool Type(ETimeSeriesType type)
+        private bool Type(ESeriesType type)
         {
             //type is not used here, just a decorator
             return this.name == null;  //then this.meta will also be null, but we only test .name

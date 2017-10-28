@@ -58,11 +58,11 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
-        {
-            G.Writeln2("*** ERROR: Wrong use of Range class");
-            throw new GekkoException();
-        }
+        //public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
+        //{
+        //    G.Writeln2("*** ERROR: Wrong use of Range class");
+        //    throw new GekkoException();
+        //}
 
         public double GetValOLD(GekkoSmpl t)
         {

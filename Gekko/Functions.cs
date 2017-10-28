@@ -244,7 +244,7 @@ namespace Gekko
             
             Series rhs = O.GetTimeSeries(rightSide);
 
-            Series lhs = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
+            Series lhs = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
 
             bool isLog = false;
             if (log == 0d)
@@ -1387,7 +1387,7 @@ namespace Gekko
             if (x1.Type() == EVariableType.Series)
             {
                 Series x1_ts = x1 as Series;
-                Series ts = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
+                Series ts = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                 foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0, smpl.t3))
                 {
                     ts.SetData(t, (x1_ts.GetData(smpl, t) / x1_ts.GetData(smpl, t.Add(-1)) - 1d) * 100d);
@@ -1439,7 +1439,7 @@ namespace Gekko
             if (x.Type() == EVariableType.Series)
             {
                 Series ts = (Series)x;
-                Series z = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
+                Series z = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                 foreach (GekkoTime gt in smpl.Iterate03())
                 {
                     double sum = 0d;

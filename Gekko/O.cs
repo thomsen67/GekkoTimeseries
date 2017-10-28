@@ -529,7 +529,7 @@ namespace Gekko
             if (x.Type() == EVariableType.Series)
             {
                 Series x_series = x as Series;
-                Series rv_series = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
+                Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                 rv = rv_series;
                 if (logical.Type() == EVariableType.Series)
                 {
@@ -569,7 +569,7 @@ namespace Gekko
                     //we have to convert the VAL to a SERIES here
                     ScalarVal x_val = x as ScalarVal;
                     Series logical_series = logical as Series;
-                    Series rv_series = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
+                    Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                     rv = rv_series;
                     foreach (GekkoTime t in smpl.Iterate03())
                     {                        
@@ -877,7 +877,7 @@ namespace Gekko
                 }
                 else if (m.data.GetLength(0) == n && m.data.GetLength(1) == 1)
                 {
-                    Series rv_series = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
+                    Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                     int counter = -1;
                     foreach (GekkoTime t in smpl.Iterate12())
                     {
@@ -913,7 +913,7 @@ namespace Gekko
                 }
                 else if(m.list.Count() == n)
                 {
-                    Series rv_series = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
+                    Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                     int counter = -1;
                     foreach (GekkoTime t in smpl.Iterate12())
                     {
@@ -2281,7 +2281,7 @@ namespace Gekko
             else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
             {
                 CheckFreqAndCreateSeries(x, y);  //checks freqs
-                Series rv_series = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);
+                Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                 rv = rv_series;
                 foreach (GekkoTime t in smpl.Iterate03())
                 {
@@ -2365,7 +2365,7 @@ namespace Gekko
 
         public static Series CreateTimeSeriesFromVal(GekkoSmpl smpl, double d)
         {
-            Series tsl = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3); //will have small dataarray            
+            Series tsl = new Series(ESeriesType.Light, smpl.t0, smpl.t3); //will have small dataarray            
             for (int i = 0; i < tsl.dataArray.Length; i++)
             {
                 tsl.dataArray[i] = d;
@@ -2610,7 +2610,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Expected " + n + " rows in matrix");
                 throw new GekkoException();
             }
-            Series tsl = new Series(ETimeSeriesType.SeriesLight, smpl.t0, smpl.t3);            
+            Series tsl = new Series(ESeriesType.Light, smpl.t0, smpl.t3);            
             for (int i = 0; i < tsl.dataArray.Length; i++)
             {
                 tsl.dataArray[i] = m.data[i, 0];
