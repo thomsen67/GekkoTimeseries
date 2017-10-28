@@ -942,13 +942,13 @@ namespace Gekko
         public static IVariable LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithTilde, string freq, IVariable rhsExpressionOriginal)
         {
             IVariable lhs = ib.GetIVariable(varnameWithTilde);
-            
+
             IVariable rhsExpression = rhsExpressionOriginal;
             if (varnameWithTilde[0] != Globals.symbolMemvar && varnameWithTilde[0] != Globals.symbolList)
             {
                 //first, if it is a SERIES on lhs (no sigil), we try to convert the RHS directly (so x = ... will work, not necessary with SERIES x = ...)
                 rhsExpression = O.ConvertToTimeSeries(smpl, rhsExpressionOriginal);
-            }            
+            }
 
             LookupTypeCheck(rhsExpression, varnameWithTilde);
 
@@ -978,80 +978,86 @@ namespace Gekko
                         throw new GekkoException();
                     }
 
+                    //Series rhsExpression_series = rhsExpression as Series;
+
                     EFreq lhsFreq = EFreq.Annual;
                     if (freq == null) lhsFreq = Program.options.freq;
                     else lhsFreq = G.GetFreq(freq);  //will fail with an error if not recognized
 
-                    if (rhsExpression.Type() == EVariableType.Series)
-                    {
-                        Series tsRhs = rhsExpression as Series;
-                        if (lhsFreq != tsRhs.freq)
-                        {
-                            G.Writeln2("***ERROR: Freq " + lhsFreq.ToString() + " on left-hand side, and freq " + tsRhs.freq + " on right-hand side");
-                            throw new GekkoException();
-                        }
+                    lhs = new Series(lhsFreq, varnameWithTilde);
 
-                        Series tsLhs = null; 
-                        if (tsRhs.IsArrayTimeseries())
-                        {
-                            if (tsRhs.dimensionsStorage.storage.Count > 0)
-                            {
-                                G.Writeln2("*** ERROR: Please use the copy command for this.");
-                                throw new GekkoException();
-                            }
-                            //ok if it is for instance xx = series(2);
-                            tsLhs = tsRhs.DeepClone() as Series;
-                            tsLhs.SetDirty(true);
-                        }
-                        else
-                        {
-                            
-                            tsLhs = new Series(tsRhs.freq, varnameWithTilde);
-                            int n = smpl.Observations12();
-                            tsLhs.dataArray = new double[n];
-                            tsLhs.InitializeDataArray(tsLhs.dataArray);
+                    //    if (rhsExpression.Type() == EVariableType.Series)
+                    //    {
+                    //        Series tsRhs = rhsExpression as Series;
+                    //        if (lhsFreq != tsRhs.freq)
+                    //        {
+                    //            G.Writeln2("***ERROR: Freq " + lhsFreq.ToString() + " on left-hand side, and freq " + tsRhs.freq + " on right-hand side");
+                    //            throw new GekkoException();
+                    //        }
 
+                    //        Series tsLhs = null; 
+                    //        if (tsRhs.IsArrayTimeseries())
+                    //        {
+                    //            if (tsRhs.dimensionsStorage.storage.Count > 0)
+                    //            {
+                    //                G.Writeln2("*** ERROR: Please use the copy command for this.");
+                    //                throw new GekkoException();
+                    //            }
+                    //            //ok if it is for instance xx = series(2);
+                    //            tsLhs = tsRhs.DeepClone() as Series;
+                    //            tsLhs.SetDirty(true);
+                    //        }
+                    //        else
+                    //        {
 
-                            //GekkoTime ttt0 = tsRhs.GetArrayFirstPeriod();
-                            //GekkoTime ttt1 = tsRhs.GetArrayLastPeriod();
-                            //if (ttt0.StrictlyLargerThan(smpl.t1))
-                            //{
-                            //    if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError();
-                            //    smpl.gekkoError.t1Problem = GekkoTime.Observations(smpl.t1, ttt0) - 1;
-                            //}
-                            //if (ttt1.StrictlySmallerThan(smpl.t2))
-                            //{
-                            //    if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError();
-                            //    smpl.gekkoError.t2Problem = GekkoTime.Observations(ttt1, smpl.t2) - 1;
-                            //}
+                    //            tsLhs = new Series(tsRhs.freq, varnameWithTilde);
+                    //            int n = smpl.Observations12();
+                    //            tsLhs.dataArray = new double[n];
+                    //            tsLhs.InitializeDataArray(tsLhs.dataArray);
 
 
+                    //            //GekkoTime ttt0 = tsRhs.GetArrayFirstPeriod();
+                    //            //GekkoTime ttt1 = tsRhs.GetArrayLastPeriod();
+                    //            //if (ttt0.StrictlyLargerThan(smpl.t1))
+                    //            //{
+                    //            //    if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError();
+                    //            //    smpl.gekkoError.t1Problem = GekkoTime.Observations(smpl.t1, ttt0) - 1;
+                    //            //}
+                    //            //if (ttt1.StrictlySmallerThan(smpl.t2))
+                    //            //{
+                    //            //    if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError();
+                    //            //    smpl.gekkoError.t2Problem = GekkoTime.Observations(ttt1, smpl.t2) - 1;
+                    //            //}
 
 
-                            tsLhs.SetDirty(true);
 
 
-                        }
-                        tsLhs.name = varnameWithTilde;
-                        ib.AddIVariable(varnameWithTilde, tsLhs);
-                    }
-                    else if (rhsExpression.Type() == EVariableType.Val)
-                    {
-                        ScalarVal sv = rhsExpression as ScalarVal;
-                        Series tsLhs = new Series(lhsFreq, varnameWithTilde);
-                        //LIGHTFIX, speed
-                        foreach (GekkoTime t in smpl.Iterate03())
-                        {
-                            tsLhs.SetData(t, sv.val);
-                        }
-                        ib.AddIVariable(varnameWithTilde, tsLhs);
-                    }
+                    //            tsLhs.SetDirty(true);
+
+
+                    //        }
+                    //        tsLhs.name = varnameWithTilde;
+                    //        ib.AddIVariable(varnameWithTilde, tsLhs);
+                    //    }
+                    //    else if (rhsExpression.Type() == EVariableType.Val)
+                    //    {
+                    //        ScalarVal sv = rhsExpression as ScalarVal;
+                    //        Series tsLhs = new Series(lhsFreq, varnameWithTilde);
+                    //        //LIGHTFIX, speed
+                    //        foreach (GekkoTime t in smpl.Iterate03())
+                    //        {
+                    //            tsLhs.SetData(t, sv.val);
+                    //        }
+                    //        ib.AddIVariable(varnameWithTilde, tsLhs);
+                    //    }
+                    //}
                 }
             }
-            else
+
+            if (true)
             {
                 //LEFT-HAND SIDE EXISTS
-                //LEFT-HAND SIDE EXISTS
+                //LEFT-HAND SIDE EXISTS   or has just been created
                 //LEFT-HAND SIDE EXISTS
                 if (varnameWithTilde[0] == Globals.symbolMemvar)
                 {
@@ -1114,8 +1120,8 @@ namespace Gekko
                             }
                             tsTmp.meta = new TimeSeriesMetaInformation();
                             ib.AddIVariable(tsTmp.name, tsTmp);
-                        }                                             
-                        
+                        }
+
                     }
                     else if (rhsExpression.Type() == EVariableType.Val)
                     {
@@ -1131,6 +1137,7 @@ namespace Gekko
             }
 
             return lhs;
+
         }
 
         private static void LookupTypeCheck(IVariable rhs, string varName)
