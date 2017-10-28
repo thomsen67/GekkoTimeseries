@@ -2949,7 +2949,7 @@ namespace Gekko.Parser.Gek
                             {
                                 string listName = "m" + ++Globals.counter;  //for ultra-safety
                                 string code = "List " + listName + " = null; try { " + listName + " = new List();" + G.NL;
-                                code += "for (smpl." + Globals.bankNumberiName + " = 0; smpl." + Globals.bankNumberiName + " < 2; smpl." + Globals.bankNumberiName + "++) {" + G.NL;
+                                code += "for (smpl." + Globals.bankNumberiName + " = 0; smpl." + Globals.bankNumberiName + " < " + Globals.bankNumberiMax + "; smpl." + Globals.bankNumberiName + "++) {" + G.NL;
                                 //code += node[0].Code + ";" + G.NL;
                                 code += listName + ".Add(" + node[0].Code + ");" + G.NL;
                                 code += "}" + G.NL;  //end of for
@@ -2966,7 +2966,7 @@ namespace Gekko.Parser.Gek
                                 string code = null;
                                 string funcName = "PrintHelper_" + ++Globals.counter;
                                 string listName = "m" + ++Globals.counter;  //for ultra-safety
-                                string methodCode = "public static List " + funcName + "(GekkoSmpl smpl) { try { List " + listName + " = new List(); for (smpl." + Globals.bankNumberiName + " = 0; smpl." + Globals.bankNumberiName + " < 2; smpl." + Globals.bankNumberiName + "++)";
+                                string methodCode = "public static List " + funcName + "(GekkoSmpl smpl) { try { List " + listName + " = new List(); for (smpl." + Globals.bankNumberiName + " = 0; smpl." + Globals.bankNumberiName + " < " + Globals.bankNumberiMax + "; smpl." + Globals.bankNumberiName + "++)";
                                 methodCode += "{" + G.NL;
                                 methodCode += "" + listName + ".Add(" + node[0].Code + ");" + G.NL;
                                 methodCode += "}" + G.NL;

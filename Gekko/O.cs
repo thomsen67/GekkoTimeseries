@@ -778,9 +778,9 @@ namespace Gekko
                     {
                         //DATA mode
                         //Search if on the right-hand side (rhs), in data mode, and no bank is indicated
-                        if (smpl.bankNumber == 1)
+                        if (smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
                         {
-                            //at the moment, this logic also includes VALs etc. !!!!!!!!!!!!!!!!!!!! (why not, really?)
+                            //we only do this for timeseries!
                             rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
                         }
                         else
@@ -796,7 +796,7 @@ namespace Gekko
                     else
                     {
                         //SIM mode, can only fetch it in the primary databank (unless bankNumber is active)
-                        if (smpl.bankNumber == 1)
+                        if (smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
                         {
                             //at the moment, this logic also includes VALs etc. !!!!!!!!!!!!!!!!!!!! (why not, really?)
                             rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
@@ -812,9 +812,9 @@ namespace Gekko
                     //We have an explicit databank given, like "PRT bank1:x"
                     //If we have bankNumber = 1 (Ref bank, used for PRT), we put in the Ref bank instead
                     //In that way, "MULPRT x" and "MULPRT work:x" will give the same (as it should).
-                    if (smpl.bankNumber == 1)
+                    if (smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
                     {
-                        //at the moment, this logic also includes VALs etc. !!!!!!!!!!!!!!!!!!!! (why not, really?)
+                        //only for series type
                         rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
                     }
                     else
@@ -992,14 +992,45 @@ namespace Gekko
                         }
 
                         Series tsLhs = null; 
-                        if (tsRhs.IsLight())
+                        if (tsRhs.IsArrayTimeseries())
                         {
-                            tsLhs = tsRhs;                           
-                            tsLhs.meta = new TimeSeriesMetaInformation();  //transforms it into a non-light series   
+                            if (tsRhs.dimensionsStorage.storage.Count > 0)
+                            {
+                                G.Writeln2("*** ERROR: Please use the copy command for this.");
+                                throw new GekkoException();
+                            }
+                            //ok if it is for instance xx = series(2);
+                            tsLhs = tsRhs.DeepClone() as Series;
+                            tsLhs.SetDirty(true);
                         }
                         else
                         {
-                            tsLhs = tsRhs.DeepClone() as Series;  //cannot just refer to it, since it may be y = x, and if we later on change x, y will change too (bad).
+                            
+                            tsLhs = new Series(tsRhs.freq, varnameWithTilde);
+                            int n = smpl.Observations12();
+                            tsLhs.dataArray = new double[n];
+                            tsLhs.InitializeDataArray(tsLhs.dataArray);
+
+
+                            //GekkoTime ttt0 = tsRhs.GetArrayFirstPeriod();
+                            //GekkoTime ttt1 = tsRhs.GetArrayLastPeriod();
+                            //if (ttt0.StrictlyLargerThan(smpl.t1))
+                            //{
+                            //    if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError();
+                            //    smpl.gekkoError.t1Problem = GekkoTime.Observations(smpl.t1, ttt0) - 1;
+                            //}
+                            //if (ttt1.StrictlySmallerThan(smpl.t2))
+                            //{
+                            //    if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError();
+                            //    smpl.gekkoError.t2Problem = GekkoTime.Observations(ttt1, smpl.t2) - 1;
+                            //}
+
+
+
+
+                            tsLhs.SetDirty(true);
+
+
                         }
                         tsLhs.name = varnameWithTilde;
                         ib.AddIVariable(varnameWithTilde, tsLhs);
@@ -1081,6 +1112,7 @@ namespace Gekko
                             {
                                 if (tsTmp.IsLight() == null) tsTmp.meta = new TimeSeriesMetaInformation();  //so that parentDatabank can be put in in ib.AddIVariable                               
                             }
+                            tsTmp.meta = new TimeSeriesMetaInformation();
                             ib.AddIVariable(tsTmp.name, tsTmp);
                         }                                             
                         
@@ -2875,14 +2907,14 @@ namespace Gekko
 
         public static void TryNewSmpl(GekkoSmpl smpl, int iSmpl)
         {
-            int uoverflow = smpl.gekkoError.uoverflow;
-            if (uoverflow < 0)
+            //int uoverflow = smpl.gekkoError.uoverflow;
+            if (smpl.gekkoError.t1Problem > 0)
             {
-                smpl.t0 = smpl.t0.Add(uoverflow * (iSmpl + 1));
+                smpl.t0 = smpl.t0.Add(-smpl.gekkoError.t1Problem * (iSmpl + 1));
             }
-            else
+            if (smpl.gekkoError.t2Problem > 0)
             {
-                smpl.t3 = smpl.t3.Add(uoverflow * (iSmpl + 1));
+                smpl.t3 = smpl.t3.Add(smpl.gekkoError.t2Problem * (iSmpl + 1));
             }
             smpl.gekkoError = null;  //we try again
         }

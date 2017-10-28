@@ -227,7 +227,12 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: #763209485");  //use AddIVariable(x), remember tilde in x.variableName.
                     throw new GekkoException();
-                }                
+                }
+                if (ts.IsLight())
+                {
+                    G.Writeln2("*** ERROR: #7632090085");
+                    throw new GekkoException();
+                }                           
                 ts.meta.parentDatabank = this;
                 ts.SetDirty(true);
             }

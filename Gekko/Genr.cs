@@ -9,12 +9,8 @@ namespace Gekko
     public class TranslatedCode
     {
         public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
-        public static readonly ScalarVal i88 = new ScalarVal(2001d);
-        public static readonly ScalarVal i89 = new ScalarVal(2003d);
-        public static readonly ScalarVal i92 = new ScalarVal(1d);
-        public static readonly ScalarVal i93 = new ScalarVal(2d);
-        public static readonly ScalarVal i94 = new ScalarVal(3d);
-        public static readonly ScalarVal i97 = new ScalarVal(1d);
+        public static readonly ScalarVal i97 = new ScalarVal(2d);
+        public static readonly ScalarVal i98 = new ScalarVal(3d);
         public static void ClearTS(P p)
         {
         }
@@ -28,48 +24,24 @@ namespace Gekko
 
 
             p.SetText(@"¤0"); O.InitSmpl(smpl);
-            O.Reset o0 = new O.Reset();
-            o0.p = p; o0.Exe(smpl);
-
-
-
-
-            p.SetText(@"¤1"); O.InitSmpl(smpl);
-            O.Time o1 = new O.Time();
-            o1.t1 = O.ConvertToDate(i88, O.GetDateChoices.FlexibleStart);
-            ;
-            o1.t2 = O.ConvertToDate(i89, O.GetDateChoices.FlexibleEnd);
-            ;
-
-            o1.Exe();
-
-
-
-
-            p.SetText(@"¤0"); O.InitSmpl(smpl);
-            IVariable ivTmpvar90 = O.ListDefHelper(i92, i93, i94);
-            for (int iSmpl91 = 0; iSmpl91 < int.MaxValue; iSmpl91++)
+            List m99 = null; try
             {
-                O.Lookup(smpl, null, null, "xx", null, ivTmpvar90, true)
-                ;
-
-                if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl91); else break;
-            };
-
-
-
-
-            p.SetText(@"¤0"); O.InitSmpl(smpl);
-            IVariable ivTmpvar95 = O.Indexer(smpl, O.Add(smpl, O.Lookup(smpl, null, null, "xx", null, null, false), O.Lookup(smpl, null, null, "xx", null, null, false)), O.Negate(smpl, i97)
-            );
-            for (int iSmpl96 = 0; iSmpl96 < int.MaxValue; iSmpl96++)
+                m99 = new List();
+                for (smpl.bankNumber = 0; smpl.bankNumber < 2; smpl.bankNumber++)
+                {
+                    m99.Add(O.Indexer(smpl, O.Lookup(smpl, null, null, "#m", null, null, false), (new Range(i97, i98))));
+                }
+            }
+            finally
             {
-                O.Lookup(smpl, null, null, "xx2", null, ivTmpvar95, true)
-                ;
+                smpl.bankNumber = 0;
+            }
+            for (int iSmpl100 = 0; iSmpl100 < int.MaxValue; iSmpl100++)
+            {
+                O.Print(smpl, m99);
 
-                if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl96); else break;
-            };
-
+                if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl100); else break;
+            }
 
 
 

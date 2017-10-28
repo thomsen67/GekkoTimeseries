@@ -369,12 +369,9 @@ namespace Gekko
                 {
                     if (this.IsLight())
                     {
-                        int ii = index;
-                        if (index >= 0)
-                        {
-                            ii = index - (this.dataArray.Length - 1);
-                        }
-                        if (smpl != null) smpl.gekkoError = new GekkoError(ii);  //GetData() can be called with smpl=null, where out-of-window is not signalled back. Typically because we take the timeseries directly from a databank, so they are not light.
+                        if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError();
+                        if (index < 0) smpl.gekkoError.t1Problem = -index;
+                        if (index >= this.dataArray.Length) smpl.gekkoError.t2Problem = -(this.dataArray.Length - 1 - index);
                     }
                     return double.NaN;  //out of bounds, we return a missing value (NaN)
                 }
@@ -694,6 +691,26 @@ namespace Gekko
             return GetPeriod(this.meta.lastPeriodPositionInArray);
         }
 
+        public GekkoTime GetArrayFirstPeriod()
+        {
+            if (this.isTimeless || this.dataArray == null)
+            {
+                G.Writeln2("*** ERROR: Series error #235");
+                throw new GekkoException();
+            }
+            return GetPeriod(0);
+        }
+
+        public GekkoTime GetArrayLastPeriod()
+        {
+            if (this.isTimeless || this.dataArray == null)
+            {
+                G.Writeln2("*** ERROR: Series error #325");
+                throw new GekkoException();
+            }
+            return GetPeriod(this.dataArray.Length - 1);
+        }
+
         public GekkoTime GetRealDataPeriodFirst()
         {
             //Takes some time for large non-trimmed arrays, but is more precise than GetPeriodFirst()
@@ -782,7 +799,7 @@ namespace Gekko
         // ----------------- private methods -------------------------------------------
         // -----------------------------------------------------------------------------
 
-        private void InitializeDataArray(double[] dataArray)
+        public void InitializeDataArray(double[] dataArray)
         {            
             //Fill it with NaN's.
             if (Globals.initializeDataArrayWithNaN)
@@ -925,6 +942,19 @@ namespace Gekko
             }
         }
 
+        public double GetDataFromIndex(int i)
+        {            
+            if (i < 0 || i >= this.dataArray.Length)
+            {
+                if (IsLight())
+                {
+                    G.Writeln2("*** ERROR: Series access");
+                    throw new GekkoException();
+                }
+            }
+            return double.NaN;
+        }
+
         public static string GetHashCodeFromIvariables(IVariable[] indexes)
         {
             string hash = null;
@@ -988,7 +1018,7 @@ namespace Gekko
 
             if (x2_series == null)
             {
-                x2_val = x2_series.ConvertToVal();  //VAL or 1x1 MATRIX is ok
+                x2_val = x2.ConvertToVal();  //VAL or 1x1 MATRIX is ok
             }
             else
             {
@@ -1019,18 +1049,18 @@ namespace Gekko
             int i1 = Series.FromGekkoTimeToArrayIndex(windowT1, x1.anchorPeriod, x1.anchorPeriodPositionInArray);
             int i2 = -12345;
             if (x2_series != null) i2 = Series.FromGekkoTimeToArrayIndex(windowT1, x2_series.anchorPeriod, x2_series.anchorPeriodPositionInArray);
-            
+
             for (int i = 0; i < rv_series.dataArray.Length; i++)
             {
                 if (x2_series == null)
                 {
-                    rv_series.dataArray[i] = x1.dataArray[i + i1] + x2_val;
+                    rv_series.dataArray[i] = x1.GetDataFromIndex(i + i1) + x2_val;
                 }
                 else
                 {
-                    rv_series.dataArray[i] = x1.dataArray[i + i1] + x2_series.dataArray[i + i2];
+                    rv_series.dataArray[i] = x1.GetDataFromIndex(i + i1) + x2_series.GetDataFromIndex(i + i2);
                 }
-            }            
+            }
 
             rv = rv_series;
             return rv;
@@ -1166,7 +1196,7 @@ namespace Gekko
                 if (this.dimensionsStorage == null)
                 {
                     string txt = null; foreach (string ss in keys) txt += "'" + ss + "', ";
-                    G.Writeln2("*** ERROR: The variable '" + this.name + "' is not an array-timeseries.");
+                    G.Writeln2("*** ERROR: The variable '" + this.meta.parentDatabank.aliasName + ":" + this.name + "' is not an array-timeseries.");
                     G.Writeln("           Indexer used: [" + txt.Substring(0, txt.Length - 2) + "]", Color.Red);
                     G.Writeln("           You may use '" + this.name + " = series(" + keys.Length + ");' to create it,", Color.Red);
                     G.Writeln("           perhaps with 'CREATE " + this.name + ";' first.", Color.Red);
