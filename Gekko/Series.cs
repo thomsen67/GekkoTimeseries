@@ -123,8 +123,8 @@ namespace Gekko
         /// </summary>
         [ProtoMember(6)]
         public int anchorPeriodPositionInArray;
-        [ProtoMember(7)]
-        private bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]        
+        //[ProtoMember(7)]
+        //private bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]        
         [ProtoMember(8)]
         public MapMultidim dimensionsStorage = null;  //only active if it is an array-timeseries
         [ProtoMember(9)]
@@ -328,7 +328,7 @@ namespace Gekko
         /// </exception>
         public void Truncate(GekkoTime start, GekkoTime end)
         {
-            if (this.IsTimeless()) return;
+            if (this.type == ESeriesType.Timeless) return;
             if (this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot truncate a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             int indexStart = this.GetArrayIndex(start);
             int indexEnd = this.GetArrayIndex(end);
@@ -391,7 +391,7 @@ namespace Gekko
             if (hasTimeDimension) tDim = 1;
             this.dimensionsStorage = new MapMultidim();
             this.dimensions = dimensions - tDim;
-            if (!hasTimeDimension) this.SetTimeless();
+            if (!hasTimeDimension) this.type = ESeriesType.Timeless;
         }
 
         /// <summary>
@@ -453,7 +453,7 @@ namespace Gekko
                     return double.NaN;
                 }
             }
-            if (this.isTimeless)
+            if (this.type == ESeriesType.Timeless)
             {
                 return this.dataArray[0];
             }
@@ -486,7 +486,7 @@ namespace Gekko
 
         public void SetTimelessData(double value)
         {
-            if (!this.isTimeless)
+            if (this.type != ESeriesType.Timeless)
             {
                 G.Writeln2("*** ERROR: Timeless variable error #100");
                 throw new GekkoException();
@@ -502,7 +502,7 @@ namespace Gekko
 
         public double GetTimelessData()
         {
-            if (!this.isTimeless)
+            if (this.type != ESeriesType.Timeless)
             {
                 G.Writeln2("*** ERROR: Timeless variable error #1009");
                 throw new GekkoException();
@@ -522,7 +522,7 @@ namespace Gekko
         /// <exception cref="GekkoException">Exception if frequency of timeseries and period do not match.</exception>
         public void SetData(GekkoTime t, double value)
         {
-            if (this.isTimeless)
+            if (this.type == ESeriesType.Timeless)
             {
                 //Should not normally be used.
                 //But this may be called from for instance DECOMP, calling it with a time period
@@ -541,7 +541,7 @@ namespace Gekko
                 InitDataArray(t);
             }
 
-            if (this.isTimeless)
+            if (this.type == ESeriesType.Timeless)
             {
                 this.dataArray[0] = value;             
             }
@@ -597,7 +597,7 @@ namespace Gekko
 
             //DimensionCheck();
 
-            if (this.isTimeless)
+            if (this.type == ESeriesType.Timeless)
             {
                 int n = GekkoTime.Observations(gt1, gt2);
                 double[] numbers = new double[n];
@@ -658,7 +658,7 @@ namespace Gekko
         /// <returns></returns>
         public double[] GetDataSequence(out int index1, out int index2, GekkoTime per1, GekkoTime per2)
         {
-            if (this.isTimeless)
+            if (this.type == ESeriesType.Timeless)
             {
                 G.Writeln2("*** ERROR: Timeless variable error #2");
                 throw new GekkoException();
@@ -676,7 +676,7 @@ namespace Gekko
         /// <exception cref="GekkoException">Exception if frequency of timeseries and periods differ.</exception>
         public void SetDataSequence(GekkoTime gt1, GekkoTime gt2, double[] input, int inputOffset)
         {
-            if (this.isTimeless)
+            if (this.type == ESeriesType.Timeless)
             {
                 G.Writeln2("*** ERROR: Timeless variable error #3");
                 throw new GekkoException();
@@ -731,17 +731,18 @@ namespace Gekko
         //    this.SetGhost(b2);
         //}        
 
-        public bool IsTimeless()
-        {
-            return this.isTimeless;
-        }
+        //public bool IsTimeless()
+        //{
+        //    return this.type == ESeriesType.Timeless;
+        //}
 
-        public void SetTimeless()
-        {
-            this.isTimeless = true;
-            this.dataArray = new double[1];  //wipe anything existing out
-            this.dataArray[0] = double.NaN;
-        }
+        //public void SetTimeless()
+        //{
+        //    //this.isTimeless = true;
+        //    this.type = ESeriesType.Timeless
+        //    this.dataArray = new double[1];  //wipe anything existing out
+        //    this.dataArray[0] = double.NaN;
+        //}
 
         /// <summary>
         /// Overload with no offset.
@@ -762,7 +763,7 @@ namespace Gekko
         /// </returns>
         public GekkoTime GetPeriodFirst()
         {
-            if (this.isTimeless)
+            if (this.type == ESeriesType.Timeless)
             {
                 G.Writeln2("*** ERROR: Timeless variable error #4");
                 throw new GekkoException();
@@ -778,7 +779,7 @@ namespace Gekko
         /// </returns>
         public GekkoTime GetPeriodLast()
         {
-            if (this.isTimeless)
+            if (this.type == ESeriesType.Timeless)
             {
                 G.Writeln2("*** ERROR: Timeless variable error #5");
                 throw new GekkoException();
@@ -788,7 +789,7 @@ namespace Gekko
 
         public GekkoTime GetArrayFirstPeriod()
         {
-            if (this.isTimeless || this.dataArray == null)
+            if (this.type == ESeriesType.Timeless || this.dataArray == null)
             {
                 G.Writeln2("*** ERROR: Series error #235");
                 throw new GekkoException();
@@ -798,7 +799,7 @@ namespace Gekko
 
         public GekkoTime GetArrayLastPeriod()
         {
-            if (this.isTimeless || this.dataArray == null)
+            if (this.type == ESeriesType.Timeless || this.dataArray == null)
             {
                 G.Writeln2("*** ERROR: Series error #325");
                 throw new GekkoException();
@@ -810,7 +811,7 @@ namespace Gekko
         {
             //Takes some time for large non-trimmed arrays, but is more precise than GetPeriodFirst()
             GekkoTime rv = GekkoTime.tNull;
-            if (this.isTimeless)
+            if (this.type == ESeriesType.Timeless)
             {
                 //do nothing
             }
@@ -832,7 +833,7 @@ namespace Gekko
         {
             //Takes some time for large non-trimmed arrays, but is more precise than GetPeriodLast()
             GekkoTime rv = GekkoTime.tNull;
-            if (this.isTimeless)
+            if (this.type == ESeriesType.Timeless)
             {
                 //do nothing
             }
@@ -857,7 +858,7 @@ namespace Gekko
         /// <returns>The period (GekkoTime).</returns>
         public GekkoTime GetPeriod(int indexInDataArray)
         {
-            if (this.isTimeless)
+            if (this.type == ESeriesType.Timeless)
             {
                 G.Writeln2("*** ERROR: Timeless variable error #7");
                 throw new GekkoException();
@@ -947,6 +948,16 @@ namespace Gekko
             return rv;
         }
 
+        public GekkoTime FromArrayIndexToGekkoTime(int i)
+        {
+            return FromArrayIndexToGekkoTime(i, this.anchorPeriod, this.anchorPeriodPositionInArray);
+        }
+
+        public int FromGekkoTimeToArrayIndex(GekkoTime gt)
+        {
+            return FromGekkoTimeToArrayIndex(gt, this.anchorPeriod, this.anchorPeriodPositionInArray);
+        }
+
         //public static int FromGekkoTimeToArrayIndex(GekkoTime gt, EFreq freqEnum,int anchorPeriodPositionInArray, int anchorSuperPeriod, int anchorSubPeriod)
         //{            
         //    //this.anchorPeriod.sub is always 1 at the moment, and will always be 1 for Annual.
@@ -1020,7 +1031,7 @@ namespace Gekko
 
         private void InitDataArray(GekkoTime t)
         {
-            if (this.isTimeless)
+            if (this.type == ESeriesType.Timeless)
             {
                 G.Writeln2("*** ERROR: Timeless error #10");
                 throw new GekkoException();
@@ -1313,7 +1324,7 @@ namespace Gekko
                     else
                     {
                         ts = new Series(this.freq, null);
-                        if (this.IsTimeless()) ts.SetTimeless();  //inherits from ghost
+                        if (this.type == ESeriesType.Timeless) ts.type = ESeriesType.Timeless;  //inherits from ghost
                         this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys), ts);
                     }
                 }
@@ -1536,7 +1547,7 @@ namespace Gekko
             {
                 //Will fail with an error if not all indexes are of STRING type                
                 Series ts = this.FindArrayTimeSeries(indexes, true);  //if not found, it will inherit the timeless status from this timeseries.
-                if (ts.IsTimeless())
+                if (ts.type == ESeriesType.Timeless)
                 {
                     double d = rhsExpression.ConvertToVal();
                     ts.SetTimelessData(d);
@@ -1594,6 +1605,7 @@ namespace Gekko
         {            
             //Always make sure new fields are remembered in the DeepClone() method
             Series tsCopy = new Series(this.freq, this.name);
+            tsCopy.type = this.type;
             if (this.dataArray == null)
             {
                 tsCopy.dataArray = null;
@@ -1604,8 +1616,7 @@ namespace Gekko
                 System.Array.Copy(this.dataArray, tsCopy.dataArray, this.dataArray.Length);
             }
             tsCopy.anchorPeriod = this.anchorPeriod;
-            tsCopy.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray;
-            tsCopy.isTimeless = this.isTimeless;
+            tsCopy.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray;            
             tsCopy.dimensionsStorage = this.dimensionsStorage;
             tsCopy.dimensions = this.dimensions;
 

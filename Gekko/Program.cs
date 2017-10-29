@@ -2907,7 +2907,7 @@ namespace Gekko
 
         private static void MergeTwoTimeseriesWithDateWindow(AllFreqsHelper dates, Series tsExisting, Series tsProtobuf, ref int maxYearInProtobufFile, ref int minYearInProtobufFile, ref bool wipeExistingOut)
         {
-            if (tsProtobuf.IsTimeless() || (tsExisting != null && tsExisting.IsTimeless()))
+            if (tsProtobuf.type == ESeriesType.Timeless || (tsExisting != null && tsExisting.type == ESeriesType.Timeless))
             {
                 //!!! BEWARE: remember to truncate and add it to container outside of this method
                 //if either is timeless, just wipe existing out
@@ -4375,7 +4375,7 @@ namespace Gekko
                                     if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
                                     ts = new Series(EFreq.Annual, varNameWithFreq);                                    
                                     ts.meta.label = label;
-                                    if (timeDimNr == -12345) ts.SetTimeless();  //not really relevant, since the timeseries is only a ghost
+                                    if (timeDimNr == -12345) ts.type = ESeriesType.Timeless;  //not really relevant, since the timeseries is only a ghost
                                     ts.SetArrayTimeseries(gdxDimensions, hasTimeDimension == 1);                                    
                                     databank.AddIVariable(ts.name, ts);
                                 }
@@ -4387,7 +4387,7 @@ namespace Gekko
                                     if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
                                     ts = new Series(EFreq.Annual, varNameWithFreq);
                                     ts.meta.label = label;
-                                    if (timeDimNr == -12345) ts.SetTimeless();
+                                    if (timeDimNr == -12345) ts.type = ESeriesType.Timeless;
                                     //ts.name = varName + Globals.freqIndicator + "a";
                                     databank.AddIVariable(ts.name, ts);
                                 }
@@ -4478,7 +4478,7 @@ namespace Gekko
                                             if (iv == null)
                                             {
                                                 ts2 = new Series(EFreq.Annual, null);  //has no name,  but will it be understood as SeriesLight??                                           
-                                                if (timeDimNr == -12345) ts2.SetTimeless();
+                                                if (timeDimNr == -12345) ts2.type = ESeriesType.Timeless;
                                                 ts.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts2);
                                             }
                                             else
@@ -4690,7 +4690,7 @@ namespace Gekko
 
                 string label = ""; if (ts.meta?.label != null) label = ts.meta.label;  //label = null will fail with weird error later on
 
-                int timeDimension = 1; if (ts.IsTimeless()) timeDimension = 0;
+                int timeDimension = 1; if (ts.type == ESeriesType.Timeless) timeDimension = 0;
 
                 //GAMSVariable gvar = db.AddVariable(nameWithoutFreq, ts.storageDim + timeDimension, VarType.Free, label);
                 
@@ -4734,7 +4734,7 @@ namespace Gekko
 
         private static void WriteGdxHelper2(GekkoTime t1, GekkoTime t2, bool usePrefix, GAMSVariable gvar, Series ts2, string[] ss)
         {            
-            if (ts2.IsTimeless())
+            if (ts2.type == ESeriesType.Timeless)
             {                
                 gvar.AddRecord(ss).Level = ts2.GetTimelessData();  //timeless data location   
             }
@@ -7355,7 +7355,7 @@ namespace Gekko
                     Program.databanks.GetFirst().AddVariable(ts2);
                     if (timeIndex == -12345)
                     {
-                        ts2.SetTimeless();
+                        ts2.type = ESeriesType.Timeless;
                     }
                 }
 
@@ -23903,7 +23903,7 @@ p (xx1,{#m});
                     case EVariableType.Series:
                         {
                             Series ts = x as Series;
-                            string tl = null; if (ts.IsTimeless()) tl = " (timeless)";
+                            string tl = null; if (ts.type == ESeriesType.Timeless) tl = " (timeless)";
                             G.Writeln2("SERIES = " + tl);
                             int ii1 = -1;
                             foreach (GekkoTime t in smpl.Iterate12())

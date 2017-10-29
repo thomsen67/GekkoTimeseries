@@ -501,7 +501,7 @@ namespace Gekko
 
             if (G.Equal(type, "timeless"))
             {
-                ts.SetTimeless();  //dataarray will be set with 1 NaN element, this is never used. But .isTimeless is set.
+                ts.type = ESeriesType.Timeless;  //dataarray will be set with 1 NaN element, this is never used. But .isTimeless is set.
             }
 
             return ts;

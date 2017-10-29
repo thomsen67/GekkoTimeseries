@@ -939,127 +939,54 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public static IVariable LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithTilde, string freq, IVariable rhsExpressionOriginal)
+        public static IVariable LookupHelperLeftsideOLD(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhsExpression)
         {
-            IVariable lhs = ib.GetIVariable(varnameWithTilde);
+            //This is an assignment, for instance %x = 5, or x = (1, 2, 3), or bank:x = bank:y
 
-            IVariable rhsExpression = rhsExpressionOriginal;
-            if (varnameWithTilde[0] != Globals.symbolMemvar && varnameWithTilde[0] != Globals.symbolList)
+            IVariable lhs = ib.GetIVariable(varnameWithFreq);
+                        
+            if (varnameWithFreq[0] != Globals.symbolMemvar && varnameWithFreq[0] != Globals.symbolList)
             {
                 //first, if it is a SERIES on lhs (no sigil), we try to convert the RHS directly (so x = ... will work, not necessary with SERIES x = ...)
-                rhsExpression = O.ConvertToTimeSeries(smpl, rhsExpressionOriginal);
+                rhsExpression = O.ConvertToTimeSeries(smpl, rhsExpression);  //for instance, x = (1, 2, 3) will have (1, 2, 3) converted to series
             }
 
-            LookupTypeCheck(rhsExpression, varnameWithTilde);
-
+            LookupTypeCheck(rhsExpression, varnameWithFreq);
+            
             if (lhs == null)
             {
                 //LEFT-HAND SIDE DOES NOT EXIST
                 //LEFT-HAND SIDE DOES NOT EXIST
                 //LEFT-HAND SIDE DOES NOT EXIST
-                if (varnameWithTilde[0] == Globals.symbolMemvar)
+                if (varnameWithFreq[0] == Globals.symbolMemvar)
                 {
                     //VAL, STRING, DATE                                                
-                    ib.AddIVariable(varnameWithTilde, rhsExpression.DeepClone());
+                    ib.AddIVariable(varnameWithFreq, rhsExpression.DeepClone());
                 }
-                else if (varnameWithTilde[0] == Globals.symbolList)
+                else if (varnameWithFreq[0] == Globals.symbolList)
                 {
                     //LIST, DICT, MATRIX                                                
-                    ib.AddIVariable(varnameWithTilde, rhsExpression.DeepClone());
+                    ib.AddIVariable(varnameWithFreq, rhsExpression.DeepClone());
                 }
                 else
                 {
                     //SERIES
-                    //create it                            
-                    if (ib.BankType() == EBankType.Normal && !Program.options.databank_create_auto && !varnameWithTilde.StartsWith("xx", StringComparison.OrdinalIgnoreCase))
+                    //check if it can be created          
+                    if (ib.BankType() == EBankType.Normal && !Program.options.databank_create_auto && !varnameWithFreq.StartsWith("xx", StringComparison.OrdinalIgnoreCase))
                     {
-                        G.Writeln2("*** ERROR: Cannot create timeseries '" + varnameWithTilde);
-                        G.Writeln("    You may use CREATE " + varnameWithTilde + ", or use MODE data, or use a name starting with 'xx'", Color.Red);
+                        G.Writeln2("*** ERROR: Cannot create timeseries '" + varnameWithFreq);
+                        G.Writeln("    You may use CREATE " + varnameWithFreq + ", or use MODE data, or use a name starting with 'xx'", Color.Red);
                         throw new GekkoException();
-                    }
-
-                    //Series rhsExpression_series = rhsExpression as Series;
-
-                    EFreq lhsFreq = EFreq.Annual;
-                    if (freq == null) lhsFreq = Program.options.freq;
-                    else lhsFreq = G.GetFreq(freq);  //will fail with an error if not recognized
-
-                    lhs = new Series(lhsFreq, varnameWithTilde);
-
-                    //    if (rhsExpression.Type() == EVariableType.Series)
-                    //    {
-                    //        Series tsRhs = rhsExpression as Series;
-                    //        if (lhsFreq != tsRhs.freq)
-                    //        {
-                    //            G.Writeln2("***ERROR: Freq " + lhsFreq.ToString() + " on left-hand side, and freq " + tsRhs.freq + " on right-hand side");
-                    //            throw new GekkoException();
-                    //        }
-
-                    //        Series tsLhs = null; 
-                    //        if (tsRhs.IsArrayTimeseries())
-                    //        {
-                    //            if (tsRhs.dimensionsStorage.storage.Count > 0)
-                    //            {
-                    //                G.Writeln2("*** ERROR: Please use the copy command for this.");
-                    //                throw new GekkoException();
-                    //            }
-                    //            //ok if it is for instance xx = series(2);
-                    //            tsLhs = tsRhs.DeepClone() as Series;
-                    //            tsLhs.SetDirty(true);
-                    //        }
-                    //        else
-                    //        {
-
-                    //            tsLhs = new Series(tsRhs.freq, varnameWithTilde);
-                    //            int n = smpl.Observations12();
-                    //            tsLhs.dataArray = new double[n];
-                    //            tsLhs.InitializeDataArray(tsLhs.dataArray);
-
-
-                    //            //GekkoTime ttt0 = tsRhs.GetArrayFirstPeriod();
-                    //            //GekkoTime ttt1 = tsRhs.GetArrayLastPeriod();
-                    //            //if (ttt0.StrictlyLargerThan(smpl.t1))
-                    //            //{
-                    //            //    if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError();
-                    //            //    smpl.gekkoError.t1Problem = GekkoTime.Observations(smpl.t1, ttt0) - 1;
-                    //            //}
-                    //            //if (ttt1.StrictlySmallerThan(smpl.t2))
-                    //            //{
-                    //            //    if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError();
-                    //            //    smpl.gekkoError.t2Problem = GekkoTime.Observations(ttt1, smpl.t2) - 1;
-                    //            //}
-
-
-
-
-                    //            tsLhs.SetDirty(true);
-
-
-                    //        }
-                    //        tsLhs.name = varnameWithTilde;
-                    //        ib.AddIVariable(varnameWithTilde, tsLhs);
-                    //    }
-                    //    else if (rhsExpression.Type() == EVariableType.Val)
-                    //    {
-                    //        ScalarVal sv = rhsExpression as ScalarVal;
-                    //        Series tsLhs = new Series(lhsFreq, varnameWithTilde);
-                    //        //LIGHTFIX, speed
-                    //        foreach (GekkoTime t in smpl.Iterate03())
-                    //        {
-                    //            tsLhs.SetData(t, sv.val);
-                    //        }
-                    //        ib.AddIVariable(varnameWithTilde, tsLhs);
-                    //    }
-                    //}
+                    }                    
                 }
             }
 
             if (true)
             {
                 //LEFT-HAND SIDE EXISTS
-                //LEFT-HAND SIDE EXISTS   or has just been created
+                //LEFT-HAND SIDE EXISTS   or can be created if it is a series name
                 //LEFT-HAND SIDE EXISTS
-                if (varnameWithTilde[0] == Globals.symbolMemvar)
+                if (varnameWithFreq[0] == Globals.symbolMemvar)
                 {
                     //VAL, STRING, DATE
                     if (lhs.Type() == rhsExpression.Type())
@@ -1071,11 +998,11 @@ namespace Gekko
                     }
                     else
                     {
-                        ib.RemoveIVariable(varnameWithTilde);
-                        ib.AddIVariable(varnameWithTilde, rhsExpression.DeepClone());
+                        ib.RemoveIVariable(varnameWithFreq);
+                        ib.AddIVariable(varnameWithFreq, rhsExpression.DeepClone());
                     }
                 }
-                else if (varnameWithTilde[0] == Globals.symbolList)
+                else if (varnameWithFreq[0] == Globals.symbolList)
                 {
                     //LIST, MAP, MATRIX, variable already exists
                     if (lhs.Type() == rhsExpression.Type())
@@ -1084,17 +1011,23 @@ namespace Gekko
                         //      Hence, it would not need to be removed and added to the dictionary, and a new object is not needed.
                     }
                     //this is safe, but a little slow in some cases --> see above
-                    ib.RemoveIVariable(varnameWithTilde);
-                    ib.AddIVariable(varnameWithTilde, rhsExpression.DeepClone());
+                    ib.RemoveIVariable(varnameWithFreq);
+                    ib.AddIVariable(varnameWithFreq, rhsExpression.DeepClone());
                 }
                 else
                 {
                     //SERIES
-                    Series tsLhs = lhs as Series;
+                    Series tsLhs = null;
                     if (rhsExpression.Type() == EVariableType.Series)
                     {
                         Series tsRhs = rhsExpression as Series;
-                        //LIGHTFIX, speed   
+                        //LIGHTFIX, speed  
+
+                        if (tsLhs == null)
+                        {
+                            tsLhs = new Series(ESeriesType.Normal, tsRhs.freq, varnameWithFreq);
+                            ib.AddIVariable(tsLhs.name, tsLhs);
+                        }
 
                         //NOW, we have xx2 = xx1, where these may be different as regards whether they are array-timeseries.
 
@@ -1111,9 +1044,9 @@ namespace Gekko
                         else
                         {
                             //types are differnet (array and non-array), or both are array (not likely...). In these cases, we wipe out the existing timeseries
-                            ib.RemoveIVariable(varnameWithTilde);
+                            ib.RemoveIVariable(varnameWithFreq);
                             Series tsTmp = (Series)rhsExpression.DeepClone();
-                            tsTmp.name = varnameWithTilde;
+                            tsTmp.name = varnameWithFreq;
                             if (ib.GetType() == typeof(Databank))
                             {
                                 if (tsTmp.IsLight() == null) tsTmp.meta = new TimeSeriesMetaInformation();  //so that parentDatabank can be put in in ib.AddIVariable                               
@@ -1125,9 +1058,14 @@ namespace Gekko
                     }
                     else if (rhsExpression.Type() == EVariableType.Val)
                     {
+                        if (tsLhs == null)
+                        {
+                            tsLhs = new Series(ESeriesType.Normal, Program.options.freq, varnameWithFreq);
+                            ib.AddIVariable(tsLhs.name, tsLhs);
+                        }
                         ScalarVal sv = rhsExpression as ScalarVal;
                         //LIGHTFIX, speed
-                        foreach (GekkoTime t in smpl.Iterate03())
+                        foreach (GekkoTime t in smpl.Iterate12())
                         {
                             tsLhs.SetData(t, sv.val);
                         }
@@ -1135,10 +1073,399 @@ namespace Gekko
                     //TODO
                 }
             }
-
             return lhs;
+        }
+
+        public static void LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhsExpression)
+        {
+            //This is an assignment, for instance %x = 5, or x = (1, 2, 3), or bank:x = bank:y
+            //Assignment is the hardest part of Lookup()
+
+            //IVariable lhs = ib.GetIVariable(varnameWithFreq);
+
+            IVariable lhs = null;
+
+            if (varnameWithFreq[0] == Globals.symbolMemvar)
+            {
+                switch (rhsExpression.Type())
+                {
+                    case EVariableType.Series:
+                        {
+                            Series rhsExpression_series = rhsExpression as Series;
+                            switch (rhsExpression_series.type)
+                            {
+                                case ESeriesType.Normal:
+                                    {
+                                        //---------------------------------------------------------
+                                        // %x = Series Normal
+                                        //---------------------------------------------------------
+
+                                        G.Writeln2("*** ERROR: Type mismatch");
+                                        throw new GekkoException();
+
+                                    }
+                                    break;
+                                case ESeriesType.Light:
+                                    {
+                                        //---------------------------------------------------------
+                                        // %x = Series Light
+                                        //---------------------------------------------------------
+                                        
+                                            G.Writeln2("*** ERROR: Type mismatch");
+                                            throw new GekkoException();
+                                        
+                                    }
+                                    break;
+                                case ESeriesType.Timeless:
+                                    {
+                                        //---------------------------------------------------------
+                                        // %x = Series Timeless
+                                        //---------------------------------------------------------
+                                        lhs = new ScalarVal(rhsExpression_series.GetTimelessData());
+                                    }
+                                    break;
+                                case ESeriesType.ArraySuper:
+                                    {
+                                        //---------------------------------------------------------
+                                        // %x = Series Array Super
+                                        //---------------------------------------------------------
+
+                                        
+                                            G.Writeln2("*** ERROR: Type mismatch");
+                                            throw new GekkoException();
+                                        
+                                    }
+                                    break;
+                                case ESeriesType.ArraySub:
+                                    {
+                                        //---------------------------------------------------------
+                                        // %x = Series Array Sub
+                                        //---------------------------------------------------------
+                                        
+                                            G.Writeln2("*** ERROR: Type mismatch");
+                                            throw new GekkoException();
+                                        
+                                    }
+                                    break;
+                                default:
+                                    {
+                                        G.Writeln2("*** ERROR: Expected SERIES to be 1 of 5 types");
+                                        throw new GekkoException();
+                                    }
+                                    break;
+                            }
+                        }
+                        break;
+                    case EVariableType.Val:
+                        {
+                            //---------------------------------------------------------
+                            // %x = VAL
+                            //---------------------------------------------------------
+                            //TODO: can be injected if exist and is val
+                            lhs = new ScalarVal(((ScalarVal)rhsExpression).val);
+                        }
+                        break;
+                    case EVariableType.String:
+                        {
+                            //---------------------------------------------------------
+                            // %x = STRING
+                            //---------------------------------------------------------
+                            lhs = new ScalarString(((ScalarString)rhsExpression)._string2);
+                        }
+                        break;
+                    case EVariableType.Date:
+                        {
+                            //---------------------------------------------------------
+                            // %x = DATE
+                            //---------------------------------------------------------
+                            lhs = new ScalarDate(((ScalarDate)rhsExpression).date);
+                        }
+                        break;
+                    case EVariableType.List:
+                        {
+                            //---------------------------------------------------------
+                            // %x = LIST
+                            //---------------------------------------------------------
+                            
+                                G.Writeln2("*** ERROR: Type mismatch");
+                                throw new GekkoException();
+                            
+                        }
+                        break;
+                    case EVariableType.Map:
+                        {
+                            //---------------------------------------------------------
+                            // %x = MAP
+                            //---------------------------------------------------------
+                            
+                                G.Writeln2("*** ERROR: Type mismatch");
+                                throw new GekkoException();
+                            
+                        }
+                        break;
+                    case EVariableType.Matrix:
+                        {
+                            //---------------------------------------------------------
+                            // %x = MATRIX
+                            //---------------------------------------------------------                            
+                            lhs = new ScalarVal(rhsExpression.ConvertToVal());  //only 1x1 matrix will become VAL
+                        }
+                        break;
+                    default:
+                        {
+                            G.Writeln2("*** ERROR: Expected IVariable to be 1 of 7 types");
+                            throw new GekkoException();
+                        }
+                        break;
+                }
+            }
+            else if (varnameWithFreq[0] == Globals.symbolList)
+            {
+                switch (rhsExpression.Type())
+                {
+                    case EVariableType.Series:
+                        {
+                            Series rhsExpression_series = rhsExpression as Series;
+                            switch (rhsExpression_series.type)
+                            {
+                                case ESeriesType.Normal:
+                                    {
+                                        //---------------------------------------------------------
+                                        // #x = Series Normal
+                                        //---------------------------------------------------------
+                                        int n = smpl.Observations12();
+                                        lhs = new Matrix(1, n);
+                                        int i1 = Series.FromGekkoTimeToArrayIndex(smpl.t1, rhsExpression_series.anchorPeriod, rhsExpression_series.anchorPeriodPositionInArray);
+                                        
+                                    }
+                                    break;
+                                case ESeriesType.Light:
+                                    {
+                                        //---------------------------------------------------------
+                                        // #x = Series Light
+                                        //---------------------------------------------------------
+                                    }
+                                    break;
+                                case ESeriesType.Timeless:
+                                    {
+                                        //---------------------------------------------------------
+                                        // #x = Series Timeless
+                                        //---------------------------------------------------------
+                                    }
+                                    break;
+                                case ESeriesType.ArraySuper:
+                                    {
+                                        //---------------------------------------------------------
+                                        // #x = Series Array Super
+                                        //---------------------------------------------------------
+                                        {
+                                            G.Writeln2("*** ERROR: Type mismatch");
+                                            throw new GekkoException();
+                                        }
+                                    }
+                                    break;
+                                case ESeriesType.ArraySub:
+                                    {
+                                        //---------------------------------------------------------
+                                        // #x = Series Array Sub
+                                        //---------------------------------------------------------
+                                    }
+                                    break;
+                                default:
+                                    {
+                                        G.Writeln2("*** ERROR: Expected SERIES to be 1 of 5 types");
+                                        throw new GekkoException();
+                                    }
+                                    break;
+                            }
+                        }
+                        break;
+                    case EVariableType.Val:
+                        {
+                            //---------------------------------------------------------
+                            // #x = VAL
+                            //---------------------------------------------------------
+                        }
+                        break;
+                    case EVariableType.String:
+                        {
+                            //---------------------------------------------------------
+                            // #x = STRING
+                            //---------------------------------------------------------
+                            {
+                                G.Writeln2("*** ERROR: Type mismatch");
+                                throw new GekkoException();
+                            }
+                        }
+                        break;
+                    case EVariableType.Date:
+                        {
+                            //---------------------------------------------------------
+                            // #x = DATE
+                            //---------------------------------------------------------
+                            {
+                                G.Writeln2("*** ERROR: Type mismatch");
+                                throw new GekkoException();
+                            }
+                        }
+                        break;
+                    case EVariableType.List:
+                        {
+                            //---------------------------------------------------------
+                            // #x = LIST
+                            //---------------------------------------------------------
+                        }
+                        break;
+                    case EVariableType.Map:
+                        {
+                            //---------------------------------------------------------
+                            // #x = MAP
+                            //---------------------------------------------------------
+                        }
+                        break;
+                    case EVariableType.Matrix:
+                        {
+                            //---------------------------------------------------------
+                            // #x = MATRIX
+                            //---------------------------------------------------------
+                        }
+                        break;
+                    default:
+                        {
+                            G.Writeln2("*** ERROR: Expected IVariable to be 1 of 7 types");
+                            throw new GekkoException();
+                        }
+                        break;
+                }
+            }
+            else
+            {
+                switch (rhsExpression.Type())
+                {
+                    case EVariableType.Series:
+                        {
+                            Series rhsExpression_series = rhsExpression as Series;
+                            switch (rhsExpression_series.type)
+                            {
+                                case ESeriesType.Normal:
+                                    {
+                                        //---------------------------------------------------------
+                                        // x = Series Normal
+                                        //---------------------------------------------------------
+                                    }
+                                    break;
+                                case ESeriesType.Light:
+                                    {
+                                        //---------------------------------------------------------
+                                        // x = Series Light
+                                        //---------------------------------------------------------
+                                    }
+                                    break;
+                                case ESeriesType.Timeless:
+                                    {
+                                        //---------------------------------------------------------
+                                        // x = Series Timeless
+                                        //---------------------------------------------------------
+                                    }
+                                    break;
+                                case ESeriesType.ArraySuper:
+                                    {
+                                        //---------------------------------------------------------
+                                        // x = Series Array Super
+                                        //---------------------------------------------------------
+
+                                        //??????????????????
+                                        //??????????????????
+                                        //??????????????????
+
+                                    }
+                                    break;
+                                case ESeriesType.ArraySub:
+                                    {
+                                        //---------------------------------------------------------
+                                        // x = Series Array Sub
+                                        //---------------------------------------------------------
+                                    }
+                                    break;
+                                default:
+                                    {
+                                        G.Writeln2("*** ERROR: Expected SERIES to be 1 of 5 types");
+                                        throw new GekkoException();
+                                    }
+                                    break;
+                            }
+                        }
+                        break;
+                    case EVariableType.Val:
+                        {
+                            //---------------------------------------------------------
+                            // x = VAL
+                            //---------------------------------------------------------
+                        }
+                        break;
+                    case EVariableType.String:
+                        {
+                            //---------------------------------------------------------
+                            // x = STRING
+                            //---------------------------------------------------------
+                            {
+                                G.Writeln2("*** ERROR: Type mismatch");
+                                throw new GekkoException();
+                            }
+                        }
+                        break;
+                    case EVariableType.Date:
+                        {
+                            //---------------------------------------------------------
+                            // x = DATE
+                            //---------------------------------------------------------
+                            {
+                                G.Writeln2("*** ERROR: Type mismatch");
+                                throw new GekkoException();
+                            }
+                        }
+                        break;
+                    case EVariableType.List:
+                        {
+                            //---------------------------------------------------------
+                            // x = LIST
+                            //---------------------------------------------------------
+                        }
+                        break;
+                    case EVariableType.Map:
+                        {
+                            //---------------------------------------------------------
+                            // x = MAP
+                            //---------------------------------------------------------
+                            {
+                                G.Writeln2("*** ERROR: Type mismatch");
+                                throw new GekkoException();
+                            }
+                        }
+                        break;
+                    case EVariableType.Matrix:
+                        {
+                            //---------------------------------------------------------
+                            // x = MATRIX
+                            //---------------------------------------------------------
+                        }
+                        break;
+                    default:
+                        {
+                            G.Writeln2("*** ERROR: Expected IVariable to be 1 of 7 types");
+                            throw new GekkoException();
+                        }
+                        break;
+                }
+            }
+
+
+
+
+            return;
 
         }
+
 
         private static void LookupTypeCheck(IVariable rhs, string varName)
         {
