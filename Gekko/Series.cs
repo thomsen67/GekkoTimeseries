@@ -232,21 +232,9 @@ namespace Gekko
         /// </summary>
         /// <param name="frequency">The frequency of the timeseries</param>
         /// <param name="variableName">The variable name of the timeseries</param>
-        public Series(EFreq frequency, string variableName)
+        public Series(EFreq frequency, string variableName) : this(ESeriesType.Normal, frequency, variableName)
         {
-            //Will add freq in name, if it is missing
-            this.freq = frequency;
-            this.name = variableName;  //Note: the variableName does contain a '!'. If the name is null, it is a light Series.
-            if (this.name != null)
-            {
-                if (!this.name.Contains(Globals.freqIndicator))
-                {
-                    G.Writeln2("*** ERROR: Missing freq indicator, see G.AddFreqToName()");
-                    throw new GekkoException();
-                }
-                this.meta = new TimeSeriesMetaInformation(); //do not create this object if this.name = null, that is, a light Series.
-            }
-        }
+        }       
 
         public Series(ESeriesType type, EFreq frequency, string variableName)
         {
@@ -521,8 +509,15 @@ namespace Gekko
                 //Normally timeless variables should be called via the SetData(double value) method
                 this.dataArray[0] = value;
             }
-            if (this.type != ESeriesType.Light && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
-            
+            try
+            {
+                if (this.type != ESeriesType.Light && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
+            }
+            catch
+            {
+
+            }
+
             if (this.freq != t.freq)
             {
                 //See comment to GetData()

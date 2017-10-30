@@ -1416,9 +1416,19 @@ namespace Gekko
 
                                         //we merge any existing series with the new data, considering also the sample
 
+                                        bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
                                         AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);
                                         int i1 = -12345; int i2 = -12345; bool shouldOverwriteLaterOn = false;
                                         Program.MergeTwoTimeseriesWithDateWindow(dates, lhs_series, rhs_series, ref i1, ref i2, ref shouldOverwriteLaterOn);
+                                        if (create)
+                                        {
+                                            AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
+                                        }
+                                        else
+                                        {
+                                            //nothing to do, either already existing in bank/map or array-subseries
+                                        }
+
                                     }
                                     break;
                                 case ESeriesType.Light:
@@ -1429,10 +1439,18 @@ namespace Gekko
 
                                         //we merge any existing series with the new data, considering also the sample
 
+                                        bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
                                         AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);
                                         int i1 = -12345; int i2 = -12345; bool shouldOverwriteLaterOn = false;
                                         Program.MergeTwoTimeseriesWithDateWindow(dates, lhs_series, rhs_series, ref i1, ref i2, ref shouldOverwriteLaterOn);
-
+                                        if (create)
+                                        {
+                                            AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
+                                        }
+                                        else
+                                        {
+                                            //nothing to do, either already existing in bank/map or array-subseries
+                                        }
                                     }
                                     break;
                                 case ESeriesType.Timeless:
@@ -1441,7 +1459,8 @@ namespace Gekko
                                         // x = Series Timeless
                                         //---------------------------------------------------------
                                         // stuff below also handles array-timeseries just fine   
-                                        double d = rhs_series.dataArray[0];
+                                        double d = double.NaN;
+                                        if (rhs_series.dataArray != null) d = rhs_series.dataArray[0];
                                         bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
                                         foreach (GekkoTime t in smpl.Iterate12())
                                         {
@@ -1570,6 +1589,45 @@ namespace Gekko
                             //---------------------------------------------------------
                             // x = MATRIX
                             //---------------------------------------------------------
+
+                            // stuff below also handles array-timeseries just fine     
+
+                            Matrix rhs_matrix = rhs as Matrix;
+                            bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
+
+                            if (rhs_matrix.data.Length == 1)
+                            {
+                                double d = rhs.ConvertToVal();  //will fail with error if not 1x1                            
+                                
+                                foreach (GekkoTime t in smpl.Iterate12())
+                                {
+                                    lhs_series.SetData(t, d);
+                                }
+                                
+                            }
+                            else
+                            {
+                                int n = smpl.Observations12();
+                                if (n != lhs_series.dataArray.GetLength(0))
+                                {
+                                    G.Writeln2("*** ERROR: Expected " + n + " list items, got " + lhs_series.dataArray.GetLength(0));
+                                    throw new GekkoException();
+                                }
+                                for (int i = 0;i < lhs_series.dataArray.GetLength(0);i++)
+                                {
+                                    lhs_series.SetData(smpl.t1.Add(i), rhs_matrix.data[i, 0]);
+                                }                            
+
+                            }
+                            if (create)
+                            {
+                                AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
+                            }
+                            else
+                            {
+                                //nothing to do, either already existing in bank/map or array-subseries
+                            }
+
                         }
                         break;
                     default:
@@ -1580,9 +1638,6 @@ namespace Gekko
                         break;
                 }
             }
-
-
-
 
             return;
 

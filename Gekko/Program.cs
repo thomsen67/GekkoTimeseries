@@ -2983,7 +2983,7 @@ namespace Gekko
                                 int index2;
                                 try
                                 {
-                                    double[] data = tsSource.GetDataSequence(out index1, out index2, firstTruncated, lastTruncated, true);
+                                    double[] data = tsSource.GetDataSequence(out index1, out index2, firstTruncated, lastTruncated, false);
                                     tsExisting.SetDataSequence(firstTruncated, lastTruncated, data, index1);
                                 }
                                 catch (Exception e)

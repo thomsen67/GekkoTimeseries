@@ -1878,9 +1878,9 @@ namespace Gekko.Parser.Gek
                                 }
                                 //method def:
                                 sb1.AppendLine("public static IVariable " + tempName + "(GekkoSmpl smpl" + parentListLoopVars1 + ") {");
-                                if (G.Equal(functionNameLower, "sum"))
+                                if (G.Equal(functionNameLower, "sum")) 
                                 {
-                                    sb1.AppendLine("Series " + tempName + " = new Series(Program.options.freq, null); " + tempName + ".SetZero(smpl);" + G.NL);
+                                    sb1.AppendLine("Series " + tempName + " = new Series(ESeriesType.Normal, Program.options.freq, null); " + tempName + ".SetZero(smpl);" + G.NL);
                                 }
                                 else
                                 {

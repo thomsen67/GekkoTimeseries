@@ -453,57 +453,102 @@ namespace Gekko
         private static Series HELPER_seriesAndTimeless(string type, IVariable[] x)
         {
             Series ts = null;
-            if (x.Length == 0)
+            if (G.Equal(type, "series"))
             {
-                ts = new Series(Program.options.freq, null);
-            }
-            else if (x.Length == 1)
-            {
-                if (x[0].Type() == EVariableType.String)
-                {
-                    //frequency
-                    EFreq freq = G.GetFreq(O.ConvertToString(x[0]));
-                    ts = new Series(freq, null);
-                }
-                else if (x[0].Type() == EVariableType.Val)
+                if (x.Length == 0)
                 {
                     ts = new Series(Program.options.freq, null);
-                    ts.dimensionsStorage = new MapMultidim();
-                    ts.dimensions = O.ConvertToInt(x[0]);
-                    ts.type = ESeriesType.ArraySuper;
-                    ts.meta = new TimeSeriesMetaInformation();
+                }
+                else if (x.Length == 1)
+                {
+                    if (x[0].Type() == EVariableType.String)
+                    {
+                        //frequency
+                        EFreq freq = G.GetFreq(O.ConvertToString(x[0]));
+                        ts = new Series(freq, null);
+                    }
+                    else if (x[0].Type() == EVariableType.Val)
+                    {
+                        ts = new Series(Program.options.freq, null);
+                        ts.dimensionsStorage = new MapMultidim();
+                        ts.dimensions = O.ConvertToInt(x[0]);
+                        ts.type = ESeriesType.ArraySuper;
+                        ts.meta = new TimeSeriesMetaInformation();
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Expected argument 1 in series() to be VAL or STRING");
+                        throw new GekkoException();
+                    }
+                }
+                else if (x.Length == 2)
+                {
+                    if (x[0].Type() == EVariableType.String)
+                    {
+                        //frequency
+                        EFreq freq = G.GetFreq(O.ConvertToString(x[0]));
+                        ts = new Series(freq, null);
+                        ts.dimensions = O.ConvertToInt(x[1]);
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: series() with 2 arguments must have STRING as first argument");
+                        throw new GekkoException();
+                    }
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Expected argument 1 in series() to be VAL or STRING");
+
+                    G.Writeln2("*** ERROR: series() does not accept > 2 arguments");
                     throw new GekkoException();
                 }
-            }
-            else if (x.Length == 2)
-            {
-                if (x[0].Type() == EVariableType.String)
-                {
-                    //frequency
-                    EFreq freq = G.GetFreq(O.ConvertToString(x[0]));
-                    ts = new Series(freq, null);
-                    ts.dimensions = O.ConvertToInt(x[1]);
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: series() with 2 arguments must have STRING as first argument");
-                    throw new GekkoException();
-                }
+                
             }
             else
             {
+                if (x.Length == 0)
+                {
+                    ts = new Series(ESeriesType.Timeless, Program.options.freq, null, double.NaN);
+                }
+                else if (x.Length == 1)
+                {
+                    if (x[0].Type() == EVariableType.String)
+                    {
+                        //frequency
+                        EFreq freq = G.GetFreq(O.ConvertToString(x[0]));
+                        ts = new Series(ESeriesType.Timeless, freq, null, double.NaN);
+                    }
+                    else if (x[0].Type() == EVariableType.Val)
+                    {
+                        ts = new Series(ESeriesType.Timeless, Program.options.freq, null, x[0].ConvertToVal());
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Expected argument 1 in timeless() to be VAL or STRING");
+                        throw new GekkoException();
+                    }
+                }
+                else if (x.Length == 2)
+                {
+                    if (x[0].Type() == EVariableType.String)
+                    {
+                        //frequency
+                        EFreq freq = G.GetFreq(O.ConvertToString(x[0]));
+                        double d = x[1].ConvertToVal();
+                        ts = new Series(ESeriesType.Timeless, freq, null, d);
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: timeless() with 2 arguments must have STRING as first argument");
+                        throw new GekkoException();
+                    }
+                }
+                else
+                {
 
-                G.Writeln2("*** ERROR: series() does not accept > 2 arguments");
-                throw new GekkoException();
-            }
-
-            if (G.Equal(type, "timeless"))
-            {
-                ts.type = ESeriesType.Timeless;  //dataarray will be set with 1 NaN element, this is never used. But .isTimeless is set.
+                    G.Writeln2("*** ERROR: series() does not accept > 2 arguments");
+                    throw new GekkoException();
+                }
             }
 
             return ts;

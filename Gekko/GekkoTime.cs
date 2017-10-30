@@ -158,13 +158,13 @@ namespace Gekko
                 {
                     if (t1.freq == EFreq.Quarterly)
                     {
-                        tt1 = new GekkoTime(EFreq.Quarterly, t1.super, 1);  //first q
-                        tt2 = new GekkoTime(EFreq.Quarterly, t2.super, GekkoTimeStuff.numberOfQuarters);  //last q
+                        tt1 = new GekkoTime(EFreq.Annual, t1.super, 1);  
+                        tt2 = new GekkoTime(EFreq.Annual, t2.super, 1);  
                     }
                     else if (t1.freq == EFreq.Monthly)
                     {
-                        tt1 = new GekkoTime(EFreq.Monthly, t1.super, 1);  //first m
-                        tt2 = new GekkoTime(EFreq.Monthly, t2.super, GekkoTimeStuff.numberOfMonths);  //last m
+                        tt1 = new GekkoTime(EFreq.Annual, t1.super, 1);  
+                        tt2 = new GekkoTime(EFreq.Annual, t2.super, 1);  
                     }
 
                 }
@@ -172,27 +172,27 @@ namespace Gekko
                 {
                     if (t1.freq == EFreq.Annual)
                     {
-                        tt1 = new GekkoTime(EFreq.Annual, t1.super, 1);
-                        tt2 = new GekkoTime(EFreq.Annual, t2.super, 1);
+                        tt1 = new GekkoTime(EFreq.Quarterly, t1.super, 1);
+                        tt2 = new GekkoTime(EFreq.Quarterly, t2.super, GekkoTimeStuff.numberOfQuarters);
                     }
 
                     else if (t1.freq == EFreq.Monthly)
                     {
-                        tt1 = new GekkoTime(EFreq.Monthly, t1.super, GekkoTime.FromQuarterToMonthStart(t1.sub));  //first m
-                        tt2 = new GekkoTime(EFreq.Monthly, t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub));  //last m                 
+                        tt1 = new GekkoTime(EFreq.Quarterly, t1.super, GekkoTime.FromMonthToQuarter(t1.sub));  //first m
+                        tt2 = new GekkoTime(EFreq.Quarterly, t2.super, GekkoTime.FromMonthToQuarter(t2.sub));  //last m                 
                     }
                 }
                 else if (freq == EFreq.Monthly)
-                {                    
+                {
                     if (t1.freq == EFreq.Annual)
                     {
-                        tt1 = new GekkoTime(EFreq.Annual, t1.super, 1);
-                        tt2 = new GekkoTime(EFreq.Annual, t2.super, 1);
-                    }
+                        tt1 = new GekkoTime(EFreq.Monthly, t1.super, 1);
+                        tt2 = new GekkoTime(EFreq.Monthly, t2.super, GekkoTimeStuff.numberOfMonths);
+                    }                
                     else if (t1.freq == EFreq.Quarterly)
                     {
-                        tt1 = new GekkoTime(EFreq.Quarterly, t1.super, GekkoTime.FromMonthToQuarter(t1.sub));
-                        tt2 = new GekkoTime(EFreq.Quarterly, t2.super, GekkoTime.FromMonthToQuarter(t2.sub));
+                        tt1 = new GekkoTime(EFreq.Monthly, t1.super, GekkoTime.FromQuarterToMonthStart(t1.sub));
+                        tt2 = new GekkoTime(EFreq.Monthly, t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub));
                     }
                 }
             }
