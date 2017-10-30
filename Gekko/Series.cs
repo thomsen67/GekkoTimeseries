@@ -32,8 +32,7 @@ namespace Gekko
         Normal,
         Light,
         Timeless,
-        ArraySuper,
-        ArraySub
+        ArraySuper        
     }
 
     //                 name        meta        dataArray     dimensions      dimensionsArray
@@ -41,9 +40,9 @@ namespace Gekko
     // Normal             x           x                x             0               null
     // Light           null        null          small x             0               null
     // Timeless           x           x              1 x             0               null
-    // ArraySuper         x           x             null             n                  x
-    // ArraySub        null           x                x             0               null
+    // ArraySuper         x           x             null             n                  x    
     // ---------------------------------------------------------------------------------------------
+    // ArraySub has no name, else like Normal
     //
 
     /// <summary>
@@ -251,29 +250,22 @@ namespace Gekko
 
         public Series(ESeriesType type, EFreq frequency, string variableName)
         {
-            // --------------------------------------------
-            // ONLY for Normal and ArraySub
-            // --------------------------------------------
+            // -------------------------------------------------------------------------------------------
+            // ONLY for Normal (includes array sub-series that must have name Globals.seriesArraySubName
+            // -------------------------------------------------------------------------------------------
 
-            if (this.type != ESeriesType.Normal && this.type != ESeriesType.ArraySub)
+            if (this.type != ESeriesType.Normal)
             {
                 G.Writeln2("*** ERROR: SERIES constructor 3");
                 throw new GekkoException();
             }
 
             this.type = type;
-            //Will add freq in name, if it is missing
+            
             this.freq = frequency;
-            if (type == ESeriesType.ArraySub && variableName != null)
-            {
-                G.Writeln2("*** ERROR: Series name not allowed");
-                throw new GekkoException();
-            }
-            else
-            {
-                this.name = variableName;  //Note: the variableName does contain a '!'. If the name is null, it is a light Series.                       
-            }
-
+                        
+            this.name = variableName;  //Note: the variableName does contain a '!'. If the name is null, it is a light Series.                       
+            
             if (this.name != null)
             {
                 if (!this.name.Contains(Globals.freqIndicator))
@@ -1330,7 +1322,7 @@ namespace Gekko
                     {
                         //ts = new Series(this.freq, null);
 
-                        ts = new Series(ESeriesType.ArraySub, this.freq, null);
+                        ts = new Series(ESeriesType.Normal, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq));
                         //ts.type = ESeriesType.ArraySub;
                         if (this.type == ESeriesType.Timeless) ts.type = ESeriesType.Timeless;  //inherits from ghost                        
                         this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys), ts);

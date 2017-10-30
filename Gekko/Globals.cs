@@ -395,6 +395,8 @@ namespace Gekko
         public static bool initializeDataArrayWithNaN = true;
         public static bool simulationCheckThatAllDataGetsFromBArrayToTimeSeries = true;
 
+        public const string seriesArraySubName = "[array]";
+
         public static int simCounter = 0;
 
         /// <summary>

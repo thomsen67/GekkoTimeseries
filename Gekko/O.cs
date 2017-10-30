@@ -1136,18 +1136,7 @@ namespace Gekko
                                             throw new GekkoException();
                                         
                                     }
-                                    break;
-                                case ESeriesType.ArraySub:
-                                    {
-                                        //---------------------------------------------------------
-                                        // %x = Series Array Sub
-                                        //---------------------------------------------------------
-                                        
-                                            G.Writeln2("*** ERROR: Type mismatch");
-                                            throw new GekkoException();
-                                        
-                                    }
-                                    break;
+                                    break;                                
                                 default:
                                     {
                                         G.Writeln2("*** ERROR: Expected SERIES to be 1 of 5 types");
@@ -1317,14 +1306,7 @@ namespace Gekko
                                             throw new GekkoException();
                                         }
                                     }
-                                    break;
-                                case ESeriesType.ArraySub:
-                                    {
-                                        //---------------------------------------------------------
-                                        // #x = Series Array Sub
-                                        //---------------------------------------------------------
-                                    }
-                                    break;
+                                    break;                                
                                 default:
                                     {
                                         G.Writeln2("*** ERROR: Expected SERIES to be 1 of 5 types");
@@ -1442,14 +1424,7 @@ namespace Gekko
                                         ((Series)clone).name = varnameWithFreq;
                                         AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, clone);
                                     }
-                                    break;
-                                case ESeriesType.ArraySub:
-                                    {
-                                        //---------------------------------------------------------
-                                        // x = Series Array Sub
-                                        //---------------------------------------------------------
-                                    }
-                                    break;
+                                    break;                                
                                 default:
                                     {
                                         G.Writeln2("*** ERROR: Expected SERIES to be 1 of 5 types");
@@ -1503,7 +1478,7 @@ namespace Gekko
                             }
 
                             bool create = false;
-                            if (lhs_series != null && (lhs_series.type == ESeriesType.Normal || lhs_series.type == ESeriesType.ArraySub))
+                            if (lhs_series != null && lhs_series.type == ESeriesType.Normal)
                             {
                                 //do nothing, use it
                             }
