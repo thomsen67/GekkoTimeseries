@@ -1546,21 +1546,8 @@ namespace Gekko
             else 
             {
                 //Will fail with an error if not all indexes are of STRING type                
-                Series ts = this.FindArrayTimeSeries(indexes, true);  //if not found, it will inherit the timeless status from this timeseries.
-
-                if (ts.type == ESeriesType.Timeless)
-                {
-                    double d = rhsExpression.ConvertToVal();
-                    ts.SetTimelessData(d);
-                }
-                else
-                {
-                    IVariable tsExpression = O.ConvertToTimeSeries(smpl, rhsExpression);
-                    foreach (GekkoTime t in smpl.Iterate03())
-                    {
-                        ts.SetData(t, tsExpression.GetVal(t));  //will fail if expression is wrong type
-                    }
-                }
+                Series ts = this.FindArrayTimeSeries(indexes, true);  //if not found, it will be created (since we are on the lhs) and inherit the timeless status from this timeseries.
+                O.LookupHelperLeftside(smpl, ts, rhsExpression);                
             }
         }
 

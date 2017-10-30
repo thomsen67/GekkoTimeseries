@@ -2814,9 +2814,9 @@ namespace Gekko
                                             {
                                                 //now we need to merge the two series
                                                 //also see #98520983
-                                                bool wipeExistingOut = false;
-                                                MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsProtobuf, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref wipeExistingOut);
-                                                MergeTwoTimeseriesWithDateWindowHelper(dates, gmapExisting, nameDimProtobuf, tsProtobuf, wipeExistingOut);
+                                                bool shouldOverwriteLaterOn = false;
+                                                MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsProtobuf, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref shouldOverwriteLaterOn);
+                                                MergeTwoTimeseriesWithDateWindowHelper(dates, gmapExisting, nameDimProtobuf, tsProtobuf, shouldOverwriteLaterOn);
                                             }
                                         }
                                     }
@@ -2895,9 +2895,9 @@ namespace Gekko
             }
         }
 
-        private static void MergeTwoTimeseriesWithDateWindowHelper(AllFreqsHelper dates, MapMultidim gmap, MapMultidimItem gmapItem, Series tsProtobuf, bool wipeExistingOut)
+        private static void MergeTwoTimeseriesWithDateWindowHelper(AllFreqsHelper dates, MapMultidim gmap, MapMultidimItem gmapItem, Series tsProtobuf, bool shouldOverwriteLaterOn)
         {
-            if (wipeExistingOut)
+            if (shouldOverwriteLaterOn)
             {
                 //better to keep this outside of MergeTwoTimeseriesWithDateWindow()                                     
                 tsProtobuf.Truncate(dates);
@@ -2905,14 +2905,14 @@ namespace Gekko
             }
         }
 
-        private static void MergeTwoTimeseriesWithDateWindow(AllFreqsHelper dates, Series tsExisting, Series tsSource, ref int maxYearInProtobufFile, ref int minYearInProtobufFile, ref bool wipeExistingOut)
+        public static void MergeTwoTimeseriesWithDateWindow(AllFreqsHelper dates, Series tsExisting, Series tsSource, ref int maxYearInProtobufFile, ref int minYearInProtobufFile, ref bool shouldOverwriteLaterOn)
         {
             if (tsSource.type == ESeriesType.Timeless || (tsExisting != null && tsExisting.type == ESeriesType.Timeless))
             {
                 //!!! BEWARE: remember to truncate and add it to container outside of this method
                 //if either is timeless, just wipe existing out
                 //handle it like non-series
-                wipeExistingOut = true;
+                shouldOverwriteLaterOn = true;
             }
             else
             {
@@ -2922,7 +2922,7 @@ namespace Gekko
                 {
                     //!!! BEWARE: remember to truncate and add it to container outside of this method
                     //Does not exist already: just put it in, but remember to truncate dates                    
-                    wipeExistingOut = true;
+                    shouldOverwriteLaterOn = true;
                 }
                 else
                 {

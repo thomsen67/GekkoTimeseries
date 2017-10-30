@@ -1078,14 +1078,28 @@ namespace Gekko
 
         public static void LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhs)
         {
+            //normal use
+            LookupHelperLeftside(smpl, ib, varnameWithFreq, freq, rhs, null);        
+        }
+
+        public static void LookupHelperLeftside(GekkoSmpl smpl, Series arraySubSeries, IVariable rhs)
+        {
+            //use for array-series, for instance xx['a'] = ...
+            LookupHelperLeftside(smpl, null, null, null, rhs, arraySubSeries);
+        }
+
+        private static void LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhs, Series arraySubSeries)
+        {
             //This is an assignment, for instance %x = 5, or x = (1, 2, 3), or bank:x = bank:y
             //Assignment is the hardest part of Lookup()
-
-            //IVariable lhs = ib.GetIVariable(varnameWithFreq);
-                        
-            IVariable lhs = ib.GetIVariable(varnameWithFreq);  //may return null
-
-            if (varnameWithFreq[0] == Globals.symbolMemvar)
+            
+            bool isArraySubSeries = false;
+            if (arraySubSeries != null) isArraySubSeries = true;
+            
+            IVariable lhs = null;
+            if (ib != null) lhs = ib.GetIVariable(varnameWithFreq); //may return null
+            
+            if (!isArraySubSeries && varnameWithFreq[0] == Globals.symbolMemvar)
             {
                 switch (rhs.Type())
                 {
@@ -1139,7 +1153,7 @@ namespace Gekko
                                     break;                                
                                 default:
                                     {
-                                        G.Writeln2("*** ERROR: Expected SERIES to be 1 of 5 types");
+                                        G.Writeln2("*** ERROR: Expected SERIES to be 1 of 4 types");
                                         throw new GekkoException();
                                     }
                                     break;
@@ -1213,7 +1227,7 @@ namespace Gekko
                         break;
                 }
             }
-            else if (varnameWithFreq[0] == Globals.symbolList)
+            else if (!isArraySubSeries && varnameWithFreq[0] == Globals.symbolList)
             {
                 switch (rhs.Type())
                 {
@@ -1309,7 +1323,7 @@ namespace Gekko
                                     break;                                
                                 default:
                                     {
-                                        G.Writeln2("*** ERROR: Expected SERIES to be 1 of 5 types");
+                                        G.Writeln2("*** ERROR: Expected SERIES to be 1 of 4 types");
                                         throw new GekkoException();
                                     }
                                     break;
@@ -1321,6 +1335,8 @@ namespace Gekko
                             //---------------------------------------------------------
                             // #x = VAL
                             //---------------------------------------------------------
+                            G.Writeln2("*** ERROR: Type mismatch");
+                            throw new GekkoException();
                         }
                         break;
                     case EVariableType.String:
@@ -1349,7 +1365,8 @@ namespace Gekko
                         {
                             //---------------------------------------------------------
                             // #x = LIST
-                            //---------------------------------------------------------
+                            //---------------------------------------------------------                                                        
+                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone());
                         }
                         break;
                     case EVariableType.Map:
@@ -1357,6 +1374,7 @@ namespace Gekko
                             //---------------------------------------------------------
                             // #x = MAP
                             //---------------------------------------------------------
+                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone());
                         }
                         break;
                     case EVariableType.Matrix:
@@ -1364,6 +1382,7 @@ namespace Gekko
                             //---------------------------------------------------------
                             // #x = MATRIX
                             //---------------------------------------------------------
+                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone());
                         }
                         break;
                     default:
@@ -1376,9 +1395,11 @@ namespace Gekko
             }
             else
             {
-                //name is of Series type     
+                //name is of Series type, can have !isArraySubSeries == true.    
 
-                Series lhs_series = lhs as Series;                          
+                Series lhs_series = null;                
+                if (isArraySubSeries) lhs_series = arraySubSeries;                    
+                else lhs_series = lhs as Series;
 
                 switch (rhs.Type())
                 {
@@ -1393,8 +1414,11 @@ namespace Gekko
                                         // x = Series Normal
                                         //---------------------------------------------------------
 
+                                        //we merge any existing series with the new data, considering also the sample
 
-
+                                        AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);
+                                        int i1 = -12345; int i2 = -12345; bool shouldOverwriteLaterOn = false;
+                                        Program.MergeTwoTimeseriesWithDateWindow(dates, lhs_series, rhs_series, ref i1, ref i2, ref shouldOverwriteLaterOn);
                                     }
                                     break;
                                 case ESeriesType.Light:
@@ -1403,8 +1427,11 @@ namespace Gekko
                                         // x = Series Light
                                         //---------------------------------------------------------
 
+                                        //we merge any existing series with the new data, considering also the sample
 
-
+                                        AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);
+                                        int i1 = -12345; int i2 = -12345; bool shouldOverwriteLaterOn = false;
+                                        Program.MergeTwoTimeseriesWithDateWindow(dates, lhs_series, rhs_series, ref i1, ref i2, ref shouldOverwriteLaterOn);
 
                                     }
                                     break;
@@ -1413,6 +1440,21 @@ namespace Gekko
                                         //---------------------------------------------------------
                                         // x = Series Timeless
                                         //---------------------------------------------------------
+                                        // stuff below also handles array-timeseries just fine   
+                                        double d = rhs_series.dataArray[0];
+                                        bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
+                                        foreach (GekkoTime t in smpl.Iterate12())
+                                        {
+                                            lhs_series.SetData(t, d);
+                                        }
+                                        if (create)
+                                        {
+                                            AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
+                                        }
+                                        else
+                                        {
+                                            //nothing to do, either already existing in bank/map or array-subseries
+                                        }
                                     }
                                     break;
                                 case ESeriesType.ArraySuper:
@@ -1420,14 +1462,19 @@ namespace Gekko
                                         //---------------------------------------------------------
                                         // x = Series Array Super
                                         //---------------------------------------------------------
-                                        IVariable clone = rhs_series.DeepClone();
+                                        if (isArraySubSeries)
+                                        {
+                                            G.Writeln2("*** ERROR: You cannot put an array-series inside an array-series");
+                                            throw new GekkoException();
+                                        }
+                                        IVariable clone = rhs.DeepClone();
                                         ((Series)clone).name = varnameWithFreq;
                                         AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, clone);
                                     }
                                     break;                                
                                 default:
                                     {
-                                        G.Writeln2("*** ERROR: Expected SERIES to be 1 of 5 types");
+                                        G.Writeln2("*** ERROR: Expected SERIES to be 1 of 4 types");
                                         throw new GekkoException();
                                     }
                                     break;
@@ -1438,7 +1485,22 @@ namespace Gekko
                         {
                             //---------------------------------------------------------
                             // x = VAL
-                            //---------------------------------------------------------
+                            //---------------------------------------------------------       
+                            // stuff below also handles array-timeseries just fine                     
+                            double d = ((ScalarVal)rhs).val;
+                            bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
+                            foreach (GekkoTime t in smpl.Iterate12())
+                            {
+                                lhs_series.SetData(t, d);
+                            }
+                            if (create)
+                            {
+                                AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
+                            }
+                            else
+                            {
+                                //nothing to do, either already existing in bank/map or array-subseries
+                            }
                         }
                         break;
                     case EVariableType.String:
@@ -1468,6 +1530,7 @@ namespace Gekko
                             //---------------------------------------------------------
                             // x = LIST
                             //---------------------------------------------------------
+                            // stuff below also handles array-timeseries just fine 
 
                             List rhs_list = rhs as List;
                             int n = smpl.Observations12();
@@ -1476,18 +1539,7 @@ namespace Gekko
                                 G.Writeln2("*** ERROR: Expected " + n + " list items, got " + rhs_list.list.Count);
                                 throw new GekkoException();
                             }
-
-                            bool create = false;
-                            if (lhs_series != null && lhs_series.type == ESeriesType.Normal)
-                            {
-                                //do nothing, use it
-                            }
-                            else
-                            {
-                                //create it
-                                create = true;
-                                lhs_series = new Series(ESeriesType.Normal, Program.options.freq, varnameWithFreq);
-                            }
+                            bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
                             for (int i = 0; i < rhs_list.list.Count; i++)
                             {
                                 lhs_series.SetData(smpl.t1.Add(i), rhs_list.list[i].ConvertToVal());
@@ -1498,7 +1550,7 @@ namespace Gekko
                             }
                             else
                             {
-                                //nothing to do
+                                //nothing to do, either already existing in bank/map or array-subseries
                             }
                         }
                         break;
@@ -1534,6 +1586,23 @@ namespace Gekko
 
             return;
 
+        }
+
+        private static bool CreateSeriesIfNotExisting(string varnameWithFreq, ref Series lhs_series)
+        {
+            bool create = false;
+            if (lhs_series != null && lhs_series.type == ESeriesType.Normal)
+            {
+                //do nothing, use it
+            }
+            else
+            {
+                //create it
+                create = true;
+                lhs_series = new Series(ESeriesType.Normal, Program.options.freq, varnameWithFreq);
+            }
+
+            return create;
         }
 
         private static void AddIvariableWithOverwrite(IBank ib, string varnameWithFreq, bool removeFirstBeforeAdding, IVariable lhsNew)
