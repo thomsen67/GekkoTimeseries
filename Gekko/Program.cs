@@ -2367,11 +2367,11 @@ namespace Gekko
             {
                 Series ts = iv as Series;
                 if (ts == null) continue;
-                if (ts.IsArrayTimeseries())
+                if (ts.type == ESeriesType.ArraySuper)
                 {
                     foreach (Series tsSub in ts.dimensionsStorage.storage.Values)
                     {
-                        if (tsSub.IsLight()) tsSub.meta = new Gekko.TimeSeriesMetaInformation();
+                        if (tsSub.type == ESeriesType.Light) tsSub.meta = new Gekko.TimeSeriesMetaInformation();
                         tsSub.meta.parentDatabank = db;
                         if (!merge) tsSub.SetDirty(false);
                     }
@@ -2776,7 +2776,7 @@ namespace Gekko
                             Series tsExisting = GetTsExisting(databank, name);  //may be null
                             Series tsProtobuf = iv as Series;  //cannot be null
 
-                            if (tsProtobuf.IsArrayTimeseries())
+                            if (tsProtobuf.type == ESeriesType.ArraySuper)
                             {
                                 //---------------------------
                                 // handle array-timeseries
@@ -2905,9 +2905,9 @@ namespace Gekko
             }
         }
 
-        private static void MergeTwoTimeseriesWithDateWindow(AllFreqsHelper dates, Series tsExisting, Series tsProtobuf, ref int maxYearInProtobufFile, ref int minYearInProtobufFile, ref bool wipeExistingOut)
+        private static void MergeTwoTimeseriesWithDateWindow(AllFreqsHelper dates, Series tsExisting, Series tsSource, ref int maxYearInProtobufFile, ref int minYearInProtobufFile, ref bool wipeExistingOut)
         {
-            if (tsProtobuf.type == ESeriesType.Timeless || (tsExisting != null && tsExisting.type == ESeriesType.Timeless))
+            if (tsSource.type == ESeriesType.Timeless || (tsExisting != null && tsExisting.type == ESeriesType.Timeless))
             {
                 //!!! BEWARE: remember to truncate and add it to container outside of this method
                 //if either is timeless, just wipe existing out
@@ -2928,34 +2928,49 @@ namespace Gekko
                 {
                     //already exists: now we must merge the observations
                     //There are 3 time-windows in play: Work bank window, file window and dates window:
-                    //  Work window: the window of the existing timeseries (will not have any effect on the merging)
-                    //  file window: the window of the series from the deflated file
-                    //  dates window: time-truncation of the file window
-                    //So we find the overlap of the file window and the date window (if it is active at all)
-                    //Then we put that overlap into the Work databank
+                    //  - Existing: the window of the existing timeseries (will not have any effect on the merging)
+                    //  - Source: the window of the series from the deflated protobuf file
+                    //  - Dates window: time-truncation of the file window
+                    //So we find the overlap of the source window and the date window (if it is active at all)
+                    //Then we put that overlap into the existing timeseries
 
-                    //Find the overlap of the file window (tsExisting) and the date window
-
+                    //
+                    //       source       existing          dates (2002-6)    Result
+                    //2001                 
+                    //2002                    M              x                    M
+                    //2003      M           100              x                  100
+                    //2004      M           200              x                  200
+                    //2005      1           300              x                    1
+                    //2006      2           400              x                    2
+                    //2007      3             M                                   M                 
+                    //2008      M
+                    //2009 
+                    //2010 
+                    //
+                    // Here, firstSource is 2005, lastSource is 2007
+                    // Common window will be 2005-2006                    
+                    
+                    //Find the overlap of the source window (tsSource) and the date window
                     //Time consumption on the two lines below is ok, if the databank is trimmed (which is is for gbk files)
-                    GekkoTime firstExisting = tsExisting.GetRealDataPeriodFirst(); //takes a bit of time, but then we get the real period 
-                    GekkoTime lastExisting = tsExisting.GetRealDataPeriodLast(); //takes a bit of time, but then we get the real period
+                    GekkoTime firstSource = tsSource.GetRealDataPeriodFirst(); //takes a bit of time, but then we get the real period 
+                    GekkoTime lastSource = tsSource.GetRealDataPeriodLast(); //takes a bit of time, but then we get the real period
 
-                    maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, lastExisting.super);
-                    minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, firstExisting.super);
+                    //only for printing out the period
+                    maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, lastSource.super);
+                    minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, firstSource.super);
 
-                    if (firstExisting.IsNull())
+                    if (firstSource.IsNull())
                     {
-                        //no real data at all (lastX will be null, too)
+                        //no real data at all (lastSource will be null, too)
                         //do not write anything, no matter if dates = null or not.
                     }
                     else
                     {
-                        //We have a data window in tsExisting. Truncate the window with dates window (if it exists)
+                        //We have a data window in tsSource. Truncate the window with dates window (if it exists)
                         if (dates != null)
                         {
                             //this will adjust first and last to comply with the dates window
-                            var tuple = GetFirstLastDates(dates, firstExisting, lastExisting);
-
+                            var tuple = GetFirstLastDates(dates, firstSource, lastSource);
                             GekkoTime firstTruncated = tuple.Item1;
                             GekkoTime lastTruncated = tuple.Item2;
                             //offset is not used
@@ -2968,7 +2983,7 @@ namespace Gekko
                                 int index2;
                                 try
                                 {
-                                    double[] data = tsProtobuf.GetDataSequence(out index1, out index2, firstTruncated, lastTruncated, true);
+                                    double[] data = tsSource.GetDataSequence(out index1, out index2, firstTruncated, lastTruncated, true);
                                     tsExisting.SetDataSequence(firstTruncated, lastTruncated, data, index1);
                                 }
                                 catch (Exception e)
@@ -2987,11 +3002,10 @@ namespace Gekko
                             //firstExisting is guaranteed to be != tNull, so lastExisting is so too
                             int index1;
                             int index2;
-                            double[] data = tsProtobuf.GetDataSequence(out index1, out index2, firstExisting, lastExisting, true);
-                            tsExisting.SetDataSequence(firstExisting, lastExisting, data, index1);
+                            double[] data = tsSource.GetDataSequence(out index1, out index2, firstSource, lastSource, true);
+                            tsExisting.SetDataSequence(firstSource, lastSource, data, index1);
                         }
                     }
-
                 }
             }
 
@@ -4713,7 +4727,7 @@ namespace Gekko
         private static int WriteGdxHelper(GekkoTime t1, GekkoTime t2, bool usePrefix, int counterVariables, Databank gdb, Series ts, GAMSVariable gvar)
         {
 
-            if (ts.IsArrayTimeseries())
+            if (ts.type == ESeriesType.ArraySuper)
             {
                 foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
                 {
@@ -6797,7 +6811,7 @@ namespace Gekko
             //input.AddRange(db.storage.Keys);
             foreach (KeyValuePair<string, IVariable> kvp in db.storage)
             {
-                Series xx = kvp.Value as Series; if (xx != null && xx.IsArrayTimeseries()) continue;  //ignore ghosts
+                Series xx = kvp.Value as Series; if (xx != null && xx.type == ESeriesType.ArraySuper) continue;  //ignore ghosts
                 input.Add(new ScalarString(kvp.Key));
             }
 
@@ -13570,7 +13584,7 @@ namespace Gekko
                         existenceCheck++;
                         varCounter++;
 
-                        if (ts.IsArrayTimeseries())
+                        if (ts.type == ESeriesType.ArraySuper)
                         {
                             //show info on array-timeseries
                             List<string> names = MatchWildcardInDatabank(var + Globals.symbolTurtle + "*", db);  //are sorted
@@ -15360,7 +15374,7 @@ namespace Gekko
                     if (!filter.ContainsKey(s)) continue;  //ignore this
                 }
                 Series ts = work.GetVariable(s);  //can this not be moved before loop??
-                if (ts.IsArrayTimeseries()) continue;  //ignore it
+                if (ts.type == ESeriesType.ArraySuper) continue;  //ignore it
                 foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
                 {                    
                     double value = ts.GetData(null, t);

@@ -1031,7 +1031,7 @@ namespace Gekko
 
                         //NOW, we have xx2 = xx1, where these may be different as regards whether they are array-timeseries.
 
-                        if (!tsLhs.IsArrayTimeseries() && !tsRhs.IsArrayTimeseries())
+                        if (tsLhs.type != ESeriesType.ArraySuper && tsRhs.type != ESeriesType.ArraySuper)
                         {
                             //Inject the data, only for the current
                             //This must run fast
@@ -1049,7 +1049,7 @@ namespace Gekko
                             tsTmp.name = varnameWithFreq;
                             if (ib.GetType() == typeof(Databank))
                             {
-                                if (tsTmp.IsLight() == null) tsTmp.meta = new TimeSeriesMetaInformation();  //so that parentDatabank can be put in in ib.AddIVariable                               
+                                if (tsTmp.type == ESeriesType.Light) tsTmp.meta = new TimeSeriesMetaInformation();  //so that parentDatabank can be put in in ib.AddIVariable                               
                             }
                             tsTmp.meta = new TimeSeriesMetaInformation();
                             ib.AddIVariable(tsTmp.name, tsTmp);
@@ -1076,22 +1076,22 @@ namespace Gekko
             return lhs;
         }
 
-        public static void LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhsExpression)
+        public static void LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhs)
         {
             //This is an assignment, for instance %x = 5, or x = (1, 2, 3), or bank:x = bank:y
             //Assignment is the hardest part of Lookup()
 
             //IVariable lhs = ib.GetIVariable(varnameWithFreq);
-
-            IVariable lhs = null;
+                        
+            IVariable lhs = ib.GetIVariable(varnameWithFreq);  //may return null
 
             if (varnameWithFreq[0] == Globals.symbolMemvar)
             {
-                switch (rhsExpression.Type())
+                switch (rhs.Type())
                 {
                     case EVariableType.Series:
                         {
-                            Series rhsExpression_series = rhsExpression as Series;
+                            Series rhsExpression_series = rhs as Series;
                             switch (rhsExpression_series.type)
                             {
                                 case ESeriesType.Normal:
@@ -1121,7 +1121,8 @@ namespace Gekko
                                         //---------------------------------------------------------
                                         // %x = Series Timeless
                                         //---------------------------------------------------------
-                                        lhs = new ScalarVal(rhsExpression_series.GetTimelessData());
+                                        IVariable lhsNew = new ScalarVal(rhsExpression_series.GetTimelessData());
+                                        AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
                                     }
                                     break;
                                 case ESeriesType.ArraySuper:
@@ -1161,16 +1162,18 @@ namespace Gekko
                             //---------------------------------------------------------
                             // %x = VAL
                             //---------------------------------------------------------
-                            //TODO: can be injected if exist and is val
-                            lhs = new ScalarVal(((ScalarVal)rhsExpression).val);
+                            //TODO: can be injected if exist and is val                            
+                            IVariable lhsNew = new ScalarVal(((ScalarVal)rhs).val);
+                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
                         }
                         break;
                     case EVariableType.String:
                         {
                             //---------------------------------------------------------
                             // %x = STRING
-                            //---------------------------------------------------------
-                            lhs = new ScalarString(((ScalarString)rhsExpression)._string2);
+                            //---------------------------------------------------------                            
+                            IVariable lhsNew = new ScalarString(((ScalarString)rhs)._string2);
+                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
                         }
                         break;
                     case EVariableType.Date:
@@ -1178,7 +1181,8 @@ namespace Gekko
                             //---------------------------------------------------------
                             // %x = DATE
                             //---------------------------------------------------------
-                            lhs = new ScalarDate(((ScalarDate)rhsExpression).date);
+                            IVariable lhsNew = new ScalarDate(((ScalarDate)rhs).date);
+                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
                         }
                         break;
                     case EVariableType.List:
@@ -1208,7 +1212,8 @@ namespace Gekko
                             //---------------------------------------------------------
                             // %x = MATRIX
                             //---------------------------------------------------------                            
-                            lhs = new ScalarVal(rhsExpression.ConvertToVal());  //only 1x1 matrix will become VAL
+                            IVariable lhsNew = new ScalarVal(rhs.ConvertToVal());  //only 1x1 matrix will become VAL
+                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
                         }
                         break;
                     default:
@@ -1221,22 +1226,53 @@ namespace Gekko
             }
             else if (varnameWithFreq[0] == Globals.symbolList)
             {
-                switch (rhsExpression.Type())
+                switch (rhs.Type())
                 {
                     case EVariableType.Series:
                         {
-                            Series rhsExpression_series = rhsExpression as Series;
-                            switch (rhsExpression_series.type)
+                            Series rhs_series = rhs as Series;
+                            switch (rhs_series.type)
                             {
                                 case ESeriesType.Normal:
                                     {
                                         //---------------------------------------------------------
                                         // #x = Series Normal
                                         //---------------------------------------------------------
+
+                                        // array    smpl          destination
+                                        // source
+                                        //         
+                                        //           o   i1=-1    y 0             --> will become NaN
+                                        //   x 0     o            y 1
+                                        //   x 1     o            y 2
+                                        //   x 2     o            y 3
+                                        //   x 3     o            y 4
+                                        //           o   i2 = 4   y 5             --> will become NaN
+                                        //                                        
+
+                                        //method will only work if smpl freq is same as series freq
                                         int n = smpl.Observations12();
-                                        lhs = new Matrix(1, n);
-                                        int i1 = Series.FromGekkoTimeToArrayIndex(smpl.t1, rhsExpression_series.anchorPeriod, rhsExpression_series.anchorPeriodPositionInArray);
-                                        
+                                        int i1 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t1);
+                                        int i2 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t2);
+                                        Matrix m = new Matrix(1, n);
+                                        double[,] destination = m.data;
+                                        double[] source = rhs_series.dataArray;
+
+                                        int destinationStart = 0;
+                                        int ii1 = Math.Max(0, i1);
+                                        int ii2 = Math.Min(source.Length - 1, i2);
+                                        for (int j = i1; j < 0; j++)
+                                        {
+                                            destination[1, j - i1 + destinationStart] = double.NaN;
+                                        }
+                                        for (int j = i2; j >= source.Length; j--)
+                                        {
+                                            destination[1, j - i1 + destinationStart] = double.NaN;
+                                        }
+                                        //see also #0985324985237
+                                        Buffer.BlockCopy(source, 8 * ii1, destination, 8 * destinationStart, 8 * (ii2 - ii1 + 1));
+                                        IVariable lhsNew = m;
+                                        AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
                                     }
                                     break;
                                 case ESeriesType.Light:
@@ -1244,6 +1280,20 @@ namespace Gekko
                                         //---------------------------------------------------------
                                         // #x = Series Light
                                         //---------------------------------------------------------
+                                        //method will only work if smpl freq is same as series freq
+                                        int n = smpl.Observations12();
+                                        Matrix m = new Matrix(1, n);
+                                        int ii1 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t1);
+                                        int ii2 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t2);
+                                        if (ii1 < 0) smpl.gekkoError.t1Problem = -ii1;
+                                        if (ii2 > rhs_series.dataArray.Length - 1) smpl.gekkoError.t2Problem = ii2 - (rhs_series.dataArray.Length - 1);
+                                        int destinationStart = 0;
+                                        double[,] destination = m.data;
+                                        double[] source = rhs_series.dataArray;
+                                        //see #0985324985237
+                                        Buffer.BlockCopy(source, 8 * ii1, destination, 8 * destinationStart, 8 * (ii2 - ii1 + 1));
+                                        IVariable lhsNew = m;
+                                        AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
                                     }
                                     break;
                                 case ESeriesType.Timeless:
@@ -1251,6 +1301,10 @@ namespace Gekko
                                         //---------------------------------------------------------
                                         // #x = Series Timeless
                                         //---------------------------------------------------------
+                                        int n = smpl.Observations12();
+                                        double d = rhs_series.dataArray[0];
+                                        Matrix m = new Matrix(1, n, d);  //expanded as if it was a real timeseries                                       
+                                        AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
                                     }
                                     break;
                                 case ESeriesType.ArraySuper:
@@ -1340,18 +1394,25 @@ namespace Gekko
             }
             else
             {
-                switch (rhsExpression.Type())
+                //name is of Series type     
+
+                Series lhs_series = lhs as Series;                          
+
+                switch (rhs.Type())
                 {
                     case EVariableType.Series:
                         {
-                            Series rhsExpression_series = rhsExpression as Series;
-                            switch (rhsExpression_series.type)
+                            Series rhs_series = rhs as Series;
+                            switch (rhs_series.type)
                             {
                                 case ESeriesType.Normal:
                                     {
                                         //---------------------------------------------------------
                                         // x = Series Normal
                                         //---------------------------------------------------------
+
+
+
                                     }
                                     break;
                                 case ESeriesType.Light:
@@ -1359,6 +1420,10 @@ namespace Gekko
                                         //---------------------------------------------------------
                                         // x = Series Light
                                         //---------------------------------------------------------
+
+
+
+
                                     }
                                     break;
                                 case ESeriesType.Timeless:
@@ -1373,11 +1438,9 @@ namespace Gekko
                                         //---------------------------------------------------------
                                         // x = Series Array Super
                                         //---------------------------------------------------------
-
-                                        //??????????????????
-                                        //??????????????????
-                                        //??????????????????
-
+                                        IVariable clone = rhs_series.DeepClone();
+                                        ((Series)clone).name = varnameWithFreq;
+                                        AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, clone);
                                     }
                                     break;
                                 case ESeriesType.ArraySub:
@@ -1430,6 +1493,38 @@ namespace Gekko
                             //---------------------------------------------------------
                             // x = LIST
                             //---------------------------------------------------------
+
+                            List rhs_list = rhs as List;
+                            int n = smpl.Observations12();
+                            if (n != rhs_list.list.Count)
+                            {
+                                G.Writeln2("*** ERROR: Expected " + n + " list items, got " + rhs_list.list.Count);
+                                throw new GekkoException();
+                            }
+
+                            bool create = false;
+                            if (lhs_series != null && (lhs_series.type == ESeriesType.Normal || lhs_series.type == ESeriesType.ArraySub))
+                            {
+                                //do nothing, use it
+                            }
+                            else
+                            {
+                                //create it
+                                create = true;
+                                lhs_series = new Series(ESeriesType.Normal, Program.options.freq, varnameWithFreq);
+                            }
+                            for (int i = 0; i < rhs_list.list.Count; i++)
+                            {
+                                lhs_series.SetData(smpl.t1.Add(i), rhs_list.list[i].ConvertToVal());
+                            }
+                            if (create)
+                            {
+                                AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
+                            }
+                            else
+                            {
+                                //nothing to do
+                            }
                         }
                         break;
                     case EVariableType.Map:
@@ -1466,6 +1561,11 @@ namespace Gekko
 
         }
 
+        private static void AddIvariableWithOverwrite(IBank ib, string varnameWithFreq, bool removeFirstBeforeAdding, IVariable lhsNew)
+        {
+            if (removeFirstBeforeAdding) ib.RemoveIVariable(varnameWithFreq);
+            ib.AddIVariable(varnameWithFreq, lhsNew);
+        }
 
         private static void LookupTypeCheck(IVariable rhs, string varName)
         {

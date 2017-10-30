@@ -3832,7 +3832,7 @@ namespace UnitTests
         private static void AssertHelperScalarVal(string s, double d, double delta)
         {
             double d2 = ((ScalarVal)Program.scalars[s]).val;
-            AssertHelperTwoDoubles(d2, d, delta);
+            _AssertHelperTwoDoubles(d2, d, delta);
         }
 
         private static void AssertHelperScalarDate(string s, EFreq freq, int super, int sub)
@@ -4080,40 +4080,51 @@ namespace UnitTests
             if (b) throw new GekkoException();
         }
 
-
-
-
-        private static void AssertSeries(Databank db, string s, int year, double x, double delta)
+        private static void _AssertList(Databank db, string s, int i, double x, double delta)
         {
-            AssertSeries(db, s, null, EFreq.Annual, year, 1, year, 1, x, delta);
+            List iv_list = db.GetIVariable(s) as List;
+            ScalarVal sv = iv_list.list[i - 1] as ScalarVal;
+            _AssertHelperTwoDoubles(x, sv.val, sharedDelta);
         }
 
-        private static void AssertSeries(Databank db, string s, int year1, int year2, double x, double delta)
+        private static void _AssertMatrix(Databank db, string s, int i, int j, double d, double delta)
         {
-            AssertSeries(db, s, null, EFreq.Annual, year1, 1, year2, 1, x, delta);
+            Matrix m = db.GetIVariable(s) as Matrix;
+            _AssertHelperTwoDoubles(d, m.data[i - 1, j - 1], sharedDelta);
         }
 
-        private static void AssertSeries(Databank db, string s, EFreq freq, int year, int subper, double x, double delta)
+
+        private static void _AssertSeries(Databank db, string s, int year, double x, double delta)
         {
-            AssertSeries(db, s, null, freq, year, subper, year, subper, x, delta);
+            _AssertSeries(db, s, null, EFreq.Annual, year, 1, year, 1, x, delta);
         }
 
-        private static void AssertSeries(Databank db, string s, string[] indexes, int year, double x, double delta)
+        private static void _AssertSeries(Databank db, string s, int year1, int year2, double x, double delta)
         {
-            AssertSeries(db, s, indexes, EFreq.Annual, year, 1, year, 1, x, delta);
+            _AssertSeries(db, s, null, EFreq.Annual, year1, 1, year2, 1, x, delta);
         }
 
-        private static void AssertSeries(Databank db, string s, string[] indexes, int year1, int year2, double x, double delta)
+        private static void _AssertSeries(Databank db, string s, EFreq freq, int year, int subper, double x, double delta)
         {
-            AssertSeries(db, s, indexes, EFreq.Annual, year1, 1, year2, 1, x, delta);
+            _AssertSeries(db, s, null, freq, year, subper, year, subper, x, delta);
         }
 
-        private static void AssertSeries(Databank db, string s, string[] indexes, EFreq freq, int year, int subper, double x, double delta)
+        private static void _AssertSeries(Databank db, string s, string[] indexes, int year, double x, double delta)
         {
-            AssertSeries(db, s, indexes, freq, year, subper, year, subper, x, delta);
+            _AssertSeries(db, s, indexes, EFreq.Annual, year, 1, year, 1, x, delta);
         }
 
-        private static void AssertSeries(Databank db, string s2, string[] indexes, EFreq freq, int year1, int sub1, int year2, int sub2, double x, double delta)
+        private static void _AssertSeries(Databank db, string s, string[] indexes, int year1, int year2, double x, double delta)
+        {
+            _AssertSeries(db, s, indexes, EFreq.Annual, year1, 1, year2, 1, x, delta);
+        }
+
+        private static void _AssertSeries(Databank db, string s, string[] indexes, EFreq freq, int year, int subper, double x, double delta)
+        {
+            _AssertSeries(db, s, indexes, freq, year, subper, year, subper, x, delta);
+        }
+
+        private static void _AssertSeries(Databank db, string s2, string[] indexes, EFreq freq, int year1, int sub1, int year2, int sub2, double x, double delta)
         {
             string s = G.AddCurrentFreqToName(s2);
 
@@ -4127,7 +4138,7 @@ namespace UnitTests
             if (indexes != null)
             {
                 Series tsGhost = db.GetIVariable(s) as Series;
-                if (!tsGhost.IsArrayTimeseries()) throw new GekkoException();
+                if (tsGhost.type != ESeriesType.ArraySuper) throw new GekkoException();
                 if (tsGhost.dimensions == 0) throw new GekkoException();
                 IVariable iv = null; tsGhost.dimensionsStorage.TryGetValue(new MapMultidimItem(indexes), out iv);
                 ts = iv as Series;
@@ -4135,14 +4146,16 @@ namespace UnitTests
             else
             {
                 ts = db.GetIVariable(s) as Series;
-                if (ts.IsArrayTimeseries()) throw new GekkoException();
-                if (ts.dimensions != 0) throw new GekkoException();                
+                if (ts.type == ESeriesType.ArraySuper)
+                    throw new GekkoException();
+                if (ts.dimensions != 0)
+                    throw new GekkoException(); //should be caught above              
             }            
 
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
                 double y = ts.GetData(null, t);
-                AssertHelperTwoDoubles(x, y, delta);
+                _AssertHelperTwoDoubles(x, y, delta);
             }
         }
 
@@ -4202,11 +4215,11 @@ namespace UnitTests
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
                 double y = ts.GetData(null, t);
-                AssertHelperTwoDoubles(x, y, delta);
+                _AssertHelperTwoDoubles(x, y, delta);
             }
         }
 
-        private static void AssertHelperTwoDoubles(double x, double y, double delta)
+        private static void _AssertHelperTwoDoubles(double x, double y, double delta)
         {
             if (NaNCheck(x, y))
             {
@@ -4942,32 +4955,32 @@ namespace UnitTests
                 I("PRT<2010 2010> a;");
                 Table table = Globals.lastPrtOrMulprtTable;
                 Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
-                AssertHelperTwoDoubles(table.Get(2, 2).number, 20d, sharedDelta);
+                _AssertHelperTwoDoubles(table.Get(2, 2).number, 20d, sharedDelta);
                 I("PRT<2010 2010> @a;");
                 table = Globals.lastPrtOrMulprtTable;
                 Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
-                AssertHelperTwoDoubles(table.Get(2, 2).number, 50d, sharedDelta);
+                _AssertHelperTwoDoubles(table.Get(2, 2).number, 50d, sharedDelta);
                 I("PRT<2010 2010 m> a;");
                 table = Globals.lastPrtOrMulprtTable;
                 Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
-                AssertHelperTwoDoubles(table.Get(2, 2).number, -30d, sharedDelta);
+                _AssertHelperTwoDoubles(table.Get(2, 2).number, -30d, sharedDelta);
                 // -----------------
                 I("PRT<2010 2010> bank2:a;");
                 table = Globals.lastPrtOrMulprtTable;
                 Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
-                AssertHelperTwoDoubles(table.Get(2, 2).number, 20d, sharedDelta);
+                _AssertHelperTwoDoubles(table.Get(2, 2).number, 20d, sharedDelta);
                 I("PRT<2010 2010> bank3:a;");
                 table = Globals.lastPrtOrMulprtTable;
                 Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
-                AssertHelperTwoDoubles(table.Get(2, 2).number, 50d, sharedDelta);
+                _AssertHelperTwoDoubles(table.Get(2, 2).number, 50d, sharedDelta);
                 I("PRT<2010 2010> work:a;");
                 table = Globals.lastPrtOrMulprtTable;
                 Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
-                AssertHelperTwoDoubles(table.Get(2, 2).number, 10d, sharedDelta);
+                _AssertHelperTwoDoubles(table.Get(2, 2).number, 10d, sharedDelta);
                 I("PRT<2010 2010> ref:a;");
                 table = Globals.lastPrtOrMulprtTable;
                 Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
-                AssertHelperTwoDoubles(table.Get(2, 2).number, 10d, sharedDelta);
+                _AssertHelperTwoDoubles(table.Get(2, 2).number, 10d, sharedDelta);
 
 
                 // ---- succession
@@ -6895,8 +6908,8 @@ namespace UnitTests
                 }
                 else
                 {
-                    AssertHelperTwoDoubles(v1, 1.2345d * Math.Pow((1d + 0.12345d / 100d), (double)counter), sharedDelta);
-                    AssertHelperTwoDoubles(v2, 1.2345d * Math.Pow((1d + 0.12345d / 100d), (double)counter), sharedDelta);
+                    _AssertHelperTwoDoubles(v1, 1.2345d * Math.Pow((1d + 0.12345d / 100d), (double)counter), sharedDelta);
+                    _AssertHelperTwoDoubles(v2, 1.2345d * Math.Pow((1d + 0.12345d / 100d), (double)counter), sharedDelta);
                     counter++;
                 }
             }
@@ -6936,8 +6949,8 @@ namespace UnitTests
                 {
                     double v1 = First().GetVariable("tsQ1").GetData(null, new GekkoTime(EFreq.Quarterly, i, j));
                     double v2 = First().GetVariable("tsQ2").GetData(null, new GekkoTime(EFreq.Quarterly, i, j));
-                    AssertHelperTwoDoubles(v1, 1.2345d * Math.Pow((1d + 0.12345d / 100d), (double)counter), sharedDelta);
-                    AssertHelperTwoDoubles(v2, 1.2345d * Math.Pow((1d + 0.12345d / 100d), (double)counter), sharedDelta);
+                    _AssertHelperTwoDoubles(v1, 1.2345d * Math.Pow((1d + 0.12345d / 100d), (double)counter), sharedDelta);
+                    _AssertHelperTwoDoubles(v2, 1.2345d * Math.Pow((1d + 0.12345d / 100d), (double)counter), sharedDelta);
                     counter++;
                 }
             }
@@ -6975,8 +6988,8 @@ namespace UnitTests
                 }
                 else
                 {
-                    AssertHelperTwoDoubles(v1, 1.2345d + 0.12345d * (double)counter, sharedDelta);
-                    AssertHelperTwoDoubles(v2, 1.2345d + 0.12345d * (double)counter, sharedDelta);
+                    _AssertHelperTwoDoubles(v1, 1.2345d + 0.12345d * (double)counter, sharedDelta);
+                    _AssertHelperTwoDoubles(v2, 1.2345d + 0.12345d * (double)counter, sharedDelta);
                     counter++;
                 }
             }
@@ -7010,7 +7023,7 @@ namespace UnitTests
                 }
                 else
                 {
-                    AssertHelperTwoDoubles(v1, 1.2345d * Math.Pow((1d + 0.12345d / 100d), (double)counter), sharedDelta);
+                    _AssertHelperTwoDoubles(v1, 1.2345d * Math.Pow((1d + 0.12345d / 100d), (double)counter), sharedDelta);
                     counter++;
                 }
             }
@@ -7049,8 +7062,8 @@ namespace UnitTests
                 }
                 else
                 {
-                    AssertHelperTwoDoubles(v1 - b1, 0.12345d, sharedDelta);
-                    AssertHelperTwoDoubles(v2 - b2, 0.12345d, sharedDelta);
+                    _AssertHelperTwoDoubles(v1 - b1, 0.12345d, sharedDelta);
+                    _AssertHelperTwoDoubles(v2 - b2, 0.12345d, sharedDelta);
                     counter++;
                 }
             }
@@ -7083,13 +7096,13 @@ namespace UnitTests
                     }
                     else if (i <= start + 10)
                     {
-                        AssertHelperTwoDoubles(v1, 1.2345d * Math.Pow((1d + 0.12345d / 100d), (double)counter) + 0.2d, sharedDelta);
+                        _AssertHelperTwoDoubles(v1, 1.2345d * Math.Pow((1d + 0.12345d / 100d), (double)counter) + 0.2d, sharedDelta);
                         counter++;
                     }
                     else
                     {
                         double valueIn2010 = 1.2345d * Math.Pow((1d + 0.12345d / 100d), 10d) + 0.2d;
-                        AssertHelperTwoDoubles(v1, valueIn2010 * Math.Pow((1d + 0.12345d / 100d), (double)(counter - 10)), sharedDelta);
+                        _AssertHelperTwoDoubles(v1, valueIn2010 * Math.Pow((1d + 0.12345d / 100d), (double)(counter - 10)), sharedDelta);
                         counter++;
                     }
                 }
@@ -7127,10 +7140,10 @@ namespace UnitTests
                 }
                 else
                 {
-                    AssertHelperTwoDoubles(v1, 1.2345d, sharedDelta);
-                    AssertHelperTwoDoubles(v2, Math.Log(1.2345d) + Math.Log(0.5d), sharedDelta);
-                    AssertHelperTwoDoubles(v3, Math.Exp(1.2345d) + Math.Exp(-0.5d) + Math.Exp(0.5d), sharedDelta);
-                    AssertHelperTwoDoubles(v4, Math.Abs(1.2345d), sharedDelta);
+                    _AssertHelperTwoDoubles(v1, 1.2345d, sharedDelta);
+                    _AssertHelperTwoDoubles(v2, Math.Log(1.2345d) + Math.Log(0.5d), sharedDelta);
+                    _AssertHelperTwoDoubles(v3, Math.Exp(1.2345d) + Math.Exp(-0.5d) + Math.Exp(0.5d), sharedDelta);
+                    _AssertHelperTwoDoubles(v4, Math.Abs(1.2345d), sharedDelta);
                 }
             }
 
@@ -9206,44 +9219,56 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Gekko30()
         {
-            I("RESET;");
-            I("TIME 2001 2005;");
+
+            I("RESET; TIME 2001 2005;");
             I("xx1 = (1, 2, 3, 4, 5);");
-            AssertSeries(First(), "xx1", 2000, double.NaN, sharedDelta);
-            AssertSeries(First(), "xx1", 2001, 1d, sharedDelta);
-            AssertSeries(First(), "xx1", 2002, 2d, sharedDelta);
-            AssertSeries(First(), "xx1", 2003, 3d, sharedDelta);
-            AssertSeries(First(), "xx1", 2004, 4d, sharedDelta);
-            AssertSeries(First(), "xx1", 2005, 5d, sharedDelta);
-            AssertSeries(First(), "xx1", 2006, double.NaN, sharedDelta);
+            I("#m = xx1;");
+            _AssertMatrix(First(), "#m", 1, 1, 1, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 2, 2, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 3, 3, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 4, 4, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 5, 5, sharedDelta);
+
+            I("RESET; TIME 2001 2005;");
+            I("xx1 = (1, 2, 3, 4, 5);");
+            _AssertSeries(First(), "xx1", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2003, 3d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2004, 4d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, 5d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2006, double.NaN, sharedDelta);
 
             I("xx3 = xx1[-1];");
-            AssertSeries(First(), "xx3", 2000, double.NaN, sharedDelta);
-            AssertSeries(First(), "xx3", 2001, double.NaN, sharedDelta);
-            AssertSeries(First(), "xx3", 2002, 1d, sharedDelta);
-            AssertSeries(First(), "xx3", 2003, 2d, sharedDelta);
-            AssertSeries(First(), "xx3", 2004, 3d, sharedDelta);
-            AssertSeries(First(), "xx3", 2005, 4d, sharedDelta);
-            AssertSeries(First(), "xx3", 2006, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", 2002, 1d, sharedDelta);
+            _AssertSeries(First(), "xx3", 2003, 2d, sharedDelta);
+            _AssertSeries(First(), "xx3", 2004, 3d, sharedDelta);
+            _AssertSeries(First(), "xx3", 2005, 4d, sharedDelta);
+            _AssertSeries(First(), "xx3", 2006, double.NaN, sharedDelta);
 
             I("xx3 = (xx1+xx1)[-1];");
-            AssertSeries(First(), "xx3", 2000, double.NaN, sharedDelta);
-            AssertSeries(First(), "xx3", 2001, double.NaN, sharedDelta);
-            AssertSeries(First(), "xx3", 2002, 2d, sharedDelta);
-            AssertSeries(First(), "xx3", 2003, 4d, sharedDelta);
-            AssertSeries(First(), "xx3", 2004, 6d, sharedDelta);
-            AssertSeries(First(), "xx3", 2005, 8d, sharedDelta);
-            AssertSeries(First(), "xx3", 2006, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xx3", 2003, 4d, sharedDelta);
+            _AssertSeries(First(), "xx3", 2004, 6d, sharedDelta);
+            _AssertSeries(First(), "xx3", 2005, 8d, sharedDelta);
+            _AssertSeries(First(), "xx3", 2006, double.NaN, sharedDelta);
 
+
+
+            I("RESET; TIME 2001 2005;");
             I("xx2 = series(2);");
             I("xx2['a', 'b'] = (1, 2, 3, 4, 5);");            
-            AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2000, double.NaN, sharedDelta);
-            AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2001, 1d, sharedDelta);
-            AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2002, 2d, sharedDelta);
-            AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2003, 3d, sharedDelta);
-            AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2004, 4d, sharedDelta);
-            AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2005, 5d, sharedDelta);
-            AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2006, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2003, 3d, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2004, 4d, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2005, 5d, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2006, double.NaN, sharedDelta);
             
 
         }
@@ -9870,8 +9895,8 @@ namespace UnitTests
                 Assert.AreEqual(First().GetVariable("tsA2").GetData(null, new GekkoTime(EFreq.Annual, i, 1)), 0.12345d);
             }
             Assert.AreEqual(First().GetVariable("tsA3").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 0.12345d);
-            AssertHelperTwoDoubles(First().GetVariable("tsA3").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 0.01d, sharedDelta);
-            AssertHelperTwoDoubles(First().GetVariable("tsA3").GetData(null, new GekkoTime(EFreq.Annual, 2002, 1)), 0.01d, sharedDelta);
+            _AssertHelperTwoDoubles(First().GetVariable("tsA3").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 0.01d, sharedDelta);
+            _AssertHelperTwoDoubles(First().GetVariable("tsA3").GetData(null, new GekkoTime(EFreq.Annual, 2002, 1)), 0.01d, sharedDelta);
             Assert.IsTrue(double.IsNaN(First().GetVariable("tsA1").GetData(null, new GekkoTime(EFreq.Annual, 1999, 1))));
             Assert.IsTrue(double.IsNaN(First().GetVariable("tsA1").GetData(null, new GekkoTime(EFreq.Annual, 2003, 1))));
             Assert.IsTrue(double.IsNaN(First().GetVariable("tsA2").GetData(null, new GekkoTime(EFreq.Annual, 1999, 1))));
@@ -9992,9 +10017,9 @@ namespace UnitTests
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008> xx1 % 5;");
             AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            u = Data("xx1", 2006, "a"); AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
-            u = Data("xx1", 2007, "a"); AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
-            u = Data("xx1", 2008, "a"); AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
+            u = Data("xx1", 2006, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
+            u = Data("xx1", 2007, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
+            u = Data("xx1", 2008, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
             AssertHelper(First(), "xx1", 2009, x2009, sharedDelta);
             AssertHelper(First(), "xx1", 2010, x2010, sharedDelta);
 
@@ -10004,9 +10029,9 @@ namespace UnitTests
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008 p> xx1 = 5;");
             AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            u = Data("xx1", 2006, "a"); AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
-            u = Data("xx1", 2007, "a"); AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
-            u = Data("xx1", 2008, "a"); AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
+            u = Data("xx1", 2006, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
+            u = Data("xx1", 2007, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
+            u = Data("xx1", 2008, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
             AssertHelper(First(), "xx1", 2009, x2009, sharedDelta);
             AssertHelper(First(), "xx1", 2010, x2010, sharedDelta);
 
@@ -10016,9 +10041,9 @@ namespace UnitTests
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008> xx1 # 6;");
             AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            u = Data("xx1", 2006, "a"); AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
-            u = Data("xx1", 2007, "a"); AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
-            u = Data("xx1", 2008, "a"); AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
+            u = Data("xx1", 2006, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
+            u = Data("xx1", 2007, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
+            u = Data("xx1", 2008, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
             AssertHelper(First(), "xx1", 2009, x2009, sharedDelta);
             AssertHelper(First(), "xx1", 2010, x2010, sharedDelta);
 
@@ -10028,9 +10053,9 @@ namespace UnitTests
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008 mp> xx1 = 6;");
             AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            u = Data("xx1", 2006, "a"); AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
-            u = Data("xx1", 2007, "a"); AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
-            u = Data("xx1", 2008, "a"); AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
+            u = Data("xx1", 2006, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
+            u = Data("xx1", 2007, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
+            u = Data("xx1", 2008, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
             AssertHelper(First(), "xx1", 2009, x2009, sharedDelta);
             AssertHelper(First(), "xx1", 2010, x2010, sharedDelta);
 
@@ -10144,9 +10169,9 @@ namespace UnitTests
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008> xx1 %$ 5;");
             AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            u = Data("xx1", 2006, "a"); AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
-            u = Data("xx1", 2007, "a"); AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
-            u = Data("xx1", 2008, "a"); AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
+            u = Data("xx1", 2006, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
+            u = Data("xx1", 2007, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
+            u = Data("xx1", 2008, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
             y2008 = work.GetVariable("xx1").GetData(null, new GekkoTime(EFreq.Annual, 2008, 1));
             AssertHelper(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
             AssertHelper(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
@@ -10157,9 +10182,9 @@ namespace UnitTests
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008 p keep=p> xx1 = 5;");
             AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            u = Data("xx1", 2006, "a"); AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
-            u = Data("xx1", 2007, "a"); AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
-            u = Data("xx1", 2008, "a"); AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
+            u = Data("xx1", 2006, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
+            u = Data("xx1", 2007, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
+            u = Data("xx1", 2008, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
             y2008 = work.GetVariable("xx1").GetData(null, new GekkoTime(EFreq.Annual, 2008, 1));
             AssertHelper(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
             AssertHelper(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
@@ -10170,9 +10195,9 @@ namespace UnitTests
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008> xx1 #$ 6;");
             AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            u = Data("xx1", 2006, "a"); AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
-            u = Data("xx1", 2007, "a"); AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
-            u = Data("xx1", 2008, "a"); AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
+            u = Data("xx1", 2006, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
+            u = Data("xx1", 2007, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
+            u = Data("xx1", 2008, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
             y2008 = work.GetVariable("xx1").GetData(null, new GekkoTime(EFreq.Annual, 2008, 1));
             AssertHelper(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
             AssertHelper(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
@@ -10183,9 +10208,9 @@ namespace UnitTests
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008 mp keep=p> xx1 = 6;");
             AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            u = Data("xx1", 2006, "a"); AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
-            u = Data("xx1", 2007, "a"); AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
-            u = Data("xx1", 2008, "a"); AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
+            u = Data("xx1", 2006, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
+            u = Data("xx1", 2007, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
+            u = Data("xx1", 2008, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
             y2008 = work.GetVariable("xx1").GetData(null, new GekkoTime(EFreq.Annual, 2008, 1));
             AssertHelper(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
             AssertHelper(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
@@ -10528,10 +10553,10 @@ namespace UnitTests
             Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x/px");
             Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "%");
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2014"); //why is it not a date?
-            AssertHelperTwoDoubles(table.Get(2, 2).number, 1.428, sharedTableDelta);
-            AssertHelperTwoDoubles(table.Get(2, 3).number, 15.53398058, sharedTableDelta);
-            AssertHelperTwoDoubles(table.Get(2, 4).number, 123.2, sharedTableDelta);
-            AssertHelperTwoDoubles(table.Get(2, 5).number, 21.14060964, sharedTableDelta);            
+            _AssertHelperTwoDoubles(table.Get(2, 2).number, 1.428, sharedTableDelta);
+            _AssertHelperTwoDoubles(table.Get(2, 3).number, 15.53398058, sharedTableDelta);
+            _AssertHelperTwoDoubles(table.Get(2, 4).number, 123.2, sharedTableDelta);
+            _AssertHelperTwoDoubles(table.Get(2, 5).number, 21.14060964, sharedTableDelta);            
             
             I("PRT<2014 2014 n> #xx, x/px;");
             table = Globals.lastPrtOrMulprtTable;
@@ -10541,8 +10566,8 @@ namespace UnitTests
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "px");            
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x/px");            
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2014"); //why is it not a date?            
-            AssertHelperTwoDoubles(table.Get(2, 2).number, 1.428, sharedTableDelta);
-            AssertHelperTwoDoubles(table.Get(2, 3).number, 123.2, sharedTableDelta);            
+            _AssertHelperTwoDoubles(table.Get(2, 2).number, 1.428, sharedTableDelta);
+            _AssertHelperTwoDoubles(table.Get(2, 3).number, 123.2, sharedTableDelta);            
 
             I("PRT<2014 2014 d> #xx, x/px;");
             table = Globals.lastPrtOrMulprtTable;
@@ -10552,8 +10577,8 @@ namespace UnitTests
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "px");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x/px");          
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2014"); //why is it not a date?
-            AssertHelperTwoDoubles(table.Get(2, 2).number, 0.1920, sharedTableDelta);
-            AssertHelperTwoDoubles(table.Get(2, 3).number, 21.50, sharedTableDelta);
+            _AssertHelperTwoDoubles(table.Get(2, 2).number, 0.1920, sharedTableDelta);
+            _AssertHelperTwoDoubles(table.Get(2, 3).number, 21.50, sharedTableDelta);
 
             I("PRT<2014 2014 p> #xx, x/px;");
             table = Globals.lastPrtOrMulprtTable;
@@ -10563,8 +10588,8 @@ namespace UnitTests
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "px");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x/px");          
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2014"); //why is it not a date?
-            AssertHelperTwoDoubles(table.Get(2, 2).number, 15.5340, sharedTableDelta);
-            AssertHelperTwoDoubles(table.Get(2, 3).number, 21.1406, sharedTableDelta);
+            _AssertHelperTwoDoubles(table.Get(2, 2).number, 15.5340, sharedTableDelta);
+            _AssertHelperTwoDoubles(table.Get(2, 3).number, 21.1406, sharedTableDelta);
 
             I("PRT<2014 2014 m> #xx, x/px;");
             table = Globals.lastPrtOrMulprtTable;
@@ -10574,8 +10599,8 @@ namespace UnitTests
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "px");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x/px");          
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2014"); //why is it not a date?
-            AssertHelperTwoDoubles(table.Get(2, 2).number, 0.0280, sharedTableDelta);
-            AssertHelperTwoDoubles(table.Get(2, 3).number, 13.2, sharedTableDelta);
+            _AssertHelperTwoDoubles(table.Get(2, 2).number, 0.0280, sharedTableDelta);
+            _AssertHelperTwoDoubles(table.Get(2, 3).number, 13.2, sharedTableDelta);
 
             //TODO TODO TODO TODO
             //TODO TODO TODO TODO
@@ -10598,8 +10623,8 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "px [m%]");
                 Assert.AreEqual(table.Get(2, 3).CellText.TextData[0], "/px [m%]");
                 Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2014"); //why is it not a date?
-                AssertHelperTwoDoubles(table.Get(3, 2).number, 2d, sharedTableDelta);
-                AssertHelperTwoDoubles(table.Get(3, 3).number, 12d, sharedTableDelta);
+                _AssertHelperTwoDoubles(table.Get(3, 2).number, 2d, sharedTableDelta);
+                _AssertHelperTwoDoubles(table.Get(3, 3).number, 12d, sharedTableDelta);
 
                 I("PRT<2014 2014 dp> #xx, x/px;");
                 table = Globals.lastPrtOrMulprtTable;
@@ -10612,8 +10637,8 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "x [dif%]");
                 Assert.AreEqual(table.Get(2, 3).CellText.TextData[0], "x [dif%]");
                 Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2014"); //why is it not a date?
-                AssertHelperTwoDoubles(table.Get(3, 2).number, 8.5210, sharedTableDelta);
-                AssertHelperTwoDoubles(table.Get(3, 3).number, 47.4450, sharedTableDelta);
+                _AssertHelperTwoDoubles(table.Get(3, 2).number, 8.5210, sharedTableDelta);
+                _AssertHelperTwoDoubles(table.Get(3, 3).number, 47.4450, sharedTableDelta);
 
                 I("PRT<2014 2014 mp> #xx, x/px;");
                 table = Globals.lastPrtOrMulprtTable;
@@ -10626,8 +10651,8 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], " [mdif%]");
                 Assert.AreEqual(table.Get(2, 3).CellText.TextData[0], " [mdif%]");
                 Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2014"); //why is it not a date?
-                AssertHelperTwoDoubles(table.Get(3, 2).number, -1.1327, sharedTableDelta);
-                AssertHelperTwoDoubles(table.Get(3, 3).number, -1.0816, sharedTableDelta);
+                _AssertHelperTwoDoubles(table.Get(3, 2).number, -1.1327, sharedTableDelta);
+                _AssertHelperTwoDoubles(table.Get(3, 3).number, -1.0816, sharedTableDelta);
 
                 // ----------- BASE bank ------------
 
@@ -10639,8 +10664,8 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "px");
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x/px");
                 Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2014"); //why is it not a date?
-                AssertHelperTwoDoubles(table.Get(2, 2).number, 1.4, sharedTableDelta);
-                AssertHelperTwoDoubles(table.Get(2, 3).number, 110, sharedTableDelta);
+                _AssertHelperTwoDoubles(table.Get(2, 2).number, 1.4, sharedTableDelta);
+                _AssertHelperTwoDoubles(table.Get(2, 3).number, 110, sharedTableDelta);
 
                 I("PRT<2014 2014 n> #xx, ref:x/@px;");
                 table = Globals.lastPrtOrMulprtTable;
@@ -10650,8 +10675,8 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "px");
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "ref:x/@px");
                 Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2014"); //why is it not a date?
-                AssertHelperTwoDoubles(table.Get(2, 2).number, 1.428, sharedTableDelta);
-                AssertHelperTwoDoubles(table.Get(2, 3).number, 110, sharedTableDelta);
+                _AssertHelperTwoDoubles(table.Get(2, 2).number, 1.428, sharedTableDelta);
+                _AssertHelperTwoDoubles(table.Get(2, 3).number, 110, sharedTableDelta);
 
                 I("PRT<2014 2014 rd> #xx, x/px;");
                 table = Globals.lastPrtOrMulprtTable;
@@ -10661,8 +10686,8 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "px [@dif]");
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x/px [@dif]");
                 Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2014"); //why is it not a date?
-                AssertHelperTwoDoubles(table.Get(2, 2).number, 0.2, sharedTableDelta);
-                AssertHelperTwoDoubles(table.Get(2, 3).number, 20d, sharedTableDelta);
+                _AssertHelperTwoDoubles(table.Get(2, 2).number, 0.2, sharedTableDelta);
+                _AssertHelperTwoDoubles(table.Get(2, 3).number, 20d, sharedTableDelta);
 
                 I("PRT<2014 2014 rp> #xx, x/px;");
                 table = Globals.lastPrtOrMulprtTable;
@@ -10675,8 +10700,8 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "px [@%]");
                 Assert.AreEqual(table.Get(2, 3).CellText.TextData[0], "/px [@%]");
                 Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2014"); //why is it not a date?
-                AssertHelperTwoDoubles(table.Get(3, 2).number, 16.6667, sharedTableDelta);
-                AssertHelperTwoDoubles(table.Get(3, 3).number, 22.2222, sharedTableDelta);
+                _AssertHelperTwoDoubles(table.Get(3, 2).number, 16.6667, sharedTableDelta);
+                _AssertHelperTwoDoubles(table.Get(3, 3).number, 22.2222, sharedTableDelta);
 
                 I("PRT<2014 2014 rdp> #xx, x/px;");
                 table = Globals.lastPrtOrMulprtTable;
@@ -10689,8 +10714,8 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], " [@dif%]");
                 Assert.AreEqual(table.Get(2, 3).CellText.TextData[0], " [@dif%]");
                 Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2014"); //why is it not a date?
-                AssertHelperTwoDoubles(table.Get(3, 2).number, 7.5758, sharedTableDelta);
-                AssertHelperTwoDoubles(table.Get(3, 3).number, 47.2222, sharedTableDelta);
+                _AssertHelperTwoDoubles(table.Get(3, 2).number, 7.5758, sharedTableDelta);
+                _AssertHelperTwoDoubles(table.Get(3, 3).number, 47.2222, sharedTableDelta);
 
             }
 
@@ -10746,14 +10771,14 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
             I("RUN lille1.cmd;");
             double delta = 0.0002d;
-            AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 42960.0455d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 42960.0455d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 85920.0909d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 85920.0909d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 284964.7035d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 284964.7035d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 945121.0002d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 945121.0002d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 42960.0455d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 42960.0455d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 85920.0909d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 85920.0909d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 284964.7035d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 284964.7035d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 945121.0002d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 945121.0002d, delta);
         }
 
         [TestMethod]
@@ -10767,14 +10792,14 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
             I("RUN lille2.cmd;");
             double delta = 0.01d;  //the numbers are quite large, so 0.01 is strict.
-            AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 67695.0934d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 67695.0934d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 77545.9412d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 77545.9412d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 222821.3945d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 222821.3945d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 989331.9881d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 989331.9881d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 67695.0934d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 67695.0934d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 77545.9412d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 77545.9412d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 222821.3945d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 222821.3945d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 989331.9881d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 989331.9881d, delta);
         }
 
         [TestMethod]
@@ -10788,14 +10813,14 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
             I("RUN lille3.cmd;");
             double delta = 0.0001d;  //the numbers are quite large, so 0.01 is strict.
-            AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 146098.8121d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 146098.8121d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 48482.9387d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 48482.9387d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 533625.2015d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 533625.2015d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 935807.1374d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 935807.1374d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 146098.8121d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 146098.8121d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 48482.9387d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 48482.9387d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 533625.2015d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 533625.2015d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 935807.1374d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 935807.1374d, delta);
         }
 
         [TestMethod]
@@ -10809,14 +10834,14 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
             I("RUN lille4.cmd;"); //option solve newton backtrack = no;
             double delta = 0.0001d;  //the numbers are quite large, so 0.01 is strict.
-            AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 161071.7813d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 161071.7813d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 44425.9141d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 44425.9141d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 540864.2500d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 540864.2500d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 921567.5625d, delta);
-            AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 921567.5625d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 161071.7813d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 161071.7813d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 44425.9141d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 44425.9141d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 540864.2500d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 540864.2500d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.Annual, 2000, 1)), 921567.5625d, delta);
+            _AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.Annual, 2001, 1)), 921567.5625d, delta);
         }
 
         [TestMethod]
@@ -11171,15 +11196,15 @@ namespace UnitTests
             EqualTimeseries("xx", "xx3", 1996, 2004);
             EqualTimeseries("xx", "xx4", 1996, 2004);
             u = Data("xx", 1995, "a"); Assert.AreEqual(u.w, double.NaN);
-            u = Data("xx", 1996, "a"); AssertHelperTwoDoubles(u.w, 1239.848378d, 0.0001d);  //0.01% difference accepted
-            u = Data("xx", 1997, "a"); AssertHelperTwoDoubles(u.w, 1255.015604d, 0.0001d);  //0.01% difference accepted
-            u = Data("xx", 1998, "a"); AssertHelperTwoDoubles(u.w, 1270.397993d, 0.0001d);  //0.01% difference accepted
-            u = Data("xx", 1999, "a"); AssertHelperTwoDoubles(u.w, 1296.009146d, 0.0001d);  //0.01% difference accepted
-            u = Data("xx", 2000, "a"); AssertHelperTwoDoubles(u.w, 1329.022865d, 0.0001d);  //0.01% difference accepted
-            u = Data("xx", 2001, "a"); AssertHelperTwoDoubles(u.w, 1362.512038d, 0.0001d);  //0.01% difference accepted
-            u = Data("xx", 2002, "a"); AssertHelperTwoDoubles(u.w, 1398.347268d, 0.0001d);  //0.01% difference accepted
-            u = Data("xx", 2003, "a"); AssertHelperTwoDoubles(u.w, 1433.347951d, 0.0001d);  //0.01% difference accepted
-            u = Data("xx", 2004, "a"); AssertHelperTwoDoubles(u.w, 1468.498758d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 1996, "a"); _AssertHelperTwoDoubles(u.w, 1239.848378d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 1997, "a"); _AssertHelperTwoDoubles(u.w, 1255.015604d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 1998, "a"); _AssertHelperTwoDoubles(u.w, 1270.397993d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 1999, "a"); _AssertHelperTwoDoubles(u.w, 1296.009146d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 2000, "a"); _AssertHelperTwoDoubles(u.w, 1329.022865d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 2001, "a"); _AssertHelperTwoDoubles(u.w, 1362.512038d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 2002, "a"); _AssertHelperTwoDoubles(u.w, 1398.347268d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 2003, "a"); _AssertHelperTwoDoubles(u.w, 1433.347951d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 2004, "a"); _AssertHelperTwoDoubles(u.w, 1468.498758d, 0.0001d);  //0.01% difference accepted
             u = Data("xx", 2005, "a"); Assert.AreEqual(u.w, double.NaN);
 
             I("RESET;");
@@ -11189,15 +11214,15 @@ namespace UnitTests
             I("SERIES input = 1242 1353 1142 1255 1417 1312 1440 1422 1470;");
             I("SERIES xx = hpfilter(2000m1, 2000m9, input, 10, 0);");
             u = Data("xx", 1999, 12, "m"); Assert.AreEqual(u.w, double.NaN);
-            u = Data("xx", 2000, 1, "m"); AssertHelperTwoDoubles(u.w, 1239.848378d, 0.0001d);  //0.01% difference accepted
-            u = Data("xx", 2000, 2, "m"); AssertHelperTwoDoubles(u.w, 1255.015604d, 0.0001d);  //0.01% difference accepted
-            u = Data("xx", 2000, 3, "m"); AssertHelperTwoDoubles(u.w, 1270.397993d, 0.0001d);  //0.01% difference accepted
-            u = Data("xx", 2000, 4, "m"); AssertHelperTwoDoubles(u.w, 1296.009146d, 0.0001d);  //0.01% difference accepted
-            u = Data("xx", 2000, 5, "m"); AssertHelperTwoDoubles(u.w, 1329.022865d, 0.0001d);  //0.01% difference accepted
-            u = Data("xx", 2000, 6, "m"); AssertHelperTwoDoubles(u.w, 1362.512038d, 0.0001d);  //0.01% difference accepted
-            u = Data("xx", 2000, 7, "m"); AssertHelperTwoDoubles(u.w, 1398.347268d, 0.0001d);  //0.01% difference accepted
-            u = Data("xx", 2000, 8, "m"); AssertHelperTwoDoubles(u.w, 1433.347951d, 0.0001d);  //0.01% difference accepted
-            u = Data("xx", 2000, 9, "m"); AssertHelperTwoDoubles(u.w, 1468.498758d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 2000, 1, "m"); _AssertHelperTwoDoubles(u.w, 1239.848378d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 2000, 2, "m"); _AssertHelperTwoDoubles(u.w, 1255.015604d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 2000, 3, "m"); _AssertHelperTwoDoubles(u.w, 1270.397993d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 2000, 4, "m"); _AssertHelperTwoDoubles(u.w, 1296.009146d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 2000, 5, "m"); _AssertHelperTwoDoubles(u.w, 1329.022865d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 2000, 6, "m"); _AssertHelperTwoDoubles(u.w, 1362.512038d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 2000, 7, "m"); _AssertHelperTwoDoubles(u.w, 1398.347268d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 2000, 8, "m"); _AssertHelperTwoDoubles(u.w, 1433.347951d, 0.0001d);  //0.01% difference accepted
+            u = Data("xx", 2000, 9, "m"); _AssertHelperTwoDoubles(u.w, 1468.498758d, 0.0001d);  //0.01% difference accepted
             u = Data("xx", 2000, 10, "m"); Assert.AreEqual(u.w, double.NaN);
         }
 
@@ -11249,8 +11274,8 @@ namespace UnitTests
             I("SERIES dif_x = fib/xx_x;");
             for (int i = 1998; i <= 2002; i++)
             {
-                u = Data("dif_p", i, "a"); AssertHelperTwoDoubles(u.w, 1.0d, 0.0001d);  //0.01% difference accepted (some loss of precision when reading ADAM data)
-                u = Data("dif_x", i, "a"); AssertHelperTwoDoubles(u.w, 1.0d, 0.0001d);
+                u = Data("dif_p", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.0001d);  //0.01% difference accepted (some loss of precision when reading ADAM data)
+                u = Data("dif_x", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.0001d);
             }
 
             I("RESET;");
@@ -11290,8 +11315,8 @@ namespace UnitTests
             I("SERIES dif_x = fy/xx_x;");
             for (int i = 1998; i <= 2002; i++)
             {
-                u = Data("dif_p", i, "a"); AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);  //0.01% difference accepted (some loss of precision when reading ADAM data)
-                u = Data("dif_x", i, "a"); AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);
+                u = Data("dif_p", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);  //0.01% difference accepted (some loss of precision when reading ADAM data)
+                u = Data("dif_x", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);
             }
 
             //Testing fixed base index
@@ -11331,8 +11356,8 @@ namespace UnitTests
             I("SERIES dif_x = fy/xx_x;");
             for (int i = 1998; i <= 2002; i++)
             {
-                u = Data("dif_p", i, "a"); AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);  //0.01% difference accepted (some loss of precision when reading ADAM data)
-                u = Data("dif_x", i, "a"); AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);
+                u = Data("dif_p", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);  //0.01% difference accepted (some loss of precision when reading ADAM data)
+                u = Data("dif_x", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.00001d);
             }
         }
 
@@ -11347,38 +11372,38 @@ namespace UnitTests
             double[] xx = new double[] { 12.0000, 10.4402, 9.1965, 12.8125, 12.6469, 11.7909, 15.4698, 16.2052, 12.5011, 13.6092, 11.7736, 15.7687, 13.2121, 14.5027, 17.0762, 17.3749, 19.6337, 20.6965, 19.4992, 19.1998, 16.0000, 15.0000 };
             for (int i = 0; i < 22; i++)
             {
-                u = Data("y", 2000 + i, "a"); AssertHelperTwoDoubles(u.w, xx[i], epsilon);
+                u = Data("y", 2000 + i, "a"); _AssertHelperTwoDoubles(u.w, xx[i], epsilon);
             }
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models\forward';");
             I("RUN st2a;"); //See st.xlsx
             epsilon = 0.0001d;
-            u = Data("y", 2000, "a"); AssertHelperTwoDoubles(u.w, 12d, epsilon);
-            u = Data("y", 2001, "a"); AssertHelperTwoDoubles(u.w, 8.1809d, epsilon);
-            u = Data("y", 2002, "a"); AssertHelperTwoDoubles(u.w, 4.9362d, epsilon);
-            u = Data("y", 2003, "a"); AssertHelperTwoDoubles(u.w, 3d, epsilon);
+            u = Data("y", 2000, "a"); _AssertHelperTwoDoubles(u.w, 12d, epsilon);
+            u = Data("y", 2001, "a"); _AssertHelperTwoDoubles(u.w, 8.1809d, epsilon);
+            u = Data("y", 2002, "a"); _AssertHelperTwoDoubles(u.w, 4.9362d, epsilon);
+            u = Data("y", 2003, "a"); _AssertHelperTwoDoubles(u.w, 3d, epsilon);
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models\forward';");
             I("RUN st2b;"); //See st.xlsx
             epsilon = 0.0001d;
-            u = Data("y", 2000, "a"); AssertHelperTwoDoubles(u.w, 12d, epsilon);
-            u = Data("y", 2001, "a"); AssertHelperTwoDoubles(u.w, 8.1809d, epsilon);
-            u = Data("y", 2002, "a"); AssertHelperTwoDoubles(u.w, 6.7512d, epsilon);
-            u = Data("y", 2003, "a"); AssertHelperTwoDoubles(u.w, 9.0502d, epsilon);
-            u = Data("y", 2004, "a"); AssertHelperTwoDoubles(u.w, 4d, epsilon);
+            u = Data("y", 2000, "a"); _AssertHelperTwoDoubles(u.w, 12d, epsilon);
+            u = Data("y", 2001, "a"); _AssertHelperTwoDoubles(u.w, 8.1809d, epsilon);
+            u = Data("y", 2002, "a"); _AssertHelperTwoDoubles(u.w, 6.7512d, epsilon);
+            u = Data("y", 2003, "a"); _AssertHelperTwoDoubles(u.w, 9.0502d, epsilon);
+            u = Data("y", 2004, "a"); _AssertHelperTwoDoubles(u.w, 4d, epsilon);
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models\forward';");
             I("RUN st2c;"); //See st.xlsx
             epsilon = 0.0001d;
-            u = Data("y", 2000, "a"); AssertHelperTwoDoubles(u.w, 12d, epsilon);
-            u = Data("y", 2001, "a"); AssertHelperTwoDoubles(u.w, 8.1809d, epsilon);
-            u = Data("y", 2002, "a"); AssertHelperTwoDoubles(u.w, 6.7512d, epsilon);
-            u = Data("y", 2003, "a"); AssertHelperTwoDoubles(u.w, 10.6173d, epsilon);
-            u = Data("y", 2004, "a"); AssertHelperTwoDoubles(u.w, 9.2235d, epsilon);
-            u = Data("y", 2005, "a"); AssertHelperTwoDoubles(u.w, 5d, epsilon);
+            u = Data("y", 2000, "a"); _AssertHelperTwoDoubles(u.w, 12d, epsilon);
+            u = Data("y", 2001, "a"); _AssertHelperTwoDoubles(u.w, 8.1809d, epsilon);
+            u = Data("y", 2002, "a"); _AssertHelperTwoDoubles(u.w, 6.7512d, epsilon);
+            u = Data("y", 2003, "a"); _AssertHelperTwoDoubles(u.w, 10.6173d, epsilon);
+            u = Data("y", 2004, "a"); _AssertHelperTwoDoubles(u.w, 9.2235d, epsilon);
+            u = Data("y", 2005, "a"); _AssertHelperTwoDoubles(u.w, 5d, epsilon);
 
         }
 
@@ -12517,7 +12542,7 @@ namespace UnitTests
                         else I("RUN m" + ii + ".cmd;");
                         for (int t = 2002; t <= 2100; t++)
                         {
-                            AssertHelperTwoDoubles(First().GetVariable("sum").GetData(null, new GekkoTime(EFreq.Annual, t, 1)), 0d, delta);
+                            _AssertHelperTwoDoubles(First().GetVariable("sum").GetData(null, new GekkoTime(EFreq.Annual, t, 1)), 0d, delta);
                         }
                     }
                 }

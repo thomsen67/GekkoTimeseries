@@ -441,7 +441,7 @@ namespace Gekko
             if (this.dataArray == null)
             {
                 //If no data has been added to the timeseries, NaN will always be returned.
-                if (this.IsArrayTimeseries())
+                if (this.type == ESeriesType.ArraySuper)
                 {
                     G.Writeln2("*** ERROR: The variable '" + this.name + "' is an array-timeseries,");
                     G.Writeln("           but is used as a normal timeseries here (without []-indexer)", Color.Red);
@@ -462,7 +462,7 @@ namespace Gekko
                 int index = GetArrayIndex(t);
                 if (index < 0 || index >= this.dataArray.Length)
                 {
-                    if (this.IsLight())
+                    if (this.type == ESeriesType.Light)
                     {
                         if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError();
                         if (index < 0) smpl.gekkoError.t1Problem = -index;
@@ -491,7 +491,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Timeless variable error #100");
                 throw new GekkoException();
             }
-            if (!this.IsLight() && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (this.type != ESeriesType.Light && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
                         
             if (this.dataArray == null)
             {
@@ -529,7 +529,7 @@ namespace Gekko
                 //Normally timeless variables should be called via the SetData(double value) method
                 this.dataArray[0] = value;
             }
-            if (!this.IsLight() && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (this.type != ESeriesType.Light && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             
             if (this.freq != t.freq)
             {
@@ -553,7 +553,7 @@ namespace Gekko
                 this.dataArray[index] = value;
                 //Start and end date for observations are adjusted.
                 //for the first obs put into a new timeseries, both the if's should trigger.
-                if (!this.IsLight())
+                if (this.type != ESeriesType.Light)
                 {
                     if (index > this.meta.lastPeriodPositionInArray)
                     {
@@ -565,7 +565,7 @@ namespace Gekko
                     }
                 }                
             }
-            if (!this.IsLight()) this.SetDirty(true);
+            if (this.type != ESeriesType.Light) this.SetDirty(true);
         }
 
         /// <summary>
@@ -923,6 +923,11 @@ namespace Gekko
 
         public static int FromGekkoTimeToArrayIndex(GekkoTime gt, GekkoTime anchorPeriod, int anchorPeriodPositionInArray)
         {
+            if (gt.freq != anchorPeriod.freq)
+            {
+                G.Writeln2("*** ERROR: Frequency mismatch");
+                throw new GekkoException();
+            }
             //this.anchorPeriod.sub is always 1 at the moment, and will always be 1 for Annual.
             //but we cannot count on anchorSubPeriod being 1 forever (for instance for daily obs)   
             int rv = -12345;
@@ -1052,7 +1057,7 @@ namespace Gekko
         {            
             if (i < 0 || i >= this.dataArray.Length)
             {
-                if (IsLight())
+                if (this.type == ESeriesType.Light)
                 {
                     G.Writeln2("*** ERROR: Series access");
                     throw new GekkoException();
@@ -1174,7 +1179,7 @@ namespace Gekko
 
         private static void GetStartEndPeriod(GekkoSmpl smpl, Series x1, ref GekkoTime x1t0, ref GekkoTime x1t3)
         {
-            if (x1.IsLight())
+            if (x1.type == ESeriesType.Light)
             {
                 x1t0 = x1.anchorPeriod.Add(-x1.anchorPeriodPositionInArray);
                 x1t3 = x1.anchorPeriod.Add(-x1.anchorPeriodPositionInArray + x1.dataArray.Length - 1);
@@ -1232,7 +1237,7 @@ namespace Gekko
                 if (IsLagOrLead(i))
                 {
                     //must be a lag
-                    if (this.IsLight())
+                    if (this.type == ESeriesType.Light)
                     {
                         //just move the offset!
                         //this object is not used in other places, and will soon be garbage collected anyway
@@ -1323,8 +1328,11 @@ namespace Gekko
                     }
                     else
                     {
-                        ts = new Series(this.freq, null);
-                        if (this.type == ESeriesType.Timeless) ts.type = ESeriesType.Timeless;  //inherits from ghost
+                        //ts = new Series(this.freq, null);
+
+                        ts = new Series(ESeriesType.ArraySub, this.freq, null);
+                        //ts.type = ESeriesType.ArraySub;
+                        if (this.type == ESeriesType.Timeless) ts.type = ESeriesType.Timeless;  //inherits from ghost                        
                         this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys), ts);
                     }
                 }
@@ -1547,6 +1555,7 @@ namespace Gekko
             {
                 //Will fail with an error if not all indexes are of STRING type                
                 Series ts = this.FindArrayTimeSeries(indexes, true);  //if not found, it will inherit the timeless status from this timeseries.
+
                 if (ts.type == ESeriesType.Timeless)
                 {
                     double d = rhsExpression.ConvertToVal();
@@ -1565,7 +1574,7 @@ namespace Gekko
 
         public void SetDirty(bool b1)
         {
-            if (this.IsLight())
+            if (this.type == ESeriesType.Light)
             {
                 G.Writeln2("*** ERROR: Light series cannot be set dirty");
                 throw new GekkoException();
@@ -1587,15 +1596,15 @@ namespace Gekko
             return this.meta.IsDirty();
         }
 
-        public bool IsLight()
-        {
-            return this.meta == null;
-        }
+        //public bool IsLight()
+        //{
+        //    return this.meta == null;
+        //}
 
-        public bool IsArrayTimeseries()
-        {
-            return this.dimensions > 0;
-        }
+        //public bool IsArrayTimeseries()
+        //{
+        //    return this.dimensions > 0;
+        //}
 
         /// <summary>
         /// Creates a clone of the Series, copying all fields. Used for copying databanks in RAM.
@@ -1620,7 +1629,7 @@ namespace Gekko
             tsCopy.dimensionsStorage = this.dimensionsStorage;
             tsCopy.dimensions = this.dimensions;
 
-            if (!this.IsLight())
+            if (this.type != ESeriesType.Light)
             {
                 tsCopy.meta = new TimeSeriesMetaInformation();
                 tsCopy.meta.firstPeriodPositionInArray = this.meta.firstPeriodPositionInArray;

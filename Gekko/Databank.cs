@@ -201,7 +201,7 @@ namespace Gekko
         {
             if (this.protect) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
             //For Series, use AddIVariable
-            bool hasTilde = false;
+            bool hasFreqIndicator = false;
             foreach (char c in name)
             {
                 //The good thing is that this is only checked when putting stuff INTO the databank, and not
@@ -218,17 +218,17 @@ namespace Gekko
                     G.Writeln2("***ERROR: Malformed name: '" + name + "'");
                     throw new GekkoException();
                 }
-                if (c == Globals.freqIndicator) hasTilde = true;
+                if (c == Globals.freqIndicator) hasFreqIndicator = true;
             }
             Series ts = x as Series;
             if (ts != null)
             {
-                if (ts.name != name || !hasTilde)
+                if (ts.name != name || !hasFreqIndicator)
                 {
                     G.Writeln2("*** ERROR: #763209485");  //use AddIVariable(x), remember tilde in x.variableName.
                     throw new GekkoException();
                 }
-                if (ts.IsLight())
+                if (ts.type == ESeriesType.Light)
                 {
                     G.Writeln2("*** ERROR: #7632090085");
                     throw new GekkoException();
