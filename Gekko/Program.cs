@@ -3066,42 +3066,42 @@ namespace Gekko
             //that GekkoTime.Observations(first, last) > 0 before putting any data in.
             //
 
-            GekkoTime firstRv = GekkoTime.tNull;
-            GekkoTime lastRv = GekkoTime.tNull;
+            GekkoTime firstRv = first;
+            GekkoTime lastRv = last;
 
             int offset = 0;
             if (first.freq == EFreq.Annual)
             {
-                if (first.SmallerThanOrEqual(dates.t1Annual))
+                if (dates.t1Annual.StrictlyLargerThan(first))
                 {
                     offset = GekkoTime.Observations(first, dates.t1Annual) - 1;
                     firstRv = dates.t1Annual;
                 }
-                if (last.LargerThanOrEqual(dates.t2Annual))
+                if (dates.t2Annual.StrictlySmallerThan(last))
                 {
                     lastRv = dates.t2Annual;
                 }
             }
             else if (first.freq == EFreq.Quarterly)
             {
-                if (first.SmallerThanOrEqual(dates.t1Quarterly))
-                {                    
+                if (dates.t1Quarterly.StrictlyLargerThan(first))
+                {
                     offset = GekkoTime.Observations(first, dates.t1Quarterly) - 1;
                     firstRv = dates.t1Quarterly;
                 }
-                if (last.LargerThanOrEqual(dates.t2Quarterly))
+                if (dates.t2Quarterly.StrictlySmallerThan(last))
                 {
                     lastRv = dates.t2Quarterly;
                 }
             }
             else if (first.freq == EFreq.Monthly)
             {
-                if (first.SmallerThanOrEqual(dates.t1Monthly))
+                if (dates.t1Monthly.StrictlyLargerThan(first))
                 {
                     offset = GekkoTime.Observations(first, dates.t1Monthly) - 1;
-                    firstRv = dates.t1Monthly;                    
+                    firstRv = dates.t1Monthly;
                 }
-                if (last.LargerThanOrEqual(dates.t2Monthly))
+                if (dates.t2Monthly.StrictlySmallerThan(last))
                 {
                     lastRv = dates.t2Monthly;
                 }

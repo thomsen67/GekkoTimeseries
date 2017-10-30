@@ -137,6 +137,18 @@ namespace Gekko
             //Empty timeseries should not be created that way.            
         }
 
+        public Series(ESeriesType type, EFreq freq)
+        {
+            //Creates minimal light series
+            this.type = type;
+            this.freq = freq;
+            if (type != ESeriesType.Light)
+            {
+                G.Writeln2("*** ERROR: Series constructor error");
+                throw new GekkoException();
+            }
+        }
+
         //public Series(ETimeSeriesType type, GekkoSmpl smpl)
         //{
         //    // ------------------------------
@@ -154,6 +166,14 @@ namespace Gekko
         //    this.anchorPeriodPositionInArray = 0;
         //}
 
+        //public Series(ESeriesType type, GekkoTime t1, GekkoTime t2) : this(type, t1, t2)
+        //{
+        //}
+
+        //public Series(ESeriesType type, EFreq freq) : this(type, GekkoTime.tNull, GekkoTime.tNull, true, freq)
+        //{
+        //}
+
         public Series(ESeriesType type, GekkoTime t1, GekkoTime t2)
         {
             // --------------------------------------------
@@ -162,8 +182,9 @@ namespace Gekko
 
             this.type = type;
             if (type == ESeriesType.Light)
-            {                
-                this.freq = t1.freq;  //same as for t1, t2 or t3                               
+            {
+
+                this.freq = t1.freq;  //same as for t1, t2 or t3  
                 int n = GekkoTime.Observations(t1, t2);
                 if (n < 1)
                 {
@@ -174,6 +195,7 @@ namespace Gekko
                 InitializeDataArray(this.dataArray);
                 this.anchorPeriod = t1;
                 this.anchorPeriodPositionInArray = 0;
+
             }
             else
             {
@@ -1049,8 +1071,9 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Series access");
                     throw new GekkoException();
                 }
+                return double.NaN;
             }
-            return double.NaN;
+            return this.dataArray[i];
         }
 
         public static string GetHashCodeFromIvariables(IVariable[] indexes)
@@ -1223,25 +1246,17 @@ namespace Gekko
 
                 if (IsLagOrLead(i))
                 {
-                    //must be a lag
-                    if (this.type == ESeriesType.Light)
-                    {
-                        //just move the offset!
-                        //this object is not used in other places, and will soon be garbage collected anyway
-                        this.anchorPeriodPositionInArray += i;
-                        rv = this;
-                    }
-                    else
-                    {
-                        //cannot offset, since this object lives in a databank, so that would
-                        //yield bad side-effects.
-                        Series ts = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
-                        foreach (GekkoTime t in smpl.Iterate03())
-                        {
-                            ts.SetData(t, this.GetData(smpl, t.Add(i)));
-                        }
-                        rv = ts;
-                    }                    
+                    //!! this is done for both Normal and Light series
+                    //   regarding Normal series, there is a pointer to the real dataArray
+                    //   that lives in a databank. But in Lookup(), we always DeepClone() when
+                    //   putting stuff from the rhs into the lhs. So this should not be a problem.                    
+                    Series temp = new Series(ESeriesType.Light, this.freq);
+                    temp.dataArray = this.dataArray; //pointer, instead of copying 
+                    temp.anchorPeriod = this.anchorPeriod;
+                    temp.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray;
+                    temp.anchorPeriodPositionInArray += i; //just move the offset!
+                    rv = temp;
+
                 }
                 else
                 {
