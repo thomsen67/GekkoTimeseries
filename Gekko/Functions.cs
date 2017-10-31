@@ -473,7 +473,7 @@ namespace Gekko
                         ts.dimensionsStorage = new MapMultidim();
                         ts.dimensions = O.ConvertToInt(x[0]);
                         ts.type = ESeriesType.ArraySuper;
-                        ts.meta = new TimeSeriesMetaInformation();
+                        ts.meta = new SeriesMetaInformation();
                     }
                     else
                     {

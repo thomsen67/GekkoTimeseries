@@ -1049,9 +1049,9 @@ namespace Gekko
                             tsTmp.name = varnameWithFreq;
                             if (ib.GetType() == typeof(Databank))
                             {
-                                if (tsTmp.type == ESeriesType.Light) tsTmp.meta = new TimeSeriesMetaInformation();  //so that parentDatabank can be put in in ib.AddIVariable                               
+                                if (tsTmp.type == ESeriesType.Light) tsTmp.meta = new SeriesMetaInformation();  //so that parentDatabank can be put in in ib.AddIVariable                               
                             }
-                            tsTmp.meta = new TimeSeriesMetaInformation();
+                            tsTmp.meta = new SeriesMetaInformation();
                             ib.AddIVariable(tsTmp.name, tsTmp);
                         }
 
@@ -1259,7 +1259,7 @@ namespace Gekko
                                         int i2 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t2);
                                         Matrix m = new Matrix(1, n);
                                         double[,] destination = m.data;
-                                        double[] source = rhs_series.dataArray;
+                                        double[] source = rhs_series.data.dataArray;
 
                                         int destinationStart = 0;
                                         int ii1 = Math.Max(0, i1);
@@ -1289,10 +1289,10 @@ namespace Gekko
                                         int ii1 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t1);
                                         int ii2 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t2);
                                         if (ii1 < 0) smpl.gekkoError.t1Problem = -ii1;
-                                        if (ii2 > rhs_series.dataArray.Length - 1) smpl.gekkoError.t2Problem = ii2 - (rhs_series.dataArray.Length - 1);
+                                        if (ii2 > rhs_series.data.dataArray.Length - 1) smpl.gekkoError.t2Problem = ii2 - (rhs_series.data.dataArray.Length - 1);
                                         int destinationStart = 0;
                                         double[,] destination = m.data;
-                                        double[] source = rhs_series.dataArray;
+                                        double[] source = rhs_series.data.dataArray;
                                         //see #0985324985237
                                         Buffer.BlockCopy(source, 8 * ii1, destination, 8 * destinationStart, 8 * (ii2 - ii1 + 1));
                                         IVariable lhsNew = m;
@@ -1305,7 +1305,7 @@ namespace Gekko
                                         // #x = Series Timeless
                                         //---------------------------------------------------------
                                         int n = smpl.Observations12();
-                                        double d = rhs_series.dataArray[0];
+                                        double d = rhs_series.data.dataArray[0];
                                         Matrix m = new Matrix(1, n, d);  //expanded as if it was a real timeseries                                       
                                         AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
                                     }
@@ -1460,7 +1460,7 @@ namespace Gekko
                                         //---------------------------------------------------------
                                         // stuff below also handles array-timeseries just fine   
                                         double d = double.NaN;
-                                        if (rhs_series.dataArray != null) d = rhs_series.dataArray[0];
+                                        if (rhs_series.data.dataArray != null) d = rhs_series.data.dataArray[0];
                                         bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
                                         foreach (GekkoTime t in smpl.Iterate12())
                                         {
@@ -1608,12 +1608,12 @@ namespace Gekko
                             else
                             {
                                 int n = smpl.Observations12();
-                                if (n != lhs_series.dataArray.GetLength(0))
+                                if (n != lhs_series.data.dataArray.GetLength(0))
                                 {
-                                    G.Writeln2("*** ERROR: Expected " + n + " list items, got " + lhs_series.dataArray.GetLength(0));
+                                    G.Writeln2("*** ERROR: Expected " + n + " list items, got " + lhs_series.data.dataArray.GetLength(0));
                                     throw new GekkoException();
                                 }
-                                for (int i = 0;i < lhs_series.dataArray.GetLength(0);i++)
+                                for (int i = 0;i < lhs_series.data.dataArray.GetLength(0);i++)
                                 {
                                     lhs_series.SetData(smpl.t1.Add(i), rhs_matrix.data[i, 0]);
                                 }                            
@@ -2892,9 +2892,9 @@ namespace Gekko
         public static Series CreateTimeSeriesFromVal(GekkoSmpl smpl, double d)
         {
             Series tsl = new Series(ESeriesType.Light, smpl.t0, smpl.t3); //will have small dataarray            
-            for (int i = 0; i < tsl.dataArray.Length; i++)
+            for (int i = 0; i < tsl.data.dataArray.Length; i++)
             {
-                tsl.dataArray[i] = d;
+                tsl.data.dataArray[i] = d;
             }
             return tsl;
         }
@@ -3137,9 +3137,9 @@ namespace Gekko
                 throw new GekkoException();
             }
             Series tsl = new Series(ESeriesType.Light, smpl.t0, smpl.t3);            
-            for (int i = 0; i < tsl.dataArray.Length; i++)
+            for (int i = 0; i < tsl.data.dataArray.Length; i++)
             {
-                tsl.dataArray[i] = m.data[i, 0];
+                tsl.data.dataArray[i] = m.data[i, 0];
             }
             return tsl;
         }
@@ -5854,11 +5854,11 @@ namespace Gekko
                     //this.anchorPeriodPositionInArray = 0;
                     //this.anchorPeriod = smpl.t1;
 
-                    int i = Series.FromGekkoTimeToArrayIndex(this.t1, new GekkoTime(this.rhs.freq, this.rhs.anchorPeriod.sub, this.rhs.anchorPeriod.super), this.rhs.anchorPeriodPositionInArray);
+                    int i = Series.FromGekkoTimeToArrayIndex(this.t1, new GekkoTime(this.rhs.freq, this.rhs.data.anchorPeriod.sub, this.rhs.data.anchorPeriod.super), this.rhs.GetAnchorPeriodPositionInArray());
                     int n = GekkoTime.Observations(this.t1, this.t2);
 
                     //TODO TODO TODO, should not be possible
-                    if (i < 0 || i >= this.rhs.dataArray.Length)
+                    if (i < 0 || i >= this.rhs.data.dataArray.Length)
                     {
                         G.Writeln2("*** ERROR: Sample error #9876201872");
                         throw new GekkoException();
@@ -5871,7 +5871,7 @@ namespace Gekko
                         G.Writeln2("*** ERROR: Sample error #9376201872");
                         throw new GekkoException();
                     }
-                    Array.Copy(this.rhs.dataArray, i, dataArray, index1, n);
+                    Array.Copy(this.rhs.data.dataArray, i, dataArray, index1, n);
                 }
 
                 if (this.meta != null)
@@ -6063,7 +6063,7 @@ namespace Gekko
                         }
                         else tsNew = ts;
                         
-                        double[] data = tsNew.dataArray;
+                        double[] data = tsNew.data.dataArray;
                         for (int ii = 0; ii < data.Length; ii++)
                         {
                             //could use ts.firstPeriodPositionInArray etc., but better to do it for all since ts.ts.firstPeriodPositionInArray is not always correct

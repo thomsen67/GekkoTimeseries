@@ -2371,7 +2371,7 @@ namespace Gekko
                 {
                     foreach (Series tsSub in ts.dimensionsStorage.storage.Values)
                     {
-                        if (tsSub.type == ESeriesType.Light) tsSub.meta = new Gekko.TimeSeriesMetaInformation();
+                        if (tsSub.type == ESeriesType.Light) tsSub.meta = new Gekko.SeriesMetaInformation();
                         tsSub.meta.parentDatabank = db;
                         if (!merge) tsSub.SetDirty(false);
                     }
@@ -4974,7 +4974,7 @@ namespace Gekko
             {
                 index1 = ts.meta.firstPeriodPositionInArray;
                 index2 = ts.meta.lastPeriodPositionInArray;
-                dataArray = ts.dataArray;
+                dataArray = ts.data.dataArray;
                 per1 = ts.GetPeriodFirst();
                 per2 = ts.GetPeriodLast();
             }
@@ -5125,7 +5125,7 @@ namespace Gekko
             {
                 index1 = ts.meta.firstPeriodPositionInArray;
                 index2 = ts.meta.lastPeriodPositionInArray;
-                dataArray = ts.dataArray;
+                dataArray = ts.data.dataArray;
                 per1 = ts.GetPeriodFirst();
                 per2 = ts.GetPeriodLast();
             }
