@@ -611,11 +611,11 @@ namespace Gekko
             {
                 //This check: better safe than sorry!
                 //See comment to GetData()                
-                FreqError(gt1);                
+                FreqError(gt1);
             }
 
             if (gt1.freq != gt2.freq)
-            {                
+            {
                 //See comment to GetData()                
                 throw new GekkoException();  //should be rare...
             }
@@ -627,8 +627,11 @@ namespace Gekko
 
             index1 = GetArrayIndex(gt1);
             index2 = GetArrayIndex(gt2);
+            int tooSmall, tooLarge;
+            TooSmallOrTooLarge(index1, index2, out tooSmall, out tooLarge);
 
-            if (index1 < 0 || index1 >= this.data.dataArray.Length || index2 < 0 || index2 >= this.data.dataArray.Length)
+            bool tooSmallOrTooLarge = tooSmall > 0 || tooLarge > 0;
+            if (tooSmallOrTooLarge)
             {
                 index1 = ResizeDataArray(gt1);
                 index2 = ResizeDataArray(gt2);  //this would never change index1                                                
@@ -646,6 +649,12 @@ namespace Gekko
                 }
             }
             return this.data.dataArray;
+        }
+
+        public void TooSmallOrTooLarge(int index1, int index2, out int tooSmall, out int tooLarge)
+        {
+            tooSmall = -index1;
+            tooLarge = index2 - (this.data.dataArray.Length - 1);
         }
 
         /// <summary>
@@ -908,7 +917,7 @@ namespace Gekko
         }
 
         //Not intended for outside use
-        private int GetArrayIndex(GekkoTime gt)
+        public int GetArrayIndex(GekkoTime gt)
         {
             int rv = FromGekkoTimeToArrayIndex(gt, new GekkoTime(this.freq, this.data.anchorPeriod.super, this.data.anchorPeriod.sub), this.GetAnchorPeriodPositionInArray());
             return rv;

@@ -254,7 +254,14 @@ namespace Gekko
             return allFreqsHelper;
         }
 
+        
         public static EFreq GetFreq(string freq)
+        {
+            return GetFreq(freq, false);
+        }
+
+
+        public static EFreq GetFreq(string freq, bool nullIsCurrent)
         {
             EFreq eFreq = EFreq.Annual;
             if (G.Equal(freq, "a"))
@@ -275,8 +282,15 @@ namespace Gekko
             }
             else
             {
-                G.Writeln("*** ERROR regarding frequency: '" + freq + "' not recognized");
-                throw new GekkoException();
+                if (nullIsCurrent)
+                {
+                    eFreq = Program.options.freq;
+                }
+                else
+                {
+                    G.Writeln("*** ERROR regarding frequency: '" + freq + "' not recognized");
+                    throw new GekkoException();
+                }
             }
             return eFreq;
         }

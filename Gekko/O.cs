@@ -1462,7 +1462,7 @@ namespace Gekko
                                                                                 
                                         GekkoTime tt1 = GekkoTime.tNull;
                                         GekkoTime tt2 = GekkoTime.tNull;
-                                        GekkoTime.ConvertFreqs(G.GetFreq(freq), smpl.t1, smpl.t2, ref tt1, ref tt2);  //converts smpl.t1 and smpl.t2 to tt1 and tt2 in freq frequency
+                                        GekkoTime.ConvertFreqs(G.GetFreq(freq, true), smpl.t1, smpl.t2, ref tt1, ref tt2);  //converts smpl.t1 and smpl.t2 to tt1 and tt2 in freq frequency
                                         bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
                                         //Now the smpl window runs from tt1 to tt2
                                         //We copy in from that window
@@ -1472,13 +1472,18 @@ namespace Gekko
                                             throw new GekkoException();
                                         }
 
-
-                                        if (rhs_series.GetArrayIndex(tt1) < 0 || rhs_series.GetArrayIndex(tt2) >= rhs_series.data.dataArray.Length)
+                                        if (rhs_series.type == ESeriesType.Light)
                                         {
-
+                                            int tooSmall = 0; int tooLarge = 0;
+                                            rhs_series.TooSmallOrTooLarge(rhs_series.GetArrayIndex(tt1), rhs_series.GetArrayIndex(tt2), out tooSmall, out tooLarge);
+                                            if (tooSmall > 0 || tooLarge > 0)
+                                            {
+                                                smpl.gekkoError = new GekkoError();
+                                                smpl.gekkoError.t1Problem = tooSmall;
+                                                smpl.gekkoError.t2Problem = tooLarge;
+                                            }
+                                            return;
                                         }
-
-
 
                                         int index1, index2;
                                         //may enlarge the array with NaNs first and last
@@ -1678,17 +1683,17 @@ namespace Gekko
         }
 
         private static bool CreateSeriesIfNotExisting(string varnameWithFreq, string freq, ref Series lhs_series)
-        {
+        {            
             bool create = false;
             if (lhs_series != null && lhs_series.type == ESeriesType.Normal)
             {
                 //do nothing, use it
             }
             else
-            {
+            {                
                 //create it
                 create = true;
-                lhs_series = new Series(ESeriesType.Normal, G.GetFreq(freq), varnameWithFreq);
+                lhs_series = new Series(ESeriesType.Normal, G.GetFreq(freq,true), varnameWithFreq);
             }
 
             return create;
