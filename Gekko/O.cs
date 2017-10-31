@@ -1408,49 +1408,83 @@ namespace Gekko
                             Series rhs_series = rhs as Series;
                             switch (rhs_series.type)
                             {
+                                //case ESeriesType.Normal:
+                                //    {
+                                //        //---------------------------------------------------------
+                                //        // x = Series Normal
+                                //        //---------------------------------------------------------
+
+                                //        //we merge any existing series with the new data, considering also the sample
+
+                                //        bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
+                                //        AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);
+                                //        int i1 = -12345; int i2 = -12345; bool shouldOverwriteLaterOn = false;
+                                //        Program.MergeTwoTimeseriesWithDateWindow(dates, lhs_series, rhs_series, false, ref i1, ref i2, ref shouldOverwriteLaterOn);
+                                //        if (create)
+                                //        {
+                                //            AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
+                                //        }
+                                //        else
+                                //        {
+                                //            //nothing to do, either already existing in bank/map or array-subseries
+                                //        }
+
+                                //    }
+                                //    break;
+                                //case ESeriesType.Light:
+                                //    {
+                                //        //---------------------------------------------------------
+                                //        // x = Series Light
+                                //        //---------------------------------------------------------
+
+                                //        //we merge any existing series with the new data, considering also the sample
+
+                                //        bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
+                                //        AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);
+                                //        int i1 = -12345; int i2 = -12345; bool shouldOverwriteLaterOn = false;
+                                //        Program.MergeTwoTimeseriesWithDateWindow(dates, lhs_series, rhs_series, false, ref i1, ref i2, ref shouldOverwriteLaterOn);
+                                //        if (create)
+                                //        {
+                                //            AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
+                                //        }
+                                //        else
+                                //        {
+                                //            //nothing to do, either already existing in bank/map or array-subseries
+                                //        }
+                                //    }
+                                //    break;
                                 case ESeriesType.Normal:
-                                    {
-                                        //---------------------------------------------------------
-                                        // x = Series Normal
-                                        //---------------------------------------------------------
-
-                                        //we merge any existing series with the new data, considering also the sample
-
-                                        bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
-                                        AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);
-                                        int i1 = -12345; int i2 = -12345; bool shouldOverwriteLaterOn = false;
-                                        Program.MergeTwoTimeseriesWithDateWindow(dates, lhs_series, rhs_series, false, ref i1, ref i2, ref shouldOverwriteLaterOn);
-                                        if (create)
-                                        {
-                                            AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
-                                        }
-                                        else
-                                        {
-                                            //nothing to do, either already existing in bank/map or array-subseries
-                                        }
-
-                                    }
-                                    break;
                                 case ESeriesType.Light:
                                     {
                                         //---------------------------------------------------------
-                                        // x = Series Light
+                                        // x = Series Normal or Light
                                         //---------------------------------------------------------
-
-                                        //we merge any existing series with the new data, considering also the sample
-
-                                        bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
-                                        AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);
-                                        int i1 = -12345; int i2 = -12345; bool shouldOverwriteLaterOn = false;
-                                        Program.MergeTwoTimeseriesWithDateWindow(dates, lhs_series, rhs_series, false, ref i1, ref i2, ref shouldOverwriteLaterOn);
-                                        if (create)
+                                                                                
+                                        GekkoTime tt1 = GekkoTime.tNull;
+                                        GekkoTime tt2 = GekkoTime.tNull;
+                                        GekkoTime.ConvertFreqs(G.GetFreq(freq), smpl.t1, smpl.t2, ref tt1, ref tt2);  //converts smpl.t1 and smpl.t2 to tt1 and tt2 in freq frequency
+                                        bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
+                                        //Now the smpl window runs from tt1 to tt2
+                                        //We copy in from that window
+                                        if (lhs_series.freq != rhs_series.freq)
                                         {
-                                            AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
+                                            G.Writeln2("*** ERROR: Frequency mismatch");
+                                            throw new GekkoException();
                                         }
-                                        else
+
+
+                                        if (rhs_series.GetArrayIndex(tt1) < 0 || rhs_series.GetArrayIndex(tt2) >= rhs_series.data.dataArray.Length)
                                         {
-                                            //nothing to do, either already existing in bank/map or array-subseries
+
                                         }
+
+
+
+                                        int index1, index2;
+                                        //may enlarge the array with NaNs first and last
+                                        double[] data = rhs_series.GetDataSequence(out index1, out index2, tt1, tt2, false);
+                                        //may enlarge the array with NaNs first and last
+                                        lhs_series.SetDataSequence(tt1, tt2, data, index1);
                                     }
                                     break;
                                 case ESeriesType.Timeless:
@@ -1461,7 +1495,7 @@ namespace Gekko
                                         // stuff below also handles array-timeseries just fine   
                                         double d = double.NaN;
                                         if (rhs_series.data.dataArray != null) d = rhs_series.data.dataArray[0];
-                                        bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
+                                        bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
                                         foreach (GekkoTime t in smpl.Iterate12())
                                         {
                                             lhs_series.SetData(t, d);
@@ -1507,7 +1541,7 @@ namespace Gekko
                             //---------------------------------------------------------       
                             // stuff below also handles array-timeseries just fine                     
                             double d = ((ScalarVal)rhs).val;
-                            bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
+                            bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
                             foreach (GekkoTime t in smpl.Iterate12())
                             {
                                 lhs_series.SetData(t, d);
@@ -1558,7 +1592,7 @@ namespace Gekko
                                 G.Writeln2("*** ERROR: Expected " + n + " list items, got " + rhs_list.list.Count);
                                 throw new GekkoException();
                             }
-                            bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
+                            bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
                             for (int i = 0; i < rhs_list.list.Count; i++)
                             {
                                 lhs_series.SetData(smpl.t1.Add(i), rhs_list.list[i].ConvertToVal());
@@ -1593,7 +1627,7 @@ namespace Gekko
                             // stuff below also handles array-timeseries just fine     
 
                             Matrix rhs_matrix = rhs as Matrix;
-                            bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
+                            bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
 
                             if (rhs_matrix.data.Length == 1)
                             {
@@ -1643,7 +1677,7 @@ namespace Gekko
 
         }
 
-        private static bool CreateSeriesIfNotExisting(string varnameWithFreq, ref Series lhs_series)
+        private static bool CreateSeriesIfNotExisting(string varnameWithFreq, string freq, ref Series lhs_series)
         {
             bool create = false;
             if (lhs_series != null && lhs_series.type == ESeriesType.Normal)
@@ -1654,7 +1688,7 @@ namespace Gekko
             {
                 //create it
                 create = true;
-                lhs_series = new Series(ESeriesType.Normal, Program.options.freq, varnameWithFreq);
+                lhs_series = new Series(ESeriesType.Normal, G.GetFreq(freq), varnameWithFreq);
             }
 
             return create;
