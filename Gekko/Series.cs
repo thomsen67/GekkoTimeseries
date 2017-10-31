@@ -629,9 +629,9 @@ namespace Gekko
             index2 = GetArrayIndex(gt2);
 
             if (index1 < 0 || index1 >= this.data.dataArray.Length || index2 < 0 || index2 >= this.data.dataArray.Length)
-            {                
+            {
                 index1 = ResizeDataArray(gt1);
-                index2 = ResizeDataArray(gt2);  //this would never change index1                                
+                index2 = ResizeDataArray(gt2);  //this would never change index1                                                
             }
 
             if (setStartEndPeriods)  //only relevant if the returned arrays is actually tampered with, which is normally NOT the case (only for a[,] and b[] array stuff in simulation)
@@ -1018,13 +1018,16 @@ namespace Gekko
                     this.data.anchorPeriodPositionInArray += diffSize;
                     if (adjustStartEndDates)  //only for setting data
                     {
-                        if (this.meta.firstPeriodPositionInArray != Globals.firstPeriodPositionInArrayNull)
+                        if (this.meta != null)
                         {
-                            this.meta.firstPeriodPositionInArray += diffSize;
-                        }
-                        if (this.meta.lastPeriodPositionInArray != Globals.lastPeriodPositionInArrayNull)
-                        {
-                            this.meta.lastPeriodPositionInArray += diffSize;
+                            if (this.meta.firstPeriodPositionInArray != Globals.firstPeriodPositionInArrayNull)
+                            {
+                                this.meta.firstPeriodPositionInArray += diffSize;
+                            }
+                            if (this.meta.lastPeriodPositionInArray != Globals.lastPeriodPositionInArrayNull)
+                            {
+                                this.meta.lastPeriodPositionInArray += diffSize;
+                            }
                         }
                     }
                 }
