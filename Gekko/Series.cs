@@ -142,7 +142,7 @@ namespace Gekko
             //Creates minimal light series
             this.type = type;
             this.freq = freq;
-            if (type != ESeriesType.Light)
+            if (type != ESeriesType.Normal && type != ESeriesType.Light)
             {
                 G.Writeln2("*** ERROR: Series constructor error");
                 throw new GekkoException();
@@ -638,9 +638,9 @@ namespace Gekko
             index2 = GetArrayIndex(gt2);
 
             if (index1 < 0 || index1 >= this.dataArray.Length || index2 < 0 || index2 >= this.dataArray.Length)
-            {
+            {                
                 index1 = ResizeDataArray(gt1);
-                index2 = ResizeDataArray(gt2);  //this would never change index1
+                index2 = ResizeDataArray(gt2);  //this would never change index1                                
             }
 
             if (setStartEndPeriods)  //only relevant if the returned arrays is actually tampered with, which is normally NOT the case (only for a[,] and b[] array stuff in simulation)
@@ -1249,14 +1249,25 @@ namespace Gekko
                     //!! this is done for both Normal and Light series
                     //   regarding Normal series, there is a pointer to the real dataArray
                     //   that lives in a databank. But in Lookup(), we always DeepClone() when
-                    //   putting stuff from the rhs into the lhs. So this should not be a problem.                    
-                    Series temp = new Series(ESeriesType.Light, this.freq);
-                    temp.dataArray = this.dataArray; //pointer, instead of copying 
-                    temp.anchorPeriod = this.anchorPeriod;
-                    temp.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray;
-                    temp.anchorPeriodPositionInArray += i; //just move the offset!
-                    rv = temp;
-
+                    //   putting stuff from the rhs into the lhs. So this should not be a problem. 
+                    if (this.type == ESeriesType.ArraySuper)
+                    {
+                        G.Writeln2("*** ERROR: You cannot use lags/lead directly on an array-series");
+                        throw new GekkoException();
+                    }
+                    else if (this.type == ESeriesType.Timeless)
+                    {
+                        rv = this;  //no effect of lag/lead
+                    }
+                    else
+                    {
+                        Series temp = new Series(this.type, this.freq);  //This Series gets the same type, so if it is Normal and access is outside dataArray, it can safely return a NaN.
+                        temp.dataArray = this.dataArray; //pointer, instead of copying 
+                        temp.anchorPeriod = this.anchorPeriod;
+                        temp.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray;
+                        temp.anchorPeriodPositionInArray += i; //just move the offset!
+                        rv = temp;
+                    }
                 }
                 else
                 {
@@ -1279,8 +1290,8 @@ namespace Gekko
             }
             else
             {
-                //Not x[2] or x[2020q1]                
-                rv = this.FindArrayTimeSeries(indexes, false);
+                //Not x[-2] or x[2020q1]                
+                rv = this.FindArraySeries(indexes, false);
             }
 
             return rv;
@@ -1292,7 +1303,7 @@ namespace Gekko
             return this.name == null;  //then this.meta will also be null, but we only test .name
         }
 
-        private Series FindArrayTimeSeries(IVariable[] indexes, bool isLhs)
+        private Series FindArraySeries(IVariable[] indexes, bool isLhs)
         {
             if (indexes.Length == 0)
             {
@@ -1556,7 +1567,7 @@ namespace Gekko
             else 
             {
                 //Will fail with an error if not all indexes are of STRING type                
-                Series ts = this.FindArrayTimeSeries(indexes, true);  //if not found, it will be created (since we are on the lhs) and inherit the timeless status from this timeseries.
+                Series ts = this.FindArraySeries(indexes, true);  //if not found, it will be created (since we are on the lhs) and inherit the timeless status from this timeseries.
                 O.LookupHelperLeftside(smpl, ts, rhsExpression);                
             }
         }

@@ -685,7 +685,7 @@ namespace Gekko
             //map != null:             the variable is found in the MAP, otherwise, the variable is found in a databank
             //rhsExpression != null:   it is an assignment of the left-hand side
 
-            string varnameWithFreq = HandleSigilAndFreq(varname, freq);
+             string varnameWithFreq = HandleSigilAndFreq(varname, freq);
 
             if (isLeftSideVariable)
             {
@@ -1419,7 +1419,7 @@ namespace Gekko
                                         bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
                                         AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);
                                         int i1 = -12345; int i2 = -12345; bool shouldOverwriteLaterOn = false;
-                                        Program.MergeTwoTimeseriesWithDateWindow(dates, lhs_series, rhs_series, ref i1, ref i2, ref shouldOverwriteLaterOn);
+                                        Program.MergeTwoTimeseriesWithDateWindow(dates, lhs_series, rhs_series, false, ref i1, ref i2, ref shouldOverwriteLaterOn);
                                         if (create)
                                         {
                                             AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
@@ -1442,7 +1442,7 @@ namespace Gekko
                                         bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
                                         AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);
                                         int i1 = -12345; int i2 = -12345; bool shouldOverwriteLaterOn = false;
-                                        Program.MergeTwoTimeseriesWithDateWindow(dates, lhs_series, rhs_series, ref i1, ref i2, ref shouldOverwriteLaterOn);
+                                        Program.MergeTwoTimeseriesWithDateWindow(dates, lhs_series, rhs_series, false, ref i1, ref i2, ref shouldOverwriteLaterOn);
                                         if (create)
                                         {
                                             AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);

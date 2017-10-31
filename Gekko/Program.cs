@@ -2815,7 +2815,7 @@ namespace Gekko
                                                 //now we need to merge the two series
                                                 //also see #98520983
                                                 bool shouldOverwriteLaterOn = false;
-                                                MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsProtobuf, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref shouldOverwriteLaterOn);
+                                                MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsProtobuf, true, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref shouldOverwriteLaterOn);
                                                 MergeTwoTimeseriesWithDateWindowHelper(dates, gmapExisting, nameDimProtobuf, tsProtobuf, shouldOverwriteLaterOn);
                                             }
                                         }
@@ -2835,10 +2835,9 @@ namespace Gekko
 
                                 //also see #98520983
                                 bool wipeExistingOut = false;
-                                MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsProtobuf, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref wipeExistingOut);
+                                MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsProtobuf, true, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref wipeExistingOut);
                                 MergeTwoTimeseriesWithDateWindowHelper(dates, databank, name, tsProtobuf, wipeExistingOut);
                             }
-
                         }
                         else
                         {
@@ -2905,7 +2904,7 @@ namespace Gekko
             }
         }
 
-        public static void MergeTwoTimeseriesWithDateWindow(AllFreqsHelper dates, Series tsExisting, Series tsSource, ref int maxYearInProtobufFile, ref int minYearInProtobufFile, ref bool shouldOverwriteLaterOn)
+        public static void MergeTwoTimeseriesWithDateWindow(AllFreqsHelper dates, Series tsExisting, Series tsSource, bool useRealDataPeriodForSource, ref int maxYearInProtobufFile, ref int minYearInProtobufFile, ref bool shouldOverwriteLaterOn)
         {
             if (tsSource.type == ESeriesType.Timeless || (tsExisting != null && tsExisting.type == ESeriesType.Timeless))
             {
@@ -2934,7 +2933,7 @@ namespace Gekko
                     //So we find the overlap of the source window and the date window (if it is active at all)
                     //Then we put that overlap into the existing timeseries
 
-                    //
+                    //  --> useRealDataPeriodForSource = true
                     //       source       existing          dates (2002-6)    Result
                     //2001                 
                     //2002                    M              x                    M
@@ -2948,12 +2947,58 @@ namespace Gekko
                     //2010 
                     //
                     // Here, firstSource is 2005, lastSource is 2007
-                    // Common window will be 2005-2006                    
-                    
+                    // Common window will be 2005-2006        
+                    // This funcionality is good for merging databanks
+
+
+                    //  --> useRealDataPeriodForSource = false
+                    //       source       existing          dates (2002-6)     Resut      [Result for sample 2003-6]
+                    //2001                 
+                    //2002                    M              x                 ERROR             M 
+                    //2003      M           100              x                                   M
+                    //2004      M           200              x                                   M
+                    //2005      1           300              x                                   1
+                    //2006      2           400              x                                   2
+                    //2007      3             M                                                  M                 
+                    //2008      M
+                    //2009 
+                    //2010 
+                    //                    
+                    // Will give an ERROR, since 2002 is outside of source array.
+                    //If dates are 2003-6, we get M for 2003 and 2004 (we are not merging databanks,
+                    //so we should use all the source data).
+
                     //Find the overlap of the source window (tsSource) and the date window
                     //Time consumption on the two lines below is ok, if the databank is trimmed (which is is for gbk files)
-                    GekkoTime firstSource = tsSource.GetRealDataPeriodFirst(); //takes a bit of time, but then we get the real period 
-                    GekkoTime lastSource = tsSource.GetRealDataPeriodLast(); //takes a bit of time, but then we get the real period
+
+                    
+                    GekkoTime firstSource = GekkoTime.tNull;
+                    GekkoTime lastSource = GekkoTime.tNull;
+
+                    if (!useRealDataPeriodForSource)
+                    {
+                        if (tsSource.freq == EFreq.Annual)
+                        {
+                            firstSource = dates.t1Annual;
+                            lastSource = dates.t2Annual;
+                        }
+                        else if (tsSource.freq == EFreq.Quarterly)
+                        {
+                            firstSource = dates.t1Quarterly;
+                            lastSource = dates.t2Quarterly;
+                        }
+                        else if (tsSource.freq == EFreq.Monthly)
+                        {
+                            firstSource = dates.t1Monthly;
+                            lastSource = dates.t2Monthly;
+                        }
+                        else throw new GekkoException();
+                    }
+                    else
+                    {
+                        firstSource = tsSource.GetRealDataPeriodFirst(); //takes a bit of time, but then we get the real period 
+                        lastSource = tsSource.GetRealDataPeriodLast(); //takes a bit of time, but then we get the real period
+                    }
 
                     //only for printing out the period
                     maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, lastSource.super);
