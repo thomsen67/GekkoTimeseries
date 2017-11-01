@@ -1288,8 +1288,15 @@ namespace Gekko
                                         Matrix m = new Matrix(1, n);
                                         int ii1 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t1);
                                         int ii2 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t2);
-                                        if (ii1 < 0) smpl.gekkoError.t1Problem = -ii1;
-                                        if (ii2 > rhs_series.data.dataArray.Length - 1) smpl.gekkoError.t2Problem = ii2 - (rhs_series.data.dataArray.Length - 1);
+                                        
+                                        int tooSmall = 0; int tooLarge = 0;
+                                        rhs_series.TooSmallOrTooLarge(ii1, ii2, out tooSmall, out tooLarge);
+                                        if(tooSmall>0 || tooLarge>0)
+                                        {
+                                            if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
+                                            return;
+                                        }
+
                                         int destinationStart = 0;
                                         double[,] destination = m.data;
                                         double[] source = rhs_series.data.dataArray;
@@ -1478,9 +1485,9 @@ namespace Gekko
                                             rhs_series.TooSmallOrTooLarge(rhs_series.GetArrayIndex(tt1), rhs_series.GetArrayIndex(tt2), out tooSmall, out tooLarge);
                                             if (tooSmall > 0 || tooLarge > 0)
                                             {
-                                                smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
-                                            }
-                                            return;
+                                                if(smpl.gekkoError==null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
+                                                return;
+                                            }                                            
                                         }
 
                                         int index1, index2;
@@ -1488,6 +1495,7 @@ namespace Gekko
                                         double[] data = rhs_series.GetDataSequence(out index1, out index2, tt1, tt2, false);
                                         //may enlarge the array with NaNs first and last
                                         lhs_series.SetDataSequence(tt1, tt2, data, index1);
+                                        if (create) AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
                                     }
                                     break;
                                 case ESeriesType.Timeless:
@@ -1503,14 +1511,7 @@ namespace Gekko
                                         {
                                             lhs_series.SetData(t, d);
                                         }
-                                        if (create)
-                                        {
-                                            AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
-                                        }
-                                        else
-                                        {
-                                            //nothing to do, either already existing in bank/map or array-subseries
-                                        }
+                                        if (create) AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);                                        
                                     }
                                     break;
                                 case ESeriesType.ArraySuper:
