@@ -1817,7 +1817,7 @@ d.Add("Y" ,Y);
 // ------------------- expression START -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-expression:                 additiveExpression;
+expression:                 additiveExpression -> ^(ASTEXPRESSION additiveExpression);
 
 additiveExpression:         (multiplicativeExpression -> multiplicativeExpression)
 							( (PLUS lbla=multiplicativeExpression -> ^(ASTPLUS $additiveExpression $lbla))

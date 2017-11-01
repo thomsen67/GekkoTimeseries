@@ -855,6 +855,11 @@ namespace Gekko
             InitSmpl(smpl, 0);
         }
 
+        public static IVariable HandleExpression(GekkoSmpl smpl, IVariable x)
+        {
+            return x;
+        }
+
         public static void InitSmpl(GekkoSmpl smpl, int i)
         {
             //called before each command is run
