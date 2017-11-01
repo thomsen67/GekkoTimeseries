@@ -453,13 +453,13 @@ namespace Gekko
             else
             {
                 int index = GetArrayIndex(t);
-                if (index < 0 || index >= this.data.dataArray.Length)
+                int tooSmall = 0; int tooLarge = 0;
+                this.TooSmallOrTooLarge(index, out tooSmall, out tooLarge);
+                if (tooSmall > 0 || tooLarge > 0)
                 {
                     if (this.type == ESeriesType.Light)
                     {
-                        if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError();
-                        if (index < 0) smpl.gekkoError.t1Problem = -index;
-                        if (index >= this.data.dataArray.Length) smpl.gekkoError.t2Problem = -(this.data.dataArray.Length - 1 - index);
+                        if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);                        
                     }
                     return double.NaN;  //out of bounds, we return a missing value (NaN)
                 }
@@ -655,6 +655,12 @@ namespace Gekko
         {
             tooSmall = -index1;
             tooLarge = index2 - (this.data.dataArray.Length - 1);
+        }
+
+        public void TooSmallOrTooLarge(int index, out int tooSmall, out int tooLarge)
+        {
+            tooSmall = -index;
+            tooLarge = index - (this.data.dataArray.Length - 1);
         }
 
         /// <summary>

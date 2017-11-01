@@ -1478,9 +1478,7 @@ namespace Gekko
                                             rhs_series.TooSmallOrTooLarge(rhs_series.GetArrayIndex(tt1), rhs_series.GetArrayIndex(tt2), out tooSmall, out tooLarge);
                                             if (tooSmall > 0 || tooLarge > 0)
                                             {
-                                                smpl.gekkoError = new GekkoError();
-                                                smpl.gekkoError.t1Problem = tooSmall;
-                                                smpl.gekkoError.t2Problem = tooLarge;
+                                                smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
                                             }
                                             return;
                                         }
