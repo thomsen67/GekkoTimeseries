@@ -1,138 +1,123 @@
-using System;
+
+
+ using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Windows.Forms;
+using
+ System.Windows.Forms;
 using System.Drawing;
 using Gekko.Parser;
 namespace Gekko
 {
-    public class TranslatedCode
+    public class
+     TranslatedCode
     {
         public static GekkoTime globalGekkoTimeIterator = Globals.tNull;
-        public static readonly ScalarVal i1 = new ScalarVal(10d);
-        public static IVariable list4 = null;
+        public static
+         IVariable list10 = null;
+        public static IVariable list11 = null;
+        public static readonly ScalarVal
+         i12 = new ScalarVal(2019d);
         public static void ClearTS(P p)
         {
         }
-        public static void ClearScalar(P p)
+        public static void ClearScalar(P
+         p)
         {
         }
         public static void C0(P p)
         {
 
-            GekkoTime t = Globals.tNull;
+            GekkoTime t =
+             Globals.tNull;
+
+            p.SetText(@"¤1");
 
 
-            p.SetText(@"¤2");
-            O.List o0 = new O.List();
-            o0.name = O.GetString((new ScalarString("i")));
-            o0.listItems = new List<string>();
-            o0.p = p;
-            o0.listItems = new List<string>();
-            o0.listItems.AddRange(O.GetList((new ScalarString("a"))));
-
-            o0.Exe();
+            p.SetText(@"¤16");
 
 
 
-
-            p.SetText(@"¤3");
-            O.Series o1 = new O.Series();
-
-            o1.lhs = null;
-            o1.p = p;
-            foreach (GekkoTime t2 in new GekkoTimeIterator(o1.t1, o1.t2))
-            {
-                t = t2;
-                double data = O.GetVal(i1, t);
-                if (o1.lhs == null) o1.lhs = O.GetTimeSeries(O.Indexer(t, O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("x"))), 1, O.ECreatePossibilities.Can), true, new ScalarString(@"a"))
-                 );
-                o1.lhs.SetData(t, data);
-            }
-            t = Globals.tNull;
-            o1.Exe();
+            p.SetText(@"¤24");
+            O.Reset o10 =
+             new O.Reset();
+            o10.p =
+             p; o10.Exe();
 
 
 
 
-            p.SetText(@"¤4");
-            O.Genr o2 = new O.Genr();
-            IVariable ts2 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("y"))), 1, O.ECreatePossibilities.Can);
-            IVariable ts5 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("x"))), 1);
-            o2.t1 = Globals.globalPeriodStart;
-            o2.t2 = Globals.globalPeriodEnd;
-
-            o2.lhs = null;
-            o2.p = p;
-            foreach (GekkoTime t2 in new GekkoTimeIterator(o2.t1, o2.t2))
-            {
-                t = t2;
-                IVariable temp8 = O.GetScalarFromCache(ref list4, "#i", false, false);
-
-                double[] storage6 = new double[((MetaList)temp8).Count()];
-                int counter7 = 0;
-                {
-                    GekkoTime t3 = t2;
-
-                    foreach (IVariable listloop_i3 in new O.GekkoListIterator(temp8))
-                    {
-                        t = t3;
-                        storage6[counter7] = O.GetVal(O.Indexer(t, ts5, false, listloop_i3), t);
-                        counter7++;
-                    }
-                }
-                IVariable temp12 = O.GetScalarFromCache(ref list4, "#i", false, false);
+            p.SetText(@"¤24");
+            Program.Cls(""); Program.Cls("output");
 
 
-                double[] storage10 = new double[((MetaList)temp12).Count()];
-                int counter11 = 0;
-                {
-                    GekkoTime t3 = t2;
 
-                    foreach (IVariable listloop_i9 in new O.GekkoListIterator(temp12))
-                    {
-                        t = t3;
-                        storage10[counter11] = O.GetVal(O.Indexer(t, ts5, false, listloop_i9), t);
-                        counter11++;
-                    }
-                }
-                double data = O.GetVal(O.Add(O.HandleSummations("sum", storage6), O.HandleSummations("sum", storage10), t), t);
-                if (o2.lhs == null) o2.lhs = O.GetTimeSeries(ts2);
-                o2.lhs.SetData(t, data);
-            }
-            t = Globals.tNull;
-            o2.meta = @"ser y = sum(#i, x[#i]) + sum(#i, x[#i])";
-            o2.Exe();
+            p.SetText(@"¤25");
+            O.Create o12 = new O.Create();
+            o12.listItems = new List<string>();
+            o12.listItems.AddRange(O.GetList((new ScalarString("a"))));
+
+            o12.listItems.AddRange(O.GetList((new ScalarString("b"))));
+
+            o12.listItems.AddRange(O.GetList((new ScalarString("c"))));
+
+            o12.p = p;
+            o12.Exe();
 
 
 
 
+            p.SetText(@"¤26");
+            O.Create o13 = new O.Create();
+            o13.listItems = new List<string>();
+            o13.listItems.AddRange(O.GetList((new ScalarString("x"))));
 
-            p.SetText(@"¤5");
-            O.Prt o3 = new O.Prt();
-            o3.prtType = "print";
+            o13.listItems.AddRange(O.GetList((new ScalarString("y"))));
 
-            {
-                List<int> bankNumbers = null;
-                O.Prt.Element ope3 = new O.Prt.Element();
-                ope3.label = O.SubstituteScalarsAndLists("y", false);
-                bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o3, ope3));
-                foreach (int bankNumber in bankNumbers)
-                {
-                    IVariable ts13 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString("y"))), bankNumber);
-                    foreach (GekkoTime t2 in new GekkoTimeIterator(o3.t1.Add(-2), o3.t2))
-                    {
-                        t = t2;
-                        O.GetVal777(ts13, bankNumber, ope3, t);
-                    }
-                    t = Globals.tNull;
-                }
-                o3.prtElements.Add(ope3);
-            }
+            o13.listItems.AddRange(O.GetList((new ScalarString("z"))));
+
+            o13.p = p;
+            o13.Exe();
 
 
-            o3.counter = 1;
-            o3.Exe();
+
+
+            p.SetText(@"¤27");
+            O.List o14 = new O.List();
+            o14.name = O.GetString((new ScalarString("vars")));
+            o14.listItems = new List<string>();
+            o14.p = p;
+            o14.listItems = new List<string>();
+            o14.listItems.AddRange(O.GetList((new ScalarString("a"))));
+
+            o14.listItems.AddRange(O.GetList((new ScalarString("b"))));
+
+            o14.listItems.AddRange(O.GetList((new ScalarString("c"))));
+
+            o14.Exe();
+
+
+
+
+            p.SetText(@"¤28");
+            O.List o15 = new O.List();
+            o15.name = O.GetString((new ScalarString("endogenize")));
+            o15.listItems = new List<string>();
+            o15.p = p;
+            o15.listItems = new List<string>();
+            o15.listItems.AddRange(O.GetList((new ScalarString("x"))));
+
+            o15.listItems.AddRange(O.GetList((new ScalarString("y"))));
+
+            o15.listItems.AddRange(O.GetList((new ScalarString("z"))));
+
+            o15.Exe();
+
+
+
+
+            p.SetText(@"¤30");
+            //O.SetStringData((new ScalarString("s")), UProc.simx(p, t, O.GetScalarFromCache(ref list10, "#vars", false, false), O.GetScalarFromCache(ref list11, "#endogenize", false, false), i12), false);
 
 
 
@@ -151,3 +136,4 @@ namespace Gekko
         }
     }
 }
+
