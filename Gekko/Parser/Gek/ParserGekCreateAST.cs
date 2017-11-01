@@ -174,7 +174,8 @@ namespace Gekko.Parser.Gek
             string csCode = s.ToString();
             string csMethods = null;
 
-            if (Program.options.system_code_split > 0) CodeSplit(ref csCode, ref csMethods);
+            //#8750932875984325
+            if (false && Program.options.system_code_split > 0) CodeSplit(ref csCode, ref csMethods);
 
             StringBuilder s2 = new StringBuilder();
             s2.AppendLine("using System;");
@@ -240,227 +241,227 @@ namespace Gekko.Parser.Gek
             return ch2;
         }
 
-        public static ConvertHelper CreateAST_OLD_DELETE(ParseHelper ph, P p)
-        {
-            //Q q = new Q();  //make a fresh container for method argument helpers
-            //p.SetQ(q);
+        //public static ConvertHelper CreateAST_OLD_DELETE(ParseHelper ph, P p)
+        //{
+        //    //Q q = new Q();  //make a fresh container for method argument helpers
+        //    //p.SetQ(q);
 
-            ConvertHelper ch2 = new ConvertHelper();
+        //    ConvertHelper ch2 = new ConvertHelper();
 
-            string textInput = ph.commandsText + "\r\n" + "\r\n"; //newlines for ease of use of ANTLR
+        //    string textInput = ph.commandsText + "\r\n" + "\r\n"; //newlines for ease of use of ANTLR
 
-            ANTLRStringStream input = new ANTLRStringStream(textInput);
+        //    ANTLRStringStream input = new ANTLRStringStream(textInput);
 
-            List<string> errors = null;
-            CommonTree t = null;
+        //    List<string> errors = null;
+        //    CommonTree t = null;
 
-            if (true)
-            {
-                G.Writeln2(ph.commandsText, Color.Green);
-                // Create a lexer attached to that input            
-                Cmd3Parser parser3 = null;
-                Cmd3Lexer lexer3 = new Cmd3Lexer(input);
-                //usually debugTokens=false, and this is stepped into manually (otherwise the tokens are consumed and preliminary steps cannot be run)
-                //if (Globals.runningOnTTComputer && Globals.debugTokens) Gekko.Parser.ParserCommon.DebugTokens(lexer3);
-                // Create a stream of tokens pulled from the lexer
-                CommonTokenStream tokens3 = new CommonTokenStream(lexer3);
-                // Create a parser attached to the token stream
-                parser3 = new Cmd3Parser(tokens3);
-                // Invoke the program rule in get return value
-                Cmd3Parser.start_return r3 = null;
+        //    if (true)
+        //    {
+        //        G.Writeln2(ph.commandsText, Color.Green);
+        //        // Create a lexer attached to that input            
+        //        Cmd3Parser parser3 = null;
+        //        Cmd3Lexer lexer3 = new Cmd3Lexer(input);
+        //        //usually debugTokens=false, and this is stepped into manually (otherwise the tokens are consumed and preliminary steps cannot be run)
+        //        //if (Globals.runningOnTTComputer && Globals.debugTokens) Gekko.Parser.ParserCommon.DebugTokens(lexer3);
+        //        // Create a stream of tokens pulled from the lexer
+        //        CommonTokenStream tokens3 = new CommonTokenStream(lexer3);
+        //        // Create a parser attached to the token stream
+        //        parser3 = new Cmd3Parser(tokens3);
+        //        // Invoke the program rule in get return value
+        //        Cmd3Parser.start_return r3 = null;
 
-                try
-                {
-                    r3 = parser3.start();
-                }
-                catch (Exception e)
-                {
-                    //G.Writeln(e.Message);
-                    List<string> temp = new List<string>();
-                    temp.Add(e.Message);
-                    //string textInput = ph.commandsText + "\r\n";
-                    string input2 = textInput + "\r\n";
-                    PrintLexerErrors(temp, Program.CreateListOfStringsFromString(input2), ph);
-                    throw new GekkoException(); //this will make a double error -- but the other one will be identified later on (both text and filename are null) and skipped -- a little bit hacky, but oh well...
-                }
+        //        try
+        //        {
+        //            r3 = parser3.start();
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            //G.Writeln(e.Message);
+        //            List<string> temp = new List<string>();
+        //            temp.Add(e.Message);
+        //            //string textInput = ph.commandsText + "\r\n";
+        //            string input2 = textInput + "\r\n";
+        //            PrintLexerErrors(temp, Program.CreateListOfStringsFromString(input2), ph);
+        //            throw new GekkoException(); //this will make a double error -- but the other one will be identified later on (both text and filename are null) and skipped -- a little bit hacky, but oh well...
+        //        }
 
-                //if (parser3.NumberOfSyntaxErrors > 0) G.Writeln2("ERROR!!");                                              
+        //        //if (parser3.NumberOfSyntaxErrors > 0) G.Writeln2("ERROR!!");                                              
 
-                if (parser3.GetErrors().Count > 0)
-                {
-                    PrintParserErrors(parser3.GetErrors(), Program.CreateListOfStringsFromString(textInput), ph);
-                    throw new GekkoException();
-                }
-                t = (CommonTree)r3.Tree;
-                PrintAST(t, 0);
-                return null;
-            }
+        //        if (parser3.GetErrors().Count > 0)
+        //        {
+        //            PrintParserErrors(parser3.GetErrors(), Program.CreateListOfStringsFromString(textInput), ph);
+        //            throw new GekkoException();
+        //        }
+        //        t = (CommonTree)r3.Tree;
+        //        PrintAST(t, 0);
+        //        return null;
+        //    }
 
-            // Create a lexer attached to that input            
-            Cmd2Parser parser2 = null;
-            Cmd2Lexer lexer2 = new Cmd2Lexer(input);
-            //usually debugTokens=false, and this is stepped into manually (otherwise the tokens are consumed and preliminary steps cannot be run)
-            if (Globals.runningOnTTComputer && Globals.debugTokens) Gekko.Parser.ParserCommon.DebugTokens(lexer2);
-            // Create a stream of tokens pulled from the lexer
-            CommonTokenStream tokens = new CommonTokenStream(lexer2);
-            // Create a parser attached to the token stream
-            parser2 = new Cmd2Parser(tokens);
-            // Invoke the program rule in get return value
-            Cmd2Parser.expr_return r = null;
-            DateTime t0 = DateTime.Now;
+        //    // Create a lexer attached to that input            
+        //    Cmd2Parser parser2 = null;
+        //    Cmd2Lexer lexer2 = new Cmd2Lexer(input);
+        //    //usually debugTokens=false, and this is stepped into manually (otherwise the tokens are consumed and preliminary steps cannot be run)
+        //    if (Globals.runningOnTTComputer && Globals.debugTokens) Gekko.Parser.ParserCommon.DebugTokens(lexer2);
+        //    // Create a stream of tokens pulled from the lexer
+        //    CommonTokenStream tokens = new CommonTokenStream(lexer2);
+        //    // Create a parser attached to the token stream
+        //    parser2 = new Cmd2Parser(tokens);
+        //    // Invoke the program rule in get return value
+        //    Cmd2Parser.expr_return r = null;
+        //    DateTime t0 = DateTime.Now;
 
-            try
-            {
-                r = parser2.expr();
-            }
-            catch (Exception e)
-            {
-                //G.Writeln(e.Message);
-                List<string> temp = new List<string>();
-                temp.Add(e.Message);
-                //string textInput = ph.commandsText + "\r\n";
-                string input2 = textInput + "\r\n";
-                PrintLexerErrors(temp, Program.CreateListOfStringsFromString(input2), ph);
-                throw new GekkoException(); //this will make a double error -- but the other one will be identified later on (both text and filename are null) and skipped -- a little bit hacky, but oh well...
-            }
+        //    try
+        //    {
+        //        r = parser2.expr();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        //G.Writeln(e.Message);
+        //        List<string> temp = new List<string>();
+        //        temp.Add(e.Message);
+        //        //string textInput = ph.commandsText + "\r\n";
+        //        string input2 = textInput + "\r\n";
+        //        PrintLexerErrors(temp, Program.CreateListOfStringsFromString(input2), ph);
+        //        throw new GekkoException(); //this will make a double error -- but the other one will be identified later on (both text and filename are null) and skipped -- a little bit hacky, but oh well...
+        //    }
 
-            if (parser2.GetErrors().Count > 0)
-            {
-                PrintParserErrors(parser2.GetErrors(), Program.CreateListOfStringsFromString(textInput), ph);
-                throw new GekkoException();
-            }
-            t = (CommonTree)r.Tree;
-
-
-            if (Globals.printAST)
-            {
-                PrintAST(t, 0);
-            }
-
-            GekkoStringBuilder s = new GekkoStringBuilder();
-            W wh2 = new W();
-
-            //TODO
-            //TODO
-            //TODO  one list for each command line
-            //TODO  
-            //TODO
-            //EmitCsCodeForCmdHelperStatic helperStatic = new EmitCsCodeForCmdHelperStatic(textInput);
-
-            wh2.fileNameContainingParsedCode = ph.fileName;
-
-            ASTNode root = new ASTNode(null);
-            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Create AST start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
-            CreateASTNodesForCmd(t, root, 0);
-            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Create AST end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
-
-            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("EMIT cs start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
-
-            Dictionary<string, int> functions = new Dictionary<string, int>();
-            Gekko.Parser.Gek.ParserGekWalkASTAndEmit.FindFunctionsUsedInGekkoCode(root, functions);
-            foreach (string function in functions.Keys)
-            {
-                if (Globals.uFunctionStorageCs.ContainsKey(function))  //case-insensitive anyway
-                {
-                    //ok
-                }
-                else if (Globals.gekkoInbuiltFunctions.ContainsKey(function))
-                {
-                    //ok                    
-                }
-                else if (Globals.lagFunctions.Contains(function))
-                {
-                    //some or most of these are contained in Globals.gekkoInbuiltFunctions
-                }
-                else
-                {
-                    //Now it is not FUNCTION inside the same .gcm file, it is not n Gekko.Functions,
-                    //and it is not a Gekko lag function. So we must look for it elsewhere, in 
-                    //the file system.
-                }
-            }
+        //    if (parser2.GetErrors().Count > 0)
+        //    {
+        //        PrintParserErrors(parser2.GetErrors(), Program.CreateListOfStringsFromString(textInput), ph);
+        //        throw new GekkoException();
+        //    }
+        //    t = (CommonTree)r.Tree;
 
 
+        //    if (Globals.printAST)
+        //    {
+        //        PrintAST(t, 0);
+        //    }
+
+        //    GekkoStringBuilder s = new GekkoStringBuilder();
+        //    W wh2 = new W();
+
+        //    //TODO
+        //    //TODO
+        //    //TODO  one list for each command line
+        //    //TODO  
+        //    //TODO
+        //    //EmitCsCodeForCmdHelperStatic helperStatic = new EmitCsCodeForCmdHelperStatic(textInput);
+
+        //    wh2.fileNameContainingParsedCode = ph.fileName;
+
+        //    ASTNode root = new ASTNode(null);
+        //    if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Create AST start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
+        //    CreateASTNodesForCmd(t, root, 0);
+        //    if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Create AST end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
+
+        //    if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("EMIT cs start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
+
+        //    Dictionary<string, int> functions = new Dictionary<string, int>();
+        //    Gekko.Parser.Gek.ParserGekWalkASTAndEmit.FindFunctionsUsedInGekkoCode(root, functions);
+        //    foreach (string function in functions.Keys)
+        //    {
+        //        if (Globals.uFunctionStorageCs.ContainsKey(function))  //case-insensitive anyway
+        //        {
+        //            //ok
+        //        }
+        //        else if (Globals.gekkoInbuiltFunctions.ContainsKey(function))
+        //        {
+        //            //ok                    
+        //        }
+        //        else if (Globals.lagFunctions.Contains(function))
+        //        {
+        //            //some or most of these are contained in Globals.gekkoInbuiltFunctions
+        //        }
+        //        else
+        //        {
+        //            //Now it is not FUNCTION inside the same .gcm file, it is not n Gekko.Functions,
+        //            //and it is not a Gekko lag function. So we must look for it elsewhere, in 
+        //            //the file system.
+        //        }
+        //    }
 
 
-            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("WALK START");
-            Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmit(root, 0, 0, textInput, wh2, p);
-            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("WALK END");
 
-            s.AppendLine(root.Code.ToString());
 
-            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("EMIT cs end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
+        //    if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("WALK START");
+        //    Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmit(root, 0, 0, textInput, wh2, p);
+        //    if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("WALK END");
 
-            //if (Globals.testing) G.Writeln(s.ToString(), Color.Gray);
+        //    s.AppendLine(root.Code.ToString());
 
-            string csCode = s.ToString();
-            string csMethods = null;
+        //    if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("EMIT cs end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
 
-            if (Program.options.system_code_split > 0) CodeSplit(ref csCode, ref csMethods);
+        //    //if (Globals.testing) G.Writeln(s.ToString(), Color.Gray);
 
-            StringBuilder s2 = new StringBuilder();
-            s2.AppendLine("using System;");
-            s2.AppendLine("using System.Collections.Generic;");
-            s2.AppendLine("using System.Text;");
-            s2.AppendLine("using System.Windows.Forms;");
-            s2.AppendLine("using System.Drawing;");  //to use Color.Red in G.Writeln()
-            s2.AppendLine("using Gekko.Parser;"); //all the AST_Xxx() methods are found in Gekko.Parser.AST.cs
-            s2.AppendLine("namespace Gekko");
-            s2.AppendLine("{");
+        //    string csCode = s.ToString();
+        //    string csMethods = null;
 
-            s2.AppendLine("public class TranslatedCode");
-            s2.AppendLine("{");
+        //    if (Program.options.system_code_split > 0) CodeSplit(ref csCode, ref csMethods);
 
-            s2.AppendLine("public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;");
-            s2.Append(wh2.headerCs);
+        //    StringBuilder s2 = new StringBuilder();
+        //    s2.AppendLine("using System;");
+        //    s2.AppendLine("using System.Collections.Generic;");
+        //    s2.AppendLine("using System.Text;");
+        //    s2.AppendLine("using System.Windows.Forms;");
+        //    s2.AppendLine("using System.Drawing;");  //to use Color.Red in G.Writeln()
+        //    s2.AppendLine("using Gekko.Parser;"); //all the AST_Xxx() methods are found in Gekko.Parser.AST.cs
+        //    s2.AppendLine("namespace Gekko");
+        //    s2.AppendLine("{");
 
-            s2.AppendLine("public static void ClearTS(P p) {");
-            s2.Append(wh2.headerMethodTsCs);
-            s2.AppendLine("}");
+        //    s2.AppendLine("public class TranslatedCode");
+        //    s2.AppendLine("{");
 
-            s2.AppendLine("public static void ClearScalar(P p) {");
-            s2.Append(wh2.headerMethodScalarCs);
-            s2.AppendLine("}");
+        //    s2.AppendLine("public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;");
+        //    s2.Append(wh2.headerCs);
 
-            s2.AppendLine(csMethods);  //definitions of C1(), C2(), etc. -- may be empty
+        //    s2.AppendLine("public static void ClearTS(P p) {");
+        //    s2.Append(wh2.headerMethodTsCs);
+        //    s2.AppendLine("}");
 
-            s2.Append(wh2.headerExpressions);  //definitions of GekkoExpression1(), ...
+        //    s2.AppendLine("public static void ClearScalar(P p) {");
+        //    s2.Append(wh2.headerMethodScalarCs);
+        //    s2.AppendLine("}");
 
-            s2.AppendLine("public static void CodeLines(P p)");
-            s2.AppendLine("{");
-            s2.AppendLine(Globals.gekkoSmplInit);
-            //The generated code, but much of it may be in codeCi
-            s2.AppendLine(csCode);
+        //    s2.AppendLine(csMethods);  //definitions of C1(), C2(), etc. -- may be empty
 
-            s2.AppendLine("}");  //method CodeLines()
-            s2.AppendLine("}");  //class TranslatedCode
+        //    s2.Append(wh2.headerExpressions);  //definitions of GekkoExpression1(), ...
 
-            s2.AppendLine("}");  //namespace Gekko            
+        //    s2.AppendLine("public static void CodeLines(P p)");
+        //    s2.AppendLine("{");
+        //    s2.AppendLine(Globals.gekkoSmplInit);
+        //    //The generated code, but much of it may be in codeCi
+        //    s2.AppendLine(csCode);
 
-            ch2.code = s2.ToString().Replace("`", Globals.QT);
-            ch2.errors = errors;  //not used?
+        //    s2.AppendLine("}");  //method CodeLines()
+        //    s2.AppendLine("}");  //class TranslatedCode
 
-            if (Globals.uFunctionStorageCs.Count > 0)
-            {
-                StringBuilder s3 = new StringBuilder();
-                foreach (string sCode in Globals.uFunctionStorageCs.Values)
-                {
-                    s3.Append(sCode);
-                }
-                ch2.codeUFunctions = s3.ToString().Replace("`", Globals.QT);
-            }
+        //    s2.AppendLine("}");  //namespace Gekko            
 
-            if (Globals.printAST)
-            {
-                G.Writeln(ch2.codeUFunctions);
-                G.Writeln("===============================");
-                G.Writeln("===============================");
-                G.Writeln("===============================");
-                G.Writeln(ch2.code);
-            }
+        //    ch2.code = s2.ToString().Replace("`", Globals.QT);
+        //    ch2.errors = errors;  //not used?
 
-            return ch2;
-        }
+        //    if (Globals.uFunctionStorageCs.Count > 0)
+        //    {
+        //        StringBuilder s3 = new StringBuilder();
+        //        foreach (string sCode in Globals.uFunctionStorageCs.Values)
+        //        {
+        //            s3.Append(sCode);
+        //        }
+        //        ch2.codeUFunctions = s3.ToString().Replace("`", Globals.QT);
+        //    }
+
+        //    if (Globals.printAST)
+        //    {
+        //        G.Writeln(ch2.codeUFunctions);
+        //        G.Writeln("===============================");
+        //        G.Writeln("===============================");
+        //        G.Writeln("===============================");
+        //        G.Writeln(ch2.code);
+        //    }
+
+        //    return ch2;
+        //}
 
         private static void CodeSplit(ref string csCode, ref string csMethods)
         {
