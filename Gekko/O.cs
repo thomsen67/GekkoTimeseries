@@ -852,6 +852,11 @@ namespace Gekko
 
         public static void InitSmpl(GekkoSmpl smpl)
         {
+            InitSmpl(smpl, 0);
+        }
+
+        public static void InitSmpl(GekkoSmpl smpl, int i)
+        {
             //called before each command is run
             if (smpl != null)
             {
@@ -860,6 +865,7 @@ namespace Gekko
                 smpl.t2 = Globals.globalPeriodEnd;
                 smpl.t3 = Globals.globalPeriodEnd.Add(0);
                 smpl.gekkoError = null;
+                smpl.gekkoErrorI = 0;
                 smpl.bankNumber = 0;
             }
         }        
@@ -3476,16 +3482,16 @@ namespace Gekko
             return mat;
         }
 
-        public static void TryNewSmpl(GekkoSmpl smpl, int iSmpl)
+        public static void TryNewSmpl(GekkoSmpl smpl)
         {
-            //int uoverflow = smpl.gekkoError.uoverflow;
+            smpl.gekkoErrorI++;            
             if (smpl.gekkoError.t1Problem > 0)
             {
-                smpl.t0 = smpl.t0.Add(-smpl.gekkoError.t1Problem * (iSmpl + 1));
+                smpl.t0 = smpl.t0.Add(-smpl.gekkoError.t1Problem * smpl.gekkoErrorI);
             }
             if (smpl.gekkoError.t2Problem > 0)
             {
-                smpl.t3 = smpl.t3.Add(smpl.gekkoError.t2Problem * (iSmpl + 1));
+                smpl.t3 = smpl.t3.Add(smpl.gekkoError.t2Problem * smpl.gekkoErrorI);
             }
             smpl.gekkoError = null;  //we try again
         }

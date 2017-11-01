@@ -70,6 +70,7 @@ namespace Gekko
         public GekkoTime t2 = GekkoTime.tNull;  //end of real sample  
         public GekkoTime t3 = GekkoTime.tNull;  //end of the period for which the expressions are calculated (<= t1) 
         public GekkoError gekkoError = null; //only set to something, if the sample .t0 to .t3 is too tight       
+        public int gekkoErrorI = 0;
         public int bankNumber = 0;  //0 is inactive, 1 is Ref databank
 
         public GekkoSmpl()

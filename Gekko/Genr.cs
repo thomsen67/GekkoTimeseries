@@ -54,42 +54,28 @@ namespace Gekko
             for (int iSmpl91 = 0; iSmpl91 < int.MaxValue; iSmpl91++)
             {
                 O.Lookup(smpl, null, null, "xx1", null, ivTmpvar90, true)
+                    
                 ;
+                break;
 
-                if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl91); else break;
+              
             };
 
-
-
-
-            p.SetText(@"¤0"); O.InitSmpl(smpl);
-            IVariable ivTmpvar97 = O.Indexer(smpl, O.Lookup(smpl, null, null, "xx1", null, null, false), O.Negate(smpl, i99)
-            );
-            for (int iSmpl98 = 0; iSmpl98 < int.MaxValue; iSmpl98++)
-            {
-                O.Lookup(smpl, null, null, "xx2", null, ivTmpvar97, true)
-                ;
-
-                if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl98); else break;
-            };
-
-
-
-
-            p.SetText(@"¤0"); O.InitSmpl(smpl);
             
-            for (int iSmpl101 = 0; iSmpl101 < int.MaxValue; iSmpl101++)
+
+            p.SetText(@"¤0"); O.InitSmpl(smpl);
+
+            Desti:
+
+            IVariable xxx = O.Add(smpl, O.Lookup(smpl, null, null, "xx1", null, null, false), O.Lookup(smpl, null, null, "xx1", null, null, false));
+            IVariable ivTmpvar100 = O.Indexer(smpl, xxx, O.Negate(smpl, i102));
+            O.Lookup(smpl, null, null, "xx3", null, ivTmpvar100, true);
+
+            if (smpl.HasError())
             {
-                IVariable ivTmpvar100 = O.Indexer(smpl, O.Add(smpl, O.Lookup(smpl, null, null, "xx1", null, null, false), O.Lookup(smpl, null, null, "xx1", null, null, false)), O.Negate(smpl, i102));
-                O.Lookup(smpl, null, null, "xx3", null, ivTmpvar100, true)
-                ;
-
-                if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl101); else break;
-            };
-
-
-
-
+                O.TryNewSmpl(smpl);
+                goto Desti;
+            }
         }
 
 

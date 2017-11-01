@@ -2959,7 +2959,8 @@ namespace Gekko.Parser.Gek
                                 code += "smpl." + Globals.bankNumberiName + " = 0;" + G.NL;
                                 code += "}" + G.NL;
                                 node.Code.A(code);
-                                node.Code.LoopSmplCode("O.Print(smpl, " + listName + ")");
+                                if(false) node.Code.LoopSmplCode("O.Print(smpl, " + listName + ")");
+                                node.Code.A("O.Print(smpl, " + listName + ");");
                             }
                             else { 
 
@@ -2978,9 +2979,8 @@ namespace Gekko.Parser.Gek
                                 methodCode += "}" + G.NL;
                                 methodCode += "}" + G.NL;  //end of method
                                 w.headerCs.Append(methodCode);
-
-
-                                node.Code.LoopSmplCode("O.Print(smpl, (" + funcName + "(smpl)" + "))");
+                                if(false) node.Code.LoopSmplCode("O.Print(smpl, (" + funcName + "(smpl)" + "))");
+                                node.Code.A("O.Print(smpl, (" + funcName + "(smpl)" + "));");
                             }
                         }
                         break;
@@ -3175,7 +3175,8 @@ namespace Gekko.Parser.Gek
                             {
                                 s += child.Code + G.NL;
                             }
-                            node.Code.LoopSmplCode(s);                            
+                            if(false) node.Code.LoopSmplCode(s);
+                            node.Code.A(s);
                         }
                         break;
                     case "ASTOPENHELPER":
@@ -4527,7 +4528,11 @@ namespace Gekko.Parser.Gek
                 //#982375: if it is 0, walk the sub-tree to see...                  
                 if (!w.wh.isGotoOrTarget)
                 {
-                    node.Code.CA("p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + node.Code + G.NL); //so errors get line numbers. Hmm with A() instead of CA() we get the command run 2 times...  //init the smpl for every command (this excludes IF, FOR, etc.? never mind).                    
+                    //node.Code.CA("p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + node.Code + G.NL); //so errors get line numbers. Hmm with A() instead of CA() we get the command run 2 times...  //init the smpl for every command (this excludes IF, FOR, etc.? never mind).                    
+
+                    string target = "Target" + ++Globals.counter;
+                    node.Code.CA("p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + target + ":" + G.NL + node.Code + G.NL + "if (smpl.HasError()) { O.TryNewSmpl(smpl); goto " + target + ";}"); //so errors get line numbers. Hmm with A() instead of CA() we get the command run 2 times...  //init the smpl for every command (this excludes IF, FOR, etc.? never mind).                    
+
                 }
 
                 if (Program.options.system_code_split > 0)
