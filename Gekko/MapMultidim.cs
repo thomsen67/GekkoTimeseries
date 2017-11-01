@@ -31,8 +31,11 @@ namespace Gekko
         }
 
         public void AddIVariableWithOverwrite(MapMultidimItem gmi, IVariable iv)
-        {
-            //GMapItem gmi = new GMapItem(s);
+        {            
+            if (iv.Type() == EVariableType.Series && ((Series)iv).type == ESeriesType.Light)
+            {
+                throw new GekkoException(); //this check can be removed at some point
+            }
             if (this.storage.ContainsKey(gmi)) this.storage.Remove(gmi);
             this.storage.Add(gmi, iv);
         }

@@ -175,7 +175,7 @@ namespace Gekko.Parser.Gek
             string csMethods = null;
 
             //#8750932875984325
-            if (false && Program.options.system_code_split > 0) CodeSplit(ref csCode, ref csMethods);
+            if (Program.options.system_code_split > 0) CodeSplit(ref csCode, ref csMethods);
 
             StringBuilder s2 = new StringBuilder();
             s2.AppendLine("using System;");
@@ -478,8 +478,14 @@ namespace Gekko.Parser.Gek
             int commandCounter = 0;
             int commandState = 0;
 
+            //int i = 0;
             foreach (string line in csLines)
             {
+                //i++;
+                //if (i == 120)
+                //{
+
+                //}
                 if (line.StartsWith(Globals.splitSTART2))
                 {
                     if (state == 1)  //should alternate

@@ -179,7 +179,8 @@ namespace Gekko
         public static string gekkoSmplIteratorName = "{__GekkoCounter__}";
         public static string startGekkoSmplIteratorCode = "for (int iSmpl" + gekkoSmplIteratorName + " = 0; iSmpl" + gekkoSmplIteratorName + " < int.MaxValue; iSmpl" + gekkoSmplIteratorName + "++) {" + G.NL;
         public static string endGekkoSmplIteratorCode = G.NL + "if (smpl.HasError()) O.TryNewSmpl(smpl, iSmpl" + gekkoSmplIteratorName + "); else break;" + G.NL + "}";
-
+        public const int smplInitStart = 0;  //could be -2
+        public const int smplInitEnd = 0;
 
         //public static string startGekkoListIteratorCode = "{" + G.NL + " //HEJ1 " + G.NL;
         //public static string endGekkoListIteratorCode = "}" + G.NL + " //HEJ2 " + G.NL;

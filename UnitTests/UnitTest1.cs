@@ -9228,7 +9228,6 @@ namespace UnitTests
             _AssertSeries(First(), "xx1", 2004, 4d, sharedDelta);
             _AssertSeries(First(), "xx1", 2005, 5d, sharedDelta);
             _AssertSeries(First(), "xx1", 2006, double.NaN, sharedDelta);
-
             I("xx2 = xx1[-1];");
             _AssertSeries(First(), "xx2", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx2", 2001, double.NaN, sharedDelta);
@@ -9237,15 +9236,37 @@ namespace UnitTests
             _AssertSeries(First(), "xx2", 2004, 3d, sharedDelta);
             _AssertSeries(First(), "xx2", 2005, 4d, sharedDelta);
             _AssertSeries(First(), "xx2", 2006, double.NaN, sharedDelta);
-
-            I("xx3 = (xx1 + xx1)[-1];");
-            //with smpl set to current period,
-            //result of xx1+xx1 over 2001-5 is 2,4,6,8,10, light series.
-            //the lag moves a pointer, so 2002-6 is 2,4,6,8,10.
-            //in Lookup() this should give an error, since 2001 is outside bounds
-            //of light timeseries.
+            I("xx3 = (xx1 + xx1)[-1];");            
             _AssertSeries(First(), "xx3", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx3", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xx3", 2003, 4d, sharedDelta);
+            _AssertSeries(First(), "xx3", 2004, 6d, sharedDelta);
+            _AssertSeries(First(), "xx3", 2005, 8d, sharedDelta);
+            _AssertSeries(First(), "xx3", 2006, double.NaN, sharedDelta);
+
+            I("RESET; TIME 2000 2005;");
+            I("xx1 = (-1, 1, 2, 3, 4, 5);");
+            _AssertSeries(First(), "xx1", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2000, -1d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2003, 3d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2004, 4d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, 5d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2006, double.NaN, sharedDelta);
+            I("TIME 2001 2005;");
+            I("xx2 = xx1[-1];");
+            _AssertSeries(First(), "xx2", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx2", 2001, -1d, sharedDelta);
+            _AssertSeries(First(), "xx2", 2002, 1d, sharedDelta);
+            _AssertSeries(First(), "xx2", 2003, 2d, sharedDelta);
+            _AssertSeries(First(), "xx2", 2004, 3d, sharedDelta);
+            _AssertSeries(First(), "xx2", 2005, 4d, sharedDelta);
+            _AssertSeries(First(), "xx2", 2006, double.NaN, sharedDelta);
+            I("xx3 = (xx1 + xx1)[-1];");
+            _AssertSeries(First(), "xx3", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", 2001, -2d, sharedDelta);
             _AssertSeries(First(), "xx3", 2002, 2d, sharedDelta);
             _AssertSeries(First(), "xx3", 2003, 4d, sharedDelta);
             _AssertSeries(First(), "xx3", 2004, 6d, sharedDelta);

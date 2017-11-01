@@ -860,10 +860,10 @@ namespace Gekko
             //called before each command is run
             if (smpl != null)
             {
-                smpl.t0 = Globals.globalPeriodStart.Add(-0);
+                smpl.t0 = Globals.globalPeriodStart.Add(Globals.smplInitStart);
                 smpl.t1 = Globals.globalPeriodStart;
                 smpl.t2 = Globals.globalPeriodEnd;
-                smpl.t3 = Globals.globalPeriodEnd.Add(0);
+                smpl.t3 = Globals.globalPeriodEnd.Add(Globals.smplInitEnd);
                 smpl.gekkoError = null;
                 smpl.gekkoErrorI = 0;
                 smpl.bankNumber = 0;

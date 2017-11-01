@@ -120,7 +120,7 @@ namespace Gekko
         [ProtoMember(10)]
         public ESeriesType type = ESeriesType.Normal;  //default
 
-        public int dataLag = 0;  //only used in Series Light, to create lags/leads
+        public int dataOffsetLag = 0;  //only used in Series Light, to create lags/leads, never stored in protobuf since Series Light are never stored there
 
         private Series()
         {
@@ -1273,7 +1273,7 @@ namespace Gekko
                         Series temp = new Series(this.type, this.freq);  //This Series gets the same type, so if it is Normal and access is outside dataArray, it can safely return a NaN.
                         //The two below correspond to just moving pointers
                         temp.data = this.data; 
-                        temp.dataLag = i;
+                        temp.dataOffsetLag = i;
                         rv = temp;                        
                     }
                 }
@@ -1601,7 +1601,7 @@ namespace Gekko
         public int GetAnchorPeriodPositionInArray()
         {
             //this.data is not null when this is called
-            return this.data.anchorPeriodPositionInArray + this.dataLag;  //.dataOffset changed from 0 to -1 is same as x[-1]
+            return this.data.anchorPeriodPositionInArray + this.dataOffsetLag;  //.dataOffset changed from 0 to -1 is same as x[-1]
         }
 
         public bool IsDirty()
@@ -1629,7 +1629,7 @@ namespace Gekko
             //Always make sure new fields are remembered in the DeepClone() method
             Series tsCopy = new Series(this.freq, this.name);
             tsCopy.type = this.type;
-            tsCopy.dataLag = this.dataLag;  //probably 0 in all cases
+            tsCopy.dataOffsetLag = this.dataOffsetLag;  //probably 0 in all cases
 
             if (this.data != null)
             {

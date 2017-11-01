@@ -178,23 +178,27 @@ namespace Gekko
 
         public void AddIVariable(IVariable x)
         {
-            Series ts = x as Series;
-            if (ts != null) AddIVariable(ts.name, x);
-            else
-            {
-                G.Writeln2("***ERROR: Internal error: please use AddIvariable(name, x)");
-                throw new GekkoException();
-            }
+            //Series ts = x as Series;
+            //if (ts != null) AddIVariable(ts.name, x);
+            //else
+            //{
+            //    G.Writeln2("***ERROR: Internal error: please use AddIvariable(name, x)");
+            //    throw new GekkoException();
+            //}
         }
 
         public void AddIVariableWithOverwrite(string name, IVariable x)
         {
             if (this.protect) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (x.Type() == EVariableType.Series && ((Series)x).type == ESeriesType.Light)
+            {
+                throw new GekkoException(); //this check can be removed at some point
+            }
             if (this.ContainsIVariable(name))
             {
-                this.RemoveIVariable(name);
-                this.AddIVariable(name, x);
+                this.RemoveIVariable(name);                
             }
+            this.AddIVariable(name, x);
         }
 
         public void AddIVariable(string name, IVariable x)
@@ -223,6 +227,11 @@ namespace Gekko
             Series ts = x as Series;
             if (ts != null)
             {
+                if (ts.type == ESeriesType.Light)
+                {
+                    throw new GekkoException(); //this check can be removed at some point
+                }
+
                 if (ts.name != name || !hasFreqIndicator)
                 {
                     G.Writeln2("*** ERROR: #763209485");  //use AddIVariable(x), remember tilde in x.variableName.
