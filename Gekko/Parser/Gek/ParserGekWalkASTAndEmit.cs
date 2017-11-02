@@ -995,7 +995,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTEXPRESSION":
                         {
-                            node.Code.CA("O.HandleExpression(smpl, " + node[0].Code + ")");
+                            node.Code.CA(node[0].Code);
                         }
                         break;
                     case "ASTD":

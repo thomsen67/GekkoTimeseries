@@ -20272,8 +20272,26 @@ namespace Gekko
             }
         }
 
+        public static IVariable Indexer(IVariable lag, GekkoSmpl smpl, IVariable x)
+        {
+            return null;
+        }
+
+        public static IVariable LagHelper(GekkoSmpl smpl, IVariable lag)
+        {
+            int d = (int)lag.ConvertToVal();
+            smpl.t0 = smpl.t0.Add(d);
+            return lag;
+        }
+
         public static void Re(GekkoSmpl smpl, string s, P p)
         {
+            //if (Globals.runningOnTTComputer)
+            //{                
+            //    IVariable z = Indexer(LagHelper(smpl, new ScalarVal(-1000)), smpl, O.Add(smpl, O.Lookup(smpl, null, "Work", "xx", "a", null, false), O.Lookup(smpl, null, "Work", "xx", "a", null, false)));
+            //}           
+            
+            
             //s may be "reset" or "restart"
             bool ini = false;
             if (s == "restart") ini = true;
