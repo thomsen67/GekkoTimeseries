@@ -206,7 +206,7 @@ namespace Gekko
             {
                 this.freq = freq;
                 this.name = variableName;
-                this.meta = new SeriesMetaInformation();                
+                this.meta = new SeriesMetaInformation();
                 this.dimensions = dimensions;
                 this.dimensionsStorage = new MapMultidim();
                 this.data = null; //for safety this is killed off                
@@ -231,7 +231,7 @@ namespace Gekko
                 this.name = variableName;
                 this.meta = new SeriesMetaInformation();
                 this.data.dataArray = new double[1];
-                this.data.dataArray[0] = val;                
+                this.data.dataArray[0] = val;
             }
             else
             {
@@ -247,7 +247,7 @@ namespace Gekko
         /// <param name="variableName">The variable name of the timeseries</param>
         public Series(EFreq frequency, string variableName) : this(ESeriesType.Normal, frequency, variableName)
         {
-        }       
+        }
 
         public Series(ESeriesType type, EFreq frequency, string variableName)
         {
@@ -262,18 +262,18 @@ namespace Gekko
             }
 
             this.type = type;
-            
+
             this.freq = frequency;
-                        
+
             this.name = variableName;  //Note: the variableName does contain a '!'. If the name is null, it is a light Series.                       
-            
+
             if (this.name != null)
             {
                 if (!this.name.Contains(Globals.freqIndicator))
                 {
                     G.Writeln2("*** ERROR: Missing freq indicator, see G.AddFreqToName()");
                     throw new GekkoException();
-                }                
+                }
             }
             this.meta = new SeriesMetaInformation();
             //ok that dataArray is null to start out with
@@ -363,7 +363,7 @@ namespace Gekko
                 {
                     this.data.dataArray[i] = double.NaN;
                 }
-            }                        
+            }
             this.SetDirty(true);
         }
 
@@ -426,10 +426,10 @@ namespace Gekko
         /// <returns>The value (double.NaN if missing)</returns>
         /// <exception cref="GekkoException">Exception if frequency of timeseries and period do not match.</exception>
         public double GetData(GekkoSmpl smpl, GekkoTime t)
-        {            
+        {
             if (this.freq != t.freq)
-            {                
-                FreqError(t);             
+            {
+                FreqError(t);
             }
             if (this.data.dataArray == null)
             {
@@ -459,7 +459,7 @@ namespace Gekko
                 {
                     if (this.type == ESeriesType.Light)
                     {
-                        if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);                        
+                        if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
                     }
                     return double.NaN;  //out of bounds, we return a missing value (NaN)
                 }
@@ -485,7 +485,7 @@ namespace Gekko
                 throw new GekkoException();
             }
             if (this.type != ESeriesType.Light && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
-                        
+
             if (this.data.dataArray == null)
             {
                 this.data.dataArray = new double[1];
@@ -534,7 +534,7 @@ namespace Gekko
             if (this.freq != t.freq)
             {
                 //See comment to GetData()
-                FreqError(t);                
+                FreqError(t);
             }
             if (this.data.dataArray == null)
             {
@@ -543,7 +543,7 @@ namespace Gekko
 
             if (this.type == ESeriesType.Timeless)
             {
-                this.data.dataArray[0] = value;             
+                this.data.dataArray[0] = value;
             }
             else
             {
@@ -563,7 +563,7 @@ namespace Gekko
                     {
                         this.meta.firstPeriodPositionInArray = index;
                     }
-                }                
+                }
             }
             if (this.type != ESeriesType.Light) this.SetDirty(true);
         }
@@ -697,7 +697,7 @@ namespace Gekko
                 throw new GekkoException();
             }
             if (this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change observations in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
-            
+
             if (this.freq != gt1.freq)
             {
                 //This check: better safe than sorry!
@@ -841,7 +841,7 @@ namespace Gekko
                     }
                 }
             }
-            return rv;            
+            return rv;
         }
 
         public GekkoTime GetRealDataPeriodLast()
@@ -865,7 +865,7 @@ namespace Gekko
             }
             return rv;
         }
-        
+
         /// <summary>
         /// Gets the period (GekkoTime) corresponding to a particular index in the data array.
         /// </summary>
@@ -905,13 +905,13 @@ namespace Gekko
             GekkoTime t = new GekkoTime(this.freq, resultSuperPer, resultSubPer);
             return t;
         }
-         
+
         // -----------------------------------------------------------------------------
         // ----------------- private methods -------------------------------------------
         // -----------------------------------------------------------------------------
 
         public void InitializeDataArray(double[] dataArray)
-        {            
+        {
             //Fill it with NaN's.
             if (Globals.initializeDataArrayWithNaN)
             {
@@ -1065,14 +1065,14 @@ namespace Gekko
                 this.data.dataArray = new double[Globals.defaultPeriodsWhenCreatingTimeSeries];
                 this.data.anchorPeriodPositionInArray = Globals.defaultPeriodsWhenCreatingTimeSeries / 2;  //possible to simulate 100 years forwards, and have data 100 years back.
                 InitializeDataArray(this.data.dataArray);  //may fill it with NaN's
-                                                      //the following two will always be fixed to what they
-                                                      //were for the very first observation entering the double[] array (unless the array is resized).
+                                                           //the following two will always be fixed to what they
+                                                           //were for the very first observation entering the double[] array (unless the array is resized).
                 this.data.anchorPeriod = t;
             }
         }
 
         public double GetDataFromIndex(int i)
-        {            
+        {
             if (i < 0 || i >= this.data.dataArray.Length)
             {
                 if (this.type == ESeriesType.Light)
@@ -1105,7 +1105,7 @@ namespace Gekko
         {
             string hash = null;
             for (int i = 0; i < indexes.Length; i++)
-            {                
+            {
                 hash += indexes[i];
                 if (i < indexes.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter
             }
@@ -1241,18 +1241,25 @@ namespace Gekko
                 ts.SetData(t, -this.GetData(smpl, t));
             }
             return ts;
-        }    
+        }
+
+        public static int FindLagLeadFixed(params IVariable[] indexes)
+        {
+            if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Val)
+            {
+                int i = O.ConvertToInt(indexes[0]);
+                return i;
+            }
+            return -12345;
+        }
 
         public IVariable Indexer(GekkoSmpl smpl, params IVariable[] indexes)
         {
             IVariable rv = null;
-
-            if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Val)
+            int i = FindLagLeadFixed(indexes);
+            if (i != -12345)
             {
-                int i = O.ConvertToInt(indexes[0]);
-
                 //TODO: Broken lags!!
-
                 if (IsLagOrLead(i))
                 {
                     //!! this is done for both Normal and Light series
@@ -1272,9 +1279,9 @@ namespace Gekko
                     {
                         Series temp = new Series(this.type, this.freq);  //This Series gets the same type, so if it is Normal and access is outside dataArray, it can safely return a NaN.
                         //The two below correspond to just moving pointers
-                        temp.data = this.data; 
+                        temp.data = this.data;
                         temp.dataOffsetLag = i;
-                        rv = temp;                        
+                        rv = temp;
                     }
                 }
                 else
@@ -1433,7 +1440,7 @@ namespace Gekko
             return ts;
         }
 
-        private static bool IsLagOrLead(int i)
+        public static bool IsLagOrLead(int i)
         {
             return i > -100 && i < 100;
         }

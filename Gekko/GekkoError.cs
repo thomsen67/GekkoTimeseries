@@ -12,6 +12,8 @@ namespace Gekko
         
         public GekkoError(int t1Problem, int t2Problem)
         {
+            G.Writeln2("*** ERROR: TooSmallTooLarge: " + t1Problem + " " + t2Problem);
+            throw new GekkoException();
             this.t1Problem = t1Problem;
             this.t2Problem = t2Problem;
         }               

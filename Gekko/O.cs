@@ -1867,30 +1867,70 @@ namespace Gekko
             x.IndexerSetData(smpl, y, indexes);
         }
 
-        public static IVariable Indexer(GekkoSmpl smpl, IVariable x, params IVariable[] indexes)
+        //See Indexer() below
+        public static GekkoSmpl Indexer2(GekkoSmpl smpl, params IVariable[] indexes)
         {
-            if (x == null)
+            GekkoSmpl smplOld = null;
+            int i = -12345;
+            i = Series.FindLagLeadFixed(indexes);
+            if (i != -12345)
             {
-                if (indexes.Length == 1)
+                smplOld = new GekkoSmpl();
+                smplOld.t0 = smpl.t0;
+                smplOld.t1 = smpl.t1;
+                smplOld.t2 = smpl.t2;
+                smplOld.t3 = smpl.t3;
+                
+                if (Series.IsLagOrLead(i))
                 {
-                    //[y]
-                    //['q*']
-                    ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);  //a bit cheating, but we save an interface method, and performance is not really an issue when indexing whole databanks
-                    return ss.Indexer(smpl, indexes);
+                    smpl.t0 = smpl.t0.Add(i);
+                    smpl.t3 = smpl.t3.Add(i);
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Stand-alone indexer with pattern [... , ... ] not possible");
-                    throw new GekkoException();
+                    smpl.t0 = new GekkoTime(EFreq.Annual, i, 1);
+                    smpl.t3 = new GekkoTime(EFreq.Annual, i, 1);
                 }
             }
+            return smplOld;
+        }
 
-            //x[y]
-            //a[1] or #a['q*']
-            //#x[1, 2]                 
-            //x['nz', 'w']           
-            return x.Indexer(smpl, indexes);
-                        
+        //See Indexer2() above. The first argument should be Indexer2(smpl, indexes)
+        public static IVariable Indexer(GekkoSmpl smplOld, GekkoSmpl smpl, IVariable x, params IVariable[] indexes)
+        {
+            try
+            {
+
+                if (x == null)
+                {
+                    if (indexes.Length == 1)
+                    {
+                        //[y]
+                        //['q*']
+                        ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);  //a bit cheating, but we save an interface method, and performance is not really an issue when indexing whole databanks
+                        return ss.Indexer(smpl, indexes);
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Stand-alone indexer with pattern [... , ... ] not possible");
+                        throw new GekkoException();
+                    }
+                }
+
+                //x[y]
+                //a[1] or #a['q*']
+                //#x[1, 2]                 
+                //x['nz', 'w']           
+                return x.Indexer(smpl, indexes);
+            }
+            finally
+            {
+                if (smplOld != null)
+                {
+                    smpl.t0 = smplOld.t0;
+                    smpl.t3 = smplOld.t3;
+                }
+            }            
         }        
 
         public static IVariable IndexerPlus(GekkoSmpl smpl, IVariable x, bool isLhs, IVariable y)
@@ -2551,13 +2591,13 @@ namespace Gekko
             }            
         }
 
-        public static IVariable GetValFromStringIndexer(GekkoSmpl smpl, string name, IVariable index, int bank)
-        {
-            //Used to pick out a value from a list item, like #m[2][2015], where index=2015
-            Series mts = O.GetTimeSeries(smpl, name, bank);  //always from work....
-            IVariable result = O.Indexer(smpl, mts, index);
-            return result;
-        }
+        //public static IVariable GetValFromStringIndexer(GekkoSmpl smpl, string name, IVariable index, int bank)
+        //{
+        //    //Used to pick out a value from a list item, like #m[2][2015], where index=2015
+        //    Series mts = O.GetTimeSeries(smpl, name, bank);  //always from work....
+        //    IVariable result = O.Indexer(smpl, mts, index);
+        //    return result;
+        //}
 
         public static Series GetTimeSeries(GekkoSmpl smpl, string originalName, int bankNumber)
         {
@@ -3482,19 +3522,19 @@ namespace Gekko
             return mat;
         }
 
-        public static void TryNewSmpl(GekkoSmpl smpl)
-        {
-            smpl.gekkoErrorI++;            
-            if (smpl.gekkoError.t1Problem > 0)
-            {
-                smpl.t0 = smpl.t0.Add(-smpl.gekkoError.t1Problem * smpl.gekkoErrorI);
-            }
-            if (smpl.gekkoError.t2Problem > 0)
-            {
-                smpl.t3 = smpl.t3.Add(smpl.gekkoError.t2Problem * smpl.gekkoErrorI);
-            }
-            smpl.gekkoError = null;  //we try again
-        }
+        //public static void TryNewSmpl(GekkoSmpl smpl)
+        //{
+        //    smpl.gekkoErrorI++;            
+        //    if (smpl.gekkoError.t1Problem > 0)
+        //    {
+        //        smpl.t0 = smpl.t0.Add(-smpl.gekkoError.t1Problem * smpl.gekkoErrorI);
+        //    }
+        //    if (smpl.gekkoError.t2Problem > 0)
+        //    {
+        //        smpl.t3 = smpl.t3.Add(smpl.gekkoError.t2Problem * smpl.gekkoErrorI);
+        //    }
+        //    smpl.gekkoError = null;  //we try again
+        //}
 
         public static double[,] SubtractMatrixMatrix(double[,] a, double[,] b, int m, int k)  //a - b
         {

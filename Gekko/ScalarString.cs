@@ -317,7 +317,8 @@ namespace Gekko
                 {
                     //#8932074324
                     //TODO: What about string 'jul05:fy' ??????
-                    IVariable result = O.GetValFromStringIndexer(smpl, this._string2, index, 1);
+                    //IVariable result = O.GetValFromStringIndexer(smpl, this._string2, index, 1);
+                    IVariable result = null;
                     rv = result;
                 }
                 else
