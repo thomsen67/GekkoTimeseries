@@ -1868,18 +1868,16 @@ namespace Gekko
         }
 
         //See Indexer() below
-        public static GekkoSmpl Indexer2(GekkoSmpl smpl, params IVariable[] indexes)
+        public static GekkoSmplRemember Indexer2(GekkoSmpl smpl, params IVariable[] indexes)
         {
-            GekkoSmpl smplOld = null;
+            GekkoSmplRemember smplRemember = null;
             int i = -12345;
             i = Series.FindLagLeadFixed(indexes);
             if (i != -12345)
             {
-                smplOld = new GekkoSmpl();
-                smplOld.t0 = smpl.t0;
-                smplOld.t1 = smpl.t1;
-                smplOld.t2 = smpl.t2;
-                smplOld.t3 = smpl.t3;
+                smplRemember = new GekkoSmplRemember();
+                smplRemember.t0 = smpl.t0;                
+                smplRemember.t3 = smpl.t3;
                 
                 if (Series.IsLagOrLead(i))
                 {
@@ -1892,11 +1890,11 @@ namespace Gekko
                     smpl.t3 = new GekkoTime(EFreq.Annual, i, 1);
                 }
             }
-            return smplOld;
+            return smplRemember;
         }
 
         //See Indexer2() above. The first argument should be Indexer2(smpl, indexes)
-        public static IVariable Indexer(GekkoSmpl smplOld, GekkoSmpl smpl, IVariable x, params IVariable[] indexes)
+        public static IVariable Indexer(GekkoSmplRemember smplOld, GekkoSmpl smpl, IVariable x, params IVariable[] indexes)
         {
             try
             {
@@ -1926,6 +1924,7 @@ namespace Gekko
             }
             finally
             {
+                //resetting t0 and t3 time to what it was before
                 if (smplOld != null)
                 {
                     smpl.t0 = smplOld.t0;

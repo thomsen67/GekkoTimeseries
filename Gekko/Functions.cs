@@ -1429,24 +1429,32 @@ namespace Gekko
         }
 
         //ALL THESE SHOULD BE DELETED
-        public static IVariable pch(GekkoSmpl smpl, IVariable x1)
+        public static IVariable pch(GekkoSmplRemember smplRemember, GekkoSmpl smpl, IVariable x1)
         {
-            if (x1.Type() == EVariableType.Series)
+            try
             {
-                Series x1_ts = x1 as Series;
-                Series ts = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
-                foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0, smpl.t3))
+                if (x1.Type() == EVariableType.Series)
                 {
-                    ts.SetData(t, (x1_ts.GetData(smpl, t) / x1_ts.GetData(smpl, t.Add(-1)) - 1d) * 100d);
+                    Series x1_ts = x1 as Series;
+                    Series ts = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                    foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0, smpl.t3))
+                    {
+                        ts.SetData(t, (x1_ts.GetData(smpl, t) / x1_ts.GetData(smpl, t.Add(-1)) - 1d) * 100d);
+                    }
+                    return ts;
                 }
-                return ts;
-            }            
-            else
-            {
-                G.Writeln2("*** ERROR: pch() function only valid for time series arguments");
-                throw new GekkoException();
+                else
+                {
+                    G.Writeln2("*** ERROR: pch() function only valid for time series arguments");
+                    throw new GekkoException();
+                }
+                return null;
             }
-            return null;
+            finally
+            {
+                smpl.t0 = smplRemember.t0;
+                smpl.t3 = smplRemember.t3;
+            }
         }
 
         //ALL THESE SHOULD BE DELETED
