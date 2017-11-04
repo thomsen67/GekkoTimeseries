@@ -1920,8 +1920,9 @@ namespace Gekko
                 //x[y]
                 //a[1] or #a['q*']
                 //#x[1, 2]                 
-                //x['nz', 'w']           
-                return x.Indexer(smpl, indexes);
+                //x['nz', 'w']    
+                IVariable rv = x.Indexer(smpl, indexes);
+                return rv;
             }
             finally
             {

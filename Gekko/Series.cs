@@ -1280,7 +1280,7 @@ namespace Gekko
                         Series temp = new Series(this.type, this.freq);  //This Series gets the same type, so if it is Normal and access is outside dataArray, it can safely return a NaN.
                         //The two below correspond to just moving pointers
                         temp.data = this.data;
-                        temp.dataOffsetLag = i;
+                        temp.dataOffsetLag = this.dataOffsetLag + i;
                         rv = temp;
                     }
                 }
