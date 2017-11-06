@@ -61,18 +61,18 @@ using System.Linq;
 
 namespace Gekko
 {
-    public class GekkoLagFunction
-    {
-        public GekkoTime t0 = GekkoTime.tNull;
-        public GekkoTime t3 = GekkoTime.tNull;
-        public Func<GekkoSmpl, IVariable> func = null;
-        public GekkoLagFunction(GekkoTime t0, GekkoTime t3, Func<GekkoSmpl, IVariable> func)
-        {
-            this.t0 = t0;
-            this.t3 = t3;
-            this.func = func;
-        }
-    }
+    //public class GekkoLagFunction
+    //{
+    //    public GekkoTime t0 = GekkoTime.tNull;
+    //    public GekkoTime t3 = GekkoTime.tNull;
+    //    public Func<GekkoSmpl, IVariable> func = null;
+    //    public GekkoLagFunction(GekkoTime t0, GekkoTime t3, Func<GekkoSmpl, IVariable> func)
+    //    {
+    //        this.t0 = t0;
+    //        this.t3 = t3;
+    //        this.func = func;
+    //    }
+    //}
 
 
     public class GekkoSmplRemember
@@ -20290,68 +20290,68 @@ namespace Gekko
             }
         }
 
-        public static IVariable Indexer(IVariable lag, GekkoSmpl smpl, IVariable x)
-        {
-            return null;
-        }       
+        //public static IVariable Indexer(IVariable lag, GekkoSmpl smpl, IVariable x)
+        //{
+        //    return null;
+        //}       
 
-        public static IVariable LagHelper(GekkoSmpl smpl, IVariable lag)
-        {
-            int d = (int)lag.ConvertToVal();
-            smpl.t0 = smpl.t0.Add(d);
-            return lag;
-        }
+        //public static IVariable LagHelper(GekkoSmpl smpl, IVariable lag)
+        //{
+        //    int d = (int)lag.ConvertToVal();
+        //    smpl.t0 = smpl.t0.Add(d);
+        //    return lag;
+        //}
 
-        public static GekkoLagFunction IndexerSLET(GekkoLagFunction glf, IVariable lag)
-        {            
-            int ilag = (int)lag.ConvertToVal();
-            GekkoLagFunction rv = new GekkoLagFunction(glf.t0.Add(ilag), glf.t3.Add(ilag), glf.func);
-            return rv;
-        }
+        //public static GekkoLagFunction IndexerSLET(GekkoLagFunction glf, IVariable lag)
+        //{            
+        //    int ilag = (int)lag.ConvertToVal();
+        //    GekkoLagFunction rv = new GekkoLagFunction(glf.t0.Add(ilag), glf.t3.Add(ilag), glf.func);
+        //    return rv;
+        //}
 
         public static void Re(GekkoSmpl smpl, string s, P p)
         {
             if (Globals.runningOnTTComputer)
             {
-                smpl = new GekkoSmpl(new GekkoTime(EFreq.Annual, 2000, 1), new GekkoTime(EFreq.Annual, 2001, 1));
-                Func<GekkoSmpl, IVariable> AddXx1Xx2_ = (smplHere) => O.Lookup(smplHere, null, null, "xx1", null, null, false).Add(smplHere, O.Lookup(smplHere, null, null, "xx2", null, null, false));
-                GekkoLagFunction addXxx1Xx2 = new GekkoLagFunction(smpl.t0, smpl.t3, AddXx1Xx2_);
+                //smpl = new GekkoSmpl(new GekkoTime(EFreq.Annual, 2000, 1), new GekkoTime(EFreq.Annual, 2001, 1));
+                //Func<GekkoSmpl, IVariable> AddXx1Xx2_ = (smplHere) => O.Lookup(smplHere, null, null, "xx1", null, null, false).Add(smplHere, O.Lookup(smplHere, null, null, "xx2", null, null, false));
+                //GekkoLagFunction addXxx1Xx2 = new GekkoLagFunction(smpl.t0, smpl.t3, AddXx1Xx2_);
 
-                //Globals.globalPeriodStart = new GekkoTime(EFreq.Annual, 2000, 1);
-                //Globals.globalPeriodEnd = new GekkoTime(EFreq.Annual, 2001, 1);
+                ////Globals.globalPeriodStart = new GekkoTime(EFreq.Annual, 2000, 1);
+                ////Globals.globalPeriodEnd = new GekkoTime(EFreq.Annual, 2001, 1);
 
-                Series xx1 = new Series(EFreq.Annual, "xx1!a");
-                xx1.SetData(new GekkoTime(EFreq.Annual, 1998, 1), 98);
-                xx1.SetData(new GekkoTime(EFreq.Annual, 1999, 1), 99);
-                xx1.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 100);
-                xx1.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 101);
+                //Series xx1 = new Series(EFreq.Annual, "xx1!a");
+                //xx1.SetData(new GekkoTime(EFreq.Annual, 1998, 1), 98);
+                //xx1.SetData(new GekkoTime(EFreq.Annual, 1999, 1), 99);
+                //xx1.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 100);
+                //xx1.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 101);
 
-                Series xx2 = new Series(EFreq.Annual, "xx2!a");
-                xx2.SetData(new GekkoTime(EFreq.Annual, 1998, 1), 198);
-                xx2.SetData(new GekkoTime(EFreq.Annual, 1999, 1), 199);
-                xx2.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 200);
-                xx2.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 201);
+                //Series xx2 = new Series(EFreq.Annual, "xx2!a");
+                //xx2.SetData(new GekkoTime(EFreq.Annual, 1998, 1), 198);
+                //xx2.SetData(new GekkoTime(EFreq.Annual, 1999, 1), 199);
+                //xx2.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 200);
+                //xx2.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 201);
 
-                Program.databanks.GetFirst().AddIVariable("xx1!a", xx1);
-                Program.databanks.GetFirst().AddIVariable("xx2!a", xx2);
+                //Program.databanks.GetFirst().AddIVariable("xx1!a", xx1);
+                //Program.databanks.GetFirst().AddIVariable("xx2!a", xx2);
 
-                GekkoLagFunction xx3 = IndexerSLET(IndexerSLET(new GekkoLagFunction(smpl.t0, smpl.t3, AddXx1Xx2_), new ScalarVal(-1d)), new ScalarVal(-1d));    //(xx1+xx2)[-1][-1]
+                //GekkoLagFunction xx3 = IndexerSLET(IndexerSLET(new GekkoLagFunction(smpl.t0, smpl.t3, AddXx1Xx2_), new ScalarVal(-1d)), new ScalarVal(-1d));    //(xx1+xx2)[-1][-1]
                 
-                GekkoSmpl smpl2 = new GekkoSmpl();
-                smpl2.t0 = xx3.t0;
-                smpl2.t3 = xx3.t3;
-                IVariable rv = xx3.func.Invoke(smpl2);
-                GekkoTime t2000 = new GekkoTime(EFreq.Annual, 2000, 1);
-                GekkoTime t2001 = new GekkoTime(EFreq.Annual, 2001, 1);
+                //GekkoSmpl smpl2 = new GekkoSmpl();
+                //smpl2.t0 = xx3.t0;
+                //smpl2.t3 = xx3.t3;
+                //IVariable rv = xx3.func.Invoke(smpl2);
+                //GekkoTime t2000 = new GekkoTime(EFreq.Annual, 2000, 1);
+                //GekkoTime t2001 = new GekkoTime(EFreq.Annual, 2001, 1);
 
-                double sum = 0d;
-                for (int i = 0; i < 100; i++)
-                {
-                    rv = xx3.func.Invoke(smpl);
-                    sum += ((Series)rv).GetData(smpl, t2001);
-                }
+                //double sum = 0d;
+                //for (int i = 0; i < 100; i++)
+                //{
+                //    rv = xx3.func.Invoke(smpl);
+                //    sum += ((Series)rv).GetData(smpl, t2001);
+                //}
 
-                G.Writeln2("SUM " + sum);
+                //G.Writeln2("SUM " + sum);
 
             }           
             

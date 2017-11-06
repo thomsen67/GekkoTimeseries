@@ -1243,20 +1243,28 @@ namespace Gekko
             return ts;
         }
 
-        public static int FindLagLeadFixed(params IVariable[] indexes)
+        public static void FindLagLeadFixed(ref int i, ref GekkoTime t, params IVariable[] indexes)
         {
-            if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Val)
-            {
-                int i = O.ConvertToInt(indexes[0]);
-                return i;
+            if (indexes.Length == 1) {
+                if (indexes[0].Type() == EVariableType.Val)
+                {
+                    i = O.ConvertToInt(indexes[0]);
+                }
+                else if (indexes[0].Type() == EVariableType.Date)
+                {
+                    t = ((ScalarDate)indexes[0]).date;
+                }                
             }
-            return -12345;
+            return;
         }
 
         public IVariable Indexer(GekkoSmpl smpl, params IVariable[] indexes)
         {
-            IVariable rv = null;
-            int i = FindLagLeadFixed(indexes);
+            IVariable rv = null;            
+
+            int i = -12345; GekkoTime t = GekkoTime.tNull;
+            Series.FindLagLeadFixed(ref i, ref t, indexes);
+
             if (i != -12345)
             {
                 //TODO: Broken lags!!
@@ -1298,14 +1306,14 @@ namespace Gekko
                     }
                 }
             }
-            else if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Date)
+            else if (!t.IsNull())
             {
-                double d = this.GetData(smpl, ((ScalarDate)indexes[0]).date);
+                double d = this.GetData(smpl, t);
                 rv = new ScalarVal(d);
             }
             else
             {
-                //Not x[-2] or x[2020q1]                
+                //Not x[-2] or x[2020] or x[2020a1] or x[2020q1]                
                 rv = this.FindArraySeries(indexes, false);
             }
 

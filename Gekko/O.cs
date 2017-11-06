@@ -1871,14 +1871,14 @@ namespace Gekko
         public static GekkoSmplRemember Indexer2(GekkoSmpl smpl, params IVariable[] indexes)
         {
             GekkoSmplRemember smplRemember = null;
-            int i = -12345;
-            i = Series.FindLagLeadFixed(indexes);
+            int i = -12345; GekkoTime t = GekkoTime.tNull;
+            Series.FindLagLeadFixed(ref i, ref t, indexes);
             if (i != -12345)
             {
                 smplRemember = new GekkoSmplRemember();
-                smplRemember.t0 = smpl.t0;                
+                smplRemember.t0 = smpl.t0;
                 smplRemember.t3 = smpl.t3;
-                
+
                 if (Series.IsLagOrLead(i))
                 {
                     smpl.t0 = smpl.t0.Add(i);
@@ -1889,6 +1889,11 @@ namespace Gekko
                     smpl.t0 = new GekkoTime(EFreq.Annual, i, 1);
                     smpl.t3 = new GekkoTime(EFreq.Annual, i, 1);
                 }
+            }
+            else if (!t.IsNull())
+            {
+                smpl.t0 = t;
+                smpl.t3 = t;
             }
             return smplRemember;
         }
