@@ -1427,34 +1427,27 @@ namespace Gekko
             //return new ScalarVal(Math.Pow(d1, d2));
             return null;
         }
-
-        //ALL THESE SHOULD BE DELETED
-        public static IVariable pch(GekkoSmplRemember smplRemember, GekkoSmpl smpl, IVariable x1)
+        
+        [MyCustom(Lag = "lag=1")]
+        public static IVariable pch(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
         {
-            try
+            Program.RevertSmpl(smplOriginal, smpl);
+            if (x1.Type() == EVariableType.Series)
             {
-                if (x1.Type() == EVariableType.Series)
+                Series x1_ts = x1 as Series;
+                Series ts = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0, smpl.t3))
                 {
-                    Series x1_ts = x1 as Series;
-                    Series ts = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
-                    foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0, smpl.t3))
-                    {
-                        ts.SetData(t, (x1_ts.GetData(smpl, t) / x1_ts.GetData(smpl, t.Add(-1)) - 1d) * 100d);
-                    }
-                    return ts;
+                    ts.SetData(t, (x1_ts.GetData(smpl, t) / x1_ts.GetData(smpl, t.Add(-1)) - 1d) * 100d);
                 }
-                else
-                {
-                    G.Writeln2("*** ERROR: pch() function only valid for time series arguments");
-                    throw new GekkoException();
-                }
-                return null;
+                return ts;
             }
-            finally
+            else
             {
-                smpl.t0 = smplRemember.t0;
-                smpl.t3 = smplRemember.t3;
+                G.Writeln2("*** ERROR: pch() function only valid for time series arguments");
+                throw new GekkoException();
             }
+            return null;
         }
 
         //ALL THESE SHOULD BE DELETED
@@ -1469,19 +1462,24 @@ namespace Gekko
             return null;
         }
 
-        //ALL THESE SHOULD BE DELETED
-        public static IVariable lag(GekkoSmpl t, IVariable x, IVariable ilag)
+        [MyCustom(Lag = "lag=[2]")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
+        public static IVariable lag(GekkoSmpl2 smpl2, GekkoSmpl smpl, IVariable x, IVariable ilag)
         {
-            return null;
+            Program.RevertSmpl(smpl2, smpl);
+            return O.Indexer(smpl2, smpl, x, O.Negate(smpl, ilag));
         }
-                
-        public static IVariable movsum(GekkoSmpl smpl, IVariable x, IVariable ilags)
+
+        [MyCustom(Lag = "lag=[2]-1")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
+        public static IVariable movsum(GekkoSmpl2 smpl2, GekkoSmpl smpl, IVariable x, IVariable ilags)
         {
+            Program.RevertSmpl(smpl2, smpl);
             return MovAvgSum(smpl, x, ilags, false);            
         }
 
-        public static IVariable movavg(GekkoSmpl smpl, IVariable x, IVariable ilags)
+        [MyCustom(Lag = "lag=[2]-1")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
+        public static IVariable movavg(GekkoSmpl2 smpl2, GekkoSmpl smpl, IVariable x, IVariable ilags)
         {
+            Program.RevertSmpl(smpl2, smpl);
             return MovAvgSum(smpl, x, ilags, true);
         }
 

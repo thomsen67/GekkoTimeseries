@@ -6,36 +6,41 @@ using System.Drawing;
 using Gekko.Parser;
 namespace Gekko
 {
-public class TranslatedCode
-{
-public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
-public static void ClearTS(P p) {
-}
-public static void ClearScalar(P p) {
-}
+    public class TranslatedCode
+    {
+        public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
+        public static readonly ScalarVal i94 = new ScalarVal(2d);
+        public static readonly ScalarVal i95 = new ScalarVal(2d);
+        public static void ClearTS(P p)
+        {
+        }
+        public static void ClearScalar(P p)
+        {
+        }
 
-public static void CodeLines(P p)
-{
-GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl);
+        public static void CodeLines(P p)
+        {
+            GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl);
 
-//[[splitSTART]]
-p.SetText(@"¤0"); O.InitSmpl(smpl);
-List m80 = null; try { m80 = new List();
-for (smpl.bankNumber = 0; smpl.bankNumber < 1; smpl.bankNumber++) {
-m80.Add(O.Indexer(O.Indexer2(smpl, new ScalarDate(G.FromStringToDate("1900a1"))
-), smpl, O.Add(smpl, O.Lookup(smpl, null, null, "xx", null, null, false), O.Lookup(smpl, null, null, "xx", null, null, false)), new ScalarDate(G.FromStringToDate("1900a1"))
-));
-}
-}
-finally
-{
-smpl.bankNumber = 0;
-}
-O.Print(smpl, m80);
+            //[[splitSTART]]
+            p.SetText(@"¤1"); O.InitSmpl(smpl);
+            List m96 = null; try
+            {
+                m96 = new List();
+                for (smpl.bankNumber = 0; smpl.bankNumber < 1; smpl.bankNumber++)
+                {
+                    m96.Add(Functions.movsum(O.Smpl(smpl, O.Add(smpl, i95, new ScalarVal(-1d))), smpl, Functions.movsum(O.Smpl(smpl, O.Add(smpl, i94, new ScalarVal(-1d))), smpl, O.Lookup(smpl, null, null, "xx", null, null, false), i94), i95));
+                }
+            }
+            finally
+            {
+                smpl.bankNumber = 0;
+            }
+            O.Print(smpl, m96);
 
-//[[splitSTOP]]
+            //[[splitSTOP]]
 
 
-}
-}
+        }
+    }
 }

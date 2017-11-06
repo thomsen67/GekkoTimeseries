@@ -1111,41 +1111,82 @@ namespace Gekko
             }
             return hash;
         }
-
-        //public Tuple<GekkoTime, GekkoTime> CommonPeriod(GekkoSmpl smpl, Series x1, Series x2)
-        //{
-        //    GekkoTime t1 = GekkoTime.tNull;
-        //    GekkoTime t2 = GekkoTime.tNull;
-
-        //    Tuple<GekkoTime, GekkoTime> common = new Tuple<GekkoTime, GekkoTime>(smpl.t0, smpl.t3);
-        //    if (x1.IsLight())
-        //    {
-
-        //        //will be fast if x1.freq == smpl.t0.freq (and will also test that smpl.t0.freq == smpl.t3.freq)
-        //        GekkoTime.ConvertFreqs(x1.freq, smpl.t0, smpl.t3, ref t1, ref t2);
-
-
-
-        //    }
-        //    else
-        //    {
-
-        //    }
-
-        //    return common;
-        //}
+               
 
         public IVariable Add(GekkoSmpl smpl, IVariable input)
         {
             //Incoming is this --> x1 and input --> x2
-            Series x1 = this;  //born as series
-            IVariable x2 = input;  //inknown type
-            double x2_val = double.NaN;
-            Series x2_series = input as Series;
 
-            IVariable rv = null;  //return value              
+            //-------------------------------------
+            //x1 = SERIES
+            //x2 = SERIES or VAL or MATRIX 1x1
+            //-------------------------------------
+
             Series rv_series = null;
 
+            Series x1_series, x2_series; double x2_val;
+            PrepareInput(input, out x1_series, out x2_series, out x2_val);
+
+            GekkoTime window1, window2, windowNew1, windowNew2;
+            InitWindows(out window1, out window2, out windowNew1, out windowNew2);
+
+            GetStartEndPeriod(smpl, x1_series, ref window1, ref window2); //if light series, the returned period corresponds to array size, else smpl window is used
+
+            if (x2_series != null)
+            {
+                GetStartEndPeriod(smpl, x2_series, ref windowNew1, ref windowNew2); //if light series, the returned period corresponds to array size, else smpl window is used
+                FindCommonWindow(ref window1, ref window2, windowNew1, windowNew2);
+            }
+
+            rv_series = new Series(ESeriesType.Light, window1, window2);  //also checks that nobs > 0            
+
+            int i1 = x1_series.FromGekkoTimeToArrayIndex(window1);
+
+            if (x2_series != null)
+            {
+                // -------------------
+                // x2 is a SERIES
+                // -------------------
+                foreach (GekkoTime t in new GekkoTimeIterator(window1, window2))
+                {
+                    rv_series.SetData(t, x1_series.GetData(smpl, t) + x2_series.GetData(smpl, t));
+                }
+
+            }
+            else
+            {
+                // ---------------------------
+                // x2 is a VAL or MATRIX 1x1
+                // ---------------------------
+                foreach (GekkoTime t in new GekkoTimeIterator(window1, window2))
+                {
+                    rv_series.SetData(t, x1_series.GetData(smpl, t) + x2_val);
+                }
+            }
+
+            return rv_series;
+        }
+
+        private static void InitWindows(out GekkoTime window1, out GekkoTime window2, out GekkoTime windowNew1, out GekkoTime windowNew2)
+        {
+            window1 = GekkoTime.tNull;
+            window2 = GekkoTime.tNull;
+            windowNew1 = GekkoTime.tNull;
+            windowNew2 = GekkoTime.tNull;
+        }
+
+        private static void FindCommonWindow(ref GekkoTime window1, ref GekkoTime window2, GekkoTime windowNew1, GekkoTime windowNew2)
+        {
+            if (windowNew1.StrictlySmallerThan(window1)) window1 = windowNew1;
+            if (windowNew2.StrictlyLargerThan(window2)) window2 = windowNew2;
+        }
+
+        private void PrepareInput(IVariable input, out Series x1, out Series x2_series, out double x2_val)
+        {
+            x1 = this;
+            IVariable x2 = input;  //inknown type
+            x2_val = double.NaN;
+            x2_series = input as Series;
             if (x2_series == null)
             {
                 x2_val = x2.ConvertToVal();  //VAL or 1x1 MATRIX is ok
@@ -1158,54 +1199,18 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-
-            GekkoTime windowT1 = GekkoTime.tNull;
-            GekkoTime windowT2 = GekkoTime.tNull;
-            GekkoTime x2T1 = GekkoTime.tNull;
-            GekkoTime x2T2 = GekkoTime.tNull;
-
-            GetStartEndPeriod(smpl, x1, ref windowT1, ref windowT2); //if light series, the returned period corresponds to array size, else smpl window is used
-
-            if (x2_series != null)
-            {
-                GetStartEndPeriod(smpl, x2_series, ref x2T1, ref x2T2); //if light series, the returned period corresponds to array size, else smpl window is used
-                if (x2T1.StrictlySmallerThan(windowT1)) windowT1 = x2T1;
-                if (x2T2.StrictlyLargerThan(windowT2)) windowT2 = x2T2;
-            }
-
-            rv_series = new Series(ESeriesType.Light, windowT1, windowT2);  //also checks that nobs > 0
-
-            int newi = 0;
-            int i1 = Series.FromGekkoTimeToArrayIndex(windowT1, x1.data.anchorPeriod, x1.GetAnchorPeriodPositionInArray());
-            int i2 = -12345;
-            if (x2_series != null) i2 = Series.FromGekkoTimeToArrayIndex(windowT1, x2_series.data.anchorPeriod, x2_series.GetAnchorPeriodPositionInArray());
-
-            for (int i = 0; i < rv_series.data.dataArray.Length; i++)
-            {
-                if (x2_series == null)
-                {
-                    rv_series.data.dataArray[i] = x1.GetDataFromIndex(i + i1) + x2_val;
-                }
-                else
-                {
-                    rv_series.data.dataArray[i] = x1.GetDataFromIndex(i + i1) + x2_series.GetDataFromIndex(i + i2);
-                }
-            }
-
-            rv = rv_series;
-            return rv;
         }
 
-        private static void GetStartEndPeriod(GekkoSmpl smpl, Series x1, ref GekkoTime x1t0, ref GekkoTime x1t3)
+        private static void GetStartEndPeriod(GekkoSmpl smpl, Series x1, ref GekkoTime window1, ref GekkoTime window2)
         {
             if (x1.type == ESeriesType.Light)
             {
-                x1t0 = x1.data.anchorPeriod.Add(-x1.GetAnchorPeriodPositionInArray());
-                x1t3 = x1.data.anchorPeriod.Add(-x1.GetAnchorPeriodPositionInArray() + x1.data.dataArray.Length - 1);
+                window1 = x1.data.anchorPeriod.Add(-x1.GetAnchorPeriodPositionInArray());
+                window2 = window1.Add(x1.data.dataArray.Length - 1);
             }
             else
             {
-                GekkoTime.ConvertFreqs(x1.freq, smpl.t0, smpl.t3, ref x1t0, ref x1t3);
+                GekkoTime.ConvertFreqs(x1.freq, smpl.t0, smpl.t3, ref window1, ref window2);
             }
         }
 

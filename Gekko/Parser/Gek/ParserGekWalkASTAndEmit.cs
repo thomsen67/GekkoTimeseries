@@ -1878,7 +1878,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 //method def:
                                 sb1.AppendLine("public static IVariable " + tempName + "(GekkoSmpl smpl" + parentListLoopVars1 + ") {");
-                                if (G.Equal(functionNameLower, "sum")) 
+                                if (G.Equal(functionNameLower, "sum"))
                                 {
                                     sb1.AppendLine("Series " + tempName + " = new Series(ESeriesType.Normal, Program.options.freq, null); " + tempName + ".SetZero(smpl);" + G.NL);
                                 }
@@ -1914,24 +1914,91 @@ namespace Gekko.Parser.Gek
                             {
                                 //Not a sum() or unfold() function that is going to be looped                                
 
-                                string args = null;
-                                for (int i = 1; i < node.ChildrenCount(); i++)
-                                {
-                                    args += ", " + node[i].Code;
-                                }
+                                
 
-                                int numberOfArguments = node.ChildrenCount() - 1;
-
-                                if (Globals.gekkoInbuiltFunctions.ContainsKey(functionNameLower))
+                                string meta = null;
+                                if (Globals.gekkoInbuiltFunctions.TryGetValue(functionNameLower, out meta))
                                 {
-                                    node.Code.A("Functions." + functionNameLower).A("(" + Globals.functionT1Cs + "").A(args).A(")");
+                                    string extra = null;
+                                    int lagIndex = -12345;
+                                    int lagIndexOffset = 0;
+                                    if (meta != null)
+                                    {
+                                        meta = meta.ToLower().Replace(" ", "");
+                                        if (meta.StartsWith("lag="))
+                                        {
+                                            meta = meta.Replace("lag=", "");
+                                            if (G.IsInteger(meta))
+                                            {
+                                                //simple: lag=2                                                
+                                                extra = "O.Smpl(smpl, " + -int.Parse(meta) + "), ";
+                                            }
+                                            else
+                                            {
+                                                //example: lag=[2] or lag=[2]-1
+                                                string[] ss = meta.Split('-');
+                                                if (ss.Length == 2)
+                                                {
+                                                    lagIndexOffset = -int.Parse(ss[1]);
+                                                    lagIndex = int.Parse(ss[0].Substring(1, ss[0].Length - 2));
+                                                }
+                                                else
+                                                {
+                                                    ss = meta.Split('+');
+                                                    if (ss.Length == 2)
+                                                    {
+                                                        lagIndexOffset = int.Parse(ss[1]);
+                                                        lagIndex = int.Parse(ss[0].Substring(1, ss[0].Length - 2));
+                                                    }
+                                                    else
+                                                    {
+                                                        //no offset
+                                                        lagIndexOffset = 0;
+                                                        lagIndex = int.Parse(meta.Substring(1, meta.Length - 2));
+                                                    }
+                                                }
+
+                                            }
+                                        }
+                                        else
+                                        {
+                                            //ignore
+                                        }                                        
+                                    }
+
+                                    string args = null;
+                                    for (int i = 1; i < node.ChildrenCount(); i++)
+                                    {
+                                        if (lagIndex == i)
+                                        {
+                                            if (lagIndexOffset == 0)
+                                            {
+                                                extra = "O.Smpl(smpl, " + node[i].Code + "), ";
+                                            }
+                                            else
+                                            {
+                                                extra = "O.Smpl(smpl, O.Add(smpl, " + node[i].Code + ", new ScalarVal(" + lagIndexOffset + "d))), ";
+                                            }
+                                        }                                        
+                                        
+                                        args += ", " + node[i].Code;
+                                        
+                                    }
+                                    int numberOfArguments = node.ChildrenCount() - 1;
+                                    node.Code.A("Functions." + functionNameLower).A("(" + extra + Globals.functionT1Cs + "").A(args).A(")");
                                 }
                                 else
                                 {
+                                    string args = null;
+                                    for (int i = 1; i < node.ChildrenCount(); i++)
+                                    {
+                                        args += ", " + node[i].Code;
+                                    }
+                                    int numberOfArguments = node.ChildrenCount() - 1;
                                     node.Code.A("O.FunctionLookup").A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionT1Cs + "").A(args).A(")");
                                 }
 
-                            }                         
+                            }                        
                         }
                         break;
                     

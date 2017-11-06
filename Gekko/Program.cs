@@ -74,8 +74,13 @@ namespace Gekko
     //    }
     //}
 
+    
+    public class MyCustomAttribute : Attribute
+    {
+        public string Lag { get; set; }
+    }
 
-    public class GekkoSmplRemember
+    public class GekkoSmpl2
     {
         public GekkoTime t0 = GekkoTime.tNull;
         public GekkoTime t3 = GekkoTime.tNull;
@@ -20479,17 +20484,30 @@ namespace Gekko
             CrossThreadStuff.Pulse();
         }
 
-        public static Dictionary<string, int> FindGekkoInbuiltFunctions()
+        public static Dictionary<string, string> FindGekkoInbuiltFunctions()
         {
-            Dictionary<string, int> gekkoBuiltInFunctions = new Dictionary<string, int>();
+            Dictionary<string, string> gekkoBuiltInFunctions = new Dictionary<string, string>();
             Type myType = (typeof(Functions));
             MethodInfo[] myArrayMethodInfo = myType.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
             for (int i = 0; i < myArrayMethodInfo.Length; i++)
             {
                 MethodInfo myMethodInfo = (MethodInfo)myArrayMethodInfo[i];
+
+                //foreach(ParameterInfo pi in myMethodInfo.GetParameters())
+                //{
+                //    if(G.Equal(pi.Name, "xxx") { };
+                //}
+                
                 string name = myMethodInfo.Name.ToLower();  //should be superfluous
-                if (!gekkoBuiltInFunctions.ContainsKey(name)) gekkoBuiltInFunctions.Add(name, 1);  //1 is just arbitrary                
+                string meta = null;
+                object[] metaInfo = myMethodInfo.GetCustomAttributes(false);
+                if (metaInfo.Length > 0) meta = ((MyCustomAttribute)(metaInfo[0])).Lag;                
+                if (!gekkoBuiltInFunctions.ContainsKey(name))
+                {
+                    gekkoBuiltInFunctions.Add(name, meta);  //meta contains info on lags etc.         
+                }
             }
+            
             return gekkoBuiltInFunctions;
         }
 
@@ -21641,6 +21659,14 @@ namespace Gekko
                 }
             }
             return Program.databanks.GetFirst().GetVariable(s).GetData(null, t) - Program.databanks.GetRef().GetVariable(s).GetData(null, t);
+        }
+        public static void RevertSmpl(GekkoSmpl2 smplRemember, GekkoSmpl smpl)
+        {
+            if (smplRemember != null)
+            {
+                smpl.t0 = smplRemember.t0;
+                smpl.t3 = smplRemember.t3;
+            }
         }
 
         //Used for tables, don't use for other stuff!

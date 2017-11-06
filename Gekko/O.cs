@@ -1867,15 +1867,35 @@ namespace Gekko
             x.IndexerSetData(smpl, y, indexes);
         }
 
-        //See Indexer() below
-        public static GekkoSmplRemember Indexer2(GekkoSmpl smpl, params IVariable[] indexes)
+        public static GekkoSmpl2 Smpl(GekkoSmpl smpl, int i)
         {
-            GekkoSmplRemember smplRemember = null;
+            GekkoSmpl2 smplRemember = null;
+            smplRemember = new GekkoSmpl2();
+            smplRemember.t0 = smpl.t0;
+            smplRemember.t3 = smpl.t3;
+            smpl.t0 = smpl.t0.Add(i);
+            return smplRemember;
+        }
+
+        public static GekkoSmpl2 Smpl(GekkoSmpl smpl, IVariable i)
+        {
+            GekkoSmpl2 smplRemember = null;
+            smplRemember = new GekkoSmpl2();
+            smplRemember.t0 = smpl.t0;
+            smplRemember.t3 = smpl.t3;
+            smpl.t0 = smpl.t0.Add(-O.ConvertToInt(i));
+            return smplRemember;
+        }
+
+        //See Indexer() below
+        public static GekkoSmpl2 Indexer2(GekkoSmpl smpl, params IVariable[] indexes)
+        {
+            GekkoSmpl2 smplRemember = null;
             int i = -12345; GekkoTime t = GekkoTime.tNull;
             Series.FindLagLeadFixed(ref i, ref t, indexes);
             if (i != -12345)
             {
-                smplRemember = new GekkoSmplRemember();
+                smplRemember = new GekkoSmpl2();
                 smplRemember.t0 = smpl.t0;
                 smplRemember.t3 = smpl.t3;
 
@@ -1899,10 +1919,11 @@ namespace Gekko
         }
 
         //See Indexer2() above. The first argument should be Indexer2(smpl, indexes)
-        public static IVariable Indexer(GekkoSmplRemember smplOld, GekkoSmpl smpl, IVariable x, params IVariable[] indexes)
+        public static IVariable Indexer(GekkoSmpl2 smplRemember, GekkoSmpl smpl, IVariable x, params IVariable[] indexes)
         {
-            try
-            {
+            Program.RevertSmpl(smplRemember, smpl);
+            //try
+            //{
 
                 if (x == null)
                 {
@@ -1926,17 +1947,9 @@ namespace Gekko
                 //x['nz', 'w']    
                 IVariable rv = x.Indexer(smpl, indexes);
                 return rv;
-            }
-            finally
-            {
-                //resetting t0 and t3 time to what it was before
-                if (smplOld != null)
-                {
-                    smpl.t0 = smplOld.t0;
-                    smpl.t3 = smplOld.t3;
-                }
-            }            
-        }        
+            //}
+            //finally { Program.RevertSmpl(smplRemember, smpl); }
+        }      
 
         public static IVariable IndexerPlus(GekkoSmpl smpl, IVariable x, bool isLhs, IVariable y)
         {
