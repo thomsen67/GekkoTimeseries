@@ -207,7 +207,8 @@ namespace Gekko
 
         static void CrashHandler(object sender, UnhandledExceptionEventArgs args)
         {
-           
+
+            if (!Globals.threadIsInProcessOfAborting)
             {
                 Exception e = (Exception)args.ExceptionObject;
                 MessageBox.Show("Unexpected Gekko crash: " + e.Message + G.NL + "Terminating: " + args.IsTerminating);
@@ -1710,37 +1711,61 @@ namespace Gekko
                     }
                 }
             }
-        } 
+        }
 
         // Stop worker thread if it is running.
         // Called when user presses Stop button or form is closed.
         private void StopThread()
         {
-            if (threadWorkerThread != null && threadWorkerThread.IsAlive)  // thread is active
+            if (false)
             {
-                // set event "Stop"
-                threadEventStopThread.Set();
-
-                // wait when thread  will stop or finish
-                while (threadWorkerThread.IsAlive)
+                if (threadWorkerThread != null && threadWorkerThread.IsAlive)  // thread is active
                 {
-                    // We cannot use here infinite wait because our thread
-                    // makes syncronous calls to main form, this will cause deadlock.
-                    // Instead of this we wait for event some appropriate time
-                    // (and by the way give time to worker thread) and
-                    // process events. These events may contain Invoke calls.
-                    if (WaitHandle.WaitAll(
-                        (new ManualResetEvent[] { threadEventThreadStopped }),
-                        100,
-                        true))
-                    {
-                        break;
-                    }
+                    // set event "Stop"
+                    threadEventStopThread.Set();
 
-                    Application.DoEvents();
+                    // wait when thread  will stop or finish
+                    while (threadWorkerThread.IsAlive)
+                    {
+                        // We cannot use here infinite wait because our thread
+                        // makes syncronous calls to main form, this will cause deadlock.
+                        // Instead of this we wait for event some appropriate time
+                        // (and by the way give time to worker thread) and
+                        // process events. These events may contain Invoke calls.
+                        if (WaitHandle.WaitAll(
+                            (new ManualResetEvent[] { threadEventThreadStopped }),
+                            100,
+                            true))
+                        {
+                            break;
+                        }
+
+                        Application.DoEvents();
+                    }
                 }
+                ThreadFinished();		// set initial state of buttons
             }
-            ThreadFinished();		// set initial state of buttons
+            else
+            {
+                Globals.threadIsInProcessOfAborting = true;
+                G.Writeln2("Hard abort of all running jobs.");
+                G.Writeln("Please note that this may leave databanks etc. in a corrupted state, and");
+                G.Writeln("external files may not be closed properly. A RESET or RESTART is advised.");
+                //running_ = false;
+                //G.Writeln2("Interrupting 1");
+                threadWorkerThread.Interrupt();
+                //G.Writeln2("Interrupting 2");
+                if (!threadWorkerThread.Join(1000))
+                { // or an agreed resonable time
+                    //G.Writeln2("Abort 1");
+                    threadWorkerThread.Abort();
+                    //G.Writeln2("Abort 2");
+                }
+                //G.Writeln2("Abort 3");
+                ThreadFinished();		// set initial state of buttons
+            }
+
+
         }
 
         // Add string to list box.
@@ -1777,7 +1802,7 @@ namespace Gekko
 
             Globals.btnStartThread = true;
             Globals.btnStopThread = false;
-            Globals.tasks.Dequeue();
+            if (Globals.tasks.Count > 0) Globals.tasks.Dequeue();
 
             //Console.WriteLine("tråd stop: " + gui.m_WorkerThread.GetHashCode());
             if (Globals.tasks.Count > 0)
@@ -1844,7 +1869,8 @@ namespace Gekko
                 if (!(G.Contains(p.lastFileSentToANTLR, Globals.autoExecCmdFileName)))
                 {
                     double ms = (DateTime.Now - p.startingTime).TotalMilliseconds;
-                    if (ms > 1000) {  //to avoid UFunctions being shown here. Fix better when #980324532985 is done
+                    if (ms > 1000 && !Globals.threadIsInProcessOfAborting)
+                    {  //to avoid UFunctions being shown here. Fix better when #980324532985 is done
                         G.Writeln();
                         G.Writeln("Total elapsed time: " + G.SecondsFormat(ms));
                         G.Writeln();
@@ -2238,10 +2264,17 @@ namespace Gekko
         private void toolStripButton3_Click_1(object sender, EventArgs e)
         {
             //StopThread();
-            if (threadWorkerThread != null && threadWorkerThread.IsAlive == true)
+            if (false)
             {
-                G.Writeln("+++ NOTE: Trying to stop the job -- may take some time...", Color.Red);
-                Globals.threadIsInProcessOfAborting = true;
+                if (threadWorkerThread != null && threadWorkerThread.IsAlive == true)
+                {
+                    G.Writeln("+++ NOTE: Trying to stop the job -- may take some time...", Color.Red);
+                    Globals.threadIsInProcessOfAborting = true;
+                }
+            }
+            else
+            {
+                StopThread();
             }
         }
 

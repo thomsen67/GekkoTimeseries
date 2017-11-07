@@ -17993,7 +17993,7 @@ namespace Gekko
             return shouldFilter;
         }
 
-        
+
         /// <summary>
         /// Execute a <b style="color:black;background-color:#ff9999">shell</b> command
         /// </summary>
@@ -18025,7 +18025,7 @@ namespace Gekko
                 if (_CommandLine != null && _CommandLine.Length > 0)
                 {
                     _Arguments = string.Format(System.Globalization.CultureInfo.InvariantCulture, "/C {0}", new object[] { _CommandLine, System.Globalization.CultureInfo.InvariantCulture });
-                }                
+                }
                 // sets a value indicating not to start the process in a new window.
                 process.StartInfo.CreateNoWindow = true;
                 // sets a value indicating not to use the operating system shell to start the process.
@@ -18049,33 +18049,42 @@ namespace Gekko
                 using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
                 using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
                 {
-                    process.OutputDataReceived += (sender, e) => {
-                        if (e.Data == null)
+                    process.OutputDataReceived += (sender, e) =>
+                    {
+                        if (!Globals.threadIsInProcessOfAborting)
                         {
-                            outputWaitHandle.Set();
-                        }
-                        else
-                        {
-                            if (!mute) G.Writeln(e.Data);  //write it as a flowing stream
-                            //output.AppendLine(e.Data);
+                            if (e.Data == null)
+                            {
+                                outputWaitHandle.Set();
+                            }
+                            else
+                            {
+                                if (!mute) G.Writeln(e.Data);  //write it as a flowing stream                            
+                            }
                         }
                     };
                     process.ErrorDataReceived += (sender, e) =>
                     {
-                        if (e.Data == null)
+                        if (!Globals.threadIsInProcessOfAborting)
                         {
-                            errorWaitHandle.Set();
-                        }
-                        else
-                        {
-                            error.AppendLine(e.Data);
+                            if (e.Data == null)
+                            {
+                                errorWaitHandle.Set();
+                            }
+                            else
+                            {
+                                error.AppendLine(e.Data);
+                            }
                         }
                     };
 
                     process.Start();
 
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
+                    if (!Globals.threadIsInProcessOfAborting)
+                    {
+                        process.BeginOutputReadLine();
+                        process.BeginErrorReadLine();
+                    }
 
                     if (process.WaitForExit(timeout) && outputWaitHandle.WaitOne(timeout) && errorWaitHandle.WaitOne(timeout))
                     {
@@ -18085,59 +18094,97 @@ namespace Gekko
                     {
                         // Timed out.
                     }
-                }                
-                
-                int exitCode = process.ExitCode;
-                if (exitCode != 0)
-                {
-                    G.Writeln2("*** ERROR: SYS command exited with exit code: " + exitCode);
-                    G.Writeln("           SYS command: " + _CommandLine);
-                    fail = true;
+
                 }
 
-                if (!mute)
-                {                    
+                if (!Globals.threadIsInProcessOfAborting)
+                {
+                    int exitCode = process.ExitCode;
+                    if (exitCode != 0)
+                    {
+                        G.Writeln2("+++ WARNING: SYS command exited with exit code: " + exitCode, Globals.warningColor);
+                        G.Writeln("             SYS command: " + _CommandLine, Globals.warningColor);
+                        //fail = true;
+                    }
+                }
+
+                if (!mute || Globals.threadIsInProcessOfAborting)
+                {
                     try
                     {
                         //G.Writeln2(output.ToString());
                         if (error.Length > 0)
                         {
-                            G.Writeln2("=================== SYS error message ===================");
-                            G.Writeln2(error.ToString());
+                            G.Writeln2("=================== SYS error message ===================", Globals.warningColor);
+                            G.Writeln2(error.ToString(), Globals.warningColor);
+                            //fail = true;
                         }
                     }
                     catch (Exception e)
                     {
-                        G.Writeln2("*** ERROR: Could not write output from SYS command");
-                        throw new GekkoException();
+                        G.Writeln2("+++ WARNING: Could not write output from SYS command", Globals.warningColor);
+                        //fail = true;
                     }
-                    finally
-                    {
-                        
-                    }
-                }    
+                }
             }
             catch (Win32Exception _Win32Exception)
             {
-                // Error
-                Console.WriteLine("Win32 Exception caught in process: {0}", _Win32Exception.ToString());
+                if (!Globals.threadIsInProcessOfAborting)
+                {
+                    // Error
+                    G.Writeln2("*** ERROR: SYS Win32 exception: " + _Win32Exception.ToString());
+                    fail = true;
+                }
             }
             catch (Exception _Exception)
             {
-                // Error
-                Console.WriteLine("Exception caught in process: {0}", _Exception.ToString());
+                if (!Globals.threadIsInProcessOfAborting)
+                {
+                    // Error
+                    G.Writeln2("*** ERROR: SYS exception: " + _Exception.ToString());
+                    fail = true;
+                }
             }
             finally
             {
-                //resetting, also if there is an error
-                Program.options.print_width = widthRemember;
-                Program.options.print_filewidth = fileWidthRemember;
-                // close process and do cleanup
-                process.Close();
-                process.Dispose();
-                process = null;
+                if (!Globals.threadIsInProcessOfAborting)
+                {
+                }
+                else
+                {
+                    //resetting, also if there is an error
+                    Program.options.print_width = widthRemember;
+                    Program.options.print_filewidth = fileWidthRemember;
+                    // close process and do cleanup
+                    if (true)
+                    {
+                        //like killing it in the task manager, no questions asked
+                        if (!process.HasExited)
+                        {
+                            try
+                            {
+                                process.Kill();
+                            }
+                            catch
+                            {
+                                //in principle, the process could exit just after .HasExited is asked, there the try here
+                            }
+                        }
+                        else
+                        {
+                            process.Close();
+                            process.Dispose();
+                        }
+                    }
+                    else
+                    {
+                        process.Close();
+                        process.Dispose();
+                    }
+                    //process = null;
+                }
             }
-            if (fail) throw new GekkoException();
+            if (!Globals.threadIsInProcessOfAborting && fail) throw new GekkoException();  //we throw it here, after cleanup is performed
         }
 
         /// <summary>Use this function like string.Split but instead of a character to split on,
