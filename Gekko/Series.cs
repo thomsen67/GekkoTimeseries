@@ -1142,11 +1142,13 @@ namespace Gekko
             }
             else
             {
-                x1_series.data.dataArray[0] = double.NaN;
+                double[] temp = new double[x1_series.data.dataArray.Length];
+                temp[0] = double.NaN;
                 for (int i = 0 + 1; i < x1_series.data.dataArray.Length; i++)
                 {
-                    x1_series.data.dataArray[i] = a.Invoke(x1_series.data.dataArray[i], x1_series.data.dataArray[i - 1]);
+                    temp[i] = a.Invoke(x1_series.data.dataArray[i], x1_series.data.dataArray[i - 1]);
                 }
+                x1_series.data.dataArray = temp;  //has same size and same anchors            
                 rv_series = x1_series;
             }
 
