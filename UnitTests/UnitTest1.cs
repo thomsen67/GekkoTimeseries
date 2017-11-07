@@ -4080,51 +4080,56 @@ namespace UnitTests
             if (b) throw new GekkoException();
         }
 
-        private static void _AssertList(Databank db, string s, int i, double x, double delta)
+        private static void _AssertList(IBank db, string s, int i, double x, double delta)
         {
             List iv_list = db.GetIVariable(s) as List;
             ScalarVal sv = iv_list.list[i - 1] as ScalarVal;
             _AssertHelperTwoDoubles(x, sv.val, sharedDelta);
         }
 
-        private static void _AssertMatrix(Databank db, string s, int i, int j, double d, double delta)
+        private static void _AssertMatrix(IBank db, string s, int i, int j, double d, double delta)
         {
             Matrix m = db.GetIVariable(s) as Matrix;
             _AssertHelperTwoDoubles(d, m.data[i - 1, j - 1], sharedDelta);
         }
 
+        private static void _AssertScalarString(IBank db, string s, string s2)
+        {
+            ScalarString ss = db.GetIVariable(s) as ScalarString;
+            Assert.AreEqual(ss._string2, s2);
+        }
 
-        private static void _AssertSeries(Databank db, string s, int year, double x, double delta)
+        private static void _AssertSeries(IBank db, string s, int year, double x, double delta)
         {
             _AssertSeries(db, s, null, EFreq.Annual, year, 1, year, 1, x, delta);
         }
 
-        private static void _AssertSeries(Databank db, string s, int year1, int year2, double x, double delta)
+        private static void _AssertSeries(IBank db, string s, int year1, int year2, double x, double delta)
         {
             _AssertSeries(db, s, null, EFreq.Annual, year1, 1, year2, 1, x, delta);
         }
 
-        private static void _AssertSeries(Databank db, string s, EFreq freq, int year, int subper, double x, double delta)
+        private static void _AssertSeries(IBank db, string s, EFreq freq, int year, int subper, double x, double delta)
         {
             _AssertSeries(db, s, null, freq, year, subper, year, subper, x, delta);
         }
 
-        private static void _AssertSeries(Databank db, string s, string[] indexes, int year, double x, double delta)
+        private static void _AssertSeries(IBank db, string s, string[] indexes, int year, double x, double delta)
         {
             _AssertSeries(db, s, indexes, EFreq.Annual, year, 1, year, 1, x, delta);
         }
 
-        private static void _AssertSeries(Databank db, string s, string[] indexes, int year1, int year2, double x, double delta)
+        private static void _AssertSeries(IBank db, string s, string[] indexes, int year1, int year2, double x, double delta)
         {
             _AssertSeries(db, s, indexes, EFreq.Annual, year1, 1, year2, 1, x, delta);
         }
 
-        private static void _AssertSeries(Databank db, string s, string[] indexes, EFreq freq, int year, int subper, double x, double delta)
+        private static void _AssertSeries(IBank db, string s, string[] indexes, EFreq freq, int year, int subper, double x, double delta)
         {
             _AssertSeries(db, s, indexes, freq, year, subper, year, subper, x, delta);
         }
 
-        private static void _AssertSeries(Databank db, string s2, string[] indexes, EFreq freq, int year1, int sub1, int year2, int sub2, double x, double delta)
+        private static void _AssertSeries(IBank db, string s2, string[] indexes, EFreq freq, int year1, int sub1, int year2, int sub2, double x, double delta)
         {
             string s = G.AddCurrentFreqToName(s2);
 
@@ -9236,7 +9241,7 @@ namespace UnitTests
             _AssertSeries(First(), "xx2", 2004, 3d, sharedDelta);
             _AssertSeries(First(), "xx2", 2005, 4d, sharedDelta);
             _AssertSeries(First(), "xx2", 2006, double.NaN, sharedDelta);
-            I("xx3 = (xx1 + xx1)[-1];");            
+            I("xx3 = (xx1 + xx1)[-1];");
             _AssertSeries(First(), "xx3", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx3", 2001, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx3", 2002, 2d, sharedDelta);
@@ -9244,6 +9249,41 @@ namespace UnitTests
             _AssertSeries(First(), "xx3", 2004, 6d, sharedDelta);
             _AssertSeries(First(), "xx3", 2005, 8d, sharedDelta);
             _AssertSeries(First(), "xx3", 2006, double.NaN, sharedDelta);
+            I("xx4 = pch(xx1 + xx1)[-1];");
+            _AssertSeries(First(), "xx4", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx4", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx4", 2002, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx4", 2003, (2d / 1d - 1d) * 100d, sharedDelta);
+            _AssertSeries(First(), "xx4", 2004, (3d / 2d - 1d) * 100d, sharedDelta);
+            _AssertSeries(First(), "xx4", 2005, (4d / 3d - 1d) * 100d, sharedDelta);
+            _AssertSeries(First(), "xx4", 2006, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx4", 2007, double.NaN, sharedDelta);
+            I("xx5 = movsum(movsum(xx1, 2), 3);");   //m 3 5 7 9 -> m, m, m, 15 21
+            _AssertSeries(First(), "xx5", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx5", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx5", 2002, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx5", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx5", 2004, 15d, sharedDelta);
+            _AssertSeries(First(), "xx5", 2005, 21d, sharedDelta);
+            _AssertSeries(First(), "xx5", 2006, double.NaN, sharedDelta);
+            I("xx6 = movsum(movsum(xx1, 3), 2);");  //same as before
+            _AssertSeries(First(), "xx6", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx6", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx6", 2002, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx6", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx6", 2004, 15d, sharedDelta);
+            _AssertSeries(First(), "xx6", 2005, 21d, sharedDelta);
+            _AssertSeries(First(), "xx6", 2006, double.NaN, sharedDelta);
+            I("xx7 = movsum(movsum(xx1, 4), 2);");   //m m m 10 15 -> m, m, m, m, 25
+            _AssertSeries(First(), "xx7", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx7", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx7", 2002, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx7", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx7", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx7", 2005, 24d, sharedDelta);
+            _AssertSeries(First(), "xx7", 2006, double.NaN, sharedDelta);
+
+            // ------------------------------------------------------------------
 
             I("RESET; TIME 2000 2005;");
             I("xx1 = (-1, 1, 2, 3, 4, 5);");
@@ -9272,7 +9312,71 @@ namespace UnitTests
             _AssertSeries(First(), "xx3", 2004, 6d, sharedDelta);
             _AssertSeries(First(), "xx3", 2005, 8d, sharedDelta);
             _AssertSeries(First(), "xx3", 2006, double.NaN, sharedDelta);
+            I("xx4 = (1 + xx1 + xx1 + 1)[-1];");
+            _AssertSeries(First(), "xx4", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx4", 2001, 0d, sharedDelta);
+            _AssertSeries(First(), "xx4", 2002, 4d, sharedDelta);
+            _AssertSeries(First(), "xx4", 2003, 6d, sharedDelta);
+            _AssertSeries(First(), "xx4", 2004, 8d, sharedDelta);
+            _AssertSeries(First(), "xx4", 2005, 10d, sharedDelta);
+            _AssertSeries(First(), "xx4", 2006, double.NaN, sharedDelta);
 
+        }
+
+        [TestMethod]
+        public void _Test_Map()
+        {
+            I("reset;");
+            I("time 2001 2003;");
+            I("xx = 100;");
+            I("#m = (%i1 = 'a', #mm = (%i1 = 'b', %i2 = 'c', ts = xx));");
+            I("p #m.%i1;");
+            I("p #m.#mm.%i1;");
+            I("p #m.#mm.%i2;");
+            I("p #m.#mm.ts;");
+
+            Map m1 = Program.databanks.GetFirst().GetIVariable("#m") as Map;                        
+            Map m2 = m1.GetIVariable("#mm") as Map;
+
+            _AssertScalarString(m1, "%i1", "a");
+            _AssertScalarString(m2, "%i1", "b");
+            _AssertScalarString(m2, "%i2", "c");
+            _AssertSeries(m2, "ts", 2000, double.NaN, sharedDelta);
+            _AssertSeries(m2, "ts", 2001, 100d, sharedDelta);
+            _AssertSeries(m2, "ts", 2002, 100d, sharedDelta);
+            _AssertSeries(m2, "ts", 2003, 100d, sharedDelta);
+            _AssertSeries(m2, "ts", 2004, double.NaN, sharedDelta);          
+
+            I("write slet;");
+            I("reset;");
+            I("read slet;");
+            I("p #m.%i1;");
+            I("p #m.#mm.%i1;");
+            I("p #m.#mm.%i2;");
+            I("p #m.#mm.ts;");
+
+            m1 = Program.databanks.GetFirst().GetIVariable("#m") as Map;
+            m2 = m1.GetIVariable("#mm") as Map;
+
+            _AssertScalarString(m1, "%i1", "a");
+            _AssertScalarString(m2, "%i1", "b");
+            _AssertScalarString(m2, "%i2", "c");
+            _AssertSeries(m2, "ts", 2000, double.NaN, sharedDelta);
+            _AssertSeries(m2, "ts", 2001, 100d, sharedDelta);
+            _AssertSeries(m2, "ts", 2002, 100d, sharedDelta);
+            _AssertSeries(m2, "ts", 2003, 100d, sharedDelta);
+            _AssertSeries(m2, "ts", 2004, double.NaN, sharedDelta);
+
+            I("reset; time 2001 2003;");
+            I("xx = 100;");
+            I("xx[2000+1] = 1;");
+            I("xx[2001a1+1] = 2;");
+            I("p xx;");
+            _AssertSeries(First(), "xx", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx", 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "xx", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2003, 100d, sharedDelta);
+            _AssertSeries(First(), "xx", 2004, double.NaN, sharedDelta);
         }
 
         [TestMethod]
@@ -9281,7 +9385,7 @@ namespace UnitTests
 
             I("RESET; TIME 2001 2005;");
             I("xx1 = (1, 2, 3, 4, 5);");
-            I("#m = xx1;");
+            I("#m = xx1;");  //autoconverted into matrix    WHY???
             _AssertMatrix(First(), "#m", 1, 1, 1, sharedDelta);
             _AssertMatrix(First(), "#m", 1, 2, 2, sharedDelta);
             _AssertMatrix(First(), "#m", 1, 3, 3, sharedDelta);
