@@ -1104,7 +1104,30 @@ namespace Gekko
                 if (i < indexes.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter
             }
             return hash;
-        }                       
+        }
+
+        public static Series ArithmeticsSeries(GekkoSmpl smpl, Series x1_series, Func<double, double> a)
+        {
+            Series rv_series;
+            if (x1_series.type == ESeriesType.Normal)
+            {
+                rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                foreach (GekkoTime t in smpl.Iterate03())
+                {
+                    rv_series.SetData(t, a.Invoke(x1_series.GetData(smpl, t)));
+                }
+            }
+            else
+            {
+                for (int i = 0; i < x1_series.data.dataArray.Length; i++)
+                {
+                    x1_series.data.dataArray[i] = a.Invoke(x1_series.data.dataArray[i]);
+                }
+                rv_series = x1_series;
+            }
+
+            return rv_series;
+        }
 
         public static Series ArithmeticsSeriesVal(GekkoSmpl smpl, Series x1_series, double x2_val, Func<double, double, double> a)
         {
@@ -1115,9 +1138,7 @@ namespace Gekko
             GetStartEndPeriod(smpl, x1_series, ref window1, ref window2); //if light series, the returned period corresponds to array size, else smpl window is used
 
             rv_series = new Series(ESeriesType.Light, window1, window2);  //also checks that nobs > 0            
-
-            int i1 = x1_series.FromGekkoTimeToArrayIndex(window1);
-
+            
             // ---------------------------
             // x2 is a VAL or MATRIX 1x1
             // ---------------------------
@@ -1140,9 +1161,7 @@ namespace Gekko
             FindCommonWindow(ref window1, ref window2, windowNew1, windowNew2);
 
             rv_series = new Series(ESeriesType.Light, window1, window2);  //also checks that nobs > 0            
-
-            int i1 = x1_series.FromGekkoTimeToArrayIndex(window1);
-
+            
             // -------------------
             // x2 is a SERIES
             // -------------------
@@ -1297,27 +1316,10 @@ namespace Gekko
         }
 
         public IVariable Negate(GekkoSmpl smpl)
-        {
-            Series rv_series = null;
-            if (this.type == ESeriesType.Normal)
-            {
-                rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
-                foreach (GekkoTime t in smpl.Iterate03())
-                {
-                    rv_series.SetData(t, -this.GetData(smpl, t));
-                }
-            }
-            else
-            {
-                for (int i = 0; i < this.data.dataArray.Length; i++)
-                {
-                    this.data.dataArray[i] = -this.data.dataArray[i];
-                }
-                rv_series = this;
-            }            
-            return rv_series;
+        {            
+            return ArithmeticsSeries(smpl, this, Globals.arithmentics1[0]); // (x1) => -x1;
         }
-
+        
         public static void FindLagLeadFixed(ref int i, ref GekkoTime t, params IVariable[] indexes)
         {
             if (indexes.Length == 1) {

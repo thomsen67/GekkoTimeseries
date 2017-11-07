@@ -1180,17 +1180,21 @@ namespace Gekko
             return z2;
         }
 
-        public static IVariable abs(GekkoSmpl t, IVariable x)
+        public static IVariable abs(GekkoSmpl smpl, IVariable input)
         {
             IVariable rv = null;
-            if (IsValOrTimeseries(x))
+            if (input.Type() == EVariableType.Val)
             {
-                //double d = O.ConvertToVal(t, x); #875324397
-                //rv = new ScalarVal(Math.Abs(d));
+                double d = O.ConvertToVal(input);
+                rv = new ScalarVal(Math.Abs(d));
             }
-            else if (x.Type() == EVariableType.Matrix)
+            else if (input.Type() == EVariableType.Series)
             {
-                Matrix m = O.ConvertToMatrix(x);
+                return Series.ArithmeticsSeries(smpl, input as Series, Globals.arithmentics1[1]); // (x1) => Math.Abs(x1);
+            }
+            else if (input.Type() == EVariableType.Matrix)
+            {
+                Matrix m = O.ConvertToMatrix(input);
                 Matrix m2 = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
                 for (int i = 0; i < m.data.GetLength(0); i++)
                 {
@@ -1199,10 +1203,10 @@ namespace Gekko
                         m2.data[i, j] = Math.Abs(m.data[i, j]);
                     }
                 }
-            }
+            }            
             else
             {
-                G.Writeln2("*** ERROR: abs(): type " + x.Type().ToString() + " not supported");
+                G.Writeln2("*** ERROR: abs(): type " + input.Type().ToString() + " not supported");
             }
             return rv;
         }
@@ -1328,20 +1332,20 @@ namespace Gekko
             return new ScalarVal(result);            
         }
 
-        public static IVariable log(GekkoSmpl t, IVariable x)
+        public static IVariable log(GekkoSmpl smpl, IVariable input)
         {
             IVariable rv = null;
-            if (x.Type() == EVariableType.Val)
+            if (input.Type() == EVariableType.Val)
             {
-                rv = new ScalarVal(Math.Log(x.ConvertToVal()));
+                rv = new ScalarVal(Math.Log(input.ConvertToVal()));
             }
-            else if (x.Type() == EVariableType.Series)
+            else if (input.Type() == EVariableType.Series)
             {
-                throw new GekkoException();
+                return Series.ArithmeticsSeries(smpl, input as Series, Globals.arithmentics1[2]); // (x1) => Math.Log(x1);
             }
-            else if (x.Type() == EVariableType.Matrix)
+            else if (input.Type() == EVariableType.Matrix)
             {
-                Matrix m = O.ConvertToMatrix(x);
+                Matrix m = O.ConvertToMatrix(input);
                 Matrix m2 = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
                 for (int i = 0; i < m.data.GetLength(0); i++)
                 {
@@ -1353,23 +1357,27 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: log(): type " + x.Type().ToString() + " not supported");
+                G.Writeln2("*** ERROR: log(): type " + input.Type().ToString() + " not supported");
                 throw new GekkoException();
             }
             return rv;            
         }
 
-        public static IVariable exp(GekkoSmpl t, IVariable x)
+        public static IVariable exp(GekkoSmpl smpl, IVariable input)
         {
             IVariable rv = null;
-            if (IsValOrTimeseries(x))
+            if (input.Type() == EVariableType.Val)
             {
-                //double d = O.ConvertToVal(t, x); //#875324397
-                //rv = new ScalarVal(Math.Exp(d));
+                double d = O.ConvertToVal(input);
+                rv = new ScalarVal(Math.Exp(d));
             }
-            else if (x.Type() == EVariableType.Matrix)
+            else if (input.Type() == EVariableType.Series)
             {
-                Matrix m = O.ConvertToMatrix(x);
+                return Series.ArithmeticsSeries(smpl, input as Series, Globals.arithmentics1[3]); // (x1) => Math.Exp(x1);
+            }
+            else if (input.Type() == EVariableType.Matrix)
+            {
+                Matrix m = O.ConvertToMatrix(input);
                 Matrix m2 = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
                 for (int i = 0; i < m.data.GetLength(0); i++)
                 {
@@ -1381,23 +1389,27 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: exp(): type " + x.Type().ToString() + " not supported");
+                G.Writeln2("*** ERROR: exp(): type " + input.Type().ToString() + " not supported");
                 throw new GekkoException();
             }
             return rv;
         }
 
-        public static IVariable sqrt(GekkoSmpl t, IVariable x)
+        public static IVariable sqrt(GekkoSmpl smpl, IVariable input)
         {
             IVariable rv = null;
-            if (IsValOrTimeseries(x))
+            if (input.Type() == EVariableType.Val)
             {
-                //double d = O.ConvertToVal(t, x);  #875324397
-                //rv = new ScalarVal(Math.Sqrt(d));
+                double d = O.ConvertToVal(input);
+                rv = new ScalarVal(Math.Sqrt(d));
             }
-            else if (x.Type() == EVariableType.Matrix)
+            else if (input.Type() == EVariableType.Series)
             {
-                Matrix m = O.ConvertToMatrix(x);
+                return Series.ArithmeticsSeries(smpl, input as Series, Globals.arithmentics1[4]); // (x1) => Math.Sqrt(x1);
+            }
+            else if (input.Type() == EVariableType.Matrix)
+            {
+                Matrix m = O.ConvertToMatrix(input);
                 rv = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
                 for (int i = 0; i < m.data.GetLength(0); i++)
                 {
@@ -1409,7 +1421,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: abs(): type " + x.Type().ToString() + " not supported");
+                G.Writeln2("*** ERROR: abs(): type " + input.Type().ToString() + " not supported");
                 throw new GekkoException();
             }
             return rv;

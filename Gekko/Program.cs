@@ -20427,6 +20427,12 @@ namespace Gekko
             Globals.arithmentics[8] = (x1, x2) => Math.Pow(x1, x2);
             Globals.arithmentics[9] = (x1, x2) => Math.Pow(x2, x1);
 
+            Globals.arithmentics1[0] = (x1) => -x1;
+            Globals.arithmentics1[1] = (x1) => Math.Abs(x1);
+            Globals.arithmentics1[2] = (x1) => Math.Log(x1);
+            Globals.arithmentics1[3] = (x1) => Math.Exp(x1);
+            Globals.arithmentics1[4] = (x1) => Math.Sqrt(x1);
+
             if (workingFolder != null && workingFolder != "")
             {
                 Program.options.folder_working = workingFolder;
