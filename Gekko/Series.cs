@@ -1129,6 +1129,30 @@ namespace Gekko
             return rv_series;
         }
 
+        public static Series ArithmeticsSeriesLag(GekkoSmpl smpl, Series x1_series, Func<double, double, double> a)
+        {
+            Series rv_series;
+            if (x1_series.type == ESeriesType.Normal)
+            {
+                rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                foreach (GekkoTime t in smpl.Iterate03())
+                {
+                    rv_series.SetData(t, a.Invoke(x1_series.GetData(smpl, t), x1_series.GetData(smpl, t.Add(-1))));
+                }
+            }
+            else
+            {
+                x1_series.data.dataArray[0] = double.NaN;
+                for (int i = 0 + 1; i < x1_series.data.dataArray.Length; i++)
+                {
+                    x1_series.data.dataArray[i] = a.Invoke(x1_series.data.dataArray[i], x1_series.data.dataArray[i - 1]);
+                }
+                rv_series = x1_series;
+            }
+
+            return rv_series;
+        }
+
         public static Series ArithmeticsSeriesVal(GekkoSmpl smpl, Series x1_series, double x2_val, Func<double, double, double> a)
         {
             Series rv_series;

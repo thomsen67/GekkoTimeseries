@@ -418,15 +418,7 @@ namespace Gekko
         {
             return zeros(smpl, x1, x2);
         }
-
-        //public static IVariable timeless(GekkoSmpl smpl, IVariable x1)
-        //{
-        //    double d = x1.ConvertToVal();
-        //    Series ts = new Series(Program.options.freq, null);
-        //    ts.SetTimeless();
-        //    ts.SetTimelessData(d);
-        //    return ts;
-        //}
+        
         
         public static IVariable series(GekkoSmpl smpl, params IVariable[] x)
         {
@@ -1122,14 +1114,16 @@ namespace Gekko
             return new ScalarVal(u2);
         }
 
-        public static IVariable sum(GekkoSmpl t, params IVariable[] items) //uuu
+        public static IVariable sum(GekkoSmpl smpl, params IVariable[] items) //uuu
         {
+            throw new GekkoException();
+
             IVariable rv = null;
             if (items.Length == 0)
             {
                 G.Writeln2("*** ERROR: sum() function must have > 0 arguments.");
                 throw new GekkoException();
-            }
+            }            
 
             if (true)
             {
@@ -1151,7 +1145,7 @@ namespace Gekko
 
         public static IVariable avg(GekkoSmpl smpl, params IVariable[] items)//uuu
         {
-            ////fix #89043752438
+            throw new GekkoException();
             return null;
         }
 
@@ -1432,12 +1426,9 @@ namespace Gekko
             return x.Type() == EVariableType.Val || x.Type() == EVariableType.Series || x.Type() == EVariableType.Series;
         }
 
-        public static IVariable pow(GekkoSmpl t, IVariable x1, IVariable x2)
+        public static IVariable pow(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
-            //double d1 = O.ConvertToVal(t, x1);  #875324397
-            //double d2 = O.ConvertToVal(t, x2);
-            //return new ScalarVal(Math.Pow(d1, d2));
-            return null;
+            return O.Power(smpl, x1, x2);            
         }
         
         [MyCustom(Lag = "lag=1")]
@@ -1445,14 +1436,8 @@ namespace Gekko
         {
             Program.RevertSmpl(smplOriginal, smpl);
             if (x1.Type() == EVariableType.Series)
-            {
-                Series x1_ts = x1 as Series;
-                Series ts = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
-                foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0, smpl.t3))
-                {
-                    ts.SetData(t, (x1_ts.GetData(smpl, t) / x1_ts.GetData(smpl, t.Add(-1)) - 1d) * 100d);
-                }
-                return ts;
+            {                
+                return Series.ArithmeticsSeriesLag(smpl, x1 as Series, Globals.arithmentics[10]);  //(x, x.1) => (x / x.1 - 1d) * 100d;                
             }
             else
             {
@@ -1462,15 +1447,35 @@ namespace Gekko
             return null;
         }
 
-        //ALL THESE SHOULD BE DELETED
-        public static IVariable dlog(GekkoSmpl t, IVariable x1)
+        [MyCustom(Lag = "lag=1")]
+        public static IVariable dlog(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
         {
+            Program.RevertSmpl(smplOriginal, smpl);
+            if (x1.Type() == EVariableType.Series)
+            {
+                return Series.ArithmeticsSeriesLag(smpl, x1 as Series, Globals.arithmentics[11]); // (x, x.1) => Math.Log(x / x.1);
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: pch() function only valid for time series arguments");
+                throw new GekkoException();
+            }
             return null;
         }
 
-        //ALL THESE SHOULD BE DELETED
-        public static IVariable dif(GekkoSmpl t, IVariable x1)
+        [MyCustom(Lag = "lag=1")]
+        public static IVariable dif(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
         {
+            Program.RevertSmpl(smplOriginal, smpl);
+            if (x1.Type() == EVariableType.Series)
+            {
+                return Series.ArithmeticsSeriesLag(smpl, x1 as Series, Globals.arithmentics[2]); // (x, x.1) => x - x.1;
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: pch() function only valid for time series arguments");
+                throw new GekkoException();
+            }
             return null;
         }
 
@@ -1556,9 +1561,9 @@ namespace Gekko
             return ss;
         }
 
-        public static IVariable round(GekkoSmpl t, IVariable x1, IVariable x2)
+        public static IVariable round(GekkoSmpl smpl, IVariable input, IVariable round)
         {            
-            double d2 = O.ConvertToVal(x2);             //#875324397
+            double d2 = O.ConvertToVal(round);          
             int aaa1 = 0;
             if (!G.Round(out aaa1, d2))
             {
@@ -1571,16 +1576,19 @@ namespace Gekko
                 G.Writeln2("*** ERROR: number of decimals in round() must be positive");
                 throw new GekkoException();
             }
-
-            if (IsValOrTimeseries(x1))
+                        
+            if (input.Type() == EVariableType.Val)
             {
-                double d1 = O.ConvertToVal(x1);  //#875324397
-                double value2 = Math.Round(d1, decimals);
-                return new ScalarVal(value2);
+                double d = O.ConvertToVal(input);
+                return new ScalarVal(Math.Round(d, decimals));
             }
-            else if (x1.Type() == EVariableType.Matrix)
+            else if (input.Type() == EVariableType.Series)
+            {                  
+                return Series.ArithmeticsSeriesVal(smpl, input as Series, decimals, Globals.arithmentics[12]);  //(x1, x2) => Math.Round(x1, (int)x2);                
+            }
+            else if (input.Type() == EVariableType.Matrix)
             {
-                Matrix m = O.ConvertToMatrix(x1);
+                Matrix m = O.ConvertToMatrix(input);
                 Matrix m2 = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
                 for (int i = 0; i < m.data.GetLength(0); i++)
                 {
@@ -1593,7 +1601,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: round() does not support type " + x1.Type().ToString());
+                G.Writeln2("*** ERROR: round() does not support type " + input.Type().ToString());
                 throw new GekkoException();
             }
         }

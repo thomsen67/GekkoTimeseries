@@ -20426,6 +20426,9 @@ namespace Gekko
             Globals.arithmentics[7] = (x1, x2) => x2 / x1;
             Globals.arithmentics[8] = (x1, x2) => Math.Pow(x1, x2);
             Globals.arithmentics[9] = (x1, x2) => Math.Pow(x2, x1);
+            Globals.arithmentics[10] = (x1, x2) => (x1 / x2 - 1d) * 100d;
+            Globals.arithmentics[11] = (x1, x2) => Math.Log(x1 / x2);
+            Globals.arithmentics[12] = (x1, x2) => Math.Round(x1, (int)x2);
 
             Globals.arithmentics1[0] = (x1) => -x1;
             Globals.arithmentics1[1] = (x1) => Math.Abs(x1);

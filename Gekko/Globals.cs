@@ -78,7 +78,7 @@ namespace Gekko
         public static string splitSTOP = G.NL + splitSTOP2 + G.NL;
         public static string functionParameterCode = "param_";
 
-        public static Func<double, double, double>[] arithmentics = new Func<double, double, double>[10];
+        public static Func<double, double, double>[] arithmentics = new Func<double, double, double>[20];
         public static Func<double, double>[] arithmentics1 = new Func<double, double>[10];
 
         //User functions: more can be added if necessary, or users can use LIST or DICT.
