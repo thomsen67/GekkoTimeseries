@@ -17881,32 +17881,40 @@ namespace Gekko
                 {
                     process.OutputDataReceived += (sender, e) =>
                     {
-                        if (e.Data == null)
+                        if (!Globals.threadIsInProcessOfAborting)
                         {
-                            outputWaitHandle.Set();
-                        }
-                        else
-                        {
-                            if (!mute) G.Writeln(e.Data);  //write it as a flowing stream
-                            //output.AppendLine(e.Data);
+                            if (e.Data == null)
+                            {
+                                outputWaitHandle.Set();
+                            }
+                            else
+                            {
+                                if (!mute) G.Writeln(e.Data);  //write it as a flowing stream                            
+                            }
                         }
                     };
                     process.ErrorDataReceived += (sender, e) =>
                     {
-                        if (e.Data == null)
+                        if (!Globals.threadIsInProcessOfAborting)
                         {
-                            errorWaitHandle.Set();
-                        }
-                        else
-                        {
-                            error.AppendLine(e.Data);
+                            if (e.Data == null)
+                            {
+                                errorWaitHandle.Set();
+                            }
+                            else
+                            {
+                                error.AppendLine(e.Data);
+                            }
                         }
                     };
+                    
+                    process.Start();
 
-                    process.Start();                    
-
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
+                    if (!Globals.threadIsInProcessOfAborting)
+                    {
+                        process.BeginOutputReadLine();
+                        process.BeginErrorReadLine();
+                    }
 
                     if (process.WaitForExit(timeout) && outputWaitHandle.WaitOne(timeout) && errorWaitHandle.WaitOne(timeout))
                     {
@@ -17918,16 +17926,19 @@ namespace Gekko
                     }
 
                 }
-                
-                int exitCode = process.ExitCode;
-                if (exitCode != 0)
+
+                if (!Globals.threadIsInProcessOfAborting)
                 {
-                    G.Writeln2("+++ WARNING: SYS command exited with exit code: " + exitCode, Globals.warningColor);
-                    G.Writeln("             SYS command: " + _CommandLine, Globals.warningColor);
-                    //fail = true;
+                    int exitCode = process.ExitCode;
+                    if (exitCode != 0)
+                    {
+                        G.Writeln2("+++ WARNING: SYS command exited with exit code: " + exitCode, Globals.warningColor);
+                        G.Writeln("             SYS command: " + _CommandLine, Globals.warningColor);
+                        //fail = true;
+                    }
                 }
 
-                if (!mute)
+                if (!mute || Globals.threadIsInProcessOfAborting)
                 {                    
                     try
                     {
@@ -17948,34 +17959,51 @@ namespace Gekko
             }
             catch (Win32Exception _Win32Exception)
             {
-                // Error
-                G.Writeln2("*** ERROR: SYS Win32 exception: " + _Win32Exception.ToString());
-                fail = true;
+                if (!Globals.threadIsInProcessOfAborting)
+                {
+                    // Error
+                    G.Writeln2("*** ERROR: SYS Win32 exception: " + _Win32Exception.ToString());
+                    fail = true;
+                }
             }
             catch (Exception _Exception)
             {
-                // Error
-                G.Writeln2("*** ERROR: SYS exception: " + _Exception.ToString());
-                fail = true;
+                if (!Globals.threadIsInProcessOfAborting)
+                {
+                    // Error
+                    G.Writeln2("*** ERROR: SYS exception: " + _Exception.ToString());
+                    fail = true;
+                }
             }
             finally
             {
-                //resetting, also if there is an error
-                Program.options.print_width = widthRemember;
-                Program.options.print_filewidth = fileWidthRemember;
-                // close process and do cleanup
-                if (true)
+                if (!Globals.threadIsInProcessOfAborting)
                 {
-                    //like killing it in the task manager, no questions asked
-                    if (!process.HasExited)
+                }
+                else
+                {
+                    //resetting, also if there is an error
+                    Program.options.print_width = widthRemember;
+                    Program.options.print_filewidth = fileWidthRemember;
+                    // close process and do cleanup
+                    if (true)
                     {
-                        try
+                        //like killing it in the task manager, no questions asked
+                        if (!process.HasExited)
                         {
-                            process.Kill();
+                            try
+                            {
+                                process.Kill();
+                            }
+                            catch
+                            {
+                                //in principle, the process could exit just after .HasExited is asked, there the try here
+                            }
                         }
-                        catch
+                        else
                         {
-                            //in principle, the process could exit just after .HasExited is asked, there the try here
+                            process.Close();
+                            process.Dispose();
                         }
                     }
                     else
@@ -17983,15 +18011,10 @@ namespace Gekko
                         process.Close();
                         process.Dispose();
                     }
+                    //process = null;
                 }
-                else
-                {
-                    process.Close();
-                    process.Dispose();
-                }                             
-                //process = null;
             }
-            if (fail) throw new GekkoException();  //we throw it here, after cleanup is performed
+            if (!Globals.threadIsInProcessOfAborting && fail) throw new GekkoException();  //we throw it here, after cleanup is performed
         }
 
         /// <summary>Use this function like string.Split but instead of a character to split on,
