@@ -150,9 +150,9 @@ namespace Gekko
         //    }
         //}
 
-        public IVariable Add(GekkoSmpl smpl, IVariable x)
+        public IVariable Add(GekkoSmpl smpl, IVariable input)
         {
-            switch (x.Type())
+            switch (input.Type())
             {
                 case EVariableType.Val:
                     {
@@ -160,22 +160,24 @@ namespace Gekko
                         //Apparently, small scalar objects like these are quickly created and swept. They probably stay in
                         //the first generation memory, and not much fragmentation occurs.
                         //All in all, it is pretty impressive from C#, and we avoid object pooling complexities and other horrors.                        
-                        return new ScalarVal(this.val + ((ScalarVal)x).val);
+                        return new ScalarVal(this.val + ((ScalarVal)input).val);
 
                     }
                 case EVariableType.Series:
                     {
-                        Series tsl = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
-                        Series xx = x as Series;                                                
-                        foreach (GekkoTime t in smpl.Iterate03())
-                        {
-                            tsl.SetData(t, this.val + xx.GetData(smpl, t));
-                        }
-                        return tsl;
+                        //-------------------------------------
+                        //x1 = VAL (this)
+                        //x2 = SERIES (input)
+                        //-------------------------------------
+                        Series x2_series = (Series)input;
+                        double x1_val = ((ScalarVal)this).val;
+                        Func<double, double, double> a = Globals.arithmentics[1];  //(x1, x2) => x2 + x1;  //NOTE: SWAP
+                        Series  rv_series = Series.ArithmeticsSeriesVal(smpl, x2_series, x1_val, a);
+                        return rv_series;
                     }
                 case EVariableType.String:
                     {
-                        return Operators.StringVal.Add((ScalarString)x, this, true);
+                        return Operators.StringVal.Add((ScalarString)input, this, true);
                     }
                 case EVariableType.Matrix:
                     {
@@ -190,18 +192,26 @@ namespace Gekko
             }
         }
 
-        public IVariable Subtract(GekkoSmpl t, IVariable x)
+        public IVariable Subtract(GekkoSmpl smpl, IVariable input)
         {
-            switch (x.Type())
+            switch (input.Type())
             {
                 case EVariableType.Val:
                     {                        
-                        return new ScalarVal(this.val - ((ScalarVal)x).val);
+                        return new ScalarVal(this.val - ((ScalarVal)input).val);
                     }
                 case EVariableType.Series:
                     {
-                        return new ScalarVal(this.val - O.ConvertToVal(x));  //#875324397
-                    }                
+                        //-------------------------------------
+                        //x1 = VAL (this)
+                        //x2 = SERIES (input)
+                        //-------------------------------------
+                        Series x2_series = (Series)input;
+                        double x1_val = ((ScalarVal)this).val;
+                        Func<double, double, double> a = Globals.arithmentics[3]; //(x1, x2) => x2 - x1;  //NOTE: SWAP
+                        Series rv_series = Series.ArithmeticsSeriesVal(smpl, x2_series, x1_val, a);
+                        return rv_series;
+                    }
                 default:
                     {
                         G.Writeln2("*** ERROR: Memory variable conversion error.");
@@ -210,22 +220,30 @@ namespace Gekko
             }
         }
 
-        public IVariable Multiply(GekkoSmpl t, IVariable x)
+        public IVariable Multiply(GekkoSmpl smpl, IVariable input)
         {
-            switch (x.Type())
+            switch (input.Type())
             {
                 case EVariableType.Val:
                     {
-                        return new ScalarVal(this.val * ((ScalarVal)x).val);
+                        return new ScalarVal(this.val * ((ScalarVal)input).val);
                     }
                 case EVariableType.Series:
                     {
-                        return new ScalarVal(this.val * O.ConvertToVal(x));  //#875324397
+                        //-------------------------------------
+                        //x1 = VAL (this)
+                        //x2 = SERIES (input)
+                        //-------------------------------------
+                        Series x2_series = (Series)input;
+                        double x1_val = ((ScalarVal)this).val;
+                        Func<double, double, double> a = Globals.arithmentics[5]; //(x1, x2) => x2 * x1;  //NOTE: SWAP
+                        Series rv_series = Series.ArithmeticsSeriesVal(smpl, x2_series, x1_val, a);
+                        return rv_series;
                     }
                 case EVariableType.Matrix:
                     {
                         //This is allowed in AREMOS, too
-                        double[,] a = O.ConvertToMatrix(x).data;
+                        double[,] a = O.ConvertToMatrix(input).data;
                         double b = O.ConvertToVal(this);
                         int m = a.GetLength(0);
                         int k = a.GetLength(1);
@@ -242,18 +260,26 @@ namespace Gekko
             }
         }
 
-        public IVariable Divide(GekkoSmpl t, IVariable x)
+        public IVariable Divide(GekkoSmpl smpl, IVariable input)
         {
-            switch (x.Type())
+            switch (input.Type())
             {
                 case EVariableType.Val:
                     {
-                        return new ScalarVal(this.val / ((ScalarVal)x).val);
+                        return new ScalarVal(this.val / ((ScalarVal)input).val);
                     }
                 case EVariableType.Series:
                     {
-                        return new ScalarVal(this.val / O.ConvertToVal(x));  //#875324397
-                    }                
+                        //-------------------------------------
+                        //x1 = VAL (this)
+                        //x2 = SERIES (input)
+                        //-------------------------------------
+                        Series x2_series = (Series)input;
+                        double x1_val = ((ScalarVal)this).val;
+                        Func<double, double, double> a = Globals.arithmentics[7]; //(x1, x2) => x2 / x1;  //NOTE: SWAP
+                        Series rv_series = Series.ArithmeticsSeriesVal(smpl, x2_series, x1_val, a);
+                        return rv_series;
+                    }
                 default:
                     {
                         G.Writeln2("*** ERROR: Memory variable conversion error.");
@@ -262,18 +288,26 @@ namespace Gekko
             }
         }
 
-        public IVariable Power(GekkoSmpl t, IVariable x)
+        public IVariable Power(GekkoSmpl smpl, IVariable input)
         {
-            switch (x.Type())
+            switch (input.Type())
             {
                 case EVariableType.Val:
                     {
-                        return new ScalarVal(Math.Pow(this.val, ((ScalarVal)x).val));
+                        return new ScalarVal(Math.Pow(this.val, ((ScalarVal)input).val));
                     }
                 case EVariableType.Series:
                     {
-                        return new ScalarVal(Math.Pow(this.val, O.ConvertToVal(x)));  //#875324397
-                    }                
+                        //-------------------------------------
+                        //x1 = VAL (this)
+                        //x2 = SERIES (input)
+                        //-------------------------------------
+                        Series x2_series = (Series)input;
+                        double x1_val = ((ScalarVal)this).val;
+                        Func<double, double, double> a = Globals.arithmentics[9]; //(x1, x2) => Math.Pow(x2, x1);  //NOTE: SWAP
+                        Series rv_series = Series.ArithmeticsSeriesVal(smpl, x2_series, x1_val, a);
+                        return rv_series;
+                    }
                 default:
                     {
                         G.Writeln2("*** ERROR: Memory variable conversion error.");

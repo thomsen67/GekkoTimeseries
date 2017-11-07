@@ -1104,28 +1104,9 @@ namespace Gekko
                 if (i < indexes.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter
             }
             return hash;
-        }
+        }                       
 
-
-        public IVariable Add(GekkoSmpl smpl, IVariable input)
-        {            
-            //-------------------------------------
-            //x1 = SERIES (this)
-            //x2 = SERIES or VAL or MATRIX 1x1 (input)
-            //-------------------------------------
-            
-            Series x1_series, x2_series; double x2_val;
-            PrepareInput(input, out x1_series, out x2_series, out x2_val);
-
-            Func<double, double, double> a = Globals.arithmentics[0];  //(x1, x2) => x1 + x2;
-
-            Series rv_series = null;
-            if (x1_series != null) rv_series = ArithmeticsSeriesSeries(smpl, x1_series, x2_series, a);
-            else rv_series = ArithmeticsSeriesVal(smpl, x1_series, x2_val, a);
-            return rv_series;
-        }
-
-        private static Series ArithmeticsSeriesVal(GekkoSmpl smpl, Series x1_series, double x2_val, Func<double, double, double> a)
+        public static Series ArithmeticsSeriesVal(GekkoSmpl smpl, Series x1_series, double x2_val, Func<double, double, double> a)
         {
             Series rv_series;
             GekkoTime window1, window2, windowNew1, windowNew2;
@@ -1225,6 +1206,24 @@ namespace Gekko
             }
         }
 
+        public IVariable Add(GekkoSmpl smpl, IVariable input)
+        {
+            //-------------------------------------
+            //x1 = SERIES (this)
+            //x2 = SERIES or VAL or MATRIX 1x1 (input)
+            //-------------------------------------
+
+            Series x1_series, x2_series; double x2_val;
+            PrepareInput(input, out x1_series, out x2_series, out x2_val);
+
+            Func<double, double, double> a = Globals.arithmentics[0];  //(x1, x2) => x1 + x2;
+
+            Series rv_series = null;
+            if (x2_series != null) rv_series = ArithmeticsSeriesSeries(smpl, x1_series, x2_series, a);
+            else rv_series = ArithmeticsSeriesVal(smpl, x1_series, x2_val, a);
+            return rv_series;
+        }
+
         public IVariable Subtract(GekkoSmpl smpl, IVariable input)
         {
             //-------------------------------------
@@ -1238,7 +1237,7 @@ namespace Gekko
             Func<double, double, double> a = Globals.arithmentics[2]; //(x1, x2) => x1 - x2;
 
             Series rv_series = null;
-            if (x1_series != null) rv_series = ArithmeticsSeriesSeries(smpl, x1_series, x2_series, a);
+            if (x2_series != null) rv_series = ArithmeticsSeriesSeries(smpl, x1_series, x2_series, a);
             else rv_series = ArithmeticsSeriesVal(smpl, x1_series, x2_val, a);
             return rv_series;
         }
@@ -1256,7 +1255,7 @@ namespace Gekko
             Func<double, double, double> a = Globals.arithmentics[4]; //(x1, x2) => x1 * x2;
 
             Series rv_series = null;
-            if (x1_series != null) rv_series = ArithmeticsSeriesSeries(smpl, x1_series, x2_series, a);
+            if (x2_series != null) rv_series = ArithmeticsSeriesSeries(smpl, x1_series, x2_series, a);
             else rv_series = ArithmeticsSeriesVal(smpl, x1_series, x2_val, a);
             return rv_series;
         }
@@ -1274,7 +1273,7 @@ namespace Gekko
             Func<double, double, double> a = Globals.arithmentics[6]; //(x1, x2) => x1 / x2;
 
             Series rv_series = null;
-            if (x1_series != null) rv_series = ArithmeticsSeriesSeries(smpl, x1_series, x2_series, a);
+            if (x2_series != null) rv_series = ArithmeticsSeriesSeries(smpl, x1_series, x2_series, a);
             else rv_series = ArithmeticsSeriesVal(smpl, x1_series, x2_val, a);
             return rv_series;
         }
@@ -1292,7 +1291,7 @@ namespace Gekko
             Func<double, double, double> a = Globals.arithmentics[8]; //(x1, x2) => Math.Pow(x1, x2);
 
             Series rv_series = null;
-            if (x1_series != null) rv_series = ArithmeticsSeriesSeries(smpl, x1_series, x2_series, a);
+            if (x2_series != null) rv_series = ArithmeticsSeriesSeries(smpl, x1_series, x2_series, a);
             else rv_series = ArithmeticsSeriesVal(smpl, x1_series, x2_val, a);
             return rv_series;
         }

@@ -458,109 +458,6 @@ namespace Gekko.Parser.Gek
                             node.Code.CA("O.AndMultiply(smpl, " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
-                    //case "[":  //indexer
-                    //case Globals.symbolGlueChar6:  //indexer, '[_['
-                    //case Globals.symbolGlueChar6a:  //indexer, '[_['
-                    //case Globals.symbolGlueChar7:  //indexer, '[¨['
-                    //    {
-
-                    //        if (node.ChildrenCount() > 1 && node[1].Text == "ASTINDEXERELEMENTPLUS")
-                    //        {
-                    //            node.Code.A("O.IndexerPlus(smpl, " + node[0].Code + ", false, " + node[1].Code + ")");
-                    //        }
-                    //        else
-                    //        {
-
-                    //            string s = null;
-                    //            if (w.wh.seriesHelper == WalkHelper.seriesType.SeriesLhs && node[0].Text == "ASTNAMEWITHBANK") //is a "normal" variable with indexer
-                    //            {
-                    //                //
-                    //                //
-                    //                // NOTE NOTE NOTE: This only deals with the left-hand side of SERIES, for instance SERIES y[#i] = .... ;
-                    //                //
-                    //                //
-
-                    //                for (int i = 1; i < node.ChildrenCount(); i++)
-                    //                {
-
-                    //                    if (node[i][0] != null && node[i][0].Text == "ASTINDEXERELEMENTBANK" && GetSimpleHashName(node[i][1]) != null)
-
-                    //                    {
-
-                    //                        string listName = GetSimpleHashName(node[i][1]);
-                    //                        string nameCode = null;
-
-                    //                        string found = null; if (w.wh.seriesHelperListNames != null) w.wh.seriesHelperListNames.TryGetValue(listName, out found);
-
-                    //                        if (found != null)
-                    //                        {
-                    //                            G.Writeln2("*** ERROR: SERIES problem: the same list name is used multiple times in []-indexer");
-                    //                            throw new GekkoException();
-                    //                        }
-                    //                        if (w.wh.seriesHelperListNames == null) w.wh.seriesHelperListNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                    //                        w.wh.seriesHelperListNames.Add(listName, node[i].Code.ToString());
-                    //                        found = node[i].Code.ToString();
-
-                    //                        if (found == null)  //not found
-                    //                        {
-                    //                            nameCode = found;
-                    //                        }
-                    //                        else
-                    //                        {
-                    //                            nameCode = GetLoopNameCs(node, listName);
-                    //                        }
-
-                    //                        s += ", " + nameCode;
-
-
-                    //                    }
-                    //                    else
-                    //                    {
-                    //                        s += ", " + node[i].Code.ToString();
-                    //                    }
-                    //                }
-                    //            }
-                    //            else
-                    //            {
-                    //                //
-                    //                //  Here, an indexer like x[#i] will be on the right-hand side (or at least certainly NOT be for instance SERIES x[#i] = ... ;
-                    //                //
-                                                                       
-
-                    //                for (int i = 1; i < node.ChildrenCount(); i++)
-                    //                {
-
-                    //                    bool success = false;
-                    //                    if (node[i][0] != null && node[i][0].Text == "ASTINDEXERELEMENTBANK" && GetSimpleHashName(node[i][1]) != null)
-                    //                    {
-
-                    //                        string listName = GetSimpleHashName(node[i][1]);
-
-                    //                        if (listName != null)
-                    //                        {
-                    //                            string internalName = SearchUpwardsInTree2(node[i], listName);
-                    //                            if (internalName != null)
-                    //                            {                                                    
-                    //                                s += ", " + internalName;
-                    //                                success = true;
-                    //                            }
-                    //                        }
-
-                    //                    }
-                    //                    if (success == false)
-                    //                    {
-                    //                        s += ", " + node[i].Code.ToString();
-                    //                    }
-                    //                }
-                    //            }
-
-                    //            string tf = "false";
-                    //            if (w.wh.seriesHelper == WalkHelper.seriesType.SeriesLhs) tf = "true";                                
-                    //            node.Code.A("O.Indexer(smpl, " + node[0].Code + ", " + tf + s + ")");                               
-
-                    //        }
-                    //    }
-                    //    break;
                     case "ASTPLUS":
                         {
                             node.Code.CA("O.Add(smpl, " + node[0].Code + ", " + node[1].Code + ")");
@@ -569,6 +466,21 @@ namespace Gekko.Parser.Gek
                     case "ASTMINUS":
                         {
                             node.Code.CA("O.Subtract(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                        }
+                        break;
+                    case "ASTSTAR":
+                        {
+                            node.Code.CA("O.Multiply(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                        }
+                        break;
+                    case "ASTDIV":
+                        {
+                            node.Code.CA("O.Divide(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                        }
+                        break;
+                    case "ASTPOWER":
+                        {
+                            node.Code.CA("O.Power(smpl, " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
                     case "ASTXLINE":
@@ -632,17 +544,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.CA("new ScalarString(`@`)");
                         }
-                        break;
-                    case "ASTSTAR":
-                        {                            
-                            node.Code.CA("O.Multiply(smpl, " + node[0].Code + ", " + node[1].Code + ")");
-                        }
-                        break;
-                    case "ASTDIV":
-                        {
-                            node.Code.CA("O.Divide(smpl, " + node[0].Code + ", " + node[1].Code + ")");
-                        }
-                        break;
+                        break;                    
                     case "ASTUPDDATACOMPLICATED":
                         {
                             
