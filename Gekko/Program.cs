@@ -20415,6 +20415,17 @@ namespace Gekko
 
             Globals.detectedRPath = null;  //we reset this, too
             Globals.r_fileContent = null;
+                         
+            Globals.arithmentics[0] = (x1, x2) => x1 + x2;
+            Globals.arithmentics[1] = (x1, x2) => x2 + x1;
+            Globals.arithmentics[2] = (x1, x2) => x1 - x2;
+            Globals.arithmentics[3] = (x1, x2) => x2 - x1;
+            Globals.arithmentics[4] = (x1, x2) => x1 * x2;
+            Globals.arithmentics[5] = (x1, x2) => x2 * x1;
+            Globals.arithmentics[6] = (x1, x2) => x1 / x2;
+            Globals.arithmentics[7] = (x1, x2) => x2 / x1;
+            Globals.arithmentics[8] = (x1, x2) => Math.Pow(x1, x2);
+            Globals.arithmentics[9] = (x1, x2) => Math.Pow(x2, x1);
 
             if (workingFolder != null && workingFolder != "")
             {

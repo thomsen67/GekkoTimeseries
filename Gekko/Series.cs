@@ -522,15 +522,9 @@ namespace Gekko
                 //Normally timeless variables should be called via the SetData(double value) method
                 this.data.dataArray[0] = value;
             }
-            try
-            {
-                if (this.type != ESeriesType.Light && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
-            }
-            catch
-            {
-
-            }
-
+           
+            if (this.type != ESeriesType.Light && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
+            
             if (this.freq != t.freq)
             {
                 //See comment to GetData()
@@ -1111,57 +1105,74 @@ namespace Gekko
             }
             return hash;
         }
-               
+
 
         public IVariable Add(GekkoSmpl smpl, IVariable input)
-        {
-            //Incoming is this --> x1 and input --> x2
-
+        {            
             //-------------------------------------
-            //x1 = SERIES
-            //x2 = SERIES or VAL or MATRIX 1x1
+            //x1 = SERIES (this)
+            //x2 = SERIES or VAL or MATRIX 1x1 (input)
             //-------------------------------------
-
-            Series rv_series = null;
-
+            
             Series x1_series, x2_series; double x2_val;
             PrepareInput(input, out x1_series, out x2_series, out x2_val);
 
+            Func<double, double, double> a = Globals.arithmentics[0];  //(x1, x2) => x1 + x2;
+
+            Series rv_series = null;
+            if (x1_series != null) rv_series = ArithmeticsSeriesSeries(smpl, x1_series, x2_series, a);
+            else rv_series = ArithmeticsSeriesVal(smpl, x1_series, x2_val, a);
+            return rv_series;
+        }
+
+        private static Series ArithmeticsSeriesVal(GekkoSmpl smpl, Series x1_series, double x2_val, Func<double, double, double> a)
+        {
+            Series rv_series;
             GekkoTime window1, window2, windowNew1, windowNew2;
             InitWindows(out window1, out window2, out windowNew1, out windowNew2);
 
             GetStartEndPeriod(smpl, x1_series, ref window1, ref window2); //if light series, the returned period corresponds to array size, else smpl window is used
 
-            if (x2_series != null)
+            rv_series = new Series(ESeriesType.Light, window1, window2);  //also checks that nobs > 0            
+
+            int i1 = x1_series.FromGekkoTimeToArrayIndex(window1);
+
+            // ---------------------------
+            // x2 is a VAL or MATRIX 1x1
+            // ---------------------------
+            foreach (GekkoTime t in new GekkoTimeIterator(window1, window2))
             {
-                GetStartEndPeriod(smpl, x2_series, ref windowNew1, ref windowNew2); //if light series, the returned period corresponds to array size, else smpl window is used
-                FindCommonWindow(ref window1, ref window2, windowNew1, windowNew2);
+                rv_series.SetData(t, a.Invoke(x1_series.GetData(smpl, t), x2_val));
             }
+
+            return rv_series;
+        }
+
+        private static Series ArithmeticsSeriesSeries(GekkoSmpl smpl, Series x1_series, Series x2_series, Func<double, double, double> a)
+        {
+            Series rv_series;
+            GekkoTime window1, window2, windowNew1, windowNew2;
+            InitWindows(out window1, out window2, out windowNew1, out windowNew2);
+
+            GetStartEndPeriod(smpl, x1_series, ref window1, ref window2); //if light series, the returned period corresponds to array size, else smpl window is used
+            GetStartEndPeriod(smpl, x2_series, ref windowNew1, ref windowNew2); //if light series, the returned period corresponds to array size, else smpl window is used
+            FindCommonWindow(ref window1, ref window2, windowNew1, windowNew2);
 
             rv_series = new Series(ESeriesType.Light, window1, window2);  //also checks that nobs > 0            
 
             int i1 = x1_series.FromGekkoTimeToArrayIndex(window1);
 
-            if (x2_series != null)
-            {
-                // -------------------
-                // x2 is a SERIES
-                // -------------------
-                foreach (GekkoTime t in new GekkoTimeIterator(window1, window2))
-                {
-                    rv_series.SetData(t, x1_series.GetData(smpl, t) + x2_series.GetData(smpl, t));
-                }
+            // -------------------
+            // x2 is a SERIES
+            // -------------------
 
-            }
-            else
+            //Using Func<> instead of for instance raw '+' uses a bit more than double the time for simple double addition.
+            //But when dealing with GetData(), SetData() etc. the difference can not be seen.
+            //So for practical purposes, Func<> here does not cost performance.
+            //If raw arrays were being used over large samples, perhaps the difference could be seen.
+            foreach (GekkoTime t in new GekkoTimeIterator(window1, window2))
             {
-                // ---------------------------
-                // x2 is a VAL or MATRIX 1x1
-                // ---------------------------
-                foreach (GekkoTime t in new GekkoTimeIterator(window1, window2))
-                {
-                    rv_series.SetData(t, x1_series.GetData(smpl, t) + x2_val);
-                }
+                rv_series.SetData(t, a.Invoke(x1_series.GetData(smpl, t), x2_series.GetData(smpl, t)));
             }
 
             return rv_series;
@@ -1214,38 +1225,98 @@ namespace Gekko
             }
         }
 
-        public IVariable Subtract(GekkoSmpl smpl, IVariable x)
+        public IVariable Subtract(GekkoSmpl smpl, IVariable input)
         {
-            G.Writeln2("Ts error 2");
-            return null;
+            //-------------------------------------
+            //x1 = SERIES (this)
+            //x2 = SERIES or VAL or MATRIX 1x1 (input)
+            //-------------------------------------
+
+            Series x1_series, x2_series; double x2_val;
+            PrepareInput(input, out x1_series, out x2_series, out x2_val);
+
+            Func<double, double, double> a = Globals.arithmentics[2]; //(x1, x2) => x1 - x2;
+
+            Series rv_series = null;
+            if (x1_series != null) rv_series = ArithmeticsSeriesSeries(smpl, x1_series, x2_series, a);
+            else rv_series = ArithmeticsSeriesVal(smpl, x1_series, x2_val, a);
+            return rv_series;
         }
 
-        public IVariable Multiply(GekkoSmpl smpl, IVariable x)
+        public IVariable Multiply(GekkoSmpl smpl, IVariable input)
         {
-            G.Writeln2("Ts error 3");
-            return null;
+            //-------------------------------------
+            //x1 = SERIES (this)
+            //x2 = SERIES or VAL or MATRIX 1x1 (input)
+            //-------------------------------------
+
+            Series x1_series, x2_series; double x2_val;
+            PrepareInput(input, out x1_series, out x2_series, out x2_val);
+
+            Func<double, double, double> a = Globals.arithmentics[4]; //(x1, x2) => x1 * x2;
+
+            Series rv_series = null;
+            if (x1_series != null) rv_series = ArithmeticsSeriesSeries(smpl, x1_series, x2_series, a);
+            else rv_series = ArithmeticsSeriesVal(smpl, x1_series, x2_val, a);
+            return rv_series;
         }
 
-        public IVariable Divide(GekkoSmpl smpl, IVariable x)
+        public IVariable Divide(GekkoSmpl smpl, IVariable input)
         {
-            G.Writeln2("Ts error 4");
-            return null;
+            //-------------------------------------
+            //x1 = SERIES (this)
+            //x2 = SERIES or VAL or MATRIX 1x1 (input)
+            //-------------------------------------
+
+            Series x1_series, x2_series; double x2_val;
+            PrepareInput(input, out x1_series, out x2_series, out x2_val);
+
+            Func<double, double, double> a = Globals.arithmentics[6]; //(x1, x2) => x1 / x2;
+
+            Series rv_series = null;
+            if (x1_series != null) rv_series = ArithmeticsSeriesSeries(smpl, x1_series, x2_series, a);
+            else rv_series = ArithmeticsSeriesVal(smpl, x1_series, x2_val, a);
+            return rv_series;
         }
 
-        public IVariable Power(GekkoSmpl smpl, IVariable x)
+        public IVariable Power(GekkoSmpl smpl, IVariable input)
         {
-            G.Writeln2("Ts error 5");
-            return null;
+            //-------------------------------------
+            //x1 = SERIES (this)
+            //x2 = SERIES or VAL or MATRIX 1x1 (input)
+            //-------------------------------------
+
+            Series x1_series, x2_series; double x2_val;
+            PrepareInput(input, out x1_series, out x2_series, out x2_val);
+
+            Func<double, double, double> a = Globals.arithmentics[8]; //(x1, x2) => Math.Pow(x1, x2);
+
+            Series rv_series = null;
+            if (x1_series != null) rv_series = ArithmeticsSeriesSeries(smpl, x1_series, x2_series, a);
+            else rv_series = ArithmeticsSeriesVal(smpl, x1_series, x2_val, a);
+            return rv_series;
         }
 
         public IVariable Negate(GekkoSmpl smpl)
         {
-            Series ts = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
-            foreach (GekkoTime t in smpl.Iterate03())
+            Series rv_series = null;
+            if (this.type == ESeriesType.Normal)
             {
-                ts.SetData(t, -this.GetData(smpl, t));
+                rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                foreach (GekkoTime t in smpl.Iterate03())
+                {
+                    rv_series.SetData(t, -this.GetData(smpl, t));
+                }
             }
-            return ts;
+            else
+            {
+                for (int i = 0; i < this.data.dataArray.Length; i++)
+                {
+                    this.data.dataArray[i] = -this.data.dataArray[i];
+                }
+                rv_series = this;
+            }            
+            return rv_series;
         }
 
         public static void FindLagLeadFixed(ref int i, ref GekkoTime t, params IVariable[] indexes)

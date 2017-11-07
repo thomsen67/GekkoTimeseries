@@ -566,6 +566,11 @@ namespace Gekko.Parser.Gek
                             node.Code.CA("O.Add(smpl, " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
+                    case "ASTMINUS":
+                        {
+                            node.Code.CA("O.Subtract(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                        }
+                        break;
                     case "ASTXLINE":
                         {
                             node.Code.CA("new ScalarString(`xline`)");
@@ -629,8 +634,13 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTSTAR":
+                        {                            
+                            node.Code.CA("O.Multiply(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                        }
+                        break;
+                    case "ASTDIV":
                         {
-                            node.Code.CA("new ScalarVal(123454321)");  //signifies infinity for REP * in UPD.
+                            node.Code.CA("O.Divide(smpl, " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
                     case "ASTUPDDATACOMPLICATED":

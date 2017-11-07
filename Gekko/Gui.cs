@@ -612,17 +612,7 @@ namespace Gekko
             if (track) MessageBox.Show("27");
 
             Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();  //uses reflection to do this
-
-            //string helpfile = "I_OVERVIEW";
-            //try
-            //{
-            //    Program.Help(helpfile);  //can contains errors is user fiddles with it, therefore try{}
-            //}
-            //catch
-            //{
-            //    MessageBox.Show("Failed to auto-load help file " + helpfile + ".rtf" + "\nIt may be missing or in a wrong format");
-            //}
-
+            
             if (noini != null && noini == "true")
             {
                 Globals.noini = true;  //has to be put in here, to be fetched later on by GuiAutoExecStuff
