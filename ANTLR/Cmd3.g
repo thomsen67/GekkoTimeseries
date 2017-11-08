@@ -2043,7 +2043,171 @@ ini:					    INI -> ^({token("ASTINI", ASTINI, $INI.Line)});
 
 option:                     OPTION optionType -> ^({token("ASTOPTION", ASTOPTION, $OPTION.Line)} optionType);
 
-print:					    P expression -> ^(ASTPRINT expression);
+//print:					prtHelper expression -> ^(ASTPRINT expression);
+print:                      prtHelper prtOpt1? prtElements prtOpt2? -> ^(ASTPRT ^(ASTPRTTYPE prtHelper) prtOpt1? prtOpt2? prtElements);
+prtHelper:				    P | PRT | PRI | PRINT | MULPRT | GMULPRT | SHEET | CLIP | PLOT;
+prtElements:                prtElement (COMMA2 prtElement)* -> ^(ASTPRTELEMENTS prtElement+);
+prtElement:                 expression
+                            gekkoLabel?
+							prtElementOptionField?
+							-> ^({token("ASTPRTELEMENT¤"+($expression.text)+"¤"+($gekkoLabel.text), ASTPRTELEMENT, 0)} ^(ASTEXPRESSION expression) gekkoLabel? prtElementOptionField?)
+						    ;
+prtElementOptionField:      leftAngle prtOptionField4Helper* RIGHTANGLE -> ^(ASTPRTELEMENTOPTIONFIELD prtOptionField4Helper*);
+prtOpt1:					ISNOTQUAL
+						  | leftAngle2          prtOpt1Helper* RIGHTANGLE -> ^(ASTOPT1 prtOpt1Helper*)							
+						  | leftAngleNo2 dates? prtOpt1Helper* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) prtOpt1Helper*)
+                            ;
+prtOptionField4Helper:      width
+						  | dec
+						  | nwidth
+						  | pwidth
+						  | ndec
+						  | pdec
+						  | opt2 -> ^(ASTPRTOPTION opt2)
+						  | TYPE '=' linetypeHelper -> ^(ASTPRTELEMENTLINETYPE linetypeHelper)
+						  | DASHTYPE '=' expression -> ^(ASTPRTELEMENTDASHTYPE expression)
+						  | LINEWIDTH '=' expression -> ^(ASTPRTELEMENTLINEWIDTH expression)
+						  | LINECOLOR '=' expression -> ^(ASTPRTELEMENTLINECOLOR expression)
+						  | POINTTYPE '=' expression -> ^(ASTPRTELEMENTPOINTTYPE expression)
+						  | POINTSIZE '=' expression -> ^(ASTPRTELEMENTPOINTSIZE expression)
+						  | FILLSTYLE '=' expression -> ^(ASTPRTELEMENTFILLSTYLE expression)						
+						  | Y2 -> ^(ASTPRTELEMENTY2)
+						    ;
+prtOpt1Helper:              filter						
+						  | opt2 -> ^(ASTPRTOPTION opt2)
+						  | WIDTH EQUAL expression -> ^(ASTOPT_VAL_WIDTH expression)
+						  | DEC EQUAL expression -> ^(ASTOPT_VAL_DEC expression)
+						  | NWIDTH EQUAL expression -> ^(ASTOPT_VAL_NWIDTH expression)
+						  | PWIDTH EQUAL expression -> ^(ASTOPT_VAL_PWIDTH expression)
+						  | NDEC EQUAL expression -> ^(ASTOPT_VAL_NDEC expression)
+						  | PDEC EQUAL expression -> ^(ASTOPT_VAL_PDEC expression)						
+						  | APPEND (EQUAL yesNo)? -> ^(ASTOPT_STRING_APPEND yesNo?)
+						  | BOXWIDTH '=' expression -> ^(ASTOPT_VAL_BOXWIDTH expression)  //PLOT
+						  | BOXGAP '=' expression -> ^(ASTOPT_VAL_BOXGAP expression)  //PLOT
+						  | CELL '=' expression -> ^(ASTOPT_STRING_CELL expression)
+						  | COLLAPSE (EQUAL prtOptCollapseHelper)? -> ^(ASTOPT_STRING_COLLAPSE prtOptCollapseHelper?)
+						  | COLORS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLORS yesNo?)
+						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)
+						  | DATES (EQUAL yesNo)? -> ^(ASTOPT_STRING_DATES yesNo?)						
+						  | DUMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_DUMP yesNo?)
+						  | FONT '=' expression -> ^(ASTOPT_STRING_FONT expression)  //PLOT
+						  | FONTSIZE '=' expression -> ^(ASTOPT_VAL_FONTSIZE expression)  //PLOT						
+						  | GRID '=' gridHelper -> ^(ASTOPT_STRING_GRID gridHelper)
+						  | HEADING '=' expression -> ^(ASTOPT_STRING_TITLE expression)
+						  | KEY '=' expression -> ^(ASTOPT_STRING_KEY expression)  //PLOT
+						  | TITLE '=' expression -> ^(ASTOPT_STRING_TITLE expression)
+						  | NAMES (EQUAL yesNo)? -> ^(ASTOPT_STRING_NAMES yesNo?)	
+						  | PALETTE '=' expression -> ^(ASTOPT_STRING_PALETTE expression)  //PLOT					
+						  | PLOTCODE '=' expression -> ^(ASTOPT_STRING_PLOTCODE expression)
+						  | ROWS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ROWS yesNo?)						
+						  | SEPARATE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SEPARATE yesNo?)  //PLOT
+						  | SHEET '=' expression -> ^(ASTOPT_STRING_SHEET expression)
+						  | SIZE '=' expression -> ^(ASTOPT_STRING_SIZE expression)  //PLOT						
+						  | STACK (EQUAL yesNo)? -> ^(ASTOPT_STRING_STACK yesNo?)  //PLOT
+						  | STAMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STAMP yesNo?)	
+						  | SUBTITLE '=' expression -> ^(ASTOPT_STRING_SUBTITLE expression)	  //PLOT	
+						  | TICS '=' expression -> ^(ASTOPT_STRING_TICS expression)  //PLOT			
+						  | USING EQUAL fileNameStar -> ^(ASTOPT_STRING_USING fileNameStar)		
+						  | XLINE '=' expression -> ^(ASTOPT_DATE_XLINE expression)  //PLOT	
+						  | XLINEBEFORE '=' expression -> ^(ASTOPT_DATE_XLINEBEFORE expression)  //PLOT	
+						  | XLINEAFTER '=' expression -> ^(ASTOPT_DATE_XLINEAFTER expression)  //PLOT							  						
+						  | X2ZEROAXIS (EQUAL yesNo)? -> ^(ASTOPT_STRING_X2ZEROAXIS yesNo?)
+						  | Y2LINE EQUAL expression -> ^(ASTOPT_VAL_Y2LINE expression)  //PLOT						
+						  | Y2MAX EQUAL expression -> ^(ASTOPT_VAL_Y2MAX expression)  //PLOT	
+						  | Y2MIN EQUAL expression -> ^(ASTOPT_VAL_Y2MIN expression)  //PLOT	
+						  | Y2MAXHARD EQUAL expression -> ^(ASTOPT_VAL_Y2MAXHARD expression)  //PLOT	
+						  | Y2MINHARD EQUAL expression -> ^(ASTOPT_VAL_Y2MINHARD expression)  //PLOT	
+						  | Y2MAXSOFT EQUAL expression -> ^(ASTOPT_VAL_Y2MAXSOFT expression)  //PLOT	
+						  | Y2MINSOFT EQUAL expression -> ^(ASTOPT_VAL_Y2MINSOFT expression)  //PLOT	
+						  | XZEROAXIS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XZEROAXIS yesNo?)		  						  				
+						  | YLINE EQUAL expression -> ^(ASTOPT_VAL_YLINE expression)  //PLOT
+						  | YMAX EQUAL expression -> ^(ASTOPT_VAL_YMAX expression)  //PLOT	
+						  | YMIN EQUAL expression -> ^(ASTOPT_VAL_YMIN expression)  //PLOT	
+						  | YMAXHARD EQUAL expression -> ^(ASTOPT_VAL_YMAXHARD expression)  //PLOT	
+						  | YMINHARD EQUAL expression -> ^(ASTOPT_VAL_YMINHARD expression)  //PLOT	
+						  | YMAXSOFT EQUAL expression -> ^(ASTOPT_VAL_YMAXSOFT expression)  //PLOT	
+						  | YMINSOFT EQUAL expression -> ^(ASTOPT_VAL_YMINSOFT expression)  //PLOT						
+						  | YMIRROR '=' expression -> ^(ASTOPT_STRING_YMIRROR expression)  //PLOT
+						  | YTITLE EQUAL expression -> ^(ASTOPT_STRING_YTITLE expression)  //PLOT
+						  | Y2TITLE EQUAL expression -> ^(ASTOPT_STRING_Y2TITLE expression)  //PLOT
+						  | GRIDSTYLE EQUAL expression -> ^(ASTOPT_STRING_GRIDSTYLE expression)  //PLOT
+						  | BOLD EQUAL expression -> ^(ASTOPT_STRING_BOLD expression)  //PLOT
+						  | ITALIC EQUAL expression -> ^(ASTOPT_STRING_ITALIC expression)  //PLOT						
+						  | TYPE '=' linetypeHelper -> ^(ASTOPT_STRING_LINETYPE linetypeHelper)
+						  | DASHTYPE '=' expression -> ^(ASTOPT_STRING_DASHTYPE expression)
+						  | LINEWIDTH '=' expression -> ^(ASTOPT_VAL_LINEWIDTH expression)
+						  | LINECOLOR '=' expression -> ^(ASTOPT_STRING_LINECOLOR expression)
+						  | POINTTYPE '=' expression -> ^(ASTOPT_STRING_POINTTYPE expression)
+						  | POINTSIZE '=' expression -> ^(ASTOPT_VAL_POINTSIZE expression)
+						  | FILLSTYLE '=' expression -> ^(ASTOPT_STRING_FILLSTYLE expression)						  						
+						    ;
+linetypeHelper:             LINESPOINTS -> ASTLINESPOINTS
+						  | LINES -> ASTLINES
+						  | BOXES -> ASTBOXES
+						  | FILLEDCURVES -> ASTFILLEDCURVES
+						  | STEPS -> ASTSTEPS
+						  | POINTS -> ASTPOINTS
+						  | DOTS -> ASTDOTS
+						  | IMPULSES -> ASTIMPULSES
+						  | expression
+						    ;
+gridHelper:                 YLINE -> ASTYLINE
+						  | XLINE -> ASTXLINE
+						  | yesNo					
+						    ;
+prtOpt2:                    prtOpt2Helper+ -> ^(ASTOPT2 prtOpt2Helper+);
+prtOpt2Helper:              FILE '=' fileName -> ^(ASTOPT_STRING_FILENAME fileName)
+						  | USING '=' fileNameStar -> ^(ASTOPT_STRING_USING fileNameStar)
+						    ;
+prtOptCollapseHelper:       AVG -> ASTAVG
+                          | TOTAL -> ASTTOTAL
+						  | expression -> expression						
+						    ;
+opt2:                       optNew | optOld;							
+optOld:                     N    ('=' yesNo -> ^(ASTN yesNo) | -> ^(ASTN ASTYES))
+						  | D    ('=' yesNo -> ^(ASTD yesNo) | -> ^(ASTD  ASTYES))
+						  | P    ('=' yesNo -> ^(ASTP yesNo) | -> ^(ASTP  ASTYES))
+						  | DP    ('=' yesNo -> ^(ASTDP yesNo) | -> ^(ASTDP  ASTYES))
+						  | R    ('=' yesNo -> ^(ASTS yesNo) | -> ^(ASTS  ASTYES))
+						  | RN    ('=' yesNo -> ^(ASTSN yesNo) | -> ^(ASTSN  ASTYES))
+						  | RD    ('=' yesNo -> ^(ASTSD yesNo) | -> ^(ASTSD  ASTYES))
+						  | RP    ('=' yesNo -> ^(ASTSP yesNo) | -> ^(ASTSP  ASTYES))
+						  | RDP    ('=' yesNo -> ^(ASTSDP yesNo) | -> ^(ASTSDP  ASTYES))
+						  | M    ('=' yesNo -> ^(ASTM yesNo) | -> ^(ASTM  ASTYES))
+						  | Q    ('=' yesNo -> ^(ASTQ yesNo) | -> ^(ASTQ  ASTYES))
+						  | MP    ('=' yesNo -> ^(ASTMP yesNo) | -> ^(ASTMP  ASTYES))
+						    ;
+optNew:                     lev
+						  | abs
+						  | dif
+						  | pch
+						  | gdif
+						  | v
+                          ;
+abs:					    ABS ('=' yesNoAppend -> ^(ASTABS yesNoAppend) |  -> ^(ASTABS ASTYES))
+                          | NOABS -> ^(ASTABS ASTNO)
+                          | UABS -> ^(ASTABS ASTAPPEND)
+						    ;
+lev:						LEV ('=' yesNoAppend -> ^(ASTLEV yesNoAppend) |  -> ^(ASTLEV ASTYES))
+                          | NOLEV -> ^(ASTLEV ASTNO)
+                          | ULEV -> ^(ASTLEV ASTAPPEND)
+						    ;
+dif:						(DIF|DIFF) ('=' yesNoAppend -> ^(ASTDIF yesNoAppend) | -> ^(ASTDIF ASTYES))
+                          | (NODIF|NODIFF) -> ^(ASTDIF ASTNO)
+                          | (UDIF|UDIFF) -> ^(ASTDIF ASTAPPEND)
+                            ;
+pch:						PCH ('=' yesNoAppend -> ^(ASTPCH yesNoAppend) |  -> ^(ASTPCH ASTYES) )
+                          | NOPCH -> ^(ASTPCH ASTNO)
+                          | UPCH -> ^(ASTPCH ASTAPPEND)
+						    ;
+gdif:					    (GDIF|GDIFF) ('=' yesNoAppend -> ^(ASTGDIF yesNoAppend) | -> ^(ASTGDIF ASTYES) )
+                          | (NOGDIF|NOGDIFF) -> ^(ASTGDIF ASTNO)
+                          | (UGDIF|UGDIFF) -> ^(ASTGDIF ASTAPPEND)
+						    ;
+v:    					    V ('=' yesNo -> ^(ASTV yesNo) | -> ^(ASTV ASTYES))
+                          | NOV -> ^(ASTV ASTNO)
+						    ;
+
 
 						    //!!!Two identical lines ONLY because of token stuff
 read:                       READ   readOpt1? fileNameStar (TO identOrStar)? -> ^({token("ASTREAD", ASTREAD, $READ.Line)}   READ   readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?))
@@ -2132,6 +2296,29 @@ optionType :
 // ------------------------------------
 // Semi lexer stuff here
 // ------------------------------------
+
+gekkoLabel:                 StringInQuotes -> ^(ASTGEKKOLABEL StringInQuotes);
+
+yesNoAppend:			    yesNo
+						  | append
+						    ;
+
+nwidth:					    NWIDTH '=' expression -> ^(ASTPRTELEMENTNWIDTH expression);
+pwidth:					    PWIDTH '=' expression -> ^(ASTPRTELEMENTPWIDTH expression);
+ndec:					    NDEC '=' expression -> ^(ASTPRTELEMENTNDEC expression);
+pdec:					    PDEC '=' expression -> ^(ASTPRTELEMENTPDEC expression);
+width:					    WIDTH '=' expression -> ^(ASTPRTELEMENTWIDTH expression);
+dec:						DEC '=' expression -> ^(ASTPRTELEMENTDEC expression);
+
+append:					    APPEND -> ASTAPPEND;
+
+filter:                     FILTER '=' (  no   -> ^(ASTPRTTIMEFILTER NO)
+										| yes  -> ^(ASTPRTTIMEFILTER YES)
+										| HIDE -> ^(ASTPRTTIMEFILTER HIDE)
+										| AVG  -> ^(ASTPRTTIMEFILTER AVG)    )
+						  | FILTER -> ^(ASTPRTTIMEFILTER YES)
+						  | NOFILTER -> ^(ASTPRTTIMEFILTER NO)
+						    ;
 
 optionFreq:                 a | q | m | u;
 a:                          A;

@@ -23073,7 +23073,7 @@ namespace Gekko
                     foreach (O.Prt.SubElement se in e.subElements)
                     {
                         countK++;
-                        double v = se.tsWork.GetData(null, t);
+                        double v = (se.tsWork as Series).GetData(null, t);
                         if (G.isNumericalError(v))
                         {
                             G.Writeln2("*** ERROR: Missing value: " + labels[countK] + " in " + t.ToString());
@@ -23194,18 +23194,38 @@ namespace Gekko
             }
         }
 
-        public static void OPrint(GekkoSmpl smpl, IVariable x)
+        public static void OPrint(O.Prt oPrt)
         {
+            List<IVariable> wlist = new List<IVariable>();
+            List<IVariable> rlist = new List<IVariable>();
+            List<string> printCodes = new List<string>();
+            foreach (O.Prt.Element element in oPrt.prtElements)
+            {
+                O.Prt.SubElement subElement = element.subElements[0];
+                //generally, subElements only have 1 item (used to expand lists in Gekko < 3.0)
 
+                List<OptString> printCodes2 = new List<OptString>();
+                if (element.printCodes.Count == 0) printCodes2.Add(new OptString("n", "yes"));
+                else printCodes2.AddRange(element.printCodes);
+                foreach (OptString printCode in printCodes2)
+                {
+                    wlist.Add(subElement.tsWork);
+                    rlist.Add(subElement.tsBase);
+                    printCodes.Add(printCode.s1);
+                }
+            }
+
+            GekkoSmpl smpl = new GekkoSmpl(oPrt.t1, oPrt.t2);
             //Globals.globalPeriodTimeFilters2 = new List<GekkoTime> { new GekkoTime(EFreq.Monthly, 2003, 1), new GekkoTime(EFreq.Monthly, 2003, 2) };
-            string[] printCodes = new string[] { "n", "n", "n" };  //1 element
+            
             string format = "f14.4";
             string type = "plot";
-            List inputList = x as List;  //will always be a list
+            //List inputList = x as List;  //will always be a list
+            List inputList = null;
 
             //print always receives a List with 1 or 2 elements (Work and Ref so to say)
 
-            if (false)
+            if (true)
             {
 
                 /*
@@ -23235,10 +23255,10 @@ p (xx1,{#m});
                  * 
                  * */
 
-                IVariable[] ivs = PrintHelperConvertToList(inputList); //ivs has 1 or 2 elements. The sub-elements of these are now lists (of things to print, like x1, x2, x3)
+                //IVariable[] ivs = PrintHelperConvertToList(inputList); //ivs has 1 or 2 elements. The sub-elements of these are now lists (of things to print, like x1, x2, x3)
                 
-                List workList = ivs[0] as List;  //the elements here correspond to comma-separated argumentsIVariable workList = ivs[0];  //the elements here correspond to comma-separated arguments
-                List refList = ivs[1] as List;  //same as above
+                //List workList = ivs[0] as List;  //the elements here correspond to comma-separated argumentsIVariable workList = ivs[0];  //the elements here correspond to comma-separated arguments
+                //List refList = ivs[1] as List;  //same as above
 
                 bool[] freqs = new bool[3];
                 List<IVariable> explodeWork = new List<IVariable>();
@@ -23252,13 +23272,13 @@ p (xx1,{#m});
                 explodePrintcodes.Add(null);
 
                 int counter = -1;
-                foreach (IVariable iv in workList.list)
+                foreach (IVariable iv in wlist)
                 {
                     counter++;
                     PrintHelper2(printCodes, freqs, explodeWork, explodePrintcodes, counter, iv, true, false);
                 }
                 counter = -1;
-                foreach (IVariable iv in refList.list)
+                foreach (IVariable iv in rlist)
                 {
                     counter++;
                     PrintHelper2(printCodes, freqs, explodeRef, explodePrintcodes, counter, iv, true, true);
@@ -23306,11 +23326,7 @@ p (xx1,{#m});
                 //22. SUM12M                 Msum                                 
                 //23. SUM4Q             Qsum           
                 //24. ANNUAL     A
-
-                int rowsPerYear = 24;  //beware, if they layout is changed
-                //int i = 0;
-                //int j = 0;
-
+                
                 if(true)
                 {
                     int i = 0;
@@ -24013,8 +24029,8 @@ p (xx1,{#m});
             }
             else
             {
-
-                x = inputList.list[0];  //HAXKKKCCCK!!!
+                                
+                IVariable x = inputList.list[0];  //HAXKKKCCCK!!!
 
                 if (x == null)
                 {
@@ -24218,7 +24234,7 @@ p (xx1,{#m});
             return 123454321d;
         }
 
-        private static void PrintHelper2(string[] printcode, bool[] freqs, List<IVariable> explode, List<string> explodePrintcodes, int counter, IVariable iv, bool root, bool isRef)
+        private static void PrintHelper2(List<string> printcode, bool[] freqs, List<IVariable> explode, List<string> explodePrintcodes, int counter, IVariable iv, bool root, bool isRef)
         {
             if (iv.Type() == EVariableType.Series)
             {
@@ -24260,24 +24276,24 @@ p (xx1,{#m});
             else if (((Series)iv).freq == EFreq.Monthly) freqs[2] = true;
         }
 
-        private static IVariable[] PrintHelperConvertToList(List inputList)
-        {
-            IVariable[] ivs = new IVariable[2];
-            for (int i = 0; i < 2; i++)
-            {
-                ivs[i] = inputList.list[i];
-                if (ivs[i] == null) continue;
-                if (ivs[i].Type() != EVariableType.List)
-                {
-                    //transform it into a list: much easier afterwards
-                    List temp = new Gekko.List();
-                    temp.list = new List<IVariable>();
-                    temp.list.Add(ivs[i]);
-                    ivs[i] = temp;
-                }
-            }
-            return ivs;
-        }
+        //private static IVariable[] PrintHelperConvertToList(List inputList)
+        //{
+        //    IVariable[] ivs = new IVariable[2];
+        //    for (int i = 0; i < 2; i++)
+        //    {
+        //        ivs[i] = inputList.list[i];
+        //        if (ivs[i] == null) continue;
+        //        if (ivs[i].Type() != EVariableType.List)
+        //        {
+        //            //transform it into a list: much easier afterwards
+        //            List temp = new Gekko.List();
+        //            temp.list = new List<IVariable>();
+        //            temp.list.Add(ivs[i]);
+        //            ivs[i] = temp;
+        //        }
+        //    }
+        //    return ivs;
+        //}
 
         public static int PrtNew2(O.Prt o)
         {
@@ -24588,8 +24604,8 @@ p (xx1,{#m});
                         {
                             bool filter = timefilter && ShouldFilterPeriod(gt);
 
-                            Series ts = subPe.tsWork;
-                            Series tsGrund = subPe.tsBase;
+                            Series ts = subPe.tsWork as Series;
+                            Series tsGrund = subPe.tsBase as Series;
 
                             double var1;
                             double varPch;

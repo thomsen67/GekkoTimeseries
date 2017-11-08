@@ -1764,7 +1764,7 @@ namespace Gekko
 
         public static void Print(GekkoSmpl smpl, IVariable x)
         {
-            Program.OPrint(smpl, x);
+            //Program.OPrint(smpl, x);
         }
 
         
@@ -6328,7 +6328,7 @@ namespace Gekko
                 public string format = null;
                 public List<Prt.Element> prtElements = new List<Prt.Element>();
                 public void Exe() {
-                    Program.GetTable(this.name).CurRow.SetValues(this.col, this.prtElements[0].subElements[0].tsWork, this.prtElements[0].subElements[0].tsBase, null, this.t1, this.t2, Globals.tableOption, this.printcode, this.scale, this.format);
+                    Program.GetTable(this.name).CurRow.SetValues(this.col, this.prtElements[0].subElements[0].tsWork as Series, this.prtElements[0].subElements[0].tsBase as Series, null, this.t1, this.t2, Globals.tableOption, this.printcode, this.scale, this.format);
                 }
             }
         }
@@ -6424,11 +6424,18 @@ namespace Gekko
             public long counter = -12345;
 
             public void Exe()
-            {                                
-                Program.PrtNew(this);
-                if (G.Equal(prtType, "mulprt") && G.Equal(Program.options.interface_mode, "data"))
+            {
+                if (true)
                 {
-                    G.Writeln2("+++ WARNING: MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
+                    Program.OPrint(this);
+                }
+                else
+                {
+                    Program.PrtNew(this);
+                    if (G.Equal(prtType, "mulprt") && G.Equal(Program.options.interface_mode, "data"))
+                    {
+                        G.Writeln2("+++ WARNING: MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
+                    }
                 }
             }
             
@@ -6606,8 +6613,8 @@ namespace Gekko
             public class SubElement
             {
                 //Items that are unfolded via lists
-                public Series tsWork = null;
-                public Series tsBase = null;
+                public IVariable tsWork = null;
+                public IVariable tsBase = null;
                 public string label;
             }
         }
