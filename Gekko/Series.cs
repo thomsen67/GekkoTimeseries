@@ -1182,11 +1182,17 @@ namespace Gekko
             GekkoTime window1, window2, windowNew1, windowNew2;
             InitWindows(out window1, out window2, out windowNew1, out windowNew2);
 
+            //if smpl freq and x1/x2_series freq are the same,
+            //these windows will just be smpl.t0 to smpl.t3
+            //both for normal and light series. So common
+            //window will also be .t0 to .t3.
+            //-------------------------------------
             GetStartEndPeriod(smpl, x1_series, ref window1, ref window2); //if light series, the returned period corresponds to array size, else smpl window is used
             GetStartEndPeriod(smpl, x2_series, ref windowNew1, ref windowNew2); //if light series, the returned period corresponds to array size, else smpl window is used
             FindCommonWindow(ref window1, ref window2, windowNew1, windowNew2);
+            //-------------------------------------
 
-            rv_series = new Series(ESeriesType.Light, window1, window2);  //also checks that nobs > 0            
+            rv_series = new Series(ESeriesType.Light, window1, window2);  //also checks that nobs > 0   ---> this will most often be smpl.t0 to smpl.t3         
             
             // -------------------
             // x2 is a SERIES
@@ -1195,7 +1201,7 @@ namespace Gekko
             //Using Func<> instead of for instance raw '+' uses a bit more than double the time for simple double addition.
             //But when dealing with GetData(), SetData() etc. the difference can not be seen.
             //So for practical purposes, Func<> here does not cost performance.
-            //If raw arrays were being used over large samples, perhaps the difference could be seen.
+            //If raw arrays were being used over large samples, perhaps the difference would manifest.
             foreach (GekkoTime t in new GekkoTimeIterator(window1, window2))
             {
                 rv_series.SetData(t, a.Invoke(x1_series.GetData(smpl, t), x2_series.GetData(smpl, t)));
@@ -1244,6 +1250,23 @@ namespace Gekko
             {
                 window1 = x1.data.anchorPeriod.Add(-x1.GetAnchorPeriodPositionInArray());
                 window2 = window1.Add(x1.data.dataArray.Length - 1);
+
+                if (Globals.runningOnTTComputer)
+                {
+                    //#08753205743
+                    GekkoTime wwwindow1 = GekkoTime.tNull;
+                    GekkoTime wwwindow2 = GekkoTime.tNull;
+                    GekkoTime.ConvertFreqs(x1.freq, smpl.t0, smpl.t3, ref wwwindow1, ref wwwindow2);
+                    if (window1.IsSamePeriod(wwwindow1) && window2.IsSamePeriod(wwwindow2))
+                    {
+                        //G.Writeln("----> window test ok", Color.Gray);
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Window test, #08753205743"); throw new GekkoException();
+                    }
+                }
+
             }
             else
             {
