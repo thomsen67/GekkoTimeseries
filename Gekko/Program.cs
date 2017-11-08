@@ -23196,9 +23196,10 @@ namespace Gekko
 
         public static void OPrint(O.Prt oPrt)
         {
-            List<IVariable> wlist = new List<IVariable>();
-            List<IVariable> rlist = new List<IVariable>();
-            List<string> printCodes = new List<string>();
+            List<O.PrtContainer> container = new List<O.PrtContainer>();
+            //List<IVariable> wlist = new List<IVariable>();
+            //List<IVariable> rlist = new List<IVariable>();
+            //List<string> printCodes = new List<string>();
             foreach (O.Prt.Element element in oPrt.prtElements)
             {
                 O.Prt.SubElement subElement = element.subElements[0];
@@ -23209,9 +23210,15 @@ namespace Gekko
                 else printCodes2.AddRange(element.printCodes);
                 foreach (OptString printCode in printCodes2)
                 {
-                    wlist.Add(subElement.tsWork);
-                    rlist.Add(subElement.tsBase);
-                    printCodes.Add(printCode.s1);
+                    //wlist.Add(subElement.tsWork);
+                    //rlist.Add(subElement.tsBase);
+                    //printCodes.Add(printCode.s1);
+                    O.PrtContainer c = new O.PrtContainer();
+                    c.ivFirst = subElement.tsWork;
+                    c.ivRef = subElement.tsBase;
+                    c.printCode = printCode.s1;
+                    c.label = subElement.label;
+                    container.Add(c);
                 }
             }
 
@@ -23219,7 +23226,7 @@ namespace Gekko
             //Globals.globalPeriodTimeFilters2 = new List<GekkoTime> { new GekkoTime(EFreq.Monthly, 2003, 1), new GekkoTime(EFreq.Monthly, 2003, 2) };
             
             string format = "f14.4";
-            string type = "plot";
+            string type = "print";
             //List inputList = x as List;  //will always be a list
             List inputList = null;
 
@@ -23256,33 +23263,30 @@ p (xx1,{#m});
                  * */
 
                 //IVariable[] ivs = PrintHelperConvertToList(inputList); //ivs has 1 or 2 elements. The sub-elements of these are now lists (of things to print, like x1, x2, x3)
-                
+
                 //List workList = ivs[0] as List;  //the elements here correspond to comma-separated argumentsIVariable workList = ivs[0];  //the elements here correspond to comma-separated arguments
                 //List refList = ivs[1] as List;  //same as above
 
+                List<O.PrtContainer> containerExplode = new List<O.PrtContainer>();
+
                 bool[] freqs = new bool[3];
-                List<IVariable> explodeWork = new List<IVariable>();
-                List<IVariable> explodeRef = new List<IVariable>();
-                List<string> explodePrintcodes = new List<string>();
+                //List<IVariable> explodeWork = new List<IVariable>();
+                //List<IVariable> explodeRef = new List<IVariable>();
+                //List<string> explodePrintcodes = new List<string>();
 
                 AllFreqsHelper allFreqs = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);  //converts between A, Q, M, so all are given. Also used in IMPORT<per1 per2> etc.
 
-                explodeWork.Add(null);  //signals to do a column of dates later on
-                explodeRef.Add(null); 
-                explodePrintcodes.Add(null);
+                //explodeWork.Add(null);  //signals to do a column of dates later on
+                //explodeRef.Add(null); 
+                //explodePrintcodes.Add(null);
+                containerExplode.Add(null);
 
                 int counter = -1;
-                foreach (IVariable iv in wlist)
+                foreach (O.PrtContainer c in container)
                 {
                     counter++;
-                    PrintHelper2(printCodes, freqs, explodeWork, explodePrintcodes, counter, iv, true, false);
-                }
-                counter = -1;
-                foreach (IVariable iv in rlist)
-                {
-                    counter++;
-                    PrintHelper2(printCodes, freqs, explodeRef, explodePrintcodes, counter, iv, true, true);
-                }
+                    PrintHelper2(containerExplode, freqs, counter, c, true, false);
+                }                
 
                 EFreq sameFreq = EFreq.None;
                 if (freqs[0] && !freqs[1] && !freqs[2]) sameFreq = EFreq.Annual;
@@ -23332,14 +23336,24 @@ p (xx1,{#m});
                     int i = 0;
                     int j = 0;
                     int iPlot = 0;                    
-                    for (int iVarCounter = 0; iVarCounter < explodeWork.Count; iVarCounter++)
+                    for (int iVarCounter = 0; iVarCounter < containerExplode.Count; iVarCounter++)
                     {                      
 
                         i = 1;
                         j++;
-                        IVariable ivWork = explodeWork[iVarCounter];
-                        IVariable ivRef = explodeRef[iVarCounter];
-                        string printCode = explodePrintcodes[iVarCounter];
+
+                        IVariable ivWork = null;
+                        IVariable ivRef = null;
+                        string printCode = null;
+                        string label = null;
+
+                        if (iVarCounter > 0)
+                        {
+                            ivWork = containerExplode[iVarCounter].ivFirst;
+                            ivRef = containerExplode[iVarCounter].ivRef;
+                            printCode = containerExplode[iVarCounter].printCode;
+                            label = containerExplode[iVarCounter].label;
+                        }
 
                         //--------------------------------
                         //TODO: make this depend upon printcode
@@ -24217,13 +24231,25 @@ p (xx1,{#m});
 
             double dWork = 0d;
             double dRef = 0d;
+            double dWorkLag = 0d;
+            double dRefLag = 0d;
             for (int i = 0; i < sumOver + filterSkip; i++)
             {
-                dWork += tsWork.GetData(smpl, t.Add(-i));
-                dRef += tsRef.GetData(smpl, t.Add(-i));
+                if (tsWork != null)
+                {
+                    dWork += tsWork.GetData(smpl, t.Add(-i));
+                    dWorkLag += tsWork.GetData(smpl, t.Add(-i - 1));
+                }
+                if (tsRef != null)
+                {
+                    dRef += tsRef.GetData(smpl, t.Add(-i));
+                    dRefLag += tsRef.GetData(smpl, t.Add(-i - 1));
+                }
             }
             if (G.Equal(printcode, "n")) return dWork;
             else if (G.Equal(printcode, "q")) return (dWork / dRef - 1d) * 100d;
+            else if (G.Equal(printcode, "p")) return (dWork / dWorkLag - 1d) * 100d;
+
             return 123454321d;
         }
 
@@ -24234,31 +24260,33 @@ p (xx1,{#m});
             return 123454321d;
         }
 
-        private static void PrintHelper2(List<string> printcode, bool[] freqs, List<IVariable> explode, List<string> explodePrintcodes, int counter, IVariable iv, bool root, bool isRef)
+        private static void PrintHelper2(List<O.PrtContainer> containerExplode, bool[] freqs, int counter, O.PrtContainer container, bool root, bool isRef)
         {
-            if (iv.Type() == EVariableType.Series)
+            if (container.ivFirst.Type() == EVariableType.Series)
             {
-                explode.Add(iv);
-                if (!isRef) PrintFreqHelper(freqs, iv);                
-                if (!isRef) explodePrintcodes.Add(printcode[counter]);
+                containerExplode.Add(container);
+                PrintFreqHelper(freqs, container.ivFirst);  //the ref one should be same freq
             }
-            else if (iv.Type() == EVariableType.Val)
+            else if (container.ivFirst.Type() == EVariableType.Val)
             {
-                explode.Add(iv);
-                if (!isRef) explodePrintcodes.Add(printcode[counter]);
+                containerExplode.Add(container);
             }
-            else if (iv.Type() == EVariableType.Matrix && ((Matrix)iv).data.Length == 1)  //an 1x1 matrix
+            else if (container.ivFirst.Type() == EVariableType.Matrix && ((Matrix)container.ivFirst).data.Length == 1)  //an 1x1 matrix
             {
-                explode.Add(iv);
-                if (!isRef) explodePrintcodes.Add(printcode[counter]);
+                containerExplode.Add(container);
             }
-            else if (iv.Type() == EVariableType.List)
+            else if (container.ivFirst.Type() == EVariableType.List)
             {
                 if (root)
                 {
-                    foreach (IVariable iv2 in ((List)iv).list)
+                    for(int i = 0;i< ((List)container.ivFirst).list.Count;i++)
                     {
-                        PrintHelper2(printcode, freqs, explode, explodePrintcodes, counter, iv2, false, isRef);  //the counter is fixed
+                        O.PrtContainer c2 = new O.PrtContainer();
+                        if (container.ivFirst != null) c2.ivFirst = ((List)container.ivFirst).list[i];
+                        if (container.ivRef != null) c2.ivRef = ((List)container.ivRef).list[i];
+                        c2.label = container.label;
+                        c2.printCode = container.printCode;
+                        PrintHelper2(containerExplode, freqs, counter, c2, false, isRef);  //the counter is fixed
                     }
                 }
             }

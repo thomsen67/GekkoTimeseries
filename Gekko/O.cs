@@ -6619,6 +6619,16 @@ namespace Gekko
             }
         }
 
+
+        public class PrtContainer
+        {
+            //Items that are unfolded via lists
+            public IVariable ivFirst = null;
+            public IVariable ivRef = null;
+            public string printCode = null;
+            public string label = null;
+        }
+
         public class Ols
         {
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
