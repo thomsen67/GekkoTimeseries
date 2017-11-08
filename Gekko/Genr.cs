@@ -9,6 +9,7 @@ namespace Gekko
     public class TranslatedCode
     {
         public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
+        public static readonly ScalarVal i80 = new ScalarVal(1d);
         public static void ClearTS(P p)
         {
         }
@@ -22,20 +23,22 @@ namespace Gekko
 
             //[[splitSTART]]
             p.SetText(@"¤0"); O.InitSmpl(smpl);
-            List m857 = null; try
+            List m81 = null; try
             {
-                m857 = new List();
+                m81 = new List();
                 for (smpl.bankNumber = 0; smpl.bankNumber < 1; smpl.bankNumber++)
                 {
-                    IVariable temp = (O.Lookup(smpl, null, null, "%s", null, null, false));
-                    m857.Add(O.Lookup(smpl, null, temp, null, false));
+                    IVariable xx = O.Indexer(O.Indexer2(smpl, O.Negate(smpl, i80)
+                    ), smpl, O.Add(smpl, O.Lookup(smpl, null, null, "xx", null, null, false), O.Lookup(smpl, null, null, "xx", null, null, false)), O.Negate(smpl, i80)
+                    );
+                    m81.Add(xx);
                 }
             }
             finally
             {
                 smpl.bankNumber = 0;
             }
-            O.Print(smpl, m857);
+            O.Print(smpl, m81);
 
             //[[splitSTOP]]
 
