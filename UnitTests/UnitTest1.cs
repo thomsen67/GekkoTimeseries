@@ -135,7 +135,7 @@ namespace UnitTests
             Program.databanks.storage.Add(new Databank(Globals.Ref));
 
             Program.CreateTempFilesFolder();
-
+            
             string s = Globals.localTempFilesLocation;
             if (!(s.Contains("AppData") && s.Contains("tempfiles")))
             {
@@ -9321,6 +9321,31 @@ namespace UnitTests
             _AssertSeries(First(), "xx4", 2005, 10d, sharedDelta);
             _AssertSeries(First(), "xx4", 2006, double.NaN, sharedDelta);
 
+        }
+
+        [TestMethod]
+        public void _Test_Print()
+        {
+            I("reset;");
+            I("time 2001 2003;");
+            I("xx1 = (1,2,3);");
+            I("xx2 = (4,5,6);");
+            I("option freq q;");
+            I("xx3 = (1,2,3,4,5,6,7,8,9,10,11,12);");
+            I("option freq m;");
+            I("xx4 = (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,18,29,30,31,32,33,34,35,36);");
+            I("#m = ('xx3!q', 'xx4!m');");
+            I("write slet;");
+            I("read slet;");
+            I("option freq a;");
+            I("xx1 = xx1 + 1000;");
+            I("xx2 = xx2 + 1000;");
+            I("option freq q;");
+            I("xx3 = xx3 + 1000;");
+            I("option freq m;");
+            I("xx4 = xx4 + 1000;");
+            I("option freq a;");
+            I("p xx1, xx2, {#m};");
         }
 
         [TestMethod]

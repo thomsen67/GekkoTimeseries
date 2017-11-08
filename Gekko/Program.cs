@@ -23226,59 +23226,21 @@ namespace Gekko
             //Globals.globalPeriodTimeFilters2 = new List<GekkoTime> { new GekkoTime(EFreq.Monthly, 2003, 1), new GekkoTime(EFreq.Monthly, 2003, 2) };
             
             string format = "f14.4";
-            string type = "print";
+            string type = "plot";
             //List inputList = x as List;  //will always be a list
             List inputList = null;
 
             //print always receives a List with 1 or 2 elements (Work and Ref so to say)
 
             if (true)
-            {
-
-                /*
-                 * 
-                 * reset;
-time 2001 2003;
-xx1 = (1,2,3);
-xx2 = (4,5,6);
-option freq q;
-xx3 = (1,2,3,4,5,6,7,8,9,10,11,12);
-option freq m;
-xx4 = (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,18,29,30,31,32,33,34,35,36);
-
-#m = ('xx3!q', 'xx4!m');
-write slet;
-read slet;
-option freq a;
-xx1 = xx1 + 1000;
-xx2 = xx2 + 1000;
-option freq q;
-xx3 = xx3 + 1000;       //why not just xx3!q = xx3!q + 100; without freq change???
-option freq m;
-xx4 = xx4 + 1000;
-option freq a;
-p (xx1,{#m});
-                 * 
-                 * 
-                 * */
-
-                //IVariable[] ivs = PrintHelperConvertToList(inputList); //ivs has 1 or 2 elements. The sub-elements of these are now lists (of things to print, like x1, x2, x3)
-
-                //List workList = ivs[0] as List;  //the elements here correspond to comma-separated argumentsIVariable workList = ivs[0];  //the elements here correspond to comma-separated arguments
-                //List refList = ivs[1] as List;  //same as above
+            {               
 
                 List<O.PrtContainer> containerExplode = new List<O.PrtContainer>();
 
-                bool[] freqs = new bool[3];
-                //List<IVariable> explodeWork = new List<IVariable>();
-                //List<IVariable> explodeRef = new List<IVariable>();
-                //List<string> explodePrintcodes = new List<string>();
+                bool[] freqs = new bool[3];                
 
                 AllFreqsHelper allFreqs = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);  //converts between A, Q, M, so all are given. Also used in IMPORT<per1 per2> etc.
-
-                //explodeWork.Add(null);  //signals to do a column of dates later on
-                //explodeRef.Add(null); 
-                //explodePrintcodes.Add(null);
+                                
                 containerExplode.Add(null);
 
                 int counter = -1;
@@ -23294,7 +23256,17 @@ p (xx1,{#m});
                 else if (!freqs[0] && !freqs[1] && freqs[2]) sameFreq = EFreq.Monthly;
                 else sameFreq = EFreq.None;  //superflous, just to state the obvious
 
+                if (!freqs[0] && !freqs[1] && !freqs[2])
+                {
+                    //for instance printing a scalar
+                    sameFreq = Program.options.freq;
+                    if (Program.options.freq == EFreq.Annual) freqs[0] = true;
+                    else if (Program.options.freq == EFreq.Quarterly) freqs[1] = true;
+                    else if (Program.options.freq == EFreq.Monthly) freqs[2] = true;
+                }
+
                 Table table = new Table();
+                table.writeOnce = true;
 
                 GekkoTime t1 = smpl.t1;
                 GekkoTime t2 = smpl.t2;
@@ -23395,12 +23367,11 @@ p (xx1,{#m});
 
                         //remember there is a label column which gets number 1
                         for (int year = y1; year <= y2; year++)
-                        {
-                            //i = (year - y1) * rowsPerYear;
-                            
+                        {                            
                             if (type != "plot") // ------------------------------------------------------------- (1)
                             {
-                                
+                                i++;
+                                i++;
                                 //Non-plots have a first column with dates, plots have such a column for each series
                                 if (j == 1)  //then iv == null
                                 {
@@ -23408,7 +23379,7 @@ p (xx1,{#m});
                                     // --------------------------
                                     if (type != "plot") table.Set(i, j, year.ToString());
                                 }
-                                i++;
+                                
                             }
 
                             if (true)  // ------------------------------------------------------------- (2)
