@@ -6627,6 +6627,8 @@ namespace Gekko
             public IVariable ivRef = null;
             public string printCode = null;
             public string label = null;
+            public double min = double.MaxValue;
+            public double max = double.MinValue;
         }
 
         public class Ols
