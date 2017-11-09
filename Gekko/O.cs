@@ -6629,6 +6629,15 @@ namespace Gekko
             public string label = null;
             public double min = double.MaxValue;
             public double max = double.MinValue;
+
+            public string linetypes = null;
+            public string dashtypes = null;
+            public double linewidths = double.NaN;
+            public string linecolors = null;
+            public string pointtypes = null;
+            public double pointsizes = double.NaN;
+            public string fillstyles = null;
+            public string y2s = null;
         }
 
         public class Ols

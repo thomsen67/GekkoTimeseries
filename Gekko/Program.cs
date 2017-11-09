@@ -23204,7 +23204,7 @@ namespace Gekko
             {
                 O.Prt.SubElement subElement = element.subElements[0];
                 //generally, subElements only have 1 item (used to expand lists in Gekko < 3.0)
-
+                
                 List<OptString> printCodes2 = new List<OptString>();
                 if (element.printCodes.Count == 0) printCodes2.Add(new OptString("n", "yes"));
                 else printCodes2.AddRange(element.printCodes);
@@ -23218,6 +23218,16 @@ namespace Gekko
                     c.ivRef = subElement.tsBase;
                     c.printCode = printCode.s1;
                     c.label = subElement.label;
+
+                    c.linetypes=element.linetype;
+                    c.dashtypes = element.dashtype;
+                    c.linewidths = element.linewidth;
+                    c.linecolors = element.linecolor;
+                    c.pointtypes = element.pointtype;
+                    c.pointsizes = element.pointsize;
+                    c.fillstyles = element.fillstyle;
+                    c.y2s = element.y2;
+
                     container.Add(c);
                 }
             }
@@ -23239,13 +23249,13 @@ namespace Gekko
 
                 AllFreqsHelper allFreqs = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);  //converts between A, Q, M, so all are given. Also used in IMPORT<per1 per2> etc.
                                 
-                containerExplode.Add(null);
+                //containerExplode.Add(null);
 
                 int counter = -1;
                 foreach (O.PrtContainer c in container)
                 {
                     counter++;
-                    PrintHelper2(containerExplode, freqs, counter, c, true, false);
+                    PrintHelper2(containerExplode, freqs, c, true, false);
                 }                
 
                 EFreq sameFreq = EFreq.None;
@@ -23301,33 +23311,35 @@ namespace Gekko
                 //23. SUM4Q             Qsum           
                 //24. ANNUAL     A
 
-                double[] dataMin = new double[containerExplode.Count];
-                double[] dataMax = new double[containerExplode.Count];
+                //double[] dataMin = new double[containerExplode.Count];
+                //double[] dataMax = new double[containerExplode.Count];
 
                 if (true)
                 {
                     int i = 0;
                     int j = 0;
                     int iPlot = 0;                    
-                    for (int iVarCounter = 0; iVarCounter < containerExplode.Count; iVarCounter++)
-                    {                      
+                    for (int iVarCounter = -1; iVarCounter < containerExplode.Count; iVarCounter++)
+                    {
+                        //iVarCounter = -1 is the column with dates etc.
 
                         i = 1;
                         j++;
 
-                        O.PrtContainer cc = containerExplode[iVarCounter];
+                        O.PrtContainer cc = null;
                         IVariable ivWork = null;
                         IVariable ivRef = null;
                         string printCode = null;
                         string label = null;
 
-                        if (iVarCounter > 0)
+                        if (iVarCounter >= 0)
                         {
+                            cc = containerExplode[iVarCounter];
                             ivWork = cc.ivFirst;
                             ivRef = cc.ivRef;
                             printCode = cc.printCode;
                             label = cc.label;
-                        }
+                        }                        
 
                         //--------------------------------
                         //TODO: make this depend upon printcode
@@ -23346,7 +23358,6 @@ namespace Gekko
                             else if (bankCombi == 1 && ivRef.Type() == EVariableType.Series) freqColumn = ((Series)ivRef).freq;
                             else if (bankCombi == 2 && ivWork.Type() == EVariableType.Series) freqColumn = ((Series)ivWork).freq;
                         }
-
                         
                         double scalarValueWork = double.NaN;
                         Series tsWork = null;
@@ -24242,7 +24253,7 @@ namespace Gekko
             return 123454321d;
         }
 
-        private static void PrintHelper2(List<O.PrtContainer> containerExplode, bool[] freqs, int counter, O.PrtContainer container, bool root, bool isRef)
+        private static void PrintHelper2(List<O.PrtContainer> containerExplode, bool[] freqs, O.PrtContainer container, bool root, bool isRef)
         {
             if (container.ivFirst.Type() == EVariableType.Series)
             {
@@ -24268,7 +24279,7 @@ namespace Gekko
                         if (container.ivRef != null) c2.ivRef = ((List)container.ivRef).list[i];
                         c2.label = container.label;
                         c2.printCode = container.printCode;
-                        PrintHelper2(containerExplode, freqs, counter, c2, false, isRef);  //the counter is fixed
+                        PrintHelper2(containerExplode, freqs, c2, false, isRef);  //the counter is fixed
                     }
                 }
             }
@@ -26832,7 +26843,7 @@ namespace Gekko
 
             //bool isInside = true;
             //bool test2 = false;
-            int count = containerExplode.Count - 1;
+            int count = containerExplode.Count;
             bool firstXLabelFix = true;
 
             bool isInside = false;  //corresponds to at
@@ -27066,28 +27077,26 @@ namespace Gekko
             
             bool isSeparated = NotNullAndNotNo(separate);  //#23475432985
 
-            List<string> linetypes = new List<string>();
-            List<string> dashtypes = new List<string>();
-            List<double> linewidths = new List<double>();
-            List<string> linecolors = new List<string>();
-            List<string> pointtypes = new List<string>();
-            List<double> pointsizes = new List<double>();
-            List<string> fillstyles = new List<string>();
-            List<string> y2s = new List<string>();
-            foreach (O.Prt.Element pe in o.prtElements)  //varI 0-based
-            {
-                foreach (O.Prt.SubElement subPe in pe.subElements)
-                {
-                    linetypes.Add(pe.linetype);
-                    dashtypes.Add(pe.dashtype);
-                    linewidths.Add(pe.linewidth);
-                    linecolors.Add(pe.linecolor);
-                    pointtypes.Add(pe.pointtype);
-                    pointsizes.Add(pe.pointsize);
-                    fillstyles.Add(pe.fillstyle);
-                    y2s.Add(pe.y2);
-                }
-            }
+            //List<string> linetypes = new List<string>();
+            //List<string> dashtypes = new List<string>();
+            //List<double> linewidths = new List<double>();
+            //List<string> linecolors = new List<string>();
+            //List<string> pointtypes = new List<string>();
+            //List<double> pointsizes = new List<double>();
+            //List<string> fillstyles = new List<string>();
+            //List<string> y2s = new List<string>();
+
+            //foreach (O.Prt.Element pe in o.prtElements)  //varI 0-based
+            //{
+            //    linetypes.Add(pe.linetype);
+            //    dashtypes.Add(pe.dashtype);
+            //    linewidths.Add(pe.linewidth);
+            //    linecolors.Add(pe.linecolor);
+            //    pointtypes.Add(pe.pointtype);
+            //    pointsizes.Add(pe.pointsize);
+            //    fillstyles.Add(pe.fillstyle);
+            //    y2s.Add(pe.y2);
+            //}
 
             double linewidthCorrection = 1d;
             double pointsizeCorrection = 1d;
@@ -27123,14 +27132,16 @@ namespace Gekko
             double[] dataMin = new double[containerExplode.Count];
             double[] dataMax = new double[containerExplode.Count];
             List<string> labelsNonBroken = new List<string>();
-            for (int i = 1; i <= count; i++)
+            for (int i = 0; i < count; i++)
             {                
                 dataMin[i] = containerExplode[i].min;
                 dataMax[i] = containerExplode[i].max;
-                labelsNonBroken.Add(containerExplode[i].label);
+                string label = "";
+                if (containerExplode[i].label != null) label = containerExplode[i].label;
+                labelsNonBroken.Add(label);
             }
 
-            string discard = PlotHandleLines(true, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, quarterFix, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, linetypes, dashtypes, linewidths, linecolors, pointtypes, pointsizes, fillstyles, y2s, linewidthCorrection, pointsizeCorrection, isInside);
+            string discard = PlotHandleLines(true, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, quarterFix, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside);
             
             StringBuilder txt = new StringBuilder();
                         
@@ -27549,7 +27560,7 @@ namespace Gekko
             //          SECOND PASS
             // ---------------------------------------
             // ---------------------------------------
-            string plotline = PlotHandleLines(false, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, quarterFix, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, linetypes, dashtypes, linewidths, linecolors, pointtypes, pointsizes, fillstyles, y2s, linewidthCorrection, pointsizeCorrection, isInside);
+            string plotline = PlotHandleLines(false, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, quarterFix, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside);
 
             txt.AppendLine(plotline);
 
@@ -27685,7 +27696,7 @@ namespace Gekko
             return setTitlePlaceholder;
         }
 
-        private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, int quarterFix, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<string> linetypes, List<string> dashtypes, List<double> linewidths, List<string> linecolors, List<string> pointtypes, List<double> pointsizes, List<string> fillstyles, List<string> y2s, double linewidthCorrection, double pointsizeCorrection, bool isInside)
+        private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, int quarterFix, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<O.PrtContainer> co, double linewidthCorrection, double pointsizeCorrection, bool isInside)
         {
             int manyXValues = 0;  //0 or 1
 
@@ -27732,14 +27743,14 @@ namespace Gekko
                 // --------- loading lines section start
                 // ---------------------------------------------
 
-                linetype = GetText(linetypes[i], o.opt_linetype, line3 == null ? null : line3.SelectSingleNode("type"), linetypeMain, dlinetype);
-                dashtype = GetText(dashtypes[i], o.opt_dashtype, line3 == null ? null : line3.SelectSingleNode("dashtype"), dashtypeMain, ddashtype);
-                linewidth = GetText(G.isNumericalError(linewidths[i]) ? null : linewidths[i].ToString(), G.isNumericalError(o.opt_linewidth) ? null : o.opt_linewidth.ToString(), line3 == null ? null : line3.SelectSingleNode("linewidth"), linewidthMain, dlinewidth);
-                linecolor = GetText(linecolors[i], o.opt_linecolor, line3 == null ? null : line3.SelectSingleNode("linecolor"), linecolorMain, dlinecolor);
-                pointtype = GetText(pointtypes[i], o.opt_pointtype, line3 == null ? null : line3.SelectSingleNode("pointtype"), pointtypeMain, dpointtype);
-                pointsize = GetText(G.isNumericalError(pointsizes[i]) ? null : pointsizes[i].ToString(), G.isNumericalError(o.opt_pointsize) ? null : o.opt_pointsize.ToString(), line3 == null ? null : line3.SelectSingleNode("pointsize"), pointsizeMain, dpointsize);
-                fillstyle = GetText(fillstyles[i], o.opt_fillstyle, line3 == null ? null : line3.SelectSingleNode("fillstyle"), fillstyleMain, dfillstyle);
-                y2 = GetText(y2s[i], null, line3 == null ? null : line3.SelectSingleNode("y2"), null, "no"); //default: no, #23475432985
+                linetype = GetText(co[i].linetypes, o.opt_linetype, line3 == null ? null : line3.SelectSingleNode("type"), linetypeMain, dlinetype);
+                dashtype = GetText(co[i].dashtypes, o.opt_dashtype, line3 == null ? null : line3.SelectSingleNode("dashtype"), dashtypeMain, ddashtype);
+                linewidth = GetText(G.isNumericalError(co[i].linewidths) ? null : co[i].linewidths.ToString(), G.isNumericalError(o.opt_linewidth) ? null : o.opt_linewidth.ToString(), line3 == null ? null : line3.SelectSingleNode("linewidth"), linewidthMain, dlinewidth);
+                linecolor = GetText(co[i].linecolors, o.opt_linecolor, line3 == null ? null : line3.SelectSingleNode("linecolor"), linecolorMain, dlinecolor);
+                pointtype = GetText(co[i].pointtypes, o.opt_pointtype, line3 == null ? null : line3.SelectSingleNode("pointtype"), pointtypeMain, dpointtype);
+                pointsize = GetText(G.isNumericalError(co[i].pointsizes) ? null : co[i].pointsizes.ToString(), G.isNumericalError(o.opt_pointsize) ? null : o.opt_pointsize.ToString(), line3 == null ? null : line3.SelectSingleNode("pointsize"), pointsizeMain, dpointsize);
+                fillstyle = GetText(co[i].fillstyles, o.opt_fillstyle, line3 == null ? null : line3.SelectSingleNode("fillstyle"), fillstyleMain, dfillstyle);
+                y2 = GetText(co[i].y2s, null, line3 == null ? null : line3.SelectSingleNode("y2"), null, "no"); //default: no, #23475432985
                 label = HandleLabel(line3, isExplicit, labelCleaned);
 
                 if (G.Equal(linetype, "boxes"))
