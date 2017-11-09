@@ -26832,7 +26832,7 @@ namespace Gekko
 
             //bool isInside = true;
             //bool test2 = false;
-            int count = containerExplode.Count;
+            int count = containerExplode.Count - 1;
             bool firstXLabelFix = true;
 
             bool isInside = false;  //corresponds to at
@@ -26918,12 +26918,12 @@ namespace Gekko
             //double[] dataMax = new double[count]; for (int i = 0; i < count; i++) dataMax[i] = double.MinValue;
             //double[] dataMin = new double[count]; for (int i = 0; i < count; i++) dataMin[i] = double.MaxValue;
 
-            
+            List<string> tabLines = data.Print();
 
             using (FileStream fs = WaitForFileStream(fileData, GekkoFileReadOrWrite.Write))
             using (StreamWriter tw = G.GekkoStreamWriter(fs))
             {
-                foreach (string s in data.Print()) tw.WriteLine(s);
+                foreach (string s in tabLines) tw.WriteLine(s);
 
                 //for (int t = 0; t < numberOfObs; t++)
                 //{
@@ -27123,8 +27123,8 @@ namespace Gekko
             double[] dataMin = new double[containerExplode.Count];
             double[] dataMax = new double[containerExplode.Count];
             List<string> labelsNonBroken = new List<string>();
-            for (int i = 0; i < containerExplode.Count; i++)
-            {
+            for (int i = 1; i <= count; i++)
+            {                
                 dataMin[i] = containerExplode[i].min;
                 dataMax[i] = containerExplode[i].max;
                 labelsNonBroken.Add(containerExplode[i].label);
