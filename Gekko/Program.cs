@@ -23314,6 +23314,8 @@ namespace Gekko
                 //double[] dataMin = new double[containerExplode.Count];
                 //double[] dataMax = new double[containerExplode.Count];
 
+                int[] colCounter = new int[containerExplode.Count];
+
                 if (true)
                 {
                     int i = 0;
@@ -24009,12 +24011,15 @@ namespace Gekko
                                     }
                                 }
                             }
-
-                        }
-                    }
+                        }  //end of years
+                        //if (i > 1) G.Writeln(j + " " + i);
+                        if (iVarCounter >= 0) colCounter[iVarCounter] = i;
+                    }  //end of iVarCounter
                 } // type
 
                 //bool filter = ShouldFilterPeriod(new GekkoTime());
+
+
 
                 if (type == "plot")
                 {

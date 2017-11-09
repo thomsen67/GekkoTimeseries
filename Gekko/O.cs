@@ -6638,6 +6638,8 @@ namespace Gekko
             public double pointsizes = double.NaN;
             public string fillstyles = null;
             public string y2s = null;
+
+            public int numberOfTableRows = 0;  //used to insert M's in the file
         }
 
         public class Ols
