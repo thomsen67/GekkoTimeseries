@@ -23251,10 +23251,10 @@ namespace Gekko
                                 
                 //containerExplode.Add(null);
 
-                int counter = -1;
+                //int counter = -1;
                 foreach (O.PrtContainer c in container)
                 {
-                    counter++;
+                    //counter++;
                     PrintHelper2(containerExplode, freqs, c, true, false);
                 }                
 
@@ -23411,7 +23411,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqInThisTableRow, subHere, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqInThisTableRow, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -23432,7 +23432,7 @@ namespace Gekko
                                     else
                                     {
 
-                                        PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -23453,7 +23453,7 @@ namespace Gekko
                                     else
                                     {
 
-                                        PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -23488,7 +23488,7 @@ namespace Gekko
                                         }
                                         else
                                         {
-                                            PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                            PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                         }
                                     }
                                 }
@@ -23509,7 +23509,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -23539,7 +23539,7 @@ namespace Gekko
                                     else
                                     {
 
-                                        PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -23560,7 +23560,7 @@ namespace Gekko
                                     else
                                     {
 
-                                        PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -23581,7 +23581,7 @@ namespace Gekko
                                     else
                                     {
 
-                                        PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -23616,7 +23616,7 @@ namespace Gekko
                                         }
                                         else
                                         {
-                                            PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                            PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                         }
                                     }
                                 }
@@ -23637,7 +23637,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -23681,7 +23681,7 @@ namespace Gekko
                                     else
                                     {
 
-                                        PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -23702,7 +23702,7 @@ namespace Gekko
                                     else
                                     {
 
-                                        PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -23723,7 +23723,7 @@ namespace Gekko
                                     else
                                     {
 
-                                        PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -23758,7 +23758,7 @@ namespace Gekko
                                         }
                                         else
                                         {
-                                            PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                            PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                         }
                                     }
                                 }
@@ -23780,7 +23780,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -23813,7 +23813,7 @@ namespace Gekko
                                     else
                                     {
 
-                                        PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -23834,7 +23834,7 @@ namespace Gekko
                                     else
                                     {
 
-                                        PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -23855,7 +23855,7 @@ namespace Gekko
                                     else
                                     {
 
-                                        PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -23890,7 +23890,7 @@ namespace Gekko
                                         }
                                         else
                                         {
-                                            PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                            PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                         }
                                     }
                                 }
@@ -23927,7 +23927,7 @@ namespace Gekko
                                         }
                                         else
                                         {
-                                            PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                            PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                         }
                                     }
                                 }
@@ -23947,7 +23947,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -23983,7 +23983,7 @@ namespace Gekko
                                         }
                                         else
                                         {
-                                            PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                            PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                         }
                                     }
                                 }
@@ -24005,7 +24005,7 @@ namespace Gekko
                                     else
                                     {
 
-                                        PrintHelper3(smpl, type, format, sameFreq, table, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                        PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
                             }
@@ -24170,7 +24170,7 @@ namespace Gekko
 
         }
 
-        private static void PrintHelper3(GekkoSmpl smpl,string type, string format, EFreq sameFreq, Table table, int i, int j, int iPlot, string printCode, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, int sumOver, int[] skipCounter, O.PrtContainer cc)
+        private static void PrintHelper3(GekkoSmpl smpl,string type, string format, EFreq sameFreq, Table table, int count, int i, int j, int iPlot, string printCode, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, int sumOver, int[] skipCounter, O.PrtContainer cc)
         {
             GekkoTime t = new GekkoTime(freqColumn, year, subHere);
 
@@ -24203,8 +24203,10 @@ namespace Gekko
                 {
                     double tt = ((ScalarVal)Functions.time(t)).val;
                     if (freqColumn == EFreq.Annual) tt += 0.5;
-                    table.SetNumber(i - 1, 2 * (j - 2) + 1, tt, format);  //j=2 -> 1, j=3 -> 3
-                    table.SetNumber(i - 1, 2 * (j - 2) + 2, (double)d, format);  //j=2 -> 2, j=3 -> 4
+                    //table.SetNumber(i - 1, 2 * (j - 2) + 1, tt, format);  //j=2 -> 1, j=3 -> 3
+                    //table.SetNumber(i - 1, 2 * (j - 2) + 2, (double)d, format);  //j=2 -> 2, j=3 -> 4
+                    table.SetNumber(i - 1, (j - 2) + 1, tt, format);                 //j=2 -> 1, j=3 -> 2
+                    table.SetNumber(i - 1, (j - 2) + 1 + count, (double)d, format);  //j=2 -> 1+count, j=3 -> 2+count
                 }
 
             }
@@ -27701,7 +27703,7 @@ namespace Gekko
         private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<O.PrtContainer> co, double linewidthCorrection, double pointsizeCorrection, bool isInside)
         {
             int manyXValues = 0;  //0 or 1
-            int quarterFix = 0;
+            int quarterFix = count - 1;
 
             string plotline = "plot ";
 
@@ -27709,8 +27711,10 @@ namespace Gekko
             int boxesY2Counter = 0;
             int areasYCounter = 0;
             int areasY2Counter = 0;
+            int iii = 0;
             for (int i = 0; i < count; i++)
             {
+                iii = i;
                 XmlNode line3 = lines3[i];
 
                 //defaults
@@ -27874,11 +27878,11 @@ namespace Gekko
                         if (ss != null && ss.EndsWith("+")) ss = ss.Substring(0, ss.Length - 1); //remove last '+'                       
                         if (isInside)
                         {
-                            xAdjustment = "($" + (quarterFix + 1) + "+" + GetXAdjustmentForInsideTics(isInside) + ")(" + ss + ")" + ":(" + d_width3 + ")";
+                            xAdjustment = "($" + (iii + 1) + "+" + GetXAdjustmentForInsideTics(isInside) + ")(" + ss + ")" + ":(" + d_width3 + ")";
                         }
                         else
                         {
-                            xAdjustment = "" + (quarterFix + 1) + ":(" + ss + ")" + ":(" + d_width3 + ")";
+                            xAdjustment = "" + (iii + 1) + ":(" + ss + ")" + ":(" + d_width3 + ")";
                         }
                     }
                     else
@@ -27893,11 +27897,11 @@ namespace Gekko
                         }
                         if (isInside)
                         {
-                            xAdjustment = "($" + (quarterFix + 1) + " " + minus + d + "+" + GetXAdjustmentForInsideTics(isInside) + "):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
+                            xAdjustment = "($" + (iii + 1) + " " + minus + d + "+" + GetXAdjustmentForInsideTics(isInside) + "):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
                         }
                         else
                         {
-                            xAdjustment = "($" + (quarterFix + 1) + " " + minus + d + "):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
+                            xAdjustment = "($" + (iii + 1) + " " + minus + d + "):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
                         }                        
                     }
                 }
@@ -27942,22 +27946,22 @@ namespace Gekko
                         if (ss != null && ss.EndsWith("+")) ss = ss.Substring(0, ss.Length - 1);  //remove last '+'                       
                         if (isInside)
                         {
-                            xAdjustment = "($" + (quarterFix + 1) + "+" + GetXAdjustmentForInsideTics(isInside) + "):(" + ss + ")";
+                            xAdjustment = "($" + (iii + 1) + "+" + GetXAdjustmentForInsideTics(isInside) + "):(" + ss + ")";
                         }
                         else
                         {
-                            xAdjustment = "" + (quarterFix + 1) + ":(" + ss + ")";
+                            xAdjustment = "" + (iii + 1) + ":(" + ss + ")";
                         }
                     }
                     else
                     {
                         if (isInside)
                         {
-                            xAdjustment = "($" + (quarterFix + 1) + "+" + GetXAdjustmentForInsideTics(isInside) + "):" + (i + quarterFix + 2);  //just normal positioning
+                            xAdjustment = "($" + (iii + 1) + "+" + GetXAdjustmentForInsideTics(isInside) + "):" + (i + quarterFix + 2);  //just normal positioning
                         }
                         else
                         {
-                            xAdjustment = "" + (quarterFix + 1) + ":" + (i + quarterFix + 2);  //just normal positioning
+                            xAdjustment = "" + (iii + 1) + ":" + (i + quarterFix + 2);  //just normal positioning
                         }
                     }
                 }
@@ -27970,11 +27974,11 @@ namespace Gekko
                     }
                     if (isInside)
                     {                        
-                        xAdjustment = "($" + (quarterFix + 1) + "+" + GetXAdjustmentForInsideTics(isInside) + "):" + (i + quarterFix + 2);
+                        xAdjustment = "($" + (iii + 1) + "+" + GetXAdjustmentForInsideTics(isInside) + "):" + (i + quarterFix + 2);
                     }
                     else
                     {
-                        xAdjustment = "" + (quarterFix + 1) + ":" + (i + quarterFix + 2);
+                        xAdjustment = "" + (iii + 1) + ":" + (i + quarterFix + 2);
                     }
                     //xAdjustment = "" + (quarterFix + 1) + ":" + (i + quarterFix + 2);
                 }
