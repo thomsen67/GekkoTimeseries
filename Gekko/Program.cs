@@ -23319,14 +23319,14 @@ namespace Gekko
                 if (true)
                 {
                     int i = 0;
-                    int j = 0;
+                    //int j = 0;
                     int iPlot = 0;                    
-                    for (int iVarCounter = -1; iVarCounter < containerExplode.Count; iVarCounter++)
+                    for (int j = 1; j < containerExplode.Count + 2; j++)
                     {
                         //iVarCounter = -1 is the column with dates etc.
 
                         i = 1;
-                        j++;
+                        //j++;
 
                         O.PrtContainer cc = null;
                         IVariable ivWork = null;
@@ -23334,9 +23334,9 @@ namespace Gekko
                         string printCode = null;
                         string label = null;
 
-                        if (iVarCounter >= 0)
+                        if (j-2 >= 0)
                         {
-                            cc = containerExplode[iVarCounter];
+                            cc = containerExplode[j-2];
                             ivWork = cc.ivFirst;
                             ivRef = cc.ivRef;
                             printCode = cc.printCode;
@@ -24013,13 +24013,27 @@ namespace Gekko
                             }
                         }  //end of years
                         //if (i > 1) G.Writeln(j + " " + i);
-                        if (iVarCounter >= 0) colCounter[iVarCounter] = i;
+                        if (j-2 >= 0) colCounter[j-2] = i;
                     }  //end of iVarCounter
-                } // type
+                } // true
+
+                int max = int.MinValue;
+                for (int jj = 0; jj < containerExplode.Count; jj++)
+                {
+                    max = Math.Max(max, colCounter[jj]);
+                }
+                for (int jj = 0; jj < containerExplode.Count; jj++)
+                {
+                    for (int jjj = colCounter[jj]; jjj < max ; jjj++)
+                    {
+                        table.Set(jjj, jj + 1, "M");
+                        table.SetAlign(jjj, jj + 1, Align.Right);
+                        table.Set(jjj, containerExplode.Count + jj + 1, "M", CellType.Text);
+                        table.SetAlign(jjj, containerExplode.Count + jj + 1, Align.Right);
+                    }
+                }
 
                 //bool filter = ShouldFilterPeriod(new GekkoTime());
-
-
 
                 if (type == "plot")
                 {
