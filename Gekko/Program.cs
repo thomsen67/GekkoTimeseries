@@ -26865,8 +26865,8 @@ namespace Gekko
             
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
 
-            int quarterFix = 0;
-            if (Program.options.freq == EFreq.Quarterly || Program.options.freq == EFreq.Monthly) quarterFix = 1;
+            //int quarterFix = 0;
+            //if (Program.options.freq == EFreq.Quarterly || Program.options.freq == EFreq.Monthly) quarterFix = 1;
 
             if (count == 0)
             {
@@ -27141,7 +27141,7 @@ namespace Gekko
                 labelsNonBroken.Add(label);
             }
 
-            string discard = PlotHandleLines(true, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, quarterFix, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside);
+            string discard = PlotHandleLines(true, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside);
             
             StringBuilder txt = new StringBuilder();
                         
@@ -27259,34 +27259,36 @@ namespace Gekko
             if (set_yrange.Trim() != ":") txt.AppendLine("set yrange [" + set_yrange + "]");
             if (set_y2range.Trim() != ":") txt.AppendLine("set y2range [" + set_y2range + "]");
 
-            if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
-            {
-                if (quarterFix == 0)
+            
+                if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
                 {
-                    txt.AppendLine("set xdata time");
-                    txt.AppendLine(@"set timefmt ""%Y/%m/%d""");
-                    txt.AppendLine(@"set format x ""%Y/%m""");
-                }
-            }
-            else
-            {
-                //annual or undated
-                if (numberOfObs > 140)
-                {
-                    txt.AppendLine("set xtics 20");
-                    txt.AppendLine("set mxtics 20");
-                }
-                else if (numberOfObs > 70)
-                {
-                    txt.AppendLine("set xtics 10");
-                    txt.AppendLine("set mxtics 10");
+                    //if (quarterFix == 0)
+                    //{
+                    //    txt.AppendLine("set xdata time");
+                    //    txt.AppendLine(@"set timefmt ""%Y/%m/%d""");
+                    //    txt.AppendLine(@"set format x ""%Y/%m""");
+                    //}
                 }
                 else
                 {
-                    txt.AppendLine("set xtics 5");
-                    txt.AppendLine("set mxtics 5");
+                    //annual or undated
+                    if (numberOfObs > 140)
+                    {
+                        txt.AppendLine("set xtics 20");
+                        txt.AppendLine("set mxtics 20");
+                    }
+                    else if (numberOfObs > 70)
+                    {
+                        txt.AppendLine("set xtics 10");
+                        txt.AppendLine("set mxtics 10");
+                    }
+                    else
+                    {
+                        txt.AppendLine("set xtics 5");
+                        txt.AppendLine("set mxtics 5");
+                    }
                 }
-            }
+            
 
             //txt.AppendLine("set xtic scale 1.7, 0.85");
             txt.AppendLine("set xtic scale 2, 0.7");
@@ -27514,7 +27516,7 @@ namespace Gekko
             {
                 int mxtics = -12345;
                 string ticsTxt = null;
-                mxtics = HandleXTics(quarterFix, labels1, labels2, ref ticsTxt, mxtics);
+                mxtics = HandleXTics(labels1, labels2, ref ticsTxt, mxtics);
                 if (ticsTxt != null) txt.AppendLine(ticsTxt);
             }
 
@@ -27560,7 +27562,7 @@ namespace Gekko
             //          SECOND PASS
             // ---------------------------------------
             // ---------------------------------------
-            string plotline = PlotHandleLines(false, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, quarterFix, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside);
+            string plotline = PlotHandleLines(false, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside);
 
             txt.AppendLine(plotline);
 
@@ -27696,9 +27698,10 @@ namespace Gekko
             return setTitlePlaceholder;
         }
 
-        private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, int quarterFix, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<O.PrtContainer> co, double linewidthCorrection, double pointsizeCorrection, bool isInside)
+        private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<O.PrtContainer> co, double linewidthCorrection, double pointsizeCorrection, bool isInside)
         {
             int manyXValues = 0;  //0 or 1
+            int quarterFix = 0;
 
             string plotline = "plot ";
 
@@ -27842,6 +27845,7 @@ namespace Gekko
                         boxesY2Counter++;
                         if (firstPass) boxesY2.Add(i);
                     }
+                                       
 
                     if (stacked)
                     {
@@ -28101,7 +28105,7 @@ namespace Gekko
             return s.Replace(@"_", @"\\_");
         }
 
-        private static int HandleXTics(int quarterFix, List<string> labels1, List<string> labels2, ref string ticsTxt, int mxtics)
+        private static int HandleXTics(List<string> labels1, List<string> labels2, ref string ticsTxt, int mxtics)
         {
             if (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)
             {
@@ -28126,13 +28130,13 @@ namespace Gekko
                     if (subperiods.Contains(int.Parse(split[1])))
                     {
                         string xx = labels2[i];
-                        if (quarterFix == 1)
-                        {
-                            if (Program.options.freq == EFreq.Quarterly || Program.options.freq == EFreq.Monthly)
-                            {
-                                xx = FromGnuplotDateToFloatingValue(split);
-                            }
-                        }
+                        //if (quarterFix == 1)
+                        //{
+                        //    if (Program.options.freq == EFreq.Quarterly || Program.options.freq == EFreq.Monthly)
+                        //    {
+                        //        xx = FromGnuplotDateToFloatingValue(split);
+                        //    }
+                        //}
                         s3 += "\"" + labels1[i] + "\" \"" + xx + "\", ";
                     }
                 }
