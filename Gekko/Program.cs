@@ -9894,7 +9894,7 @@ namespace Gekko
         public static void Mem(string tpe)
         {
             if (false && Globals.runningOnTTComputer)
-            {                
+            {
 
                 bool intern = false;
 
@@ -9992,15 +9992,23 @@ namespace Gekko
             */
 
             //call with null, string, name, date, val
-            int counter = 0;
-            //if (Program.scalars.Count > 0)
-            {
-                List<string> keys = new List<string>();                
+            
+            bool foundSomething = false;
 
-                foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetFirst().storage)
+            foreach (Databank db in Program.databanks.storage)
+            {
+
+                int counter = 0;
+
+                List<string> keys = new List<string>();
+
+                foreach (KeyValuePair<string, IVariable> kvp in db.storage)
                 {
                     if (kvp.Key.StartsWith(Globals.symbolMemvar.ToString())) keys.Add(kvp.Key);
                 }
+
+                if (keys.Count() == 0) continue;
+                foundSomething = true;
 
                 keys.Sort(StringComparer.OrdinalIgnoreCase);
 
@@ -10014,7 +10022,7 @@ namespace Gekko
                 tab.SetBorder(row, 1, row, 3, BorderType.Bottom);
                 row++;
                 foreach (string s in keys)
-                {                    
+                {
                     IVariable a = Program.databanks.GetFirst().storage[s];
                     string value = "";
                     if (a.Type() == EVariableType.Date)
@@ -10032,10 +10040,10 @@ namespace Gekko
                         if (tpe != null && tpe != "val") continue;
                         value = a.ConvertToVal().ToString();
                         if (value == "NaN") value = "M";
-                    }                    
+                    }
 
                     string type = a.Type().ToString().ToUpper();
-                    
+
                     tab.Set(row, 1, type);
                     tab.Set(row, 2, s);
                     tab.Set(row, 3, value);
@@ -10043,18 +10051,16 @@ namespace Gekko
                     counter++;
                 }
                 tab.SetBorder(row - 1, 1, row - 1, 3, BorderType.Bottom);
-                if (counter == 0)
-                {
-                    if (tpe == null) G.Writeln2("No scalars found");
-                    else G.Writeln2("No " + tpe.ToUpper() + " scalar(s) found");
-                }
-                else
-                {
-                    string tpe2 = "";
-                    if (tpe != null) tpe2 = " " + tpe.ToUpper();
-                    G.Writeln2(counter + tpe2 + " scalar(s) found");
-                    foreach (string s in tab.Print()) G.Writeln(s);
-                }
+
+                string tpe2 = "";
+                if (tpe != null) tpe2 = " " + tpe.ToUpper();
+                G.Writeln2(db.aliasName + " databank: " + counter + tpe2 + " scalar(s) found");
+                foreach (string s in tab.Print()) G.Writeln(s);
+            }
+            if (!foundSomething)
+            {
+                if (tpe == null) G.Writeln2("No scalars found in any open databank");
+                else G.Writeln2("No " + tpe.ToUpper() + " scalar(s) found in any open databank");
             }
         }
 

@@ -1717,7 +1717,7 @@ namespace Gekko
             {
                 //Will fail with an error if not all indexes are of STRING type                
                 Series ts = this.FindArraySeries(indexes, true);  //if not found, it will be created (since we are on the lhs) and inherit the timeless status from this timeseries.
-                O.LookupHelperLeftside(smpl, ts, rhsExpression);                
+                O.LookupHelperLeftside(smpl, ts, rhsExpression, EVariableType.Var);                
             }
         }
 

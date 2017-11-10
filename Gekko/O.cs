@@ -610,18 +610,18 @@ namespace Gekko
         }
 
         //NOTE: Must have same signature as Lookup(), #89075234532
-        public static void DollarLookup(IVariable logical, GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable)
+        public static void DollarLookup(IVariable logical, GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type)
         {
             //Only encountered on the LHS
             if (logical == null)
             {
-                Lookup(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable);
+                Lookup(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable, type);
             }
             if (logical.Type() == EVariableType.Val)
             {
                 if (IsTrue(((ScalarVal)logical).val))
                 {
-                    Lookup(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable);
+                    Lookup(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable, type);
                 }
                 else
                 {
@@ -635,14 +635,14 @@ namespace Gekko
         }
 
         //NOTE: Must have same signature as DollarLookup(), #89075234532
-        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, bool isLeftSideVariable)
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type)
         {
             //This calls the more general Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression)
 
             if (x.Type() == EVariableType.String)
             {                
                 string dbName, varName, freq; char firstChar; Chop((x as ScalarString)._string2, out dbName, out varName, out freq);                
-                IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable);
+                IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable, type);
                 return iv;
 
             }
@@ -663,7 +663,7 @@ namespace Gekko
                     foreach(string s in items)
                     {
                         string dbName, varName, freq; char firstChar; Chop(s, out dbName, out varName, out freq);
-                        IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable);
+                        IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable, type);
                         rv.Add(iv);
                     }
                     List m = new List(rv);
@@ -680,12 +680,12 @@ namespace Gekko
             return x;
         }
 
-        public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable)
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type)
         {
             //map != null:             the variable is found in the MAP, otherwise, the variable is found in a databank
             //rhsExpression != null:   it is an assignment of the left-hand side
 
-             string varnameWithFreq = HandleSigilAndFreq(varname, freq);
+             string varnameWithFreq = HandleSigilAndFreq(varname, freq, type);
 
             if (isLeftSideVariable)
             {
@@ -713,7 +713,7 @@ namespace Gekko
                     //direct assignment, like x = 5, or %s = 'a'
                     //in these cases, the LHS can be created if it is not already existing
                     //ScalarString ss = rhsExpression as ScalarString;                    
-                    LookupHelperLeftside(smpl, ib, varnameWithFreq, freq, rhsExpression);
+                    LookupHelperLeftside(smpl, ib, varnameWithFreq, freq, rhsExpression, type);
                     return null;
                 }
                 else
@@ -721,6 +721,7 @@ namespace Gekko
                     //indexers on lhs, for instance x['a'] = ... or x[2000] = 5 or #x.%s = ...
                     //in this case, the x variable must exist
                     //NOTE: no databank search is allowed!
+                    //NOTE: sigils cannot be omitted here. VAL x['v'] = 100 or VAL x.v = 100 will not access a %v variable.
                     IVariable ivar2 = ib.GetIVariable(varnameWithFreq);
                     if (ivar2 == null)
                     {
@@ -746,16 +747,17 @@ namespace Gekko
             }
         }
 
-        public static string HandleSigilAndFreq(string varname, string freq)
+        public static string HandleSigilAndFreq(string varname, string freq, EVariableType type)
         {
             bool hasSigil = false; if (varname[0] == Globals.symbolMemvar || varname[0] == Globals.symbolList) hasSigil = true;
 
             //rhsExpression means the value of the rhs variable, meaning that the present lookup is setting a value for the lhs variable
             //IVariable lhs = null;
             string varnameWithFreq = varname;
-            if (!hasSigil)
+            if (!hasSigil && (type == EVariableType.Var || type == EVariableType.Series))
             {
                 //Series has '!' added
+                //In VAL v = 100, there will be no freq added.
                 if (freq != null) varnameWithFreq = varname + Globals.freqIndicator + freq;
                 else varnameWithFreq = varname + Globals.freqIndicator + G.GetFreq(Program.options.freq);
             }
@@ -1082,19 +1084,19 @@ namespace Gekko
             return lhs;
         }
 
-        public static void LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhs)
+        public static void LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhs, EVariableType type)
         {
             //normal use
-            LookupHelperLeftside(smpl, ib, varnameWithFreq, freq, rhs, null);        
+            LookupHelperLeftside(smpl, ib, varnameWithFreq, freq, rhs, null, type);        
         }
 
-        public static void LookupHelperLeftside(GekkoSmpl smpl, Series arraySubSeries, IVariable rhs)
+        public static void LookupHelperLeftside(GekkoSmpl smpl, Series arraySubSeries, IVariable rhs, EVariableType type)
         {
             //use for array-series, for instance xx['a'] = ...
-            LookupHelperLeftside(smpl, null, null, null, rhs, arraySubSeries);
+            LookupHelperLeftside(smpl, null, null, null, rhs, arraySubSeries, type);
         }
 
-        private static void LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhs, Series arraySubSeries)
+        private static void LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhs, Series arraySubSeries, EVariableType type)
         {
             //This is an assignment, for instance %x = 5, or x = (1, 2, 3), or bank:x = bank:y
             //Assignment is the hardest part of Lookup()
@@ -1104,7 +1106,15 @@ namespace Gekko
             
             IVariable lhs = null;
             if (ib != null) lhs = ib.GetIVariable(varnameWithFreq); //may return null
-            
+
+            if (!G.StartsWithSigil(varnameWithFreq))
+            {
+                //VAL v = 100 ---> %v = 100
+                //LIST m = ('a', 'b') --> #m = ('a', 'b') 
+                if (type == EVariableType.Val || type == EVariableType.String || type == EVariableType.Date) varnameWithFreq = Globals.symbolMemvar + varnameWithFreq;
+                else if (type == EVariableType.List || type == EVariableType.Matrix || type == EVariableType.Map) varnameWithFreq = Globals.symbolList + varnameWithFreq;
+            }
+
             if (!isArraySubSeries && varnameWithFreq[0] == Globals.symbolMemvar)
             {
                 switch (rhs.Type())
@@ -3629,10 +3639,79 @@ namespace Gekko
             return new ScalarVal(data);
         }
 
-        public static List<string> GetList(List<string>l)
+        public static List<string> GetList(List<string> l)
         {
             return l;
         }
+
+       
+        public static IVariable IvConvertTo(EVariableType type, IVariable a)
+        {
+            switch (type)
+            {
+                case EVariableType.Val:
+                    {
+                        if (a.Type() == EVariableType.Val) return a;
+                        else return new ScalarVal(a.ConvertToVal());
+                    }
+                    break;
+                case EVariableType.String:
+                    {
+                        if (a.Type() == EVariableType.String) return a;
+                        else return new ScalarString(a.ConvertToString());
+                    }
+                    break;
+                case EVariableType.Date:
+                    {
+                        if (a.Type() == EVariableType.Date) return a;
+                        else return new ScalarDate(a.ConvertToDate(GetDateChoices.Strict));
+                    }
+                    break;
+                case EVariableType.Series:
+                    {
+                        if (a.Type() == EVariableType.Series) return a;
+                        else
+                        {
+                            G.Writeln2("*** ERROR: Could not transform " + G.GetTypeString(a) + " into SERIES");
+                            throw new GekkoException();
+                        }
+                    }
+                    break;
+                case EVariableType.List:
+                    {
+                        if (a.Type() == EVariableType.List) return a;
+                        else return new List(a.ConvertToList());
+                    }
+                    break;
+                case EVariableType.Matrix:
+                    {
+                        if (a.Type() == EVariableType.Matrix) return a;
+                        else
+                        {
+                            G.Writeln2("*** ERROR: Could not transform " + G.GetTypeString(a) + " into MATRIX");
+                            throw new GekkoException();
+                        }
+                    }
+                    break;
+                case EVariableType.Map:
+                    {
+                        if (a.Type() == EVariableType.Map) return a;
+                        else
+                        {
+                            G.Writeln2("*** ERROR: Could not transform " + G.GetTypeString(a) + " into MAP");
+                            throw new GekkoException();
+                        }
+                    }
+                    break;
+                case EVariableType.Var:
+                    {
+                        return a;
+                    }
+                    break;
+                default: throw new GekkoException();  //should not be possible
+            }
+        }
+        
 
         public static double ConvertToVal(GekkoTime t, IVariable a)
         {            

@@ -17,7 +17,8 @@ namespace Gekko
         Map,
         Matrix,   
         Range,      
-        GekkoError
+        GekkoError,
+        Var
     }
 
     public enum EScalarRefType

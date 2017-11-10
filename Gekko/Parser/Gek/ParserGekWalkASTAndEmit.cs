@@ -2752,16 +2752,19 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTASSIGNMENT":
                         {
-                            string type = node[0].Text;
-                            string ivTempVar = SearchUpwardsInTree4(node[1]);
+                            string type = HandleVar(node[3].Text);  //2 is options                            
+                            if (G.Equal(type, "STRING2")) type = "string";
+                            string ivTempVar = SearchUpwardsInTree4(node[0]);
                             if (ivTempVar == null)
                             {
                                 G.Writeln2("*** ERROR: Internal error #7698248427");
                                 throw new GekkoException();
                             }
+                            string convertTo = null;
+                            if (type != null) node.Code.A("IVariable " + ivTempVar + " = O.IvConvertTo(EVariableType." + type + ", ").A(node[1].Code).A(")").End();
+                            else  node.Code.A("IVariable " + ivTempVar + " = ").A(node[1].Code).End();
 
-                            node.Code.A("IVariable " + ivTempVar + " = ").A(node[2].Code).End();
-                            node.Code.A(node[1].Code).End();
+                            node.Code.A(node[0].Code).End();
 
                         }
                         break;
@@ -2793,7 +2796,10 @@ namespace Gekko.Parser.Gek
 
                     case "ASTBANKVARNAME":
                         {
-                            bool isLeftSideVariable = CheckIfLeftSide(node);  //In x[%s1, %s2][%date] = ... this will only be true for x, not for the other vars
+
+                            Tuple<bool, string> tuple = CheckIfLeftSide(node);  //In x[%s1, %s2][%date] = ... this will only be true for x, not for the other vars
+                            bool isLeftSideVariable = tuple.Item1; string type = tuple.Item2;
+
                             string isLeftSideVariableString = "false"; if (isLeftSideVariable) isLeftSideVariableString = "true";
                             bool isInsidePrintStatement = SearchUpwardsInTree5(node);
                                                         
@@ -2894,7 +2900,7 @@ namespace Gekko.Parser.Gek
 
                             
 
-                                    string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + ivTempVar + ", " + isLeftSideVariableString + ")";
+                                    string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." + type + ")";
                                                                         
                                     node.Code.CA(lookupCode);
                                                                         
@@ -2916,7 +2922,7 @@ namespace Gekko.Parser.Gek
                                         nameAndBankCode = "(" + node[0][0].Code + ")" + ".Add(smpl, O.scalarStringColon)" + ".Add(smpl, " + node[1].Code + ")";                                        
                                     }
 
-                                    node.Code.A("O.Lookup(smpl, " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + isLeftSideVariableString + ")");
+                                    node.Code.A("O.Lookup(smpl, " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." +  type + ")");
                                     
                                 }
                             }
@@ -4541,7 +4547,7 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        private static bool CheckIfLeftSide(ASTNode node)
+        private static Tuple<bool, string> CheckIfLeftSide(ASTNode node)
         {
             //We must detect x in these (will also cover dots):
             //x = 5
@@ -4554,7 +4560,8 @@ namespace Gekko.Parser.Gek
             //   ASTDOTORINDEXER
             //     ASTDOTORINDEXER
             //       ASTBANKVARNAME -- node is here
-            //--> beware that these most be the first children!
+            //--> beware that these must be the first children!
+            string type = null;
             bool isLeftSideVariable = true;
             if (node.Number != 0)
             {
@@ -4586,8 +4593,27 @@ namespace Gekko.Parser.Gek
                     }
                     parent = parent.Parent;
                 }
+
+                parent = node.Parent;  //cannot be null
+                while (true)
+                {
+                    if (node.Parent == null) break;  //just for ultra safety, will not happen                    
+                    if (parent.Text == "ASTASSIGNMENT")
+                    {                        
+                        type = HandleVar(parent[3].Text);
+                        break;
+                    }
+                    parent = parent.Parent;
+                }
             }
-            return isLeftSideVariable;
+            return new Tuple<bool, string>(isLeftSideVariable, type);
+        }
+
+        private static string HandleVar(string type)
+        {
+            if (type == "ASTPLACEHOLDER") type = "var";
+            else if (G.Equal(type, "var")) type = "var";
+            return type.Substring(0, 1).ToUpper() + type.Substring(1).ToLower();
         }
 
         private static void GetCodes(ASTNode node, int i, out string codeStart, out string codeEnd2, out string codeStep)

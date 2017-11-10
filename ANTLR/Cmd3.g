@@ -2030,7 +2030,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | write                SEMICOLON!
 						    ;
 
-assignment:				    assignmentType leftSide EQUAL expression -> ^(ASTASSIGNMENT assignmentType leftSide expression);
+assignment:				    assignmentType leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression ASTPLACEHOLDER assignmentType);
 assignmentType:             SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | -> ASTPLACEHOLDER;  //may be empty
 
 // ----------------------------------------------------------------------------------------------------

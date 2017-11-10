@@ -9,6 +9,7 @@ namespace Gekko
 public class TranslatedCode
 {
 public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
+public static readonly ScalarVal i83 = new ScalarVal(100d);
 public static void ClearTS(P p) {
 }
 public static void ClearScalar(P p) {
@@ -19,12 +20,10 @@ public static void CodeLines(P p)
 GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl);
 
 //[[splitSTART]]
-p.SetText(@"¤1"); O.InitSmpl(smpl);
-O.Run o0 = new O.Run();
-o0.fileName = (new ScalarString("table", true, false)).ConvertToString();
-            
-o0.p = p;
-o0.Exe();
+p.SetText(@"¤0"); O.InitSmpl(smpl);
+            IVariable ivTmpvar82 = null;
+O.Lookup(smpl, null, null, "%v", null, ivTmpvar82, true, EVariableType.Var)
+;
 
 
 //[[splitSTOP]]
