@@ -2016,18 +2016,22 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | functionDef          SEMICOLON!
 						  | if2
 						  | ini                  SEMICOLON!
+						  | mem                  SEMICOLON!
 						  | option				 SEMICOLON!
+						  | pipe				 SEMICOLON!
 						  | print                SEMICOLON!
 						  | read                 SEMICOLON!
 						  | reset                SEMICOLON!
 						  | return2              SEMICOLON!
 						  | run                  SEMICOLON!
+						  | sys                  SEMICOLON!
+						  | tell                 SEMICOLON!
 						  | time                 SEMICOLON!
 						  | write                SEMICOLON!
 						    ;
 
-
-assignment:				    leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression);  //careful: see #09873245325 if changed
+assignment:				    assignmentType leftSide EQUAL expression -> ^(ASTASSIGNMENT assignmentType leftSide expression);
+assignmentType:             SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | -> ASTPLACEHOLDER;  //may be empty
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -2041,7 +2045,18 @@ if2:						IF leftParen logical rightParen functionStatements (ELSE functionState
 
 ini:					    INI -> ^({token("ASTINI", ASTINI, $INI.Line)});
 
+mem:                        MEM -> ^({token("ASTMEM", ASTMEM, $MEM.Line)});
+
 option:                     OPTION optionType -> ^({token("ASTOPTION", ASTOPTION, $OPTION.Line)} optionType);
+
+pipe:                       PIPE pipeOpt1? fileName? ->^({token("ASTPIPE", ASTPIPE, $PIPE.Line)} pipeOpt1? ^(ASTHANDLEFILENAME fileName?));
+pipeOpt1:                   ISNOTQUAL | leftAngle pipeOpt1h* RIGHTANGLE -> pipeOpt1h*;
+pipeOpt1h:                  HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
+						  | APPEND (EQUAL yesNo)? -> ^(ASTOPT_STRING_APPEND yesNo?)	
+						  | PAUSE (EQUAL yesNo)? -> ^(ASTOPT_STRING_PAUSE yesNo?)						
+						  | CONTINUE (EQUAL yesNo)? -> ^(ASTOPT_STRING_CONTINUE yesNo?)						
+						  | STOP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STOP yesNo?)											
+						    ;
 
 //print:					prtHelper expression -> ^(ASTPRINT expression);
 print:                      prtHelper prtOpt1? prtElements prtOpt2? -> ^(ASTPRT ^(ASTPRTTYPE prtHelper) prtOpt1? prtOpt2? prtElements);
@@ -2237,6 +2252,16 @@ readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)
 						    ;
 
+run:                        RUN fileNameStar -> ^({token("ASTRUN", ASTRUN, $RUN.Line)} fileNameStar);
+
+sys:						SYS -> ^({token("ASTSYS", ASTSYS, $SYS.Line)})
+						  | SYS sysOpt1? expression -> ^({token("ASTSYS", ASTSYS, $SYS.Line)} expression sysOpt1?)
+						    ;
+sysOpt1:			        ISNOTQUAL | leftAngle sysOpt1h* RIGHTANGLE -> sysOpt1h*;
+sysOpt1h:                   MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);
+
+tell:					    TELL ('<' NOCR? '>')? expression -> ^({token("ASTTELL", ASTTELL, $TELL.Line)} expression NOCR?);
+
 time:                       TIME dates -> ^({token("ASTTIME", ASTTIME, $TIME.Line)} ^(ASTDATES dates))
 						  | TIME question -> ^({token("ASTTIMEQUESTION", ASTTIMEQUESTION, $TIME.Line)})		
 						  | TIME oneDate -> ^({token("ASTTIME", ASTTIME, $TIME.Line)} ^(ASTDATES oneDate oneDate))  //duplicating, TIME 2015 ==> TIME 2015 2015
@@ -2270,8 +2295,6 @@ writeOpt1h:                 TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
 						  | SERIES -> ^(ASTOPT_STRING_SERIES ASTOPN)												  				
 						    ;
 
-run:						RUN -> ^(ASTRUN);
-
 reset:					    RESET -> ^(ASTRESET);
 
 return2:                    RETURN2 expression? -> ^({token("ASTRETURN", ASTRETURN, $RETURN2.Line)} expression?); //used in functions
@@ -2284,7 +2307,7 @@ functionStatements2:        functionStatements;  //alias
 type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX ;
 
 
-optionType :	
+optionType:	
                             FREQ '='? optionFreq -> FREQ ^(ASTSTRINGSIMPLE optionFreq);
 
 

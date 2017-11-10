@@ -2752,16 +2752,16 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTASSIGNMENT":
                         {
-
-                            string ivTempVar = SearchUpwardsInTree4(node[0]);
+                            string type = node[0].Text;
+                            string ivTempVar = SearchUpwardsInTree4(node[1]);
                             if (ivTempVar == null)
                             {
                                 G.Writeln2("*** ERROR: Internal error #7698248427");
                                 throw new GekkoException();
                             }
 
-                            node.Code.A("IVariable " + ivTempVar + " = ").A(node[1].Code).End();
-                            node.Code.A(node[0].Code).End();
+                            node.Code.A("IVariable " + ivTempVar + " = ").A(node[2].Code).End();
+                            node.Code.A(node[1].Code).End();
 
                         }
                         break;
@@ -4073,7 +4073,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.Run o" + Num(node) + " = new O.Run();" + G.NL);
                             //HMMM is this right:
-                            //node.Code.A("o" + Num(node) + ".fileName = " + node[0].Code + ".GetString();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[0].Code + ");" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }

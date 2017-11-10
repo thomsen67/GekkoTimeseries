@@ -9893,9 +9893,8 @@ namespace Gekko
 
         public static void Mem(string tpe)
         {
-            if (Globals.runningOnTTComputer)
-            {
-                
+            if (false && Globals.runningOnTTComputer)
+            {                
 
                 bool intern = false;
 
@@ -9996,11 +9995,13 @@ namespace Gekko
             int counter = 0;
             //if (Program.scalars.Count > 0)
             {
-                List<string> keys = new List<string>();
-                foreach (string s in Program.scalars.Keys)
+                List<string> keys = new List<string>();                
+
+                foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetFirst().storage)
                 {
-                    keys.Add(s);
+                    if (kvp.Key.StartsWith(Globals.symbolMemvar.ToString())) keys.Add(kvp.Key);
                 }
+
                 keys.Sort(StringComparer.OrdinalIgnoreCase);
 
                 Table tab = new Table();
@@ -10013,51 +10014,28 @@ namespace Gekko
                 tab.SetBorder(row, 1, row, 3, BorderType.Bottom);
                 row++;
                 foreach (string s in keys)
-                {
-                    IVariable a = Program.scalars[s];  //no need for tryget
+                {                    
+                    IVariable a = Program.databanks.GetFirst().storage[s];
                     string value = "";
                     if (a.Type() == EVariableType.Date)
                     {
                         if (tpe != null && tpe != "date") continue;
-                        value = G.FromDateToString(O.ConvertToDate(a));
+                        value = G.FromDateToString(a.ConvertToDate(O.GetDateChoices.Strict));
                     }
                     else if (a.Type() == EVariableType.String)
                     {
+                        if (tpe != null && tpe != "string") continue;
                         value = "'" + a.ConvertToString() + "'";
                     }
                     else if (a.Type() == EVariableType.Val)
                     {
                         if (tpe != null && tpe != "val") continue;
-                        value = a.GetValOLD(null).ToString();
+                        value = a.ConvertToVal().ToString();
                         if (value == "NaN") value = "M";
-                    }
-                    else if (a.Type() == EVariableType.List)
-                    {
-                        continue;  //skip this
-                    }
-                    else if (a.Type() == EVariableType.Matrix)
-                    {
-                        continue;  //skip this
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: unknown mem variable type: " + a.Type().ToString());
-                        throw new GekkoException();
-                    }
+                    }                    
 
                     string type = a.Type().ToString().ToUpper();
-                    if (type == "STRING" && ((ScalarString)a)._isName)
-                    {
-                        //name
-                        type = "NAME";
-                        if (tpe != null && tpe != "name") continue;
-                    }
-                    if (type == "STRING" && !((ScalarString)a)._isName)
-                    {
-                        //string
-                        type = "STRING";
-                        if (tpe != null && tpe != "string") continue;
-                    }
+                    
                     tab.Set(row, 1, type);
                     tab.Set(row, 2, s);
                     tab.Set(row, 3, value);

@@ -5043,7 +5043,7 @@ namespace Gekko
             public P p = null;
             public void Exe()
             {
-                if (Globals.runningOnTTComputer)
+                if (false && Globals.runningOnTTComputer)
                 {
                     //Globals.globalPeriodStart = new GekkoTime(EFreq.Annual, 2007, 1);
                     //Globals.globalPeriodEnd = new GekkoTime(EFreq.Annual, 2017, 1);
