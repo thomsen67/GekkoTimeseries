@@ -3334,7 +3334,7 @@ namespace Gekko
         {
             //used for avgt() or sumt() without period indication
             return x;
-        }
+        }        
 
         public static GekkoTime ConvertToDate(IVariable x, GetDateChoices c)
         {            
@@ -5275,6 +5275,7 @@ namespace Gekko
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set      
             public double lag = double.NaN;
+            public IVariable x = null;
             public List<O.Prt.Element> prtElements = new List<O.Prt.Element>();
             public void Exe()
             {

@@ -22919,6 +22919,45 @@ namespace Gekko
             }
         }
 
+        public static List<IVariable> Unfold(IVariable x)
+        {
+            return Unfold(new List<IVariable> { x });
+        }
+
+        public static List<IVariable> Unfold(List<IVariable> xlist)
+        {
+            List<IVariable> xlistUnfolded = new List<IVariable>();
+            foreach (IVariable x in xlist)
+            {
+                if (x.Type() == EVariableType.Series)
+                {
+                    xlistUnfolded.Add(x);                    
+                }
+                else if (x.Type() == EVariableType.Val)
+                {
+                    xlistUnfolded.Add(x);
+                }
+                else if (x.Type() == EVariableType.Matrix && ((Matrix)x).data.Length == 1)  //an 1x1 matrix
+                {
+                    xlistUnfolded.Add(x);
+                }
+                else if (x.Type() == EVariableType.List)
+                {
+                    foreach (IVariable iv in ((List)x).list)
+                    {
+                        List<IVariable> extraContainerExplode = Unfold(iv);
+                        xlistUnfolded.AddRange(extraContainerExplode);
+                    }
+                }
+                else
+                {
+                    G.Writeln2("ERROR: Can only use SERIES, VAL, 1x1 MATRIX, or LISTs with these");
+                    throw new GekkoException();
+                }
+            }
+            return xlistUnfolded;
+        }
+
         public static void Analyze(O.Analyze o)
         {
 
@@ -22970,12 +23009,28 @@ namespace Gekko
             GekkoTime t1 = o.t1;
             GekkoTime t2 = o.t2;
 
+            List<IVariable> input = Unfold(o.x);
             List<string> labels = new List<string>();
-            double[,] tsData = null;
-            int k = 0;
+            for (int i = 0; i < input.Count; i++)
+            {
+                labels.Add("Var " + (i + 1));
+            }
+            
             int n = GekkoTime.Observations(t1, t2);
-            List<O.Prt.Element> elements = o.prtElements;
-            UnfoldVarsAndLabels(ref k, ref tsData, t1, t2, labels, n, elements, 0);
+            int k = input.Count;            
+            double[,] tsData = new double[n, k];
+
+            int n_i = 0;
+            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+            {
+                int k_i = 0;
+                foreach (IVariable x in input)
+                {
+                    tsData[n_i, k_i] = x.GetVal(t);
+                    k_i++;
+                }
+                n_i++;
+            }
 
             G.Writeln();
             int counter = -1;

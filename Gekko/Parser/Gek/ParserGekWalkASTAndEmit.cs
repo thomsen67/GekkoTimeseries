@@ -404,7 +404,7 @@ namespace Gekko.Parser.Gek
             {
                 string s2 = node.Text.Substring(12);                
                 if (node.ChildrenCount() == 0) throw new GekkoException();
-                else node.Code.A("o" + Num(node) + ".opt_" + s2.ToLower() + " = O.GetDate(" + node[0].Code + ");" + G.NL);
+                else node.Code.A("o" + Num(node) + ".opt_" + s2.ToLower() + " = O.ConvertToDate(" + node[0].Code + ", O.GetDateChoices.Strict);" + G.NL);
             }
             else if (node.Text != null && node.Text.StartsWith("ASTOPT_LIST_"))
             {
@@ -709,7 +709,7 @@ namespace Gekko.Parser.Gek
                     case "ASTANALYZE":
                         {
                             node.Code.A("O.Analyze o" + Num(node) + " = new O.Analyze();" + G.NL);
-                            GetCodeFromAllChildren(node);
+                            node.Code.A("o" + Num(node) + ".x = " + node[0].Code).End();
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -1235,7 +1235,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A(Globals.splitSTOP);
 
-                            node.Code.A("goto " + node[0].Text.ToLower().Trim() + ";" + G.NL);  //calls a C# label
+                            node.Code.A("goto " + node[0][0].Text.ToLower().Trim() + ";" + G.NL);  //calls a C# label
                             w.wh.isGotoOrTarget = true;
 
                             node.Code.A(Globals.splitSTART);
@@ -1245,7 +1245,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A(Globals.splitSTOP);
                             
-                            node.Code.A(node[0].Text.ToLower().Trim() + ":;" + G.NL);  //a C# label
+                            node.Code.A(node[0][0].Text.ToLower().Trim() + ":;" + G.NL);  //a C# label
                             w.wh.isGotoOrTarget = true;
 
                             node.Code.A(Globals.splitSTART);
@@ -1398,11 +1398,11 @@ namespace Gekko.Parser.Gek
                             
                             node.Code.A(setLoopStringCs + G.NL);
                             node.Code.A("int " + stepName + " = O.ConvertToInt(" + codeStep + ");" + G.NL);
-                            node.Code.A("GekkoTime " + startName + " = O.GetDate(" + codeFrom + ");" + G.NL);
-                            node.Code.A("GekkoTime " + endName + " = O.GetDate(" + codeEnd + ");" + G.NL);  //added a tiny bit of steplength, to guard against rounding errors
+                            node.Code.A("GekkoTime " + startName + " = O.ConvertToDate(" + codeFrom + ", O.GetDateChoices.Strict);" + G.NL);
+                            node.Code.A("GekkoTime " + endName + " = O.ConvertToDate(" + codeEnd + ", O.GetDateChoices.Strict);" + G.NL);  //added a tiny bit of steplength, to guard against rounding errors
                             node.Code.A("ScalarDate " + tempName + " = (ScalarDate)" + loopVariable + ";" + G.NL);
                             node.Code.A("try {");
-                            node.Code.A("for (" + tempName + ".date = " + startName + " ; O.ContinueIterating(" + tempName + ".date, " + endName + ", " + stepName + "); " + tempName + ".date = O.GetDate(" + tempName + ".Add(smpl, " + codeStep + ")))");
+                            node.Code.A("for (" + tempName + ".date = " + startName + " ; O.ContinueIterating(" + tempName + ".date, " + endName + ", " + stepName + "); " + tempName + ".date = O.ConvertToDate(" + tempName + ".Add(smpl, " + codeStep + "), O.GetDateChoices.Strict))");
                             node.Code.A("{" + G.NL);
 
                             node.Code.A(Globals.splitSTART);
@@ -2105,7 +2105,7 @@ namespace Gekko.Parser.Gek
                     case "ASTGENRINDEXER":
                         {
                             //GENR fy[2015] = ...
-                            node.Code.A("O.GetTimeSeries(" + node[0].Code + ").SetData(O.GetDate(" + node[1].Code + "), O.ConvertToVal(smpl, " + node[2].Code + "));" + G.NL);
+                            node.Code.A("O.GetTimeSeries(" + node[0].Code + ").SetData(O.ConvertToDate(" + node[1].Code + ", O.GetDateChoices.Strict), O.ConvertToVal(smpl, " + node[2].Code + "));" + G.NL);
                             node.Code.A("O.GetTimeSeries(" + node[0].Code + ").Stamp();" + G.NL);
                         }
                         break;
@@ -2161,7 +2161,7 @@ namespace Gekko.Parser.Gek
                     case "ASTGENRLISTINDEXER2":
                         {
                             //GENR #m[2][2015] = ...
-                            node.Code.A("O.GetTimeSeriesFromList(smpl, " + node[0].Code + ", " + node[1].Code + ", 1).ts.SetData(O.GetDate(" + node[2].Code + "), O.ConvertToVal(smpl, " + node[3].Code + "));" + G.NL);
+                            node.Code.A("O.GetTimeSeriesFromList(smpl, " + node[0].Code + ", " + node[1].Code + ", 1).ts.SetData(O.ConvertToDate(" + node[2].Code + ", O.GetDateChoices.Strict), O.ConvertToVal(smpl, " + node[3].Code + "));" + G.NL);
                         }
                         break;
                     case "ASTHASHPAREN":
@@ -2323,11 +2323,11 @@ namespace Gekko.Parser.Gek
 
                             if (node[1][0] != null)
                             {
-                                node.Code.A("o" + Num(node) + ".date1 = O.GetDate(" + node[1][0].Code + ");" + G.NL);
+                                node.Code.A("o" + Num(node) + ".date1 = O.ConvertToDate(" + node[1][0].Code + ", O.GetDateChoices.Strict);" + G.NL);
                             }
                             if (node[1][1] != null)
                             {
-                                node.Code.A("o" + Num(node) + ".date2 = O.GetDate(" + node[1][1].Code + ");" + G.NL);
+                                node.Code.A("o" + Num(node) + ".date2 = O.ConvertToDate(" + node[1][1].Code + ", O.GetDateChoices.Strict);" + G.NL);
                             }
                             if (node[2] != null) node.Code.A(node[2].Code);  //options
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
@@ -2798,8 +2798,9 @@ namespace Gekko.Parser.Gek
                         {
 
                             Tuple<bool, string> tuple = CheckIfLeftSide(node);  //In x[%s1, %s2][%date] = ... this will only be true for x, not for the other vars
-                            bool isLeftSideVariable = tuple.Item1; string type = tuple.Item2;
-
+                            bool isLeftSideVariable = tuple.Item1;
+                            string type = tuple.Item2;
+                            
                             string isLeftSideVariableString = "false"; if (isLeftSideVariable) isLeftSideVariableString = "true";
                             bool isInsidePrintStatement = SearchUpwardsInTree5(node);
                                                         
@@ -2821,7 +2822,7 @@ namespace Gekko.Parser.Gek
                                         functionHit = true;
                                     }
                                 }
-                            }
+                            }                          
 
                             if (!functionHit)
                             {
@@ -3449,8 +3450,8 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.Table.SetValues o" + Num(node) + " = new O.Table.SetValues();" + G.NL);
                             node.Code.A("o" + Num(node) + ".name = O.ConvertToString(" + node[0].Code + ");" + G.NL);
                             node.Code.A("o" + Num(node) + ".col = O.ConvertToInt(" + node[1].Code + ");" + G.NL);
-                            node.Code.A("o" + Num(node) + ".t1 = O.GetDate(" + node[2].Code + ");" + G.NL);
-                            node.Code.A("o" + Num(node) + ".t2 = O.GetDate(" + node[3].Code + ");" + G.NL);
+                            node.Code.A("o" + Num(node) + ".t1 = O.ConvertDate(" + node[2].Code + ", O.GetDateChoices.Strict);" + G.NL);
+                            node.Code.A("o" + Num(node) + ".t2 = O.ConvertDate(" + node[3].Code + ", O.GetDateChoices.Strict);" + G.NL);
                             node.Code.A("o" + Num(node) + ".printcode = O.ConvertToString(" + node[5].Code + ");" + G.NL);
                             node.Code.A("o" + Num(node) + ".scale = O.ConvertToVal(smpl, " + node[6].Code + ");" + G.NL);
                             node.Code.A("o" + Num(node) + ".format = O.ConvertToString(" + node[7].Code + ");" + G.NL);
@@ -3536,7 +3537,7 @@ namespace Gekko.Parser.Gek
 
                     case "ASTTABLESETDATES":
                         {                            
-                            node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.SetDates(O.ConvertToInt(" + node[2].Code + "), O.GetDate(" + node[3].Code + "), O.GetDate(" + node[4].Code + "));");                            
+                            node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.SetDates(O.ConvertToInt(" + node[2].Code + "), O.ConvertToDate(" + node[3].Code + ", O.GetDateChoices.Strict), O.ConvertToDate(" + node[4].Code + ", O.GetDateChoices.Strict));");                            
                         }
                         break;
 
@@ -3836,7 +3837,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A(node[2].Code);                       
                             if (node.ChildrenCount() > 3)
                             {
-                                node.Code.A("o" + Num(node) + ".date = O.GetDate(" + node[3].Code + ");" + G.NL);
+                                node.Code.A("o" + Num(node) + ".date = O.ConvertToDate(" + node[3].Code + ", O.GetDateChoices.Strict);" + G.NL);
                             }
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
 
@@ -3867,16 +3868,16 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.TimeFilterHelper " + tempName + " = new O.TimeFilterHelper();" + G.NL);
                             if (node.ChildrenCount() == 1)
                             {                                
-                                node.Code.A(tempName + ".from = O.GetDate(" + node[0].Code + ");" + G.NL);                                                                
+                                node.Code.A(tempName + ".from = O.ConvertToDate(" + node[0].Code + ", O.GetDateChoices.Strict);" + G.NL);                                                                
                             }
                             else if (node.ChildrenCount() == 2) {
-                                node.Code.A(tempName + ".from = O.GetDate(" + node[0].Code + ");" + G.NL);
-                                node.Code.A(tempName + ".to = O.GetDate(" + node[1].Code + ");" + G.NL);                                                                
+                                node.Code.A(tempName + ".from = O.ConvertToDate(" + node[0].Code + ", O.GetDateChoices.Strict);" + G.NL);
+                                node.Code.A(tempName + ".to = O.ConvertToDate(" + node[1].Code + ", O.GetDateChoices.Strict);" + G.NL);                                                                
                             }
                             else if (node.ChildrenCount() == 3) {
-                                node.Code.A(tempName + ".from = O.GetDate(" + node[0].Code + ");" + G.NL);
-                                node.Code.A(tempName + ".to = O.GetDate(" + node[1].Code + ");" + G.NL);
-                                node.Code.A(tempName + ".step = O.ConvertToInt(" + node[2].Code + ");" + G.NL);
+                                node.Code.A(tempName + ".from = O.ConvertToDate(" + node[0].Code + ", O.GetDateChoices.Strict);" + G.NL);
+                                node.Code.A(tempName + ".to = O.ConvertToDate(" + node[1].Code + ", O.GetDateChoices.Strict);" + G.NL);
+                                node.Code.A(tempName + ".step = O.ConvertToDate(" + node[2].Code + ");" + G.NL);
                             }
                             node.Code.A("o" + Num(node) + ".timeFilterPeriods.Add(" + tempName + ");" + G.NL);
                         }
@@ -4561,7 +4562,7 @@ namespace Gekko.Parser.Gek
             //     ASTDOTORINDEXER
             //       ASTBANKVARNAME -- node is here
             //--> beware that these must be the first children!
-            string type = null;
+            string type = "var"; //same as unknown
             bool isLeftSideVariable = true;
             if (node.Number != 0)
             {
@@ -4572,7 +4573,7 @@ namespace Gekko.Parser.Gek
                 ASTNode parent = node.Parent;  //cannot be null
                 while (true)
                 {
-                    if (node.Parent == null) break;  //just for ultra safety, will not happen
+                    if (parent == null) break;  //just for ultra safety, will not happen
                     if (parent.Number != 0)
                     {
                         isLeftSideVariable = false;
@@ -4597,22 +4598,22 @@ namespace Gekko.Parser.Gek
                 parent = node.Parent;  //cannot be null
                 while (true)
                 {
-                    if (node.Parent == null) break;  //just for ultra safety, will not happen                    
+                    if (parent == null) break;  //just for ultra safety, will not happen                    
                     if (parent.Text == "ASTASSIGNMENT")
                     {                        
-                        type = HandleVar(parent[3].Text);
+                        type = parent[3].Text;
                         break;
                     }
                     parent = parent.Parent;
                 }
             }
+            type = HandleVar(type);
             return new Tuple<bool, string>(isLeftSideVariable, type);
         }
 
         private static string HandleVar(string type)
         {
-            if (type == "ASTPLACEHOLDER") type = "var";
-            else if (G.Equal(type, "var")) type = "var";
+            if (type == "ASTPLACEHOLDER") type = "var";            
             return type.Substring(0, 1).ToUpper() + type.Substring(1).ToLower();
         }
 

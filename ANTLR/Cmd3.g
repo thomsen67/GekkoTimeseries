@@ -2012,8 +2012,11 @@ statements:                 statements2*;
 
 statements2:                SEMICOLON -> //stray semicolon is ok, nothing is written
                           | assignment           SEMICOLON!
+						  | analyze              SEMICOLON!
+						  | accept               SEMICOLON!
 						  | for2
 						  | functionDef          SEMICOLON!
+						  | goto2                SEMICOLON!
 						  | if2
 						  | ini                  SEMICOLON!
 						  | mem                  SEMICOLON!
@@ -2025,15 +2028,42 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | return2              SEMICOLON!
 						  | run                  SEMICOLON!
 						  | sys                  SEMICOLON!
+						  | target2              SEMICOLON!
 						  | tell                 SEMICOLON!
 						  | time                 SEMICOLON!
+						  | timefilter           SEMICOLON!
 						  | write                SEMICOLON!
 						    ;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// ASSIGNMENT, VAL, STRING, DATE, SERIES, LIST, MATRIX, MAP, VAR
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 assignment:				    assignmentType leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression ASTPLACEHOLDER assignmentType);
 assignmentType:             SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | -> ASTPLACEHOLDER;  //may be empty
 
-// ----------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// ANALYZE
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+analyze:                    ANALYZE analyzeOpt1? expression -> ^({token("ASTANALYZE", ASTANALYZE, $ANALYZE.Line)} analyzeOpt1? expression);
+analyzeOpt1:                ISNOTQUAL
+						  | leftAngle2          analyzeOpt1h* RIGHTANGLE -> ^(ASTOPT1 analyzeOpt1h*)							
+						  | leftAngleNo2 dates? analyzeOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) analyzeOpt1h*)
+						    ;
+analyzeOpt1h:               LAG EQUAL expression -> ^(ASTOPT_VAL_LAG expression)
+						    ;						
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// ACCEPT
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+accept:                     ACCEPT acceptType name expression -> ^({token("ASTACCEPT", ASTACCEPT, $ACCEPT.Line)} acceptType name expression);
+acceptType:                 VAL | STRING2 | NAME | DATE | LIST;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// FOR
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  functionStatements END -> ^(ASTFOR ^(ASTPLACEHOLDER forHelper2+) functionStatements)
 						  | FOR leftParen (forHelper2 ','?)+ ')' SEMICOLON? functionStatements END -> ^(ASTFOR ^(ASTPLACEHOLDER forHelper2+) functionStatements)
@@ -2041,13 +2071,50 @@ for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  func
 
 forHelper2:                 type? svarname EQUAL expression (TO expression2)? (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2?) ^(ASTPLACEHOLDER expression3?));
 
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// FUNCTION
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+functionDef:				FUNCTION type ident leftParenGlue functionArg RIGHTPAREN SEMICOLON functionStatements END -> ^(ASTFUNCTIONDEF2 type ident functionArg functionStatements);
+functionArg:                (functionArgElement (',' functionArgElement)*)? -> ^(ASTPLACEHOLDER functionArgElement*);
+functionArgElement:         type svarname -> ^(ASTPLACEHOLDER type svarname);
+functionStatements:         statements2* -> ^(ASTPLACEHOLDER statements2*);
+functionStatements2:        functionStatements;  //alias
+type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX ;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// GOTO
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+goto2:                      GOTO ident -> ^({token("ASTGOTO", ASTGOTO, $GOTO.Line)} ident);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// IF
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
 if2:						IF leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIF", ASTIF, $IF.Line)} logical functionStatements functionStatements2);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// INI
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 ini:					    INI -> ^({token("ASTINI", ASTINI, $INI.Line)});
 
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// MEM
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
 mem:                        MEM -> ^({token("ASTMEM", ASTMEM, $MEM.Line)});
 
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// OPTION
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
 option:                     OPTION optionType -> ^({token("ASTOPTION", ASTOPTION, $OPTION.Line)} optionType);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// PIPE
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 pipe:                       PIPE pipeOpt1? fileName? ->^({token("ASTPIPE", ASTPIPE, $PIPE.Line)} pipeOpt1? ^(ASTHANDLEFILENAME fileName?));
 pipeOpt1:                   ISNOTQUAL | leftAngle pipeOpt1h* RIGHTANGLE -> pipeOpt1h*;
@@ -2057,6 +2124,10 @@ pipeOpt1h:                  HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
 						  | CONTINUE (EQUAL yesNo)? -> ^(ASTOPT_STRING_CONTINUE yesNo?)						
 						  | STOP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STOP yesNo?)											
 						    ;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// PRINT, PLOT, SHEET, CLIP
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 //print:					prtHelper expression -> ^(ASTPRINT expression);
 print:                      prtHelper prtOpt1? prtElements prtOpt2? -> ^(ASTPRT ^(ASTPRTTYPE prtHelper) prtOpt1? prtOpt2? prtElements);
@@ -2223,6 +2294,9 @@ v:    					    V ('=' yesNo -> ^(ASTV yesNo) | -> ^(ASTV ASTYES))
                           | NOV -> ^(ASTV ASTNO)
 						    ;
 
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// READ and IMPORT
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 						    //!!!Two identical lines ONLY because of token stuff
 read:                       READ   readOpt1? fileNameStar (TO identOrStar)? -> ^({token("ASTREAD", ASTREAD, $READ.Line)}   READ   readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?))
@@ -2252,7 +2326,15 @@ readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)
 						    ;
 
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// RUN
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
 run:                        RUN fileNameStar -> ^({token("ASTRUN", ASTRUN, $RUN.Line)} fileNameStar);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// SYS
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 sys:						SYS -> ^({token("ASTSYS", ASTSYS, $SYS.Line)})
 						  | SYS sysOpt1? expression -> ^({token("ASTSYS", ASTSYS, $SYS.Line)} expression sysOpt1?)
@@ -2260,13 +2342,77 @@ sys:						SYS -> ^({token("ASTSYS", ASTSYS, $SYS.Line)})
 sysOpt1:			        ISNOTQUAL | leftAngle sysOpt1h* RIGHTANGLE -> sysOpt1h*;
 sysOpt1h:                   MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);
 
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// TABLE
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+						  //TODO: use {token()} for line numbers...
+table:					    TABLE name EQUAL NEW TABLE leftParenGlue ')'  -> ^(ASTNEWTABLE name)
+						  | TABLE name GLUEDOT DOT PRINT leftParenGlue expression? ')'  -> ^(ASTTABLEPRINT name expression?)
+						  | tableCurrow SETTOPBORDER leftParenGlue expression ',' expression ')'  -> ^(ASTTABLESETTOPBORDER tableCurrow CURROW expression expression)
+						  | tableCurrow SETBOTTOMBORDER leftParenGlue expression ',' expression ')'  -> ^(ASTTABLESETBOTTOMBORDER tableCurrow CURROW expression expression)
+						  | tableCurrow SETLEFTBORDER leftParenGlue expression ')'  -> ^(ASTTABLESETLEFTBORDER tableCurrow CURROW expression)
+						  | tableCurrow SETLEFTBORDER leftParenGlue expression ',' expression ')'  -> ^(ASTTABLESETLEFTBORDER tableCurrow CURROW expression expression)
+						  | tableCurrow SETRIGHTBORDER leftParenGlue expression ')'  -> ^(ASTTABLESETRIGHTBORDER tableCurrow CURROW expression)
+						  | tableCurrow SETRIGHTBORDER leftParenGlue expression ',' expression ')'  -> ^(ASTTABLESETRIGHTBORDER tableCurrow CURROW expression expression)						
+						  | tableCurrow HIDELEFTBORDER leftParenGlue expression ')'  -> ^(ASTTABLEHIDELEFTBORDER tableCurrow CURROW expression)
+						  | tableCurrow HIDERIGHTBORDER leftParenGlue expression ')'  -> ^(ASTTABLEHIDERIGHTBORDER tableCurrow CURROW expression)						
+						  | tableCurrow SHOWBORDERS leftParenGlue ')'  -> ^(ASTTABLESHOWBORDERS tableCurrow CURROW)						
+						  | tableCurrow NEXT leftParenGlue ')'  -> ^(ASTTABLENEXT tableCurrow)
+						  | tableCurrow SETTEXT leftParenGlue expression ',' expression ')'  -> ^(ASTTABLESETTEXT tableCurrow CURROW expression expression)
+			              | tableCurrow ALIGNLEFT leftParenGlue expression ')'  -> ^(ASTTABLEALIGNLEFT tableCurrow CURROW expression)
+						  | tableCurrow ALIGNCENTER leftParenGlue expression ')'  -> ^(ASTTABLEALIGNCENTER tableCurrow CURROW expression)
+						  | tableCurrow ALIGNRIGHT leftParenGlue expression ')'  -> ^(ASTTABLEALIGNRIGHT tableCurrow CURROW expression)
+			              | tableCurrow MERGECOLS leftParenGlue expression ',' expression ')'  -> ^(ASTTABLEMERGECOLS tableCurrow CURROW expression expression)						
+						  | tableCurrow SETDATES leftParenGlue expression ',' expression ',' expression ')'  -> ^(ASTTABLESETDATES tableCurrow CURROW  expression expression expression)						
+						    //col, t1, t2, expression, printcode, scale, format
+						  | tableCurrow SETVALUES leftParenGlue expression ',' expression ',' expression ',' expression ',' expression ',' expression ',' expression ')'  -> ^(ASTTABLESETVALUES tableCurrow expression expression expression ^(ASTTABLESETVALUESELEMENT expression) expression expression expression)
+						  | TABLE     tableOpt1? fileName -> ^(ASTTABLE     tableOpt1? ^(ASTHANDLEFILENAME fileName)) //!beware line below
+						  | MENUTABLE tableOpt1? fileName -> ^(ASTMENUTABLE tableOpt1? ^(ASTHANDLEFILENAME fileName)) //!beware line above
+						    ;
+tableOpt1:                  ISNOTQUAL
+						  | leftAngle2          tableOpt1h* RIGHTANGLE -> ^(ASTOPT1 tableOpt1h*)							
+						  | leftAngleNo2 dates? tableOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) tableOpt1h*)
+                            ;
+tableOpt1h:                 HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
+						  | WINDOW EQUAL MAIN -> ^(ASTOPT_STRING_WINDOW ASTTABLEMAIN)						
+  						  | optOld  //printcodes						
+						    ;
+
+tableCurrow:			    TABLE name GLUEDOT DOT CURROW GLUEDOT DOT  -> name;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// TARGET
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+target2:                    TARGET ident -> ^(ASTTARGET ident);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// TELL
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
 tell:					    TELL ('<' NOCR? '>')? expression -> ^({token("ASTTELL", ASTTELL, $TELL.Line)} expression NOCR?);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// TIME
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 time:                       TIME dates -> ^({token("ASTTIME", ASTTIME, $TIME.Line)} ^(ASTDATES dates))
 						  | TIME question -> ^({token("ASTTIMEQUESTION", ASTTIMEQUESTION, $TIME.Line)})		
 						  | TIME oneDate -> ^({token("ASTTIME", ASTTIME, $TIME.Line)} ^(ASTDATES oneDate oneDate))  //duplicating, TIME 2015 ==> TIME 2015 2015
 						    ;
 oneDate:                    expression;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// TIMEFILTER
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+timefilter:                 TIMEFILTER timefilterperiods -> ^({token("ASTTIMEFILTER", ASTTIMEFILTER, $TIMEFILTER.Line)} timefilterperiods);
+timefilterperiods:		    (timefilterperiod (',' timefilterperiod)*)?  -> ^(ASTTIMEFILTERPERIODS timefilterperiod+);
+timefilterperiod:           expression ((doubleDot | TO) expression (BY expression)?)? -> ^(ASTTIMEFILTERPERIOD expression (expression expression?)?);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// WRITE and EXPORT
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 						    //!!!2x2 identical lines ONLY because of token stuff
 write:					    WRITE  writeOpt1? listItemsWildRange? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE  writeOpt1?  ^(ASTHANDLEFILENAME fileName?) listItemsWildRange?)
@@ -2295,17 +2441,21 @@ writeOpt1h:                 TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
 						  | SERIES -> ^(ASTOPT_STRING_SERIES ASTOPN)												  				
 						    ;
 
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// RESET
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
 reset:					    RESET -> ^(ASTRESET);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// RETURN
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 return2:                    RETURN2 expression? -> ^({token("ASTRETURN", ASTRETURN, $RETURN2.Line)} expression?); //used in functions
 
-functionDef:				FUNCTION type ident leftParenGlue functionArg RIGHTPAREN SEMICOLON functionStatements END -> ^(ASTFUNCTIONDEF2 type ident functionArg functionStatements);
-functionArg:                (functionArgElement (',' functionArgElement)*)? -> ^(ASTPLACEHOLDER functionArgElement*);
-functionArgElement:         type svarname -> ^(ASTPLACEHOLDER type svarname);
-functionStatements:         statements2* -> ^(ASTPLACEHOLDER statements2*);
-functionStatements2:        functionStatements;  //alias
-type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX ;
-
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// OPTION
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 optionType:	
                             FREQ '='? optionFreq -> FREQ ^(ASTSTRINGSIMPLE optionFreq);
