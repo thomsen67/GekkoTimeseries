@@ -28,6 +28,8 @@ namespace Gekko.Parser.Gek
         //    this.storage = null;
         //}
 
+            
+
         public override string ToString()
         {
             if (this.storage == null)
@@ -172,6 +174,16 @@ namespace Gekko.Parser.Gek
             Val,
             String,
             Date
+        }
+
+        public static string GetStringFromIdent(ASTNode node)
+        {
+            if (node.Text != "ASTIDENT")
+            {
+                G.Writeln2("*** ERROR: #8937524309");
+                throw new GekkoException();
+            }
+            return node[0].Text;
         }
 
         public static void FindFunctionsUsedInGekkoCode(ASTNode node, Dictionary<string, int> functions)
@@ -853,9 +865,9 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTHELP":
                         {
-                            string txt = "null";
-                            if (node.ChildrenCount() > 0) txt = "`" + node[0].Text + "`";
-                            node.Code.A("Program.Help(" + txt + ");" + G.NL);
+                            string code = "null";
+                            if (node.ChildrenCount() > 0) code = "O.ConvertToString(" + node[0].Code + ")";
+                            node.Code.A("Program.Help(" + code + ");" + G.NL);
                         }
                         break;
                     case "ASTCREATEQUESTION":
@@ -1246,20 +1258,16 @@ namespace Gekko.Parser.Gek
                     case "ASTGOTO":
                         {
                             node.Code.A(Globals.splitSTOP);
-
-                            node.Code.A("goto " + node[0][0].Text.ToLower().Trim() + ";" + G.NL);  //calls a C# label
+                            node.Code.A("goto " + GetStringFromIdent(node[0]).ToLower().Trim() + ";" + G.NL);  //calls a C# label
                             w.wh.isGotoOrTarget = true;
-
                             node.Code.A(Globals.splitSTART);
                         }
                         break;
                     case "ASTTARGET":  //AREMOS: target
                         {
-                            node.Code.A(Globals.splitSTOP);
-                            
-                            node.Code.A(node[0][0].Text.ToLower().Trim() + ":;" + G.NL);  //a C# label
+                            node.Code.A(Globals.splitSTOP);                            
+                            node.Code.A(GetStringFromIdent(node[0]).ToLower().Trim() + ":;" + G.NL);  //a C# label
                             w.wh.isGotoOrTarget = true;
-
                             node.Code.A(Globals.splitSTART);
                         }
                         break;

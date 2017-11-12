@@ -5171,16 +5171,17 @@ namespace Gekko
                 string value = "";
                 string msg = O.ConvertToString(message);
                 if (Program.InputBox("Accept", msg, ref value) == DialogResult.OK)
-                {                    
-                    string nme = O.ConvertToString(name);
+                {
+                    string varname = name.ConvertToString();
+
                     if (G.Equal(type, "val"))
-                    {                          
+                    {
+                        if (!G.StartsWithSigil(varname)) varname = Globals.symbolScalar + varname;
                         try
                         {
-                            double v = double.Parse(value.Trim());
-                            if(G.StartsWithSigil()
-                            Program.databanks.GetFirst().AddIVariableWithOverwrite(nme, new ScalarVal(v));
-                            G.Writeln2("VAL " + nme + " = " + v);
+                            double v = double.Parse(value.Trim());                            
+                            Program.databanks.GetFirst().AddIVariableWithOverwrite(varname, new ScalarVal(v));
+                            G.Writeln2("VAL " + varname + " = " + v);
                         }
                         catch
                         {
@@ -5189,82 +5190,36 @@ namespace Gekko
                         }                        
                     }
                     else if (G.Equal(type, "string"))
-                    {                                               
-                        
+                    {
+                        if (!G.StartsWithSigil(varname)) varname = Globals.symbolScalar + varname;
                         try
                         {
                             string v = value.Trim();
                             v = Program.StripQuotes(v);
-                            if (Program.scalars.ContainsKey(nme)) Program.scalars.Remove(nme);
-                            Program.scalars.Add(nme, new ScalarString(v, false));
-                            G.Writeln2("STRING " + nme + " = '" + v + "'");
+                            Program.databanks.GetFirst().AddIVariableWithOverwrite(varname, new ScalarString(v));
+                            G.Writeln2("STRING " + varname + " = '" + v + "'");
                         }
                         catch
                         {
                             G.Writeln2("*** ERROR: Could not convert '" + value + "' into a STRING");
                             throw new GekkoException();
                         }
-                    }
-                    else if (G.Equal(type, "name"))
-                    {
-                        try
-                        {
-                            string v = value.Trim();
-                            v = Program.StripQuotes(v);
-                            if (Program.scalars.ContainsKey(nme)) Program.scalars.Remove(nme);
-                            Program.scalars.Add(nme, new ScalarString(v, true));
-                            G.Writeln2("NAME " + nme + " = '" + v + "'");
-                        }
-                        catch
-                        {
-                            G.Writeln2("*** ERROR: Could not convert '" + value + "' into a NAME");
-                            throw new GekkoException();
-                        }
-                    }
+                    }                    
                     else if (G.Equal(type, "date"))
                     {
+                        if (!G.StartsWithSigil(varname)) varname = Globals.symbolScalar + varname;
                         try
                         {
-                            GekkoTime gt = G.FromStringToDate(value.Trim());                            
-                            if (Program.scalars.ContainsKey(nme)) Program.scalars.Remove(nme);
-                            Program.scalars.Add(nme, new ScalarDate(gt));
-                            G.Writeln2("DATE " + nme + " = " + gt.ToString());
+                            GekkoTime gt = G.FromStringToDate(value.Trim());
+                            Program.databanks.GetFirst().AddIVariableWithOverwrite(varname, new ScalarDate(gt));
+                            G.Writeln2("DATE " + varname + " = " + gt.ToString());
                         }
                         catch
                         {
                             G.Writeln2("*** ERROR: Could not convert '" + value + "' into a DATE");
                             throw new GekkoException();
                         }
-                    }
-                    else if (G.Equal(type, "list"))
-                    {
-                        try
-                        {
-                            string v = value.Trim();
-                            string[] vv = v.Split(',');
-                            List<string> xx = new List<string>();
-                            foreach (string s in vv)
-                            {
-                                string ss = s.Trim();
-                                ss = Program.StripQuotes(ss);
-                                if (!G.IsSimpleToken(ss))
-                                {
-                                    G.Writeln2("*** ERROR: Element '" + ss + "' is not a simple name");
-                                    throw new GekkoException();
-                                }
-                                xx.Add(ss);
-                            }
-
-                            if (Program.scalars.ContainsKey(Globals.symbolCollection + nme)) Program.scalars.Remove(Globals.symbolCollection + nme);
-                            Program.scalars.Add(Globals.symbolCollection + nme, new List(xx));
-                            G.Writeln2("LIST " + nme + " = " + G.GetListWithCommas(xx));
-                        }
-                        catch
-                        {
-                            G.Writeln2("*** ERROR: Could not convert '" + value + "' into a LIST");
-                            throw new GekkoException();
-                        }
-                    }
+                    }                    
                 }
             }
         }

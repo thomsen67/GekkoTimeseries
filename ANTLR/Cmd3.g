@@ -1906,7 +1906,7 @@ mapHelper1:                 (mapItem ',')* mapItem -> mapItem+;
 mapHelper2:                 (mapItem ',')+ -> mapItem+;
 mapItem:                    assignment -> ^(ASTMAPITEM assignment);
 
-listFile:                   HASH leftParenGlue LISTFILE ident RIGHTPAREN -> ^(ASTLISTFILE ident);
+listFile:                   HASH leftParenGlue LISTFILE name RIGHTPAREN -> ^(ASTLISTFILE name);
 
 function:                   ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTFUNCTION ident expression*);
 					
@@ -2015,21 +2015,31 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | accept               SEMICOLON!
 						  | analyze              SEMICOLON!
 						  | accept               SEMICOLON!
+						  | clone                SEMICOLON!
+						  | close                SEMICOLON!
+						  | cls                  SEMICOLON!
 						  | for2
 						  | functionDef          SEMICOLON!
 						  | goto2                SEMICOLON!
+					      | help                 SEMICOLON!
 						  | if2
 						  | ini                  SEMICOLON!
+						  | ini                  SEMICOLON!
 						  | mem                  SEMICOLON!
+		   			      | mode                 SEMICOLON!
 						  | ols  				 SEMICOLON!
+						  | open                 SEMICOLON!
 						  | option				 SEMICOLON!
 						  | pipe				 SEMICOLON!
 						  | print                SEMICOLON!
 						  | read                 SEMICOLON!
 						  | reset                SEMICOLON!
+						  | restart              SEMICOLON!
 						  | return2              SEMICOLON!
 						  | run                  SEMICOLON!
+						  | stop                 SEMICOLON!
 						  | sys                  SEMICOLON!
+						  | table                SEMICOLON!
 						  | target2              SEMICOLON!
 						  | tell                 SEMICOLON!
 						  | time                 SEMICOLON!
@@ -2048,7 +2058,7 @@ assignmentType:             SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | M
 // ACCEPT
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-accept:                     ACCEPT acceptType name expression -> ^({token("ASTACCEPT", ASTACCEPT, $ACCEPT.Line)} acceptType name expression);
+accept:                     ACCEPT acceptType varname expression -> ^({token("ASTACCEPT", ASTACCEPT, $ACCEPT.Line)} acceptType varname expression);
 acceptType:                 VAL | STRING2 | DATE;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2061,7 +2071,30 @@ analyzeOpt1:                ISNOTQUAL
 						  | leftAngleNo2 dates? analyzeOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) analyzeOpt1h*)
 						    ;
 analyzeOpt1h:               LAG EQUAL expression -> ^(ASTOPT_VAL_LAG expression)
-						    ;						
+						    ;		
+							
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// CLONE
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+clone:                      CLONE -> ^({token("ASTCLONE", ASTCLONE, $CLONE.Line)});		
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// CLS
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+cls:					    CLS -> ^({token("ASTCLS", ASTCLS, $CLS.Line)});
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// CLOSE
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+							
+close:					    CLOSE closeOpt1? listItems -> ^({token("ASTCLOSE", ASTCLOSE, $CLOSE.Line)} listItems closeOpt1?)
+						  | CLOSE closeOpt1? star -> ^({token("ASTCLOSESTAR", ASTCLOSESTAR, $CLOSE.Line)} closeOpt1?)
+						    ;
+closeOpt1:				    ISNOTQUAL | leftAngle closeOpt1h* RIGHTANGLE -> ^(ASTOPT1 closeOpt1h*);
+closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)							
+						    ;		
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // FOR
@@ -2091,6 +2124,12 @@ type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX ;
 goto2:                      GOTO ident -> ^({token("ASTGOTO", ASTGOTO, $GOTO.Line)} ident);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
+// HELP
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+help:					    HELP name? -> ^({token("ASTHELP", ASTHELP, $HELP.Line)} name?);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 // IF
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -2109,6 +2148,15 @@ ini:					    INI -> ^({token("ASTINI", ASTINI, $INI.Line)});
 mem:                        MEM -> ^({token("ASTMEM", ASTMEM, $MEM.Line)});
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
+// MODE
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+mode:                       MODE mode2 -> ^({token("ASTMODE", ASTMODE, $MODE.Line)} mode2)
+                          | MODE question -> ^({token("ASTMODEQUESTION", ASTMODEQUESTION, $MODE.Line)})	
+						    ;	
+mode2:                      MIXED | SIM | DATA;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 // OLS
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -2118,6 +2166,37 @@ olsImpose:                  IMPOSE EQUAL expression -> ^(ASTIMPOSE expression?);
 olsOpt1:                    ISNOTQUAL | leftAngle olsOpt1h* RIGHTANGLE -> olsOpt1h*;
 olsOpt1h:                   dates -> ^(ASTDATES dates)
 						  | CONSTANT (EQUAL yesNo)? -> ^(ASTOPT_STRING_CONSTANT yesNo?)
+						    ;
+							
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// OPEN
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+open:                       OPEN openOpt1? openHelper (COMMA2 openHelper)* -> ^({token("ASTOPEN", ASTOPEN, $OPEN.Line)} openOpt1? openHelper+);
+openHelper:                 fileNameStar (AS name)? -> ^(ASTOPENHELPER ^(ASTFILENAME fileNameStar) ^(ASTAS name?));
+openOpt1:                   ISNOTQUAL | leftAngle openOpt1h* RIGHTANGLE -> openOpt1h*;
+openOpt1h:                  TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
+						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
+						  | GBK (EQUAL yesNo)? -> ^(ASTOPT_STRING_GBK yesNo?)
+						  | GDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_GDX yesNo?)
+						  | GDXOPT EQUAL expression -> ^(ASTOPT_STRING_GDXOPT expression)
+						  | PCIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PCIM yesNo?)
+						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
+						  | PRN (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRN yesNo?)	
+						  | PX (EQUAL yesNo)? -> ^(ASTOPT_STRING_PX yesNo?)					
+						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
+  						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)
+						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)						
+						  | PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)  //obsolete						
+						  | FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)						
+						  | SEC (EQUAL yesNo)? -> ^(ASTOPT_STRING_SEC yesNo?)						
+						  | LAST (EQUAL yesNo)? -> ^(ASTOPT_STRING_LAST yesNo?)						
+						  | EDIT (EQUAL yesNo)? -> ^(ASTOPT_STRING_EDIT yesNo?)						
+						  | REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_REF yesNo?)						
+						  | PROT (EQUAL yesNo)? -> ^(ASTOPT_STRING_PROT yesNo?)	
+						  | EDIT (EQUAL yesNo)? -> ^(ASTOPT_STRING_EDIT yesNo?)	
+						  | SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)
+						  | POS EQUAL expression -> ^(ASTOPT_VAL_POS expression)
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2340,11 +2419,24 @@ readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)
 						    ;
 
+							
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// RESTART
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+restart:                    RESTART -> ^({token("ASTRESTART", ASTRESTART, $RESTART.Line)});
+
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // RUN
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 run:                        RUN fileNameStar -> ^({token("ASTRUN", ASTRUN, $RUN.Line)} fileNameStar);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// STOP
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+stop:					    STOP -> ^({token("ASTSTOP", ASTSTOP, $STOP.Line)});
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // SYS

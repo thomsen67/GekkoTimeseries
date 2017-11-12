@@ -218,9 +218,14 @@ namespace Gekko
 
         public void AddIVariable(string name, IVariable x)
         {
+            AddIVariable(name, x, false);
+        }
+
+        public void AddIVariable(string name, IVariable x, bool isSimpleName)
+        {
             if (this.protect) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
-                        
-            G.CheckIVariableNameAndType(x, G.CheckIVariableName(name));
+
+            if (!isSimpleName) G.CheckIVariableNameAndType(x, G.CheckIVariableName(name));
 
             Series ts = x as Series;
             if (ts != null)

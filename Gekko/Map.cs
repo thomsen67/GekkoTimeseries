@@ -61,11 +61,15 @@ namespace Gekko
                 this.AddIVariable(name, x);
             }
         }
-
         public void AddIVariable(string name, IVariable x)
         {
+            AddIVariable(name, x, false);        
+        }
+
+        public void AddIVariable(string name, IVariable x, bool isSimpleName)
+        {
             //Simpler than the corresponding method in Databank.cs            
-            G.CheckIVariableNameAndType(x, G.CheckIVariableName(name));                        
+            if (!isSimpleName) G.CheckIVariableNameAndType(x, G.CheckIVariableName(name));                     
             this.storage.Add(name, x);
         }
 
