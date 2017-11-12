@@ -22563,29 +22563,50 @@ namespace Gekko
             //What about: http://christoph.ruegg.name/blog/linear-regression-mathnet-numerics.html ?
             //Also see: http://christoph.ruegg.name/blog/towards-mathnet-numerics-v3.html
 
+            List<IVariable> rhs_unfolded = Unfold(o.rhs);
+            Series lhs_series = o.lhs as Series;
+            if (lhs_series == null)
+            {
+                G.Writeln2("*** ERROR: Left-hand side should be a SERIES");
+                throw new GekkoException();
+            }
 
-            bool useScale = false; //usually true
+            //bool useScale = false; //usually true
 
             GekkoTime t1 = o.t1;
             GekkoTime t2 = o.t2;
             string name = o.name;
             if (name == null) name = "ols";
 
-            List<string> labels = new List<string>();
+            //List<string> labels = new List<string>();
             double[,] tsData2 = null;
             int m2 = 0;
-            int n = GekkoTime.Observations(t1, t2);
-            List<O.Prt.Element> elements = o.prtElements;
+
             int constant = 1;
             if (G.Equal(o.opt_constant, "no")) constant = 0;
-            UnfoldVarsAndLabels(ref m2, ref tsData2, t1, t2, labels, n, elements, constant);
 
-            int m = m2 - 1;  //explanatory vars including constant
-
+            int n = GekkoTime.Observations(t1, t2);
+            int m = rhs_unfolded.Count + constant;  //explanatory vars including constant     
             if (n <= m)
             {
                 G.Writeln2("*** ERROR: There are " + m + " variables with only " + n + " observations");
                 throw new GekkoException();
+            }
+            double[,] x = new double[n, m];  //includes constant if it is there, does not include lhs
+            double[] y = new double[n];
+
+            int n_i = 0;
+            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+            {
+                int k_i = 0;
+                foreach (IVariable xx in rhs_unfolded)
+                {
+                    x[n_i, k_i] = xx.GetVal(t);
+                    k_i++;
+                }
+                if (constant == 1) x[n_i, rhs_unfolded.Count] = 1d;
+                y[n_i] = o.lhs.GetVal(t);
+                n_i++;
             }
 
             Matrix name_coeff = new Matrix(m, 1, double.NaN);
@@ -22594,19 +22615,19 @@ namespace Gekko
             Matrix name_stats = new Matrix(9, 1, double.NaN);
             Matrix name_covar = new Matrix(m, m, double.NaN);
             Matrix name_corr = new Matrix(m, m, double.NaN);
-            Series name_predict = new Series(t1.freq, name + "_predict");
-            Series name_residual = new Series(t1.freq, name + "_residual");
+            Series name_predict = new Series(t1.freq, G.AddFreqToName(name + "_predict", lhs_series.freq));
+            Series name_residual = new Series(t1.freq, G.AddFreqToName(name + "_residual", lhs_series.freq));
 
-            double[] y = new double[n];
-            double[,] x = new double[n, m];
-            for (int i = 0; i < n; i++)
-            {
-                y[i] = tsData2[i, 0];
-                for (int j = 0; j < m; j++)
-                {
-                    x[i, j] = tsData2[i, j + 1];
-                }
-            }
+            //double[] y = new double[n];
+            //double[,] x = new double[n, m];
+            //for (int i = 0; i < n; i++)
+            //{
+            //    y[i] = tsData2[i, 0];
+            //    for (int j = 0; j < m; j++)
+            //    {
+            //        x[i, j] = tsData2[i, j + 1];
+            //    }
+            //}
 
             double[] beta = null;
             int info = 0;
@@ -22621,10 +22642,6 @@ namespace Gekko
                 }
                 scaling[kk] = sum / x.GetLength(0);
                 if (scaling[kk] == 0d) scaling[kk] = 1d;
-
-                //scaling[kk] = 1d;
-                //if (kk == 0) scaling[kk] = 1d / 1000d;
-                //if (kk == 1) scaling[kk] = 1d / .01d;
 
                 for (int tt = 0; tt < x.GetLength(0); tt++)
                 {
@@ -22652,7 +22669,7 @@ namespace Gekko
                         restrict[i, j] = rr.data[i, j] / scaling[j];
                     }
                     restrict[i, rr.data.GetLength(1) - 1] = rr.data[i, rr.data.GetLength(1) - 1];
-                }                
+                }
             }
 
             r = new double[restrict.GetLength(0), restrict.GetLength(1) - 1];
@@ -22679,28 +22696,20 @@ namespace Gekko
                 throw;
             }
 
-            //for (int kk = 0; kk < x.GetLength(1); kk++)
-            //{
-            //    for (int tt = 0; tt < x.GetLength(0); tt++)
-            //    {
-            //        x[tt, kk] = x[tt, kk] * scaling[kk];
-            //    }
-            //}
-
             double[] ypredict = new double[n];
             double[] residual = new double[n];
 
             double dw1 = 0d;
             double rss = 0d;
-            
+
             double resMean = 0d;
-            
+
             double lhsMean = 0d;
 
             double ySum = 0d;
             for (int i = 0; i < n; i++)
-            {                
-                ySum += y[i];                
+            {
+                ySum += y[i];
             }
             double yAvg = ySum / (double)n;
 
@@ -22715,7 +22724,7 @@ namespace Gekko
                 }
                 residual[i] = y[i] - ypredict[i];
                 resMean += residual[i];
-                
+
                 lhsMean += y[i];
                 rss += residual[i] * residual[i];
                 ssTot += (y[i] - yAvg) * (y[i] - yAvg);
@@ -22726,7 +22735,7 @@ namespace Gekko
             }
             resMean = resMean / (double)n;
             lhsMean = lhsMean / (double)n;
-            
+
             double dw = dw1 / rss;
             double rmse = Math.Sqrt(rss / (double)(n));
             double see = Math.Sqrt(rss / (double)(n - m + k));
@@ -22751,12 +22760,11 @@ namespace Gekko
 
             //usedCovar = rep.covpar; --> this yields the same (without restrictions), also in the case without constant
 
-            
             for (int i = 0; i < usedCovar.GetLength(0); i++)
             {
                 for (int j = 0; j < usedCovar.GetLength(1); j++)
                 {
-                    usedCovar[i, j] = usedCovar[i, j] / scaling[i] / scaling[j];                    
+                    usedCovar[i, j] = usedCovar[i, j] / scaling[i] / scaling[j];
                 }
             }
 
@@ -22768,7 +22776,7 @@ namespace Gekko
                     usedCorr[i, j] = usedCovar[i, j] / Math.Sqrt(usedCovar[i, i]) / Math.Sqrt(usedCovar[j, j]);
                 }
             }
-            
+
             Table tab = new Table();
 
             tab.Set(1, 1, "Variable");
@@ -22781,19 +22789,20 @@ namespace Gekko
             {
                 double coeff = 1d / scaling[i] * beta[i];
 
-                string s = TruncateTextWithDots(25, labels[i + 1]);
-                tab.Set(i + 2, 1, s);                
+                //string s = TruncateTextWithDots(25, labels[i + 1]);
+                string s = TruncateTextWithDots(25, "...RHS LABEL");
+                tab.Set(i + 2, 1, s);
                 tab.SetAlign(i + 2, 1, Align.Left);
-                
+
                 int digits = -(int)RoundDecimals1(coeff) + 6;  //can be negative
                 if (digits < 0) digits = 0;
-                
+
                 double se = double.NaN;
                 double t = double.NaN;
-                
+
                 se = Math.Sqrt(usedCovar[i, i]);
                 t = Math.Abs(coeff / Math.Sqrt(usedCovar[i, i]));
-                
+
                 tab.SetNumber(i + 2, 2, coeff, "f16." + digits);
                 tab.SetNumber(i + 2, 3, se, "f16." + digits);
                 tab.SetNumber(i + 2, 4, t, "f12.2");
@@ -22811,23 +22820,24 @@ namespace Gekko
             CrossThreadStuff.CopyButtonEnabled(true);
 
             double r2 = 1 - rss / ssTot;
-            double r2cor = 1 - (1 - r2) * (n - 1) / (n - (m - 1) - 1 + k);  //google r2 adjusted formula. Our m includes the constant, usually regressors do not count the constant -> therefore (m-1). TT added k, must be so.
-        
+            double r2cor = 1 - (1 - r2) * (n - 1) / (n - (m - 1) - 1 + k);  //google "r2 adjusted formula". Our m includes the constant, usually regressors do not count the constant -> therefore (m-1). TT added k, must be so.
+
             int widthRemember = Program.options.print_width;
             int fileWidthRemember = Program.options.print_filewidth;
             Program.options.print_width = int.MaxValue;
             Program.options.print_filewidth = int.MaxValue;
             G.Writeln2("OLS estimation " + t1 + "-" + t2 + " (n = " + n + ")");
-            G.Writeln(labels[0]);  //labels contain the LHS and all the RHS!            
+            //G.Writeln(labels[0]);  //labels contain the LHS and all the RHS!       
+            G.Writeln("...LHS LABEL");  //labels contain the LHS and all the RHS!       
             foreach (string s in temp) G.Writeln(s);
             G.Writeln("R2: " + Math.Round(r2, 6) + "    " + "SEE: " + RoundToSignificantDigits(see, 6) + "    " + "DW: " + Math.Round(dw, 4));
-            
-            if (Math.Abs(resMean) > 0.000001d*see)
+
+            if (Math.Abs(resMean) > 0.000001d * see)
             {
                 G.Writeln2("+++ NOTE: The residuals do not seem to sum to zero. Did you omit a constant term?");
                 G.Writeln("          Note that R2 and other statistics may be misleading in this case.");
             }
-                        
+
             name_stats.data[1 - 1, 0] = rss;
             name_stats.data[2 - 1, 0] = see;
             name_stats.data[3 - 1, 0] = resMean;
@@ -22839,27 +22849,15 @@ namespace Gekko
             name_covar.data = usedCovar;
             name_corr.data = usedCorr;
 
-            if (true)
-            {
-                if (Program.databanks.GetFirst().ContainsVariable(name + "_predict")) Program.databanks.GetFirst().RemoveVariable(name + "_predict");
-                Program.databanks.GetFirst().AddVariable(name_predict);
-                if (Program.databanks.GetFirst().ContainsVariable(name + "_residual")) Program.databanks.GetFirst().RemoveVariable(name + "_residual");
-                Program.databanks.GetFirst().AddVariable(name_residual);
-                if (Program.scalars.ContainsKey(Globals.symbolList + name + "_stats")) Program.scalars.Remove(Globals.symbolList + name + "_stats");
-                Program.scalars.Add(Globals.symbolList + name + "_stats", name_stats);
-                if (Program.scalars.ContainsKey(Globals.symbolList + name + "_param")) Program.scalars.Remove(Globals.symbolList + name + "_param");
-                Program.scalars.Add(Globals.symbolList + name + "_param", name_coeff);
-                if (Program.scalars.ContainsKey(Globals.symbolList + name + "_t")) Program.scalars.Remove(Globals.symbolList + name + "_t");
-                Program.scalars.Add(Globals.symbolList + name + "_t", name_t);
-                if (Program.scalars.ContainsKey(Globals.symbolList + name + "_se")) Program.scalars.Remove(Globals.symbolList + name + "_se");
-                Program.scalars.Add(Globals.symbolList + name + "_se", name_se);
-                if (Program.scalars.ContainsKey(Globals.symbolList + name + "_covar")) Program.scalars.Remove(Globals.symbolList + name + "_covar");
-                Program.scalars.Add(Globals.symbolList + name + "_covar", name_covar);
-                if (Program.scalars.ContainsKey(Globals.symbolList + name + "_corr")) Program.scalars.Remove(Globals.symbolList + name + "_corr");
-                Program.scalars.Add(Globals.symbolList + name + "_corr", name_corr);
-            }
-
-
+            Program.databanks.GetFirst().AddIVariableWithOverwrite(name_predict);
+            Program.databanks.GetFirst().AddIVariableWithOverwrite(name_residual);
+            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolList + name + "_stats", name_stats);
+            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolList + name + "_coeff", name_coeff);
+            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolList + name + "_t", name_t);
+            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolList + name + "_se", name_se);
+            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolList + name + "_covar", name_covar);
+            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolList + name + "_corr", name_corr);
+            
             Program.options.print_width = widthRemember;
             Program.options.print_filewidth = fileWidthRemember;
         }

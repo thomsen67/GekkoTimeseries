@@ -192,13 +192,28 @@ namespace Gekko
             if (this.protect) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
             if (x.Type() == EVariableType.Series && ((Series)x).type == ESeriesType.Light)
             {
-                throw new GekkoException(); //this check can be removed at some point
+                throw new GekkoException(); //only intended for non-series
             }
             if (this.ContainsIVariable(name))
             {
                 this.RemoveIVariable(name);                
             }
             this.AddIVariable(name, x);
+        }
+
+        public void AddIVariableWithOverwrite(IVariable x)
+        {
+            if (this.protect) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
+            Series x_series = x as Series;
+            if (x_series != null)
+            {
+                if (this.ContainsIVariable(x_series.name))
+                {
+                    this.RemoveIVariable(x_series.name);
+                }
+                this.AddIVariable(x_series.name, x);
+            }
+            else throw new GekkoException();  //only intended for series            
         }
 
         public void AddIVariable(string name, IVariable x)

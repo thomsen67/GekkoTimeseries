@@ -2020,6 +2020,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | if2
 						  | ini                  SEMICOLON!
 						  | mem                  SEMICOLON!
+						  | ols  				 SEMICOLON!
 						  | option				 SEMICOLON!
 						  | pipe				 SEMICOLON!
 						  | print                SEMICOLON!
@@ -2105,6 +2106,18 @@ ini:					    INI -> ^({token("ASTINI", ASTINI, $INI.Line)});
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 mem:                        MEM -> ^({token("ASTMEM", ASTMEM, $MEM.Line)});
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// OLS
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+ols:                        OLS olsOpt1? name? expression EQUAL expression olsImpose? -> ^({token("ASTOLS", ASTOLS, $OLS.Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER name?) ^(ASTPLACEHOLDER olsImpose?) expression expression)						  
+						    ;
+olsImpose:                  IMPOSE EQUAL expression -> ^(ASTIMPOSE expression?);
+olsOpt1:                    ISNOTQUAL | leftAngle olsOpt1h* RIGHTANGLE -> olsOpt1h*;
+olsOpt1h:                   dates -> ^(ASTDATES dates)
+						  | CONSTANT (EQUAL yesNo)? -> ^(ASTOPT_STRING_CONSTANT yesNo?)
+						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // OPTION

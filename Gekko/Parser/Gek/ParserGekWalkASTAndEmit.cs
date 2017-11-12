@@ -254,6 +254,7 @@ namespace Gekko.Parser.Gek
                 w.expressionCounter = -1;  //for labels in PRT elements
             }
 
+            //#9874352093573
             if (node.Text == "ASTGENR" || node.Text == "ASTSERIES" || node.Text == "ASTGENRLHSFUNCTION" || node.Text == "ASTPRTELEMENT" || node.Text == "ASTOLSELEMENT" || node.Text == "ASTTABLESETVALUESELEMENT")
             {
                 //This local cache is only used for commands that do implicit timeseries looping with expressions
@@ -710,6 +711,17 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.Analyze o" + Num(node) + " = new O.Analyze();" + G.NL);
                             node.Code.A("o" + Num(node) + ".x = " + node[0].Code).End();
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
+                    case "ASTOLS":
+                        {
+                            node.Code.A("O.Ols o" + Num(node) + " = new O.Ols();" + G.NL);
+                            ImportCodeFromAllChildren(node, node[0]);
+                            if(!node[1].Code.IsNull()) node.Code.A("o" + Num(node) + ".name = " + node[1].Code).End();
+                            if (!node[2].Code.IsNull()) node.Code.A("o" + Num(node) + ".impose = " + node[2].Code).End();
+                            node.Code.A("o" + Num(node) + ".lhs = " + node[3].Code).End();
+                            node.Code.A("o" + Num(node) + ".rhs = " + node[4].Code).End();
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -3342,67 +3354,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("o" + Num(node) + ".impose = " + node[0].Code + ";" + G.NL);                           
                         }
-                        break;
-                    case "ASTOLS":
-                    case "ASTPRT":
-                        {
-                            if (true)
-                            {
-                                if (node.Text == "ASTOLS")
-                                {
-                                    node.Code.A("O.Ols o" + Num(node) + " = new O.Ols();" + G.NL);
-                                }
-                                else
-                                {
-                                    //PRT
-                                    node.Code.A("O.Prt o" + Num(node) + " = new O.Prt();" + G.NL);
-                                }
-                                GetCodeFromAllChildren(node);
-
-                                if (node.Text == "ASTPRT")
-                                {
-                                    //Globals.lastPrtCsSnippet = node.Code.ToString();  //without the o117.Exe()
-                                    //Globals.lastPrtCsSnippet += "return o" + Num(node) + ";" + G.NL;
-                                    //Globals.lastPrtCsSnippetHeader = w.headerCs.ToString();  //may contain a lot of unnecessary IVariables, but never mind (not a problem when used interactively)
-
-                                    Globals.prtCsSnippetsCounter++;
-                                    node.Code.A("o" + Num(node) + ".counter = " + Globals.prtCsSnippetsCounter + ";" + G.NL);
-                                    Globals.prtCsSnippets.Add(Globals.prtCsSnippetsCounter, node.Code.ToString() + "return o" + Num(node) + ";" + G.NL);
-                                    Globals.prtCsSnippetsHeaders.Add(Globals.prtCsSnippetsCounter, w.headerCs.ToString());
-                                }
-                                node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
-                            }
-                            else
-                            {
-
-
-                                if (node.Text == "ASTOLS")
-                                {
-                                    node.Code.A("O.Ols o" + Num(node) + " = new O.Ols();" + G.NL);
-                                }
-                                else
-                                {
-                                    //PRT
-                                    node.Code.A("O.Prt o" + Num(node) + " = new O.Prt();" + G.NL);
-                                }
-                                GetCodeFromAllChildren(node);
-
-                                if (node.Text == "ASTPRT")
-                                {
-                                    //Globals.lastPrtCsSnippet = node.Code.ToString();  //without the o117.Exe()
-                                    //Globals.lastPrtCsSnippet += "return o" + Num(node) + ";" + G.NL;
-                                    //Globals.lastPrtCsSnippetHeader = w.headerCs.ToString();  //may contain a lot of unnecessary IVariables, but never mind (not a problem when used interactively)
-
-                                    Globals.prtCsSnippetsCounter++;
-                                    node.Code.A("o" + Num(node) + ".counter = " + Globals.prtCsSnippetsCounter + ";" + G.NL);
-                                    Globals.prtCsSnippets.Add(Globals.prtCsSnippetsCounter, node.Code.ToString() + "return o" + Num(node) + ";" + G.NL);
-                                    Globals.prtCsSnippetsHeaders.Add(Globals.prtCsSnippetsCounter, w.headerCs.ToString());
-                                }
-                                node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
-                            }
-
-                        }
-                        break;
+                        break;                    
                     case "ASTPRTTYPE":
                         {
                             node.Code.A("o" + Num(node) + ".prtType = `" + node[0].Text + "`;" + G.NL);
@@ -5372,6 +5324,14 @@ namespace Gekko.Parser.Gek
             }
         }
 
+        private static void ImportCodeFromAllChildren(ASTNode receiver, ASTNode node)
+        {
+            foreach (ASTNode child in node.ChildrenIterator())
+            {
+                receiver.Code.A(child.Code + G.NL);
+            }
+        }
+
 
         //private static string AstBankHelperList(ASTNode node, W wh2)
         //{
@@ -5387,7 +5347,7 @@ namespace Gekko.Parser.Gek
         //    string code = "O.GetListWithBankPrefix(" + node[0].Code + ", " + node[1].Code + ", " + bankNumberCode + ")";            
         //    return code;
         //}
-        
+
 
         //private static string AstBankHelper(ASTNode node, W wh2, int type)
         //{
@@ -5400,7 +5360,7 @@ namespace Gekko.Parser.Gek
         //    {
         //        isLhsSoCanAutoCreate = ", O.ECreatePossibilities.Must";
         //    }
-            
+
         //    string bankNumberCode = null;
         //    if (wh2.wh.currentCommand == "ASTPRT" || wh2.wh.currentCommand == "ASTTABLESETVALUES")
         //    {
@@ -5439,7 +5399,7 @@ namespace Gekko.Parser.Gek
         //    }
 
         //    string fallBackCode = "O.ConvertToString(" + node[0].Code + ") + `:` + O.ConvertToString(" + node[1].Code + ")";
-            
+
         //    string simpleHash = null;
         //    //node[1].ChildrenCount() is always > 0
         //    if (node[0].ChildrenCount() > 0)
@@ -5462,9 +5422,9 @@ namespace Gekko.Parser.Gek
         //    }
 
         //    bool isSimple = false; if (simpleHash != null) isSimple = true;
-                        
+
         //    string code = null;
-            
+
         //    string fa;
         //    int choice;
         //    GetChoice(node, wh2, simpleHash, isSimple, out fa, out choice);
