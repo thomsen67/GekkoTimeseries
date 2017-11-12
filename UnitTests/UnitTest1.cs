@@ -3225,7 +3225,7 @@ namespace UnitTests
 
         private static List<string> GetListOfStrings(string s)
         {
-            return O.GetStringList(Program.scalars[Globals.symbolList + s]);
+            return O.GetStringList(Program.scalars[Globals.symbolCollection + s]);
         }
 
         private static void AssertHelperList(string s, List<string> ss)
@@ -3815,7 +3815,7 @@ namespace UnitTests
 
         private static void AssertHelperMatrix(string s, int i, int j, double d, double delta)
         {
-            Matrix m = (Matrix)Program.scalars[Globals.symbolList + s];
+            Matrix m = (Matrix)Program.scalars[Globals.symbolCollection + s];
             Assert.AreEqual(m.data[i - 1, j - 1], d, delta);
         }
 
@@ -3825,7 +3825,7 @@ namespace UnitTests
             if (dim == "cols") dim2 = 1;
             else if (dim == "rows") ;
             else throw new GekkoException();
-            Matrix m = (Matrix)Program.scalars[Globals.symbolList + s];
+            Matrix m = (Matrix)Program.scalars[Globals.symbolCollection + s];
             Assert.AreEqual(m.data.GetLength(dim2), i);
         }
 

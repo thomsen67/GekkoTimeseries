@@ -41,6 +41,14 @@ namespace Gekko
     /// </summary>
     public class G {
 
+        public enum ESigilType
+        {
+            Scalar,
+            Collection,
+            Frequency,  //can be series
+            None  //can be series            
+        }
+
         public static string NL = "\r\n";
 
         /// <summary>
@@ -415,7 +423,7 @@ namespace Gekko
             if (indx != -1)
             {
                 string rest = key.Substring(indx);
-                if (rest.Contains("'") || rest.Contains(Globals.symbolList.ToString())) variable = key;  //if input is x['a', 'z'] or x[#i, #j], etc.
+                if (rest.Contains("'") || rest.Contains(Globals.symbolCollection.ToString())) variable = key;  //if input is x['a', 'z'] or x[#i, #j], etc.
                 else variable = key.Substring(0, indx - 0);
             }
             else variable = key;            
@@ -1011,11 +1019,138 @@ namespace Gekko
         {
             if (s == null) return false;
             if (s.Length == 0) return false;
-            if (s[0] == Globals.symbolMemvar || s[0] == Globals.symbolList)
+            if (s[0] == Globals.symbolScalar || s[0] == Globals.symbolCollection)
             {
                 return true;
             }
             return false;
+        }
+
+        //Use together with CheckIVariableName()
+        public static void CheckIVariableNameAndType(IVariable x, G.ESigilType sigilType)
+        {
+            //Fortunately these checks are only when putting things in, and injecting will avoid it
+            if (sigilType == G.ESigilType.Scalar)
+            {
+                if (x.Type() == EVariableType.Val || x.Type() == EVariableType.String || x.Type() == EVariableType.Date)
+                {
+                    //good
+                }
+            }
+            else if (sigilType == G.ESigilType.Collection)
+            {
+                if (x.Type() == EVariableType.List || x.Type() == EVariableType.Matrix || x.Type() == EVariableType.Map)
+                {
+                    //good
+                }
+            }
+            else if (sigilType == G.ESigilType.Frequency)
+            {
+                if (x.Type() == EVariableType.Series)
+                {
+                    //good
+                }
+            }
+            else
+            {
+                //bad, also including a series with name 'x'
+                G.Writeln2("*** ERROR: Variable name and type do not conform");
+                throw new GekkoException();
+            }
+        }
+
+        //Use together with CheckIVariableNameAndType()
+        public static ESigilType CheckIVariableName(string name)
+        {
+            //Fortunately these checks are only when putting things in, and injecting will avoid it
+            bool hasFreqIndicator = false;
+            int hasSigil = 0;
+            ESigilType rv = ESigilType.None;
+
+            if (name == null || name.Length == 0)
+            {
+                G.Writeln2("*** ERROR: Name has zero length");
+                throw new GekkoException();
+            }
+
+            if (name[0] == Globals.symbolScalar)
+            {
+                rv = ESigilType.Scalar;
+                hasSigil = 1;
+            }
+            else if (name[0] == Globals.symbolCollection)
+            {
+                rv = ESigilType.Collection;
+                hasSigil = 1;
+            }
+
+            if (hasSigil == 1 && name.Length == 1)
+            {
+                G.Writeln2("*** ERROR: Name is naked % or #");
+                throw new GekkoException();
+            }
+
+            for (int i = hasSigil; i < name.Length; i++)
+            {
+                char c = name[i];
+                //The good thing is that this is only checked when putting stuff INTO the databank, and not
+                //when retrieving from the databank. A ScalarVal will for instance just have its contents replaced,
+                //if inside a loop.
+
+                if (i > hasSigil && G.IsLetterOrDigitOrUnderscore(c))
+                {
+                    //good
+                }
+                else if (i == hasSigil && G.IsLetterOrUnderscore(c))
+                {
+                    //good, will not allow %117industries or #117industries, probably best to disallow this
+                }
+                else if (i < name.Length - 1 && c == Globals.freqIndicator)
+                {
+                    //good
+                    hasFreqIndicator = true;
+                    if (hasSigil == 1)
+                    {
+                        G.Writeln2("*** ERROR: Cannot combine '%', '#' and '!'");
+                        throw new GekkoException();
+                    }
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Malformed name: '" + name + "'");
+                    throw new GekkoException();
+                }
+            }
+
+            if (hasSigil == 0)
+            {
+                if (hasFreqIndicator) rv = ESigilType.Frequency;
+            }
+
+            return rv;
+        }
+
+
+        public static string AddScalarSigil(string s)
+        {
+            if (s == null) return s;
+            if (s.Length == 0) return s;
+            string rv = null;
+            if (s[0] == Globals.symbolScalar)
+            {
+                rv = s.Substring(1);
+            }
+            else if (s[0] == Globals.symbolCollection)
+            {
+                G.Writeln2("*** ERROR: Name cannot start with " + Globals.symbolLeftCurly);
+                throw new GekkoException();
+            }
+            if (!G.IsIdent(rv))
+            {
+                G.Writeln2("*** ERROR: Name contains illegal characters");
+                throw new GekkoException();
+            }
+            return Globals.symbolScalar + rv;
         }
 
         public static bool IsLetterOrUnderscore(char c)

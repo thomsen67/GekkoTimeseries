@@ -73,14 +73,14 @@ namespace Gekko
                         {
                             //now we have left curly at i, and right curly at j
                             string ss = s.Substring(i + 1, j - i - 1).Trim();
-                            if (ss.StartsWith(Globals.symbolMemvar.ToString()))
+                            if (ss.StartsWith(Globals.symbolScalar.ToString()))
                             {
                                 ss = ss.Substring(1);  //remove it
                             }
                             if (G.IsSimpleToken(ss, false))
                             {
                                 //look up the scalar
-                                IVariable a = O.Lookup(null, null, null, Globals.symbolMemvar + ss, null, null, false, EVariableType.Var);
+                                IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + ss, null, null, false, EVariableType.Var);
                                 string s2 = a.ConvertToString();
                                 sb.Append(s2);
                                 i = j + 1;  //to jump forwards
@@ -137,7 +137,7 @@ namespace Gekko
                 //if (s[j] == Globals.symbolDollar[0]) isDollar = true;
                 if (s[j] == '{') isCurly = true;
                 //if (j > 0 && s[j - 1] == Globals.symbolTilde && isDollar) tilde = true;  // ~$x                                
-                if ((s[j] == Globals.symbolMemvar) && !tilde)
+                if ((s[j] == Globals.symbolScalar) && !tilde)
                 {
                     string variable = null;
                     int end = -1;
@@ -159,7 +159,7 @@ namespace Gekko
                     {
                         try
                         {
-                            IVariable a = O.Lookup(null, null, null, Globals.symbolMemvar + variable, null, null, false, EVariableType.Var);
+                            IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + variable, null, null, false, EVariableType.Var);
                             if (a.Type() == EVariableType.String || a.Type() == EVariableType.Date || a.Type() == EVariableType.Val)
                             {
                                 bool valfail = false;
@@ -219,12 +219,12 @@ namespace Gekko
                     if (end != -1)
                     {
                         variable = s.Substring(j + 1, end - (j + 1)).Trim();
-                        if (variable.StartsWith(Globals.symbolMemvar.ToString())) variable = variable.Substring(1);
+                        if (variable.StartsWith(Globals.symbolScalar.ToString())) variable = variable.Substring(1);
                         if (G.IsSimpleToken(variable))
                         {
                             try
                             {
-                                IVariable a = O.Lookup(null, null, null, Globals.symbolMemvar + variable, null, null, false, EVariableType.Var);
+                                IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + variable, null, null, false, EVariableType.Var);
 
                                 if (a.Type() == EVariableType.String || a.Type() == EVariableType.Date || a.Type() == EVariableType.Val)
                                 {
@@ -255,8 +255,8 @@ namespace Gekko
                 s2 += s.Substring(lastEnd + 1, s.Length - lastEnd - 1);
                 s = s2;
             }
-            string tp = new string(new char[] { Globals.symbolTilde, Globals.symbolMemvar });
-            string p = new string(Globals.symbolMemvar, 1);
+            string tp = new string(new char[] { Globals.symbolTilde, Globals.symbolScalar });
+            string p = new string(Globals.symbolScalar, 1);
             s = s.Replace(tp, p);
             //string tp2 = new string(new char[] { Globals.symbolTilde, Globals.symbolDollar[0] });
             //string p2 = new string(Globals.symbolDollar[0], 1);

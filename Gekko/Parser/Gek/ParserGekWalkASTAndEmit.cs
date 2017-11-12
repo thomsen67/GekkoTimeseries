@@ -321,8 +321,8 @@ namespace Gekko.Parser.Gek
                             string name = child[1][1][0].Text;
 
                             string s = null;
-                            if (sigil == "ASTPERCENT") s += Globals.symbolMemvar;
-                            else if (sigil == "ASTHASH") s += Globals.symbolList;
+                            if (sigil == "ASTPERCENT") s += Globals.symbolScalar;
+                            else if (sigil == "ASTHASH") s += Globals.symbolCollection;
 
                             s += name;
 
@@ -350,7 +350,7 @@ namespace Gekko.Parser.Gek
                             {
                                 if (node.listLoopAnchor.ContainsKey(s))
                                 {
-                                    G.Writeln2("*** ERROR: The list " + Globals.symbolList + s + " is used several times for multidimensional looping in sum() or unfold() function");
+                                    G.Writeln2("*** ERROR: The list " + Globals.symbolCollection + s + " is used several times for multidimensional looping in sum() or unfold() function");
                                     throw new GekkoException();
                                 }
                                 node.listLoopAnchor.Add(s, "listloop_" + s + ++Globals.counter);
@@ -4586,11 +4586,11 @@ namespace Gekko.Parser.Gek
                 string varname = node[0][i][1][0][1][0].Text;
                 if (node[0][i][1][0][0][0] != null)
                 {
-                    if (node[0][i][1][0][0][0].Text == "ASTPERCENT") varname = Globals.symbolMemvar + varname;
-                    else if (node[0][i][1][0][0][0].Text == "ASTHASH") varname = Globals.symbolList + varname;
+                    if (node[0][i][1][0][0][0].Text == "ASTPERCENT") varname = Globals.symbolScalar + varname;
+                    else if (node[0][i][1][0][0][0].Text == "ASTHASH") varname = Globals.symbolCollection + varname;
                     else throw new GekkoException();
                 }
-                if (!varname.StartsWith(Globals.symbolMemvar.ToString()))
+                if (!varname.StartsWith(Globals.symbolScalar.ToString()))
                 {
                     G.Writeln2("*** ERROR: Only scalar variables (%) allowed as FOR loop variablse");
                     throw new GekkoException();
@@ -4606,8 +4606,8 @@ namespace Gekko.Parser.Gek
             string sigil = null;
             if (nn[0] != null)
             {
-                if (nn[0].Text == "ASTPERCENT") sigil = Globals.symbolMemvar.ToString();
-                if (nn[0].Text == "ASTHASH") sigil = Globals.symbolList.ToString();
+                if (nn[0].Text == "ASTPERCENT") sigil = Globals.symbolScalar.ToString();
+                if (nn[0].Text == "ASTHASH") sigil = Globals.symbolCollection.ToString();
             }
             return sigil;
         }
@@ -4906,11 +4906,11 @@ namespace Gekko.Parser.Gek
                     string listWithNumber = "list" + ++Globals.counter;
                     listCache.Add(simpleIdent, listWithNumber);
                     GetHeaderCs(w).AppendLine("public static IVariable " + listWithNumber + " = null;");  //cannot set it to ScalarVal since it may change type...
-                    node.Code.A("O.GetScalarFromCache(ref " + listWithNumber + ", `" + Globals.symbolList + simpleIdent + "`, false, " + stringifyString + ")");
+                    node.Code.A("O.GetScalarFromCache(ref " + listWithNumber + ", `" + Globals.symbolCollection + simpleIdent + "`, false, " + stringifyString + ")");
                 }
                 else
                 {
-                    node.Code.A("O.GetScalarFromCache(ref " + s + ", `" + Globals.symbolList + simpleIdent + "`, false, " + stringifyString + ")");
+                    node.Code.A("O.GetScalarFromCache(ref " + s + ", `" + Globals.symbolCollection + simpleIdent + "`, false, " + stringifyString + ")");
                 }
             }
         }

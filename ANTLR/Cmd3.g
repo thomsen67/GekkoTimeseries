@@ -2012,6 +2012,7 @@ statements:                 statements2*;
 
 statements2:                SEMICOLON -> //stray semicolon is ok, nothing is written
                           | assignment           SEMICOLON!
+						  | accept               SEMICOLON!
 						  | analyze              SEMICOLON!
 						  | accept               SEMICOLON!
 						  | for2
@@ -2044,6 +2045,13 @@ assignment:				    assignmentType leftSide EQUAL expression -> ^(ASTASSIGNMENT l
 assignmentType:             SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | -> ASTPLACEHOLDER;  //may be empty
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
+// ACCEPT
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+accept:                     ACCEPT acceptType name expression -> ^({token("ASTACCEPT", ASTACCEPT, $ACCEPT.Line)} acceptType name expression);
+acceptType:                 VAL | STRING2 | DATE;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ANALYZE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -2054,13 +2062,6 @@ analyzeOpt1:                ISNOTQUAL
 						    ;
 analyzeOpt1h:               LAG EQUAL expression -> ^(ASTOPT_VAL_LAG expression)
 						    ;						
-
-// ---------------------------------------------------------------------------------------------------------------------------------------------------
-// ACCEPT
-// ---------------------------------------------------------------------------------------------------------------------------------------------------
-
-accept:                     ACCEPT acceptType name expression -> ^({token("ASTACCEPT", ASTACCEPT, $ACCEPT.Line)} acceptType name expression);
-acceptType:                 VAL | STRING2 | NAME | DATE | LIST;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // FOR

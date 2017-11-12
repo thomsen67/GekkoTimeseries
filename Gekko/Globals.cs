@@ -224,8 +224,8 @@ namespace Gekko
         public const string symbolBankColon = ":";
         public const char symbolBankColon2 = ':';
         //public const char symbolTilde = '!';
-        public const char symbolList = '#';
-        public const char symbolMemvar = '%';
+        public const char symbolCollection = '#';
+        public const char symbolScalar = '%';
         public const string symbolDollar = "$";
         public const char symbolTilde = '~';
         public const char symbolLeftCurly = '{';

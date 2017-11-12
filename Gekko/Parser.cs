@@ -1243,17 +1243,17 @@ namespace Gekko
         private static List<string> GetList(string listName)
         {
             IVariable storedList = null;
-            if (Program.scalars.ContainsKey(Globals.symbolList + listName))
+            if (Program.scalars.ContainsKey(Globals.symbolCollection + listName))
             {
                 //use tryget...: faster
-                storedList = Program.scalars[Globals.symbolList + listName];
+                storedList = Program.scalars[Globals.symbolCollection + listName];
                 List x = O.GetList(storedList);
                 x.list.Clear();
             }
             else
             {
                 storedList = new List(new List<string>());
-                Program.scalars.Add(Globals.symbolList + listName, storedList);
+                Program.scalars.Add(Globals.symbolCollection + listName, storedList);
             }
             return O.GetStringList((List)storedList);
         }

@@ -1949,8 +1949,8 @@ namespace Gekko
                 }
                 if (listName != "")
                 {
-                    if (Program.scalars.ContainsKey(Globals.symbolList + listName)) Program.scalars.Remove(Globals.symbolList + listName);
-                    Program.scalars.Add(Globals.symbolList + listName, new List(found));
+                    if (Program.scalars.ContainsKey(Globals.symbolCollection + listName)) Program.scalars.Remove(Globals.symbolCollection + listName);
+                    Program.scalars.Add(Globals.symbolCollection + listName, new List(found));
                     if (found.Count == 0) G.Writeln("+++ NOTE: The list #" + listName + " contains zero elements");
                     else G.Writeln("The list #" + listName + " contains the above list of variables");                    
                 }
@@ -2247,7 +2247,7 @@ namespace Gekko
                     {
                         if (!open && (oRead.openType == EOpenType.First || oRead.openType == EOpenType.Normal))
                         {
-                            IVariable all2 = null; Program.scalars.TryGetValue(Globals.symbolList + "all", out all2);
+                            IVariable all2 = null; Program.scalars.TryGetValue(Globals.symbolCollection + "all", out all2);
                             if (all2 == null) all2 = new List(new List<string>());
                             List<string> all = O.GetStringList(O.GetList(all2));
                             readInfo.createdVars = Program.CreateVariables(all, false);
@@ -2558,11 +2558,11 @@ namespace Gekko
                         mm.data[row - 1 - rowOffset, col - 1 - colOffset] = v;                        
                     }
                 }
-                if (Program.scalars.ContainsKey(Globals.symbolList + matrixName))
+                if (Program.scalars.ContainsKey(Globals.symbolCollection + matrixName))
                 {
-                    Program.scalars.Remove(Globals.symbolList + matrixName);
+                    Program.scalars.Remove(Globals.symbolCollection + matrixName);
                 }                                
-                Program.scalars.Add(Globals.symbolList + matrixName, mm);
+                Program.scalars.Add(Globals.symbolCollection + matrixName, mm);
                 G.Writeln2("Matrix #" + matrixName + " imported (" + rr + "x" + cc + ")");
             }
         }
@@ -4372,7 +4372,7 @@ namespace Gekko
                                 gdx.gdxDataReadDone();
 
                                 //add the list to databank
-                                string name = Globals.symbolList + varName;
+                                string name = Globals.symbolCollection + varName;
                                 if (databank.ContainsIVariable(name))
                                 {
                                     databank.RemoveIVariable(name);
@@ -6434,11 +6434,11 @@ namespace Gekko
         {
             List<string> newList = null;
 
-            IVariable temp2 = null; Program.scalars.TryGetValue(Globals.symbolList + name2, out temp2);
+            IVariable temp2 = null; Program.scalars.TryGetValue(Globals.symbolCollection + name2, out temp2);
 
             if (temp2 == null)
             {
-                Program.scalars.Add(Globals.symbolList + name2, new List(listItems2));
+                Program.scalars.Add(Globals.symbolCollection + name2, new List(listItems2));
                 newList = listItems2;
             }
             else
@@ -8431,9 +8431,9 @@ namespace Gekko
                     else
                     {
                         string[] ss = data.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                        if (Program.scalars.ContainsKey(Globals.symbolList + name))
+                        if (Program.scalars.ContainsKey(Globals.symbolCollection + name))
                         {
-                            Program.scalars.Remove(Globals.symbolList + name);
+                            Program.scalars.Remove(Globals.symbolCollection + name);
                         }
                         Matrix m = new Matrix(rows, cols);
 
@@ -8445,7 +8445,7 @@ namespace Gekko
                             if (s2 != "NA") d = double.Parse(s2);
                             m.data[cnt / cols, cnt % cols] = d;
                         }
-                        Program.scalars.Add(Globals.symbolList + name, m);
+                        Program.scalars.Add(Globals.symbolCollection + name, m);
 
                         data = null;
                         name = null;
@@ -10004,7 +10004,7 @@ namespace Gekko
 
                 foreach (KeyValuePair<string, IVariable> kvp in db.storage)
                 {
-                    if (kvp.Key.StartsWith(Globals.symbolMemvar.ToString())) keys.Add(kvp.Key);
+                    if (kvp.Key.StartsWith(Globals.symbolScalar.ToString())) keys.Add(kvp.Key);
                 }
 
                 if (keys.Count() == 0) continue;
@@ -11625,7 +11625,7 @@ namespace Gekko
 
                         int min = int.MaxValue;
                         int max = int.MinValue;
-                        List<string> list = O.GetStringList(Program.scalars[Globals.symbolList + "endo"]);
+                        List<string> list = O.GetStringList(Program.scalars[Globals.symbolCollection + "endo"]);
                         int x = list.Count;
                         G.Writeln("Testing " + x + " endogenous vars");
                         for (int i = 0; i < x; i += n)
@@ -12645,32 +12645,32 @@ namespace Gekko
                             if (G.IsLetterOrDigitOrUnderscore(c1) && c2 == '(') glue = true;
                             else if (G.IsLetterOrDigitOrUnderscore(c1) && c2 == '[') glue2 = true;
                             else if (G.IsLetterOrDigitOrUnderscore(c1) && c2 == '{') glue = true;
-                            else if (G.IsLetterOrDigitOrUnderscore(c1) && c2 == Globals.symbolMemvar) glue = true;
-                            else if (G.IsLetterOrDigitOrUnderscore(c1) && c2 == Globals.symbolList) glue = true;
+                            else if (G.IsLetterOrDigitOrUnderscore(c1) && c2 == Globals.symbolScalar) glue = true;
+                            else if (G.IsLetterOrDigitOrUnderscore(c1) && c2 == Globals.symbolCollection) glue = true;
 
                             else if (c1 == ')' && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
                             else if (c1 == ')' && c2 == '{') glue = true;
-                            else if (c1 == ')' && c2 == Globals.symbolMemvar) glue = true;
-                            else if (c1 == ')' && c2 == Globals.symbolList) glue = true;
+                            else if (c1 == ')' && c2 == Globals.symbolScalar) glue = true;
+                            else if (c1 == ')' && c2 == Globals.symbolCollection) glue = true;
                             else if (c1 == ')' && c2 == '[') glue2 = true;
 
                             else if (c1 == '}' && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
                             else if (c1 == '}' && c2 == '{') glue = true;
-                            else if (c1 == '}' && c2 == Globals.symbolMemvar) glue = true;
-                            else if (c1 == '}' && c2 == Globals.symbolList) glue = true;
+                            else if (c1 == '}' && c2 == Globals.symbolScalar) glue = true;
+                            else if (c1 == '}' && c2 == Globals.symbolCollection) glue = true;
                             else if (c1 == '}' && c2 == '[') glue2 = true;
 
-                            else if (c1 == Globals.symbolMemvar && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
-                            else if (c1 == Globals.symbolMemvar && c2 == '(') glue = true;
-                            else if (c1 == Globals.symbolMemvar && c2 == '{') glue = true;
+                            else if (c1 == Globals.symbolScalar && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
+                            else if (c1 == Globals.symbolScalar && c2 == '(') glue = true;
+                            else if (c1 == Globals.symbolScalar && c2 == '{') glue = true;
 
                             //else if (c1 == Globals.symbolDollar[0] && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
                             //else if (c1 == Globals.symbolDollar[0] && c2 == '(') glue = true;
                             //else if (c1 == Globals.symbolDollar[0] && c2 == '{') glue = true;
 
-                            else if (c1 == Globals.symbolList && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
-                            else if (c1 == Globals.symbolList && c2 == '(') glue = true;
-                            else if (c1 == Globals.symbolList && c2 == '{') glue = true;
+                            else if (c1 == Globals.symbolCollection && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
+                            else if (c1 == Globals.symbolCollection && c2 == '(') glue = true;
+                            else if (c1 == Globals.symbolCollection && c2 == '{') glue = true;
 
                             else if (c1 == ']' && c2 == '[') glue2 = true;
 
@@ -14261,7 +14261,7 @@ namespace Gekko
                     try
                     {
                         string m = type.Substring(2);
-                        List<string> a1 = O.GetStringList(Program.scalars[Globals.symbolList + m]);
+                        List<string> a1 = O.GetStringList(Program.scalars[Globals.symbolCollection + m]);
                         bool showList = true;
                         if (a1.Count > 5000)
                         {
@@ -14353,7 +14353,7 @@ namespace Gekko
                         {
                             if (hasLargeModel)
                             {
-                                List<string> a1 = O.GetStringList(Program.scalars[Globals.symbolList + m]);                                
+                                List<string> a1 = O.GetStringList(Program.scalars[Globals.symbolCollection + m]);                                
                                 G.Write("list #" + m + " = ["); G.WriteLink("show", "list:?_" + m); G.Writeln("]  (" + a1.Count + " elements from '" + a1[0] + "' to '" + a1[a1.Count - 1] + "')");
                                 G.Writeln();
                             }
@@ -14395,18 +14395,18 @@ namespace Gekko
                     else
                     {
 
-                        if (Program.scalars.ContainsKey(Globals.symbolList + leftSide))
+                        if (Program.scalars.ContainsKey(Globals.symbolCollection + leftSide))
                         {
-                            Program.scalars.Remove(Globals.symbolList + leftSide);
+                            Program.scalars.Remove(Globals.symbolCollection + leftSide);
                         }
-                        Program.scalars.Add(Globals.symbolList + leftSide, new List(unfoldedRightSide));
+                        Program.scalars.Add(Globals.symbolCollection + leftSide, new List(unfoldedRightSide));
                     }
                 }
                 else if (type == "-")
                 {
-                    if (Program.scalars.ContainsKey(Globals.symbolList + leftSide))
+                    if (Program.scalars.ContainsKey(Globals.symbolCollection + leftSide))
                     {
-                        Program.scalars.Remove(Globals.symbolList + leftSide);
+                        Program.scalars.Remove(Globals.symbolCollection + leftSide);
                         G.Writeln("List #" + leftSide + " removed");
                     }
                     else
@@ -14422,19 +14422,19 @@ namespace Gekko
         private static bool IsLargeModel()
         {
             bool hasLargeModel = false;
-            if (Program.scalars.ContainsKey(Globals.symbolList + "all"))
+            if (Program.scalars.ContainsKey(Globals.symbolCollection + "all"))
             {
-                if ((O.GetList(Program.scalars[Globals.symbolList + "all"])).list.Count > 100) hasLargeModel = true;  //more then 100 vars --> no printing of model lists here
+                if ((O.GetList(Program.scalars[Globals.symbolCollection + "all"])).list.Count > 100) hasLargeModel = true;  //more then 100 vars --> no printing of model lists here
             }
             return hasLargeModel;
         }
 
         public static void WriteListItems(string m)
         {
-            IVariable iv = null; Program.scalars.TryGetValue(Globals.symbolList + m, out iv);
+            IVariable iv = null; Program.scalars.TryGetValue(Globals.symbolCollection + m, out iv);
             if (iv == null)
             {
-                G.Writeln2("*** ERROR: List " + Globals.symbolList + m + " was not found");
+                G.Writeln2("*** ERROR: List " + Globals.symbolCollection + m + " was not found");
                 throw new GekkoException();
             }
             List<string> a1 = O.GetStringList(iv);
@@ -14671,14 +14671,14 @@ namespace Gekko
         private static void PutListsIntoModelListHelper()
         {
             ModelListHelper modelListHelper = new ModelListHelper();
-            if (Program.scalars.ContainsKey(Globals.symbolList + "all")) modelListHelper.all = O.GetStringList(Program.scalars[Globals.symbolList + "all"]);
-            if (Program.scalars.ContainsKey(Globals.symbolList + "endo")) modelListHelper.endo = O.GetStringList(Program.scalars[Globals.symbolList + "endo"]);
-            if (Program.scalars.ContainsKey(Globals.symbolList + "exo")) modelListHelper.exo = O.GetStringList(Program.scalars[Globals.symbolList + "exo"]);
-            if (Program.scalars.ContainsKey(Globals.symbolList + "exod")) modelListHelper.exod = O.GetStringList(Program.scalars[Globals.symbolList + "exod"]);
-            if (Program.scalars.ContainsKey(Globals.symbolList + "exodjz")) modelListHelper.exodjz = O.GetStringList(Program.scalars[Globals.symbolList + "exodjz"]);
-            if (Program.scalars.ContainsKey(Globals.symbolList + "exoj")) modelListHelper.exoj = O.GetStringList(Program.scalars[Globals.symbolList + "exoj"]);
-            if (Program.scalars.ContainsKey(Globals.symbolList + "exotrue")) modelListHelper.exotrue = O.GetStringList(Program.scalars[Globals.symbolList + "exotrue"]);
-            if (Program.scalars.ContainsKey(Globals.symbolList + "exoz")) modelListHelper.exoz = O.GetStringList(Program.scalars[Globals.symbolList + "exoz"]);
+            if (Program.scalars.ContainsKey(Globals.symbolCollection + "all")) modelListHelper.all = O.GetStringList(Program.scalars[Globals.symbolCollection + "all"]);
+            if (Program.scalars.ContainsKey(Globals.symbolCollection + "endo")) modelListHelper.endo = O.GetStringList(Program.scalars[Globals.symbolCollection + "endo"]);
+            if (Program.scalars.ContainsKey(Globals.symbolCollection + "exo")) modelListHelper.exo = O.GetStringList(Program.scalars[Globals.symbolCollection + "exo"]);
+            if (Program.scalars.ContainsKey(Globals.symbolCollection + "exod")) modelListHelper.exod = O.GetStringList(Program.scalars[Globals.symbolCollection + "exod"]);
+            if (Program.scalars.ContainsKey(Globals.symbolCollection + "exodjz")) modelListHelper.exodjz = O.GetStringList(Program.scalars[Globals.symbolCollection + "exodjz"]);
+            if (Program.scalars.ContainsKey(Globals.symbolCollection + "exoj")) modelListHelper.exoj = O.GetStringList(Program.scalars[Globals.symbolCollection + "exoj"]);
+            if (Program.scalars.ContainsKey(Globals.symbolCollection + "exotrue")) modelListHelper.exotrue = O.GetStringList(Program.scalars[Globals.symbolCollection + "exotrue"]);
+            if (Program.scalars.ContainsKey(Globals.symbolCollection + "exoz")) modelListHelper.exoz = O.GetStringList(Program.scalars[Globals.symbolCollection + "exoz"]);
             Program.model.modelInfo.modelListHelper = modelListHelper;
         }
 
@@ -14687,20 +14687,20 @@ namespace Gekko
             string[] lists = new string[] { "all", "endo", "exo", "exod", "exodjz", "exoj", "exotrue", "exoz" };
             foreach (string s in lists)
             {
-                if (Program.scalars.ContainsKey(Globals.symbolList + s)) Program.scalars.Remove(Globals.symbolList + s);
+                if (Program.scalars.ContainsKey(Globals.symbolCollection + s)) Program.scalars.Remove(Globals.symbolCollection + s);
             }
             foreach (string s in lists)
             {
-                Program.scalars.Add(Globals.symbolList + s, new List(new List<string>()));
+                Program.scalars.Add(Globals.symbolCollection + s, new List(new List<string>()));
             }
-            if (Program.model.modelInfo.modelListHelper.all != null) O.GetStringList(Program.scalars[Globals.symbolList + "all"]).AddRange(Program.model.modelInfo.modelListHelper.all);
-            if (Program.model.modelInfo.modelListHelper.endo != null) O.GetStringList(Program.scalars[Globals.symbolList + "endo"]).AddRange(Program.model.modelInfo.modelListHelper.endo);
-            if (Program.model.modelInfo.modelListHelper.exo != null) O.GetStringList(Program.scalars[Globals.symbolList + "exo"]).AddRange(Program.model.modelInfo.modelListHelper.exo);
-            if (Program.model.modelInfo.modelListHelper.exod != null) O.GetStringList(Program.scalars[Globals.symbolList + "exod"]).AddRange(Program.model.modelInfo.modelListHelper.exod);
-            if (Program.model.modelInfo.modelListHelper.exodjz != null) O.GetStringList(Program.scalars[Globals.symbolList + "exodjz"]).AddRange(Program.model.modelInfo.modelListHelper.exodjz);
-            if (Program.model.modelInfo.modelListHelper.exoj != null) O.GetStringList(Program.scalars[Globals.symbolList + "exoj"]).AddRange(Program.model.modelInfo.modelListHelper.exoj);
-            if (Program.model.modelInfo.modelListHelper.exotrue != null) O.GetStringList(Program.scalars[Globals.symbolList + "exotrue"]).AddRange(Program.model.modelInfo.modelListHelper.exotrue);
-            if (Program.model.modelInfo.modelListHelper.exoz != null) O.GetStringList(Program.scalars[Globals.symbolList + "exoz"]).AddRange(Program.model.modelInfo.modelListHelper.exoz);
+            if (Program.model.modelInfo.modelListHelper.all != null) O.GetStringList(Program.scalars[Globals.symbolCollection + "all"]).AddRange(Program.model.modelInfo.modelListHelper.all);
+            if (Program.model.modelInfo.modelListHelper.endo != null) O.GetStringList(Program.scalars[Globals.symbolCollection + "endo"]).AddRange(Program.model.modelInfo.modelListHelper.endo);
+            if (Program.model.modelInfo.modelListHelper.exo != null) O.GetStringList(Program.scalars[Globals.symbolCollection + "exo"]).AddRange(Program.model.modelInfo.modelListHelper.exo);
+            if (Program.model.modelInfo.modelListHelper.exod != null) O.GetStringList(Program.scalars[Globals.symbolCollection + "exod"]).AddRange(Program.model.modelInfo.modelListHelper.exod);
+            if (Program.model.modelInfo.modelListHelper.exodjz != null) O.GetStringList(Program.scalars[Globals.symbolCollection + "exodjz"]).AddRange(Program.model.modelInfo.modelListHelper.exodjz);
+            if (Program.model.modelInfo.modelListHelper.exoj != null) O.GetStringList(Program.scalars[Globals.symbolCollection + "exoj"]).AddRange(Program.model.modelInfo.modelListHelper.exoj);
+            if (Program.model.modelInfo.modelListHelper.exotrue != null) O.GetStringList(Program.scalars[Globals.symbolCollection + "exotrue"]).AddRange(Program.model.modelInfo.modelListHelper.exotrue);
+            if (Program.model.modelInfo.modelListHelper.exoz != null) O.GetStringList(Program.scalars[Globals.symbolCollection + "exoz"]).AddRange(Program.model.modelInfo.modelListHelper.exoz);
             Program.model.modelInfo.modelListHelper = null;  //only used for temporary transfer of these lists
         }
 
@@ -15309,21 +15309,21 @@ namespace Gekko
                 hasModel = true;
                 try
                 {
-                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolList + "exod"]))
+                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolCollection + "exod"]))
                         exod.Add(s, "");
-                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolList + "exoj"]))
+                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolCollection + "exoj"]))
                         exoj.Add(s, "");
-                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolList + "exoz"]))
+                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolCollection + "exoz"]))
                         exoz.Add(s, "");
-                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolList + "exodjz"]))
+                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolCollection + "exodjz"]))
                         exodjz.Add(s, "");
-                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolList + "exo"]))
+                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolCollection + "exo"]))
                         exo.Add(s, "");
-                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolList + "exotrue"]))
+                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolCollection + "exotrue"]))
                         exotrue.Add(s, "");
-                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolList + "endo"]))
+                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolCollection + "endo"]))
                         endo.Add(s, "");
-                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolList + "all"]))
+                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolCollection + "all"]))
                         all.Add(s, "");
                 }
                 catch { };  //if error, we just ignore it, and the list will be empty.
@@ -15456,12 +15456,12 @@ namespace Gekko
 
                     if (true)
                     {
-                        if (Program.scalars.ContainsKey(Globals.symbolList+ listname))
+                        if (Program.scalars.ContainsKey(Globals.symbolCollection+ listname))
                         {
-                            Program.scalars.Remove(Globals.symbolList + listname);
+                            Program.scalars.Remove(Globals.symbolCollection + listname);
                         }
                         list.Sort();
-                        Program.scalars.Add(Globals.symbolList + listname, new List(list));
+                        Program.scalars.Add(Globals.symbolCollection + listname, new List(list));
                         if (list.Count > 0)
                         {
                             string v = "variables";
@@ -18988,7 +18988,7 @@ namespace Gekko
             {
                 foreach (string s in o.listItems)
                 {
-                    if (!s.StartsWith(Globals.symbolList.ToString()))
+                    if (!s.StartsWith(Globals.symbolCollection.ToString()))
                     {
                         G.Writeln2("*** ERROR: EXPORT<r>: expected all list items to start with '#'");
                         throw new GekkoException();
@@ -21950,13 +21950,13 @@ namespace Gekko
                             Program.scalars.Add("#delete_me_12345", temp);
                             //This is somewhat of a hack, calling a MULPRT command indirectly like that
                             //But it really saves a lot of work, instead of wiring up to the Prt() method!
-                            Program.obeyCommandCalledFromGUI("MULPRT " + Globals.symbolList + "delete_me_12345;", new P());
+                            Program.obeyCommandCalledFromGUI("MULPRT " + Globals.symbolCollection + "delete_me_12345;", new P());
                         }
                         finally
                         {
                             //to make sure everything is reset if there is an exception
                             Program.options.print_mulprt_pch = showPchRemember;
-                            if (Program.scalars.ContainsKey(Globals.symbolList + "delete_me_12345")) Program.scalars.Remove(Globals.symbolList + "delete_me_12345");
+                            if (Program.scalars.ContainsKey(Globals.symbolCollection + "delete_me_12345")) Program.scalars.Remove(Globals.symbolCollection + "delete_me_12345");
                             if (!tStart.IsNull())
                             {
                                 Globals.globalPeriodStart = t1tmp;
@@ -22851,12 +22851,12 @@ namespace Gekko
 
             Program.databanks.GetFirst().AddIVariableWithOverwrite(name_predict);
             Program.databanks.GetFirst().AddIVariableWithOverwrite(name_residual);
-            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolList + name + "_stats", name_stats);
-            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolList + name + "_coeff", name_coeff);
-            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolList + name + "_t", name_t);
-            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolList + name + "_se", name_se);
-            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolList + name + "_covar", name_covar);
-            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolList + name + "_corr", name_corr);
+            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_stats", name_stats);
+            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_coeff", name_coeff);
+            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_t", name_t);
+            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_se", name_se);
+            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_covar", name_covar);
+            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_corr", name_corr);
             
             Program.options.print_width = widthRemember;
             Program.options.print_filewidth = fileWidthRemember;
@@ -23062,8 +23062,8 @@ namespace Gekko
                 alglib.pearsoncorrm(tsData, out y);
                 Matrix m = new Matrix();
                 m.data = y;
-                if (Program.scalars.ContainsKey(Globals.symbolList + "corr")) Program.scalars.Remove(Globals.symbolList + "corr");
-                Program.scalars.Add(Globals.symbolList + "corr", m);
+                if (Program.scalars.ContainsKey(Globals.symbolCollection + "corr")) Program.scalars.Remove(Globals.symbolCollection + "corr");
+                Program.scalars.Add(Globals.symbolCollection + "corr", m);
 
                 G.Writeln2("Cross correlation based on " + k + " variables and " + n + " observations");
                 counter = 0;
@@ -23072,7 +23072,7 @@ namespace Gekko
                     counter++;
                     G.Writeln("Variable " + counter + ": " + s);
                 }
-                Program.ShowMatrix(m, Globals.symbolList + "corr");
+                Program.ShowMatrix(m, Globals.symbolCollection + "corr");
             }
         }
 

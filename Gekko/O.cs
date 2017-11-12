@@ -23,8 +23,8 @@ namespace Gekko
         //Common methods start
         //Common methods start
 
-        public static ScalarString scalarStringPercent = new ScalarString(Globals.symbolMemvar.ToString());
-        public static ScalarString scalarStringHash = new ScalarString(Globals.symbolList.ToString());
+        public static ScalarString scalarStringPercent = new ScalarString(Globals.symbolScalar.ToString());
+        public static ScalarString scalarStringHash = new ScalarString(Globals.symbolCollection.ToString());
         public static ScalarString scalarStringTilde = new ScalarString(Globals.freqIndicator.ToString());
         public static ScalarString scalarStringColon = new ScalarString(Globals.symbolBankColon.ToString());
 
@@ -749,7 +749,7 @@ namespace Gekko
 
         public static string HandleSigilAndFreq(string varname, string freq, EVariableType type)
         {
-            bool hasSigil = false; if (varname[0] == Globals.symbolMemvar || varname[0] == Globals.symbolList) hasSigil = true;
+            bool hasSigil = false; if (varname[0] == Globals.symbolScalar || varname[0] == Globals.symbolCollection) hasSigil = true;
 
             //rhsExpression means the value of the rhs variable, meaning that the present lookup is setting a value for the lhs variable
             //IVariable lhs = null;
@@ -953,7 +953,7 @@ namespace Gekko
 
             IVariable lhs = ib.GetIVariable(varnameWithFreq);
                         
-            if (varnameWithFreq[0] != Globals.symbolMemvar && varnameWithFreq[0] != Globals.symbolList)
+            if (varnameWithFreq[0] != Globals.symbolScalar && varnameWithFreq[0] != Globals.symbolCollection)
             {
                 //first, if it is a SERIES on lhs (no sigil), we try to convert the RHS directly (so x = ... will work, not necessary with SERIES x = ...)
                 rhsExpression = O.ConvertToTimeSeries(smpl, rhsExpression);  //for instance, x = (1, 2, 3) will have (1, 2, 3) converted to series
@@ -966,12 +966,12 @@ namespace Gekko
                 //LEFT-HAND SIDE DOES NOT EXIST
                 //LEFT-HAND SIDE DOES NOT EXIST
                 //LEFT-HAND SIDE DOES NOT EXIST
-                if (varnameWithFreq[0] == Globals.symbolMemvar)
+                if (varnameWithFreq[0] == Globals.symbolScalar)
                 {
                     //VAL, STRING, DATE                                                
                     ib.AddIVariable(varnameWithFreq, rhsExpression.DeepClone());
                 }
-                else if (varnameWithFreq[0] == Globals.symbolList)
+                else if (varnameWithFreq[0] == Globals.symbolCollection)
                 {
                     //LIST, DICT, MATRIX                                                
                     ib.AddIVariable(varnameWithFreq, rhsExpression.DeepClone());
@@ -994,7 +994,7 @@ namespace Gekko
                 //LEFT-HAND SIDE EXISTS
                 //LEFT-HAND SIDE EXISTS   or can be created if it is a series name
                 //LEFT-HAND SIDE EXISTS
-                if (varnameWithFreq[0] == Globals.symbolMemvar)
+                if (varnameWithFreq[0] == Globals.symbolScalar)
                 {
                     //VAL, STRING, DATE
                     if (lhs.Type() == rhsExpression.Type())
@@ -1010,7 +1010,7 @@ namespace Gekko
                         ib.AddIVariable(varnameWithFreq, rhsExpression.DeepClone());
                     }
                 }
-                else if (varnameWithFreq[0] == Globals.symbolList)
+                else if (varnameWithFreq[0] == Globals.symbolCollection)
                 {
                     //LIST, MAP, MATRIX, variable already exists
                     if (lhs.Type() == rhsExpression.Type())
@@ -1111,11 +1111,11 @@ namespace Gekko
             {
                 //VAL v = 100 ---> %v = 100
                 //LIST m = ('a', 'b') --> #m = ('a', 'b') 
-                if (type == EVariableType.Val || type == EVariableType.String || type == EVariableType.Date) varnameWithFreq = Globals.symbolMemvar + varnameWithFreq;
-                else if (type == EVariableType.List || type == EVariableType.Matrix || type == EVariableType.Map) varnameWithFreq = Globals.symbolList + varnameWithFreq;
+                if (type == EVariableType.Val || type == EVariableType.String || type == EVariableType.Date) varnameWithFreq = Globals.symbolScalar + varnameWithFreq;
+                else if (type == EVariableType.List || type == EVariableType.Matrix || type == EVariableType.Map) varnameWithFreq = Globals.symbolCollection + varnameWithFreq;
             }
 
-            if (!isArraySubSeries && varnameWithFreq[0] == Globals.symbolMemvar)
+            if (!isArraySubSeries && varnameWithFreq[0] == Globals.symbolScalar)
             {
                 switch (rhs.Type())
                 {
@@ -1243,7 +1243,7 @@ namespace Gekko
                         break;
                 }
             }
-            else if (!isArraySubSeries && varnameWithFreq[0] == Globals.symbolList)
+            else if (!isArraySubSeries && varnameWithFreq[0] == Globals.symbolCollection)
             {
                 switch (rhs.Type())
                 {
@@ -1722,7 +1722,7 @@ namespace Gekko
 
         private static void LookupTypeCheck(IVariable rhs, string varName)
         {
-            if (varName[0] == Globals.symbolMemvar)
+            if (varName[0] == Globals.symbolScalar)
             {
                 //VAL, STRING, DATE                        
                 if (rhs.Type() != EVariableType.Val && rhs.Type() != EVariableType.String && rhs.Type() != EVariableType.Date)
@@ -1731,7 +1731,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            else if (varName[0] == Globals.symbolList)
+            else if (varName[0] == Globals.symbolCollection)
             {
                 //LIST, DICT, MATRIX                        
                 if (rhs.Type() != EVariableType.Matrix && rhs.Type() != EVariableType.List && rhs.Type() != EVariableType.Map)
@@ -2048,7 +2048,7 @@ namespace Gekko
             }            
             else
             {
-                G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolMemvar + name + "' was not found");
+                G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolScalar + name + "' was not found");
                 throw new GekkoException();
             }
             return a;
@@ -2182,12 +2182,12 @@ namespace Gekko
         {
             string name = ConvertToString(iv);
             IVariable a = null;
-            if (Program.scalars.TryGetValue(Globals.symbolList + name, out a))
+            if (Program.scalars.TryGetValue(Globals.symbolCollection + name, out a))
             {
             }
             else
             {
-                G.Writeln2("*** ERROR: List '" + Globals.symbolList + name + "' was not found");
+                G.Writeln2("*** ERROR: List '" + Globals.symbolCollection + name + "' was not found");
                 throw new GekkoException();
             }
             return a;
@@ -2213,7 +2213,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolMemvar + name + "' was not found");
+                G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolScalar + name + "' was not found");
                 throw new GekkoException();
             }
             return a;
@@ -2437,12 +2437,12 @@ namespace Gekko
                 IVariable x = null; Program.scalars.TryGetValue(originalName, out x);
                 if (x == null)
                 {
-                    if (originalName.StartsWith(char.ToString(Globals.symbolList)))
+                    if (originalName.StartsWith(char.ToString(Globals.symbolCollection)))
                     {
                         G.Writeln2("*** ERROR: Could not find list or matrix '" + originalName + "'");
                         if (Program.scalars.ContainsKey(originalName.Substring(1)))
                         {
-                            G.Writeln("    Did you intend to refer to the scalar '" + Globals.symbolMemvar + originalName.Substring(1) + "'", Color.Red);
+                            G.Writeln("    Did you intend to refer to the scalar '" + Globals.symbolScalar + originalName.Substring(1) + "'", Color.Red);
                         }
                     }
                     else
@@ -2800,7 +2800,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolMemvar + name + "' was not found");
+                G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolScalar + name + "' was not found");
                 throw new GekkoException();
             }
             return a;
@@ -3325,7 +3325,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolMemvar + name + "' was not found");
+                G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolScalar + name + "' was not found");
                 throw new GekkoException();
             }
         }
@@ -3377,7 +3377,7 @@ namespace Gekko
         {
             string name2 = name.ConvertToString();
             IVariable lhs = null;            
-            if (Program.scalars.TryGetValue(Globals.symbolList + name2, out lhs))
+            if (Program.scalars.TryGetValue(Globals.symbolCollection + name2, out lhs))
             {
                 //Scalar is already existing                
                 if (lhs.Type() == EVariableType.Matrix)
@@ -3386,13 +3386,13 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: " + Globals.symbolList + name2 + " is not a matrix");
+                    G.Writeln2("*** ERROR: " + Globals.symbolCollection + name2 + " is not a matrix");
                     throw new GekkoException();
                 }
             }
             else
             {
-                G.Writeln2("*** ERROR: " + Globals.symbolList + name2 + " could not be found");
+                G.Writeln2("*** ERROR: " + Globals.symbolCollection + name2 + " could not be found");
                 throw new GekkoException();
             }
             return (Matrix)lhs;
@@ -4369,7 +4369,7 @@ namespace Gekko
                 IVariable a = null; Program.scalars.TryGetValue(s, out a);
                 if (a == null || a.Type() != EVariableType.Val)
                 {
-                    G.Writeln2("*** ERROR: VAL " + Globals.symbolMemvar.ToString() + s + " was not found");
+                    G.Writeln2("*** ERROR: VAL " + Globals.symbolScalar.ToString() + s + " was not found");
                     throw new GekkoException();
                 }
                 string ss = a.GetValOLD(null).ToString();
@@ -4389,7 +4389,7 @@ namespace Gekko
                 IVariable a = null; Program.scalars.TryGetValue(s, out a);
                 if (a == null || a.Type() != EVariableType.String || ((ScalarString)a)._isName == true)
                 {
-                    G.Writeln2("*** ERROR: STRING "+ Globals.symbolMemvar.ToString()  + s + " was not found");
+                    G.Writeln2("*** ERROR: STRING "+ Globals.symbolScalar.ToString()  + s + " was not found");
                     throw new GekkoException();
                 }
                 G.Writeln2("STRING " + s + " = '" + a.ConvertToString() + "'");
@@ -4425,7 +4425,7 @@ namespace Gekko
                 IVariable lhs = null;
 
                 string name2 = name.ConvertToString();
-                if (Program.scalars.TryGetValue(Globals.symbolList + name2, out lhs))
+                if (Program.scalars.TryGetValue(Globals.symbolCollection + name2, out lhs))
                 {
                     //Matrix is already existing, may inherit the row/columnames               
                     if (lhs.Type() == EVariableType.Matrix)
@@ -4446,25 +4446,25 @@ namespace Gekko
                     {
                         if (value == null)
                         {
-                            G.Writeln2("*** ERROR: No matrix with name '" + Globals.symbolList + name2 + "' exists");
+                            G.Writeln2("*** ERROR: No matrix with name '" + Globals.symbolCollection + name2 + "' exists");
                             throw new GekkoException();
                         }
                         //The object has to die and be recreated, since it is of a wrong type.                                
-                        Program.scalars.Remove(Globals.symbolList + name2);
+                        Program.scalars.Remove(Globals.symbolCollection + name2);
                         //lhs = new ScalarDate(value);
-                        Program.scalars.Add(Globals.symbolList + name2, value);
+                        Program.scalars.Add(Globals.symbolCollection + name2, value);
                     }
                 }
                 else
                 {
                     if (value == null)
                     {
-                        G.Writeln2("*** ERROR: No matrix with name '" + Globals.symbolList + name2 + "' exists");
+                        G.Writeln2("*** ERROR: No matrix with name '" + Globals.symbolCollection + name2 + "' exists");
                         throw new GekkoException();
                     }
                     //Scalar does not exist beforehand            
                     //lhs = new ScalarDate(value);
-                    Program.scalars.Add(Globals.symbolList + name2, value);
+                    Program.scalars.Add(Globals.symbolCollection + name2, value);
                 }
                 //return (Matrix)lhs;
             }
@@ -4472,14 +4472,14 @@ namespace Gekko
             public static void Q(string s)
             {                
                 Show ss = new Show();
-                IVariable iv = null; Program.scalars.TryGetValue(Globals.symbolList.ToString() + s, out iv);
+                IVariable iv = null; Program.scalars.TryGetValue(Globals.symbolCollection.ToString() + s, out iv);
                 if (iv == null)
                 {
-                    G.Writeln2("Matrix " + Globals.symbolList.ToString() + s + " not found");
+                    G.Writeln2("Matrix " + Globals.symbolCollection.ToString() + s + " not found");
                     return;
                 }
                 ss.input = iv;
-                ss.label = Globals.symbolList.ToString() + s;
+                ss.label = Globals.symbolCollection.ToString() + s;
                 ss.Exe();
             }
             public static void Q()
@@ -4509,7 +4509,7 @@ namespace Gekko
                 IVariable a = null; Program.scalars.TryGetValue(s, out a);
                 if (a == null || a.Type() != EVariableType.String || ((ScalarString)a)._isName == false)
                 {
-                    G.Writeln2("*** ERROR: NAME " + Globals.symbolMemvar.ToString() + s + " was not found");
+                    G.Writeln2("*** ERROR: NAME " + Globals.symbolScalar.ToString() + s + " was not found");
                 }
                 G.Writeln2("NAME " + s + " = '" + a.ConvertToString() + "'");
             }
@@ -4526,7 +4526,7 @@ namespace Gekko
                 IVariable a = null; Program.scalars.TryGetValue(s, out a);
                 if (a == null || a.Type() != EVariableType.Date)
                 {
-                    G.Writeln2("*** ERROR: DATE " + Globals.symbolMemvar.ToString() + s + " was not found");
+                    G.Writeln2("*** ERROR: DATE " + Globals.symbolScalar.ToString() + s + " was not found");
                 }
                 G.Writeln2("DATE " + s + " = " + G.FromDateToString(O.ConvertToDate(a)));
             }
@@ -5178,8 +5178,8 @@ namespace Gekko
                         try
                         {
                             double v = double.Parse(value.Trim());
-                            if (Program.scalars.ContainsKey(nme)) Program.scalars.Remove(nme);
-                            Program.scalars.Add(nme, new ScalarVal(v));
+                            if(G.StartsWithSigil()
+                            Program.databanks.GetFirst().AddIVariableWithOverwrite(nme, new ScalarVal(v));
                             G.Writeln2("VAL " + nme + " = " + v);
                         }
                         catch
@@ -5255,8 +5255,8 @@ namespace Gekko
                                 xx.Add(ss);
                             }
 
-                            if (Program.scalars.ContainsKey(Globals.symbolList + nme)) Program.scalars.Remove(Globals.symbolList + nme);
-                            Program.scalars.Add(Globals.symbolList + nme, new List(xx));
+                            if (Program.scalars.ContainsKey(Globals.symbolCollection + nme)) Program.scalars.Remove(Globals.symbolCollection + nme);
+                            Program.scalars.Add(Globals.symbolCollection + nme, new List(xx));
                             G.Writeln2("LIST " + nme + " = " + G.GetListWithCommas(xx));
                         }
                         catch
@@ -6931,7 +6931,7 @@ namespace Gekko
                 string all = null;
                 foreach (string s in this.r_exportItems)
                 {
-                    IVariable iv = null; Program.scalars.TryGetValue(Globals.symbolList + s, out iv);
+                    IVariable iv = null; Program.scalars.TryGetValue(Globals.symbolCollection + s, out iv);
                     if (iv != null && iv.Type() == EVariableType.Matrix)
                     {
                         Matrix m = (Matrix)iv;
@@ -6940,7 +6940,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: Could not find matrix " + Globals.symbolList + s);
+                        G.Writeln2("*** ERROR: Could not find matrix " + Globals.symbolCollection + s);
                         throw new GekkoException();
                     }
                 }

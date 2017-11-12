@@ -219,26 +219,9 @@ namespace Gekko
         public void AddIVariable(string name, IVariable x)
         {
             if (this.protect) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
-            //For Series, use AddIVariable
-            bool hasFreqIndicator = false;
-            foreach (char c in name)
-            {
-                //The good thing is that this is only checked when putting stuff INTO the databank, and not
-                //when retrieving from the databank. A ScalarVal will for instance just have its contents replaced,
-                //if inside a loop.
-                //The name may still be strange, but that will be caught in the Chop() method.
-                //it seems "SER {'1x'} = ... " will be legal, but never mind. It can never be called with "PRT 1x" anyway.
-                if (G.IsLetterOrDigitOrUnderscore(c) || c == Globals.symbolMemvar || c == Globals.symbolList || c == Globals.freqIndicator)
-                {
-                    //good
-                }
-                else
-                {
-                    G.Writeln2("***ERROR: Malformed name: '" + name + "'");
-                    throw new GekkoException();
-                }
-                if (c == Globals.freqIndicator) hasFreqIndicator = true;
-            }
+                        
+            G.CheckIVariableNameAndType(x, G.CheckIVariableName(name));
+
             Series ts = x as Series;
             if (ts != null)
             {
@@ -246,22 +229,13 @@ namespace Gekko
                 {
                     throw new GekkoException(); //this check can be removed at some point
                 }
-
-                if (ts.name != name || !hasFreqIndicator)
-                {
-                    G.Writeln2("*** ERROR: #763209485");  //use AddIVariable(x), remember tilde in x.variableName.
-                    throw new GekkoException();
-                }
-                if (ts.type == ESeriesType.Light)
-                {
-                    G.Writeln2("*** ERROR: #7632090085");
-                    throw new GekkoException();
-                }                           
                 ts.meta.parentDatabank = this;
                 ts.SetDirty(true);
             }
             this.storage.Add(name, x);
         }
+
+        
 
         public void RemoveIVariable(string name)
         {
