@@ -23290,15 +23290,24 @@ namespace Gekko
                 bool[] freqs = new bool[3];                
 
                 AllFreqsHelper allFreqs = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);  //converts between A, Q, M, so all are given. Also used in IMPORT<per1 per2> etc.
-                                
+
                 //containerExplode.Add(null);
 
                 //int counter = -1;
+
+                List<IVariable> errorList = new List<IVariable>();
+
                 foreach (O.PrtContainer c in container)
                 {
                     //counter++;
-                    PrintHelper2(containerExplode, freqs, c, true, false);
-                }                
+                    PrintHelper2(containerExplode, freqs, c, true, false, errorList);
+                }
+
+                if (errorList.Count > 0)
+                {
+                    G.Writeln2("+++ WARNING: Can only print or plot SERIES, VAL, 1x1 MATRIX, or a LIST with the same");
+                    return;
+                }           
 
                 EFreq sameFreq = EFreq.None;
                 if (freqs[0] && !freqs[1] && !freqs[2]) sameFreq = EFreq.Annual;
@@ -24316,7 +24325,7 @@ namespace Gekko
             return 123454321d;
         }
 
-        private static void PrintHelper2(List<O.PrtContainer> containerExplode, bool[] freqs, O.PrtContainer container, bool root, bool isRef)
+        private static void PrintHelper2(List<O.PrtContainer> containerExplode, bool[] freqs, O.PrtContainer container, bool root, bool isRef, List<IVariable> errorList)
         {
             if (container.ivFirst.Type() == EVariableType.Series)
             {
@@ -24342,14 +24351,13 @@ namespace Gekko
                         if (container.ivRef != null) c2.ivRef = ((List)container.ivRef).list[i];
                         c2.label = container.label;
                         c2.printCode = container.printCode;
-                        PrintHelper2(containerExplode, freqs, c2, false, isRef);  //the counter is fixed
+                        PrintHelper2(containerExplode, freqs, c2, false, isRef, errorList);  //the counter is fixed
                     }
                 }
             }
             else
             {
-                G.Writeln2("ERROR: Can only print SERIES, VAL, 1x1 MATRIX, or a LIST with the same");
-                throw new GekkoException();
+                errorList.Add(container.ivFirst);                            
             }
         }
 

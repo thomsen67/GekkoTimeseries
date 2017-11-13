@@ -337,7 +337,30 @@ namespace Gekko
                 {
                     Program.Pause("BETA VERSION -- no guarantees");
                 }
-            }            
+            }
+
+            if (Globals.isAlphaVersion)
+            {
+                G.Writeln();
+                G.Writeln("  +--------------------------------------------+", Color.Red);
+                G.Writeln("  |       This is a not fully tested           |", Color.Red);
+                G.Writeln("  |  ALPHA VERSION of the up-coming Gekko 3.0. |", Color.Red);
+                G.Writeln("  |  Please do not use it for serious purposes |", Color.Red);
+                G.Writeln("  +--------------------------------------------+", Color.Red);
+                G.Writeln();
+                //Program.Pause("This is an untested ALPHA VERSION" + G.NL + "Please do not use it for serious purposes");
+                if (Globals.runningOnTTComputer)
+                {
+                    G.Writeln("ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ", Color.Red);
+                    G.Writeln("ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ", Color.Red);
+                    G.Writeln("ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ALPHA ", Color.Red);                    
+                    G.Writeln();
+                }
+                else
+                {
+                    Program.Pause("ALPHA VERSION -- no guarantees");
+                }
+            }
 
             Program.CreateLocalCopyHelpChm();
             CrossThreadStuff.Zoom();

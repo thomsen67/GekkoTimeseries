@@ -1820,7 +1820,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                 {
-                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))), null, false))) {");  //false is regarding isLeftSide
+                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))), null, false, EVariableType.Var))) {");  //false is regarding isLeftSide
                                 }
 
                                 if (G.Equal(functionNameLower, "sum"))
