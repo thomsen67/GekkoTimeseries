@@ -798,7 +798,7 @@ namespace Gekko
                     else
                     {
                         //SIM mode, can only fetch it in the primary databank (unless bankNumber is active)
-                        if (smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
+                        if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
                         {
                             //at the moment, this logic also includes VALs etc. !!!!!!!!!!!!!!!!!!!! (why not, really?)
                             rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
@@ -1104,9 +1104,6 @@ namespace Gekko
             bool isArraySubSeries = false;
             if (arraySubSeries != null) isArraySubSeries = true;
             
-            IVariable lhs = null;
-            if (ib != null) lhs = ib.GetIVariable(varnameWithFreq); //may return null
-
             if (!G.StartsWithSigil(varnameWithFreq))
             {
                 //VAL v = 100 ---> %v = 100
@@ -1114,6 +1111,9 @@ namespace Gekko
                 if (type == EVariableType.Val || type == EVariableType.String || type == EVariableType.Date) varnameWithFreq = Globals.symbolScalar + varnameWithFreq;
                 else if (type == EVariableType.List || type == EVariableType.Matrix || type == EVariableType.Map) varnameWithFreq = Globals.symbolCollection + varnameWithFreq;
             }
+
+            IVariable lhs = null;
+            if (ib != null) lhs = ib.GetIVariable(varnameWithFreq); //may return null
 
             if (!isArraySubSeries && varnameWithFreq[0] == Globals.symbolScalar)
             {
@@ -3710,8 +3710,7 @@ namespace Gekko
                     break;
                 default: throw new GekkoException();  //should not be possible
             }
-        }
-        
+        }        
 
         public static double ConvertToVal(GekkoTime t, IVariable a)
         {            
@@ -6334,15 +6333,10 @@ namespace Gekko
                             Globals.tableOption = os.s1;
                             break;
                         }
-                    } 
-
-                    string tt1 = "__tabletimestart";
-                    string tt2 = "__tabletimeend";
-
-                    if (Program.scalars.ContainsKey(tt1)) Program.scalars.Remove(tt1);
-                    if (Program.scalars.ContainsKey(tt2)) Program.scalars.Remove(tt2);
-                    Program.scalars.Add(tt1, new ScalarDate(this.t1));
-                    Program.scalars.Add(tt2, new ScalarDate(this.t2));
+                    }
+                    
+                    Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolScalar + "__tabletimestart", new ScalarDate(this.t1));
+                    Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolScalar + "__tabletimeend", new ScalarDate(this.t2));
 
                     string tableFileName = Program.TableHelper(this.fileName, this.menuTable);
 

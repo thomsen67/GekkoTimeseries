@@ -21202,6 +21202,8 @@ namespace Gekko
                         else if (nodeText2.ToLower().StartsWith("series "))
                             nodeText2 = nodeText2.Substring("series ".Length);
 
+                        nodeText2 = nodeText2.Replace("´", "'");
+
                         if (colInfo.Get("type") == "expand")
                         {
                             xh.s.AppendLine("TABLE tab.CurRow.SetValues(%__c" + counter + ", %__t1, %__t2, " + nodeText2 + ", '" + a_vardisplay + "', " + a_varscale + ", '" + a_varformat + "');");
@@ -23273,7 +23275,10 @@ namespace Gekko
             //Globals.globalPeriodTimeFilters2 = new List<GekkoTime> { new GekkoTime(EFreq.Monthly, 2003, 1), new GekkoTime(EFreq.Monthly, 2003, 2) };
             
             string format = "f14.4";
-            string type = "plot";
+
+            string type = "print";
+            if (G.Equal(oPrt.prtType, "plot")) type = "plot";
+            
             //List inputList = x as List;  //will always be a list
             List inputList = null;            
 
