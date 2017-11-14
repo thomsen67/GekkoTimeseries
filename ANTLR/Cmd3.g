@@ -232,6 +232,7 @@ ASTCOMPARE2;
     ASTENDOQUESTION;
     ASTEXIT;
     ASTEXO;
+	ASTBANKVARNAMELIST;
     ASTEXOQUESTION;
     ASTEXPRESSION;
     ASTEXPRESSIONTUPLE;
@@ -1954,7 +1955,7 @@ varname:                    nameOrCname freq? -> ^(ASTVARNAME ^(ASTPLACEHOLDER) 
 
 bankvarname:                bankColon? varname -> ^(ASTBANKVARNAME ^(ASTPLACEHOLDER bankColon?) varname);
 
-bankColon:                  AT GLUE -> ^(ASTNAME REF)            
+bankColon:                  AT GLUE -> ^(ASTNAME ^(ASTIDENT REF))            
 				          | name COLON -> name
 						    ;
 
@@ -2022,6 +2023,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | clone                SEMICOLON!
 						  | close                SEMICOLON!
 						  | cls                  SEMICOLON!
+						  | disp                 SEMICOLON!
 						  | for2
 						  | functionDef          SEMICOLON!
 						  | goto2                SEMICOLON!
@@ -2057,6 +2059,8 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 
 assignment:				    assignmentType leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression ASTPLACEHOLDER assignmentType);
 assignmentType:             SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | -> ASTPLACEHOLDER;  //may be empty
+
+bankvarnameList:            bankvarname (COMMA2 bankvarname)* -> ^(ASTBANKVARNAMELIST bankvarname+);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ACCEPT
@@ -2099,6 +2103,21 @@ close:					    CLOSE closeOpt1? listItems -> ^({token("ASTCLOSE", ASTCLOSE, $CLO
 closeOpt1:				    ISNOTQUAL | leftAngle closeOpt1h* RIGHTANGLE -> ^(ASTOPT1 closeOpt1h*);
 closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)							
 						    ;		
+														
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// DISP
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+disp:						DISP StringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, $DISP.Line)} StringInQuotes)
+						  | DISP dispOpt1? temp -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) temp)
+						    ;
+temp:bankvarnameList|expression;
+dispOpt1:					ISNOTQUAL
+						  | leftAngle2          dispOpt1h* RIGHTANGLE -> ^(ASTOPT1 dispOpt1h*)							
+						  | leftAngleNo2 dates? dispOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) dispOpt1h*)
+                            ;
+dispOpt1h:				    INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // FOR

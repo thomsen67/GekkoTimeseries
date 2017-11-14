@@ -519,7 +519,7 @@ namespace Gekko
             return new GekkoSmpl(Globals.globalPeriodStart, Globals.globalPeriodEnd);
         }
 
-        public static IVariable ListDefHelper(params IVariable[] x)
+        public static List ListDefHelper(params IVariable[] x)
         {
             List<IVariable> m = new List<Gekko.IVariable>();
             foreach (IVariable iv in x)
@@ -791,8 +791,8 @@ namespace Gekko
                             //we only do this for timeseries!
                             rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
                             if (rv == null)
-                            {
-                                G.Writeln2("*** ERROR: Could not find variable '" + varnameWithFreq + "' in databank 'Ref'");
+                            {                                
+                                G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in databank 'Ref'");
                                 throw new GekkoException();
                             }
                         }
@@ -801,7 +801,7 @@ namespace Gekko
                             rv = GetVariableSearch(rv, varnameWithFreq);
                             if (rv == null)
                             {
-                                G.Writeln2("*** ERROR: Could not find variable '" + varnameWithFreq + "' in any open databank (excluding Ref)");
+                                G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in any open databank (excluding Ref)");
                                 throw new GekkoException();
                             }
                         }
@@ -815,7 +815,7 @@ namespace Gekko
                             rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
                             if (rv == null)
                             {
-                                G.Writeln2("*** ERROR: Could not find variable '" + varnameWithFreq + "' in databank 'Ref'");
+                                G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in databank 'Ref'");
                                 throw new GekkoException();
                             }
                         }
@@ -824,7 +824,7 @@ namespace Gekko
                             rv = Program.databanks.GetFirst().GetIVariable(varnameWithFreq);
                             if (rv == null)
                             {
-                                G.Writeln2("*** ERROR: Could not find variable '" + varnameWithFreq + "' in the first-position databank ('" + Program.databanks.GetFirst().aliasName + "')");
+                                G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in the first-position databank ('" + Program.databanks.GetFirst().aliasName + "')");
                                 throw new GekkoException();
                             }
                         }
@@ -841,7 +841,7 @@ namespace Gekko
                         rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
                         if (rv == null)
                         {
-                            G.Writeln2("*** ERROR: Could not find variable '" + varnameWithFreq + "' in databank 'Ref'");
+                            G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in databank 'Ref'");
                             throw new GekkoException();
                         }
                     }
@@ -852,7 +852,7 @@ namespace Gekko
                         rv = LookupHelperRightside2(map, dbName, varnameWithFreq);
                         if (rv == null)
                         {
-                            G.Writeln2("*** ERROR: Could not find variable '" + varnameWithFreq + "' in databank '" + dbName + "'");
+                            G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in databank '" + dbName + "'");
                             throw new GekkoException();
                         }
                     }
@@ -864,12 +864,18 @@ namespace Gekko
                 rv = LookupHelperRightside2(map, dbName, varnameWithFreq);
                 if (rv == null)
                 {
-                    G.Writeln2("*** ERROR: Could not find variable '" + varnameWithFreq + "' in map collection");
+                    G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in map collection");
                     throw new GekkoException();
                 }
             }
             
             return rv;
+        }
+
+        public static List CreateListFromStrings(string[] input)
+        {
+            List m = new List(new List<string>(input));
+            return m;
         }
 
         private static IVariable LookupHelperRightside2(Map map, string dbName, string varnameWithFreq)
@@ -5744,14 +5750,20 @@ namespace Gekko
         {
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
-            public List<string> listItems = null;            
+            //public List<string> listItems = null;
+            public List list = null;          
             public string searchName = null;
             public string opt_info = null;
             public void Exe()
             {
                 if (this.searchName == null)
                 {
-                    Program.Disp(this.t1, this.t2, this.listItems, this);
+                    List<string> m = new List<string>();
+                    foreach (IVariable iv in list.list)
+                    {
+                        m.Add(iv.ConvertToString());
+                    }
+                    Program.Disp(this.t1, this.t2, m, this);
                 }
                 else
                 {

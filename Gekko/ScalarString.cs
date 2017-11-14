@@ -61,8 +61,7 @@ namespace Gekko
 
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < s.Length; i++)
-            {
-                Flag1:
+            {                
                 if (IsLeftCurly(s, i))
                 {
                     //search for matching
@@ -83,7 +82,7 @@ namespace Gekko
                                 IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + ss, null, null, false, EVariableType.Var);
                                 string s2 = a.ConvertToString();
                                 sb.Append(s2);
-                                i = j + 1;  //to jump forwards
+                                i = j;  //to jump forwards
                                 goto Flag1;
 
                             }
@@ -95,6 +94,7 @@ namespace Gekko
                     }
                 }
                 sb.Append(s[i]);
+                Flag1: i = i;
             }
 
             sb.Replace("~'", "'");

@@ -2842,8 +2842,60 @@ namespace Gekko.Parser.Gek
                         }
                         break;
 
+                    case "ASTBANKVARNAMELIST":
+                        {
+                            //In this case, if we override what has been made in subtree (where the items will produce O.Lookup(...)
+                            //Instead, we convert it to a list of strings.
+                            //See the structure under "ASTBANKVARNAME"
+                            string code = "O.CreateListFromStrings(new string[] {";
+                            foreach (ASTNode child in node.ChildrenIterator())
+                            {
+                                bool fail = false;
+                                if (child.Text != "ASTBANKVARNAME") fail = true; //should not be possible
+                                string bankname = null; if (child?[0]?[0]?[0]?.Text != null && child?[0]?[0]?[0]?.Text != "ASTIDENT") fail = true; else bankname = child?[0]?[0]?[0]?[0]?.Text;
+                                string sigil = child?[1]?[0]?[0]?.Text;
+                                if (sigil == "ASTPERCENT") sigil = Globals.symbolScalar.ToString();
+                                else if (sigil == "ASTHASH") sigil = Globals.symbolCollection.ToString();
+                                string varname = null; if (child?[1]?[1]?[0]?[0]?.Text != null && child?[1]?[1]?[0]?[0]?.Text != "ASTIDENT") fail = true; else varname = child?[1]?[1]?[0]?[0]?[0]?.Text;
+                                string freq = null; if (child?[1]?[2]?[0]?[0]?.Text != null && child?[1]?[2]?[0]?[0]?.Text != "ASTIDENT") fail = true; else freq = child?[1]?[2]?[0]?[0]?[0]?.Text;
+                                if (fail)
+                                {
+                                    G.Writeln2("*** ERROR: List item is not a simple name compsed of bankname, varname and frequency");
+                                    G.Writeln2("*** ERROR: Allowed examples: x, b:x, %x, #x, b:%x, b:x!q and similar simple names");
+                                    throw new GekkoException();
+                                }
+                                string name = sigil + varname;
+                                if (freq != null) name = name + Globals.freqIndicator + freq;
+                                if (bankname != null) name = bankname + Globals.symbolBankColon + name;
+                                code += "`" + name + "`, ";
+                            }
+                            code = code.Substring(0, code.Length - ", ".Length);
+                            code += "})";
+                            node.Code.CA(code);  //CA() overrides the Lookup(...) stuff that was made in subnodes
+                        }
+                        break;
                     case "ASTBANKVARNAME":
                         {
+                            //The structure is the following:
+                            // b1:%x!q
+
+                            //       ASTBANKVARNAME (child)
+                            //         ASTPLACEHOLDER
+                            //           ASTNAME
+                            //             ASTIDENT
+                            //               b1                <-- bankname
+                            //         ASTVARNAME
+                            //           ASTPLACEHOLDER
+                            //             ASTPERCENT          <-- %-sigil
+                            //           ASTPLACEHOLDER
+                            //             ASTNAME
+                            //               ASTIDENT
+                            //                 x               <-- varname
+                            //           ASTPLACEHOLDER
+                            //             ASTNAME
+                            //               ASTIDENT
+                            //                 q               <--- freq indicator
+
 
                             Tuple<bool, string> tuple = CheckIfLeftSide(node);  //In x[%s1, %s2][%date] = ... this will only be true for x, not for the other vars
                             bool isLeftSideVariable = tuple.Item1;
@@ -2965,7 +3017,8 @@ namespace Gekko.Parser.Gek
                                 {
                                     //Complicated name, for instance
                                     //{%s}, a%s, a{#m}, {%b}:a, b:a!{%f}, %(%s),  ... 
-
+                                    
+                                    //#746384984 merge these in a method
                                     string nameAndBankCode = null;                                    
                                     if (node[0][0] == null)
                                     {
@@ -2974,8 +3027,10 @@ namespace Gekko.Parser.Gek
                                     }
                                     else
                                     {
-                                        //bank indicator   
-                                        nameAndBankCode = "(" + node[0][0].Code + ")" + ".Add(smpl, O.scalarStringColon)" + ".Add(smpl, " + node[1].Code + ")";                                        
+                                        //bank indicator  
+                                        string bankNameCs = null;
+                                        bankNameCs = node[0][0].Code.ToString();
+                                        nameAndBankCode = "(" + bankNameCs + ")" + ".Add(smpl, O.scalarStringColon)" + ".Add(smpl, " + node[1].Code + ")";                                        
                                     }
 
                                     node.Code.A("O.Lookup(smpl, " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." +  type + ")");
@@ -4116,7 +4171,9 @@ namespace Gekko.Parser.Gek
                         {                            
                             node.Code.A("O.Disp o" + Num(node) + " = new O.Disp();" + G.NL);                            
                             node.Code.A(node[0].Code);  //dates
-                            node.Code.A(node[1].Code);  //list                            
+                                                        
+                            node.Code.A("o" + Num(node) + ".list = " + node[1].Code + ";" + G.NL);
+
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
                         break;

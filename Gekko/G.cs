@@ -306,9 +306,8 @@ namespace Gekko
         // #09832752
         public static string RemoveFreqFromKey(string s)
         {
-            //OBSOLETE: DELETE SOON!!
-            
-            //This will become faster when A freq has %a attached!
+            //OBSOLETE: DELETE SOON many places, keep in DISP etc.
+                        
             int i = s.IndexOf(Globals.freqIndicator);
             if (i == 0)
             {
@@ -317,7 +316,7 @@ namespace Gekko
             }
             else if (i > 0)
             {
-                return s.Substring(0, i);  //for instance, fy%q --> fy
+                return s.Substring(0, i);  //for instance, fy!q --> fy
             }
             return s;  //annual            
         }
@@ -362,6 +361,7 @@ namespace Gekko
             ChopFreq(name, ref freq2, ref name2);
             return name2;
         }
+
         public static void ChopFreq(string input, ref string freq, ref string varName)
         {
             if (input == null) return;
@@ -371,10 +371,15 @@ namespace Gekko
                 G.Writeln2("*** ERROR: More than 1 freq indicators ('!') in '" + input + "'");
                 throw new GekkoException();
             }
-            if (ss2.Length == 2)
+            else if (ss2.Length == 2)
             {
                 varName = ss2[0];
                 freq = ss2[1];
+            }
+            else if (ss2.Length == 1)
+            {
+                varName = input;
+                freq = null;
             }
             return;
         }
@@ -1592,6 +1597,16 @@ namespace Gekko
                 G.Writeln("*** ERROR regarding year");
                 throw new GekkoException();
             }
+        }
+
+        public static string GetNameAndFreqPretty(string input)
+        {
+            //returns '%s' or 'x' or 'x' (Annual)
+            string freq = null; string varname = null;
+            G.ChopFreq(input, ref freq, ref varname);
+            string freqPretty = null;
+            if (freq != null) freqPretty = " (" + G.GetFreqString(GetFreq(freq)) + ")";
+            return "'" + varname + "'" + freqPretty;
         }
 
         public static string GetFreqString()
