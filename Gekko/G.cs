@@ -1026,6 +1026,22 @@ namespace Gekko
             return false;
         }
 
+        //public static bool IsScalarType(string type)
+        //{
+        //    if (G.Equal(type, "val")) return true;
+        //    if (G.Equal(type, "string")) return true;
+        //    if (G.Equal(type, "date")) return true;
+        //    return false;
+        //}
+
+        //public static bool IsCollectionType(string type)
+        //{
+        //    if (G.Equal(type, "list")) return true;
+        //    if (G.Equal(type, "matrix")) return true;
+        //    if (G.Equal(type, "map")) return true;
+        //    return false;
+        //}
+
         //Use together with CheckIVariableName()
         //See also G.AddSigil()
         public static void CheckIVariableNameAndType(IVariable x, G.ESigilType sigilType)
@@ -1130,6 +1146,25 @@ namespace Gekko
             }
 
             return rv;
+        }
+
+        public static EVariableType GetVariableType(string type)
+        {
+            EVariableType etype = EVariableType.Var;
+            if (G.Equal(type, "val")) etype = EVariableType.Val;
+            else if (G.Equal(type, "string")) etype = EVariableType.String;
+            else if (G.Equal(type, "date")) etype = EVariableType.Date;
+            else if (G.Equal(type, "series")) etype = EVariableType.Series;
+            else if (G.Equal(type, "ser")) etype = EVariableType.Series;
+            else if (G.Equal(type, "list")) etype = EVariableType.List;
+            else if (G.Equal(type, "matrix")) etype = EVariableType.Matrix;
+            else if (G.Equal(type, "map")) etype = EVariableType.Map;
+            return etype;
+        }
+
+        public static string AddSigil(string varnameWithFreq, string type)
+        {
+            return G.AddSigil(varnameWithFreq, G.GetVariableType(type));
         }
 
         public static string AddSigil(string varnameWithFreq, EVariableType type)

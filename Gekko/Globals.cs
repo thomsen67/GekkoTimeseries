@@ -158,8 +158,11 @@ namespace Gekko
         //public static string functionT1Cs = "t";
         //public static string functionT2Cs = "GekkoTime t";
         
-        public static string functionT1Cs = "smpl, p";
-        public static string functionT2Cs = "GekkoTime smpl, P p";
+        public static string functionTP1Cs = "smpl, p";
+        public static string functionTP2Cs = "GekkoTime smpl, P p";
+
+        public static string functionT1Cs = "smpl";
+        public static string functionT2Cs = "GekkoTime smpl";
 
         public static string functionP1Cs = "p";
         public static string functionP2Cs = "P p";

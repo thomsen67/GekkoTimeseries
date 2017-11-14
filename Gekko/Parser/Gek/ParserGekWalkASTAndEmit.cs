@@ -335,8 +335,10 @@ namespace Gekko.Parser.Gek
                             string s = null;
                             if (sigil == "ASTPERCENT") s += Globals.symbolScalar;
                             else if (sigil == "ASTHASH") s += Globals.symbolCollection;
-
+                            
                             s += name;
+
+                            s = G.AddSigil(s, type);  //see also #980753275
 
                             if (node.functionDefAnchor == null) node.functionDefAnchor = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                             if (node.functionDefAnchor.ContainsKey(s))
@@ -1658,7 +1660,7 @@ namespace Gekko.Parser.Gek
                             }
 
                             string method = Globals.splitSTOP;
-                            method += "public static " + lhsClassNameCode + " " + w.uFunctionsHelper.functionName.ToLower() + "(" + Globals.functionP2Cs + ", " + Globals.functionT2Cs + ", ";
+                            method += "public static " + lhsClassNameCode + " " + w.uFunctionsHelper.functionName.ToLower() + "(" + Globals.functionP2Cs + ", " + Globals.functionTP2Cs + ", ";
 
                             for (int i = 0; i < w.uFunctionsHelper.storage.Count; i++)
                             {
@@ -1925,7 +1927,7 @@ namespace Gekko.Parser.Gek
                                         args += ", " + node[i].Code;
                                     }
                                     int numberOfArguments = node.ChildrenCount() - 1;
-                                    node.Code.A("O.FunctionLookup").A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionT1Cs + "").A(args).A(")");
+                                    node.Code.A("O.FunctionLookup").A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(args).A(")");
                                 }
 
                             }                        
@@ -3687,7 +3689,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".prtElements.Add(ope" + Num(node) + ");" + G.NL);                            
                             node.Code.A("}" + G.NL);  //avoid scope collisions
 
-                            node.Code.A(Globals.GekkoSmplNull);
+                            //node.Code.A(Globals.GekkoSmplNull);
                             
                         }
                         break;
@@ -4581,11 +4583,15 @@ namespace Gekko.Parser.Gek
                     else if (node[0][i][1][0][0][0].Text == "ASTHASH") varname = Globals.symbolCollection + varname;
                     else throw new GekkoException();
                 }
-                if (!varname.StartsWith(Globals.symbolScalar.ToString()))
+
+                if (varname.StartsWith(Globals.symbolCollection.ToString()))
                 {
-                    G.Writeln2("*** ERROR: Only scalar variables (%) allowed as FOR loop variablse");
+                    G.Writeln2("*** ERROR: At present, only scalar variables (%) are allowed as FOR loop variablse");
                     throw new GekkoException();
                 }
+
+                varname = G.AddSigil(varname, EVariableType.Val);  //will add % to VAL/STRING/DATE if missing.
+                                
                 rv.Add(varname);
             }
             return rv;

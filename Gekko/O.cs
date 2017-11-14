@@ -464,6 +464,13 @@ namespace Gekko
                     throw new GekkoException();
                 }
                 List start_list = start as List;
+
+                if (start_list == null)
+                {
+                    G.Writeln2("*** ERROR: Expected FOR to loop over list, not a " + G.GetTypeString(start) + " type");
+                    throw new GekkoException();
+                }               
+
                 if (counter <= start_list.list.Count) rv = true;
 
             }
@@ -783,6 +790,11 @@ namespace Gekko
                         {
                             //we only do this for timeseries!
                             rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
+                            if (rv == null)
+                            {
+                                G.Writeln2("*** ERROR: Could not find variable '" + varnameWithFreq + "' in databank 'Ref'");
+                                throw new GekkoException();
+                            }
                         }
                         else
                         {
@@ -801,10 +813,20 @@ namespace Gekko
                         {
                             //at the moment, this logic also includes VALs etc. !!!!!!!!!!!!!!!!!!!! (why not, really?)
                             rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
+                            if (rv == null)
+                            {
+                                G.Writeln2("*** ERROR: Could not find variable '" + varnameWithFreq + "' in databank 'Ref'");
+                                throw new GekkoException();
+                            }
                         }
                         else
                         {
                             rv = Program.databanks.GetFirst().GetIVariable(varnameWithFreq);
+                            if (rv == null)
+                            {
+                                G.Writeln2("*** ERROR: Could not find variable '" + varnameWithFreq + "' in the first-position databank ('" + Program.databanks.GetFirst().aliasName + "')");
+                                throw new GekkoException();
+                            }
                         }
                     }
                 }
@@ -817,12 +839,22 @@ namespace Gekko
                     {
                         //only for series type
                         rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
+                        if (rv == null)
+                        {
+                            G.Writeln2("*** ERROR: Could not find variable '" + varnameWithFreq + "' in databank 'Ref'");
+                            throw new GekkoException();
+                        }
                     }
                     else
                     {
                         //databank name is given explicitly, and we are not doing bankNumber stuff
-                        //We use the IBank interface here
+                        //We use the IBank interface here (map==null)
                         rv = LookupHelperRightside2(map, dbName, varnameWithFreq);
+                        if (rv == null)
+                        {
+                            G.Writeln2("*** ERROR: Could not find variable '" + varnameWithFreq + "' in databank '" + dbName + "'");
+                            throw new GekkoException();
+                        }
                     }
                 }
             }
@@ -830,6 +862,11 @@ namespace Gekko
             {
                 //We use the IBank interface here
                 rv = LookupHelperRightside2(map, dbName, varnameWithFreq);
+                if (rv == null)
+                {
+                    G.Writeln2("*** ERROR: Could not find variable '" + varnameWithFreq + "' in map collection");
+                    throw new GekkoException();
+                }
             }
             
             return rv;
@@ -5171,9 +5208,10 @@ namespace Gekko
                 {
                     string varname = name.ConvertToString();
 
+                    varname = G.AddSigil(varname, this.type);  //see also #980753275
+
                     if (G.Equal(type, "val"))
-                    {
-                        if (!G.StartsWithSigil(varname)) varname = Globals.symbolScalar + varname;
+                    {                        
                         try
                         {
                             double v = double.Parse(value.Trim());                            
@@ -5187,8 +5225,7 @@ namespace Gekko
                         }                        
                     }
                     else if (G.Equal(type, "string"))
-                    {
-                        if (!G.StartsWithSigil(varname)) varname = Globals.symbolScalar + varname;
+                    {                        
                         try
                         {
                             string v = value.Trim();
@@ -5203,8 +5240,7 @@ namespace Gekko
                         }
                     }                    
                     else if (G.Equal(type, "date"))
-                    {
-                        if (!G.StartsWithSigil(varname)) varname = Globals.symbolScalar + varname;
+                    {                        
                         try
                         {
                             GekkoTime gt = G.FromStringToDate(value.Trim());
