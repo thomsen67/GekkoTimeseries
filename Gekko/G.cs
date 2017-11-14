@@ -1027,6 +1027,7 @@ namespace Gekko
         }
 
         //Use together with CheckIVariableName()
+        //See also G.AddSigil()
         public static void CheckIVariableNameAndType(IVariable x, G.ESigilType sigilType)
         {
             //Fortunately these checks are only when putting things in, and injecting will avoid it
@@ -1060,6 +1061,7 @@ namespace Gekko
         }
 
         //Use together with CheckIVariableNameAndType()
+        //See also G.AddSigil()
         public static ESigilType CheckIVariableName(string name)
         {
             //Fortunately these checks are only when putting things in, and injecting will avoid it
@@ -1130,28 +1132,22 @@ namespace Gekko
             return rv;
         }
 
-
-        public static string AddScalarSigil(string s)
+        public static string AddSigil(string varnameWithFreq, EVariableType type)
         {
-            if (s == null) return s;
-            if (s.Length == 0) return s;
-            string rv = null;
-            if (s[0] == Globals.symbolScalar)
+            //just adds a % or # if it is not there, depending on type
+            //no other checks are performed, so the adding is quite simple. A more rigorous name check
+            //is performed when variables are added to a databank or map.
+            //See G.CheckIVariableNameAndType() and G.CheckIVariableName()
+            //
+            if (!G.StartsWithSigil(varnameWithFreq))
             {
-                rv = s.Substring(1);
+                //VAL v = 100 ---> %v = 100
+                //LIST m = ('a', 'b') --> #m = ('a', 'b') 
+                if (type == EVariableType.Val || type == EVariableType.String || type == EVariableType.Date) varnameWithFreq = Globals.symbolScalar + varnameWithFreq;
+                else if (type == EVariableType.List || type == EVariableType.Matrix || type == EVariableType.Map) varnameWithFreq = Globals.symbolCollection + varnameWithFreq;
             }
-            else if (s[0] == Globals.symbolCollection)
-            {
-                G.Writeln2("*** ERROR: Name cannot start with " + Globals.symbolLeftCurly);
-                throw new GekkoException();
-            }
-            if (!G.IsIdent(rv))
-            {
-                G.Writeln2("*** ERROR: Name contains illegal characters");
-                throw new GekkoException();
-            }
-            return Globals.symbolScalar + rv;
-        }
+            return varnameWithFreq;
+        }        
 
         public static bool IsLetterOrUnderscore(char c)
         {

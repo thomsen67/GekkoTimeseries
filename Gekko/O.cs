@@ -644,7 +644,6 @@ namespace Gekko
                 string dbName, varName, freq; char firstChar; Chop((x as ScalarString)._string2, out dbName, out varName, out freq);                
                 IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable, type);
                 return iv;
-
             }
             else if (x.Type() == EVariableType.List)
             {
@@ -1100,17 +1099,11 @@ namespace Gekko
         {
             //This is an assignment, for instance %x = 5, or x = (1, 2, 3), or bank:x = bank:y
             //Assignment is the hardest part of Lookup()
-            
+
             bool isArraySubSeries = false;
             if (arraySubSeries != null) isArraySubSeries = true;
-            
-            if (!G.StartsWithSigil(varnameWithFreq))
-            {
-                //VAL v = 100 ---> %v = 100
-                //LIST m = ('a', 'b') --> #m = ('a', 'b') 
-                if (type == EVariableType.Val || type == EVariableType.String || type == EVariableType.Date) varnameWithFreq = Globals.symbolScalar + varnameWithFreq;
-                else if (type == EVariableType.List || type == EVariableType.Matrix || type == EVariableType.Map) varnameWithFreq = Globals.symbolCollection + varnameWithFreq;
-            }
+
+            varnameWithFreq = G.AddSigil(varnameWithFreq, type);
 
             IVariable lhs = null;
             if (ib != null) lhs = ib.GetIVariable(varnameWithFreq); //may return null
@@ -1140,10 +1133,10 @@ namespace Gekko
                                         //---------------------------------------------------------
                                         // %x = Series Light
                                         //---------------------------------------------------------
-                                        
-                                            G.Writeln2("*** ERROR: Type mismatch");
-                                            throw new GekkoException();
-                                        
+
+                                        G.Writeln2("*** ERROR: Type mismatch");
+                                        throw new GekkoException();
+
                                     }
                                     break;
                                 case ESeriesType.Timeless:
@@ -1161,12 +1154,12 @@ namespace Gekko
                                         // %x = Series Array Super
                                         //---------------------------------------------------------
 
-                                        
-                                            G.Writeln2("*** ERROR: Type mismatch");
-                                            throw new GekkoException();
-                                        
+
+                                        G.Writeln2("*** ERROR: Type mismatch");
+                                        throw new GekkoException();
+
                                     }
-                                    break;                                
+                                    break;
                                 default:
                                     {
                                         G.Writeln2("*** ERROR: Expected SERIES to be 1 of 4 types");
@@ -1209,10 +1202,10 @@ namespace Gekko
                             //---------------------------------------------------------
                             // %x = LIST
                             //---------------------------------------------------------
-                            
-                                G.Writeln2("*** ERROR: Type mismatch");
-                                throw new GekkoException();
-                            
+
+                            G.Writeln2("*** ERROR: Type mismatch");
+                            throw new GekkoException();
+
                         }
                         break;
                     case EVariableType.Map:
@@ -1220,10 +1213,10 @@ namespace Gekko
                             //---------------------------------------------------------
                             // %x = MAP
                             //---------------------------------------------------------
-                            
-                                G.Writeln2("*** ERROR: Type mismatch");
-                                throw new GekkoException();
-                            
+
+                            G.Writeln2("*** ERROR: Type mismatch");
+                            throw new GekkoException();
+
                         }
                         break;
                     case EVariableType.Matrix:
@@ -1304,10 +1297,10 @@ namespace Gekko
                                         Matrix m = new Matrix(1, n);
                                         int ii1 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t1);
                                         int ii2 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t2);
-                                        
+
                                         int tooSmall = 0; int tooLarge = 0;
                                         rhs_series.TooSmallOrTooLarge(ii1, ii2, out tooSmall, out tooLarge);
-                                        if(tooSmall>0 || tooLarge>0)
+                                        if (tooSmall > 0 || tooLarge > 0)
                                         {
                                             if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
                                             return;
@@ -1343,7 +1336,7 @@ namespace Gekko
                                             throw new GekkoException();
                                         }
                                     }
-                                    break;                                
+                                    break;
                                 default:
                                     {
                                         G.Writeln2("*** ERROR: Expected SERIES to be 1 of 4 types");
@@ -1420,8 +1413,8 @@ namespace Gekko
             {
                 //name is of Series type, can have !isArraySubSeries == true.    
 
-                Series lhs_series = null;                
-                if (isArraySubSeries) lhs_series = arraySubSeries;                    
+                Series lhs_series = null;
+                if (isArraySubSeries) lhs_series = arraySubSeries;
                 else lhs_series = lhs as Series;
 
                 switch (rhs.Type())
@@ -1482,7 +1475,7 @@ namespace Gekko
                                         //---------------------------------------------------------
                                         // x = Series Normal or Light
                                         //---------------------------------------------------------
-                                                                                
+
                                         GekkoTime tt1 = GekkoTime.tNull;
                                         GekkoTime tt2 = GekkoTime.tNull;
                                         GekkoTime.ConvertFreqs(G.GetFreq(freq, true), smpl.t1, smpl.t2, ref tt1, ref tt2);  //converts smpl.t1 and smpl.t2 to tt1 and tt2 in freq frequency
@@ -1501,9 +1494,9 @@ namespace Gekko
                                             rhs_series.TooSmallOrTooLarge(rhs_series.GetArrayIndex(tt1), rhs_series.GetArrayIndex(tt2), out tooSmall, out tooLarge);
                                             if (tooSmall > 0 || tooLarge > 0)
                                             {
-                                                if(smpl.gekkoError==null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
+                                                if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
                                                 return;
-                                            }                                            
+                                            }
                                         }
 
                                         int index1, index2;
@@ -1527,7 +1520,7 @@ namespace Gekko
                                         {
                                             lhs_series.SetData(t, d);
                                         }
-                                        if (create) AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);                                        
+                                        if (create) AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
                                     }
                                     break;
                                 case ESeriesType.ArraySuper:
@@ -1544,7 +1537,7 @@ namespace Gekko
                                         ((Series)clone).name = varnameWithFreq;
                                         AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, clone);
                                     }
-                                    break;                                
+                                    break;
                                 default:
                                     {
                                         G.Writeln2("*** ERROR: Expected SERIES to be 1 of 4 types");
@@ -1652,12 +1645,12 @@ namespace Gekko
                             if (rhs_matrix.data.Length == 1)
                             {
                                 double d = rhs.ConvertToVal();  //will fail with error if not 1x1                            
-                                
+
                                 foreach (GekkoTime t in smpl.Iterate12())
                                 {
                                     lhs_series.SetData(t, d);
                                 }
-                                
+
                             }
                             else
                             {
@@ -1667,10 +1660,10 @@ namespace Gekko
                                     G.Writeln2("*** ERROR: Expected " + n + " list items, got " + lhs_series.data.dataArray.GetLength(0));
                                     throw new GekkoException();
                                 }
-                                for (int i = 0;i < lhs_series.data.dataArray.GetLength(0);i++)
+                                for (int i = 0; i < lhs_series.data.dataArray.GetLength(0); i++)
                                 {
                                     lhs_series.SetData(smpl.t1.Add(i), rhs_matrix.data[i, 0]);
-                                }                            
+                                }
 
                             }
                             if (create)
@@ -1695,7 +1688,7 @@ namespace Gekko
 
             return;
 
-        }
+        }        
 
         private static bool CreateSeriesIfNotExisting(string varnameWithFreq, string freq, ref Series lhs_series)
         {            

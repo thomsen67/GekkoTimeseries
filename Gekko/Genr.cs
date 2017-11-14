@@ -6,66 +6,113 @@ using System.Drawing;
 using Gekko.Parser;
 namespace Gekko
 {
-    public class TranslatedCode
-    {
-        public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
-        public static readonly ScalarVal i80 = new ScalarVal(1d);
-        public static readonly ScalarVal i81 = new ScalarVal(2d);
-        public static readonly ScalarVal d82 = new ScalarVal(1.0d);
-        public static void ClearTS(P p)
-        {
-        }
-        public static void ClearScalar(P p)
-        {
-        }
-
-        public static void CodeLines(P p)
-        {
-            GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl);
-
-            //[[splitSTART]]
-            p.SetText(@"¤1"); O.InitSmpl(smpl);
-            O.Table.SetValues o0 = new O.Table.SetValues();
-            o0.name = O.ConvertToString((new ScalarString("tab", true, false)));
-            o0.col = O.ConvertToInt(O.Lookup(smpl, null, null, "%__c2", null, null, false, EVariableType.Var));
-            o0.t1 = O.ConvertToDate(O.Lookup(smpl, null, null, "%__t1", null, null, false, EVariableType.Var), O.GetDateChoices.Strict);
-            o0.t2 = O.ConvertToDate(O.Lookup(smpl, null, null, "%__t2", null, null, false, EVariableType.Var), O.GetDateChoices.Strict);
-            o0.printcode = O.ConvertToString(new ScalarString(ScalarString.SubstituteScalarsInString(@"n", true, false)));
-            o0.scale = O.ConvertToVal(d82);
-            o0.format = O.ConvertToString(new ScalarString(ScalarString.SubstituteScalarsInString(@"f15.2", true, false)));
-            try
-            {
-                O.isTableCall = true;
-                {
-                    List<int> bankNumbers = O.Prt.CreateBankHelper(1);
-                    O.Prt.Element ope0 = new O.Prt.Element();
-                    ope0.label = O.SubstituteScalarsAndLists("", false);
-                    smpl = new GekkoSmpl(o0.t1.Add(-2), o0.t2);
-                    bankNumbers = O.Prt.GetBankNumbers(Globals.tableOption, new List<string>() { o0.printcode });
-                    foreach (int bankNumber in bankNumbers)
-                    {
-                        ope0.subElements = new List<O.Prt.SubElement>();
-                        ope0.subElements.Add(new O.Prt.SubElement());
-                        ope0.subElements[0].tsWork = O.Multiply(smpl, O.Indexer(O.Indexer2(smpl, O.Negate(smpl, i80)
-                        ), smpl, O.Indexer(O.Indexer2(smpl, new ScalarString(ScalarString.SubstituteScalarsInString(@"a", true, false))
-                        ), smpl, O.Lookup(smpl, null, null, "x", null, null, false, EVariableType.Var), new ScalarString(ScalarString.SubstituteScalarsInString(@"a", true, false))
-                        ), O.Negate(smpl, i80)
-                        ), i81);
-                    }
-                    o0.prtElements.Add(ope0);
-                }
-                smpl = null;
-            }
-            finally
-            {
-                O.isTableCall = false;
-            }
-            o0.Exe();
+public class TranslatedCode
+{
+public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
+public static void FunctionDef2() {
 
 
-            //[[splitSTOP]]
+//[[splitSTOP]]
+
+O.PrepareUfunction(1, "gamy");
+
+Globals.ufunctions1.Add("gamy", (GekkoSmpl smpl, IVariable functionarg_1) => { p.SetText(@"¤8"); O.InitSmpl(smpl);
+O.Sys o1 = new O.Sys();
+o1.s = O.Add(smpl, O.Add(smpl, O.Lookup(smpl, null, null, "%gamY", null, null, false, EVariableType.Var), new ScalarString(ScalarString.SubstituteScalarsInString(@" ", true, false))), O.Lookup(smpl, null, null, "%parameters", null, null, false, EVariableType.Var));
+o1.Exe();
+
+p.SetText(@"¤9"); O.InitSmpl(smpl);
+
+//[[splitSTOP]]
+return O.Add(smpl, new ScalarString(ScalarString.SubstituteScalarsInString(@"gamY finished running ", true, false)), O.Lookup(smpl, null, null, "%parameters", null, null, false, EVariableType.Var));
+
+//[[splitSTART]]
+
+ ; return null; });
 
 
-        }
-    }
+//[[splitSTART]]
+
+}
+
+public static void FunctionDef8() {
+
+
+//[[splitSTOP]]
+
+O.PrepareUfunction(2, "simx");
+
+Globals.ufunctions2.Add("simx", (GekkoSmpl smpl, IVariable functionarg_3, IVariable functionarg_4) => { p.SetText(@"¤0"); O.InitSmpl(smpl);
+IVariable ivTmpvar5 = O.IvConvertTo(EVariableType.String, new ScalarString(ScalarString.SubstituteScalarsInString(@"gamY\dist\gamY\gamY.exe", true, false)));
+O.Lookup(smpl, null, null, "gamY", null, ivTmpvar5, true, EVariableType.String)
+;
+
+p.SetText(@"¤14"); O.InitSmpl(smpl);
+O.Write o5 = new O.Write();
+
+o5.opt_gdx = "yes";
+
+o5.fileName = O.ConvertToString((new ScalarString("calibration", true, false)).Add(smpl, new ScalarString("\\")).Add(smpl, (new ScalarString("gdx", true, false))).Add(smpl, new ScalarString("\\")).Add(smpl, (new ScalarString("simRAW", true, false))));
+
+o5.listItems = new List<string>();
+
+
+o5.type = @"Export";o5.Exe();
+
+p.SetText(@"¤0"); O.InitSmpl(smpl);
+IVariable ivTmpvar6 = O.IvConvertTo(EVariableType.String, O.Lookup(smpl, null, null, "%endogenize", null, null, false, EVariableType.Var));
+O.Lookup(smpl, null, null, "endoNY", null, ivTmpvar6, true, EVariableType.String)
+;
+
+p.SetText(@"¤0"); O.InitSmpl(smpl);
+IVariable ivTmpvar7 = O.IvConvertTo(EVariableType.String, O.Lookup(smpl, null, null, "%var1", null, null, false, EVariableType.Var));
+O.Lookup(smpl, null, null, "varNY", null, ivTmpvar7, true, EVariableType.String)
+;
+
+p.SetText(@"¤17"); O.InitSmpl(smpl);
+Program.Tell(O.ConvertToString(O.FunctionLookup1("gamy")(smpl, new ScalarString(ScalarString.SubstituteScalarsInString(@"Calibration\sim.gms r=Saved\calib_gaps --var1=%varny --announce=2019 --endo1=%endoNY", true, false)))), false);
+p.SetText(@"¤18"); O.InitSmpl(smpl);
+O.Run o9 = new O.Run();
+o9.fileName = O.ConvertToString((new ScalarString("sim_import", true, false)));
+o9.p = p;
+o9.Exe();
+
+p.SetText(@"¤19"); O.InitSmpl(smpl);
+
+//[[splitSTOP]]
+return new ScalarString(ScalarString.SubstituteScalarsInString(@"", true, false));
+
+//[[splitSTART]]
+
+ ; return null; });
+
+
+//[[splitSTART]]
+
+}
+
+public static void ClearTS(P p) {
+}
+public static void ClearScalar(P p) {
+}
+
+public static void CodeLines(P p)
+{
+GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl);
+
+//[[splitSTART]]
+p.SetText(@"¤7"); O.InitSmpl(smpl);
+FunctionDef2();
+
+
+p.SetText(@"¤12"); O.InitSmpl(smpl);
+FunctionDef8();
+
+
+
+//[[splitSTOP]]
+
+
+}
+}
 }

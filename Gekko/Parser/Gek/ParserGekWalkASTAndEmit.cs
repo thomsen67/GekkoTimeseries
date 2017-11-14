@@ -329,9 +329,9 @@ namespace Gekko.Parser.Gek
                         foreach (ASTNode child in node[2].ChildrenIterator())
                         {
                             string type = child[0].Text;
-                            string sigil = child[1][0][0].Text;
+                            string sigil = null;
+                            if (child[1][0][0] != null) sigil = child[1][0][0].Text;
                             string name = child[1][1][0].Text;
-
                             string s = null;
                             if (sigil == "ASTPERCENT") s += Globals.symbolScalar;
                             else if (sigil == "ASTHASH") s += Globals.symbolCollection;
@@ -1162,12 +1162,12 @@ namespace Gekko.Parser.Gek
                             GetCodeFromAllChildren(node);
                         }
                         break;
-                    case "ASTFUNCTIONDEFCODE":
-                        {
-                            GetCodeFromAllChildren(node);
-                            //AddSplitMarkers(node);                        
-                        }
-                        break;
+                    //case "ASTFUNCTIONDEFCODE":
+                    //    {
+                    //        GetCodeFromAllChildren(node);
+                    //        //AddSplitMarkers(node);                        
+                    //    }
+                    //    break;
 
                     // ================= INDENTATION CODE START ==================
                     // ================= INDENTATION CODE START ==================
