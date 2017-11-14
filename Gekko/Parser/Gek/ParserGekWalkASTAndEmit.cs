@@ -729,7 +729,7 @@ namespace Gekko.Parser.Gek
                     case "ASTOLS":
                         {
                             node.Code.A("O.Ols o" + Num(node) + " = new O.Ols();" + G.NL);
-                            ImportCodeFromAllChildren(node, node[0]);
+                            GetCodeFromAllChildren(node, node[0]);
                             if(!node[1].Code.IsNull()) node.Code.A("o" + Num(node) + ".name = " + node[1].Code).End();
                             if (!node[2].Code.IsNull()) node.Code.A("o" + Num(node) + ".impose = " + node[2].Code).End();
                             node.Code.A("o" + Num(node) + ".lhs = " + node[3].Code).End();
@@ -1558,14 +1558,12 @@ namespace Gekko.Parser.Gek
                             node.Code.A(Globals.splitSTOP);
                             node.Code.A("if(O.IsTrue(smpl, " + node[0].Code + ")) {");
                             node.Code.A(Globals.splitSTART);
-                            GetCodeFromAllChildren(node[1]);
-                            node.Code.A(node[1].Code);
+                            GetCodeFromAllChildren(node, node[1][0]);                            
                             node.Code.A(Globals.splitSTOP);
                             node.Code.A("}");
                             node.Code.A("else {");
                             node.Code.A(Globals.splitSTART);
-                            GetCodeFromAllChildren(node[2]);
-                            node.Code.A(node[2].Code);
+                            GetCodeFromAllChildren(node, node[2][0]);
                             node.Code.A(Globals.splitSTOP);
                             node.Code.A("}");
                             node.Code.A(Globals.splitSTART);
@@ -1602,7 +1600,7 @@ namespace Gekko.Parser.Gek
                             w.headerCs.AppendLine("public static void " + internalName + "() {" + G.NL);
                             w.headerCs.AppendLine(Globals.splitSTOP);
                             w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfArguments + ", `" + functionNameLower + "`);" + G.NL);
-                            w.headerCs.AppendLine("Globals.ufunctions" + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl smpl" + vars + ") => { " + node[3].Code.ToString() + " ; return null; });" + G.NL);
+                            w.headerCs.AppendLine("Globals.ufunctions" + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl smpl, P p" + vars + ") => { " + node[3].Code.ToString() + " ; return null; });" + G.NL);
                             w.headerCs.AppendLine(Globals.splitSTART);
                             w.headerCs.AppendLine("}" + G.NL);
 
@@ -2896,9 +2894,16 @@ namespace Gekko.Parser.Gek
                                 else
                                 {
                                     //#746384984 merge these in a method
-                                    if (node[0][0].Text == "ASTNAME" && node[0][0].ChildrenCount() == 1 && node[0][0][0].Text == "ASTIDENT")
+                                    if (node[0][0].Text == "ASTNAME" && node[0][0].ChildrenCount() == 1)
                                     {
-                                        simpleBank = node[0][0][0][0].Text;
+                                        if (node[0][0][0].Text == "ASTIDENT")
+                                        {
+                                            simpleBank = node[0][0][0][0].Text;
+                                        }
+                                        else if(node[0][0][0].Text == "REF")
+                                        {
+                                            simpleBank = "Ref";
+                                        }
                                     }
                                 }
 
@@ -5310,8 +5315,9 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        private static void ImportCodeFromAllChildren(ASTNode receiver, ASTNode node)
+        private static void GetCodeFromAllChildren(ASTNode receiver, ASTNode node)
         {
+            if (node == null) return;
             foreach (ASTNode child in node.ChildrenIterator())
             {
                 receiver.Code.A(child.Code + G.NL);

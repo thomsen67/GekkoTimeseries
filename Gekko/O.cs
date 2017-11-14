@@ -841,6 +841,11 @@ namespace Gekko
             IBank ib = null;
             if (map != null) ib = map;
             else ib = GetDatabankNoSearch(dbName);
+            if (ib == null)
+            {
+                G.Writeln2("*** ERROR: Databank '" + dbName + "' does not seem to be open.");
+                throw new GekkoException();
+            }
             rv = ib.GetIVariable(varnameWithFreq);
             if (rv == null)
             {
@@ -3069,10 +3074,10 @@ namespace Gekko
         // USER FUNCTION STUFF START
         // USER FUNCTION STUFF START
 
-        public static Func<GekkoSmpl, IVariable> FunctionLookup0(string name)
+        public static Func<GekkoSmpl, P, IVariable> FunctionLookup0(string name)
         {
             //NOTE: the number of args is hardcoded two places below
-            Func<GekkoSmpl, IVariable> rv = null;
+            Func<GekkoSmpl, P, IVariable> rv = null;
             Globals.ufunctions0.TryGetValue(name, out rv);
             if (rv == null)
             {
@@ -3082,10 +3087,10 @@ namespace Gekko
             return rv;
         }
 
-        public static Func<GekkoSmpl, IVariable, IVariable> FunctionLookup1(string name)
+        public static Func<GekkoSmpl, P, IVariable, IVariable> FunctionLookup1(string name)
         {
             //NOTE: the number of args is hardcoded two places below
-            Func<GekkoSmpl, IVariable, IVariable> rv = null;
+            Func<GekkoSmpl, P, IVariable, IVariable> rv = null;
             Globals.ufunctions1.TryGetValue(name, out rv);
             if (rv == null)
             {
@@ -3095,10 +3100,10 @@ namespace Gekko
             return rv;
         }
 
-        public static Func<GekkoSmpl, IVariable, IVariable, IVariable> FunctionLookup2(string name)
+        public static Func<GekkoSmpl, P, IVariable, IVariable, IVariable> FunctionLookup2(string name)
         {
             //NOTE: the number of args is hardcoded two places below
-            Func<GekkoSmpl, IVariable, IVariable, IVariable> rv = null;
+            Func<GekkoSmpl, P, IVariable, IVariable, IVariable> rv = null;
             Globals.ufunctions2.TryGetValue(name, out rv);
             if (rv == null)
             {
@@ -3108,10 +3113,10 @@ namespace Gekko
             return rv;
         }
 
-        public static Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable> FunctionLookup3(string name)
+        public static Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable> FunctionLookup3(string name)
         {
             //NOTE: the number of args is hardcoded two places below
-            Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable> rv = null;
             Globals.ufunctions3.TryGetValue(name, out rv);
             if (rv == null)
             {
@@ -3121,10 +3126,10 @@ namespace Gekko
             return rv;
         }
 
-        public static Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup4(string name)
+        public static Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup4(string name)
         {
             //NOTE: the number of args is hardcoded two places below
-            Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
             Globals.ufunctions4.TryGetValue(name, out rv);
             if (rv == null)
             {
@@ -3134,10 +3139,10 @@ namespace Gekko
             return rv;
         }
 
-        public static Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup5(string name)
+        public static Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup5(string name)
         {
             //NOTE: the number of args is hardcoded two places below
-            Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
             Globals.ufunctions5.TryGetValue(name, out rv);
             if (rv == null)
             {
@@ -3147,10 +3152,10 @@ namespace Gekko
             return rv;
         }
 
-        public static Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup6(string name)
+        public static Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup6(string name)
         {
             //NOTE: the number of args is hardcoded two places below
-            Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
             Globals.ufunctions6.TryGetValue(name, out rv);
             if (rv == null)
             {
@@ -3160,10 +3165,10 @@ namespace Gekko
             return rv;
         }
 
-        public static Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup7(string name)
+        public static Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup7(string name)
         {
             //NOTE: the number of args is hardcoded two places below
-            Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
             Globals.ufunctions7.TryGetValue(name, out rv);
             if (rv == null)
             {
@@ -3173,10 +3178,10 @@ namespace Gekko
             return rv;
         }
 
-        public static Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup8(string name)
+        public static Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup8(string name)
         {
             //NOTE: the number of args is hardcoded two places below
-            Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
             Globals.ufunctions8.TryGetValue(name, out rv);
             if (rv == null)
             {
@@ -3186,10 +3191,10 @@ namespace Gekko
             return rv;
         }
 
-        public static Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup9(string name)
+        public static Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup9(string name)
         {
             //NOTE: the number of args is hardcoded two places below
-            Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
             Globals.ufunctions9.TryGetValue(name, out rv);
             if (rv == null)
             {
@@ -3199,10 +3204,10 @@ namespace Gekko
             return rv;
         }
 
-        public static Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup10(string name)
+        public static Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup10(string name)
         {
             //NOTE: the number of args is hardcoded two places below
-            Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
             Globals.ufunctions10.TryGetValue(name, out rv);
             if (rv == null)
             {

@@ -82,17 +82,17 @@ namespace Gekko
         public static Func<double, double>[] arithmentics1 = new Func<double, double>[10];
 
         //User functions: more can be added if necessary, or users can use LIST or DICT.
-        public static Dictionary<string, Func<GekkoSmpl, IVariable>> ufunctions0 = new Dictionary<string, Func<GekkoSmpl, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable>> ufunctions1 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable>> ufunctions2 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable>> ufunctions3 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions4 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions5 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions6 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions7 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions8 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions9 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions10 = new Dictionary<string, Func<GekkoSmpl, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, IVariable>> ufunctions0 = new Dictionary<string, Func<GekkoSmpl, P, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable>> ufunctions1 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable>> ufunctions2 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable>> ufunctions3 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions4 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions5 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions6 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions7 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions8 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions9 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions10 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
 
         public static string databankformatUrl = @"www.t-t.dk/gekko/databankformat";
 
@@ -158,8 +158,8 @@ namespace Gekko
         //public static string functionT1Cs = "t";
         //public static string functionT2Cs = "GekkoTime t";
         
-        public static string functionT1Cs = "smpl";
-        public static string functionT2Cs = "GekkoTime smpl";
+        public static string functionT1Cs = "smpl, p";
+        public static string functionT2Cs = "GekkoTime smpl, P p";
 
         public static string functionP1Cs = "p";
         public static string functionP2Cs = "P p";
