@@ -384,6 +384,7 @@ namespace Gekko
             if (hasTimeDimension) tDim = 1;
             this.dimensionsStorage = new MapMultidim();
             this.dimensions = dimensions - tDim;
+            this.type = ESeriesType.ArraySuper;
             if (!hasTimeDimension) this.type = ESeriesType.Timeless;
         }
 

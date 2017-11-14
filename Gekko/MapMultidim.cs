@@ -57,6 +57,16 @@ namespace Gekko
             this.storage = s;
         }
 
+        public override string ToString()
+        {
+            string s = null;
+            foreach (string ss in this.storage)
+            {
+                s += ss + ", ";
+            }
+            return s.Substring(0, s.Length - ", ".Length);
+        }
+
         public override int GetHashCode()
         {
             int hash = 17;

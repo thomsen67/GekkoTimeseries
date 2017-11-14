@@ -1899,6 +1899,8 @@ listHelper:                 listHelper1 | listHelper2;
 listHelper1:                (expression ',')* expression -> expression+;
 listHelper2:                (expression ',')+ -> expression+;
 
+listNaked:                  expression (',' expression)+ -> ^(ASTLISTDEF expression+);
+
 map:                        leftParenNoGlue mapItem ',' mapHelper RIGHTPAREN -> ^(ASTMAPDEF mapItem mapHelper)
                           | leftParenNoGlue mapItem ','? RIGHTPAREN -> ^(ASTMAPDEF mapItem)   //the comma here is optional, not so for a list def.
 						    ;
@@ -1925,6 +1927,11 @@ indexerExpressionHelper:    expressionOrNothing doubleDot expressionOrNothing ->
 expressionOrNothing:        expression -> expression
 						  | -> ASTEMPTYRANGEELEMENT
 						    ;
+
+							//bankvarnameList is list of b:%x!q type names. Accepts a single element
+							//listNaked is a comma-separated list of expressions (without parenthesis). For instance 'a', 'b' or %a+%b, %d, etc. Must have > 1 element (one element is caught by expression below)
+							//expression is anything, but accepts a listNaked with parentheses, for instance ('a', 'b') or (%a+%b, %d). One element is ('a',), Python style.
+flexibleList:               bankvarnameList | listNaked | expression;  //used in DISP etc. ---> bankvarnameList returns a Gekko LIST of ScalarStrings.
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- name START -------------------------------------------------------------------------------
@@ -2060,7 +2067,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 assignment:				    assignmentType leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression ASTPLACEHOLDER assignmentType);
 assignmentType:             SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | -> ASTPLACEHOLDER;  //may be empty
 
-bankvarnameList:            bankvarname (COMMA2 bankvarname)* -> ^(ASTBANKVARNAMELIST bankvarname+);
+bankvarnameList:            bankvarname (COMMA2 bankvarname)* -> ^(ASTBANKVARNAMELIST bankvarname+);  //allows a single element, for instance DISP x
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ACCEPT
@@ -2110,9 +2117,9 @@ closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)
 
 
 disp:						DISP StringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, $DISP.Line)} StringInQuotes)
-						  | DISP dispOpt1? temp -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) temp)
+						  | DISP dispOpt1? flexibleList -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) flexibleList)
 						    ;
-temp:bankvarnameList|expression;
+
 dispOpt1:					ISNOTQUAL
 						  | leftAngle2          dispOpt1h* RIGHTANGLE -> ^(ASTOPT1 dispOpt1h*)							
 						  | leftAngleNo2 dates? dispOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) dispOpt1h*)
