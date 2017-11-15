@@ -1928,6 +1928,12 @@ expressionOrNothing:        expression -> expression
 						  | -> ASTEMPTYRANGEELEMENT
 						    ;
 
+// ------------------------------------------------------------------------------------------------------------------
+// ------------------- flexible list --------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------
+
+bankvarnameList:            bankvarname (COMMA2 bankvarname)* -> ^(ASTBANKVARNAMELIST bankvarname+);  //allows a single element, for instance DISP x
+
 							//bankvarnameList is list of b:%x!q type names. Accepts a single element
 							//listNaked is a comma-separated list of expressions (without parenthesis). For instance 'a', 'b' or %a+%b, %d, etc. Must have > 1 element (one element is caught by expression below)
 							//expression is anything, but accepts a listNaked with parentheses, for instance ('a', 'b') or (%a+%b, %d). One element is ('a',), Python style.
@@ -2064,10 +2070,10 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 // ASSIGNMENT, VAL, STRING, DATE, SERIES, LIST, MATRIX, MAP, VAR
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-assignment:				    assignmentType leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression ASTPLACEHOLDER assignmentType);
+assignment:				    assignmentType leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression ASTPLACEHOLDER assignmentType)
+						  | assignmentType leftSide EQUAL flexibleList -> ^(ASTASSIGNMENT leftSide flexibleList ASTPLACEHOLDER assignmentType)
+						    ;
 assignmentType:             SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | -> ASTPLACEHOLDER;  //may be empty
-
-bankvarnameList:            bankvarname (COMMA2 bankvarname)* -> ^(ASTBANKVARNAMELIST bankvarname+);  //allows a single element, for instance DISP x
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ACCEPT
@@ -2134,7 +2140,9 @@ for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  func
 						  | FOR leftParen (forHelper2 ','?)+ ')' SEMICOLON? functionStatements END -> ^(ASTFOR ^(ASTPLACEHOLDER forHelper2+) functionStatements)
 						    ;
 
-forHelper2:                 type? svarname EQUAL expression (TO expression2)? (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2?) ^(ASTPLACEHOLDER expression3?));
+forHelper2:                 type? svarname EQUAL expression (TO expression2)? (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2?) ^(ASTPLACEHOLDER expression3?))
+                          | type? svarname EQUAL flexibleList -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER flexibleList) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // FUNCTION
