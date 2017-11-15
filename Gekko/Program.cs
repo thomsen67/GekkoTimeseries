@@ -13541,7 +13541,7 @@ namespace Gekko
             {
                 string sleft = left.storage[i];
                 string sright = right.storage[i];
-                int ii = string.Compare(sleft, sright, StringComparison.OrdinalIgnoreCase);
+                int ii = G.CompareNatural(sleft, sright, CultureInfo.InvariantCulture, CompareOptions.IgnoreCase);
                 if (ii != 0) return ii;
             }
             return 0;
@@ -13579,79 +13579,60 @@ namespace Gekko
 
                 string var = ts.name;
                 string bank = ts.meta.parentDatabank.aliasName;
-                
+
                 if (ts.type == ESeriesType.ArraySuper)
                 {
                     //foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
                     //{
-                        
+
                     //}
 
                     List<MapMultidimItem> keys = ts.dimensionsStorage.storage.Keys.ToList();
                     keys.Sort(CompareMapMultidimItems);
 
+                    GekkoDictionary<string, string>[] temp = new GekkoDictionary<string, string>[ts.dimensions];
+                    
                     G.Writeln2("==========================================================================================");
                     G.Writeln("ARRAY-SERIES " + bank + Globals.symbolBankColon + G.RemoveFreqFromKey(ts.name));
-                    G.Writeln(G.GetFreqString(ts.freq) + " Array-timeseries has " + keys.Count + " subseries in " + ts.dimensions + " dimensions:");
-                    G.Writeln("First element: " + keys[0]);
-                    G.Writeln("Last element: " + keys[keys.Count - 1]);
+                    G.Writeln(G.GetFreqString(ts.freq) + " array-timeseries has " + keys.Count + " subseries in " + ts.dimensions + " dimensions:");
+                    double product = 1d;
+                    string productString = null;
+                    for (int i = 0; i < ts.dimensions; i++)
+                    {
+                        temp[i] = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                          int ii = 0;
+                        foreach (MapMultidimItem key in keys)
+                        {
+                            if (!temp[i].ContainsKey(key.storage[i])) temp[i].Add(key.storage[i], null);
+                            ii++;
+                        }
+                        List<string> temp2 = temp[i].Keys.ToList();
+                        temp2.Sort(G.CompareNaturalIgnoreCase);
+                        product = product * temp[i].Count;
+                        productString += temp2.Count + " * ";
+                        G.Writeln2("Dimension #" + (i + 1) + " (" + temp[i].Count + " elements): " + G.GetListWithCommas(temp2));
+                    }
+                    productString = productString.Substring(0, productString.Length - " * ".Length);
+
+                    string first = null;
+                    foreach (string s in keys[0].storage)
+                    {
+                        first += "'" + s + "'" + ", ";
+                    }
+                    first = first.Substring(0, first.Length - ", ".Length);
+
+                    string last = null;
+                    foreach (string s in keys[keys.Count - 1].storage)
+                    {
+                        last += "'" + s + "'" + ", ";
+                    }
+                    last = last.Substring(0, last.Length - ", ".Length);
+
+                    G.Writeln2("First element: " + G.RemoveFreqFromKey(ts.name) + "[" + first + "]");
+                    G.Writeln("Last element: " + G.RemoveFreqFromKey(ts.name) + "[" + last + "]");
+                    G.Writeln2("Dimension span: " + productString + " = " + product + ", density: " + keys.Count + "/" + product + " = " + Program.NumberFormat(100d * (keys.Count / product), "0.00") + "%");
                     G.Writeln("==========================================================================================");
-                    //        G.Writeln("Last element: " + G.PrettifyTimeseriesHash(last, true, false));
-
-                    //int existenceCheck = 0;
-
-                    //foreach (Databank db in dbList) {                        
-
-                    //    Series ts = db.GetVariable(var);
-                    //    if (ts == null) continue;
-
-                    //    existenceCheck++;
-                    //    varCounter++;
-
-                    //    if (ts.type == ESeriesType.ArraySuper)
-                    //    {
-                    //        //show info on array-timeseries
-                    //        List<string> names = MatchWildcardInDatabank(var + Globals.symbolTurtle + "*", db);  //are sorted
-                    //        if (names == null || names.Count == 0)
-                    //        {
-                    //            G.Writeln2("Could not find any " + var + "[...] array-timeseries");
-                    //            continue;
-                    //        }
-
-                    //        List<GekkoDictionary<string, string>> dimensions = GetDimensions(names);
-
-                    //        G.Writeln2("Array-timeseries '" + var + "' has " + names.Count + " subseries in the following dimensions:");
-
-                    //        int counter = 0;
-                    //        double product = 1d;
-                    //        string productString = "";
-                    //        foreach (GekkoDictionary<string, string> xxx in dimensions)
-                    //        {
-                    //            counter++;
-                    //            List<string> xxxx = new List<string>(xxx.Keys);
-                    //            //xxxx.Sort();
-                    //            xxxx = new List<string>(xxxx.OrderBy(f => f, new G.CustomComparer<string>(G.CompareNatural)).ToArray());
-                    //            G.Writeln2("Dimension #" + counter + " (" + xxxx.Count + " elements): " + G.GetListWithCommas(xxxx));
-                    //            product = product * xxxx.Count;
-                    //            productString += xxxx.Count + " * ";
-                    //        }
-                    //        productString = productString.Substring(0, productString.Length - " x ".Length);
-
-                    //        string first = names[0];
-                    //        string last = names[names.Count - 1];
-
-                    //        G.Writeln2("First element: " + G.PrettifyTimeseriesHash(first, true, false));
-                    //        G.Writeln("Last element: " + G.PrettifyTimeseriesHash(last, true, false));
-
-                    //        G.Writeln2("Dimension span: " + productString + " = " + product + ", density: " + names.Count + "/" + product + " = " + Program.NumberFormat(100d * (names.Count / product), "0.00") + "%");
-
-                    //        return;
-
-                    //    }
-
-
-
-
+                    
                 }
 
                 else
@@ -13891,11 +13872,11 @@ namespace Gekko
          
             if (varCounter == 1)
             {
-                G.Writeln("Displayed " + varCounter + " variable");
+                G.Writeln2("Displayed " + varCounter + " variable");
             }
             else
             {
-                G.Writeln("Displayed " + varCounter + " variables");
+                G.Writeln2("Displayed " + varCounter + " variables");
             }
         }
 

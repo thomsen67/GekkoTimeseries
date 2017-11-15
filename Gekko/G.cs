@@ -831,10 +831,10 @@ namespace Gekko
                 else return "'" + s.Replace(Globals.symbolTurtle, "', '") + "'";
             }
         }
-        public static int CompareNatural(string strA, string strB)
+        public static int CompareNaturalIgnoreCase(string strA, string strB)
         {
             return CompareNatural(strA, strB, CultureInfo.CurrentCulture, CompareOptions.IgnoreCase);
-        }
+        }       
 
         public static int CompareNatural(string strA, string strB, CultureInfo culture, CompareOptions options)
         {
