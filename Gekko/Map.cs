@@ -86,7 +86,7 @@ namespace Gekko
                 //Indices run from 1, 2, 3, ... n. Element 0 is length of list.
                 if (index.Type() == EVariableType.String)
                 {
-                    string s = (index as ScalarString)._string2;
+                    string s = (index as ScalarString).string2;
                     string varnameWithFreq = O.HandleSigilAndFreq(s, null, EVariableType.Var);  //we do not know the freq. So if s has no '!', current freq will be added.
                     IVariable rv = null; this.storage.TryGetValue(varnameWithFreq, out rv);
                     if (rv == null)

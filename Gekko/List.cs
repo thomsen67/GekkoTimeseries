@@ -100,7 +100,7 @@ namespace Gekko
                 }
                 else if (index.Type() == EVariableType.String)
                 {                    
-                    string s5 = ((ScalarString)index)._string2;
+                    string s5 = ((ScalarString)index).string2;
                     if(s5.Contains("?") || s5.Contains("*"))
                     {
                         //Wildcard: return a list of those
@@ -115,7 +115,7 @@ namespace Gekko
                             ScalarString x_string = x as ScalarString;
                             if (x_string != null)
                             {
-                                if (G.Equal(x_string._string2, s5)) return Globals.scalarVal1;
+                                if (G.Equal(x_string.string2, s5)) return Globals.scalarVal1;
                             }
                         }
                         return Globals.scalarVal0;
@@ -242,29 +242,54 @@ namespace Gekko
         {
             switch (x.Type())
             {                    
-                case EVariableType.String:
-                    {
-                        //HMMM do we want this?
-                        return Operators.StringList.Add((ScalarString)x, this, true);
+                case EVariableType.List:
+                    {                        
+                        return Functions.union(t, this, x);                     
                     }
+                    break;
                 default:
                     {
-                        G.Writeln2("*** ERROR: Type mismatch regarding add");                
+                        G.Writeln2("*** ERROR: Adding only allowed for two lists");
                         throw new GekkoException();
                     }
+                    break;
             }
         }
 
         public IVariable Subtract(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: You cannot use subtract with lists");                
-            throw new GekkoException();
+            switch (x.Type())
+            {
+                case EVariableType.List:
+                    {
+                        return Functions.difference(t, this, x);
+                    }
+                    break;
+                default:
+                    {
+                        G.Writeln2("*** ERROR: Adding only allowed for two lists");
+                        throw new GekkoException();
+                    }
+                    break;
+            }
         }
 
         public IVariable Multiply(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: You cannot use multiply with lists");                
-            throw new GekkoException();
+            switch (x.Type())
+            {
+                case EVariableType.List:
+                    {
+                        return Functions.intersect(t, this, x);
+                    }
+                    break;
+                default:
+                    {
+                        G.Writeln2("*** ERROR: Adding only allowed for two lists");
+                        throw new GekkoException();
+                    }
+                    break;
+            }
         }
 
         public IVariable Divide(GekkoSmpl t, IVariable x)

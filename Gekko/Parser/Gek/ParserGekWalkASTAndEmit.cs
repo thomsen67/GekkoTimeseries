@@ -1820,7 +1820,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                 {
-                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ", true, false)))), null, false, EVariableType.Var))) {");  //false is regarding isLeftSide
+                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ")))), null, false, EVariableType.Var))) {");  //false is regarding isLeftSide
                                 }
 
                                 if (G.Equal(functionNameLower, "sum"))
@@ -2295,7 +2295,7 @@ namespace Gekko.Parser.Gek
                     case "ASTIDENT":
                     case "ASTIDENTDIGIT":
                         {
-                            node.Code.CA("new ScalarString(`" + node[0].Text + "`, true, false)");  //problem is that we now allow VAL %v = 1, for instance. Here %v is not recursive.
+                            node.Code.CA("new ScalarString(`" + node[0].Text + "`)");  //problem is that we now allow VAL %v = 1, for instance. Here %v is not recursive.
                         }
                         break;
 
@@ -5880,6 +5880,7 @@ namespace Gekko.Parser.Gek
 
             string sss = s1a.ToString();
             s1 = s1.Replace("_", " ");
+            //#0934580980
             sss = sss.Replace("True", "`yes`");
             sss = sss.Replace("False", "`no`");
             sss = sss.Replace("true", "`yes`");

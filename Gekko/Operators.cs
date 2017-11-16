@@ -49,11 +49,11 @@ namespace Gekko
                 string z = null;
                 if (invert)
                 {
-                    z = i + s._string2;
+                    z = i + s.string2;
                 }
                 else
                 {
-                    z = s._string2 + i;
+                    z = s.string2 + i;
                 }
                 return new ScalarString(z);
             }            
@@ -67,11 +67,11 @@ namespace Gekko
                 string z = null;
                 if (invert)
                 {
-                    z = G.FromDateToString(gt) + s._string2;
+                    z = G.FromDateToString(gt) + s.string2;
                 }
                 else
                 {
-                    z = s._string2 + G.FromDateToString(gt);
+                    z = s.string2 + G.FromDateToString(gt);
                 }
                 return new ScalarString(z);
             }
@@ -85,13 +85,13 @@ namespace Gekko
                 List<string> newList = new List<string>();
                 if (!swap)
                 {
-                    newList.Add(s._string2);
+                    newList.Add(s.string2);
                     newList.AddRange(m);
                 }
                 else
                 {
                     newList.AddRange(m);
-                    newList.Add(s._string2);
+                    newList.Add(s.string2);
                 }
                 return new List(newList);
             }

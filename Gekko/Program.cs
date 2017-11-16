@@ -10162,7 +10162,7 @@ namespace Gekko
                 for (int i = 0; i < indexes.Length; i++)
                 {
                     ScalarString ss = indexes[i] as ScalarString;
-                    keys[i] = ss._string2;
+                    keys[i] = ss.string2;
                 }
             }
 
@@ -13566,7 +13566,7 @@ namespace Gekko
             {
                 varCounter++;
                 //one listitem could be obk:fx*, fy, #m, obk:#m, @fy
-
+                
                 IVariable x = O.Lookup(smpl, null, new ScalarString(listItem), null, false, EVariableType.Var);
 
                 Series ts = x as Series;
@@ -19826,6 +19826,14 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Sorry, internal Gekko error #837432");
                 throw new GekkoException();
             }
+
+            string dir = Path.GetDirectoryName(pathAndFilenameDestination);
+            if (type == "copy" && !Directory.Exists(dir))
+            {
+                G.Writeln2("*** ERROR: The folder " + dir + " does not exist for file copying");
+                throw new GekkoException();
+            }
+
             int gap = Globals.waitFileGap;  //2 second
             int totalTime = Globals.waitFileTotalTime;  //600 seconds
             int repeats = totalTime / gap;
@@ -26458,13 +26466,31 @@ namespace Gekko
                 G.Writeln2("*** ERROR: PLOT called with 0 variables");
                 throw new GekkoException();
             }
+
+            string pplotType = "emf";
+            if (o.opt_filename != null)
+            {
+                pplotType = Path.GetExtension(o.opt_filename);
+                if (pplotType.StartsWith(".")) pplotType = pplotType.Substring(1);
+                if (pplotType == "")
+                {
+                    o.opt_filename = AddExtension(o.opt_filename, ".emf");
+                    pplotType = "emf";
+                }
+                if (pplotType != "emf" && pplotType != "png" && pplotType != "svg")
+                {
+                    G.Writeln2("*** ERROR: In PLOT, expected file type is emf, png or svg");
+                    throw new GekkoException();
+                }
+            }
+
             int numberOfObs = GekkoTime.Observations(o.t1, o.t2);
             int rr = Program.RandomInt();
             string file1 = "temp" + rr + ".dat";
-            string file2 = "temp" + rr + ".emf";
+            string file2 = "temp" + rr + "." + pplotType;
             string file3 = "temp" + rr + ".gp";
             string heading = "";
-            string pplotType = "emf";
+            
 
             if (o.opt_filename != null)
             {
@@ -26896,6 +26922,23 @@ namespace Gekko
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
 
+            string extension = "emf";
+            if (o.opt_filename != null)
+            {
+                extension = Path.GetExtension(o.opt_filename);
+                if (extension.StartsWith(".")) extension = extension.Substring(1);
+                if (extension == "")
+                {
+                    o.opt_filename = AddExtension(o.opt_filename, ".emf");
+                    extension = "emf";
+                }
+                if (extension != "emf" && extension != "png" && extension != "svg")
+                {
+                    G.Writeln2("*** ERROR: In PLOT, expected file type is emf, png or svg");
+                    throw new GekkoException();
+                }
+            }
+
             //bool isInside = true;
             //bool test2 = false;
             int count = containerExplode.Count;
@@ -26931,7 +26974,7 @@ namespace Gekko
             int numberOfObs = GekkoTime.Observations(o.t1, o.t2);
             int rr = Program.RandomInt();
             string file1 = "temp" + rr + ".dat";
-            string file2 = "temp" + rr + ".emf";
+            string file2 = "temp" + rr + "." + extension;
             string file3 = "temp" + rr + ".gp";
             string heading = "";
             string pplotType = "emf";
@@ -27114,21 +27157,6 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            if (o.opt_filename != null)
-            {
-                pplotType = Path.GetExtension(o.opt_filename);
-                if (pplotType.StartsWith(".")) pplotType = pplotType.Substring(1);
-                if (pplotType == "")
-                {
-                    o.opt_filename = AddExtension(o.opt_filename, ".emf");
-                    pplotType = "emf";
-                }
-                if (pplotType != "emf" && pplotType != "png" && pplotType != "svg")
-                {
-                    G.Writeln2("*** ERROR: In PLOT, expected file type is emf, png or svg");
-                    throw new GekkoException();
-                }
-            }
             
             bool isSeparated = NotNullAndNotNo(separate);  //#23475432985
 
@@ -27155,7 +27183,7 @@ namespace Gekko
 
             double linewidthCorrection = 1d;
             double pointsizeCorrection = 1d;
-            if (G.Equal(pplotType, "svg") || G.Equal(pplotType, "png"))
+            if (G.Equal(extension, "svg") || G.Equal(extension, "png"))
             {
                 linewidthCorrection = 2d / 3d;
                 pointsizeCorrection = 0.8d / 0.5d;
@@ -27214,7 +27242,7 @@ namespace Gekko
             }            
 
             string enhanced = null;
-            if (G.Equal(pplotType, "emf"))
+            if (G.Equal(extension, "emf"))
             {
                 enhanced = " enhanced";
                 fontsize = 0.95 * fontsize;
@@ -27224,7 +27252,7 @@ namespace Gekko
                 fontsize = 0.75 * fontsize;
             }
                         
-            txt.AppendLine("set terminal " + pplotType + enhanced + " font '" + font + "," + (zoom * fontsize) + "'"); ;
+            txt.AppendLine("set terminal " + extension + enhanced + " font '" + font + "," + (zoom * fontsize) + "'"); ;
             txt.AppendLine("set output \"" + file2 + "\"");
             txt.AppendLine("set key " + key);            
 
@@ -27233,15 +27261,15 @@ namespace Gekko
                 txt.AppendLine("set decimalsign ','");
             }
             
-            if (G.Equal(pplotType, "emf"))
+            if (G.Equal(extension, "emf"))
             {
                 fontfactor = 1.4d / 1.2d;
             }
-            else if (G.Equal(pplotType, "svg"))
+            else if (G.Equal(extension, "svg"))
             {
                 fontfactor = 1.4d / 1.2d;
             }
-            else if (G.Equal(pplotType, "png"))
+            else if (G.Equal(extension, "png"))
             {
                 fontfactor = 1.0d / 1.2d;
             }

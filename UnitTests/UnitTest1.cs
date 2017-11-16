@@ -3164,7 +3164,7 @@ namespace UnitTests
             Assert.AreEqual(b2.val, 5d);
             I("STRING b3 = string(#a[%i]);");     //b3 = 'a2', picking out the %i'th name as a string
             ScalarString b3 = (ScalarString)Program.scalars["b3"];
-            Assert.AreEqual(b3._string2, "a2");
+            Assert.AreEqual(b3.string2, "a2");
             I("SERIES y = #a[%i];");      //y = a2, SERIES corresponds to the SERIES command.
             AssertHelper(First(), "y", 2000, 100d, sharedDelta);
             AssertHelper(First(), "y", 2001, 100d, sharedDelta);
@@ -3844,7 +3844,7 @@ namespace UnitTests
 
         private static void AssertHelperScalarString(string s, string s2)
         {
-            Assert.AreEqual(((ScalarString)Program.scalars[s])._string2, s2);
+            Assert.AreEqual(((ScalarString)Program.scalars[s]).string2, s2);
         }
 
         [TestMethod]
@@ -4096,7 +4096,7 @@ namespace UnitTests
         private static void _AssertScalarString(IBank db, string s, string s2)
         {
             ScalarString ss = db.GetIVariable(s) as ScalarString;
-            Assert.AreEqual(ss._string2, s2);
+            Assert.AreEqual(ss.string2, s2);
         }
 
         private static void _AssertSeries(IBank db, string s, int year, double x, double delta)

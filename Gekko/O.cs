@@ -296,21 +296,21 @@ namespace Gekko
                 if (lhs.Type() == EVariableType.String)
                 {
                     //Already existing lhs is a STRING, inject into it. Injecting is faster than recreating an object.                    
-                    ((ScalarString)lhs)._string2 = value;
-                    ((ScalarString)lhs)._isName = isName;
+                    ((ScalarString)lhs).string2 = value;
+                    //((ScalarString)lhs)._isName = isName;
                 }
                 else
                 {
                     //The object has to die and be recreated, since it is of a wrong type.                                
                     Program.scalars.Remove(name2);
-                    lhs = new ScalarString(value, isName, false);
+                    lhs = new ScalarString(value);
                     Program.scalars.Add(name2, lhs);
                 }
             }
             else
             {
                 //Scalar does not exist beforehand  
-                lhs = new ScalarString(value, isName, false);
+                lhs = new ScalarString(value);
                 Program.scalars.Add(name2, lhs);
             }
             return (ScalarString)lhs;
@@ -374,7 +374,7 @@ namespace Gekko
                         G.Writeln2("*** ERROR: list element " + (counter + 1) + " is not a STRING");
                         throw new GekkoException();
                     }
-                    x_string._string2 = item._string2;
+                    x_string.string2 = item.string2;
                 }
             }
             else throw new GekkoException();
@@ -394,7 +394,7 @@ namespace Gekko
                 }
                 else if (start.Type() == EVariableType.String)
                 {
-                    x = new ScalarString(((ScalarString)start)._string2);
+                    x = new ScalarString(((ScalarString)start).string2);
                 }
                 else if (start.Type() == EVariableType.List)
                 {
@@ -410,7 +410,7 @@ namespace Gekko
                         G.Writeln2("*** ERROR: list element 1 is not a STRING");
                         throw new GekkoException();
                     }
-                    x = new Gekko.ScalarString(xx._string2);
+                    x = new Gekko.ScalarString(xx.string2);
                     //x = start_list.list[0];  ----------------> FAIL, sideeffect because then the first item in the list will change when x changes....!!!
                 }
                 else throw new GekkoException();
@@ -648,7 +648,7 @@ namespace Gekko
 
             if (x.Type() == EVariableType.String)
             {                
-                string dbName, varName, freq; char firstChar; Chop((x as ScalarString)._string2, out dbName, out varName, out freq);                
+                string dbName, varName, freq; char firstChar; Chop((x as ScalarString).string2, out dbName, out varName, out freq);                
                 IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable, type);
                 return iv;
             }
@@ -892,7 +892,7 @@ namespace Gekko
             rv = ib.GetIVariable(varnameWithFreq);
             if (rv == null)
             {
-                G.Writeln2("*** ERROR: Could not find variable '" + varnameWithFreq + "'" + " in " + ib.Message());
+                G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in " + ib.Message());
                 throw new GekkoException();
             }
 
@@ -1049,7 +1049,7 @@ namespace Gekko
                         //fast, especially in loops!
                         if (lhs.Type() == EVariableType.Val) ((ScalarVal)lhs).val = ((ScalarVal)rhsExpression).val;
                         else if (lhs.Type() == EVariableType.Date) ((ScalarDate)lhs).date = ((ScalarDate)rhsExpression).date;
-                        else if (lhs.Type() == EVariableType.String) ((ScalarString)lhs)._string2 = ((ScalarString)rhsExpression)._string2;
+                        else if (lhs.Type() == EVariableType.String) ((ScalarString)lhs).string2 = ((ScalarString)rhsExpression).string2;
                     }
                     else
                     {
@@ -1232,7 +1232,7 @@ namespace Gekko
                             //---------------------------------------------------------
                             // %x = STRING
                             //---------------------------------------------------------                            
-                            IVariable lhsNew = new ScalarString(((ScalarString)rhs)._string2);
+                            IVariable lhsNew = new ScalarString(((ScalarString)rhs).string2);
                             AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
                         }
                         break;
@@ -1863,7 +1863,7 @@ namespace Gekko
             //firstChar = varName[0];
 
             freq = null;
-            G.ChopFreq(input, ref freq, ref varName);
+            G.ChopFreq(varName, ref freq, ref varName);
             //varName = DecorateWithTilde(varName, freq);
         }        
 
@@ -2242,7 +2242,7 @@ namespace Gekko
                 if (a.Type() == EVariableType.String)
                 {
                     //GENR y = %s; <-- %s is a STRING
-                    Series ts = Program.databanks.GetFirst().GetVariable(((ScalarString)a)._string2);
+                    Series ts = Program.databanks.GetFirst().GetVariable(((ScalarString)a).string2);
                     //a = new MetaTimeSeries(ts, null, null);
                     a = ts;
                 }
@@ -2306,8 +2306,8 @@ namespace Gekko
                 //The 'x' scalar has a fast pointer already
                 if (a.Type() == EVariableType.String)
                 {
-                    ((ScalarString)a)._string2 = s;
-                    ((ScalarString)a)._isName = isName;
+                    ((ScalarString)a).string2 = s;
+                    //((ScalarString)a)._isName = isName;
                 }
                 else
                 {
@@ -2330,8 +2330,8 @@ namespace Gekko
                     //does exist in the dictionary
                     if (x.Type() == EVariableType.String)
                     {
-                        ((ScalarString)x)._string2 = s;
-                        ((ScalarString)x)._isName = isName;
+                        ((ScalarString)x).string2 = s;
+                        //((ScalarString)x)._isName = isName;
                         a = x;
                     }
                     else
@@ -2530,7 +2530,7 @@ namespace Gekko
                 if (x.Type() == EVariableType.String)
                 {
                     ScalarString ss = (ScalarString)x;
-                    ScalarString ss2 = new ScalarString(ss._string2, false);
+                    ScalarString ss2 = new ScalarString(ss.string2, false);
                     rv = ss2;
                 }
                 else if (x.Type() == EVariableType.List)
@@ -2647,7 +2647,7 @@ namespace Gekko
             if (list.Type() == EVariableType.List)
             {
                 ScalarString x = (ScalarString)list.Indexer(smpl, new IVariable[] { index });  //will return ScalarString with .isName = true.
-                Series mts = O.GetTimeSeries(smpl, x._string2, 1);  //always from work....
+                Series mts = O.GetTimeSeries(smpl, x.string2, 1);  //always from work....
                 return mts;
             }
             else
@@ -2835,7 +2835,7 @@ namespace Gekko
             {
                 //VAL y = %s[2000]; <-- %s is a STRING
                 //GENR y = %s[2000]; <-- %s is a STRING
-                Series ts = Program.databanks.GetFirst().GetVariable(((ScalarString)a)._string2);
+                Series ts = Program.databanks.GetFirst().GetVariable(((ScalarString)a).string2);
                 //a = new MetaTimeSeries(ts, null, null);
                 a = ts;
             }
@@ -3309,7 +3309,7 @@ namespace Gekko
             foreach (IVariable iv in ml.list)
             {
                 string s = O.ConvertToString(iv);
-                if(G.Equal(ss._string2,s))
+                if(G.Equal(ss.string2,s))
                 {
                     b = true;
                     break;
@@ -3392,7 +3392,7 @@ namespace Gekko
             return a.ConvertToString();            
         }
 
-        public static string GetString(string s)
+        public static string ConvertToString(string s)
         {
             return s;
         }
@@ -3842,9 +3842,9 @@ namespace Gekko
             else if (a.Type() == EVariableType.String)
             {
                 ScalarString ss = (ScalarString)a;
-                if (ss._isName)
+                if (false)
                 {
-                    Series ts = O.FindTimeSeries(ss._string2, 1);
+                    Series ts = O.FindTimeSeries(ss.string2, 1);
                     return ts;
                 }
                 else
@@ -4427,7 +4427,7 @@ namespace Gekko
             public static void Q(string s)
             {                
                 IVariable a = null; Program.scalars.TryGetValue(s, out a);
-                if (a == null || a.Type() != EVariableType.String || ((ScalarString)a)._isName == true)
+                if (a == null || a.Type() != EVariableType.String)
                 {
                     G.Writeln2("*** ERROR: STRING "+ Globals.symbolScalar.ToString()  + s + " was not found");
                     throw new GekkoException();
@@ -4547,7 +4547,7 @@ namespace Gekko
             public static void Q(string s)
             {
                 IVariable a = null; Program.scalars.TryGetValue(s, out a);
-                if (a == null || a.Type() != EVariableType.String || ((ScalarString)a)._isName == false)
+                if (a == null || a.Type() != EVariableType.String)
                 {
                     G.Writeln2("*** ERROR: NAME " + Globals.symbolScalar.ToString() + s + " was not found");
                 }

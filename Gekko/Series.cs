@@ -1090,7 +1090,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Expected [] indexer element #" + (i + 1) + " to be STRING");
                     throw new GekkoException();
                 }
-                hash += ((ScalarString)indexes[i])._string2;
+                hash += ((ScalarString)indexes[i]).string2;
                 if (i < indexes.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter
             }
             return hash;

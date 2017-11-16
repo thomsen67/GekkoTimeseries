@@ -11,9 +11,9 @@ namespace Gekko
     public class ScalarString : IVariable
     {
         [ProtoMember(1)]
-        public string _string2;
+        public string string2;
         //public IVariable pointerTo = null;  //used in case the string points to for instance a timeseries. Only used inside a GENR/PRT statement, inside the implicit timeloop (where we can be sure that the string itself does not change value). Is set to null again after the time loop.
-        public bool _isName = false;
+        //public bool _isName = false;
         
         private ScalarString()
         {
@@ -22,26 +22,28 @@ namespace Gekko
 
         public ScalarString(string s)
         {
-            Initialize(s, false, false);  //last arg cannot be true --> too many errors regarding varnames etc.
+            Initialize(s, false);  //last arg cannot be true --> too many errors regarding varnames etc.
         }
+        
 
-        public ScalarString(string s, bool isName)
+        public ScalarString(string s, bool substitute)
         {
-            Initialize(s, isName, true);
+            Initialize(s, substitute);
         }
 
-        public ScalarString(string s, bool isName, bool substitute)
-        {
-            Initialize(s, isName, substitute);
-        }
-
-        public void Initialize(string s, bool isName, bool substitute)
+        public void Initialize(string s, bool substitute)
         {
             //for instance, for a #x variable that returns a string because of an implicit list loop. This string is indicated as being a name, not a string.
             if (s == null) s = "";  //for instance, a label or source from a timeseries that is null. If later search() or similar is used, it is better to use "" than null.
             if (substitute) s = SubstituteScalarsInString(s, true, false);
-            _string2 = s;
-            _isName = isName;
+            string2 = s;
+            //_isName = isName;
+        }
+
+        public static string SubstituteScalarsInString(string s, string reportError, string avoidVal)
+        {
+            //Seems to be activated here: #0934580980 -- we live with it for the time being
+            return SubstituteScalarsInString(s, G.Equal(reportError, "yes"), G.Equal(avoidVal, "yes"));
         }
 
         public static string SubstituteScalarsInString(string s, bool reportError, bool avoidVal)
@@ -280,9 +282,9 @@ namespace Gekko
             return s;
         }
 
-        public bool IsName() {
-            return _isName;
-        }
+        //public bool IsName() {
+        //    return _isName;
+        //}
 
         public EVariableType Type()
         {
@@ -295,13 +297,13 @@ namespace Gekko
             {
                 IVariable index = indexes[0];
                 IVariable rv = null;
-                if (this._string2 == Globals.indexerAloneCheatString)
+                if (this.string2 == Globals.indexerAloneCheatString)
                 {
                     //corresponds to empty indexer like ['fy*'], different from #a['fy*']
                     if (index.Type() == EVariableType.String)
                     {
                         //string vars = null;                    
-                        ExtractBankAndRestHelper h = Program.ExtractBankAndRest(((ScalarString)index)._string2, EExtrackBankAndRest.GetDatabank);
+                        ExtractBankAndRestHelper h = Program.ExtractBankAndRest(((ScalarString)index).string2, EExtrackBankAndRest.GetDatabank);
                         List<string> output = Program.MatchWildcardInDatabank(h.name, h.databank);
                         rv = new List(output);
                     }
@@ -312,15 +314,7 @@ namespace Gekko
                         G.Writeln("    The right use is PRT [gd*] and similar.");
                         throw new GekkoException();
                     }
-                }
-                else if (this._isName)
-                {
-                    //#8932074324
-                    //TODO: What about string 'jul05:fy' ??????
-                    //IVariable result = O.GetValFromStringIndexer(smpl, this._string2, index, 1);
-                    IVariable result = null;
-                    rv = result;
-                }
+                }                
                 else
                 {
                     G.Writeln2("*** ERROR: You cannot use indexer on a string, for instance %s[2],");
@@ -388,8 +382,8 @@ namespace Gekko
         {
 
             //Conversion not allowed in for instance VAL x = %s, where s is a STRING pointing to a timeseries.
-            G.Writeln2("*** ERROR: You are trying to extract a numerical value from STRING '" + this._string2 + "'");
-            G.Writeln("           A STRING s ('" + this._string2 + "') can refer to a timeseries name (" + this._string2 + "), but in");
+            G.Writeln2("*** ERROR: You are trying to extract a numerical value from STRING '" + this.string2 + "'");
+            G.Writeln("           A STRING s ('" + this.string2 + "') can refer to a timeseries name (" + this.string2 + "), but in");
             G.Writeln("           that case you must use {s} or {%s} instead of %s.");
             throw new GekkoException();
         }
@@ -408,12 +402,12 @@ namespace Gekko
 
         public string ConvertToString()
         {
-            return this._string2;
+            return this.string2;
         }
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
-            G.Writeln2("*** ERROR: Could not convert the STRING " + this._string2 + " directly into a DATE.");
+            G.Writeln2("*** ERROR: Could not convert the STRING " + this.string2 + " directly into a DATE.");
             G.Writeln("           You may try the date() conversion function.");            
             throw new GekkoException();
         }
@@ -421,7 +415,7 @@ namespace Gekko
         public List<IVariable> ConvertToList()
         {
             //for instance for list elements, where a string is considered a 1-item list.
-            return new List<IVariable>() { new ScalarString(this._string2) };  //always make a copy, so no risk of side effects
+            return new List<IVariable>() { new ScalarString(this.string2) };  //always make a copy, so no risk of side effects
         }
         
         public IVariable Add(GekkoSmpl t, IVariable x)
@@ -430,7 +424,7 @@ namespace Gekko
             {
                 case EVariableType.String:
                     {
-                        return new ScalarString(this._string2 + ((ScalarString)x)._string2);
+                        return new ScalarString(this.string2 + ((ScalarString)x).string2);
                     }                    
                 case EVariableType.List:
                     {
@@ -489,7 +483,7 @@ namespace Gekko
 
         public IVariable DeepClone()
         {
-            return new ScalarString(this._string2);
+            return new ScalarString(this.string2);
         }
 
         public void DeepTrim()

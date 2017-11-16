@@ -978,7 +978,7 @@ namespace Gekko
 
             double[,] y = ((Matrix)x).data;
 
-            string s = ((ScalarString)type)._string2;
+            string s = ((ScalarString)type).string2;
 
             bool upper = true;
             if(G.Equal(s,"upper"))
@@ -1671,7 +1671,7 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.String)
             {
-                s = ((ScalarString)x)._string2;  //maybe could just return x here, but maybe that is not safe
+                s = ((ScalarString)x).string2;  //maybe could just return x here, but maybe that is not safe
             }
             else if (x.Type() == EVariableType.List)
             {
@@ -1704,7 +1704,7 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.String)
             {
-                string s = ((ScalarString)x)._string2;
+                string s = ((ScalarString)x).string2;
                 d = G.FromStringToDate(s);
             }
             else if (x.Type() == EVariableType.List)
@@ -1742,7 +1742,7 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.String)
             {
-                string s = ((ScalarString)x)._string2;
+                string s = ((ScalarString)x).string2;
                 if (G.Equal(s, "m"))
                 {
                     v = double.NaN;
