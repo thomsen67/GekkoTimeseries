@@ -6,60 +6,42 @@ using System.Drawing;
 using Gekko.Parser;
 namespace Gekko
 {
-    public class TranslatedCode
-    {
-        public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
-        public static IVariable temp60(GekkoSmpl smpl)
-        {
-            List temp60 = new List();
+public class TranslatedCode
+{
+public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
+public static void ClearTS(P p) {
+}
+public static void ClearScalar(P p) {
+}
 
-            foreach (IVariable listloop_xx59 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("xx")))), null, false, EVariableType.Var)))
+public static void CodeLines(P p)
+{
+GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl);
+
+//[[splitSTART]]
+p.SetText(@"¤0"); O.InitSmpl(smpl);
+            Func<IVariable> temp33 = () =>
             {
-                temp60.Add(O.Indexer(O.Indexer2(smpl, listloop_xx59), smpl, O.Lookup(smpl, null, null, "x", null, null, false, EVariableType.Var), listloop_xx59));
+                List temp3 = new List();
 
-            }
-            return temp60;
-
-        }
-        public static void ClearTS(P p)
-        {
-        }
-        public static void ClearScalar(P p)
-        {
-        }
-
-        public static void CodeLines(P p)
-        {
-            GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl);
-            if (true)
-            {
-                Func<IVariable> func1 = () =>
+                foreach (IVariable listloop_i2 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("i")))), null, false, EVariableType.Var)))
                 {
-                    List temp60 = new List();
-                    foreach (IVariable listloop_xx59 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("xx")))), null, false, EVariableType.Var)))
-                    {
-                        temp60.Add(O.Indexer(O.Indexer2(smpl, listloop_xx59), smpl, O.Lookup(smpl, null, null, "x", null, null, false, EVariableType.Var), listloop_xx59));
-                    }
-                    return temp60;
-                };
-                p.SetText(@"¤0"); O.InitSmpl(smpl);
-                IVariable ivTmpvar58 = O.IvConvertTo(EVariableType.Var, func1());
-                O.Lookup(smpl, null, null, "xx", null, ivTmpvar58, true, EVariableType.Var)
-                ;
-            }
-            else
-            {
+                    temp3.Add(O.Indexer(O.Indexer2(smpl, listloop_i2), smpl, O.Lookup(smpl, null, null, "x", null, null, false, EVariableType.Var), listloop_i2));
 
-                //[[splitSTART]]
-                p.SetText(@"¤0"); O.InitSmpl(smpl);
-                IVariable ivTmpvar58 = O.IvConvertTo(EVariableType.Var, temp60(smpl));
-                O.Lookup(smpl, null, null, "xx", null, ivTmpvar58, true, EVariableType.Var)
-                ;
-            }
+                }
+                return temp3;
 
-            //[[splitSTOP]]
+            };
 
 
-        }
-    }
+IVariable ivTmpvar1 = O.IvConvertTo(EVariableType.Var, temp33());
+O.Lookup(smpl, null, null, "xx", null, ivTmpvar1, true, EVariableType.Var)
+;
+
+
+//[[splitSTOP]]
+
+
+}
+}
 }

@@ -2179,23 +2179,25 @@ namespace Gekko
 
                     AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(oRead.t1, oRead.t2);
 
-                    if (wipeDatabankBeforeInsertingData) databank.Clear();  //Reading gbk may point to a whole new databank, this is ok. Wipe will only be for READ, no READ<merge> or READ ... TO ... . IMPORT is never wiped.
+                    //if (wipeDatabankBeforeInsertingData) databank.Clear();  //Reading gbk may point to a whole new databank, this is ok. Wipe will only be for READ, no READ<merge> or READ ... TO ... . IMPORT is never wiped.
+
+                    Databank databankTemp = new Databank(databank.aliasName);
 
                     if (oRead.Type == EDataFormat.Pcim)
                     {
-                        Program.ReadPCIM(databank, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
+                        Program.ReadPCIM(databankTemp, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
                     }
                     else if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn || oRead.Type == EDataFormat.Xls || oRead.Type == EDataFormat.Xlsx)
                     {
-                        ReadSheet(dates, oRead, readInfo, file, databank, originalFilePath);
+                        ReadSheet(dates, oRead, readInfo, file, databankTemp, originalFilePath);
                     }
                     else if (oRead.Type == EDataFormat.Tsd)
                     {
-                        ReadTsd(dates, oRead, readInfo, ref file, ref databank, originalFilePath, ref NaNCounter);
+                        ReadTsd(dates, oRead, readInfo, ref file, ref databankTemp, originalFilePath, ref NaNCounter);
                     }
                     else if (oRead.Type == EDataFormat.Tsd || oRead.Type == EDataFormat.Tsdx || oRead.Type == EDataFormat.Gbk || oRead.Type == EDataFormat.None)
                     {
-                        ReadGbk(dates, oRead, readInfo, ref file, ref databank, originalFilePath, ref tsdxFile, ref tempTsdxPath);
+                        ReadGbk(dates, oRead, readInfo, ref file, ref databankTemp, originalFilePath, ref tsdxFile, ref tempTsdxPath);
                     }
                     else if (oRead.Type == EDataFormat.Tsp)
                     {
@@ -2204,7 +2206,7 @@ namespace Gekko
                             G.Writeln2("*** ERROR: You cannot use period truncation in TSP data import");
                             throw new GekkoException();
                         }
-                        TspUtilities.tspDataUtility(file, databank, oRead, readInfo, open);
+                        TspUtilities.tspDataUtility(file, databankTemp, oRead, readInfo, open);
                     }
                     else if (oRead.Type == EDataFormat.Gdx)
                     {
@@ -2213,12 +2215,12 @@ namespace Gekko
                             G.Writeln2("*** ERROR: At the moment, you cannot use period truncation in GDX data import");
                             throw new GekkoException();
                         }
-                        if (oRead.Merge)
-                        {
-                            G.Writeln2("*** ERROR: At the moment, you cannot merge in GDX data import");
-                            throw new GekkoException();
-                        }
-                        Program.ReadGdx(databank, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
+                        //if (oRead.Merge)
+                        //{
+                        //    G.Writeln2("*** ERROR: At the moment, you cannot merge in GDX data import");
+                        //    throw new GekkoException();
+                        //}
+                        Program.ReadGdx(databankTemp, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
                     }
                     else if (oRead.Type == EDataFormat.Px)
                     {
@@ -2227,17 +2229,40 @@ namespace Gekko
                             G.Writeln2("*** ERROR: At the moment, you cannot use period truncation in PX data import");
                             throw new GekkoException();
                         }
-                        if (oRead.Merge)
-                        {
-                            G.Writeln2("*** ERROR: At the moment, you cannot merge in PX data import");
-                            throw new GekkoException();
-                        }
-                        Program.ReadPxHelper(databank, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
+                        //if (oRead.Merge)
+                        //{
+                        //    G.Writeln2("*** ERROR: At the moment, you cannot merge in PX data import");
+                        //    throw new GekkoException();
+                        //}
+                        Program.ReadPxHelper(databankTemp, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
                     }
                     else
                     {
                         G.Writeln2("*** ERROR #78632432");
                         throw new GekkoException();
+                    }
+
+                    if (wipeDatabankBeforeInsertingData)
+                    {
+                        //string name = databank.aliasName;
+                        //databank = databankTemp;
+                        //databank.aliasName = name;
+                        for (int ii = 0; ii < Program.databanks.storage.Count; ii++)
+                        {
+                            if (G.Equal(Program.databanks.storage[ii].aliasName, databank.aliasName))
+                            {
+                                Program.databanks.storage[ii] = databankTemp;
+                            }
+                        }                        
+                    }
+                    else
+                    {
+                        //merging
+                        foreach (KeyValuePair<string, IVariable> kvp in databankTemp.storage)
+                        {
+                            if (databank.ContainsIVariable(kvp.Key)) databank.RemoveIVariable(kvp.Key);
+                            databank.AddIVariable(kvp.Key, kvp.Value); //no need to deep clone kvp.Value
+                        }
                     }
 
                     HandleCleanAndParentForTimeseries(databank, oRead.Merge);  //otherwise it will look dirty
@@ -19761,8 +19786,17 @@ namespace Gekko
                         throw new GekkoException();
                     }
                 }
-
-                if (type == GekkoFileReadOrWrite.Write)
+                else if (type == GekkoFileReadOrWrite.WriteAppend)
+                {
+                    //checking if the file is there at all for appending
+                    if (!File.Exists(pathAndFilename))
+                    {
+                        G.Writeln2("*** ERROR: Could not find file '" + pathAndFilename + "' for appending");
+                        if (!Directory.Exists(pathName)) G.Writeln2("*** ERROR: The directory '" + pathName + "' does not seem to exist");
+                        throw new GekkoException();
+                    }
+                }
+                else if (type == GekkoFileReadOrWrite.Write)
                 {
                     //checking if the path exists for writing the file
                     //string extension = Path.GetExtension(pathAndFilename);

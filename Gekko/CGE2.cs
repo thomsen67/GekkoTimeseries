@@ -57,7 +57,19 @@ namespace Gekko
             //======= household demand ==========
             //======= household demand ==========
 
-            useFunctions = false;
+            ccCode = null;
+        oString = "o";
+        idCounter = 0;
+        sw = null;
+        aggString = "agg";
+        priceString = "???";
+        volumeString = "???";
+        costString = "???";
+        activityString = "???";        
+        counterh = 0;
+        countere = 0;
+
+        useFunctions = false;
 
             sw = sw1;
 
@@ -220,7 +232,7 @@ namespace Gekko
                     }
                     else
                     {
-                        node.xCode = "frml " + i + " l" + node.volumeId + "w" + " = log(" + eff + right + " + gamma" + countere + ");";
+                        node.xCode = "frml " + i + " l" + node.volumeId + "w" + " = log(" + eff + right + " + gamma" + countere + " * oc" + countere + ");";
                     }                        
                 }
             }

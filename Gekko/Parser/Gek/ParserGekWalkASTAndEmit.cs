@@ -1782,6 +1782,8 @@ namespace Gekko.Parser.Gek
                                 //GAMS-like sum function, for instance sum(#i, x[#i]+1),
                                 //or unfold()-function, for instance unfold(#i, x[#i]+1)
 
+                                //string funcName = "localFunc" + ++Globals.counter;
+
                                 string parentListLoopVars1 = null;
                                 string parentListLoopVars2 = null;
 
@@ -1801,6 +1803,7 @@ namespace Gekko.Parser.Gek
                                 }
 
                                 string tempName = "temp" + ++Globals.counter;
+                                string funcName = "func" + ++Globals.counter;
                                 StringBuilder sb1 = new StringBuilder();
                                 string listName = null;
                                 if (node.listLoopAnchor == null)
@@ -1809,7 +1812,9 @@ namespace Gekko.Parser.Gek
                                     throw new GekkoException();
                                 }
                                 //method def:
-                                sb1.AppendLine("public static IVariable " + tempName + "(GekkoSmpl smpl" + parentListLoopVars1 + ") {");
+
+                                sb1.AppendLine("Func<IVariable> " + funcName + " = () => {");
+                                //sb1.AppendLine("public static IVariable " + tempName + "(GekkoSmpl smpl" + parentListLoopVars1 + ") {");
                                 if (G.Equal(functionNameLower, "sum"))
                                 {
                                     sb1.AppendLine("Series " + tempName + " = new Series(ESeriesType.Normal, Program.options.freq, null); " + tempName + ".SetZero(smpl);" + G.NL);
@@ -1837,9 +1842,11 @@ namespace Gekko.Parser.Gek
                                     sb1.AppendLine("}");
                                 }
                                 sb1.AppendLine("return " + tempName + ";" + G.NL);
-                                sb1.AppendLine("}");  //method def
-                                w.headerCs.Append(sb1);
-                                node.Code.A(tempName + "(smpl" + parentListLoopVars2 + ")");  //functionname may be for instance temp27(smpl)
+                                sb1.AppendLine("};");  //method def, must end with ;
+                                //w.headerCs.Append(sb1);
+                                if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
+                                w.wh.localFuncs.AppendLine(sb1.ToString());
+                                node.Code.A(funcName + "()"); //functionname may be for instance temp27(smpl)
 
                             }
                             else
@@ -4510,7 +4517,7 @@ namespace Gekko.Parser.Gek
                         break;                   
 
                 }
-            }
+            }  //end of switch on node.Text AFTER sub-nodes are done
             
             if (relativeDepth == 1)
             {
@@ -4519,7 +4526,7 @@ namespace Gekko.Parser.Gek
                 {
                     //string target = "Target" + ++Globals.counter;
                     //node.Code.CA("p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + target + ":" + G.NL + node.Code + G.NL + "if (smpl.HasError()) { O.TryNewSmpl(smpl); goto " + target + ";}"); //so errors get line numbers. Hmm with A() instead of CA() we get the command run 2 times...  //init the smpl for every command (this excludes IF, FOR, etc.? never mind).                    
-                    node.Code.CA("p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + node.Code);             
+                    node.Code.CA("p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + w.wh?.localFuncs?.ToString() + G.NL + node.Code);
 
                 }
 
@@ -6083,8 +6090,11 @@ namespace Gekko.Parser.Gek
             SeriesLhs,
             SeriesRhs
         }
-        
+
         //created for each new command (except IF, FOR, etc -- hmm is this true now?)
+
+        public GekkoStringBuilder localFuncs = null;
+
         public GekkoDictionary<string, string> localStatementCache = null;        
         public seriesType seriesHelper = seriesType.None;
 
