@@ -2119,13 +2119,22 @@ namespace Gekko
                     //if (Globals.pipeFileHelper.isPiping = true)  //this can be false with PIPE<pause>, and set with PIPE<continue>
                     {
                         isPiping = true;
-                        if (newline) Globals.pipeFileHelper.pipeFile.WriteLine(s);
-                        else Globals.pipeFileHelper.pipeFile.Write(s);
-                        Globals.pipeFileHelper.pipeFile.Flush();
+                        try
+                        {
+                            if (newline) Globals.pipeFileHelper.pipeFile.WriteLine(s);
+                            else Globals.pipeFileHelper.pipeFile.Write(s);
+                        }
+                        catch (IOException)
+                        {
+                            G.Writeln2("*** ERROR: I-o Problem with writing a line to pipe file");
+                            throw;
+                        }
+                        Globals.pipeFileHelper.pipeFile.Flush();  ////#80435243075235 flushing turned off here
                     }
                 }
                 catch (Exception e)
                 {
+                    //#80435243075235
                     MessageBox.Show("*** ERROR: Could not PIPE to file: " + Globals.pipeFileHelper.pipeFileFileWithPath);                    
                     throw new GekkoException();
                 }
@@ -2139,7 +2148,7 @@ namespace Gekko
                 isPiping = true;                
                 if (newline) Globals.pipeFileHelper2.pipeFile.WriteLine(s);
                 else Globals.pipeFileHelper2.pipeFile.Write(s);
-                Globals.pipeFileHelper2.pipeFile.Flush();
+                //Globals.pipeFileHelper2.pipeFile.Flush();  //turned off
                 }
                 catch (Exception e)
                 {

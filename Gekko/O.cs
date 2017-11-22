@@ -16,7 +16,7 @@ namespace Gekko
     /// in the code.    
     /// </summary>
 
-  
+
     public static class O
     {
         //Common methods start
@@ -57,12 +57,12 @@ namespace Gekko
         }
 
         public class GekkoListIterator : IEnumerable<ScalarString>
-        {            
+        {
             private List _ml = null;
 
             public GekkoListIterator(IVariable list)
             {
-                if(list.Type() != EVariableType.List)
+                if (list.Type() != EVariableType.List)
                 {
                     G.Writeln2("*** ERROR: Expected a list in iterator");
                     throw new GekkoException();
@@ -72,11 +72,11 @@ namespace Gekko
 
             public IEnumerator<ScalarString> GetEnumerator()
             {
-                foreach(IVariable iv in _ml.list)
+                foreach (IVariable iv in _ml.list)
                 {
                     string s = O.ConvertToString(iv);
                     yield return new ScalarString(s);
-                }                                         
+                }
             }
 
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
@@ -190,12 +190,12 @@ namespace Gekko
                     G.Writeln2("Databank " + bank.aliasName + " is empty");
                     continue;
                 }
-                foreach (Series ts in bank.storage.Values)  
+                foreach (Series ts in bank.storage.Values)
                 {
                     if (ts.freq == EFreq.Annual) a++;
                     else if (ts.freq == EFreq.Quarterly) q++;
                     else if (ts.freq == EFreq.Monthly) m++;
-                    else if (ts.freq == EFreq.Undated) u++;                    
+                    else if (ts.freq == EFreq.Undated) u++;
                 }
                 G.Writeln2("Databank " + bank.aliasName + ":");
                 if (a > 0) G.Writeln("  " + a + " annual timeseries");
@@ -288,7 +288,7 @@ namespace Gekko
         {
             //Returns the IVariable it finds here (or creates)
             string name2 = name.ConvertToString();
-            string value = rhs.ConvertToString();            
+            string value = rhs.ConvertToString();
             IVariable lhs = null;
             if (Program.scalars.TryGetValue(name2, out lhs))
             {
@@ -335,7 +335,7 @@ namespace Gekko
                     //The object has to die and be recreated, since it is of a wrong type.                                
                     Program.scalars.Remove(name2);
                     lhs = new ScalarDate(value);
-                    Program.scalars.Add(name2,lhs );
+                    Program.scalars.Add(name2, lhs);
                 }
             }
             else
@@ -358,7 +358,7 @@ namespace Gekko
                 x_val.val += step_val.val;
             }
             else if (x.Type() == EVariableType.String)
-            {                
+            {
                 //it is tested previously that step = null and start is metalist
                 List start_list = start as List;
                 if (counter >= start_list.list.Count)
@@ -469,13 +469,13 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: Expected FOR to loop over list, not a " + G.GetTypeString(start) + " type");
                     throw new GekkoException();
-                }               
+                }
 
                 if (counter <= start_list.list.Count) rv = true;
 
             }
             else throw new GekkoException();
-            return rv;        
+            return rv;
         }
 
 
@@ -484,11 +484,11 @@ namespace Gekko
             {
                 //for instance: FOR VAL i = 1 to 11 by 2; (1, 3, 5, 7, 9, 11)
                 //max typically has step/1000000 added, so it might be 11.000002
-                return i <= max;  
+                return i <= max;
             }
             else
             {
-                return i >= max;  
+                return i >= max;
                 //for instance: FOR VAL i = 11 to 1 by -2; (11, 9, 7, 5, 3, 1)
                 //max typically has step/1000000 added, so it might be 0.999998
             }
@@ -511,7 +511,7 @@ namespace Gekko
 
         public static void HandleIndexer(IVariable y, params IVariable[] x)
         {
-            HandleIndexerHelper(0, y, x);            
+            HandleIndexerHelper(0, y, x);
         }
 
         public static GekkoSmpl Smpl()
@@ -579,7 +579,7 @@ namespace Gekko
                     Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                     rv = rv_series;
                     foreach (GekkoTime t in smpl.Iterate03())
-                    {                        
+                    {
                         if (IsTrue(logical_series.GetData(smpl, t))) rv_series.SetData(t, x_val.val);
                         else rv_series.SetData(t, 0d);
                     }
@@ -641,15 +641,20 @@ namespace Gekko
             }
         }
 
-        //NOTE: Must have same signature as DollarLookup(), #89075234532
         public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type)
+        {
+            return Lookup(smpl, map, x, rhsExpression, isLeftSideVariable, type, true);
+        }
+
+        //NOTE: Must have same signature as DollarLookup(), #89075234532
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type, bool errorIfNotFound)
         {
             //This calls the more general Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression)
 
             if (x.Type() == EVariableType.String)
             {                
                 string dbName, varName, freq; char firstChar; Chop((x as ScalarString).string2, out dbName, out varName, out freq);                
-                IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable, type);
+                IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable, type, errorIfNotFound);
                 return iv;
             }
             else if (x.Type() == EVariableType.List)
@@ -669,7 +674,7 @@ namespace Gekko
                     foreach(string s in items)
                     {
                         string dbName, varName, freq; char firstChar; Chop(s, out dbName, out varName, out freq);
-                        IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable, type);
+                        IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable, type, errorIfNotFound);
                         rv.Add(iv);
                     }
                     List m = new List(rv);
@@ -687,6 +692,11 @@ namespace Gekko
         }
 
         public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type)
+        {
+            return Lookup(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable, type, true);
+        }
+
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type, bool errorIfNotFound)
         {
             //map != null:             the variable is found in the MAP, otherwise, the variable is found in a databank
             //rhsExpression != null:   it is an assignment of the left-hand side
@@ -749,7 +759,7 @@ namespace Gekko
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
 
                 //NOTE: databank search may be allowed!
-                return LookupHelperRightside(smpl, map, dbName, varnameWithFreq);
+                return LookupHelperRightside(smpl, map, dbName, varnameWithFreq, errorIfNotFound);
             }
         }
 
@@ -773,6 +783,11 @@ namespace Gekko
 
         private static IVariable LookupHelperRightside(GekkoSmpl smpl, Map map, string dbName, string varnameWithFreq)
         {
+            return LookupHelperRightside(smpl, map, dbName, varnameWithFreq, true);
+        }
+
+        private static IVariable LookupHelperRightside(GekkoSmpl smpl, Map map, string dbName, string varnameWithFreq, bool errorIfNotFound)
+        {
             //Can either look up stuff in a Map, or in a databank
                        
             IVariable rv = null;
@@ -786,12 +801,12 @@ namespace Gekko
                     {
                         //DATA mode
                         //Search if on the right-hand side (rhs), in data mode, and no bank is indicated
-                        if (smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
+                        if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
                         {
                             //we only do this for timeseries!
                             rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
-                            if (rv == null)
-                            {                                
+                            if (rv == null && errorIfNotFound)
+                            {
                                 G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in databank 'Ref'");
                                 throw new GekkoException();
                             }
@@ -799,7 +814,7 @@ namespace Gekko
                         else
                         {
                             rv = GetVariableSearch(rv, varnameWithFreq);
-                            if (rv == null)
+                            if (rv == null && errorIfNotFound)
                             {
                                 G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in any open databank (excluding Ref)");
                                 throw new GekkoException();
@@ -813,7 +828,7 @@ namespace Gekko
                         {
                             //at the moment, this logic also includes VALs etc. !!!!!!!!!!!!!!!!!!!! (why not, really?)
                             rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
-                            if (rv == null)
+                            if (rv == null && errorIfNotFound)
                             {
                                 G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in databank 'Ref'");
                                 throw new GekkoException();
@@ -822,7 +837,7 @@ namespace Gekko
                         else
                         {
                             rv = Program.databanks.GetFirst().GetIVariable(varnameWithFreq);
-                            if (rv == null)
+                            if (rv == null && errorIfNotFound)
                             {
                                 G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in the first-position databank ('" + Program.databanks.GetFirst().aliasName + "')");
                                 throw new GekkoException();
@@ -839,7 +854,7 @@ namespace Gekko
                     {
                         //only for series type
                         rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
-                        if (rv == null)
+                        if (rv == null && errorIfNotFound)
                         {
                             G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in databank 'Ref'");
                             throw new GekkoException();
@@ -850,7 +865,7 @@ namespace Gekko
                         //databank name is given explicitly, and we are not doing bankNumber stuff
                         //We use the IBank interface here (map==null)
                         rv = LookupHelperRightside2(map, dbName, varnameWithFreq);
-                        if (rv == null)
+                        if (rv == null && errorIfNotFound)
                         {
                             G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in databank '" + dbName + "'");
                             throw new GekkoException();

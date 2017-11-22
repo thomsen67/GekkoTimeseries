@@ -14788,7 +14788,7 @@ namespace Gekko
                     Globals.pipe = false;
                     Globals.pipeFileHelper.pipeFile = null;
                     Globals.pipeFileHelper.pipeFileFileWithPath = "";
-                    if (!mute) G.Writeln("Directing output to main window");
+                    if (!mute) G.Writeln2("Directing output to main window");
                 }
             }
             else if(pause)
@@ -14851,10 +14851,11 @@ namespace Gekko
 
         private static void StartPipingToFile(string fileName, bool append, bool html, bool mute)
         {
-            if (!mute && !Globals.pipe) G.Writeln("Directing output to file: '" + fileName + "'");
+            if (!mute && !Globals.pipe) G.Writeln2("Directing output to file: '" + fileName + "'");
             Globals.pipe = true;
             GekkoFileReadOrWrite option = GekkoFileReadOrWrite.Write;
-            if (append) option = GekkoFileReadOrWrite.WriteAppend;  //will be ok if the file does not exist, then it is just created with no warning issued
+
+            bool exists = false; if (File.Exists(fileName)) exists = true;
 
             bool mustDeleteFileFirst = false;
             string s1 = null;
@@ -14866,7 +14867,7 @@ namespace Gekko
                 css = GetHtmlHeaderCssStyles();
                 s1 = Globals.htmlFileStart1 + css + Globals.htmlFileStart2;
                 s2 = Globals.htmlFileEnd;
-                if (append && File.Exists(fileName))
+                if (append && exists)
                 {
                     mustDeleteFileFirst = true;
                     string s = GetTextFromFileWithWait(fileName);
@@ -14879,10 +14880,13 @@ namespace Gekko
                     //this behavior is equivalent to txt files.
                 }
             }
-            if (mustDeleteFileFirst)
+            if (mustDeleteFileFirst)  //if html && append && exists
             {
                 WaitForFileDelete(fileName);
             }
+
+            if (append && exists && !mustDeleteFileFirst) option = GekkoFileReadOrWrite.WriteAppend;  //only for append in text files, html will have will have mustDeleteFileFirst = true. Should be ok if the file does not exist, then it is just created with no warning issued
+
             FileStream fs = WaitForFileStream(fileName, option);
             Globals.pipeFileHelper.pipeFile = G.GekkoStreamWriter(fs);
             Globals.pipeFileHelper.pipeFileTypeIsHtml = html;
@@ -19823,12 +19827,15 @@ namespace Gekko
                 }
                 catch (UnauthorizedAccessException e)
                 {
-                    G.Writeln2("*** ERROR: It seems the file may be read-only: " + pathAndFilename);
-                    throw;
+                    //G.Writeln2("*** ERROR: It seems the file may be read-only: " + pathAndFilename);
+                    //throw;
+                    G.Writeln("+++ WARNING: File '" + pathAndFilename + "' seems read-only. Retrying... (" + (i * gap) + " seconds)");
+                    System.Threading.Thread.Sleep(gap * 1000);  //1 seconds
+                    continue;
+
                 }
                 catch (Exception e)
-                {
-                    //TODO: Can also fail with IOException if folder is not existing, handle that...
+                {                    
                     G.Writeln("+++ WARNING: File '" + pathAndFilename + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
                     System.Threading.Thread.Sleep(gap * 1000);  //1 seconds
                     continue;

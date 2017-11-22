@@ -1533,20 +1533,17 @@ namespace Gekko
 
             return rv;
         }
-       
-        //ALL THESE SHOULD BE DELETED
+               
         public static IVariable pchy(GekkoSmpl t, IVariable x1)
         {
             return null;
         }
-
-        //ALL THESE SHOULD BE DELETED
+               
         public static IVariable dlogy(GekkoSmpl t, IVariable x1)
         {
             return null;
         }
-
-        //ALL THESE SHOULD BE DELETED
+                
         public static IVariable dify(GekkoSmpl t, IVariable x1)
         {
             return null;
@@ -1856,57 +1853,21 @@ namespace Gekko
         public static IVariable exist(GekkoSmpl smpl, IVariable x1)
         {
             double d = 0d;
-            string s1 = O.ConvertToString(x1);
-            ExtractBankAndRestHelper h = Program.ExtractBankAndRest(s1, EExtrackBankAndRest.OnlyStrings);
-            if (Program.databanks.GetDatabank(h.bank) == null)
-            {
-                G.Writeln2("*** ERROR: The databank '" + h.bank + "' is not open");
-                throw new GekkoException();
-            }
-            if (Program.databanks.GetDatabank(h.bank).ContainsVariable(true, h.name)) d = 1d;
+            IVariable y = O.Lookup(smpl, null, x1, null, false, EVariableType.Var, false);  //will use search settings (data, sim mode) if not bank is given
+            if (y != null) d = 1d;            
             ScalarVal v = new ScalarVal(d);
             return v;
         }
 
         public static IVariable fromseries(GekkoTime t, IVariable x1, IVariable x2)
         {
-            string s1 = O.ConvertToString(x1);
+            //string s1 = O.ConvertToString(x1);
             string s2 = O.ConvertToString(x2);
-
-            //TODO TODO
-            //TODO TODO
-            //TODO TODO use ExtractBankAndRest() here
-            //TODO TODO
-            //TODO TODO
-
-            string bank = Program.databanks.GetFirst().aliasName;
-            string name = null;
-            string[] split = s1.Split(':');
-            if (split.Length > 2)
-            {
-                G.Writeln2("*** ERROR: fromSeries() first arg has > 1 colons");
-                throw new GekkoException();
-            }
-            else if (split.Length == 2)
-            {
-                bank = split[0].Trim();
-                name = split[1].Trim();
-            }
-            else
-            {
-                name = split[0].Trim();
-            }
-
-            Databank db = Program.databanks.GetDatabank(bank);
-            if (db == null)
-            {
-                G.Writeln2("*** ERROR: fromSeries(): Databank '" + db + "' could not be found.");
-                throw new GekkoException();
-            }
-            Series ts = db.GetVariable(name);
+                        
+            Series ts = O.Lookup(null, null, x1, null, false, EVariableType.Var) as Series;
             if (ts == null)
             {
-                G.Writeln2("*** ERROR: fromSeries(): Series '" + name + "' could not be found in '" + bank + "'.");
+                G.Writeln2("*** ERROR: Variable is not of series type");
                 throw new GekkoException();
             }
 
