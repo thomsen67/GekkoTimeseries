@@ -23274,24 +23274,20 @@ namespace Gekko
             //List<string> printCodes = new List<string>();
             foreach (O.Prt.Element element in oPrt.prtElements)
             {
-                //O.Prt.SubElement subElement = element.subElements[0];
-                //generally, subElements only have 1 item (used to expand lists in Gekko < 3.0)
                 
                 List<OptString> printCodes2 = new List<OptString>();
                 if (element.printCodes.Count == 0) printCodes2.Add(new OptString("n", "yes"));
                 else printCodes2.AddRange(element.printCodes);
-                foreach (OptString printCode in printCodes2)
+                foreach (string printCode in element.printCodesFinal)
                 {
-                    //wlist.Add(subElement.tsWork);
-                    //rlist.Add(subElement.tsBase);
-                    //printCodes.Add(printCode.s1);
+                    
                     O.PrtContainer c = new O.PrtContainer();
-                    c.ivFirst = element.tsWork;
-                    c.ivRef = element.tsBase;
-                    c.printCode = printCode.s1;
+                    c.ivFirst = element.variable[0];
+                    c.ivRef = element.variable[1];
+                    c.printCode = printCode;
                     c.label = element.label;
 
-                    c.linetypes=element.linetype;
+                    c.linetypes = element.linetype;
                     c.dashtypes = element.dashtype;
                     c.linewidths = element.linewidth;
                     c.linecolors = element.linecolor;

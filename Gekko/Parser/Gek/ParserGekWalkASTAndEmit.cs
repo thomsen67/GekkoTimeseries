@@ -3725,29 +3725,27 @@ namespace Gekko.Parser.Gek
                             node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2);" + G.NL);
                             ASTNode child = node.GetChild("ASTPRTELEMENTOPTIONFIELD");
                             if (child != null) node.Code.A(child.Code);
+                            
                             if (node.Text == "ASTPRTELEMENT")
                             {
-                                node.Code.A("bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o" + Num(node) + ", ope" + Num(node) + "));" + G.NL);
+                                node.Code.A("ope" + Num(node) + ".printCodesFinal = Program.GetElementPrintCodes(o" + Num(node) + ", ope" + Num(node) + ");");
+                                node.Code.A("bankNumbers = O.Prt.GetBankNumbers(null, ope" + Num(node) + ".printCodesFinal);");
+                                //node.Code.A("bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o" + Num(node) + ", ope" + Num(node) + "));" + G.NL);
                             }
                             else if (node.Text == "ASTTABLESETVALUESELEMENT")
                             {
                                 node.Code.A("bankNumbers = O.Prt.GetBankNumbers(Globals.tableOption, new List<string>(){o" + Num(node) + ".printcode}" + ");" + G.NL);
                             }
-                            node.Code.A("foreach(int bankNumber in bankNumbers) {" + G.NL);  //For bankNumber = 2, no cache will ever be used to avoid confusion. Cache is only for 1 (Work).                            
-                            
-                            //node.Code.A("ope" + Num(node) + ".ts = ("+ node[0].Code+ ");" + G.NL);  //uuu   
+                            node.Code.A("foreach(int bankNumber in bankNumbers) {" + G.NL);
 
-                            //node.Code.A("ope" + Num(node) + ".subElements = new List<O.Prt.SubElement>();" + G.NL);
-                            //node.Code.A("ope" + Num(node) + ".subElements.Add(new O.Prt.SubElement());" + G.NL);
-
+                            node.Code.A("smpl.bankNumber = bankNumber;" + G.NL);
                             node.Code.A(EmitLocalCacheForTimeLooping(w));
-
-                            //node.Code.A("ope0.subElements[0].tsWork = O.ConvertToTimeSeriesLight(" + Globals.smpl + ", " + node[0].Code + ");" + G.NL);  //HMMMMM: 0...?
-                            node.Code.A("ope" + Num(node) + ".tsWork = " + node[0].Code + ";" + G.NL);
-
-                            //node.Code.A("O.GetVal777(" + node[0].Code + ", bankNumber, ope" + Num(node) + ", t);" + G.NL);  //uuu                            
-
-                            node.Code.A("}" + G.NL);
+                                                        
+                            //node.Code.A("smpl" 
+                            node.Code.A("ope" + Num(node) + ".variable[bankNumber] = " + node[0].Code + ";" + G.NL);
+                            
+                            node.Code.A("}" + G.NL);  //end of bankNumbers
+                            node.Code.A("smpl.bankNumber = 0;" + G.NL);  //resetting, probably superfluous
                             node.Code.A("o" + Num(node) + ".prtElements.Add(ope" + Num(node) + ");" + G.NL);                            
                             node.Code.A("}" + G.NL);  //avoid scope collisions
 

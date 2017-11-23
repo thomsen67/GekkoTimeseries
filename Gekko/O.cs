@@ -6418,7 +6418,7 @@ namespace Gekko
                 public string format = null;
                 public List<Prt.Element> prtElements = new List<Prt.Element>();
                 public void Exe() {
-                    Program.GetTable(this.name).CurRow.SetValues(this.col, this.prtElements[0].tsWork as Series, this.prtElements[0].tsBase as Series, null, this.t1, this.t2, Globals.tableOption, this.printcode, this.scale, this.format);
+                    Program.GetTable(this.name).CurRow.SetValues(this.col, this.prtElements[0].variable[0] as Series, this.prtElements[0].variable[1] as Series, null, this.t1, this.t2, Globals.tableOption, this.printcode, this.scale, this.format);
                 }
             }
         }
@@ -6604,11 +6604,11 @@ namespace Gekko
                     
                     if (usesWork)
                     {
-                        rv.Add(1);
+                        rv.Add(0);
                     }
                     if (usesBase)
                     {
-                        rv.Add(2);                    
+                        rv.Add(1);                    
                     }                    
                 }
                 return rv;
@@ -6680,13 +6680,17 @@ namespace Gekko
             {
                 //public List<SubElement> subElements = null;
 
-                public IVariable tsWork = null;
-                public IVariable tsBase = null;
+                //public IVariable tsWork = null;
+                //public IVariable tsBase = null;
+                public IVariable[] variable = new IVariable[2];  //first and ref
                 public string label = null;
                 //public string originalLabel = null;
                 public string endoExoIndicator = null;
                 //-- layout
                 public List<OptString> printCodes = new List<OptString>();
+
+                public List<string> printCodesFinal = null;
+
                 public int width = -12345;
                 public int dec = -12345;
                 public int nwidth = -12345;
@@ -6704,15 +6708,10 @@ namespace Gekko
                 public string y2 = null;
                 //--- errors
                 public List<string> errors = new List<string>();
+                                
             }
 
-            public class SubElement
-            {
-                //Items that are unfolded via lists
-                public IVariable tsWork = null;
-                public IVariable tsBase = null;
-                public string label;
-            }
+            
         }
 
 
