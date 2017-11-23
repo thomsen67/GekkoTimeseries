@@ -141,13 +141,20 @@ namespace Gekko
         
         public static string Work = "Work";
         public static string Ref = "Ref";
-
-        public const string printCode_s = "r";
-        public const string printCode_sn = "rn";
-        public const string printCode_sp = "rp";
-        public const string printCode_sd = "rd";
-        public const string printCode_sdp = "rdp";      
                 
+        public const string printCode_n = "n";        
+        public const string printCode_p = "p";
+        public const string printCode_d = "d";
+        public const string printCode_dp = "dp";
+        public const string printCode_r = "r";
+        public const string printCode_rn = "rn";
+        public const string printCode_rp = "rp";
+        public const string printCode_rd = "rd";
+        public const string printCode_rdp = "rdp";
+        public const string printCode_m = "m";
+        public const string printCode_q = "q";
+        public const string printCode_mp = "mp";
+
         public List<Databank> bankOpen = new List<Databank>();
         
         public static string ttPath3 = "GekkoCS";  //or "GekkoCS"

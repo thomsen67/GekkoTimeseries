@@ -6539,51 +6539,51 @@ namespace Gekko
                 List<int> rv = new List<int>();
 
                 //TODO: CLEAN THIS UP!!                                                
-                if (G.Equal(tableOrGraphGlobalPrintCode, "n"))
+                if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_n))
                 {
                     rv = new List<int>(); rv.Add(1);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, "d"))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_d))
                 {
                     rv = new List<int>(); rv.Add(1);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, "p"))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_p))
                 {
                     rv = new List<int>(); rv.Add(1);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, "dp"))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_dp))
                 {
                     rv = new List<int>(); rv.Add(1);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_s))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_r))
                 {
                     rv = new List<int>(); rv.Add(2);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_sn))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_rn))
                 {
                     rv = new List<int>(); rv.Add(2);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_sd))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_rd))
                 {
                     rv = new List<int>(); rv.Add(2);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_sp))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_rp))
                 {
                     rv = new List<int>(); rv.Add(2);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_sdp))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_rdp))
                 {
                     rv = new List<int>(); rv.Add(2);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, "m"))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_m))
                 {
                     rv = new List<int>(); rv.Add(1); rv.Add(2);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, "q"))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_q))
                 {
                     rv = new List<int>(); rv.Add(1); rv.Add(2);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, "mp"))
+                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_mp))
                 {
                     rv = new List<int>(); rv.Add(1); rv.Add(2);
                 }                

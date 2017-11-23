@@ -1328,7 +1328,7 @@ namespace Gekko
 
         public void Set(int row, int col, string name, GekkoTime tStart, GekkoTime tEnd, string option, double scale, string format)
         {
-            if (Globals.tableOption == "" || Globals.tableOption == "n" || Globals.tableOption == "m" || Globals.tableOption == Globals.printCode_s)
+            if (Globals.tableOption == "" || Globals.tableOption == "n" || Globals.tableOption == "m" || Globals.tableOption == Globals.printCode_r)
             {
                 //good
             }
@@ -1344,7 +1344,7 @@ namespace Gekko
                 throw new GekkoException();
             }
             string db = Globals.Work;
-            if (G.Equal(Globals.tableOption, Globals.printCode_s)) db = Globals.Ref;
+            if (G.Equal(Globals.tableOption, Globals.printCode_r)) db = Globals.Ref;
             int counter = 0;
             foreach (GekkoTime t in new GekkoTimeIterator( tStart, tEnd))
             {
@@ -1413,7 +1413,7 @@ namespace Gekko
                 }                             
 
                 this.SetNumber(row, col + counter, scale * var1, format);
-                if (Globals.tableOption == "p" || Globals.tableOption == "q" || Globals.tableOption == "mp" || Globals.tableOption == "dp" || Globals.tableOption == Globals.printCode_sp || Globals.tableOption == Globals.printCode_sdp)
+                if (Globals.tableOption == "p" || Globals.tableOption == "q" || Globals.tableOption == "mp" || Globals.tableOption == "dp" || Globals.tableOption == Globals.printCode_rp || Globals.tableOption == Globals.printCode_rdp)
                 {
                     Cell cell = this.Get(row, col + counter);
                     if (cell != null)

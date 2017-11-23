@@ -568,12 +568,12 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTS":                    
                         {
-                            node.Code.A(AddPrintCode( Globals.printCode_s, node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddPrintCode( Globals.printCode_r, node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;                    
                     case "ASTSN":  //rn
                         {
-                            node.Code.A(AddPrintCode(Globals.printCode_sn, node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddPrintCode(Globals.printCode_rn, node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTBANK":
@@ -587,17 +587,17 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTSD":
                         {
-                            node.Code.A(AddPrintCode(Globals.printCode_sd, node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddPrintCode(Globals.printCode_rd, node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTSDP":
                         {
-                            node.Code.A(AddPrintCode(Globals.printCode_sdp, node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddPrintCode(Globals.printCode_rdp, node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTSP":
                         {
-                            node.Code.A(AddPrintCode(Globals.printCode_sp, node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddPrintCode(Globals.printCode_rp, node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTPRTROWS":

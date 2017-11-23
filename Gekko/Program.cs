@@ -21516,7 +21516,7 @@ namespace Gekko
 
             StampTypes type = StampTypes.Normal;
             if (G.Equal(Globals.tableOption, "m")) type = StampTypes.Multiplier;
-            else if (G.Equal(Globals.tableOption, Globals.printCode_s)) type = StampTypes.Base;
+            else if (G.Equal(Globals.tableOption, Globals.printCode_r)) type = StampTypes.Base;
             List<string> lines = GetDatabankInfo(type);
             if (Program.options.table_stamp)
             {
@@ -23269,18 +23269,50 @@ namespace Gekko
         public static void OPrint(O.Prt oPrt)
         {
             List<O.PrtContainer> container = new List<O.PrtContainer>();
-            //List<IVariable> wlist = new List<IVariable>();
-            //List<IVariable> rlist = new List<IVariable>();
-            //List<string> printCodes = new List<string>();
-            foreach (O.Prt.Element element in oPrt.prtElements)
+
+            //If PRT <m> unfold(#m, {#m}), we will get 1 prtElement (since there are no commas), where 
+            //variable[0] and [1] are both lists with two items (if #m has two items).
+
+            //If PRT unfold(#m, {#m}), we will get 1 prtElement (since there are no commas), where 
+            //variable[0] is a list with two items (if #m has two items).
+            //this must be exploded into <n p>, so from the 1 prtElement, we should take
+            //variable[0][0] as n, variable[0][0] as p, variable[0][1] as n, variable[0][1] as p.
+
+            //foreach (O.Prt.Element element in oPrt.prtElements)
+            //{
+
+            //    List<OptString> printCodes2 = new List<OptString>();
+            //    if (element.printCodes.Count == 0) printCodes2.Add(new OptString("n", "yes"));
+            //    else printCodes2.AddRange(element.printCodes);
+            //    foreach (string printCode in element.printCodesFinal)
+            //    {
+
+            //        O.PrtContainer c = new O.PrtContainer();
+            //        c.variable[0] = element.variable[0];
+            //        c.variable[1] = element.variable[1];
+            //        c.printCode = printCode;
+            //        c.label = element.label;
+
+            //        c.linetypes = element.linetype;
+            //        c.dashtypes = element.dashtype;
+            //        c.linewidths = element.linewidth;
+            //        c.linecolors = element.linecolor;
+            //        c.pointtypes = element.pointtype;
+            //        c.pointsizes = element.pointsize;
+            //        c.fillstyles = element.fillstyle;
+            //        c.y2s = element.y2;
+
+            //        container.Add(c);
+            //    }
+            //}
+
+            foreach (O.Prt.Element element in oPrt.prtElements)  //this element may be a list with 2 timeseries
             {
                 
-                List<OptString> printCodes2 = new List<OptString>();
-                if (element.printCodes.Count == 0) printCodes2.Add(new OptString("n", "yes"));
-                else printCodes2.AddRange(element.printCodes);
-                foreach (string printCode in element.printCodesFinal)
+                foreach (string printCode in element.printCodesFinal)  //this may be two printcodes <n p>
                 {
-                    
+                    //after this, 
+
                     O.PrtContainer c = new O.PrtContainer();
                     c.variable[0] = element.variable[0];
                     c.variable[1] = element.variable[1];
@@ -23326,10 +23358,31 @@ namespace Gekko
 
                 List<IVariable> errorList = new List<IVariable>();
 
-                foreach (O.PrtContainer c in container)
+                if (true)
                 {
-                    //counter++;
-                    PrintHelper2(containerExplode, freqs, c, true, false, errorList);
+                    foreach (O.PrtContainer c in container)
+                    {
+                        //counter++;
+                        PrintHelper2(containerExplode, freqs, c, true, false, errorList);
+                    }
+                }
+                else
+                {
+                    foreach (O.PrtContainer c in container)
+                    {
+                        if (c.variable[0] != null && !G.IsValueType(c.variable[0]))
+                        {
+                            errorList.Add(c.variable[0]);
+                        }
+                        else if (c.variable[1] != null && !G.IsValueType(c.variable[1]))
+                        {
+                            errorList.Add(c.variable[1]);
+                        }
+                        else
+                        {
+                            containerExplode.Add(c);
+                        }
+                    }
                 }
 
                 if (errorList.Count > 0)
@@ -23426,12 +23479,17 @@ namespace Gekko
                         //--------------------------------
                         //TODO: make this depend upon printcode
                         //--------------------------------
-                        int bankCombi = 0;  //0: Work no Ref, 1: Ref no Work: 2: both
-                        if (printCode == "n") bankCombi = 0;
-                        else if (printCode == "p") bankCombi = 0;
-                        else if (printCode == "m") bankCombi = 2;
-                        else if (printCode == "q") bankCombi = 2;
-                        else if (printCode == "r") bankCombi = 1;
+                        int bankCombi = -12345;  //0: Work no Ref, 1: Ref no Work: 2: both
+                        //if (printCode == "n") bankCombi = 0;
+                        //else if (printCode == "p") bankCombi = 0;
+                        //else if (printCode == "m") bankCombi = 2;
+                        //else if (printCode == "q") bankCombi = 2;
+                        //else if (printCode == "r") bankCombi = 1;
+
+                        List<int>bankNumbers = O.Prt.GetBankNumbers(null, new List<string> { printCode });
+                        if (bankNumbers.Contains(0) && !bankNumbers.Contains(1)) bankCombi = 0;
+                        else if (bankNumbers.Contains(1) && !bankNumbers.Contains(0)) bankCombi = 1;
+                        else bankCombi = 2;
 
                         EFreq freqColumn = EFreq.None;
                         if (j > 1)
@@ -24285,13 +24343,13 @@ namespace Gekko
             }
 
             double? d = null;
-            if (tsWork == null)
+            if (tsWork == null && tsRef == null)  //not series
             {
                 if (sameFreq == freqColumn) d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, printCode, sumOver, skipCounter);
             }
             else
             {
-                if (tsWork.freq == freqColumn) d = PrintHelperTransform(smpl, tsWork, tsRef, t, printCode, sumOver, skipCounter);
+                if ((tsWork != null && tsWork.freq == freqColumn) || (tsRef != null && tsRef.freq == freqColumn)) d = PrintHelperTransform(smpl, tsWork, tsRef, t, printCode, sumOver, skipCounter);
             }
             if (d != null)
             {
@@ -24326,37 +24384,57 @@ namespace Gekko
             double dWork = 0d;
             double dRef = 0d;
             double dWorkLag = 0d;
+            double dWorkLag2 = 0d;
             double dRefLag = 0d;
+            double dRefLag2 = 0d;
             for (int i = 0; i < sumOver + filterSkip; i++)
             {
                 if (tsWork != null)
                 {
                     dWork += tsWork.GetData(smpl, t.Add(-i));
                     dWorkLag += tsWork.GetData(smpl, t.Add(-i - 1));
+                    dWorkLag2 += tsWork.GetData(smpl, t.Add(-i - 2));
                 }
                 if (tsRef != null)
                 {
                     dRef += tsRef.GetData(smpl, t.Add(-i));
                     dRefLag += tsRef.GetData(smpl, t.Add(-i - 1));
+                    dRefLag2 += tsRef.GetData(smpl, t.Add(-i - 2));
                 }
             }
-            if (G.Equal(printcode, "n")) return dWork;
-            else if (G.Equal(printcode, "q")) return (dWork / dRef - 1d) * 100d;
-            else if (G.Equal(printcode, "p")) return (dWork / dWorkLag - 1d) * 100d;
-
-            return 123454321d;
+            if (G.Equal(printcode, Globals.printCode_n)) return dWork;
+            else if (G.Equal(printcode, Globals.printCode_m)) return dWork - dRef;
+            else if (G.Equal(printcode, Globals.printCode_q)) return (dWork / dRef - 1d) * 100d;
+            else if (G.Equal(printcode, Globals.printCode_d)) return dWork - dWorkLag;
+            else if (G.Equal(printcode, Globals.printCode_p)) return (dWork / dWorkLag - 1d) * 100d;
+            else if (G.Equal(printcode, Globals.printCode_dp)) return (dWork / dWorkLag - 1d) * 100d - (dWorkLag / dWorkLag2 - 1d) * 100d;
+            else if (G.Equal(printcode, Globals.printCode_r) || G.Equal(printcode, Globals.printCode_rn)) return dRef;
+            else if (G.Equal(printcode, Globals.printCode_rd)) return dRef - dRefLag;
+            else if (G.Equal(printcode, Globals.printCode_rp)) return (dRef / dRefLag - 1d) * 100d;
+            else if (G.Equal(printcode, Globals.printCode_rdp)) return (dRef / dRefLag - 1d) * 100d - (dRefLag / dRefLag2 - 1d) * 100d;
+            else
+            {
+                G.Writeln2("*** ERROR: Transformation error");
+                throw new GekkoException();
+            }
         }
 
         private static double PrintHelperTransformScalar(double scalarWork, double scalarRef, string printcode, int sumOver, int[] skipCounter)
         {
             if (G.Equal(printcode, "n")) return (sumOver * scalarWork);
             else if (G.Equal(printcode, "q")) return ((sumOver * scalarWork) / (sumOver * scalarRef) - 1d) * 100d;
-            return 123454321d;
+            else if (G.Equal(printcode, "p")) return 0d;
+            else
+            {
+                G.Writeln2("*** ERROR: Transformation error");
+                throw new GekkoException();
+            }
         }
 
         private static void PrintHelper2(List<O.PrtContainer> containerExplode, bool[] freqs, O.PrtContainer container, bool root, bool isRef, List<IVariable> errorList)
         {
             //TODO: what to do with ref, how to merge??? What if MULPRT {#m1}, and #m1 has different elements 
+                      
 
             if (container.variable[0] != null && container.variable[0].Type() == EVariableType.Series)
             {
@@ -24991,7 +25069,7 @@ namespace Gekko
             else
             {
                 //percent print codes
-                if (G.Equal(printCode, "p") || G.Equal(printCode, Globals.printCode_sp))
+                if (G.Equal(printCode, "p") || G.Equal(printCode, Globals.printCode_rp))
                 {
                     if (n == -12345)
                     {
@@ -25122,8 +25200,8 @@ namespace Gekko
             ph.printCodes.Clear();
             ph.printCodes.Add("n");
             ph.printCodes.Add("p");
-            ph.printCodes.Add(Globals.printCode_s);
-            ph.printCodes.Add(Globals.printCode_sp);
+            ph.printCodes.Add(Globals.printCode_r);
+            ph.printCodes.Add(Globals.printCode_rp);
             ph.printCodes.Add("m");
             ph.printCodes.Add("q");
         }
@@ -25561,7 +25639,7 @@ namespace Gekko
 
         private static bool IsLevelPrintCode(string printCode)
         {
-            return printCode == "" || printCode == "n" || printCode == "d" || printCode == Globals.printCode_s || printCode == Globals.printCode_sn || printCode == Globals.printCode_sd || printCode == "m";
+            return printCode == "" || printCode == "n" || printCode == "d" || printCode == Globals.printCode_r || printCode == Globals.printCode_rn || printCode == Globals.printCode_rd || printCode == "m";
         }
 
         private static string GetPrintCodeLabel(string printCode, bool isVerbose, bool useExoEndoIndicator, bool identicalCodes)
@@ -25571,21 +25649,21 @@ namespace Gekko
             {
                 printCodeLabel = "lev";  //MULPRT<lev>
             }
-            else if (printCode == Globals.printCode_s || printCode == Globals.printCode_sn)
+            else if (printCode == Globals.printCode_r || printCode == Globals.printCode_rn)
             {
                 printCodeLabel = "@lev";
                 if (isVerbose) printCodeLabel = Globals.Ref + " bank";
             }
             else if (printCode == "d") printCodeLabel = "dif";  //PRT<dif>
-            else if (printCode == Globals.printCode_sd) printCodeLabel = "@dif";
+            else if (printCode == Globals.printCode_rd) printCodeLabel = "@dif";
             else if (printCode == "p") printCodeLabel = "%";  //PRT<pch>
-            else if (printCode == Globals.printCode_sp)
+            else if (printCode == Globals.printCode_rp)
             {
                 printCodeLabel = "@%";
                 if (isVerbose) printCodeLabel = "%";
             }
             else if (printCode == "dp") printCodeLabel = "dif%";  //PRT<gdif>
-            else if (printCode == Globals.printCode_sdp) printCodeLabel = "@dif%";
+            else if (printCode == Globals.printCode_rdp) printCodeLabel = "@dif%";
             else if (printCode == "m")
             {
                 printCodeLabel = "mdif";  //MULPRT<abs>
@@ -25727,7 +25805,7 @@ namespace Gekko
 
         public static bool IsPrintCodeShort(string printCode)
         {
-            return G.Equal(printCode, "n") || G.Equal(printCode, "d") || G.Equal(printCode, "p") || G.Equal(printCode, "dp") || G.Equal(printCode, Globals.printCode_s) || G.Equal(printCode, Globals.printCode_sn) || G.Equal(printCode, Globals.printCode_sd) || G.Equal(printCode, Globals.printCode_sp) || G.Equal(printCode, Globals.printCode_sdp) || G.Equal(printCode, "m") || G.Equal(printCode, "q") || G.Equal(printCode, "mp");
+            return G.Equal(printCode, "n") || G.Equal(printCode, "d") || G.Equal(printCode, "p") || G.Equal(printCode, "dp") || G.Equal(printCode, Globals.printCode_r) || G.Equal(printCode, Globals.printCode_rn) || G.Equal(printCode, Globals.printCode_rd) || G.Equal(printCode, Globals.printCode_rp) || G.Equal(printCode, Globals.printCode_rdp) || G.Equal(printCode, "m") || G.Equal(printCode, "q") || G.Equal(printCode, "mp");
         }
 
         public static bool IsPrintCodeShortMultiplier(string printCode)
@@ -25737,7 +25815,7 @@ namespace Gekko
 
         public static bool IsPrintCodeShortBase(string printCode)
         {
-            return G.Equal(printCode, Globals.printCode_s) || G.Equal(printCode, Globals.printCode_sn) || G.Equal(printCode, Globals.printCode_sd) || G.Equal(printCode, Globals.printCode_sp) || G.Equal(printCode, Globals.printCode_sdp);
+            return G.Equal(printCode, Globals.printCode_r) || G.Equal(printCode, Globals.printCode_rn) || G.Equal(printCode, Globals.printCode_rd) || G.Equal(printCode, Globals.printCode_rp) || G.Equal(printCode, Globals.printCode_rdp);
         }
 
         public static bool IsPrintCodeShortWork(string printCode)
@@ -26315,8 +26393,8 @@ namespace Gekko
                         po.isDiff = false;
                         po.isLevel = false;
                         break;
-                    case Globals.printCode_s:
-                    case Globals.printCode_sn:
+                    case Globals.printCode_r:
+                    case Globals.printCode_rn:
                         po.isMultiplier = false;
                         po.isBaseline = true;
                         po.isLog = false;
@@ -26325,7 +26403,7 @@ namespace Gekko
                         po.isDiff = false;
                         po.isLevel = true;
                         break;
-                    case Globals.printCode_sd:
+                    case Globals.printCode_rd:
                         po.isMultiplier = false;
                         po.isBaseline = true;
                         po.isLog = false;
@@ -26334,7 +26412,7 @@ namespace Gekko
                         po.isDiff = true;
                         po.isLevel = false;
                         break;
-                    case Globals.printCode_sp:
+                    case Globals.printCode_rp:
                         po.isMultiplier = false;
                         po.isBaseline = true;
                         po.isLog = false;
@@ -26349,7 +26427,7 @@ namespace Gekko
                     case "mp":  //"bmp" is not meaningful
                         po.isMp = true;
                         break;
-                    case Globals.printCode_sdp:
+                    case Globals.printCode_rdp:
                         po.isDp = true;
                         po.isBaseline = true;
                         break;
@@ -28905,22 +28983,22 @@ namespace Gekko
                 var1 = PchFunction(x, xLag) - PchFunction(xLag, xLag2);
                 varPch = double.PositiveInfinity;
             }
-            else if (printCode == Globals.printCode_s || printCode == Globals.printCode_sn)  //r or rn
+            else if (printCode == Globals.printCode_r || printCode == Globals.printCode_rn)  //r or rn
             {
                 var1 = y;
                 varPch = PchFunction(y, yLag);
             }
-            else if (printCode == Globals.printCode_sd)  //rd
+            else if (printCode == Globals.printCode_rd)  //rd
             {
                 var1 = y - yLag;
                 varPch = PchFunction(y, yLag);
             }
-            else if (printCode == Globals.printCode_sp)  //rp
+            else if (printCode == Globals.printCode_rp)  //rp
             {
                 var1 = PchFunction(y, yLag);
                 varPch = double.PositiveInfinity;
             }
-            else if (printCode == Globals.printCode_sdp)  //rdp
+            else if (printCode == Globals.printCode_rdp)  //rdp
             {
                 var1 = PchFunction(y, yLag) - PchFunction(yLag, yLag2);
                 varPch = double.PositiveInfinity;

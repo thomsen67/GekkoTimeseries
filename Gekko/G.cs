@@ -1790,7 +1790,24 @@ namespace Gekko
         {
             if (s == null || s == "") return false;
             return IsInteger(s);
-        }      
+        }
+
+        public static bool IsValueType(IVariable x)
+        {
+            if (x.Type() == EVariableType.Series)
+            {
+                return true;
+            }
+            else if (x.Type() == EVariableType.Val)
+            {
+                return true;
+            }
+            else if (x.Type() == EVariableType.Matrix && ((Matrix)x).data.Length == 1)  //an 1x1 matrix
+            {
+                return true;
+            }
+            else return false;
+        }
 
         public static bool Round(out int rounded, double value)
         {
