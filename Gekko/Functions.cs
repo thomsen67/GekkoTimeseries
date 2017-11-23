@@ -1531,7 +1531,7 @@ namespace Gekko
             if (IsValOrTimeseries(x1))
             {
                 double d1 = O.GetVal(x1, t);
-                double value2 = Math.Round(d1, decimals);
+                double value2 = Math.Round(d1, decimals, MidpointRounding.AwayFromZero);
                 return new ScalarVal(value2);
             }
             else if (x1.Type() == EVariableType.Matrix)
@@ -1542,7 +1542,7 @@ namespace Gekko
                 {
                     for (int j = 0; j < m.data.GetLength(1); j++)
                     {
-                        m2.data[i, j] = Math.Round(m.data[i, j], decimals);
+                        m2.data[i, j] = Math.Round(m.data[i, j], decimals, MidpointRounding.AwayFromZero);
                     }
                 }
                 return m2;

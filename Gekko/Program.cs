@@ -22843,7 +22843,7 @@ namespace Gekko
         private static double RoundDecimals2(double d, int digits)
         {
             double scale = Math.Pow(10, RoundDecimals1(d));
-            double scale2 = scale * Math.Round(d / scale, digits);
+            double scale2 = scale * Math.Round(d / scale, digits, MidpointRounding.AwayFromZero);
             return scale2;
         }
 
@@ -26658,7 +26658,8 @@ namespace Gekko
         private static string GnuplotText(string s)
         {
             if (s == null) return null;
-            return s.Replace(@"_", @"\\_");
+            return s.Replace(@"_", @"\\_").Replace(@"@", @"\\@").Replace(@"{", @"\\{").Replace(@"}", @"\\}");
+
         }
 
         private static int HandleXTics(int quarterFix, List<string> labels1, List<string> labels2, ref string ticsTxt, int mxtics)
