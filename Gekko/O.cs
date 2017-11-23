@@ -3778,70 +3778,70 @@ namespace Gekko
             return a.ConvertToVal();
         }
 
-        public static void GetVal777(GekkoSmpl smpl, IVariable a, int bankNumber, O.Prt.Element e)  //used in PRT and similar, can accept a list that will show itself as a being an integer with ._isName set.
-        {
-            G.Writeln2("*** ERROR: Obsolete");
-            throw new GekkoException();
-            if (a.Type() == EVariableType.List)
-            {
-                List<string> items = O.GetStringList((List)a);
-                double[] d = new double[items.Count];
+        //public static void GetVal777(GekkoSmpl smpl, IVariable a, int bankNumber, O.Prt.Element e)  //used in PRT and similar, can accept a list that will show itself as a being an integer with ._isName set.
+        //{
+        //    G.Writeln2("*** ERROR: Obsolete");
+        //    throw new GekkoException();
+        //    if (a.Type() == EVariableType.List)
+        //    {
+        //        List<string> items = O.GetStringList((List)a);
+        //        double[] d = new double[items.Count];
                 
-                if (e.subElements == null)
-                {
-                    e.subElements = new List<O.Prt.SubElement>();
-                    for (int i = 0; i < items.Count; i++)
-                    {
-                        O.Prt.SubElement opeSub0 = new O.Prt.SubElement();
-                        e.subElements.Add(opeSub0);
-                    }
-                }                                
+        //        if (e.subElements == null)
+        //        {
+        //            e.subElements = new List<O.Prt.SubElement>();
+        //            for (int i = 0; i < items.Count; i++)
+        //            {
+        //                O.Prt.SubElement opeSub0 = new O.Prt.SubElement();
+        //                e.subElements.Add(opeSub0);
+        //            }
+        //        }                                
 
-                for (int i = 0; i < items.Count; i++)
-                {
-                    string s = items[i];
-                    double dd = O.ConvertToVal(O.GetTimeSeries(smpl, s, bankNumber)); //#875324397                     
-                    if (bankNumber == 1)
-                    {
-                        //if (e.subElements[i].tsWork == null) e.subElements[i].tsWork = new Series(Program.options.freq, null);
-                        //e.subElements[i].tsWork.SetData(t.t1, dd); //uuu
-                    }
-                    else
-                    {
-                        //if (e.subElements[i].tsBase == null) e.subElements[i].tsBase = new Series(Program.options.freq, null);
-                        //e.subElements[i].tsBase.SetData(t.t1, dd); //uuu
-                    }
-                    if (e.subElements[i].label == null) e.subElements[i].label = s;  //this is a bit slow because it gets repeated for each t, but PRT is slow anyways, and it only slows down list-unfolding
-                }                
+        //        for (int i = 0; i < items.Count; i++)
+        //        {
+        //            string s = items[i];
+        //            double dd = O.ConvertToVal(O.GetTimeSeries(smpl, s, bankNumber)); //#875324397                     
+        //            if (bankNumber == 1)
+        //            {
+        //                //if (e.subElements[i].tsWork == null) e.subElements[i].tsWork = new Series(Program.options.freq, null);
+        //                //e.subElements[i].tsWork.SetData(t.t1, dd); //uuu
+        //            }
+        //            else
+        //            {
+        //                //if (e.subElements[i].tsBase == null) e.subElements[i].tsBase = new Series(Program.options.freq, null);
+        //                //e.subElements[i].tsBase.SetData(t.t1, dd); //uuu
+        //            }
+        //            if (e.subElements[i].label == null) e.subElements[i].label = s;  //this is a bit slow because it gets repeated for each t, but PRT is slow anyways, and it only slows down list-unfolding
+        //        }                
 
-                return;
-            }
-            else
-            {
-                if (e.subElements == null)
-                {
-                    e.subElements = new List<O.Prt.SubElement>();                    
-                    O.Prt.SubElement opeSub0 = new O.Prt.SubElement();
-                    e.subElements.Add(opeSub0);                    
-                }                                                
+        //        return;
+        //    }
+        //    else
+        //    {
+        //        if (e.subElements == null)
+        //        {
+        //            e.subElements = new List<O.Prt.SubElement>();                    
+        //            O.Prt.SubElement opeSub0 = new O.Prt.SubElement();
+        //            e.subElements.Add(opeSub0);                    
+        //        }                                                
                 
-                double dd = a.GetValOLD(smpl);                
+        //        double dd = a.GetValOLD(smpl);                
 
-                if (bankNumber == 1)
-                {
-                    //if (e.subElements[0].tsWork == null) e.subElements[0].tsWork = new Series(Program.options.freq, null);
-                    //e.subElements[0].tsWork.SetData(t.t1, dd); //uuu
-                }
-                else
-                {
-                    //if (e.subElements[0].tsBase == null) e.subElements[0].tsBase = new Series(Program.options.freq, null);
-                    //e.subElements[0].tsBase.SetData(t.t1, dd); //uuu
-                }
+        //        if (bankNumber == 1)
+        //        {
+        //            //if (e.subElements[0].tsWork == null) e.subElements[0].tsWork = new Series(Program.options.freq, null);
+        //            //e.subElements[0].tsWork.SetData(t.t1, dd); //uuu
+        //        }
+        //        else
+        //        {
+        //            //if (e.subElements[0].tsBase == null) e.subElements[0].tsBase = new Series(Program.options.freq, null);
+        //            //e.subElements[0].tsBase.SetData(t.t1, dd); //uuu
+        //        }
 
-                //The return value is not used, but we keep it for now...                
-                return;                
-            }            
-        }
+        //        //The return value is not used, but we keep it for now...                
+        //        return;                
+        //    }            
+        //}
 
         public static double GetVal(GekkoSmpl smpl, IVariable a, int bankNumber)  //used in PRT and similar, can accept a list that will show itself as a being an integer with ._isName set.
         {            
@@ -6418,7 +6418,7 @@ namespace Gekko
                 public string format = null;
                 public List<Prt.Element> prtElements = new List<Prt.Element>();
                 public void Exe() {
-                    Program.GetTable(this.name).CurRow.SetValues(this.col, this.prtElements[0].subElements[0].tsWork as Series, this.prtElements[0].subElements[0].tsBase as Series, null, this.t1, this.t2, Globals.tableOption, this.printcode, this.scale, this.format);
+                    Program.GetTable(this.name).CurRow.SetValues(this.col, this.prtElements[0].tsWork as Series, this.prtElements[0].tsBase as Series, null, this.t1, this.t2, Globals.tableOption, this.printcode, this.scale, this.format);
                 }
             }
         }
@@ -6518,14 +6518,18 @@ namespace Gekko
                 if (true)
                 {
                     Program.OPrint(this);
-                }
-                else
-                {
-                    Program.PrtNew(this);
                     if (G.Equal(prtType, "mulprt") && G.Equal(Program.options.interface_mode, "data"))
                     {
                         G.Writeln2("+++ WARNING: MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
                     }
+                }
+                else
+                {
+                    //Program.PrtNew(this);
+                    //if (G.Equal(prtType, "mulprt") && G.Equal(Program.options.interface_mode, "data"))
+                    //{
+                    //    G.Writeln2("+++ WARNING: MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
+                    //}
                 }
             }
             
@@ -6674,8 +6678,10 @@ namespace Gekko
 
             public class Element
             {
-                public List<SubElement> subElements = null;
-            
+                //public List<SubElement> subElements = null;
+
+                public IVariable tsWork = null;
+                public IVariable tsBase = null;
                 public string label = null;
                 //public string originalLabel = null;
                 public string endoExoIndicator = null;

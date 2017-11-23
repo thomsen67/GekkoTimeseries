@@ -3737,13 +3737,13 @@ namespace Gekko.Parser.Gek
                             
                             //node.Code.A("ope" + Num(node) + ".ts = ("+ node[0].Code+ ");" + G.NL);  //uuu   
 
-                            node.Code.A("ope" + Num(node) + ".subElements = new List<O.Prt.SubElement>();" + G.NL);
-                            node.Code.A("ope" + Num(node) + ".subElements.Add(new O.Prt.SubElement());" + G.NL);
+                            //node.Code.A("ope" + Num(node) + ".subElements = new List<O.Prt.SubElement>();" + G.NL);
+                            //node.Code.A("ope" + Num(node) + ".subElements.Add(new O.Prt.SubElement());" + G.NL);
 
                             node.Code.A(EmitLocalCacheForTimeLooping(w));
 
                             //node.Code.A("ope0.subElements[0].tsWork = O.ConvertToTimeSeriesLight(" + Globals.smpl + ", " + node[0].Code + ");" + G.NL);  //HMMMMM: 0...?
-                            node.Code.A("ope" + Num(node) + ".subElements[0].tsWork = " + node[0].Code + ";" + G.NL);
+                            node.Code.A("ope" + Num(node) + ".tsWork = " + node[0].Code + ";" + G.NL);
 
                             //node.Code.A("O.GetVal777(" + node[0].Code + ", bankNumber, ope" + Num(node) + ", t);" + G.NL);  //uuu                            
 

@@ -23111,57 +23111,57 @@ namespace Gekko
             }
         }
 
-        private static void UnfoldVarsAndLabels(ref int k, ref double[,] tsData, GekkoTime t1, GekkoTime t2, List<string> labels, int n, List<O.Prt.Element> elements, int constant)
-        {           
-            foreach (O.Prt.Element e in elements)
-            {
-                foreach (O.Prt.SubElement se in e.subElements)
-                {
-                    k += 1;
-                    if (se.label != null) labels.Add(G.ReplaceGlueNew(se.label));
-                    else labels.Add(G.ReplaceGlueNew(e.label));
-                }
-            }
-            if(constant == 1)
-            {
-                labels.Add("CONSTANT");
-            }
-            if (k == 0)
-            {
-                G.Writeln2("*** ERROR: Number of explanatory variables = 0");  //probably not possible unless empty list
-                throw new GekkoException();
-            }
-            k += constant;
+        //private static void UnfoldVarsAndLabels(ref int k, ref double[,] tsData, GekkoTime t1, GekkoTime t2, List<string> labels, int n, List<O.Prt.Element> elements, int constant)
+        //{           
+        //    foreach (O.Prt.Element e in elements)
+        //    {
+        //        foreach (O.Prt.SubElement se in e.subElements)
+        //        {
+        //            k += 1;
+        //            if (se.label != null) labels.Add(G.ReplaceGlueNew(se.label));
+        //            else labels.Add(G.ReplaceGlueNew(e.label));
+        //        }
+        //    }
+        //    if(constant == 1)
+        //    {
+        //        labels.Add("CONSTANT");
+        //    }
+        //    if (k == 0)
+        //    {
+        //        G.Writeln2("*** ERROR: Number of explanatory variables = 0");  //probably not possible unless empty list
+        //        throw new GekkoException();
+        //    }
+        //    k += constant;
 
-            tsData = new double[n, k];
-            Databank work = Program.databanks.GetFirst();
-            int countT = -1;
-            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
-            {
-                countT++;
-                int countK = -1;
-                foreach (O.Prt.Element e in elements)
-                {
-                    foreach (O.Prt.SubElement se in e.subElements)
-                    {
-                        countK++;
-                        double v = (se.tsWork as Series).GetData(null, t);
-                        if (G.isNumericalError(v))
-                        {
-                            G.Writeln2("*** ERROR: Missing value: " + labels[countK] + " in " + t.ToString());
-                            G.Writeln("           Workaround: see command FINDMISSINGDATA<replace>");
-                            throw new GekkoException();
-                        }
-                        tsData[countT, countK] = v;
-                    }
-                }
-                if (constant == 1)
-                {
-                    countK++;
-                    tsData[countT, countK] = 1d;
-                }
-            }
-        }
+        //    tsData = new double[n, k];
+        //    Databank work = Program.databanks.GetFirst();
+        //    int countT = -1;
+        //    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+        //    {
+        //        countT++;
+        //        int countK = -1;
+        //        foreach (O.Prt.Element e in elements)
+        //        {
+        //            foreach (O.Prt.SubElement se in e.subElements)
+        //            {
+        //                countK++;
+        //                double v = (se.tsWork as Series).GetData(null, t);
+        //                if (G.isNumericalError(v))
+        //                {
+        //                    G.Writeln2("*** ERROR: Missing value: " + labels[countK] + " in " + t.ToString());
+        //                    G.Writeln("           Workaround: see command FINDMISSINGDATA<replace>");
+        //                    throw new GekkoException();
+        //                }
+        //                tsData[countT, countK] = v;
+        //            }
+        //        }
+        //        if (constant == 1)
+        //        {
+        //            countK++;
+        //            tsData[countT, countK] = 1d;
+        //        }
+        //    }
+        //}
 
         public static DialogResult InputBox(string title, string promptText, ref string value)
         {
@@ -23224,47 +23224,47 @@ namespace Gekko
             return Math.Floor(Math.Log10(Math.Abs(d))) + 1;
         }
 
-        public static void PrtNew(O.Prt o)
-        {
+        //public static void PrtNew(O.Prt o)
+        //{
 
-            //precedentsInput may contain #var, @var, var¤-1, @var¤-1, and also also fy#i or fy{i} (or var¤¤2010m7)
+        //    //precedentsInput may contain #var, @var, var¤-1, @var¤-1, and also also fy#i or fy{i} (or var¤¤2010m7)
 
-            LocalBanks localBanks = new LocalBanks();
-            o.opt_filename = StripQuotes(o.opt_filename);  //necessary???
+        //    LocalBanks localBanks = new LocalBanks();
+        //    o.opt_filename = StripQuotes(o.opt_filename);  //necessary???
 
-            if (o.prtElements.Count == 0)
-            {
-                //should not be possible
-                G.Writeln2("*** ERROR: No variables given");
-                throw new GekkoException();
-            }
+        //    if (o.prtElements.Count == 0)
+        //    {
+        //        //should not be possible
+        //        G.Writeln2("*** ERROR: No variables given");
+        //        throw new GekkoException();
+        //    }
 
-            //==================================================================================
+        //    //==================================================================================
 
-            if (G.Equal(o.prtType, "sheet") || G.Equal(o.prtType, "plot") || G.Equal(o.prtType, "clip"))
-            {
-                //do nothing, do not start pipe2
-            }
-            else
-            {
-                MaybeStartPipe2(o.opt_filename);
-            }
-            try
-            {
-                Program.PrtNew2(o);
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
-            finally
-            {
-                bool message = false;
-                if (Globals.pipe2) message = true;
-                ReleasePipe2();  //no harm if it is not active
-                if (message) G.Writeln2("Data written to file '" + o.opt_filename + "'");
-            }
-        }
+        //    if (G.Equal(o.prtType, "sheet") || G.Equal(o.prtType, "plot") || G.Equal(o.prtType, "clip"))
+        //    {
+        //        //do nothing, do not start pipe2
+        //    }
+        //    else
+        //    {
+        //        MaybeStartPipe2(o.opt_filename);
+        //    }
+        //    try
+        //    {
+        //        Program.PrtNew2(o);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw;
+        //    }
+        //    finally
+        //    {
+        //        bool message = false;
+        //        if (Globals.pipe2) message = true;
+        //        ReleasePipe2();  //no harm if it is not active
+        //        if (message) G.Writeln2("Data written to file '" + o.opt_filename + "'");
+        //    }
+        //}
 
         public static void OPrint(O.Prt oPrt)
         {
@@ -23274,7 +23274,7 @@ namespace Gekko
             //List<string> printCodes = new List<string>();
             foreach (O.Prt.Element element in oPrt.prtElements)
             {
-                O.Prt.SubElement subElement = element.subElements[0];
+                //O.Prt.SubElement subElement = element.subElements[0];
                 //generally, subElements only have 1 item (used to expand lists in Gekko < 3.0)
                 
                 List<OptString> printCodes2 = new List<OptString>();
@@ -23286,10 +23286,10 @@ namespace Gekko
                     //rlist.Add(subElement.tsBase);
                     //printCodes.Add(printCode.s1);
                     O.PrtContainer c = new O.PrtContainer();
-                    c.ivFirst = subElement.tsWork;
-                    c.ivRef = subElement.tsBase;
+                    c.ivFirst = element.tsWork;
+                    c.ivRef = element.tsBase;
                     c.printCode = printCode.s1;
-                    c.label = subElement.label;
+                    c.label = element.label;
 
                     c.linetypes=element.linetype;
                     c.dashtypes = element.dashtype;
@@ -24420,519 +24420,519 @@ namespace Gekko
         //    return ivs;
         //}
 
-        public static int PrtNew2(O.Prt o)
-        {
-            //beware case of printcodes!
-            //check use of base bank etc.
-            //do timeseries with lags if <p> is present etc (two lags for mp etc.)
-            //List<string> endoExoIndicators = null;
-
-            //foreach(O.Prt.Element e in o.prtElements)
-            //{
-            //    e.originalLabel = e.label;
-            //    if(e.label.StartsWith(Globals.labelCheatString))
-            //    {
-            //        e.label = e.label.Substring(Globals.labelCheatString.Length);
-            //    }
-            //}
-
-            bool hasV = false;
-            foreach (OptString ts in o.printCodes)
-            {
-                if (G.Equal(ts.s1, "v") && G.Equal(ts.s2, "yes"))
-                {
-                    hasV = true;  //could be more than one "v", so we keep looping to get the last one.
-                }
-            }
-            if (!IsMulprt(o) && hasV)
-            {
-                G.Writeln2("*** ERROR: Please use MULPRT<v> instead of PRT<v>");
-                throw new GekkoException();
-            }
-
-            bool isVerbose = false;
-            if (G.Equal(o.prtType, "gmulprt")) isVerbose = true;
-            if (IsMulprt(o) && hasV) isVerbose = true;
-            if (IsMulprt(o) && Program.options.print_mulprt_v) isVerbose = true;
-
-            if (IsMulprt(o))
-            {
-                foreach (OptString xx in o.printCodes)
-                {
-                    if (IsPrintCodeShort(xx.s1))
-                    {
-                        G.Writeln2("*** ERROR: You cannot use 'short' printcodes with MULPRT, for instance MULPRT<p> etc.");
-                        throw new GekkoException();
-                    }
-                }
-            }
-
-            if (isVerbose)
-            {
-                if (IsMulprt(o))
-                {
-                    isVerbose = true;  //GMULPRT or MULPRT<v> or MULPRT with option print_mulprt_v
-                    o.printCodes.Clear();
-                    o.printCodes.Add(new OptString("n", "yes"));
-                    o.printCodes.Add(new OptString("p", "yes"));
-                    o.printCodes.Add(new OptString(Globals.printCode_s, "yes"));
-                    o.printCodes.Add(new OptString(Globals.printCode_sp, "yes"));
-                    o.printCodes.Add(new OptString("m", "yes"));
-                    o.printCodes.Add(new OptString("q", "yes"));
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: Display code <v> (verbose) is only legal for MULPRT");
-                    throw new GekkoException();
-                }
-            }
-
-            //bool hasDataDifferentFromNaN_Infinity = false;
-            Databank work = null;
-            Databank base2 = null;
-            {
-                work = databanks.GetFirst();
-                base2 = databanks.GetRef();
-            }
-
-            List<string> masterSpaceErrors = new List<string>();
-            List<string> nonExistenceErrors = new List<string>();
-
-            int max = Program.options.print_width;
-            if (Globals.pipe || Globals.pipe2) max = Program.options.print_filewidth;  //is printing to file
-
-            string timefilterType = Program.options.timefilter_type;  //avg or skip
-            bool timefilter = Program.options.timefilter;
-            if (o.timefilter != null)
-            {
-                if (G.Equal(o.timefilter, "yes"))
-                {
-                    timefilter = true;
-                }
-                else if (G.Equal(o.timefilter, "no"))
-                {
-                    timefilter = false;
-                }
-                else if (G.Equal(o.timefilter, "avg"))
-                {
-                    timefilter = true;
-                    timefilterType = o.timefilter;
-                }
-                else if (G.Equal(o.timefilter, "hide"))
-                {
-                    timefilter = true;
-                    timefilterType = o.timefilter;
-                }
-            }
-
-            int virtualCols = 0;
-
-            Table tab = new Table();            
-
-            Globals.lastPrtOrMulprtTable = tab;  //this remembers the last PRT or MULPRT table, for possible putting on clipboard.
-            CrossThreadStuff.CopyButtonEnabled(true);
-
-            tab.writeOnce = true;  //so we don't accidentally override cells without even knowing it.
-            int numberOfLabelsLinesMax = -12345;
-
-            bool isRows;
-            bool isCols;
-            HandleRowsCols(o, out isRows, out isCols);
-            bool transpose = isRows; //transpose=false -> timeseries running down in cols, transpose=true -> timeseries running out in rows
-            if (G.Equal(o.prtType, "sheet"))
-            {
-                //TODO: the Excel emitter transposes itself, so we never transpose here. #89073253245
-                transpose = false;
-            }
-
-            int maxLabelsLinesFound = 1;
-            if (transpose)
-            {
-                numberOfLabelsLinesMax = 1;
-            }
-            else
-            {
-                numberOfLabelsLinesMax = 5;
-            }
-
-            bool identicalCodes = HasIdenticalCodes(o);  //also checks that MULPRT and short codes are not mixed
-
-            int blocks = 0;  //0-based
-            int blocksWidthRest = max;
-            string onePrintCodeLabel = "";
-            int virtualRowsStart = 0;
-            int virtualRowsMaxSeen = 0;
-            virtualCols = 0;  //1-based
-
-            int elementCounter = -1;
-            int subElementCounterTotal = -1;  //total number of variables/expressions (with unfolded lists) in a print.
-
-            List<string> labelsNonBroken = new List<string>();
-            List<string> originalLabelsNonBroken = new List<string>();
-
-
-            foreach (O.Prt.Element pe in o.prtElements)  //varI 0-based
-            {
-                elementCounter++;
-                int subElementCounter = -1;
-                foreach (O.Prt.SubElement subPe in pe.subElements)
-                {
-                    subElementCounter++;
-                    subElementCounterTotal++;
-
-                    List<string> printCodes = GetElementPrintCodes(o, pe);
-
-                    List<int> widths = new List<int>();
-                    List<int> decs = new List<int>();
-                    PrintGetWithAndDecimals(o, elementCounter, printCodes, widths, decs);
-
-                    int widthSum = 0; foreach (int w in widths) widthSum += w + 2;  //2 chars padding
-                    if (!(G.Equal(o.prtType, "plot") || G.Equal(o.prtType, "sheet") || G.Equal(o.prtType, "clip")) && !transpose && blocksWidthRest - (widthSum + 6) < 0)  //these 6 chars represent the date column. The wrapping is only approximate, but that is probably ok (that was also the case in the old PRT command)
-                    {
-                        //new block
-                        virtualRowsMaxSeen = PrintPrettify(o, tab, numberOfLabelsLinesMax, transpose, maxLabelsLinesFound, identicalCodes, onePrintCodeLabel, virtualRowsStart, virtualRowsMaxSeen);
-                        blocks++;  //0-based
-                        virtualCols = 0;  //1-based
-                        virtualRowsStart = virtualRowsMaxSeen + 1;
-                        virtualRowsMaxSeen = 0;
-                        blocksWidthRest = max;
-                        blocksWidthRest += -widthSum;
-                    }
-                    else
-                    {
-                        blocksWidthRest += -widthSum;
-                    }
-
-                    int printCodesCounter = -1;
-
-                    bool isSimplePrtOrMulprt = false;
-                    if (printCodes.Count == 2 && G.Equal(printCodes[0], "n") && G.Equal(printCodes[1], "p")) isSimplePrtOrMulprt = true;
-                    if (printCodes.Count == 2 && G.Equal(printCodes[0], "m") && G.Equal(printCodes[1], "q")) isSimplePrtOrMulprt = true;
-
-                    foreach (string printCode in printCodes)
-                    {
-                        virtualCols++;
-                        printCodesCounter++;  //0-based
-                        int width = widths[printCodesCounter];
-                        int dec = decs[printCodesCounter];
-                        int labelsWidth = -12345;
-                        int maxLength = -12345;
-                        if (transpose)
-                        {
-                            labelsWidth = 20;
-                        }
-                        else
-                        {
-                            labelsWidth = width;
-                        }
-
-                        maxLength = labelsWidth * numberOfLabelsLinesMax;
-
-                        //--------------------------- putting in labels, and handling the width of those (for normal print they may be split into several rows)
-
-                        string printCodeLabelLong = GetPrintCodeLabel(printCode, isVerbose, isSimplePrtOrMulprt, identicalCodes);
-
-                        onePrintCodeLabel = printCodeLabelLong;  //for possible use later on
-
-                        string[] labelsArray = new string[numberOfLabelsLinesMax];
-                        for (int i = 0; i < labelsArray.Length; i++) labelsArray[i] = "[[]]";
-
-                        if (printCodesCounter == 0)  //first item
-                        {
-                            string label = GetLabelInPrt(pe, subElementCounter);
-                            label = G.PrettifyTimeseriesHash(label, true, false);
-                            string originalLabel = label;
-                            if (label.StartsWith(Globals.labelCheatString)) label = label.Substring(Globals.labelCheatString.Length);                            
-
-                            if (identicalCodes || printCode == "n" || printCode == Globals.printCode_sn || printCode == Globals.printCode_s || (IsMulprt(o) && printCode == "m"))
-                            {
-                                //do nothing
-                                //if identical codes, the number of print codes will always be 1 for each item, so printCodesCounter will be = 0 always
-                            }
-                            else
-                            {
-                                label += " " + printCodeLabelLong;
-                            }
-                            int width2 = width;
-                            if (G.Equal(o.prtType, "sheet") || G.Equal(o.prtType, "clip")) width2 = int.MaxValue;
-                            int numberOfLabelsLines = PrintCreateLabelsArrayNew(label, width2, numberOfLabelsLinesMax, maxLength, labelsArray);
-                            maxLabelsLinesFound = Math.Max(maxLabelsLinesFound, numberOfLabelsLines);
-                            labelsNonBroken.Add(originalLabel);
-                        }
-                        else
-                        {
-                            //second item and on
-                            if (isSimplePrtOrMulprt)
-                            {
-                                //we override "[%]" or "[m%]" with "%", this is understandable enough
-                                string s = null;
-
-                                string label = GetLabelInPrt(pe, subElementCounter);
-
-                                if (G.IsIdent(label.Trim()))
-                                {
-                                    EEndoOrExo ee = Program.VariableTypeEndoExo(label.Trim());
-                                    if (ee == EEndoOrExo.Endo) s = "E";
-                                    else if (ee == EEndoOrExo.Exo) s = "X";
-                                }
-
-                                if (!transpose && s != null)
-                                {
-                                    //for transposed (<rows>) we do not show indicators
-                                    labelsArray[0] = "(" + s + ")" + "%";  //PCIM-style is E% or X%, but we do (E)% or (X)% to distinguish from real variables (pcp [%] etc.)
-                                }
-                                else
-                                {
-                                    labelsArray[0] = "%";
-                                }
-
-                            }
-                            else
-                            {
-                                labelsArray[0] = printCodeLabelLong;
-                            }
-                            maxLabelsLinesFound = Math.Max(maxLabelsLinesFound, 1);  //this line just for symmetry
-                            labelsNonBroken.Add("");  //should never happen for GRAPH
-                        }
-
-                        for (int i = 0; i < labelsArray.Length; i++)
-                        {
-                            if (labelsArray[i] == "[[]]") labelsArray[i] = "";
-                        }
-
-                        for (int i = 0; i < numberOfLabelsLinesMax; i++)
-                        {
-                            string s = labelsArray[numberOfLabelsLinesMax - i - 1];
-                            int ii = i;
-                            int jj = virtualCols;
-                            if (transpose)
-                            {
-                                ii = virtualCols;
-                                jj = i;
-                            }
-
-                            int ii2 = ii + 1 + virtualRowsStart;
-                            tab.Set(ii2, jj + 1, s);  //virtualRowsStart=0 if transpose=true
-                            if (!transpose)
-                            {
-                                tab.SetAlign(ii2, jj + 1, Align.Right);
-                            }
-                        }
-
-                        List<double> filterMemoryValues = new List<double>();
-                        List<string> filterMemoryDates = new List<string>();
-
-                        List<double> collapseFreqsValues = new List<double>();
-
-                        int virtualRows = virtualRowsStart;
-                        foreach (GekkoTime gt in new GekkoTimeIterator(o.t1, o.t2))
-                        {
-                            bool filter = timefilter && ShouldFilterPeriod(gt);
-
-                            Series ts = subPe.tsWork as Series;
-                            Series tsGrund = subPe.tsBase as Series;
-
-                            double var1;
-                            double varPch;
-                            ComputeValueForPrintPlotNew(out var1, out varPch, printCode, gt, ts, tsGrund, o.guiGraphIsLogTransform, false);
-
-                            collapseFreqsValues.Add(var1);
-
-                            string date = G.FromDateToString(gt);
-
-                            if (timefilter && G.Equal(timefilterType, "avg"))
-                            {
-                                if (filter)
-                                {
-                                    //filterCounter++;
-                                    filterMemoryValues.Add(var1);
-                                    filterMemoryDates.Add(date);
-                                }
-                                else
-                                {
-                                    //filterCounter = 0;
-                                    if (filterMemoryValues.Count > 0)
-                                    {
-                                        filterMemoryValues.Add(var1);
-                                        filterMemoryDates.Add(date);
-                                        var1 = CalculateAveragesForPrint(printCode, filterMemoryValues, EPrtCollapseTypes.None, -12345);  //freq will not be used here
-                                        date = filterMemoryDates[0] + "-" + filterMemoryDates[filterMemoryDates.Count - 1];
-                                    }
-                                    filterMemoryValues.Clear();
-                                    filterMemoryDates.Clear();
-                                }
-                            }
-
-                            if (filter) continue;
-
-                            virtualRows++;
-
-                            //don't do pretty printing of Q and M if there is timefilter or if it is transposed
-                            bool doAremosStuff = false; if (Program.options.print_freq == "pretty" && !timefilter && !transpose && (gt.freq == EFreq.Quarterly || gt.freq == EFreq.Monthly)) doAremosStuff = true;
-                            if (G.Equal(o.prtType, "plot") || G.Equal(o.prtType, "clip") || G.Equal(o.prtType, "sheet")) doAremosStuff = false;
-                            //Note: the method below only puts stuff into table for virtualCols == 1. Else it is only used
-                            //      to correct virtualRows when pretty-printing frequencies Q and M.
-                            PrintInsertDate(doAremosStuff, virtualCols, date, gt, o.t1, tab, numberOfLabelsLinesMax, transpose, ref virtualRows, o);
-                            PrintInsertTimeseriesData(doAremosStuff, gt, virtualCols, tab, numberOfLabelsLinesMax, transpose, width, dec, ref virtualRows, var1, collapseFreqsValues, printCode, o);
-                            virtualRowsMaxSeen = Math.Max(virtualRowsMaxSeen, virtualRows + numberOfLabelsLinesMax);
-                        } //foreach period
-                    } //foreach printcode
-                }  //foreach item in variable (if it is a list)
-            } //foreach variable
-
-            if (subElementCounterTotal == -1)
-            {
-                G.Writeln2("Empty list -- nothing to print");
-            }
-
-            virtualRowsMaxSeen = PrintPrettify(o, tab, numberOfLabelsLinesMax, transpose, maxLabelsLinesFound, identicalCodes, onePrintCodeLabel, virtualRowsStart, virtualRowsMaxSeen);
-
-            if (masterSpaceErrors.Count > 0)
-            {
-                //only results in a warning ("MULPRT @fy" will always be 0)
-                G.Writeln();
-                foreach (string s in masterSpaceErrors) G.Writeln(s);
-            }
-
-            if (nonExistenceErrors.Count > 0)
-            {
-                G.Writeln();
-                foreach (string s in nonExistenceErrors) G.Writeln(s);
-                throw new GekkoException();
-            }
-            else
-            {
-                //----------------- actually printing the stuff start -------------------------------
-                //tab.PrintCellsForDebug();
-
-                if (G.Equal(o.prtType, "plot"))
-                {
-                    //tab.PrintCellsForDebug();
-                    if (Program.options.plot_new)
-                    {
-                        //CallGnuplotNew2(tab, o, subElementCounterTotal + 1, maxLabelsLinesFound, labelsNonBroken);  //make sure there are no percent shown for levels (use <n> option, not <n p>)                            
-                    }
-                    else
-                    {
-                        //CallGnuplotNew(tab, o, subElementCounterTotal + 1, maxLabelsLinesFound, labelsNonBroken);  //make sure there are no percent shown for levels (use <n> option, not <n p>)
-                    }
-
-                    //Alternatively: store all transformations, maybe also for UDVALG
-                    //TODO.......
-                    //if (po.isCalledFromGraphWindow == false)  //PPLOT called from command prompt or command file
-                    //{
-                    //    CloneToLocalBank(graphVars, localBanks, work, base2);
-                    //}
-
-                    return 0;
-                }
-
-                if (G.IsUnitTesting())
-                {
-                    Globals.unitTestTablePointer = tab;  //to be able to inspect it in unit tests
-                }
-
-                if (G.Equal(o.prtType, "sheet"))
-                {
-                    //tab2 = tab.Transpose();
-                    //TODO: we need a counter regarding the first rows/cols of the table, how many??
-
-                    //TODO: fill with NaN!!!
-                    //TODO: fill with NaN!!!
-                    //TODO: fill with NaN!!!
-
-                    //remember append
-                    //always start in A1, no blank line
-                    //labels.. what if they break -- should be infinitely long
-
-                    Table tab2 = tab.Transpose();
-                    int startRows = 1;
-                    int startCols = 1;
-                    ExcelOptions eo = new ExcelOptions();
-                    eo.excelRowLabels = new string[tab2.GetRowMaxNumber() - startRows, 1];
-                    eo.excelColumnLabels = new string[1, tab2.GetColMaxNumber() - startCols];
-                    eo.excelData = G.CreateArrayDouble(tab2.GetRowMaxNumber() - startRows, tab2.GetColMaxNumber() - startCols, double.NaN);
-
-                    for (int i = 1; i <= tab2.GetRowMaxNumber(); i++)
-                    {
-                        for (int j = 1; j <= tab2.GetColMaxNumber(); j++)
-                        {
-                            Cell cell2 = tab2.Get(i, j);
-                            string s2 = "";
-                            if (cell2 == null)
-                            {
-                            }
-                            else
-                            {
-                                if (i == 1 && j == 1)
-                                {
-                                    //do nothing
-                                }
-                                else if (j == 1)
-                                {
-                                    //first row
-                                    string s = cell2.CellText.TextData[0];
-                                    if (s == null) s = "";
-                                    eo.excelRowLabels[i - 1 - startRows, j - 1] = s;
-                                }
-                                else if (i == 1)
-                                {
-                                    string s = cell2.CellText.TextData[0];
-                                    if (s == null) s = "";
-                                    eo.excelColumnLabels[i - 1, j - 1 - startCols] = s;
-                                }
-                                else
-                                {
-                                    eo.excelData[i - startRows - 1, j - startCols - 1] = cell2.number;
-                                    s2 = cell2.date;
-                                }
-                            }
-                        }
-                    }
-
-                    CreateExcelWorkbook2(eo, o, IsMulprt(o));
-                    return 0;
-                }
-                else if (G.Equal(o.prtType, "clip"))
-                {
-                    //maybe better to "record" into tablelight from CreateExcelWorkbook2?
-                    PrtClipboard(tab, false);
-                    return 0;
-                }
-                else  //normal PRT
-                {
-                    List<string> table = tab.Print();
-                    int widthRemember = Program.options.print_width;
-                    int fileWidthRemember = Program.options.print_filewidth;
-                    Program.options.print_width = int.MaxValue;
-                    Program.options.print_filewidth = int.MaxValue;
-                    G.Writeln();
-                    if (o.opt_title != null && o.opt_title != "")
-                    {
-                        G.Writeln(o.opt_title);
-                    }
-                    try
-                    {
-
-                        foreach (string s in table)
-                        {
-                            G.Writeln(s);
-                        }
-
-
-                    }
-                    finally
-                    {
-                        //resetting, also if there is an error
-                        Program.options.print_width = widthRemember;
-                        Program.options.print_filewidth = fileWidthRemember;
-                    }
-                    //----------------- actually printing the stuff end -------------------------------
-                }
-            }
-
-            return virtualCols;
-        }
+        //public static int PrtNew2(O.Prt o)
+        //{
+        //    //beware case of printcodes!
+        //    //check use of base bank etc.
+        //    //do timeseries with lags if <p> is present etc (two lags for mp etc.)
+        //    //List<string> endoExoIndicators = null;
+
+        //    //foreach(O.Prt.Element e in o.prtElements)
+        //    //{
+        //    //    e.originalLabel = e.label;
+        //    //    if(e.label.StartsWith(Globals.labelCheatString))
+        //    //    {
+        //    //        e.label = e.label.Substring(Globals.labelCheatString.Length);
+        //    //    }
+        //    //}
+
+        //    bool hasV = false;
+        //    foreach (OptString ts in o.printCodes)
+        //    {
+        //        if (G.Equal(ts.s1, "v") && G.Equal(ts.s2, "yes"))
+        //        {
+        //            hasV = true;  //could be more than one "v", so we keep looping to get the last one.
+        //        }
+        //    }
+        //    if (!IsMulprt(o) && hasV)
+        //    {
+        //        G.Writeln2("*** ERROR: Please use MULPRT<v> instead of PRT<v>");
+        //        throw new GekkoException();
+        //    }
+
+        //    bool isVerbose = false;
+        //    if (G.Equal(o.prtType, "gmulprt")) isVerbose = true;
+        //    if (IsMulprt(o) && hasV) isVerbose = true;
+        //    if (IsMulprt(o) && Program.options.print_mulprt_v) isVerbose = true;
+
+        //    if (IsMulprt(o))
+        //    {
+        //        foreach (OptString xx in o.printCodes)
+        //        {
+        //            if (IsPrintCodeShort(xx.s1))
+        //            {
+        //                G.Writeln2("*** ERROR: You cannot use 'short' printcodes with MULPRT, for instance MULPRT<p> etc.");
+        //                throw new GekkoException();
+        //            }
+        //        }
+        //    }
+
+        //    if (isVerbose)
+        //    {
+        //        if (IsMulprt(o))
+        //        {
+        //            isVerbose = true;  //GMULPRT or MULPRT<v> or MULPRT with option print_mulprt_v
+        //            o.printCodes.Clear();
+        //            o.printCodes.Add(new OptString("n", "yes"));
+        //            o.printCodes.Add(new OptString("p", "yes"));
+        //            o.printCodes.Add(new OptString(Globals.printCode_s, "yes"));
+        //            o.printCodes.Add(new OptString(Globals.printCode_sp, "yes"));
+        //            o.printCodes.Add(new OptString("m", "yes"));
+        //            o.printCodes.Add(new OptString("q", "yes"));
+        //        }
+        //        else
+        //        {
+        //            G.Writeln2("*** ERROR: Display code <v> (verbose) is only legal for MULPRT");
+        //            throw new GekkoException();
+        //        }
+        //    }
+
+        //    //bool hasDataDifferentFromNaN_Infinity = false;
+        //    Databank work = null;
+        //    Databank base2 = null;
+        //    {
+        //        work = databanks.GetFirst();
+        //        base2 = databanks.GetRef();
+        //    }
+
+        //    List<string> masterSpaceErrors = new List<string>();
+        //    List<string> nonExistenceErrors = new List<string>();
+
+        //    int max = Program.options.print_width;
+        //    if (Globals.pipe || Globals.pipe2) max = Program.options.print_filewidth;  //is printing to file
+
+        //    string timefilterType = Program.options.timefilter_type;  //avg or skip
+        //    bool timefilter = Program.options.timefilter;
+        //    if (o.timefilter != null)
+        //    {
+        //        if (G.Equal(o.timefilter, "yes"))
+        //        {
+        //            timefilter = true;
+        //        }
+        //        else if (G.Equal(o.timefilter, "no"))
+        //        {
+        //            timefilter = false;
+        //        }
+        //        else if (G.Equal(o.timefilter, "avg"))
+        //        {
+        //            timefilter = true;
+        //            timefilterType = o.timefilter;
+        //        }
+        //        else if (G.Equal(o.timefilter, "hide"))
+        //        {
+        //            timefilter = true;
+        //            timefilterType = o.timefilter;
+        //        }
+        //    }
+
+        //    int virtualCols = 0;
+
+        //    Table tab = new Table();            
+
+        //    Globals.lastPrtOrMulprtTable = tab;  //this remembers the last PRT or MULPRT table, for possible putting on clipboard.
+        //    CrossThreadStuff.CopyButtonEnabled(true);
+
+        //    tab.writeOnce = true;  //so we don't accidentally override cells without even knowing it.
+        //    int numberOfLabelsLinesMax = -12345;
+
+        //    bool isRows;
+        //    bool isCols;
+        //    HandleRowsCols(o, out isRows, out isCols);
+        //    bool transpose = isRows; //transpose=false -> timeseries running down in cols, transpose=true -> timeseries running out in rows
+        //    if (G.Equal(o.prtType, "sheet"))
+        //    {
+        //        //TODO: the Excel emitter transposes itself, so we never transpose here. #89073253245
+        //        transpose = false;
+        //    }
+
+        //    int maxLabelsLinesFound = 1;
+        //    if (transpose)
+        //    {
+        //        numberOfLabelsLinesMax = 1;
+        //    }
+        //    else
+        //    {
+        //        numberOfLabelsLinesMax = 5;
+        //    }
+
+        //    bool identicalCodes = HasIdenticalCodes(o);  //also checks that MULPRT and short codes are not mixed
+
+        //    int blocks = 0;  //0-based
+        //    int blocksWidthRest = max;
+        //    string onePrintCodeLabel = "";
+        //    int virtualRowsStart = 0;
+        //    int virtualRowsMaxSeen = 0;
+        //    virtualCols = 0;  //1-based
+
+        //    int elementCounter = -1;
+        //    int subElementCounterTotal = -1;  //total number of variables/expressions (with unfolded lists) in a print.
+
+        //    List<string> labelsNonBroken = new List<string>();
+        //    List<string> originalLabelsNonBroken = new List<string>();
+
+
+        //    foreach (O.Prt.Element pe in o.prtElements)  //varI 0-based
+        //    {
+        //        elementCounter++;
+        //        int subElementCounter = -1;
+        //        foreach (O.Prt.SubElement subPe in pe.subElements)
+        //        {
+        //            subElementCounter++;
+        //            subElementCounterTotal++;
+
+        //            List<string> printCodes = GetElementPrintCodes(o, pe);
+
+        //            List<int> widths = new List<int>();
+        //            List<int> decs = new List<int>();
+        //            PrintGetWithAndDecimals(o, elementCounter, printCodes, widths, decs);
+
+        //            int widthSum = 0; foreach (int w in widths) widthSum += w + 2;  //2 chars padding
+        //            if (!(G.Equal(o.prtType, "plot") || G.Equal(o.prtType, "sheet") || G.Equal(o.prtType, "clip")) && !transpose && blocksWidthRest - (widthSum + 6) < 0)  //these 6 chars represent the date column. The wrapping is only approximate, but that is probably ok (that was also the case in the old PRT command)
+        //            {
+        //                //new block
+        //                virtualRowsMaxSeen = PrintPrettify(o, tab, numberOfLabelsLinesMax, transpose, maxLabelsLinesFound, identicalCodes, onePrintCodeLabel, virtualRowsStart, virtualRowsMaxSeen);
+        //                blocks++;  //0-based
+        //                virtualCols = 0;  //1-based
+        //                virtualRowsStart = virtualRowsMaxSeen + 1;
+        //                virtualRowsMaxSeen = 0;
+        //                blocksWidthRest = max;
+        //                blocksWidthRest += -widthSum;
+        //            }
+        //            else
+        //            {
+        //                blocksWidthRest += -widthSum;
+        //            }
+
+        //            int printCodesCounter = -1;
+
+        //            bool isSimplePrtOrMulprt = false;
+        //            if (printCodes.Count == 2 && G.Equal(printCodes[0], "n") && G.Equal(printCodes[1], "p")) isSimplePrtOrMulprt = true;
+        //            if (printCodes.Count == 2 && G.Equal(printCodes[0], "m") && G.Equal(printCodes[1], "q")) isSimplePrtOrMulprt = true;
+
+        //            foreach (string printCode in printCodes)
+        //            {
+        //                virtualCols++;
+        //                printCodesCounter++;  //0-based
+        //                int width = widths[printCodesCounter];
+        //                int dec = decs[printCodesCounter];
+        //                int labelsWidth = -12345;
+        //                int maxLength = -12345;
+        //                if (transpose)
+        //                {
+        //                    labelsWidth = 20;
+        //                }
+        //                else
+        //                {
+        //                    labelsWidth = width;
+        //                }
+
+        //                maxLength = labelsWidth * numberOfLabelsLinesMax;
+
+        //                //--------------------------- putting in labels, and handling the width of those (for normal print they may be split into several rows)
+
+        //                string printCodeLabelLong = GetPrintCodeLabel(printCode, isVerbose, isSimplePrtOrMulprt, identicalCodes);
+
+        //                onePrintCodeLabel = printCodeLabelLong;  //for possible use later on
+
+        //                string[] labelsArray = new string[numberOfLabelsLinesMax];
+        //                for (int i = 0; i < labelsArray.Length; i++) labelsArray[i] = "[[]]";
+
+        //                if (printCodesCounter == 0)  //first item
+        //                {
+        //                    string label = GetLabelInPrt(pe, subElementCounter);
+        //                    label = G.PrettifyTimeseriesHash(label, true, false);
+        //                    string originalLabel = label;
+        //                    if (label.StartsWith(Globals.labelCheatString)) label = label.Substring(Globals.labelCheatString.Length);                            
+
+        //                    if (identicalCodes || printCode == "n" || printCode == Globals.printCode_sn || printCode == Globals.printCode_s || (IsMulprt(o) && printCode == "m"))
+        //                    {
+        //                        //do nothing
+        //                        //if identical codes, the number of print codes will always be 1 for each item, so printCodesCounter will be = 0 always
+        //                    }
+        //                    else
+        //                    {
+        //                        label += " " + printCodeLabelLong;
+        //                    }
+        //                    int width2 = width;
+        //                    if (G.Equal(o.prtType, "sheet") || G.Equal(o.prtType, "clip")) width2 = int.MaxValue;
+        //                    int numberOfLabelsLines = PrintCreateLabelsArrayNew(label, width2, numberOfLabelsLinesMax, maxLength, labelsArray);
+        //                    maxLabelsLinesFound = Math.Max(maxLabelsLinesFound, numberOfLabelsLines);
+        //                    labelsNonBroken.Add(originalLabel);
+        //                }
+        //                else
+        //                {
+        //                    //second item and on
+        //                    if (isSimplePrtOrMulprt)
+        //                    {
+        //                        //we override "[%]" or "[m%]" with "%", this is understandable enough
+        //                        string s = null;
+
+        //                        string label = GetLabelInPrt(pe, subElementCounter);
+
+        //                        if (G.IsIdent(label.Trim()))
+        //                        {
+        //                            EEndoOrExo ee = Program.VariableTypeEndoExo(label.Trim());
+        //                            if (ee == EEndoOrExo.Endo) s = "E";
+        //                            else if (ee == EEndoOrExo.Exo) s = "X";
+        //                        }
+
+        //                        if (!transpose && s != null)
+        //                        {
+        //                            //for transposed (<rows>) we do not show indicators
+        //                            labelsArray[0] = "(" + s + ")" + "%";  //PCIM-style is E% or X%, but we do (E)% or (X)% to distinguish from real variables (pcp [%] etc.)
+        //                        }
+        //                        else
+        //                        {
+        //                            labelsArray[0] = "%";
+        //                        }
+
+        //                    }
+        //                    else
+        //                    {
+        //                        labelsArray[0] = printCodeLabelLong;
+        //                    }
+        //                    maxLabelsLinesFound = Math.Max(maxLabelsLinesFound, 1);  //this line just for symmetry
+        //                    labelsNonBroken.Add("");  //should never happen for GRAPH
+        //                }
+
+        //                for (int i = 0; i < labelsArray.Length; i++)
+        //                {
+        //                    if (labelsArray[i] == "[[]]") labelsArray[i] = "";
+        //                }
+
+        //                for (int i = 0; i < numberOfLabelsLinesMax; i++)
+        //                {
+        //                    string s = labelsArray[numberOfLabelsLinesMax - i - 1];
+        //                    int ii = i;
+        //                    int jj = virtualCols;
+        //                    if (transpose)
+        //                    {
+        //                        ii = virtualCols;
+        //                        jj = i;
+        //                    }
+
+        //                    int ii2 = ii + 1 + virtualRowsStart;
+        //                    tab.Set(ii2, jj + 1, s);  //virtualRowsStart=0 if transpose=true
+        //                    if (!transpose)
+        //                    {
+        //                        tab.SetAlign(ii2, jj + 1, Align.Right);
+        //                    }
+        //                }
+
+        //                List<double> filterMemoryValues = new List<double>();
+        //                List<string> filterMemoryDates = new List<string>();
+
+        //                List<double> collapseFreqsValues = new List<double>();
+
+        //                int virtualRows = virtualRowsStart;
+        //                foreach (GekkoTime gt in new GekkoTimeIterator(o.t1, o.t2))
+        //                {
+        //                    bool filter = timefilter && ShouldFilterPeriod(gt);
+
+        //                    Series ts = subPe.tsWork as Series;
+        //                    Series tsGrund = subPe.tsBase as Series;
+
+        //                    double var1;
+        //                    double varPch;
+        //                    ComputeValueForPrintPlotNew(out var1, out varPch, printCode, gt, ts, tsGrund, o.guiGraphIsLogTransform, false);
+
+        //                    collapseFreqsValues.Add(var1);
+
+        //                    string date = G.FromDateToString(gt);
+
+        //                    if (timefilter && G.Equal(timefilterType, "avg"))
+        //                    {
+        //                        if (filter)
+        //                        {
+        //                            //filterCounter++;
+        //                            filterMemoryValues.Add(var1);
+        //                            filterMemoryDates.Add(date);
+        //                        }
+        //                        else
+        //                        {
+        //                            //filterCounter = 0;
+        //                            if (filterMemoryValues.Count > 0)
+        //                            {
+        //                                filterMemoryValues.Add(var1);
+        //                                filterMemoryDates.Add(date);
+        //                                var1 = CalculateAveragesForPrint(printCode, filterMemoryValues, EPrtCollapseTypes.None, -12345);  //freq will not be used here
+        //                                date = filterMemoryDates[0] + "-" + filterMemoryDates[filterMemoryDates.Count - 1];
+        //                            }
+        //                            filterMemoryValues.Clear();
+        //                            filterMemoryDates.Clear();
+        //                        }
+        //                    }
+
+        //                    if (filter) continue;
+
+        //                    virtualRows++;
+
+        //                    //don't do pretty printing of Q and M if there is timefilter or if it is transposed
+        //                    bool doAremosStuff = false; if (Program.options.print_freq == "pretty" && !timefilter && !transpose && (gt.freq == EFreq.Quarterly || gt.freq == EFreq.Monthly)) doAremosStuff = true;
+        //                    if (G.Equal(o.prtType, "plot") || G.Equal(o.prtType, "clip") || G.Equal(o.prtType, "sheet")) doAremosStuff = false;
+        //                    //Note: the method below only puts stuff into table for virtualCols == 1. Else it is only used
+        //                    //      to correct virtualRows when pretty-printing frequencies Q and M.
+        //                    PrintInsertDate(doAremosStuff, virtualCols, date, gt, o.t1, tab, numberOfLabelsLinesMax, transpose, ref virtualRows, o);
+        //                    PrintInsertTimeseriesData(doAremosStuff, gt, virtualCols, tab, numberOfLabelsLinesMax, transpose, width, dec, ref virtualRows, var1, collapseFreqsValues, printCode, o);
+        //                    virtualRowsMaxSeen = Math.Max(virtualRowsMaxSeen, virtualRows + numberOfLabelsLinesMax);
+        //                } //foreach period
+        //            } //foreach printcode
+        //        }  //foreach item in variable (if it is a list)
+        //    } //foreach variable
+
+        //    if (subElementCounterTotal == -1)
+        //    {
+        //        G.Writeln2("Empty list -- nothing to print");
+        //    }
+
+        //    virtualRowsMaxSeen = PrintPrettify(o, tab, numberOfLabelsLinesMax, transpose, maxLabelsLinesFound, identicalCodes, onePrintCodeLabel, virtualRowsStart, virtualRowsMaxSeen);
+
+        //    if (masterSpaceErrors.Count > 0)
+        //    {
+        //        //only results in a warning ("MULPRT @fy" will always be 0)
+        //        G.Writeln();
+        //        foreach (string s in masterSpaceErrors) G.Writeln(s);
+        //    }
+
+        //    if (nonExistenceErrors.Count > 0)
+        //    {
+        //        G.Writeln();
+        //        foreach (string s in nonExistenceErrors) G.Writeln(s);
+        //        throw new GekkoException();
+        //    }
+        //    else
+        //    {
+        //        //----------------- actually printing the stuff start -------------------------------
+        //        //tab.PrintCellsForDebug();
+
+        //        if (G.Equal(o.prtType, "plot"))
+        //        {
+        //            //tab.PrintCellsForDebug();
+        //            if (Program.options.plot_new)
+        //            {
+        //                //CallGnuplotNew2(tab, o, subElementCounterTotal + 1, maxLabelsLinesFound, labelsNonBroken);  //make sure there are no percent shown for levels (use <n> option, not <n p>)                            
+        //            }
+        //            else
+        //            {
+        //                //CallGnuplotNew(tab, o, subElementCounterTotal + 1, maxLabelsLinesFound, labelsNonBroken);  //make sure there are no percent shown for levels (use <n> option, not <n p>)
+        //            }
+
+        //            //Alternatively: store all transformations, maybe also for UDVALG
+        //            //TODO.......
+        //            //if (po.isCalledFromGraphWindow == false)  //PPLOT called from command prompt or command file
+        //            //{
+        //            //    CloneToLocalBank(graphVars, localBanks, work, base2);
+        //            //}
+
+        //            return 0;
+        //        }
+
+        //        if (G.IsUnitTesting())
+        //        {
+        //            Globals.unitTestTablePointer = tab;  //to be able to inspect it in unit tests
+        //        }
+
+        //        if (G.Equal(o.prtType, "sheet"))
+        //        {
+        //            //tab2 = tab.Transpose();
+        //            //TODO: we need a counter regarding the first rows/cols of the table, how many??
+
+        //            //TODO: fill with NaN!!!
+        //            //TODO: fill with NaN!!!
+        //            //TODO: fill with NaN!!!
+
+        //            //remember append
+        //            //always start in A1, no blank line
+        //            //labels.. what if they break -- should be infinitely long
+
+        //            Table tab2 = tab.Transpose();
+        //            int startRows = 1;
+        //            int startCols = 1;
+        //            ExcelOptions eo = new ExcelOptions();
+        //            eo.excelRowLabels = new string[tab2.GetRowMaxNumber() - startRows, 1];
+        //            eo.excelColumnLabels = new string[1, tab2.GetColMaxNumber() - startCols];
+        //            eo.excelData = G.CreateArrayDouble(tab2.GetRowMaxNumber() - startRows, tab2.GetColMaxNumber() - startCols, double.NaN);
+
+        //            for (int i = 1; i <= tab2.GetRowMaxNumber(); i++)
+        //            {
+        //                for (int j = 1; j <= tab2.GetColMaxNumber(); j++)
+        //                {
+        //                    Cell cell2 = tab2.Get(i, j);
+        //                    string s2 = "";
+        //                    if (cell2 == null)
+        //                    {
+        //                    }
+        //                    else
+        //                    {
+        //                        if (i == 1 && j == 1)
+        //                        {
+        //                            //do nothing
+        //                        }
+        //                        else if (j == 1)
+        //                        {
+        //                            //first row
+        //                            string s = cell2.CellText.TextData[0];
+        //                            if (s == null) s = "";
+        //                            eo.excelRowLabels[i - 1 - startRows, j - 1] = s;
+        //                        }
+        //                        else if (i == 1)
+        //                        {
+        //                            string s = cell2.CellText.TextData[0];
+        //                            if (s == null) s = "";
+        //                            eo.excelColumnLabels[i - 1, j - 1 - startCols] = s;
+        //                        }
+        //                        else
+        //                        {
+        //                            eo.excelData[i - startRows - 1, j - startCols - 1] = cell2.number;
+        //                            s2 = cell2.date;
+        //                        }
+        //                    }
+        //                }
+        //            }
+
+        //            CreateExcelWorkbook2(eo, o, IsMulprt(o));
+        //            return 0;
+        //        }
+        //        else if (G.Equal(o.prtType, "clip"))
+        //        {
+        //            //maybe better to "record" into tablelight from CreateExcelWorkbook2?
+        //            PrtClipboard(tab, false);
+        //            return 0;
+        //        }
+        //        else  //normal PRT
+        //        {
+        //            List<string> table = tab.Print();
+        //            int widthRemember = Program.options.print_width;
+        //            int fileWidthRemember = Program.options.print_filewidth;
+        //            Program.options.print_width = int.MaxValue;
+        //            Program.options.print_filewidth = int.MaxValue;
+        //            G.Writeln();
+        //            if (o.opt_title != null && o.opt_title != "")
+        //            {
+        //                G.Writeln(o.opt_title);
+        //            }
+        //            try
+        //            {
+
+        //                foreach (string s in table)
+        //                {
+        //                    G.Writeln(s);
+        //                }
+
+
+        //            }
+        //            finally
+        //            {
+        //                //resetting, also if there is an error
+        //                Program.options.print_width = widthRemember;
+        //                Program.options.print_filewidth = fileWidthRemember;
+        //            }
+        //            //----------------- actually printing the stuff end -------------------------------
+        //        }
+        //    }
+
+        //    return virtualCols;
+        //}
 
         private static bool HasIdenticalCodes(O.Prt o)
         {
@@ -24951,21 +24951,21 @@ namespace Gekko
             return identicalCodes;
         }
 
-        private static string GetLabelInPrt(O.Prt.Element pe, int subElementCounter)
-        {
-            string label = null;
-            if (pe.subElements[subElementCounter].label == null)
-            {
-                label = pe.label;
-            }
-            else
-            {
-                label = pe.subElements[subElementCounter].label;
-            }
-            label = G.ReplaceGlueNew(label);
-            label = ScalarString.SubstituteScalarsInString(label, false, true);
-            return label;
-        }
+        //private static string GetLabelInPrt(O.Prt.Element pe, int subElementCounter)
+        //{
+        //    string label = null;
+        //    if (pe.subElements[subElementCounter].label == null)
+        //    {
+        //        label = pe.label;
+        //    }
+        //    else
+        //    {
+        //        label = pe.subElements[subElementCounter].label;
+        //    }
+        //    label = G.ReplaceGlueNew(label);
+        //    label = ScalarString.SubstituteScalarsInString(label, false, true);
+        //    return label;
+        //}
 
         private static double CalculateAveragesForPrint(string printCode, List<double> filterMemoryValues, EPrtCollapseTypes collapse, int n)
         {
