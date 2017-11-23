@@ -1577,7 +1577,7 @@ namespace Gekko
             if (input.Type() == EVariableType.Val)
             {
                 double d = O.ConvertToVal(input);
-                return new ScalarVal(Math.Round(d, decimals));
+                return new ScalarVal(Math.Round(d, decimals, MidpointRounding.AwayFromZero));
             }
             else if (input.Type() == EVariableType.Series)
             {                  
@@ -1591,7 +1591,7 @@ namespace Gekko
                 {
                     for (int j = 0; j < m.data.GetLength(1); j++)
                     {
-                        m2.data[i, j] = Math.Round(m.data[i, j], decimals);
+                        m2.data[i, j] = Math.Round(m.data[i, j], decimals, MidpointRounding.AwayFromZero);
                     }
                 }
                 return m2;

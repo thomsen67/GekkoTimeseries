@@ -20492,7 +20492,7 @@ namespace Gekko
             Globals.arithmentics[9] = (x1, x2) => Math.Pow(x2, x1);
             Globals.arithmentics[10] = (x1, x2) => (x1 / x2 - 1d) * 100d;
             Globals.arithmentics[11] = (x1, x2) => Math.Log(x1 / x2);
-            Globals.arithmentics[12] = (x1, x2) => Math.Round(x1, (int)x2);
+            Globals.arithmentics[12] = (x1, x2) => Math.Round(x1, (int)x2, MidpointRounding.AwayFromZero);
 
             Globals.arithmentics1[0] = (x1) => -x1;
             Globals.arithmentics1[1] = (x1) => Math.Abs(x1);
@@ -22865,7 +22865,7 @@ namespace Gekko
             //G.Writeln(labels[0]);  //labels contain the LHS and all the RHS!       
             G.Writeln("...LHS LABEL");  //labels contain the LHS and all the RHS!       
             foreach (string s in temp) G.Writeln(s);
-            G.Writeln("R2: " + Math.Round(r2, 6) + "    " + "SEE: " + RoundToSignificantDigits(see, 6) + "    " + "DW: " + Math.Round(dw, 4));
+            G.Writeln("R2: " + Math.Round(r2, 6, MidpointRounding.AwayFromZero) + "    " + "SEE: " + RoundToSignificantDigits(see, 6) + "    " + "DW: " + Math.Round(dw, 4, MidpointRounding.AwayFromZero));
 
             if (Math.Abs(resMean) > 0.000001d * see)
             {
@@ -23215,7 +23215,7 @@ namespace Gekko
         private static double RoundDecimals2(double d, int digits)
         {
             double scale = Math.Pow(10, RoundDecimals1(d));
-            double scale2 = scale * Math.Round(d / scale, digits);
+            double scale2 = scale * Math.Round(d / scale, digits, MidpointRounding.AwayFromZero);
             return scale2;
         }
 
@@ -23282,8 +23282,8 @@ namespace Gekko
                 {
                     
                     O.PrtContainer c = new O.PrtContainer();
-                    c.ivFirst = element.variable[0];
-                    c.ivRef = element.variable[1];
+                    c.variable[0] = element.variable[0];
+                    c.variable[1] = element.variable[1];
                     c.printCode = printCode;
                     c.label = element.label;
 
@@ -23417,8 +23417,8 @@ namespace Gekko
                         if (j-2 >= 0)
                         {
                             cc = containerExplode[j-2];
-                            ivWork = cc.ivFirst;
-                            ivRef = cc.ivRef;
+                            ivWork = cc.variable[0];
+                            ivRef = cc.variable[1];
                             printCode = cc.printCode;
                             label = cc.label;
                         }                        
@@ -24356,28 +24356,30 @@ namespace Gekko
 
         private static void PrintHelper2(List<O.PrtContainer> containerExplode, bool[] freqs, O.PrtContainer container, bool root, bool isRef, List<IVariable> errorList)
         {
-            if (container.ivFirst.Type() == EVariableType.Series)
+            //TODO: what to do with ref, how to merge??? What if MULPRT {#m1}, and #m1 has different elements 
+
+            if (container.variable[0] != null && container.variable[0].Type() == EVariableType.Series)
             {
                 containerExplode.Add(container);
-                PrintFreqHelper(freqs, container.ivFirst);  //the ref one should be same freq
-            }
-            else if (container.ivFirst.Type() == EVariableType.Val)
-            {
-                containerExplode.Add(container);
-            }
-            else if (container.ivFirst.Type() == EVariableType.Matrix && ((Matrix)container.ivFirst).data.Length == 1)  //an 1x1 matrix
+                PrintFreqHelper(freqs, container.variable[0]);  //the ref one should be same freq
+            }            
+            else if (container.variable[0] != null && container.variable[0].Type() == EVariableType.Val)
             {
                 containerExplode.Add(container);
             }
-            else if (container.ivFirst.Type() == EVariableType.List)
+            else if (container.variable[0] != null && container.variable[0].Type() == EVariableType.Matrix && ((Matrix)container.variable[0]).data.Length == 1)  //an 1x1 matrix
+            {
+                containerExplode.Add(container);
+            }
+            else if (container.variable[0] != null && container.variable[0].Type() == EVariableType.List)
             {
                 if (root)
                 {
-                    for(int i = 0;i< ((List)container.ivFirst).list.Count;i++)
+                    for(int i = 0;i< ((List)container.variable[0]).list.Count;i++)
                     {
                         O.PrtContainer c2 = new O.PrtContainer();
-                        if (container.ivFirst != null) c2.ivFirst = ((List)container.ivFirst).list[i];
-                        if (container.ivRef != null) c2.ivRef = ((List)container.ivRef).list[i];
+                        if (container.variable[0] != null) c2.variable[0] = ((List)container.variable[0]).list[i];
+                        if (container.variable[0] != null) c2.variable[0] = ((List)container.variable[0]).list[i];
                         c2.label = container.label;
                         c2.printCode = container.printCode;
                         PrintHelper2(containerExplode, freqs, c2, false, isRef, errorList);  //the counter is fixed
@@ -24386,7 +24388,7 @@ namespace Gekko
             }
             else
             {
-                errorList.Add(container.ivFirst);                            
+                errorList.Add(container.variable[0]);                            
             }
         }
 

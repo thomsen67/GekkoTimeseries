@@ -6718,8 +6718,9 @@ namespace Gekko
         public class PrtContainer
         {
             //Items that are unfolded via lists
-            public IVariable ivFirst = null;
-            public IVariable ivRef = null;
+            
+            public IVariable[] variable = new IVariable[2];
+
             public string printCode = null;
             public string label = null;
             public double min = double.MaxValue;
