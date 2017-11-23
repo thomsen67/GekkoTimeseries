@@ -28227,8 +28227,16 @@ namespace Gekko
 
         private static string GnuplotText(string s)
         {
+            //cf. http://ayapin-film.sakura.ne.jp/Gnuplot/Docs/ps_guide.pdf
             if (s == null) return null;
-            return s.Replace(@"_", @"\\_");
+            string s2 = s;
+            s2 = s2.Replace(@"_", @"\\_");
+            s2 = s2.Replace(@"@", @"\\@");
+            s2 = s2.Replace(@"{", @"\\{");
+            s2 = s2.Replace(@"}", @"\\}");
+            s2 = s2.Replace(@"^", @"\\^");
+            s2 = s2.Replace(@"&", @"\\&");
+            return s2;            
         }
 
         private static int HandleXTics(List<string> labels1, List<string> labels2, ref string ticsTxt, int mxtics)
