@@ -23335,6 +23335,11 @@ namespace Gekko
                         if (xx1 != null) c.variable[1] = xx1.list[i];
                         else c.variable[1] = element.variable[1];
 
+                        if (c.variable[0] != null && !G.IsValueType(c.variable[0]) || c.variable[1] != null && !G.IsValueType(c.variable[1])) {
+                            G.Writeln2("+++ WARNING: Non-value in PRT");
+                            return;
+                        }
+
                         c.printCodeFinal = printCode;
                         
                         c.label = element.label;
@@ -23545,15 +23550,21 @@ namespace Gekko
                             if (type != "plot") // ------------------------------------------------------------- (1)
                             {
                                 i++;
+                                if (year == y1 && j > 1)
+                                {
+                                    table.Set(i, j, label);
+                                    table.SetAlign(i, j, Align.Right);
+                                }
                                 i++;
                                 //Non-plots have a first column with dates, plots have such a column for each series
                                 if (j == 1)  //then iv == null
                                 {
                                     // --------------------------                                
                                     // --------------------------
-                                    if (type != "plot") table.Set(i, j, year.ToString());
+                                    table.Set(i, j, year.ToString());                                    
                                 }
-                                
+                                if (type != "plot" && sameFreq == EFreq.Annual) i = i - 1; // #98075235874325
+
                             }
 
                             if (true)  // ------------------------------------------------------------- (2)
@@ -24161,13 +24172,18 @@ namespace Gekko
                                     // --------------------------
                                     if (j == 1)
                                     {
-                                        table.Set(i, j, "a");
+                                        if (type != "plot" && sameFreq == EFreq.Annual)
+                                        {
+                                            // #98075235874325
+                                        }
+                                        else table.Set(i, j, "a");
                                     }
                                     else
                                     {
 
                                         PrintHelper3(smpl, type, format, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
+                                    if (type != "plot" && sameFreq == EFreq.Annual) i = i - 1; // #98075235874325
                                 }
                             }
                         }  //end of years
