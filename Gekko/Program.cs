@@ -23268,7 +23268,7 @@ namespace Gekko
 
         public static void OPrint(O.Prt oPrt)
         {
-            List<O.PrtContainer> container = new List<O.PrtContainer>();
+            List<O.Prt.Element> container = new List<O.Prt.Element>();
 
             //If PRT <m> unfold(#m, {#m}), we will get 1 prtElement (since there are no commas), where 
             //variable[0] and [1] are both lists with two items (if #m has two items).
@@ -23306,29 +23306,50 @@ namespace Gekko
             //    }
             //}
 
-            foreach (O.Prt.Element element in oPrt.prtElements)  //this element may be a list with 2 timeseries
+            foreach (O.Prt.Element element in oPrt.prtElements) //for each comma in the prt statement
             {
-                
-                foreach (string printCode in element.printCodesFinal)  //this may be two printcodes <n p>
+                List xx0 = element.variable[0] as List;
+                List xx1 = element.variable[1] as List;
+                int n = 1;
+                if (xx0 != null && xx1 != null)
                 {
-                    //after this, 
+                    if (xx0.list.Count != xx1.list.Count)
+                    {
+                        G.Writeln2("*** ERROR: Lists with different number of items");
+                        throw new GekkoException();
+                    }
+                }
+                if (xx0 != null) n = xx0.list.Count;
+                else if (xx1 != null) n = xx1.list.Count;
 
-                    O.PrtContainer c = new O.PrtContainer();
-                    c.variable[0] = element.variable[0];
-                    c.variable[1] = element.variable[1];
-                    c.printCode = printCode;
-                    c.label = element.label;
+                for (int i = 0; i < n; i++)  //this element may be a list with 2 timeseries, x1 and x2
+                {
 
-                    c.linetypes = element.linetype;
-                    c.dashtypes = element.dashtype;
-                    c.linewidths = element.linewidth;
-                    c.linecolors = element.linecolor;
-                    c.pointtypes = element.pointtype;
-                    c.pointsizes = element.pointsize;
-                    c.fillstyles = element.fillstyle;
-                    c.y2s = element.y2;
+                    foreach (string printCode in element.printCodesFinal)  //this may be two printcodes <n p>
+                    {
+                        //after this, it should be x1<n>  x1<p>  x2<n>  x2<p>
 
-                    container.Add(c);
+                        O.Prt.Element c = new O.Prt.Element();
+                        if (xx0 != null) c.variable[0] = xx0.list[i];
+                        else c.variable[0] = element.variable[0];
+                        if (xx1 != null) c.variable[1] = xx1.list[i];
+                        else c.variable[1] = element.variable[1];
+
+                        c.printCodeFinal = printCode;
+                        
+                        c.label = element.label;
+
+                        c.linetype = element.linetype;
+                        c.dashtype = element.dashtype;
+                        c.linewidth = element.linewidth;
+                        c.linecolor = element.linecolor;
+                        c.pointtype = element.pointtype;
+                        c.pointsize = element.pointsize;
+                        c.fillstyle = element.fillstyle;
+                        c.y2 = element.y2;
+
+                        container.Add(c);
+                    }
                 }
             }
 
@@ -23344,9 +23365,9 @@ namespace Gekko
             List inputList = null;            
 
             if (true)
-            {               
+            {
 
-                List<O.PrtContainer> containerExplode = new List<O.PrtContainer>();
+                List<O.Prt.Element> containerExplode = container;
 
                 bool[] freqs = new bool[3];                
 
@@ -23358,38 +23379,38 @@ namespace Gekko
 
                 List<IVariable> errorList = new List<IVariable>();
 
-                if (true)
-                {
-                    foreach (O.PrtContainer c in container)
-                    {
-                        //counter++;
-                        PrintHelper2(containerExplode, freqs, c, true, false, errorList);
-                    }
-                }
-                else
-                {
-                    foreach (O.PrtContainer c in container)
-                    {
-                        if (c.variable[0] != null && !G.IsValueType(c.variable[0]))
-                        {
-                            errorList.Add(c.variable[0]);
-                        }
-                        else if (c.variable[1] != null && !G.IsValueType(c.variable[1]))
-                        {
-                            errorList.Add(c.variable[1]);
-                        }
-                        else
-                        {
-                            containerExplode.Add(c);
-                        }
-                    }
-                }
+                //if (true)
+                //{
+                //    foreach (O.PrtContainer c in container)
+                //    {
+                //        //counter++;
+                //        PrintHelper2(containerExplode, freqs, c, true, false, errorList);
+                //    }
+                //}
+                //else
+                //{
+                //    foreach (O.PrtContainer c in container)
+                //    {
+                //        if (c.variable[0] != null && !G.IsValueType(c.variable[0]))
+                //        {
+                //            errorList.Add(c.variable[0]);
+                //        }
+                //        else if (c.variable[1] != null && !G.IsValueType(c.variable[1]))
+                //        {
+                //            errorList.Add(c.variable[1]);
+                //        }
+                //        else
+                //        {
+                //            containerExplode.Add(c);
+                //        }
+                //    }
+                //}
 
-                if (errorList.Count > 0)
-                {
-                    G.Writeln2("+++ WARNING: Can only print or plot SERIES, VAL, 1x1 MATRIX, or a LIST with the same");
-                    return;
-                }           
+                //if (errorList.Count > 0)
+                //{
+                //    G.Writeln2("+++ WARNING: Can only print or plot SERIES, VAL, 1x1 MATRIX, or a LIST with the same");
+                //    return;
+                //}           
 
                 EFreq sameFreq = EFreq.None;
                 if (freqs[0] && !freqs[1] && !freqs[2]) sameFreq = EFreq.Annual;
@@ -23461,7 +23482,7 @@ namespace Gekko
                         i = 1;
                         //j++;
 
-                        O.PrtContainer cc = null;
+                        O.Prt.Element cc = null;
                         IVariable ivWork = null;
                         IVariable ivRef = null;
                         string printCode = null;
@@ -23472,7 +23493,7 @@ namespace Gekko
                             cc = containerExplode[j-2];
                             ivWork = cc.variable[0];
                             ivRef = cc.variable[1];
-                            printCode = cc.printCode;
+                            printCode = cc.printCodeFinal;
                             label = cc.label;
                         }                        
 
@@ -24327,7 +24348,7 @@ namespace Gekko
 
         }
 
-        private static void PrintHelper3(GekkoSmpl smpl,string type, string format, EFreq sameFreq, Table table, int count, int i, int j, int iPlot, string printCode, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, int sumOver, int[] skipCounter, O.PrtContainer cc)
+        private static void PrintHelper3(GekkoSmpl smpl,string type, string format, EFreq sameFreq, Table table, int count, int i, int j, int iPlot, string printCode, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, int sumOver, int[] skipCounter, O.Prt.Element cc)
         {
             GekkoTime t = new GekkoTime(freqColumn, year, subHere);
 
@@ -27034,7 +27055,7 @@ namespace Gekko
         }
         
 
-        private static void CallGnuplotNew2(Table data, O.Prt o, List<O.PrtContainer> containerExplode)
+        private static void CallGnuplotNew2(Table data, O.Prt o, List<O.Prt.Element> containerExplode)
         {
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
@@ -27898,7 +27919,7 @@ namespace Gekko
             return setTitlePlaceholder;
         }
 
-        private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<O.PrtContainer> co, double linewidthCorrection, double pointsizeCorrection, bool isInside)
+        private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<O.Prt.Element> co, double linewidthCorrection, double pointsizeCorrection, bool isInside)
         {
             int manyXValues = 0;  //0 or 1
             int quarterFix = count - 1;
@@ -27948,14 +27969,14 @@ namespace Gekko
                 // --------- loading lines section start
                 // ---------------------------------------------
 
-                linetype = GetText(co[i].linetypes, o.opt_linetype, line3 == null ? null : line3.SelectSingleNode("type"), linetypeMain, dlinetype);
-                dashtype = GetText(co[i].dashtypes, o.opt_dashtype, line3 == null ? null : line3.SelectSingleNode("dashtype"), dashtypeMain, ddashtype);
-                linewidth = GetText(G.isNumericalError(co[i].linewidths) ? null : co[i].linewidths.ToString(), G.isNumericalError(o.opt_linewidth) ? null : o.opt_linewidth.ToString(), line3 == null ? null : line3.SelectSingleNode("linewidth"), linewidthMain, dlinewidth);
-                linecolor = GetText(co[i].linecolors, o.opt_linecolor, line3 == null ? null : line3.SelectSingleNode("linecolor"), linecolorMain, dlinecolor);
-                pointtype = GetText(co[i].pointtypes, o.opt_pointtype, line3 == null ? null : line3.SelectSingleNode("pointtype"), pointtypeMain, dpointtype);
-                pointsize = GetText(G.isNumericalError(co[i].pointsizes) ? null : co[i].pointsizes.ToString(), G.isNumericalError(o.opt_pointsize) ? null : o.opt_pointsize.ToString(), line3 == null ? null : line3.SelectSingleNode("pointsize"), pointsizeMain, dpointsize);
-                fillstyle = GetText(co[i].fillstyles, o.opt_fillstyle, line3 == null ? null : line3.SelectSingleNode("fillstyle"), fillstyleMain, dfillstyle);
-                y2 = GetText(co[i].y2s, null, line3 == null ? null : line3.SelectSingleNode("y2"), null, "no"); //default: no, #23475432985
+                linetype = GetText(co[i].linetype, o.opt_linetype, line3 == null ? null : line3.SelectSingleNode("type"), linetypeMain, dlinetype);
+                dashtype = GetText(co[i].dashtype, o.opt_dashtype, line3 == null ? null : line3.SelectSingleNode("dashtype"), dashtypeMain, ddashtype);
+                linewidth = GetText(G.isNumericalError(co[i].linewidth) ? null : co[i].linewidth.ToString(), G.isNumericalError(o.opt_linewidth) ? null : o.opt_linewidth.ToString(), line3 == null ? null : line3.SelectSingleNode("linewidth"), linewidthMain, dlinewidth);
+                linecolor = GetText(co[i].linecolor, o.opt_linecolor, line3 == null ? null : line3.SelectSingleNode("linecolor"), linecolorMain, dlinecolor);
+                pointtype = GetText(co[i].pointtype, o.opt_pointtype, line3 == null ? null : line3.SelectSingleNode("pointtype"), pointtypeMain, dpointtype);
+                pointsize = GetText(G.isNumericalError(co[i].pointsize) ? null : co[i].pointsize.ToString(), G.isNumericalError(o.opt_pointsize) ? null : o.opt_pointsize.ToString(), line3 == null ? null : line3.SelectSingleNode("pointsize"), pointsizeMain, dpointsize);
+                fillstyle = GetText(co[i].fillstyle, o.opt_fillstyle, line3 == null ? null : line3.SelectSingleNode("fillstyle"), fillstyleMain, dfillstyle);
+                y2 = GetText(co[i].y2, null, line3 == null ? null : line3.SelectSingleNode("y2"), null, "no"); //default: no, #23475432985
                 label = HandleLabel(line3, isExplicit, labelCleaned);
 
                 if (G.Equal(linetype, "boxes"))

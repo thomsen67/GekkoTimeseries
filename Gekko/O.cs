@@ -6690,6 +6690,7 @@ namespace Gekko
                 public List<OptString> printCodes = new List<OptString>();
 
                 public List<string> printCodesFinal = null;
+                public string printCodeFinal = null;
 
                 public int width = -12345;
                 public int dec = -12345;
@@ -6708,6 +6709,9 @@ namespace Gekko
                 public string y2 = null;
                 //--- errors
                 public List<string> errors = new List<string>();
+
+                public double min = double.MaxValue;
+                public double max = double.MinValue;
                                 
             }
 
