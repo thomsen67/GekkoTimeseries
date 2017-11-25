@@ -6541,51 +6541,51 @@ namespace Gekko
                 //TODO: CLEAN THIS UP!!                                                
                 if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_n))
                 {
-                    rv = new List<int>(); rv.Add(1);
+                    rv = new List<int>(); rv.Add(0);
                 }
                 else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_d))
                 {
-                    rv = new List<int>(); rv.Add(1);
+                    rv = new List<int>(); rv.Add(0);
                 }
                 else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_p))
                 {
-                    rv = new List<int>(); rv.Add(1);
+                    rv = new List<int>(); rv.Add(0);
                 }
                 else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_dp))
                 {
-                    rv = new List<int>(); rv.Add(1);
+                    rv = new List<int>(); rv.Add(0);
                 }
                 else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_r))
                 {
-                    rv = new List<int>(); rv.Add(2);
+                    rv = new List<int>(); rv.Add(1);
                 }
                 else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_rn))
                 {
-                    rv = new List<int>(); rv.Add(2);
+                    rv = new List<int>(); rv.Add(1);
                 }
                 else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_rd))
                 {
-                    rv = new List<int>(); rv.Add(2);
+                    rv = new List<int>(); rv.Add(1);
                 }
                 else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_rp))
                 {
-                    rv = new List<int>(); rv.Add(2);
+                    rv = new List<int>(); rv.Add(1);
                 }
                 else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_rdp))
                 {
-                    rv = new List<int>(); rv.Add(2);
+                    rv = new List<int>(); rv.Add(1);
                 }
                 else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_m))
                 {
-                    rv = new List<int>(); rv.Add(1); rv.Add(2);
+                    rv = new List<int>(); rv.Add(0); rv.Add(1);
                 }
                 else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_q))
                 {
-                    rv = new List<int>(); rv.Add(1); rv.Add(2);
+                    rv = new List<int>(); rv.Add(0); rv.Add(1);
                 }
                 else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_mp))
                 {
-                    rv = new List<int>(); rv.Add(1); rv.Add(2);
+                    rv = new List<int>(); rv.Add(0); rv.Add(1);
                 }                
                 else
                 {

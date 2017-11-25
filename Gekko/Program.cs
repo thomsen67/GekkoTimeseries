@@ -473,9 +473,16 @@ namespace Gekko
     /// </summary>
     public class TwoStrings
     {
-        public String s1;
-        public String s2;
-        public String s2Type;
+        public string s1 = null;
+        public string s2 = null;
+        public string s2Type = null;
+    }
+
+    public class TokenHelper
+    {
+        public string s = null;
+        public string type = null;
+        public string leftblanks = null;
     }
 
     public class StackHelper
@@ -23306,6 +23313,8 @@ namespace Gekko
             //    }
             //}
 
+            bool[] freqs = new bool[3];
+
             foreach (O.Prt.Element element in oPrt.prtElements) //for each comma in the prt statement
             {
                 List xx0 = element.variable[0] as List;
@@ -23322,11 +23331,81 @@ namespace Gekko
                 if (xx0 != null) n = xx0.list.Count;
                 else if (xx1 != null) n = xx1.list.Count;
 
+
+                if (false)
+                {
+                    //Here, label may be "unfold(#m, xx[#m])" --> if so lookup #m and use it for labels
+
+                    //der søges gennem alle frie {#m} og tjekkes om nogle af dem er bundet til sum(#m,) eller avg(#m,). De ikke bundne
+                    //sættes i unfold((#m1, #m2),...)
+
+
+                    //Unknown, Word, Number, QuotedString, WhiteSpace, Symbol, EOL, EOF
+                    StringTokenizer2 tok = new StringTokenizer2(element.label, false, false);
+                    tok.IgnoreWhiteSpace = false;
+                    tok.SymbolChars = new char[] { '!', '#', '%', '&', '/', '(', ')', '=', '?', '@', '$', '{', '[', ']', '}', '+', '|', '^', '¨', '~', '*', '<', '>', '\\', ';', ',', ':', '.', '-' };
+                    Token token;
+                    int numberCounter = 0;
+                    List<TokenHelper> a = new List<TokenHelper>();
+                    string white = null;
+                    do
+                    {
+                        token = tok.Next();
+                        string value = token.Value;
+                        string kind = token.Kind.ToString();
+                        TokenHelper two = new TokenHelper();
+                        two.s = value; two.type = kind; two.leftblanks = white;
+                        if (kind == "WhiteSpace")
+                        {
+                            white = value;
+                        }
+                        else
+                        {
+                            a.Add(two);
+                            white = null;
+                        }
+                        
+                    } while (token.Kind != TokenKind.EOF);
+                    for (int i = 0; i < 10; i++) a.Add(new TokenHelper());
+
+                    GekkoDictionary<string, string> lists = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    for (int i = 0; i < a.Count - 10; i++)
+                    {
+                        //in sum(#i, ...) we need to ignore #i in ... --- also for sum((#i, #j),  ...) we need to ignore #i,#j in ..
+                        if (G.Equal(a[i].s, "sum") && a[i + 1].s == "(")
+                        {
+                            //sum(
+                            if (a[i + 2].s == "#" && a[i + 3].type == "Word" && a[i + 4].s == ",")
+                            {
+                                //sum(#x,
+                                if (!lists.ContainsKey(a[i + 3].s)) lists.Add(a[i + 3].s, null);
+                            }
+                            else if (a[i + 2].s == "(" && a[i + 3].s == "#" && a[i + 4].type == "Word")
+                            {
+                                //sum((#x
+                                if (!lists.ContainsKey(a[i + 4].s)) lists.Add(a[i + 4].s, null);
+                                for (int j = 0; j < int.MaxValue; j++)
+                                {
+                                    if (i + 5 + 3 * j > a.Count - 1) break;
+                                    if (a[i + 5 + 3 * j].s == ")") break;
+                                    if (a[i + 5 + 3 * j].s == "," && a[i + 6 + 3 * j].s == "#" && a[i + 7 + 3 * j].type == "Word")
+                                    {
+                                        if (!lists.ContainsKey(a[i + 7].s)) lists.Add(a[i + 7].s, null);
+                                    }
+                                }
+                            }
+                        }
+
+
+                    }
+                }
+
                 for (int i = 0; i < n; i++)  //this element may be a list with 2 timeseries, x1 and x2
                 {
-
+                    int iPrintCode = -1;
                     foreach (string printCode in element.printCodesFinal)  //this may be two printcodes <n p>
                     {
+                        iPrintCode++;
                         //after this, it should be x1<n>  x1<p>  x2<n>  x2<p>
 
                         O.Prt.Element c = new O.Prt.Element();
@@ -23335,14 +23414,45 @@ namespace Gekko
                         if (xx1 != null) c.variable[1] = xx1.list[i];
                         else c.variable[1] = element.variable[1];
 
+                        Series temp0 = c.variable[0] as Series;
+                        Series temp1 = c.variable[1] as Series;
+                        if (temp0 != null)
+                        {
+                            if (temp0.freq == EFreq.Annual) freqs[0] = true;
+                            else if (temp0.freq == EFreq.Quarterly) freqs[1] = true;
+                            else if (temp0.freq == EFreq.Monthly) freqs[2] = true;
+                        }
+                        else if (temp1 != null)
+                        {
+                            if (temp1.freq == EFreq.Annual) freqs[0] = true;
+                            else if (temp1.freq == EFreq.Quarterly) freqs[1] = true;
+                            else if (temp1.freq == EFreq.Monthly) freqs[2] = true;
+                        }
+
+
                         if (c.variable[0] != null && !G.IsValueType(c.variable[0]) || c.variable[1] != null && !G.IsValueType(c.variable[1])) {
                             G.Writeln2("+++ WARNING: Non-value in PRT");
                             return;
                         }
 
                         c.printCodeFinal = printCode;
-                        
                         c.label = element.label;
+
+                        //FIXME
+                        //FIXME
+                        if (G.Equal(element.printCodesFinal[0], "n") && iPrintCode > 0 && G.Equal(printCode, "p"))
+                        {
+                            c.label = "%";
+                        }
+                        else if (G.Equal(element.printCodesFinal[0], "m") && iPrintCode > 0 && G.Equal(printCode, "q"))
+                        {
+                            c.label = "%";
+                        }
+                        else
+                        {
+                            if (iPrintCode == 0) c.label = element.label + "  (" + printCode.ToLower() + ")";
+                            else if (iPrintCode > 0) c.label = "(" + printCode.ToLower() + ")";
+                        }
 
                         c.linetype = element.linetype;
                         c.dashtype = element.dashtype;
@@ -23373,9 +23483,7 @@ namespace Gekko
             {
 
                 List<O.Prt.Element> containerExplode = container;
-
-                bool[] freqs = new bool[3];                
-
+                
                 AllFreqsHelper allFreqs = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);  //converts between A, Q, M, so all are given. Also used in IMPORT<per1 per2> etc.
 
                 //containerExplode.Add(null);
@@ -24209,7 +24317,7 @@ namespace Gekko
                 }
 
                 //bool filter = ShouldFilterPeriod(new GekkoTime());
-
+                
                 if (type == "plot")
                 {
                     CallGnuplotNew2(table, oPrt, containerExplode);
@@ -24222,7 +24330,9 @@ namespace Gekko
                     {
                         G.Writeln(s);
                     }
-                    PrtClipboard(table, false);
+                    Globals.lastPrtOrMulprtTable = table;
+                    CrossThreadStuff.CopyButtonEnabled(true);
+                    //PrtClipboard(table, false);
                 }
 
             }
@@ -24413,46 +24523,62 @@ namespace Gekko
 
         private static double PrintHelperTransform(GekkoSmpl smpl, Series tsWork, Series tsRef, GekkoTime t, string printcode, int sumOver, int[] skipCounter)
         {
-            int filterSkip = 0;
-            if (t.freq == EFreq.Annual) filterSkip = skipCounter[0];
-            else if (t.freq == EFreq.Quarterly) filterSkip = skipCounter[1];
-            else if (t.freq == EFreq.Monthly) filterSkip = skipCounter[2];
-
-            double dWork = 0d;
-            double dRef = 0d;
-            double dWorkLag = 0d;
-            double dWorkLag2 = 0d;
-            double dRefLag = 0d;
-            double dRefLag2 = 0d;
-            for (int i = 0; i < sumOver + filterSkip; i++)
+            if (true)
             {
-                if (tsWork != null)
-                {
-                    dWork += tsWork.GetData(smpl, t.Add(-i));
-                    dWorkLag += tsWork.GetData(smpl, t.Add(-i - 1));
-                    dWorkLag2 += tsWork.GetData(smpl, t.Add(-i - 2));
-                }
-                if (tsRef != null)
-                {
-                    dRef += tsRef.GetData(smpl, t.Add(-i));
-                    dRefLag += tsRef.GetData(smpl, t.Add(-i - 1));
-                    dRefLag2 += tsRef.GetData(smpl, t.Add(-i - 2));
-                }
+                //TODO filter and skip, see below
+                double var1 = double.NaN;
+                double varPch = double.NaN;
+                Program.ComputeValueForPrintPlotNew(out var1, out varPch, printcode, t, tsWork, tsRef, false, false);
+                return var1;
             }
-            if (G.Equal(printcode, Globals.printCode_n)) return dWork;
-            else if (G.Equal(printcode, Globals.printCode_m)) return dWork - dRef;
-            else if (G.Equal(printcode, Globals.printCode_q)) return (dWork / dRef - 1d) * 100d;
-            else if (G.Equal(printcode, Globals.printCode_d)) return dWork - dWorkLag;
-            else if (G.Equal(printcode, Globals.printCode_p)) return (dWork / dWorkLag - 1d) * 100d;
-            else if (G.Equal(printcode, Globals.printCode_dp)) return (dWork / dWorkLag - 1d) * 100d - (dWorkLag / dWorkLag2 - 1d) * 100d;
-            else if (G.Equal(printcode, Globals.printCode_r) || G.Equal(printcode, Globals.printCode_rn)) return dRef;
-            else if (G.Equal(printcode, Globals.printCode_rd)) return dRef - dRefLag;
-            else if (G.Equal(printcode, Globals.printCode_rp)) return (dRef / dRefLag - 1d) * 100d;
-            else if (G.Equal(printcode, Globals.printCode_rdp)) return (dRef / dRefLag - 1d) * 100d - (dRefLag / dRefLag2 - 1d) * 100d;
             else
             {
-                G.Writeln2("*** ERROR: Transformation error");
-                throw new GekkoException();
+                int filterSkip = 0;
+                if (t.freq == EFreq.Annual) filterSkip = skipCounter[0];
+                else if (t.freq == EFreq.Quarterly) filterSkip = skipCounter[1];
+                else if (t.freq == EFreq.Monthly) filterSkip = skipCounter[2];
+
+                double dWork = 0d;
+                double dRef = 0d;
+                double dWorkLag = 0d;
+                double dWorkLag2 = 0d;
+                double dRefLag = 0d;
+                double dRefLag2 = 0d;
+                for (int i = 0; i < sumOver + filterSkip; i++)
+                {
+                    if (tsWork != null)
+                    {
+                        dWork += tsWork.GetData(smpl, t.Add(-i));
+                        dWorkLag += tsWork.GetData(smpl, t.Add(-i - 1));
+                        dWorkLag2 += tsWork.GetData(smpl, t.Add(-i - 2));
+                    }
+                    if (tsRef != null)
+                    {
+                        dRef += tsRef.GetData(smpl, t.Add(-i));
+                        dRefLag += tsRef.GetData(smpl, t.Add(-i - 1));
+                        dRefLag2 += tsRef.GetData(smpl, t.Add(-i - 2));
+                    }
+                }
+
+                //double var1 = double.NaN;
+                //double varPch = double.NaN;
+                //Program.ComputeValueForPrintPlotNew(out var1, out varPch, printcode, t, tsWork, tsRef, false, false);
+
+                if (G.Equal(printcode, Globals.printCode_n)) return dWork;
+                else if (G.Equal(printcode, Globals.printCode_m)) return dWork - dRef;
+                else if (G.Equal(printcode, Globals.printCode_q)) return (dWork / dRef - 1d) * 100d;
+                else if (G.Equal(printcode, Globals.printCode_d)) return dWork - dWorkLag;
+                else if (G.Equal(printcode, Globals.printCode_p)) return (dWork / dWorkLag - 1d) * 100d;
+                else if (G.Equal(printcode, Globals.printCode_dp)) return (dWork / dWorkLag - 1d) * 100d - (dWorkLag / dWorkLag2 - 1d) * 100d;
+                else if (G.Equal(printcode, Globals.printCode_r) || G.Equal(printcode, Globals.printCode_rn)) return dRef;
+                else if (G.Equal(printcode, Globals.printCode_rd)) return dRef - dRefLag;
+                else if (G.Equal(printcode, Globals.printCode_rp)) return (dRef / dRefLag - 1d) * 100d;
+                else if (G.Equal(printcode, Globals.printCode_rdp)) return (dRef / dRefLag - 1d) * 100d - (dRefLag / dRefLag2 - 1d) * 100d;
+                else
+                {
+                    G.Writeln2("*** ERROR: Transformation error");
+                    throw new GekkoException();
+                }
             }
         }
 
@@ -27587,7 +27713,7 @@ namespace Gekko
             if (!NullOrEmpty(o.opt_title)) title2 = o.opt_title;
             if (!NullOrEmpty(title2))
             {
-                txt.AppendLine("set title " + Globals.QT + EncodeDanish(GnuplotText(title2 + subtitle2)) + Globals.QT);
+                txt.AppendLine("set title " + Globals.QT + EncodeDanish(GnuplotText(title2 + subtitle2, true)) + Globals.QT);
             }
             else
             {
@@ -28337,16 +28463,24 @@ namespace Gekko
         {
             return !(x != null && x.Trim() != "");
         }
-
         private static string GnuplotText(string s)
+        {
+            return GnuplotText(s, false);
+        }
+
+
+        private static string GnuplotText(string s, bool omitCurly)
         {
             //cf. http://ayapin-film.sakura.ne.jp/Gnuplot/Docs/ps_guide.pdf
             if (s == null) return null;
             string s2 = s;
             s2 = s2.Replace(@"_", @"\\_");
             s2 = s2.Replace(@"@", @"\\@");
-            s2 = s2.Replace(@"{", @"\\{");
-            s2 = s2.Replace(@"}", @"\\}");
+            if (!omitCurly)
+            {
+                s2 = s2.Replace(@"{", @"\\{");
+                s2 = s2.Replace(@"}", @"\\}");
+            }
             s2 = s2.Replace(@"^", @"\\^");
             s2 = s2.Replace(@"&", @"\\&");
             return s2;            

@@ -237,6 +237,99 @@ namespace Gekko.Parser.Gek
             }
         }
 
+        public static void WalkASTAndEmitUnfold(ASTNode node)
+        {
+            //before subnodes
+
+            if (node.Text == "ASTBANKVARNAME")
+            {
+                string s = GetSimpleName(node);
+                if (s != null && s[0] == Globals.symbolCollection)
+                {
+                    //naked #m
+                    if (node.Parent.Text == "ASTINDEXERELEMENT")
+                    {
+                        //#m is inside a x[#m]
+                        ASTNode node2 = node.Parent.Parent;
+                        while (true)
+                        {
+                            if (node2 == null || node2.Text == null) break;
+                            if (node2.Text.StartsWith("ASTPRTELEMENT"))
+                            {
+                                if (node2.freeIndexedLists == null) node2.freeIndexedLists = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                                if (!node2.freeIndexedLists.ContainsKey(s)) node2.freeIndexedLists.Add(s, null);
+                            }
+                            node2 = node2.Parent;
+                        }
+                    }
+                }
+            }
+            foreach (ASTNode child in node.ChildrenIterator())
+            {
+                WalkASTAndEmitUnfold(child);
+            }
+            //after subnodes
+
+            if (node.Text == "ASTPRTELEMENT")
+            {
+                if (node[0].Text == "ASTEXPRESSION")
+                {
+                    //here: onfolding 1 list (#m)
+
+                    //    ASTPRTELEMENT¤unfold¨(#¨m,xx3[_[#¨m])¤ [1]
+                    // 0    ASTEXPRESSION[1]
+                    // 1      ASTFUNCTION[1] <----------- our insert begins here
+                    // 2        ASTIDENT[1]
+                    // 3          unfold[1]
+                    // 4        ASTBANKVARNAME[0]
+                    // 5          ASTPLACEHOLDER[0]
+                    // 6          ASTVARNAME[0]
+                    // 7            ASTPLACEHOLDER[0]
+                    // 8              ASTHASH[0]
+                    // 9            ASTPLACEHOLDER[1]
+                    //10              ASTNAME[1]
+                    //11                ASTIDENT[1]
+                    //12                  m[1]
+                    //13            ASTPLACEHOLDER[0]
+                    //        AST..... ----------------> orignial code after ASTEXPRESSION comes here
+
+                    string s = "m";
+                    ASTNode n0 = new ASTNode("ASTEXPRESSION", true);
+                    ASTNode n1 = new ASTNode("ASTFUNCTION", true);
+                    ASTNode n2 = new ASTNode("ASTIDENT", true);
+                    ASTNode n3 = new ASTNode("unfold", true);
+                    ASTNode n4 = new ASTNode("ASTBANKVARNAME", true);
+                    ASTNode n5 = new ASTNode("ASTPLACEHOLDER", true);
+                    ASTNode n6 = new ASTNode("ASTVARNAME", true);
+                    ASTNode n7 = new ASTNode("ASTPLACEHOLDER", true);
+                    ASTNode n8 = new ASTNode("ASTHASH", true);
+                    ASTNode n9 = new ASTNode("ASTPLACEHOLDER", true);
+                    ASTNode n10 = new ASTNode("ASTNAME", true);
+                    ASTNode n11 = new ASTNode("ASTIDENT", true);
+                    ASTNode n12 = new ASTNode(s, true);
+                    ASTNode n13 = new ASTNode("ASTPLACEHOLDER", true);
+
+                    n0.Add(n1);
+                    n1.Add(n2);
+                    n2.Add(n3);
+                    n1.Add(n4);
+                    n4.Add(n5);
+                    n4.Add(n6);
+                    n6.Add(n7);
+                    n7.Add(n8);
+                    n6.Add(n9);
+                    n9.Add(n10);
+                    n10.Add(n11);
+                    n11.Add(n12);
+                    n6.Add(n13);
+                    n1.Add(node[0][0]);  //original code goes to arg 2 of unfold function: unfold(#m, ...[here]...)
+                    node.RemoveLast();
+                    node.Add(n0);
+                    
+                }
+            }
+        }
+
         public static void WalkASTAndEmit(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p)
         {            
             if (node.Parent != null)
@@ -355,6 +448,8 @@ namespace Gekko.Parser.Gek
                     break;
                 case "ASTFUNCTION":  //kind of like ASTFUNCTIONDEF, but the difference is that these sum() functions may be nested, so the nodes themselves need to keep the anchor info
                     {
+                       
+
                         string functionName = GetFunctionName(node);
                         string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionName);
                         if (listNames != null)
@@ -2907,29 +3002,43 @@ namespace Gekko.Parser.Gek
                             Tuple<bool, string> tuple = CheckIfLeftSide(node);  //In x[%s1, %s2][%date] = ... this will only be true for x, not for the other vars
                             bool isLeftSideVariable = tuple.Item1;
                             string type = tuple.Item2;
-                            
+
                             string isLeftSideVariableString = "false"; if (isLeftSideVariable) isLeftSideVariableString = "true";
                             bool isInsidePrintStatement = SearchUpwardsInTree5(node);
-                                                        
+
                             //string bankNumber = "0"; if (isInsidePrintStatement) bankNumber = Globals.bankNumberiName;
 
+
+                            //if (sigil == Globals.symbolCollection.ToString())
+                            //{
+                            //    //naked #m
+                            //    if (node.Parent.Text == "ASTINDEXERELEMENT")
+                            //    {
+                            //        //#m is inside a x[#m]
+                            //        ASTNode node2 = node.Parent.Parent;
+                            //        while (true)
+                            //        {
+                            //            if (node2 == null || node2.Text == null) break;
+                            //            if (node2.Text.StartsWith("ASTPRTELEMENT"))
+                            //            {
+                            //                if (node2.freeIndexedLists == null) node2.freeIndexedLists = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                            //                if (!node2.freeIndexedLists.ContainsKey(s)) node2.freeIndexedLists.Add(s, null);
+                            //            }
+                            //            node2 = node2.Parent;
+                            //        }                                                    
+                            //    }
+                            //}
+
+
+                            string s = GetSimpleName(node);
+                            string internalName = null;
+                            if (s != null) internalName = SearchUpwardsInTree3(node, s);
                             bool functionHit = false;
-                            if (node[0][0] == null && node[1][2][0] == null)  //no bank and no freq indicator
+                            if (internalName != null)
                             {
-                                //#746384984 merge these in a method
-                                if (node[1][1][0].Text == "ASTNAME" && node[1][1][0].ChildrenCount() == 1 && node[1][1][0][0].Text == "ASTIDENT")
-                                {
-                                    string sigil = GetSigilAsString(node[1][0]);
-                                    string ident = node[1][1][0][0][0].Text;
-                                    string s = sigil + ident;
-                                    string internalName = SearchUpwardsInTree3(node, s);
-                                    if (internalName != null)
-                                    {
-                                        node.Code.CA(internalName);
-                                        functionHit = true;
-                                    }
-                                }
-                            }                          
+                                node.Code.CA(internalName);
+                                functionHit = true;
+                            }
 
                             if (!functionHit)
                             {
@@ -2961,7 +3070,7 @@ namespace Gekko.Parser.Gek
                                         {
                                             simpleBank = node[0][0][0][0].Text;
                                         }
-                                        else if(node[0][0][0].Text == "REF")
+                                        else if (node[0][0][0].Text == "REF")
                                         {
                                             simpleBank = "Ref";
                                         }
@@ -2992,7 +3101,7 @@ namespace Gekko.Parser.Gek
                                     {
                                         simpleFreq = node[1][2][0][0][0].Text;
                                     }
-                                }                                
+                                }
 
                                 if (simpleBank != null && simpleName != null && simpleFreq != null)
                                 {
@@ -3013,35 +3122,35 @@ namespace Gekko.Parser.Gek
                                     string simpleFreqText = Globals.QT + simpleFreq + Globals.QT;
                                     if (simpleFreq == "") simpleFreqText = "null";
 
-                            
+
 
                                     string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." + type + ")";
-                                                                        
+
                                     node.Code.CA(lookupCode);
-                                                                        
+
                                 }
                                 else
                                 {
                                     //Complicated name, for instance
                                     //{%s}, a%s, a{#m}, {%b}:a, b:a!{%f}, %(%s),  ... 
-                                    
+
                                     //#746384984 merge these in a method
-                                    string nameAndBankCode = null;                                    
+                                    string nameAndBankCode = null;
                                     if (node[0][0] == null)
                                     {
                                         //no bank indicator        
-                                        nameAndBankCode = node[1].Code.ToString();                                        
+                                        nameAndBankCode = node[1].Code.ToString();
                                     }
                                     else
                                     {
                                         //bank indicator  
                                         string bankNameCs = null;
                                         bankNameCs = node[0][0].Code.ToString();
-                                        nameAndBankCode = "(" + bankNameCs + ")" + ".Add(smpl, O.scalarStringColon)" + ".Add(smpl, " + node[1].Code + ")";                                        
+                                        nameAndBankCode = "(" + bankNameCs + ")" + ".Add(smpl, O.scalarStringColon)" + ".Add(smpl, " + node[1].Code + ")";
                                     }
 
-                                    node.Code.A("O.Lookup(smpl, " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." +  type + ")");
-                                    
+                                    node.Code.A("O.Lookup(smpl, " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." + type + ")");
+
                                 }
                             }
                         }
@@ -4553,6 +4662,27 @@ namespace Gekko.Parser.Gek
                 }
                 node.Code.A(Globals.splitSTOP);
             }
+        }
+
+        private static string GetSimpleName(ASTNode node)
+        {
+            string s = null;
+            if (node[0][0] == null && node[1][2][0] == null)  //no bank and no freq indicator
+            {
+                //#746384984 merge these in a method
+                if (node[1][1][0].Text == "ASTNAME" && node[1][1][0].ChildrenCount() == 1 && node[1][1][0][0].Text == "ASTIDENT")
+                {
+                    string sigil = GetSigilAsString(node[1][0]);
+                    string ident = node[1][1][0][0][0].Text;
+                    s = sigil + ident;
+                    
+
+                    
+
+                }
+            }
+
+            return s;
         }
 
         private static Tuple<bool, string> CheckIfLeftSide(ASTNode node)
