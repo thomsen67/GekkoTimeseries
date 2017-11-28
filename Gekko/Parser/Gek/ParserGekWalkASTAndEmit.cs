@@ -240,10 +240,12 @@ namespace Gekko.Parser.Gek
         public static void WalkASTAndEmitUnfold(ASTNode node)
         {
             //before subnodes
+            return;
 
             if (node.Text == "ASTBANKVARNAME")
             {
                 string s = GetSimpleName(node);
+                string listnameWithoutSigil = s.Substring(1);
                 if (s != null && s[0] == Globals.symbolCollection)
                 {
                     //naked #m
@@ -251,13 +253,26 @@ namespace Gekko.Parser.Gek
                     {
                         //#m is inside a x[#m]
                         ASTNode node2 = node.Parent.Parent;
+                        //Assign it to ASTPRTELEMENT, unless it is assigned to sum(#m,...) or unfold(#m,...)
                         while (true)
                         {
                             if (node2 == null || node2.Text == null) break;
-                            if (node2.Text.StartsWith("ASTPRTELEMENT"))
+                            if (node2.Text == "ASTFUNCTION" && (G.Equal(node2[0][0].Text, "sum") || G.Equal(node2[0][0].Text, "unfold")))
+                            {
+                                if (node2[1].Text == "ASTBANKVARNAME")
+                                {
+                                    string s2 = GetSimpleName(node2[1]);
+                                    if (G.Equal(s, s2))
+                                    {
+                                        node2 = node2.Parent;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (node2.Text == "ASTPRTELEMENT")
                             {
                                 if (node2.freeIndexedLists == null) node2.freeIndexedLists = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                                if (!node2.freeIndexedLists.ContainsKey(s)) node2.freeIndexedLists.Add(s, null);
+                                if (!node2.freeIndexedLists.ContainsKey(listnameWithoutSigil)) node2.freeIndexedLists.Add(listnameWithoutSigil, null);
                             }
                             node2 = node2.Parent;
                         }
@@ -274,64 +289,94 @@ namespace Gekko.Parser.Gek
             {
                 if (node[0].Text == "ASTEXPRESSION")
                 {
-                    //here: onfolding 1 list (#m)
+                    if (node.freeIndexedLists != null && node.freeIndexedLists.Count > 0)
+                    {
+                        List<string> xx = new List<string>();
+                        foreach (string ss in node.freeIndexedLists.Keys)
+                        {
+                            xx.Add(ss);
+                        }
+                        xx.Sort(StringComparer.OrdinalIgnoreCase);
 
-                    //    ASTPRTELEMENT¤unfold¨(#¨m,xx3[_[#¨m])¤ [1]
-                    // 0    ASTEXPRESSION[1]
-                    // 1      ASTFUNCTION[1] <----------- our insert begins here
-                    // 2        ASTIDENT[1]
-                    // 3          unfold[1]
-                    // 4        ASTBANKVARNAME[0]
-                    // 5          ASTPLACEHOLDER[0]
-                    // 6          ASTVARNAME[0]
-                    // 7            ASTPLACEHOLDER[0]
-                    // 8              ASTHASH[0]
-                    // 9            ASTPLACEHOLDER[1]
-                    //10              ASTNAME[1]
-                    //11                ASTIDENT[1]
-                    //12                  m[1]
-                    //13            ASTPLACEHOLDER[0]
-                    //        AST..... ----------------> orignial code after ASTEXPRESSION comes here
+                        //here: onfolding 1 list (#m)
 
-                    string s = "m";
-                    ASTNode n0 = new ASTNode("ASTEXPRESSION", true);
-                    ASTNode n1 = new ASTNode("ASTFUNCTION", true);
-                    ASTNode n2 = new ASTNode("ASTIDENT", true);
-                    ASTNode n3 = new ASTNode("unfold", true);
-                    ASTNode n4 = new ASTNode("ASTBANKVARNAME", true);
-                    ASTNode n5 = new ASTNode("ASTPLACEHOLDER", true);
-                    ASTNode n6 = new ASTNode("ASTVARNAME", true);
-                    ASTNode n7 = new ASTNode("ASTPLACEHOLDER", true);
-                    ASTNode n8 = new ASTNode("ASTHASH", true);
-                    ASTNode n9 = new ASTNode("ASTPLACEHOLDER", true);
-                    ASTNode n10 = new ASTNode("ASTNAME", true);
-                    ASTNode n11 = new ASTNode("ASTIDENT", true);
-                    ASTNode n12 = new ASTNode(s, true);
-                    ASTNode n13 = new ASTNode("ASTPLACEHOLDER", true);
+                        //    ASTPRTELEMENT
+                        // 0    ASTEXPRESSION
+                        // 1      ASTFUNCTION    <----------- our insert begins here
+                        // 2        ASTIDENT  
+                        // 3          unfold
+                        // 4        ASTBANKVARNAME         <-- if there are > 1 lists, an LISTDEF node is inserted here, and the ASTBANKVARNAME nodes are subnodes
+                        // 5          ASTPLACEHOLDER
+                        // 6          ASTVARNAME
+                        // 7            ASTPLACEHOLDER
+                        // 8              ASTHASH
+                        // 9            ASTPLACEHOLDER
+                        //10              ASTNAME
+                        //11                ASTIDENT
+                        //12                  m
+                        //13            ASTPLACEHOLDER
+                        //        AST ----------------> orignial code after ASTEXPRESSION comes here
+                                                
+                        ASTNode n0 = new ASTNode("ASTEXPRESSION", true);
+                        ASTNode n1 = new ASTNode("ASTFUNCTION", true);
+                        ASTNode n2 = new ASTNode("ASTIDENT", true);
+                        ASTNode n3 = new ASTNode("unfold", true);
 
-                    n0.Add(n1);
-                    n1.Add(n2);
-                    n2.Add(n3);
-                    n1.Add(n4);
-                    n4.Add(n5);
-                    n4.Add(n6);
-                    n6.Add(n7);
-                    n7.Add(n8);
-                    n6.Add(n9);
-                    n9.Add(n10);
-                    n10.Add(n11);
-                    n11.Add(n12);
-                    n6.Add(n13);
-                    n1.Add(node[0][0]);  //original code goes to arg 2 of unfold function: unfold(#m, ...[here]...)
-                    node.RemoveLast();
-                    node.Add(n0);
-                    
+                        n0.Add(n1);
+                        n1.Add(n2);
+                        n2.Add(n3);
+
+                        ASTNode list = new ASTNode("ASTLISTDEF", true);
+
+                        for (int i = 0; i < xx.Count; i++)
+                        {
+                            ASTNode n4 = new ASTNode("ASTBANKVARNAME", true);
+                            ASTNode n5 = new ASTNode("ASTPLACEHOLDER", true);
+                            ASTNode n6 = new ASTNode("ASTVARNAME", true);
+                            ASTNode n7 = new ASTNode("ASTPLACEHOLDER", true);
+                            ASTNode n8 = new ASTNode("ASTHASH", true);
+                            ASTNode n9 = new ASTNode("ASTPLACEHOLDER", true);
+                            ASTNode n10 = new ASTNode("ASTNAME", true);
+                            ASTNode n11 = new ASTNode("ASTIDENT", true);
+                            ASTNode n12 = new ASTNode(xx[i], true);
+                            ASTNode n13 = new ASTNode("ASTPLACEHOLDER", true);
+                            n4.Add(n5);
+                            n4.Add(n6);
+                            n6.Add(n7);
+                            n7.Add(n8);
+                            n6.Add(n9);
+                            n9.Add(n10);
+                            n10.Add(n11);
+                            n11.Add(n12);
+                            n6.Add(n13);
+                            if (xx.Count==1)
+                            {
+                                n1.Add(n4);
+                            }
+                            else
+                            {
+                                list.Add(n4);
+                            }
+                        }
+
+                        if (xx.Count > 1)
+                        {
+                            n1.Add(list);
+                        }                        
+
+                        n1.Add(node[0][0]);  //original code goes to arg 2 of unfold function: unfold(#m, ...[here]...)
+                        node.RemoveLast();
+                        node.Add(n0);
+                    }
                 }
             }
         }
 
         public static void WalkASTAndEmit(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p)
-        {            
+        {
+
+            if (node != null) G.Writeln(G.Blanks(absoluteDepth) + node.Text);
+
             if (node.Parent != null)
             {
                 string s = null;
@@ -1882,6 +1927,7 @@ namespace Gekko.Parser.Gek
                                 string parentListLoopVars1 = null;
                                 string parentListLoopVars2 = null;
 
+                                int parentListLoopCounter = 0;
                                 ASTNode node2 = node;
                                 while (true)
                                 {
@@ -1891,11 +1937,14 @@ namespace Gekko.Parser.Gek
                                     {
                                         foreach (KeyValuePair<string, string> kvp in node2.listLoopAnchor)
                                         {
-                                            parentListLoopVars1 += ", IVariable " + kvp.Value;
-                                            parentListLoopVars2 += ", " + kvp.Value;
+                                            parentListLoopVars1 += "IVariable " + kvp.Value + ", ";
+                                            parentListLoopVars2 += kvp.Value + ", ";
+                                            parentListLoopCounter++;
                                         }
                                     }
                                 }
+                                if (parentListLoopVars1 != null) parentListLoopVars1 = parentListLoopVars1.Substring(0, parentListLoopVars1.Length - ", ".Length);
+                                if (parentListLoopVars2 != null) parentListLoopVars2 = parentListLoopVars2.Substring(0, parentListLoopVars2.Length - ", ".Length);
 
                                 string tempName = "temp" + ++Globals.counter;
                                 string funcName = "func" + ++Globals.counter;
@@ -1908,7 +1957,13 @@ namespace Gekko.Parser.Gek
                                 }
                                 //method def:
 
-                                sb1.AppendLine("Func<IVariable> " + funcName + " = () => {");
+                                string iv = "IVariable";
+                                for (int i = 0; i < parentListLoopCounter; i++)
+                                {
+                                    iv = iv + ", IVariable";
+                                }
+
+                                sb1.AppendLine("Func<" + iv + "> " + funcName + " = (" + parentListLoopVars1 + ") => {");
                                 //sb1.AppendLine("public static IVariable " + tempName + "(GekkoSmpl smpl" + parentListLoopVars1 + ") {");
                                 if (G.Equal(functionNameLower, "sum"))
                                 {
@@ -1941,7 +1996,7 @@ namespace Gekko.Parser.Gek
                                 //w.headerCs.Append(sb1);
                                 if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
                                 w.wh.localFuncs.AppendLine(sb1.ToString());
-                                node.Code.A(funcName + "()"); //functionname may be for instance temp27(smpl)
+                                node.Code.A(funcName + "(" + parentListLoopVars2 + ")"); //functionname may be for instance temp27(smpl)
 
                             }
                             else
