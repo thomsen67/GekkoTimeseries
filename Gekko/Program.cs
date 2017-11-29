@@ -23170,6 +23170,8 @@ namespace Gekko
         //    }
         //}
 
+       
+
         public static DialogResult InputBox(string title, string promptText, ref string value)
         {
             Form form = new Form();
@@ -23331,76 +23333,130 @@ namespace Gekko
                 if (xx0 != null) n = xx0.list.Count;
                 else if (xx1 != null) n = xx1.list.Count;
 
+                List<string> labels2 = new List<string>();
 
-                if (false)
+                bool fail = false;
+                string label = null;
+                if (element.label.StartsWith("|||"))
                 {
-                    //Here, label may be "unfold(#m, xx[#m])" --> if so lookup #m and use it for labels
 
-                    //der søges gennem alle frie {#m} og tjekkes om nogle af dem er bundet til sum(#m,) eller avg(#m,). De ikke bundne
-                    //sættes i unfold((#m1, #m2),...)
+                    string[] ss = element.label.Split(new string[] { "|||" }, StringSplitOptions.RemoveEmptyEntries);
 
+                    string[] freelists = ss[0].Split(new string[] { "," }, StringSplitOptions.None);
 
-                    //Unknown, Word, Number, QuotedString, WhiteSpace, Symbol, EOL, EOF
-                    StringTokenizer2 tok = new StringTokenizer2(element.label, false, false);
-                    tok.IgnoreWhiteSpace = false;
-                    tok.SymbolChars = new char[] { '!', '#', '%', '&', '/', '(', ')', '=', '?', '@', '$', '{', '[', ']', '}', '+', '|', '^', '¨', '~', '*', '<', '>', '\\', ';', ',', ':', '.', '-' };
-                    Token token;
-                    int numberCounter = 0;
-                    List<TokenHelper> a = new List<TokenHelper>();
-                    string white = null;
-                    do
+                    for (int i = 0; i < freelists.Length; i++)
                     {
-                        token = tok.Next();
-                        string value = token.Value;
-                        string kind = token.Kind.ToString();
-                        TokenHelper two = new TokenHelper();
-                        two.s = value; two.type = kind; two.leftblanks = white;
-                        if (kind == "WhiteSpace")
+                        freelists[i] = freelists[i].Trim();  //there may be a blank
+                    }
+
+                    string[][] xxx = new string[freelists.Length][];
+                    int count = 0;
+                    foreach (string fl in freelists)
+                    {
+                        IVariable iv = O.Lookup(null, null, null, "#" + fl, null, null, false, EVariableType.List, false);
+                        if (iv == null)
                         {
-                            white = value;
+                            fail = true; break;
                         }
                         else
                         {
-                            a.Add(two);
-                            white = null;
-                        }
-                        
-                    } while (token.Kind != TokenKind.EOF);
-                    for (int i = 0; i < 10; i++) a.Add(new TokenHelper());
-
-                    GekkoDictionary<string, string> lists = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                    for (int i = 0; i < a.Count - 10; i++)
-                    {
-                        //in sum(#i, ...) we need to ignore #i in ... --- also for sum((#i, #j),  ...) we need to ignore #i,#j in ..
-                        if (G.Equal(a[i].s, "sum") && a[i + 1].s == "(")
-                        {
-                            //sum(
-                            if (a[i + 2].s == "#" && a[i + 3].type == "Word" && a[i + 4].s == ",")
+                            List zz = iv as List;
+                            if (zz == null)
                             {
-                                //sum(#x,
-                                if (!lists.ContainsKey(a[i + 3].s)) lists.Add(a[i + 3].s, null);
+                                fail = true; break;
                             }
-                            else if (a[i + 2].s == "(" && a[i + 3].s == "#" && a[i + 4].type == "Word")
+                            List<string> names = new List<string>();
+                            foreach (IVariable iv2 in zz.list)
                             {
-                                //sum((#x
-                                if (!lists.ContainsKey(a[i + 4].s)) lists.Add(a[i + 4].s, null);
-                                for (int j = 0; j < int.MaxValue; j++)
+                                ScalarString ssss = iv2 as ScalarString;
+                                if (ssss == null)
                                 {
-                                    if (i + 5 + 3 * j > a.Count - 1) break;
-                                    if (a[i + 5 + 3 * j].s == ")") break;
-                                    if (a[i + 5 + 3 * j].s == "," && a[i + 6 + 3 * j].s == "#" && a[i + 7 + 3 * j].type == "Word")
-                                    {
-                                        if (!lists.ContainsKey(a[i + 7].s)) lists.Add(a[i + 7].s, null);
-                                    }
+                                    fail = true; break;
+                                }
+                                names.Add(ssss.string2);
+                            }
+                            //string[] names = Program.GetListOfStringsFromListOfIvariables(new IVariable[] { iv });
+                            //if (names == null)
+                            //{
+                            //    fail = true; break;
+                            //}
+                            xxx[count] = names.ToArray();
+                        }
+
+                        count++;
+                    }
+
+                    List<TokenHelper> a = GetTokensWithLeftBlanks(ss[1]);
+
+                    
+
+                    if (freelists.Length == 1)
+                    {
+                        int j0 = 0;
+                        foreach (string list0 in xxx[j0])
+                        {
+                            string ss2 = null;
+                            for (int i = 0; i < a.Count; i++)
+                            {
+                                if (a[i].s == "#" && i < a.Count - 1 && G.Equal(a[i + 1].s, freelists[j0]))
+                                {
+                                    ss2 += a[i].leftblanks + "'" + list0 + "'";
+                                    i++;
+                                }
+                                else
+                                {
+                                    ss2 += a[i].leftblanks + a[i].s;
                                 }
                             }
+                            labels2.Add(ss2);
                         }
-
-
+                    }
+                    else if (freelists.Length == 2)
+                    {
+                        int j0 = 0;
+                        int j1 = 1;
+                        foreach (string list0 in xxx[j0])
+                        {
+                            foreach (string list1 in xxx[j1])
+                            {
+                                string ss2 = null;
+                                for (int i = 0; i < a.Count; i++)
+                                {
+                                    if (a[i].s == "#" && i < a.Count - 1 && G.Equal(a[i + 1].s, freelists[j0]))
+                                    {
+                                        ss2 += a[i].leftblanks + "'" + list0 + "'";
+                                        i++;
+                                    }
+                                    else if (a[i].s == "#" && i < a.Count - 1 && G.Equal(a[i + 1].s, freelists[j1]))
+                                    {
+                                        ss2 += a[i].leftblanks + "'" + list1 + "'";
+                                        i++;
+                                    }
+                                    else
+                                    {
+                                        ss2 += a[i].leftblanks + a[i].s;
+                                    }
+                                }
+                                labels2.Add(ss2);
+                            }                            
+                        }
+                    }
+                    else
+                    {
+                        fail = true;
                     }
                 }
+                else
+                {
+                    label = element.label;
+                }
 
-                for (int i = 0; i < n; i++)  //this element may be a list with 2 timeseries, x1 and x2
+                if (fail) {
+                    labels2 = null;
+                    label = element.label;
+                }
+
+                for (int i = 0; i < n; i++)  //this element may be a #-list with 2 timeseries, x1 and x2
                 {
                     int iPrintCode = -1;
                     foreach (string printCode in element.printCodesFinal)  //this may be two printcodes <n p>
@@ -23436,7 +23492,15 @@ namespace Gekko
                         }
 
                         c.printCodeFinal = printCode;
-                        c.label = element.label;
+
+                        if (labels2 != null && n == labels2.Count)
+                        {
+                           c.label = labels2[i];
+                        }
+                        else
+                        {
+                            c.label = label;
+                        }
 
                         //FIXME
                         //FIXME
@@ -23450,7 +23514,7 @@ namespace Gekko
                         }
                         else
                         {
-                            if (iPrintCode == 0) c.label = element.label + "  (" + printCode.ToLower() + ")";
+                            if (iPrintCode == 0) ; //c.label = c.label + "  (" + printCode.ToLower() + ")";
                             else if (iPrintCode > 0) c.label = "(" + printCode.ToLower() + ")";
                         }
 
@@ -23485,45 +23549,8 @@ namespace Gekko
                 List<O.Prt.Element> containerExplode = container;
                 
                 AllFreqsHelper allFreqs = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);  //converts between A, Q, M, so all are given. Also used in IMPORT<per1 per2> etc.
-
-                //containerExplode.Add(null);
-
-                //int counter = -1;
-
+                
                 List<IVariable> errorList = new List<IVariable>();
-
-                //if (true)
-                //{
-                //    foreach (O.PrtContainer c in container)
-                //    {
-                //        //counter++;
-                //        PrintHelper2(containerExplode, freqs, c, true, false, errorList);
-                //    }
-                //}
-                //else
-                //{
-                //    foreach (O.PrtContainer c in container)
-                //    {
-                //        if (c.variable[0] != null && !G.IsValueType(c.variable[0]))
-                //        {
-                //            errorList.Add(c.variable[0]);
-                //        }
-                //        else if (c.variable[1] != null && !G.IsValueType(c.variable[1]))
-                //        {
-                //            errorList.Add(c.variable[1]);
-                //        }
-                //        else
-                //        {
-                //            containerExplode.Add(c);
-                //        }
-                //    }
-                //}
-
-                //if (errorList.Count > 0)
-                //{
-                //    G.Writeln2("+++ WARNING: Can only print or plot SERIES, VAL, 1x1 MATRIX, or a LIST with the same");
-                //    return;
-                //}           
 
                 EFreq sameFreq = EFreq.None;
                 if (freqs[0] && !freqs[1] && !freqs[2]) sameFreq = EFreq.Annual;
@@ -24325,11 +24352,23 @@ namespace Gekko
                 else
                 {
 
-                    List<string> print = table.Print();
-                    foreach (string s in print)
+
+                    int widthRemember = Program.options.print_width;
+                    int fileWidthRemember = Program.options.print_filewidth;
+                    Program.options.print_width = int.MaxValue;
+                    Program.options.print_filewidth = int.MaxValue;
+                    try
                     {
-                        G.Writeln(s);
+                        List<string> ss = table.Print();
+                        foreach (string s in ss) G.Writeln(s);
                     }
+                    finally
+                    {
+                        //resetting, also if there is an error
+                        Program.options.print_width = widthRemember;
+                        Program.options.print_filewidth = fileWidthRemember;
+                    }
+                                        
                     Globals.lastPrtOrMulprtTable = table;
                     CrossThreadStuff.CopyButtonEnabled(true);
                     //PrtClipboard(table, false);
@@ -24472,6 +24511,37 @@ namespace Gekko
 
             }
 
+        }
+
+        private static List<TokenHelper> GetTokensWithLeftBlanks(string s)
+        {
+            StringTokenizer2 tok = new StringTokenizer2(s, false, false);
+            tok.IgnoreWhiteSpace = false;
+            tok.SymbolChars = new char[] { '!', '#', '%', '&', '/', '(', ')', '=', '?', '@', '$', '{', '[', ']', '}', '+', '|', '^', '¨', '~', '*', '<', '>', '\\', ';', ',', ':', '.', '-' };
+            Token token;
+            int numberCounter = 0;
+            List<TokenHelper> a = new List<TokenHelper>();
+            string white = null;
+            do
+            {
+                token = tok.Next();
+                string value = token.Value;
+                string kind = token.Kind.ToString();
+                TokenHelper two = new TokenHelper();
+                two.s = value; two.type = kind; two.leftblanks = white;
+                if (kind == "WhiteSpace")
+                {
+                    white = value;
+                }
+                else
+                {
+                    a.Add(two);
+                    white = null;
+                }
+
+            } while (token.Kind != TokenKind.EOF);
+            for (int i = 0; i < 10; i++) a.Add(new TokenHelper());
+            return a;
         }
 
         private static void PrintHelper3(GekkoSmpl smpl,string type, string format, EFreq sameFreq, Table table, int count, int i, int j, int iPlot, string printCode, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, int sumOver, int[] skipCounter, O.Prt.Element cc)

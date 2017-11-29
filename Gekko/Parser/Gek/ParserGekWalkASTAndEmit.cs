@@ -240,14 +240,15 @@ namespace Gekko.Parser.Gek
         public static void WalkASTAndEmitUnfold(ASTNode node)
         {
             //before subnodes
-            return;
+            //return;
 
             if (node.Text == "ASTBANKVARNAME")
             {
                 string s = GetSimpleName(node);
-                string listnameWithoutSigil = s.Substring(1);
+                
                 if (s != null && s[0] == Globals.symbolCollection)
                 {
+                    string listnameWithoutSigil = s.Substring(1);
                     //naked #m
                     if (node.Parent.Text == "ASTINDEXERELEMENT")
                     {
@@ -375,7 +376,7 @@ namespace Gekko.Parser.Gek
         public static void WalkASTAndEmit(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p)
         {
 
-            if (node != null) G.Writeln(G.Blanks(absoluteDepth) + node.Text);
+            //if (node != null) G.Writeln(G.Blanks(absoluteDepth) + node.Text);
 
             if (node.Parent != null)
             {
@@ -3885,7 +3886,28 @@ namespace Gekko.Parser.Gek
                                 else givenLabel = node.specialExpressionAndLabelInfo[1];                                
                             }                            
                             node.Code.A("O.Prt.Element ope" + Num(node) + " = new O.Prt.Element();" + G.NL);  //this must be after the list start iterator code
-                            node.Code.A("ope" + Num(node) + ".label = O.SubstituteScalarsAndLists(`" + givenLabel + "`, false);" + G.NL);
+
+                            string freelists = null;
+                            if (node.freeIndexedLists != null && node.freeIndexedLists.Count > 0)
+                            {
+                                List<string> xx = new List<string>();
+                                foreach (string ss in node.freeIndexedLists.Keys)
+                                {
+                                    xx.Add(ss);
+                                }
+                                xx.Sort(StringComparer.OrdinalIgnoreCase);
+                                foreach (string s in xx)
+                                {
+                                    freelists += s + ", ";
+                                }
+                            }
+                            if (freelists != null)
+                            {
+                                freelists = freelists.Substring(0, freelists.Length - ", ".Length);
+                                freelists = "|||" + freelists + "|||";
+                            }
+
+                            node.Code.A("ope" + Num(node) + ".label = O.SubstituteScalarsAndLists(`" + freelists + givenLabel + "`, false);" + G.NL);
                             node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2);" + G.NL);
                             ASTNode child = node.GetChild("ASTPRTELEMENTOPTIONFIELD");
                             if (child != null) node.Code.A(child.Code);
