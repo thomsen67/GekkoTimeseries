@@ -6699,6 +6699,10 @@ namespace Gekko
                 public int ndec = -12345;
                 public int pwidth = -12345;
                 public int pdec = -12345;
+
+                public int widthFinal = -12345;
+                public int decFinal = -12345;
+
                 //--- plot
                 public string linetype = null;
                 public string dashtype = null;
