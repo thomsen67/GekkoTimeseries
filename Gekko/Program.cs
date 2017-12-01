@@ -23277,6 +23277,8 @@ namespace Gekko
 
         public static void OPrint(O.Prt oPrt)
         {
+            
+
             List<O.Prt.Element> container = new List<O.Prt.Element>();
 
             //If PRT <m> unfold(#m, {#m}), we will get 1 prtElement (since there are no commas), where 
@@ -23315,6 +23317,7 @@ namespace Gekko
             //    }
             //}
 
+            int labelMaxLine = 1;
             bool[] freqs = new bool[3];
 
             foreach (O.Prt.Element element in oPrt.prtElements) //for each comma in the prt statement
@@ -23345,6 +23348,8 @@ namespace Gekko
                 // ---------------------------------------------------------------------
                 // --------------- unfold labels end -----------------------------------
                 // ---------------------------------------------------------------------
+
+                
 
                 for (int i = 0; i < n; i++)  //this element may be a #-list with 2 timeseries, x1 and x2
                 {
@@ -23384,29 +23389,33 @@ namespace Gekko
 
                         c.printCodeFinal = printCode;
 
+                        string lbl = null;
                         if (labels2 != null && n == labels2.Count)
                         {
-                            c.label = labels2[i];
+                            lbl = labels2[i];
                         }
                         else
                         {
-                            c.label = label;
-                        }
+                            lbl = label;
+                        }                        
+                        int max = PrintCreateLabelsArrayNew(lbl, 20, 5, 90, out c.label2);
 
+                        labelMaxLine = Math.Max(max, labelMaxLine);
+                        
                         //FIXME
                         //FIXME
                         if (G.Equal(element.printCodesFinal[0], "n") && iPrintCode > 0 && G.Equal(printCode, "p"))
                         {
-                            c.label = "%";
+                            c.label2 = new string[] { "%" };
                         }
                         else if (G.Equal(element.printCodesFinal[0], "m") && iPrintCode > 0 && G.Equal(printCode, "q"))
                         {
-                            c.label = "%";
+                            c.label2 = new string[] { "%" };
                         }
                         else
                         {
                             if (iPrintCode == 0) ; //c.label = c.label + "  (" + printCode.ToLower() + ")";
-                            else if (iPrintCode > 0) c.label = "(" + printCode.ToLower() + ")";
+                            else if (iPrintCode > 0) c.label2 = new string[] { "(" + printCode.ToLower() + ")" };
                         }
 
                         c.linetype = element.linetype;
@@ -23517,16 +23526,16 @@ namespace Gekko
                         IVariable ivWork = null;
                         IVariable ivRef = null;
                         string printCode = null;
-                        string label = null;
+                        string[] label = new string[] { "" };
 
-                        if (j-2 >= 0)
+                        if (j - 2 >= 0)
                         {
-                            cc = containerExplode[j-2];
+                            cc = containerExplode[j - 2];
                             ivWork = cc.variable[0];
                             ivRef = cc.variable[1];
                             printCode = cc.printCodeFinal;
-                            label = cc.label;
-                        }                        
+                            label = cc.label2;
+                        }                 
 
                         //--------------------------------
                         //TODO: make this depend upon printcode
@@ -23576,15 +23585,26 @@ namespace Gekko
                             if (type != "plot") // ------------------------------------------------------------- (1)
                             {
                                 i++;
-                                if (year == y1 && j > 1)
+                                if (year == y1)
                                 {
-                                    table.Set(i, j, label);
-                                    table.SetAlign(i, j, Align.Right);
+                                    if (j <= 1)
+                                    {
+                                        i += labelMaxLine - 1;
+                                    }
+                                    else
+                                    {
+                                        for (int ii = 0; ii < labelMaxLine; ii++)
+                                        {
+                                            table.Set(i, j, label[labelMaxLine - ii - 1]);
+                                            table.SetAlign(i, j, Align.Right);
+                                            if (ii < labelMaxLine - 1) i++;
+                                        }
+                                    }                              
                                 }
                                 i++;
                                 //Non-plots have a first column with dates, plots have such a column for each series
                                 if (j == 1)  //then iv == null
-                                {
+                                {                                    
                                     // --------------------------                                
                                     // --------------------------
                                     table.Set(i, j, year.ToString());                                    
@@ -26793,8 +26813,9 @@ namespace Gekko
             }
         }
 
-        private static int PrintCreateLabelsArrayNew(string label, int width, int numberOfLabelsRowsMax, int maxLength, string[] labelsArray)
+        private static int PrintCreateLabelsArrayNew(string label, int width, int numberOfLabelsRowsMax, int maxLength, out string[] labelsArray)
         {
+            labelsArray = new string[numberOfLabelsRowsMax];
             int numberOfLabelsRows = -12345;
 
             //string label = graphVarsLabels[j];

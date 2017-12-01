@@ -1478,6 +1478,11 @@ namespace Gekko
                 }
 
                 IVariable iv = null;
+                if (this.dimensions != keys.Length)
+                {
+                    G.Writeln("*** ERROR: " + keys.Length + " dimensional index used on " + this.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(this.name));
+                    throw new GekkoException();
+                }
                 this.dimensionsStorage.TryGetValue(new MapMultidimItem(keys), out iv);
 
                 if (iv == null)

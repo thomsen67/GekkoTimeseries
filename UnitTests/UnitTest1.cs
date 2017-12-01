@@ -9324,6 +9324,30 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_SumAndUnfold()
+        {
+
+            I("reset;");
+            I("xx3 = series(1);");
+            I("xx3['a', 'x'] = (1,2,3);");
+            I("xx3['b', 'x'] = (4,5,6);");
+            I("xx3['a', 'y'] = (7,8,9);");
+            I("xx3['b', 'y'] = (14,15,16);");
+            I("#m1 = ('a', 'b');");
+            I("#m2 = ('x', 'y');");
+
+            //p unfold(#m, xx3[#m]);
+            //p<n>   sum(#m1, xx3[#m1, #m2]) + xx3[#m1, 'x'];
+            //p unfold(#m2, sum(#m1, xx3[#m1, #m2]));
+            //p sum(#m1, xx3[#m1, #m2]);
+            //p<n> sum((#m1, #m2), xx3[#m1, #m2]);
+            //p<n>    sum((#m2), xx3['a', #m2]);
+            //p<n> sum((#m1, #m2), xx3[#m1, #m2]) + xx3[#m1, 'x'] + xx3['a', #m2];
+            //p unfold((#m1, #m2), xx3[#m1, #m2]);
+
+        }
+
+        [TestMethod]
         public void _Test_Print()
         {
             I("reset;");
