@@ -23333,128 +23333,18 @@ namespace Gekko
                 if (xx0 != null) n = xx0.list.Count;
                 else if (xx1 != null) n = xx1.list.Count;
 
+                string label = null;
                 List<string> labels2 = new List<string>();
 
-                bool fail = false;
-                string label = null;
-                if (element.label.StartsWith("|||"))
-                {
+                // ---------------------------------------------------------------------
+                // --------------- unfold labels start ---------------------------------
+                // ---------------------------------------------------------------------
 
-                    string[] ss = element.label.Split(new string[] { "|||" }, StringSplitOptions.RemoveEmptyEntries);
+                UnfoldLabels(element.label, ref label, ref labels2);
 
-                    string[] freelists = ss[0].Split(new string[] { "," }, StringSplitOptions.None);
-
-                    for (int i = 0; i < freelists.Length; i++)
-                    {
-                        freelists[i] = freelists[i].Trim();  //there may be a blank
-                    }
-
-                    string[][] xxx = new string[freelists.Length][];
-                    int count = 0;
-                    foreach (string fl in freelists)
-                    {
-                        IVariable iv = O.Lookup(null, null, null, "#" + fl, null, null, false, EVariableType.List, false);
-                        if (iv == null)
-                        {
-                            fail = true; break;
-                        }
-                        else
-                        {
-                            List zz = iv as List;
-                            if (zz == null)
-                            {
-                                fail = true; break;
-                            }
-                            List<string> names = new List<string>();
-                            foreach (IVariable iv2 in zz.list)
-                            {
-                                ScalarString ssss = iv2 as ScalarString;
-                                if (ssss == null)
-                                {
-                                    fail = true; break;
-                                }
-                                names.Add(ssss.string2);
-                            }
-                            //string[] names = Program.GetListOfStringsFromListOfIvariables(new IVariable[] { iv });
-                            //if (names == null)
-                            //{
-                            //    fail = true; break;
-                            //}
-                            xxx[count] = names.ToArray();
-                        }
-
-                        count++;
-                    }
-
-                    List<TokenHelper> a = GetTokensWithLeftBlanks(ss[1]);
-
-                    
-
-                    if (freelists.Length == 1)
-                    {
-                        int j0 = 0;
-                        foreach (string list0 in xxx[j0])
-                        {
-                            string ss2 = null;
-                            for (int i = 0; i < a.Count; i++)
-                            {
-                                if (a[i].s == "#" && i < a.Count - 1 && G.Equal(a[i + 1].s, freelists[j0]))
-                                {
-                                    ss2 += a[i].leftblanks + "'" + list0 + "'";
-                                    i++;
-                                }
-                                else
-                                {
-                                    ss2 += a[i].leftblanks + a[i].s;
-                                }
-                            }
-                            labels2.Add(ss2);
-                        }
-                    }
-                    else if (freelists.Length == 2)
-                    {
-                        int j0 = 0;
-                        int j1 = 1;
-                        foreach (string list0 in xxx[j0])
-                        {
-                            foreach (string list1 in xxx[j1])
-                            {
-                                string ss2 = null;
-                                for (int i = 0; i < a.Count; i++)
-                                {
-                                    if (a[i].s == "#" && i < a.Count - 1 && G.Equal(a[i + 1].s, freelists[j0]))
-                                    {
-                                        ss2 += a[i].leftblanks + "'" + list0 + "'";
-                                        i++;
-                                    }
-                                    else if (a[i].s == "#" && i < a.Count - 1 && G.Equal(a[i + 1].s, freelists[j1]))
-                                    {
-                                        ss2 += a[i].leftblanks + "'" + list1 + "'";
-                                        i++;
-                                    }
-                                    else
-                                    {
-                                        ss2 += a[i].leftblanks + a[i].s;
-                                    }
-                                }
-                                labels2.Add(ss2);
-                            }                            
-                        }
-                    }
-                    else
-                    {
-                        fail = true;
-                    }
-                }
-                else
-                {
-                    label = element.label;
-                }
-
-                if (fail) {
-                    labels2 = null;
-                    label = element.label;
-                }
+                // ---------------------------------------------------------------------
+                // --------------- unfold labels end -----------------------------------
+                // ---------------------------------------------------------------------
 
                 for (int i = 0; i < n; i++)  //this element may be a #-list with 2 timeseries, x1 and x2
                 {
@@ -23486,7 +23376,8 @@ namespace Gekko
                         }
 
 
-                        if (c.variable[0] != null && !G.IsValueType(c.variable[0]) || c.variable[1] != null && !G.IsValueType(c.variable[1])) {
+                        if (c.variable[0] != null && !G.IsValueType(c.variable[0]) || c.variable[1] != null && !G.IsValueType(c.variable[1]))
+                        {
                             G.Writeln2("+++ WARNING: Non-value in PRT");
                             return;
                         }
@@ -23495,7 +23386,7 @@ namespace Gekko
 
                         if (labels2 != null && n == labels2.Count)
                         {
-                           c.label = labels2[i];
+                            c.label = labels2[i];
                         }
                         else
                         {
@@ -24513,6 +24404,195 @@ namespace Gekko
 
         }
 
+        private static void UnfoldLabels(string elementLabel, ref string label, ref List<string> labels2)
+        {
+            string rawLabel = elementLabel;
+            
+            //returns either label or label2
+            bool fail = false;
+            //label = null;
+            if (elementLabel.StartsWith("|||"))
+            {
+
+                string[] ss = elementLabel.Split(new string[] { "|||" }, StringSplitOptions.RemoveEmptyEntries);
+                rawLabel = ss[1];
+                string[] freelists = ss[0].Split(new string[] { "," }, StringSplitOptions.None);
+
+                for (int i = 0; i < freelists.Length; i++)
+                {
+                    freelists[i] = freelists[i].Trim();  //there may be a blank
+                }
+
+                string[][] xxx = new string[freelists.Length][];
+                int count = 0;
+                foreach (string fl in freelists)
+                {
+                    IVariable iv = O.Lookup(null, null, null, "#" + fl, null, null, false, EVariableType.List, false);
+                    if (iv == null)
+                    {
+                        fail = true; break;
+                    }
+                    else
+                    {
+                        List zz = iv as List;
+                        if (zz == null)
+                        {
+                            fail = true; break;
+                        }
+                        List<string> names = new List<string>();
+                        foreach (IVariable iv2 in zz.list)
+                        {
+                            ScalarString ssss = iv2 as ScalarString;
+                            if (ssss == null)
+                            {
+                                fail = true; break;
+                            }
+                            names.Add(ssss.string2);
+                        }
+                        //string[] names = Program.GetListOfStringsFromListOfIvariables(new IVariable[] { iv });
+                        //if (names == null)
+                        //{
+                        //    fail = true; break;
+                        //}
+                        xxx[count] = names.ToArray();
+                    }
+
+                    count++;
+                }
+
+                List<TokenHelper> a = GetTokensWithLeftBlanks(ss[1]);  //puts in 20 empty tokens at the end
+
+                //Now we walk though the tokens to mark all that are bound with sum, 
+                //for instance sum(#m1, xx3[#m1, #m2]) --> sum(¤m1, xx3[¤m1, #m2])
+                //or sum((#m1, #m2), xx3[#m1, #m2]) --> sum((¤m1, ¤m2), xx3[¤m1, ¤m2])
+                //It is like they did not exist
+                int start = 0;
+                for (int i = 0; i < a.Count - 20; i++)
+                {
+                    GekkoDictionary<string, string> listNames = null;
+                    if (a[i].s == "sum" && a[i + 1].s == "(" && a[i + 2].s == "#" && a[i + 3].type == "Word" && a[i + 4].s == ",")
+                    {
+                        //sum(#m1, xx3[#m1, #m2])
+                        listNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                        listNames.Add(a[i + 3].s, "");
+                        a[i + 2].s = "###";
+                        start = 5;
+                    }
+                    else if (a[i].s == "sum" && a[i + 1].s == "(" && a[i + 2].s == "(" && a[i + 3].s == "#")
+                    {
+                        //sum((#m1, #m2), xx3[#m1, #m2]) 
+                        listNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+                        for (int i2 = i + 3; i2 < a.Count - 20; i2++)
+                        {
+                            //Harvesting list names from here: sum((...), xx3[#m1, #m2])
+                            if (a[i2].s == "#" && a[i2 + 1].type == "Word")
+                            {
+                                if (!listNames.ContainsKey(a[i2 + 1].s)) listNames.Add(a[i2 + 1].s, "");  //the if is probably superfluous
+                                a[i2].s = "###";                                
+                            }
+                            if (a[i2].s == ")" && a[i2 + 1].s == ",")
+                            {
+                                start = i2 + 2;
+                                break;
+                            }
+                        }                        
+                    }
+                    if(listNames !=null)
+                    {                       
+                        
+                        int paren = 1;
+                        for (int i2 = i + start; i2 < a.Count - 20; i2++)
+                        {
+                            //counting parentheses
+
+                            if (a[i2].s == "(") paren++;
+                            if (a[i2].s == ")") paren--;
+
+                            if (paren == 0) break;
+
+                            if (a[i2].s == "#" && a[i2 + 1].type == "Word" && listNames.ContainsKey(a[i2 + 1].s))
+                            {
+                                a[i2].s = "###";
+                            }
+                        }
+                    }
+                }
+
+                if (freelists.Length == 1)
+                {
+                    int j0 = 0;
+                    foreach (string list0 in xxx[j0])
+                    {
+                        string ss2 = null;
+                        for (int i = 0; i < a.Count - 20; i++)
+                        {
+                            if (a[i].s == "#" && i < a.Count - 1 && G.Equal(a[i + 1].s, freelists[j0]))
+                            {
+                                ss2 += a[i].leftblanks + "'" + list0 + "'";
+                                i++;
+                            }
+                            else
+                            {
+                                string x = a[i].s;
+                                if (x == "###") x = "#";
+                                ss2 += a[i].leftblanks + x;
+                            }
+                        }
+                        labels2.Add(ss2);
+                    }
+                }
+                else if (freelists.Length == 2)
+                {
+                    int j0 = 0;
+                    int j1 = 1;
+                    foreach (string list0 in xxx[j0])
+                    {
+                        foreach (string list1 in xxx[j1])
+                        {
+                            string ss2 = null;
+                            for (int i = 0; i < a.Count; i++)
+                            {
+                                if (a[i].s == "#" && i < a.Count - 1 && G.Equal(a[i + 1].s, freelists[j0]))
+                                {
+                                    ss2 += a[i].leftblanks + "'" + list0 + "'";
+                                    i++;
+                                }
+                                else if (a[i].s == "#" && i < a.Count - 1 && G.Equal(a[i + 1].s, freelists[j1]))
+                                {
+                                    ss2 += a[i].leftblanks + "'" + list1 + "'";
+                                    i++;
+                                }
+                                else
+                                {
+                                    string x = a[i].s;
+                                    if (x == "###") x = "#";
+                                    ss2 += a[i].leftblanks + x;
+                                }
+                            }
+                            labels2.Add(ss2);
+                        }
+                    }
+                }
+                else
+                {
+                    fail = true;
+                }
+            }
+            else
+            {
+                label = elementLabel;
+            }
+
+            if (fail)
+            {
+                labels2 = null;
+                label = rawLabel;
+            }
+
+            return;
+        }
+
         private static List<TokenHelper> GetTokensWithLeftBlanks(string s)
         {
             StringTokenizer2 tok = new StringTokenizer2(s, false, false);
@@ -24540,7 +24620,7 @@ namespace Gekko
                 }
 
             } while (token.Kind != TokenKind.EOF);
-            for (int i = 0; i < 10; i++) a.Add(new TokenHelper());
+            for (int i = 0; i < 20; i++) a.Add(new TokenHelper());
             return a;
         }
 

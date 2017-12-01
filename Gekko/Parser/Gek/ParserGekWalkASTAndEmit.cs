@@ -265,8 +265,20 @@ namespace Gekko.Parser.Gek
                                     string s2 = GetSimpleName(node2[1]);
                                     if (G.Equal(s, s2))
                                     {
-                                        node2 = node2.Parent;
-                                        break;
+                                        //node2 = node2.Parent;
+                                        goto Label;
+                                    }
+                                }
+                                else if (node2[1].Text == "ASTLISTDEF")
+                                {
+                                    foreach (ASTNode node3 in node2[1].ChildrenIterator())
+                                    {
+                                        string s2 = GetSimpleName(node3);
+                                        if (G.Equal(s, s2))
+                                        {
+                                            //node2 = node2.Parent;
+                                            goto Label;
+                                        }
                                     }
                                 }
                             }
@@ -277,6 +289,7 @@ namespace Gekko.Parser.Gek
                             }
                             node2 = node2.Parent;
                         }
+                        Label: node2 = node2;
                     }
                 }
             }
