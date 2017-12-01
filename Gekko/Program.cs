@@ -23277,7 +23277,10 @@ namespace Gekko
 
         public static void OPrint(O.Prt oPrt)
         {
-            
+            string format = "f14.4";
+
+            string type = "print";
+            if (G.Equal(oPrt.prtType, "plot")) type = "plot";
 
             List<O.Prt.Element> container = new List<O.Prt.Element>();
 
@@ -23343,13 +23346,12 @@ namespace Gekko
                 // --------------- unfold labels start ---------------------------------
                 // ---------------------------------------------------------------------
 
-                UnfoldLabels(element.label, ref label, ref labels2);
+                UnfoldLabels(element.label, ref label, ref labels2);  //unfolding over #m1 and #m2 etc.                
 
                 // ---------------------------------------------------------------------
                 // --------------- unfold labels end -----------------------------------
                 // ---------------------------------------------------------------------
-
-                
+                                
 
                 for (int i = 0; i < n; i++)  //this element may be a #-list with 2 timeseries, x1 and x2
                 {
@@ -23380,7 +23382,6 @@ namespace Gekko
                             else if (temp1.freq == EFreq.Monthly) freqs[2] = true;
                         }
 
-
                         if (c.variable[0] != null && !G.IsValueType(c.variable[0]) || c.variable[1] != null && !G.IsValueType(c.variable[1]))
                         {
                             G.Writeln2("+++ WARNING: Non-value in PRT");
@@ -23397,8 +23398,17 @@ namespace Gekko
                         else
                         {
                             lbl = label;
-                        }                        
-                        int max = PrintCreateLabelsArrayNew(lbl, 20, 5, 90, out c.label2);
+                        }
+                        int lines = 5;
+                        int width = 20;
+
+                        if (type == "plot")
+                        {
+                            lines = 1;
+                            width = int.MaxValue;
+                        }
+
+                        int max = PrintCreateLabelsArrayNew(lbl, width, lines, lines * width, out c.label2);
 
                         labelMaxLine = Math.Max(max, labelMaxLine);
                         
@@ -23435,10 +23445,7 @@ namespace Gekko
             GekkoSmpl smpl = new GekkoSmpl(oPrt.t1, oPrt.t2);
             //Globals.globalPeriodTimeFilters2 = new List<GekkoTime> { new GekkoTime(EFreq.Monthly, 2003, 1), new GekkoTime(EFreq.Monthly, 2003, 2) };
             
-            string format = "f14.4";
-
-            string type = "print";
-            if (G.Equal(oPrt.prtType, "plot")) type = "plot";
+            
             
             //List inputList = x as List;  //will always be a list
             List inputList = null;            
@@ -23512,14 +23519,14 @@ namespace Gekko
 
                 if (true)
                 {
-                    int i = 0;
+                    //int i = 0;
                     //int j = 0;
                     int iPlot = 0;                    
                     for (int j = 1; j < containerExplode.Count + 2; j++)
                     {
                         //iVarCounter = -1 is the column with dates etc.
 
-                        i = 1;
+                        int i = 0;
                         //j++;
 
                         O.Prt.Element cc = null;
@@ -23595,8 +23602,23 @@ namespace Gekko
                                     {
                                         for (int ii = 0; ii < labelMaxLine; ii++)
                                         {
-                                            table.Set(i, j, label[labelMaxLine - ii - 1]);
-                                            table.SetAlign(i, j, Align.Right);
+                                            //G.Writeln2(labelMaxLine + " " + ii);
+                                            if (labelMaxLine - ii - 1 < 0)
+                                            {
+
+                                            }
+                                            else if (labelMaxLine - ii - 1 >= label.Length)
+                                            {
+
+                                            }
+                                            else
+                                            {
+                                                if (label[labelMaxLine - ii - 1] != "[[]]")
+                                                {
+                                                    table.Set(i, j, label[labelMaxLine - ii - 1]);
+                                                    table.SetAlign(i, j, Align.Right);
+                                                }
+                                            }
                                             if (ii < labelMaxLine - 1) i++;
                                         }
                                     }                              
@@ -24270,6 +24292,7 @@ namespace Gekko
                     Program.options.print_filewidth = int.MaxValue;
                     try
                     {
+                        G.Writeln("");
                         List<string> ss = table.Print();
                         foreach (string s in ss) G.Writeln(s);
                     }
@@ -26832,6 +26855,7 @@ namespace Gekko
                 for (int i = 0; i < numberOfLabelsRowsMax; i++)
                 {
                     //chopping off text backwards
+                    if (ss == null) continue;
                     int start = ss.Length - width;
                     string s = "";
                     if (start >= 0)
@@ -26857,6 +26881,7 @@ namespace Gekko
 
         private static string TruncateTextWithDots(int maxLength, string ss)
         {
+            if (ss == null) return ss;
             if (ss.Length > maxLength)
             {
                 if (maxLength >= 3)
@@ -27671,7 +27696,7 @@ namespace Gekko
                 dataMin[i] = containerExplode[i].min;
                 dataMax[i] = containerExplode[i].max;
                 string label = "";
-                if (containerExplode[i].label != null) label = containerExplode[i].label;
+                if (containerExplode[i].label2[0] != null) label = containerExplode[i].label2[0];
                 labelsNonBroken.Add(label);
             }
 

@@ -9328,13 +9328,20 @@ namespace UnitTests
         {
 
             I("reset;");
-            I("xx3 = series(1);");
-            I("xx3['a', 'x'] = (1,2,3);");
-            I("xx3['b', 'x'] = (4,5,6);");
-            I("xx3['a', 'y'] = (7,8,9);");
-            I("xx3['b', 'y'] = (14,15,16);");
+            I("time 2001 2003;");
+            I("xx = series(2);");
+            I("xx['a', 'x'] = (1,2,3);");
+            I("xx['b', 'x'] = (4,5,6);");
+            I("xx['a', 'y'] = (7,8,9);");
+            I("xx['b', 'y'] = (14,15,16);");
             I("#m1 = ('a', 'b');");
             I("#m2 = ('x', 'y');");
+
+            I("p <n> xx['a', 'x'];");
+            Table table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001"); //why is it not a date?
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?
 
             //p unfold(#m, xx3[#m]);
             //p<n>   sum(#m1, xx3[#m1, #m2]) + xx3[#m1, 'x'];
