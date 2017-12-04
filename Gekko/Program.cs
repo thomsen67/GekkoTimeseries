@@ -483,6 +483,10 @@ namespace Gekko
         public string s = null;
         public string type = null;
         public string leftblanks = null;
+        public override string ToString()
+        {
+            return s;
+        }
     }
 
     public class StackHelper
@@ -13579,6 +13583,20 @@ namespace Gekko
             return 0;
         }
 
+        public static void UnfoldLists(IVariable iv, List<IVariable> m)
+        {
+            //Recursive list unfolding
+            List mm = iv as List;
+            if (mm != null)
+            {
+                foreach (IVariable iv2 in mm.list)
+                {
+                    UnfoldLists(iv2, m);                    
+                }
+            }
+            else m.Add(iv);
+        }
+
 
         public static void Disp(GekkoTime tStart, GekkoTime tEnd, List<string> list, bool showFrnEquation, bool showAllPeriods, bool clickedLink, O.Disp o)
         {
@@ -13594,19 +13612,48 @@ namespace Gekko
 
             int varCounter = 0;
 
-            foreach (string listItem in list)
+            List<IVariable> m = new List<IVariable>();
+            if (list != null)
+            {
+                foreach (string listItem in list)
+                {
+                    IVariable x = O.Lookup(smpl, null, new ScalarString(listItem), null, false, EVariableType.Var);
+                    m.Add(x);
+                }
+            }
+            else
+            {
+                UnfoldLists(o.iv, m);
+            }
+
+            foreach (IVariable x in m)
             {
                 varCounter++;
                 //one listitem could be obk:fx*, fy, #m, obk:#m, @fy
                 
-                IVariable x = O.Lookup(smpl, null, new ScalarString(listItem), null, false, EVariableType.Var);
+                //IVariable x = O.Lookup(smpl, null, new ScalarString(listItem), null, false, EVariableType.Var);
 
                 Series ts = x as Series;
 
                 if (ts == null)
                 {
-                    G.Writeln2("*** ERROR in DISP, " + listItem + " is not a series type");
-                    throw new GekkoException();
+                    ScalarString ss = x as ScalarString;
+
+                    if (ss != null)
+                    {
+                        IVariable iv2 = O.Lookup(smpl, null, ss, null, false, EVariableType.Var);
+                        ts = iv2 as Series;
+                        if (ts == null)
+                        {
+                            G.Writeln2("*** ERROR in DISP, type " + G.GetTypeString(x) + " not allowed");
+                            throw new GekkoException();
+                        }
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR in DISP, type " + G.GetTypeString(x) + " not allowed");
+                        throw new GekkoException();
+                    }
                 }
 
                 string var = ts.name;
@@ -13626,45 +13673,47 @@ namespace Gekko
                     
                     G.Writeln2("==========================================================================================");
                     G.Writeln("ARRAY-SERIES " + bank + Globals.symbolBankColon + G.RemoveFreqFromKey(ts.name));
-                    G.Writeln(G.GetFreqString(ts.freq) + " array-timeseries has " + keys.Count + " subseries in " + ts.dimensions + " dimensions:");
-                    double product = 1d;
-                    string productString = null;
-                    for (int i = 0; i < ts.dimensions; i++)
+                    G.Writeln(G.GetFreqString(ts.freq) + " array-timeseries has " + keys.Count + " elements in " + ts.dimensions + " dimensions");
+                    if (keys.Count > 0)
                     {
-                        temp[i] = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                          int ii = 0;
-                        foreach (MapMultidimItem key in keys)
+                        double dimCount2 = 1d;
+                        string dimCount = null;
+                        for (int i = 0; i < ts.dimensions; i++)
                         {
-                            if (!temp[i].ContainsKey(key.storage[i])) temp[i].Add(key.storage[i], null);
-                            ii++;
+                            temp[i] = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                            int ii = 0;
+                            foreach (MapMultidimItem key in keys)
+                            {
+                                if (!temp[i].ContainsKey(key.storage[i])) temp[i].Add(key.storage[i], null);
+                                ii++;
+                            }
+                            List<string> temp2 = temp[i].Keys.ToList();
+                            temp2.Sort(G.CompareNaturalIgnoreCase);
+                            dimCount2 = dimCount2 * temp[i].Count;
+                            dimCount += temp2.Count + " * ";
+                            G.Writeln2("Dimension #" + (i + 1) + " (" + temp[i].Count + " members): " + G.GetListWithCommas(temp2));
                         }
-                        List<string> temp2 = temp[i].Keys.ToList();
-                        temp2.Sort(G.CompareNaturalIgnoreCase);
-                        product = product * temp[i].Count;
-                        productString += temp2.Count + " * ";
-                        G.Writeln2("Dimension #" + (i + 1) + " (" + temp[i].Count + " elements): " + G.GetListWithCommas(temp2));
-                    }
-                    productString = productString.Substring(0, productString.Length - " * ".Length);
+                        dimCount = dimCount.Substring(0, dimCount.Length - " * ".Length);
 
-                    string first = null;
-                    foreach (string s in keys[0].storage)
-                    {
-                        first += "'" + s + "'" + ", ";
-                    }
-                    first = first.Substring(0, first.Length - ", ".Length);
+                        string first = null;
+                        foreach (string s in keys[0].storage)
+                        {
+                            first += "'" + s + "'" + ", ";
+                        }
+                        first = first.Substring(0, first.Length - ", ".Length);
 
-                    string last = null;
-                    foreach (string s in keys[keys.Count - 1].storage)
-                    {
-                        last += "'" + s + "'" + ", ";
-                    }
-                    last = last.Substring(0, last.Length - ", ".Length);
+                        string last = null;
+                        foreach (string s in keys[keys.Count - 1].storage)
+                        {
+                            last += "'" + s + "'" + ", ";
+                        }
+                        last = last.Substring(0, last.Length - ", ".Length);
 
-                    G.Writeln2("First element: " + G.RemoveFreqFromKey(ts.name) + "[" + first + "]");
-                    G.Writeln("Last element: " + G.RemoveFreqFromKey(ts.name) + "[" + last + "]");
-                    G.Writeln2("Dimension span: " + productString + " = " + product + ", density: " + keys.Count + "/" + product + " = " + Program.NumberFormat(100d * (keys.Count / product), "0.00") + "%");
-                    G.Writeln("==========================================================================================");
-                    
+                        G.Writeln2("First element: " + G.RemoveFreqFromKey(ts.name) + "[" + first + "]");
+                        G.Writeln("Last element: " + G.RemoveFreqFromKey(ts.name) + "[" + last + "]");
+                        G.Writeln2("Dimension span: " + dimCount + " = " + dimCount2 + ", density: " + keys.Count + "/" + dimCount2 + " = " + Program.NumberFormat(100d * (keys.Count / dimCount2), "0.00") + "%");
+                    }
+                    G.Writeln("==========================================================================================");                    
                 }
 
                 else
@@ -23277,7 +23326,7 @@ namespace Gekko
 
         public static void OPrint(O.Prt oPrt)
         {
-            string format = "f14.4";
+            //string format = "f14.4";
 
             string type = "print";
             if (G.Equal(oPrt.prtType, "plot")) type = "plot";
@@ -23291,35 +23340,7 @@ namespace Gekko
             //variable[0] is a list with two items (if #m has two items).
             //this must be exploded into <n p>, so from the 1 prtElement, we should take
             //variable[0][0] as n, variable[0][0] as p, variable[0][1] as n, variable[0][1] as p.
-
-            //foreach (O.Prt.Element element in oPrt.prtElements)
-            //{
-
-            //    List<OptString> printCodes2 = new List<OptString>();
-            //    if (element.printCodes.Count == 0) printCodes2.Add(new OptString("n", "yes"));
-            //    else printCodes2.AddRange(element.printCodes);
-            //    foreach (string printCode in element.printCodesFinal)
-            //    {
-
-            //        O.PrtContainer c = new O.PrtContainer();
-            //        c.variable[0] = element.variable[0];
-            //        c.variable[1] = element.variable[1];
-            //        c.printCode = printCode;
-            //        c.label = element.label;
-
-            //        c.linetypes = element.linetype;
-            //        c.dashtypes = element.dashtype;
-            //        c.linewidths = element.linewidth;
-            //        c.linecolors = element.linecolor;
-            //        c.pointtypes = element.pointtype;
-            //        c.pointsizes = element.pointsize;
-            //        c.fillstyles = element.fillstyle;
-            //        c.y2s = element.y2;
-
-            //        container.Add(c);
-            //    }
-            //}
-
+                        
             int labelMaxLine = 1;
             bool[] freqs = new bool[3];
 
@@ -23437,16 +23458,16 @@ namespace Gekko
                             //overrides ph.dec if given
                             if (element.ndec != -12345) dec = element.ndec;
                         }
-                        
-                        //c.width = element.width;
-                        //c.dec = element.dec;
-                        //c.nwidth = element.nwidth;
-                        //c.ndec = element.ndec;
-                        //c.pwidth = element.pwidth;
-                        //c.pdec = element.pdec;
 
-                        c.widthFinal = width;
-                        c.decFinal = dec;
+                        if (type == "plot")
+                        {
+                            c.widthFinal = 20;
+                            c.decFinal = 14;
+                        }
+                        else {
+                            c.widthFinal = width;
+                            c.decFinal = dec;
+                        }
 
                         c.linetype = element.linetype;
                         c.dashtype = element.dashtype;
@@ -24603,19 +24624,45 @@ namespace Gekko
                 //for instance sum(#m1, xx3[#m1, #m2]) --> sum(¤m1, xx3[¤m1, #m2])
                 //or sum((#m1, #m2), xx3[#m1, #m2]) --> sum((¤m1, ¤m2), xx3[¤m1, ¤m2])
                 //It is like they did not exist
+
+                // x[#i, 'a'] $ #j[#k]--> x[##i, 'a'] $ #j[##k]
+                for (int i = 0; i < a.Count - 20; i++)
+                {
+                    if (a[i].s == "[" && a[i - 1].type == "Word")
+                    {
+                        //is 'x['
+                        //very simple check, does not account for nesting etc....  
+                        int count2 = 1;                      
+                        for (int i2 = i + 1; i2 < a.Count - 20; i2++)
+                        {
+                            if (a[i2].s == "[") count2++;
+                            if (a[i2].s == "]") count2--;
+                            if (count2 == 0) break;
+                            if (a[i2].s == "#") a[i2].s = "##";
+                        }
+                    }
+                }
+
+                // x[##i, 'a'] $ #j[##k] --> x[#i, 'a'] $ ###j[#k]
+                for (int i = 0; i < a.Count - 20; i++)
+                {
+                    if (a[i].s == "#") a[i].s = "###";
+                    else if (a[i].s == "##") a[i].s = "#";
+                }
+
                 int start = 0;
                 for (int i = 0; i < a.Count - 20; i++)
                 {
                     GekkoDictionary<string, string> listNames = null;
-                    if (a[i].s == "sum" && a[i + 1].s == "(" && a[i + 2].s == "#" && a[i + 3].type == "Word" && a[i + 4].s == ",")
+                    if (a[i].s == "sum" && a[i + 1].s == "(" && a[i + 2].s == "###" && a[i + 3].type == "Word" && a[i + 4].s == ",")
                     {
                         //sum(#m1, xx3[#m1, #m2])
                         listNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                         listNames.Add(a[i + 3].s, "");
-                        a[i + 2].s = "###";
+                        //a[i + 2].s = "###";
                         start = 5;
                     }
-                    else if (a[i].s == "sum" && a[i + 1].s == "(" && a[i + 2].s == "(" && a[i + 3].s == "#")
+                    else if (a[i].s == "sum" && a[i + 1].s == "(" && a[i + 2].s == "(" && a[i + 3].s == "###")
                     {
                         //sum((#m1, #m2), xx3[#m1, #m2]) 
                         listNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -24623,10 +24670,10 @@ namespace Gekko
                         for (int i2 = i + 3; i2 < a.Count - 20; i2++)
                         {
                             //Harvesting list names from here: sum((...), xx3[#m1, #m2])
-                            if (a[i2].s == "#" && a[i2 + 1].type == "Word")
+                            if (a[i2].s == "###" && a[i2 + 1].type == "Word")
                             {
                                 if (!listNames.ContainsKey(a[i2 + 1].s)) listNames.Add(a[i2 + 1].s, "");  //the if is probably superfluous
-                                a[i2].s = "###";                                
+                                //a[i2].s = "###";                                
                             }
                             if (a[i2].s == ")" && a[i2 + 1].s == ",")
                             {

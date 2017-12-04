@@ -701,7 +701,8 @@ namespace Gekko
             //map != null:             the variable is found in the MAP, otherwise, the variable is found in a databank
             //rhsExpression != null:   it is an assignment of the left-hand side
 
-             string varnameWithFreq = HandleSigilAndFreq(varname, freq, type);
+            //only adds freq if not there. No sigil is added for lhs vars here.
+            string varnameWithFreq = AddFreq(varname, freq, type, isLeftSideVariable);
 
             if (isLeftSideVariable)
             {
@@ -763,14 +764,16 @@ namespace Gekko
             }
         }
 
-        public static string HandleSigilAndFreq(string varname, string freq, EVariableType type)
+        public static string AddFreq(string varname, string freq, EVariableType type, bool isLeftSideVariable)
         {
-            bool hasSigil = false; if (varname[0] == Globals.symbolScalar || varname[0] == Globals.symbolCollection) hasSigil = true;
+            //freq is added for all no-sigil rhs
+            //freq is added for lhs if it is no-sigil AND the type is SERIES or VAR
 
-            //rhsExpression means the value of the rhs variable, meaning that the present lookup is setting a value for the lhs variable
-            //IVariable lhs = null;
+            bool hasSigil = false; if (varname[0] == Globals.symbolScalar || varname[0] == Globals.symbolCollection) hasSigil = true;
+            
             string varnameWithFreq = varname;
-            if (!hasSigil && (type == EVariableType.Var || type == EVariableType.Series))
+
+            if ((!isLeftSideVariable && !hasSigil) || (isLeftSideVariable && !hasSigil && (type == EVariableType.Var || type == EVariableType.Series)))
             {
                 //Series has '!' added
                 //In VAL v = 100, there will be no freq added.
@@ -3309,7 +3312,7 @@ namespace Gekko
             return tsl;
         }
 
-        public static bool ListContains(IVariable x, IVariable y)
+        public static IVariable ListContains(IVariable x, IVariable y)
         {
 
             if (x.Type() != EVariableType.List || y.Type() != EVariableType.String)
@@ -3330,8 +3333,8 @@ namespace Gekko
                     break;
                 }
             }
-
-            return b;
+            if (b) return Globals.scalarVal1;
+            else return Globals.scalarVal0;
 
         }
 
@@ -5766,19 +5769,20 @@ namespace Gekko
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
             //public List<string> listItems = null;
-            public List list = null;          
+            public IVariable iv = null;          
             public string searchName = null;
             public string opt_info = null;
             public void Exe()
             {
                 if (this.searchName == null)
                 {
-                    List<string> m = new List<string>();
-                    foreach (IVariable iv in list.list)
-                    {
-                        m.Add(iv.ConvertToString());
-                    }
-                    Program.Disp(this.t1, this.t2, m, this);
+                    //List<string> m = new List<string>();
+                    
+                    //foreach (IVariable iv in iv.list)
+                    //{
+                    //    m.Add(iv.ConvertToString());
+                    //}
+                    Program.Disp(this.t1, this.t2, null, this);
                 }
                 else
                 {

@@ -1899,8 +1899,6 @@ listHelper:                 listHelper1 | listHelper2;
 listHelper1:                (expression ',')* expression -> expression+;
 listHelper2:                (expression ',')+ -> expression+;
 
-listNaked:                  expression (',' expression)+ -> ^(ASTLISTDEF expression+);
-
 map:                        leftParenNoGlue mapItem ',' mapHelper RIGHTPAREN -> ^(ASTMAPDEF mapItem mapHelper)
                           | leftParenNoGlue mapItem ','? RIGHTPAREN -> ^(ASTMAPDEF mapItem)   //the comma here is optional, not so for a list def.
 						    ;
@@ -1932,12 +1930,13 @@ expressionOrNothing:        expression -> expression
 // ------------------- flexible list --------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-bankvarnameList:            bankvarname (COMMA2 bankvarname)* -> ^(ASTBANKVARNAMELIST bankvarname+);  //allows a single element, for instance DISP x
-
 							//bankvarnameList is list of b:%x!q type names. Accepts a single element
 							//listNaked is a comma-separated list of expressions (without parenthesis). For instance 'a', 'b' or %a+%b, %d, etc. Must have > 1 element (one element is caught by expression below)
 							//expression is anything, but accepts a listNaked with parentheses, for instance ('a', 'b') or (%a+%b, %d). One element is ('a',), Python style.
-flexibleList:               bankvarnameList | listNaked | expression;  //used in DISP etc. ---> bankvarnameList returns a Gekko LIST of ScalarStrings.
+flexibleList:                bankvarnameList |  listNaked | expression;  //used in DISP etc. ---> bankvarnameList returns a Gekko LIST of ScalarStrings.
+bankvarnameList:            bankvarname (COMMA2 bankvarname)+ -> ^(ASTBANKVARNAMELIST bankvarname+)
+                          | bankvarname COMMA2 -> ^(ASTBANKVARNAMELIST bankvarname);
+listNaked:                  expression (',' expression)+ -> ^(ASTLISTDEF expression+);
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- name START -------------------------------------------------------------------------------
@@ -2070,8 +2069,9 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 // ASSIGNMENT, VAL, STRING, DATE, SERIES, LIST, MATRIX, MAP, VAR
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-assignment:				    assignmentType leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression ASTPLACEHOLDER assignmentType)
-						  | assignmentType leftSide EQUAL flexibleList -> ^(ASTASSIGNMENT leftSide flexibleList ASTPLACEHOLDER assignmentType)
+assignment:				 assignmentType leftSide EQUAL flexibleList -> ^(ASTASSIGNMENT leftSide flexibleList ASTPLACEHOLDER assignmentType)   
+| assignmentType leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression ASTPLACEHOLDER assignmentType)
+						   
 						    ;
 assignmentType:             SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | -> ASTPLACEHOLDER;  //may be empty
 
@@ -2124,6 +2124,7 @@ closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)
 
 disp:						DISP StringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, $DISP.Line)} StringInQuotes)
 						  | DISP dispOpt1? flexibleList -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) flexibleList)
+				//		  | DISP dispOpt1? bankvarname -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) bankvarname)
 						    ;
 
 dispOpt1:					ISNOTQUAL
@@ -2140,8 +2141,12 @@ for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  func
 						  | FOR leftParen (forHelper2 ','?)+ ')' SEMICOLON? functionStatements END -> ^(ASTFOR ^(ASTPLACEHOLDER forHelper2+) functionStatements)
 						    ;
 
-forHelper2:                 type? svarname EQUAL expression (TO expression2)? (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2?) ^(ASTPLACEHOLDER expression3?))
-                          | type? svarname EQUAL flexibleList -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER flexibleList) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+forHelper2:                 
+
+ type? svarname EQUAL expression TO expression2 (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2) ^(ASTPLACEHOLDER expression3?))
+|type? svarname EQUAL flexibleList -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER flexibleList) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+//|type? svarname EQUAL expression -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+                          
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------

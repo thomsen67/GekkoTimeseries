@@ -250,7 +250,7 @@ namespace Gekko.Parser.Gek
                 {
                     string listnameWithoutSigil = s.Substring(1);
                     //naked #m
-                    if (node.Parent.Text == "ASTINDEXERELEMENT")
+                    if (node.Parent.Text == "ASTINDEXERELEMENT" || (node.Parent.Text == "ASTCOMPARE2" && node.Number==1))
                     {
                         //#m is inside a x[#m]
                         ASTNode node2 = node.Parent.Parent;
@@ -1207,8 +1207,29 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTCOMPARE2":
-                        {                            
-                            node.Code.A("O.ListContains(" + node[0].Code + "," + node[1].Code + ")");                            
+                        {
+                            
+                            string indexes = null;
+
+                            ASTNode child = node[1];
+
+                            string listName = GetSimpleHashName(child);
+                            string internalName = null;
+                            if (listName != null)
+                            {
+                                internalName = SearchUpwardsInTree2(node, listName);
+                            }
+
+                            if (internalName != null)
+                            {
+                                indexes += internalName;
+                            }
+                            else
+                            {
+                                indexes += node[1].Code.ToString();
+                            }
+
+                            node.Code.A("O.ListContains(" + node[0].Code + "," + indexes + ")");
                         }
                         break;
                     case "ASTCOMPARE":
@@ -1244,6 +1265,7 @@ namespace Gekko.Parser.Gek
                         break;
 
                     case "ASTDOLLARCONDITIONAL":
+                    case "ASTDOLLARCONDITIONALVARIABLE":
                         {
                             GetCodeFromAllChildren(node);
                             break;
@@ -4376,7 +4398,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.Disp o" + Num(node) + " = new O.Disp();" + G.NL);                            
                             node.Code.A(node[0].Code);  //dates
                                                         
-                            node.Code.A("o" + Num(node) + ".list = " + node[1].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".iv = " + node[1].Code + ";" + G.NL);
 
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }

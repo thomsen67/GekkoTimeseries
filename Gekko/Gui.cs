@@ -358,7 +358,7 @@ namespace Gekko
                 }
                 else
                 {
-                    Program.Pause("ALPHA VERSION -- no guarantees");
+                    Program.Pause("ALPHA VERSION -- no guarantees!");
                 }
             }
 

@@ -87,7 +87,7 @@ namespace Gekko
                 if (index.Type() == EVariableType.String)
                 {
                     string s = (index as ScalarString).string2;
-                    string varnameWithFreq = O.HandleSigilAndFreq(s, null, EVariableType.Var);  //we do not know the freq. So if s has no '!', current freq will be added.
+                    string varnameWithFreq = O.AddFreq(s, null, EVariableType.Var, false);  //we do not know the freq. So if s has no '!', current freq will be added.
                     IVariable rv = null; this.storage.TryGetValue(varnameWithFreq, out rv);
                     if (rv == null)
                     {

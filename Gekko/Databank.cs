@@ -73,8 +73,7 @@ namespace Gekko
         public string info1 = null; //must be taken from DatabankInfo.xml, don't use protobuffer        
         public string date = null; //must be taken from DatabankInfo.xml, don't use protobuffer
         public bool isDirty = false;  //used to see if en OPEN databank must be re-written. Don't use protobuffer on this field.
-        public bool protect = false;  //used to set an OPEN databank as protected. Don't use protobuffer on this field.
-        //public GekkoDictionary<string, string> tmptmpVars;
+        public bool protect = false;  //used to set an OPEN databank as protected. Don't use protobuffer on this field.        
         public Program.ReadInfo readInfo = null; //contains info from reading the file, among other things info from the XML file. NOTE: do not store it in protobuf!
         public string fileHash = null; //do not store this in protobuf
 
@@ -85,11 +84,10 @@ namespace Gekko
             this.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public Databank(string aliasName)
+        public Databank(string name)
         {
             this.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
-            this.aliasName = aliasName;
-            //this.aliasNameOriginal = aliasName;
+            this.aliasName = name;            
         }
 
         public void Clear() {
