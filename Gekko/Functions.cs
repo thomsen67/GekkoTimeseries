@@ -1221,7 +1221,17 @@ namespace Gekko
                 return new ScalarVal(t.super + 1d / 12d / 2d + 1d / 12d * (t.sub - 1));
             }
             throw new GekkoException();
-        }               
+        }
+
+        public static IVariable time(GekkoSmpl smpl)
+        {
+            Series x = new Series(ESeriesType.Light, smpl.t0.freq, null);
+            foreach (GekkoTime t in smpl.Iterate03())
+            {
+                x.SetData(t, time(t).ConvertToVal());
+            }
+            return x;
+        }
 
         public static IVariable iif(GekkoSmpl t, IVariable i1, IVariable op, IVariable i2, IVariable o1, IVariable o2)
         {            

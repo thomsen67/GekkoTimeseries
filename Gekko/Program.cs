@@ -23324,14 +23324,8 @@ namespace Gekko
         //    }
         //}
 
-        public static void OPrint(O.Prt oPrt)
-        {
-            //string format = "f14.4";
-
-            string type = "print";
-            if (G.Equal(oPrt.prtType, "plot")) type = "plot";
-
-            bool nonSeries = true;
+        public static bool NonSeriesCheck(O.Prt oPrt, string type)
+        {            
             if (type == "print")
             {
                 //check if elements are non-series, or lists with non-series
@@ -23339,9 +23333,9 @@ namespace Gekko
                 {
                     if (element.variable[0] == null || element.variable[1] != null || element.variable[0].Type() == EVariableType.Series)
                     {
-                        nonSeries = false; goto Label;
+                        return false;
                     }
-                    
+
                     List temp = element.variable[0] as List;
                     if (temp != null)
                     {
@@ -23349,73 +23343,30 @@ namespace Gekko
                         {
                             if (iv.Type() == EVariableType.Series)
                             {
-                                nonSeries = false; goto Label;
+                                return false;
                             }
                         }
                     }
                 }
             }
-            Label: if (nonSeries)
+            else
             {
-                foreach (O.Prt.Element element in oPrt.prtElements)
-                {
-                    IVariable var = element.variable[0];
-                    List temp = var as List;
-                    if (temp != null)
-                    {
-                        string s = null;
-                        foreach (IVariable iv in temp.list)
-                        {
-                            if (iv.Type() == EVariableType.String)
-                            {
-                                s += ((ScalarString)iv).string2 + ", ";
-                            }
-                            else if (iv.Type() == EVariableType.Date)
-                            {
-                                s += ((ScalarDate)iv).date.ToString() + ", ";
-                            }
-                            else if (iv.Type() == EVariableType.Val)
-                            {
-                                s += ((ScalarVal)iv).val.ToString() + ", ";
-                            }
-                            else
-                            {
-                                s += "[" + iv.Type().ToString() + "]" + ", ";
-                            }
-                        }
-                        s = s.Substring(0, s.Length - ", ".Length);
-                        G.Writeln2(element.label);
-                        G.Writeln(s);
-                    }
-                    else
-                    {
-                        if (var.Type() == EVariableType.Matrix)
-                        {
-                            Program.ShowMatrix((Matrix)var, element.label);
-                        }
-                        else if (var.Type() == EVariableType.String)
-                        {
-                            G.Writeln2(element.label);
-                            G.Writeln(((ScalarString)var).string2);
-                        }
-                        else if (var.Type() == EVariableType.Val)
-                        {
-                            G.Writeln2(element.label);
-                            G.Writeln(((ScalarVal)var).val.ToString());
-                        }
-                        else if (var.Type() == EVariableType.Date)
-                        {
-                            G.Writeln2(element.label);
-                            G.Writeln(((ScalarDate)var).date.ToString());
-                        }
-                        else if (var.Type() == EVariableType.Map)
-                        {
-                            G.Writeln2(element.label);
-                            G.Writeln("MAP printing not implemented yet");
-                        }
-                    }
-                    return;
-                }
+                return false;
+            }
+            return true;
+        }
+
+        public static void OPrint(O.Prt oPrt)
+        {
+            //string format = "f14.4";
+
+            string type = "print";
+            if (G.Equal(oPrt.prtType, "plot")) type = "plot";
+            
+            if (NonSeriesCheck(oPrt, type))
+            {
+                NonSeriesHandling(oPrt);
+                return;
             }
 
             List<O.Prt.Element> container = new List<O.Prt.Element>();
@@ -24647,6 +24598,68 @@ namespace Gekko
 
             }
 
+        }
+
+        private static void NonSeriesHandling(O.Prt oPrt)
+        {
+            foreach (O.Prt.Element element in oPrt.prtElements)
+            {
+                IVariable var = element.variable[0];
+                List temp = var as List;
+                if (temp != null)
+                {
+                    string s = null;
+                    foreach (IVariable iv in temp.list)
+                    {
+                        if (iv.Type() == EVariableType.String)
+                        {
+                            s += ((ScalarString)iv).string2 + ", ";
+                        }
+                        else if (iv.Type() == EVariableType.Date)
+                        {
+                            s += ((ScalarDate)iv).date.ToString() + ", ";
+                        }
+                        else if (iv.Type() == EVariableType.Val)
+                        {
+                            s += ((ScalarVal)iv).val.ToString() + ", ";
+                        }
+                        else
+                        {
+                            s += "[" + iv.Type().ToString() + "]" + ", ";
+                        }
+                    }
+                    s = s.Substring(0, s.Length - ", ".Length);
+                    G.Writeln2(element.label);
+                    G.Writeln(s);
+                }
+                else
+                {
+                    if (var.Type() == EVariableType.Matrix)
+                    {
+                        Program.ShowMatrix((Matrix)var, element.label);
+                    }
+                    else if (var.Type() == EVariableType.String)
+                    {
+                        G.Writeln2(element.label);
+                        G.Writeln(((ScalarString)var).string2);
+                    }
+                    else if (var.Type() == EVariableType.Val)
+                    {
+                        G.Writeln2(element.label);
+                        G.Writeln(((ScalarVal)var).val.ToString());
+                    }
+                    else if (var.Type() == EVariableType.Date)
+                    {
+                        G.Writeln2(element.label);
+                        G.Writeln(((ScalarDate)var).date.ToString());
+                    }
+                    else if (var.Type() == EVariableType.Map)
+                    {
+                        G.Writeln2(element.label);
+                        G.Writeln("MAP printing not implemented yet");
+                    }
+                }
+            }
         }
 
         private static void UnfoldLabels(string elementLabel, ref string label, ref List<string> labels2)

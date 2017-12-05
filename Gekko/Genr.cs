@@ -9,10 +9,6 @@ namespace Gekko
     public class TranslatedCode
     {
         public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
-        public static readonly ScalarVal i20 = new ScalarVal(1d);
-        public static readonly ScalarVal i22 = new ScalarVal(5d);
-        public static readonly ScalarVal i23 = new ScalarVal(5d);
-        public static readonly ScalarVal i24 = new ScalarVal(2d);
         public static void ClearTS(P p)
         {
         }
@@ -25,18 +21,42 @@ namespace Gekko
             GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl);
 
             //[[splitSTART]]
-            p.SetText(@"¤0"); O.InitSmpl(smpl);
+            p.SetText(@"¤1"); O.InitSmpl(smpl);
 
-            IVariable ivTmpvar19 = O.IvConvertTo(EVariableType.Var, i20);
-            O.Lookup(smpl, null, null, "xx", null, ivTmpvar19, true, EVariableType.Var)
-            ;
+            O.Prt o0 = new O.Prt();
+            o0.prtType = "plot";
 
-            p.SetText(@"¤0"); O.InitSmpl(smpl);
+            {
+                List<int> bankNumbers = null;
+                O.Prt.Element ope0 = new O.Prt.Element();
+                ope0.label = O.SubstituteScalarsAndLists("xx", false);
+                smpl = new GekkoSmpl(o0.t1.Add(-2), o0.t2);
+                ope0.printCodesFinal = Program.GetElementPrintCodes(o0, ope0); bankNumbers = O.Prt.GetBankNumbers(null, ope0.printCodesFinal); foreach (int bankNumber in bankNumbers)
+                {
+                    smpl.bankNumber = bankNumber;
+                    ope0.variable[bankNumber] = O.Lookup(smpl, null, null, "xx", null, null, false, EVariableType.Var);
+                }
+                smpl.bankNumber = 0;
+                o0.prtElements.Add(ope0);
+            }
 
-            IVariable ivTmpvar21 = O.IvConvertTo(EVariableType.Var, i24);
-            O.DollarLookup(O.Equals(smpl, i22, i23)
-            , smpl, null, null, "xx", null, ivTmpvar21, false, EVariableType.Var)
-            ;
+            {
+                List<int> bankNumbers = null;
+                O.Prt.Element ope0 = new O.Prt.Element();
+                ope0.label = O.SubstituteScalarsAndLists("time()", false);
+                smpl = new GekkoSmpl(o0.t1.Add(-2), o0.t2);
+                ope0.printCodesFinal = Program.GetElementPrintCodes(o0, ope0); bankNumbers = O.Prt.GetBankNumbers(null, ope0.printCodesFinal); foreach (int bankNumber in bankNumbers)
+                {
+                    smpl.bankNumber = bankNumber;
+                    ope0.variable[bankNumber] = Functions.time(smpl);
+                }
+                smpl.bankNumber = 0;
+                o0.prtElements.Add(ope0);
+            }
+
+
+            o0.counter = 6;
+            o0.Exe();
 
 
             //[[splitSTOP]]
