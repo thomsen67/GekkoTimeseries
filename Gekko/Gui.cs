@@ -365,6 +365,8 @@ namespace Gekko
             Program.CreateLocalCopyHelpChm();
             CrossThreadStuff.Zoom();
 
+            Program.InitUfunctionsAndArithmetics();
+
             //gekko.exe parameters are read first, and then afterwards any gekko.ini local file
             StartupExeAndIniStuff();
             CrossThreadStuff.Mode();

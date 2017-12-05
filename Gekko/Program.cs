@@ -20436,50 +20436,6 @@ namespace Gekko
 
         public static void Re(GekkoSmpl smpl, string s, P p)
         {
-            if (Globals.runningOnTTComputer)
-            {
-                //smpl = new GekkoSmpl(new GekkoTime(EFreq.Annual, 2000, 1), new GekkoTime(EFreq.Annual, 2001, 1));
-                //Func<GekkoSmpl, IVariable> AddXx1Xx2_ = (smplHere) => O.Lookup(smplHere, null, null, "xx1", null, null, false).Add(smplHere, O.Lookup(smplHere, null, null, "xx2", null, null, false));
-                //GekkoLagFunction addXxx1Xx2 = new GekkoLagFunction(smpl.t0, smpl.t3, AddXx1Xx2_);
-
-                ////Globals.globalPeriodStart = new GekkoTime(EFreq.Annual, 2000, 1);
-                ////Globals.globalPeriodEnd = new GekkoTime(EFreq.Annual, 2001, 1);
-
-                //Series xx1 = new Series(EFreq.Annual, "xx1!a");
-                //xx1.SetData(new GekkoTime(EFreq.Annual, 1998, 1), 98);
-                //xx1.SetData(new GekkoTime(EFreq.Annual, 1999, 1), 99);
-                //xx1.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 100);
-                //xx1.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 101);
-
-                //Series xx2 = new Series(EFreq.Annual, "xx2!a");
-                //xx2.SetData(new GekkoTime(EFreq.Annual, 1998, 1), 198);
-                //xx2.SetData(new GekkoTime(EFreq.Annual, 1999, 1), 199);
-                //xx2.SetData(new GekkoTime(EFreq.Annual, 2000, 1), 200);
-                //xx2.SetData(new GekkoTime(EFreq.Annual, 2001, 1), 201);
-
-                //Program.databanks.GetFirst().AddIVariable("xx1!a", xx1);
-                //Program.databanks.GetFirst().AddIVariable("xx2!a", xx2);
-
-                //GekkoLagFunction xx3 = IndexerSLET(IndexerSLET(new GekkoLagFunction(smpl.t0, smpl.t3, AddXx1Xx2_), new ScalarVal(-1d)), new ScalarVal(-1d));    //(xx1+xx2)[-1][-1]
-                
-                //GekkoSmpl smpl2 = new GekkoSmpl();
-                //smpl2.t0 = xx3.t0;
-                //smpl2.t3 = xx3.t3;
-                //IVariable rv = xx3.func.Invoke(smpl2);
-                //GekkoTime t2000 = new GekkoTime(EFreq.Annual, 2000, 1);
-                //GekkoTime t2001 = new GekkoTime(EFreq.Annual, 2001, 1);
-
-                //double sum = 0d;
-                //for (int i = 0; i < 100; i++)
-                //{
-                //    rv = xx3.func.Invoke(smpl);
-                //    sum += ((Series)rv).GetData(smpl, t2001);
-                //}
-
-                //G.Writeln2("SUM " + sum);
-
-            }           
-            
             
             //s may be "reset" or "restart"
             bool ini = false;
@@ -20506,16 +20462,7 @@ namespace Gekko
             //Globals.uFunctionStorageCs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);  //resetting user functions
 
             //User functions: more can be added if necessary, or users can use LIST or DICT.
-            Globals.ufunctions1 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions2 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions3 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions4 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions5 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions6 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions7 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions8 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions9 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions10 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            InitUfunctionsAndArithmetics();
 
             Program.model = null; Program.unfoldedVariableList = null;
             Globals.modelFileName = "";
@@ -20523,7 +20470,7 @@ namespace Gekko
 
             string workingFolder = Program.options.folder_working;
             Program.options = new Options();  //resetting these, but letting working folder live on.
-            
+
             CrossThreadStuff.Mode();  //to show default color
 
             Program.GetStartingPeriod();
@@ -20535,26 +20482,8 @@ namespace Gekko
 
             Globals.detectedRPath = null;  //we reset this, too
             Globals.r_fileContent = null;
-                         
-            Globals.arithmentics[0] = (x1, x2) => x1 + x2;
-            Globals.arithmentics[1] = (x1, x2) => x2 + x1;
-            Globals.arithmentics[2] = (x1, x2) => x1 - x2;
-            Globals.arithmentics[3] = (x1, x2) => x2 - x1;
-            Globals.arithmentics[4] = (x1, x2) => x1 * x2;
-            Globals.arithmentics[5] = (x1, x2) => x2 * x1;
-            Globals.arithmentics[6] = (x1, x2) => x1 / x2;
-            Globals.arithmentics[7] = (x1, x2) => x2 / x1;
-            Globals.arithmentics[8] = (x1, x2) => Math.Pow(x1, x2);
-            Globals.arithmentics[9] = (x1, x2) => Math.Pow(x2, x1);
-            Globals.arithmentics[10] = (x1, x2) => (x1 / x2 - 1d) * 100d;
-            Globals.arithmentics[11] = (x1, x2) => Math.Log(x1 / x2);
-            Globals.arithmentics[12] = (x1, x2) => Math.Round(x1, (int)x2, MidpointRounding.AwayFromZero);
 
-            Globals.arithmentics1[0] = (x1) => -x1;
-            Globals.arithmentics1[1] = (x1) => Math.Abs(x1);
-            Globals.arithmentics1[2] = (x1) => Math.Log(x1);
-            Globals.arithmentics1[3] = (x1) => Math.Exp(x1);
-            Globals.arithmentics1[4] = (x1) => Math.Sqrt(x1);
+
 
             if (workingFolder != null && workingFolder != "")
             {
@@ -20590,8 +20519,42 @@ namespace Gekko
 
             StartPulse();
 
-            
 
+
+        }
+
+        public static void InitUfunctionsAndArithmetics()
+        {
+            Globals.ufunctions1 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions2 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions3 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions4 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions5 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions6 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions7 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions8 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions9 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctions10 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
+
+            Globals.arithmentics[0] = (x1, x2) => x1 + x2;
+            Globals.arithmentics[1] = (x1, x2) => x2 + x1;
+            Globals.arithmentics[2] = (x1, x2) => x1 - x2;
+            Globals.arithmentics[3] = (x1, x2) => x2 - x1;
+            Globals.arithmentics[4] = (x1, x2) => x1 * x2;
+            Globals.arithmentics[5] = (x1, x2) => x2 * x1;
+            Globals.arithmentics[6] = (x1, x2) => x1 / x2;
+            Globals.arithmentics[7] = (x1, x2) => x2 / x1;
+            Globals.arithmentics[8] = (x1, x2) => Math.Pow(x1, x2);
+            Globals.arithmentics[9] = (x1, x2) => Math.Pow(x2, x1);
+            Globals.arithmentics[10] = (x1, x2) => (x1 / x2 - 1d) * 100d;
+            Globals.arithmentics[11] = (x1, x2) => Math.Log(x1 / x2);
+            Globals.arithmentics[12] = (x1, x2) => Math.Round(x1, (int)x2, MidpointRounding.AwayFromZero);
+
+            Globals.arithmentics1[0] = (x1) => -x1;
+            Globals.arithmentics1[1] = (x1) => Math.Abs(x1);
+            Globals.arithmentics1[2] = (x1) => Math.Log(x1);
+            Globals.arithmentics1[3] = (x1) => Math.Exp(x1);
+            Globals.arithmentics1[4] = (x1) => Math.Sqrt(x1);
         }
 
         public static void RemoteInit()
