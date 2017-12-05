@@ -41,11 +41,11 @@ namespace Gekko
                 string s = x1.ConvertToString();
                 if (G.Equal(s, "first"))
                 {
-                    return new ScalarString(Program.databanks.GetFirst().aliasName);
+                    return new ScalarString(Program.databanks.GetFirst().name);
                 }
                 else if (G.Equal(s, "ref"))
                 {
-                    return new ScalarString(Program.databanks.GetRef().aliasName);
+                    return new ScalarString(Program.databanks.GetRef().name);
                 }
                 else
                 {
@@ -72,10 +72,10 @@ namespace Gekko
                     G.Writeln2("*** ERROR: bankname() must be called with < " + Program.databanks.storage.Count);
                     throw new GekkoException();
                 }
-                else if (x == 1) return new ScalarString(Program.databanks.GetFirst().aliasName);
+                else if (x == 1) return new ScalarString(Program.databanks.GetFirst().name);
                 else
                 {
-                    return new ScalarString(Program.databanks.storage[x].aliasName);
+                    return new ScalarString(Program.databanks.storage[x].name);
                 }                
             }
             else
@@ -88,7 +88,7 @@ namespace Gekko
 
         public static IVariable refname(GekkoSmpl smpl)
         {
-            return new ScalarString(Program.databanks.GetRef().aliasName);
+            return new ScalarString(Program.databanks.GetRef().name);
         }
 
         public static IVariable bankfilename(GekkoSmpl smpl, IVariable x1)

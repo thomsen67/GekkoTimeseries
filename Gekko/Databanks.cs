@@ -53,7 +53,7 @@ namespace Gekko
             {
                 foreach (Databank db in this.storage)
                 {
-                    if (G.Equal(db.aliasName, databank)) return db;
+                    if (G.Equal(db.name, databank)) return db;
                 }
             }
             return null;            
@@ -78,7 +78,7 @@ namespace Gekko
             bool readFromFile = false;
             //Does not read the actual bank, but just arranges for the bank to be read into the right 'slot'
             //If <first/edit> or <ref>, the bank in the [0] or [1] slot is pushed down to [2].
-            if (G.Equal(databank.aliasName, Globals.Work))
+            if (G.Equal(databank.name, Globals.Work))
             {
                 if (openType == EOpenType.Normal || openType == EOpenType.Last)
                 {
@@ -109,7 +109,7 @@ namespace Gekko
                     throw new GekkoException();
                 }     
             }
-            else if (G.Equal(databank.aliasName, Globals.Ref))  //Ref
+            else if (G.Equal(databank.name, Globals.Ref))  //Ref
             {
                 if (openType == EOpenType.Normal)
                 {
@@ -137,7 +137,7 @@ namespace Gekko
                     throw new GekkoException();
                 }     
             }
-            string name = databank.aliasName;
+            string name = databank.name;
             int existI; int WorkI; int BaseI; FindBanksI(name, out existI, out WorkI, out BaseI);
 
             List<Databank> m = new List<Databank>(this.storage.Count);
@@ -167,7 +167,7 @@ namespace Gekko
             readFromFile = false;
             if (openType == EOpenType.Normal || openType == EOpenType.Last || (openType == EOpenType.Pos && openPosition != 1))
             {
-                G.Writeln2("*** ERROR: Databank '" + databank.aliasName + "' is already open. Use CLOSE to close it first.");
+                G.Writeln2("*** ERROR: Databank '" + databank.name + "' is already open. Use CLOSE to close it first.");
                 throw new GekkoException();
             }
             else if (openType == EOpenType.Edit || openType == EOpenType.First || (openType == EOpenType.Pos && openPosition == 1))
@@ -180,7 +180,7 @@ namespace Gekko
                     {
                         if (databank.protect == false)
                         {
-                            G.Writeln2("Databank '" + databank.aliasName + "' is already editable in first position.");
+                            G.Writeln2("Databank '" + databank.name + "' is already editable in first position.");
                         }                        
                     }
                     m.AddRange(this.storage);  //just copied, and put back again later on
@@ -230,7 +230,7 @@ namespace Gekko
                 }
                 else if (existI == 1)
                 {
-                    G.Writeln2("*** ERROR: Databank '" + databank.aliasName + "' is already open as ref bank");
+                    G.Writeln2("*** ERROR: Databank '" + databank.name + "' is already open as ref bank");
                     throw new GekkoException();
                 }
                 else  //Trying an OPEN<edit/first>db on a db that is already there in slot [2] or below
@@ -403,15 +403,15 @@ namespace Gekko
             BaseI = -12345;
             for (int i = 0; i < Program.databanks.storage.Count; i++)
             {
-                if (G.Equal(Program.databanks.storage[i].aliasName, name))
+                if (G.Equal(Program.databanks.storage[i].name, name))
                 {
                     existI = i;
                 }
-                if (G.Equal(Program.databanks.storage[i].aliasName, Globals.Work))
+                if (G.Equal(Program.databanks.storage[i].name, Globals.Work))
                 {
                     WorkI = i;
                 }
-                if (G.Equal(Program.databanks.storage[i].aliasName, Globals.Ref))
+                if (G.Equal(Program.databanks.storage[i].name, Globals.Ref))
                 {
                     BaseI = i;
                 }
@@ -423,14 +423,14 @@ namespace Gekko
             bool ok = true;
             for (int i = 0; i < this.storage.Count; i++)
             {
-                if (G.Equal(db1.aliasName, this.storage[i].aliasName))
+                if (G.Equal(db1.name, this.storage[i].name))
                 {
                     this.storage[i] = db2; break;
                 }
             }
             if (!ok)
             {
-                G.Writeln2("*** ERROR: Could not replace databank " + db2.aliasName);
+                G.Writeln2("*** ERROR: Could not replace databank " + db2.name);
                 throw new GekkoException();
             }
         }
@@ -516,8 +516,8 @@ namespace Gekko
             Databank db2 = Program.databanks.GetDatabank(old2);
             Program.databanks.RemoveDatabank(old1);
             Program.databanks.RemoveDatabank(old2);
-            db1.aliasName = new1;
-            db2.aliasName = new2;            
+            db1.name = new1;
+            db2.name = new2;            
         }
 
         public static void Unswap()
@@ -525,16 +525,16 @@ namespace Gekko
             List<Databank> dbList = new List<Databank>();
             foreach (Databank databank in Program.databanks.storage)
             {
-                if (G.Equal(databank.aliasName, Globals.Work)) dbList.Add(databank);
+                if (G.Equal(databank.name, Globals.Work)) dbList.Add(databank);
             }
             foreach (Databank databank in Program.databanks.storage)
             {
-                if (G.Equal(databank.aliasName, Globals.Ref)) dbList.Add(databank);
+                if (G.Equal(databank.name, Globals.Ref)) dbList.Add(databank);
             }
             foreach (Databank databank in Program.databanks.storage)
             {
-                if (G.Equal(databank.aliasName, Globals.Work)) continue;
-                if (G.Equal(databank.aliasName, Globals.Ref)) continue;
+                if (G.Equal(databank.name, Globals.Work)) continue;
+                if (G.Equal(databank.name, Globals.Ref)) continue;
                 dbList.Add(databank);
             }
             Program.databanks.storage = dbList;

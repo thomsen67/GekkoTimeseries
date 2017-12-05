@@ -1587,7 +1587,7 @@ namespace Gekko
                 readInfo.startPerResultingBank = readInfo.startPerInFile;
                 readInfo.endPerResultingBank = readInfo.endPerInFile;
             }
-            Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
+            Databank currentBank = Program.databanks.GetDatabank(databank.name);
             currentBank.yearStart = readInfo.startPerResultingBank;
             currentBank.yearEnd = readInfo.endPerResultingBank;
         }
@@ -1916,7 +1916,7 @@ namespace Gekko
                     readInfo.startPerResultingBank = readInfo.startPerInFile;
                     readInfo.endPerResultingBank = readInfo.endPerInFile;
                 }
-                Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
+                Databank currentBank = Program.databanks.GetDatabank(databank.name);
                 currentBank.yearStart = readInfo.startPerResultingBank;
                 currentBank.yearEnd = readInfo.endPerResultingBank;
 
@@ -1926,7 +1926,7 @@ namespace Gekko
 
         public static void Index(string listName, string wildCard)
         {
-            string bank = Program.databanks.GetFirst().aliasName;
+            string bank = Program.databanks.GetFirst().name;
             if (wildCard.StartsWith(Globals.Work.ToLower() + ":", StringComparison.OrdinalIgnoreCase))
             {
                 bank = Globals.Work;
@@ -2192,7 +2192,7 @@ namespace Gekko
 
                     //if (wipeDatabankBeforeInsertingData) databank.Clear();  //Reading gbk may point to a whole new databank, this is ok. Wipe will only be for READ, no READ<merge> or READ ... TO ... . IMPORT is never wiped.
 
-                    Databank databankTemp = new Databank(databank.aliasName);
+                    Databank databankTemp = new Databank(databank.name);
 
                     if (oRead.Type == EDataFormat.Pcim)
                     {
@@ -2260,7 +2260,7 @@ namespace Gekko
                         //databank.aliasName = name;
                         for (int ii = 0; ii < Program.databanks.storage.Count; ii++)
                         {
-                            if (G.Equal(Program.databanks.storage[ii].aliasName, databank.aliasName))
+                            if (G.Equal(Program.databanks.storage[ii].name, databank.name))
                             {
                                 Program.databanks.storage[ii] = databankTemp;
                             }
@@ -2917,7 +2917,7 @@ namespace Gekko
                     try
                     {
                         //discarding the old bank completely, and replacing with the new one
-                        deserializedDatabank.aliasName = databank.aliasName;
+                        deserializedDatabank.name = databank.name;
                         Program.databanks.ReplaceDatabank(databank, deserializedDatabank);
                         readInfo.databank = deserializedDatabank;  //since this pointer is altered
                         databank = deserializedDatabank;  //since this pointer is altered
@@ -2935,7 +2935,7 @@ namespace Gekko
 
                 //if (emptyWarnings > 0) G.Writeln("+++ WARNING: " + emptyWarnings + " variables with empty string as name in ." + Globals.extensionDatabank + " file (skipped)");
 
-                Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
+                Databank currentBank = Program.databanks.GetDatabank(databank.name);
                 currentBank.yearStart = readInfo.startPerResultingBank;
                 currentBank.yearEnd = readInfo.endPerResultingBank;
 
@@ -3110,7 +3110,7 @@ namespace Gekko
                 readInfo.startPerResultingBank = readInfo.startPerInFile;
                 readInfo.endPerResultingBank = readInfo.endPerInFile;
             }
-            Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
+            Databank currentBank = Program.databanks.GetDatabank(databank.name);
             currentBank.yearStart = readInfo.startPerResultingBank;
             currentBank.yearEnd = readInfo.endPerResultingBank;
         }
@@ -3468,7 +3468,7 @@ namespace Gekko
                 readInfo.startPerResultingBank = readInfo.startPerInFile;
                 readInfo.endPerResultingBank = readInfo.endPerInFile;
             }
-            Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
+            Databank currentBank = Program.databanks.GetDatabank(databank.name);
             currentBank.yearStart = readInfo.startPerResultingBank;
             currentBank.yearEnd = readInfo.endPerResultingBank;
 
@@ -3676,7 +3676,7 @@ namespace Gekko
                         readInfo.startPerResultingBank = readInfo.startPerInFile;
                         readInfo.endPerResultingBank = readInfo.endPerInFile;
                     }
-                    Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
+                    Databank currentBank = Program.databanks.GetDatabank(databank.name);
                     currentBank.yearStart = readInfo.startPerResultingBank;
                     currentBank.yearEnd = readInfo.endPerResultingBank;
 
@@ -4637,7 +4637,7 @@ namespace Gekko
                 readInfo.startPerResultingBank = readInfo.startPerInFile;
                 readInfo.endPerResultingBank = readInfo.endPerInFile;
             }
-            Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
+            Databank currentBank = Program.databanks.GetDatabank(databank.name);
             currentBank.yearStart = readInfo.startPerResultingBank;
             currentBank.yearEnd = readInfo.endPerResultingBank;
 
@@ -6806,7 +6806,7 @@ namespace Gekko
                     Series ts = db.GetVariable(freq, variable);
                     if (ts != null)
                     {
-                        found.Add("'" + db.aliasName + "'");
+                        found.Add("'" + db.name + "'");
                         if (freq != Program.options.freq) changeFreq = true;  //mention that freq change could be used
                     }
                 }
@@ -6933,8 +6933,8 @@ namespace Gekko
                 int rCount = Program.databanks.GetRef().storage.Count;
                 string originalDataFileWork = "[empty]";
                 string originalDataFileBaseline = "[empty]";
-                string w = GetDatabankFileNameWithPath(Program.databanks.GetFirst().aliasName);
-                string b = GetDatabankFileNameWithPath(Program.databanks.GetRef().aliasName);
+                string w = GetDatabankFileNameWithPath(Program.databanks.GetFirst().name);
+                string b = GetDatabankFileNameWithPath(Program.databanks.GetRef().name);
                 if (w != null) originalDataFileWork = w;
                 if (b != null) originalDataFileBaseline = b;
                 string banks1 = "";
@@ -6992,7 +6992,7 @@ namespace Gekko
 
             }
 
-            Gui.gui.toolStripStatusLabel1.ToolTipText = "Period: " + f + " " + start + "-" + end + G.NL + "First: " + GetDatabankFileNameWithPath(Program.databanks.GetFirst().aliasName) + G.NL + "" + Globals.Ref + ": " + GetDatabankFileNameWithPath(Program.databanks.GetRef().aliasName) + G.NL + "Working folder: " + Program.options.folder_working + G.NL + "Mode: " + Program.options.interface_mode;
+            Gui.gui.toolStripStatusLabel1.ToolTipText = "Period: " + f + " " + start + "-" + end + G.NL + "First: " + GetDatabankFileNameWithPath(Program.databanks.GetFirst().name) + G.NL + "" + Globals.Ref + ": " + GetDatabankFileNameWithPath(Program.databanks.GetRef().name) + G.NL + "Working folder: " + Program.options.folder_working + G.NL + "Mode: " + Program.options.interface_mode;
 
             if (Globals.workerThread != null)
             {
@@ -8668,7 +8668,7 @@ namespace Gekko
                                 }
                                 db.AddVariable(ts);
                                 if (first) G.Writeln();
-                                G.Writeln("Adjusted timeseries: " + db.aliasName + ":" + varName);
+                                G.Writeln("Adjusted timeseries: " + db.name + ":" + varName);
                                 first = false;
                             }
                         }
@@ -10090,7 +10090,7 @@ namespace Gekko
 
                 string tpe2 = "";
                 if (tpe != null) tpe2 = " " + tpe.ToUpper();
-                G.Writeln2(db.aliasName + " databank: " + counter + tpe2 + " scalar(s) found");
+                G.Writeln2(db.name + " databank: " + counter + tpe2 + " scalar(s) found");
                 foreach (string s in tab.Print()) G.Writeln(s);
             }
             if (!foundSomething)
@@ -11350,7 +11350,7 @@ namespace Gekko
             if (split.Length == 1)
             {
                 if (type == EExtrackBankAndRest.OnlyStringNoFirstName) h.bank = null;  //so that we can see that the name is not explicitly indicated
-                else h.bank = Program.databanks.GetFirst().aliasName;
+                else h.bank = Program.databanks.GetFirst().name;
                 h.name = split[0].Trim();
             }
             else if (split.Length == 2)
@@ -11358,11 +11358,11 @@ namespace Gekko
                 h.bank = split[0].Trim();
                 if (h.bank == Globals.firstCheatString)
                 {
-                    h.bank = Program.databanks.GetFirst().aliasName;
+                    h.bank = Program.databanks.GetFirst().name;
                 }
                 else if (h.bank == "@")
                 {
-                    h.bank = Program.databanks.GetRef().aliasName;
+                    h.bank = Program.databanks.GetRef().name;
                     h.hasColon = true;
                 }
                 else
@@ -13657,7 +13657,7 @@ namespace Gekko
                 }
 
                 string var = ts.name;
-                string bank = ts.meta.parentDatabank.aliasName;
+                string bank = ts.meta.parentDatabank.name;
 
                 if (ts.type == ESeriesType.ArraySuper)
                 {
@@ -14093,7 +14093,7 @@ namespace Gekko
         {
             if (text.EndsWith(";")) text = text.Substring(0, text.Length - 1);  //Should be HDG 'text'; fixing it here
             Program.databanks.GetFirst().info1 = text;
-            G.Writeln2("Databank heading for '" + Program.databanks.GetFirst().aliasName + "' databank set to: '" + text + "'");
+            G.Writeln2("Databank heading for '" + Program.databanks.GetFirst().name + "' databank set to: '" + text + "'");
         }
 
         public static void Checkoff(List<string> vars2, string type)
@@ -15327,7 +15327,7 @@ namespace Gekko
                         bank.RemoveVariable(s);
                     }
                 }
-                G.Writeln2("Removed " + onlyDatabankNotModel.Count + " variable(s) in '" + bank.aliasName + "' databank");
+                G.Writeln2("Removed " + onlyDatabankNotModel.Count + " variable(s) in '" + bank.name + "' databank");
             }
         }
 
@@ -17490,7 +17490,7 @@ namespace Gekko
                 //NB: This check is here, to avoid having to do it for each timeseries later on.
                 //    The data is written in a special (fast) way that does not get checked automatically regarding
                 //    dirty and protect, cf. //#98726527
-                G.Writeln2("*** ERROR: You are trying to simulate with a first-position databank ('" + work.aliasName + "') that is non-editable");
+                G.Writeln2("*** ERROR: You are trying to simulate with a first-position databank ('" + work.name + "') that is non-editable");
                 throw new GekkoException();
             }
             DateTime dt4 = DateTime.Now;
@@ -18359,7 +18359,7 @@ namespace Gekko
 
                     if (!db.ContainsVariable(var))
                     {
-                        G.Writeln2("*** ERROR: UPDPRT: Variable '" + var + "' not found in '" + db.aliasName + "' databank");
+                        G.Writeln2("*** ERROR: UPDPRT: Variable '" + var + "' not found in '" + db.name + "' databank");
                         throw new GekkoException();
                     }
 
@@ -19220,7 +19220,7 @@ namespace Gekko
                 {
                     if (databank.fileHash == Globals.brandNewFile)
                     {
-                        G.Writeln2("Databank " + databank.aliasName + " is empty and hence not written");
+                        G.Writeln2("Databank " + databank.name + " is empty and hence not written");
                         return 0;
                     }
                     else
@@ -19303,7 +19303,7 @@ namespace Gekko
                         IVariable xx = db.GetIVariable(var.name);
                         if (xx == null)
                         {
-                            G.Writeln2("*** ERROR: Could not find variable '" + var + "' in databank '" + db.aliasName + "' for writing (" + Globals.extensionDatabank + ")");
+                            G.Writeln2("*** ERROR: Could not find variable '" + var + "' in databank '" + db.name + "' for writing (" + Globals.extensionDatabank + ")");
                             throw new GekkoException();
                         }
                         if (databankWithFewerVariables.ContainsKey(var.name))
@@ -20032,7 +20032,7 @@ namespace Gekko
                     if (ts == null)
                     {
                         //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
-                        G.Writeln2("*** ERROR: Writing csv file: variable " + s3 + " in bank '" + db.aliasName + "' with freq '" + Program.options.freq + "' does not exist");
+                        G.Writeln2("*** ERROR: Writing csv file: variable " + s3 + " in bank '" + db.name + "' with freq '" + Program.options.freq + "' does not exist");
                         throw new GekkoException();
                     }
 
@@ -20174,7 +20174,7 @@ namespace Gekko
                     Series ts = db.GetVariable(s3);
                     if (ts == null)
                     {
-                        G.Writeln2("*** ERROR: Writing gnuplot file: variable " + s3 + " in '" + db.aliasName + "' with freq '" + Program.options.freq + "' does not exist");
+                        G.Writeln2("*** ERROR: Writing gnuplot file: variable " + s3 + " in '" + db.name + "' with freq '" + Program.options.freq + "' does not exist");
                         throw new GekkoException();
                     }
                     file.Write(G.varFormat(s3, prnWidth));  //prn and gnuplot
@@ -20368,29 +20368,29 @@ namespace Gekko
 
                 Databank db1 = Program.databanks.GetDatabank(o.name);
                 db1.Clear();
-                if (db1.aliasName == Globals.Work || db1.aliasName == Globals.Ref) db1.FileNameWithPath = null;
+                if (db1.name == Globals.Work || db1.name == Globals.Ref) db1.FileNameWithPath = null;
                 G.Writeln2("Cleared databank: " + o.name);
             }
             if (G.Equal(o.opt_first, "yes"))
             {
                 Program.databanks.GetFirst().Clear();
-                if (Program.databanks.GetFirst().aliasName == Globals.Work || Program.databanks.GetFirst().aliasName == Globals.Ref) Program.databanks.GetFirst().FileNameWithPath = null;
-                G.Writeln2("Cleared first databank ('" + Program.databanks.GetFirst().aliasName + "')");
+                if (Program.databanks.GetFirst().name == Globals.Work || Program.databanks.GetFirst().name == Globals.Ref) Program.databanks.GetFirst().FileNameWithPath = null;
+                G.Writeln2("Cleared first databank ('" + Program.databanks.GetFirst().name + "')");
             }
             if (G.Equal(o.opt_ref, "yes"))
             {
                 Program.databanks.GetRef().Clear();
-                if (Program.databanks.GetRef().aliasName == Globals.Work || Program.databanks.GetRef().aliasName == Globals.Ref) Program.databanks.GetRef().FileNameWithPath = null;
-                G.Writeln2("Cleared ref databank ('" + Program.databanks.GetRef().aliasName + "')");
+                if (Program.databanks.GetRef().name == Globals.Work || Program.databanks.GetRef().name == Globals.Ref) Program.databanks.GetRef().FileNameWithPath = null;
+                G.Writeln2("Cleared ref databank ('" + Program.databanks.GetRef().name + "')");
             }
             if (o.name == null && !G.Equal(o.opt_first, "yes") && !G.Equal(o.opt_ref, "yes"))
             {
                 //Before: Cleared 'Work' and 'Ref' regardless of position
                 Program.databanks.GetFirst().Clear();
                 Program.databanks.GetRef().Clear();
-                if (Program.databanks.GetFirst().aliasName == Globals.Work || Program.databanks.GetFirst().aliasName == Globals.Ref) Program.databanks.GetFirst().FileNameWithPath = null;
-                if (Program.databanks.GetRef().aliasName == Globals.Work || Program.databanks.GetRef().aliasName == Globals.Ref) Program.databanks.GetRef().FileNameWithPath = null;
-                G.Writeln2("Cleared first and ref databanks ('" + Program.databanks.GetFirst().aliasName + "' and '" + Program.databanks.GetRef().aliasName + "')");
+                if (Program.databanks.GetFirst().name == Globals.Work || Program.databanks.GetFirst().name == Globals.Ref) Program.databanks.GetFirst().FileNameWithPath = null;
+                if (Program.databanks.GetRef().name == Globals.Work || Program.databanks.GetRef().name == Globals.Ref) Program.databanks.GetRef().FileNameWithPath = null;
+                G.Writeln2("Cleared first and ref databanks ('" + Program.databanks.GetFirst().name + "' and '" + Program.databanks.GetRef().name + "')");
             }
         }
 
@@ -20401,7 +20401,7 @@ namespace Gekko
             {
                 if (removed.save == false)
                 {
-                    G.Writeln2("Databank '" + removed.aliasName + "' closed, changes not written to file");
+                    G.Writeln2("Databank '" + removed.name + "' closed, changes not written to file");
                 }
                 else if (removed.protect)
                 {
@@ -20656,8 +20656,8 @@ namespace Gekko
             for (int i = 0; i < Program.databanks.storage.Count; i++)
             {
                 //The avoids creating new databanks, better to keep the original ones and switch their places.
-                if (G.Equal(Program.databanks.storage[i].aliasName, Globals.Work)) w = i;
-                else if (G.Equal(Program.databanks.storage[i].aliasName, Globals.Ref)) b = i;
+                if (G.Equal(Program.databanks.storage[i].name, Globals.Work)) w = i;
+                else if (G.Equal(Program.databanks.storage[i].name, Globals.Ref)) b = i;
                 else
                 {
                     MaybeWriteOpenDatabank(Program.databanks.storage[i]);
@@ -20674,7 +20674,7 @@ namespace Gekko
             GekkoTime tEnd = GekkoTime.tNull;            
             if (!removed.FileNameWithPath.EndsWith("." + Globals.extensionDatabank + ""))
             {                
-                G.Writeln2("*** ERROR: The databank '" + removed.aliasName + "' was opened with the OPEN command.");
+                G.Writeln2("*** ERROR: The databank '" + removed.name + "' was opened with the OPEN command.");
                 G.Writeln("           It has been altered, but the changes cannot be written back to the", Color.Red);
                 G.Writeln("           underlying databank file, since this file is not a ." + Globals.extensionDatabank + " file.", Color.Red);
                 G.Writeln("           (If the databank was opened with OPEN<edit>, you may use WRITE to write the ", Color.Red);
@@ -20692,7 +20692,7 @@ namespace Gekko
                 {
                     if (File.Exists(removed.FileNameWithPath))
                     {
-                        MessageBox.Show("*** ERROR: The databank '" + removed.aliasName + "' did not exist when opening it,\nbut seems to exist as a file now. \nHence, Gekko cannot write the databank to file -- \nplease consider to run your code again.");
+                        MessageBox.Show("*** ERROR: The databank '" + removed.name + "' did not exist when opening it,\nbut seems to exist as a file now. \nHence, Gekko cannot write the databank to file -- \nplease consider to run your code again.");
                         skipWrite = true;
                     }
                 }
@@ -20701,7 +20701,7 @@ namespace Gekko
                     string trueFileHash = Program.GetMD5Hash(GetTextFromFileWithWait(removed.FileNameWithPath));
                     if (!(trueFileHash == removed.fileHash))
                     {
-                        MessageBox.Show("*** ERROR: The databank '" + removed.aliasName + "' seems to have been altered since opening it. \nHence, Gekko cannot write the databank to file -- \nplease consider to run your code again.");
+                        MessageBox.Show("*** ERROR: The databank '" + removed.name + "' seems to have been altered since opening it. \nHence, Gekko cannot write the databank to file -- \nplease consider to run your code again.");
                         skipWrite = true;
                     }
                 }
@@ -21952,12 +21952,12 @@ namespace Gekko
                             Series tsGrund = base2.GetVariable(tsString);
                             if (ts == null)
                             {
-                                G.Writeln("+++ WARNING: variable '" + tsString + "' not found in " + work.aliasName + " databank");
+                                G.Writeln("+++ WARNING: variable '" + tsString + "' not found in " + work.name + " databank");
                                 continue;
                             }
                             if (tsGrund == null)
                             {
-                                G.Writeln("+++ WARNING: variable '" + tsString + "' not found in " + base2.aliasName + " databank");
+                                G.Writeln("+++ WARNING: variable '" + tsString + "' not found in " + base2.name + " databank");
                                 continue;
                             }
 
@@ -22226,7 +22226,7 @@ namespace Gekko
                     {
                         if (usedInCreateCommand && Program.options.databank_create_message)
                         {
-                            G.Writeln2("+++ WARNING: CREATE: variable " + db.aliasName + ":" + ts.name + " already exists");
+                            G.Writeln2("+++ WARNING: CREATE: variable " + db.name + ":" + ts.name + " already exists");
                         }
                     }
                 }
@@ -22261,7 +22261,7 @@ namespace Gekko
             Series ts0 = databank0.GetVariable(eFreq0, name0);
             if (ts0 == null)
             {
-                G.Writeln2("*** ERROR: Could not find variable '" + name0 + "' with frequency '" + eFreq0 + "' in '" + databank0.aliasName + "' databank");
+                G.Writeln2("*** ERROR: Could not find variable '" + name0 + "' with frequency '" + eFreq0 + "' in '" + databank0.name + "' databank");
                 throw new GekkoException();
             }
 
@@ -22405,7 +22405,7 @@ namespace Gekko
             Series ts0 = databank0.GetVariable(eFreq0, name0);
             if (ts0 == null)
             {
-                G.Writeln2("*** ERROR: Could not find variable '" + name0 + "' with frequency '" + eFreq0 + "' in '" + databank0.aliasName + "' databank");
+                G.Writeln2("*** ERROR: Could not find variable '" + name0 + "' with frequency '" + eFreq0 + "' in '" + databank0.name + "' databank");
                 throw new GekkoException();
             }
 
@@ -23330,6 +23330,93 @@ namespace Gekko
 
             string type = "print";
             if (G.Equal(oPrt.prtType, "plot")) type = "plot";
+
+            bool nonSeries = true;
+            if (type == "print")
+            {
+                //check if elements are non-series, or lists with non-series
+                foreach (O.Prt.Element element in oPrt.prtElements)
+                {
+                    if (element.variable[0] == null || element.variable[1] != null || element.variable[0].Type() == EVariableType.Series)
+                    {
+                        nonSeries = false; goto Label;
+                    }
+                    
+                    List temp = element.variable[0] as List;
+                    if (temp != null)
+                    {
+                        foreach (IVariable iv in temp.list)
+                        {
+                            if (iv.Type() == EVariableType.Series)
+                            {
+                                nonSeries = false; goto Label;
+                            }
+                        }
+                    }
+                }
+            }
+            Label: if (nonSeries)
+            {
+                foreach (O.Prt.Element element in oPrt.prtElements)
+                {
+                    IVariable var = element.variable[0];
+                    List temp = var as List;
+                    if (temp != null)
+                    {
+                        string s = null;
+                        foreach (IVariable iv in temp.list)
+                        {
+                            if (iv.Type() == EVariableType.String)
+                            {
+                                s += ((ScalarString)iv).string2 + ", ";
+                            }
+                            else if (iv.Type() == EVariableType.Date)
+                            {
+                                s += ((ScalarDate)iv).date.ToString() + ", ";
+                            }
+                            else if (iv.Type() == EVariableType.Val)
+                            {
+                                s += ((ScalarVal)iv).val.ToString() + ", ";
+                            }
+                            else
+                            {
+                                s += "[" + iv.Type().ToString() + "]" + ", ";
+                            }
+                        }
+                        s = s.Substring(0, s.Length - ", ".Length);
+                        G.Writeln2(element.label);
+                        G.Writeln(s);
+                    }
+                    else
+                    {
+                        if (var.Type() == EVariableType.Matrix)
+                        {
+                            Program.ShowMatrix((Matrix)var, element.label);
+                        }
+                        else if (var.Type() == EVariableType.String)
+                        {
+                            G.Writeln2(element.label);
+                            G.Writeln(((ScalarString)var).string2);
+                        }
+                        else if (var.Type() == EVariableType.Val)
+                        {
+                            G.Writeln2(element.label);
+                            G.Writeln(((ScalarVal)var).val.ToString());
+                        }
+                        else if (var.Type() == EVariableType.Date)
+                        {
+                            G.Writeln2(element.label);
+                            G.Writeln(((ScalarDate)var).date.ToString());
+                        }
+                        else if (var.Type() == EVariableType.Map)
+                        {
+                            G.Writeln2(element.label);
+                            G.Writeln("MAP printing not implemented yet");
+                        }
+                    }
+                    return;
+                }
+            }
 
             List<O.Prt.Element> container = new List<O.Prt.Element>();
 
@@ -26703,7 +26790,7 @@ namespace Gekko
 
         public static EMissingType CheckVariableExistence(List<string> variablesLabelsForPrtCommand, List<Dictionary<string, string>> precedents, bool isMultiplier, bool isCalledFromGenr, bool isBaseline, bool isCalledFromTable)
         {
-            if (!(G.Equal(Program.databanks.GetFirst().aliasName, Globals.Work) && G.Equal(Program.databanks.GetRef().aliasName, Globals.Ref)))
+            if (!(G.Equal(Program.databanks.GetFirst().name, Globals.Work) && G.Equal(Program.databanks.GetRef().name, Globals.Ref)))
             {
                 G.Writeln2("*** ERROR: Please use Work and " + Globals.Ref + " as first and reference databanks");
                 throw new GekkoException();
@@ -33929,7 +34016,7 @@ namespace Gekko
                     onlyWork.Sort(StringComparer.InvariantCulture);
                     onlyGrund.Sort(StringComparer.InvariantCulture);
 
-                    samFile.WriteLine("Comparing first-position (" + GetDatabankFileNameWithPath(Program.databanks.GetFirst().aliasName) + ") and reference (" + GetDatabankFileNameWithPath(Program.databanks.GetRef().aliasName) + ") databanks");
+                    samFile.WriteLine("Comparing first-position (" + GetDatabankFileNameWithPath(Program.databanks.GetFirst().name) + ") and reference (" + GetDatabankFileNameWithPath(Program.databanks.GetRef().name) + ") databanks");
                     samFile.WriteLine();
                     samFile.WriteLine("There are the following " + both.Count + " variables in both banks:");
                     G.PrintListWithCommasToFile(samFile, both);

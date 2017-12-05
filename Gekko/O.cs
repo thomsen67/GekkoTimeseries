@@ -187,7 +187,7 @@ namespace Gekko
                 int u = 0;
                 if (bank.storage.Count == 0)
                 {
-                    G.Writeln2("Databank " + bank.aliasName + " is empty");
+                    G.Writeln2("Databank " + bank.name + " is empty");
                     continue;
                 }
                 foreach (Series ts in bank.storage.Values)
@@ -197,7 +197,7 @@ namespace Gekko
                     else if (ts.freq == EFreq.Monthly) m++;
                     else if (ts.freq == EFreq.Undated) u++;
                 }
-                G.Writeln2("Databank " + bank.aliasName + ":");
+                G.Writeln2("Databank " + bank.name + ":");
                 if (a > 0) G.Writeln("  " + a + " annual timeseries");
                 if (q > 0) G.Writeln("  " + q + " quarterly timeseries");
                 if (m > 0) G.Writeln("  " + m + " monthly timeseries");
@@ -842,7 +842,7 @@ namespace Gekko
                             rv = Program.databanks.GetFirst().GetIVariable(varnameWithFreq);
                             if (rv == null && errorIfNotFound)
                             {
-                                G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in the first-position databank ('" + Program.databanks.GetFirst().aliasName + "')");
+                                G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in the first-position databank ('" + Program.databanks.GetFirst().name + "')");
                                 throw new GekkoException();
                             }
                         }
@@ -2706,11 +2706,11 @@ namespace Gekko
             ExtractBankAndRestHelper h = Program.ExtractBankAndRest(originalName, EExtrackBankAndRest.OnlyStrings);
             if (h.bank == Globals.firstCheatString)
             {
-                h.bank = Program.databanks.GetFirst().aliasName;
+                h.bank = Program.databanks.GetFirst().name;
             }
             if (bankNumber == 2)
             {
-                h.bank = Program.databanks.GetRef().aliasName;  //overrides the bank name given
+                h.bank = Program.databanks.GetRef().name;  //overrides the bank name given
                 h.hasColon = true;  //signals later on that this bank is explicitely given, so we cannot search for the timeseries
             }
             Series ts = Program.FindOrCreateTimeseries(h.bank, h.name, canAutoCreate, h.hasColon, false);
@@ -4102,11 +4102,11 @@ namespace Gekko
 
                 if (G.Equal(opt_ref, "yes"))
                 {
-                    readInfo.dbName = Program.databanks.GetRef().aliasName;
+                    readInfo.dbName = Program.databanks.GetRef().name;
                 }
                 else
                 {
-                    readInfo.dbName = Program.databanks.GetFirst().aliasName;
+                    readInfo.dbName = Program.databanks.GetFirst().name;
                 }                
 
                 if (isTo)
@@ -4347,7 +4347,7 @@ namespace Gekko
                 Databank first = Program.databanks.GetFirst();
                 int number = first.storage.Count;
                 G.Writeln();
-                G.Writeln("Cleared reference databank ('" + Program.databanks.GetRef().aliasName + "') and copied " + number + " variables from first-position ('" + Program.databanks.GetFirst().aliasName + "') to reference ('" + Program.databanks.GetRef().aliasName + "') databank");
+                G.Writeln("Cleared reference databank ('" + Program.databanks.GetRef().name + "') and copied " + number + " variables from first-position ('" + Program.databanks.GetFirst().name + "') to reference ('" + Program.databanks.GetRef().name + "') databank");
                 if (G.Equal(Program.options.interface_mode, "data"))
                 {
                     G.Writeln2("+++ WARNING: CLONE is not intended for data-mode (cf. MODE)");
@@ -4974,11 +4974,11 @@ namespace Gekko
                     {
                         foreach (Databank db in Program.databanks.storage)
                         {
-                            if (G.Equal(db.aliasName, Globals.Work) || G.Equal(db.aliasName, Globals.Ref))
+                            if (G.Equal(db.name, Globals.Work) || G.Equal(db.name, Globals.Ref))
                             {
                                 //skip it
                             }
-                            else databanks.Add(db.aliasName);
+                            else databanks.Add(db.name);
                         }
                     }
                     else
@@ -5432,7 +5432,7 @@ namespace Gekko
                         ExtractBankAndRestHelper h = Program.ExtractBankAndRest(ss, EExtrackBankAndRest.GetDatabank);
 
                         string bankName2 = null;
-                        if (localOptionToBank != null) bankName2 = localOptionToBank.aliasName;
+                        if (localOptionToBank != null) bankName2 = localOptionToBank.name;
                         string toBankName = Program.PerhapsOverrideWithDefaultBankName(bankName2, h.hasColon, h.bank);
                         toBank = Program.databanks.GetDatabank(toBankName);
                         if (toBank == null)
@@ -5447,7 +5447,7 @@ namespace Gekko
                     //We use the .aliasName here. Actually could use h.bank from above
 
                     string bankName = null;
-                    if (localOptionFromBank != null) bankName = localOptionFromBank.aliasName;
+                    if (localOptionFromBank != null) bankName = localOptionFromBank.name;
 
                     bool ignoreErrors = false; if (G.Equal(opt_error, "no")) ignoreErrors = true;
 
@@ -5509,11 +5509,11 @@ namespace Gekko
                             Series ts2 = toBank.GetVariable(newName);
                             if (ts2 != null)
                             {
-                                if (G.Equal(ts.meta.parentDatabank.aliasName, ts2.meta.parentDatabank.aliasName))
+                                if (G.Equal(ts.meta.parentDatabank.name, ts2.meta.parentDatabank.name))
                                 {
                                     if (G.Equal(ts.name, ts2.name))
                                     {
-                                        G.Writeln2("*** ERROR: You are trying to copy the timeseries '" + ts.name + "' from databank '" + ts.meta.parentDatabank.aliasName + "' to itself");
+                                        G.Writeln2("*** ERROR: You are trying to copy the timeseries '" + ts.name + "' from databank '" + ts.meta.parentDatabank.name + "' to itself");
                                         throw new GekkoException();
                                     }
                                 }
@@ -5696,7 +5696,7 @@ namespace Gekko
                         //There is probably always only 1 here
                         if (ts.meta.parentDatabank.ContainsVariable(s2))
                         {
-                            G.Writeln2("*** ERROR: Databank " + ts.meta.parentDatabank.aliasName + " already contains timeseries '" + s2 + "'");
+                            G.Writeln2("*** ERROR: Databank " + ts.meta.parentDatabank.name + " already contains timeseries '" + s2 + "'");
                             throw new GekkoException();
                         }
                         ts.meta.parentDatabank.RemoveVariable(ts.name);                        

@@ -4804,6 +4804,7 @@ namespace Gekko.Parser.Gek
             //x[2000] = 5
             //x['a'] = 5
             //x['a'][2000] = 5
+            //x['a'][2000] $ (2 == 3) = 5
             //Could be for instance:
             //ASTASSIGNMENT
             //  ASTLEFTSIDE
@@ -4815,6 +4816,7 @@ namespace Gekko.Parser.Gek
             bool isLeftSideVariable = true;
             if (node.Number != 0)
             {
+                //is also ok regarding ASTDOLLAR
                 isLeftSideVariable = false;
             }
             else
@@ -4825,12 +4827,17 @@ namespace Gekko.Parser.Gek
                     if (parent == null) break;  //just for ultra safety, will not happen
                     if (parent.Number != 0)
                     {
+                        //is also ok regarding ASTDOLLAR
                         isLeftSideVariable = false;
                         break;
                     }
                     if (parent.Text == "ASTDOTORINDEXER")
                     {
-                        //ok
+                        //ok, keep going
+                    }
+                    else if (parent.Text == "ASTDOLLAR")
+                    {
+                        //ok, keep going
                     }
                     else if (parent.Text == "ASTLEFTSIDE")
                     {

@@ -28,12 +28,11 @@ namespace Gekko
     public class Databank : IBank
     {
 
-
         //Note the .isDirty field, so methods that change anything must set isDirty = true!
         //Remember new fields in Clear() method and also in G.CloneDatabank()        
         [ProtoMember(1)]
         public GekkoDictionary<string, IVariable> storage;
-        public string aliasName = null;
+        public string name = null;
         private string fileNameWithPath = null;  //will be constructed when reading: do not protobuf it        
         public string FileNameWithPath
         {
@@ -48,7 +47,7 @@ namespace Gekko
             }
             set
             {
-                if (G.Equal(this.aliasName, Globals.Work) || G.Equal(this.aliasName, Globals.Ref))
+                if (G.Equal(this.name, Globals.Work) || G.Equal(this.name, Globals.Ref))
                 {
                     this.fileNameWithPath = value;  //overwrite filename with latest bank read or merged into Work/Ref
                 }
@@ -87,20 +86,16 @@ namespace Gekko
         public Databank(string name)
         {
             this.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
-            this.aliasName = name;            
+            this.name = name;            
         }
 
         public void Clear() {
-            if (this.protect) Program.ProtectError("You cannot clear a non-editable databank, see OPEN<edit> or UNLOCK");
-            //aliasName = null; --> keep that name when clearing
-            //fileNameWithPath = null;  --> keep that name when clearing
+            if (this.protect) Program.ProtectError("You cannot clear a non-editable databank, see OPEN<edit> or UNLOCK");            
             yearStart = -12345;
             yearEnd = -12345;
             info1 = null;
             date = null;
-            this.storage.Clear();
-            //this.fileNameWithPath = null;  --> NO! This would be ok regarding READ, but not regarding OPEN<edit/first> for instance --> we need a bank to write back to!
-            //this.readInfo = null;  //must be ok to remove, just contains stuff for printing --> but let us keep it for ultra safety for now
+            this.storage.Clear();            
             this.isDirty = true;
         }
 
@@ -163,8 +158,7 @@ namespace Gekko
             {
                 iv.DeepTrim();
             }
-            G.WritelnGray("TRIM: " + G.Seconds(t0));
-            //This does not change the databank, so this.hasBeenChanged is not touched!!
+            G.WritelnGray("TRIM: " + G.Seconds(t0));            
         }
 
         public IVariable GetIVariable(string variable)
@@ -172,18 +166,7 @@ namespace Gekko
             IVariable iv = null;
             this.storage.TryGetValue(variable, out iv);
             return iv;
-        }
-
-        public void AddIVariable(IVariable x)
-        {
-            //Series ts = x as Series;
-            //if (ts != null) AddIVariable(ts.name, x);
-            //else
-            //{
-            //    G.Writeln2("***ERROR: Internal error: please use AddIvariable(name, x)");
-            //    throw new GekkoException();
-            //}
-        }
+        }        
 
         public void AddIVariableWithOverwrite(string name, IVariable x)
         {
@@ -237,7 +220,6 @@ namespace Gekko
             }
             this.storage.Add(name, x);
         }
-
         
 
         public void RemoveIVariable(string name)
@@ -252,7 +234,7 @@ namespace Gekko
 
         public string Message()
         {
-            return "databank " + "'" + this.aliasName + "'";
+            return "databank " + "'" + this.name + "'";
         }
 
         //OLD OLD OLD

@@ -110,7 +110,7 @@ namespace Gekko
             List<string> banks2 = new List<string>();            
             foreach (Databank db in Program.databanks.storage)
             {                
-                banks2.Add(db.aliasName);            
+                banks2.Add(db.name);            
             }
 
             for (int i = 0; i < banks2.Count; i++)
@@ -119,7 +119,7 @@ namespace Gekko
                 Databank databank = Program.databanks.GetDatabank(s);
                 if (i == 1)
                 {
-                    if (G.Equal(databank.aliasName, Globals.Ref))
+                    if (G.Equal(databank.name, Globals.Ref))
                     {
                         if (databank.storage.Count == 0) continue; //skip it, so that Ref is not shown in the list when it is empty
                     }
@@ -205,23 +205,23 @@ namespace Gekko
                 Program.databanks.storage[lowerIdx] = higher;
                 Program.databanks.storage[higherIdx] = lower;
                 //remember that higher is at lowerIdx and vice versa!
-                if ((lowerIdx == 0 || lowerIdx == 1) && !(G.Equal(higher.aliasName, Globals.Work) || G.Equal(higher.aliasName, Globals.Ref)))
+                if ((lowerIdx == 0 || lowerIdx == 1) && !(G.Equal(higher.name, Globals.Work) || G.Equal(higher.name, Globals.Ref)))
                 {
                     if (!higher.protect)
                     {
                         higher.protect = true;
-                        s += "Note that the databank '" + higher.aliasName + "' has been set non-editable. ";
+                        s += "Note that the databank '" + higher.name + "' has been set non-editable. ";
                         list[lowerIdx].Prot = Globals.protectSymbol;
                     }
                     
                 }
                 //remember that higher is at lowerIdx and vice versa!
-                if ((higherIdx == 0 || higherIdx == 1) && !(G.Equal(lower.aliasName, Globals.Work) || G.Equal(lower.aliasName, Globals.Ref)))
+                if ((higherIdx == 0 || higherIdx == 1) && !(G.Equal(lower.name, Globals.Work) || G.Equal(lower.name, Globals.Ref)))
                 {
                     if (!lower.protect)
                     {
                         lower.protect = true;
-                        s += "Note that the databank '" + lower.aliasName + "' has been set non-editable. ";
+                        s += "Note that the databank '" + lower.name + "' has been set non-editable. ";
                         list[higherIdx].Prot = Globals.protectSymbol;
                     }                    
                 }

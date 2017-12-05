@@ -132,7 +132,7 @@ namespace Gekko
             
             int allCounter = 0;
 
-            string databankName = databank.aliasName;
+            string databankName = databank.name;
 
             if (!oRead.Merge)
             {

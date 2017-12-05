@@ -1470,7 +1470,7 @@ namespace Gekko
                 if (this.dimensionsStorage == null)
                 {
                     string txt = null; foreach (string ss in keys) txt += "'" + ss + "', ";
-                    G.Writeln2("*** ERROR: The variable '" + this.meta.parentDatabank.aliasName + ":" + this.name + "' is not an array-timeseries.");
+                    G.Writeln2("*** ERROR: The variable '" + this.meta.parentDatabank.name + ":" + this.name + "' is not an array-timeseries.");
                     G.Writeln("           Indexer used: [" + txt.Substring(0, txt.Length - 2) + "]", Color.Red);
                     G.Writeln("           You may use '" + this.name + " = series(" + keys.Length + ");' to create it,", Color.Red);
                     G.Writeln("           perhaps with 'CREATE " + this.name + ";' first.", Color.Red);
@@ -1529,57 +1529,8 @@ namespace Gekko
 
             return ts;
         }
-
+               
         
-
-        private Series FindArrayTimeSeriesOLDDELETE(IVariable[] indexes, bool isLhs)
-        {
-            Series ts = null;
-            int stringCount = 0;
-            foreach (IVariable iv in indexes)
-            {
-                if (iv.Type() == EVariableType.String)
-                {
-                    stringCount++;
-                }
-            }
-            if (indexes.Length == stringCount)
-            {
-                string s = G.RemoveFreqIndicator(this.name);
-                if (true)
-                {
-                    string hash = GetHashCodeFromIvariables(indexes);
-                    string varname = s + Globals.symbolTurtle + hash + Globals.freqIndicator + G.GetFreq(this.freq);
-                    ts = this.meta.parentDatabank.GetIVariable(varname) as Series;  //should not be able to return null, since no-sigil name is timeseries                    
-                    if (ts == null)
-                    {
-                        if (!isLhs)
-                        {
-                            G.Writeln2("*** ERROR: Could not find " + G.PrettifyTimeseriesHash(varname, true, false));
-                            throw new GekkoException();
-                        }
-                        else
-                        {
-                            ts = new Series(this.freq, varname);
-                            this.meta.parentDatabank.AddIVariable(ts);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                string s = null;
-                foreach (IVariable iv in indexes)
-                {
-                    s += iv.Type().ToString() + ", ";
-                }
-                G.Writeln2("*** ERROR: Series []-index with these argument types: " + s.Substring(0, s.Length - (", ").Length));
-                throw new GekkoException();
-            }
-
-            return ts;
-        }
-
         public static bool IsLagOrLead(int i)
         {
             return i > -100 && i < 100;
