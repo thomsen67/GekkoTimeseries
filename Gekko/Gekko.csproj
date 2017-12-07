@@ -175,6 +175,7 @@
     <Compile Include="Functions.cs" />
     <Compile Include="Gdxcs.cs" />
     <Compile Include="GekkoError.cs" />
+    <Compile Include="GekkoNull.cs" />
     <Compile Include="GekkoTime.cs" />
     <Compile Include="GekkoTuple.cs" />
     <Compile Include="GraphTemplate.cs" />

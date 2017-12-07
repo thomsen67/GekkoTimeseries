@@ -95,6 +95,7 @@ namespace Gekko
         public GekkoError gekkoError = null; //only set to something, if the sample .t0 to .t3 is too tight       
         public int gekkoErrorI = 0;
         public int bankNumber = 0;  //0 is inactive, 1 is Ref databank
+        public GekkoSmplCommand command = GekkoSmplCommand.Unknown;
 
         public GekkoSmpl()
         {
@@ -232,6 +233,13 @@ namespace Gekko
             Program.WaitForZipWrite(this.tempFolder, this.zipFileAndFolder);
             Program.DeleteFolder(this.tempFolder);
         }
+    }
+
+    public enum GekkoSmplCommand
+    {
+        Unfold,
+        Sum,      
+        Unknown
     }
 
     public enum EWriteType
@@ -23380,12 +23388,11 @@ namespace Gekko
                     int iPrintCode = -1;
                     foreach (string printCode in element.printCodesFinal)  //this may be two printcodes <n p>
                     {
+                        
                         iPrintCode++;
                         //after this, it should be x1<n>  x1<p>  x2<n>  x2<p>
 
                         O.Prt.Element c = new O.Prt.Element();
-
-
 
                         int width = -12345;
                         int dec = -12345;
@@ -23448,7 +23455,7 @@ namespace Gekko
                         }
 
                         //element-specific stuff
-                        if (element.dec != -12345) dec =element.dec;   //element-specific dec overrides!
+                        if (element.dec != -12345) dec = element.dec;   //element-specific dec overrides!
                         if (isPchType)
                         {
                             //overrides ph.dec if given
@@ -23465,7 +23472,8 @@ namespace Gekko
                             c.widthFinal = 20;
                             c.decFinal = 14;
                         }
-                        else {
+                        else
+                        {
                             c.widthFinal = width;
                             c.decFinal = dec;
                         }
@@ -23483,6 +23491,13 @@ namespace Gekko
                         else c.variable[0] = element.variable[0];
                         if (xx1 != null) c.variable[1] = xx1.list[i];
                         else c.variable[1] = element.variable[1];
+
+                        int bankCombi = GetBankCombi(printCode);
+                        if (bankCombi == 0 && c.variable[0].Type() == EVariableType.GekkoNull || bankCombi == 1 && c.variable[1].Type() == EVariableType.GekkoNull || bankCombi == 2 && (c.variable[0].Type() == EVariableType.GekkoNull || c.variable[1].Type() == EVariableType.GekkoNull))
+                        {
+                            //skip this column, probably a xx['something'] that is non-existing together with OPTION series array ignoremissing yes
+                            continue;
+                        }
 
                         Series temp0 = c.variable[0] as Series;
                         Series temp1 = c.variable[1] as Series;
@@ -23519,7 +23534,7 @@ namespace Gekko
 
                         int lines = -12345;
                         int widthHere = -12345;
-                       
+
                         if (type == "plot")
                         {
                             lines = 1;
@@ -23550,9 +23565,7 @@ namespace Gekko
                             if (iPrintCode == 0) ; //c.label = c.label + "  (" + printCode.ToLower() + ")";
                             else if (iPrintCode > 0) c.label2 = new string[] { "(" + printCode.ToLower() + ")" };
                         }
-
                         
-
                         container.Add(c);
                     }
                 }
@@ -23560,9 +23573,7 @@ namespace Gekko
 
             GekkoSmpl smpl = new GekkoSmpl(oPrt.t1, oPrt.t2);
             //Globals.globalPeriodTimeFilters2 = new List<GekkoTime> { new GekkoTime(EFreq.Monthly, 2003, 1), new GekkoTime(EFreq.Monthly, 2003, 2) };
-            
-            
-            
+                        
             //List inputList = x as List;  //will always be a list
             List inputList = null;            
 
@@ -23659,25 +23670,12 @@ namespace Gekko
                             printCode = cc.printCodeFinal;
                             label = cc.label2;
                         }                 
-
-                        //--------------------------------
-                        //TODO: make this depend upon printcode
-                        //--------------------------------
-                        int bankCombi = -12345;  //0: Work no Ref, 1: Ref no Work: 2: both
-                        //if (printCode == "n") bankCombi = 0;
-                        //else if (printCode == "p") bankCombi = 0;
-                        //else if (printCode == "m") bankCombi = 2;
-                        //else if (printCode == "q") bankCombi = 2;
-                        //else if (printCode == "r") bankCombi = 1;
-
-                        List<int>bankNumbers = O.Prt.GetBankNumbers(null, new List<string> { printCode });
-                        if (bankNumbers.Contains(0) && !bankNumbers.Contains(1)) bankCombi = 0;
-                        else if (bankNumbers.Contains(1) && !bankNumbers.Contains(0)) bankCombi = 1;
-                        else bankCombi = 2;
+                                                
+                        int bankCombi = GetBankCombi(printCode);
 
                         EFreq freqColumn = EFreq.None;
                         if (j > 1)
-                        {
+                        {                            
                             if (bankCombi == 0 && ivWork.Type() == EVariableType.Series) freqColumn = ((Series)ivWork).freq;
                             else if (bankCombi == 1 && ivRef.Type() == EVariableType.Series) freqColumn = ((Series)ivRef).freq;
                             else if (bankCombi == 2 && ivWork.Type() == EVariableType.Series) freqColumn = ((Series)ivWork).freq;
@@ -24396,7 +24394,7 @@ namespace Gekko
                 
                 if (type == "plot")
                 {
-                    CallGnuplotNew2(table, oPrt, containerExplode);
+                    CallGnuplotNew2(table, oPrt, containerExplode, freqs);
                 }
                 else
                 {
@@ -24524,12 +24522,7 @@ namespace Gekko
                             Matrix m = O.ConvertToMatrix(x);
                             Program.ShowMatrix(m, "label...");
                         }
-                        break;
-                    case EVariableType.GekkoError:
-                        {
-                            G.Writeln2("ERROR!");
-                        }
-                        break;
+                        break;                    
                     default:
                         {
                             G.Writeln2("*** ERROR: Assignment with unknown type");
@@ -24561,6 +24554,16 @@ namespace Gekko
 
             }
 
+        }
+
+        private static int GetBankCombi(string printCode)
+        {
+            int bankCombi = -12345;
+            List<int> bankNumbers = O.Prt.GetBankNumbers(null, new List<string> { printCode });
+            if (bankNumbers.Contains(0) && !bankNumbers.Contains(1)) bankCombi = 0;
+            else if (bankNumbers.Contains(1) && !bankNumbers.Contains(0)) bankCombi = 1;
+            else bankCombi = 2;
+            return bankCombi;
         }
 
         private static void NonSeriesHandling(O.Prt oPrt)
@@ -27597,13 +27600,18 @@ namespace Gekko
                 o.guiGraphRefreshingFilename = emfName;
             }
         }
-        
 
-        private static void CallGnuplotNew2(Table data, O.Prt o, List<O.Prt.Element> containerExplode)
+
+        private static void CallGnuplotNew2(Table data, O.Prt o, List<O.Prt.Element> containerExplode, bool[] freqs)
         {
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
 
+            EFreq highestFreq = EFreq.Annual;
+            if (freqs[0]) highestFreq = EFreq.Annual;
+            if (freqs[1]) highestFreq = EFreq.Quarterly;
+            if (freqs[2]) highestFreq = EFreq.Monthly;
+                        
             string extension = "emf";
             if (o.opt_filename != null)
             {
@@ -27627,7 +27635,7 @@ namespace Gekko
             bool firstXLabelFix = true;
 
             bool isInside = false;  //corresponds to at
-            if (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)
+            if (highestFreq == EFreq.Annual || highestFreq == EFreq.Undated)
             {
                 //annual
                 if (G.Equal(Program.options.plot_xlabels_annual, "between")) isInside = true;
@@ -27906,7 +27914,7 @@ namespace Gekko
                 labelsNonBroken.Add(label);
             }
 
-            string discard = PlotHandleLines(true, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside);
+            string discard = PlotHandleLines(true, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside, highestFreq);
             
             StringBuilder txt = new StringBuilder();
                         
@@ -28025,7 +28033,7 @@ namespace Gekko
             if (set_y2range.Trim() != ":") txt.AppendLine("set y2range [" + set_y2range + "]");
 
             
-                if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
+                if (!(highestFreq == EFreq.Annual || highestFreq == EFreq.Undated))  //ttfreq
                 {
                     //if (quarterFix == 0)
                     //{
@@ -28125,21 +28133,21 @@ namespace Gekko
             foreach (string s in xlines)
             {
                 GekkoTime gt = G.FromStringToDate(s);
-                double d = G.FromDateToFloating(gt) + GetXAdjustmentForInsideTics(isInside);                
+                double d = G.FromDateToFloating(gt) + GetXAdjustmentForInsideTics(isInside, highestFreq);                
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
             foreach (string s in xlinebefores)
             {
                 GekkoTime gt = G.FromStringToDate(s);
-                double d = (G.FromDateToFloating(gt) + G.FromDateToFloating(gt.Add(-1))) / 2d + GetXAdjustmentForInsideTics(isInside);
+                double d = (G.FromDateToFloating(gt) + G.FromDateToFloating(gt.Add(-1))) / 2d + GetXAdjustmentForInsideTics(isInside, highestFreq);
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
             foreach (string s in xlineafters)
             {
                 GekkoTime gt = G.FromStringToDate(s);
-                double d = (G.FromDateToFloating(gt) + G.FromDateToFloating(gt.Add(1))) / 2d + +GetXAdjustmentForInsideTics(isInside);
+                double d = (G.FromDateToFloating(gt) + G.FromDateToFloating(gt.Add(1))) / 2d + +GetXAdjustmentForInsideTics(isInside, highestFreq);
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
@@ -28196,12 +28204,12 @@ namespace Gekko
                 int t2 = o.t2.super;
                 //txt.AppendLine("set xtics " + (t1 - 1) + ",1," + (t2 + 0) + "");
                 int sub = 1;
-                if (Program.options.freq == EFreq.Quarterly)
+                if (highestFreq == EFreq.Quarterly)
                 {
                     sub = 4;
                     extra = (double)o.t2.sub / (double)sub;
                 }
-                else if (Program.options.freq == EFreq.Monthly)
+                else if (highestFreq == EFreq.Monthly)
                 {
                     sub = 12;
                     extra = (double)o.t2.sub / (double)sub;
@@ -28253,7 +28261,7 @@ namespace Gekko
                     string tlabel = "\"" + tx + "\"";
                     
                     ss += tlabel + " " + t + " " + "0, ";  //0 is major tic
-                    if ((Program.options.freq == EFreq.Monthly && years <= 25) || (Program.options.freq == EFreq.Quarterly && years <= 75))
+                    if ((highestFreq == EFreq.Monthly && years <= 25) || (highestFreq == EFreq.Quarterly && years <= 75))
                     {
                         for (int tt = 1; tt < sub; tt++)  //is skipped if sub = 1
                         {
@@ -28269,7 +28277,7 @@ namespace Gekko
                 txt.AppendLine("set xtics offset first 0.5, first 0");  //moves xtic labels a half year to the right, but not the tic itself
                 if (firstXLabelFix)
                 {
-                    if ((o.t1.freq == EFreq.Monthly && o.t1.sub <= 1) || (o.t1.freq == EFreq.Quarterly && o.t1.sub <= 1))  //these could perhaps be <=4 and <=2 respectively. Often the plot starts in first subperiod anyway.
+                    if ((highestFreq == EFreq.Monthly && o.t1.freq == EFreq.Monthly && o.t1.sub <= 1) || (highestFreq == EFreq.Quarterly && o.t1.freq == EFreq.Quarterly && o.t1.sub <= 1))  //these could perhaps be <=4 and <=2 respectively. Often the plot starts in first subperiod anyway.
                     {
                         //only show whole first year if monthly and m1-m4 or quarterly and q1-q2
                         double tStart = (double)t1 - 0.000000001d;                      //deducts a small number to activate the first x-axis label
@@ -28281,7 +28289,7 @@ namespace Gekko
             {
                 int mxtics = -12345;
                 string ticsTxt = null;
-                mxtics = HandleXTics(labels1, labels2, ref ticsTxt, mxtics);
+                mxtics = HandleXTics(labels1, labels2, ref ticsTxt, mxtics, highestFreq);
                 if (ticsTxt != null) txt.AppendLine(ticsTxt);
             }
 
@@ -28295,11 +28303,11 @@ namespace Gekko
             //string plotline = null;
 
             double dx = 1d;
-            if (Program.options.freq == EFreq.Quarterly)
+            if (highestFreq == EFreq.Quarterly)
             {
                 dx = 1d / 4d;
             }
-            else if (Program.options.freq == EFreq.Monthly)
+            else if (highestFreq == EFreq.Monthly)
             {
                 dx = 1d / 12d;
             }
@@ -28327,7 +28335,7 @@ namespace Gekko
             //          SECOND PASS
             // ---------------------------------------
             // ---------------------------------------
-            string plotline = PlotHandleLines(false, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside);
+            string plotline = PlotHandleLines(false, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside, highestFreq);
 
             txt.AppendLine(plotline);
 
@@ -28463,7 +28471,7 @@ namespace Gekko
             return setTitlePlaceholder;
         }
 
-        private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<O.Prt.Element> co, double linewidthCorrection, double pointsizeCorrection, bool isInside)
+        private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<O.Prt.Element> co, double linewidthCorrection, double pointsizeCorrection, bool isInside, EFreq highestFreq)
         {
             int manyXValues = 0;  //0 or 1
             int quarterFix = count - 1;
@@ -28641,7 +28649,7 @@ namespace Gekko
                         if (ss != null && ss.EndsWith("+")) ss = ss.Substring(0, ss.Length - 1); //remove last '+'                       
                         if (isInside)
                         {
-                            xAdjustment = "($" + (iii + 1) + "+" + GetXAdjustmentForInsideTics(isInside) + ")(" + ss + ")" + ":(" + d_width3 + ")";
+                            xAdjustment = "($" + (iii + 1) + "+" + GetXAdjustmentForInsideTics(isInside, highestFreq) + ")(" + ss + ")" + ":(" + d_width3 + ")";
                         }
                         else
                         {
@@ -28660,7 +28668,7 @@ namespace Gekko
                         }
                         if (isInside)
                         {
-                            xAdjustment = "($" + (iii + 1) + " " + minus + d + "+" + GetXAdjustmentForInsideTics(isInside) + "):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
+                            xAdjustment = "($" + (iii + 1) + " " + minus + d + "+" + GetXAdjustmentForInsideTics(isInside, highestFreq) + "):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
                         }
                         else
                         {
@@ -28709,7 +28717,7 @@ namespace Gekko
                         if (ss != null && ss.EndsWith("+")) ss = ss.Substring(0, ss.Length - 1);  //remove last '+'                       
                         if (isInside)
                         {
-                            xAdjustment = "($" + (iii + 1) + "+" + GetXAdjustmentForInsideTics(isInside) + "):(" + ss + ")";
+                            xAdjustment = "($" + (iii + 1) + "+" + GetXAdjustmentForInsideTics(isInside, highestFreq) + "):(" + ss + ")";
                         }
                         else
                         {
@@ -28720,7 +28728,7 @@ namespace Gekko
                     {
                         if (isInside)
                         {
-                            xAdjustment = "($" + (iii + 1) + "+" + GetXAdjustmentForInsideTics(isInside) + "):" + (i + quarterFix + 2);  //just normal positioning
+                            xAdjustment = "($" + (iii + 1) + "+" + GetXAdjustmentForInsideTics(isInside, highestFreq) + "):" + (i + quarterFix + 2);  //just normal positioning
                         }
                         else
                         {
@@ -28735,14 +28743,14 @@ namespace Gekko
                         minMax[4] = Math.Min(minMax[4], dataMin[i]);
                         minMax[5] = Math.Max(minMax[5], dataMax[i]);
                     }
-                    if (isInside)
-                    {                        
-                        xAdjustment = "($" + (iii + 1) + "+" + GetXAdjustmentForInsideTics(isInside) + "):" + (i + quarterFix + 2);
-                    }
-                    else
-                    {
-                        xAdjustment = "" + (iii + 1) + ":" + (i + quarterFix + 2);
-                    }
+                    //if (isInside)
+                    //{                        
+                        xAdjustment = "($" + (iii + 1) + "+" + GetXAdjustmentForInsideTics(isInside, highestFreq) + "):" + (i + quarterFix + 2);
+                    //}
+                    //else
+                    //{
+                    //    xAdjustment = "" + (iii + 1) + ":" + (i + quarterFix + 2);
+                    //}
                     //xAdjustment = "" + (quarterFix + 1) + ":" + (i + quarterFix + 2);
                 }
 
@@ -28756,14 +28764,16 @@ namespace Gekko
             return plotline;
         }
 
-        private static double GetXAdjustmentForInsideTics(bool isInside)
+        private static double GetXAdjustmentForInsideTics(bool isInside, EFreq highestFreq)
         {
-            if (!isInside) return 0d;
-            int sub = 1;
-            if (Program.options.freq == EFreq.Quarterly) sub = 4;
-            else if (Program.options.freq == EFreq.Monthly) sub = 12;
-            double adj = 1d / sub / 2d;
-            return adj;
+            if (!isInside && highestFreq == EFreq.Annual) return -0.5;  //in the data file, for instance 2020 will be 2020.5
+            else return 0d;
+            //if (!isInside) return 0d;
+            //int sub = 1;
+            //if (highestFreq == EFreq.Quarterly) sub = 4;
+            //else if (highestFreq == EFreq.Monthly) sub = 12;
+            //double adj = 1d / sub / 2d;
+            //return adj;
         }
 
         private static bool NotNullAndNotNo(string s)
@@ -28888,9 +28898,9 @@ namespace Gekko
             return s2;            
         }
 
-        private static int HandleXTics(List<string> labels1, List<string> labels2, ref string ticsTxt, int mxtics)
+        private static int HandleXTics(List<string> labels1, List<string> labels2, ref string ticsTxt, int mxtics, EFreq highestFreq)
         {
-            if (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)
+            if (highestFreq == EFreq.Annual || highestFreq == EFreq.Undated)
             {
                 //do nothing
                 ticsTxt = null;

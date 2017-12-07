@@ -1999,16 +1999,21 @@ namespace Gekko.Parser.Gek
                                     iv = iv + ", IVariable";
                                 }
 
+                                int smplCommandNumber = ++Globals.counter;
+
                                 sb1.AppendLine("Func<" + iv + "> " + funcName + " = (" + parentListLoopVars1 + ") => {");
                                 //sb1.AppendLine("public static IVariable " + tempName + "(GekkoSmpl smpl" + parentListLoopVars1 + ") {");
                                 if (G.Equal(functionNameLower, "sum"))
-                                {
+                                {                                    
+                                    sb1.AppendLine(GekkoSmplCommandHelper1(smplCommandNumber, "Sum"));
                                     sb1.AppendLine("Series " + tempName + " = new Series(ESeriesType.Normal, Program.options.freq, null); " + tempName + ".SetZero(smpl);" + G.NL);
                                 }
                                 else
                                 {
+                                    sb1.AppendLine(GekkoSmplCommandHelper1(smplCommandNumber, "Unfold"));
                                     sb1.AppendLine("List " + tempName + " = new List();" + G.NL);
                                 }
+                                
                                 foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                 {
                                     sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ")))), null, false, EVariableType.Var))) {");  //false is regarding isLeftSide
@@ -2027,6 +2032,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     sb1.AppendLine("}");
                                 }
+                                sb1.AppendLine(GekkoSmplCommandHelper2(smplCommandNumber));  //resets command name to what it was previously
                                 sb1.AppendLine("return " + tempName + ";" + G.NL);
                                 sb1.AppendLine("};");  //method def, must end with ;
                                 //w.headerCs.Append(sb1);
@@ -4774,6 +4780,18 @@ namespace Gekko.Parser.Gek
                 }
                 node.Code.A(Globals.splitSTOP);
             }
+        }
+
+        private static string GekkoSmplCommandHelper2(int smplCommandNumber)
+        {
+            string s2 = "smpl.command = smplCommandRemember" + smplCommandNumber + ";";
+            return s2;
+        }
+
+        private static string GekkoSmplCommandHelper1(int smplCommandNumber, string ss)
+        {
+            string s = "var smplCommandRemember" + smplCommandNumber + " = smpl.command; smpl.command = GekkoSmplCommand." + ss + ";";
+            return s;
         }
 
         private static string GetSimpleName(ASTNode node)

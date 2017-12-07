@@ -15,10 +15,10 @@ namespace Gekko
         Series,        
         List,
         Map,
-        Matrix,   
-        Range,      
-        GekkoError,
-        Var
+        Matrix,
+        Var,
+        Range,              
+        GekkoNull        
     }
 
     public enum EScalarRefType

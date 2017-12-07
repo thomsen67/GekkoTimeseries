@@ -1149,13 +1149,14 @@ namespace Gekko
             return null;
         }
 
-        public static IVariable percentile(GekkoSmpl t, IVariable inputVar, IVariable percent)
+        public static IVariable percentile(GekkoSmpl t, IVariable x1, IVariable percent)
         {
             //Mimics Excel's percentile function, see unit tests
+            if (IsGekkoNull(x1)) return x1;
             GekkoTime t1 = Globals.globalPeriodStart;
             GekkoTime t2 = Globals.globalPeriodEnd;
 
-            Series ts = O.GetTimeSeries(inputVar);
+            Series ts = O.GetTimeSeries(x1);
             double percent2 = O.ConvertToVal(percent);
 
             int index1 = -12345;
@@ -1174,21 +1175,22 @@ namespace Gekko
             return z2;
         }
 
-        public static IVariable abs(GekkoSmpl smpl, IVariable input)
+        public static IVariable abs(GekkoSmpl smpl, IVariable x1)
         {
+            if (IsGekkoNull(x1)) return x1;
             IVariable rv = null;
-            if (input.Type() == EVariableType.Val)
+            if (x1.Type() == EVariableType.Val)
             {
-                double d = O.ConvertToVal(input);
+                double d = O.ConvertToVal(x1);
                 rv = new ScalarVal(Math.Abs(d));
             }
-            else if (input.Type() == EVariableType.Series)
+            else if (x1.Type() == EVariableType.Series)
             {
-                return Series.ArithmeticsSeries(smpl, input as Series, Globals.arithmentics1[1]); // (x1) => Math.Abs(x1);
+                return Series.ArithmeticsSeries(smpl, x1 as Series, Globals.arithmentics1[1]); // (x1) => Math.Abs(x1);
             }
-            else if (input.Type() == EVariableType.Matrix)
+            else if (x1.Type() == EVariableType.Matrix)
             {
-                Matrix m = O.ConvertToMatrix(input);
+                Matrix m = O.ConvertToMatrix(x1);
                 Matrix m2 = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
                 for (int i = 0; i < m.data.GetLength(0); i++)
                 {
@@ -1200,7 +1202,7 @@ namespace Gekko
             }            
             else
             {
-                G.Writeln2("*** ERROR: abs(): type " + input.Type().ToString() + " not supported");
+                G.Writeln2("*** ERROR: abs(): type " + x1.Type().ToString() + " not supported");
             }
             return rv;
         }
@@ -1234,7 +1236,8 @@ namespace Gekko
         }
 
         public static IVariable iif(GekkoSmpl t, IVariable i1, IVariable op, IVariable i2, IVariable o1, IVariable o2)
-        {            
+        {
+            if (IsGekkoNull(i1) && IsGekkoNull(i1)) return i1;
             double result=double.NaN;
             if (!IsValOrTimeseries(i1))
             {
@@ -1336,20 +1339,21 @@ namespace Gekko
             return new ScalarVal(result);            
         }
 
-        public static IVariable log(GekkoSmpl smpl, IVariable input)
+        public static IVariable log(GekkoSmpl smpl, IVariable x1)
         {
+            if (IsGekkoNull(x1)) return x1;
             IVariable rv = null;
-            if (input.Type() == EVariableType.Val)
+            if (x1.Type() == EVariableType.Val)
             {
-                rv = new ScalarVal(Math.Log(input.ConvertToVal()));
+                rv = new ScalarVal(Math.Log(x1.ConvertToVal()));
             }
-            else if (input.Type() == EVariableType.Series)
+            else if (x1.Type() == EVariableType.Series)
             {
-                return Series.ArithmeticsSeries(smpl, input as Series, Globals.arithmentics1[2]); // (x1) => Math.Log(x1);
+                return Series.ArithmeticsSeries(smpl, x1 as Series, Globals.arithmentics1[2]); // (x1) => Math.Log(x1);
             }
-            else if (input.Type() == EVariableType.Matrix)
+            else if (x1.Type() == EVariableType.Matrix)
             {
-                Matrix m = O.ConvertToMatrix(input);
+                Matrix m = O.ConvertToMatrix(x1);
                 Matrix m2 = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
                 for (int i = 0; i < m.data.GetLength(0); i++)
                 {
@@ -1361,27 +1365,28 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: log(): type " + input.Type().ToString() + " not supported");
+                G.Writeln2("*** ERROR: log(): type " + x1.Type().ToString() + " not supported");
                 throw new GekkoException();
             }
             return rv;            
         }
 
-        public static IVariable exp(GekkoSmpl smpl, IVariable input)
+        public static IVariable exp(GekkoSmpl smpl, IVariable x1)
         {
+            if (IsGekkoNull(x1)) return x1;
             IVariable rv = null;
-            if (input.Type() == EVariableType.Val)
+            if (x1.Type() == EVariableType.Val)
             {
-                double d = O.ConvertToVal(input);
+                double d = O.ConvertToVal(x1);
                 rv = new ScalarVal(Math.Exp(d));
             }
-            else if (input.Type() == EVariableType.Series)
+            else if (x1.Type() == EVariableType.Series)
             {
-                return Series.ArithmeticsSeries(smpl, input as Series, Globals.arithmentics1[3]); // (x1) => Math.Exp(x1);
+                return Series.ArithmeticsSeries(smpl, x1 as Series, Globals.arithmentics1[3]); // (x1) => Math.Exp(x1);
             }
-            else if (input.Type() == EVariableType.Matrix)
+            else if (x1.Type() == EVariableType.Matrix)
             {
-                Matrix m = O.ConvertToMatrix(input);
+                Matrix m = O.ConvertToMatrix(x1);
                 Matrix m2 = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
                 for (int i = 0; i < m.data.GetLength(0); i++)
                 {
@@ -1393,27 +1398,28 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: exp(): type " + input.Type().ToString() + " not supported");
+                G.Writeln2("*** ERROR: exp(): type " + x1.Type().ToString() + " not supported");
                 throw new GekkoException();
             }
             return rv;
         }
 
-        public static IVariable sqrt(GekkoSmpl smpl, IVariable input)
+        public static IVariable sqrt(GekkoSmpl smpl, IVariable x1)
         {
+            if (IsGekkoNull(x1)) return x1;
             IVariable rv = null;
-            if (input.Type() == EVariableType.Val)
+            if (x1.Type() == EVariableType.Val)
             {
-                double d = O.ConvertToVal(input);
+                double d = O.ConvertToVal(x1);
                 rv = new ScalarVal(Math.Sqrt(d));
             }
-            else if (input.Type() == EVariableType.Series)
+            else if (x1.Type() == EVariableType.Series)
             {
-                return Series.ArithmeticsSeries(smpl, input as Series, Globals.arithmentics1[4]); // (x1) => Math.Sqrt(x1);
+                return Series.ArithmeticsSeries(smpl, x1 as Series, Globals.arithmentics1[4]); // (x1) => Math.Sqrt(x1);
             }
-            else if (input.Type() == EVariableType.Matrix)
+            else if (x1.Type() == EVariableType.Matrix)
             {
-                Matrix m = O.ConvertToMatrix(input);
+                Matrix m = O.ConvertToMatrix(x1);
                 rv = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
                 for (int i = 0; i < m.data.GetLength(0); i++)
                 {
@@ -1425,7 +1431,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: abs(): type " + input.Type().ToString() + " not supported");
+                G.Writeln2("*** ERROR: abs(): type " + x1.Type().ToString() + " not supported");
                 throw new GekkoException();
             }
             return rv;
@@ -1438,15 +1444,17 @@ namespace Gekko
 
         public static IVariable pow(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
+            if (IsGekkoNull(x1)) return x1;
             return O.Power(smpl, x1, x2);            
         }
         
         [MyCustom(Lag = "lag=1")]
         public static IVariable pch(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
         {
+            if (IsGekkoNull(x1)) return x1;
             Program.RevertSmpl(smplOriginal, smpl);
             if (x1.Type() == EVariableType.Series)
-            {                
+            {
                 return Series.ArithmeticsSeriesLag(smpl, x1 as Series, Globals.arithmentics[10]);  //(x, x.1) => (x / x.1 - 1d) * 100d;                
             }
             else
@@ -1457,9 +1465,15 @@ namespace Gekko
             return null;
         }
 
+        private static bool IsGekkoNull(IVariable x1)
+        {
+            return x1.Type() == EVariableType.GekkoNull;
+        }
+
         [MyCustom(Lag = "lag=1")]
         public static IVariable dlog(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
         {
+            if (IsGekkoNull(x1)) return x1;
             Program.RevertSmpl(smplOriginal, smpl);
             if (x1.Type() == EVariableType.Series)
             {
@@ -1476,6 +1490,7 @@ namespace Gekko
         [MyCustom(Lag = "lag=1")]
         public static IVariable dif(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
         {
+            if (IsGekkoNull(x1)) return x1;
             Program.RevertSmpl(smplOriginal, smpl);
             if (x1.Type() == EVariableType.Series)
             {
@@ -1490,24 +1505,27 @@ namespace Gekko
         }
 
         [MyCustom(Lag = "lag=[2]")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
-        public static IVariable lag(GekkoSmpl2 smpl2, GekkoSmpl smpl, IVariable x, IVariable ilag)
+        public static IVariable lag(GekkoSmpl2 smpl2, GekkoSmpl smpl, IVariable x1, IVariable ilag)
         {
+            if (IsGekkoNull(x1)) return x1;
             Program.RevertSmpl(smpl2, smpl);
-            return O.Indexer(smpl2, smpl, x, O.Negate(smpl, ilag));
+            return O.Indexer(smpl2, smpl, x1, O.Negate(smpl, ilag));
         }
 
         [MyCustom(Lag = "lag=[2]-1")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
-        public static IVariable movsum(GekkoSmpl2 smpl2, GekkoSmpl smpl, IVariable x, IVariable ilags)
+        public static IVariable movsum(GekkoSmpl2 smpl2, GekkoSmpl smpl, IVariable x1, IVariable ilags)
         {
+            if (IsGekkoNull(x1)) return x1;
             Program.RevertSmpl(smpl2, smpl);
-            return MovAvgSum(smpl, x, ilags, false);            
+            return MovAvgSum(smpl, x1, ilags, false);            
         }
 
         [MyCustom(Lag = "lag=[2]-1")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
-        public static IVariable movavg(GekkoSmpl2 smpl2, GekkoSmpl smpl, IVariable x, IVariable ilags)
+        public static IVariable movavg(GekkoSmpl2 smpl2, GekkoSmpl smpl, IVariable x1, IVariable ilags)
         {
+            if (IsGekkoNull(x1)) return x1;
             Program.RevertSmpl(smpl2, smpl);
-            return MovAvgSum(smpl, x, ilags, true);
+            return MovAvgSum(smpl, x1, ilags, true);
         }
 
         private static IVariable MovAvgSum(GekkoSmpl smpl, IVariable x, IVariable ilags, bool avg)
@@ -1568,8 +1586,9 @@ namespace Gekko
             return ss;
         }
 
-        public static IVariable round(GekkoSmpl smpl, IVariable input, IVariable round)
-        {            
+        public static IVariable round(GekkoSmpl smpl, IVariable x1, IVariable round)
+        {
+            if (IsGekkoNull(x1)) return x1;
             double d2 = O.ConvertToVal(round);          
             int aaa1 = 0;
             if (!G.Round(out aaa1, d2))
@@ -1584,18 +1603,18 @@ namespace Gekko
                 throw new GekkoException();
             }
                         
-            if (input.Type() == EVariableType.Val)
+            if (x1.Type() == EVariableType.Val)
             {
-                double d = O.ConvertToVal(input);
+                double d = O.ConvertToVal(x1);
                 return new ScalarVal(Math.Round(d, decimals, MidpointRounding.AwayFromZero));
             }
-            else if (input.Type() == EVariableType.Series)
+            else if (x1.Type() == EVariableType.Series)
             {                  
-                return Series.ArithmeticsSeriesVal(smpl, input as Series, decimals, Globals.arithmentics[12]);  //(x1, x2) => Math.Round(x1, (int)x2);                
+                return Series.ArithmeticsSeriesVal(smpl, x1 as Series, decimals, Globals.arithmentics[12]);  //(x1, x2) => Math.Round(x1, (int)x2);                
             }
-            else if (input.Type() == EVariableType.Matrix)
+            else if (x1.Type() == EVariableType.Matrix)
             {
-                Matrix m = O.ConvertToMatrix(input);
+                Matrix m = O.ConvertToMatrix(x1);
                 Matrix m2 = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
                 for (int i = 0; i < m.data.GetLength(0); i++)
                 {
@@ -1608,7 +1627,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: round() does not support type " + input.Type().ToString());
+                G.Writeln2("*** ERROR: round() does not support type " + x1.Type().ToString());
                 throw new GekkoException();
             }
         }
@@ -1727,16 +1746,17 @@ namespace Gekko
             return new ScalarDate(d);
         }
 
-        public static IVariable val(GekkoSmpl smpl, IVariable x)  //'string' not allowed as method name
+        public static IVariable val(GekkoSmpl smpl, IVariable x1)  //'string' not allowed as method name
         {
+            if (IsGekkoNull(x1)) return x1;
             double v = double.NaN;
-            if (x.Type() == EVariableType.Val)
+            if (x1.Type() == EVariableType.Val)
             {
-                v = ((ScalarVal)x).val;
+                v = ((ScalarVal)x1).val;
             }
-            else if (x.Type() == EVariableType.Date)
+            else if (x1.Type() == EVariableType.Date)
             {
-                ScalarDate sd = (ScalarDate)x;
+                ScalarDate sd = (ScalarDate)x1;
                 if (sd.date.freq == EFreq.Annual || sd.date.freq == EFreq.Undated)
                 {
                     v = sd.date.super;
@@ -1747,9 +1767,9 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            else if (x.Type() == EVariableType.String)
+            else if (x1.Type() == EVariableType.String)
             {
-                string s = ((ScalarString)x).string2;
+                string s = ((ScalarString)x1).string2;
                 if (G.Equal(s, "m"))
                 {
                     v = double.NaN;
@@ -1767,12 +1787,12 @@ namespace Gekko
                     }
                 }
             }
-            else if (x.Type() == EVariableType.List)
+            else if (x1.Type() == EVariableType.List)
             {
                 G.Writeln2("*** ERROR: Cannot convert a LIST to a VAL");
                 throw new GekkoException();
             }
-            else if (x.Type() == EVariableType.Series)
+            else if (x1.Type() == EVariableType.Series)
             {
                 G.Writeln2("*** ERROR: Cannot convert a SERIES to a DATE");
                 throw new GekkoException();

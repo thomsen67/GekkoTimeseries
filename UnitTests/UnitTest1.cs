@@ -9653,7 +9653,56 @@ namespace UnitTests
             Assert.AreEqual(table.Get(5, 2).number, 18.0000d, 0.0001);
             Assert.AreEqual(table.Get(6, 2).number, 20.0000d, 0.0001);
             Assert.AreEqual(table.Get(7, 2).number, 22.0000d, 0.0001);
-                       
+
+            // -----------------------------------------------------
+            //   test of ignoremissing, 0 for sum() and skip for unfold()
+            // -----------------------------------------------------
+
+            I("reset;");
+            I("time 2001 2003;");
+            I("xx = series(2);");
+            I("xx['a', 'x'] = (1,2,3);");
+            I("xx['b', 'x'] = (4,5,6);");
+            //I("xx['a', 'y'] = (7,8,9);");
+            I("xx['b', 'y'] = (14,15,16);");
+            I("#m1 = ('a', 'b');");
+            I("#m2 = ('x', 'y');");
+            FAIL("p <n> sum((#m1, #m2), xx[#m1, #m2]);");
+            I("option series array ignoremissing yes;");
+            I("p <n> sum((#m1, #m2), xx[#m1, #m2]);");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2001"); //why is it not a date?
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "2002"); //why is it not a date?
+            Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "2003"); //why is it not a date?
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "sum");
+            Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "((#m1, #m2), ");
+            Assert.AreEqual(table.Get(3, 2).CellText.TextData[0], "xx[#m1, #m2])");
+            Assert.AreEqual(table.Get(4, 2).number, 19.0000d, 0.0001);
+            Assert.AreEqual(table.Get(5, 2).number, 22.0000d, 0.0001);
+            Assert.AreEqual(table.Get(6, 2).number, 25.0000d, 0.0001);
+
+            I("option series array ignoremissing no;");
+            FAIL("p <n> xx[#m1, #m2];");
+            I("option series array ignoremissing yes;");
+            I("p <n> xx[#m1, #m2];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001"); //why is it not a date?
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx['a', 'x']");
+            Assert.AreEqual(table.Get(2, 2).number, 1.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 2).number, 2.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 2).number, 3.0000d, 0.0001);            
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx['b', 'x']");
+            Assert.AreEqual(table.Get(2, 3).number, 4.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 3).number, 5.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 3).number, 6.0000d, 0.0001);
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx['b', 'y']");
+            Assert.AreEqual(table.Get(2, 4).number, 14.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 4).number, 15.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 4).number, 16.0000d, 0.0001);
+
+
         }
 
         [TestMethod]

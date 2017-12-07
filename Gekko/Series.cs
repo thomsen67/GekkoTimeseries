@@ -1441,7 +1441,7 @@ namespace Gekko
             else
             {
                 //Not x[-2] or x[2020] or x[2020a1] or x[2020q1]                
-                rv = this.FindArraySeries(indexes, false);
+                rv = this.FindArraySeries(smpl.command, indexes, false);
             }
 
             return rv;
@@ -1453,14 +1453,14 @@ namespace Gekko
             return this.name == null;  //then this.meta will also be null, but we only test .name
         }
 
-        private Series FindArraySeries(IVariable[] indexes, bool isLhs)
+        private IVariable FindArraySeries(GekkoSmplCommand command, IVariable[] indexes, bool isLhs)
         {
             if (indexes.Length == 0)
             {
                 G.Writeln2("*** ERROR: Indexer has 0 length");
                 throw new GekkoException();
             }
-            Series ts = null;
+            IVariable rv = null;
 
             string[] keys = Program.GetListOfStringsFromListOfIvariables(indexes);
 
@@ -1489,25 +1489,48 @@ namespace Gekko
                 {
                     if (!isLhs)
                     {
-                        string txt = null; foreach (string ss in keys) txt += "'" + ss + "', ";
-                        G.Writeln2("*** ERROR: The arrayseries '" + this.name + "' did not contain this element:");
-                        G.Writeln("*** ERROR: [" + txt.Substring(0, txt.Length - 2) + "]");
-                        throw new GekkoException();
+                        if (Program.options.series_array_ignoremissing)
+                        {
+                            if (command == GekkoSmplCommand.Sum)
+                            {
+                                rv = new Series(ESeriesType.Timeless, this.freq, null);
+                                ((Series)rv).SetTimelessData(0d);
+                            }
+                            else if (command == GekkoSmplCommand.Unfold)
+                            {
+                                rv = new GekkoNull();
+                            }
+                            else
+                            {
+                                //when does this happen -- table?
+                                rv = new Series(ESeriesType.Timeless, this.freq, null);
+                                ((Series)rv).SetTimelessData(double.NaN);
+                            }
+                        }
+                        else
+                        {
+
+                            string txt = null; foreach (string ss in keys) txt += "'" + ss + "', ";
+                            G.Writeln2("*** ERROR: The arrayseries " + G.GetNameAndFreqPretty(this.name) + " did not contain this element:");
+                            G.Writeln("*** ERROR: [" + txt.Substring(0, txt.Length - 2) + "]");
+                            G.Writeln("+++ NOTE: You may ignore such errors with OPTION series array ignoremissing = yes;");
+                            throw new GekkoException();
+                        }
                     }
                     else
                     {
                         //ts = new Series(this.freq, null);
 
-                        ts = new Series(ESeriesType.Normal, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq));
+                        rv = new Series(ESeriesType.Normal, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq));
                         //ts.type = ESeriesType.ArraySub;
-                        if (this.type == ESeriesType.Timeless) ts.type = ESeriesType.Timeless;  //inherits from ghost                        
-                        this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys), ts);
+                        if (this.type == ESeriesType.Timeless) ((Series)rv).type = ESeriesType.Timeless;  //inherits from ghost                        
+                        this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys), rv);
                     }
                 }
                 else
                 {
-                    ts = iv as Series;
-                    if (ts == null)
+                    rv = iv as Series;
+                    if (rv == null)
                     {
                         G.Writeln2("*** ERROR: Array-timeseries element is non-series.");
                         throw new GekkoException();
@@ -1527,7 +1550,7 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            return ts;
+            return rv;
         }
                
         
@@ -1672,8 +1695,15 @@ namespace Gekko
             }
             else 
             {
-                //Will fail with an error if not all indexes are of STRING type                
-                Series ts = this.FindArraySeries(indexes, true);  //if not found, it will be created (since we are on the lhs) and inherit the timeless status from this timeseries.
+                //Will fail with an error if not all indexes are of STRING type                                
+                IVariable iv = this.FindArraySeries(smpl.command, indexes, true);  //if not found, it will be created (since we are on the lhs) and inherit the timeless status from this timeseries.
+                Series ts = iv as Series;
+                if (ts == null)
+                {
+                    //Probably not possible, sum() and unfold are on the RHS
+                    G.Writeln2("*** ERROR: indexer on LHS on a null object");
+                    throw new GekkoException();
+                }
                 O.LookupHelperLeftside(smpl, ts, rhsExpression, EVariableType.Var);                
             }
         }
