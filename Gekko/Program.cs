@@ -23333,14 +23333,14 @@ namespace Gekko
 
             string type = "print";
             if (G.Equal(oPrt.prtType, "plot")) type = "plot";
-            
+
             if (NonSeriesCheck(oPrt, type))
             {
                 NonSeriesHandling(oPrt);
                 return;
             }
 
-            List<O.Prt.Element> container = new List<O.Prt.Element>();
+            List<O.Prt.Element> containerExplode = new List<O.Prt.Element>();
 
             //If PRT <m> unfold(#m, {#m}), we will get 1 prtElement (since there are no commas), where 
             //variable[0] and [1] are both lists with two items (if #m has two items).
@@ -23349,7 +23349,7 @@ namespace Gekko
             //variable[0] is a list with two items (if #m has two items).
             //this must be exploded into <n p>, so from the 1 prtElement, we should take
             //variable[0][0] as n, variable[0][0] as p, variable[0][1] as n, variable[0][1] as p.
-                        
+
             int labelMaxLine = 1;
             bool[] freqs = new bool[3];
 
@@ -23388,11 +23388,11 @@ namespace Gekko
                     int iPrintCode = -1;
                     foreach (string printCode in element.printCodesFinal)  //this may be two printcodes <n p>
                     {
-                        
+
                         iPrintCode++;
                         //after this, it should be x1<n>  x1<p>  x2<n>  x2<p>
 
-                        O.Prt.Element c = new O.Prt.Element();
+                        O.Prt.Element explodeElement = new O.Prt.Element();
 
                         int width = -12345;
                         int dec = -12345;
@@ -23469,38 +23469,38 @@ namespace Gekko
 
                         if (type == "plot")
                         {
-                            c.widthFinal = 20;
-                            c.decFinal = 14;
+                            explodeElement.widthFinal = 20;
+                            explodeElement.decFinal = 14;
                         }
                         else
                         {
-                            c.widthFinal = width;
-                            c.decFinal = dec;
+                            explodeElement.widthFinal = width;
+                            explodeElement.decFinal = dec;
                         }
 
-                        c.linetype = element.linetype;
-                        c.dashtype = element.dashtype;
-                        c.linewidth = element.linewidth;
-                        c.linecolor = element.linecolor;
-                        c.pointtype = element.pointtype;
-                        c.pointsize = element.pointsize;
-                        c.fillstyle = element.fillstyle;
-                        c.y2 = element.y2;
+                        explodeElement.linetype = element.linetype;
+                        explodeElement.dashtype = element.dashtype;
+                        explodeElement.linewidth = element.linewidth;
+                        explodeElement.linecolor = element.linecolor;
+                        explodeElement.pointtype = element.pointtype;
+                        explodeElement.pointsize = element.pointsize;
+                        explodeElement.fillstyle = element.fillstyle;
+                        explodeElement.y2 = element.y2;
 
-                        if (xx0 != null) c.variable[0] = xx0.list[i];
-                        else c.variable[0] = element.variable[0];
-                        if (xx1 != null) c.variable[1] = xx1.list[i];
-                        else c.variable[1] = element.variable[1];
+                        if (xx0 != null) explodeElement.variable[0] = xx0.list[i];
+                        else explodeElement.variable[0] = element.variable[0];
+                        if (xx1 != null) explodeElement.variable[1] = xx1.list[i];
+                        else explodeElement.variable[1] = element.variable[1];
 
                         int bankCombi = GetBankCombi(printCode);
-                        if (bankCombi == 0 && c.variable[0].Type() == EVariableType.GekkoNull || bankCombi == 1 && c.variable[1].Type() == EVariableType.GekkoNull || bankCombi == 2 && (c.variable[0].Type() == EVariableType.GekkoNull || c.variable[1].Type() == EVariableType.GekkoNull))
+                        if (bankCombi == 0 && explodeElement.variable[0].Type() == EVariableType.GekkoNull || bankCombi == 1 && explodeElement.variable[1].Type() == EVariableType.GekkoNull || bankCombi == 2 && (explodeElement.variable[0].Type() == EVariableType.GekkoNull || explodeElement.variable[1].Type() == EVariableType.GekkoNull))
                         {
                             //skip this column, probably a xx['something'] that is non-existing together with OPTION series array ignoremissing yes
                             continue;
                         }
 
-                        Series temp0 = c.variable[0] as Series;
-                        Series temp1 = c.variable[1] as Series;
+                        Series temp0 = explodeElement.variable[0] as Series;
+                        Series temp1 = explodeElement.variable[1] as Series;
                         if (temp0 != null)
                         {
                             if (temp0.freq == EFreq.Annual) freqs[0] = true;
@@ -23514,13 +23514,13 @@ namespace Gekko
                             else if (temp1.freq == EFreq.Monthly) freqs[2] = true;
                         }
 
-                        if (c.variable[0] != null && !G.IsValueType(c.variable[0]) || c.variable[1] != null && !G.IsValueType(c.variable[1]))
+                        if (explodeElement.variable[0] != null && !G.IsValueType(explodeElement.variable[0]) || explodeElement.variable[1] != null && !G.IsValueType(explodeElement.variable[1]))
                         {
                             G.Writeln2("+++ WARNING: Non-value in PRT");
                             return;
                         }
 
-                        c.printCodeFinal = printCode;
+                        explodeElement.printCodeFinal = printCode;
 
                         string lbl = null;
                         if (labels2 != null && n == labels2.Count)
@@ -23543,998 +23543,862 @@ namespace Gekko
                         else
                         {
                             lines = 5;
-                            widthHere = c.widthFinal;
+                            widthHere = explodeElement.widthFinal;
                         }
 
-                        int max = PrintCreateLabelsArrayNew(lbl, widthHere, lines, lines * widthHere, out c.label2);
+                        int max2 = PrintCreateLabelsArrayNew(lbl, widthHere, lines, lines * widthHere, out explodeElement.label2);
 
-                        labelMaxLine = Math.Max(max, labelMaxLine);
+                        labelMaxLine = Math.Max(max2, labelMaxLine);
 
                         //FIXME
                         //FIXME
                         if (G.Equal(element.printCodesFinal[0], "n") && iPrintCode > 0 && G.Equal(printCode, "p"))
                         {
-                            c.label2 = new string[] { "%" };
+                            explodeElement.label2 = new string[] { "%" };
                         }
                         else if (G.Equal(element.printCodesFinal[0], "m") && iPrintCode > 0 && G.Equal(printCode, "q"))
                         {
-                            c.label2 = new string[] { "%" };
+                            explodeElement.label2 = new string[] { "%" };
                         }
                         else
                         {
                             if (iPrintCode == 0) ; //c.label = c.label + "  (" + printCode.ToLower() + ")";
-                            else if (iPrintCode > 0) c.label2 = new string[] { "(" + printCode.ToLower() + ")" };
+                            else if (iPrintCode > 0) explodeElement.label2 = new string[] { "(" + printCode.ToLower() + ")" };
                         }
-                        
-                        container.Add(c);
+
+                        containerExplode.Add(explodeElement);
                     }
                 }
             }
 
             GekkoSmpl smpl = new GekkoSmpl(oPrt.t1, oPrt.t2);
             //Globals.globalPeriodTimeFilters2 = new List<GekkoTime> { new GekkoTime(EFreq.Monthly, 2003, 1), new GekkoTime(EFreq.Monthly, 2003, 2) };
-                        
+
             //List inputList = x as List;  //will always be a list
-            List inputList = null;            
+            List inputList = null;
 
-            if (true)
+            //List<O.Prt.Element> containerExplode = container;
+
+            AllFreqsHelper allFreqs = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);  //converts between A, Q, M, so all are given. Also used in IMPORT<per1 per2> etc.
+
+            List<IVariable> errorList = new List<IVariable>();
+
+            EFreq sameFreq = EFreq.None;
+            if (freqs[0] && !freqs[1] && !freqs[2]) sameFreq = EFreq.Annual;
+            else if (!freqs[0] && freqs[1] && !freqs[2]) sameFreq = EFreq.Quarterly;
+            else if (!freqs[0] && !freqs[1] && freqs[2]) sameFreq = EFreq.Monthly;
+            else sameFreq = EFreq.None;  //superflous, just to state the obvious
+
+            if (!freqs[0] && !freqs[1] && !freqs[2])
             {
-
-                List<O.Prt.Element> containerExplode = container;
-                
-                AllFreqsHelper allFreqs = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);  //converts between A, Q, M, so all are given. Also used in IMPORT<per1 per2> etc.
-                
-                List<IVariable> errorList = new List<IVariable>();
-
-                EFreq sameFreq = EFreq.None;
-                if (freqs[0] && !freqs[1] && !freqs[2]) sameFreq = EFreq.Annual;
-                else if (!freqs[0] && freqs[1] && !freqs[2]) sameFreq = EFreq.Quarterly;
-                else if (!freqs[0] && !freqs[1] && freqs[2]) sameFreq = EFreq.Monthly;
-                else sameFreq = EFreq.None;  //superflous, just to state the obvious
-
-                if (!freqs[0] && !freqs[1] && !freqs[2])
-                {
-                    //for instance printing a scalar
-                    sameFreq = Program.options.freq;
-                    if (Program.options.freq == EFreq.Annual) freqs[0] = true;
-                    else if (Program.options.freq == EFreq.Quarterly) freqs[1] = true;
-                    else if (Program.options.freq == EFreq.Monthly) freqs[2] = true;
-                }
-
-                Table table = new Table();
-                table.writeOnce = true;
-
-                GekkoTime t1 = smpl.t1;
-                GekkoTime t2 = smpl.t2;
-
-                int y1 = t1.super;
-                int y2 = t2.super;
-
-                //TIMEFILTER!!!!!!! with avg
-
-                //timefilter removes items hitted. If avg/sum timefilter, track the omitted and print them instead of non-hitted
-
-                // 1. 2003 (label)       
-                // 2. 2003q1            Q         
-                // 3. 2003m1                 M
-                // 4. 2003m2                 M      
-                // 5. 2003m3                 M
-                // 6. SUM3M                  Msum (only when 3 M above else empty)
-                // 7. 2003q2            Q           
-                // 8. 2003m4                 M
-                // 9. 2003m5                 M
-                //10. 2003m6                 M
-                //11. SUM3M                  Msum           
-                //12. 2003q3            Q
-                //13. 2003m7                 M
-                //14. 2003m8                 M                 <--------- if timefilter is 2003m2..2003m7, we consolidate in 2003m8:  "2003m2-2003m8    123.45"
-                //15. 2003m9                 M                            Msum is only shown if not touched by timefilter
-                //16. SUM3M                  Msum           
-                //17. 2003q4            Q          
-                //18. 2003m10                M
-                //19. 2003m11                M
-                //20. 2003m12                M
-                //21. SUM3M                  Msum
-                //22. SUM12M                 Msum                                 
-                //23. SUM4Q             Qsum           
-                //24. ANNUAL     A
-
-                //double[] dataMin = new double[containerExplode.Count];
-                //double[] dataMax = new double[containerExplode.Count];
-
-                int[] colCounter = new int[containerExplode.Count];
-
-                if (true)
-                {
-                    //int i = 0;
-                    //int j = 0;
-                    int iPlot = 0;                    
-                    for (int j = 1; j < containerExplode.Count + 2; j++)
-                    {
-                        //iVarCounter = -1 is the column with dates etc.
-
-                        int i = 0;
-                        //j++;
-
-                        O.Prt.Element cc = null;
-                        IVariable ivWork = null;
-                        IVariable ivRef = null;
-                        string printCode = null;
-                        string[] label = new string[] { "" };
-
-                        if (j - 2 >= 0)
-                        {
-                            cc = containerExplode[j - 2];
-                            ivWork = cc.variable[0];
-                            ivRef = cc.variable[1];
-                            printCode = cc.printCodeFinal;
-                            label = cc.label2;
-                        }                 
-                                                
-                        int bankCombi = GetBankCombi(printCode);
-
-                        EFreq freqColumn = EFreq.None;
-                        if (j > 1)
-                        {                            
-                            if (bankCombi == 0 && ivWork.Type() == EVariableType.Series) freqColumn = ((Series)ivWork).freq;
-                            else if (bankCombi == 1 && ivRef.Type() == EVariableType.Series) freqColumn = ((Series)ivRef).freq;
-                            else if (bankCombi == 2 && ivWork.Type() == EVariableType.Series) freqColumn = ((Series)ivWork).freq;
-                        }
-                        
-                        double scalarValueWork = double.NaN;
-                        Series tsWork = null;
-                        if (ivWork != null)
-                        {
-                            tsWork = ivWork as Series;  //remember that the first col has phoney null IVariable
-                            if (tsWork == null) scalarValueWork = ivWork.GetVal(GekkoTime.tNull);
-                        }
-                        double scalarValueRef = double.NaN;
-                        Series tsRef = null;
-                        if (ivRef != null)
-                        {
-                            tsRef = ivRef as Series;  //remember that the first col has phoney null IVariable
-                            if (tsRef == null) scalarValueRef = ivRef.GetVal(GekkoTime.tNull);
-                        }
-
-                        //if (iv != null && ts == null) scalarValue = iv.GetVal(GekkoTime.tNull);
-
-                        int[] skipCounter = new int[3];
-
-                        //remember there is a label column which gets number 1
-                        for (int year = y1; year <= y2; year++)
-                        {                            
-                            if (type != "plot") // ------------------------------------------------------------- (1)
-                            {
-                                i++;
-                                if (year == y1)
-                                {
-                                    if (j <= 1)
-                                    {
-                                        i += labelMaxLine - 1;
-                                    }
-                                    else
-                                    {
-                                        for (int ii = 0; ii < labelMaxLine; ii++)
-                                        {
-                                            //G.Writeln2(labelMaxLine + " " + ii);
-                                            if (labelMaxLine - ii - 1 < 0)
-                                            {
-
-                                            }
-                                            else if (labelMaxLine - ii - 1 >= label.Length)
-                                            {
-
-                                            }
-                                            else
-                                            {
-                                                if (label[labelMaxLine - ii - 1] != "[[]]")
-                                                {
-                                                    table.Set(i, j, label[labelMaxLine - ii - 1]);
-                                                    table.SetAlign(i, j, Align.Right);
-                                                }
-                                            }
-                                            if (ii < labelMaxLine - 1) i++;
-                                        }
-                                    }                              
-                                }
-                                i++;
-                                //Non-plots have a first column with dates, plots have such a column for each series
-                                if (j == 1)  //then iv == null
-                                {                                    
-                                    // --------------------------                                
-                                    // --------------------------
-                                    table.Set(i, j, year.ToString());                                    
-                                }
-                                if (type != "plot" && sameFreq == EFreq.Annual) i = i - 1; // #98075235874325
-
-                            }
-
-                            if (true)  // ------------------------------------------------------------- (2)
-                            {
-                                if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
-                                {
-                                    // --------------------------
-                                    EFreq freqInThisTableRow = EFreq.Monthly;
-                                    int subHere = 1;
-                                    i++;
-                                    int sumOver = 1;
-                                    // --------------------------
-                                    if (j == 1)
-                                    {
-                                        table.Set(i, j, "m1");
-                                    }
-                                    else
-                                    {                                        
-                                        PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqInThisTableRow, subHere, sumOver, skipCounter, cc);
-                                    }
-                                }
-                            }
-                            if (true)  // ------------------------------------------------------------- (3)
-                            {
-                                if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Monthly;
-                                    int subHere = 2;
-                                    i++;
-                                    int sumOver = 1;
-                                    // --------------------------
-                                    if (j == 1)
-                                    {
-                                        table.Set(i, j, "m2");
-                                    }
-                                    else
-                                    {
-
-                                        PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                    }
-                                }
-                            }
-                            if (true)  // ------------------------------------------------------------- (4)
-                            {
-                                if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Monthly;
-                                    int subHere = 3;
-                                    i++;
-                                    int sumOver = 1;
-                                    // --------------------------
-                                    if (j == 1)
-                                    {
-                                        table.Set(i, j, "m3");
-                                    }
-                                    else
-                                    {
-
-                                        PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                    }
-                                }
-                            }
-
-                            if (true)  // ------------------------------------------------------------- (5)
-                            {
-                                if ((type != "plot" && freqs[2]))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Monthly;
-                                    int subHere = 3;
-                                    i++;
-                                    int sumOver = 3;
-                                    // --------------------------
-
-                                    bool skip = false;
-                                    GekkoTime t = new GekkoTime(freqHere, year, subHere);
-                                    foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
-                                    {
-                                        if (t.freq == tFilter.freq && t.Equals(tFilter))
-                                        {
-                                            skip = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if (!skip)
-                                    {
-                                        if (j == 1)
-                                        {
-                                            table.Set(i, j, "mSUM");
-                                        }
-                                        else
-                                        {
-                                            PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                        }
-                                    }
-                                }
-                            }
-                            if (true)  // ------------------------------------------------------------- (6)
-                            {
-                                if ((type != "plot" && freqs[1]) || (type == "plot" && freqColumn == EFreq.Quarterly))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Quarterly;
-                                    int subHere = 1;
-                                    i++;
-                                    int sumOver = 1;
-                                    // --------------------------
-                                    if (j == 1)
-                                    {
-                                        table.Set(i, j, "q1");
-                                    }
-                                    else
-                                    {
-                                        PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                    }
-                                }
-                            }
-
-
-
-
-
-
-
-
-
-                            if (true)  // ------------------------------------------------------------- (7)
-                            {
-                                if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Monthly;
-                                    int subHere = 4;
-                                    i++;
-                                    int sumOver = 1;
-                                    // --------------------------
-                                    if (j == 1)
-                                    {
-                                        table.Set(i, j, "m4");
-                                    }
-                                    else
-                                    {
-
-                                        PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                    }
-                                }
-                            }
-                            if (true)  // ------------------------------------------------------------- (8)
-                            {
-                                if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Monthly;
-                                    int subHere = 5;
-                                    i++;
-                                    int sumOver = 1;
-                                    // --------------------------
-                                    if (j == 1)
-                                    {
-                                        table.Set(i, j, "m5");
-                                    }
-                                    else
-                                    {
-
-                                        PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                    }
-                                }
-                            }
-                            if (true)  // ------------------------------------------------------------- (9)
-                            {
-                                if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Monthly;
-                                    int subHere = 6;
-                                    i++;
-                                    int sumOver = 1;
-                                    // --------------------------
-                                    if (j == 1)
-                                    {
-                                        table.Set(i, j, "m6");
-                                    }
-                                    else
-                                    {
-
-                                        PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                    }
-                                }
-                            }
-
-                            if (true)  // ------------------------------------------------------------- (10)
-                            {
-                                if ((type != "plot" && freqs[2]))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Monthly;
-                                    int subHere = 6;
-                                    i++;
-                                    int sumOver = 3;
-                                    // --------------------------
-
-                                    bool skip = false;
-                                    GekkoTime t = new GekkoTime(freqHere, year, subHere);
-                                    foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
-                                    {
-                                        if (t.freq == tFilter.freq && t.Equals(tFilter))
-                                        {
-                                            skip = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if (!skip)
-                                    {
-                                        if (j == 1)
-                                        {
-                                            table.Set(i, j, "mSUM");
-                                        }
-                                        else
-                                        {
-                                            PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                        }
-                                    }
-                                }
-                            }
-                            if (true)  // ------------------------------------------------------------- (11)
-                            {
-                                if ((type != "plot" && freqs[1]) || (type == "plot" && freqColumn == EFreq.Quarterly))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Quarterly;
-                                    int subHere = 2;
-                                    i++;
-                                    int sumOver = 1;
-                                    // --------------------------
-                                    if (j == 1)
-                                    {
-                                        table.Set(i, j, "q2");
-                                    }
-                                    else
-                                    {
-                                        PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                    }
-                                }
-                            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                            if (true)  // ------------------------------------------------------------- (12)
-                            {
-                                if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Monthly;
-                                    int subHere = 7;
-                                    i++;
-                                    int sumOver = 1;
-                                    // --------------------------
-                                    if (j == 1)
-                                    {
-                                        table.Set(i, j, "m7");
-                                    }
-                                    else
-                                    {
-
-                                        PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                    }
-                                }
-                            }
-                            if (true)  // ------------------------------------------------------------- (13)
-                            {
-                                if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Monthly;
-                                    int subHere = 8;
-                                    i++;
-                                    int sumOver = 1;
-                                    // --------------------------
-                                    if (j == 1)
-                                    {
-                                        table.Set(i, j, "m8");
-                                    }
-                                    else
-                                    {
-
-                                        PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                    }
-                                }
-                            }
-                            if (true)  // ------------------------------------------------------------- (14)
-                            {
-                                if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Monthly;
-                                    int subHere = 9;
-                                    i++;
-                                    int sumOver = 1;
-                                    // --------------------------
-                                    if (j == 1)
-                                    {
-                                        table.Set(i, j, "m9");
-                                    }
-                                    else
-                                    {
-
-                                        PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                    }
-                                }
-                            }
-
-                            if (true)  // ------------------------------------------------------------- (15)
-                            {
-                                if ((type != "plot" && freqs[2]))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Monthly;
-                                    int subHere = 9;
-                                    i++;
-                                    int sumOver = 3;
-                                    // --------------------------
-
-                                    bool skip = false;
-                                    GekkoTime t = new GekkoTime(freqHere, year, subHere);
-                                    foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
-                                    {
-                                        if (t.freq == tFilter.freq && t.Equals(tFilter))
-                                        {
-                                            skip = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if (!skip)
-                                    {
-                                        if (j == 1)
-                                        {
-                                            table.Set(i, j, "mSUM");
-                                        }
-                                        else
-                                        {
-                                            PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (true)  // ------------------------------------------------------------- (16)
-                            {
-                                if ((type != "plot" && freqs[1]) || (type == "plot" && freqColumn == EFreq.Quarterly))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Quarterly;
-                                    int subHere = 3;
-                                    i++;
-                                    int sumOver = 1;
-                                    // --------------------------
-                                    if (j == 1)
-                                    {
-                                        table.Set(i, j, "q3");
-                                    }
-                                    else
-                                    {
-                                        PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                    }
-                                }
-                            }
-
-
-
-
-
-
-
-
-
-
-
-
-                            if (true)  // ------------------------------------------------------------- (17)
-                            {
-                                if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Monthly;
-                                    int subHere = 10;
-                                    i++;
-                                    int sumOver = 1;
-                                    // --------------------------
-                                    if (j == 1)
-                                    {
-                                        table.Set(i, j, "m10");
-                                    }
-                                    else
-                                    {
-
-                                        PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                    }
-                                }
-                            }
-                            if (true)  // ------------------------------------------------------------- (18)
-                            {
-                                if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Monthly;
-                                    int subHere = 11;
-                                    i++;
-                                    int sumOver = 1;
-                                    // --------------------------
-                                    if (j == 1)
-                                    {
-                                        table.Set(i, j, "m11");
-                                    }
-                                    else
-                                    {
-
-                                        PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                    }
-                                }
-                            }
-                            if (true)  // ------------------------------------------------------------- (19)
-                            {
-                                if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Monthly;
-                                    int subHere = 12;
-                                    i++;
-                                    int sumOver = 1;
-                                    // --------------------------
-                                    if (j == 1)
-                                    {
-                                        table.Set(i, j, "m12");
-                                    }
-                                    else
-                                    {
-
-                                        PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                    }
-                                }
-                            }
-
-                            if (true)  // ------------------------------------------------------------- (20)
-                            {
-                                if ((type != "plot" && freqs[2]))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Monthly;
-                                    int subHere = 12;
-                                    i++;
-                                    int sumOver = 3;
-                                    // --------------------------
-
-                                    bool skip = false;
-                                    GekkoTime t = new GekkoTime(freqHere, year, subHere);
-                                    foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
-                                    {
-                                        if (t.freq == tFilter.freq && t.Equals(tFilter))
-                                        {
-                                            skip = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if (!skip)
-                                    {
-                                        if (j == 1)
-                                        {
-                                            table.Set(i, j, "mSUM");
-                                        }
-                                        else
-                                        {
-                                            PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                        }
-                                    }
-                                }
-                            }
-
-
-                            if (true)  // ------------------------------------------------------------- (21)
-                            {
-                                if ((type != "plot" && freqs[2]) )
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Monthly;
-                                    int subHere = 12;
-                                    i++;
-                                    int sumOver = 12;
-                                    // --------------------------
-
-                                    bool skip = false;
-                                    GekkoTime t = new GekkoTime(freqHere, year, subHere);
-                                    foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
-                                    {
-                                        if (t.freq == tFilter.freq && t.Equals(tFilter))
-                                        {
-                                            skip = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if (!skip)
-                                    {
-                                        if (j == 1)
-                                        {
-                                            table.Set(i, j, "mSUM12");
-                                        }
-                                        else
-                                        {
-                                            PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                        }
-                                    }
-                                }
-                            }
-                            if (true)  // ------------------------------------------------------------- (22)
-                            {
-                                if ((type != "plot" && freqs[1]) || (type == "plot" && freqColumn == EFreq.Quarterly))
-                                {// --------------------------
-                                    EFreq freqHere = EFreq.Quarterly;
-                                    int subHere = 4;
-                                    i++;
-                                    int sumOver = 1;
-                                    // --------------------------
-                                    if (j == 1)
-                                    {
-                                        table.Set(i, j, "q4");
-                                    }
-                                    else
-                                    {
-                                        PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                    }
-                                }
-                            }
-
-
-                            if (true)  // ------------------------------------------------------------- (23)
-                            {
-                                if ((type != "plot" && freqs[1]))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Quarterly;
-                                    int subHere = 4;
-                                    i++;
-                                    int sumOver = 4;
-                                    // --------------------------
-
-                                    bool skip = false;
-                                    GekkoTime t = new GekkoTime(freqHere, year, subHere);
-                                    foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
-                                    {
-                                        if (t.freq == tFilter.freq && t.Equals(tFilter))
-                                        {
-                                            skip = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if (!skip)
-                                    {
-                                        if (j == 1)
-                                        {
-                                            table.Set(i, j, "qSUM");
-                                        }
-                                        else
-                                        {
-                                            PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                        }
-                                    }
-                                }
-                            }
-                            if (true)  // ------------------------------------------------------------- (24)
-                            {
-                                if ((type != "plot" && freqs[0]) || (type == "plot" && freqColumn == EFreq.Annual))
-                                {
-                                    // --------------------------
-                                    EFreq freqHere = EFreq.Annual;
-                                    int subHere = 1;
-                                    i++;
-                                    int sumOver = 1;
-                                    // --------------------------
-                                    if (j == 1)
-                                    {
-                                        if (type != "plot" && sameFreq == EFreq.Annual)
-                                        {
-                                            // #98075235874325
-                                        }
-                                        else table.Set(i, j, "a");
-                                    }
-                                    else
-                                    {
-
-                                        PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                                    }
-                                    if (type != "plot" && sameFreq == EFreq.Annual) i = i - 1; // #98075235874325
-                                }
-                            }
-                        }  //end of years
-                        //if (i > 1) G.Writeln(j + " " + i);
-                        if (j-2 >= 0) colCounter[j-2] = i;
-                    }  //end of iVarCounter
-                } // true
-
-                int max = int.MinValue;
-                for (int jj = 0; jj < containerExplode.Count; jj++)
-                {
-                    max = Math.Max(max, colCounter[jj]);
-                }
-                for (int jj = 0; jj < containerExplode.Count; jj++)
-                {
-                    for (int jjj = colCounter[jj]; jjj < max ; jjj++)
-                    {
-                        table.Set(jjj, jj + 1, "M");
-                        table.SetAlign(jjj, jj + 1, Align.Right);
-                        table.Set(jjj, containerExplode.Count + jj + 1, "M", CellType.Text);
-                        table.SetAlign(jjj, containerExplode.Count + jj + 1, Align.Right);
-                    }
-                }
-
-                //bool filter = ShouldFilterPeriod(new GekkoTime());
-                
-                if (type == "plot")
-                {
-                    CallGnuplotNew2(table, oPrt, containerExplode, freqs);
-                }
-                else
-                {
-
-
-                    int widthRemember = Program.options.print_width;
-                    int fileWidthRemember = Program.options.print_filewidth;
-                    Program.options.print_width = int.MaxValue;
-                    Program.options.print_filewidth = int.MaxValue;
-                    try
-                    {
-                        G.Writeln("");
-                        List<string> ss = table.Print();
-                        foreach (string s in ss) G.Writeln(s);
-                    }
-                    finally
-                    {
-                        //resetting, also if there is an error
-                        Program.options.print_width = widthRemember;
-                        Program.options.print_filewidth = fileWidthRemember;
-                    }
-                                        
-                    Globals.lastPrtOrMulprtTable = table;
-                    CrossThreadStuff.CopyButtonEnabled(true);
-                    //PrtClipboard(table, false);
-                }
-
+                //for instance printing a scalar
+                sameFreq = Program.options.freq;
+                if (Program.options.freq == EFreq.Annual) freqs[0] = true;
+                else if (Program.options.freq == EFreq.Quarterly) freqs[1] = true;
+                else if (Program.options.freq == EFreq.Monthly) freqs[2] = true;
             }
-            else
-            {
-                                
-                IVariable x = inputList.list[0];  //HAXKKKCCCK!!!
 
-                if (x == null)
+            Table table = new Table();
+            table.writeOnce = true;
+
+            GekkoTime t1 = smpl.t1;
+            GekkoTime t2 = smpl.t2;
+
+            int y1 = t1.super;
+            int y2 = t2.super;
+
+            //TIMEFILTER!!!!!!! with avg
+
+            //timefilter removes items hitted. If avg/sum timefilter, track the omitted and print them instead of non-hitted
+
+            // 1. 2003 (label)       
+            // 2. 2003q1            Q         
+            // 3. 2003m1                 M
+            // 4. 2003m2                 M      
+            // 5. 2003m3                 M
+            // 6. SUM3M                  Msum (only when 3 M above else empty)
+            // 7. 2003q2            Q           
+            // 8. 2003m4                 M
+            // 9. 2003m5                 M
+            //10. 2003m6                 M
+            //11. SUM3M                  Msum           
+            //12. 2003q3            Q
+            //13. 2003m7                 M
+            //14. 2003m8                 M                 <--------- if timefilter is 2003m2..2003m7, we consolidate in 2003m8:  "2003m2-2003m8    123.45"
+            //15. 2003m9                 M                            Msum is only shown if not touched by timefilter
+            //16. SUM3M                  Msum           
+            //17. 2003q4            Q          
+            //18. 2003m10                M
+            //19. 2003m11                M
+            //20. 2003m12                M
+            //21. SUM3M                  Msum
+            //22. SUM12M                 Msum                                 
+            //23. SUM4Q             Qsum           
+            //24. ANNUAL     A
+
+            //double[] dataMin = new double[containerExplode.Count];
+            //double[] dataMax = new double[containerExplode.Count];
+
+            int[] colCounter = new int[containerExplode.Count];
+
+            //int i = 0;
+            //int j = 0;
+            int iPlot = 0;
+            for (int j = 1; j < containerExplode.Count + 2; j++)
+            {
+                //iVarCounter = -1 is the column with dates etc.
+
+                int i = 0;
+                //j++;
+
+                O.Prt.Element cc = null;
+                IVariable ivWork = null;
+                IVariable ivRef = null;
+                string printCode = null;
+                string[] label = new string[] { "" };
+
+                if (j - 2 >= 0)
                 {
-                    G.Writeln2("*** ERROR: Print of null object");
-                    throw new GekkoException();
+                    cc = containerExplode[j - 2];
+                    ivWork = cc.variable[0];
+                    ivRef = cc.variable[1];
+                    printCode = cc.printCodeFinal;
+                    label = cc.label2;
                 }
 
-                Table tab = new Table();
-                tab.writeOnce = true;
+                int bankCombi = GetBankCombi(printCode);
 
-                switch (x.Type())
+                EFreq freqColumn = EFreq.None;
+                if (j > 1)
                 {
-                    case EVariableType.Val:
+                    if (bankCombi == 0 && ivWork.Type() == EVariableType.Series) freqColumn = ((Series)ivWork).freq;
+                    else if (bankCombi == 1 && ivRef.Type() == EVariableType.Series) freqColumn = ((Series)ivRef).freq;
+                    else if (bankCombi == 2 && ivWork.Type() == EVariableType.Series) freqColumn = ((Series)ivWork).freq;
+                }
+
+                double scalarValueWork = double.NaN;
+                Series tsWork = null;
+                if (ivWork != null)
+                {
+                    tsWork = ivWork as Series;  //remember that the first col has phoney null IVariable
+                    if (tsWork == null) scalarValueWork = ivWork.GetVal(GekkoTime.tNull);
+                }
+                double scalarValueRef = double.NaN;
+                Series tsRef = null;
+                if (ivRef != null)
+                {
+                    tsRef = ivRef as Series;  //remember that the first col has phoney null IVariable
+                    if (tsRef == null) scalarValueRef = ivRef.GetVal(GekkoTime.tNull);
+                }
+
+                //if (iv != null && ts == null) scalarValue = iv.GetVal(GekkoTime.tNull);
+
+                int[] skipCounter = new int[3];
+
+                if (type == "plot") i++;
+                
+
+
+                    //remember there is a label column which gets number 1
+                for (int year = y1; year <= y2; year++)
+                {
+                    
+                    if (type != "plot") // ------------------------------------------------------------- (1)
+                    {
+                        i++;
+                        if (year == y1)
                         {
-                            double d = O.ConvertToVal(x);  //#875324397
-                            G.Writeln2("VAL = " + d);
-                        }
-                        break;
-                    case EVariableType.String:
-                        {
-                            string s = O.ConvertToString(x);
-                            G.Writeln2("STRING = '" + s + "'");
-                        }
-                        break;
-                    case EVariableType.Date:
-                        {
-                            string d = O.ConvertToDate(x).ToString();
-                            G.Writeln2("DATE = " + d);
-                        }
-                        break;
-                    case EVariableType.List:
-                        {
-                            List m = x as List;
-                            if (m.list[0].Type() == EVariableType.Series || m.list[0].Type() == EVariableType.Val)
+                            if (j <= 1)
                             {
-                                //List of values
-                                int ii1 = -1;
-                                foreach (GekkoTime t in smpl.Iterate12())
-                                {
-                                    ii1++;
-                                    tab.SetDate(ii1 + 1, 1, t.ToString());
-                                    int ii2 = -1;
-                                    foreach (IVariable iv in m.list)
-                                    {
-                                        ii2++;
-                                        if (iv.Type() == EVariableType.Series)
-                                        {
-                                            Series ts = iv as Series;
-                                            tab.SetNumber(ii1 + 1, ii2 + 2, ts.GetData(smpl, t), "f12.4");
-                                        }
-                                        else if (iv.Type() == EVariableType.Val)
-                                        {
-                                            ScalarVal sv = iv as ScalarVal;
-                                            tab.SetNumber(ii1 + 1, ii2 + 2, sv.val, "f12.4");
-                                        }
-                                        else
-                                        {
-                                            G.Writeln("*** ERROR: Type error 3243");
-                                        }
-                                    }
-                                    G.Writeln();
-                                    //
-                                }
-                            }
-                            else if (m.list[0].Type() == EVariableType.List)
-                            {
-                                G.Writeln2("Two lists to be handled (work/base)");
+                                i += labelMaxLine - 1;
                             }
                             else
                             {
-                                List<string> l = O.GetStringList(x);
-                                G.Writeln2("LIST = ");
-                                foreach (string s in l) G.Writeln(s);
-                            }
-                        }
-                        break;
-                    case EVariableType.Series:
-                        {
-                            Series ts = x as Series;
-                            string tl = null; if (ts.type == ESeriesType.Timeless) tl = " (timeless)";
-                            G.Writeln2("SERIES = " + tl);
-                            int ii1 = -1;
-                            foreach (GekkoTime t in smpl.Iterate12())
-                            {
-                                ii1++;
-                                tab.SetDate(ii1 + 1, 1, t.ToString());
-                                tab.SetNumber(ii1 + 1, 2, ts.GetData(smpl, t), "f12.4");
-                            }
-                        }
-                        break;
-                    case EVariableType.Matrix:
-                        {
-                            Matrix m = O.ConvertToMatrix(x);
-                            Program.ShowMatrix(m, "label...");
-                        }
-                        break;                    
-                    default:
-                        {
-                            G.Writeln2("*** ERROR: Assignment with unknown type");
-                            throw new GekkoException();
-                        }
-                        break;
-                }
+                                for (int ii = 0; ii < labelMaxLine; ii++)
+                                {
+                                    //G.Writeln2(labelMaxLine + " " + ii);
+                                    if (labelMaxLine - ii - 1 < 0)
+                                    {
 
-                if (smpl.HasError())
+                                    }
+                                    else if (labelMaxLine - ii - 1 >= label.Length)
+                                    {
+
+                                    }
+                                    else
+                                    {
+                                        if (label[labelMaxLine - ii - 1] != "[[]]")
+                                        {
+                                            table.Set(i, j, label[labelMaxLine - ii - 1]);
+                                            table.SetAlign(i, j, Align.Right);
+                                        }
+                                    }
+                                    if (ii < labelMaxLine - 1) i++;
+                                }
+                            }
+                        }
+                        i++;
+                        //Non-plots have a first column with dates, plots have such a column for each series
+                        if (j == 1)  //then iv == null
+                        {
+                            // --------------------------                                
+                            // --------------------------
+                            table.Set(i, j, year.ToString());
+                        }
+                        if (type != "plot" && sameFreq == EFreq.Annual) i = i - 1; // #98075235874325
+
+                    }
+
+                    if (true)  // ------------------------------------------------------------- (2)
+                    {
+                        if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
+                        {
+                            // --------------------------
+                            EFreq freqInThisTableRow = EFreq.Monthly;
+                            int subHere = 1;
+                            i++;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i, j, "m1");
+                            }
+                            else
+                            {
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqInThisTableRow, subHere, sumOver, skipCounter, cc);
+                            }
+                        }
+                    }
+                    if (true)  // ------------------------------------------------------------- (3)
+                    {
+                        if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 2;
+                            i++;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i, j, "m2");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            }
+                        }
+                    }
+                    if (true)  // ------------------------------------------------------------- (4)
+                    {
+                        if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 3;
+                            i++;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i, j, "m3");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            }
+                        }
+                    }
+
+                    if (true)  // ------------------------------------------------------------- (5)
+                    {
+                        if ((type != "plot" && freqs[2]))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 3;
+                            i++;
+                            int sumOver = 3;
+                            // --------------------------
+
+                            bool skip = false;
+                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            {
+                                if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                {
+                                    skip = true;
+                                    break;
+                                }
+                            }
+
+                            if (!skip)
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, "mSUM");
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
+                            }
+                        }
+                    }
+                    if (true)  // ------------------------------------------------------------- (6)
+                    {
+                        if ((type != "plot" && freqs[1]) || (type == "plot" && freqColumn == EFreq.Quarterly))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Quarterly;
+                            int subHere = 1;
+                            i++;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i, j, "q1");
+                            }
+                            else
+                            {
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            }
+                        }
+                    }
+
+
+
+
+
+
+
+
+
+                    if (true)  // ------------------------------------------------------------- (7)
+                    {
+                        if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 4;
+                            i++;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i, j, "m4");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            }
+                        }
+                    }
+                    if (true)  // ------------------------------------------------------------- (8)
+                    {
+                        if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 5;
+                            i++;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i, j, "m5");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            }
+                        }
+                    }
+                    if (true)  // ------------------------------------------------------------- (9)
+                    {
+                        if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 6;
+                            i++;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i, j, "m6");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            }
+                        }
+                    }
+
+                    if (true)  // ------------------------------------------------------------- (10)
+                    {
+                        if ((type != "plot" && freqs[2]))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 6;
+                            i++;
+                            int sumOver = 3;
+                            // --------------------------
+
+                            bool skip = false;
+                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            {
+                                if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                {
+                                    skip = true;
+                                    break;
+                                }
+                            }
+
+                            if (!skip)
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, "mSUM");
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
+                            }
+                        }
+                    }
+                    if (true)  // ------------------------------------------------------------- (11)
+                    {
+                        if ((type != "plot" && freqs[1]) || (type == "plot" && freqColumn == EFreq.Quarterly))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Quarterly;
+                            int subHere = 2;
+                            i++;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i, j, "q2");
+                            }
+                            else
+                            {
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            }
+                        }
+                    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    if (true)  // ------------------------------------------------------------- (12)
+                    {
+                        if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 7;
+                            i++;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i, j, "m7");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            }
+                        }
+                    }
+                    if (true)  // ------------------------------------------------------------- (13)
+                    {
+                        if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 8;
+                            i++;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i, j, "m8");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            }
+                        }
+                    }
+                    if (true)  // ------------------------------------------------------------- (14)
+                    {
+                        if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 9;
+                            i++;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i, j, "m9");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            }
+                        }
+                    }
+
+                    if (true)  // ------------------------------------------------------------- (15)
+                    {
+                        if ((type != "plot" && freqs[2]))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 9;
+                            i++;
+                            int sumOver = 3;
+                            // --------------------------
+
+                            bool skip = false;
+                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            {
+                                if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                {
+                                    skip = true;
+                                    break;
+                                }
+                            }
+
+                            if (!skip)
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, "mSUM");
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
+                            }
+                        }
+                    }
+
+                    if (true)  // ------------------------------------------------------------- (16)
+                    {
+                        if ((type != "plot" && freqs[1]) || (type == "plot" && freqColumn == EFreq.Quarterly))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Quarterly;
+                            int subHere = 3;
+                            i++;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i, j, "q3");
+                            }
+                            else
+                            {
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            }
+                        }
+                    }
+
+
+
+
+
+
+
+
+
+
+
+
+                    if (true)  // ------------------------------------------------------------- (17)
+                    {
+                        if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 10;
+                            i++;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i, j, "m10");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            }
+                        }
+                    }
+                    if (true)  // ------------------------------------------------------------- (18)
+                    {
+                        if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 11;
+                            i++;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i, j, "m11");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            }
+                        }
+                    }
+                    if (true)  // ------------------------------------------------------------- (19)
+                    {
+                        if ((type != "plot" && freqs[2]) || (type == "plot" && freqColumn == EFreq.Monthly))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 12;
+                            i++;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i, j, "m12");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            }
+                        }
+                    }
+
+                    if (true)  // ------------------------------------------------------------- (20)
+                    {
+                        if ((type != "plot" && freqs[2]))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 12;
+                            i++;
+                            int sumOver = 3;
+                            // --------------------------
+
+                            bool skip = false;
+                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            {
+                                if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                {
+                                    skip = true;
+                                    break;
+                                }
+                            }
+
+                            if (!skip)
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, "mSUM");
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
+                            }
+                        }
+                    }
+
+
+                    if (true)  // ------------------------------------------------------------- (21)
+                    {
+                        if ((type != "plot" && freqs[2]))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Monthly;
+                            int subHere = 12;
+                            i++;
+                            int sumOver = 12;
+                            // --------------------------
+
+                            bool skip = false;
+                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            {
+                                if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                {
+                                    skip = true;
+                                    break;
+                                }
+                            }
+
+                            if (!skip)
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, "mSUM12");
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
+                            }
+                        }
+                    }
+                    if (true)  // ------------------------------------------------------------- (22)
+                    {
+                        if ((type != "plot" && freqs[1]) || (type == "plot" && freqColumn == EFreq.Quarterly))
+                        {// --------------------------
+                            EFreq freqHere = EFreq.Quarterly;
+                            int subHere = 4;
+                            i++;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                table.Set(i, j, "q4");
+                            }
+                            else
+                            {
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            }
+                        }
+                    }
+
+
+                    if (true)  // ------------------------------------------------------------- (23)
+                    {
+                        if ((type != "plot" && freqs[1]))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Quarterly;
+                            int subHere = 4;
+                            i++;
+                            int sumOver = 4;
+                            // --------------------------
+
+                            bool skip = false;
+                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            {
+                                if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                {
+                                    skip = true;
+                                    break;
+                                }
+                            }
+
+                            if (!skip)
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, "qSUM");
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
+                            }
+                        }
+                    }
+                    if (true)  // ------------------------------------------------------------- (24)
+                    {
+                        if ((type != "plot" && freqs[0]) || (type == "plot" && freqColumn == EFreq.Annual))
+                        {
+                            // --------------------------
+                            EFreq freqHere = EFreq.Annual;
+                            int subHere = 1;
+                            i++;
+                            int sumOver = 1;
+                            // --------------------------
+                            if (j == 1)
+                            {
+                                if (type != "plot" && sameFreq == EFreq.Annual)
+                                {
+                                    // #98075235874325
+                                }
+                                else table.Set(i, j, "a");
+                            }
+                            else
+                            {
+
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            }
+                            if (type != "plot" && sameFreq == EFreq.Annual) i = i - 1; // #98075235874325
+                        }
+                    }
+                }  //end of years
+                   //if (i > 1) G.Writeln(j + " " + i);
+                if (j - 2 >= 0) colCounter[j - 2] = i;
+            }  //end of iVarCounter
+
+
+            int max = int.MinValue;
+            for (int jj = 0; jj < containerExplode.Count; jj++)
+            {
+                max = Math.Max(max, colCounter[jj]);
+            }
+            for (int jj = 0; jj < containerExplode.Count; jj++)
+            {
+                for (int jjj = colCounter[jj]; jjj < max; jjj++)
                 {
-                    return;
+                    table.Set(jjj, jj + 1, "M");
+                    table.SetAlign(jjj, jj + 1, Align.Right);
+                    table.Set(jjj, containerExplode.Count + jj + 1, "M", CellType.Text);
+                    table.SetAlign(jjj, containerExplode.Count + jj + 1, Align.Right);
                 }
+            }
+
+            //bool filter = ShouldFilterPeriod(new GekkoTime());
+
+            if (type == "plot")
+            {
+                CallGnuplotNew2(table, oPrt, containerExplode, freqs);
+            }
+            else
+            {
+
 
                 int widthRemember = Program.options.print_width;
                 int fileWidthRemember = Program.options.print_filewidth;
@@ -24542,7 +24406,8 @@ namespace Gekko
                 Program.options.print_filewidth = int.MaxValue;
                 try
                 {
-                    List<string> ss = tab.Print();
+                    G.Writeln("");
+                    List<string> ss = table.Print();
                     foreach (string s in ss) G.Writeln(s);
                 }
                 finally
@@ -24552,8 +24417,10 @@ namespace Gekko
                     Program.options.print_filewidth = fileWidthRemember;
                 }
 
+                Globals.lastPrtOrMulprtTable = table;
+                CrossThreadStuff.CopyButtonEnabled(true);
+                //PrtClipboard(table, false);
             }
-
         }
 
         private static int GetBankCombi(string printCode)
@@ -28766,7 +28633,7 @@ namespace Gekko
 
         private static double GetXAdjustmentForInsideTics(bool isInside, EFreq highestFreq)
         {
-            if (!isInside && highestFreq == EFreq.Annual) return -0.5;  //in the data file, for instance 2020 will be 2020.5
+            if (!isInside && highestFreq == EFreq.Annual) return -0.5;
             else return 0d;
             //if (!isInside) return 0d;
             //int sub = 1;
