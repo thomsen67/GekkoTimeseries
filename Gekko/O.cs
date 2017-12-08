@@ -853,7 +853,7 @@ namespace Gekko
                     //We have an explicit databank given, like "PRT bank1:x"
                     //If we have bankNumber = 1 (Ref bank, used for PRT), we put in the Ref bank instead
                     //In that way, "MULPRT x" and "MULPRT work:x" will give the same (as it should).
-                    if (smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
+                    if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
                     {
                         //only for series type
                         rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
@@ -3876,20 +3876,35 @@ namespace Gekko
 
         public static int ConvertToInt(IVariable a)
         {
+            return ConvertToInt(a, true);
+        }
+
+        public static int ConvertToInt(IVariable a, bool reportError)
+        {
+            bool problem = false;
             //GetInt() is really just GetVal() converted to int afterwards.
             if (a.Type() == EVariableType.Series)
             {
-                G.Writeln2("*** ERROR: Using GetInt() on timeseries.");
-                G.Writeln("           Did you forget []-brackets to pick out an observation, for instance x[2020]?");
-                throw new GekkoException();
+                if (reportError)
+                {
+                    G.Writeln2("*** ERROR: Using GetInt() on timeseries.");
+                    G.Writeln("           Did you forget []-brackets to pick out an observation, for instance x[2020]?");
+                    throw new GekkoException();
+                }
+                problem = true;
             }
             double d = ConvertToVal(a);
             int intValue = -12345;
             if (!G.Round(out intValue, d))
             {
-                G.Writeln2("*** ERROR: Could not convert value '" + d + "' into integer");
-                throw new GekkoException();
+                if (reportError)
+                {
+                    G.Writeln2("*** ERROR: Could not convert value '" + d + "' into integer");
+                    throw new GekkoException();
+                }
+                problem = true;
             }
+            if (!reportError && problem) intValue = int.MaxValue;  //signals a problem with the conversion
             return intValue;
         }
 
@@ -7064,6 +7079,7 @@ namespace Gekko
             public GekkoTime t1 = GekkoTime.tNull; //default, if not explicitely set
             public GekkoTime t2 = GekkoTime.tNull; //default, if not explicitely set
             public string fileName = null;
+            public IVariable list = null;
             public List<string> listItems = null;
             
             public string opt_tsd = null;
@@ -7081,7 +7097,7 @@ namespace Gekko
             public string opt_series = null;
             public string type = null;  //THIS IS NOT WORKING PROPERLY!!
             public void Exe()
-            {                
+            {               
                 Program.Write(this);
             }
         }

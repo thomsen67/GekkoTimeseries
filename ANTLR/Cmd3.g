@@ -54,11 +54,13 @@ tokens {
 	ASTSTRINGINQUOTES;
 	ASTDOUBLE;
 	ASTDOLLARCONDITIONALVARIABLE;
+	ASTINDEXERELEMENTIDENT;
 	ASTPRINT;
 	ASTIFSTATEMENTS;
 	ASTELSESTATEMENTS;
 	ASTNAME;
 	ASTEXPRESSIONNEW;
+	ASTFLEXIBLELIST;
 ASTNAME;
 ASTIDENT;
 ASTCURLYSIMPLE;
@@ -1880,12 +1882,15 @@ leftSideIndexerExpression:  (bankvarname -> bankvarname)
 indexerAlone:			    (leftBracketNoGlue|leftBracketNoGlueWild) indexerExpressionHelper RIGHTBRACKET -> ^(ASTINDEXERALONE indexerExpressionHelper); //also see rule indexerExpression
 						
 dotOrIndexer:               GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
+						  //| leftBracketGlue indexerExpressionHelper3 RIGHTBRACKET -> ^(ASTINDEXERSIMPLE indexerExpressionHelper3) //simple ident, x[a, 85] --> x['a', '85']
 						  | leftBracketGlue indexerExpressionHelper2 RIGHTBRACKET -> ^(ASTINDEXER indexerExpressionHelper2)
 						    ;
 
 						    //just like b1:fy!q, we can use #m.fy!q, where fy!q is the varname.
 dotHelper:				    varname | function | Integer;
 indexerExpressionHelper2:   (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper+;
+//indexerExpressionHelper3:   (indexerExpressionHelper4 (',' indexerExpressionHelper4)*) -> indexerExpressionHelper4+;
+//indexerExpressionHelper4:   ident | Integer;
 
 matrix:                     matrixCol;
 matrixCol:                  leftBracketNoGlue matrixRow ((doubleVerticalBar|SEMICOLON) matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
@@ -1917,7 +1922,8 @@ dollarConditional:          LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITI
 
 bankvarnameindex:           bankvarname ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 bankvarname expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!  //should catch #i0[#i], does not need a parenthesis!						
 					
-indexerExpressionHelper:    expressionOrNothing doubleDot expressionOrNothing -> ^(ASTINDEXERELEMENT expressionOrNothing expressionOrNothing)     //'fm1'..'fm5'
+indexerExpressionHelper:    ident -> ^(ASTINDEXERELEMENTIDENT ident)   
+						  | expressionOrNothing doubleDot expressionOrNothing -> ^(ASTINDEXERELEMENT expressionOrNothing expressionOrNothing)     //'fm1'..'fm5'
 						  | expression -> ^(ASTINDEXERELEMENT expression)                                     //'fm*' or -2 or 2000 or 2010q3
 						  | PLUS expression -> ^(ASTINDEXERELEMENTPLUS expression)                            //+1
                             ;
@@ -2564,10 +2570,10 @@ timefilterperiod:           expression ((doubleDot | TO) expression (BY expressi
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 						    //!!!2x2 identical lines ONLY because of token stuff
-write:					    WRITE  writeOpt1? listItemsWildRange? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE  writeOpt1?  ^(ASTHANDLEFILENAME fileName?) listItemsWildRange?)
-						  | EXPORT writeOpt1? listItemsWildRange? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT writeOpt1?  ^(ASTHANDLEFILENAME fileName?) listItemsWildRange?)
-						  | WRITE  writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE  writeOpt1?  ^(ASTHANDLEFILENAME fileName))
-						  | EXPORT writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT writeOpt1?  ^(ASTHANDLEFILENAME fileName))
+write:					    WRITE  writeOpt1? flexibleList FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTFLEXIBLELIST flexibleList))
+						  | EXPORT writeOpt1? flexibleList FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTFLEXIBLELIST flexibleList))
+						  | WRITE  writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTFLEXIBLELIST))
+						  | EXPORT writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTFLEXIBLELIST))
 						    ;
 writeOpt1:                  ISNOTQUAL
 						  | leftAngle        writeOpt1h* RIGHTANGLE -> writeOpt1h*

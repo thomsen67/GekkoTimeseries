@@ -2645,6 +2645,13 @@ namespace Gekko.Parser.Gek
                             //GetCommaCodeFromAllChildren(node);
                         }
                         break;
+                    case "ASTINDEXERELEMENTIDENT": 
+                        {
+                            string s = node[0][0].Text;
+                            node.Code.A("new ScalarString(\"" + s + "\")");
+                            
+                        }
+                        break;
                     case "ASTINDEXERELEMENT":  //For ASTINDEXER, see "["
                     case "ASTINDEXERELEMENTPLUS":
                         {
@@ -4218,10 +4225,17 @@ namespace Gekko.Parser.Gek
                     //    break;
                     case "ASTWRITE":
                         {                            
-                            node.Code.A("O.Write o" + Num(node) + " = new O.Write();" + G.NL);                            
-                            GetCodeFromAllChildren(node);
+                            node.Code.A("O.Write o" + Num(node) + " = new O.Write();" + G.NL);
                             node.Code.A("o" + Num(node) + ".type = @`" + node[0].Text + "`;");
+                            GetCodeFromAllChildren(node, node[1]);  //options
+                            node.Code.A("o" + Num(node) + ".fileName = " + node[2].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".list = " + node[3].Code + ";" + G.NL);                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
+                    case "ASTFLEXIBLELIST":
+                        {                            
+                            GetCodeFromAllChildren(node);
                         }
                         break;
                     case "ASTSHEETIMPORT":

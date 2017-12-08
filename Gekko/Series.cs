@@ -1387,63 +1387,66 @@ namespace Gekko
 
         public IVariable Indexer(GekkoSmpl smpl, params IVariable[] indexes)
         {
-            IVariable rv = null;            
+            IVariable rv = null;
 
-            int i = -12345; GekkoTime t = GekkoTime.tNull;
-            Series.FindLagLeadFixed(ref i, ref t, indexes);
-
-            if (i != -12345)
+            if (this.type == ESeriesType.ArraySuper)
             {
-                //TODO: Broken lags!!
-                if (IsLagOrLead(i))
+                rv = this.FindArraySeries(smpl.command, indexes, false);
+            }
+            else {
+
+                int i = -12345; GekkoTime t = GekkoTime.tNull;
+                Series.FindLagLeadFixed(ref i, ref t, indexes);
+
+                if (i != -12345)
                 {
-                    //!! this is done for both Normal and Light series
-                    //   regarding Normal series, there is a pointer to the real dataArray
-                    //   that lives in a databank. But in Lookup(), we always DeepClone() when
-                    //   putting stuff from the rhs into the lhs. So this should not be a problem. 
-                    if (this.type == ESeriesType.ArraySuper)
+                    //This is a lag or lead, x[-2] or x[+1]
+                    //TODO: Broken lags!!
+                    if (IsLagOrLead(i))
                     {
-                        G.Writeln2("*** ERROR: You cannot use lags/lead directly on an array-series");
-                        throw new GekkoException();
-                    }
-                    else if (this.type == ESeriesType.Timeless)
-                    {
-                        rv = this;  //no effect of lag/lead
+                        //!! this is done for both Normal and Light series
+                        //   regarding Normal series, there is a pointer to the real dataArray
+                        //   that lives in a databank. But in Lookup(), we always DeepClone() when
+                        //   putting stuff from the rhs into the lhs. So this should not be a problem. 
+                        if (this.type == ESeriesType.Timeless)
+                        {
+                            rv = this;  //no effect of lag/lead
+                        }
+                        else
+                        {
+                            Series temp = new Series(this.type, this.freq);  //This Series gets the same type, so if it is Normal and access is outside dataArray, it can safely return a NaN.
+                                                                             //The two below correspond to just moving pointers
+                            temp.data = this.data;
+                            temp.dataOffsetLag = this.dataOffsetLag + i;
+                            rv = temp;
+                        }
                     }
                     else
                     {
-                        Series temp = new Series(this.type, this.freq);  //This Series gets the same type, so if it is Normal and access is outside dataArray, it can safely return a NaN.
-                        //The two below correspond to just moving pointers
-                        temp.data = this.data;
-                        temp.dataOffsetLag = this.dataOffsetLag + i;
-                        rv = temp;
+                        if (this.freq == EFreq.Annual || this.freq == EFreq.Undated)
+                        {
+                            double d = this.GetData(smpl, new GekkoTime(this.freq, i, 1));
+                            rv = new ScalarVal(d);
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: You cannot index " + G.GetFreqString(this.freq) + " series with value " + i);
+                            throw new GekkoException();
+                        }
                     }
+                }
+                else if (!t.IsNull())
+                {
+                    double d = this.GetData(smpl, t);
+                    rv = new ScalarVal(d);
                 }
                 else
                 {
-                    if (this.freq == EFreq.Annual || this.freq == EFreq.Undated)
-                    {
-                        double d = this.GetData(smpl, new GekkoTime(this.freq, i, 1));
-                        rv = new ScalarVal(d);
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: You cannot index " + G.GetFreqString(this.freq) + " series with value " + i);
-                        throw new GekkoException();
-                    }
+                    G.Writeln2("*** ERROR: Could not understand the []-index of series " + G.GetNameAndFreqPretty(this.name));
+                    throw new GekkoException();
                 }
-            }
-            else if (!t.IsNull())
-            {
-                double d = this.GetData(smpl, t);
-                rv = new ScalarVal(d);
-            }
-            else
-            {
-                //Not x[-2] or x[2020] or x[2020a1] or x[2020q1]                
-                rv = this.FindArraySeries(smpl.command, indexes, false);
-            }
-
+            }  //end of non-arraysuper
+            
             return rv;
         }
 

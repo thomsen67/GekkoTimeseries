@@ -1815,7 +1815,7 @@ namespace Gekko
             bool flag = false;
             rounded = Convert.ToInt32(value);  //this function rounds to nearest int, so -12.98 --> -13
             double decimals = value - rounded;
-            if (Math.Abs(decimals) < 0.0001)
+            if (Math.Abs(decimals) < 0.000001)
             {
                 flag = true;
             }

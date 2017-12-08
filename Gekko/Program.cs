@@ -206,7 +206,7 @@ namespace Gekko
     {
         public string bank = null;
         public string name = null;
-        public string version = null; //not used 
+        public string version = null;
     }
 
     public class Zipper
@@ -6590,19 +6590,16 @@ namespace Gekko
 
         public static List<BankNameVersion> GetInfoFromStringWildcard(string s, string defaultBank, bool decorateWithFirstDatabankName)
         {
+            string dbName, varName, freq; char firstChar; O.Chop(s, out dbName, out varName, out freq);
 
-            ExtractBankAndRestHelper h = null;
-            if (decorateWithFirstDatabankName) h = Program.ExtractBankAndRest(s, EExtrackBankAndRest.OnlyStrings);
-            else h = Program.ExtractBankAndRest(s, EExtrackBankAndRest.OnlyStringNoFirstName);
-
-            string varName = h.name;
-            string bank = h.bank;
-            bank = PerhapsOverrideWithDefaultBankName(defaultBank, h.hasColon, bank);
+            if (dbName == null) dbName = defaultBank;
+            if (dbName == null && decorateWithFirstDatabankName) dbName = Program.databanks.GetFirst().name;            
 
             List<BankNameVersion> list = new List<Gekko.BankNameVersion>();
 
             if (varName.Contains("*") || varName.Contains("?"))
             {
+                string bank = null;
                 Databank db = Program.databanks.GetDatabank(bank);
                 if (db == null)
                 {
@@ -6622,6 +6619,7 @@ namespace Gekko
             }
             else if (varName.Contains(".."))
             {
+                string bank = null;
                 string[] ss2 = varName.Split(new string[] { ".." }, StringSplitOptions.None);
                 ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);
                 IVariable xx = ss.Indexer(null, new Range(new ScalarString(bank + ":" + ss2[0]), new ScalarString(ss2[1])));
@@ -6643,18 +6641,10 @@ namespace Gekko
             }
             else
             {
-                //Databank db = Program.databanks.GetDatabank(bank);
-                //if (db == null)
-                //{
-                //    G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found");
-                //    throw new GekkoException();
-                //}
-                //Series temp = db.GetVariable(varName);
-                //if (temp != null) list.Add(temp);  //returns 0-item list, not null list.
-
                 BankNameVersion bnv = new BankNameVersion();
-                bnv.bank = bank;
+                bnv.bank = dbName;
                 bnv.name = varName;
+                bnv.version = freq;
                 if (bnv.name != null && bnv.name != "") list.Add(bnv);
             }
 
@@ -10190,27 +10180,56 @@ namespace Gekko
         }
         public static string[] GetListOfStringsFromListOfIvariables(IVariable[] indexes)
         {
-            string[] keys = null;
+            string[] keys = new string[indexes.Length];
             int stringCount = 0;
+            int i = -1;
             foreach (IVariable iv in indexes)
             {
+                i++;
                 if (iv.Type() == EVariableType.String)
                 {
                     stringCount++;
-                }
-            }
-            if (indexes.Length == stringCount)
-            {
-
-                keys = new string[indexes.Length];
-                for (int i = 0; i < indexes.Length; i++)
-                {
-                    ScalarString ss = indexes[i] as ScalarString;
+                    ScalarString ss = iv as ScalarString;
                     keys[i] = ss.string2;
                 }
+                else if (iv.Type() == EVariableType.Val)  //will not handle 007 in x[a, 007], must be x[a, '007']
+                {
+                    int ii = O.ConvertToInt(iv, false);
+                    if (ii != int.MaxValue)
+                    {
+                        stringCount++;
+                        keys[i] = ii.ToString();
+                    }
+                }
+            }
+            if (indexes.Length != stringCount)
+            {
+                keys = null;  //signals a problem
             }
 
             return keys;
+        }
+
+        public static List<string> UnfoldFlexibleListIntoListOfStrings(IVariable iv)
+        {
+            List<string> rv = new List<string>();
+
+            if (iv.Type() == EVariableType.String)
+            {
+                rv.Add(iv.ConvertToString());
+            }
+            else if (iv.Type() == EVariableType.List)
+            {
+                List l = iv as List;
+                foreach(IVariable iv2 in l.list)
+                {
+                    if (iv2.Type() == EVariableType.String)
+                    {
+                        rv.Add(iv2.ConvertToString());
+                    }
+                }
+            }            
+            return rv;
         }
 
 
@@ -18854,6 +18873,8 @@ namespace Gekko
         {
             EWriteType writeType = GetWriteType(o);
 
+            if (o.list != null) o.listItems = Program.UnfoldFlexibleListIntoListOfStrings(o.list);
+
             if (writeType == EWriteType.Tsdx)
             {
                 G.Writeln2("*** ERROR: You cannot use <tsdx>. The extension name has changed to to ." + Globals.extensionDatabank + ".");
@@ -18907,7 +18928,7 @@ namespace Gekko
                 }
             }
 
-            bool isRecordsFormat = isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes");
+            bool isRecordsFormat = isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes");
 
             //TODO TODO TODO
             //TODO TODO TODO
@@ -19300,13 +19321,9 @@ namespace Gekko
                     foreach (BankNameVersion var in list)
                     {
                         Databank db = GetBankFromBankNameVersion(var.bank);
-                        IVariable xx = db.GetIVariable(var.name);
-                        if (xx == null)
-                        {
-                            G.Writeln2("*** ERROR: Could not find variable '" + var + "' in databank '" + db.name + "' for writing (" + Globals.extensionDatabank + ")");
-                            throw new GekkoException();
-                        }
-                        if (databankWithFewerVariables.ContainsKey(var.name))
+                        IVariable xx = O.Lookup(null, null, var.bank, var.name, var.version, null, false, EVariableType.Var, true);
+
+                        if (databankWithFewerVariables.ContainsKey(var.name + Globals.freqIndicator + var.version))
                         {
                             G.Writeln();
                             G.Writeln("*** ERROR: Gbk format does not allow duplicate variables ('" + var.name + "')");
