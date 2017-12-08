@@ -13703,19 +13703,9 @@ namespace Gekko
                         }
                         dimCount = dimCount.Substring(0, dimCount.Length - " * ".Length);
 
-                        string first = null;
-                        foreach (string s in keys[0].storage)
-                        {
-                            first += "'" + s + "'" + ", ";
-                        }
-                        first = first.Substring(0, first.Length - ", ".Length);
-
-                        string last = null;
-                        foreach (string s in keys[keys.Count - 1].storage)
-                        {
-                            last += "'" + s + "'" + ", ";
-                        }
-                        last = last.Substring(0, last.Length - ", ".Length);
+                        MapMultidimItem mm = keys[0];
+                        string first = keys[0].ToString();
+                        string last = keys[keys.Count - 1].ToString();
 
                         G.Writeln2("First element: " + G.RemoveFreqFromKey(ts.name) + "[" + first + "]");
                         G.Writeln("Last element: " + G.RemoveFreqFromKey(ts.name) + "[" + last + "]");
@@ -13968,6 +13958,8 @@ namespace Gekko
                 G.Writeln2("Displayed " + varCounter + " variables");
             }
         }
+
+        
 
         private static List<GekkoDictionary<string, string>> GetDimensions(List<string> names)
         {
@@ -23340,6 +23332,74 @@ namespace Gekko
                 return;
             }
 
+            bool unfoldLabels = true;
+            List<string> labelsHandmade = new List<string>();
+
+            if (oPrt.prtElements.Count == 1 && ((oPrt.prtElements[0].variable[0] != null && oPrt.prtElements[0].variable[0].Type() == EVariableType.Series) || (oPrt.prtElements[0].variable[1] != null && oPrt.prtElements[0].variable[1].Type() == EVariableType.Series)))
+            {
+                bool[] banks = new bool[2];  //first, ref
+                foreach (string printCode in oPrt.prtElements[0].printCodesFinal)
+                {
+                    int bankCombi = GetBankCombi(printCode);
+                    if (bankCombi == 0) banks[0] = true;
+                    else if (bankCombi == 1) banks[1] = true;
+                    else if (bankCombi == 2)
+                    {
+                        banks[0] = true;
+                        banks[1] = true;
+                    }
+                }
+
+                Series ts = null;
+                if (banks[0]) ts = oPrt.prtElements[0].variable[0] as Series;
+                else ts = oPrt.prtElements[0].variable[1] as Series;
+                
+                if (ts.type == ESeriesType.ArraySuper)
+                {                    
+                    List<MapMultidimItem> keys = ts.dimensionsStorage.storage.Keys.ToList();
+                    if (keys.Count == 0)
+                    {
+                        G.Writeln2("Array-series " + ts.name + " has no elements");
+                        return;
+                    }
+                    keys.Sort(CompareMapMultidimItems);
+                    List m0 = new List();
+                    List m1 = new List();
+                    foreach (MapMultidimItem key in keys)
+                    {
+                        try
+                        {
+                            if (banks[0]) m0.Add(ts.dimensionsStorage.storage[key]);
+                            if (banks[1]) m1.Add(ts.dimensionsStorage.storage[key]);
+                        }
+                        catch
+                        {
+                            G.Writeln2("*** ERROR: Array elements do not match in first-position and ref databank");
+                            throw new GekkoException();
+                        }
+                        string bankName = null;
+                        if (ts.meta != null && ts.meta.parentDatabank != null)
+                        {
+                            if (G.Equal(ts.meta.parentDatabank.name, Program.databanks.GetFirst().name))
+                            {
+                            }
+                            else if (G.Equal(ts.meta.parentDatabank.name, Program.databanks.GetRef().name))
+                            {
+                                bankName = Globals.symbolBankName;
+                            }
+                            else
+                            {
+                                bankName = ts.meta.parentDatabank + Globals.symbolBankColon;
+                            }
+                        }
+                        labelsHandmade.Add(bankName + G.RemoveFreqFromKey(ts.name) + "[" + key.ToString() + "]");
+                    }
+                    if (banks[0]) oPrt.prtElements[0].variable[0] = m0;
+                    if (banks[1]) oPrt.prtElements[0].variable[1] = m1;                    
+                    unfoldLabels = false;
+                }
+            }
+
             List<O.Prt.Element> containerExplode = new List<O.Prt.Element>();
 
             //If PRT <m> unfold(#m, {#m}), we will get 1 prtElement (since there are no commas), where 
@@ -23376,7 +23436,7 @@ namespace Gekko
                 // --------------- unfold labels start ---------------------------------
                 // ---------------------------------------------------------------------
 
-                UnfoldLabels(element.label, ref label, ref labels2);  //unfolding over #m1 and #m2 etc.                
+                if(unfoldLabels) UnfoldLabels(element.label, ref label, ref labels2);  //unfolding over #m1 and #m2 etc.                
 
                 // ---------------------------------------------------------------------
                 // --------------- unfold labels end -----------------------------------
@@ -23523,7 +23583,11 @@ namespace Gekko
                         explodeElement.printCodeFinal = printCode;
 
                         string lbl = null;
-                        if (labels2 != null && n == labels2.Count)
+                        if (!unfoldLabels && n == labelsHandmade.Count)
+                        {
+                            lbl = labelsHandmade[i];
+                        }
+                        else if (labels2 != null && n == labels2.Count)
                         {
                             lbl = labels2[i];
                         }

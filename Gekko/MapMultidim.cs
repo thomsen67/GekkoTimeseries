@@ -55,16 +55,17 @@ namespace Gekko
         public MapMultidimItem(string[] s)
         {
             this.storage = s;
-        }
+        }        
 
         public override string ToString()
         {
-            string s = null;
-            foreach (string ss in this.storage)
+            string first = null;
+            foreach (string s in this.storage)
             {
-                s += ss + ", ";
+                first += "'" + s + "'" + ", ";
             }
-            return s.Substring(0, s.Length - ", ".Length);
+            first = first.Substring(0, first.Length - ", ".Length);
+            return first;
         }
 
         public override int GetHashCode()
@@ -93,5 +94,7 @@ namespace Gekko
             }
             return true;
         }
+
+        
     }
 }

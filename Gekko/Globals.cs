@@ -155,6 +155,8 @@ namespace Gekko
         public const string printCode_q = "q";
         public const string printCode_mp = "mp";
 
+        public const string symbolBankName = "@";
+
         public List<Databank> bankOpen = new List<Databank>();
         
         public static string ttPath3 = "GekkoCS";  //or "GekkoCS"
