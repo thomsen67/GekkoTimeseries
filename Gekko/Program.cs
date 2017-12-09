@@ -96,6 +96,7 @@ namespace Gekko
         public int gekkoErrorI = 0;
         public int bankNumber = 0;  //0 is inactive, 1 is Ref databank
         public GekkoSmplCommand command = GekkoSmplCommand.Unknown;
+        public P p;
 
         public GekkoSmpl()
         {
@@ -20504,7 +20505,7 @@ namespace Gekko
             CrossThreadStuff.Mode();  //to show default color
 
             Program.GetStartingPeriod();
-            O.InitSmpl(smpl);  //Uses the method above. Just for ultra-safety, so that the smpl does not live on unadjusted after af RESET/RESTART
+            O.InitSmpl(smpl, p);  //Uses the method above. Just for ultra-safety, so that the smpl does not live on unadjusted after af RESET/RESTART
 
             Globals.globalPeriodTimeSpans = new GekkoTimeSpans();  //Probably not used anymore
             Globals.globalPeriodTimeFilters = new GekkoTimeSpans();  //nothing in .data yet.
@@ -22151,11 +22152,11 @@ namespace Gekko
                         {
                             if (counter == 1)
                             {
-                                G.Write2("Created 1 variable with freq '" + Program.options.freq + "'" + " "); G.ServiceMessage();
+                                G.Writeln2("Created 1 variable with freq '" + Program.options.freq + "'" + " ");
                             }
                             else
                             {
-                                G.Write2("Created " + counter + " variables with freq '" + Program.options.freq + "'" + " "); G.ServiceMessage();
+                                G.Writeln2("Created " + counter + " variables with freq '" + Program.options.freq + "'" + " ");
                             }
                         }
                     }
@@ -35344,6 +35345,7 @@ namespace Gekko
         public bool hasSeenStopCommand = false;
         private GekkoDictionary<string, int> commandFileCounter = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         private GekkoDictionary<string, string> commandFileCounterTainted = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        //public int numberOfServiceMessages = 0;
 
         public string GetStack(int i)
         {

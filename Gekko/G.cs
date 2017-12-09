@@ -1418,9 +1418,15 @@ namespace Gekko
             return version;
         }
 
-        public static void ServiceMessage()
+        public static void ServiceMessage(string s, P p)
         {
-            G.Writeln(Globals.serviceMessage, Color.LightGray);
+            //if (p.IsSimple() && p.numberOfServiceMessages == 0)
+            if (p.IsSimple())
+            {
+                G.Write2(s);
+                G.Writeln(Globals.serviceMessage, Color.LightGray);
+                //p.numberOfServiceMessages++;
+            }
         }
 
         //1.4.9 stuff
@@ -1599,14 +1605,20 @@ namespace Gekko
             }
         }
 
-        public static string GetNameAndFreqPretty(string input)
+        public static string GetNameAndFreqPretty(string input, bool useQuotes)
         {
             //returns '%s' or 'x' or 'x' (Annual)
             string freq = null; string varname = null;
             G.ChopFreq(input, ref freq, ref varname);
             string freqPretty = null;
             if (freq != null) freqPretty = " (" + G.GetFreqString(GetFreq(freq)) + ")";
-            return "'" + varname + "'" + freqPretty;
+            if(useQuotes) return "'" + varname + "'" + freqPretty;
+            else return varname + freqPretty;
+        }
+
+        public static string GetNameAndFreqPretty(string input)
+        {
+            return GetNameAndFreqPretty(input, true);
         }
 
         public static string GetFreqString()

@@ -1227,6 +1227,7 @@ Y2                    = 'Y2'                       ;
     UPDX             = 'UPDX'             ;
     V= 'V'             ;
     VAL              = 'VAL'             ;
+	VAR              = 'VAR'             ;
     VALUE            = 'VALUE'             ;
     VERS             = 'VERS'            ;
     VERSION             = 'VERSION'            ;
@@ -1771,6 +1772,7 @@ d.Add("Y" ,Y);
                                         d.Add("updx"    , UPDX       );
                                         d.Add("v"    , V    );
                                         d.Add("val"     , VAL    );
+										d.Add("var"     , VAR    );
                                         d.Add("value"   , VALUE    );
                                         d.Add("vers"    , VERS    );
                                         d.Add("version"    , VERSION    );
@@ -2091,12 +2093,36 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 // ASSIGNMENT, VAL, STRING, DATE, SERIES, LIST, MATRIX, MAP, VAR
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-assignment:				    assignmentType leftSide EQUAL flexibleList -> ^(ASTASSIGNMENT leftSide flexibleList ASTPLACEHOLDER assignmentType)   
-						  | assignmentType leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression ASTPLACEHOLDER assignmentType)
+assignment:				    assignmentType seriesOpt1? leftSide EQUAL flexibleList -> ^(ASTASSIGNMENT leftSide flexibleList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
 						    ;
-assignmentMap:				assignmentType leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression ASTPLACEHOLDER assignmentType) ;
+assignmentMap:				assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType) ;
 
-assignmentType:             SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | -> ASTPLACEHOLDER;  //may be empty
+assignmentType:             SER 
+					 	  | SERIES 
+						  | STRING2 
+						  | VAL 
+						  | DATE 
+						  | LIST 
+						  | MAP 
+						  | MATRIX 
+						  | VAR 
+						  | -> ASTPLACEHOLDER  //may be empty
+						    ;
+
+seriesOpt1                : ISNOTQUAL
+						  | leftAngle2          seriesOpt1h* RIGHTANGLE -> ^(ASTOPT1 seriesOpt1h*)
+						  | leftAngleNo2 dates? seriesOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) seriesOpt1h*)
+                          ;
+
+seriesOpt1h               : D (EQUAL yesNo)? -> ^(ASTOPT_STRING_D yesNo?)
+						  | P (EQUAL yesNo)? -> ^(ASTOPT_STRING_P yesNo?)
+						  | M (EQUAL yesNo)? -> ^(ASTOPT_STRING_M yesNo?)
+						  | Q (EQUAL yesNo)? -> ^(ASTOPT_STRING_Q yesNo?)
+						  | MP (EQUAL yesNo)? -> ^(ASTOPT_STRING_MP yesNo?)						
+						  | N (EQUAL yesNo)? -> ^(ASTOPT_STRING_N yesNo?)						
+						  | KEEP EQUAL exportType -> ^(ASTOPT_STRING_KEEP exportType)
+						  ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ACCEPT
@@ -3542,6 +3568,7 @@ ident2: 					Ident|
                             U|
                             VALUE|
                             VAL|
+							VAR|
                             VERSION|
                             VERS|
                             VPRT|

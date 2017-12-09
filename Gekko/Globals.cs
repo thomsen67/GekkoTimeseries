@@ -714,8 +714,8 @@ namespace Gekko
         
         //public static string gekkoTimeIniCs = "GekkoTime t = GekkoTime.tNull;";
         //public static string gekkoSmplInit = "GekkoSmpl smpl = O.Smpl();";
-        public static string gekkoSmplInit = "GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl);";
-        public static string gekkoSmplInitCommand = "O.InitSmpl(smpl);";
+        public static string gekkoSmplInit = "GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);";
+        public static string gekkoSmplInitCommand = "O.InitSmpl(smpl, p);";
         public static string GekkoSmplNull = "smpl = null;";
         public static string smpl = "smpl";
 

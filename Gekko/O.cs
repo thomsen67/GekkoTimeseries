@@ -917,12 +917,12 @@ namespace Gekko
             return rv;
         }
 
-        public static void InitSmpl(GekkoSmpl smpl)
+        public static void InitSmpl(GekkoSmpl smpl, P p)
         {
-            InitSmpl(smpl, 0);
+            InitSmpl(smpl, 0, p);
         }
 
-        public static void InitSmpl(GekkoSmpl smpl, int i)
+        public static void InitSmpl(GekkoSmpl smpl, int i, P p)
         {
             //called before each command is run
             if (smpl != null)
@@ -934,6 +934,8 @@ namespace Gekko
                 smpl.gekkoError = null;
                 smpl.gekkoErrorI = 0;
                 smpl.bankNumber = 0;
+                //p.numberOfServiceMessages = 0;
+                smpl.p = p;
             }
         }        
 
@@ -1191,7 +1193,6 @@ namespace Gekko
 
                                         G.Writeln2("*** ERROR: Type mismatch");
                                         throw new GekkoException();
-
                                     }
                                     break;
                                 case ESeriesType.Light:
@@ -1199,10 +1200,8 @@ namespace Gekko
                                         //---------------------------------------------------------
                                         // %x = Series Light
                                         //---------------------------------------------------------
-
                                         G.Writeln2("*** ERROR: Type mismatch");
                                         throw new GekkoException();
-
                                     }
                                     break;
                                 case ESeriesType.Timeless:
@@ -1212,6 +1211,8 @@ namespace Gekko
                                         //---------------------------------------------------------
                                         IVariable lhsNew = new ScalarVal(rhsExpression_series.GetTimelessData());
                                         AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                        G.ServiceMessage("VAL " + varnameWithFreq + " updated ", smpl.p);
+
                                     }
                                     break;
                                 case ESeriesType.ArraySuper:
@@ -1219,11 +1220,8 @@ namespace Gekko
                                         //---------------------------------------------------------
                                         // %x = Series Array Super
                                         //---------------------------------------------------------
-
-
                                         G.Writeln2("*** ERROR: Type mismatch");
                                         throw new GekkoException();
-
                                     }
                                     break;
                                 default:
@@ -1242,7 +1240,8 @@ namespace Gekko
                             //---------------------------------------------------------
                             //TODO: can be injected if exist and is val                            
                             IVariable lhsNew = new ScalarVal(((ScalarVal)rhs).val);
-                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);                                                        
+                            G.ServiceMessage("VAL " + varnameWithFreq + " updated ", smpl.p);
                         }
                         break;
                     case EVariableType.String:
@@ -1252,6 +1251,7 @@ namespace Gekko
                             //---------------------------------------------------------                            
                             IVariable lhsNew = new ScalarString(((ScalarString)rhs).string2);
                             AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                            G.ServiceMessage("STRING " + varnameWithFreq + " updated ", smpl.p); 
                         }
                         break;
                     case EVariableType.Date:
@@ -1261,6 +1261,7 @@ namespace Gekko
                             //---------------------------------------------------------
                             IVariable lhsNew = new ScalarDate(((ScalarDate)rhs).date);
                             AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                            G.ServiceMessage("DATE " + varnameWithFreq + " updated ", smpl.p);
                         }
                         break;
                     case EVariableType.List:
@@ -1271,7 +1272,6 @@ namespace Gekko
 
                             G.Writeln2("*** ERROR: Type mismatch");
                             throw new GekkoException();
-
                         }
                         break;
                     case EVariableType.Map:
@@ -1292,6 +1292,7 @@ namespace Gekko
                             //---------------------------------------------------------                            
                             IVariable lhsNew = new ScalarVal(rhs.ConvertToVal());  //only 1x1 matrix will become VAL
                             AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                            G.ServiceMessage("VAL " + varnameWithFreq + " updated ", smpl.p);
                         }
                         break;
                     default:
@@ -1351,6 +1352,7 @@ namespace Gekko
                                         Buffer.BlockCopy(source, 8 * ii1, destination, 8 * destinationStart, 8 * (ii2 - ii1 + 1));
                                         IVariable lhsNew = m;
                                         AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                        G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
                                     }
                                     break;
                                 case ESeriesType.Light:
@@ -1379,6 +1381,7 @@ namespace Gekko
                                         Buffer.BlockCopy(source, 8 * ii1, destination, 8 * destinationStart, 8 * (ii2 - ii1 + 1));
                                         IVariable lhsNew = m;
                                         AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                        G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
                                     }
                                     break;
                                 case ESeriesType.Timeless:
@@ -1390,6 +1393,7 @@ namespace Gekko
                                         double d = rhs_series.data.dataArray[0];
                                         Matrix m = new Matrix(1, n, d);  //expanded as if it was a real timeseries                                       
                                         AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
+                                        G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
                                     }
                                     break;
                                 case ESeriesType.ArraySuper:
@@ -1449,6 +1453,7 @@ namespace Gekko
                             // #x = LIST
                             //---------------------------------------------------------                                                        
                             AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone());
+                            G.ServiceMessage("LIST " + varnameWithFreq + " updated ", smpl.p);
                         }
                         break;
                     case EVariableType.Map:
@@ -1457,6 +1462,7 @@ namespace Gekko
                             // #x = MAP
                             //---------------------------------------------------------
                             AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone());
+                            G.ServiceMessage("MAP " + varnameWithFreq + " updated ", smpl.p);
                         }
                         break;
                     case EVariableType.Matrix:
@@ -1465,6 +1471,7 @@ namespace Gekko
                             // #x = MATRIX
                             //---------------------------------------------------------
                             AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone());
+                            G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
                         }
                         break;
                     default:
@@ -1490,51 +1497,7 @@ namespace Gekko
                             Series rhs_series = rhs as Series;
                             switch (rhs_series.type)
                             {
-                                //case ESeriesType.Normal:
-                                //    {
-                                //        //---------------------------------------------------------
-                                //        // x = Series Normal
-                                //        //---------------------------------------------------------
-
-                                //        //we merge any existing series with the new data, considering also the sample
-
-                                //        bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
-                                //        AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);
-                                //        int i1 = -12345; int i2 = -12345; bool shouldOverwriteLaterOn = false;
-                                //        Program.MergeTwoTimeseriesWithDateWindow(dates, lhs_series, rhs_series, false, ref i1, ref i2, ref shouldOverwriteLaterOn);
-                                //        if (create)
-                                //        {
-                                //            AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
-                                //        }
-                                //        else
-                                //        {
-                                //            //nothing to do, either already existing in bank/map or array-subseries
-                                //        }
-
-                                //    }
-                                //    break;
-                                //case ESeriesType.Light:
-                                //    {
-                                //        //---------------------------------------------------------
-                                //        // x = Series Light
-                                //        //---------------------------------------------------------
-
-                                //        //we merge any existing series with the new data, considering also the sample
-
-                                //        bool create = CreateSeriesIfNotExisting(varnameWithFreq, ref lhs_series);
-                                //        AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);
-                                //        int i1 = -12345; int i2 = -12345; bool shouldOverwriteLaterOn = false;
-                                //        Program.MergeTwoTimeseriesWithDateWindow(dates, lhs_series, rhs_series, false, ref i1, ref i2, ref shouldOverwriteLaterOn);
-                                //        if (create)
-                                //        {
-                                //            AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
-                                //        }
-                                //        else
-                                //        {
-                                //            //nothing to do, either already existing in bank/map or array-subseries
-                                //        }
-                                //    }
-                                //    break;
+                                
                                 case ESeriesType.Normal:
                                 case ESeriesType.Light:
                                     {
@@ -1571,6 +1534,7 @@ namespace Gekko
                                         //may enlarge the array with NaNs first and last
                                         lhs_series.SetDataSequence(tt1, tt2, data, index1);
                                         if (create) AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
+                                        G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
                                     }
                                     break;
                                 case ESeriesType.Timeless:
@@ -1587,6 +1551,7 @@ namespace Gekko
                                             lhs_series.SetData(t, d);
                                         }
                                         if (create) AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
+                                        G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
                                     }
                                     break;
                                 case ESeriesType.ArraySuper:
@@ -1602,6 +1567,7 @@ namespace Gekko
                                         IVariable clone = rhs.DeepClone();
                                         ((Series)clone).name = varnameWithFreq;
                                         AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, clone);
+                                        G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
                                     }
                                     break;
                                 default:
@@ -1633,6 +1599,7 @@ namespace Gekko
                             {
                                 //nothing to do, either already existing in bank/map or array-subseries
                             }
+                            G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
                         }
                         break;
                     case EVariableType.String:
@@ -1684,6 +1651,7 @@ namespace Gekko
                             {
                                 //nothing to do, either already existing in bank/map or array-subseries
                             }
+                            G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
                         }
                         break;
                     case EVariableType.Map:
@@ -1740,6 +1708,7 @@ namespace Gekko
                             {
                                 //nothing to do, either already existing in bank/map or array-subseries
                             }
+                            G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
 
                         }
                         break;
@@ -6004,10 +5973,6 @@ namespace Gekko
 
                 Program.PutListIntoListOrListfile(this.listItems, this.name, this.listFile);
 
-                if (this.p.IsSimple())
-                {
-                    G.Write2("Created 1 list from " + this.listItems.Count + " elements "); G.ServiceMessage();
-                }
             }
 
             
@@ -6035,11 +6000,7 @@ namespace Gekko
                     lhs.meta.source = s + this.meta;                    
                     lhs.SetDirty(true);
                 }
-                lhs.Stamp();
-                if (this.p.IsSimple())
-                {
-                    G.Write2("1 series updated " + t1.ToString() + "-" + t2.ToString() + " "); G.ServiceMessage();
-                }
+                lhs.Stamp();                
             }            
         }
 
@@ -6095,10 +6056,7 @@ namespace Gekko
                     lhs.SetDirty(true);
                 }
                 lhs.Stamp();
-                if (this.p.IsSimple())
-                {
-                    G.Write2("1 series updated " + t1.ToString() + "-" + t2.ToString() + " "); G.ServiceMessage();
-                }
+                
             }
         }
 
@@ -6328,10 +6286,7 @@ namespace Gekko
                     this.op = this.op.Substring(0, this.op.Length - 1);
                 }                
                 Program.Upd(this);
-                if (this.p.IsSimple())
-                {
-                    G.Write2(listItems.Count + " series updated " + t1.ToString() + "-" + t2.ToString() + " "); G.ServiceMessage();
-                }
+                
             }
         }
 

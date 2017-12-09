@@ -1144,8 +1144,18 @@ namespace Gekko.Parser.Gek
                             string s2 = null;
                             if (ss2 == null) s2 = "Globals.globalPeriodEnd";
                             else s2 = "O.ConvertToDate(" + ss2 + ", O.GetDateChoices.FlexibleEnd);" + G.NL;
-                            node.Code.A("o").A(Num(node)).A(".t1 = ").A(s1).A(";").A(G.NL);
-                            node.Code.A("o").A(Num(node)).A(".t2 = ").A(s2).A(";").A(G.NL);
+
+                            string xx = node?.Parent?.Parent?.Parent?.Text;
+                            if (xx == "ASTASSIGNMENT")  //these do not have an o object
+                            {
+                                node.Code.A("smpl.t1 = ").A(s1).A(";").A(G.NL);
+                                node.Code.A("smpl.t2 = ").A(s2).A(";").A(G.NL);
+                            }
+                            else
+                            {
+                                node.Code.A("o").A(Num(node)).A(".t1 = ").A(s1).A(";").A(G.NL);
+                                node.Code.A("o").A(Num(node)).A(".t2 = ").A(s2).A(";").A(G.NL);
+                            }
                         }
                         break;
                     case "ASTDOTINDEXER":
@@ -3006,7 +3016,8 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTASSIGNMENT":
                         {
-                            string type = HandleVar(node[3].Text);  //2 is options                            
+                            string type = HandleVar(node[3].Text);  //2 is options   
+                            GetCodeFromAllChildren(node, node[2]);                         
                             if (G.Equal(type, "STRING2")) type = "string";
                             string ivTempVar = SearchUpwardsInTree4(node[0]);
                             if (ivTempVar == null)
