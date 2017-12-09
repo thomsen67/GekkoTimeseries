@@ -1940,8 +1940,7 @@ expressionOrNothing:        expression -> expression
 							//listNaked is a comma-separated list of expressions (without parenthesis). For instance 'a', 'b' or %a+%b, %d, etc. Must have > 1 element (one element is caught by expression below)
 							//expression is anything, but accepts a listNaked with parentheses, for instance ('a', 'b') or (%a+%b, %d). One element is ('a',), Python style.
 flexibleList:                bankvarnameList |  listNaked | expression;  //used in DISP etc. ---> bankvarnameList returns a Gekko LIST of ScalarStrings.
-bankvarnameList:            bankvarname (COMMA2 bankvarname)+ -> ^(ASTBANKVARNAMELIST bankvarname+)
-                          | bankvarname COMMA2 -> ^(ASTBANKVARNAMELIST bankvarname);
+bankvarnameList:            bankvarname (COMMA2 bankvarname)* -> ^(ASTBANKVARNAMELIST bankvarname+);
 listNaked:                  expression (',' expression)+ -> ^(ASTLISTDEF expression+);
 
 // ------------------------------------------------------------------------------------------------------------------

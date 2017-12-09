@@ -206,7 +206,7 @@ namespace Gekko
     {
         public string bank = null;
         public string name = null;
-        public string version = null;
+        public string freq = null;
     }
 
     public class Zipper
@@ -6590,7 +6590,7 @@ namespace Gekko
 
         public static List<BankNameVersion> GetInfoFromStringWildcard(string s, string defaultBank, bool decorateWithFirstDatabankName)
         {
-            string dbName, varName, freq; char firstChar; O.Chop(s, out dbName, out varName, out freq);
+            string dbName, varName, freq; char firstChar; O.Chop(s, out dbName, out varName, out freq); firstChar = varName[0];
 
             if (dbName == null) dbName = defaultBank;
             if (dbName == null && decorateWithFirstDatabankName) dbName = Program.databanks.GetFirst().name;            
@@ -6599,6 +6599,8 @@ namespace Gekko
 
             if (varName.Contains("*") || varName.Contains("?"))
             {
+                G.Writeln2("*** ERROR: Search is defunct in 3.0, will be fixed");
+                throw new GekkoException();
                 string bank = null;
                 Databank db = Program.databanks.GetDatabank(bank);
                 if (db == null)
@@ -6619,6 +6621,8 @@ namespace Gekko
             }
             else if (varName.Contains(".."))
             {
+                G.Writeln2("*** ERROR: Range is defunct in 3.0, will be fixed");
+                throw new GekkoException();
                 string bank = null;
                 string[] ss2 = varName.Split(new string[] { ".." }, StringSplitOptions.None);
                 ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);
@@ -6644,7 +6648,10 @@ namespace Gekko
                 BankNameVersion bnv = new BankNameVersion();
                 bnv.bank = dbName;
                 bnv.name = varName;
-                bnv.version = freq;
+                bnv.freq = freq;
+                if (G.IsLetterOrUnderscore(firstChar) && bnv.freq == null) bnv.freq = G.GetFreq(Program.options.freq);
+                //string freq = var.freq;
+                //if (freq == null) freq = G.GetFreq(Program.options.freq);
                 if (bnv.name != null && bnv.name != "") list.Add(bnv);
             }
 
@@ -19321,18 +19328,26 @@ namespace Gekko
                     foreach (BankNameVersion var in list)
                     {
                         Databank db = GetBankFromBankNameVersion(var.bank);
-                        IVariable xx = O.Lookup(null, null, var.bank, var.name, var.version, null, false, EVariableType.Var, true);
+                        IVariable xx = O.Lookup(null, null, var.bank, var.name, var.freq, null, false, EVariableType.Var, true);
 
-                        if (databankWithFewerVariables.ContainsKey(var.name + Globals.freqIndicator + var.version))
+                        string varnameWithFreq = var.name;
+                        if (xx.Type() == EVariableType.Series)
+                        {
+                            //string freq = var.freq;
+                            //if (freq == null) freq = G.GetFreq(Program.options.freq);
+                            varnameWithFreq = var.name + Globals.freqIndicator + var.freq;
+                        }
+
+                        if (databankWithFewerVariables.ContainsKey(varnameWithFreq))
                         {
                             G.Writeln();
-                            G.Writeln("*** ERROR: Gbk format does not allow duplicate variables ('" + var.name + "')");
+                            G.Writeln("*** ERROR: Gbk format does not allow duplicate variables, " + G.GetNameAndFreqPretty(varnameWithFreq));
                             G.Writeln("           This is enforced for " + Globals.extensionDatabank + " version 1.1 and later.");
                             throw new GekkoException();
                         }
                         else
                         {
-                            databankWithFewerVariables.Add(var.name, xx);
+                            databankWithFewerVariables.Add(varnameWithFreq, xx);
                         }
                     }
                 }
@@ -19459,8 +19474,11 @@ namespace Gekko
             {                
                 foreach (BankNameVersion var in list)
                 {
-                    Databank db = GetBankFromBankNameVersion(var.bank);                    
-                    IVariable iv = db.GetIVariable(var.name);
+                    //Databank db = GetBankFromBankNameVersion(var.bank);                    
+                    //IVariable iv = db.GetIVariable(var.name);
+
+                    IVariable iv = O.Lookup(null, null, var.bank, var.name, var.freq, null, false, EVariableType.Var, true);
+
                     if (iv == null)
                     {
                         G.Writeln();

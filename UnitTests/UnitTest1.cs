@@ -9406,6 +9406,101 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_DatabanksInOut()
+        {
+            //full write/read
+
+            I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            DatabanksTestHelper8();
+            I("WRITE sletmig;");
+            I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("READ sletmig;");            
+            Assert.AreEqual(First().storage.Count, 4); DatabanksTestHelper5(); DatabanksTestHelper6(); DatabanksTestHelper7();
+
+            I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            DatabanksTestHelper8();
+            I("WRITE <gdx> sletmig;");
+            I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("READ <gdx> sletmig;");
+            Assert.AreEqual(First().storage.Count, 2); DatabanksTestHelper5(); DatabanksTestHelper6();
+
+            //write/read of 1 var
+
+            I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            DatabanksTestHelper8();
+            I("WRITE xx1 file=sletmig;");
+            I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("READ sletmig;");
+            Assert.AreEqual(First().storage.Count, 1); DatabanksTestHelper6();
+
+            I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            DatabanksTestHelper8();
+            I("WRITE <gdx> xx1 file=sletmig;");
+            I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("READ <gdx> sletmig;");
+            Assert.AreEqual(First().storage.Count, 1); DatabanksTestHelper6();
+
+            //write/read of 2 vars
+
+            I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            DatabanksTestHelper8();
+            I("WRITE xx1, xx2 file=sletmig;");
+            I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("READ sletmig;");
+            Assert.AreEqual(First().storage.Count, 2); DatabanksTestHelper5(); DatabanksTestHelper6();
+
+            I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            DatabanksTestHelper8();
+            I("WRITE <gdx> xx1, xx2 file=sletmig;");
+            I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("READ <gdx> sletmig;");
+            Assert.AreEqual(First().storage.Count, 2); DatabanksTestHelper5(); DatabanksTestHelper6();
+
+        }
+
+        private static void DatabanksTestHelper8()
+        {
+            I("xx1 = series(1);");
+            I("xx1[a] = 101, 102, 103;");
+            I("xx1[b] = 201, 202, 203;");
+            I("xx2 = 100, 101, 102;");
+            I("%v = 100;");
+            I("#m = [100, 101];");
+        }
+
+        private static void DatabanksTestHelper5()
+        {
+            _AssertSeries(First(), "xx2", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx2", 2000, 100d, sharedDelta);
+            _AssertSeries(First(), "xx2", 2001, 101d, sharedDelta);
+            _AssertSeries(First(), "xx2", 2002, 102d, sharedDelta);
+            _AssertSeries(First(), "xx2", 2003, double.NaN, sharedDelta);
+                       
+        }
+
+        private static void DatabanksTestHelper7()
+        {
+            _AssertScalarVal(First(), "%v", 100d);
+            _AssertMatrix(First(), "#m", 1, 1, 100d, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 2, 101d, sharedDelta);
+        }
+
+        private static void DatabanksTestHelper6()
+        {
+            _AssertSeries(First(), "xx1", new string[] { "a" }, 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", new string[] { "a" }, 2000, 101d, sharedDelta);
+            _AssertSeries(First(), "xx1", new string[] { "a" }, 2001, 102d, sharedDelta);
+            _AssertSeries(First(), "xx1", new string[] { "a" }, 2002, 103d, sharedDelta);
+            _AssertSeries(First(), "xx1", new string[] { "a" }, 2003, double.NaN, sharedDelta);
+
+            _AssertSeries(First(), "xx1", new string[] { "b" }, 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", new string[] { "b" }, 2000, 201d, sharedDelta);
+            _AssertSeries(First(), "xx1", new string[] { "b" }, 2001, 202d, sharedDelta);
+            _AssertSeries(First(), "xx1", new string[] { "b" }, 2002, 203d, sharedDelta);
+            _AssertSeries(First(), "xx1", new string[] { "b" }, 2003, double.NaN, sharedDelta);
+        }
+
+        [TestMethod]
         public void _Test_Dollar()
         {
             I("reset; time 2000 2002;");
