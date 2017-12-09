@@ -2234,11 +2234,6 @@ namespace Gekko
                             G.Writeln2("*** ERROR: At the moment, you cannot use period truncation in GDX data import");
                             throw new GekkoException();
                         }
-                        //if (oRead.Merge)
-                        //{
-                        //    G.Writeln2("*** ERROR: At the moment, you cannot merge in GDX data import");
-                        //    throw new GekkoException();
-                        //}
                         Program.ReadGdx(databankTemp, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
                     }
                     else if (oRead.Type == EDataFormat.Px)
@@ -2661,7 +2656,7 @@ namespace Gekko
             tsdxFile = file;
             //file = tempTsdxPath + "\\" + unzippedFile;
             file = tempTsdxPath + "\\" + foundTsdFile;
-
+            
             XmlDocument doc = new XmlDocument();
             //We can presume that DatabankInfo.xml is in UTF-8, since it is typically written by Gekko
             //So no need to use GetTextFromFile()
@@ -4652,6 +4647,8 @@ namespace Gekko
             readInfo.databank.info1 = readInfo.info1;
             readInfo.databank.date = readInfo.date;
             readInfo.databank.FileNameWithPath = readInfo.fileName;
+                        
+            databank.FileNameWithPath = readInfo.fileName;
 
             //TODO: Maybe only do this on the gdx variables if possible
             //Anyway, the speed penalty is small anyway.
@@ -4800,18 +4797,16 @@ namespace Gekko
             {
                 foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
                 {
-                    string[] ss = kvp.Key.storage;
-                    counterVariables++;
+                    string[] ss = kvp.Key.storage;                    
                     WriteGdxHelper2(t1, t2, usePrefix, gvar, kvp.Value as Series, ss);
                 }
             }
             else
             {
                 //normal timeseries
-                WriteGdxHelper2(t1, t2, usePrefix, gvar, ts, new string[0]);
-                counterVariables++;
+                WriteGdxHelper2(t1, t2, usePrefix, gvar, ts, new string[0]);                
             }
-
+            counterVariables++;
             return counterVariables;
         }
 
@@ -6616,6 +6611,7 @@ namespace Gekko
                     BankNameVersion bnv = new BankNameVersion();
                     bnv.bank = bank;
                     bnv.name = s2;
+                    if (G.IsLetterOrUnderscore(firstChar) && bnv.freq == null) bnv.freq = G.GetFreq(Program.options.freq);
                     if (bnv.name != null && bnv.name != "") list.Add(bnv);
                 }
             }
@@ -6640,6 +6636,7 @@ namespace Gekko
                     BankNameVersion bnv = new BankNameVersion();
                     bnv.bank = bank;
                     bnv.name = s2;
+                    if (G.IsLetterOrUnderscore(firstChar) && bnv.freq == null) bnv.freq = G.GetFreq(Program.options.freq);
                     if (bnv.name != null && bnv.name != "") list.Add(bnv);
                 }
             }
@@ -6650,11 +6647,9 @@ namespace Gekko
                 bnv.name = varName;
                 bnv.freq = freq;
                 if (G.IsLetterOrUnderscore(firstChar) && bnv.freq == null) bnv.freq = G.GetFreq(Program.options.freq);
-                //string freq = var.freq;
-                //if (freq == null) freq = G.GetFreq(Program.options.freq);
                 if (bnv.name != null && bnv.name != "") list.Add(bnv);
             }
-
+            
             return list;
         }
 
@@ -34740,10 +34735,13 @@ namespace Gekko
                 }
                 tab.CurRow.SetText(1, "File     : " + this.fileName + " " + this.databankVersion);
                 tab.CurRow.Next();
-                tab.CurRow.SetText(1, "Period   : The file contains data from " + this.startPerInFile + "-" + this.endPerInFile);
+
+                string i1, i2; GetYearPeriod(this.startPerInFile, this.endPerInFile, out i1, out i2);
+
+                tab.CurRow.SetText(1, "Period   : The file contains data from " + i1 + "-" + i2);
                 tab.CurRow.Next();
                 //#8572309572439
-                int total = Program.databanks.GetDatabank(this.dbName).storage.Count;  
+                int total = Program.databanks.GetDatabank(this.dbName).storage.Count;
                 if (this.shouldMerge)
                 {
                     tab.CurRow.SetText(1, "Size     : Merged " + this.variables + " variables from file into " + this.dbName + " databank (" + G.SecondsFormat(time) + ")");
@@ -34825,6 +34823,16 @@ namespace Gekko
                 }
 
             }
+
+            
+        }
+
+        public static void GetYearPeriod(int startPerInFile, int endPerInFile, out string i1, out string i2)
+        {
+            i1 = "[year?]";
+            i2 = "[year?]";
+            if (startPerInFile != int.MaxValue) i1 = startPerInFile.ToString();
+            if (endPerInFile != int.MinValue) i2 = endPerInFile.ToString();
         }
 
         public class OneList

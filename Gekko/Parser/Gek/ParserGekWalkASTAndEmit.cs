@@ -3399,15 +3399,15 @@ namespace Gekko.Parser.Gek
                             }
                         }
                         break;
-                    case "ASTNAMESLIST":
-                        {
-                            node.Code.A("o" + Num(node) + ".namesList = new List<string>();" + G.NL);
-                            foreach (ASTNode child in node.ChildrenIterator())
-                            {
-                                node.Code.A("o" + Num(node) + ".namesList.Add(O.ConvertToString(" + child.Code + "));" + G.NL);
-                            }
-                        }
-                        break;
+                    //case "ASTNAMESLIST":
+                    //    {
+                    //        node.Code.A("o" + Num(node) + ".namesList = new List<string>();" + G.NL);
+                    //        foreach (ASTNode child in node.ChildrenIterator())
+                    //        {
+                    //            node.Code.A("o" + Num(node) + ".namesList.Add(O.ConvertToString(" + child.Code + "));" + G.NL);
+                    //        }
+                    //    }
+                    //    break;
                     //case "ASTLISTWITHBANK":
                     //    {
                     //        node.Code.A(AstBankHelperList(node, w));
@@ -4234,6 +4234,7 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTFLEXIBLELIST":
+                    case "ASTNAMESLIST":
                         {                            
                             GetCodeFromAllChildren(node);
                         }

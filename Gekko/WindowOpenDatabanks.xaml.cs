@@ -125,7 +125,12 @@ namespace Gekko
                     }
                 }
                 string c = "";
-                string period = databank.yearStart + "-" + databank.yearEnd;
+
+                string i1, i2; Program.GetYearPeriod(databank.yearStart, databank.yearEnd, out i1, out i2);
+
+                string period = i1 + "-" + i2;
+
+
                 if (databank.yearStart == -12345 || databank.yearEnd == -12345) period = "";
                 string prot = null;
                 if (!databank.protect) prot = Globals.protectSymbol;

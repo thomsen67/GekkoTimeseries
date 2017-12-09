@@ -61,6 +61,7 @@ tokens {
 	ASTNAME;
 	ASTEXPRESSIONNEW;
 	ASTFLEXIBLELIST;
+	ASTNAMESLIST;
 ASTNAME;
 ASTIDENT;
 ASTCURLYSIMPLE;
@@ -1910,7 +1911,7 @@ map:                        leftParenNoGlue mapItem ',' mapHelper RIGHTPAREN -> 
 mapHelper:                  mapHelper1 | mapHelper2;
 mapHelper1:                 (mapItem ',')* mapItem -> mapItem+;
 mapHelper2:                 (mapItem ',')+ -> mapItem+;
-mapItem:                    assignment -> ^(ASTMAPITEM assignment);
+mapItem:                    assignmentMap -> ^(ASTMAPITEM assignmentMap);
 
 listFile:                   HASH leftParenGlue LISTFILE name RIGHTPAREN -> ^(ASTLISTFILE name);
 
@@ -1939,9 +1940,25 @@ expressionOrNothing:        expression -> expression
 							//bankvarnameList is list of b:%x!q type names. Accepts a single element
 							//listNaked is a comma-separated list of expressions (without parenthesis). For instance 'a', 'b' or %a+%b, %d, etc. Must have > 1 element (one element is caught by expression below)
 							//expression is anything, but accepts a listNaked with parentheses, for instance ('a', 'b') or (%a+%b, %d). One element is ('a',), Python style.
-flexibleList:                bankvarnameList |  listNaked | expression;  //used in DISP etc. ---> bankvarnameList returns a Gekko LIST of ScalarStrings.
-bankvarnameList:            bankvarname (COMMA2 bankvarname)* -> ^(ASTBANKVARNAMELIST bankvarname+);
-listNaked:                  expression (',' expression)+ -> ^(ASTLISTDEF expression+);
+
+flexibleList:               bankvarnameList2    //used in DISP etc. ---> bankvarnameList returns a Gekko LIST of ScalarStrings.
+						  | bankvarnameList3
+						  | listNaked 
+						  | expression
+						    ;
+
+namesList:                  bankvarnameList
+						  | bankvarnameList3
+						  | listNaked
+						  | expression
+						    ;                 
+
+bankvarnameList:            bankvarname (COMMA2 bankvarname)* -> ^(ASTBANKVARNAMELIST bankvarname+);                       //a OR a,b OR a,b,c
+bankvarnameList2:           bankvarname (COMMA2 bankvarname)+ -> ^(ASTBANKVARNAMELIST bankvarname+); //mandatory comma     //a,b OR a,b,c
+bankvarnameList3:           bankvarname COMMA2 -> ^(ASTBANKVARNAMELIST bankvarname);                                       //a,
+
+listNaked:                  expression (',' expression)+ -> ^(ASTLISTDEF expression+);                                     //must have comma
+
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- name START -------------------------------------------------------------------------------
@@ -2074,10 +2091,11 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 // ASSIGNMENT, VAL, STRING, DATE, SERIES, LIST, MATRIX, MAP, VAR
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-assignment:				 assignmentType leftSide EQUAL flexibleList -> ^(ASTASSIGNMENT leftSide flexibleList ASTPLACEHOLDER assignmentType)   
-| assignmentType leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression ASTPLACEHOLDER assignmentType)
-						   
+assignment:				    assignmentType leftSide EQUAL flexibleList -> ^(ASTASSIGNMENT leftSide flexibleList ASTPLACEHOLDER assignmentType)   
+						  | assignmentType leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression ASTPLACEHOLDER assignmentType)
 						    ;
+assignmentMap:				assignmentType leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression ASTPLACEHOLDER assignmentType) ;
+
 assignmentType:             SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | -> ASTPLACEHOLDER;  //may be empty
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2128,8 +2146,7 @@ closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)
 
 
 disp:						DISP StringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, $DISP.Line)} StringInQuotes)
-						  | DISP dispOpt1? flexibleList -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) flexibleList)
-				//		  | DISP dispOpt1? bankvarname -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) bankvarname)
+						  | DISP dispOpt1? namesList -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) namesList)				
 						    ;
 
 dispOpt1:					ISNOTQUAL
@@ -2149,7 +2166,7 @@ for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  func
 forHelper2:                 
 
  type? svarname EQUAL expression TO expression2 (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2) ^(ASTPLACEHOLDER expression3?))
-|type? svarname EQUAL flexibleList -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER flexibleList) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+|type? svarname EQUAL namesList -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER namesList) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
 //|type? svarname EQUAL expression -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
                           
 						    ;
@@ -2569,10 +2586,10 @@ timefilterperiod:           expression ((doubleDot | TO) expression (BY expressi
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 						    //!!!2x2 identical lines ONLY because of token stuff
-write:					    WRITE  writeOpt1? flexibleList FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTFLEXIBLELIST flexibleList))
-						  | EXPORT writeOpt1? flexibleList FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTFLEXIBLELIST flexibleList))
-						  | WRITE  writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTFLEXIBLELIST))
-						  | EXPORT writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTFLEXIBLELIST))
+write:					    WRITE  writeOpt1? namesList FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST namesList))
+						  | EXPORT writeOpt1? namesList FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST namesList))
+						  | WRITE  writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST))
+						  | EXPORT writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST))
 						    ;
 writeOpt1:                  ISNOTQUAL
 						  | leftAngle        writeOpt1h* RIGHTANGLE -> writeOpt1h*
