@@ -9,9 +9,9 @@ namespace Gekko
 public class TranslatedCode
 {
 public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
-public static readonly ScalarVal i202 = new ScalarVal(1d);
-public static readonly ScalarVal i203 = new ScalarVal(2000d);
-public static readonly ScalarVal i204 = new ScalarVal(2000d);
+public static readonly ScalarVal i212 = new ScalarVal(1d);
+public static readonly ScalarVal i213 = new ScalarVal(2d);
+public static readonly ScalarVal i214 = new ScalarVal(3d);
 public static void ClearTS(P p) {
 }
 public static void ClearScalar(P p) {
@@ -24,14 +24,8 @@ GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 //[[splitSTART]]
 p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            smpl.t1 = O.ConvertToDate(i203, O.GetDateChoices.FlexibleStart);
-;
-smpl.t2 = O.ConvertToDate(i204, O.GetDateChoices.FlexibleEnd);
-;
-
-
-IVariable ivTmpvar201 = O.IvConvertTo(EVariableType.Var, i202);
-O.Lookup(smpl, null, null, "yy", null, ivTmpvar201, true, EVariableType.Var)
+IVariable ivTmpvar211 = O.IvConvertTo(EVariableType.Series, O.ListDefHelper(i212, i213, i214));
+O.Lookup(smpl, null, null, "xx", null, ivTmpvar211, true, EVariableType.Series)
 ;
 
 

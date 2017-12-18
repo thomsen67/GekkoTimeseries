@@ -4913,8 +4913,11 @@ namespace Gekko.Parser.Gek
 
         private static string HandleVar(string type)
         {
-            if (type == "ASTPLACEHOLDER") type = "var";            
-            return type.Substring(0, 1).ToUpper() + type.Substring(1).ToLower();
+            if (type == "ASTPLACEHOLDER") type = "var";
+            string s = type.Substring(0, 1).ToUpper() + type.Substring(1).ToLower();
+            if (s == "Ser") s = "Series";
+            if (s == "Series") s = "Var";  //This is done because we otherwise get errors if rhs if for instance a list.
+            return s;
         }
 
         private static void GetCodes(ASTNode node, int i, out string codeStart, out string codeEnd2, out string codeStep)

@@ -23350,26 +23350,28 @@ namespace Gekko
             return true;
         }
 
-        public static void OPrint(O.Prt oPrt)
+        public static void OPrint(O.Prt o)
         {
             //string format = "f14.4";
 
-            string type = "print";
-            if (G.Equal(oPrt.prtType, "plot")) type = "plot";
+            bool rows = false; if (G.Equal(o.opt_rows, "yes")) rows = true;
 
-            if (NonSeriesCheck(oPrt, type))
+            string type = "print";
+            if (G.Equal(o.prtType, "plot")) type = "plot";
+
+            if (NonSeriesCheck(o, type))
             {
-                NonSeriesHandling(oPrt);
+                NonSeriesHandling(o);
                 return;
             }
 
             bool unfoldLabels = true;
             List<string> labelsHandmade = new List<string>();
 
-            if (oPrt.prtElements.Count == 1 && ((oPrt.prtElements[0].variable[0] != null && oPrt.prtElements[0].variable[0].Type() == EVariableType.Series) || (oPrt.prtElements[0].variable[1] != null && oPrt.prtElements[0].variable[1].Type() == EVariableType.Series)))
+            if (o.prtElements.Count == 1 && ((o.prtElements[0].variable[0] != null && o.prtElements[0].variable[0].Type() == EVariableType.Series) || (o.prtElements[0].variable[1] != null && o.prtElements[0].variable[1].Type() == EVariableType.Series)))
             {
                 bool[] banks = new bool[2];  //first, ref
-                foreach (string printCode in oPrt.prtElements[0].printCodesFinal)
+                foreach (string printCode in o.prtElements[0].printCodesFinal)
                 {
                     int bankCombi = GetBankCombi(printCode);
                     if (bankCombi == 0) banks[0] = true;
@@ -23382,8 +23384,8 @@ namespace Gekko
                 }
 
                 Series ts = null;
-                if (banks[0]) ts = oPrt.prtElements[0].variable[0] as Series;
-                else ts = oPrt.prtElements[0].variable[1] as Series;
+                if (banks[0]) ts = o.prtElements[0].variable[0] as Series;
+                else ts = o.prtElements[0].variable[1] as Series;
                 
                 if (ts.type == ESeriesType.ArraySuper)
                 {                    
@@ -23425,8 +23427,8 @@ namespace Gekko
                         }
                         labelsHandmade.Add(bankName + G.RemoveFreqFromKey(ts.name) + "[" + key.ToString() + "]");
                     }
-                    if (banks[0]) oPrt.prtElements[0].variable[0] = m0;
-                    if (banks[1]) oPrt.prtElements[0].variable[1] = m1;                    
+                    if (banks[0]) o.prtElements[0].variable[0] = m0;
+                    if (banks[1]) o.prtElements[0].variable[1] = m1;                    
                     unfoldLabels = false;
                 }
             }
@@ -23444,7 +23446,7 @@ namespace Gekko
             int labelMaxLine = 1;
             bool[] freqs = new bool[3];
 
-            foreach (O.Prt.Element element in oPrt.prtElements) //for each comma in the prt statement
+            foreach (O.Prt.Element element in o.prtElements) //for each comma in the prt statement
             {
                 List xx0 = element.variable[0] as List;
                 List xx1 = element.variable[1] as List;
@@ -23504,16 +23506,16 @@ namespace Gekko
                         // ---------------------------------------------
                         // --- Width -----------------------------------
                         // ---------------------------------------------
-                        if (oPrt.opt_width != -12345) width = (int)oPrt.opt_width;
+                        if (o.opt_width != -12345) width = (int)o.opt_width;
                         if (isPchType)
                         {
                             //overrides ph.width if given
-                            if (oPrt.opt_pwidth != -12345) width = (int)oPrt.opt_pwidth;
+                            if (o.opt_pwidth != -12345) width = (int)o.opt_pwidth;
                         }
                         else
                         {
                             //overrides ph.width if given
-                            if (oPrt.opt_nwidth != -12345) width = (int)oPrt.opt_nwidth;
+                            if (o.opt_nwidth != -12345) width = (int)o.opt_nwidth;
                         }
 
                         //element-specific stuff
@@ -23533,16 +23535,16 @@ namespace Gekko
                         // ---------------------------------------------
                         // --- Decimals --------------------------------
                         // ---------------------------------------------
-                        if (oPrt.opt_dec != -12345) dec = (int)oPrt.opt_dec;
+                        if (o.opt_dec != -12345) dec = (int)o.opt_dec;
                         if (isPchType)
                         {
                             //overrides ph.dec if given
-                            if (oPrt.opt_pdec != -12345) dec = (int)oPrt.opt_pdec;
+                            if (o.opt_pdec != -12345) dec = (int)o.opt_pdec;
                         }
                         else
                         {
                             //overrides ph.dec if given
-                            if (oPrt.opt_ndec != -12345) dec = (int)oPrt.opt_ndec;
+                            if (o.opt_ndec != -12345) dec = (int)o.opt_ndec;
                         }
 
                         //element-specific stuff
@@ -23630,7 +23632,7 @@ namespace Gekko
                         int lines = -12345;
                         int widthHere = -12345;
 
-                        if (type == "plot")
+                        if (type == "plot" || rows)
                         {
                             lines = 1;
                             widthHere = int.MaxValue;
@@ -23666,7 +23668,7 @@ namespace Gekko
                 }
             }
 
-            GekkoSmpl smpl = new GekkoSmpl(oPrt.t1, oPrt.t2);
+            GekkoSmpl smpl = new GekkoSmpl(o.t1, o.t2);
             //Globals.globalPeriodTimeFilters2 = new List<GekkoTime> { new GekkoTime(EFreq.Monthly, 2003, 1), new GekkoTime(EFreq.Monthly, 2003, 2) };
 
             //List inputList = x as List;  //will always be a list
@@ -23833,15 +23835,28 @@ namespace Gekko
                             }
                         }
                         i++;
+                        
+                        
+                        
                         //Non-plots have a first column with dates, plots have such a column for each series
-                        if (j == 1)  //then iv == null
+                        //if (j == 1)  //then iv == null
                         {
                             // --------------------------                                
                             // --------------------------
-                            table.Set(i, j, year.ToString());
+                            if (sameFreq == EFreq.Annual && Globals.globalPeriodTimeFilters2.Count > 0 && Globals.globalPeriodTimeFilters2[0].freq == EFreq.Annual && Program.ShouldFilterPeriod(new Gekko.GekkoTime(EFreq.Annual, year, 1)))
+                            {
+                                //kind of hack for annual to omit year if the year is filtered out
+                                i--;
+                            }
+                            else
+                            {
+                                if(j==1)table.Set(i, j, year.ToString()); if (rows) table.SetAlign(i, j, Align.Right);
+                            }
                         }
-                        if (type != "plot" && sameFreq == EFreq.Annual) i = i - 1; // #98075235874325
 
+
+
+                        if (sameFreq == EFreq.Annual) i--; // #98075235874325
                     }
 
                     if (true)  // ------------------------------------------------------------- (2)
@@ -23856,7 +23871,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m1");
+                                table.Set(i, j, "m1"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -23876,7 +23891,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m2");
+                                table.Set(i, j, "m2"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -23897,7 +23912,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m3");
+                                table.Set(i, j, "m3"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -23933,7 +23948,7 @@ namespace Gekko
                             {
                                 if (j == 1)
                                 {
-                                    table.Set(i, j, "mSUM");
+                                    table.Set(i, j, "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
                                 }
                                 else
                                 {
@@ -23954,7 +23969,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "q1");
+                                table.Set(i, j, "q1"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -23983,7 +23998,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m4");
+                                table.Set(i, j, "m4"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -24004,7 +24019,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m5");
+                                table.Set(i, j, "m5"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -24025,7 +24040,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m6");
+                                table.Set(i, j, "m6"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -24061,7 +24076,7 @@ namespace Gekko
                             {
                                 if (j == 1)
                                 {
-                                    table.Set(i, j, "mSUM");
+                                    table.Set(i, j, "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
                                 }
                                 else
                                 {
@@ -24082,7 +24097,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "q2");
+                                table.Set(i, j, "q2"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -24125,7 +24140,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m7");
+                                table.Set(i, j, "m7"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -24146,7 +24161,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m8");
+                                table.Set(i, j, "m8"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -24167,7 +24182,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m9");
+                                table.Set(i, j, "m9"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -24203,7 +24218,7 @@ namespace Gekko
                             {
                                 if (j == 1)
                                 {
-                                    table.Set(i, j, "mSUM");
+                                    table.Set(i, j, "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
                                 }
                                 else
                                 {
@@ -24225,7 +24240,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "q3");
+                                table.Set(i, j, "q3"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -24257,7 +24272,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m10");
+                                table.Set(i, j, "m10"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -24278,7 +24293,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m11");
+                                table.Set(i, j, "m11"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -24299,7 +24314,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m12");
+                                table.Set(i, j, "m12"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -24335,7 +24350,7 @@ namespace Gekko
                             {
                                 if (j == 1)
                                 {
-                                    table.Set(i, j, "mSUM");
+                                    table.Set(i, j, "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
                                 }
                                 else
                                 {
@@ -24372,7 +24387,7 @@ namespace Gekko
                             {
                                 if (j == 1)
                                 {
-                                    table.Set(i, j, "mSUM12");
+                                    table.Set(i, j, "mSUM12"); if (rows) table.SetAlign(i, j, Align.Right);
                                 }
                                 else
                                 {
@@ -24392,7 +24407,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "q4");
+                                table.Set(i, j, "q4"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -24428,7 +24443,7 @@ namespace Gekko
                             {
                                 if (j == 1)
                                 {
-                                    table.Set(i, j, "qSUM");
+                                    table.Set(i, j, "qSUM"); if (rows) table.SetAlign(i, j, Align.Right);
                                 }
                                 else
                                 {
@@ -24453,7 +24468,7 @@ namespace Gekko
                                 {
                                     // #98075235874325
                                 }
-                                else table.Set(i, j, "a");
+                                else table.Set(i, j, "a"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -24489,11 +24504,11 @@ namespace Gekko
 
             if (type == "plot")
             {
-                CallGnuplotNew2(table, oPrt, containerExplode, freqs);
+                CallGnuplotNew2(table, o, containerExplode, freqs);
             }
             else
             {
-
+                if (rows) table = table.Transpose();
 
                 int widthRemember = Program.options.print_width;
                 int fileWidthRemember = Program.options.print_filewidth;
