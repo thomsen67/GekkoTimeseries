@@ -90,6 +90,18 @@ namespace Gekko
         }        
     }
 
+    public class TokenHelper
+    {
+        public string s = null;
+        public string type = null;
+        public string leftblanks = null;
+        public override string ToString()
+        {
+            return s;
+        }
+    }
+
+
     public class GekkoList<T>
     {
         private List<T> container = new List<T>();
@@ -8526,232 +8538,479 @@ namespace Gekko
             return per;
         }
 
+        public static List<TokenHelper> GetTokensWithLeftBlanks(string s)
+        {
+            StringTokenizer2 tok = new StringTokenizer2(s, false, false);
+            tok.IgnoreWhiteSpace = false;
+            tok.SymbolChars = new char[] { '!', '#', '%', '&', '/', '(', ')', '=', '?', '@', '$', '{', '[', ']', '}', '+', '|', '^', '¨', '~', '*', '<', '>', '\\', ';', ',', ':', '.', '-' };
+            Token token;
+            int numberCounter = 0;
+            List<TokenHelper> a = new List<TokenHelper>();
+            string white = null;
+            do
+            {
+                token = tok.Next();
+                string value = token.Value;
+                string kind = token.Kind.ToString();
+                TokenHelper two = new TokenHelper();
+                two.s = value; two.type = kind; two.leftblanks = white;
+                if (kind == "WhiteSpace")
+                {
+                    white = value;
+                }
+                else
+                {
+                    a.Add(two);
+                    white = null;
+                }
+
+            } while (token.Kind != TokenKind.EOF);
+            for (int i = 0; i < 20; i++) a.Add(new TokenHelper());
+            return a;
+        }
+
+        public static void WriteHtml(StringBuilder sb, string s)
+        {
+            sb.AppendLine("<p>" + s + "</p>");
+        }
+
         public static void Browser()
         {
             G.Writeln2("Starting html browser generation");
+            
+            string cssName = "styles.css";
+            int gap = 20;
+            string subdir = "browser";
+            GekkoTime tLine = new GekkoTime(EFreq.Annual, 2016, 1);
 
             GekkoTime tStart = Globals.globalPeriodStart;
+            GekkoTime tStartPlot = Globals.globalPeriodStart.Add(-10);
             GekkoTime tEnd = Globals.globalPeriodEnd;
 
-            string var = "fy";
-            TimeSeries ts = Program.databanks.GetFirst().GetVariable(var);
+            string bank1 = Path.GetFileName(Program.databanks.GetFirst().FileNameWithPath);
+            string bank2 = Path.GetFileName(Program.databanks.GetRef().FileNameWithPath);
 
-            G.Writeln("SERIES " + var);
-            if (true)
+            List<string> vars = new List<string> { "fy", "tg" };
+
+            MetaList ml = Program.scalars["#all"] as MetaList;
+            vars = ml.list;
+
+            foreach (string var in vars)
             {
-                EEndoOrExo type1 = VariableTypeEndoExo(var);
-                string type = "";
-                if (type1 == EEndoOrExo.Exo) type = "Exogenous, ";
-                else if (type1 == EEndoOrExo.Endo) type = "Endogenous, ";
+                StringBuilder sb = new StringBuilder();
+                TimeSeries ts1 = Program.databanks.GetFirst().GetVariable(var);
+                TimeSeries ts2 = Program.databanks.GetRef().GetVariable(var);
 
-                string freq = "[unknown frequency]";
-                if (ts.frequency == "a")
-                {
-                    freq = "Annual";
-                }
-                else if (ts.frequency == "q")
-                {
-                    freq = "Quarterly";
-                }
-                else if (ts.frequency == "m")
-                {
-                    freq = "Monthly";
-                }
-                else if (ts.frequency == "u")
-                {
-                    freq = "Undated";
-                }
+                WriteHtml(sb, "<big><b>" + var + "</b></big>");
 
-                bool noData = ts.IsNullPeriod(); //We are opening up to this possibility of 'empty' data                    
-
-                //GekkoTime first = ts.GetPeriodFirst();
-                //GekkoTime last = ts.GetPeriodLast();
-
-                GekkoTime first = ts.GetRealDataPeriodFirst();
-                GekkoTime last = ts.GetRealDataPeriodLast();
-
-                G.Write(type);
-                string stamp = null;
-                if (ts.stamp != null && ts.stamp != "") stamp = " (updated: " + ts.stamp + ")";
-                if (ts.frequency == "a" || ts.frequency == "u")
+                StringBuilder sb4 = new StringBuilder();
+                               
+                if (true)
                 {
-                    if (noData || first.super == -12345 || last.super == -12345)
+                    EEndoOrExo type1 = VariableTypeEndoExo(var);
+                    string type = "";
+                    if (type1 == EEndoOrExo.Exo) type = "Exogenous, ";
+                    else if (type1 == EEndoOrExo.Endo) type = "Endogenous, ";
+
+                    string freq = "[unknown frequency]";
+                    if (ts1.frequency == "a")
                     {
-                        G.Writeln(freq + ", no data period");
+                        freq = "Annual";
                     }
-                    else
+                    else if (ts1.frequency == "q")
                     {
-                        //we don't want 1995a1 to 2005a1, instead 1995 to 2005
-                        G.Writeln(freq + " data from " + first.super + " to " + last.super + stamp);
+                        freq = "Quarterly";
                     }
-                }
-                else
-                {
-                    if (noData || first.super == -12345 || last.super == -12345)
+                    else if (ts1.frequency == "m")
                     {
-                        G.Writeln(freq + ", no data period");
+                        freq = "Monthly";
                     }
-                    else
+                    else if (ts1.frequency == "u")
                     {
-                        G.Writeln(freq + " data from " + first.super + ts.frequency + first.sub + " to " + last.super + ts.frequency + last.sub + stamp);
+                        freq = "Undated";
                     }
-                }
 
-            }
+                    bool noData = ts1.IsNullPeriod(); //We are opening up to this possibility of 'empty' data                    
 
-            List<string> varExpl = Program.GetVariableExplanation(var);
-            foreach (string line in varExpl)
-            {
-                if (line != "")
-                {
-                    G.Writeln(line);
-                }
-            }
+                    //GekkoTime first = ts.GetPeriodFirst();
+                    //GekkoTime last = ts.GetPeriodLast();
 
-            //ts.label = "BNP i faste priser";
-            //ts.expression = "SERIES y = c + i + g;";
-            //ts.stamp = "20-1-2016 10:34";
+                    GekkoTime first = ts1.GetRealDataPeriodFirst();
+                    GekkoTime last = ts1.GetRealDataPeriodLast();
 
-            if (ts.label != null) G.Writeln("Series label: " + ts.label);
-
-            if (ts.source != null)
-            {
-                //We keep the SERIES (or SER), there may be options etc. But we capitalize it.
-                string src2 = ts.source.Trim();
-                if (src2 != "")
-                {
-                    G.Writeln("Series source: " + src2);
-                }
-            }            
-
-            if (Program.model != null)
-            {
-                List<string> d4 = new List<string>();
-                if (Program.model.dependents.ContainsKey(var))
-                {
-                    Dictionary<string, string> d2 = Program.model.dependents[var].storage;
-                    if (d2 != null)
+                    sb4.Append(type);
+                    string stamp = null;
+                    if (ts1.stamp != null && ts1.stamp != "") stamp = " (updated: " + ts1.stamp + ")";
+                    if (ts1.frequency == "a" || ts1.frequency == "u")
                     {
-                        foreach (string d3 in d2.Keys)
+                        if (noData || first.super == -12345 || last.super == -12345)
                         {
-                            d4.Add(d3);
+                            sb4.Append(freq + ", no data period");
+                        }
+                        else
+                        {
+                            //we don't want 1995a1 to 2005a1, instead 1995 to 2005
+                            sb4.Append(freq + " data from " + first.super + " to " + last.super + stamp);
                         }
                     }
-                    d4.Sort(StringComparer.InvariantCulture);
-                }
-
-                EquationHelper found = Program.FindEquationByMeansOfVariableName(var);
-
-                if (found != null && found.modelBlock != null && found.modelBlock != "" && found.modelBlock != "Unnamed")
-                {
-                    G.Writeln("Modelblock: " + found.modelBlock);
-                }
-
-                G.Write("Influences: ");
-                if (d4.Count == 0) G.Writeln("<none>");
-                else
-                {
-                    G.PrintListWithCommas(d4, true);
-                }
-
-                G.Writeln("------------------------------------------------------------------------------------------");
-
-                if (found != null)
-                {
-                    int widthRemember = Program.options.print_width;
-                    int fileWidthRemember = Program.options.print_filewidth;
-                    Program.options.print_width = int.MaxValue;
-                    Program.options.print_filewidth = int.MaxValue;
-                    try
+                    else
                     {
-                        //check for endo (but really not necessary, exo just does not exist)
-                        //G.Writeln(found.equationFormula);
-                        string strSplit = found.equationText;
-                        strSplit = strSplit.Replace("\r\n", "£");  //hack: £ unlikely to be used much
-                        char[] arrDelimiters = new char[] { ' ', '(', ')', '[', ']', '=', '+', '-', '*', '/', ',', ';', '$', '£' };  //last one is part of new line (\r\n)
-                        List<string> alWork = Program.SplitStringAndKeepDelimiters(strSplit, arrDelimiters);
-                        foreach (string s in alWork)
+                        if (noData || first.super == -12345 || last.super == -12345)
                         {
-                            if (s == "£") G.Writeln();
-                            else
+                            sb4.Append(freq + ", no data period");
+                        }
+                        else
+                        {
+                            sb4.Append(freq + " data from " + first.super + ts1.frequency + first.sub + " to " + last.super + ts1.frequency + last.sub + stamp);
+                        }
+                    }
+                    WriteHtml(sb, sb4.ToString());
+
+                }
+
+                List<string> varExpl = Program.GetVariableExplanation(var);
+                foreach (string line in varExpl)
+                {
+                    if (line != "")
+                    {
+                        WriteHtml(sb, line);
+                    }
+                }
+
+                //ts.label = "BNP i faste priser";
+                //ts.expression = "SERIES y = c + i + g;";
+                //ts.stamp = "20-1-2016 10:34";
+
+                if (ts1.label != null) WriteHtml(sb, "Series label: " + ts1.label);
+
+                if (ts1.source != null)
+                {
+                    //We keep the SERIES (or SER), there may be options etc. But we capitalize it.
+                    string src2 = ts1.source.Trim();
+                    if (src2 != "")
+                    {
+                        WriteHtml(sb, "Series source: " + src2);
+                    }
+                }
+
+                if (Program.model != null)
+                {
+                    List<string> list = new List<string>();
+                    if (Program.model.dependents.ContainsKey(var))
+                    {
+                        Dictionary<string, string> d2 = Program.model.dependents[var].storage;
+                        if (d2 != null)
+                        {
+                            foreach (string d3 in d2.Keys)
                             {
-                                if (Program.model.varsAType.ContainsKey(s))
-                                {
-                                    //seems the word exists as variable
-                                    G.WriteLink(s, "disp:" + s);
-                                }
-                                else
-                                {
-                                    G.Write(s);
-                                }
+                                list.Add(d3);
                             }
                         }
-                        G.Writeln();
-                    }
-                    finally
-                    {
-                        //resetting, also if there is an error
-                        Program.options.print_width = widthRemember;
-                        Program.options.print_filewidth = fileWidthRemember;
+                        list.Sort(StringComparer.InvariantCulture);
                     }
 
-                    G.Writeln("------------------------------------------------------------------------------------------");
-                    string rhs = found.csCodeRhsHumanVersion;
-                    rhs = rhs.Replace("\r\n", "");
-                    //rhs = rhs.Replace("[", "(");
-                    //rhs = rhs.Replace("]", ")");
-                    rhs = rhs.Replace("[0]", "");
-                                       
+                    EquationHelper found = Program.FindEquationByMeansOfVariableName(var);
+
+                    if (found != null && found.modelBlock != null && found.modelBlock != "" && found.modelBlock != "Unnamed")
+                    {
+                        WriteHtml(sb, "Modelblock: " + found.modelBlock);
+                    }
+
+                    StringBuilder sb5 = new StringBuilder();
+                    sb5.Append("Influences: ");
+                    if (list.Count == 0) sb5.Append("<none>");
+                    else
+                    {
+
+                        int counter = 0;
+                        for (int i = 0; i < list.Count; i++)
+                        {
+                            string s = list[i];
+
+
+                            sb5.Append(HtmlLink(s));
+                               
+                                    
+                                    if (i < list.Count - 1) sb5.Append(", ");
+                                                            
+                            
+                        }
+                        sb5.AppendLine();                       
+
+                    }
+                    WriteHtml(sb, sb5.ToString());
+                    
+                    if (found != null)
+                    {
+                        StringBuilder sb2 = new StringBuilder();
+                        InsertLinksIntoEquation(found, true, sb2);
+                        WriteHtmlPreCode(sb, sb2.ToString());
+                    }
+                }
+
+                bool hasFilter = false; if (Program.options.timefilter && Globals.globalPeriodTimeFilters2.Count > 0) hasFilter = true;
+
+                int max = Program.options.print_disp_maxlines;
+                if (hasFilter || Program.options.print_disp_maxlines == -1) max = int.MaxValue;
+
+                if (true)
+                {
+                    GekkoTime t = Globals.tNull;
+                    O.Prt o0 = new O.Prt();
+
+                    o0.t1 = tStartPlot;
+                    o0.t2 = tEnd;
+                    
+                    o0.prtType = "plot";
+                    o0.opt_filename = Program.options.folder_working + "\\" + subdir + "\\" + var.ToLower() + ".svg";
+
+                    o0.opt_xlineafter = tLine;
+
+                    {
+                        List<int> bankNumbers = null;
+
+                        if (ts2 != null)
+                        {
+                            O.Prt.Element ope0 = new O.Prt.Element();
+                            ope0.label = bank2.ToLower().Replace(".gbk", "") + ":" + var;
+                            ope0.linetype = "lines";
+                            ope0.dashtype = "3";
+
+                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o0, ope0));
+                            foreach (int bankNumber in bankNumbers)
+                            {
+                                IVariable ts11 = O.GetTimeSeries(O.GetString(new ScalarString("Ref")) + ":" + O.GetString((new ScalarString(var))), bankNumber);
+                                foreach (GekkoTime t2 in new GekkoTimeIterator(o0.t1.Add(-2), o0.t2))
+                                {
+                                    t = t2; O.GetVal777(ts11, bankNumber, ope0, t);
+                                }
+                                t = Globals.tNull;
+                            }
+                            o0.prtElements.Add(ope0);
+                        }
+
+                        
+                        {
+                            O.Prt.Element ope0 = new O.Prt.Element();
+                            ope0.label = bank1.ToLower().Replace(".gbk", "") + ":" + var;
+                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o0, ope0));
+                            foreach (int bankNumber in bankNumbers)
+                            {
+                                IVariable ts11 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString(var))), bankNumber);
+                                foreach (GekkoTime t2 in new GekkoTimeIterator(o0.t1.Add(-2), o0.t2))
+                                {
+                                    t = t2; O.GetVal777(ts11, bankNumber, ope0, t);
+                                }
+                                t = Globals.tNull;
+                            }
+                            o0.prtElements.Add(ope0);
+                        }
+
+
+                    }
+
+                    o0.Exe();
+
+                    sb.AppendLine("<img src = `" + var.ToLower() + ".svg" + "`>");
+                }
+
+                if (true)
+                {
+                    
+                    
+                    StringBuilder sb3 = new StringBuilder();
+                    sb3.AppendLine(bank1 + G.Blanks(30 - bank1.Length + gap) + bank2);
+                    sb3.AppendLine();
+                    sb3.AppendLine("Period        value        %  " + G.Blanks(gap) + "Period        value        %  ");
+                    int counter = 0;
+                    foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
+                    {
+                        counter++;
+                        if (hasFilter)  //some periods are set via TIMEFILTER
+                        {                            
+                            if (ShouldFilterPeriod(gt)) continue;
+                        }
+
+                        int counter2 = -1;
+                        foreach (TimeSeries ts in new List<TimeSeries> { ts1, ts2 })
+                        {
+                            counter2++;
+                            if (ts == null)
+                            {
+                                //ignore it
+                            }
+                            else
+                            {                                
+                                BrowserWritePrintLine(ts, sb3, gt);
+                                if (counter2 == 0) sb3.Append(G.Blanks(gap + 1));
+                            }
+                        }
+
+                        sb3.AppendLine();
+                    }
+
+                    WriteHtmlPreCode(sb, sb3.ToString());
+
+                }                
+
+                StringBuilder x = new StringBuilder();                
+                x.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
+                x.AppendLine("<html>");
+                x.AppendLine("  <head>");
+                x.AppendLine("    <link rel=`stylesheet` href=`styles.css` type=`text/css`>");
+                x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
+                x.AppendLine("    <title>" + var + "</title>");
+                x.AppendLine("  </head>");
+                x.AppendLine("  <body>");
+                //x.AppendLine("  <big><b>" + var + "</b></big><br>");
+                //x.Append("<pre><code>");
+                x.Append(sb);
+                //x.Append("</code></pre>");
+                x.AppendLine("  </body>");
+                x.AppendLine("</html>");
+
+                string pathAndFilename = Program.options.folder_working + "\\" + subdir + "\\" + var.ToLower() + ".html";
+                using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {
+                    sw.Write(x.Replace('`', '\"'));
                 }
             }
 
-            bool hasFilter = false; if (Program.options.timefilter && Globals.globalPeriodTimeFilters2.Count > 0) hasFilter = true;
-
-            int max = Program.options.print_disp_maxlines;
-            if (hasFilter || Program.options.print_disp_maxlines == -1) max = int.MaxValue;
-
-            if (max > 0)
+            StringBuilder x2 = new StringBuilder();
+            x2.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
+            x2.AppendLine("<html>");
+            x2.AppendLine("  <head>");
+            x2.AppendLine("    <link rel=`stylesheet` href=`styles.css` type=`text/css`>");
+            x2.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
+            x2.AppendLine("    <title>List of vars</title>");
+            x2.AppendLine("  </head>");
+            x2.AppendLine("  <body>");
+            x2.AppendLine("  <p><big><b>SMECdok, take one. Søg på variabelnavn med Ctrl+F (find)</b></big></p>");
+            x2.AppendLine("  <p>");
+            foreach (string var2 in vars)
             {
+                x2.Append(HtmlLink(var2));
+                x2.AppendLine("<br>"); ;
+            }
+            x2.AppendLine("  </p>");
+            x2.AppendLine("  </body>");
+            x2.AppendLine("</html>");
+            string pathAndFilename2 = Program.options.folder_working + "\\" + subdir + "\\" + "index" + ".html";
+            using (FileStream fs = Program.WaitForFileStream(pathAndFilename2, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                sw.Write(x2.Replace('`', '\"'));
+            }
 
-                G.Writeln("------------------------------------------------------------------------------------------");
-                G.Writeln("Period        value        %");
+            G.Writeln2("End of html browser generation");
 
-                int counter = 0;
-                foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
+        }
+
+        private static void BrowserWritePrintLine(TimeSeries ts, StringBuilder sb3, GekkoTime gt)
+        {
+            if (Program.options.freq == EFreq.Annual) sb3.Append((gt.super) + " ");
+            else sb3.Append(gt.super + ts.frequency + gt.sub + " ");
+
+            double n1 = ts.GetData(gt);
+            double n0 = ts.GetData(gt.Add(-1));
+
+            double level1 = n1;
+            double pch1 = ((n1 / n0 - 1) * 100d);
+
+            if (n1 == n0) pch1 = 0d;
+
+            string levelFormatted;
+            string pchFormatted;
+            Program.ConvertToPrintFormat(level1, pch1, out levelFormatted, out pchFormatted);
+
+            sb3.Append(levelFormatted + " " + pchFormatted + " ");
+        }
+
+        private static void WriteHtmlPreCode(StringBuilder sb, string sb2)
+        {
+            sb.Append("<pre><code>"); sb.Append(sb2); sb.Append("</code></pre>");
+        }
+
+        private static void InsertLinksIntoEquation(EquationHelper found, bool html, StringBuilder sb)
+        {
+            int widthRemember = -12345;
+            int fileWidthRemember = -12345;
+            if (!html)
+            {
+                widthRemember = Program.options.print_width;
+                fileWidthRemember = Program.options.print_filewidth;
+                Program.options.print_width = int.MaxValue;
+                Program.options.print_filewidth = int.MaxValue;
+            }
+            try
+            {
+                List<TokenHelper> a = GetTokensWithLeftBlanks(found.equationText);
+
+                int counter = -1;
+                for (int i = 0; i < a.Count; i++)
                 {
+
+
                     counter++;
-                    if (hasFilter)  //some periods are set via TIMEFILTER
+                    //string s = tokens[i].s;
+                    //if (s == "£") G.Writeln();
+
+
+                    if (a[i].leftblanks != null && a[i].leftblanks.Length > 0)
                     {
-                        //if some filter is set, we never truncate output to 3 or 5 lines (showAllPeriods)
-                        if (ShouldFilterPeriod(gt)) continue;
+                        if (!html)
+                        {
+                            G.Write(a[i].leftblanks);
+                        }
+                        else
+                        {
+                            sb.Append(a[i].leftblanks);
+                        }
                     }
-                    
+                    if (counter > 1 && a[i].type == "Word" && Program.model.varsAType.ContainsKey(a[i].s))
+                    {
+                        if (!html)
+                        {
+                            G.WriteLink(a[i].s, "disp:" + a[i].s);
+                        }
+                        else
+                        {                            
+                            sb.Append(HtmlLink(a[i].s));
+                        }
+                    }
+                    else
+                    {
+                        if (!html)
+                        {
+                            G.Write(a[i].s);
+                        }
+                        else
+                        {
+                            sb.Append(a[i].s);
+                        }
+                    }
 
-                    if (Program.options.freq == EFreq.Annual) G.Write((gt.super) + " ");
-                    else G.Write(gt.super + ts.frequency + gt.sub + " ");
-
-                    double n1 = ts.GetData(gt);
-                    double n0 = ts.GetData(gt.Add(-1));
-
-                    double level1 = n1;
-                    double pch1 = ((n1 / n0 - 1) * 100d);
-
-                    if (n1 == n0) pch1 = 0d;
-
-                    string levelFormatted;
-                    string pchFormatted;
-                    Program.ConvertToPrintFormat(level1, pch1, out levelFormatted, out pchFormatted);
-
-                    G.Write(levelFormatted + " " + pchFormatted + " ");
+                }
+                if (!html)
+                {
                     G.Writeln();
                 }
-                int surplus = counter - max;
-                
             }
-            G.Writeln("==========================================================================================");
-            G.Writeln();
+            finally
+            {
+                if (!html)
+                {
+                    //resetting, also if there is an error
+                    Program.options.print_width = widthRemember;
+                    Program.options.print_filewidth = fileWidthRemember;
+                }
+            }
+        }
 
-
+        private static string HtmlLink(string xx)
+        {
+            return "<a href = \"" + xx.ToLower() + ".html" + "\" >" + xx + "</a>";
         }
 
         public static void ShowMatrix(Matrix a, string label)
