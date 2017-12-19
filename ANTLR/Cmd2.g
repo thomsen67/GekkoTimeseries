@@ -62,6 +62,7 @@ tokens {
 	ASTSERIESRHS;
 	ASTOPT_STRING_PX;
 	ASTOPT_STRING_BOLD;
+	ASTOPT_STRING_BROWSER;
 	ASTOPT_STRING_ITALIC;
 	ASTOPT_STRING_GRIDSTYLE;
 	ASTOPT_STRING_PREFIX;
@@ -713,6 +714,7 @@ ASTOPT_STRING_Y2;
 		//POINTS = 'POINTS';
 		DOTS = 'DOTS';
 		IMPULSES = 'IMPULSES';
+		BROWSER = 'BROWSER';
 CONTINUE              = 'CONTINUE';
 SIZE                  = 'SIZE'                     ;
 //TITLE                 = 'TITLE'                    ;
@@ -1347,6 +1349,7 @@ d.Add("Y" ,Y);
                                         d.Add("AREMOS", AREMOS);
                                         d.Add("as"  , AS    );
                                         d.Add("AUTO", AUTO);
+										d.Add("BROWSER", BROWSER);
                                         d.Add("avg"  , AVG    );
                                         d.Add("backtrack"               , BACKTRACK );
                                         d.Add("bank"    , BANK );
@@ -1907,7 +1910,12 @@ copyOpt1h                 : RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT ye
 						  | TO EQUAL AT GLUE? -> ^(ASTOPT_STRING_TO ASTAT)
 						  ;
 
-doc                       : DOC listItemsWildRange0 docOpt2 -> ^({token("ASTDOC", ASTDOC, $DOC.Line)} listItemsWildRange0 ^(ASTOPT_ docOpt2?));
+doc                       : DOC listItemsWildRange0 docOpt2 -> ^({token("ASTDOC", ASTDOC, $DOC.Line)} listItemsWildRange0 ^(ASTOPT_ docOpt2?))
+                          | DOC docOpt1 -> ^({token("ASTDOC", ASTDOC, $DOC.Line)} docOpt1)
+						  ;
+docOpt1                   : ISNOTQUAL | leftAngle docOpt1h* RIGHTANGLE -> ^(ASTOPT1 docOpt1h*);
+docOpt1h				  : BROWSER (EQUAL yesNo)? -> ^(ASTOPT_STRING_BROWSER yesNo?)
+						  ;
 docOpt2                   : docOpt2h*;
 docOpt2h                  : LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expression)
 						  | SOURCE EQUAL expression -> ^(ASTOPT_STRING_SOURCE expression)
@@ -3531,6 +3539,7 @@ ident                     : Ident|
                             CSV|
                             CURROW|
                             DAMP|
+							BROWSER|
                             DANISH|
                             DATABANK|
                             DATAWIDTH|

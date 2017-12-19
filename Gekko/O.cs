@@ -3149,10 +3149,15 @@ namespace Gekko
         {
             public string opt_label = null;
             public string opt_source = null;
-            public string opt_stamp = null;            
+            public string opt_stamp = null;
+            public string opt_browser = null;      
             public List<string> listItems0 = null;  //left side     
             public void Exe()
             {
+                if (G.equal(opt_browser, "yes")) {
+                    Program.Browser();
+                    return;
+                }
                 foreach (string s in listItems0)
                 {
                     ExtractBankAndRestHelper h = Program.ExtractBankAndRest(s, EExtrackBankAndRest.GetDatabankAndTimeSeries);
