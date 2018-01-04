@@ -1419,13 +1419,25 @@ namespace Gekko
         }
 
         public static void ServiceMessage(string s, P p)
-        {
-            //if (p.IsSimple() && p.numberOfServiceMessages == 0)
+        {            
             if (p.IsSimple())
             {
-                G.Write2(s);
-                G.Writeln(Globals.serviceMessage, Color.LightGray);
-                //p.numberOfServiceMessages++;
+                if (p.numberOfServiceMessages < 4)
+                {
+                    G.Write2(s);
+                    G.Writeln(Globals.serviceMessage, Color.LightGray);
+                    p.numberOfServiceMessages++;
+                }
+                else if (p.numberOfServiceMessages == 4)
+                {
+                    G.Write2(s);
+                    G.Writeln(Globals.serviceMessageTruncated, Color.LightGray);
+                    p.numberOfServiceMessages++;
+                }
+                else 
+                {                    
+                    //do nothing
+                }                
             }
         }
 

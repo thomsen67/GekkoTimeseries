@@ -207,8 +207,9 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: You cannot state bank name (with colon) on the left-hand side in a MAP element");
                     throw new GekkoException();
-                }        
-                O.LookupHelperLeftside(smpl, this, s, freq, rhsExpression, EVariableType.Var);
+                }
+                string varnameWithFreq = O.AddFreq(varName, freq, EVariableType.Var, true);
+                O.LookupHelperLeftside(smpl, this, varnameWithFreq, freq, rhsExpression, EVariableType.Var);
                 
                 //IVariable iv = this.GetIVariable(s);
                 //if (iv != null) this.RemoveIVariable(s);

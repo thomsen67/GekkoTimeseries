@@ -24571,9 +24571,16 @@ namespace Gekko
                             s += "[" + iv.Type().ToString() + "]" + ", ";
                         }
                     }
-                    s = s.Substring(0, s.Length - ", ".Length);
                     G.Writeln2(element.label);
-                    G.Writeln(s);
+                    if (temp.list.Count > 0)
+                    {
+                        s = s.Substring(0, s.Length - ", ".Length);
+                        G.Writeln(s);
+                    }
+                    else
+                    {
+                        G.Writeln("[empty list]");
+                    }
                 }
                 else
                 {
@@ -24599,7 +24606,16 @@ namespace Gekko
                     else if (var.Type() == EVariableType.Map)
                     {
                         G.Writeln2(element.label);
-                        G.Writeln("MAP printing not implemented yet");
+                        Map map = var as Map;
+                                                
+                        if (map.storage.Count == 0)
+                        {
+                            G.Writeln("[empty map]");
+                        }
+                        else
+                        {
+                            G.Writeln("MAP printing not implemented yet");
+                        }                        
                     }
                 }
             }
@@ -24661,6 +24677,7 @@ namespace Gekko
                     count++;
                 }
 
+                int twenty = 20;
                 List<TokenHelper> a = GetTokensWithLeftBlanks(ss[1]);  //puts in 20 empty tokens at the end
 
                 //Now we walk though the tokens to mark all that are bound with sum, 
@@ -24669,14 +24686,14 @@ namespace Gekko
                 //It is like they did not exist
 
                 // x[#i, 'a'] $ #j[#k]--> x[##i, 'a'] $ #j[##k]
-                for (int i = 0; i < a.Count - 20; i++)
+                for (int i = 0; i < a.Count - twenty; i++)
                 {
                     if (a[i].s == "[" && a[i - 1].type == "Word")
                     {
                         //is 'x['
                         //very simple check, does not account for nesting etc....  
                         int count2 = 1;                      
-                        for (int i2 = i + 1; i2 < a.Count - 20; i2++)
+                        for (int i2 = i + 1; i2 < a.Count - twenty; i2++)
                         {
                             if (a[i2].s == "[") count2++;
                             if (a[i2].s == "]") count2--;
@@ -24686,15 +24703,33 @@ namespace Gekko
                     }
                 }
 
+                // x{#i, 'a'} --> x{##i, 'a'}
+                for (int i = 0; i < a.Count - twenty; i++)
+                {
+                    if (a[i].s == "{")
+                    {
+                        //is 'x{'
+                        //very simple check, does not account for nesting etc....  
+                        int count2 = 1;
+                        for (int i2 = i + 1; i2 < a.Count - twenty; i2++)
+                        {
+                            if (a[i2].s == "{") count2++;
+                            if (a[i2].s == "}") count2--;
+                            if (count2 == 0) break;
+                            if (a[i2].s == "#") a[i2].s = "##";
+                        }
+                    }
+                }
+
                 // x[##i, 'a'] $ #j[##k] --> x[#i, 'a'] $ ###j[#k]
-                for (int i = 0; i < a.Count - 20; i++)
+                for (int i = 0; i < a.Count - twenty; i++)
                 {
                     if (a[i].s == "#") a[i].s = "###";
                     else if (a[i].s == "##") a[i].s = "#";
                 }
 
                 int start = 0;
-                for (int i = 0; i < a.Count - 20; i++)
+                for (int i = 0; i < a.Count - twenty; i++)
                 {
                     GekkoDictionary<string, string> listNames = null;
                     if (a[i].s == "sum" && a[i + 1].s == "(" && a[i + 2].s == "###" && a[i + 3].type == "Word" && a[i + 4].s == ",")
@@ -24710,7 +24745,7 @@ namespace Gekko
                         //sum((#m1, #m2), xx3[#m1, #m2]) 
                         listNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-                        for (int i2 = i + 3; i2 < a.Count - 20; i2++)
+                        for (int i2 = i + 3; i2 < a.Count - twenty; i2++)
                         {
                             //Harvesting list names from here: sum((...), xx3[#m1, #m2])
                             if (a[i2].s == "###" && a[i2 + 1].type == "Word")
@@ -24729,7 +24764,7 @@ namespace Gekko
                     {                       
                         
                         int paren = 1;
-                        for (int i2 = i + start; i2 < a.Count - 20; i2++)
+                        for (int i2 = i + start; i2 < a.Count - twenty; i2++)
                         {
                             //counting parentheses
 
@@ -24752,14 +24787,13 @@ namespace Gekko
                     foreach (string list0 in xxx[j0])
                     {
                         string ss2 = null;
-                        for (int i = 0; i < a.Count - 20; i++)
-                        {
-                            if (a[i].s == "#" && i < a.Count - 1 && G.Equal(a[i + 1].s, freelists[j0]))
-                            {
-                                ss2 += a[i].leftblanks + "'" + list0 + "'";
-                                i++;
-                            }
-                            else
+                        for (int i = 0; i < a.Count - twenty; i++)
+                        {                            
+
+                            bool flag = false;
+                            UnfoldLabelsHelper(a, list0, ref ss2, ref i, freelists[j0], ref flag);
+
+                            if (!flag)
                             {
                                 string x = a[i].s;
                                 if (x == "###") x = "#";
@@ -24778,26 +24812,55 @@ namespace Gekko
                         foreach (string list1 in xxx[j1])
                         {
                             string ss2 = null;
-                            for (int i = 0; i < a.Count; i++)
+                            for (int i = 0; i < a.Count - twenty; i++)
                             {
-                                if (a[i].s == "#" && i < a.Count - 1 && G.Equal(a[i + 1].s, freelists[j0]))
-                                {
-                                    ss2 += a[i].leftblanks + "'" + list0 + "'";
-                                    i++;
-                                }
-                                else if (a[i].s == "#" && i < a.Count - 1 && G.Equal(a[i + 1].s, freelists[j1]))
-                                {
-                                    ss2 += a[i].leftblanks + "'" + list1 + "'";
-                                    i++;
-                                }
-                                else
+
+                                bool flag = false;
+                                UnfoldLabelsHelper(a, list0, ref ss2, ref i, freelists[j0], ref flag);
+                                UnfoldLabelsHelper(a, list1, ref ss2, ref i, freelists[j1], ref flag);
+
+                                if (!flag)
                                 {
                                     string x = a[i].s;
                                     if (x == "###") x = "#";
                                     ss2 += a[i].leftblanks + x;
                                 }
+
                             }
                             labels2.Add(ss2);
+                        }
+                    }
+                }
+                else if (freelists.Length == 3)
+                {
+                    int j0 = 0;
+                    int j1 = 1;
+                    int j2 = 2;
+                    foreach (string list0 in xxx[j0])
+                    {
+                        foreach (string list1 in xxx[j1])
+                        {
+                            foreach (string list2 in xxx[j2])
+                            {
+                                string ss2 = null;
+                                for (int i = 0; i < a.Count - twenty; i++)
+                                {
+
+                                    bool flag = false;
+                                    UnfoldLabelsHelper(a, list0, ref ss2, ref i, freelists[j0], ref flag);
+                                    UnfoldLabelsHelper(a, list1, ref ss2, ref i, freelists[j1], ref flag);
+                                    UnfoldLabelsHelper(a, list2, ref ss2, ref i, freelists[j2], ref flag);
+
+                                    if (!flag)
+                                    {
+                                        string x = a[i].s;
+                                        if (x == "###") x = "#";
+                                        ss2 += a[i].leftblanks + x;
+                                    }
+
+                                }
+                                labels2.Add(ss2);
+                            }
                         }
                     }
                 }
@@ -24818,6 +24881,22 @@ namespace Gekko
             }
 
             return;
+        }
+
+        private static void UnfoldLabelsHelper(List<TokenHelper> a, string list0, ref string ss2, ref int i, string freelist, ref bool flag)
+        {
+            if (a[i].s == "{" && a[i + 1].s == "#" && a[i + 3].s == "}" && G.Equal(a[i + 2].s, freelist))
+            {
+                ss2 += list0;  //no leftblanks                                
+                i += 3;
+                flag = true;
+            }
+            else if (a[i].s == "#" && G.Equal(a[i + 1].s, freelist))
+            {
+                ss2 += a[i].leftblanks + list0;
+                i++;
+                flag = true;
+            }
         }
 
         private static List<TokenHelper> GetTokensWithLeftBlanks(string s)
@@ -35360,7 +35439,7 @@ namespace Gekko
         public bool hasSeenStopCommand = false;
         private GekkoDictionary<string, int> commandFileCounter = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         private GekkoDictionary<string, string> commandFileCounterTainted = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        //public int numberOfServiceMessages = 0;
+        public int numberOfServiceMessages = 0;
 
         public string GetStack(int i)
         {

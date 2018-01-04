@@ -59,7 +59,8 @@ namespace Gekko
         public static string extensionTable = "gtb";
 
         public static string serviceMessage = "[service message]";
-        
+        public static string serviceMessageTruncated = "[further service messages truncated]";
+
         public static bool nameFix = true;
         
         public static bool readImportFilter = false;

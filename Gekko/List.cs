@@ -247,9 +247,14 @@ namespace Gekko
                         return Functions.union(t, this, x);                     
                     }
                     break;
+                case EVariableType.String:                
+                    {
+                        return Functions.union(t, this, new List(new List<IVariable> { x }));
+                    }
+                    break;
                 default:
                     {
-                        G.Writeln2("*** ERROR: Adding only allowed for two lists");
+                        G.Writeln2("*** ERROR: Adding to list not allowed for this type: " + G.GetTypeString(x));
                         throw new GekkoException();
                     }
                     break;
@@ -265,12 +270,17 @@ namespace Gekko
                         return Functions.difference(t, this, x);
                     }
                     break;
-                default:
+                case EVariableType.String:
                     {
-                        G.Writeln2("*** ERROR: Adding only allowed for two lists");
-                        throw new GekkoException();
+                        return Functions.difference(t, this, new List(new List<IVariable> { x }));
                     }
                     break;
+                default:
+                    {
+                        G.Writeln2("*** ERROR: Subtract from list not allowed for this type: " + G.GetTypeString(x));
+                        throw new GekkoException();
+                    }
+                    break;               
             }
         }
 
@@ -283,9 +293,14 @@ namespace Gekko
                         return Functions.intersect(t, this, x);
                     }
                     break;
+                case EVariableType.String:
+                    {
+                        return Functions.intersect(t, this, new List(new List<IVariable> { x }));
+                    }
+                    break;
                 default:
                     {
-                        G.Writeln2("*** ERROR: Adding only allowed for two lists");
+                        G.Writeln2("*** ERROR: Intersect with list not allowed for this type: " + G.GetTypeString(x));
                         throw new GekkoException();
                     }
                     break;

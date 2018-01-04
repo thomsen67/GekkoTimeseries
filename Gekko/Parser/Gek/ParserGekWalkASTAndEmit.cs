@@ -250,9 +250,9 @@ namespace Gekko.Parser.Gek
                 {
                     string listnameWithoutSigil = s.Substring(1);
                     //naked #m
-                    if (node.Parent.Text == "ASTINDEXERELEMENT" || (node.Parent.Text == "ASTCOMPARE2" && node.Number==1))
+                    if (node.Parent.Text == "ASTINDEXERELEMENT" || node.Parent.Text == "ASTCURLY" || (node.Parent.Text == "ASTCOMPARE2" && node.Number==1))
                     {
-                        //#m is inside a x[#m]
+                        //#m is inside a x[#m], or inside a x{#m} or is a #m1[#m] conditional
                         ASTNode node2 = node.Parent.Parent;
                         //Assign it to ASTPRTELEMENT, unless it is assigned to sum(#m,...) or unfold(#m,...)
                         while (true)
@@ -2501,13 +2501,24 @@ namespace Gekko.Parser.Gek
                     //        node.Code.CA("O.GetListFromCache(`" + node[0].Text + "`)";
                     //    }
                     //    break;
-                    case "ASTIDENT":
-                    case "ASTIDENTDIGIT":
+                    case "ASTIDENT":                    
                         {
                             node.Code.CA("new ScalarString(`" + node[0].Text + "`)");  //problem is that we now allow VAL %v = 1, for instance. Here %v is not recursive.
                         }
                         break;
-
+                                            
+                    case "ASTIDENTDIGIT":
+                        {
+                            if (node[0].Text == "ASTIDENT")
+                            {
+                                node.Code.CA(node[0].Code);
+                            }
+                            else
+                            {
+                                node.Code.CA("new ScalarString(`" + node[0].Text + "`)");
+                            }                            
+                        }
+                        break;
                     //case "ASTIMPORT":
                     //    {
                     //        node.Code.A(Globals.clearTsCsCode + G.NL);
@@ -3026,8 +3037,23 @@ namespace Gekko.Parser.Gek
                                 throw new GekkoException();
                             }
                             string convertTo = null;
-                            if (type != null) node.Code.A("IVariable " + ivTempVar + " = O.IvConvertTo(EVariableType." + type + ", ").A(node[1].Code).A(")").End();
-                            else  node.Code.A("IVariable " + ivTempVar + " = ").A(node[1].Code).End();
+
+                            string temp = node[1].Code.ToString();
+
+                            //string temp = null;
+                            //if (node[4].Text == "=") temp = node[1].Code.ToString();
+                            //else if (node[4].Text == "+=") temp = "O.Add(smpl, " + node[0].Code.ToString() + ", " + node[1].Code.ToString() + ")";
+                            //else if (node[4].Text == "-=") temp = "O.Subtract(smpl, " + node[0].Code.ToString() + ", " + node[1].Code.ToString() + ")";
+                            //else if (node[4].Text == "*=") temp = "O.Multiply(smpl, " + node[0].Code.ToString() + ", " + node[1].Code.ToString() + ")";
+                            //else if (node[4].Text == "/=") temp = "O.Divide(smpl, " + node[0].Code.ToString() + ", " + node[1].Code.ToString() + ")";
+                            //else
+                            //{
+                            //    G.Writeln2("*** ERRROR: Unknown assignment operator");
+                            //    throw new GekkoException();
+                            //}
+
+                            if (type != null) node.Code.A("IVariable " + ivTempVar + " = O.IvConvertTo(EVariableType." + type + ", ").A(temp).A(")").End();
+                            else  node.Code.A("IVariable " + ivTempVar + " = ").A(temp).End();
 
                             node.Code.A(node[0].Code).End();
 

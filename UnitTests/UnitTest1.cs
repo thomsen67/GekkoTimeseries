@@ -162,6 +162,8 @@ namespace UnitTests
 
             Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();  //uses reflection to do this
 
+            Program.InitUfunctionsAndArithmetics();
+
             //Globals.unitTestCounter++;
             //if (Globals.unitTestWindow == null)
             //{
@@ -9343,8 +9345,49 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_SeriesIndexing()
+        public void _Test_ArraySeries()
         {
+            I("RESET; TIME 2001 2005;");
+            I("xx2 = series(2);");
+            I("xx2['a', 'b'] = (1, 2, 3, 4, 5);");
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2003, 3d, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2004, 4d, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2005, 5d, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2006, double.NaN, sharedDelta);
+        }
+
+        [TestMethod]
+        public void _Test_AssignmentOperator()
+        {
+            I("RESET; TIME 2001 2001;");
+            I("xx = 5;");
+            I("xx += 2;");
+            _AssertSeries(First(), "xx", 2001, 7, sharedDelta);
+            I("xx -= 2;");
+            _AssertSeries(First(), "xx", 2001, 5, sharedDelta);
+            I("xx *= 2;");
+            _AssertSeries(First(), "xx", 2001, 10, sharedDelta);
+            I("xx /= 2;");
+            _AssertSeries(First(), "xx", 2001, 5, sharedDelta);
+
+            I("%xx = 5;");
+            I("%xx += 2;");
+            _AssertScalarVal(First(), "%xx", 7d);
+            I("%xx -= 2;");
+            _AssertScalarVal(First(), "%xx", 5d);
+            I("%xx *= 2;");
+            _AssertScalarVal(First(), "%xx", 10d);
+            I("%xx /= 2;");
+            _AssertScalarVal(First(), "%xx", 5d);
+        }
+
+        [TestMethod]
+        public void _Test_SeriesIndexing()
+        {           
+
             I("reset; time 2000 2002;");
             I("xx = 100;");
             I("xx[2001] = 1;");
@@ -9376,7 +9419,16 @@ namespace UnitTests
             //AssertHelper(First(), "xx", 2002, 2d, sharedDelta);
             //AssertHelper(First(), "xx", 2003, 3d, sharedDelta);
             //AssertHelper(First(), "xx", 2004, double.NaN, sharedDelta);
-            
+
+            I("RESET; TIME 2001 2005;");
+            I("xx1 = (1, 2, 3, 4, 5);");
+            I("#m = xx1;");  //autoconverted into matrix    WHY???
+            _AssertMatrix(First(), "#m", 1, 1, 1, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 2, 2, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 3, 3, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 4, 4, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 5, 5, sharedDelta);
+
             I("#m = [1, 2; 3, 4];");
             _AssertMatrix(First(), "#m", 1, 1, 1d, sharedDelta);
             _AssertMatrix(First(), "#m", 1, 2, 2d, sharedDelta);
@@ -9578,14 +9630,19 @@ namespace UnitTests
             I("reset;");
             I("time 2001 2003;");
             I("xx = series(2);");
-            I("xx['a', 'x'] = (1,2,3);");
-            I("xx['b', 'x'] = (4,5,6);");
-            I("xx['a', 'y'] = (7,8,9);");
-            I("xx['b', 'y'] = (14,15,16);");
+            I("xx[a, x] = (1,2,3);");
+            I("xx[b, x] = (4,5,6);");
+            I("xx[a, y] = (7,8,9);");
+            I("xx[b, y] = (14,15,16);");
             I("#m1 = ('a', 'b');");
             I("#m2 = ('x', 'y');");
             I("#m3 = ('a', );");
             I("#m4 = ('b', );");
+
+            I("xxax = (1,2,3);");
+            I("xxbx = (4,5,6);");
+            I("xxay = (7,8,9);");
+            I("xxby = (14,15,16);");
 
             /*                     
                                   xx['a', 'x'] 
@@ -9593,12 +9650,12 @@ namespace UnitTests
                           2002          2.0000 
                           2003          3.0000
              */
-            I("p <n> xx['a', 'x'];");
+            I("p <n> xx[a, x];");
             Table table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001"); //why is it not a date?
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx['a', 'x']");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx[a, x]");
             Assert.AreEqual(table.Get(2, 2).number, 1.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 2).number, 2.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 2).number, 3.0000d, 0.0001);
@@ -9611,16 +9668,30 @@ namespace UnitTests
 
             */
 
-            I("p <n> xx[#m1, 'x'];");
+            I("p <n> xx[#m1, x];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001"); //why is it not a date?
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx['a', 'x']");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx[a, x]");
             Assert.AreEqual(table.Get(2, 2).number, 1.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 2).number, 2.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 2).number, 3.0000d, 0.0001);
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx['b', 'x']");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx[b, x]");
+            Assert.AreEqual(table.Get(2, 3).number, 4.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 3).number, 5.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 3).number, 6.0000d, 0.0001);
+
+            I("p <n> xx{#m1}x;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001"); //why is it not a date?
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xxax");
+            Assert.AreEqual(table.Get(2, 2).number, 1.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 2).number, 2.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 2).number, 3.0000d, 0.0001);
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xxbx");
             Assert.AreEqual(table.Get(2, 3).number, 4.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 3).number, 5.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 3).number, 6.0000d, 0.0001);
@@ -9632,16 +9703,16 @@ namespace UnitTests
                           2012          3.0000          9.0000              
              */
 
-            I("p <n> xx['a', #m2];");
+            I("p <n> xx[a, #m2];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001"); //why is it not a date?
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx['a', 'x']");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx[a, x]");
             Assert.AreEqual(table.Get(2, 2).number, 1.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 2).number, 2.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 2).number, 3.0000d, 0.0001);
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx['a', 'y']");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx[a, y]");
             Assert.AreEqual(table.Get(2, 3).number, 7.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 3).number, 8.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 3).number, 9.0000d, 0.0001);
@@ -9658,19 +9729,19 @@ namespace UnitTests
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001"); //why is it not a date?
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx['a', 'x']");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx[a, x]");
             Assert.AreEqual(table.Get(2, 2).number, 1.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 2).number, 2.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 2).number, 3.0000d, 0.0001);
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx['a', 'y']");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx[a, y]");
             Assert.AreEqual(table.Get(2, 3).number, 7.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 3).number, 8.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 3).number, 9.0000d, 0.0001);
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx['b', 'x']");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx[b, x]");
             Assert.AreEqual(table.Get(2, 4).number, 4.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 4).number, 5.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 4).number, 6.0000d, 0.0001);
-            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "xx['b', 'y']");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "xx[b, y]");
             Assert.AreEqual(table.Get(2, 5).number, 14.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 5).number, 15.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 5).number, 16.0000d, 0.0001);
@@ -9680,22 +9751,24 @@ namespace UnitTests
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001"); //why is it not a date?
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx['a', 'x']");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx[a, x]");
             Assert.AreEqual(table.Get(2, 2).number, 1.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 2).number, 2.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 2).number, 3.0000d, 0.0001);
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx['a', 'y']");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx[a, y]");
             Assert.AreEqual(table.Get(2, 3).number, 7.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 3).number, 8.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 3).number, 9.0000d, 0.0001);
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx['b', 'x']");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx[b, x]");
             Assert.AreEqual(table.Get(2, 4).number, 4.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 4).number, 5.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 4).number, 6.0000d, 0.0001);
-            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "xx['b', 'y']");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "xx[b, y]");
             Assert.AreEqual(table.Get(2, 5).number, 14.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 5).number, 15.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 5).number, 16.0000d, 0.0001);
+
+            // -------------> from here we use single quotes
 
             I("p <n> sum(#m1, xx[#m1, 'x']);");
             table = Globals.lastPrtOrMulprtTable;
@@ -9806,15 +9879,15 @@ namespace UnitTests
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001"); //why is it not a date?
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx['a', 'x']");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx[a, x]");
             Assert.AreEqual(table.Get(2, 2).number, 1.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 2).number, 2.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 2).number, 3.0000d, 0.0001);            
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx['b', 'x']");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx[b, x]");
             Assert.AreEqual(table.Get(2, 3).number, 4.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 3).number, 5.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 3).number, 6.0000d, 0.0001);
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx['b', 'y']");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx[b, y]");
             Assert.AreEqual(table.Get(2, 4).number, 14.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 4).number, 15.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 4).number, 16.0000d, 0.0001);
@@ -9866,6 +9939,64 @@ namespace UnitTests
             _AssertListString(First(), "#v3", 1, "a");
             _AssertListString(First(), "#v3", 2, "b");
 
+            I("#m = ('a', [1,2;3,4]);");
+            I("p #m[2];");
+            I("p #m[2][1,1];");
+            Assert.AreEqual(((First().GetIVariable("#m") as List).list[1] as Matrix).data[1, 1], 4d);
+
+            I("#m = (('a', 'b'), 'c');");
+            Assert.AreEqual((((First().GetIVariable("#m") as List).list[0] as List).list[1] as ScalarString).string2, "b");
+            I("#m[1][2]='x';");
+            I("p #m[1][2];");
+
+        }
+
+        [TestMethod]
+        public void _Test_UserDefinedFunctions()
+        {
+            I("function list add2(val %x, val %y); return (%x, %x +%y); end;");
+            I("%v = add2(10, 20)[2];");
+            _AssertScalarVal(First(), "%v", 30d);
+
+            I("function val f(val %x); return 2*%x; end;");
+            I("%v1 = 100;");
+            I("%v2 = f(f(%v1));");
+            _AssertScalarVal(First(), "%v2", 400d);
+        }
+
+        [TestMethod]
+        public void _Test_For()
+        {
+            //parallel for loop
+            I("#m1 = ('a', 'b');");
+            I("#m2 = ('x', 'y');");
+            I("#m3 = list();");
+            I("for %i = #m1, %j = #m2; %s = %i + %j; #m3 = #m3 + (%s,); end;");
+            _AssertListString(First(), "#m3", 1, "ax");
+            _AssertListString(First(), "#m3", 2, "by");
+                        
+            I("#m3 = list();");
+            I("for %i = #m1, %j = #m2; %s = %i + %j; #m3 = #m3 + %s; end;");
+            _AssertListString(First(), "#m3", 1, "ax");
+            _AssertListString(First(), "#m3", 2, "by");
+
+            I("#m3 = list();");
+            I("for %i = #m1, %j = #m2; %s = %i + %j; #m3 += %s; end;");
+            _AssertListString(First(), "#m3", 1, "ax");
+            _AssertListString(First(), "#m3", 2, "by");
+
+            I("time 2001 2001; xx = 0;");
+            I("for %i = 1 to 1e2; xx = xx + %i; end;");
+            _AssertSeries(First(), "xx", 2001, 5050d, sharedDelta);
+
+            I("%sum = 0;");
+            I("for %i = 1 to 1e2; %sum += %i; end;");
+            _AssertScalarVal(First(), "%sum", 5050d);
+
+            I("function val add1(val %x); return %x + 1; end;");
+            I("%sum = 0;");
+            I("for %i = 1 to 1e2; %sum = add1(%sum); end;");
+            _AssertScalarVal(First(), "%sum", 100d);
 
         }
 
@@ -9875,7 +10006,8 @@ namespace UnitTests
             I("reset;");
             I("time 2001 2003;");
             I("xx = 100;");
-            I("#m = (%i1 = 'a', #mm = (%i1 = 'b', %i2 = 'c', ts = xx));");
+            I("#m = (%i1 = 'a', #mm = (%i1 = 'b', %i2 = 'c', ts = xx, var<2010 2011> ts = (1, 2)), %v1 = 100);");
+            I("#m.%v1 += 1;");
             I("p #m.%i1;");
             I("p #m.#mm.%i1;");
             I("p #m.#mm.%i2;");
@@ -9885,13 +10017,18 @@ namespace UnitTests
             Map m2 = m1.GetIVariable("#mm") as Map;
 
             _AssertScalarString(m1, "%i1", "a");
+            _AssertScalarVal(m1, "%v1", 101d);
             _AssertScalarString(m2, "%i1", "b");
             _AssertScalarString(m2, "%i2", "c");
             _AssertSeries(m2, "ts", 2000, double.NaN, sharedDelta);
             _AssertSeries(m2, "ts", 2001, 100d, sharedDelta);
             _AssertSeries(m2, "ts", 2002, 100d, sharedDelta);
             _AssertSeries(m2, "ts", 2003, 100d, sharedDelta);
-            _AssertSeries(m2, "ts", 2004, double.NaN, sharedDelta);          
+            _AssertSeries(m2, "ts", 2004, double.NaN, sharedDelta);
+            _AssertSeries(m2, "ts", 2009, double.NaN, sharedDelta);
+            _AssertSeries(m2, "ts", 2010, 1d, sharedDelta);
+            _AssertSeries(m2, "ts", 2011, 2d, sharedDelta);
+            _AssertSeries(m2, "ts", 2012, double.NaN, sharedDelta);
 
             I("write slet;");
             I("reset;");
@@ -9900,6 +10037,10 @@ namespace UnitTests
             I("p #m.#mm.%i1;");
             I("p #m.#mm.%i2;");
             I("p #m.#mm.ts;");
+            I("p #m['%i1'];");
+            I("p #m['#mm']['%i1'];");
+            I("p #m['#mm']['%i2'];");
+            I("p #m['#mm']['ts'];");
 
             m1 = Program.databanks.GetFirst().GetIVariable("#m") as Map;
             m2 = m1.GetIVariable("#mm") as Map;
@@ -9912,41 +10053,17 @@ namespace UnitTests
             _AssertSeries(m2, "ts", 2002, 100d, sharedDelta);
             _AssertSeries(m2, "ts", 2003, 100d, sharedDelta);
             _AssertSeries(m2, "ts", 2004, double.NaN, sharedDelta);
-
-           
-        }
-
-        [TestMethod]
-        public void _Test_Gekko30()
-        {
-
-            I("RESET; TIME 2001 2005;");
-            I("xx1 = (1, 2, 3, 4, 5);");
-            I("#m = xx1;");  //autoconverted into matrix    WHY???
-            _AssertMatrix(First(), "#m", 1, 1, 1, sharedDelta);
-            _AssertMatrix(First(), "#m", 1, 2, 2, sharedDelta);
-            _AssertMatrix(First(), "#m", 1, 3, 3, sharedDelta);
-            _AssertMatrix(First(), "#m", 1, 4, 4, sharedDelta);
-            _AssertMatrix(First(), "#m", 1, 5, 5, sharedDelta);
-
-            //------------------
-
+            _AssertSeries(m2, "ts", 2009, double.NaN, sharedDelta);
+            _AssertSeries(m2, "ts", 2010, 1d, sharedDelta);
+            _AssertSeries(m2, "ts", 2011, 2d, sharedDelta);
+            _AssertSeries(m2, "ts", 2012, double.NaN, sharedDelta);
             
-            //------------------
-
-            I("RESET; TIME 2001 2005;");
-            I("xx2 = series(2);");
-            I("xx2['a', 'b'] = (1, 2, 3, 4, 5);");            
-            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2000, double.NaN, sharedDelta);
-            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2001, 1d, sharedDelta);
-            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2002, 2d, sharedDelta);
-            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2003, 3d, sharedDelta);
-            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2004, 4d, sharedDelta);
-            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2005, 5d, sharedDelta);
-            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2006, double.NaN, sharedDelta);
             
 
+
         }
+
+        
 
         [TestMethod]
         public void Test__DataFormatsInOut()

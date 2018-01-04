@@ -1868,7 +1868,7 @@ value:                      function //must be before varname
 						  | map
 						    ;
 
-leftSide:                   leftSideDollarExpression -> ^(ASTLEFTSIDE leftSideDollarExpression);
+leftSide:                   leftSideDollarExpression -> leftSideDollarExpression;
 
 leftSideDollarExpression:   (leftSideIndexerExpression -> leftSideIndexerExpression)
 						    (DOLLAR lbla=dollarConditional -> ^(ASTDOLLAR $leftSideDollarExpression $lbla))*	
@@ -1943,13 +1943,13 @@ expressionOrNothing:        expression -> expression
 							//listNaked is a comma-separated list of expressions (without parenthesis). For instance 'a', 'b' or %a+%b, %d, etc. Must have > 1 element (one element is caught by expression below)
 							//expression is anything, but accepts a listNaked with parentheses, for instance ('a', 'b') or (%a+%b, %d). One element is ('a',), Python style.
 
-flexibleList:               bankvarnameList2    //used in DISP etc. ---> bankvarnameList returns a Gekko LIST of ScalarStrings.
-						  | bankvarnameList3
+flexibleList:               bankseriesnameList2          //used in LIST and FOR loop etc. ---> bankvarnameList returns a Gekko LIST of ScalarStrings.
+						  | bankseriesnameList3
 						  | listNaked 
 						  | expression
 						    ;
 
-namesList:                  bankvarnameList
+namesList:                  bankvarnameList            //used in DISP, WRITE, etc.
 						  | bankvarnameList3
 						  | listNaked
 						  | expression
@@ -1959,8 +1959,11 @@ bankvarnameList:            bankvarname (COMMA2 bankvarname)* -> ^(ASTBANKVARNAM
 bankvarnameList2:           bankvarname (COMMA2 bankvarname)+ -> ^(ASTBANKVARNAMELIST bankvarname+); //mandatory comma     //a,b OR a,b,c
 bankvarnameList3:           bankvarname COMMA2 -> ^(ASTBANKVARNAMELIST bankvarname);                                       //a,
 
-listNaked:                  expression (',' expression)+ -> ^(ASTLISTDEF expression+);                                     //must have comma
+bankseriesnameList:         bankseriesname (COMMA2 bankseriesname)* -> ^(ASTBANKVARNAMELIST bankseriesname+);                       //a OR a,b OR a,b,c
+bankseriesnameList2:        bankseriesname (COMMA2 bankseriesname)+ -> ^(ASTBANKVARNAMELIST bankseriesname+); //mandatory comma     //a,b OR a,b,c
+bankseriesnameList3:        bankseriesname COMMA2 -> ^(ASTBANKVARNAMELIST bankseriesname);                                       //a,
 
+listNaked:                  expression (',' expression)+ -> ^(ASTLISTDEF expression+);                                     //must have comma
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- name START -------------------------------------------------------------------------------
@@ -1996,6 +1999,10 @@ bankColon:                  AT GLUE -> ^(ASTNAME ^(ASTIDENT REF))
 						    ;
 
 svarname:                   sigil? ident -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER sigil?) ident);
+
+//used for lists: LIST a, b, c instead of LIST 'a', 'b', 'c'
+bankseriesname:             bankColon? seriesname -> ^(ASTBANKVARNAME ^(ASTPLACEHOLDER bankColon?) seriesname);
+seriesname:                 nameOrCname freq? -> ^(ASTVARNAME ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER nameOrCname) ^(ASTPLACEHOLDER freq?));
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- name END -------------------------------------------------------------------------------
@@ -2093,10 +2100,22 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 // ASSIGNMENT, VAL, STRING, DATE, SERIES, LIST, MATRIX, MAP, VAR
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-assignment:				    assignmentType seriesOpt1? leftSide EQUAL flexibleList -> ^(ASTASSIGNMENT leftSide flexibleList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
-						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+assignment:				    assignmentType seriesOpt1? leftSide EQUAL flexibleList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) flexibleList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+						  | assignmentType seriesOpt1? leftSide PLUSEQUAL flexibleList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide flexibleList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+						  | assignmentType seriesOpt1? leftSide MINUSEQUAL flexibleList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide flexibleList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide MINUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+						  | assignmentType seriesOpt1? leftSide STAREQUAL flexibleList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide flexibleList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide STAREQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+						  | assignmentType seriesOpt1? leftSide DIVEQUAL flexibleList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide flexibleList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
 						    ;
-assignmentMap:				assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTASSIGNMENT leftSide expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType) ;
+
+							//using += etc. will not be good in map def, too confusing. You can use #m.ts += 1 just fine which is enough.
+assignmentMap:				assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)						 
+						    ;
+
 
 assignmentType:             SER 
 					 	  | SERIES 
@@ -2189,14 +2208,11 @@ for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  func
 						  | FOR leftParen (forHelper2 ','?)+ ')' SEMICOLON? functionStatements END -> ^(ASTFOR ^(ASTPLACEHOLDER forHelper2+) functionStatements)
 						    ;
 
-forHelper2:                 
-
- type? svarname EQUAL expression TO expression2 (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2) ^(ASTPLACEHOLDER expression3?))
-|type? svarname EQUAL namesList -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER namesList) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
-//|type? svarname EQUAL expression -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+forHelper2:                 type? svarname EQUAL expression TO expression2 (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2) ^(ASTPLACEHOLDER expression3?))
+                          | type? svarname EQUAL flexibleList -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER flexibleList) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+                          | type? svarname EQUAL expression -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+                            ;
                           
-						    ;
-
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // FUNCTION
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3694,6 +3710,10 @@ MINUS:                      '-';
 DIV:                        '/';
 STARS:                      '**';
 EQUAL:                      '=';
+PLUSEQUAL:                  '+=';
+MINUSEQUAL:                 '-=';
+DIVEQUAL:                   '/=';
+STAREQUAL:                  '*=';
 BACKSLASH:                  '\\';
 QUESTION:                   '?';
 

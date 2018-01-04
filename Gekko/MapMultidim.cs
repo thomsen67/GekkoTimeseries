@@ -62,7 +62,8 @@ namespace Gekko
             string first = null;
             foreach (string s in this.storage)
             {
-                first += "'" + s + "'" + ", ";
+                //first += "'" + s + "'" + ", ";
+                first += s + ", ";
             }
             first = first.Substring(0, first.Length - ", ".Length);
             return first;

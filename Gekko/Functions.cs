@@ -1339,6 +1339,22 @@ namespace Gekko
             return new ScalarVal(result);            
         }
 
+        public static IVariable list(GekkoSmpl smpl)
+        {
+            //empty list
+            List rv = new List();
+            rv.list = new List<IVariable>();
+            return rv;
+        }
+
+        public static IVariable map(GekkoSmpl smpl)
+        {
+            //empty map
+            Map rv = new Map();
+            rv.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
+            return rv;
+        }
+
         public static IVariable log(GekkoSmpl smpl, IVariable x1)
         {
             if (IsGekkoNull(x1)) return x1;
