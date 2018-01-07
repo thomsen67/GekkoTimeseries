@@ -114,6 +114,7 @@ ASTCOMPARE2;
 	ASTSERIESLHS;
 	ASTSERIESRHS;
 	ASTOPT_STRING_PX;
+	ASTOPT_STRING_NOMAX;
 	ASTOPT_STRING_BOLD;
 	ASTOPT_STRING_ITALIC;
 	ASTOPT_STRING_GRIDSTYLE;
@@ -738,6 +739,8 @@ ASTOPT_STRING_Y2;
 	ASTXEDIT;
 
 	// --- tokens1 start ---
+	ELEMENTS = 'ELEMENTS';
+	NOMAX = 'NOMAX';
 	RETURN2 = 'RETURN';
 	IN = 'IN';
 	MAP = 'MAP';
@@ -1679,6 +1682,8 @@ d.Add("Y" ,Y);
                                         d.Add("RESET", RESET);
                                         d.Add("respect",RESPECT);
                                         d.Add("RESTART", RESTART);
+										d.Add("elements"  , ELEMENTS    );
+										d.Add("nomax"  , NOMAX    );
                                         d.Add("return"  , RETURN2    );
                                         d.Add("ring"    , RING    );
                                         d.Add("rn"               , RN );
@@ -2381,6 +2386,7 @@ prtOpt1Helper:              filter
 						  | GRID '=' gridHelper -> ^(ASTOPT_STRING_GRID gridHelper)
 						  | HEADING '=' expression -> ^(ASTOPT_STRING_TITLE expression)
 						  | KEY '=' expression -> ^(ASTOPT_STRING_KEY expression)  //PLOT
+						  | NOMAX (EQUAL yesNo)? -> ^(ASTOPT_STRING_NOMAX yesNo?)	
 						  | TITLE '=' expression -> ^(ASTOPT_STRING_TITLE expression)
 						  | NAMES (EQUAL yesNo)? -> ^(ASTOPT_STRING_NAMES yesNo?)	
 						  | PALETTE '=' expression -> ^(ASTOPT_STRING_PALETTE expression)  //PLOT					
@@ -2755,7 +2761,8 @@ optionType:
              | MODEL CACHE '='? yesNoSimple -> MODEL CACHE ^(ASTBOOL yesNoSimple)
 			 | MODEL INFOFILE '='? optionModelInfoFile -> MODEL INFOFILE ^(ASTSTRINGSIMPLE optionModelInfoFile)
 
-			 | PLOT question -> PLOT question			 
+			 | PLOT question -> PLOT question	
+			 | PLOT ELEMENTS MAX '='? Integer -> PLOT ELEMENTS MAX ^(ASTINTEGER Integer)		 
 			 | PLOT LINES POINTS '='? yesNoSimple -> PLOT LINES POINTS ^(ASTBOOL yesNoSimple )	
 			 | PLOT XLABELS ANNUAL '='? optionPlotXlabels ->  PLOT XLABELS ANNUAL ^(ASTSTRINGSIMPLE optionPlotXlabels)
 			 | PLOT XLABELS DIGITS '='? Integer ->  PLOT XLABELS DIGITS  ^(ASTINTEGER Integer)
@@ -2766,6 +2773,7 @@ optionType:
 			
 			 | PRINT question -> PRINT question
 			 | PRINT COLLAPSE '='? optionPrintCollapse ->  PRINT COLLAPSE ^(ASTSTRINGSIMPLE optionPrintCollapse)
+			 | PRINT ELEMENTS MAX '='? Integer -> PRINT ELEMENTS MAX ^(ASTINTEGER Integer)		 
 			 | PRINT FREQ '='? optionPrintFreq ->  PRINT FREQ ^(ASTSTRINGSIMPLE optionPrintFreq)
              | PRINT DISP MAXLINES '='? '-'? Integer -> PRINT DISP MAXLINES ^(ASTINTEGER '-'? Integer)  //can be set to -1
              | PRINT FIELDS NDEC '='? Integer -> PRINT FIELDS NDEC ^(ASTINTEGER Integer)
@@ -3486,6 +3494,8 @@ ident2: 					Ident|
                             RESTART|
                             RES|
                             RETURN2|
+							ELEMENTS|
+							NOMAX|
                             RING|
                             RN|
                             ROWS|

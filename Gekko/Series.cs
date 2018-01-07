@@ -385,7 +385,7 @@ namespace Gekko
             this.dimensionsStorage = new MapMultidim();
             this.dimensions = dimensions - tDim;
             this.type = ESeriesType.ArraySuper;
-            if (!hasTimeDimension) this.type = ESeriesType.Timeless;
+            //if (!hasTimeDimension) this.type = ESeriesType.Timeless;
         }
 
         /// <summary>
@@ -773,6 +773,7 @@ namespace Gekko
         /// </returns>
         public GekkoTime GetPeriodFirst()
         {
+            //TODO: Implement for array-series
             if (this.type == ESeriesType.Timeless)
             {
                 G.Writeln2("*** ERROR: Timeless variable error #4");
@@ -789,6 +790,7 @@ namespace Gekko
         /// </returns>
         public GekkoTime GetPeriodLast()
         {
+            //TODO: Implement for array-series
             if (this.type == ESeriesType.Timeless)
             {
                 G.Writeln2("*** ERROR: Timeless variable error #5");
@@ -819,6 +821,7 @@ namespace Gekko
 
         public GekkoTime GetRealDataPeriodFirst()
         {
+            //TODO: Implement for array-series
             //Takes some time for large non-trimmed arrays, but is more precise than GetPeriodFirst()
             GekkoTime rv = GekkoTime.tNull;
             if (this.type == ESeriesType.Timeless)
@@ -827,20 +830,24 @@ namespace Gekko
             }
             else
             {
-                for (int i = 0; i < this.data.dataArray.Length; i++)
+                if (this.data.dataArray != null)
                 {
-                    if (!G.isNumericalError(this.data.dataArray[i]))
+                    for (int i = 0; i < this.data.dataArray.Length; i++)
                     {
-                        rv = GetPeriod(i);
-                        break;
+                        if (!G.isNumericalError(this.data.dataArray[i]))
+                        {
+                            rv = GetPeriod(i);
+                            break;
+                        }
                     }
-                }
+                }                
             }
             return rv;
         }
 
         public GekkoTime GetRealDataPeriodLast()
         {
+            //TODO: Implement for array-series
             //Takes some time for large non-trimmed arrays, but is more precise than GetPeriodLast()
             GekkoTime rv = GekkoTime.tNull;
             if (this.type == ESeriesType.Timeless)
@@ -849,12 +856,15 @@ namespace Gekko
             }
             else
             {
-                for (int i = this.data.dataArray.Length - 1; i >= 0; i--)
+                if (this.data.dataArray != null)
                 {
-                    if (!G.isNumericalError(this.data.dataArray[i]))
+                    for (int i = this.data.dataArray.Length - 1; i >= 0; i--)
                     {
-                        rv = GetPeriod(i);
-                        break;
+                        if (!G.isNumericalError(this.data.dataArray[i]))
+                        {
+                            rv = GetPeriod(i);
+                            break;
+                        }
                     }
                 }
             }
@@ -1803,9 +1813,23 @@ namespace Gekko
         }
 
         public void DeepTrim()
+        {             
+            if (this.type == ESeriesType.ArraySuper)
+            {                
+                foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
+                {
+                    kvp.Value.DeepTrim();
+                }
+            }
+            else
+            {
+                this.Trim();
+            }            
+        }
+
+        public void DeepCleanup()
         {
-            //Handle sub-series!!! #987539875
-            this.Trim();
+            //do nothing
         }
     }
 

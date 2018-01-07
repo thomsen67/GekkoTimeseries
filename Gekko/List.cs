@@ -339,11 +339,18 @@ namespace Gekko
         }
 
         public IVariable DeepClone()
-        {            
+        {
             List<IVariable> temp = new List<IVariable>();
-            foreach (IVariable iv in this.list)
+            if (this.list == null)
             {
-                temp.Add(iv.DeepClone());
+                //should not happen, but just in case
+            }
+            else
+            {
+                foreach (IVariable iv in this.list)
+                {
+                    temp.Add(iv.DeepClone());
+                }
             }
             return new List(temp);
         }
@@ -354,6 +361,15 @@ namespace Gekko
             {
                 iv.DeepClone();
             }         
+        }
+
+        public void DeepCleanup()
+        {
+            if (this.list == null) this.list = new List<IVariable>();
+            foreach (IVariable iv in this.list)
+            {
+                iv.DeepCleanup();
+            }
         }
     }
 }

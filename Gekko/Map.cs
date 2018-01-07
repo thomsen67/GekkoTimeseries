@@ -240,6 +240,15 @@ namespace Gekko
             }            
         }
 
+        public void DeepCleanup()
+        {
+            if (this.storage == null) this.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
+            foreach (KeyValuePair<string, IVariable> kvp in this.storage)
+            {
+                kvp.Value.DeepCleanup();
+            }
+        }
+
         public EBankType BankType()
         {
             return EBankType.Map;

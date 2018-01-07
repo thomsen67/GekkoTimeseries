@@ -2782,6 +2782,10 @@ namespace Gekko
                 {
                     DateTime dt3 = DateTime.Now;
                     deserializedDatabank = Serializer.Deserialize<Databank>(fs);
+                    foreach (IVariable iv in deserializedDatabank.storage.Values)
+                    {
+                        iv.DeepCleanup();  //fixes maps and lists with 0 elements
+                    }
                     readInfo.variables = deserializedDatabank.storage.Count;
                     G.WritelnGray("Protobuf deserialize took: " + G.Seconds(dt3));
                 }
@@ -2933,7 +2937,7 @@ namespace Gekko
                     }
                     readInfo.startPerInFile = minYearInProtobufFile;
                     readInfo.endPerInFile = maxYearInProtobufFile;
-                    readInfo.startPerResultingBank = readInfo.startPerInFile;
+                    readInfo.startPerResultingBank = readInfo.startPerInFile; 
                     readInfo.endPerResultingBank = readInfo.endPerInFile;
                 }
 
@@ -4377,7 +4381,7 @@ namespace Gekko
                         for (int i = 1; i < int.MaxValue; i++)
                         {
                             gdx.gdxSymbolInfo(i, ref varName, ref gdxDimensions, ref varType);
-
+                            
                             string label = null; int records = -12345; int userInfo = -12345;
                             gdx.gdxSymbolInfoX(i, ref records, ref userInfo, ref label);
 
@@ -4391,7 +4395,8 @@ namespace Gekko
                                 //  ======================================
                                 //              sets
                                 //  ======================================
-                                //
+                                //                  
+
                                 if (gdxDimensions != 1)
                                 {
                                     skippedSets++;
@@ -4454,7 +4459,7 @@ namespace Gekko
                                     if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
                                     ts = new Series(EFreq.Annual, varNameWithFreq);
                                     ts.meta.label = label;
-                                    if (timeDimNr == -12345) ts.type = ESeriesType.Timeless;  //not really relevant, since the timeseries is only a ghost
+                                    //if (timeDimNr == -12345) ts.type = ESeriesType.Timeless;  //not really relevant, since the timeseries is only a ghost
                                     ts.SetArrayTimeseries(gdxDimensions, hasTimeDimension == 1);
                                     databank.AddIVariable(ts.name, ts);
                                 }
@@ -4753,6 +4758,12 @@ namespace Gekko
             foreach (BankNameVersion bnv in list)
             {
                 string name = bnv.name;
+
+                if(name.Contains("d1c"))
+                {
+
+                }
+
                 if (!G.StartsWithSigil(bnv.name))
                 {
                     name = G.AddCurrentFreqToName(name);
@@ -4771,7 +4782,29 @@ namespace Gekko
 
                 string label = ""; if (ts.meta?.label != null) label = ts.meta.label;  //label = null will fail with weird error later on
 
-                int timeDimension = 1; if (ts.type == ESeriesType.Timeless) timeDimension = 0;
+                int timeDimension = 1;
+                if (ts.type == ESeriesType.Timeless)
+                {
+                    timeDimension = 0;
+                }
+                else if (ts.type == ESeriesType.ArraySuper)
+                {
+                    int ntimeless = 0;
+                    int nnontimeless = 0;
+                    foreach (IVariable iv2 in ts.dimensionsStorage.storage.Values)
+                    {
+                        if ((iv2 as Series).type == ESeriesType.Timeless) ntimeless++;
+                        else nnontimeless++;
+                    }
+                    if (ntimeless > 0 && nnontimeless > 0)
+                    {
+                        G.Writeln2("*** ERROR: The array-timeseries " + ts.name + " has subseries that are both");
+                        G.Writeln("           timeless and non-timeless --> cannot write to GDX.");
+                        throw new GekkoException();
+                    }
+                    if (ntimeless > 0) timeDimension = 0;
+                    //if ntimeless + nnontimeless == 0 it will be assumed to have time-dim in GAMS --> hard to know.
+                }
 
                 //GAMSVariable gvar = db.AddVariable(nameWithoutFreq, ts.storageDim + timeDimension, VarType.Free, label);
 
@@ -4802,6 +4835,7 @@ namespace Gekko
                     WriteGdxHelper2(t1, t2, usePrefix, gvar, kvp.Value as Series, ss);
                 }
             }
+            
             else
             {
                 //normal timeseries
@@ -4815,7 +4849,14 @@ namespace Gekko
         {
             if (ts2.type == ESeriesType.Timeless)
             {
-                gvar.AddRecord(ss).Level = ts2.GetTimelessData();  //timeless data location   
+                try
+                {
+                    gvar.AddRecord(ss).Level = ts2.GetTimelessData();  //timeless data location   
+                }
+                catch
+                {
+
+                }
             }
             else
             {
@@ -23383,49 +23424,46 @@ namespace Gekko
                     }
                 }
 
-                Series ts = null;
-                if (banks[0]) ts = o.prtElements[0].variable[0] as Series;
-                else ts = o.prtElements[0].variable[1] as Series;
-                
-                if (ts.type == ESeriesType.ArraySuper)
-                {                    
-                    List<MapMultidimItem> keys = ts.dimensionsStorage.storage.Keys.ToList();
+                Series tsFirst = null;
+                Series tsRef = null;
+                if (banks[0]) tsFirst = o.prtElements[0].variable[0] as Series;
+                if (banks[1]) tsRef = o.prtElements[0].variable[1] as Series;
+
+                string name = null;
+                if (tsFirst != null) name = tsFirst.name;
+                else name = tsRef.name;
+                                
+                if ((tsFirst != null && tsFirst.type == ESeriesType.ArraySuper) || (tsRef != null && tsRef.type == ESeriesType.ArraySuper))
+                {
+                    //Print an array-timeseries
+
+                    List<MapMultidimItem> keys = null;
+
+                    if (tsFirst != null) keys = tsFirst.dimensionsStorage.storage.Keys.ToList();
+                    else if (tsRef != null) keys = tsRef.dimensionsStorage.storage.Keys.ToList();
+
                     if (keys.Count == 0)
                     {
-                        G.Writeln2("Array-series " + ts.name + " has no elements");
+                        G.Writeln2("Array-series " + G.GetNameAndFreqPretty(name) + " has no elements");
                         return;
                     }
                     keys.Sort(CompareMapMultidimItems);
-                    List m0 = new List();
-                    List m1 = new List();
+                    List m0 = new List(); //subseries first
+                    List m1 = new List(); //subseries ref
                     foreach (MapMultidimItem key in keys)
                     {
                         try
                         {
-                            if (banks[0]) m0.Add(ts.dimensionsStorage.storage[key]);
-                            if (banks[1]) m1.Add(ts.dimensionsStorage.storage[key]);
+                            if (banks[0]) m0.Add(tsFirst.dimensionsStorage.storage[key]);
+                            if (banks[1]) m1.Add(tsRef.dimensionsStorage.storage[key]);
                         }
                         catch
                         {
                             G.Writeln2("*** ERROR: Array elements do not match in first-position and ref databank");
                             throw new GekkoException();
                         }
-                        string bankName = null;
-                        if (ts.meta != null && ts.meta.parentDatabank != null)
-                        {
-                            if (G.Equal(ts.meta.parentDatabank.name, Program.databanks.GetFirst().name))
-                            {
-                            }
-                            else if (G.Equal(ts.meta.parentDatabank.name, Program.databanks.GetRef().name))
-                            {
-                                bankName = Globals.symbolBankName;
-                            }
-                            else
-                            {
-                                bankName = ts.meta.parentDatabank + Globals.symbolBankColon;
-                            }
-                        }
-                        labelsHandmade.Add(bankName + G.RemoveFreqFromKey(ts.name) + "[" + key.ToString() + "]");
+                        string bankName = null;                        
+                        labelsHandmade.Add(bankName + G.RemoveFreqFromKey(name) + "[" + key.ToString() + "]");
                     }
                     if (banks[0]) o.prtElements[0].variable[0] = m0;
                     if (banks[1]) o.prtElements[0].variable[1] = m1;                    
@@ -23738,8 +23776,34 @@ namespace Gekko
 
             int[] colCounter = new int[containerExplode.Count];
 
-            //int i = 0;
-            //int j = 0;
+
+            if (type == "plot")
+            {
+                if (containerExplode.Count > Program.options.plot_elements_max)
+                {
+                    if (!G.Equal(o.opt_nomax, "yes"))
+                    {
+                        G.Writeln2("*** ERROR: PLOT had " + containerExplode.Count + " elements, max is " + Program.options.plot_elements_max);
+                        G.Writeln("           You can use PLOT<nomax> or set OPTION plot elements max = ... ;", Color.Red);
+                        throw new GekkoException();
+                    }
+                }
+            }
+            else if (type == "print")
+            {
+                if (containerExplode.Count > Program.options.print_elements_max)
+                {
+                    if (!G.Equal(o.opt_nomax, "yes"))
+                    {
+                        G.Writeln2("*** ERROR: PRINT had " + containerExplode.Count + " elements, max is " + Program.options.print_elements_max);
+                        G.Writeln("           You can use PRT<nomax> or set OPTION print elements max = ... ;", Color.Red);
+                        throw new GekkoException();
+                    }
+                }
+            }
+
+            //if(containerExplode.Count)
+
             int iPlot = 0;
             for (int j = 1; j < containerExplode.Count + 2; j++)
             {
@@ -24614,7 +24678,8 @@ namespace Gekko
                         }
                         else
                         {
-                            G.Writeln("MAP printing not implemented yet");
+                            G.Writeln("MAP printing not implemented yet. But individual elements can");
+                            G.Writeln("be printed like for instance #m.%s, #m.x, etc.");
                         }                        
                     }
                 }
@@ -25744,48 +25809,56 @@ namespace Gekko
 
         public static List<string> GetElementPrintCodes(O.Prt o, O.Prt.Element ope)
         {
-            bool isGraph = false;
-            bool isSheet = false;
-            if (G.Equal(o.prtType, "plot")) isGraph = true;
-            else if (G.Equal(o.prtType, "sheet")) isSheet = true;
-            else if (G.Equal(o.prtType, "clip")) isSheet = true;
-
-            bool isMulprt = IsMulprt(o);
             List<string> printCodes = new List<string>();
-            printCodes.AddRange(GetSuperPrintCodes(o)); //start with a fresh copy of super-printcodes
-
-            if (!isMulprt && printCodes.Count == 1 && G.Equal(printCodes[0], "lev"))
+            if (o.interactivePrintCode != null)
             {
-                G.Writeln2("*** ERROR: PRT<lev> is not legal: use PRT<abs> to print absolute levels");
-                throw new GekkoException();
+                printCodes.Add(o.interactivePrintCode);
             }
+            else
+            { 
+                bool isGraph = false;
+                bool isSheet = false;
+                if (G.Equal(o.prtType, "plot")) isGraph = true;
+                else if (G.Equal(o.prtType, "sheet")) isSheet = true;
+                else if (G.Equal(o.prtType, "clip")) isSheet = true;
 
-            if (isMulprt && printCodes.Count == 1 && (G.Equal(printCodes[0], "dif") || G.Equal(printCodes[0], "diff")))
-            {
-                G.Writeln2("*** ERROR: MULPRT<dif> is not legal: use MULPRT<abs> to print multiplier differences");
-                throw new GekkoException();
-            }
+                bool isMulprt = IsMulprt(o);
+                
+                printCodes.AddRange(GetSuperPrintCodes(o)); //start with a fresh copy of super-printcodes
 
-            if (ope != null && ope.printCodes != null && ope.printCodes.Count > 0)
-            {
-                //element-specific printcode overrides!
-                printCodes = new List<string>();
-                foreach (OptString ts in ope.printCodes)
+                if (!isMulprt && printCodes.Count == 1 && G.Equal(printCodes[0], "lev"))
                 {
-                    //hmmm, what if there is a no after a yes for the same code????
-                    if (G.Equal(ts.s2, "yes")) printCodes.Add(ts.s1);
-                    else if (G.Equal(ts.s2, "no"))
+                    G.Writeln2("*** ERROR: PRT<lev> is not legal: use PRT<abs> to print absolute levels");
+                    throw new GekkoException();
+                }
+
+                if (isMulprt && printCodes.Count == 1 && (G.Equal(printCodes[0], "dif") || G.Equal(printCodes[0], "diff")))
+                {
+                    G.Writeln2("*** ERROR: MULPRT<dif> is not legal: use MULPRT<abs> to print multiplier differences");
+                    throw new GekkoException();
+                }
+
+                if (ope != null && ope.printCodes != null && ope.printCodes.Count > 0)
+                {
+                    //element-specific printcode overrides!
+                    printCodes = new List<string>();
+                    foreach (OptString ts in ope.printCodes)
                     {
-                        //do not add
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: Printcode = '" + ts.s2 + "' should be 'yes' or 'no'");
-                        throw new GekkoException();
+                        //hmmm, what if there is a no after a yes for the same code????
+                        if (G.Equal(ts.s2, "yes")) printCodes.Add(ts.s1);
+                        else if (G.Equal(ts.s2, "no"))
+                        {
+                            //do not add
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: Printcode = '" + ts.s2 + "' should be 'yes' or 'no'");
+                            throw new GekkoException();
+                        }
                     }
                 }
+                printCodes = PrintGetPrintcodesOLD(isMulprt, printCodes, isGraph, isSheet);
             }
-            printCodes = PrintGetPrintcodesOLD(isMulprt, printCodes, isGraph, isSheet);
             return printCodes;
         }
 

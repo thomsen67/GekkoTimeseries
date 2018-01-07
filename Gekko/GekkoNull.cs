@@ -92,5 +92,10 @@ namespace Gekko
         {
             throw new GekkoException();
         }
+
+        public void DeepCleanup()
+        {
+            throw new GekkoException();
+        }
     }
 }

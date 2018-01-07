@@ -2557,14 +2557,17 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTPRT":
-                        {
-                            if (true)
+                        {                            
                             {
-                                
-                                {
-                                    //PRT
-                                    node.Code.A("O.Prt o" + Num(node) + " = new O.Prt();" + G.NL);
-                                }
+                                //PRT
+
+                                node.Code.A("Action<string> print" + Num(node) + " = (printCode" + Num(node) + ") =>" + G.NL);
+                                node.Code.A("{" + G.NL);  //start Action
+
+                                node.Code.A("O.Prt o" + Num(node) + " = new O.Prt();" + G.NL);
+
+                                node.Code.A("o" + Num(node) + ".interactivePrintCode = printCode" + Num(node) + ";" + G.NL); //printCode is from the Func<> call, is null if PLOT window buttons are not clicked
+
                                 GetCodeFromAllChildren(node);
 
                                 if (node.Text == "ASTPRT")
@@ -2579,6 +2582,10 @@ namespace Gekko.Parser.Gek
                                     Globals.prtCsSnippetsHeaders.Add(Globals.prtCsSnippetsCounter, w.headerCs.ToString());
                                 }
                                 node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+
+                                node.Code.A("};" + G.NL);  //end Action
+
+                                node.Code.A("print" + Num(node) + "(null);" + G.NL); //end Action
                             }
                             
 

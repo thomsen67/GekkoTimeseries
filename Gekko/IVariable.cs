@@ -96,6 +96,8 @@ namespace Gekko
 
         void DeepTrim();
 
+        void DeepCleanup();
+
         void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] dims);
     }
 }

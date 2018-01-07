@@ -105,6 +105,7 @@ Additionally, there are model, solve, equation options.
         public int model_cache_max = 20;  //model options are non-solving options. How many fixed models are kept in RAM        
         public string model_infofile = "yes";  //yes/no/temp
         public string plot_decimalseparator = "period";  //comma|period
+        public int plot_elements_max = 200;
         public bool plot_lines_points = true;
         public bool plot_new = true;
         //public string plot_xlabels_between_truncate = "auto";     //digits|skip|digitsskip|skipdigits|none  --> when all too pressed we use label at.
@@ -112,6 +113,7 @@ Additionally, there are model, solve, equation options.
         public string plot_xlabels_nonannual = "between"; //at|between          
         public int plot_xlabels_digits = 4; // 4 or 2, only applies to 'between' type   
         public int print_disp_maxlines = 3; //-1 means infinite, 0 means no data shown
+        public int print_elements_max = 400; 
         public int print_fields_ndec = 4;
         public int print_fields_nwidth = 13;
         public int print_fields_pdec = 2;

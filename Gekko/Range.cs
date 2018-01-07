@@ -153,6 +153,11 @@ namespace Gekko
             throw new GekkoException();
         }
 
+        public void DeepCleanup()
+        {
+            //do nothing
+        }
+
     }
 }
 

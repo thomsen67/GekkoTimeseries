@@ -169,5 +169,10 @@ namespace Gekko
         {
             //do nothing, nothing to trim
         }
+
+        public void DeepCleanup()
+        {
+            //do nothing
+        }
     }
 }

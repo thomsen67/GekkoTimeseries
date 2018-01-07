@@ -6407,9 +6407,13 @@ namespace Gekko
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
             //public string rows = null;            
             public List<Element> prtElements = new List<Element>();                        
-            public List<OptString> printCodes = new List<OptString>();            
+            public List<OptString> printCodes = new List<OptString>();
+
+            public string interactivePrintCode = null;  //clicking in the PLOT window
+                  
             public string timefilter = null;
             //public string heading = null;
+            public string opt_nomax = null;
                       
             public double opt_width = -12345;
             public double opt_dec = -12345;
