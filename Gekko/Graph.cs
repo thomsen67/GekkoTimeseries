@@ -362,9 +362,9 @@ namespace Gekko
             {
                 cs = cs.Replace("O.Prt.GetBankNumbers(null,", "O.Prt.GetBankNumbers(`m`,");
             }
-            this.graphOptions.o = Program.PrtSnippet(cs, code2);
-            if (this.graphOptions.o == null) return;  //If so, an error box has been shown.    
-            this.graphOptions.o.printCodes = new List<OptString>();
+            //this.graphOptions.o = Program.PrtSnippet(cs, code2);
+            //if (this.graphOptions.o == null) return;  //If so, an error box has been shown.    
+            //this.graphOptions.o.printCodes = new List<OptString>();
 
             string s = null;
             if (isLevel) s = "n";
@@ -376,10 +376,14 @@ namespace Gekko
             else if (isDlog && isMultiplier) s = "m";
             else if (isDlog && !isMultiplier) s = "d";
 
-            if (isDlog || isLog) this.graphOptions.o.guiGraphIsLogTransform = true;                        
-            this.graphOptions.o.printCodes.Add(new OptString(s, "yes"));
-            this.graphOptions.o.guiGraphIsRefreshing = true;
-            this.graphOptions.o.Exe();            
+            if (isDlog || isLog) this.graphOptions.o.guiGraphIsLogTransform = true;
+            //this.graphOptions.o.interactivePrintCode = s;                                 
+            //this.graphOptions.o.printCodes.Add(new OptString(s, "yes"));
+            //this.graphOptions.o.guiGraphIsRefreshing = true;
+
+            Globals.printCs[this.graphOptions.printCsCounter](s);
+
+            //this.graphOptions.o.Exe();            
             this.graphOptions.emfName = this.graphOptions.o.guiGraphRefreshingFilename;            
             Invalidate();
         }
@@ -582,6 +586,7 @@ namespace Gekko
         //public string csSnippetHeader = null;
         public bool windowIsShown = false;
         public long counter = -12345;
+        public int printCsCounter = -12345;
         
         public GraphOptions()
         {

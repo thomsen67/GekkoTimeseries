@@ -20536,6 +20536,8 @@ namespace Gekko
             //User functions: more can be added if necessary, or users can use LIST or DICT.
             InitUfunctionsAndArithmetics();
 
+            Globals.printCs = new Dictionary<int, Action<string>>();
+
             Program.model = null; Program.unfoldedVariableList = null;
             Globals.modelFileName = "";
             GuiSetModelName();
@@ -28568,6 +28570,8 @@ namespace Gekko
                 graphOptions.graphVars = null;
                 graphOptions.graphVarsNames = labelsNonBroken;
                 graphOptions.title = null;
+                graphOptions.printCsCounter = o.printCsCounter;
+
 
                 Thread thread = new Thread(new ParameterizedThreadStart(GraphThreadFunction));
                 thread.SetApartmentState(ApartmentState.STA);

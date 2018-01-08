@@ -6408,6 +6408,8 @@ namespace Gekko
             //public string rows = null;            
             public List<Element> prtElements = new List<Element>();                        
             public List<OptString> printCodes = new List<OptString>();
+                        
+            public int printCsCounter = -12345;
 
             public string interactivePrintCode = null;  //clicking in the PLOT window
                   
@@ -6493,22 +6495,13 @@ namespace Gekko
 
             public void Exe()
             {
-                if (true)
+
+                Program.OPrint(this);
+                if (G.Equal(prtType, "mulprt") && G.Equal(Program.options.interface_mode, "data"))
                 {
-                    Program.OPrint(this);
-                    if (G.Equal(prtType, "mulprt") && G.Equal(Program.options.interface_mode, "data"))
-                    {
-                        G.Writeln2("+++ WARNING: MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
-                    }
+                    G.Writeln2("+++ WARNING: MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
                 }
-                else
-                {
-                    //Program.PrtNew(this);
-                    //if (G.Equal(prtType, "mulprt") && G.Equal(Program.options.interface_mode, "data"))
-                    //{
-                    //    G.Writeln2("+++ WARNING: MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
-                    //}
-                }
+
             }
             
             public static List<int> GetBankNumbers(string tableOrGraphGlobalPrintCode, List<string> printCodes)

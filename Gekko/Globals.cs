@@ -82,6 +82,8 @@ namespace Gekko
         public static Func<double, double, double>[] arithmentics = new Func<double, double, double>[20];
         public static Func<double, double>[] arithmentics1 = new Func<double, double>[10];
 
+        public static Dictionary<int, Action<string>> printCs = new Dictionary<int, Action<string>>();
+
         //User functions: more can be added if necessary, or users can use LIST or DICT.
         public static Dictionary<string, Func<GekkoSmpl, P, IVariable>> ufunctions0 = new Dictionary<string, Func<GekkoSmpl, P, IVariable>>();
         public static Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable>> ufunctions1 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable>>();

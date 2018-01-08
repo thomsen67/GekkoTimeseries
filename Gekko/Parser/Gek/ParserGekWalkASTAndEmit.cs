@@ -2581,9 +2581,14 @@ namespace Gekko.Parser.Gek
                                     Globals.prtCsSnippets.Add(Globals.prtCsSnippetsCounter, node.Code.ToString() + "return o" + Num(node) + ";" + G.NL);
                                     Globals.prtCsSnippetsHeaders.Add(Globals.prtCsSnippetsCounter, w.headerCs.ToString());
                                 }
+                                node.Code.A("o" + Num(node) + ".printCsCounter = Globals.printCs.Count - 1;" + G.NL);
                                 node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
 
                                 node.Code.A("};" + G.NL);  //end Action
+
+                                //node.Code.A("o" + Num(node) + ".printCs = print" + Num(node) + "; " + G.NL);  //so Action can be used later on
+
+                                node.Code.A("Globals.printCs.Add(Globals.printCs.Count, print" + Num(node) + "); " + G.NL);
 
                                 node.Code.A("print" + Num(node) + "(null);" + G.NL); //end Action
                             }
