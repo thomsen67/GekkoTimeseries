@@ -20536,7 +20536,7 @@ namespace Gekko
             //User functions: more can be added if necessary, or users can use LIST or DICT.
             InitUfunctionsAndArithmetics();
 
-            Globals.printCs = new Dictionary<int, Action<string>>();
+            Globals.printCs = new Dictionary<int, Func<GraphHelper, string>>();
 
             Program.model = null; Program.unfoldedVariableList = null;
             Globals.modelFileName = "";
@@ -23941,7 +23941,7 @@ namespace Gekko
                             }
                             else
                             {
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqInThisTableRow, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqInThisTableRow, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -23962,7 +23962,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -23983,7 +23983,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -24018,7 +24018,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -24039,7 +24039,7 @@ namespace Gekko
                             }
                             else
                             {
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -24069,7 +24069,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -24090,7 +24090,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -24111,7 +24111,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -24146,7 +24146,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -24167,7 +24167,7 @@ namespace Gekko
                             }
                             else
                             {
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -24211,7 +24211,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -24232,7 +24232,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -24253,7 +24253,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -24288,7 +24288,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -24310,7 +24310,7 @@ namespace Gekko
                             }
                             else
                             {
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -24343,7 +24343,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -24364,7 +24364,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -24385,7 +24385,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -24420,7 +24420,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -24457,7 +24457,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -24477,7 +24477,7 @@ namespace Gekko
                             }
                             else
                             {
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -24513,7 +24513,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -24539,7 +24539,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                             if (type != "plot" && sameFreq == EFreq.Annual) i = i - 1; // #98075235874325
                         }
@@ -24997,7 +24997,7 @@ namespace Gekko
             return a;
         }
 
-        private static void PrintHelper3(GekkoSmpl smpl,string type, EFreq sameFreq, Table table, int count, int i, int j, int iPlot, string printCode, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, int sumOver, int[] skipCounter, O.Prt.Element cc)
+        private static void PrintHelper3(GekkoSmpl smpl,string type, EFreq sameFreq, Table table, int count, int i, int j, int iPlot, string printCode, bool isLogTransform, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, int sumOver, int[] skipCounter, O.Prt.Element cc)
         {
             string format = "f" + cc.widthFinal + "." + cc.decFinal;
 
@@ -25017,11 +25017,11 @@ namespace Gekko
             double? d = null;
             if (tsWork == null && tsRef == null)  //not series
             {
-                if (sameFreq == freqColumn) d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, printCode, sumOver, skipCounter);
+                if (sameFreq == freqColumn) d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, printCode, isLogTransform, sumOver, skipCounter);
             }
             else
             {
-                if ((tsWork != null && tsWork.freq == freqColumn) || (tsRef != null && tsRef.freq == freqColumn)) d = PrintHelperTransform(smpl, tsWork, tsRef, t, printCode, sumOver, skipCounter);
+                if ((tsWork != null && tsWork.freq == freqColumn) || (tsRef != null && tsRef.freq == freqColumn)) d = PrintHelperTransform(smpl, tsWork, tsRef, t, printCode, isLogTransform, sumOver, skipCounter);
             }
             if (d != null)
             {
@@ -25046,14 +25046,14 @@ namespace Gekko
 
         }
 
-        private static double PrintHelperTransform(GekkoSmpl smpl, Series tsWork, Series tsRef, GekkoTime t, string printcode, int sumOver, int[] skipCounter)
+        private static double PrintHelperTransform(GekkoSmpl smpl, Series tsWork, Series tsRef, GekkoTime t, string printcode, bool logTransform, int sumOver, int[] skipCounter)
         {
             if (true)
             {
                 //TODO filter and skip, see below
                 double var1 = double.NaN;
                 double varPch = double.NaN;
-                Program.ComputeValueForPrintPlotNew(out var1, out varPch, printcode, t, tsWork, tsRef, false, false);
+                Program.ComputeValueForPrintPlotNew(out var1, out varPch, printcode, t, tsWork, tsRef, logTransform, false);
                 return var1;
             }
             else
@@ -25107,11 +25107,20 @@ namespace Gekko
             }
         }
 
-        private static double PrintHelperTransformScalar(double scalarWork, double scalarRef, string printcode, int sumOver, int[] skipCounter)
+        private static double PrintHelperTransformScalar(double scalarWork, double scalarRef, string printcode, bool logTransform, int sumOver, int[] skipCounter)
         {
+            if (logTransform)
+            {
+                scalarWork = Math.Log(scalarWork);
+                scalarRef = Math.Log(scalarRef);
+            }
+
             if (G.Equal(printcode, "n")) return (sumOver * scalarWork);
             else if (G.Equal(printcode, "q")) return ((sumOver * scalarWork) / (sumOver * scalarRef) - 1d) * 100d;
+            else if (G.Equal(printcode, "m")) return (sumOver * scalarWork) - (sumOver * scalarRef);
+            else if (G.Equal(printcode, "d")) return 0d;
             else if (G.Equal(printcode, "p")) return 0d;
+            else if (G.Equal(printcode, "dp")) return 0d;
             else
             {
                 G.Writeln2("*** ERROR: Transformation error");
@@ -25812,9 +25821,9 @@ namespace Gekko
         public static List<string> GetElementPrintCodes(O.Prt o, O.Prt.Element ope)
         {
             List<string> printCodes = new List<string>();
-            if (o.interactivePrintCode != null)
+            if (o.guiGraphPrintCode != null)
             {
-                printCodes.Add(o.interactivePrintCode);
+                printCodes.Add(o.guiGraphPrintCode);
             }
             else
             { 
@@ -27275,462 +27284,462 @@ namespace Gekko
             return numberOfLabelsRows;
         }
 
-        private static void CallGnuplotNew(Table data, O.Prt o, int count, int maxLabelsLinesFound, List<string> labelsNonBroken)
-        {
-            if (count == 0)
-            {
-                G.Writeln2("*** ERROR: PLOT called with 0 variables");
-                throw new GekkoException();
-            }
+        //private static void CallGnuplotNew(Table data, O.Prt o, int count, int maxLabelsLinesFound, List<string> labelsNonBroken)
+        //{
+        //    if (count == 0)
+        //    {
+        //        G.Writeln2("*** ERROR: PLOT called with 0 variables");
+        //        throw new GekkoException();
+        //    }
 
-            string pplotType = "emf";
-            if (o.opt_filename != null)
-            {
-                pplotType = Path.GetExtension(o.opt_filename);
-                if (pplotType.StartsWith(".")) pplotType = pplotType.Substring(1);
-                if (pplotType == "")
-                {
-                    o.opt_filename = AddExtension(o.opt_filename, ".emf");
-                    pplotType = "emf";
-                }
-                if (pplotType != "emf" && pplotType != "png" && pplotType != "svg")
-                {
-                    G.Writeln2("*** ERROR: In PLOT, expected file type is emf, png or svg");
-                    throw new GekkoException();
-                }
-            }
+        //    string pplotType = "emf";
+        //    if (o.opt_filename != null)
+        //    {
+        //        pplotType = Path.GetExtension(o.opt_filename);
+        //        if (pplotType.StartsWith(".")) pplotType = pplotType.Substring(1);
+        //        if (pplotType == "")
+        //        {
+        //            o.opt_filename = AddExtension(o.opt_filename, ".emf");
+        //            pplotType = "emf";
+        //        }
+        //        if (pplotType != "emf" && pplotType != "png" && pplotType != "svg")
+        //        {
+        //            G.Writeln2("*** ERROR: In PLOT, expected file type is emf, png or svg");
+        //            throw new GekkoException();
+        //        }
+        //    }
 
-            int numberOfObs = GekkoTime.Observations(o.t1, o.t2);
-            int rr = Program.RandomInt();
-            string file1 = "temp" + rr + ".dat";
-            string file2 = "temp" + rr + "." + pplotType;
-            string file3 = "temp" + rr + ".gp";
-            string heading = "";
+        //    int numberOfObs = GekkoTime.Observations(o.t1, o.t2);
+        //    int rr = Program.RandomInt();
+        //    string file1 = "temp" + rr + ".dat";
+        //    string file2 = "temp" + rr + "." + pplotType;
+        //    string file3 = "temp" + rr + ".gp";
+        //    string heading = "";
             
 
-            if (o.opt_filename != null)
-            {
-                pplotType = Path.GetExtension(o.opt_filename);
-                if (pplotType.StartsWith(".")) pplotType = pplotType.Substring(1);
-                if (pplotType == "")
-                {
-                    o.opt_filename = AddExtension(o.opt_filename, ".emf");
-                    pplotType = "emf";
-                }
-                if (pplotType != "emf" && pplotType != "png" && pplotType != "svg")
-                {
-                    G.Writeln2("*** ERROR: In PLOT, expected file type is emf, png or svg");
-                    throw new GekkoException();
-                }
-            }
-            bool histo = false;
-            string currentDir = Directory.GetCurrentDirectory();  //remembered in order to switch back
-            string path = System.Windows.Forms.Application.LocalUserAppDataPath + "\\gnuplot\\tempfiles";
+        //    if (o.opt_filename != null)
+        //    {
+        //        pplotType = Path.GetExtension(o.opt_filename);
+        //        if (pplotType.StartsWith(".")) pplotType = pplotType.Substring(1);
+        //        if (pplotType == "")
+        //        {
+        //            o.opt_filename = AddExtension(o.opt_filename, ".emf");
+        //            pplotType = "emf";
+        //        }
+        //        if (pplotType != "emf" && pplotType != "png" && pplotType != "svg")
+        //        {
+        //            G.Writeln2("*** ERROR: In PLOT, expected file type is emf, png or svg");
+        //            throw new GekkoException();
+        //        }
+        //    }
+        //    bool histo = false;
+        //    string currentDir = Directory.GetCurrentDirectory();  //remembered in order to switch back
+        //    string path = System.Windows.Forms.Application.LocalUserAppDataPath + "\\gnuplot\\tempfiles";
 
-            //tw.WriteLine("set terminal emf size 300 ,200");
+        //    //tw.WriteLine("set terminal emf size 300 ,200");
 
-            // Determine whether the directory exists.
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-            Directory.SetCurrentDirectory(path); //so that gnuplot can access the files
+        //    // Determine whether the directory exists.
+        //    if (!Directory.Exists(path))
+        //    {
+        //        Directory.CreateDirectory(path);
+        //    }
+        //    Directory.SetCurrentDirectory(path); //so that gnuplot can access the files
 
 
-            //foreach (string s in data.Print()) { G.Writeln(s); };
+        //    //foreach (string s in data.Print()) { G.Writeln(s); };
 
-            List<string> labels1 = new List<string>();
-            List<string> labels2 = new List<string>();
+        //    List<string> labels1 = new List<string>();
+        //    List<string> labels2 = new List<string>();
 
-            using (FileStream fs = WaitForFileStream(path + "\\" + file1, GekkoFileReadOrWrite.Write))
-            using (StreamWriter tw = G.GekkoStreamWriter(fs))
-            {
-                for (int t = 0; t < numberOfObs; t++)
-                {
-                    string s = null;
-                    for (int i = 0; i <= count; i++)
-                    {
-                        Cell c = data.Get(t + 1 + maxLabelsLinesFound, i + 1);
-                        if (i == 0 && c.cellType == CellType.Text)
-                        {
-                            string d = c.CellText.TextData[0];
-                            string dOrig = d;
-                            d = GetDateStringSuitableForGnuplot(d);
-                            labels1.Add(dOrig);
-                            labels2.Add(d);
-                            s += d + " ";
-                        }
-                        else if (i > 0 && c.cellType == CellType.Number)
-                        {
-                            double d = c.number;
-                            s += d + " ";
-                        }
-                        else
-                        {
-                            G.Writeln2("*** ERROR: Graph error");
-                            throw new GekkoException();
-                        }
-                    }
-                    tw.WriteLine(s);
-                }
-            }
+        //    using (FileStream fs = WaitForFileStream(path + "\\" + file1, GekkoFileReadOrWrite.Write))
+        //    using (StreamWriter tw = G.GekkoStreamWriter(fs))
+        //    {
+        //        for (int t = 0; t < numberOfObs; t++)
+        //        {
+        //            string s = null;
+        //            for (int i = 0; i <= count; i++)
+        //            {
+        //                Cell c = data.Get(t + 1 + maxLabelsLinesFound, i + 1);
+        //                if (i == 0 && c.cellType == CellType.Text)
+        //                {
+        //                    string d = c.CellText.TextData[0];
+        //                    string dOrig = d;
+        //                    d = GetDateStringSuitableForGnuplot(d);
+        //                    labels1.Add(dOrig);
+        //                    labels2.Add(d);
+        //                    s += d + " ";
+        //                }
+        //                else if (i > 0 && c.cellType == CellType.Number)
+        //                {
+        //                    double d = c.number;
+        //                    s += d + " ";
+        //                }
+        //                else
+        //                {
+        //                    G.Writeln2("*** ERROR: Graph error");
+        //                    throw new GekkoException();
+        //                }
+        //            }
+        //            tw.WriteLine(s);
+        //        }
+        //    }
 
-            using (FileStream fs = WaitForFileStream(path + "\\" + file3, GekkoFileReadOrWrite.Write))
-            using (StreamWriter tw = G.GekkoStreamWriter(fs))
-            {
-                if (o.opt_plotcode != null && o.opt_plotcode.Contains("[histo]"))
-                {
-                    histo = true;
-                    o.opt_plotcode = o.opt_plotcode.Replace("[histo]", "");
-                }
+        //    using (FileStream fs = WaitForFileStream(path + "\\" + file3, GekkoFileReadOrWrite.Write))
+        //    using (StreamWriter tw = G.GekkoStreamWriter(fs))
+        //    {
+        //        if (o.opt_plotcode != null && o.opt_plotcode.Contains("[histo]"))
+        //        {
+        //            histo = true;
+        //            o.opt_plotcode = o.opt_plotcode.Replace("[histo]", "");
+        //        }
 
-                tw.WriteLine("set encoding iso_8859_1");
+        //        tw.WriteLine("set encoding iso_8859_1");
 
-                heading = EncodeDanish(heading);
+        //        heading = EncodeDanish(heading);
 
-                tw.WriteLine("set title \"" + heading + "\"");
-                tw.WriteLine("set datafile missing \"NaN\"");
-                tw.WriteLine("set terminal " + pplotType);
-                tw.WriteLine("set output \"" + file2 + "\"");
-                //tw.WriteLine("set data style linespoints"); //probably superfluous
-                //tw.WriteLine("set title \"Graph\"");
-                //tw.WriteLine("set xlabel \"År\"");
-                //tw.WriteLine("set ylabel \"Var1\"");
+        //        tw.WriteLine("set title \"" + heading + "\"");
+        //        tw.WriteLine("set datafile missing \"NaN\"");
+        //        tw.WriteLine("set terminal " + pplotType);
+        //        tw.WriteLine("set output \"" + file2 + "\"");
+        //        //tw.WriteLine("set data style linespoints"); //probably superfluous
+        //        //tw.WriteLine("set title \"Graph\"");
+        //        //tw.WriteLine("set xlabel \"År\"");
+        //        //tw.WriteLine("set ylabel \"Var1\"");
 
-                if (!double.IsNaN(o.opt_ymin) && double.IsNaN(o.opt_ymax))
-                {
-                    tw.WriteLine("set yrange [" + o.opt_ymin + ":]");
-                }
-                else if (double.IsNaN(o.opt_ymin) && !double.IsNaN(o.opt_ymax))
-                {
-                    tw.WriteLine("set yrange [:" + o.opt_ymax + "]");
-                }
-                else if (!double.IsNaN(o.opt_ymin) && !double.IsNaN(o.opt_ymax))
-                {
-                    tw.WriteLine("set yrange [" + o.opt_ymin + ":" + o.opt_ymax + "]");
-                }
+        //        if (!double.IsNaN(o.opt_ymin) && double.IsNaN(o.opt_ymax))
+        //        {
+        //            tw.WriteLine("set yrange [" + o.opt_ymin + ":]");
+        //        }
+        //        else if (double.IsNaN(o.opt_ymin) && !double.IsNaN(o.opt_ymax))
+        //        {
+        //            tw.WriteLine("set yrange [:" + o.opt_ymax + "]");
+        //        }
+        //        else if (!double.IsNaN(o.opt_ymin) && !double.IsNaN(o.opt_ymax))
+        //        {
+        //            tw.WriteLine("set yrange [" + o.opt_ymin + ":" + o.opt_ymax + "]");
+        //        }
 
-                if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
-                {
-                    tw.WriteLine("set xdata time");
-                    tw.WriteLine(@"set timefmt ""%Y/%m/%d""");
-                    tw.WriteLine(@"set format x ""%Y/%m""");
-                }
-                else
-                {
-                    if (numberOfObs > 70)
-                    {
-                        tw.WriteLine("set xtics 10");
-                        tw.WriteLine("set mxtics 10");
-                    }
-                    else
-                    {
-                        tw.WriteLine("set xtics 5");
-                        tw.WriteLine("set mxtics 5");
-                    }
-                }
+        //        if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
+        //        {
+        //            tw.WriteLine("set xdata time");
+        //            tw.WriteLine(@"set timefmt ""%Y/%m/%d""");
+        //            tw.WriteLine(@"set format x ""%Y/%m""");
+        //        }
+        //        else
+        //        {
+        //            if (numberOfObs > 70)
+        //            {
+        //                tw.WriteLine("set xtics 10");
+        //                tw.WriteLine("set mxtics 10");
+        //            }
+        //            else
+        //            {
+        //                tw.WriteLine("set xtics 5");
+        //                tw.WriteLine("set mxtics 5");
+        //            }
+        //        }
                 
-                tw.WriteLine("set ticscale 1.4 0.7");
-                //tw.WriteLine("set key outside top");
-                //tw.WriteLine("set key 100, 100");
-                tw.WriteLine("set border 3");
-                tw.WriteLine("set xtics nomirror");
-                tw.WriteLine("set ytics nomirror");
-                tw.WriteLine("set xzeroaxis lt -1");
-                tw.WriteLine("set yzeroaxis");
-                //tw.WriteLine("set grid");
-                //tw.WriteLine("set size 0.5,0.5");
-                //tw.WriteLine("set size ratio 0.2"); does not work
+        //        tw.WriteLine("set ticscale 1.4 0.7");
+        //        //tw.WriteLine("set key outside top");
+        //        //tw.WriteLine("set key 100, 100");
+        //        tw.WriteLine("set border 3");
+        //        tw.WriteLine("set xtics nomirror");
+        //        tw.WriteLine("set ytics nomirror");
+        //        tw.WriteLine("set xzeroaxis lt -1");
+        //        tw.WriteLine("set yzeroaxis");
+        //        //tw.WriteLine("set grid");
+        //        //tw.WriteLine("set size 0.5,0.5");
+        //        //tw.WriteLine("set size ratio 0.2"); does not work
 
-                int mxtics = -12345;
+        //        int mxtics = -12345;
 
-                if (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)
-                {
-                }
-                else
-                {
-                    List<int> subperiods = new List<int>();
-                    int onlyYears = -12345;
-                    if (Program.options.freq == EFreq.Quarterly)
-                    {
-                        if (labels1.Count <= 12)  //for quarterly, 12 corresponds to 3 years with 4 subpers each
-                        {
-                            subperiods.Add(1);  //q1
-                            subperiods.Add(4);  //q2
-                            subperiods.Add(7);  //q3
-                            subperiods.Add(10);  //q4
-                        }
-                        else if (labels1.Count <= 24)
-                        {
-                            subperiods.Add(1);  //q1
-                            subperiods.Add(7);  //q3
-                            mxtics = 2;
-                        }
-                        else if (labels1.Count <= 48)
-                        {
-                            subperiods.Add(1);  //q1
-                            mxtics = 4;
-                        }
-                        else if (labels1.Count <= 5 * 48)
-                        {
-                            onlyYears = 5;
-                            subperiods.Add(1);  //q1
-                            mxtics = 5;
-                        }
-                        else if (labels1.Count <= 10 * 48)
-                        {
-                            onlyYears = 10;
-                            subperiods.Add(1);  //q1
-                            mxtics = 10;
-                        }
-                        else
-                        {
-                            onlyYears = 20;
-                            subperiods.Add(1);  //q1
-                        }
-                    }
-                    else  //monthly
-                    {
-                        if (labels1.Count <= 12)  //for monthly, 12 corresponds to 1 year with 12 subpers
-                        {
-                            subperiods.Add(1);  //m1
-                            subperiods.Add(2);  //m2
-                            subperiods.Add(3);  //m3
-                            subperiods.Add(4);  //m4
-                            subperiods.Add(5);  //m5
-                            subperiods.Add(6);  //m6
-                            subperiods.Add(7);  //m7
-                            subperiods.Add(8);  //m8
-                            subperiods.Add(9);  //m9
-                            subperiods.Add(10);  //m10
-                            subperiods.Add(11);  //m11
-                            subperiods.Add(12);  //m12
-                        }
-                        else if (labels1.Count <= 24)
-                        {
-                            subperiods.Add(1);  //m1
-                            subperiods.Add(3);  //m3
-                            subperiods.Add(5);  //m5
-                            subperiods.Add(7);  //m7
-                            subperiods.Add(9);  //m9
-                            subperiods.Add(11);  //m11
-                            mxtics = 2;
-                        }
-                        else if (labels1.Count <= 36)
-                        {
-                            subperiods.Add(1);  //m1
-                            subperiods.Add(4);  //m4
-                            subperiods.Add(7);  //m7
-                            subperiods.Add(10);  //m10
-                            mxtics = 3;
-                        }
-                        else if (labels1.Count <= 48)
-                        {
-                            subperiods.Add(1);  //m1
-                            subperiods.Add(5);  //m5
-                            subperiods.Add(9);  //m9
-                            mxtics = 4;
-                        }
-                        else if (labels1.Count <= 72)
-                        {
-                            subperiods.Add(1);  //m1
-                            subperiods.Add(7);  //m7
-                            mxtics = 6;
-                        }
-                        else if (labels1.Count <= 144)
-                        {
-                            subperiods.Add(1);  //m1
-                        }
-                        else if (labels1.Count <= 15 * 48)
-                        {
-                            onlyYears = 5;
-                            subperiods.Add(1);  //m1
-                            mxtics = 5;
-                        }
-                        else if (labels1.Count <= 30 * 48)
-                        {
-                            onlyYears = 10;
-                            subperiods.Add(1);  //m1
-                            mxtics = 10;
-                        }
-                        else
-                        {
-                            onlyYears = 20;
-                            subperiods.Add(1);  //m1
-                        }
-                    }
+        //        if (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)
+        //        {
+        //        }
+        //        else
+        //        {
+        //            List<int> subperiods = new List<int>();
+        //            int onlyYears = -12345;
+        //            if (Program.options.freq == EFreq.Quarterly)
+        //            {
+        //                if (labels1.Count <= 12)  //for quarterly, 12 corresponds to 3 years with 4 subpers each
+        //                {
+        //                    subperiods.Add(1);  //q1
+        //                    subperiods.Add(4);  //q2
+        //                    subperiods.Add(7);  //q3
+        //                    subperiods.Add(10);  //q4
+        //                }
+        //                else if (labels1.Count <= 24)
+        //                {
+        //                    subperiods.Add(1);  //q1
+        //                    subperiods.Add(7);  //q3
+        //                    mxtics = 2;
+        //                }
+        //                else if (labels1.Count <= 48)
+        //                {
+        //                    subperiods.Add(1);  //q1
+        //                    mxtics = 4;
+        //                }
+        //                else if (labels1.Count <= 5 * 48)
+        //                {
+        //                    onlyYears = 5;
+        //                    subperiods.Add(1);  //q1
+        //                    mxtics = 5;
+        //                }
+        //                else if (labels1.Count <= 10 * 48)
+        //                {
+        //                    onlyYears = 10;
+        //                    subperiods.Add(1);  //q1
+        //                    mxtics = 10;
+        //                }
+        //                else
+        //                {
+        //                    onlyYears = 20;
+        //                    subperiods.Add(1);  //q1
+        //                }
+        //            }
+        //            else  //monthly
+        //            {
+        //                if (labels1.Count <= 12)  //for monthly, 12 corresponds to 1 year with 12 subpers
+        //                {
+        //                    subperiods.Add(1);  //m1
+        //                    subperiods.Add(2);  //m2
+        //                    subperiods.Add(3);  //m3
+        //                    subperiods.Add(4);  //m4
+        //                    subperiods.Add(5);  //m5
+        //                    subperiods.Add(6);  //m6
+        //                    subperiods.Add(7);  //m7
+        //                    subperiods.Add(8);  //m8
+        //                    subperiods.Add(9);  //m9
+        //                    subperiods.Add(10);  //m10
+        //                    subperiods.Add(11);  //m11
+        //                    subperiods.Add(12);  //m12
+        //                }
+        //                else if (labels1.Count <= 24)
+        //                {
+        //                    subperiods.Add(1);  //m1
+        //                    subperiods.Add(3);  //m3
+        //                    subperiods.Add(5);  //m5
+        //                    subperiods.Add(7);  //m7
+        //                    subperiods.Add(9);  //m9
+        //                    subperiods.Add(11);  //m11
+        //                    mxtics = 2;
+        //                }
+        //                else if (labels1.Count <= 36)
+        //                {
+        //                    subperiods.Add(1);  //m1
+        //                    subperiods.Add(4);  //m4
+        //                    subperiods.Add(7);  //m7
+        //                    subperiods.Add(10);  //m10
+        //                    mxtics = 3;
+        //                }
+        //                else if (labels1.Count <= 48)
+        //                {
+        //                    subperiods.Add(1);  //m1
+        //                    subperiods.Add(5);  //m5
+        //                    subperiods.Add(9);  //m9
+        //                    mxtics = 4;
+        //                }
+        //                else if (labels1.Count <= 72)
+        //                {
+        //                    subperiods.Add(1);  //m1
+        //                    subperiods.Add(7);  //m7
+        //                    mxtics = 6;
+        //                }
+        //                else if (labels1.Count <= 144)
+        //                {
+        //                    subperiods.Add(1);  //m1
+        //                }
+        //                else if (labels1.Count <= 15 * 48)
+        //                {
+        //                    onlyYears = 5;
+        //                    subperiods.Add(1);  //m1
+        //                    mxtics = 5;
+        //                }
+        //                else if (labels1.Count <= 30 * 48)
+        //                {
+        //                    onlyYears = 10;
+        //                    subperiods.Add(1);  //m1
+        //                    mxtics = 10;
+        //                }
+        //                else
+        //                {
+        //                    onlyYears = 20;
+        //                    subperiods.Add(1);  //m1
+        //                }
+        //            }
 
-                    string s3 = null;
-                    int c = -1;
-                    for (int i = 0; i < labels1.Count; i++)
-                    {
-                        c++;
-                        //int subper=labels2[i]
-                        //if (labels1.Count > 20 && c %  != 0) continue;
-                        string[] split = labels2[i].Split(new char[] { '/' });
-                        if (onlyYears != -12345 && int.Parse(split[0]) % onlyYears != 0) continue;
-                        if (subperiods.Contains(int.Parse(split[1])))
-                        {
-                            s3 += "\"" + labels1[i] + "\" \"" + labels2[i] + "\", ";
-                        }
-                    }
-                    if (s3.EndsWith(", ")) s3 = s3.Substring(0, s3.Length - 2);
-                    tw.WriteLine("set xtics (" + s3 + ")");
-                }
+        //            string s3 = null;
+        //            int c = -1;
+        //            for (int i = 0; i < labels1.Count; i++)
+        //            {
+        //                c++;
+        //                //int subper=labels2[i]
+        //                //if (labels1.Count > 20 && c %  != 0) continue;
+        //                string[] split = labels2[i].Split(new char[] { '/' });
+        //                if (onlyYears != -12345 && int.Parse(split[0]) % onlyYears != 0) continue;
+        //                if (subperiods.Contains(int.Parse(split[1])))
+        //                {
+        //                    s3 += "\"" + labels1[i] + "\" \"" + labels2[i] + "\", ";
+        //                }
+        //            }
+        //            if (s3.EndsWith(", ")) s3 = s3.Substring(0, s3.Length - 2);
+        //            tw.WriteLine("set xtics (" + s3 + ")");
+        //        }
 
-                if (mxtics != -12345)
-                {
-                    //for quarterly and monthly
-                    if (false)
-                    {
-                        //TODO: why does this not work??
-                        tw.WriteLine("set mxtics " + mxtics);
-                    }
-                }
+        //        if (mxtics != -12345)
+        //        {
+        //            //for quarterly and monthly
+        //            if (false)
+        //            {
+        //                //TODO: why does this not work??
+        //                tw.WriteLine("set mxtics " + mxtics);
+        //            }
+        //        }
 
-                if (histo)
-                {
-                    if (false)  //not really working (labels)
-                    {
-                        tw.WriteLine("set size ratio 0.5");
-                        tw.WriteLine("set key outside top");
-                    }
+        //        if (histo)
+        //        {
+        //            if (false)  //not really working (labels)
+        //            {
+        //                tw.WriteLine("set size ratio 0.5");
+        //                tw.WriteLine("set key outside top");
+        //            }
 
-                    tw.WriteLine("set style fill solid 1.000000 border -1");
-                    tw.WriteLine("set boxwidth 0.3");
-
-
-                    //tw.WriteLine("set style line 1 lt 1 lw 3 lc rgb \"black\" ");
-                    tw.WriteLine("set style line 1 lt 1 lw 4.0");
-                    tw.WriteLine("set style line 2 lt 2 lw 2.0");
-                    tw.WriteLine("set style line 3 lt 3 lw 2.0");
-
-                }
-
-                if (o.opt_plotcode != null)
-                {
-                    tw.WriteLine("");
-                    tw.WriteLine(o.opt_plotcode);  //user code
-                    tw.WriteLine("");
-                }
-
-                tw.Write("plot ");
-                for (int i = 0; i < count; i++)
-                {
-                    string label = EncodeDanish(labelsNonBroken[i]);
-
-                    if (!histo)
-                    {
-                        string lineType = "with lines ";
-                        if (Program.options.plot_lines_points)
-                        {
-                            lineType = "with linespoints ";
-                        }
-                        tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " " + lineType + "lw 2.0 " + " title \"  " + label + "\" ");
-                    }
-                    else
-                    {
-                        if (i == 0) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 1 " + " title \"  " + label + "\" ");  //obs
-                        else if (i == 1) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 2 " + " title \"  " + label + "\" ");  //fitted
-                        else if (i == 2) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 3 " + " title \"  " + label + "\" ");  //wanted
-                        else if (i == 3) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with boxes lw 2.0 " + " title \"  " + label + "\" ");  //residual
-                        else tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints lw 2.0 " + " title \"  " + label + "\" ");
-                    }
+        //            tw.WriteLine("set style fill solid 1.000000 border -1");
+        //            tw.WriteLine("set boxwidth 0.3");
 
 
+        //            //tw.WriteLine("set style line 1 lt 1 lw 3 lc rgb \"black\" ");
+        //            tw.WriteLine("set style line 1 lt 1 lw 4.0");
+        //            tw.WriteLine("set style line 2 lt 2 lw 2.0");
+        //            tw.WriteLine("set style line 3 lt 3 lw 2.0");
 
-                    if (i < count - 1) tw.Write(",");
-                }
-                tw.WriteLine();
-                tw.Flush();
-                tw.Close();
-            }
+        //        }
 
-            string emfName = path + "\\" + file2;
+        //        if (o.opt_plotcode != null)
+        //        {
+        //            tw.WriteLine("");
+        //            tw.WriteLine(o.opt_plotcode);  //user code
+        //            tw.WriteLine("");
+        //        }
 
-            Process p = new Process();
-            //p.MainWindowTitle = title;
-            p.StartInfo.FileName = Application.StartupPath + "\\gnuplot\\wgnuplot.exe";
-            //p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            //NOTE: quotes added because this path may contain blanks
-            p.StartInfo.Arguments = Globals.QT + path + "\\" + file3 + Globals.QT;
+        //        tw.Write("plot ");
+        //        for (int i = 0; i < count; i++)
+        //        {
+        //            string label = EncodeDanish(labelsNonBroken[i]);
 
-            bool exited = false;
-            try
-            {
-                p.Start();
-                exited = p.WaitForExit(5000);  //5 sec, should always be able to do it in < 1 sec
-                if (!exited)
-                {
-                    MessageBox.Show("*** ERROR: The gnuplot call did not respond within 5 seconds, so the " + G.NL + "gnuplot call was aborted.");
-                    throw new GekkoException();
-                }
-            }
-            catch (Exception e)
-            {
-                if (exited)
-                {
-                    MessageBox.Show("*** ERROR: There was a internal problem calling gnuplot." + G.NL + "ERROR: " + e.Message);
-                }
-                throw new GekkoException();
-            }
+        //            if (!histo)
+        //            {
+        //                string lineType = "with lines ";
+        //                if (Program.options.plot_lines_points)
+        //                {
+        //                    lineType = "with linespoints ";
+        //                }
+        //                tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " " + lineType + "lw 2.0 " + " title \"  " + label + "\" ");
+        //            }
+        //            else
+        //            {
+        //                if (i == 0) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 1 " + " title \"  " + label + "\" ");  //obs
+        //                else if (i == 1) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 2 " + " title \"  " + label + "\" ");  //fitted
+        //                else if (i == 2) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 3 " + " title \"  " + label + "\" ");  //wanted
+        //                else if (i == 3) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with boxes lw 2.0 " + " title \"  " + label + "\" ");  //residual
+        //                else tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints lw 2.0 " + " title \"  " + label + "\" ");
+        //            }
 
-            p.Close();
-            //resets current dir to previous location
-            Directory.SetCurrentDirectory(currentDir);
 
-            if (o.opt_filename != null && o.opt_filename != "")
-            {
-                string fileNameWithPath = CreateFullPathAndFileName(o.opt_filename);
-                WaitForFileCopy(emfName, fileNameWithPath);
-                G.Writeln2("PLOT created file " + fileNameWithPath);
-                return;
-            }
 
-            if (!o.guiGraphIsRefreshing)
-            {
-                PrtOptionsHelper po = new PrtOptionsHelper();
-                po.isLevel = true;
-                po.isLog = false;
-                po.isDiff = false;
-                po.isPch = false;
-                po.isDlog = false;
-                po.isMultiplier = false;
+        //            if (i < count - 1) tw.Write(",");
+        //        }
+        //        tw.WriteLine();
+        //        tw.Flush();
+        //        tw.Close();
+        //    }
 
-                GraphOptions graphOptions = new GraphOptions();
-                graphOptions.counter = o.counter;
-                graphOptions.localBanks = null;
-                graphOptions.emfName = emfName;
-                graphOptions.po = po;
-                graphOptions.pph = null;
-                graphOptions.precedents = null;
-                graphOptions.tEnd = o.t2;
-                graphOptions.tStart = o.t1;
-                graphOptions.graphVars = null;
-                graphOptions.graphVarsNames = labelsNonBroken;
-                graphOptions.title = null;
+        //    string emfName = path + "\\" + file2;
 
-                Thread thread = new Thread(new ParameterizedThreadStart(GraphThreadFunction));
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.CurrentCulture = new System.Globalization.CultureInfo("en-US");  //gets . instead of , in doubles
-                thread.Start(graphOptions);
+        //    Process p = new Process();
+        //    //p.MainWindowTitle = title;
+        //    p.StartInfo.FileName = Application.StartupPath + "\\gnuplot\\wgnuplot.exe";
+        //    //p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+        //    //NOTE: quotes added because this path may contain blanks
+        //    p.StartInfo.Arguments = Globals.QT + path + "\\" + file3 + Globals.QT;
 
-                //Also see #9237532567
-                //This stuff makes sure we wait for the window to open, before we move on with the code.
-                for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
-                {
-                    System.Threading.Thread.Sleep(10);  //0.01s
-                    if (graphOptions.windowIsShown)
-                    {
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                o.guiGraphRefreshingFilename = emfName;
-            }
-        }
+        //    bool exited = false;
+        //    try
+        //    {
+        //        p.Start();
+        //        exited = p.WaitForExit(5000);  //5 sec, should always be able to do it in < 1 sec
+        //        if (!exited)
+        //        {
+        //            MessageBox.Show("*** ERROR: The gnuplot call did not respond within 5 seconds, so the " + G.NL + "gnuplot call was aborted.");
+        //            throw new GekkoException();
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        if (exited)
+        //        {
+        //            MessageBox.Show("*** ERROR: There was a internal problem calling gnuplot." + G.NL + "ERROR: " + e.Message);
+        //        }
+        //        throw new GekkoException();
+        //    }
+
+        //    p.Close();
+        //    //resets current dir to previous location
+        //    Directory.SetCurrentDirectory(currentDir);
+
+        //    if (o.opt_filename != null && o.opt_filename != "")
+        //    {
+        //        string fileNameWithPath = CreateFullPathAndFileName(o.opt_filename);
+        //        WaitForFileCopy(emfName, fileNameWithPath);
+        //        G.Writeln2("PLOT created file " + fileNameWithPath);
+        //        return;
+        //    }
+
+        //    if (!o.guiGraphIsRefreshing)
+        //    {
+        //        PrtOptionsHelper po = new PrtOptionsHelper();
+        //        po.isLevel = true;
+        //        po.isLog = false;
+        //        po.isDiff = false;
+        //        po.isPch = false;
+        //        po.isDlog = false;
+        //        po.isMultiplier = false;
+
+        //        GraphOptions graphOptions = new GraphOptions();
+        //        graphOptions.counter = o.counter;
+        //        graphOptions.localBanks = null;
+        //        graphOptions.emfName = emfName;
+        //        graphOptions.po = po;
+        //        graphOptions.pph = null;
+        //        graphOptions.precedents = null;
+        //        graphOptions.tEnd = o.t2;
+        //        graphOptions.tStart = o.t1;
+        //        graphOptions.graphVars = null;
+        //        graphOptions.graphVarsNames = labelsNonBroken;
+        //        graphOptions.title = null;
+
+        //        Thread thread = new Thread(new ParameterizedThreadStart(GraphThreadFunction));
+        //        thread.SetApartmentState(ApartmentState.STA);
+        //        thread.CurrentCulture = new System.Globalization.CultureInfo("en-US");  //gets . instead of , in doubles
+        //        thread.Start(graphOptions);
+
+        //        //Also see #9237532567
+        //        //This stuff makes sure we wait for the window to open, before we move on with the code.
+        //        for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
+        //        {
+        //            System.Threading.Thread.Sleep(10);  //0.01s
+        //            if (graphOptions.windowIsShown)
+        //            {
+        //                break;
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        o.guiGraphRefreshingFilename = emfName;
+        //    }
+        //}
 
 
         private static void CallGnuplotNew2(Table data, O.Prt o, List<O.Prt.Element> containerExplode, bool[] freqs)
@@ -28547,6 +28556,8 @@ namespace Gekko
                 G.Writeln2("PLOT created file " + fileNameWithPath);
                 return;
             }
+
+            o.emfName = emfName;
 
             if (!o.guiGraphIsRefreshing)
             {

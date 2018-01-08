@@ -38,7 +38,14 @@ namespace Gekko
 
     public delegate void CloseDelegate();
 
-    public class Graph : Form
+    public class GraphHelper
+    {
+        public string printCode = null;
+        public bool isRefreshing = false;
+        public bool isLogTransform = false;
+    }
+
+        public class Graph : Form
     {
         //public string csCode = null;
 
@@ -297,7 +304,7 @@ namespace Gekko
             this.Controls.Add(this.button1);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.groupBox1);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            //this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.Name = "Graph";
             this.Text = "Graph";
@@ -376,15 +383,21 @@ namespace Gekko
             else if (isDlog && isMultiplier) s = "m";
             else if (isDlog && !isMultiplier) s = "d";
 
-            if (isDlog || isLog) this.graphOptions.o.guiGraphIsLogTransform = true;
+            //if (isDlog || isLog) this.graphOptions.o.guiGraphIsLogTransform = true;
             //this.graphOptions.o.interactivePrintCode = s;                                 
             //this.graphOptions.o.printCodes.Add(new OptString(s, "yes"));
             //this.graphOptions.o.guiGraphIsRefreshing = true;
 
-            Globals.printCs[this.graphOptions.printCsCounter](s);
+            GraphHelper gh = new Gekko.GraphHelper();
+            gh.printCode = s;
+            if (isDlog || isLog) gh.isLogTransform = true;
+            gh.isRefreshing = true;
+
+            string emfName = Globals.printCs[this.graphOptions.printCsCounter](gh);
 
             //this.graphOptions.o.Exe();            
-            this.graphOptions.emfName = this.graphOptions.o.guiGraphRefreshingFilename;            
+            //this.graphOptions.emfName = this.graphOptions.o.guiGraphRefreshingFilename;            
+            this.graphOptions.emfName = emfName;
             Invalidate();
         }
 

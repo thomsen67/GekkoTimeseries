@@ -6408,10 +6408,11 @@ namespace Gekko
             //public string rows = null;            
             public List<Element> prtElements = new List<Element>();                        
             public List<OptString> printCodes = new List<OptString>();
+            public string emfName = null;  //name of produced emf file if PLOT
                         
             public int printCsCounter = -12345;
 
-            public string interactivePrintCode = null;  //clicking in the PLOT window
+            public string guiGraphPrintCode = null;  //clicking in the PLOT window
                   
             public string timefilter = null;
             //public string heading = null;

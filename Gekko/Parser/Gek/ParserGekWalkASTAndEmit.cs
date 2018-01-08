@@ -2561,12 +2561,16 @@ namespace Gekko.Parser.Gek
                             {
                                 //PRT
 
-                                node.Code.A("Action<string> print" + Num(node) + " = (printCode" + Num(node) + ") =>" + G.NL);
+                                node.Code.A("Func<GraphHelper, string> print" + Num(node) + " = (gh) =>" + G.NL);
                                 node.Code.A("{" + G.NL);  //start Action
 
                                 node.Code.A("O.Prt o" + Num(node) + " = new O.Prt();" + G.NL);
+                                
+                                node.Code.A("o" + Num(node) + ".guiGraphIsRefreshing = gh.isRefreshing;" + G.NL);
+                                node.Code.A("o" + Num(node) + ".guiGraphPrintCode = gh.printCode;" + G.NL); //printCode is from the Func<> call, is null if PLOT window buttons are not clicked
+                                node.Code.A("o" + Num(node) + ".guiGraphIsLogTransform = gh.isLogTransform;" + G.NL);
 
-                                node.Code.A("o" + Num(node) + ".interactivePrintCode = printCode" + Num(node) + ";" + G.NL); //printCode is from the Func<> call, is null if PLOT window buttons are not clicked
+                                
 
                                 GetCodeFromAllChildren(node);
 
@@ -2584,13 +2588,16 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("o" + Num(node) + ".printCsCounter = Globals.printCs.Count - 1;" + G.NL);
                                 node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
 
+                                node.Code.A("return o" + Num(node) + ".emfName;" + G.NL);
+
                                 node.Code.A("};" + G.NL);  //end Action
 
                                 //node.Code.A("o" + Num(node) + ".printCs = print" + Num(node) + "; " + G.NL);  //so Action can be used later on
 
                                 node.Code.A("Globals.printCs.Add(Globals.printCs.Count, print" + Num(node) + "); " + G.NL);
+                                                                
+                                node.Code.A("print" + Num(node) + "(new GraphHelper());" + G.NL); //end Action
 
-                                node.Code.A("print" + Num(node) + "(null);" + G.NL); //end Action
                             }
                             
 
