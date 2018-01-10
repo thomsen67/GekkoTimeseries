@@ -23397,10 +23397,33 @@ namespace Gekko
         {
             //string format = "f14.4";
 
-            bool rows = false; if (G.Equal(o.opt_rows, "yes")) rows = true;
-
             string type = "print";
             if (G.Equal(o.prtType, "plot")) type = "plot";
+
+            if (type == "print" && (G.Equal(o.prtType, "gmulprt") || (o.printCodes.Count == 1 && G.Equal(o.printCodes[0].s1, "v") && G.Equal(o.printCodes[0].s2, "yes")))) {
+
+                for (int i = 0;i< o.prtElements.Count;i++)
+                {
+                    //o.printCodes = new List<OptString>();
+                    //o.printCodes.Add(new OptString("n", "yes"));
+                    //o.printCodes.Add(new OptString("p", "yes"));
+                    //o.printCodes.Add(new OptString("rn", "yes"));
+                    //o.printCodes.Add(new OptString("rp", "yes"));
+                    //o.printCodes.Add(new OptString("m", "yes"));
+                    //o.printCodes.Add(new OptString("q", "yes"));
+
+                    o.prtElements[i].printCodesFinal = new List<string>();
+                    o.prtElements[i].printCodesFinal.Add("n");
+                    o.prtElements[i].printCodesFinal.Add("p");
+                    o.prtElements[i].printCodesFinal.Add("rn");
+                    o.prtElements[i].printCodesFinal.Add("rp");
+                    o.prtElements[i].printCodesFinal.Add("m");
+                    o.prtElements[i].printCodesFinal.Add("q");
+                    
+                }
+            }
+
+            bool rows = false; if (G.Equal(o.opt_rows, "yes")) rows = true;            
 
             if (NonSeriesCheck(o, type))
             {

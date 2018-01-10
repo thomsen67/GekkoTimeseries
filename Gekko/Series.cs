@@ -1117,10 +1117,11 @@ namespace Gekko
             return hash;
         }
 
+        //minus, abs(), log(), exp(), sqrt()
         public static Series ArithmeticsSeries(GekkoSmpl smpl, Series x1_series, Func<double, double> a)
         {
             Series rv_series;
-            if (x1_series.type == ESeriesType.Normal)
+            if (x1_series.type == ESeriesType.Normal || x1_series.type == ESeriesType.Timeless)
             {
                 rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                 foreach (GekkoTime t in smpl.Iterate03())
@@ -1128,22 +1129,29 @@ namespace Gekko
                     rv_series.SetData(t, a.Invoke(x1_series.GetData(smpl, t)));
                 }
             }
-            else
+            else if (x1_series.type == ESeriesType.Light)
             {
+                //safe to alter the object itself, since it is temporary
                 for (int i = 0; i < x1_series.data.dataArray.Length; i++)
                 {
                     x1_series.data.dataArray[i] = a.Invoke(x1_series.data.dataArray[i]);
                 }
                 rv_series = x1_series;
             }
+            else
+            {
+                G.Writeln2("*** ERROR: Internal error #4598243755");
+                throw new GekkoException();
+            }
 
             return rv_series;
         }
 
+        //pch(), dlog(), dif()
         public static Series ArithmeticsSeriesLag(GekkoSmpl smpl, Series x1_series, Func<double, double, double> a)
         {
             Series rv_series;
-            if (x1_series.type == ESeriesType.Normal)
+            if (x1_series.type == ESeriesType.Normal || x1_series.type == ESeriesType.Timeless)
             {
                 rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                 foreach (GekkoTime t in smpl.Iterate03())
@@ -1151,8 +1159,9 @@ namespace Gekko
                     rv_series.SetData(t, a.Invoke(x1_series.GetData(smpl, t), x1_series.GetData(smpl, t.Add(-1))));
                 }
             }
-            else
+            else if (x1_series.type == ESeriesType.Light)
             {
+                //safe to alter the object itself, since it is temporary
                 double[] temp = new double[x1_series.data.dataArray.Length];
                 temp[0] = double.NaN;
                 for (int i = 0 + 1; i < x1_series.data.dataArray.Length; i++)
@@ -1162,7 +1171,11 @@ namespace Gekko
                 x1_series.data.dataArray = temp;  //has same size and same anchors            
                 rv_series = x1_series;
             }
-
+            else
+            {
+                G.Writeln2("*** ERROR: Internal error #4598243756");
+                throw new GekkoException();
+            }
             return rv_series;
         }
 
