@@ -1805,6 +1805,33 @@ namespace Gekko
             //Program.OPrint(smpl, x);
         }
 
+        public static IVariable AddSpecial(IVariable x1, IVariable x2, bool minus)
+        {
+            ScalarString s1 = x1 as ScalarString;
+            if (s1 == null)
+            {
+                G.Writeln2("*** ERROR: Expected list element to be of string type");
+                throw new GekkoException();
+            }
+            string s = s1.string2;
+            int i = -12345;
+            if (int.TryParse(s, out i))
+            {
+
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Could not convert '" + s + "' into integer");
+                throw new GekkoException();
+            }
+                        
+            int i2 = O.ConvertToInt(x2);
+
+            int ii = i + i2;
+            if (minus) ii = i - i2;
+
+            return new ScalarVal(ii);
+        }
         
 
         //private static string DecorateWithTilde(string varName, string freq)

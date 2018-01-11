@@ -249,9 +249,11 @@ namespace Gekko.Parser.Gek
                 if (s != null && s[0] == Globals.symbolCollection)
                 {
                     string listnameWithoutSigil = s.Substring(1);
-                    //naked #m
-                    if (node.Parent.Text == "ASTINDEXERELEMENT" || node.Parent.Text == "ASTCURLY" || (node.Parent.Text == "ASTCOMPARE2" && node.Number==1))
+                    //naked #m: ...[#m] or ...{#m} or #m1[#m]
+                    //also ...[#m+...] and [#m-...] is supported
+                    if (node.Parent.Text == "ASTINDEXERELEMENT" || node.Parent.Text == "ASTCURLY" || (node.Parent.Text == "ASTCOMPARE2" && node.Number==1) || ((node.Parent.Text == "ASTPLUS" || node.Parent.Text == "ASTMINUS") && (node.Parent.Parent.Text == "ASTINDEXERELEMENT" || node.Parent.Parent.Text == "ASTCURLY")))
                     {
+                        //ASTPLUS/MINUS: see also #980752345
                         //#m is inside a x[#m], or inside a x{#m} or is a #m1[#m] conditional
                         ASTNode node2 = node.Parent.Parent;
                         //Assign it to ASTPRTELEMENT, unless it is assigned to sum(#m,...) or unfold(#m,...)
@@ -2651,22 +2653,53 @@ namespace Gekko.Parser.Gek
                             {
                                 ASTNode child = node[1][i];
 
-                                string listName = GetSimpleHashName(child[0]);
-                                string internalName = null;
-                                if (listName != null)
+                                if (child[0].Text == "ASTPLUS" || child[0].Text == "ASTMINUS")
                                 {
-                                    internalName = SearchUpwardsInTree2(node, listName);
-                                }
+                                    //See also #980752345
+                                    string listName = GetSimpleHashName(child[0][0]);
+                                    string internalName = null;
+                                    if (listName != null)
+                                    {
+                                        internalName = SearchUpwardsInTree2(node, listName);
+                                    }
 
-                                if (internalName != null)
-                                {
-                                    indexes += internalName;
+                                    if (internalName != null)
+                                    {
+                                        if (child[0].Text == "ASTPLUS")
+                                        {
+                                            indexes += "O.AddSpecial(" + internalName + ", " + child[0][1].Code + ", false)";
+                                        }
+                                        else
+                                        {
+                                            indexes += "O.AddSpecial(" + internalName + ", " + child[0][1].Code + ", true)";
+                                        }
+                                    }
+                                    else
+                                    {
+                                        indexes += node[1][i].Code.ToString();
+                                    }
+                                    if (i < node[1].ChildrenCount() - 1) indexes += ", ";
                                 }
                                 else
                                 {
-                                    indexes += node[1][i].Code.ToString();
+
+                                    string listName = GetSimpleHashName(child[0]);
+                                    string internalName = null;
+                                    if (listName != null)
+                                    {
+                                        internalName = SearchUpwardsInTree2(node, listName);
+                                    }
+
+                                    if (internalName != null)
+                                    {
+                                        indexes += internalName;
+                                    }
+                                    else
+                                    {
+                                        indexes += node[1][i].Code.ToString();
+                                    }
+                                    if (i < node[1].ChildrenCount() - 1) indexes += ", ";
                                 }
-                                if (i < node[1].ChildrenCount() - 1) indexes += ", ";
                             }
                             if (ivTempVar == null)
                             {
