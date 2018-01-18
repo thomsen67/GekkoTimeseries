@@ -8574,6 +8574,11 @@ namespace Gekko
             sb.AppendLine("<p>" + s + "</p>");
         }
 
+        public static void WriteHtmlColor(StringBuilder sb, string s)
+        {
+            sb.AppendLine("<p><font color=\"green\">" + s + "</font></p>");
+        }
+
         public static void Browser()
         {
             G.Writeln2("Starting html browser generation");
@@ -8602,6 +8607,15 @@ namespace Gekko
                 TimeSeries ts2 = Program.databanks.GetRef().GetVariable(var);
 
                 WriteHtml(sb, "<big><b>" + var + "</b></big>");
+
+                List<string> varExpl = Program.GetVariableExplanation(var);
+                foreach (string line in varExpl)
+                {
+                    if (line != "")
+                    {
+                        WriteHtmlColor(sb, line);
+                    }
+                }
 
                 StringBuilder sb4 = new StringBuilder();
                                
@@ -8666,16 +8680,7 @@ namespace Gekko
                     }
                     WriteHtml(sb, sb4.ToString());
 
-                }
-
-                List<string> varExpl = Program.GetVariableExplanation(var);
-                foreach (string line in varExpl)
-                {
-                    if (line != "")
-                    {
-                        WriteHtml(sb, line);
-                    }
-                }
+                }                
 
                 //ts.label = "BNP i faste priser";
                 //ts.expression = "SERIES y = c + i + g;";
