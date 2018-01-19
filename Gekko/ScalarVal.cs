@@ -47,16 +47,16 @@ namespace Gekko
         public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
             GekkoTime gt = GekkoTime.tNull;
-            int intValue = O.ConvertToInt(this);  //will issue error if the VAL is not an integer
-            int year = G.findYear(intValue);  //error is the year is crazy
+            int intValue = O.ConvertToInt(this);  //will issue error if the VAL is not an integer            
             if (c == O.GetDateChoices.Strict || (c != O.GetDateChoices.Strict && (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)))
             {
                 if (Program.options.freq == EFreq.Undated)
-                {
-                    gt = new GekkoTime(EFreq.Undated, year, 1); //here, the context matters!
+                {                    
+                    gt = new GekkoTime(EFreq.Undated, intValue, 1); //here, the context matters!
                 }
                 else
                 {
+                    int year = G.findYear(intValue);  //error is the year is crazy
                     gt = new GekkoTime(EFreq.Annual, year, 1);  //for a, q, m
                     //so date d = 2000 in freq=m will not turn this into 2000m1 or 2000m12
                 }
@@ -67,6 +67,7 @@ namespace Gekko
                 //For Annual and Undated, this has been handled above
                 //typically for TIME 2000 2010 or SERIES<2000 2010> which are turned into
                 //for instance 2000m1 to 2000m12.
+                int year = G.findYear(intValue);  //error is the year is crazy
                 if (Program.options.freq == EFreq.Quarterly)
                 {                    
                     int sub = 1;

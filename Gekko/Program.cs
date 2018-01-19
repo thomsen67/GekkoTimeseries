@@ -2203,7 +2203,17 @@ namespace Gekko
                         file = tempPath;
                     }
 
-                    AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(oRead.t1, oRead.t2);
+                    AllFreqsHelper dates = null;
+
+                    if (!oRead.t1.IsNull() && oRead.t1.freq == EFreq.Undated)
+                    {
+                        G.Writeln2("*** ERROR: Sorry, date-truncation not yet implemented for undated frequency.");
+                        throw new GekkoException();
+                    }
+                    else
+                    {
+                        dates = G.ConvertDateFreqsToAllFreqs(oRead.t1, oRead.t2);
+                    }
 
                     //if (wipeDatabankBeforeInsertingData) databank.Clear();  //Reading gbk may point to a whole new databank, this is ok. Wipe will only be for READ, no READ<merge> or READ ... TO ... . IMPORT is never wiped.
 
@@ -23513,7 +23523,7 @@ namespace Gekko
             //variable[0][0] as n, variable[0][0] as p, variable[0][1] as n, variable[0][1] as p.
 
             int labelMaxLine = 1;
-            bool[] freqs = new bool[3];
+            bool[] freqs = new bool[4];
 
             foreach (O.Prt.Element element in o.prtElements) //for each comma in the prt statement
             {
@@ -23665,15 +23675,18 @@ namespace Gekko
                         Series temp1 = explodeElement.variable[1] as Series;
                         if (temp0 != null)
                         {
-                            if (temp0.freq == EFreq.Annual) freqs[0] = true;
-                            else if (temp0.freq == EFreq.Quarterly) freqs[1] = true;
-                            else if (temp0.freq == EFreq.Monthly) freqs[2] = true;
+                            if (temp0.freq == EFreq.Undated) freqs[0] = true;
+                            else if (temp0.freq == EFreq.Annual) freqs[1] = true;
+                            else if (temp0.freq == EFreq.Quarterly) freqs[2] = true;
+                            else if (temp0.freq == EFreq.Monthly) freqs[3] = true;
+                            
                         }
                         else if (temp1 != null)
                         {
-                            if (temp1.freq == EFreq.Annual) freqs[0] = true;
-                            else if (temp1.freq == EFreq.Quarterly) freqs[1] = true;
-                            else if (temp1.freq == EFreq.Monthly) freqs[2] = true;
+                            if (temp1.freq == EFreq.Undated) freqs[0] = true;
+                            else if (temp1.freq == EFreq.Annual) freqs[1] = true;
+                            else if (temp1.freq == EFreq.Quarterly) freqs[2] = true;
+                            else if (temp1.freq == EFreq.Monthly) freqs[3] = true;                            
                         }
 
                         if (explodeElement.variable[0] != null && !G.IsValueType(explodeElement.variable[0]) || explodeElement.variable[1] != null && !G.IsValueType(explodeElement.variable[1]))
@@ -23738,30 +23751,30 @@ namespace Gekko
             }
 
             GekkoSmpl smpl = new GekkoSmpl(o.t1, o.t2);
-            //Globals.globalPeriodTimeFilters2 = new List<GekkoTime> { new GekkoTime(EFreq.Monthly, 2003, 1), new GekkoTime(EFreq.Monthly, 2003, 2) };
-
-            //List inputList = x as List;  //will always be a list
             List inputList = null;
-
-            //List<O.Prt.Element> containerExplode = container;
-
-            AllFreqsHelper allFreqs = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);  //converts between A, Q, M, so all are given. Also used in IMPORT<per1 per2> etc.
-
             List<IVariable> errorList = new List<IVariable>();
 
+            if (freqs[0] && (freqs[1] || freqs[2] || freqs[3]))
+            {
+                G.Writeln2("*** ERROR: You cannot mix undated and other frequencies for PRT/PLOT");
+                throw new GekkoException();
+            }
+
             EFreq sameFreq = EFreq.None;
-            if (freqs[0] && !freqs[1] && !freqs[2]) sameFreq = EFreq.Annual;
-            else if (!freqs[0] && freqs[1] && !freqs[2]) sameFreq = EFreq.Quarterly;
-            else if (!freqs[0] && !freqs[1] && freqs[2]) sameFreq = EFreq.Monthly;
+            if (freqs[0] && !freqs[1] && !freqs[2] && !freqs[3]) sameFreq = EFreq.Undated;
+            else if (!freqs[0] && freqs[1] && !freqs[2] && !freqs[3]) sameFreq = EFreq.Annual;
+            else if (!freqs[0] && !freqs[1] && freqs[2] && !freqs[3]) sameFreq = EFreq.Quarterly;
+            else if (!freqs[0] && !freqs[1] && !freqs[2] && freqs[3]) sameFreq = EFreq.Monthly;
             else sameFreq = EFreq.None;  //superflous, just to state the obvious
 
-            if (!freqs[0] && !freqs[1] && !freqs[2])
+            if (!freqs[0] && !freqs[1] && !freqs[2] && !freqs[3])
             {
                 //for instance printing a scalar
                 sameFreq = Program.options.freq;
-                if (Program.options.freq == EFreq.Annual) freqs[0] = true;
-                else if (Program.options.freq == EFreq.Quarterly) freqs[1] = true;
-                else if (Program.options.freq == EFreq.Monthly) freqs[2] = true;
+                if (Program.options.freq == EFreq.Undated) freqs[0] = true;
+                else if (Program.options.freq == EFreq.Annual) freqs[1] = true;
+                else if (Program.options.freq == EFreq.Quarterly) freqs[2] = true;
+                else if (Program.options.freq == EFreq.Monthly) freqs[3] = true;
             }
 
             Table table = new Table();
@@ -23885,7 +23898,7 @@ namespace Gekko
 
                 //if (iv != null && ts == null) scalarValue = iv.GetVal(GekkoTime.tNull);
 
-                int[] skipCounter = new int[3];
+                int[] skipCounter = new int[4];
 
                 if (type == EPrintTypes.Plot) i++;
                 
@@ -23938,7 +23951,7 @@ namespace Gekko
                         {
                             // --------------------------                                
                             // --------------------------
-                            if (sameFreq == EFreq.Annual && Globals.globalPeriodTimeFilters2.Count > 0 && Globals.globalPeriodTimeFilters2[0].freq == EFreq.Annual && Program.ShouldFilterPeriod(new Gekko.GekkoTime(EFreq.Annual, year, 1)))
+                            if ((sameFreq == EFreq.Undated || sameFreq == EFreq.Annual) && Globals.globalPeriodTimeFilters2.Count > 0 && ((Globals.globalPeriodTimeFilters2[0].freq == EFreq.Undated && Program.ShouldFilterPeriod(new Gekko.GekkoTime(EFreq.Undated, year, 1))) ||  (Globals.globalPeriodTimeFilters2[0].freq == EFreq.Annual && Program.ShouldFilterPeriod(new Gekko.GekkoTime(EFreq.Annual, year, 1)))))
                             {
                                 //kind of hack for annual to omit year if the year is filtered out
                                 i--;
@@ -23951,12 +23964,12 @@ namespace Gekko
 
 
 
-                        if (sameFreq == EFreq.Annual) i--; // #98075235874325
+                        if (sameFreq == EFreq.Undated || sameFreq == EFreq.Annual) i--; // #98075235874325
                     }
 
                     if (true)  // ------------------------------------------------------------- (2)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly)) 
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly)) 
                         {
                             // --------------------------
                             EFreq freqInThisTableRow = EFreq.Monthly;
@@ -23976,7 +23989,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (3)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Monthly;
@@ -23997,7 +24010,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (4)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Monthly;
@@ -24019,7 +24032,7 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (5)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]))
+                        if ((type != EPrintTypes.Plot && freqs[3]))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Monthly;
@@ -24054,7 +24067,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (6)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[1]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Quarterly))
+                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Quarterly))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Quarterly;
@@ -24083,7 +24096,7 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (7)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Monthly;
@@ -24104,7 +24117,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (8)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Monthly;
@@ -24125,7 +24138,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (9)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Monthly;
@@ -24147,7 +24160,7 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (10)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]))
+                        if ((type != EPrintTypes.Plot && freqs[3]))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Monthly;
@@ -24182,7 +24195,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (11)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[1]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Quarterly))
+                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Quarterly))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Quarterly;
@@ -24225,7 +24238,7 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (12)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Monthly;
@@ -24246,7 +24259,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (13)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Monthly;
@@ -24267,7 +24280,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (14)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Monthly;
@@ -24289,7 +24302,7 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (15)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]))
+                        if ((type != EPrintTypes.Plot && freqs[3]))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Monthly;
@@ -24325,7 +24338,7 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (16)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[1]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Quarterly))
+                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Quarterly))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Quarterly;
@@ -24357,7 +24370,7 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (17)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Monthly;
@@ -24378,7 +24391,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (18)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Monthly;
@@ -24399,7 +24412,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (19)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Monthly;
@@ -24421,7 +24434,7 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (20)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]))
+                        if ((type != EPrintTypes.Plot && freqs[3]))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Monthly;
@@ -24458,7 +24471,7 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (21)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]))
+                        if ((type != EPrintTypes.Plot && freqs[3]))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Monthly;
@@ -24493,7 +24506,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (22)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[1]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Quarterly))
+                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Quarterly))
                         {// --------------------------
                             EFreq freqHere = EFreq.Quarterly;
                             int subHere = 4;
@@ -24514,7 +24527,7 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (23)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[1]))
+                        if ((type != EPrintTypes.Plot && freqs[2]))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Quarterly;
@@ -24549,28 +24562,48 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (24)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[0]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Annual))
+
+                        int isUndatedOrAnnual = -12345;
+                        if (type == EPrintTypes.Plot)
+                        {
+                            if (freqColumn == EFreq.Undated) isUndatedOrAnnual = 0;
+                            else if (freqColumn == EFreq.Annual) isUndatedOrAnnual = 1;
+                        }
+                        else
+                        {
+                            if (freqs[0]) isUndatedOrAnnual = 0;
+                            else if (freqs[1]) isUndatedOrAnnual = 1;
+                        }
+
+                        if (isUndatedOrAnnual != -12345)
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Annual;
+
+                            EFreq freqHere = EFreq.Undated;
+                            if (isUndatedOrAnnual == 1) freqHere = EFreq.Annual;
+
+                            //EFreq freqHere = EFreq.Annual;  //will also become "annual" if it is undated
                             int subHere = 1;
                             i++;
                             int sumOver = 1;
                             // --------------------------
                             if (j == 1)
                             {
-                                if (type != EPrintTypes.Plot && sameFreq == EFreq.Annual)
+                                if (type != EPrintTypes.Plot && (sameFreq == EFreq.Undated || sameFreq == EFreq.Annual))
                                 {
                                     // #98075235874325
                                 }
-                                else table.Set(i, j, "a"); if (rows) table.SetAlign(i, j, Align.Right);
+                                else
+                                {
+                                    table.Set(i, j, "a");
+                                    if (rows) table.SetAlign(i, j, Align.Right);
+                                }
                             }
                             else
                             {
-
                                 PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
-                            if (type != EPrintTypes.Plot && sameFreq == EFreq.Annual) i = i - 1; // #98075235874325
+                            if (type != EPrintTypes.Plot && (sameFreq == EFreq.Undated || sameFreq == EFreq.Annual)) i = i - 1; // #98075235874325
                         }
                     }
                 }  //end of years
@@ -25036,9 +25069,10 @@ namespace Gekko
             {
                 if (t.freq == tFilter.freq && t.Equals(tFilter))
                 {
-                    if (t.freq == EFreq.Annual) skipCounter[0]++;
-                    else if (t.freq == EFreq.Quarterly) skipCounter[1]++;
-                    else if (t.freq == EFreq.Monthly) skipCounter[2]++;
+                    if (t.freq == EFreq.Undated) skipCounter[0]++;
+                    else if (t.freq == EFreq.Annual) skipCounter[1]++;
+                    else if (t.freq == EFreq.Quarterly) skipCounter[2]++;
+                    else if (t.freq == EFreq.Monthly) skipCounter[3]++;
                     return;
                 }
             }
@@ -25059,8 +25093,8 @@ namespace Gekko
                 if (type != EPrintTypes.Plot) table.SetNumber(i, j, (double)d, format);
                 else
                 {
-                    double tt = ((ScalarVal)Functions.time(t)).val;
-                    if (freqColumn == EFreq.Annual) tt += 0.5;
+                    double tt = ((ScalarVal)Functions.time(t)).val;                    
+                    if (freqColumn == EFreq.Undated || freqColumn == EFreq.Annual) tt += 0.5;
                     //table.SetNumber(i - 1, 2 * (j - 2) + 1, tt, format);  //j=2 -> 1, j=3 -> 3
                     //table.SetNumber(i - 1, 2 * (j - 2) + 2, (double)d, format);  //j=2 -> 2, j=3 -> 4
                     table.SetNumber(i - 1, (j - 2) + 1, tt, format);                 //j=2 -> 1, j=3 -> 2
@@ -25069,9 +25103,10 @@ namespace Gekko
 
             }
 
-            if (t.freq == EFreq.Annual) skipCounter[0] = 0;
-            else if (t.freq == EFreq.Quarterly) skipCounter[1] = 0;
-            else if (t.freq == EFreq.Monthly) skipCounter[2] = 0;
+            if (t.freq == EFreq.Undated) skipCounter[0] = 0;
+            else if (t.freq == EFreq.Annual) skipCounter[1] = 0;
+            else if (t.freq == EFreq.Quarterly) skipCounter[2] = 0;
+            else if (t.freq == EFreq.Monthly) skipCounter[3] = 0;
 
         }
 
@@ -25088,9 +25123,10 @@ namespace Gekko
             else
             {
                 int filterSkip = 0;
-                if (t.freq == EFreq.Annual) filterSkip = skipCounter[0];
-                else if (t.freq == EFreq.Quarterly) filterSkip = skipCounter[1];
-                else if (t.freq == EFreq.Monthly) filterSkip = skipCounter[2];
+                if (t.freq == EFreq.Undated) filterSkip = skipCounter[0];
+                else if (t.freq == EFreq.Annual) filterSkip = skipCounter[1];
+                else if (t.freq == EFreq.Quarterly) filterSkip = skipCounter[2];
+                else if (t.freq == EFreq.Monthly) filterSkip = skipCounter[3];
 
                 double dWork = 0d;
                 double dRef = 0d;
@@ -27777,9 +27813,10 @@ namespace Gekko
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
 
             EFreq highestFreq = EFreq.Annual;
-            if (freqs[0]) highestFreq = EFreq.Annual;
-            if (freqs[1]) highestFreq = EFreq.Quarterly;
-            if (freqs[2]) highestFreq = EFreq.Monthly;
+            if (freqs[0]) highestFreq = EFreq.Undated;
+            if (freqs[1]) highestFreq = EFreq.Annual;
+            if (freqs[2]) highestFreq = EFreq.Quarterly;
+            if (freqs[3]) highestFreq = EFreq.Monthly;
                         
             string extension = "emf";
             if (o.opt_filename != null)
@@ -28939,7 +28976,7 @@ namespace Gekko
 
         private static double GetXAdjustmentForInsideTics(bool isInside, EFreq highestFreq)
         {
-            if (!isInside && highestFreq == EFreq.Annual) return -0.5;
+            if (!isInside && (highestFreq == EFreq.Annual || highestFreq == EFreq.Undated)) return -0.5;
             else return 0d;
             //if (!isInside) return 0d;
             //int sub = 1;
