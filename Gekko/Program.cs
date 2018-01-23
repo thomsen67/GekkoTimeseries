@@ -2645,6 +2645,8 @@ namespace Gekko
             return v;
         }
 
+        
+
         private static void ReadGbk(AllFreqsHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath)
         {
             //NOTE: time-truncation is only done at the uppermost level: series or array-series. Stuff inside LIST or MAP is not time-truncated.
@@ -3139,7 +3141,7 @@ namespace Gekko
             currentBank.yearEnd = readInfo.endPerResultingBank;
         }
 
-        private static Tuple<GekkoTime, GekkoTime, int> GetFirstLastDates(AllFreqsHelper dates, GekkoTime first, GekkoTime last)
+        public static Tuple<GekkoTime, GekkoTime, int> GetFirstLastDates(AllFreqsHelper dates, GekkoTime first, GekkoTime last)
         {
             //offset is the distance from first to dates.t1. If dates.t1 < first, offset will be 0.
             //So offset tells us when to start taking data in the array of the existing timeseries, as counted from the first date.
@@ -3194,7 +3196,7 @@ namespace Gekko
             return new Tuple<GekkoTime, GekkoTime, int>(firstRv, lastRv, offset);
         }
 
-        private static void ReadAllTsdRecords(AllFreqsHelper dates, string file, bool merge, bool isTsdx, Databank databank, ref int NaNCounter, ReadInfo readInfo)
+        public static void ReadAllTsdRecords(AllFreqsHelper dates, string file, bool merge, bool isTsdx, Databank databank, ref int NaNCounter, ReadInfo readInfo)
         {
             int smallWarnings = 0;
             int emptyWarnings = 0;
@@ -4296,6 +4298,12 @@ namespace Gekko
             string gamsDir = Program.options.gams_exe_folder.Trim();
             if (gamsDir.EndsWith("\\")) gamsDir = gamsDir.Substring(0, gamsDir.Length - "\\".Length);
             if (gamsDir.Trim() == "") gamsDir = null;  //must be so and not an empty string in the GAMSWorkspace call later on            
+
+            EFreq freq = EFreq.Annual;
+            if (G.Equal(Program.options.gams_time_freq, "u")) freq = EFreq.Undated;
+            else if (G.Equal(Program.options.gams_time_freq, "q")) freq = EFreq.Quarterly;
+            else if (G.Equal(Program.options.gams_time_freq, "m")) freq = EFreq.Monthly;
+
             GAMSWorkspace ws = null;
             if (Program.options.gams_fast && gamsDir != null)
             {
@@ -4451,7 +4459,7 @@ namespace Gekko
                                 //  ======================================
                                 //
 
-                                string varNameWithFreq = varName + Globals.freqIndicator + "a";
+                                string varNameWithFreq = varName + Globals.freqIndicator + G.GetFreq(freq);
 
                                 int timeDimNr = GdxGetTimeDimNumber(ref domainSyNrs, ref domainStrings, gdxDimensions, gdx, timeIndex, i);
                                 if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0)
@@ -4473,7 +4481,7 @@ namespace Gekko
                                 {
                                     //Multi-dim timeseries
                                     if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
-                                    ts = new Series(EFreq.Annual, varNameWithFreq);
+                                    ts = new Series(freq, varNameWithFreq);
                                     ts.meta.label = label;
                                     //if (timeDimNr == -12345) ts.type = ESeriesType.Timeless;  //not really relevant, since the timeseries is only a ghost
                                     ts.SetArrayTimeseries(gdxDimensions, hasTimeDimension == 1);
@@ -4485,7 +4493,7 @@ namespace Gekko
                                     //A zero-dim timeseries in the Gekko sense can be timeless (scalar) or non-timeless (normal timeseries)
                                     //in this case, we just construct a normal timeseries
                                     if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
-                                    ts = new Series(EFreq.Annual, varNameWithFreq);
+                                    ts = new Series(freq, varNameWithFreq);
                                     ts.meta.label = label;
                                     if (timeDimNr == -12345) ts.type = ESeriesType.Timeless;
                                     //ts.name = varName + Globals.freqIndicator + "a";
@@ -4577,7 +4585,7 @@ namespace Gekko
                                             IVariable iv = null; ts.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
                                             if (iv == null)
                                             {
-                                                ts2 = new Series(EFreq.Annual, null);  //has no name,  but will it be understood as SeriesLight??                                           
+                                                ts2 = new Series(freq, null);  //has no name,  but will it be understood as SeriesLight??                                           
                                                 if (timeDimNr == -12345) ts2.type = ESeriesType.Timeless;
                                                 ts.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts2);
                                             }
@@ -4605,7 +4613,7 @@ namespace Gekko
                                         //TODO record data in an array, and use setDataSequence().
                                         //TODO
                                         //TODO
-                                        ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), value);
+                                        ts2.SetData(new GekkoTime(freq, tt, 1), value);
                                         yearMax = Math.Max(tt, yearMax);
                                         yearMin = Math.Min(tt, yearMin);
                                     }
@@ -5027,7 +5035,7 @@ namespace Gekko
             return x;
         }
 
-        private static bool IsNonsenseVariableName(string varName)
+        public static bool IsNonsenseVariableName(string varName)
         {
             bool nonsense = false;
             if (varName == "" || varName == "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0")
@@ -9026,7 +9034,7 @@ namespace Gekko
                             fn.isStartNode = false;
                             fn.id = counter[variable];
                             sw2.Add(fn);
-                            //if (G.equal(variable, "pm59"))
+                            //if (G.Equal(variable, "pm59"))
                             //    G.Writeln();
                         }
                         GekkoFlowChart.FlowArrow fa = new GekkoFlowChart.FlowArrow();
@@ -11978,7 +11986,7 @@ namespace Gekko
                 //if (s2.Length == 4)
                 //{
                 //    string sub = s2;
-                //    if (G.equal(sub, "ast2"))
+                //    if (G.Equal(sub, "ast2"))
                 //    {
                 //        //typing "ast2" on the prompt means AST tree is printed out on screen
                 //        //and test parser is used
@@ -19342,7 +19350,7 @@ namespace Gekko
 
             int count = 0;
 
-            string tsdxVersion = "1.2";
+            string tsdxVersion = "1.2"; //Gekko 3.0
 
             //try to zip it to this local folder
             tempTsdxPath = GetTempTsdxFolderPath();
@@ -20381,7 +20389,7 @@ namespace Gekko
         /// <param name="databank">The databank</param>
         /// <param name="varName">The variable name</param>
         /// <returns></returns>
-        private static Series FindOrCreateTimeSeriesInDataBank(Databank databank, string varName, EFreq frequency)
+        public static Series FindOrCreateTimeSeriesInDataBank(Databank databank, string varName, EFreq frequency)
         {
             //This auto-creates timeseries for use when reading for example tsd or PCIM files
             //Has an overload used for UPD statements etc.
