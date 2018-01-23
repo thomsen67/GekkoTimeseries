@@ -27,6 +27,8 @@ namespace Gekko
     [ProtoContract]
     public class Databank : IBank
     {
+        //Databanks: version 1.0 is tsd inside zip, version 1.1 is using protobuffers,
+        //version 1.2 is for Gekko 3.0.
 
         //Note the .isDirty field, so methods that change anything must set isDirty = true!
         //Remember new fields in Clear() method and also in G.CloneDatabank()        

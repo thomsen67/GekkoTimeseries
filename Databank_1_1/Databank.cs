@@ -1341,9 +1341,7 @@ namespace Databank_1_1
         private static void ReadGbkOld_1_1(AllFreqsHelper dates, ReadOpenMulbkHelper oRead, Program.ReadInfo readInfo, ref string file, bool isTsdx, ref bool isProtobuf, ref Databank_1_1 databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
         {
             //handles databank versions 1.0 and 1.1
-
-            bool mergeOrTimeLimit = oRead.Merge || dates != null;
-            
+                                    
             if (isTsdx)
             {
                 readInfo.databankVersion = "";
@@ -1523,7 +1521,7 @@ namespace Databank_1_1
                             continue;
                         }
 
-                        int counter = 0;
+                        
                         GekkoTime first = GekkoTime.tNull;
                         GekkoTime last = GekkoTime.tNull;
 
@@ -1533,88 +1531,16 @@ namespace Databank_1_1
                             last = tsTemp.GetPeriodLast();
                         }
 
-                        if (mergeOrTimeLimit)  //doing tsdx-protobuf merge (or time limits), get data into Work from deserialized temp databank
+                        if (!isGhost)
                         {
-                            if (dates != null)
-                            {
-                                Tuple<GekkoTime, GekkoTime, int> x = Program.GetFirstLastDates(dates, first, last);
-                            }
-
-                            int nob = GekkoTime.Observations(first, last);
-                            if (nob > 0)
-                            {
-                                //ignore if nob < 1. This means that the time limit window is outside the data window 
-                                TimeSeries ts = FindOrCreateTimeSeriesInDataBank(databank, tsTemp.variableName, tsTemp.freqEnum);
-                                int index1;
-                                int index2;
-                                try
-                                {
-                                    double[] data = tsTemp.GetDataSequence(out index1, out index2, first, last, true);
-                                    ts.SetDataSequence(first, last, data, index1);
-                                }
-                                catch (Exception e)
-                                {
-                                    G.Writeln2("*** ERROR: Unexpected technical error while merging databanks");
-                                    throw new GekkoException();
-                                }
-
-                                GekkoTime firstX = ts.GetPeriodFirst();
-                                GekkoTime lastX = ts.GetPeriodLast();
-
-                                if (!isGhost)
-                                {
-                                    maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, lastX.super);
-                                    minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, firstX.super);
-                                }
-                            }
+                            maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, last.super);
+                            minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, first.super);
                         }
-                        else
-                        {
-                            if (!isGhost)
-                            {
-                                maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, last.super);
-                                minYearInProtobufFile = G.GekkoMin(minYearInProtobufFile, first.super);
-                            }
-                        }
+
                     }
                     if (emptyWarnings > 0) G.Writeln("+++ WARNING: " + emptyWarnings + " variables with empty string as name in ." + Globals.extensionDatabank + " file (skipped)");
 
-                    if (!mergeOrTimeLimit)
-                    {
-                        try
-                        {
-                            //discarding the old bank completely, and replacing with the new one
-                            //temp.aliasName = databank.aliasName;
-                            //ReplaceDatabank(this, databank, temp);
-                            //readInfo.databank = temp;  //since this pointer is altered
-                            //databank = temp;  //since this pointer is altered
-                        }
-                        catch (Exception e)
-                        {
-                            G.Writeln2("*** ERROR: Unexpected technical error while reading " + Globals.extensionDatabank + " databank");
-                            throw new GekkoException();
-                        }
-                    }
-
-                    ////See almost identical code below, and in readCsv()
-                    //if (mergeOrTimeLimit)
-                    //{
-                    //    readInfo.startPerInFile = minYearInProtobufFile;
-                    //    readInfo.endPerInFile = maxYearInProtobufFile;
-                    //    readInfo.startPerResultingBank = G.GekkoMin(minYearInProtobufFile, databank.yearStart);
-                    //    readInfo.endPerResultingBank = G.GekkoMax(maxYearInProtobufFile, databank.yearEnd);
-                    //}
-                    //else
-                    //{
-                    //    readInfo.startPerInFile = minYearInProtobufFile;
-                    //    readInfo.endPerInFile = maxYearInProtobufFile;
-                    //    readInfo.startPerResultingBank = readInfo.startPerInFile;
-                    //    readInfo.endPerResultingBank = readInfo.endPerInFile;
-                    //}
-
-                    //Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
-                    //currentBank.yearStart = readInfo.startPerResultingBank;
-                    //currentBank.yearEnd = readInfo.endPerResultingBank;
+                    
 
                 }  //end of using
             }
@@ -1626,20 +1552,7 @@ namespace Databank_1_1
 
                 readInfo.nanCounter = NaNCounter;
 
-                //See almost identical code above and in readCsv()
-                //if (mergeOrTimeLimit)
-                //{
-                //    readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
-                //    readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
-                //}
-                //else
-                //{
-                //    readInfo.startPerResultingBank = readInfo.startPerInFile;
-                //    readInfo.endPerResultingBank = readInfo.endPerInFile;
-                //}
-                //Databank currentBank = Program.databanks.GetDatabank(databank.name);
-                //currentBank.yearStart = readInfo.startPerResultingBank;
-                //currentBank.yearEnd = readInfo.endPerResultingBank;
+                
             }
         }
 
