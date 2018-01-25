@@ -451,7 +451,7 @@ namespace Gekko
         public static Databank undoBank = null;
         public static int hasBeenEndoExoStatementsSinceLastSim = 0;
         
-        public static List<string> tsdxVersions = new List<string> { "1.0", "1.1", "1.2" };
+        public static List<string> tsdxVersions = new List<string> { "1.0", "1.1", "1.2" };  //1.0 = zipped tsd, 1.1 = protobuffers, 1.2 = Gekko 3.0 protobuffers.
 
         public static int removeAllLags = 0;
         public static char parserErrorSeparator = '¤';

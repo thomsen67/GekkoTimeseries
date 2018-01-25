@@ -265,7 +265,7 @@ namespace Gekko
 
             this.freq = frequency;
 
-            this.name = variableName;  //Note: the variableName does contain a '!'. If the name is null, it is a light Series.                       
+            this.name = variableName;  //Note: the variableName does contain a '!'. If the name is null, it is a array sub-series
 
             if (this.name != null)
             {

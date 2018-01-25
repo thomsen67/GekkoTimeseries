@@ -50,37 +50,37 @@ namespace Gekko
 
         public IVariable Negate(GekkoSmpl t)
         {
-            throw new GekkoException();
+            return this;
         }
                 
         public IVariable Add(GekkoSmpl smpl, IVariable input)
         {
-            throw new GekkoException();
+            return this;
         }
 
         public IVariable Subtract(GekkoSmpl smpl, IVariable input)
         {
-            throw new GekkoException();
+            return this;
         }
 
         public IVariable Multiply(GekkoSmpl smpl, IVariable input)
         {
-            throw new GekkoException();
+            return this;
         }
 
         public IVariable Divide(GekkoSmpl smpl, IVariable input)
         {
-            throw new GekkoException();
+            return this;
         }
 
         public IVariable Power(GekkoSmpl smpl, IVariable input)
         {
-            throw new GekkoException();
+            return this;
         }
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] dims)
         {
-            throw new GekkoException();
+            return; //the "this" object stays untouched (that is, GekkoNull)
         }
 
         public IVariable DeepClone()
