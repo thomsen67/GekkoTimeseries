@@ -944,9 +944,21 @@ namespace Gekko.Parser.Gek
                         }
                     case "ASTENDO":
                         {
-                            node.Code.A("O.Endo o" + Num(node) + " = new O.Endo();" + G.NL);
-                            if (node.ChildrenCount() > 0) node.Code.A(node[0].Code);
-                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            if (false)
+                            {
+                                node.Code.A("O.Endo o" + Num(node) + " = new O.Endo();" + G.NL);
+                                if (node.ChildrenCount() > 0) node.Code.A(node[0].Code);
+                                node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            }
+                            else
+                            {
+                               node.Code.A("O.Endo o" + Num(node) + " = new O.Endo();" + G.NL);
+
+                                node.Code.A("o" + Num(node) + ".gts = " + node[0][0].Code + G.NL);
+
+                                node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            }
+
                         }
                         break;
                     case "ASTENDOQUESTION":
@@ -1158,6 +1170,16 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("o").A(Num(node)).A(".t1 = ").A(s1).A(";").A(G.NL);
                                 node.Code.A("o").A(Num(node)).A(".t2 = ").A(s2).A(";").A(G.NL);
                             }
+                        }
+                        break;
+                    case "ASTDATES2":
+                        {                            
+                            string ss1 = node.GetChildCode(0).ToString();
+                            string s1 = "O.ConvertToDate(" + ss1 + ", O.GetDateChoices.FlexibleStart)" + G.NL;
+                            string ss2 = node.GetChildCode(1).ToString();
+                            string s2 = "O.ConvertToDate(" + ss2 + ", O.GetDateChoices.FlexibleEnd)" + G.NL;
+                            string s = "O.HandleDates(" + s1 + "," + s2 + " );";
+                            node.Code.A(s);                            
                         }
                         break;
                     case "ASTDOTINDEXER":
@@ -3587,8 +3609,14 @@ namespace Gekko.Parser.Gek
                     case "ASTOPENHELPER":
                         {
                             string as2 = null;
-                            if (node[1].ChildrenCount() == 1) as2 = node[1][0].Text;                            
-                            node.Code.A("o" + Num(node) + ".openFileNames.Add(new List<string>() {O.ConvertToString(" + node[0].Code + "), `" + as2 + "`});" + G.NL);
+                            if (node[1].ChildrenCount() == 1)
+                            {
+                                node.Code.A("o" + Num(node) + ".openFileNames.Add(new List<string>() {O.ConvertToString(" + node[0].Code + "), O.ConvertToString(" + node[1][0].Code + ")});" + G.NL);
+                            }
+                            else
+                            {
+                                node.Code.A("o" + Num(node) + ".openFileNames.Add(new List<string>() {O.ConvertToString(" + node[0].Code + "), null});" + G.NL);
+                            }
                         }
                         break;
                     case "ASTOPT_":

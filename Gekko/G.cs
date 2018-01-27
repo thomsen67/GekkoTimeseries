@@ -306,7 +306,8 @@ namespace Gekko
         // #09832752
         public static string RemoveFreqFromKey(string s)
         {
-            //OBSOLETE: DELETE SOON many places, keep in DISP etc.
+            //DELETE SOON many places, keep in DISP etc.
+            //Use RemoveFreqFromName() instead
                         
             int i = s.IndexOf(Globals.freqIndicator);
             if (i == 0)
@@ -831,6 +832,15 @@ namespace Gekko
                 else return "'" + s.Replace(Globals.symbolTurtle, "', '") + "'";
             }
         }
+
+        //public static string AddCurrentFreqToSeriesName(string variable)
+        //{
+        //    if (!variable.Contains(Globals.freqIndicator.ToString()))
+        //    {
+        //        variable = variable + Globals.freqIndicator + G.GetFreq(Program.options.freq);
+        //    }
+        //    return variable;
+        //}
         public static int CompareNaturalIgnoreCase(string strA, string strB)
         {
             return CompareNatural(strA, strB, CultureInfo.CurrentCulture, CompareOptions.IgnoreCase);

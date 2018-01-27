@@ -686,16 +686,12 @@ namespace Gekko
                 if (decimals > 0) s = cell.number.ToString("0." + new string('0', decimals), nfi);
                 else if (decimals < 0) s = (Math.Round(cell.number / Math.Pow(10d, -decimals), 0, MidpointRounding.AwayFromZero) * Math.Pow(10d, -decimals)).ToString("0", nfi);
                 else s = cell.number.ToString("0", nfi);
-            }     
-            
-            
-            
-            
-            
-                               
+            }                               
                         
-            if (s.Length > maxLength) s = new string('*', maxLength);
-            if (s.Length < maxLength) s = new string(' ', maxLength - s.Length) + s;
+            if (s.Length > maxLength)
+                s = new string('*', maxLength);
+            if (s.Length < maxLength)
+                s = new string(' ', maxLength - s.Length) + s;
 
             if (G.IsMissingVariableArtificialNumber(cell.number))
             {

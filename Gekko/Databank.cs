@@ -168,6 +168,17 @@ namespace Gekko
             IVariable iv = null;
             this.storage.TryGetValue(variable, out iv);
             return iv;
+        }
+
+        public IVariable GetIVariableWithAddedFreq(string variable)
+        {
+            if (!G.StartsWithSigil(variable))
+            {
+                variable = G.AddCurrentFreqToName(variable);
+            }
+            IVariable iv = null;
+            this.storage.TryGetValue(variable, out iv);
+            return iv;
         }        
 
         public void AddIVariableWithOverwrite(string name, IVariable x)

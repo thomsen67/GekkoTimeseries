@@ -509,6 +509,14 @@ namespace Gekko
             return rv;
         }
 
+        public static GekkoTimes HandleDates(GekkoTime t1, GekkoTime t2)
+        {
+            GekkoTimes gts = new GekkoTimes();
+            gts.t1 = t1;
+            gts.t2 = t2;
+            return gts;
+        }
+
         public static void HandleIndexer(IVariable y, params IVariable[] x)
         {
             HandleIndexerHelper(0, y, x);
@@ -777,8 +785,11 @@ namespace Gekko
             {
                 //Series has '!' added
                 //In VAL v = 100, there will be no freq added.
-                if (freq != null) varnameWithFreq = varname + Globals.freqIndicator + freq;
-                else varnameWithFreq = varname + Globals.freqIndicator + G.GetFreq(Program.options.freq);
+                if (!varname.Contains(Globals.freqIndicator.ToString()))
+                {
+                    if (freq != null) varnameWithFreq = varname + Globals.freqIndicator + freq;
+                    else varnameWithFreq = varname + Globals.freqIndicator + G.GetFreq(Program.options.freq);
+                }
             }
 
             return varnameWithFreq;
@@ -5880,7 +5891,8 @@ namespace Gekko
 
         public class Endo
         {
-            public List<string> listItems = null;
+            public List<string> listItems = null;            
+            public GekkoTimes gts = null;
             public bool question = false;
             public void Exe()
             {
@@ -5892,6 +5904,8 @@ namespace Gekko
         public class Exo
         {
             public List<string> listItems = null;
+            public GekkoTime t1 = GekkoTime.tNull;
+            public GekkoTime t2 = GekkoTime.tNull;
             public bool question = false;
             public void Exe()
             {
