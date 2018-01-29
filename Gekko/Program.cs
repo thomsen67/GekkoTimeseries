@@ -8867,6 +8867,7 @@ namespace Gekko
             // Html
             // -------------------------------------------
 
+            List<string> vars2 = new List<string>();
 
             foreach (string var in vars)
             {
@@ -8884,6 +8885,10 @@ namespace Gekko
                         WriteHtmlColor(sb, line);
                     }
                 }
+
+                string explanation = null;
+                if (varExpl != null) explanation = varExpl[0];
+                vars2.Add(var + "¤" + explanation);
 
                 StringBuilder sb4 = new StringBuilder();
 
@@ -9189,20 +9194,31 @@ namespace Gekko
 
             // ----------------- find -------------------------------------
 
+            vars2.Sort(StringComparer.OrdinalIgnoreCase);
+
             StringBuilder x3 = new StringBuilder();
             x3.AppendLine("<html>");
             x3.AppendLine("<script LANGUAGE = `JavaScript` SRC = `variable.js` ></script>");
             x3.AppendLine("<script LANGUAGE = `JavaScript` > <!-- ");
 
+            string s1 = null;
+            string s2 = null;
+            foreach (string s in vars2)
+            {
+                string[] ss = s.Split('¤');
+                s1 += "`" + ss[0] + "`" + ", ";
+                s2 += "`" + ss[1] + "`" + ", ";
+            }
+
             string js = @"            
 
             function varnavns() {
-                var varnavn = [`phk`, `fy`];
+                var varnavn = [" + s1 + @"];
                 return varnavn;
             }
 
             function beskrivs() {
-                var beskriv = [`kontantpris`, `bnp`];
+                var beskriv = ["+ s2 + @"];
                 return beskriv;
             }
 
