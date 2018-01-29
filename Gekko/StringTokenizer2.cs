@@ -58,6 +58,7 @@ namespace Gekko
 
 		public StringTokenizer2(string data, bool specialLoopSignsAcceptedAsWords, bool treatQuotesAsUnknown)
 		{
+            //Beware that the tokenizer treats both "..." and '...' as quoted strings.
             this.specialLoopSignsAcceptedAsWords = specialLoopSignsAcceptedAsWords;
             this.treatQuotesAsUnknown = treatQuotesAsUnknown;
             if (data == null)
@@ -197,7 +198,22 @@ namespace Gekko
                     }
 				}
 
-				default:
+                case '\'':
+                    {
+
+                        if (treatQuotesAsUnknown)
+                        {
+                            StartRead();
+                            Consume();
+                            return CreateToken(TokenKind.Unknown);
+                        }
+                        else
+                        {
+                            return ReadStringSingleQuotes();
+                        }
+                    }
+
+                default:
 				{
                     if (ch == '.')
                     {
@@ -380,10 +396,58 @@ namespace Gekko
 			return CreateToken(TokenKind.QuotedString);
 		}
 
-		/// <summary>
-		/// checks whether c is a symbol character.
+        /// <summary>
+		/// reads all characters until next " is found.
+		/// If "" (2 quotes) are found, then they are consumed as
+		/// part of the string
 		/// </summary>
-		protected bool IsSymbol(char c)
+		/// <returns></returns>
+		protected Token ReadStringSingleQuotes()
+        {
+            StartRead();
+
+            Consume(); // read "
+
+            while (true)
+            {
+                char ch = LA(0);
+                if (ch == EOF)
+                    break;
+                else if (ch == '\r')    // handle CR in strings
+                {
+                    Consume();
+                    if (LA(0) == '\n')  // for DOS & windows
+                        Consume();
+
+                    line++;
+                    column = 1;
+                }
+                else if (ch == '\n')    // new line in quoted string
+                {
+                    Consume();
+
+                    line++;
+                    column = 1;
+                }
+                else if (ch == '\'')
+                {
+                    Consume();
+                    if (LA(0) != '\'')
+                        break;  // done reading, and this quotes does not have escape character
+                    else
+                        Consume(); // consume second ", because first was just an escape
+                }
+                else
+                    Consume();
+            }
+
+            return CreateToken(TokenKind.QuotedString);
+        }
+
+        /// <summary>
+        /// checks whether c is a symbol character.
+        /// </summary>
+        protected bool IsSymbol(char c)
 		{
 			for (int i=0; i<symbolChars.Length; i++)
 				if (symbolChars[i] == c)

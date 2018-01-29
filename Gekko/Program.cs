@@ -8540,6 +8540,11 @@ namespace Gekko
 
         public static List<TokenHelper> GetTokensWithLeftBlanks(string s)
         {
+            return GetTokensWithLeftBlanks(s, 0, false);
+        }
+
+        public static List<TokenHelper> GetTokensWithLeftBlanks(string s, int fat, bool removeComments)
+        {
             StringTokenizer2 tok = new StringTokenizer2(s, false, false);
             tok.IgnoreWhiteSpace = false;
             tok.SymbolChars = new char[] { '!', '#', '%', '&', '/', '(', ')', '=', '?', '@', '$', '{', '[', ']', '}', '+', '|', '^', '¨', '~', '*', '<', '>', '\\', ';', ',', ':', '.', '-' };
@@ -8565,7 +8570,76 @@ namespace Gekko
                 }
 
             } while (token.Kind != TokenKind.EOF);
-            for (int i = 0; i < 20; i++) a.Add(new TokenHelper());
+
+            if(removeComments)
+            {
+                int n = a.Count - fat;
+
+                for (int i = 0; i < n; i++)
+                {
+                    if (a[i].s == "/" && a[i + 1].s == "*" && a[i + 1].leftblanks == null)
+                    {
+                        a[i].s = "";
+                        a[i + 1].s = "";
+
+                        bool match = false;
+                        for (int ii = i + 1; ii < n; ii++)
+                        {
+
+                            if (a[ii].s == "/" && a[ii + 1].s == "*" && a[ii + 1].leftblanks == null)
+                            {
+                                G.Writeln2("*** ERROR: Nested '/* ... '*/' are not supported.");
+                                throw new GekkoException();
+                            }
+
+                            if (a[ii].s == "*" && a[ii + 1].s == "/" && a[ii + 1].leftblanks == null)
+                            {
+                                a[ii].s = "";
+                                a[ii + 1].s = "";
+                                match = true;
+                                i = ii + 1;
+                                break;
+                            }
+                            a[ii].s = "";
+                            a[ii].type = "Word";
+                            a[ii].leftblanks = null;
+
+                        }
+                        if (match == false)
+                        {
+                            G.Writeln2("*** ERROR: There is a '/* at line " + (i + 1) + " with no matching '*/'");
+                            throw new GekkoException();
+                        }
+                    }
+                    else if (a[i].s == "/" && a[i + 1].s == "/" && a[i + 1].leftblanks == null)
+                    {
+                        if (i > 0 && a[i - 1].s == ":" && a[i].leftblanks == null)
+                        {
+                            //skip '://'(web address)
+                        }
+                        else
+                        {
+                            //finding a '//'
+                            a[i].s = "";
+                            a[i + 1].s = "";
+                            for (int ii = i + 2; ii < n; ii++)
+                            {
+                                if (a[ii].type == "EOL")
+                                {
+                                    i = ii;
+                                    break;
+                                }
+                                a[ii].s = "";
+                                a[ii].type = "Word";
+                                a[ii].leftblanks = "";
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            for (int i = 0; i < fat; i++) a.Add(new TokenHelper());
             return a;
         }
 
@@ -8582,23 +8656,217 @@ namespace Gekko
         public static void Browser()
         {
             G.Writeln2("Starting html browser generation");
-            
+
+
+
+
             string cssName = "styles.css";
             int gap = 20;
             string subdir = "browser";
             GekkoTime tLine = new GekkoTime(EFreq.Annual, 2016, 1);
 
+            var matches1 = Directory.GetFiles(Program.options.folder_working + "\\" + subdir + "\\", "*.css");
+            var matches2 = Directory.GetFiles(Program.options.folder_working + "\\" + subdir + "\\", "index.html");
+            var matches3 = Directory.GetFiles(Program.options.folder_working + "\\" + subdir + "\\", "find.html");
+
+            DialogResult result = MessageBox.Show("All files except .css files in folder '" + Program.options.folder_working + "\\" + subdir + "' will be deleted", "Gekko helper", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);
+            if (result == DialogResult.Yes)
+            {
+                //ok
+            }
+            else
+            {
+                return;
+            }
+
+            foreach (string file in Directory.GetFiles(Program.options.folder_working + "\\" + subdir + "\\").Except(matches1).Except(matches2).Except(matches3))
+            {
+                File.Delete(file);
+            }
+
             GekkoTime tStart = Globals.globalPeriodStart;
             GekkoTime tStartPlot = Globals.globalPeriodStart.Add(-10);
             GekkoTime tEnd = Globals.globalPeriodEnd;
 
+
             string bank1 = Path.GetFileName(Program.databanks.GetFirst().FileNameWithPath);
             string bank2 = Path.GetFileName(Program.databanks.GetRef().FileNameWithPath);
 
-            List<string> vars = new List<string> { "fy", "tg" };
-
             MetaList ml = Program.scalars["#all"] as MetaList;
-            vars = ml.list;
+            List<string> vars = ml.list;
+            vars = new List<string> { "fy", "tg", "peesq" };
+
+            // -------------------------------------------
+            // Data generation
+            // -------------------------------------------
+
+            GekkoDictionary<string, List<string>> datagen = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+
+            string genr = Program.GetTextFromFileWithWait(Program.options.folder_working + "\\" + "genr.gcm");
+
+            int fat = 3;
+
+            List<TokenHelper> a = Program.GetTokensWithLeftBlanks(genr, fat, true);
+
+            List<List<TokenHelper>> statements = new List<List<TokenHelper>>();
+
+            int n = a.Count - fat;
+            int start = 0;
+            for (int i = 0; i < n; i++)
+            {
+                for (int ii = i; ii < n; ii++)
+                {
+                    if (a[ii].s == ";")
+                    {
+                        int i1 = i; //start token, may be EOL
+                        for (int iii = i; iii <= ii; iii++)
+                        {
+                            if (a[iii].type != "EOL")
+                            {
+                                i1 = iii;
+                                break;
+                            }
+                        }
+
+                        int i2 = ii;  //end token, will be ';'
+
+                        List<TokenHelper> th = new List<TokenHelper>();
+                        for (int i3 = i1; i3 <= i2; i3++)
+                        {
+                            if (a[i3].s == null || a[i3].s == "") continue;
+                            th.Add(a[i3]);
+                        }
+                        th.Add(new TokenHelper());
+                        th.Add(new TokenHelper());
+                        th.Add(new TokenHelper());
+                        statements.Add(th);
+
+                        i = ii;
+                        break;
+                    }
+                }
+            }
+
+            for (int j = 0; j < statements.Count; j++)
+            {
+                List<TokenHelper> th = statements[j];
+                if (G.equal(th[0].s, "ser") || G.equal(th[0].s, "series"))
+                {
+                    //Skip <...>
+
+                    int startI = 1;
+                    if (th[1].s == "<")
+                    {
+                        for (int i = 1; i < th.Count; i++)
+                        {
+                            if (th[i].s == ">")
+                            {
+                                startI = i + 1;
+                                break;
+                            }
+                        }
+                    }
+
+
+                    if (th[startI].type == "Word" && th[startI + 1].s == "=")
+                    {
+                        //simple name
+                        string name = th[startI].s;
+                        string s3 = GetTextFromLeftBlanksTokens(th, 0, th.Count - 1).Trim();
+                        BrowserAddItem(datagen, name, s3);
+                    }
+                    else
+                    {
+                        int iEq = -12345;
+                        //may be a composed name like x%i, x{%i}, x{i} or x[2000]
+                        for (int i = startI; i < th.Count; i++)
+                        {
+                            if (th[i].s == "=")
+                            {
+                                iEq = i;
+                                break;
+                            }
+                        }
+                        if (iEq != -12345)
+                        {
+                            //finding scalar vars in lhs name
+
+                            GekkoDictionary<string, List<string>> scalars = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+                            for (int i = startI; i < iEq; i++)
+                            {
+                                string mem = null;
+                                if (BrowserIsScalar(th, i))
+                                {
+                                    //a%i or a{%i} or a{i}
+                                    scalars.Add(th[i + 1].s, null);
+                                }
+                            }
+
+                            //finding lists corresponding to scalar names
+
+                            for (int jj = j - 1; jj >= 0; jj--)
+                            {
+                                List<TokenHelper> th2 = statements[jj];
+                                if (G.equal(th2[0].s, "for") && th2[1].type == "Word" && th2[2].s == "=" && scalars.ContainsKey(th2[1].s))
+                                {
+                                    List<string> rhsVars = new List<string>();
+                                    for (int i2 = 3; i2 < th2.Count; i2++)
+                                    {
+                                        if ((th2[i2].type == "Word" || th2[i2].type == "QuotedString") && (th2[i2 + 1].s == "," || th2[i2 + 1].s == ";"))
+                                        {
+                                            rhsVars.Add(StripQuotes(th2[i2].s));
+                                        }
+                                    }
+                                    scalars[th2[1].s] = rhsVars;
+                                }
+                            }
+
+                            List<KeyValuePair<string, List<string>>> xx = new List<KeyValuePair<string, List<string>>>();
+                            foreach (KeyValuePair<string, List<string>> xxx in scalars) xx.Add(xxx);
+
+                            if (scalars.Count == 0)
+                            {
+                                //probably nothing to add, complicated name but no scalars found
+                            }
+                            else if (scalars.Count == 1)
+                            {
+                                foreach (string xxxx in xx[0].Value)
+                                {
+                                    for (int i = startI; i < iEq; i++)
+                                    {
+                                        string mem = null;
+                                        if (BrowserIsScalar(th, i))
+                                        {
+                                            if (G.equal(th[i + 1].s, xx[0].Key))
+                                            {
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                G.Writeln2("*** ERROR: Nested FOR not supported yet");
+                                throw new GekkoException();
+                            }
+                        }
+                    }
+                }
+            }
+
+            //string s2 = GetTextFromLeftBlanksTokens(a, 0, n - 1);
+
+            //using (FileStream fs = WaitForFileStream(Program.options.folder_working + "\\" + "x12345.gcm", GekkoFileReadOrWrite.Write))
+            //using (StreamWriter res = G.GekkoStreamWriter(fs))
+            //{
+            //    res.Write(s2);
+            //}
+
+            // -------------------------------------------
+            // Html
+            // -------------------------------------------
+
 
             foreach (string var in vars)
             {
@@ -8618,7 +8886,7 @@ namespace Gekko
                 }
 
                 StringBuilder sb4 = new StringBuilder();
-                               
+
                 if (true)
                 {
                     EEndoOrExo type1 = VariableTypeEndoExo(var);
@@ -8680,7 +8948,7 @@ namespace Gekko
                     }
                     WriteHtml(sb, sb4.ToString());
 
-                }                
+                }
 
                 //ts.label = "BNP i faste priser";
                 //ts.expression = "SERIES y = c + i + g;";
@@ -8695,6 +8963,16 @@ namespace Gekko
                     if (src2 != "")
                     {
                         WriteHtml(sb, "Series source: " + src2);
+                    }
+                }
+
+                List<string> datagen2 = null; datagen.TryGetValue(var, out datagen2);
+                if (datagen2 != null)
+                {
+                    WriteHtml(sb, "Data generation:");
+                    foreach (string s in datagen2)
+                    {
+                        WriteHtml(sb, s);
                     }
                 }
 
@@ -8734,17 +9012,17 @@ namespace Gekko
 
 
                             sb5.Append(HtmlLink(s));
-                               
-                                    
-                                    if (i < list.Count - 1) sb5.Append(", ");
-                                                            
-                            
+
+
+                            if (i < list.Count - 1) sb5.Append(", ");
+
+
                         }
-                        sb5.AppendLine();                       
+                        sb5.AppendLine();
 
                     }
                     WriteHtml(sb, sb5.ToString());
-                    
+
                     if (found != null)
                     {
                         StringBuilder sb2 = new StringBuilder();
@@ -8765,7 +9043,7 @@ namespace Gekko
 
                     o0.t1 = tStartPlot;
                     o0.t2 = tEnd;
-                    
+
                     o0.prtType = "plot";
                     o0.opt_filename = Program.options.folder_working + "\\" + subdir + "\\" + var.ToLower() + ".svg";
 
@@ -8794,7 +9072,7 @@ namespace Gekko
                             o0.prtElements.Add(ope0);
                         }
 
-                        
+
                         {
                             O.Prt.Element ope0 = new O.Prt.Element();
                             ope0.label = bank1.ToLower().Replace(".gbk", "") + ":" + var;
@@ -8821,8 +9099,8 @@ namespace Gekko
 
                 if (true)
                 {
-                    
-                    
+
+
                     StringBuilder sb3 = new StringBuilder();
                     sb3.AppendLine(bank1 + G.Blanks(30 - bank1.Length + gap) + bank2);
                     sb3.AppendLine();
@@ -8832,7 +9110,7 @@ namespace Gekko
                     {
                         counter++;
                         if (hasFilter)  //some periods are set via TIMEFILTER
-                        {                            
+                        {
                             if (ShouldFilterPeriod(gt)) continue;
                         }
 
@@ -8845,7 +9123,7 @@ namespace Gekko
                                 //ignore it
                             }
                             else
-                            {                                
+                            {
                                 BrowserWritePrintLine(ts, sb3, gt);
                                 if (counter2 == 0) sb3.Append(G.Blanks(gap + 1));
                             }
@@ -8856,9 +9134,9 @@ namespace Gekko
 
                     WriteHtmlPreCode(sb, sb3.ToString());
 
-                }                
+                }
 
-                StringBuilder x = new StringBuilder();                
+                StringBuilder x = new StringBuilder();
                 x.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
                 x.AppendLine("<html>");
                 x.AppendLine("  <head>");
@@ -8908,8 +9186,179 @@ namespace Gekko
                 sw.Write(x2.Replace('`', '\"'));
             }
 
+
+            // ----------------- find -------------------------------------
+
+            StringBuilder x3 = new StringBuilder();
+            x3.AppendLine("<html>");
+            x3.AppendLine("<script LANGUAGE = `JavaScript` SRC = `variable.js` ></script>");
+            x3.AppendLine("<script LANGUAGE = `JavaScript` > <!-- ");
+
+            string js = @"            
+
+            function varnavns() {
+                var varnavn = [`phk`, `fy`];
+                return varnavn;
+            }
+
+            function beskrivs() {
+                var beskriv = [`kontantpris`, `bnp`];
+                return beskriv;
+            }
+
+            function findvarnavn(){
+                var varnavn = varnavns();
+                var beskriv = beskrivs();
+                antal = varnavn.length;
+                tekst = new String;
+                tekst1 = new String;
+                tekst = document.form1.tekst.value.toUpperCase();
+                fundet = false;
+
+                document.writeln(`<h2>Søgeresultat efter variablen: <b>` + tekst + `</b></h2><br><br>`);
+
+                for (var i = 0; i < antal; i++)
+                {
+                    tekst1 = varnavn[i].toUpperCase();
+                    if (tekst1 == tekst)
+                    {
+                        fundet = true;
+                        document.writeln(`<b><a href=` + varnavn[i] + `.htm>` + varnavn[i] + `</a></b>`);
+                        document.writeln(`<br>` + beskriv[i] + `<br><hr><br>`);
+                    } //endif
+                } //endfor
+
+                for (var i = 0; i < antal; i++)
+                {
+                    tekst1 = varnavn[i].toUpperCase();
+                    if (tekst1.indexOf(tekst) != -1)
+                    {
+                        if (tekst1 != tekst)
+                        {
+                            fundet = true;
+                            document.writeln(`<a href=` + varnavn[i] + `.htm>` + varnavn[i] + `</a>`);
+                            document.writeln(`<br>` + beskriv[i] + `<br><br>`);
+                        } //endif
+                    } //endif
+                } //endfor
+
+                if (fundet == false)
+                {
+                    document.writeln(`... gav intet positivt resultat.<br>`);
+                } //endif
+                document.writeln(`<br><br><a href=find.html>Søg igen</a> eller <a href=index.html>Gå til hovedside</a>`);
+                tekst1.free;
+                tekst.free;
+            }  //endfunction
+
+            function check(event) {
+            var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
+        if (charCode == 13) findvarnavn();
+        }  // endfunction
+
+        function findbeskriv()
+        {
+            var varnavn = varnavns();
+            var beskriv = beskrivs();
+            antal = varnavn.length;
+            tekst = new String;
+            tekst2 = new String;
+            tekst = document.form2.tekst.value.toUpperCase();
+
+            document.writeln(`<h2>Søgeresultat</h2>Søgningen efter teksten: <b>` + tekst + `</b> i variabelliste<br><br>`);
+            fundet = false;
+            for (var i = 0; i < antal; i++)
+            {
+                tekst2 = beskriv[i].toUpperCase();
+                if (tekst2.indexOf(tekst) != -1)
+                {
+                    fundet = true;
+                    document.writeln(`<b><a href=` + varnavn[i] + `.htm>` + varnavn[i] + `</a></b>`);
+                    document.writeln(`<br>` + beskriv[i] + `<br><br>`);
+                } //endif
+            } //endfor
+            if (fundet == false)
+            {
+                document.writeln(`... gav intet positivt resultat.<br>`);
+            } //endif
+            document.writeln(`<br><br><a href=find.html>Søg igen</a> eller <a href=index.html>Gå til hovedside</a>`);
+            tekst.free;
+            tekst2.free;
+        }  //endfunction
+
+        function check2(event) {
+            var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
+        if (charCode == 13) findbeskriv();
+        }  // endfunction
+
+        ";
+
+            x3.AppendLine(js);
+            x3.AppendLine("// -->");
+            x3.AppendLine("</script>");
+            x3.AppendLine("<body onload = `document.form1.tekst.focus()`>");
+            x3.AppendLine("<table width=`100 % `><tr><td>");
+            x3.AppendLine("<P><center><h2>Indtast søgeord</h2></center></p>");
+            x3.AppendLine("<p><center>Angiv mnemoteknisk variabelnavn eller foretag fritekstsøgning i variabelbeskrivelserne</center></p>");
+            x3.AppendLine("<p>&nbsp;</p>");
+            x3.AppendLine("<center>");
+            x3.AppendLine("<h4>Søgning efter variabelnavn(mnemoteknisk betegnelse):</h4>");
+            x3.AppendLine("<FORM NAME = `form1` >");
+            x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check(event)`>");
+            x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg efter variabelnavn` onClick=`findvarnavn()`>");
+            x3.AppendLine("</FORM>");
+            x3.AppendLine("<p>&nbsp;</p>");
+            x3.AppendLine("<h4>Fritekstsøgning i variabelbeskrivelserne:</h4>");
+            x3.AppendLine("<FORM NAME = `form2`>");
+            x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check2(event)`>");
+            x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg frit i variabelbeskrivelserne` onClick=`findbeskriv()`>");
+            x3.AppendLine("</FORM></center>");
+            x3.AppendLine("</td></tr></table>");
+            x3.AppendLine("</body>");
+            x3.AppendLine("</html>");
+
+            string pathAndFilename3 = Program.options.folder_working + "\\" + subdir + "\\" + "find" + ".html";
+            using (FileStream fs = Program.WaitForFileStream(pathAndFilename3, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                sw.Write(x3.Replace('`', '\"'));
+            }
+
             G.Writeln2("End of html browser generation");
 
+        }
+
+        private static void BrowserAddItem(GekkoDictionary<string, List<string>> datagen, string name, string s3)
+        {
+            if (datagen.ContainsKey(name))
+            {
+                datagen[name].Add(s3);
+            }
+            else
+            {
+                datagen.Add(name, new List<string>() { s3 });
+            }
+        }
+
+        private static bool BrowserIsScalar(List<TokenHelper> th, int i)
+        {
+            //if token i+1 is a scalar name
+            if ((th[i].s == Globals.symbolMemvar.ToString() && th[i + 1].type == "Word" && th[i + 1].leftblanks == null) || (th[i].s == "{" && th[i + 1].type == "Word" && th[i + 2].s == "}"))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private static string GetTextFromLeftBlanksTokens(List<TokenHelper> a, int a1, int a2)
+        {
+            string s2 = null;
+            for (int i = a1; i <= a2; i++)
+            {
+                s2 += a[i].leftblanks + a[i].s;
+            }
+
+            return s2;
         }
 
         private static void BrowserWritePrintLine(TimeSeries ts, StringBuilder sb3, GekkoTime gt)
@@ -8950,8 +9399,8 @@ namespace Gekko
             }
             try
             {
-                List<TokenHelper> a = GetTokensWithLeftBlanks(found.equationText);
-
+                List<TokenHelper> a = GetTokensWithLeftBlanks(found.equationText, 20, false);
+                
                 int counter = -1;
                 for (int i = 0; i < a.Count; i++)
                 {
