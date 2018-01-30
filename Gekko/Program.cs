@@ -8650,15 +8650,12 @@ namespace Gekko
 
         public static void WriteHtmlColor(StringBuilder sb, string s)
         {
-            sb.AppendLine("<p><font color=\"green\">" + s + "</font></p>");
+            sb.AppendLine("<p><font color=\"#009933\">" + s + "</font></p>");
         }
 
         public static void Browser()
         {
             G.Writeln2("Starting html browser generation");
-
-
-
 
             string cssName = "styles.css";
             int gap = 20;
@@ -8694,12 +8691,623 @@ namespace Gekko
 
             MetaList ml = Program.scalars["#all"] as MetaList;
             List<string> vars = ml.list;
-            vars = new List<string> { "fy", "tg", "peesq" };
+            //vars = new List<string> { "fy", "tg", "peesq", "feei" };
 
             // -------------------------------------------
             // Data generation
             // -------------------------------------------
 
+            GekkoDictionary<string, List<string>> datagen = BrowserDataGenerationExtract();
+
+            // -------------------------------------------
+            // Html
+            // -------------------------------------------
+
+            List<string> vars2 = new List<string>();
+
+            GekkoDictionary<string, List<string>> est2 = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+            string est = Program.GetTextFromFileWithWait(Program.options.folder_working + "\\" + "est.lst");
+            List<string> lines = G.ExtractLinesFromText(est);
+            int listI = -12345;
+            for (int i = 0; i < lines.Count; i++)
+            {
+                if (lines[i].Trim().StartsWith("OLS estimation"))
+                {
+                    if (listI != -12345)
+                    {
+                        
+                        List<TokenHelper> a = Program.GetTokensWithLeftBlanks(lines[listI + 1].Trim(), 5, true);
+                        string varLine = null;
+                        for (int i2 = 0; i2 < a.Count; i2++)
+                        {
+                            if (a[i2].type == "Word")
+                            {
+                                if (i2 - 1 >= 0 && a[i2].leftblanks == null && (a[i2 - 1].s == Globals.symbolList.ToString() || a[i2 - 1].s == Globals.symbolMemvar.ToString()))
+                                {
+                                    //skip a #x or %x                                 }
+                                    continue;
+                                }
+                                if (a[i2 + 1].s == "(")
+                                {
+                                    //function call, skip it
+                                    continue;
+                                }
+                                varLine = a[i2].s;
+                                break;
+                            }                            
+                        }
+                                                
+                        List<string> xx = new List<string>();
+                        for (int ii = listI; ii < i; ii++)
+                        {
+                            xx.Add(lines[ii]);
+                        }
+                        if (est2.ContainsKey(varLine))
+                        {
+                            List<string> lines2 = est2[varLine];
+                            lines2.Add("");
+                            lines2.AddRange(xx);
+                        }
+                        else
+                        {
+                            est2.Add(varLine, xx);
+                        }
+                    }
+                    listI = i;
+                }
+            }
+
+            foreach (string var in vars)
+            {
+                StringBuilder sb = new StringBuilder();
+                TimeSeries ts1 = Program.databanks.GetFirst().GetVariable(var);
+                TimeSeries ts2 = Program.databanks.GetRef().GetVariable(var);
+
+                sb.AppendLine("<table cellpadding = `0` cellspacing = `0` width = `800px` border = `0`>");
+                sb.AppendLine("<tr>");
+                sb.AppendLine("<td width = `80%`><big><b> " + var + "</b></big></td>");
+                sb.AppendLine("<td width = `10%`><small><a href=`find.html`>Søg</a></small></td>");
+                sb.AppendLine("<td width = `10%`><small><a href=`index.html`>Hjem</a></small></td>");
+                sb.AppendLine("</tr>");
+                sb.AppendLine("</table>");
+
+                List<string> varExpl = Program.GetVariableExplanation(var);
+                foreach (string line in varExpl)
+                {
+                    if (line != "")
+                    {
+                        WriteHtmlColor(sb, line);
+                    }
+                }
+
+                string explanation = null;
+                if (varExpl != null && varExpl.Count > 0) explanation = varExpl[0];
+                vars2.Add(var + "¤" + explanation);
+
+                StringBuilder sb4 = new StringBuilder();
+
+                if (true)
+                {
+                    EEndoOrExo type1 = VariableTypeEndoExo(var);
+                    string type = "";
+                    if (type1 == EEndoOrExo.Exo) type = "Exogenous, ";
+                    else if (type1 == EEndoOrExo.Endo) type = "Endogenous, ";
+
+                    string freq = "[unknown frequency]";
+                    if (ts1.frequency == "a")
+                    {
+                        freq = "Annual";
+                    }
+                    else if (ts1.frequency == "q")
+                    {
+                        freq = "Quarterly";
+                    }
+                    else if (ts1.frequency == "m")
+                    {
+                        freq = "Monthly";
+                    }
+                    else if (ts1.frequency == "u")
+                    {
+                        freq = "Undated";
+                    }
+
+                    bool noData = ts1.IsNullPeriod(); //We are opening up to this possibility of 'empty' data                    
+
+                    //GekkoTime first = ts.GetPeriodFirst();
+                    //GekkoTime last = ts.GetPeriodLast();
+
+                    GekkoTime first = ts1.GetRealDataPeriodFirst();
+                    GekkoTime last = ts1.GetRealDataPeriodLast();
+
+                    sb4.Append(type);
+                    string stamp = null;
+                    if (ts1.stamp != null && ts1.stamp != "") stamp = " (updated: " + ts1.stamp + ")";
+                    if (ts1.frequency == "a" || ts1.frequency == "u")
+                    {
+                        if (noData || first.super == -12345 || last.super == -12345)
+                        {
+                            sb4.Append(freq + ", no data period");
+                        }
+                        else
+                        {
+                            //we don't want 1995a1 to 2005a1, instead 1995 to 2005
+                            sb4.Append(freq + " data from " + first.super + " to " + last.super + stamp);
+                        }
+                    }
+                    else
+                    {
+                        if (noData || first.super == -12345 || last.super == -12345)
+                        {
+                            sb4.Append(freq + ", no data period");
+                        }
+                        else
+                        {
+                            sb4.Append(freq + " data from " + first.super + ts1.frequency + first.sub + " to " + last.super + ts1.frequency + last.sub + stamp);
+                        }
+                    }
+                    WriteHtml(sb, sb4.ToString());
+
+                }
+
+                //ts.label = "BNP i faste priser";
+                //ts.expression = "SERIES y = c + i + g;";
+                //ts.stamp = "20-1-2016 10:34";
+
+                if (ts1.label != null) WriteHtml(sb, "Series label: " + ts1.label);
+
+                if (ts1.source != null)
+                {
+                    //We keep the SERIES (or SER), there may be options etc. But we capitalize it.
+                    string src2 = ts1.source.Trim();
+                    if (src2 != "")
+                    {
+                        WriteHtml(sb, "Series source: " + src2);
+                    }
+                }
+
+                
+
+                if (Program.model != null)
+                {
+                    List<string> list = new List<string>();
+                    if (Program.model.dependents.ContainsKey(var))
+                    {
+                        Dictionary<string, string> d2 = Program.model.dependents[var].storage;
+                        if (d2 != null)
+                        {
+                            foreach (string d3 in d2.Keys)
+                            {
+                                list.Add(d3);
+                            }
+                        }
+                        list.Sort(StringComparer.InvariantCulture);
+                    }
+
+                    EquationHelper found = Program.FindEquationByMeansOfVariableName(var);
+
+                    if (found != null && found.modelBlock != null && found.modelBlock != "" && found.modelBlock != "Unnamed")
+                    {
+                        WriteHtml(sb, "Modelblock: " + found.modelBlock);
+                    }
+
+                    StringBuilder sb5 = new StringBuilder();
+                    sb5.Append("Influences: ");
+                    if (list.Count == 0) sb5.Append("<none>");
+                    else
+                    {
+
+                        int counter = 0;
+                        for (int i = 0; i < list.Count; i++)
+                        {
+                            string s = list[i];
+
+
+                            sb5.Append(HtmlLink(s));
+
+
+                            if (i < list.Count - 1) sb5.Append(", ");
+
+
+                        }
+                        sb5.AppendLine();
+
+                    }
+                    WriteHtml(sb, sb5.ToString());
+
+                    if (found != null)
+                    {
+                        StringBuilder sb2 = new StringBuilder();
+                        InsertLinksIntoEquation(found, true, sb2);
+                        WriteHtmlPreCode(sb, sb2.ToString());
+                    }                   
+
+                }
+
+                string xxx = null;
+                if (est2.ContainsKey(var))
+                {
+                    List<string> xx = est2[var];
+                    foreach(string s in xx)
+                    {
+                        xxx += s + G.NL;
+                    }
+                }
+                if (xxx != null)
+                {
+                    sb.AppendLine("<button onclick = `hide()` style = `background-color: #d1d0ce; border: none; color: white; text-align: center; text-decoration: none; display: inline-block; font-size: 12px;  color:;`>Estimationsoutput</button>");
+                    sb.AppendLine("<div id = `est` style = `display: none;`>");
+                    WriteHtmlPreCode(sb, xxx);
+                    sb.AppendLine("</div>");
+                }
+
+                List<string> datagen2 = null; datagen.TryGetValue(var, out datagen2);
+                if (datagen2 != null)
+                {
+                    WriteHtml(sb, "Data generation:");
+                    string s5 = null;
+                    foreach (string s in datagen2)
+                    {
+                        s5 += s + G.NL;
+                    }
+                    WriteHtmlPreCode(sb, s5);
+                }
+
+                bool hasFilter = false; if (Program.options.timefilter && Globals.globalPeriodTimeFilters2.Count > 0) hasFilter = true;
+
+                int max = Program.options.print_disp_maxlines;
+                if (hasFilter || Program.options.print_disp_maxlines == -1) max = int.MaxValue;
+
+                if (true)
+                {
+                    GekkoTime t = Globals.tNull;
+                    O.Prt o0 = new O.Prt();
+
+                    o0.t1 = tStartPlot;
+                    o0.t2 = tEnd;
+
+                    o0.prtType = "plot";
+                    o0.opt_filename = Program.options.folder_working + "\\" + subdir + "\\" + var.ToLower() + ".svg";
+
+                    o0.opt_xlineafter = tLine;
+
+                    {
+                        List<int> bankNumbers = null;
+
+                        if (ts2 != null)
+                        {
+                            O.Prt.Element ope0 = new O.Prt.Element();
+                            ope0.label = bank2.ToLower().Replace(".gbk", "") + ":" + var;
+                            ope0.linetype = "lines";
+                            ope0.dashtype = "3";
+
+                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o0, ope0));
+                            foreach (int bankNumber in bankNumbers)
+                            {
+                                IVariable ts11 = O.GetTimeSeries(O.GetString(new ScalarString("Ref")) + ":" + O.GetString((new ScalarString(var))), bankNumber);
+                                foreach (GekkoTime t2 in new GekkoTimeIterator(o0.t1.Add(-2), o0.t2))
+                                {
+                                    t = t2; O.GetVal777(ts11, bankNumber, ope0, t);
+                                }
+                                t = Globals.tNull;
+                            }
+                            o0.prtElements.Add(ope0);
+                        }
+
+
+                        {
+                            O.Prt.Element ope0 = new O.Prt.Element();
+                            ope0.label = bank1.ToLower().Replace(".gbk", "") + ":" + var;
+                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o0, ope0));
+                            foreach (int bankNumber in bankNumbers)
+                            {
+                                IVariable ts11 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString(var))), bankNumber);
+                                foreach (GekkoTime t2 in new GekkoTimeIterator(o0.t1.Add(-2), o0.t2))
+                                {
+                                    t = t2; O.GetVal777(ts11, bankNumber, ope0, t);
+                                }
+                                t = Globals.tNull;
+                            }
+                            o0.prtElements.Add(ope0);
+                        }
+
+
+                    }
+
+                    o0.Exe();
+
+                    sb.AppendLine("<img src = `" + var.ToLower() + ".svg" + "`>");
+                }
+
+                if (true)
+                {
+
+
+                    StringBuilder sb3 = new StringBuilder();
+                    sb3.AppendLine(bank1 + G.Blanks(30 - bank1.Length + gap) + bank2);
+                    sb3.AppendLine();
+                    sb3.AppendLine("Period        value        %  " + G.Blanks(gap) + "Period        value        %  ");
+                    int counter = 0;
+                    foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
+                    {
+                        counter++;
+                        if (hasFilter)  //some periods are set via TIMEFILTER
+                        {
+                            if (ShouldFilterPeriod(gt)) continue;
+                        }
+
+                        int counter2 = -1;
+                        foreach (TimeSeries ts in new List<TimeSeries> { ts1, ts2 })
+                        {
+                            counter2++;
+                            if (ts == null)
+                            {
+                                //ignore it
+                            }
+                            else
+                            {
+                                BrowserWritePrintLine(ts, sb3, gt);
+                                if (counter2 == 0) sb3.Append(G.Blanks(gap + 1));
+                            }
+                        }
+
+                        sb3.AppendLine();
+                    }
+
+                    WriteHtmlPreCode(sb, sb3.ToString());
+
+                }
+
+                StringBuilder x = new StringBuilder();
+                x.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
+                x.AppendLine("<html>");
+                x.AppendLine("  <head>");
+                x.AppendLine("    <link rel=`stylesheet` href=`styles.css` type=`text/css`>");
+                x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
+                x.AppendLine("    <title>" + var + "</title>");
+                x.AppendLine("  </head>");
+
+                x.AppendLine("  <script LANGUAGE = `JavaScript`> <!--");
+                x.AppendLine("  function hide() {");
+                x.AppendLine("  var x = document.getElementById(`est`);");
+                x.AppendLine("  if (x.style.display === `none`)");
+                x.AppendLine("  {");
+                x.AppendLine("      x.style.display = `block`; ");
+                x.AppendLine("  }");
+                x.AppendLine("   else");
+                x.AppendLine("   {");
+                x.AppendLine("      x.style.display = `none`; ");
+                x.AppendLine("   }");
+                x.AppendLine("  }");
+                x.AppendLine("  // -->");
+                x.AppendLine("  </script >");
+
+                x.AppendLine("  <body>");
+                //x.AppendLine("  <big><b>" + var + "</b></big><br>");
+                //x.Append("<pre><code>");
+                x.Append(sb);
+                //x.Append("</code></pre>");
+                x.AppendLine("  </body>");
+                x.AppendLine("</html>");
+
+                string pathAndFilename = Program.options.folder_working + "\\" + subdir + "\\" + var.ToLower() + ".html";
+                using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {
+                    sw.Write(x.Replace('`', '\"'));
+                }
+            }
+
+            StringBuilder x2 = new StringBuilder();
+            x2.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
+            x2.AppendLine("<html>");
+            x2.AppendLine("  <head>");
+            x2.AppendLine("    <link rel=`stylesheet` href=`styles.css` type=`text/css`>");
+            x2.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
+            x2.AppendLine("    <title>List of vars</title>");
+            x2.AppendLine("  </head>");
+            x2.AppendLine("  <body>");
+            //x2.AppendLine("  <p><big><b>SMECdok, take two. Søg i browseren med Ctrl+F (find)</b></big></p>");
+
+            x2.AppendLine("  <table cellpadding = `0` cellspacing = `0` width = `1000px` border = `0`> ");
+            x2.AppendLine("  <tr>");
+            x2.AppendLine("  <td width = `70 %` ><b><big>SMECdok, take two. Søg i browseren med Ctrl + F(find) </big></b></td>");
+            x2.AppendLine("  <td width = `10 %` ><small ><a href = `find.html` > Søg </a></small ></td >");
+            x2.AppendLine("  <td width = `20 %` ><small ><a href = `index.html` > Hjem </a></small ></td >");
+            x2.AppendLine("  </tr>");
+            x2.AppendLine("  </table>");
+
+            x2.AppendLine("  <p>&nbsp;</p>");
+
+            x2.AppendLine("<table style = `width:100%`>");
+
+            foreach (string var2 in vars)
+            {
+                List<string> varExpl = Program.GetVariableExplanation(var2);
+                string expl = "";
+                if (varExpl != null && varExpl.Count > 0) expl = varExpl[0];
+
+                x2.Append("<tr>");
+                x2.Append("<td width = `20%`>");
+                x2.Append(HtmlLink(var2));
+                x2.Append("</td>");
+                x2.Append("<td width = `80%`>");
+                x2.Append(expl);
+                x2.Append("</td>");
+                x2.Append("</tr>");
+            }
+            x2.AppendLine("</table>");
+
+            x2.AppendLine("  </p>");
+            x2.AppendLine("  </body>");
+            x2.AppendLine("</html>");
+            string pathAndFilename2 = Program.options.folder_working + "\\" + subdir + "\\" + "index" + ".html";
+            using (FileStream fs = Program.WaitForFileStream(pathAndFilename2, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                sw.Write(x2.Replace('`', '\"'));
+            }
+
+
+            // ----------------- find -------------------------------------
+
+            vars2.Sort(StringComparer.OrdinalIgnoreCase);
+
+            StringBuilder x3 = new StringBuilder();
+            x3.AppendLine("<html>");
+            x3.AppendLine("<head>");
+            x3.AppendLine("<link rel = `stylesheet` href = `styles.css` type = `text/css` >");
+            x3.AppendLine("</head>");
+
+            x3.AppendLine("<script LANGUAGE = `JavaScript` SRC = `variable.js` ></script>");
+            x3.AppendLine("<script LANGUAGE = `JavaScript` > <!-- ");
+
+            string s1 = null;
+            string s2 = null;
+            foreach (string s in vars2)
+            {
+                string[] ss = s.Split('¤');
+                s1 += "`" + ss[0] + "`" + ", ";
+                s2 += "`" + ss[1] + "`" + ", ";
+            }
+
+            string js = @"            
+
+            function varnavns() {
+                var varnavn = [" + s1 + @"];
+                return varnavn;
+            }
+
+            function beskrivs() {
+                var beskriv = [" + s2 + @"];
+                return beskriv;
+            }
+
+            function findvarnavn(){
+                var varnavn = varnavns();
+                var beskriv = beskrivs();
+                antal = varnavn.length;
+                tekst = new String;
+                tekst1 = new String;
+                tekst = document.form1.tekst.value;
+                fundet = false;
+
+                //document.writeln(`<head><link rel = `stylesheet` href = `styles.css` type = `text/css` > </head>`);
+
+                document.writeln(`Søgning efter variablen: '` + tekst + `'<br><br>`);
+
+                for (var i = 0; i < antal; i++)
+                {
+                    tekst1 = varnavn[i];
+                    if (tekst1.toUpperCase() == tekst.toUpperCase())
+                    {
+                        fundet = true;
+                        document.writeln(`<b><a href=` + varnavn[i] + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
+                        document.writeln(`<br>` + beskriv[i] + `<br><hr><br>`);
+                    } //endif
+                } //endfor
+
+                for (var i = 0; i < antal; i++)
+                {
+                    tekst1 = varnavn[i];
+                    if (tekst1.toUpperCase().indexOf(tekst.toUpperCase()) != -1)
+                    {
+                        if (tekst1.toUpperCase() != tekst.toUpperCase())
+                        {
+                            fundet = true;                            
+                            document.writeln(`<a href=` + varnavn[i] + `.html style='text-decoration:none;'>` + varnavn[i] + `</a>`);
+                            document.writeln(`<br>` + beskriv[i] + `<br><br>`);
+                        } //endif
+                    } //endif
+                } //endfor
+
+                if (fundet == false)
+                {
+                    document.writeln(`... gav intet resultat.<br>`);
+                } //endif
+                document.writeln(`<br><br><a href=find.html>Søg igen</a> <br> <a href=index.html>Gå til hovedside</a>`);
+                tekst1.free;
+                tekst.free;
+            }  //endfunction
+
+            function check(event) {
+            var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
+        if (charCode == 13) findvarnavn();
+        }  // endfunction
+
+        function findbeskriv()
+        {
+            var varnavn = varnavns();
+            var beskriv = beskrivs();
+            antal = varnavn.length;
+            tekst = new String;
+            tekst2 = new String;
+            tekst = document.form2.tekst.value;
+
+            document.writeln(`Søgeresultat<br>Søgning efter teksten: '` + tekst + `' i variabelliste<br><br>`);
+            fundet = false;
+            for (var i = 0; i < antal; i++)
+            {
+                tekst2 = beskriv[i];
+                if (tekst2.toUpperCase().indexOf(tekst.toUpperCase()) != -1)
+                {
+                    fundet = true;
+                    document.writeln(`<b><a href=` + varnavn[i] + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);                    
+                    document.writeln(`<br>` + beskriv[i] + `<br><br>`);
+                } //endif
+            } //endfor
+            if (fundet == false)
+            {
+                document.writeln(`... gav intet resultat.<br>`);
+            } //endif
+            document.writeln(`<br><br><a href=find.html>Søg igen</a> <br> <a href=index.html>Gå til hovedside</a>`);
+            tekst.free;
+            tekst2.free;
+        }  //endfunction
+
+        function check2(event) {
+            var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
+        if (charCode == 13) findbeskriv();
+        }  // endfunction
+
+        ";
+
+            x3.AppendLine(js);
+            x3.AppendLine("// -->");
+            x3.AppendLine("</script>");
+            x3.AppendLine("<body onload = `document.form1.tekst.focus()`>");
+            x3.AppendLine("<table width=`100 % `><tr><td>");
+            x3.AppendLine("<p><b>Indtast søgeord</b></p>");
+            //x3.AppendLine("<p>Angiv mnemoteknisk variabelnavn eller foretag fritekstsøgning i variabelbeskrivelserne</p>");
+            //x3.AppendLine("<p>&nbsp;</p>");
+            x3.AppendLine("");
+            x3.AppendLine("Søgning efter variabelnavn:");
+            x3.AppendLine("<FORM NAME = `form1` >");
+            x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check(event)`>");
+            x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg` onClick=`findvarnavn()`>");
+            x3.AppendLine("</FORM>");
+            x3.AppendLine("<p>&nbsp;</p>");
+            x3.AppendLine("Fritekstsøgning i variabelbeskrivelserne:");
+            x3.AppendLine("<FORM NAME = `form2`>");
+            x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check2(event)`>");
+            x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg` onClick=`findbeskriv()`>");
+            x3.AppendLine("</FORM></center>");
+            x3.AppendLine("</td></tr></table>");
+            x3.AppendLine("</body>");
+            x3.AppendLine("</html>");
+
+            string pathAndFilename3 = Program.options.folder_working + "\\" + subdir + "\\" + "find" + ".html";
+            using (FileStream fs = Program.WaitForFileStream(pathAndFilename3, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                sw.Write(x3.Replace('`', '\"'));
+            }
+
+            G.Writeln2("End of html browser generation");
+
+        }
+
+        private static GekkoDictionary<string, List<string>> BrowserDataGenerationExtract()
+        {
             GekkoDictionary<string, List<string>> datagen = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
             string genr = Program.GetTextFromFileWithWait(Program.options.folder_working + "\\" + "genr.gcm");
@@ -8862,486 +9470,7 @@ namespace Gekko
             //{
             //    res.Write(s2);
             //}
-
-            // -------------------------------------------
-            // Html
-            // -------------------------------------------
-
-            List<string> vars2 = new List<string>();
-
-            foreach (string var in vars)
-            {
-                StringBuilder sb = new StringBuilder();
-                TimeSeries ts1 = Program.databanks.GetFirst().GetVariable(var);
-                TimeSeries ts2 = Program.databanks.GetRef().GetVariable(var);
-
-                WriteHtml(sb, "<big><b>" + var + "</b></big>");
-
-                List<string> varExpl = Program.GetVariableExplanation(var);
-                foreach (string line in varExpl)
-                {
-                    if (line != "")
-                    {
-                        WriteHtmlColor(sb, line);
-                    }
-                }
-
-                string explanation = null;
-                if (varExpl != null) explanation = varExpl[0];
-                vars2.Add(var + "¤" + explanation);
-
-                StringBuilder sb4 = new StringBuilder();
-
-                if (true)
-                {
-                    EEndoOrExo type1 = VariableTypeEndoExo(var);
-                    string type = "";
-                    if (type1 == EEndoOrExo.Exo) type = "Exogenous, ";
-                    else if (type1 == EEndoOrExo.Endo) type = "Endogenous, ";
-
-                    string freq = "[unknown frequency]";
-                    if (ts1.frequency == "a")
-                    {
-                        freq = "Annual";
-                    }
-                    else if (ts1.frequency == "q")
-                    {
-                        freq = "Quarterly";
-                    }
-                    else if (ts1.frequency == "m")
-                    {
-                        freq = "Monthly";
-                    }
-                    else if (ts1.frequency == "u")
-                    {
-                        freq = "Undated";
-                    }
-
-                    bool noData = ts1.IsNullPeriod(); //We are opening up to this possibility of 'empty' data                    
-
-                    //GekkoTime first = ts.GetPeriodFirst();
-                    //GekkoTime last = ts.GetPeriodLast();
-
-                    GekkoTime first = ts1.GetRealDataPeriodFirst();
-                    GekkoTime last = ts1.GetRealDataPeriodLast();
-
-                    sb4.Append(type);
-                    string stamp = null;
-                    if (ts1.stamp != null && ts1.stamp != "") stamp = " (updated: " + ts1.stamp + ")";
-                    if (ts1.frequency == "a" || ts1.frequency == "u")
-                    {
-                        if (noData || first.super == -12345 || last.super == -12345)
-                        {
-                            sb4.Append(freq + ", no data period");
-                        }
-                        else
-                        {
-                            //we don't want 1995a1 to 2005a1, instead 1995 to 2005
-                            sb4.Append(freq + " data from " + first.super + " to " + last.super + stamp);
-                        }
-                    }
-                    else
-                    {
-                        if (noData || first.super == -12345 || last.super == -12345)
-                        {
-                            sb4.Append(freq + ", no data period");
-                        }
-                        else
-                        {
-                            sb4.Append(freq + " data from " + first.super + ts1.frequency + first.sub + " to " + last.super + ts1.frequency + last.sub + stamp);
-                        }
-                    }
-                    WriteHtml(sb, sb4.ToString());
-
-                }
-
-                //ts.label = "BNP i faste priser";
-                //ts.expression = "SERIES y = c + i + g;";
-                //ts.stamp = "20-1-2016 10:34";
-
-                if (ts1.label != null) WriteHtml(sb, "Series label: " + ts1.label);
-
-                if (ts1.source != null)
-                {
-                    //We keep the SERIES (or SER), there may be options etc. But we capitalize it.
-                    string src2 = ts1.source.Trim();
-                    if (src2 != "")
-                    {
-                        WriteHtml(sb, "Series source: " + src2);
-                    }
-                }
-
-                List<string> datagen2 = null; datagen.TryGetValue(var, out datagen2);
-                if (datagen2 != null)
-                {
-                    WriteHtml(sb, "Data generation:");
-                    foreach (string s in datagen2)
-                    {
-                        WriteHtml(sb, s);
-                    }
-                }
-
-                if (Program.model != null)
-                {
-                    List<string> list = new List<string>();
-                    if (Program.model.dependents.ContainsKey(var))
-                    {
-                        Dictionary<string, string> d2 = Program.model.dependents[var].storage;
-                        if (d2 != null)
-                        {
-                            foreach (string d3 in d2.Keys)
-                            {
-                                list.Add(d3);
-                            }
-                        }
-                        list.Sort(StringComparer.InvariantCulture);
-                    }
-
-                    EquationHelper found = Program.FindEquationByMeansOfVariableName(var);
-
-                    if (found != null && found.modelBlock != null && found.modelBlock != "" && found.modelBlock != "Unnamed")
-                    {
-                        WriteHtml(sb, "Modelblock: " + found.modelBlock);
-                    }
-
-                    StringBuilder sb5 = new StringBuilder();
-                    sb5.Append("Influences: ");
-                    if (list.Count == 0) sb5.Append("<none>");
-                    else
-                    {
-
-                        int counter = 0;
-                        for (int i = 0; i < list.Count; i++)
-                        {
-                            string s = list[i];
-
-
-                            sb5.Append(HtmlLink(s));
-
-
-                            if (i < list.Count - 1) sb5.Append(", ");
-
-
-                        }
-                        sb5.AppendLine();
-
-                    }
-                    WriteHtml(sb, sb5.ToString());
-
-                    if (found != null)
-                    {
-                        StringBuilder sb2 = new StringBuilder();
-                        InsertLinksIntoEquation(found, true, sb2);
-                        WriteHtmlPreCode(sb, sb2.ToString());
-                    }
-                }
-
-                bool hasFilter = false; if (Program.options.timefilter && Globals.globalPeriodTimeFilters2.Count > 0) hasFilter = true;
-
-                int max = Program.options.print_disp_maxlines;
-                if (hasFilter || Program.options.print_disp_maxlines == -1) max = int.MaxValue;
-
-                if (true)
-                {
-                    GekkoTime t = Globals.tNull;
-                    O.Prt o0 = new O.Prt();
-
-                    o0.t1 = tStartPlot;
-                    o0.t2 = tEnd;
-
-                    o0.prtType = "plot";
-                    o0.opt_filename = Program.options.folder_working + "\\" + subdir + "\\" + var.ToLower() + ".svg";
-
-                    o0.opt_xlineafter = tLine;
-
-                    {
-                        List<int> bankNumbers = null;
-
-                        if (ts2 != null)
-                        {
-                            O.Prt.Element ope0 = new O.Prt.Element();
-                            ope0.label = bank2.ToLower().Replace(".gbk", "") + ":" + var;
-                            ope0.linetype = "lines";
-                            ope0.dashtype = "3";
-
-                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o0, ope0));
-                            foreach (int bankNumber in bankNumbers)
-                            {
-                                IVariable ts11 = O.GetTimeSeries(O.GetString(new ScalarString("Ref")) + ":" + O.GetString((new ScalarString(var))), bankNumber);
-                                foreach (GekkoTime t2 in new GekkoTimeIterator(o0.t1.Add(-2), o0.t2))
-                                {
-                                    t = t2; O.GetVal777(ts11, bankNumber, ope0, t);
-                                }
-                                t = Globals.tNull;
-                            }
-                            o0.prtElements.Add(ope0);
-                        }
-
-
-                        {
-                            O.Prt.Element ope0 = new O.Prt.Element();
-                            ope0.label = bank1.ToLower().Replace(".gbk", "") + ":" + var;
-                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o0, ope0));
-                            foreach (int bankNumber in bankNumbers)
-                            {
-                                IVariable ts11 = O.GetTimeSeries(O.GetString(new ScalarString("[FIRST]")) + ":" + O.GetString((new ScalarString(var))), bankNumber);
-                                foreach (GekkoTime t2 in new GekkoTimeIterator(o0.t1.Add(-2), o0.t2))
-                                {
-                                    t = t2; O.GetVal777(ts11, bankNumber, ope0, t);
-                                }
-                                t = Globals.tNull;
-                            }
-                            o0.prtElements.Add(ope0);
-                        }
-
-
-                    }
-
-                    o0.Exe();
-
-                    sb.AppendLine("<img src = `" + var.ToLower() + ".svg" + "`>");
-                }
-
-                if (true)
-                {
-
-
-                    StringBuilder sb3 = new StringBuilder();
-                    sb3.AppendLine(bank1 + G.Blanks(30 - bank1.Length + gap) + bank2);
-                    sb3.AppendLine();
-                    sb3.AppendLine("Period        value        %  " + G.Blanks(gap) + "Period        value        %  ");
-                    int counter = 0;
-                    foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
-                    {
-                        counter++;
-                        if (hasFilter)  //some periods are set via TIMEFILTER
-                        {
-                            if (ShouldFilterPeriod(gt)) continue;
-                        }
-
-                        int counter2 = -1;
-                        foreach (TimeSeries ts in new List<TimeSeries> { ts1, ts2 })
-                        {
-                            counter2++;
-                            if (ts == null)
-                            {
-                                //ignore it
-                            }
-                            else
-                            {
-                                BrowserWritePrintLine(ts, sb3, gt);
-                                if (counter2 == 0) sb3.Append(G.Blanks(gap + 1));
-                            }
-                        }
-
-                        sb3.AppendLine();
-                    }
-
-                    WriteHtmlPreCode(sb, sb3.ToString());
-
-                }
-
-                StringBuilder x = new StringBuilder();
-                x.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
-                x.AppendLine("<html>");
-                x.AppendLine("  <head>");
-                x.AppendLine("    <link rel=`stylesheet` href=`styles.css` type=`text/css`>");
-                x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
-                x.AppendLine("    <title>" + var + "</title>");
-                x.AppendLine("  </head>");
-                x.AppendLine("  <body>");
-                //x.AppendLine("  <big><b>" + var + "</b></big><br>");
-                //x.Append("<pre><code>");
-                x.Append(sb);
-                //x.Append("</code></pre>");
-                x.AppendLine("  </body>");
-                x.AppendLine("</html>");
-
-                string pathAndFilename = Program.options.folder_working + "\\" + subdir + "\\" + var.ToLower() + ".html";
-                using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
-                using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                {
-                    sw.Write(x.Replace('`', '\"'));
-                }
-            }
-
-            StringBuilder x2 = new StringBuilder();
-            x2.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
-            x2.AppendLine("<html>");
-            x2.AppendLine("  <head>");
-            x2.AppendLine("    <link rel=`stylesheet` href=`styles.css` type=`text/css`>");
-            x2.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
-            x2.AppendLine("    <title>List of vars</title>");
-            x2.AppendLine("  </head>");
-            x2.AppendLine("  <body>");
-            x2.AppendLine("  <p><big><b>SMECdok, take one. Søg på variabelnavn med Ctrl+F (find)</b></big></p>");
-            x2.AppendLine("  <p>");
-            foreach (string var2 in vars)
-            {
-                x2.Append(HtmlLink(var2));
-                x2.AppendLine("<br>"); ;
-            }
-            x2.AppendLine("  </p>");
-            x2.AppendLine("  </body>");
-            x2.AppendLine("</html>");
-            string pathAndFilename2 = Program.options.folder_working + "\\" + subdir + "\\" + "index" + ".html";
-            using (FileStream fs = Program.WaitForFileStream(pathAndFilename2, Program.GekkoFileReadOrWrite.Write))
-            using (StreamWriter sw = G.GekkoStreamWriter(fs))
-            {
-                sw.Write(x2.Replace('`', '\"'));
-            }
-
-
-            // ----------------- find -------------------------------------
-
-            vars2.Sort(StringComparer.OrdinalIgnoreCase);
-
-            StringBuilder x3 = new StringBuilder();
-            x3.AppendLine("<html>");
-            x3.AppendLine("<script LANGUAGE = `JavaScript` SRC = `variable.js` ></script>");
-            x3.AppendLine("<script LANGUAGE = `JavaScript` > <!-- ");
-
-            string s1 = null;
-            string s2 = null;
-            foreach (string s in vars2)
-            {
-                string[] ss = s.Split('¤');
-                s1 += "`" + ss[0] + "`" + ", ";
-                s2 += "`" + ss[1] + "`" + ", ";
-            }
-
-            string js = @"            
-
-            function varnavns() {
-                var varnavn = [" + s1 + @"];
-                return varnavn;
-            }
-
-            function beskrivs() {
-                var beskriv = ["+ s2 + @"];
-                return beskriv;
-            }
-
-            function findvarnavn(){
-                var varnavn = varnavns();
-                var beskriv = beskrivs();
-                antal = varnavn.length;
-                tekst = new String;
-                tekst1 = new String;
-                tekst = document.form1.tekst.value.toUpperCase();
-                fundet = false;
-
-                document.writeln(`<h2>Søgeresultat efter variablen: <b>` + tekst + `</b></h2><br><br>`);
-
-                for (var i = 0; i < antal; i++)
-                {
-                    tekst1 = varnavn[i].toUpperCase();
-                    if (tekst1 == tekst)
-                    {
-                        fundet = true;
-                        document.writeln(`<b><a href=` + varnavn[i] + `.htm>` + varnavn[i] + `</a></b>`);
-                        document.writeln(`<br>` + beskriv[i] + `<br><hr><br>`);
-                    } //endif
-                } //endfor
-
-                for (var i = 0; i < antal; i++)
-                {
-                    tekst1 = varnavn[i].toUpperCase();
-                    if (tekst1.indexOf(tekst) != -1)
-                    {
-                        if (tekst1 != tekst)
-                        {
-                            fundet = true;
-                            document.writeln(`<a href=` + varnavn[i] + `.htm>` + varnavn[i] + `</a>`);
-                            document.writeln(`<br>` + beskriv[i] + `<br><br>`);
-                        } //endif
-                    } //endif
-                } //endfor
-
-                if (fundet == false)
-                {
-                    document.writeln(`... gav intet positivt resultat.<br>`);
-                } //endif
-                document.writeln(`<br><br><a href=find.html>Søg igen</a> eller <a href=index.html>Gå til hovedside</a>`);
-                tekst1.free;
-                tekst.free;
-            }  //endfunction
-
-            function check(event) {
-            var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
-        if (charCode == 13) findvarnavn();
-        }  // endfunction
-
-        function findbeskriv()
-        {
-            var varnavn = varnavns();
-            var beskriv = beskrivs();
-            antal = varnavn.length;
-            tekst = new String;
-            tekst2 = new String;
-            tekst = document.form2.tekst.value.toUpperCase();
-
-            document.writeln(`<h2>Søgeresultat</h2>Søgningen efter teksten: <b>` + tekst + `</b> i variabelliste<br><br>`);
-            fundet = false;
-            for (var i = 0; i < antal; i++)
-            {
-                tekst2 = beskriv[i].toUpperCase();
-                if (tekst2.indexOf(tekst) != -1)
-                {
-                    fundet = true;
-                    document.writeln(`<b><a href=` + varnavn[i] + `.htm>` + varnavn[i] + `</a></b>`);
-                    document.writeln(`<br>` + beskriv[i] + `<br><br>`);
-                } //endif
-            } //endfor
-            if (fundet == false)
-            {
-                document.writeln(`... gav intet positivt resultat.<br>`);
-            } //endif
-            document.writeln(`<br><br><a href=find.html>Søg igen</a> eller <a href=index.html>Gå til hovedside</a>`);
-            tekst.free;
-            tekst2.free;
-        }  //endfunction
-
-        function check2(event) {
-            var charCode = (navigator.appName == `Netscape`) ? event.which : event.keyCode;
-        if (charCode == 13) findbeskriv();
-        }  // endfunction
-
-        ";
-
-            x3.AppendLine(js);
-            x3.AppendLine("// -->");
-            x3.AppendLine("</script>");
-            x3.AppendLine("<body onload = `document.form1.tekst.focus()`>");
-            x3.AppendLine("<table width=`100 % `><tr><td>");
-            x3.AppendLine("<P><center><h2>Indtast søgeord</h2></center></p>");
-            x3.AppendLine("<p><center>Angiv mnemoteknisk variabelnavn eller foretag fritekstsøgning i variabelbeskrivelserne</center></p>");
-            x3.AppendLine("<p>&nbsp;</p>");
-            x3.AppendLine("<center>");
-            x3.AppendLine("<h4>Søgning efter variabelnavn(mnemoteknisk betegnelse):</h4>");
-            x3.AppendLine("<FORM NAME = `form1` >");
-            x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check(event)`>");
-            x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg efter variabelnavn` onClick=`findvarnavn()`>");
-            x3.AppendLine("</FORM>");
-            x3.AppendLine("<p>&nbsp;</p>");
-            x3.AppendLine("<h4>Fritekstsøgning i variabelbeskrivelserne:</h4>");
-            x3.AppendLine("<FORM NAME = `form2`>");
-            x3.AppendLine("<INPUT NAME=`tekst` SIZE=`50` TYPE=`text` onKeyPress=`return check2(event)`>");
-            x3.AppendLine("<INPUT TYPE = `submit` VALUE=`Søg frit i variabelbeskrivelserne` onClick=`findbeskriv()`>");
-            x3.AppendLine("</FORM></center>");
-            x3.AppendLine("</td></tr></table>");
-            x3.AppendLine("</body>");
-            x3.AppendLine("</html>");
-
-            string pathAndFilename3 = Program.options.folder_working + "\\" + subdir + "\\" + "find" + ".html";
-            using (FileStream fs = Program.WaitForFileStream(pathAndFilename3, Program.GekkoFileReadOrWrite.Write))
-            using (StreamWriter sw = G.GekkoStreamWriter(fs))
-            {
-                sw.Write(x3.Replace('`', '\"'));
-            }
-
-            G.Writeln2("End of html browser generation");
-
+            return datagen;
         }
 
         private static void BrowserAddItem(GekkoDictionary<string, List<string>> datagen, string name, string s3)
