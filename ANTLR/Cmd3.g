@@ -1949,14 +1949,19 @@ expressionOrNothing:        expression -> expression
 							//listNaked is a comma-separated list of expressions (without parenthesis). For instance 'a', 'b' or %a+%b, %d, etc. Must have > 1 element (one element is caught by expression below)
 							//expression is anything, but accepts a listNaked with parentheses, for instance ('a', 'b') or (%a+%b, %d). One element is ('a',), Python style.
 
-flexibleList:               bankseriesnameList2          //used in LIST and FOR loop etc. ---> bankvarnameList returns a Gekko LIST of ScalarStrings.
-						  | bankseriesnameList3
+//flexibleList and namesList are without parentheses, and are used in DISP, WRITE, etc.
+//for both, the items are converted to a simple list of strings
+
+//used in assignment (rhs) and FOR, for instance #m = a, b, b:c ---> converted to #m = ('a', 'b', 'b:c')
+flexibleList:               bankseriesnameList2      //several items with commas between
+						  | bankseriesnameList3      //single item with trailing comma
 						  | listNaked 
 						  | expression
 						    ;
 
-namesList:                  bankvarnameList            //used in DISP, WRITE, etc.
-						  | bankvarnameList3
+//used in DISP and WRITE, for instance WRITE x, %x, b:#x ---> converted to WRITE ('x', '%x', 'b:#x')
+namesList:                  bankvarnameList          //single item with no comma, or several items with commas between
+						  | bankvarnameList3         //single item with trailing comma
 						  | listNaked
 						  | expression
 						    ;                 
@@ -2001,7 +2006,7 @@ varname:                    nameOrCname freq? -> ^(ASTVARNAME ^(ASTPLACEHOLDER) 
 bankvarname:                bankColon? varname -> ^(ASTBANKVARNAME ^(ASTPLACEHOLDER bankColon?) varname);
 
 bankColon:                  AT GLUE -> ^(ASTNAME ^(ASTIDENT REF))            
-				          | name COLON -> name
+				          | nameOrCname COLON -> name
 						    ;
 
 svarname:                   sigil? ident -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER sigil?) ident);
@@ -2072,6 +2077,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | clone                SEMICOLON!
 						  | close                SEMICOLON!
 						  | cls                  SEMICOLON!
+						  | compare              SEMICOLON!
 						  | disp                 SEMICOLON!
 						  | endo                 SEMICOLON!
 						  | exo                  SEMICOLON!
@@ -2208,6 +2214,18 @@ dispOpt1:					ISNOTQUAL
                             ;
 dispOpt1h:				    INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
 
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// COMPARE
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+compare:   				    COMPARE dispOpt1? namesList? -> ^({token("ASTCOMPARE", ASTCOMPARE, $COMPARE.Line)} ^(ASTOPT_ compareOpt1?) namesList?)				
+						    ;
+
+compareOpt1:			    ISNOTQUAL
+						  | leftAngle2          compareOpt1h* RIGHTANGLE -> ^(ASTOPT1 compareOpt1h*)							
+						  | leftAngleNo2 dates? compareOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) compareOpt1h*)
+                            ;
+compareOpt1h:				INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ENDO/EXO

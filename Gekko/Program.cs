@@ -3860,6 +3860,7 @@ namespace Gekko
             bool isArray = false; if (G.Equal(array, "yes")) isArray = true;
 
             bool hyphenFound = false;
+            bool underscoreFound = false;
 
             string freq = "a";
 
@@ -3993,7 +3994,7 @@ namespace Gekko
                         }
 
                         //we are using codesHeaderJson instead of codesHeader (these are more verbose)
-                        Walk(tableName, codesHeader2, codes, codesCombi, values, valuesCombi, 0, "", "", ref hyphenFound);
+                        Walk(isArray, tableName, codesHeader2, codes, codesCombi, values, valuesCombi, 0, "", "", ref hyphenFound, ref underscoreFound);
                         data = G.CreateArrayDouble(codesCombi.Count * dates.Count, double.NaN);  //fill it with NaN for safety. Statistikbanken sometimes return only a subset of the data (and the subset is zeroes)
                     }
 
@@ -4016,18 +4017,20 @@ namespace Gekko
                             counter++;
                             //G.Writeln2("oasfas " + counter);
                             double value = double.NaN;
-                            try
+
+                            if (temp2 == "\".\"" || temp2 == "\"..\"" || temp2 == "\"...\"" || temp2 == "\"....\"" || temp2 == "\":\"")
                             {
-                                value = double.Parse(temp2);
+                                //See http://www.inside-r.org/packages/cran/pxr/docs/read.px
+                                //do nothing, "." and ".." and "..." and "...." and ":" will be missing value (these include the quotes in the Axis file)
                             }
-                            catch
+                            else
                             {
-                                if (temp2 == "\".\"" || temp2 == "\"..\"" || temp2 == "\"...\"" || temp2 == "\"....\"" || temp2 == "\":\"")
+
+                                try
                                 {
-                                    //See http://www.inside-r.org/packages/cran/pxr/docs/read.px
-                                    //do nothing, "." and ".." and "..." and "...." and ":" will be missing value (these include the quotes in the Axis file)
+                                    value = double.Parse(temp2);
                                 }
-                                else
+                                catch
                                 {
                                     G.Writeln2("*** ERROR: Could not convert '" + temp2 + "' into a number");
                                     throw new GekkoException();
@@ -4144,31 +4147,36 @@ namespace Gekko
 
             }  //for each line
 
+            if (dates.Count == 0)
+            {
+                G.Writeln2("*** ERROR: No time dimension found in px file");
+                throw new GekkoException();
+            }
+
             G.Writeln("    All data read, now putting into series");
 
             if (isArray)
             {
                 // ------------------------------ array-series ---------------------------------------
 
-                int dimensionsWithoutTime = codesCombi.Count;
+                int dimensionsWithoutTime = codes.Count;
 
                 //put in the array-timeseries ghost
                 string varNameWithFreq = G.AddFreqToName(tableName, G.GetFreq(freq));
                 Series tsGhost = new Series(G.GetFreq(freq), varNameWithFreq);
-                tsGhost.SetArrayTimeseries(dimensionsWithoutTime, true);
+                tsGhost.SetArrayTimeseries(dimensionsWithoutTime + 1, true);
                 Databank databank = Program.databanks.GetFirst();
-                databank.AddIVariable(tsGhost.name, tsGhost);
+                databank.AddIVariableWithOverwrite(tsGhost.name, tsGhost);
                 tsGhost.SetDirty(true);
 
                 for (int j = 0; j < codesCombi.Count; j++)
                 {
                     Series ts = null;
-
-                    string name3 = GetArrayName(tableName, codesCombi[j]);
-                    ts = new Series(G.GetFreq(freq), G.AddFreqToName(name3, G.GetFreq(freq)));
+                                        
+                    ts = new Series(G.GetFreq(freq), null);
                     ts.meta.label = valuesCombi[j];
                     ts.meta.source = source;
-                    ts.meta.stamp = Globals.dateStamp;
+                    ts.meta.stamp = Globals.dateStamp;                    
                     ts.SetDirty(true);
 
                     GekkoTime gt_start = G.FromStringToDate(dates[0], true);
@@ -4208,9 +4216,14 @@ namespace Gekko
                     if (gt_start.StrictlySmallerThan(gt0)) gt0 = gt_start;
                     if (gt_end.StrictlyLargerThan(gt1)) gt1 = gt_end;
 
-                    string[] split = codesCombi[j].Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] split = codesCombi[j].Split(new char[] { Globals.pxInternalDelimiter }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] split2 = new string[(split.Length - 1) / 2];
+                    for (int i = 0; i < split2.Length; i++)
+                    {
+                        split2[i] = split[2 * i + 2];
+                    }
 
-                    tsGhost.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(split), ts);
+                    tsGhost.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(split2), ts);
                 }
             }
 
@@ -4226,8 +4239,9 @@ namespace Gekko
 
                     if (true)
                     {
-                        string name2 = codesCombi[j];
-                        ts = new Series(G.GetFreq(freq), name2);
+                        string name2 = codesCombi[j].Replace(Globals.pxInternalDelimiter, '_');
+                        string name3 = G.AddFreqToName(name2, G.GetFreq(freq));
+                        ts = new Series(G.GetFreq(freq), name3);
                         ts.meta.label = valuesCombi[j];
                         ts.meta.source = source;
                         ts.meta.stamp = Globals.dateStamp;
@@ -4284,9 +4298,6 @@ namespace Gekko
                 }
             }
 
-
-
-
             string downloadOrImport = "Read";
             if (isDownload) downloadOrImport = "Downloaded";
 
@@ -4294,13 +4305,13 @@ namespace Gekko
 
             if (isArray)
             {
-                G.Writeln("    Name of first timeseries: " + G.PrettifyTimeseriesHash(GetArrayName(tableName, codesCombi[0]), true, false));
-                G.Writeln("    Name of last timeseries: " + G.PrettifyTimeseriesHash(GetArrayName(tableName, codesCombi[codesCombi.Count - 1]), true, false));
+                G.Writeln("    First timeseries in px file: " + G.PrettifyTimeseriesHash(GetArrayName(tableName, codesCombi[0]), true, false));
+                G.Writeln("    Last timeseries in px file: " + G.PrettifyTimeseriesHash(GetArrayName(tableName, codesCombi[codesCombi.Count - 1]), true, false));
             }
             else
             {
-                G.Writeln("    Name of first timeseries: " + codesCombi[0]);
-                G.Writeln("    Name of last timeseries: " + codesCombi[codesCombi.Count - 1]);
+                G.Writeln("    First timeseries in px file: " + codesCombi[0].Replace(Globals.pxInternalDelimiter, '_'));
+                G.Writeln("    Last timeseries in px file: " + codesCombi[codesCombi.Count - 1].Replace(Globals.pxInternalDelimiter, '_'));
             }
 
             //return values
@@ -4314,10 +4325,16 @@ namespace Gekko
                 G.Writeln2("+++ WARNING: " + downloadOrImport + " " + allCcounter + " data points in all, expected " + data.LongLength);
             }
 
-            if (hyphenFound && !isArray)
+            if (hyphenFound)
             {
-                //See not in constrution of data array
-                G.Writeln2("+++ WARNING: From Gekko 2.3.2 and onwards, hyphens ('-') in names are removed instead of being replaced with 'h'");
+                //Only for !isArray
+                G.Writeln2("+++ WARNING: Hyphens ('-') in names have been removed");
+            }
+
+            if (underscoreFound)
+            {
+                //Only for !isArray
+                G.Writeln2("+++ WARNING: Underscores ('_') in names have been removed");
             }
 
         }
@@ -4326,7 +4343,7 @@ namespace Gekko
         {
             string name3 = null;
             string name2 = codesCombi;
-            string[] ss = name2.Split('_');
+            string[] ss = name2.Split(Globals.pxInternalDelimiter);
             List<string> dims = new List<string>();
             for (int i = 2; i < ss.Length; i += 2)
             {
@@ -4341,65 +4358,50 @@ namespace Gekko
             return name3;
         }
 
-        private static void Walk(string table, List<string> codesHeader, List<List<string>> codes, List<string> codesCombi, List<List<string>> values, List<string> valuesCombi, int depth, string sCodes, string sValues, ref bool hyphenFound)
+        private static void Walk(bool isArray, string table, List<string> codesHeader, List<List<string>> codes, List<string> codesCombi, List<List<string>> values, List<string> valuesCombi, int depth, string sCodes, string sValues, ref bool hyphenFound, ref bool underscoreFound)
         {
             //Hmmm what if a table name or column has a name with '_' inside? Probably not probable.
             if (depth > codes.Count - 1)
             {
-                if (sCodes.EndsWith("_")) sCodes = sCodes.Substring(0, sCodes.Length - 1);
+                if (sCodes.EndsWith(Globals.pxInternalDelimiter.ToString())) sCodes = sCodes.Substring(0, sCodes.Length - 1);
                 if (sValues.StartsWith(", ")) sValues = sValues.Substring(2);
 
                 string name2 = null;
 
-                if (Program.options.bugfix_px)
+                string temp = table + sCodes;
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < temp.Length; i++)
                 {
-                    string temp = table + sCodes;
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < temp.Length; i++)
+                    char tempi = temp[i];
+                    if (!isArray) //accept funny strings for arrays
                     {
-                        char tempi = temp[i];
                         if (tempi == '-')
                         {
                             hyphenFound = true;
                         }
-
-                        if (tempi == 'æ') sb.Append("ae");
-                        else if (tempi == 'ø') sb.Append("oe");
-                        else if (tempi == 'å') sb.Append("aa");
-                        else if (tempi == 'Æ') sb.Append("AE");
-                        else if (tempi == 'Ø') sb.Append("OE");
-                        else if (tempi == 'Å') sb.Append("AA");
-                        else if (!G.IsLetterOrDigitOrUnderscore(tempi))  //only accepts english letters
+                        else if (tempi == '_')
                         {
-                            //ignore it, 
-                        }
-                        else
-                        {
-                            sb.Append(tempi);  //here we know that it is englishletter or digit or underscore
+                            underscoreFound = true;
                         }
                     }
-                    name2 = sb.ToString();
+
+                    if (tempi == 'æ') sb.Append("ae");
+                    else if (tempi == 'ø') sb.Append("oe");
+                    else if (tempi == 'å') sb.Append("aa");
+                    else if (tempi == 'Æ') sb.Append("AE");
+                    else if (tempi == 'Ø') sb.Append("OE");
+                    else if (tempi == 'Å') sb.Append("AA");
+                    else if (!isArray && !(G.IsLetterOrDigit(tempi) || tempi == Globals.pxInternalDelimiter))  //for non-arrays, only letter or digit is allowed, everything else is thrown out
+                    {
+                        //ignore it
+                    }
+                    else
+                    {
+                        sb.Append(tempi);  //here we know that it is englishletter or digit or underscore
+                    }
                 }
-                else
-                {
-                    if (name2.Contains("-")) hyphenFound = true;
-                    name2 = table + sCodes;
-                    name2 = name2.Replace("Æ", "AE");
-                    name2 = name2.Replace("Ø", "OE");
-                    name2 = name2.Replace("Å", "AA");
-                    name2 = name2.Replace("æ", "ae");
-                    name2 = name2.Replace("ø", "oe");
-                    name2 = name2.Replace("å", "aa");
-                    //name2 = name2.Replace("-", "h");  //h like hyphen, cannot use "_" since this is used as delimiter when composing names
-                    name2 = name2.Replace("-", "");
-                    name2 = name2.Replace(" ", "");
-                    name2 = name2.Replace("(", "");
-                    name2 = name2.Replace(")", "");
-                    name2 = name2.Replace("=", "");
-                    name2 = name2.Replace(".", "");
-                    name2 = name2.Replace(",", "");
-                    name2 = name2.Replace(":", "");
-                }
+                name2 = sb.ToString();
+
                 codesCombi.Add(name2);
                 valuesCombi.Add(sValues);
                 return;
@@ -4407,12 +4409,10 @@ namespace Gekko
 
             for (int i = 0; i < codes[depth].Count; i++)
             {
-                string sCodesTemp = sCodes + "_" + codesHeader[depth] + "_" + codes[depth][i];
+                string sCodesTemp = sCodes + Globals.pxInternalDelimiter + codesHeader[depth] + Globals.pxInternalDelimiter + codes[depth][i];
                 string sValuesTemp = sValues + ", " + values[depth][i];
-
-                Walk(table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodesTemp, sValuesTemp, ref hyphenFound);
+                Walk(isArray, table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodesTemp, sValuesTemp, ref hyphenFound, ref underscoreFound);
             }
-
         }
 
         public static void ReadGdx(Databank databank, AllFreqsHelper dates, ReadOpenMulbkHelper oRead, string file2, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
@@ -13933,8 +13933,8 @@ namespace Gekko
                         string first = keys[0].ToString();
                         string last = keys[keys.Count - 1].ToString();
 
-                        G.Writeln2("First element: " + G.RemoveFreqFromKey(ts.name) + "[" + first + "]");
-                        G.Writeln("Last element: " + G.RemoveFreqFromKey(ts.name) + "[" + last + "]");
+                        G.Writeln2("First element (alphabetically): " + G.RemoveFreqFromKey(ts.name) + "[" + first + "]");
+                        G.Writeln("Last element (alphabetically): " + G.RemoveFreqFromKey(ts.name) + "[" + last + "]");
                         G.Writeln2("Dimension span: " + dimCount + " = " + dimCount2 + ", density: " + keys.Count + "/" + dimCount2 + " = " + Program.NumberFormat(100d * (keys.Count / dimCount2), "0.00") + "%");
                     }
                     G.Writeln("==========================================================================================");                    
@@ -26873,7 +26873,7 @@ namespace Gekko
                 s2 = s2.Replace(".", ",");
             }
             if (s2 == "9.99999E+99" || s2 == "9,99999E+99"  //I think this is funny number made in Excel printing routine, to signal missing value
-                || G.isNumericalError(d2) || d2 == 3e300d )  //NumericalError is 'M', and the number 3e300 is a signal from a table that variable is non-existing ('N')
+                || G.isNumericalError(d2) || d2 == Globals.missingVariableArtificialNumber)  //NumericalError is 'M', and the number 3e300 is a signal from a table that variable is non-existing ('N')
             {
                 s2 = "=na()";
                 if (G.Equal(Program.options.interface_excel_language, "danish"))

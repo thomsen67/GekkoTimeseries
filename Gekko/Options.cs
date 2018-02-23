@@ -45,7 +45,7 @@ Additionally, there are model, solve, equation options.
 
         //!! do not use '_' inside an option -- the '_' corresponds to a blank in ANTLR        
         
-        public bool bugfix_px = true;
+        //public bool bugfix_px = true;
         public bool bugfix_download = true;
 
         public bool databank_create_auto = false;

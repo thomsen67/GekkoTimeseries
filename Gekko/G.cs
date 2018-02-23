@@ -1023,6 +1023,13 @@ namespace Gekko
             else return false;
         }
 
+        public static bool IsLetterOrDigit(char c)
+        {
+            if (G.IsEnglishLetter(c) || char.IsDigit(c))
+                return true;
+            else return false;
+        }
+
         public static bool IsLetterOrDigitOrUnderscoreOrTilde(char c)
         {
             if (G.IsEnglishLetter(c) || char.IsDigit(c) || c == '_' || c == Globals.freqIndicator)

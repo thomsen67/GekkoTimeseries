@@ -703,8 +703,9 @@ namespace Gekko
         public static System.Windows.Media.FontFamily decompFontFamily = new System.Windows.Media.FontFamily("Calibri");
         public static System.Windows.Media.SolidColorBrush decompSolidColorBrush = new System.Windows.Media.SolidColorBrush(Globals.GrayExcelLine);
         
-        public static double missingVariableArtificialNumber = 3e300d;  //max value for double is 1.7976931348623157E+308        
-        public static double missingDatabankArtificialNumber = 4e300d;  //max value for double is 1.7976931348623157E+308        
+        public static double missingVariableArtificialNumber = 3e300d;  //max value for double is 1.7976931348623157E+308           
+        
+        public static char pxInternalDelimiter = '¤';
 
         public static string RunGekkoTabToTextStuff_folder = "";  //not too pretty, but only used to send stuff from menu into thread
 
