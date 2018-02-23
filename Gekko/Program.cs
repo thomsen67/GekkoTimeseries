@@ -3573,7 +3573,7 @@ namespace Gekko
                         }
 
                         //we are using codesHeaderJson instead of codesHeader (these are more verbose)
-                        Walk(tableName, codesHeader2, codes, codesCombi, values, valuesCombi, 0, "", "", ref hyphenFound);
+                        Walk(isArray, tableName, codesHeader2, codes, codesCombi, values, valuesCombi, 0, "", "", ref hyphenFound);
                         data = G.CreateArrayDouble(codesCombi.Count * dates.Count, double.NaN);  //fill it with NaN for safety. Statistikbanken sometimes return only a subset of the data (and the subset is zeroes)
                     }
 
@@ -3596,18 +3596,19 @@ namespace Gekko
                             counter++;
                             //G.Writeln2("oasfas " + counter);
                             double value = double.NaN;
-                            try
+
+                            if (temp2 == "\".\"" || temp2 == "\"..\"" || temp2 == "\"...\"" || temp2 == "\"....\"" || temp2 == "\":\"")
                             {
-                                value = double.Parse(temp2);
+                                //See http://www.inside-r.org/packages/cran/pxr/docs/read.px
+                                //do nothing, "." and ".." and "..." and "...." and ":" will be missing value (these include the quotes in the Axis file)
                             }
-                            catch
+                            else
                             {
-                                if (temp2 == "\".\"" || temp2 == "\"..\"" || temp2 == "\"...\"" || temp2 == "\"....\"" || temp2 == "\":\"")
+                                try
                                 {
-                                    //See http://www.inside-r.org/packages/cran/pxr/docs/read.px
-                                    //do nothing, "." and ".." and "..." and "...." and ":" will be missing value (these include the quotes in the Axis file)
+                                    value = double.Parse(temp2);
                                 }
-                                else
+                                catch
                                 {
                                     G.Writeln2("*** ERROR: Could not convert '" + temp2 + "' into a number");
                                     throw new GekkoException();
@@ -3753,7 +3754,7 @@ namespace Gekko
                 }
                 else
                 {
-                    string name2 = codesCombi[j];
+                    string name2 = codesCombi[j].Replace('¤', '_');
                     ts = new TimeSeries(G.GetFreq(freq), name2);
                     ts.label = valuesCombi[j];
                     ts.source = source;
@@ -3836,8 +3837,8 @@ namespace Gekko
             }
             else
             {
-                G.Writeln("    Name of first timeseries: " + codesCombi[0]);
-                G.Writeln("    Name of last timeseries: " + codesCombi[codesCombi.Count - 1]);
+                G.Writeln("    Name of first timeseries: " + codesCombi[0].Replace('¤', '_'));
+                G.Writeln("    Name of last timeseries: " + codesCombi[codesCombi.Count - 1].Replace('¤', '_'));
             }
 
             //return values
@@ -3863,7 +3864,7 @@ namespace Gekko
         {
             string name3 = null;
             string name2 = codesCombi;
-            string[] ss = name2.Split('_');
+            string[] ss = name2.Split('¤');
             List<string> dims = new List<string>();
             for (int i = 2; i < ss.Length; i += 2)
             {
@@ -3878,12 +3879,12 @@ namespace Gekko
             return name3;
         }
 
-        private static void Walk(string table, List<string> codesHeader, List<List<string>> codes, List<string> codesCombi, List<List<string>> values, List<string> valuesCombi, int depth, string sCodes, string sValues, ref bool hyphenFound)
+        private static void Walk(bool isArray, string table, List<string> codesHeader, List<List<string>> codes, List<string> codesCombi, List<List<string>> values, List<string> valuesCombi, int depth, string sCodes, string sValues, ref bool hyphenFound)
         {
             //Hmmm what if a table name or column has a name with '_' inside? Probably not probable.
             if (depth > codes.Count - 1)
             {
-                if (sCodes.EndsWith("_")) sCodes = sCodes.Substring(0, sCodes.Length - 1);
+                if (sCodes.EndsWith("¤")) sCodes = sCodes.Substring(0, sCodes.Length - 1);
                 if (sValues.StartsWith(", ")) sValues = sValues.Substring(2);
 
                 string name2 = null;
@@ -3906,7 +3907,7 @@ namespace Gekko
                         else if (tempi == 'Æ') sb.Append("AE");
                         else if (tempi == 'Ø') sb.Append("OE");
                         else if (tempi == 'Å') sb.Append("AA");
-                        else if (!G.IsLetterOrDigitOrUnderscore(tempi))  //only accepts english letters
+                        else if (!isArray && !(G.IsLetterOrDigit(tempi) || tempi == '¤'))
                         {
                             //ignore it, 
                         }
@@ -3929,6 +3930,7 @@ namespace Gekko
                     name2 = name2.Replace("å", "aa");
                     //name2 = name2.Replace("-", "h");  //h like hyphen, cannot use "_" since this is used as delimiter when composing names
                     name2 = name2.Replace("-", "");
+                    name2 = name2.Replace("_", "");
                     name2 = name2.Replace(" ", "");
                     name2 = name2.Replace("(", "");
                     name2 = name2.Replace(")", "");
@@ -3944,10 +3946,10 @@ namespace Gekko
 
             for (int i = 0; i < codes[depth].Count; i++)
             {
-                string sCodesTemp = sCodes + "_" + codesHeader[depth] + "_" + codes[depth][i];
+                string sCodesTemp = sCodes + "¤" + codesHeader[depth] + "¤" + codes[depth][i];
                 string sValuesTemp = sValues + ", " + values[depth][i];
 
-                Walk(table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodesTemp, sValuesTemp, ref hyphenFound);
+                Walk(isArray, table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodesTemp, sValuesTemp, ref hyphenFound);
             }
         }        
 
@@ -19235,7 +19237,7 @@ namespace Gekko
 
                     if (!db.ContainsVariable(var))
                     {
-                        G.Writeln2("*** ERROR: UPDPRT: Variable '" + var + "' not found in '" + db.aliasName + "' databank");
+                        G.Writeln2("*** ERROR: Variable '" + var + "' not found in '" + db.aliasName + "' databank");
                         throw new GekkoException();
                     }
 
@@ -19243,7 +19245,7 @@ namespace Gekko
                     {
                         if (!base2.ContainsVariable(var))
                         {
-                            G.Writeln2("*** ERROR: UPDPRT: Variable '" + var + "' not found in reference databank -- necessary for operator '" + op + "'");
+                            G.Writeln2("*** ERROR: Variable '" + var + "' not found in reference databank -- necessary for operator '" + op + "'");
                             throw new GekkoException();
                         }
                     }
@@ -19574,18 +19576,18 @@ namespace Gekko
 
                     if (repI != rep)
                     {
-                        G.Writeln2("*** ERROR: UPD: REP " + rep + " is not an integer value");
+                        G.Writeln2("*** ERROR: SERIES: REP " + rep + " is not an integer value");
                         throw new GekkoException();
                     }
 
                     if (repI < 1)
                     {
-                        G.Writeln2("*** ERROR: UPD: REP " + repI + " should not be zero or negative");
+                        G.Writeln2("*** ERROR: SERIES: REP " + repI + " should not be zero or negative");
                         throw new GekkoException();
                     }
                     else if (repI > 10000)
                     {
-                        G.Writeln2("*** ERROR: UPD: REP " + repI + " seems too large... (> 10.000)");
+                        G.Writeln2("*** ERROR: SERIES: REP " + repI + " seems too large... (> 10.000)");
                         throw new GekkoException();
                     }
                     //Now we know that repI is 1, 2, 3, ... up to a resonable number
@@ -19648,7 +19650,7 @@ namespace Gekko
                 if (o.data.Length > expectedNumberOfObservations)
                 {
                     //TODO: truncate it
-                    G.Writeln2("*** ERROR: UPD " + ts.variableName + ": There were " + o.data.Length + " numbers given for the period " + tStart + " to " + tEnd + " (= " + expectedNumberOfObservations + " periods)");
+                    G.Writeln2("*** ERROR: SERIES " + ts.variableName + ": There were " + o.data.Length + " numbers given for the period " + tStart + " to " + tEnd + " (= " + expectedNumberOfObservations + " periods)");
                     throw new GekkoException();
                 }
 
@@ -19661,7 +19663,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: UPD " + ts.variableName + ": There were " + o.data.Length + " numbers given for the period " + tStart + " to " + tEnd + " (= " + expectedNumberOfObservations + " periods)");
+                        G.Writeln2("*** ERROR: SERIES " + ts.variableName + ": There were " + o.data.Length + " numbers given for the period " + tStart + " to " + tEnd + " (= " + expectedNumberOfObservations + " periods)");
                         throw new GekkoException();
                     }
                 }
@@ -19716,7 +19718,7 @@ namespace Gekko
             {
                 //if input.Length == 1, this can never be the case
                 //For instance, for TIME 2010 2015, this will fail: "UPD xx = 1,2,3,4,5,6,7 rep *;", whereas "UPD xx = 1,2,3,4,5,6 rep *;" will be ok
-                G.Writeln2("*** ERROR: UPD: There were " + input.Length + " numbers given for the period, expected " + expectedNumberOfObservations);
+                G.Writeln2("*** ERROR: SERIES: There were " + input.Length + " numbers given for the period, expected " + expectedNumberOfObservations);
                 throw new GekkoException();
             }
             double[] data3 = new double[expectedNumberOfObservations];
@@ -33356,12 +33358,12 @@ namespace Gekko
                             }
                             else
                             {
-                                G.Writeln2("*** ERROR: updprt: variable '" + var + "' does not exist in base bank");
+                                G.Writeln2("*** ERROR: variable '" + var + "' does not exist in base bank");
                             }
                         }
                         else
                         {
-                            G.Writeln2("*** ERROR: updprt: operator not supported");
+                            G.Writeln2("*** ERROR: operator not supported");
                             return;
                         }
                         string s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0000000000E+00}", data);
@@ -33372,7 +33374,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: updprt: variable '" + var + "' does not exist in work bank");
+                    G.Writeln2("*** ERROR: variable '" + var + "' does not exist in work bank");
                 }
             }
             G.Writeln();
