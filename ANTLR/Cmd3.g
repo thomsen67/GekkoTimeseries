@@ -2234,7 +2234,8 @@ compareOpt1h:				INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
 endo:                       ENDO eeOpt1? eeHelper -> ^(ASTENDO ^(ASTPLACEHOLDER eeOpt1?) eeHelper);
 exo:                        EXO eeOpt1? eeHelper -> ^(ASTEXO ^(ASTPLACEHOLDER eeOpt1?) eeHelper);
 
-eeOpt1:				     leftAngleNo2 dates RIGHTANGLE -> ^(ASTDATES2 dates);
+eeOpt1:				     ISNOTQUAL
+						 | leftAngleNo2 dates? RIGHTANGLE -> ^(ASTDATES2 dates?);
 
 eeHelper:              eeHelper2 (COMMA2 eeHelper2)* -> eeHelper2+;
 eeHelper2:             indexerExpression eeOpt1?  -> ^(ASTPLACEHOLDER indexerExpression eeOpt1?);

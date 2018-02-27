@@ -960,40 +960,55 @@ namespace Gekko.Parser.Gek
                                 //ASTNode nodeVar1 = node[1][0];
                                 //ASTNode nodeLocalTime1 = node[1][1];
 
-                                if (node[1][0].Text == "ASTDOTORINDEXER")
+                                node.Code.A("GekkoTimes gt = null; " + G.NL);
+                                string s2 = node[0][0].Code.ToString();
+                                if (s2 != null)
                                 {
-                                    
+                                    node.Code.A("gt = " + s2 + "; " + G.NL);
+                                }
+                                                               
+                                
+                                node.Code.A("List<O.HandleEndoHelper> l0 = new List<O.HandleEndoHelper>()" + "; " + G.NL);
+                                for (int ii = 0 + 1; ii < node.ChildrenCount(); ii++)
+                                {
 
-                                    if (!node[1][0][0].Code.ToString().StartsWith("O.Lookup("))
+                                    if (node[ii][0].Text == "ASTDOTORINDEXER")
                                     {
-                                        G.Writeln2("*** ERROR: Internal error #09875209835");
-                                        throw new GekkoException();
+
+                                        if (!node[ii][0][0].Code.ToString().StartsWith("O.Lookup("))
+                                        {
+                                            G.Writeln2("*** ERROR: Internal error #09875209835");
+                                            throw new GekkoException();
+                                        }
+
+                                        node.Code.A("O.HandleEndoHelper helper" + ii + " = new O.HandleEndoHelper();" + G.NL);
+
+                                        node.Code.A("List<IVariable> l" + ii + " = new List<IVariable>();" + G.NL);
+
+                                        for (int i = 0; i < node[ii][0][1].ChildrenCount(); i++)
+                                        {
+                                            node.Code.A("l" + ii + ".Add(" + node[ii][0][1][i].Code + ");" + G.NL);
+                                        }
+
+
+                                        string s = node[ii][1].Code.ToString();
+                                        if ( s != null)
+                                        {
+                                            node.Code.A("helper" + ii + ".local = " + s + ";" + G.NL);
+                                        }
+                                        node.Code.A("helper" + ii + ".varname = " + "O.NameLookup(" + node[ii][0][0].Code.ToString().Substring("O.Lookup(".Length) + ";" + G.NL);
+                                        node.Code.A("helper" + ii + ".indices = " + "l" + ii + ";" + G.NL);
+                                        node.Code.A("l0.Add(helper" + ii + ");" + G.NL);
+                                                                               
+
+                                    }
+                                    else
+                                    {
+                                        //TODO
                                     }
 
-                                    node.Code.A("GekkoTimes gt = " + node[0][0].Code + "; " + G.NL);
-                                    
-                                    node.Code.A("O.HandleEndoHelper helper = new O.HandleEndoHelper();" + G.NL);
-
-                                    node.Code.A("List<IVariable> l1 = new List<IVariable>();" + G.NL);
-
-                                    for (int i = 0; i < node[1][0][1].ChildrenCount(); i++)
-                                    {
-                                        node.Code.A("l1.Add(" + node[1][0][1][i].Code + ");" + G.NL);
-                                    }
-
-                                    node.Code.A("helper.local = " + node[1][1].Code + ";" + G.NL);
-                                    node.Code.A("helper.varname = " + "O.NameLookup(" + node[1][0][0].Code.ToString().Substring("O.Lookup(".Length) + ";" + G.NL);
-                                    node.Code.A("helper.indices = " + "l1" + ";" + G.NL);
-
-                                    node.Code.A("O.HandleEndo(gt, helper);" + G.NL);
-
                                 }
-                                else
-                                {
-                                    //TODO
-                                }
-
-
+                                node.Code.A("O.HandleEndo(gt, l0);" + G.NL);
 
                             }
 

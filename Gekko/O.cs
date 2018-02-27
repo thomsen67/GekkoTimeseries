@@ -291,7 +291,7 @@ namespace Gekko
         //    return (ScalarVal)lhs;
         //}
 
-        public static void HandleEndo(GekkoTimes global, HandleEndoHelper helper)
+        public static void HandleEndo(GekkoTimes global, List<HandleEndoHelper> helper)
         {
             if (Globals.endo == null) Globals.endo = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             //string s1 = x1.ConvertToString();
@@ -727,6 +727,17 @@ namespace Gekko
         public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type)
         {
             return Lookup(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable, type, true);
+        }
+
+        public static IVariable NameLookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type)
+        {
+            if (dbName != null || freq != null)
+            {
+                G.Writeln2("*** ERROR: Expected a simple variable name without bank or frequency");
+                throw new GekkoException();
+            }
+
+            return new ScalarString(varname);
         }
 
         //Also see #8093275432098
