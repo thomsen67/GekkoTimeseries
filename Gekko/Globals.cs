@@ -40,7 +40,7 @@ namespace Gekko
     /// </summary>
     public class Globals        
     {
-        public static string versionInternal = "v4";  //v4
+        public static string versionInternal = "v5";  //v5
 
         public static bool version30 = true;
 
@@ -450,7 +450,10 @@ namespace Gekko
 
         public static Databank undoBank = null;
         public static int hasBeenEndoExoStatementsSinceLastSim = 0;
-        
+
+        public static GekkoDictionary<string, string> endo = null;
+        public static GekkoDictionary<string, string> exo = null;
+
         public static List<string> tsdxVersions = new List<string> { "1.0", "1.1", "1.2" };  //1.0 = zipped tsd, 1.1 = protobuffers, 1.2 = Gekko 3.0 protobuffers.
 
         public static int removeAllLags = 0;
@@ -669,6 +672,11 @@ namespace Gekko
 
         public static GAMS.GAMSWorkspace gamsWorkspace = null;
         public static string gamsWorkspaceHelper = null;
+        public static double gamsEps = 5e300d;
+        public static double gamsNegInf = 4e300d;
+        public static double gamsPosInf = 3e300d;
+        public static double gamsNA = 2e300d;
+        public static double gamsUndf = 1e300d; //probably has this value in gdx, see https://github.com/NREL/gdx-pandas/blob/master/gdxpds/gdx.py
 
         public static int convertTableCounter = 0;
         public static int convertTableErrorCounter = 0;
@@ -703,8 +711,10 @@ namespace Gekko
         public static System.Windows.Media.FontFamily decompFontFamily = new System.Windows.Media.FontFamily("Calibri");
         public static System.Windows.Media.SolidColorBrush decompSolidColorBrush = new System.Windows.Media.SolidColorBrush(Globals.GrayExcelLine);
         
-        public static double missingVariableArtificialNumber = 3e300d;  //max value for double is 1.7976931348623157E+308           
-        
+        public static double missingVariableArtificialNumber = 3e303d;  //max value for double is 1.7976931348623157E+308. GAMS uses e300, so we use e303
+        public static double missingVariableArtificialNumberLow = 2.999e303d; 
+        public static double missingVariableArtificialNumberHigh = 3.001e303d; 
+
         public static char pxInternalDelimiter = '¤';
 
         public static string RunGekkoTabToTextStuff_folder = "";  //not too pretty, but only used to send stuff from menu into thread

@@ -9,6 +9,12 @@ namespace Gekko
 public class TranslatedCode
 {
 public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
+public static readonly ScalarVal i16 = new ScalarVal(2010d);
+public static readonly ScalarVal i17 = new ScalarVal(2010d);
+public static readonly ScalarVal i18 = new ScalarVal(2011d);
+public static readonly ScalarVal i19 = new ScalarVal(2011d);
+public static readonly ScalarVal i20 = new ScalarVal(2012d);
+public static readonly ScalarVal i21 = new ScalarVal(2012d);
 public static void ClearTS(P p) {
 }
 public static void ClearScalar(P p) {
@@ -19,37 +25,29 @@ public static void CodeLines(P p)
 GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 
 //[[splitSTART]]
-p.SetText(@"¤1"); O.InitSmpl(smpl, p);
+p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-Func<GraphHelper, string> print0 = (gh) =>
-{
-O.Prt o0 = new O.Prt();
-o0.guiGraphIsRefreshing = gh.isRefreshing;
-o0.guiGraphPrintCode = gh.printCode;
-o0.guiGraphIsLogTransform = gh.isLogTransform;
-o0.prtType = "p";
+IVariable ivTmpvar15 = O.IvConvertTo(EVariableType.Var, O.CreateListFromStrings(new string[] {"a", "b", "c"}));
+O.Lookup(smpl, null, null, "#m", null, ivTmpvar15, true, EVariableType.Var)
+;
 
-{
-List<int> bankNumbers = null;
-O.Prt.Element ope0 = new O.Prt.Element();
-ope0.label = O.SubstituteScalarsAndLists("-eX[goo]", false);
-smpl = new GekkoSmpl(o0.t1.Add(-2), o0.t2);
-ope0.printCodesFinal = Program.GetElementPrintCodes(o0, ope0);bankNumbers = O.Prt.GetBankNumbers(null, ope0.printCodesFinal);foreach(int bankNumber in bankNumbers) {
-smpl.bankNumber = bankNumber;
-ope0.variable[bankNumber] = O.Negate(smpl, O.Indexer(O.Indexer2(smpl, new ScalarString("goo")), smpl, O.Lookup(smpl, null, null, "eX", null, null, false, EVariableType.Var), new ScalarString("goo")));
-}
-smpl.bankNumber = 0;
-o0.prtElements.Add(ope0);
-}
+p.SetText(@"¤4"); O.InitSmpl(smpl, p);
 
-
-o0.counter = 134;
-o0.printCsCounter = Globals.printCs.Count - 1;
-o0.Exe();
-return o0.emfName;
-};
-Globals.printCs.Add(Globals.printCs.Count, print0); 
-print0(new GraphHelper());
+GekkoTimes gt = O.HandleDates(O.ConvertToDate(i16, O.GetDateChoices.FlexibleStart)
+,O.ConvertToDate(i17, O.GetDateChoices.FlexibleEnd)
+ );; 
+O.HandleEndoHelper helper = new O.HandleEndoHelper();
+List<IVariable> l1 = new List<IVariable>();
+l1.Add(O.Lookup(smpl, null, null, "#m", null, null, false, EVariableType.Var)
+);
+l1.Add(new ScalarString(ScalarString.SubstituteScalarsInString(@"k1", true, false))
+);
+helper.local = O.HandleDates(O.ConvertToDate(i18, O.GetDateChoices.FlexibleStart)
+,O.ConvertToDate(i19, O.GetDateChoices.FlexibleEnd)
+ );;
+helper.varname = O.NameLookup(smpl, null, (new ScalarString(ScalarString.SubstituteScalarsInString(@"x", true, false))), null, false, EVariableType.Var);
+helper.indices = l1;
+O.HandleEndo(gt, helper);
 
 
 //[[splitSTOP]]

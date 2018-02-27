@@ -56,6 +56,13 @@ namespace Gekko
             return s;
         }
 
+        public class HandleEndoHelper
+        {
+            public GekkoTimes local = null;
+            public IVariable varname = null;
+            public List<IVariable> indices = null;
+        }
+
         public class GekkoListIterator : IEnumerable<ScalarString>
         {
             private List _ml = null;
@@ -283,6 +290,19 @@ namespace Gekko
         //    }
         //    return (ScalarVal)lhs;
         //}
+
+        public static void HandleEndo(GekkoTimes global, HandleEndoHelper helper)
+        {
+            if (Globals.endo == null) Globals.endo = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            //string s1 = x1.ConvertToString();
+            //List<string> xx2 = null; // O.GetStringList(x2);
+
+            ////string s2 = x2.ConvertToString();
+            //foreach (string s in xx2)
+            //{
+            //    Globals.endo.Add(s1 + "¤" + s, null);
+            //}
+        }
 
         public static ScalarString SetStringData(IVariable name, IVariable rhs, bool isName)
         {
@@ -654,6 +674,11 @@ namespace Gekko
             return Lookup(smpl, map, x, rhsExpression, isLeftSideVariable, type, true);
         }
 
+        public static IVariable NameLookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type)
+        {
+            return x;
+        }
+
         //NOTE: Must have same signature as DollarLookup(), #89075234532
         public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type, bool errorIfNotFound)
         {
@@ -704,6 +729,7 @@ namespace Gekko
             return Lookup(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable, type, true);
         }
 
+        //Also see #8093275432098
         public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type, bool errorIfNotFound)
         {
             //map != null:             the variable is found in the MAP, otherwise, the variable is found in a databank
@@ -771,6 +797,18 @@ namespace Gekko
                 return LookupHelperRightside(smpl, map, dbName, varnameWithFreq, errorIfNotFound);
             }
         }
+                
+        //Also see #8093275432098
+        public static string NameLookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type, bool errorIfNotFound)
+        {            
+            return varname;            
+        }
+
+        ////Also see #8093275432098
+        //public static string LookupOnlyGetName(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type)
+        //{
+        //    return LookupOnlyGetName(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable, type, true);
+        //}
 
         public static string AddFreq(string varname, string freq, EVariableType type, bool isLeftSideVariable)
         {
@@ -3429,14 +3467,29 @@ namespace Gekko
 
         public static List<string> GetStringList(IVariable a)
         {
-            List<IVariable> m = a.ConvertToList();
-            List<string> mm = new List<string>();
-            foreach (IVariable iv in m)
+            if (a.Type() == EVariableType.String)
             {
-                string s = O.ConvertToString(iv);
-                mm.Add(s);
+                List<string> mm = new List<string>();
+                mm.Add(a.ConvertToString());
+                return mm;
             }
-            return mm;
+            else if (a.Type() == EVariableType.List)
+            {
+                List<IVariable> m = a.ConvertToList();
+                List<string> mm = new List<string>();
+                foreach (IVariable iv in m)
+                {
+                    string s = O.ConvertToString(iv);
+                    mm.Add(s);
+                }
+                return mm;
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: input must b a string or list of strings");
+                throw new GekkoException();
+            }
+
         }
 
         public static Matrix GetMatrixFromString(IVariable name)

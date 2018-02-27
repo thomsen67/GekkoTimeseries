@@ -1593,7 +1593,7 @@ namespace Gekko
 
         public static bool IsMissingVariableArtificialNumber(double val)
         {
-            if (val > 2.999e300d && val < 3.001e300d)
+            if (val > Globals.missingVariableArtificialNumberLow && val < Globals.missingVariableArtificialNumberHigh)
                 return true;
             else return false;
         }        

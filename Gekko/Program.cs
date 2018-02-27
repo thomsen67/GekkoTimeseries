@@ -4738,6 +4738,28 @@ namespace Gekko
                                     }
 
                                     double value = values[gamsglobals.val_level];
+
+                                    if (value == Globals.gamsEps)
+                                    {
+                                        value = 0d;  //infinitely small value, in Gekko it is a real zero
+                                    }
+                                    else if (value == Globals.gamsNegInf)
+                                    {
+                                        value = double.NegativeInfinity;
+                                    }
+                                    else if (value == Globals.gamsPosInf)
+                                    {
+                                        value = double.PositiveInfinity;
+                                    }
+                                    else if (value == Globals.gamsNA)
+                                    {
+                                        value = double.NaN;
+                                    }
+                                    else if (value == Globals.gamsUndf)
+                                    {
+                                        value = double.NaN;
+                                    }
+
                                     if (tt == -12345)
                                     {
                                         ts2.SetTimelessData(value);
@@ -4749,6 +4771,8 @@ namespace Gekko
                                         //TODO record data in an array, and use setDataSequence().
                                         //TODO
                                         //TODO
+
+
                                         ts2.SetData(new GekkoTime(freq, tt, 1), value);
                                         yearMax = Math.Max(tt, yearMax);
                                         yearMin = Math.Min(tt, yearMin);
@@ -26873,7 +26897,7 @@ namespace Gekko
                 s2 = s2.Replace(".", ",");
             }
             if (s2 == "9.99999E+99" || s2 == "9,99999E+99"  //I think this is funny number made in Excel printing routine, to signal missing value
-                || G.isNumericalError(d2) || d2 == Globals.missingVariableArtificialNumber)  //NumericalError is 'M', and the number 3e300 is a signal from a table that variable is non-existing ('N')
+                || G.isNumericalError(d2) || d2 == Globals.missingVariableArtificialNumber)  //NumericalError is 'M', and the number Globals.missingVariableArtificialNumber is a signal from a table that variable is non-existing ('N')
             {
                 s2 = "=na()";
                 if (G.Equal(Program.options.interface_excel_language, "danish"))

@@ -952,12 +952,52 @@ namespace Gekko.Parser.Gek
                             }
                             else
                             {
-                               node.Code.A("O.Endo o" + Num(node) + " = new O.Endo();" + G.NL);
+                                //node.Code.A("O.Endo o" + Num(node) + " = new O.Endo();" + G.NL);
+                                //node.Code.A("o" + Num(node) + ".gts = " + node[0][0].Code + G.NL);
+                                //node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
 
-                                node.Code.A("o" + Num(node) + ".gts = " + node[0][0].Code + G.NL);
+                                //ASTNode nodeGeneralTime = node[0][0];
+                                //ASTNode nodeVar1 = node[1][0];
+                                //ASTNode nodeLocalTime1 = node[1][1];
 
-                                node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                                if (node[1][0].Text == "ASTDOTORINDEXER")
+                                {
+                                    
+
+                                    if (!node[1][0][0].Code.ToString().StartsWith("O.Lookup("))
+                                    {
+                                        G.Writeln2("*** ERROR: Internal error #09875209835");
+                                        throw new GekkoException();
+                                    }
+
+                                    node.Code.A("GekkoTimes gt = " + node[0][0].Code + "; " + G.NL);
+                                    
+                                    node.Code.A("O.HandleEndoHelper helper = new O.HandleEndoHelper();" + G.NL);
+
+                                    node.Code.A("List<IVariable> l1 = new List<IVariable>();" + G.NL);
+
+                                    for (int i = 0; i < node[1][0][1].ChildrenCount(); i++)
+                                    {
+                                        node.Code.A("l1.Add(" + node[1][0][1][i].Code + ");" + G.NL);
+                                    }
+
+                                    node.Code.A("helper.local = " + node[1][1].Code + ";" + G.NL);
+                                    node.Code.A("helper.varname = " + "O.NameLookup(" + node[1][0][0].Code.ToString().Substring("O.Lookup(".Length) + ";" + G.NL);
+                                    node.Code.A("helper.indices = " + "l1" + ";" + G.NL);
+
+                                    node.Code.A("O.HandleEndo(gt, helper);" + G.NL);
+
+                                }
+                                else
+                                {
+                                    //TODO
+                                }
+
+
+
                             }
+
+
 
                         }
                         break;
@@ -4937,10 +4977,6 @@ namespace Gekko.Parser.Gek
                     string sigil = GetSigilAsString(node[1][0]);
                     string ident = node[1][1][0][0][0].Text;
                     s = sigil + ident;
-                    
-
-                    
-
                 }
             }
 
