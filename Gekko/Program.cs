@@ -4524,7 +4524,7 @@ namespace Gekko
                             string s = null;
                             int error = -1;
                             int error2 = gdx.gdxUMUelGet(u, ref s, ref error);
-                            uel[u] = s;  //remember that uel[0] is empty an not meaningful                     
+                            uel[u] = s;  //remember that uel[0] is empty and not meaningful                     
                         }
 
                         timeIndex = -12345; gdx.gdxFindSymbol(Program.options.gams_time_set, ref timeIndex);
@@ -4859,6 +4859,10 @@ namespace Gekko
             //merge and date truncation:
             //do this by first reading into a Gekko databank, and then merge that with the merge facilities from gbk read
 
+            DateTime t = DateTime.Now;
+            double[] gdxValues = G.CreateArrayDouble(gamsglobals.val_max, 0d);
+            gdxValues[gamsglobals.val_scale] = 1d;
+
             string prefix = Program.options.gams_time_prefix.Trim().ToLower();
             bool hasPrefix = prefix.Length > 0;
             string file = AddExtension(file2, "." + "gdx");
@@ -4878,6 +4882,8 @@ namespace Gekko
             if (G.Equal(Program.options.gams_time_freq, "u")) freq = EFreq.Undated;
             else if (G.Equal(Program.options.gams_time_freq, "q")) freq = EFreq.Quarterly;
             else if (G.Equal(Program.options.gams_time_freq, "m")) freq = EFreq.Monthly;
+
+            int syCnt = 0, uelCnt = 0;
 
             //GAMSWorkspace ws = null;
 
@@ -4918,80 +4924,151 @@ namespace Gekko
                 }
                 gdx.gdxGetDLLVersion(ref Msg);
                 Console.WriteLine("Using GDX DLL version: " + Msg);
+                //if (false)
+                //{
+                //    //write demand data
+                //    gdx.gdxOpenWrite("demanddata.gdx", "Gekko", ref ErrNr);
+                //    if (ErrNr != 0)
+                //    {
+                //        //xp_example1.ReportIOError(ErrNr);
+                //        throw new GekkoException();
+                //    }
+                    
+                //    if (gdx.gdxDataWriteStrStart("x", "label", 2, gamsglobals.dt_par, 0) == 0)
+                //    {
+                //        //ReportGDXError();
+                //        throw new GekkoException();
+                //    }
+
+                //    string[] Indx2 = new string[gamsglobals.maxdim];
+                //    double[] Values2 = new double[gamsglobals.val_max];
+                //    Indx[0] = "lkaasdgf";
+                //    Values[gamsglobals.val_level] = 123;
+                //    gdx.gdxDataWriteStr(Indx2, Values2);
+                //    //gdx.gdxDataWriteRaw(KeyInt, Values);
+
+                //    if (gdx.gdxDataWriteDone() == 0)
+                //    {
+                //        //ReportGDXError();
+                //        throw new GekkoException();
+                //    }
+                //    //Console.WriteLine("Demand data written by xp_example1");
+                //}
+
+
                 if (true)
                 {
-                    //write demand data
-                    gdx.gdxOpenWrite("demanddata.gdx", "xp_example1", ref ErrNr);
+                    gdx.gdxOpenWrite(file2, "Gekko", ref ErrNr);
                     if (ErrNr != 0)
                     {
                         //xp_example1.ReportIOError(ErrNr);
                         throw new GekkoException();
                     }
-                    if (gdx.gdxDataWriteStrStart("Demand", "Demand data", 1, gamsglobals.dt_par, 0) == 0)
+                    //int counter = 0;
+                    foreach (BankNameVersion bnv in list)
                     {
-                        //ReportGDXError();
-                        throw new GekkoException();
-                    }
-                    WriteData("New-York", 324.0, gdx);
-                    WriteData("Chicago", 299.0, gdx);
-                    WriteData("Topeka", 274.0, gdx);
-                    if (gdx.gdxDataWriteDone() == 0)
-                    {
-                        //ReportGDXError();
-                        throw new GekkoException();
-                    }
-                    Console.WriteLine("Demand data written by xp_example1");
-                }
-                else
-                {
-                    rc = gdx.gdxOpenRead(file, ref ErrNr);
-                    if (ErrNr != 0)
-                    {
-                        //ReportIOError(ErrNr);
-                        throw new GekkoException();
-                    }
-                    //read x variable back (non-default level values only)
-                    gdx.gdxFileVersion(ref Msg, ref Producer);
-                    Console.WriteLine("GDX file written using version: " + Msg);
-                    Console.WriteLine("GDX file written by: " + Producer);
-                    if (gdx.gdxFindSymbol("x", ref VarNr) == 0)
-                    {
-                        Console.WriteLine("**** Could not find variable X");
-                        throw new GekkoException();
-                    }
-                    gdx.gdxSymbolInfo(VarNr, ref VarName, ref Dimen, ref VarTyp);
-                    if (Dimen != 2 || VarTyp != gamsglobals.dt_var)
-                    {
-                        Console.WriteLine("**** X is not a two dimensional variable");
-                        throw new GekkoException();    
-                    }
-                    if (gdx.gdxDataReadStrStart(VarNr, ref NrRecs) == 0)
-                    {
-                        //ReportGDXError();
-                        throw new GekkoException();
-                    }
-                    Console.WriteLine("Variable X has " + NrRecs + " records");
-                    while (gdx.gdxDataReadStr(ref Indx, ref Values, ref N) != 0)
-                    {
-                        if (Values[gamsglobals.val_level] == 0.0) //skip level = 0.0 is default
-                            continue;
-                        for (D = 0; D < Dimen; D++)
+                        
+                        string name = bnv.name;
+
+                        if (!G.StartsWithSigil(bnv.name))
                         {
-                            Console.Write(Indx[D]);
-                            if (D < Dimen - 1) Console.Write(".");
+                            name = G.AddCurrentFreqToName(name);
                         }
-                        Console.WriteLine(" = " + Values[gamsglobals.val_level]);
+                        string nameWithoutFreq = G.RemoveFreqFromName(name);
+
+                        Databank gdb = GetBankFromBankNameVersion(bnv.bank);
+                        IVariable iv = gdb.GetIVariable(name);
+
+                        if (iv == null)
+                        {
+                            G.Writeln2("*** ERROR: Cannot find variable '" + name + "' in databank '" + bnv.bank + "'");
+                        }
+                        Series ts = iv as Series;
+                        if (ts == null) continue;  //only write timeseries at the moment
+
+                        string label = ""; if (ts.meta?.label != null) label = ts.meta.label;  //label = null will fail with weird error later on
+
+                        int timeDimension = 1;
+                        if (ts.type == ESeriesType.Timeless)
+                        {
+                            timeDimension = 0;
+                        }
+                        else if (ts.type == ESeriesType.ArraySuper)
+                        {
+                            int ntimeless = 0;
+                            int nnontimeless = 0;
+                            foreach (IVariable iv2 in ts.dimensionsStorage.storage.Values)
+                            {
+                                if ((iv2 as Series).type == ESeriesType.Timeless) ntimeless++;
+                                else nnontimeless++;
+                            }
+                            if (ntimeless > 0 && nnontimeless > 0)
+                            {
+                                G.Writeln2("*** ERROR: The array-timeseries " + ts.name + " has subseries that are both");
+                                G.Writeln("           timeless and non-timeless --> cannot write to GDX.");
+                                throw new GekkoException();
+                            }
+                            if (ntimeless > 0) timeDimension = 0;
+                            //if ntimeless + nnontimeless == 0 it will be assumed to have time-dim in GAMS --> hard to know.
+                        }
+
+                        string[] domains = new string[ts.dimensions + timeDimension];
+                        for (int i = 0; i < domains.Length; i++) domains[i] = "*";
+                        if (timeDimension == 1) domains[domains.Length - 1] = Program.options.gams_time_set;  //we alway put the t domain last
+
+                        //counter++;
+
+                        if (gdx.gdxDataWriteStrStart(nameWithoutFreq, label, domains.Length, gamsglobals.dt_var, 0) == 0)
+                        {
+                            //ReportGDXError();
+                            throw new GekkoException();
+                        }
+                                                
+                        gdx.gdxSystemInfo(ref syCnt, ref uelCnt);                
+
+                        if (gdx.gdxSymbolSetDomainX(syCnt, domains) == 0)  //Beware, counter is brittle, how to do this properly
+                        {
+                            G.Writeln2("*** ERROR: Could not write domain names");
+                            throw new GekkoException();
+                        }
+                        
+                        if (ts.type == ESeriesType.ArraySuper)
+                        {
+                            foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
+                            {
+                                string[] ss = kvp.Key.storage;
+                                WriteGdxHelper2(t1, t2, hasPrefix, gdx, kvp.Value as Series, ss, gdxValues);
+                            }
+                        }
+                        else
+                        {
+                            //normal timeseries
+                            WriteGdxHelper2(t1, t2, hasPrefix, gdx, ts, new string[0], gdxValues);
+                        }
+                        counterVariables++;
+
+
+                        if (gdx.gdxDataWriteDone() == 0)
+                        {
+                            //ReportGDXError();
+                            throw new GekkoException();
+                        }
+
                     }
-                    Console.WriteLine("All solution values shown");
-                    gdx.gdxDataReadDone();
+                    
                 }
+
+
                 ErrNr = gdx.gdxClose();
                 if (ErrNr != 0)
                 {
                     //ReportIOError(ErrNr);
                     throw new GekkoException();
                 }
-                //return 0;
+                //return 0;
+                G.Writeln2("Wrote " + syCnt + " variables to gdx file (" + G.Seconds(t) + ")");
+
+
             }
 
 
@@ -5398,7 +5475,7 @@ namespace Gekko
             }
         }
 
-        public static void WriteGdxOld(Databank databank, GekkoTime t1, GekkoTime t2, string file2, List<BankNameVersion> list, string writeOption, bool isCloseCommand)
+        public static void WriteGdxSlow(Databank databank, GekkoTime t1, GekkoTime t2, string file2, List<BankNameVersion> list, string writeOption, bool isCloseCommand)
         {
             //TODO: try-catch if writing fails    
 
@@ -5479,9 +5556,7 @@ namespace Gekko
                     }
                     if (ntimeless > 0) timeDimension = 0;
                     //if ntimeless + nnontimeless == 0 it will be assumed to have time-dim in GAMS --> hard to know.
-                }
-
-                //GAMSVariable gvar = db.AddVariable(nameWithoutFreq, ts.storageDim + timeDimension, VarType.Free, label);
+                }                
 
                 string[] domains = new string[ts.dimensions + timeDimension];
                 for (int i = 0; i < domains.Length; i++) domains[i] = "*";
@@ -5489,7 +5564,7 @@ namespace Gekko
 
                 GAMSVariable gvar = db.AddVariable(nameWithoutFreq, VarType.Free, label, domains);
 
-                counterVariables = WriteGdxHelper(t1, t2, usePrefix, counterVariables, gdb, ts, gvar);
+                counterVariables = WriteGdxHelperSlow(t1, t2, usePrefix, counterVariables, gdb, ts, gvar);
 
             }
 
@@ -5499,7 +5574,7 @@ namespace Gekko
             if (timelessCounter > 0) G.Writeln("+++ NOTE: " + timelessCounter + " timeless timeseries skipped");
         }
 
-        private static int WriteGdxHelper(GekkoTime t1, GekkoTime t2, bool usePrefix, int counterVariables, Databank gdb, Series ts, GAMSVariable gvar)
+        private static int WriteGdxHelperSlow(GekkoTime t1, GekkoTime t2, bool usePrefix, int counterVariables, Databank gdb, Series ts, GAMSVariable gvar)
         {
 
             if (ts.type == ESeriesType.ArraySuper)
@@ -5507,20 +5582,20 @@ namespace Gekko
                 foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
                 {
                     string[] ss = kvp.Key.storage;                    
-                    WriteGdxHelper2(t1, t2, usePrefix, gvar, kvp.Value as Series, ss);
+                    WriteGdxHelperSlow2(t1, t2, usePrefix, gvar, kvp.Value as Series, ss);
                 }
             }
             
             else
             {
                 //normal timeseries
-                WriteGdxHelper2(t1, t2, usePrefix, gvar, ts, new string[0]);                
+                WriteGdxHelperSlow2(t1, t2, usePrefix, gvar, ts, new string[0]);                
             }
             counterVariables++;
             return counterVariables;
         }
 
-        private static void WriteGdxHelper2(GekkoTime t1, GekkoTime t2, bool usePrefix, GAMSVariable gvar, Series ts2, string[] ss)
+        private static void WriteGdxHelperSlow2(GekkoTime t1, GekkoTime t2, bool usePrefix, GAMSVariable gvar, Series ts2, string[] ss)
         {
             if (ts2.type == ESeriesType.Timeless)
             {
@@ -5564,6 +5639,85 @@ namespace Gekko
                         ss2[ss2.Length - 1] = date;
 
                         gvar.AddRecord(ss2).Level = ts2.GetData(null, t);
+
+                    }
+                }
+            }
+
+            return;
+        }
+
+        //private static int WriteGdxHelper(GekkoTime t1, GekkoTime t2, bool usePrefix, int counterVariables, Databank gdb, Series ts, GAMSVariable gvar)
+        //{
+
+        //    if (ts.type == ESeriesType.ArraySuper)
+        //    {
+        //        foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
+        //        {
+        //            string[] ss = kvp.Key.storage;
+        //            WriteGdxHelper2(t1, t2, usePrefix, gvar, kvp.Value as Series, ss);
+        //        }
+        //    }
+
+        //    else
+        //    {
+        //        //normal timeseries
+        //        WriteGdxHelper2(t1, t2, usePrefix, gvar, ts, new string[0]);
+        //    }
+        //    counterVariables++;
+        //    return counterVariables;
+        //}
+
+        private static void WriteGdxHelper2(GekkoTime t1, GekkoTime t2, bool usePrefix, Gdxcs gdx, Series ts2, string[] ss, double[] gdxValues)
+        {
+            
+            if (ts2.type == ESeriesType.Timeless)
+            {
+                try
+                {
+                    gdxValues[gamsglobals.val_level] = ts2.GetTimelessData();
+                    gdx.gdxDataWriteStr(ss, gdxValues);
+                    //gvar.AddRecord(ss).Level = ts2.GetTimelessData();  //timeless data location   
+                }
+                catch
+                {
+
+                }
+            }
+            else
+            {
+                GekkoTime gt1 = t1;
+                GekkoTime gt2 = t2;
+                if (t1.IsNull())
+                {
+                    gt1 = ts2.GetRealDataPeriodFirst();
+                    gt2 = ts2.GetRealDataPeriodLast();
+                }
+                if (gt1.IsNull())
+                {
+                    //do not write a weird record if the timeseries has no data
+                }
+                else
+                {
+                    string[] ss2 = new string[ss.Length + 1];
+                    foreach (GekkoTime t in new GekkoTimeIterator(gt1, gt2))
+                    {                        
+                        Array.Copy(ss, 0, ss2, 0, ss.Length);
+                        string date = null;
+                        if (usePrefix && t.freq == EFreq.Annual)
+                        {
+                            date = Program.options.gams_time_prefix + (t.super - (int)Program.options.gams_time_offset).ToString();
+                        }
+                        else
+                        {
+                            date = t.ToString();
+                        }
+                        ss2[ss2.Length - 1] = date;
+
+                        gdxValues[gamsglobals.val_level] = ts2.GetData(null, t);
+                        gdx.gdxDataWriteStr(ss2, gdxValues);
+
+                        //gvar.AddRecord(ss2).Level = ts2.GetData(null, t);
 
                     }
                 }
