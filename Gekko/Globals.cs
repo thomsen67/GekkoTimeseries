@@ -40,7 +40,7 @@ namespace Gekko
     /// </summary>
     public class Globals        
     {
-        public static string versionInternal = "v5";  //v5
+        public static string versionInternal = "v6";  //v6
 
         public static bool version30 = true;
 
@@ -451,8 +451,8 @@ namespace Gekko
         public static Databank undoBank = null;
         public static int hasBeenEndoExoStatementsSinceLastSim = 0;
 
-        public static GekkoDictionary<string, string> endo = null;
-        public static GekkoDictionary<string, string> exo = null;
+        public static O.HandleEndoHelper2 endo = null;
+        public static O.HandleEndoHelper2 exo = null;
 
         public static List<string> tsdxVersions = new List<string> { "1.0", "1.1", "1.2" };  //1.0 = zipped tsd, 1.1 = protobuffers, 1.2 = Gekko 3.0 protobuffers.
 

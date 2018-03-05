@@ -9894,8 +9894,43 @@ namespace UnitTests
 
 
         }
-
         [TestMethod]
+        public void _Test_EndoExo()
+        {
+            I("reset;");
+            I("%s1 = 'a';");
+            I("string s2 = 'x';");
+
+            I("exo {%s2}[%s1+'', 'k1'] <2002 2004>, y<2004 2006>;");
+            I("endo <2003 2005> x['a', 'k1']<2001 2002>, y;");
+
+            _AssertSeries(First(), "exo_x", new string[] { "a", "k1" }, 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "exo_x", new string[] { "a", "k1" }, 2002, 1d, sharedDelta);
+            _AssertSeries(First(), "exo_x", new string[] { "a", "k1" }, 2003, 1d, sharedDelta);
+            _AssertSeries(First(), "exo_x", new string[] { "a", "k1" }, 2004, 1d, sharedDelta);
+            _AssertSeries(First(), "exo_x", new string[] { "a", "k1" }, 2005, double.NaN, sharedDelta);
+
+            _AssertSeries(First(), "exo_y", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "exo_y", 2004, 1d, sharedDelta);
+            _AssertSeries(First(), "exo_y", 2005, 1d, sharedDelta);
+            _AssertSeries(First(), "exo_y", 2006, 1d, sharedDelta);
+            _AssertSeries(First(), "exo_y", 2007, double.NaN, sharedDelta);
+
+            _AssertSeries(First(), "endo_x", new string[] { "a", "k1" }, 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "endo_x", new string[] { "a", "k1" }, 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "endo_x", new string[] { "a", "k1" }, 2002, 1d, sharedDelta);            
+            _AssertSeries(First(), "endo_x", new string[] { "a", "k1" }, 2003, double.NaN, sharedDelta);
+
+            _AssertSeries(First(), "endo_y", 2002, double.NaN, sharedDelta);
+            _AssertSeries(First(), "endo_y", 2003, 1d, sharedDelta);
+            _AssertSeries(First(), "endo_y", 2004, 1d, sharedDelta);
+            _AssertSeries(First(), "endo_y", 2005, 1d, sharedDelta);
+            _AssertSeries(First(), "endo_y", 2006, double.NaN, sharedDelta);
+            
+        }
+
+
+    [TestMethod]
         public void _Test_Print()
         {
             I("reset;");

@@ -56,6 +56,12 @@ namespace Gekko
             return s;
         }
 
+        public class HandleEndoHelper2
+        {
+            public GekkoTimes global = null;            
+            public List<HandleEndoHelper> helper = null;
+        }
+
         public class HandleEndoHelper
         {
             public GekkoTimes local = null;
@@ -291,17 +297,146 @@ namespace Gekko
         //    return (ScalarVal)lhs;
         //}
 
-        public static void HandleEndo(GekkoTimes global, List<HandleEndoHelper> helper)
+        public static void HandleEndoExo(GekkoTimes global, List<HandleEndoHelper> helper, bool type)
         {
-            if (Globals.endo == null) Globals.endo = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            //string s1 = x1.ConvertToString();
-            //List<string> xx2 = null; // O.GetStringList(x2);
+            
+            if (type)
+            {
+                Globals.endo = new HandleEndoHelper2();
+                Globals.endo.global = global;
+                Globals.endo.helper = helper;
+            }
+            else
+            {
+                Globals.exo = new HandleEndoHelper2();
+                Globals.exo.global = global;
+                Globals.exo.helper = helper;
+            }
+            SetEndoExo(type);
+        }
 
-            ////string s2 = x2.ConvertToString();
-            //foreach (string s in xx2)
-            //{
-            //    Globals.endo.Add(s1 + "¤" + s, null);
-            //}
+        public static void SetEndoExo(bool type)
+        {
+
+            Databank databank = Program.databanks.GetFirst();
+
+            string name = "endo"; if (!type) name = "exo";
+
+            //Clear all endo_ or exo_ variables
+            if (true)
+            {
+                List<string> delete = new List<string>();
+                foreach (KeyValuePair<string, IVariable> kvp in databank.storage)
+                {
+                    if (kvp.Key.StartsWith(name + "_", StringComparison.OrdinalIgnoreCase) && kvp.Key.EndsWith(Globals.freqIndicator + G.GetFreq(EFreq.Annual), StringComparison.OrdinalIgnoreCase))
+                    {
+                        //starts with endo_ or exo_ and is of annual type
+                        delete.Add(kvp.Key);
+                    }
+                }
+                foreach (string s in delete)
+                {
+                    databank.RemoveIVariable(s);
+                }
+            }
+
+
+            GekkoTimes global = null;
+            List<HandleEndoHelper> helper = null;
+
+            if (type)
+            {
+                global = Globals.endo.global;
+                helper = Globals.endo.helper;
+            }
+            else 
+            {
+                global = Globals.exo.global;
+                helper = Globals.exo.helper;
+            }
+
+            foreach (HandleEndoHelper h in helper)
+            {
+                string s = h.varname.ConvertToString();
+                if (!G.IsSimpleToken(s))
+                {
+                    G.Writeln2("*** ERROR: The name '" + s + "' is not a simple series name");
+                    throw new GekkoException();
+                }
+                List<string> ss = new List<string>();
+                if (h.indices != null)
+                {
+                    foreach (IVariable iv in h.indices)
+                    {
+                        if (iv.Type() != EVariableType.String)
+                        {
+                            G.Writeln2("*** ERROR: Expected indices of '" + s + "' to be of string type");
+                            G.Writeln("           List type will be supported soon.");
+                            throw new GekkoException();
+                        }
+                        ss.Add(iv.ConvertToString());
+                    }
+                }
+                
+
+                EFreq freq = EFreq.Annual;
+                string varNameWithFreq = name + "_" + s + Globals.freqIndicator + G.GetFreq(freq);
+
+                GekkoTimes gts = global;
+                if (h.local != null) gts = h.local;
+
+                if (gts == null)
+                {
+                    G.Writeln2("*** ERROR: No time period given for variable '" + s + "'");
+                    throw new GekkoException();
+                }
+
+                Series ts2 = null;
+
+                Series ts = databank.GetIVariable(varNameWithFreq) as Series;
+
+                if (ss.Count > 0)
+                {
+                    //Multi-dim timeseries
+                    //What about timeless??                        
+
+                    if (ts == null)
+                    {
+                        ts = new Series(freq, varNameWithFreq);
+                        ts.SetArrayTimeseries(ss.Count + 1, true);
+                        databank.AddIVariable(ts.name, ts);
+                    }
+
+                    MapMultidimItem mmi = new MapMultidimItem(ss.ToArray());
+                    IVariable iv = null; ts.dimensionsStorage.TryGetValue(mmi, out iv);
+                    if (iv == null)
+                    {
+                        ts2 = new Series(freq, null);
+                        ts.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts2);
+                    }
+                    else
+                    {
+                        ts2 = iv as Series;
+                    }
+                }
+                else
+                {
+                    //Normal 0-dim timeseries
+                    //What about timeless??
+                    ts2 = ts;
+                    if (ts2 == null)
+                    {
+                        ts2 = new Series(freq, varNameWithFreq);
+                        databank.AddIVariable(ts2.name, ts2);
+                    }
+                }
+
+                foreach (GekkoTime t in new GekkoTimeIterator(gts.t1, gts.t2))
+                {
+                    ts2.SetData(t, 1d);
+                }
+            }
+
         }
 
         public static ScalarString SetStringData(IVariable name, IVariable rhs, bool isName)
