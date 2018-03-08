@@ -86,6 +86,27 @@ namespace Gekko
             
         }
 
+        public static IVariable getendoexo(GekkoSmpl smpl)
+        {
+            Databank databank = Program.databanks.GetFirst();
+            
+            List<string> fixes = new List<string>();
+            foreach (string name in new string[] { "endo", "exo" })
+            {
+                foreach (KeyValuePair<string, IVariable> kvp in databank.storage)
+                {
+                    if (kvp.Key.StartsWith(name + "_", StringComparison.OrdinalIgnoreCase) && kvp.Key.EndsWith(Globals.freqIndicator + G.GetFreq(Program.options.freq), StringComparison.OrdinalIgnoreCase))
+                    {
+                        //starts with endo_ or exo_ and is of annual type
+                        fixes.Add(G.RemoveFreqIndicator(kvp.Key));
+                    }
+                }
+            }
+            fixes.Sort();
+            List fix = new List(fixes);            
+            return fix;
+        }
+
         public static IVariable refname(GekkoSmpl smpl)
         {
             return new ScalarString(Program.databanks.GetRef().name);

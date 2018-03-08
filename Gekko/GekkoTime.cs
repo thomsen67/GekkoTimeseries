@@ -292,7 +292,11 @@ namespace Gekko
         {
             if (this.freq == EFreq.Annual)
             {
-                return "" + super;
+                if (super >= Globals.timeStringsStart && super <= Globals.timeStringsEnd)
+                {
+                    return Globals.timeStrings[super - Globals.timeStringsStart];  //faster, and works like a string cache
+                }
+                return super.ToString();
             }
             else if (this.freq == EFreq.Quarterly)
             {

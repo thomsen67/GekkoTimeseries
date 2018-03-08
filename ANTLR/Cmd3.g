@@ -2766,6 +2766,7 @@ optionType:
 
 			 | GAMS TIME DETECT AUTO '='? yesNoSimple -> GAMS TIME DETECT AUTO ^(ASTBOOL yesNoSimple)
 			 | GAMS EXE FOLDER '='? fileName -> GAMS EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
+			 | GAMS FAST '='? yesNoSimple -> GAMS FAST ^(ASTBOOL yesNoSimple)
 			 | GAMS TIME FREQ '='? expression -> GAMS TIME FREQ ^(ASTSTRINGSIMPLE expression)
 			 | GAMS TIME OFFSET '='? Integer -> GAMS TIME OFFSET ^(ASTINTEGER Integer)
 			 | GAMS TIME PREFIX '='? expression -> GAMS TIME PREFIX ^(ASTSTRINGSIMPLE expression)

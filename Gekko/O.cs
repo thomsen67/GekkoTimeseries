@@ -328,7 +328,7 @@ namespace Gekko
                 List<string> delete = new List<string>();
                 foreach (KeyValuePair<string, IVariable> kvp in databank.storage)
                 {
-                    if (kvp.Key.StartsWith(name + "_", StringComparison.OrdinalIgnoreCase) && kvp.Key.EndsWith(Globals.freqIndicator + G.GetFreq(EFreq.Annual), StringComparison.OrdinalIgnoreCase))
+                    if (kvp.Key.StartsWith(name + "_", StringComparison.OrdinalIgnoreCase) && kvp.Key.EndsWith(Globals.freqIndicator + G.GetFreq(Program.options.freq), StringComparison.OrdinalIgnoreCase))
                     {
                         //starts with endo_ or exo_ and is of annual type
                         delete.Add(kvp.Key);
@@ -353,7 +353,8 @@ namespace Gekko
             {
                 global = Globals.exo.global;
                 helper = Globals.exo.helper;
-            }
+            }                       
+            
 
             foreach (HandleEndoHelper h in helper)
             {
@@ -377,11 +378,10 @@ namespace Gekko
                         ss.Add(iv.ConvertToString());
                     }
                 }
+                                                
+                string varNameWithoutFreq = name + "_" + s;
+                string varNameWithFreq = varNameWithoutFreq + Globals.freqIndicator + G.GetFreq(Program.options.freq);
                 
-
-                EFreq freq = EFreq.Annual;
-                string varNameWithFreq = name + "_" + s + Globals.freqIndicator + G.GetFreq(freq);
-
                 GekkoTimes gts = global;
                 if (h.local != null) gts = h.local;
 
@@ -402,7 +402,7 @@ namespace Gekko
 
                     if (ts == null)
                     {
-                        ts = new Series(freq, varNameWithFreq);
+                        ts = new Series(Program.options.freq, varNameWithFreq);
                         ts.SetArrayTimeseries(ss.Count + 1, true);
                         databank.AddIVariable(ts.name, ts);
                     }
@@ -411,7 +411,7 @@ namespace Gekko
                     IVariable iv = null; ts.dimensionsStorage.TryGetValue(mmi, out iv);
                     if (iv == null)
                     {
-                        ts2 = new Series(freq, null);
+                        ts2 = new Series(Program.options.freq, null);
                         ts.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts2);
                     }
                     else
@@ -426,7 +426,7 @@ namespace Gekko
                     ts2 = ts;
                     if (ts2 == null)
                     {
-                        ts2 = new Series(freq, varNameWithFreq);
+                        ts2 = new Series(Program.options.freq, varNameWithFreq);
                         databank.AddIVariable(ts2.name, ts2);
                     }
                 }
@@ -436,7 +436,6 @@ namespace Gekko
                     ts2.SetData(t, 1d);
                 }
             }
-
         }
 
         public static ScalarString SetStringData(IVariable name, IVariable rhs, bool isName)

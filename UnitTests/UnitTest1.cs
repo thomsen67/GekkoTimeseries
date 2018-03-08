@@ -162,7 +162,7 @@ namespace UnitTests
 
             Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();  //uses reflection to do this
 
-            Program.InitUfunctionsAndArithmetics();
+            Program.InitUfunctionsAndArithmeticsAndMore();
 
             //Globals.unitTestCounter++;
             //if (Globals.unitTestWindow == null)

@@ -725,7 +725,7 @@ namespace Gekko
         {
             int i = s.LastIndexOf(Globals.freqIndicator);
             if (i < 0) return s;
-            return s.Substring(0, s.Length - i);
+            return s.Substring(0, i);
         }
 
         public static string ReplaceFirstOccurrence(string original, string oldValue, string newValue)

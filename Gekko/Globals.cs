@@ -40,7 +40,7 @@ namespace Gekko
     /// </summary>
     public class Globals        
     {
-        public static string versionInternal = "v6";  //v6
+        public static string versionInternal = "v7"; 
 
         public static bool version30 = true;
 
@@ -181,6 +181,10 @@ namespace Gekko
 
         public static string uProc = "UProc";
         public static Dictionary<string, string> uFunctionStorageCs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        public const int timeStringsStart = 1900;
+        public const int timeStringsEnd = 2500;
+        public static string[] timeStrings = null;  //stores "1900" to "2500" for easy access and reuse
 
         //public static bool useTestParser = true;  //for debugging, use trial parser        
         public static bool substituteAssignVars = false;
