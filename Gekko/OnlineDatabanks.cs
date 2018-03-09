@@ -71,16 +71,29 @@ namespace Gekko
                 throw;
             }
 
-            string tableName = null;
+            bool saved = false;
+            int? saved2 = null;
             try
             {
-                tableName = (string)jsonTree["table"];
+                saved2 = (int)jsonTree["savedQueryId"];
             }
             catch { }
-            if (tableName == null)
+            if (saved2 != null) saved = true;
+            
+
+            string tableName = null;
+            if (!saved)
             {
-                G.Writeln2("*** ERROR: You should use \"table\": \"...\", in the .json file");
-                throw new GekkoException();
+                try
+                {
+                    tableName = (string)jsonTree["table"];
+                }
+                catch { }
+                if (tableName == null)
+                {
+                    G.Writeln2("*** ERROR: You should use \"table\": \"...\", in the .json file");
+                    throw new GekkoException();
+                }
             }
             
             string format = null;
@@ -94,20 +107,24 @@ namespace Gekko
                 G.Writeln2("*** ERROR: You should use \"format\": \"px\", in the .json file");
                 throw new GekkoException();
             }
-            
-            List<string> codesHeaderJson = new List<string>();
-            try
-            {
-                object[] o = (object[])jsonTree["variables"];
-                foreach (Dictionary<string, object> oo in o)
+
+            List<string> codesHeaderJson = null;
+            if (!saved)
+            {                
+                try
                 {
-                    codesHeaderJson.Add((string)oo["code"]);
+                    object[] o = (object[])jsonTree["variables"];                    
+                    foreach (Dictionary<string, object> oo in o)
+                    {
+                        if (codesHeaderJson == null) codesHeaderJson = new List<string>();
+                        codesHeaderJson.Add((string)oo["code"]);
+                    }
                 }
-            }
-            catch
-            {
-                G.Writeln2("*** ERROR: The \"variables\" field in the .json file seems malformed");
-                throw new GekkoException();
+                catch
+                {
+                    G.Writeln2("*** ERROR: The \"variables\" field in the .json file seems malformed");
+                    throw new GekkoException();
+                }
             }
 
             StreamWriter streamWriter = null;
