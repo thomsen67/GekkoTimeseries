@@ -59,28 +59,44 @@ namespace Gekko
             httpWebRequest.Credentials = CredentialCache.DefaultNetworkCredentials;  //seems necessary together with the above
             httpWebRequest.UserAgent = "Gekko/" + Globals.gekkoVersion;  //Pelle Rossau von Hedemann (DST) skriver "Jeg kan i øvrigt anbefale at sætte UserAgent, fx Gekko/2.3.4, på request-objektet, således at denne kan genfindes i loggen. API’et returnerer i øvrigt en header med navnet ” StatbankAPI-Request-Id”, som indeholder et GUID for hvert eneste kald. Denne gør det muligt at identificere det specifikke kald i vores log. Man kan, hvis man ønsker det, opsamle denne id og præsentere den for brugeren på en eller anden måde"
 
-            Dictionary<string, object> jsonTree = null;
+            
+Dictionary<string, object> jsonTree = null;
             try
             {
                 jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
             }
             catch (Exception e)
             {
-                G.Writeln2("*** ERROR: The .json file does not seem correctly formatted.");
-                G.Writeln("           Message: " + e.Message);
-                throw;
+                G.Writeln2("+++ WARNING: The .json file does not seem correctly formatted.");
+                G.Writeln("             " + e.Message);
+                //throw;
             }
 
-            string tableName = null;
+            bool saved = false;
+            int? saved2 = null;
+
             try
             {
-                tableName = (string)jsonTree["table"];
+                saved2 = (int)jsonTree["savedQueryId"];
             }
             catch { }
-            if (tableName == null)
+            if (saved2 != null) saved = true;
+            
+
+            string tableName = null;
+            if (!saved)
             {
-                G.Writeln2("*** ERROR: You should use \"table\": \"...\", in the .json file");
-                throw new GekkoException();
+
+                try
+                {
+                    tableName = (string)jsonTree["table"];
+                }
+                catch { }
+                if (tableName == null)
+                {
+                    G.Writeln2("+++ WARNING: You should use \"table\": \"...\", in the .json file");
+                    //throw new GekkoException();
+                }
             }
             
             string format = null;
@@ -91,23 +107,27 @@ namespace Gekko
             catch { }
             if (format == null || !G.Equal(format, "px"))
             {
-                G.Writeln2("*** ERROR: You should use \"format\": \"px\", in the .json file");
-                throw new GekkoException();
+                G.Writeln2("+++ WARNING: You should use \"format\": \"px\", in the .json file");
+                //throw new GekkoException();
             }
-            
-            List<string> codesHeaderJson = new List<string>();
-            try
-            {
-                object[] o = (object[])jsonTree["variables"];
-                foreach (Dictionary<string, object> oo in o)
+
+            List<string> codesHeaderJson = null;
+            if (!saved)
+            {                
+                try
                 {
-                    codesHeaderJson.Add((string)oo["code"]);
+                    object[] o = (object[])jsonTree["variables"];                    
+                    foreach (Dictionary<string, object> oo in o)
+                    {
+                        if (codesHeaderJson == null) codesHeaderJson = new List<string>();
+                        codesHeaderJson.Add((string)oo["code"]);
+                    }
                 }
-            }
-            catch
-            {
-                G.Writeln2("*** ERROR: The \"variables\" field in the .json file seems malformed");
-                throw new GekkoException();
+                catch
+                {
+                    G.Writeln2("+++ WARNING: The \"variables\" field in the .json file seems malformed");
+                    //throw new GekkoException();
+                }
             }
 
             StreamWriter streamWriter = null;
@@ -122,7 +142,6 @@ namespace Gekko
                 G.Writeln("           " + e.Message);
                 throw;
             }
-
             using (streamWriter)
             {
                 streamWriter.Write(jsonCode);

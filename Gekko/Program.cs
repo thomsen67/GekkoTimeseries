@@ -754,6 +754,8 @@ namespace Gekko
         /// </summary>
         public static Model model = null;
 
+        public static ModelGams modelGams = null;
+
         //these should be cleared with closeall
         /// <summary>
         /// Contains names of the open databanks. Not case-sensitive. The name of any bank points to a
@@ -2262,7 +2264,7 @@ namespace Gekko
                             G.Writeln2("*** ERROR: At the moment, you cannot use period truncation in GDX data import");
                             throw new GekkoException();
                         }
-                        Program.ReadGdx(databankTemp, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
+                        Program.ReadGdx(databankTemp, dates, oRead, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
                     }
                     else if (oRead.Type == EDataFormat.Px)
                     {
@@ -2439,9 +2441,12 @@ namespace Gekko
             bool isDirty = false;
             if (removed.isDirty) isDirty = true;
             else
-            {
-                foreach (Series ts in removed.storage.Values)
+            {               
+
+                foreach (IVariable iv in removed.storage.Values)
                 {
+                    Series ts = iv as Series;
+                    if (ts == null) continue;
                     if (ts.IsDirty())
                     {
                         isDirty = true;
@@ -4415,14 +4420,14 @@ namespace Gekko
             }
         }
 
-        public static void ReadGdx(Databank databank, AllFreqsHelper dates, ReadOpenMulbkHelper oRead, string file2, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
+        public static void ReadGdx(Databank databank, AllFreqsHelper dates, ReadOpenMulbkHelper oRead, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
         {
             //merge and date truncation:
             //do this by first reading into a Gekko databank, and then merge that with the merge facilities from gbk read
 
             string prefix = Program.options.gams_time_prefix.Trim().ToLower();
             bool hasPrefix = prefix.Length > 0;
-            string file = AddExtension(file2, "." + "gdx");
+            string file = AddExtension(fileLocal, "." + "gdx");
             int offset = (int)Program.options.gams_time_offset;
             DateTime dt1 = DateTime.Now;
             int skippedSets = 0;
@@ -4537,9 +4542,11 @@ namespace Gekko
                         //varType = 0: SET
                         //varType = 1: PARAM
                         //varType = 2: VARIABLE
+                        //varType = 3: EQU
                         //varType = 4: ALIAS
                         for (int i = 1; i < int.MaxValue; i++)
-                        {
+                        {                          
+
                             gdx.gdxSymbolInfo(i, ref varName, ref gdxDimensions, ref varType);
                             
                             string label = null; int records = -12345; int userInfo = -12345;
@@ -4587,6 +4594,20 @@ namespace Gekko
 
                                 importedSets++;
                             }
+                            //else if (varType == 3) //equ
+                            //{
+                            //    if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0)
+                            //    {
+                            //        G.Writeln2("*** ERROR: gdx error");
+                            //        throw new GekkoException();
+                            //    }
+                            //    while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
+                            //    {
+                            //        string s = null;
+                                    
+                            //    }
+                            //    gdx.gdxDataReadDone();
+                            //}
                             else if (varType == 1 || varType == 2) //parameter or variable
                             {
                                 //
@@ -4631,7 +4652,7 @@ namespace Gekko
                                     if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
                                     ts = new Series(freq, varNameWithFreq);
                                     ts.meta.label = label;
-                                    if (timeDimNr == -12345) ts.type = ESeriesType.Timeless;                                    
+                                    if (timeDimNr == -12345) ts.type = ESeriesType.Timeless;
                                     databank.AddIVariable(ts.name, ts);
                                 }
 
@@ -14115,6 +14136,8 @@ namespace Gekko
 
         public static void DispSearch(string s)
         {
+            Databank db = Program.databanks.GetFirst();
+
             G.Writeln();
             int widthRemember = Program.options.print_width;
             int fileWidthRemember = Program.options.print_filewidth;
@@ -14123,29 +14146,60 @@ namespace Gekko
             try
             {
                 s = StripQuotes(s);
-                if (Program.unfoldedVariableList == null || Program.unfoldedVariableList.Count == 0)
-                {
-                    G.Writeln("No variable list read, so label search cannot be performed");
-                    return;
-                }
-                List<string> explanation = new List<string>();
-                if (Program.unfoldedVariableList == null) return;
+
                 List<string> vars = new List<string>();
                 List<string> expl = new List<string>();
                 List<string> both = new List<string>();
-                foreach (Program.Item item in Program.unfoldedVariableList)
+                List<string> both2 = new List<string>();
+
+                bool differentFreq = false;
+                if (Program.unfoldedVariableList == null || Program.unfoldedVariableList.Count == 0)
                 {
-                    string ss = "";
-                    if (item.explanation.Count > 0) ss = item.explanation[0];
-                    if (G.Contains(ss, s))
+                    //try variable labels
+                    foreach (IVariable iv in db.storage.Values)
                     {
-                        vars.Add(item.variable);
-                        expl.Add(ss);
-                        both.Add(item.variable + "¤" + ss); //A bit hacky, but an easy way to get the variables sorted without using LINQ or Dictionary
+                        Series ts = iv as Series;
+                        if (ts == null) continue;
+                        string label = ts?.meta.label;
+                        if (label == null) continue;
+                        if (G.Contains(label, s))
+                        {
+                            vars.Add(ts.name);
+                            expl.Add(label);
+                            both.Add(ts.name + "¤" + label); //A bit hacky, but an easy way to get the variables sorted without using LINQ or Dictionary
+                            both2.Add(G.RemoveFreqFromName(ts.name) + "¤" + label);
+                            if (Program.options.freq != ts.freq)
+                                differentFreq = true;                            
+                        }
+                    }
+                }
+                else
+                {
+                    List<string> explanation = new List<string>();
+                    if (Program.unfoldedVariableList == null) return;
+                    
+                    foreach (Program.Item item in Program.unfoldedVariableList)
+                    {
+                        string ss = "";
+                        if (item.explanation.Count > 0) ss = item.explanation[0];
+                        if (G.Contains(ss, s))
+                        {
+                            vars.Add(item.variable);
+                            expl.Add(ss);
+                            both.Add(item.variable + "¤" + ss); //A bit hacky, but an easy way to get the variables sorted without using LINQ or Dictionary
+                        }
                     }
                 }
 
-                both.Sort();
+                if (!differentFreq)
+                {
+                    both2.Sort();
+                    both = both2;
+                }
+                else
+                {
+                    both.Sort();
+                }
 
                 int max = 0;
                 for (int i = 0; i < vars.Count; i++)
@@ -14226,6 +14280,9 @@ namespace Gekko
 
         public static void Disp(GekkoTime tStart, GekkoTime tEnd, List<string> list, bool showFrnEquation, bool showAllPeriods, bool clickedLink, O.Disp o)
         {
+            bool gamsStyle = true;
+            bool gamsToGekko = true;
+
             GekkoSmpl smpl = new GekkoSmpl(tStart, tEnd);
             if (o != null && G.Equal(o.opt_info, "yes"))
             {
@@ -14283,25 +14340,95 @@ namespace Gekko
                 }
 
                 string var = ts.name;
-                string bank = ts.meta.parentDatabank.name;
+                string bank = ts.meta.parentDatabank.name;                                
 
-                if (ts.type == ESeriesType.ArraySuper)
-                {
-                    //foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
-                    //{
+                string varnameWithoutFreq = G.RemoveFreqFromKey(ts.name);
 
-                    //}
+                if (gamsStyle)
+                {                       
 
-                    List<MapMultidimItem> keys = ts.dimensionsStorage.storage.Keys.ToList();
-                    keys.Sort(CompareMapMultidimItems);
-
-                    GekkoDictionary<string, string>[] temp = new GekkoDictionary<string, string>[ts.dimensions];
-                    
                     G.Writeln2("==========================================================================================");
-                    G.Writeln("ARRAY-SERIES " + bank + Globals.symbolBankColon + G.RemoveFreqFromKey(ts.name));
-                    G.Writeln(G.GetFreqString(ts.freq) + " array-timeseries has " + keys.Count + " elements in " + ts.dimensions + " dimensions");
-                    if (keys.Count > 0)
+                    G.Writeln("SERIES " + bank + Globals.symbolBankColon + varnameWithoutFreq);
+                    if (!G.NullOrEmpty(ts.meta.label)) G.Writeln(ts.meta.label);
+                    
+                    List<MapMultidimItem> keys = null;
+                    GekkoDictionary<string, string>[] temp = null;
+
+                    if (ts.type == ESeriesType.ArraySuper)
                     {
+                        keys = ts.dimensionsStorage.storage.Keys.ToList();
+                        keys.Sort(CompareMapMultidimItems);
+                        temp = new GekkoDictionary<string, string>[ts.dimensions];
+                    }
+
+                    if (Program.modelGams?.equations != null)
+                    {
+                        GekkoDictionary<string, string> precedents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                        foreach (KeyValuePair<string, List<ModelGamsEquation>> e4 in Program.modelGams.equations)
+                        {
+                            foreach (ModelGamsEquation e5 in e4.Value)
+                            {
+                                GekkoDictionary<string, string> knownVars2 = GetKnownVars(e5.rhsRaw);
+                                if (knownVars2.ContainsKey(varnameWithoutFreq) && !precedents.ContainsKey(e4.Key)) precedents.Add(e4.Key, null);
+                            }
+                        }
+                        List<string> precedents2 = new List<string>();
+                        precedents2.AddRange(precedents.Keys);
+                        precedents2.Sort();
+
+                        if (precedents2.Count > 0)
+                        {
+                            G.Write("Influences: ");
+                            int counter = -1;
+                            foreach (string s in precedents2)
+                            {
+                                counter++;
+                                if (counter > 0)
+                                {
+                                    G.Write(", ");
+                                }
+                                G.WriteLink(s, "disp:" + s);
+                            }
+                            G.Writeln();
+                        }                        
+
+                        List<ModelGamsEquation> eqs = null; Program.modelGams.equations.TryGetValue(varnameWithoutFreq, out eqs);
+
+                        if (eqs != null && eqs.Count > 0)
+                        {
+                            PrintEquationWithLinks(gamsToGekko, varnameWithoutFreq, eqs);
+                        }
+
+                        if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
+
+                    }
+
+                    if (ts.dimensions > 0)
+                    {
+                        GekkoTime t1 = GekkoTime.tNull;
+                        GekkoTime t2 = GekkoTime.tNull;
+
+                        foreach (IVariable iv in ts.dimensionsStorage.storage.Values)
+                        {
+                            Series ts2 = iv as Series;
+                            if (ts == null || ts.freq != ts2.freq) continue;
+                            GekkoTime tt1 = ts2.GetRealDataPeriodFirst();
+                            GekkoTime tt2 = ts2.GetRealDataPeriodLast();
+                            if (tt1.StrictlySmallerThan(t1)) t1 = tt1;
+                            if (tt2.StrictlyLargerThan(t2)) t2 = tt2;
+                        }
+
+                        string period = null;
+                        if (t1.IsNull() || t2.IsNull())
+                        {
+                            //skip period
+                        }
+                        else
+                        {
+                            period = " (period " + t1.ToString() + " - " + t2.ToString() + ")";
+                        }
+                        
+                        G.Writeln2(G.GetFreqString(ts.freq) + " series has " + keys.Count + " elements in " + ts.dimensions + " dimensions" + period);
                         double dimCount2 = 1d;
                         string dimCount = null;
                         for (int i = 0; i < ts.dimensions; i++)
@@ -14317,7 +14444,7 @@ namespace Gekko
                             temp2.Sort(G.CompareNaturalIgnoreCase);
                             dimCount2 = dimCount2 * temp[i].Count;
                             dimCount += temp2.Count + " * ";
-                            G.Writeln2("Dimension #" + (i + 1) + " (" + temp[i].Count + " members): " + G.GetListWithCommas(temp2));
+                            G.Writeln("Dimension #" + (i + 1) + " (" + temp[i].Count + " members): " + G.GetListWithCommas(temp2));
                         }
                         dimCount = dimCount.Substring(0, dimCount.Length - " * ".Length);
 
@@ -14325,15 +14452,89 @@ namespace Gekko
                         string first = keys[0].ToString();
                         string last = keys[keys.Count - 1].ToString();
 
-                        G.Writeln2("First element (alphabetically): " + G.RemoveFreqFromKey(ts.name) + "[" + first + "]");
-                        G.Writeln("Last element (alphabetically): " + G.RemoveFreqFromKey(ts.name) + "[" + last + "]");
-                        G.Writeln2("Dimension span: " + dimCount + " = " + dimCount2 + ", density: " + keys.Count + "/" + dimCount2 + " = " + Program.NumberFormat(100d * (keys.Count / dimCount2), "0.00") + "%");
+                        G.Writeln("First/last elements (alphabetically): " + G.RemoveFreqFromKey(ts.name) + "[" + first + "]" + " ... " + G.RemoveFreqFromKey(ts.name) + "[" + last + "]");
+                        if (ts.dimensions > 1)
+                        {
+                            G.Writeln("Dimension span: " + dimCount + " = " + dimCount2 + ", density: " + keys.Count + "/" + dimCount2 + " = " + Program.NumberFormat(100d * (keys.Count / dimCount2), "0.00") + "%");
+                        }
+                    }
+                    else
+                    {
+                        //normal timeseries (possibly timeless)
+                        bool hasFilter = false; if (Program.options.timefilter && Globals.globalPeriodTimeFilters2.Count > 0) hasFilter = true;
+
+                        int max = Program.options.print_disp_maxlines;
+                        if (hasFilter || Program.options.print_disp_maxlines == -1) max = int.MaxValue;
+
+                        if (max > 0)
+                        {
+
+                            if (ts.type == ESeriesType.Timeless)
+                            {
+                                G.Writeln("------------------------------------------------------------------------------------------");
+                                G.Writeln("Value = " + G.levelFormatOld(ts.GetTimelessData()) + " (timeless)");
+                                //G.Writeln("------------------------------------------------------------------------------------------");
+                            }
+                            else
+                            {
+
+                                G.Writeln("------------------------------------------------------------------------------------------");
+                                G.Writeln("Period        value        %");
+
+                                int counter = 0;
+                                foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
+                                {
+                                    counter++;
+                                    if (hasFilter)  //some periods are set via TIMEFILTER
+                                    {
+                                        //if some filter is set, we never truncate output to 3 or 5 lines (showAllPeriods)
+                                        if (ShouldFilterPeriod(gt)) continue;
+                                    }
+                                    else
+                                    {
+                                        if (!showAllPeriods && counter > max)
+                                        {
+                                            continue;
+                                        }
+                                    }
+
+                                    if (Program.options.freq == EFreq.Annual) G.Write((gt.super) + " ");
+                                    else G.Write(gt.super + G.GetFreq(ts.freq) + gt.sub + " ");
+
+                                    double n1 = ts.GetData(null, gt);
+                                    double n0 = ts.GetData(null, gt.Add(-1));
+
+                                    double level1 = n1;
+                                    double pch1 = ((n1 / n0 - 1) * 100d);
+
+                                    if (n1 == n0) pch1 = 0d;
+
+                                    string levelFormatted;
+                                    string pchFormatted;
+                                    Program.ConvertToPrintFormat(level1, pch1, out levelFormatted, out pchFormatted);
+
+                                    G.Write(levelFormatted + " " + pchFormatted + " ");
+                                    G.Writeln();
+                                }
+                                int surplus = counter - max;
+                                if (!showAllPeriods && surplus > 0)
+                                {
+                                    G.Writeln("------------------------------------------------------------------------------------------");
+                                    string ps = "period";
+                                    if (surplus > 1) ps = "periods";
+                                    G.Write(surplus + " " + ps + " hidden (");
+                                    G.WriteLink("show", "disp3:" + var);
+                                    G.Writeln(")");
+                                }
+                            }
+                        }
+
                     }
                     G.Writeln("==========================================================================================");                    
                 }
-
                 else
                 {
+                    //ADAM-style, normal timeseries
 
                     G.Writeln();
                     G.Writeln("==========================================================================================");
@@ -14384,8 +14585,6 @@ namespace Gekko
                             }
                         }
 
-
-
                         List<string> varExpl = Program.GetVariableExplanation(var);
                         foreach (string line in varExpl)
                         {
@@ -14399,11 +14598,10 @@ namespace Gekko
                         //ts.expression = "SERIES y = c + i + g;";
                         //ts.stamp = "20-1-2016 10:34";
 
-                        if (ts.meta.label != null) G.Writeln("Series label: " + ts.meta.label);
+                        if (!G.NullOrEmpty(ts.meta.label)) G.Writeln("Series label: " + ts.meta.label);
 
-                        if (ts.meta.source != null)
-                        {
-                            //We keep the SERIES (or SER), there may be options etc. But we capitalize it.
+                        if (!G.NullOrEmpty(ts.meta.source))
+                        {                            
                             string src2 = ts.meta.source.Trim();
                             if (src2 != "")
                             {
@@ -14569,7 +14767,7 @@ namespace Gekko
          
             if (varCounter == 1)
             {
-                G.Writeln2("Displayed " + varCounter + " variable");
+                //G.Writeln2("Displayed " + varCounter + " variable");
             }
             else
             {
@@ -14577,7 +14775,102 @@ namespace Gekko
             }
         }
 
-        
+        private static void PrintEquationWithLinks(bool gamsToGekko, string varnameWithoutFreq, List<ModelGamsEquation> eqs)
+        {
+            int widthRemember = Program.options.print_width;
+            int fileWidthRemember = Program.options.print_filewidth;
+            Program.options.print_width = int.MaxValue;
+            Program.options.print_filewidth = int.MaxValue;
+
+            try
+            {
+                foreach (ModelGamsEquation eq in eqs)
+                {
+                    G.Write2(eq.lhsRaw + " = ");
+                    int length = (eq.lhsRaw + " = ").Length;
+
+                    GekkoDictionary<string, string> knownVars = GetKnownVars(eq.rhsRaw, true);
+                    List<TokenHelper> tokens = GetTokensWithLeftBlanks(eq.rhsRaw);  //slack, tokenizing two times
+
+                    for (int i = 0; i < tokens.Count; i++)
+                    {
+                        TokenHelper token = tokens[i];
+                        if (token.leftblanks != null) G.Write(token.leftblanks);
+                        if (token.type == "Word" && knownVars.ContainsKey(token.s))
+                        {
+                            G.WriteLink(token.s, "disp:" + token.s);
+                        }
+                        else
+                        {
+                            if (token.s == "\\")  //tokens[i]
+                            {
+                                if (i < tokens.Count - 2 && G.Equal(tokens[i + 1].s, "n"))
+                                {
+                                    if (i > 1 && tokens[i - 2].s == "\\" && G.Equal(tokens[i - 1].s, "n"))
+                                    {
+                                        //do nothing                                                        
+                                        tokens[i + 2].leftblanks = null;
+                                    }
+                                    else
+                                    {
+                                        G.Writeln();
+                                        tokens[i + 2].leftblanks = G.Blanks(length);
+                                    }
+                                    i++;
+                                    continue;
+                                }
+                            }
+                            G.Write(token.s);
+                        }
+                    }
+                    G.Writeln(";");
+                }
+            }
+
+            finally
+            {
+                //resetting, also if there is an error
+                Program.options.print_width = widthRemember;
+                Program.options.print_filewidth = fileWidthRemember;
+            }
+            
+        }
+
+        private static GekkoDictionary<string, string> GetKnownVars(string input)
+        {
+            return GetKnownVars(input, false);
+        }
+
+        private static GekkoDictionary<string, string> GetKnownVars(string input, bool useDatabank)
+        {
+            GekkoDictionary<string, string> knownVars = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            List<TokenHelper> tokens = GetTokensWithLeftBlanks(input);
+            foreach (TokenHelper token in tokens)
+            {
+                if (token.type == "Word")
+                {
+                    List<ModelGamsEquation> e3 = null; Program.modelGams.equations.TryGetValue(token.s, out e3);
+
+                    if (e3 != null)
+                    {
+                        if (!knownVars.ContainsKey(token.s)) knownVars.Add(token.s, null);
+                    }
+                    else
+                    {
+                        if (useDatabank)
+                        {
+                            string varnameWithFreq = token.s + Globals.freqIndicator + G.GetFreq(Program.options.freq);
+                            if (Program.databanks.GetFirst().ContainsIVariable(varnameWithFreq))
+                            {
+                                if (!knownVars.ContainsKey(token.s)) knownVars.Add(token.s, null);
+                            }
+                        }
+                    }
+                }
+            }
+            return knownVars;
+        }
+
 
         private static List<GekkoDictionary<string, string>> GetDimensions(List<string> names)
         {
@@ -15162,6 +15455,8 @@ namespace Gekko
 
         public static void Model(O.Model o)
         {
+            bool isGms = G.Equal(o.opt_gms, "yes");
+
             string fileName = o.fileName;
             P p = o.p;
 
@@ -15170,10 +15465,13 @@ namespace Gekko
             //Random random = new Random();
             Globals.modelRandomID = Program.RandomInt(11111111, 99999999);  //used in GetModelInfoPath()
 
+            string type = "frm";
+            if (isGms) type = "gms";
+
             bool cancel = false;
             if (fileName == "*")
             {
-                SelectFile("frm", ref fileName, ref cancel);
+                SelectFile(type, ref fileName, ref cancel);
                 CrossThreadStuff.SetTextInput(fileName, "model");
             }
             if (cancel) return;
@@ -15181,7 +15479,7 @@ namespace Gekko
             DateTime dt0 = DateTime.Now;
 
             //fileName = SubstituteAssignVarsInExpression(fileName);
-            fileName = AddExtension(fileName, ".frm");
+            fileName = AddExtension(fileName, "." + type);
 
             string fileNameSimple = fileName;
 
@@ -15199,115 +15497,202 @@ namespace Gekko
             }
 
             string textInputRaw = Program.GetTextFromFileWithWait(fileName);  //textInputRaw is without any VARLIST$
-            //TODO: keep the old version, so model command can be undone (like undo sim)
-            Program.model = new Model();
-            Program.model.modelInfo.fileName = fileName;
-            //this also creates Program.model.varlist if there is a varlist
 
-            ModelCommentsHelper modelCommentsHelper = new ModelCommentsHelper();
-            string textInput = Program.HandleModelFiles(textInputRaw, modelCommentsHelper);
-
-            string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + modelCommentsHelper.modelHashTrue + ".mdl";
-            
-            if (Program.options.model_cache == true)
+            if (isGms)
             {
-                if (File.Exists(mdlFileNameAndPath))
+                List<TokenHelper> tokens = GetTokensWithLeftBlanks(textInputRaw); 
+                List<List<string>> eqLines = new List<List<string>>();
+                List<string> temp = new List<string>();
+                foreach (TokenHelper token in tokens)
                 {
-                    try
+                    if (token.type == "EOL")
+                    {
+                        eqLines.Add(temp);
+                        temp = new List<string>();
+                    }
+                    else if (token.s == ",")
                     {                        
+                        //do nothing
+                    }
+                    else
+                    {
+                        temp.Add(token.s);
+                    }
+                }
+                G.Writeln2("Read " + eqLines.Count + " lines from csv file");
+
+                Program.modelGams = new ModelGams();
+                //Program.modelGams.equations = eqLines;
+
+                Dictionary<string, List<ModelGamsEquation>> xx = new Dictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
+
+                bool first = true;
+                foreach (List<string> line in eqLines)
+                {
+                    if (first)
+                    {
+                        first = false;
+                        continue;
+                    }
+                    ModelGamsEquation e = new ModelGamsEquation();
+                    if (line.Count == null || line.Count == 0) continue;  //probably will not happen
+                    if (line.Count < 5)
+                    {
+                        G.Writeln2("*** ERROR: Expected 5 cols per line");
+                        throw new GekkoException();
+                    }
+                    e.nameRaw = StripQuotes2(line[0]);
+                    e.setsRaw = StripQuotes2(line[1]);
+                    e.conditionalsRaw = StripQuotes2(line[2]);
+                    e.lhsRaw = StripQuotes2(line[3]);
+                    e.rhsRaw = StripQuotes2(line[4]);
+
+                    List<TokenHelper> fields = GetTokensWithLeftBlanks(e.lhsRaw); 
+                    string varName = null;
+                    foreach (TokenHelper t in fields)
+                    {
+                        if(t.type=="Word")
+                        {
+                            if (G.Equal(t.s, "log") || G.Equal(t.s, "exp")) continue;  //this logic could be improved... how to distinguish functions log(x) and sets y(t) ??
+                            varName = t.s;
+                            break;
+                        }
+                    }
+                    if (varName==null)
+                    {
+                        G.Writeln2("*** Could not find variable name in: " + fields[0].s);
+                        throw new GekkoException();
+                    }
+                    
+                    if(xx.ContainsKey(varName))
+                    {
+                        xx[varName].Add(e);  //can have more than one eq with same lhs variable
+                    }
+                    else
+                    {
+                        List<ModelGamsEquation> e2 = new List<ModelGamsEquation>();
+                        e2.Add(e);
+                        xx.Add(varName, e2);
+                    }
+                }
+                Program.modelGams.equations = xx;
+                G.Writeln("Found " + xx.Count + " distinct equations");
+
+
+            }
+            else
+            {
+
+                //TODO: keep the old version, so model command can be undone (like undo sim)
+                Program.model = new Model();
+                Program.model.modelInfo.fileName = fileName;
+                //this also creates Program.model.varlist if there is a varlist
+
+                ModelCommentsHelper modelCommentsHelper = new ModelCommentsHelper();
+                string textInput = Program.HandleModelFiles(textInputRaw, modelCommentsHelper);
+
+                string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + modelCommentsHelper.modelHashTrue + ".mdl";
+
+                if (Program.options.model_cache == true)
+                {
+                    if (File.Exists(mdlFileNameAndPath))
+                    {
+                        try
+                        {
+                            DateTime dt1 = DateTime.Now;
+                            //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
+                            //RuntimeTypeModel serializer = TypeModel.Create();
+                            //serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+                            // ----- DESERIALIZE
+                            //DeleteFolder(outputPath);
+                            //Directory.CreateDirectory(outputPath);
+                            //WaitForZipRead(outputPath, mdlFileNameAndPath);
+                            using (FileStream fs = WaitForFileStream(mdlFileNameAndPath, GekkoFileReadOrWrite.Read))
+                            {
+                                Program.model = Serializer.Deserialize<Model>(fs);
+                            }
+
+                            GetListsFromModelListHelper();
+
+                            //=============================================
+                            //FOR SAFETY: see mail from TKD 5/3 2013
+                            Program.model.simulateResults = new double[10];
+                            //=============================================
+
+                            G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
+                            Program.model.modelInfo.loadedFromMdlFile = true;
+                            Program.model.modelInfo.fileName = fileName;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
+                        }
+                        catch
+                        {
+                            //do nothing, we then have to parse the file
+                            Program.model.modelInfo.loadedFromMdlFile = false;
+                        }
+                    }
+                }
+                else
+                {
+                    Program.model.modelInfo.loadedFromMdlFile = false;
+                }
+
+                Program.model.modelInfo.date = modelCommentsHelper.dateText;
+                Program.model.modelInfo.info = modelCommentsHelper.infoText;
+                Program.model.signatureStatus = modelCommentsHelper.signatureStatus;
+                Program.model.signatureFoundInFileHeader = modelCommentsHelper.signatureFoundInFileHeader;
+                Program.model.modelHashTrue = modelCommentsHelper.modelHashTrue;
+
+                string parsingSeconds = null;
+                if (Program.model.modelInfo.loadedFromMdlFile)
+                {
+                    //Needs to load lists into Program.list, and varlist too
+                    GuiSetModelName();
+                }
+                else
+                {
+                    DateTime t1 = DateTime.Now;
+                    ParserOLD.EmitModelFromANTLR(textInput, fileName);
+                    parsingSeconds = G.Seconds(t1);
+
+                    ParserOLD.OrderAndCompileModel(ECompiledModelType.Gauss, true, false);  //default.
+
+                    try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
+                    {
                         DateTime dt1 = DateTime.Now;
+
+                        PutListsIntoModelListHelper();
+
                         //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                        //RuntimeTypeModel serializer = TypeModel.Create();
-                        //serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-                        // ----- DESERIALIZE
+                        RuntimeTypeModel serializer = TypeModel.Create();
+                        serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+
+
+                        // ----- SERIALIZE
+                        //string outputPath = Globals.localTempFilesLocation;
                         //DeleteFolder(outputPath);
                         //Directory.CreateDirectory(outputPath);
-                        //WaitForZipRead(outputPath, mdlFileNameAndPath);
-                        using (FileStream fs = WaitForFileStream(mdlFileNameAndPath, GekkoFileReadOrWrite.Read))
+                        string protobufFileName = Globals.gekkoVersion + "_" + model.modelHashTrue + ".mdl";
+                        string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
+                        using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
                         {
-                            Program.model = Serializer.Deserialize<Model>(fs);
+                            //Serializer.Serialize(fs, m);
+                            serializer.Serialize(fs, Program.model);
                         }
-
-                        GetListsFromModelListHelper();
-
-                        //=============================================
-                        //FOR SAFETY: see mail from TKD 5/3 2013
-                        Program.model.simulateResults = new double[10];
-                        //=============================================
-
-                        G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
-                        Program.model.modelInfo.loadedFromMdlFile = true;
-                        Program.model.modelInfo.fileName = fileName;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
+                        //Program.WaitForZipWrite(outputPath, Globals.localTempFilesLocation + "\\" + protobufFileName);
+                        G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        //do nothing, we then have to parse the file
-                        Program.model.modelInfo.loadedFromMdlFile = false;
+                        //do nothing, not the end of the world if it fails
                     }
                 }
+
+                HandleVarlist(modelCommentsHelper);
+
+                Program.model.modelInfo.timeUsedParsing = parsingSeconds;
+                Program.model.modelInfo.timeUsedTotal = G.Seconds(dt0);
+
+                Program.model.modelInfo.Print();
             }
-            else
-            {
-                Program.model.modelInfo.loadedFromMdlFile = false;
-            }
-
-            Program.model.modelInfo.date = modelCommentsHelper.dateText;
-            Program.model.modelInfo.info = modelCommentsHelper.infoText;
-            Program.model.signatureStatus = modelCommentsHelper.signatureStatus;
-            Program.model.signatureFoundInFileHeader = modelCommentsHelper.signatureFoundInFileHeader;
-            Program.model.modelHashTrue = modelCommentsHelper.modelHashTrue;
-
-            string parsingSeconds = null;
-            if (Program.model.modelInfo.loadedFromMdlFile)
-            {
-                //Needs to load lists into Program.list, and varlist too
-                GuiSetModelName();
-            }
-            else
-            {
-                DateTime t1 = DateTime.Now;
-                ParserOLD.EmitModelFromANTLR(textInput, fileName);
-                parsingSeconds = G.Seconds(t1);
-
-                ParserOLD.OrderAndCompileModel(ECompiledModelType.Gauss, true, false);  //default.
-
-                try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
-                {
-                    DateTime dt1 = DateTime.Now;
-
-                    PutListsIntoModelListHelper();
-
-                    //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                    RuntimeTypeModel serializer = TypeModel.Create();
-                    serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-
-
-                    // ----- SERIALIZE
-                    //string outputPath = Globals.localTempFilesLocation;
-                    //DeleteFolder(outputPath);
-                    //Directory.CreateDirectory(outputPath);
-                    string protobufFileName = Globals.gekkoVersion + "_" + model.modelHashTrue + ".mdl";
-                    string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                    using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
-                    {
-                        //Serializer.Serialize(fs, m);
-                        serializer.Serialize(fs, Program.model);
-                    }
-                    //Program.WaitForZipWrite(outputPath, Globals.localTempFilesLocation + "\\" + protobufFileName);
-                    G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
-                }
-                catch (Exception e)
-                {
-                    //do nothing, not the end of the world if it fails
-                }
-            }
-
-            HandleVarlist(modelCommentsHelper);
-
-            Program.model.modelInfo.timeUsedParsing = parsingSeconds;
-            Program.model.modelInfo.timeUsedTotal = G.Seconds(dt0);
-
-            Program.model.modelInfo.Print();
         }
 
         private static void HandleVarlist(ModelCommentsHelper modelCommentsHelper)
@@ -15719,6 +16104,16 @@ namespace Gekko
         {
             if (s == null) return null;
             if (s.StartsWith("'") && s.EndsWith("'"))
+            {
+                s = s.Substring(1, s.Length - 2);
+            }
+            return s;
+        }
+
+        public static string StripQuotes2(string s)
+        {
+            if (s == null) return null;
+            if (s.StartsWith("\"") && s.EndsWith("\""))
             {
                 s = s.Substring(1, s.Length - 2);
             }
@@ -21114,6 +21509,8 @@ namespace Gekko
             Globals.modelFileName = "";
             GuiSetModelName();
 
+            Program.modelGams = null;
+
             string workingFolder = Program.options.folder_working;
             Program.options = new Options();  //resetting these, but letting working folder live on.
 
@@ -23974,6 +24371,8 @@ namespace Gekko
         public static void OPrint(O.Prt o)
         {
             //string format = "f14.4";
+            //TODO: we could check if there is 1 object printed and it is of type=normal. If so, the label could be printed.
+            //  if .meta is augmented with a pointer to the array-series, the label for x[a] could be taken via that pointer.
 
             EPrintTypes type = EPrintTypes.Print;
             if (G.Equal(o.prtType, "plot")) type = EPrintTypes.Plot;
@@ -25399,7 +25798,7 @@ namespace Gekko
                 }
 
                 int twenty = 20;
-                List<TokenHelper> a = GetTokensWithLeftBlanks(ss[1]);  //puts in 20 empty tokens at the end
+                List<TokenHelper> a = GetTokensWithLeftBlanks(ss[1], 20);  //puts in 20 empty tokens at the end
 
                 //Now we walk though the tokens to mark all that are bound with sum, 
                 //for instance sum(#m1, xx3[#m1, #m2]) --> sum(¤m1, xx3[¤m1, #m2])
@@ -25622,6 +26021,11 @@ namespace Gekko
 
         private static List<TokenHelper> GetTokensWithLeftBlanks(string s)
         {
+            return GetTokensWithLeftBlanks(s, 0);
+        }
+
+        private static List<TokenHelper> GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd)
+        {
             StringTokenizer2 tok = new StringTokenizer2(s, false, false);
             tok.IgnoreWhiteSpace = false;
             tok.SymbolChars = new char[] { '!', '#', '%', '&', '/', '(', ')', '=', '?', '@', '$', '{', '[', ']', '}', '+', '|', '^', '¨', '~', '*', '<', '>', '\\', ';', ',', ':', '.', '-' };
@@ -25647,7 +26051,7 @@ namespace Gekko
                 }
 
             } while (token.Kind != TokenKind.EOF);
-            for (int i = 0; i < 20; i++) a.Add(new TokenHelper());
+            for (int i = 0; i < emptyTokensAtEnd; i++) a.Add(new TokenHelper());
             return a;
         }
 
@@ -28837,29 +29241,29 @@ namespace Gekko
                 {
                     txt.AppendLine("set ytics nomirror " + ticsInOut);
                     txt.AppendLine("set border 3");                    
-                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);
+                    if (!G.NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);
                    
                 }
                 else if (ymirror == "1")  //y2 axis
                 {
                     txt.AppendLine("set ytics " + ticsInOut);
                     txt.AppendLine("set border 11");                    
-                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);
+                    if (!G.NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);
                 }
                 else if (ymirror == "2")  //y2 axis and y2 tics
                 {
                     txt.AppendLine("set ytics " + ticsInOut);
                     txt.AppendLine("set y2tics " + ticsInOut);
                     txt.AppendLine("set border 11");                    
-                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);                                    
+                    if (!G.NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);                                    
                 }
                 else if (ymirror == "3")
                 {
                     txt.AppendLine("set ytics " + ticsInOut);  //y2 axis and y2 tics and y2 label
                     txt.AppendLine("set y2tics " + ticsInOut);
                     txt.AppendLine("set border 11");                    
-                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);                    
-                    if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", false);
+                    if (!G.NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);                    
+                    if (!G.NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", false);
                 }
             }
             else
@@ -28868,20 +29272,20 @@ namespace Gekko
                 txt.AppendLine("set ytics nomirror " + ticsInOut);
                 txt.AppendLine("set y2tics " + ticsInOut);
                 txt.AppendLine("set border 11");                
-                if (!NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);                
-                if (!NullOrEmpty(y2title)) setTitlePlaceholder = SetYAxisText(y2title, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", false);
+                if (!G.NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);                
+                if (!G.NullOrEmpty(y2title)) setTitlePlaceholder = SetYAxisText(y2title, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", false);
                 if (NotNullAndNotNo(x2zeroaxis) || isSeparated) txt.AppendLine("set x2zeroaxis lt -1");  //draws x axis for y2=0, #23475432985 
             }
 
             //must be after labels
             string subtitle2 = null;
-            if (!NullOrEmpty(subtitle)) subtitle2 = subtitle;
-            if (!NullOrEmpty(o.opt_subtitle)) subtitle2 = o.opt_subtitle;
-            if (!NullOrEmpty(subtitle2)) subtitle2 = "\\n{/*0.80 " + subtitle2 + "}";
+            if (!G.NullOrEmpty(subtitle)) subtitle2 = subtitle;
+            if (!G.NullOrEmpty(o.opt_subtitle)) subtitle2 = o.opt_subtitle;
+            if (!G.NullOrEmpty(subtitle2)) subtitle2 = "\\n{/*0.80 " + subtitle2 + "}";
             string title2 = null;
-            if (!NullOrEmpty(title)) title2 = title;
-            if (!NullOrEmpty(o.opt_title)) title2 = o.opt_title;
-            if (!NullOrEmpty(title2))
+            if (!G.NullOrEmpty(title)) title2 = title;
+            if (!G.NullOrEmpty(o.opt_title)) title2 = o.opt_title;
+            if (!G.NullOrEmpty(title2))
             {
                 txt.AppendLine("set title " + Globals.QT + EncodeDanish(GnuplotText(title2 + subtitle2, true)) + Globals.QT);
             }
@@ -29320,7 +29724,7 @@ namespace Gekko
                 label = GnuplotText(label);
 
                 string s = null;
-                if (!NullOrEmpty(linetype))
+                if (!G.NullOrEmpty(linetype))
                 {
                     if (G.Equal(linetype, "filledcurve") || G.Equal(linetype, "filledcurves"))
                     {
@@ -29353,13 +29757,13 @@ namespace Gekko
                 catch { };
 
 
-                if (!NullOrEmpty(dashtype)) s += " dashtype " + dashtype;
-                if (!NullOrEmpty(linewidth)) s += " linewidth " + linewidth;
-                if (!NullOrEmpty(linecolor)) s += " linecolor rgb \"" + linecolor + "\"";
-                if (!NullOrEmpty(pointtype)) s += " pointtype " + pointtype;
-                if (!NullOrEmpty(pointtype)) s += " pointsize " + pointsize;
-                if (!NullOrEmpty(fillstyle)) s += " fillstyle " + fillstyle;
-                if (!NullOrEmpty(label)) s += " title " + Globals.QT + label + "   " + Globals.QT;  //blanks added to separate items in the legend                    
+                if (!G.NullOrEmpty(dashtype)) s += " dashtype " + dashtype;
+                if (!G.NullOrEmpty(linewidth)) s += " linewidth " + linewidth;
+                if (!G.NullOrEmpty(linecolor)) s += " linecolor rgb \"" + linecolor + "\"";
+                if (!G.NullOrEmpty(pointtype)) s += " pointtype " + pointtype;
+                if (!G.NullOrEmpty(pointtype)) s += " pointsize " + pointsize;
+                if (!G.NullOrEmpty(fillstyle)) s += " fillstyle " + fillstyle;
+                if (!G.NullOrEmpty(label)) s += " title " + Globals.QT + label + "   " + Globals.QT;  //blanks added to separate items in the legend                    
 
                 //linestyle is an association of linecolor, linewidth, dashtype, pointtype
                 //linetype is the same, just permanent
@@ -29557,7 +29961,7 @@ namespace Gekko
             else  //for instance: PLOT x*y;
             {
                 label = labelCleaned;
-                if (!NullOrEmpty(labelGpt)) label = labelGpt;  //xml label overrides variables
+                if (!G.NullOrEmpty(labelGpt)) label = labelGpt;  //xml label overrides variables
             }
 
             return label;
@@ -29635,10 +30039,7 @@ namespace Gekko
             return GetText(x, null);
         }
 
-        private static bool NullOrEmpty(string x)
-        {
-            return !(x != null && x.Trim() != "");
-        }
+        
         private static string GnuplotText(string s)
         {
             return GnuplotText(s, false);
@@ -29839,21 +30240,21 @@ namespace Gekko
 
             string left = null;
             string right = null;
-            if (!NullOrEmpty(ymin))
+            if (!G.NullOrEmpty(ymin))
             {                
                 left = ymin;
             }
             else
             {                
-                if (!NullOrEmpty(yminhard) && !NullOrEmpty(yminsoft))
+                if (!G.NullOrEmpty(yminhard) && !G.NullOrEmpty(yminsoft))
                 {
                     left = yminhard + " < * < " + yminsoft;
                 }
-                else if (!NullOrEmpty(yminhard) && NullOrEmpty(yminsoft))
+                else if (!G.NullOrEmpty(yminhard) && G.NullOrEmpty(yminsoft))
                 {
                     left = yminhard + " < * ";
                 }
-                else if (NullOrEmpty(yminhard) && !NullOrEmpty(yminsoft))
+                else if (G.NullOrEmpty(yminhard) && !G.NullOrEmpty(yminsoft))
                 {
                     left = " * < " + yminsoft;
                 }
@@ -29863,22 +30264,22 @@ namespace Gekko
                 }
             }
 
-            if (!NullOrEmpty(ymax))
+            if (!G.NullOrEmpty(ymax))
             {
                 double xx = ParseIntoDouble(ymax);  //just testing
                 right = ymax;
             }
             else
             {
-                if (!NullOrEmpty(ymaxhard) && !NullOrEmpty(ymaxsoft))
+                if (!G.NullOrEmpty(ymaxhard) && !G.NullOrEmpty(ymaxsoft))
                 {
                     right = ymaxsoft + " < * < " + ymaxhard;
                 }
-                else if (!NullOrEmpty(ymaxhard) && NullOrEmpty(ymaxsoft))
+                else if (!G.NullOrEmpty(ymaxhard) && G.NullOrEmpty(ymaxsoft))
                 {
                     right = " * < " + ymaxhard;
                 }
-                else if (NullOrEmpty(ymaxhard) && !NullOrEmpty(ymaxsoft))
+                else if (G.NullOrEmpty(ymaxhard) && !G.NullOrEmpty(ymaxsoft))
                 {
                     right = ymaxsoft + " < * ";
                 }

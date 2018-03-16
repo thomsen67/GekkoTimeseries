@@ -98,8 +98,8 @@ namespace Gekko
         public Type assemblyPrologueEpilogueFailSafe = null;
         //public Type assemblyEigen = null;        
         
-    }
-    
+    }    
+
     [ProtoContract]
     public class Model
     {
@@ -383,5 +383,27 @@ namespace Gekko
             if (this.loadedFromMdlFile) cache = " (model loaded from cache file)";
             G.Writeln("Model statement ended succesfully with no errors in " + timeUsedTotal + extra + cache);
         }
+    }
+
+    public class ModelGams
+    {
+        public Dictionary<string, List<ModelGamsEquation>> equations = null;
+    }
+
+    public class ModelGamsEquation
+    {
+        public string nameRaw = null;
+        public string setsRaw = null;
+        public string conditionalsRaw = null;
+        public string lhsRaw = null;
+        public string rhsRaw = null;
+
+        public string name = null;
+        public string sets = null;
+        public string conditionals = null;
+        public string lhs = null;
+        public string rhs = null;
+
+
     }
 }

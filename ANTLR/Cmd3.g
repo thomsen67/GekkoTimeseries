@@ -114,6 +114,7 @@ ASTCOMPARE2;
 	ASTSERIES;
 	ASTSERIESLHS;
 	ASTSERIESRHS;
+	ASTOPT_STRING_GMS;
 	ASTOPT_STRING_PX;
 	ASTOPT_STRING_NOMAX;
 	ASTOPT_STRING_BOLD;
@@ -740,6 +741,7 @@ ASTOPT_STRING_Y2;
 	ASTXEDIT;
 
 	// --- tokens1 start ---
+	GMS = 'GMS';
 	ELEMENTS = 'ELEMENTS';
 	NOMAX = 'NOMAX';
 	RETURN2 = 'RETURN';
@@ -1685,6 +1687,7 @@ d.Add("Y" ,Y);
                                         d.Add("RESTART", RESTART);
 										d.Add("elements"  , ELEMENTS    );
 										d.Add("nomax"  , NOMAX    );
+										d.Add("gms"  , GMS    );
                                         d.Add("return"  , RETURN2    );
                                         d.Add("ring"    , RING    );
                                         d.Add("rn"               , RN );
@@ -2089,6 +2092,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | ini                  SEMICOLON!
 						  | ini                  SEMICOLON!
 						  | mem                  SEMICOLON!
+						  | model                SEMICOLON!
 		   			      | mode                 SEMICOLON!
 						  | ols  				 SEMICOLON!
 						  | open                 SEMICOLON!
@@ -2302,6 +2306,16 @@ mode:                       MODE mode2 -> ^({token("ASTMODE", ASTMODE, $MODE.Lin
                           | MODE question -> ^({token("ASTMODEQUESTION", ASTMODEQUESTION, $MODE.Line)})	
 						    ;	
 mode2:                      MIXED | SIM | DATA;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// MODEL
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+model:                      MODEL modelOpt1? fileNameStar -> ^({token("ASTMODEL", ASTMODEL, $MODEL.Line)} ^(ASTHANDLEFILENAME fileNameStar) modelOpt1?);
+modelOpt1:                  ISNOTQUAL | leftAngle modelOpt1h* RIGHTANGLE -> modelOpt1h*;
+modelOpt1h:                 INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?)
+						  |	GMS (EQUAL yesNo)? -> ^(ASTOPT_STRING_GMS yesNo?)
+						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // OLS
@@ -2540,8 +2554,8 @@ v:    					    V ('=' yesNo -> ^(ASTV yesNo) | -> ^(ASTV ASTYES))
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 						    //!!!Two identical lines ONLY because of token stuff
-read:                       READ   readOpt1? fileNameStar (TO identOrStar)? -> ^({token("ASTREAD", ASTREAD, $READ.Line)}   READ   readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?))
-                          | IMPORT readOpt1? fileNameStar (TO identOrStar)? -> ^({token("ASTREAD", ASTREAD, $IMPORT.Line)} IMPORT readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO identOrStar?))
+read:                       READ   readOpt1? fileNameStar (TO nameOrStar)? -> ^({token("ASTREAD", ASTREAD, $READ.Line)}   READ   readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO nameOrStar?))
+                          | IMPORT readOpt1? fileNameStar (TO nameOrStar)? -> ^({token("ASTREAD", ASTREAD, $IMPORT.Line)} IMPORT readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO nameOrStar?))
 						    ;
 readOpt1:                   ISNOTQUAL
 						  | leftAngle        readOpt1h* RIGHTANGLE -> readOpt1h*						
@@ -3081,7 +3095,7 @@ exportType:                 D -> ASTOPD
 						  | expression  //will handle quotes etc.
 						    ;
 
-identOrStar:                ident -> ident
+nameOrStar:                 name -> name
 						  | star -> ASTBANKISSTARCHEATCODE
 						    ;
 
@@ -3533,6 +3547,7 @@ ident2: 					Ident|
                             RETURN2|
 							ELEMENTS|
 							NOMAX|
+							GMS|
                             RING|
                             RN|
                             ROWS|
@@ -3676,6 +3691,7 @@ fragment DIGIT:             '0'..'9' ;
 fragment LETTER:            'a'..'z'|'A'..'Z';
 
 HTTP:                       H_ T_ T_ P_  ':' ('//');  // 'catch HTTP://' before COMMENT interferes with the '//'
+HTTPS:                      H_ T_ T_ P_ S_  ':' ('//');  // 'catch HTTPS://' before COMMENT interferes with the '//'
 
 WHITESPACE:                 ( '\t' | ' ' | '\u000C'| NEWLINE2 | NEWLINE3)+ { $channel=HIDDEN; } ;  //u000C is form feed
 
@@ -3689,7 +3705,9 @@ Integer:                    DIGIT+  ;
                             //for instance 25e12
 DigitsEDigits:              DIGIT+  ( E_ )  DIGIT+;  //for instance 25e12, problem is this can also be a name chunk!
                             //for instance 2012q3
-DateDef:                    DIGIT+  ( A_ | Q_ | M_ ) DIGIT+;  //for instance 2000q2 or 2003m11
+DateDef:                    DIGIT+ ( A_ | Q_ | M_ | U_ ) DIGIT+  //for instance 2000q2 or 2003m11
+					      | DIGIT+ ( A_ | U_ )  //2010a or 18u
+						    ;  
                             //for instance 05a, everything not captured by Ident, Integer, DigitsEDigits, Datedef.
 IdentStartingWithInt:       (DIGIT|LETTER|'_')+;
 

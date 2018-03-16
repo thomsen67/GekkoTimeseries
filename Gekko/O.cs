@@ -1689,6 +1689,12 @@ namespace Gekko
                     case EVariableType.Series:
                         {
                             Series rhs_series = rhs as Series;
+                            string freq_rhs = G.GetFreq(rhs_series.freq);
+                            if (!varnameWithFreq.ToLower().EndsWith(Globals.freqIndicator + freq_rhs))
+                            {
+                                G.Writeln2("*** ERROR: Frequency: illegal series name '" + varnameWithFreq + "', should end with '" + Globals.freqIndicator + freq_rhs + "'");
+                                throw new GekkoException();
+                            }
                             switch (rhs_series.type)
                             {
                                 
@@ -4293,7 +4299,7 @@ namespace Gekko
                     hlp.Merge = false;  //but mixing <merge> and TO give error above anyway                
                     hlp.protect = true;  //superfluous but for safety
                     hlp.openType = EOpenType.Normal;
-                    if (readTo == "ASTBANKISSTARCHEATCODE")
+                    if (readTo == "*")
                     {
                         readTo = Path.GetFileNameWithoutExtension(hlp.FileName);
                     }
@@ -7005,7 +7011,8 @@ namespace Gekko
         public class Model
         {
             public string fileName = null;
-            public bool info = false;
+            public string opt_info = null;
+            public string opt_gms = null;
             public P p = null;
             public void Exe()
             {                

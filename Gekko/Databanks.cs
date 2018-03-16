@@ -258,7 +258,7 @@ namespace Gekko
                 m.Add(this.storage[1]);  //ref
                 m.Add(databank);
                 for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
-                G.Writeln2("Databank '" + name + "' opened");
+                G.Writeln2("Opening databank '" + name + "'");
             }
             else if (openType == EOpenType.First || openType == EOpenType.Edit || (openType == EOpenType.Pos && openPosition == 1))
             {
@@ -268,8 +268,8 @@ namespace Gekko
                 m.Add(this.storage[1]);  //ref
                 m.Add(this.storage[0]);
                 for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
-                if (openType == EOpenType.Edit) G.Writeln2("Databank '" + name + "' opened as editable in first position");
-                else G.Writeln2("Databank '" + name + "' opened in first position");
+                if (openType == EOpenType.Edit) G.Writeln2("Opening databank '" + name + "' as editable in first position");
+                else G.Writeln2("Opening databank '" + name + "' in first position");
             }
             else if (openType == EOpenType.Ref)
             {
@@ -277,7 +277,7 @@ namespace Gekko
                 m.Add(databank);                //ref
                 m.Add(this.storage[1]);
                 for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
-                G.Writeln2("Databank '" + name + "' opened as ref");
+                G.Writeln2("Opening databank '" + name + "' as ref");
             }
             else if (ShouldPutBankLast(openType, openPosition))
             {
@@ -285,14 +285,14 @@ namespace Gekko
                 m.Add(this.storage[1]);  //ref                
                 for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
                 m.Add(databank);
-                G.Writeln2("Databank '" + name + "' opened");
+                G.Writeln2("Opening databank '" + name + "'");
             }
             else if (openType == EOpenType.Pos)
             {
                 //pos is not 1., 2. or count+1 ===> so 3, 4, ..., up to count.
                 if (openPosition < 1)
                 {
-                    G.Writeln2("*** ERROR: OPEN<pos=...> cannot be 0 or negative");
+                    G.Writeln2("*** ERROR: OPEN <pos = ...> cannot be 0 or negative");
                     throw new GekkoException();
                 }
                 m.Add(this.storage[0]);  //first
@@ -306,7 +306,7 @@ namespace Gekko
                 {
                     m.Add(this.storage[i]);
                 }
-                G.Writeln2("Databank '" + name + "' opened in position " + openPosition);
+                G.Writeln2("Opening databank '" + name + "' in position " + openPosition);
             }
             else
             {

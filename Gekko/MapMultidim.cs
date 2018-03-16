@@ -96,6 +96,12 @@ namespace Gekko
             return true;
         }
 
-        
+        public MapMultidimItem Clone()
+        {
+            string[] ss = new string[this.storage.Length];
+            Array.Copy(this.storage, ss, this.storage.Length);
+            return new MapMultidimItem(ss);
+        }
+
     }
 }

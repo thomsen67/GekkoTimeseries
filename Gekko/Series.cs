@@ -116,7 +116,7 @@ namespace Gekko
         [ProtoMember(8)]
         public MapMultidim dimensionsStorage = null;  //only active if it is an array-timeseries
         [ProtoMember(9)]
-        public int dimensions = 0;  //default is 0 which is same as normal timeseries, also used in IsArrayTimeseries()
+        public int dimensions = 0;  //non-time dimensions: default is 0 which is same as normal timeseries, also used in IsArrayTimeseries()
         [ProtoMember(10)]
         public ESeriesType type = ESeriesType.Normal;  //default
 
@@ -378,12 +378,12 @@ namespace Gekko
             return this.meta.firstPeriodPositionInArray == Globals.firstPeriodPositionInArrayNull && this.meta.lastPeriodPositionInArray == Globals.lastPeriodPositionInArrayNull;
         }
 
-        public void SetArrayTimeseries(int dimensions, bool hasTimeDimension)
+        public void SetArrayTimeseries(int dimensionsIncludingTimeDimension, bool hasTimeDimension)
         {
             int tDim = 0;
             if (hasTimeDimension) tDim = 1;
             this.dimensionsStorage = new MapMultidim();
-            this.dimensions = dimensions - tDim;
+            this.dimensions = dimensionsIncludingTimeDimension - tDim;
             this.type = ESeriesType.ArraySuper;
             //if (!hasTimeDimension) this.type = ESeriesType.Timeless;
         }

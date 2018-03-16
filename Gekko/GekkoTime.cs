@@ -201,6 +201,7 @@ namespace Gekko
         public bool StrictlyLargerThan(GekkoTime gt2)
         {
             CheckSameFreq(gt2);
+            if (gt2.IsNull()) return true;
             if (this.super > gt2.super) return true;
             else if (this.super == gt2.super)
             {
@@ -213,14 +214,22 @@ namespace Gekko
         {
             if (this.freq != gt2.freq)
             {
-                G.Writeln2("*** ERROR: Comparing two different frequencies");
-                throw new GekkoException();
+                if (this.IsNull() || gt2.IsNull())
+                {
+                    //ok
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Comparing two different frequencies");
+                    throw new GekkoException();
+                }                
             }
         }
 
         public bool LargerThanOrEqual(GekkoTime gt2)
         {
             CheckSameFreq(gt2);
+            if (gt2.IsNull()) return true;
             if (this.super == gt2.super && this.sub == gt2.sub) return true;
             if (StrictlyLargerThan(gt2)) return true;
             return false;
@@ -229,6 +238,7 @@ namespace Gekko
         public bool SmallerThanOrEqual(GekkoTime gt2)
         {
             CheckSameFreq(gt2);
+            if (gt2.IsNull()) return true;
             if (this.super == gt2.super && this.sub == gt2.sub) return true;
             if (StrictlySmallerThan(gt2)) return true;
             return false;
@@ -237,6 +247,7 @@ namespace Gekko
         public bool StrictlySmallerThan(GekkoTime gt2)
         {
             CheckSameFreq(gt2);
+            if (gt2.IsNull()) return true;
             if (this.super < gt2.super) return true;
             else if (this.super == gt2.super)
             {
@@ -247,7 +258,8 @@ namespace Gekko
 
         public bool IsSamePeriod(GekkoTime gt2)
         {
-            CheckSameFreq(gt2);
+            //will handle null ok, two null --> true
+            CheckSameFreq(gt2);            
             if (this.super == gt2.super)
                 if (this.sub == gt2.sub)
                     return true;
@@ -290,6 +302,7 @@ namespace Gekko
 
         public override string ToString()  //can just as well implement it, better than nasty surprises with object ToString()
         {
+            if (this.IsNull()) return "[unknown]";
             if (this.freq == EFreq.Annual)
             {
                 if (super >= Globals.timeStringsStart && super <= Globals.timeStringsEnd)

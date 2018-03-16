@@ -1183,6 +1183,10 @@ namespace Gekko
             else if (G.Equal(type, "map")) etype = EVariableType.Map;
             return etype;
         }
+        public static bool NullOrEmpty(string x)
+        {
+            return !(x != null && x.Trim() != "");
+        }
 
         public static string AddSigil(string varnameWithFreq, string type)
         {
@@ -1266,6 +1270,20 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
+            else if (s.EndsWith("a", StringComparison.OrdinalIgnoreCase))
+            {
+                int i = -12345;
+                bool b = int.TryParse(s.Substring(0, s.Length - 1), out i);
+                if (b)
+                {
+                    return new GekkoTime(EFreq.Annual, G.findYear(i), 1);
+                }
+                else
+                {
+                    G.Writeln("*** ERROR: timeperiod " + s + " not valid");
+                    throw new GekkoException();
+                }
+            }
 
             if (s.Contains("q") || s.Contains("Q"))
             {
@@ -1334,6 +1352,11 @@ namespace Gekko
                 {
                     s2 = s.Substring(0, s.Length - 2);
                 }
+                else if (s.EndsWith("u", StringComparison.OrdinalIgnoreCase))
+                {
+                    s2 = s.Substring(0, s.Length - 1);
+                }
+
                 try
                 {
                     t = new GekkoTime(EFreq.Undated, int.Parse(s2), 1);

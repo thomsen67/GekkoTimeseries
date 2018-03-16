@@ -6,8 +6,6 @@ using System.Text;
 namespace Gekko
 {    
 
-    
-
     public class Functions
     {
         //NOTE:
@@ -32,6 +30,78 @@ namespace Gekko
             Max,
             Sum,
             Avg
+        }
+
+        public static IVariable rotate(GekkoSmpl smpl, IVariable x1, IVariable dim)
+        {
+            int iDim = O.ConvertToInt(dim);
+            
+            Series ts = x1 as Series;
+            if (ts == null || ts.type != ESeriesType.ArraySuper)
+            {
+                G.Writeln2("*** ERROR: You must use a array-timeseries variable");
+                throw new GekkoException();
+            }
+
+            if (iDim > ts.dimensions || iDim < 1)
+            {
+                G.Writeln2("*** ERROR: Array-series does not have a dimension #" + iDim);
+                throw new GekkoException();
+            }
+           
+            Series tsRotated = new Series(EFreq.Undated, ts.name);
+            tsRotated.meta.label = ts.meta.label;
+            tsRotated.SetArrayTimeseries(ts.dimensions + 1, true);
+
+            foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
+            {
+                //foreach array-subseries, for instance x[#age] over the ages 18-100
+                //must be converted into y[#t] where #t is for instance 1950-2100, and the timeperiod is undated 18-100
+
+                MapMultidimItem map = kvp.Key;
+                string s = map.storage[iDim - 1];
+                int a = G.IntParse(s);
+                if (a == -12345)
+                {
+                    G.Writeln2("+++ NOTE: Could not parse '" + s + "' as an integer, skipped");
+                    continue;
+                }
+
+                Series tsSub = kvp.Value as Series;
+                if (tsSub == null)
+                {
+                    G.Writeln2("*** ERROR: Element is not a series");  //should not be possible
+                    throw new GekkoException();
+                }
+
+                if (tsSub.type == ESeriesType.Timeless)
+                {
+                    G.Writeln2("*** ERROR: Sub-series is timeless ... conversion will be fixed later on");
+                    throw new GekkoException();
+                }
+
+                foreach (GekkoTime t in new GekkoTimeIterator(tsSub.GetRealDataPeriodFirst(), tsSub.GetRealDataPeriodLast()))
+                {
+                    MapMultidimItem mapRotated = map.Clone();
+                    mapRotated.storage[iDim - 1] = t.ToString();
+
+                    Series tsRotatedSub = null;
+                    IVariable iv2 = null; tsRotated.dimensionsStorage.TryGetValue(mapRotated, out iv2);                    
+                    if (iv2 == null)
+                    {
+                        tsRotatedSub = new Series(EFreq.Undated, null);
+                        tsRotated.dimensionsStorage.AddIVariableWithOverwrite(mapRotated, tsRotatedSub);
+                    }
+                    else
+                    {
+                        tsRotatedSub = iv2 as Series;
+                    }
+                    GekkoTime tu = new GekkoTime(EFreq.Undated, a, 1);
+                    tsRotatedSub.SetData(tu, tsSub.GetVal(t));                    
+                }
+            }
+
+            return tsRotated;
         }
 
         public static IVariable bankname(GekkoSmpl smpl, IVariable x1)

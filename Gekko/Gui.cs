@@ -1501,13 +1501,16 @@ namespace Gekko
                 if (Program.guiBrowseNumber < 2) return;
                 string var = Program.guiBrowseHistory[Program.guiBrowseNumber - 2];
                 Program.guiBrowseNumber += -2;  //1 will be added later, when calling "disp". Net result: -1.
-
-                if (Program.model.varsAType.ContainsKey(var))
+                                
+                if ((Program.model?.varsAType != null && Program.model.varsAType.ContainsKey(var)) || (Program.modelGams?.equations != null && Program.modelGams.equations.ContainsKey(var)))
                 {
                     List<string> temp = new List<string>();
                     temp.Add(var);
-                    Program.Disp(Globals.dispLastDispStart, Globals.dispLastDispEnd, temp, false, false, true, null);
-                    //Program.guiBrowseHistory.Add(e.LinkText);
+                    Program.Disp(Globals.dispLastDispStart, Globals.dispLastDispEnd, temp, false, false, true, null);                    
+                }
+                else
+                {
+                    //do nothing
                 }
                 gui.textBox2.Focus();
             }
@@ -1537,7 +1540,7 @@ namespace Gekko
                 if (Program.guiBrowseNumber >= Program.guiBrowseHistory.Count) return;
                 string var = Program.guiBrowseHistory[Program.guiBrowseNumber - 0];
                 Program.guiBrowseNumber += 0;  //1 will be added later, when calling "disp". Net result: 1.
-                if (Program.model.varsAType.ContainsKey(var))
+                if ((Program.model?.varsAType != null && Program.model.varsAType.ContainsKey(var)) || (Program.modelGams?.equations != null && Program.modelGams.equations.ContainsKey(var)))
                 {
                     List<string> temp = new List<string>();
                     temp.Add(var);

@@ -4402,7 +4402,14 @@ namespace Gekko.Parser.Gek
                         {
                             if (node.ChildrenCount() > 0)
                             {
-                                node.Code.A("o" + Num(node) + ".readTo = `" + node[0].Text + "`;");
+                                if (node[0].Text == "ASTBANKISSTARCHEATCODE")
+                                {
+                                    node.Code.A("o" + Num(node) + ".readTo = `*`;");
+                                }
+                                else
+                                {
+                                    node.Code.A("o" + Num(node) + ".readTo =  O.ConvertToString(" + node[0].Code + ");");
+                                }
                             }                            
                         }
                         break;
