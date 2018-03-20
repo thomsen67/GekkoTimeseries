@@ -503,7 +503,7 @@ namespace Gekko
                                 //suddently pops into existence, then it MUST be run no matter stamps
                                 Globals.remoteFileStamp = dt;
                                 //Program.Run(remoteFile, new P());
-                                Gui.gui.StartThread("RUN remote.gcm;", false);
+                                Gui.gui.StartThread("RUN " + Program.options.folder_working + "\\remote.gcm;", true);
 
                             }
                             else {
@@ -515,7 +515,7 @@ namespace Gekko
                                     //run it
                                     Globals.remoteFileStamp = dt;
                                     //Program.Run(remoteFile, new P());
-                                    Gui.gui.StartThread("RUN remote.gcm;", false);
+                                    Gui.gui.StartThread("RUN " + Program.options.folder_working + "\\remote.gcm;", true);
                                 }
                                 else
                                 {
