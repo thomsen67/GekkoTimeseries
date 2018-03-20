@@ -2935,7 +2935,7 @@ namespace Gekko
                         deserializedDatabank = Serializer.Deserialize<Databank>(fs);
                         foreach (IVariable iv in deserializedDatabank.storage.Values)
                         {
-                            iv.DeepCleanup();  //fixes maps and lists with 0 elements
+                            iv.DeepCleanup();  //fixes maps and lists with 0 elements, also binds MapMultiDim.parent
                         }
                         readInfo.variables = deserializedDatabank.storage.Count;
                         G.WritelnGray("Protobuf deserialize took: " + G.Seconds(dt3));
@@ -4436,42 +4436,15 @@ namespace Gekko
             int counterParameters = 0;
             int yearMax = int.MinValue;
             int yearMin = int.MaxValue;
-            string gamsDir = Program.options.gams_exe_folder.Trim();
-            if (gamsDir.EndsWith("\\")) gamsDir = gamsDir.Substring(0, gamsDir.Length - "\\".Length);
-            if (gamsDir.Trim() == "") gamsDir = null;  //must be so and not an empty string in the GAMSWorkspace call later on            
 
             EFreq freq = EFreq.Annual;
             if (G.Equal(Program.options.gams_time_freq, "u")) freq = EFreq.Undated;
             else if (G.Equal(Program.options.gams_time_freq, "q")) freq = EFreq.Quarterly;
             else if (G.Equal(Program.options.gams_time_freq, "m")) freq = EFreq.Monthly;
 
-            GAMSWorkspace ws = null;
-            if (Program.options.gams_fast && gamsDir != null)
-            {
-                //do nothing
-            }
-            else
-            {
-                try
-                {
-                    if (Globals.gamsWorkspace == null || Globals.gamsWorkspaceHelper != gamsDir)
-                    {
-                        ws = new GAMSWorkspace(workingDirectory: Program.options.folder_working, systemDirectory: gamsDir);
-                        Globals.gamsWorkspace = ws;
-                        Globals.gamsWorkspaceHelper = gamsDir;  //record the param it was called with
-                    }
-                    else ws = Globals.gamsWorkspace;
-                    gamsDir = ws.SystemDirectory;
-                }
-                catch (Exception e)
-                {
-                    G.Writeln2("*** ERROR: Import of gdx file (GAMS) failed. Could not locate GAMS (GAMSWorkspace problem).");
-                    G.Writeln("           Technical error:");
-                    G.Writeln("           " + e.Message);
-                    GdxErrorMessage();
-                    throw;
-                }
-            }
+            string gamsDir = null; GAMSWorkspace ws = null;
+            GetGAMSWorkspace(ref gamsDir, ref ws);
+
             if (Program.options.gams_fast)
             {
                 if (Program.options.gams_time_detect_auto)
@@ -4545,10 +4518,10 @@ namespace Gekko
                         //varType = 3: EQU
                         //varType = 4: ALIAS
                         for (int i = 1; i < int.MaxValue; i++)
-                        {                          
+                        {
 
                             gdx.gdxSymbolInfo(i, ref varName, ref gdxDimensions, ref varType);
-                            
+
                             string label = null; int records = -12345; int userInfo = -12345;
                             gdx.gdxSymbolInfoX(i, ref records, ref userInfo, ref label);
 
@@ -4604,7 +4577,7 @@ namespace Gekko
                             //    while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
                             //    {
                             //        string s = null;
-                                    
+
                             //    }
                             //    gdx.gdxDataReadDone();
                             //}
@@ -4857,13 +4830,46 @@ namespace Gekko
             readInfo.databank.info1 = readInfo.info1;
             readInfo.databank.date = readInfo.date;
             readInfo.databank.FileNameWithPath = readInfo.fileName;
-                        
+
             databank.FileNameWithPath = readInfo.fileName;
 
             //TODO: Maybe only do this on the gdx variables if possible
             //Anyway, the speed penalty is small anyway.
             databank.Trim();
 
+        }
+
+        private static void GetGAMSWorkspace(ref string gamsDir, ref GAMSWorkspace ws)
+        {
+            gamsDir = Program.options.gams_exe_folder.Trim();
+            if (gamsDir.EndsWith("\\")) gamsDir = gamsDir.Substring(0, gamsDir.Length - "\\".Length);
+            if (gamsDir.Trim() == "") gamsDir = null;  //must be so and not an empty string in the GAMSWorkspace call later on                        
+            if (Program.options.gams_fast && gamsDir != null)
+            {
+                //do nothing
+            }
+            else
+            {
+                try
+                {
+                    if (Globals.gamsWorkspace == null || Globals.gamsWorkspaceHelper != gamsDir)
+                    {
+                        ws = new GAMSWorkspace(workingDirectory: Program.options.folder_working, systemDirectory: gamsDir);
+                        Globals.gamsWorkspace = ws;
+                        Globals.gamsWorkspaceHelper = gamsDir;  //record the param it was called with
+                    }
+                    else ws = Globals.gamsWorkspace;
+                    gamsDir = ws.SystemDirectory;
+                }
+                catch (Exception e)
+                {
+                    G.Writeln2("*** ERROR: Import of gdx file (GAMS) failed. Could not locate GAMS (GAMSWorkspace problem).");
+                    G.Writeln("           Technical error:");
+                    G.Writeln("           " + e.Message);
+                    GdxErrorMessage();
+                    throw;
+                }
+            }
         }
 
         //static void WriteData(string s, double V, Gdxcs gdx)
@@ -4895,9 +4901,9 @@ namespace Gekko
             int counterParameters = 0;
             int yearMax = int.MinValue;
             int yearMin = int.MaxValue;
-            string gamsDir = Program.options.gams_exe_folder.Trim();
-            if (gamsDir.EndsWith("\\")) gamsDir = gamsDir.Substring(0, gamsDir.Length - "\\".Length);
-            if (gamsDir.Trim() == "") gamsDir = null;  //must be so and not an empty string in the GAMSWorkspace call later on            
+            
+            string gamsDir = null; GAMSWorkspace ws = null;
+            GetGAMSWorkspace(ref gamsDir, ref ws);
 
             EFreq freq = EFreq.Annual;
             if (G.Equal(Program.options.gams_time_freq, "u")) freq = EFreq.Undated;
@@ -19148,6 +19154,7 @@ namespace Gekko
                     };
 
                     process.Start();
+                    //string output = process.StandardOutput.ReadToEnd();
 
                     if (!Globals.threadIsInProcessOfAborting)
                     {
@@ -19155,7 +19162,7 @@ namespace Gekko
                         process.BeginErrorReadLine();
                     }
 
-                    if (process.WaitForExit(timeout) && outputWaitHandle.WaitOne(timeout) && errorWaitHandle.WaitOne(timeout))
+                    if (process.WaitForExit(timeout) && outputWaitHandle.WaitOne(timeout) && errorWaitHandle.WaitOne(timeout))                    
                     {
                         // Process completed. Check process.ExitCode here.
                     }

@@ -208,7 +208,7 @@ namespace Gekko
                 this.name = variableName;
                 this.meta = new SeriesMetaInformation();
                 this.dimensions = dimensions;
-                this.dimensionsStorage = new MapMultidim();
+                this.dimensionsStorage = new MapMultidim(this);
                 this.data = null; //for safety this is killed off                
             }
             else
@@ -382,7 +382,7 @@ namespace Gekko
         {
             int tDim = 0;
             if (hasTimeDimension) tDim = 1;
-            this.dimensionsStorage = new MapMultidim();
+            this.dimensionsStorage = new MapMultidim(this);
             this.dimensions = dimensionsIncludingTimeDimension - tDim;
             this.type = ESeriesType.ArraySuper;
             //if (!hasTimeDimension) this.type = ESeriesType.Timeless;
@@ -1805,7 +1805,7 @@ namespace Gekko
             {
                 //Clone the array-subseries
                 tsCopy.dimensions = this.dimensions;
-                tsCopy.dimensionsStorage = new MapMultidim();                
+                tsCopy.dimensionsStorage = new MapMultidim(this);                
                 foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
                 {
                     tsCopy.dimensionsStorage.storage.Add(kvp.Key, kvp.Value.DeepClone());
@@ -1842,7 +1842,18 @@ namespace Gekko
 
         public void DeepCleanup()
         {
-            //do nothing
+            if (this.type == ESeriesType.ArraySuper)
+            {
+                //#parentpointer
+                //foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
+                //{
+                //    Series ts = kvp.Value as Series;
+                //    if (ts != null)
+                //    {
+                //        this.dimensionsStorage.SetParent(ts);
+                //    }
+                //}
+            }
         }
     }
 

@@ -11,6 +11,33 @@ namespace Gekko
     {
         [ProtoMember(1)]
         public Dictionary<MapMultidimItem, IVariable> storage = new Dictionary<MapMultidimItem, IVariable>();
+
+        //#parentpointer
+        private Series parent = null;
+
+        //#parentpointer
+        public MapMultidim(Series ts)
+        {
+            this.parent = ts;
+        }
+
+        public MapMultidim()
+        {
+            //only for protobuf use
+        }
+
+        //#parentpointer
+        public Series GetParent()
+        {
+            return this.parent;
+        }
+
+        //#parentpointer
+        public void SetParent(Series ts)
+        {
+            this.parent = ts;
+        }
+
         public IVariable this[params string[] s]
         {
             get

@@ -1690,7 +1690,7 @@ namespace Gekko
                         {
                             Series rhs_series = rhs as Series;
                             string freq_rhs = G.GetFreq(rhs_series.freq);
-                            if (!varnameWithFreq.ToLower().EndsWith(Globals.freqIndicator + freq_rhs))
+                            if (varnameWithFreq != null && !varnameWithFreq.ToLower().EndsWith(Globals.freqIndicator + freq_rhs))  //null if it is a subseries under an array-superseries
                             {
                                 G.Writeln2("*** ERROR: Frequency: illegal series name '" + varnameWithFreq + "', should end with '" + Globals.freqIndicator + freq_rhs + "'");
                                 throw new GekkoException();

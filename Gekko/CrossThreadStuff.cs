@@ -481,6 +481,12 @@ namespace Gekko
 
                 //At start, Globals.remoteFileStamp is = new DateTime(0l), kind of like = null.
 
+                //if (true)
+                //{
+                //    Gui.gui.StartThread("RUN remote.gcm", false);
+                //    return;
+                //}
+
                 if (Program.options.interface_remote && Globals.remoteIsInvestigating == false)
                 {
                     Globals.remoteIsInvestigating = true;
@@ -496,7 +502,8 @@ namespace Gekko
                                 Globals.remoteExists = 1;
                                 //suddently pops into existence, then it MUST be run no matter stamps
                                 Globals.remoteFileStamp = dt;
-                                Program.Run(remoteFile, new P());
+                                //Program.Run(remoteFile, new P());
+                                Gui.gui.StartThread("RUN remote.gcm;", false);
 
                             }
                             else {
@@ -507,7 +514,8 @@ namespace Gekko
                                 {
                                     //run it
                                     Globals.remoteFileStamp = dt;
-                                    Program.Run(remoteFile, new P());
+                                    //Program.Run(remoteFile, new P());
+                                    Gui.gui.StartThread("RUN remote.gcm;", false);
                                 }
                                 else
                                 {
