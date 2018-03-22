@@ -59,6 +59,7 @@ namespace Gekko.Parser
         public GekkoDictionary<string, string> functionDefAnchor = null;
         public GekkoDictionary<string, string> forLoopAnchor = null;
         public GekkoDictionary<string, string> freeIndexedLists = null; //like x[#m], need to unfold for PRT/PLOT
+        //public GekkoDictionary<string, string> freeIndexedListsLeftSide = null; //like series x[#m] = 1
         public List<Tuple<string, string>> forLoop = null;
         public List<Tuple<string, string>> functionDef = null;
         //public string listLoopNestCode = null; //code delivered from sub-tree

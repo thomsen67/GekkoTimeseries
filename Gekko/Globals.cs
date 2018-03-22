@@ -298,6 +298,8 @@ namespace Gekko
         public static DateTime remoteFileStamp = new DateTime(0l);
         public static int remoteExists = -12345;  //unknown
 
+        public static string listLoopInternalName = "listloop_";
+
         public static string printNaNIndicator = "M";  //= AREMOS, could be "NaN" instead
 
         public static readonly string QT = "\"";  //QT = " (single quote)               

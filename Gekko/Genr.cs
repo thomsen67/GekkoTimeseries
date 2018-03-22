@@ -6,37 +6,68 @@ using System.Drawing;
 using Gekko.Parser;
 namespace Gekko
 {
-    public class TranslatedCode
-    {
-        public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
-        public static void ClearTS(P p)
-        {
-        }
-        public static void ClearScalar(P p)
-        {
-        }
+public class TranslatedCode
+{
+public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
+public static void ClearTS(P p) {
+}
+public static void ClearScalar(P p) {
+}
 
-        public static void CodeLines(P p)
-        {
-            GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
+public static void CodeLines(P p)
+{
+GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 
-            //[[splitSTART]]
-            p.SetText(@"¤1"); O.InitSmpl(smpl, p);
+//[[splitSTART]]
+p.SetText(@"¤1"); O.InitSmpl(smpl, p);
+Func<IVariable> func20 = () => {
+var smplCommandRemember21 = smpl.command; smpl.command = GekkoSmplCommand.Unfold;
+List temp19 = new List();
 
-            Program.Tell(O.ConvertToString(new ScalarString(ScalarString.SubstituteScalarsInString(@"Hei fra remote", true, false))), false);
-            p.SetText(@"¤2"); O.InitSmpl(smpl, p);
+foreach (IVariable listloop_s18 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("s")))), null, false, EVariableType.Var))) {
+temp19.Add(O.Indexer(O.Indexer2(smpl, listloop_s18), smpl, O.Lookup(smpl, null, null, "v", null, null, false, EVariableType.Var), listloop_s18));
 
-            Program.Tell(O.ConvertToString(new ScalarString(ScalarString.SubstituteScalarsInString(@"Hej fra remote", true, false))), false);
-            p.SetText(@"¤3"); O.InitSmpl(smpl, p);
+}
+smpl.command = smplCommandRemember21;
+return temp19;
 
-            O.Sys o2 = new O.Sys();
-            o2.s = new ScalarString(ScalarString.SubstituteScalarsInString(@"dir", true, false));
-            o2.Exe();
-
-
-            //[[splitSTOP]]
+};
 
 
-        }
-    }
+Func<GraphHelper, string> print0 = (gh) =>
+{
+O.Prt o0 = new O.Prt();
+o0.guiGraphIsRefreshing = gh.isRefreshing;
+o0.guiGraphPrintCode = gh.printCode;
+o0.guiGraphIsLogTransform = gh.isLogTransform;
+o0.prtType = "prt";
+
+{
+List<int> bankNumbers = null;
+O.Prt.Element ope0 = new O.Prt.Element();
+ope0.label = O.SubstituteScalarsAndLists("|||s|||v[#s]", false);
+smpl = new GekkoSmpl(o0.t1.Add(-2), o0.t2);
+ope0.printCodesFinal = Program.GetElementPrintCodes(o0, ope0);bankNumbers = O.Prt.GetBankNumbers(null, ope0.printCodesFinal);foreach(int bankNumber in bankNumbers) {
+smpl.bankNumber = bankNumber;
+ope0.variable[bankNumber] = func20();
+}
+smpl.bankNumber = 0;
+o0.prtElements.Add(ope0);
+}
+
+
+o0.counter = 3;
+o0.printCsCounter = Globals.printCs.Count - 1;
+o0.Exe();
+return o0.emfName;
+};
+Globals.printCs.Add(Globals.printCs.Count, print0); 
+print0(new GraphHelper());
+
+
+//[[splitSTOP]]
+
+
+}
+}
 }

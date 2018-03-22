@@ -2118,6 +2118,8 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 // ASSIGNMENT, VAL, STRING, DATE, SERIES, LIST, MATRIX, MAP, VAR
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
+//NOTE: ASTLEFTSIDE must always have ASTASSIGNMENT as parent, cf. #324683532
+
 assignment:				    assignmentType seriesOpt1? leftSide EQUAL flexibleList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) flexibleList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
 						  | assignmentType seriesOpt1? leftSide PLUSEQUAL flexibleList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide flexibleList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   

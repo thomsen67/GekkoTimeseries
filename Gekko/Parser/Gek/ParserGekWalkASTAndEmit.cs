@@ -240,18 +240,20 @@ namespace Gekko.Parser.Gek
         public static void WalkASTAndEmitUnfold(ASTNode node)
         {
             //before subnodes
-            //return;
+            //locates x[#m] or x[#m+...] or x[#m-...], or same for curlies         
+            //The #m is assigned to sum() or unfold() or to PRTELEMENT (last one will be converted to unfold()).
+            //Also in x[#m] = y[#m] + ... , the #m is assigned to ASTASSIGNMENT
 
             if (node.Text == "ASTBANKVARNAME")
             {
                 string s = GetSimpleName(node);
-                
+
                 if (s != null && s[0] == Globals.symbolCollection)
                 {
                     string listnameWithoutSigil = s.Substring(1);
                     //naked #m: ...[#m] or ...{#m} or #m1[#m]
                     //also ...[#m+...] and [#m-...] is supported
-                    if (node.Parent.Text == "ASTINDEXERELEMENT" || node.Parent.Text == "ASTCURLY" || (node.Parent.Text == "ASTCOMPARE2" && node.Number==1) || ((node.Parent.Text == "ASTPLUS" || node.Parent.Text == "ASTMINUS") && (node.Parent.Parent.Text == "ASTINDEXERELEMENT" || node.Parent.Parent.Text == "ASTCURLY")))
+                    if (node.Parent.Text == "ASTINDEXERELEMENT" || node.Parent.Text == "ASTCURLY" || (node.Parent.Text == "ASTCOMPARE2" && node.Number == 1) || ((node.Parent.Text == "ASTPLUS" || node.Parent.Text == "ASTMINUS") && (node.Parent.Parent.Text == "ASTINDEXERELEMENT" || node.Parent.Parent.Text == "ASTCURLY")))
                     {
                         //ASTPLUS/MINUS: see also #980752345
                         //#m is inside a x[#m], or inside a x{#m} or is a #m1[#m] conditional
@@ -284,11 +286,27 @@ namespace Gekko.Parser.Gek
                                     }
                                 }
                             }
-                            if (node2.Text == "ASTPRTELEMENT")
+                            else if (node2.Text == "ASTPRTELEMENT" || node2.Text == "ASTLEFTSIDE")  //Note: we cannot have both of these in the same tree, they are always separate
                             {
-                                if (node2.freeIndexedLists == null) node2.freeIndexedLists = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                                if (!node2.freeIndexedLists.ContainsKey(listnameWithoutSigil)) node2.freeIndexedLists.Add(listnameWithoutSigil, null);
+                                ASTNode tmp = node2;
+                                if (node2.Text == "ASTLEFTSIDE")
+                                {
+                                    tmp = node2.Parent;
+                                    if (tmp.Text != "ASTASSIGNMENT")
+                                    {
+                                        G.Writeln2("*** ERROR: Internal error #32468353233");  //see #32468353233
+                                        throw new GekkoException();
+                                    }
+                                }
+
+                                if (tmp.freeIndexedLists == null) tmp.freeIndexedLists = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                                if (!tmp.freeIndexedLists.ContainsKey(listnameWithoutSigil)) tmp.freeIndexedLists.Add(listnameWithoutSigil, null);
                             }
+                            //else if (node2.Text == "ASTLEFTSIDE")
+                            //{
+                            //    if (node2.freeIndexedListsLeftSide == null) node2.freeIndexedListsLeftSide = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                            //    if (!node2.freeIndexedListsLeftSide.ContainsKey(listnameWithoutSigil)) node2.freeIndexedListsLeftSide.Add(listnameWithoutSigil, null);
+                            //}
                             node2 = node2.Parent;
                         }
                         Label: node2 = node2;
@@ -301,12 +319,29 @@ namespace Gekko.Parser.Gek
             }
             //after subnodes
 
-            if (node.Text == "ASTPRTELEMENT")
+            if (node.freeIndexedLists != null && node.freeIndexedLists.Count > 0)
             {
-                if (node[0].Text == "ASTEXPRESSION")
+
+                if (node.Text == "ASTASSIGNMENT")
                 {
-                    if (node.freeIndexedLists != null && node.freeIndexedLists.Count > 0)
+                    //augment SearchUpwardsInTree2() in normal Walker so that it also checks
+                    //if it is a left-side looper
+                    //what about ser x[#i] = 1 + sum(#i, x[#i]) + x[#i], sum should fail. must use alias. or allow it??
+                    //int i = node.freeIndexedListsLeftSide.Count;
+
+                    //ok to just reassign, we are not going to add to any of these dictionaries anyway
+
+                    if (node.listLoopAnchor == null) node.listLoopAnchor = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    foreach (string s in node.freeIndexedLists.Keys)
                     {
+                        node.listLoopAnchor.Add(s, Globals.listLoopInternalName + s + ++Globals.counter);
+                    }
+                }
+                else if (node.Text == "ASTPRTELEMENT")
+                {
+                    if (node[0].Text == "ASTEXPRESSION")
+                    {
+
                         List<string> xx = new List<string>();
                         foreach (string ss in node.freeIndexedLists.Keys)
                         {
@@ -332,7 +367,7 @@ namespace Gekko.Parser.Gek
                         //12                  m
                         //13            ASTPLACEHOLDER
                         //        AST ----------------> orignial code after ASTEXPRESSION comes here
-                                                
+
                         ASTNode n0 = new ASTNode("ASTEXPRESSION", true);
                         ASTNode n1 = new ASTNode("ASTFUNCTION", true);
                         ASTNode n2 = new ASTNode("ASTIDENT", true);
@@ -365,7 +400,7 @@ namespace Gekko.Parser.Gek
                             n10.Add(n11);
                             n11.Add(n12);
                             n6.Add(n13);
-                            if (xx.Count==1)
+                            if (xx.Count == 1)
                             {
                                 n1.Add(n4);
                             }
@@ -378,7 +413,7 @@ namespace Gekko.Parser.Gek
                         if (xx.Count > 1)
                         {
                             n1.Add(list);
-                        }                        
+                        }
 
                         n1.Add(node[0][0]);  //original code goes to arg 2 of unfold function: unfold(#m, ...[here]...)
                         node.RemoveLast();
@@ -523,7 +558,7 @@ namespace Gekko.Parser.Gek
                                     G.Writeln2("*** ERROR: The list " + Globals.symbolCollection + s + " is used several times for multidimensional looping in sum() or unfold() function");
                                     throw new GekkoException();
                                 }
-                                node.listLoopAnchor.Add(s, "listloop_" + s + ++Globals.counter);
+                                node.listLoopAnchor.Add(s, Globals.listLoopInternalName + s + ++Globals.counter);
                             }
                         }
                     }
@@ -3187,19 +3222,7 @@ namespace Gekko.Parser.Gek
                             string convertTo = null;
 
                             string temp = node[1].Code.ToString();
-
-                            //string temp = null;
-                            //if (node[4].Text == "=") temp = node[1].Code.ToString();
-                            //else if (node[4].Text == "+=") temp = "O.Add(smpl, " + node[0].Code.ToString() + ", " + node[1].Code.ToString() + ")";
-                            //else if (node[4].Text == "-=") temp = "O.Subtract(smpl, " + node[0].Code.ToString() + ", " + node[1].Code.ToString() + ")";
-                            //else if (node[4].Text == "*=") temp = "O.Multiply(smpl, " + node[0].Code.ToString() + ", " + node[1].Code.ToString() + ")";
-                            //else if (node[4].Text == "/=") temp = "O.Divide(smpl, " + node[0].Code.ToString() + ", " + node[1].Code.ToString() + ")";
-                            //else
-                            //{
-                            //    G.Writeln2("*** ERRROR: Unknown assignment operator");
-                            //    throw new GekkoException();
-                            //}
-
+                            
                             if (type != null) node.Code.A("IVariable " + ivTempVar + " = O.IvConvertTo(EVariableType." + type + ", ").A(temp).A(")").End();
                             else  node.Code.A("IVariable " + ivTempVar + " = ").A(temp).End();
 
@@ -5284,41 +5307,43 @@ namespace Gekko.Parser.Gek
             return functionName;
         }
 
-        private static void SearchUpwardsInTree(ASTNode node, out int timeLoopDepth, out ASTNode parentTimeLoop)
-        {
-            timeLoopDepth = 0;
-            ASTNode tmp = node.Parent;
-            parentTimeLoop = null;
-            while (tmp != null)
-            {
-                bool ok = false;
+        //private static void SearchUpwardsInTree(ASTNode node, out int timeLoopDepth, out ASTNode parentTimeLoop)
+        //{
+        //    timeLoopDepth = 0;
+        //    ASTNode tmp = node.Parent;
+        //    parentTimeLoop = null;
+        //    while (tmp != null)
+        //    {
+        //        bool ok = false;
 
-                if (
+        //        if (
 
-                       (tmp.Text == "ASTFUNCTION" && (Globals.lagFunctions.Contains(tmp[0].Text.ToLower()) || tmp[0].Text.ToLower() == "sum"))  //check that sum is gams-like
-                    || tmp.Text == "ASTOLSELEMENT"
-                    || tmp.Text == "ASTPRTELEMENT"
-                    || tmp.Text == "ASTTABLESETVALUESELEMENT"
-                    || tmp.Text == "ASTSERIES"
-                    || tmp.Text == "ASTGENR"
-                    || tmp.Text == "ASTGENRLHSFUNCTION"
-                    || tmp.Text == "ASTGENRLISTINDEXER"
-                    || tmp.Text == "ASTRETURNTUPLE"
-                    || (G.Equal(tmp.Text, "series") && (tmp.Parent != null && tmp.Text == "ASTTUPLEITEM") && (tmp.Parent.Parent != null && tmp.Parent.Text == "ASTTUPLE"))
+        //               (tmp.Text == "ASTFUNCTION" && (Globals.lagFunctions.Contains(tmp[0].Text.ToLower()) || tmp[0].Text.ToLower() == "sum"))  //check that sum is gams-like
+        //            || tmp.Text == "ASTOLSELEMENT"
+        //            || tmp.Text == "ASTPRTELEMENT"
+        //            || tmp.Text == "ASTTABLESETVALUESELEMENT"
+        //            || tmp.Text == "ASTSERIES"
+        //            || tmp.Text == "ASTGENR"
+        //            || tmp.Text == "ASTGENRLHSFUNCTION"
+        //            || tmp.Text == "ASTGENRLISTINDEXER"
+        //            || tmp.Text == "ASTRETURNTUPLE"
+        //            || (G.Equal(tmp.Text, "series") && (tmp.Parent != null && tmp.Text == "ASTTUPLEITEM") && (tmp.Parent.Parent != null && tmp.Parent.Text == "ASTTUPLE"))
 
-                    ) ok = true;
+        //            ) ok = true;
 
-                if (ok)
-                {
-                    timeLoopDepth++;
-                    if (parentTimeLoop == null) parentTimeLoop = tmp;  //only first one
-                }
-                tmp = tmp.Parent;
-            }
-        }
+        //        if (ok)
+        //        {
+        //            timeLoopDepth++;
+        //            if (parentTimeLoop == null) parentTimeLoop = tmp;  //only first one
+        //        }
+        //        tmp = tmp.Parent;
+        //    }
+        //}
 
+        
         private static string SearchUpwardsInTree2(ASTNode node, string listName)
-        {            
+        {
+            //Looks for list loop anchor, for instance looping in sum() or unfold()  -- or the left-hand side controlled lists in SERIES looping (like x[#i] = y[#i] + ...)
             ASTNode tmp = node.Parent;
             string rv = null;         
             while (tmp != null)
@@ -5335,8 +5360,10 @@ namespace Gekko.Parser.Gek
             return rv;
         }
 
+        
         private static string SearchUpwardsInTree3(ASTNode node, string varName)
         {
+            //Looking for function defintion (bound arguments), or for loop vars
             ASTNode tmp = node.Parent;
             ASTNode parent = null;
             string rv = null;
@@ -5362,7 +5389,7 @@ namespace Gekko.Parser.Gek
         private static string SearchUpwardsInTree4(ASTNode node)
         {
             //finds out if the variable is a LHS (left-side) variable
-            //returns null if RHS or (LHS and there is a ASTBANKVAR or ASTDOTORINDEXER above.
+            //returns null if RHS or (LHS and there is a ASTBANKVAR or ASTDOTORINDEXER above)
             ASTNode tmp = node;            
             string rv = null;
             while (tmp != null)

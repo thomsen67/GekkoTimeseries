@@ -9347,16 +9347,64 @@ namespace UnitTests
         [TestMethod]
         public void _Test_ArraySeries()
         {
-            I("RESET; TIME 2001 2005;");
+            I("RESET; TIME 2001 2003;");
             I("xx2 = series(2);");
-            I("xx2['a', 'b'] = (1, 2, 3, 4, 5);");
+            I("xx2['a', 'b'] = (1, 2, 3);");
+            I("xx2['a', 'c'] = (11, 12, 13);");
             _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2001, 1d, sharedDelta);
             _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2002, 2d, sharedDelta);
-            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2003, 3d, sharedDelta);
-            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2004, 4d, sharedDelta);
-            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2005, 5d, sharedDelta);
-            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2006, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2003, 3d, sharedDelta);            
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "c" }, 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "c" }, 2001, 11d, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "c" }, 2002, 12d, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "c" }, 2003, 13d, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "c" }, 2004, double.NaN, sharedDelta);
+
+            I("xx3 = xx2;");
+            _AssertSeries(First(), "xx3", new string[] { "a", "b" }, 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "b" }, 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "b" }, 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "b" }, 2003, 3d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "b" }, 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "c" }, 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "c" }, 2001, 11d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "c" }, 2002, 12d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "c" }, 2003, 13d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "c" }, 2004, double.NaN, sharedDelta);
+
+            I("xx2['a', 'b'][2002] = 100;");
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2002, 100d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "b" }, 2002, 2d, sharedDelta);
+
+            I("xx3['a', 'c'] = xx2['a', 'b'];");
+            _AssertSeries(First(), "xx3", new string[] { "a", "b" }, 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "b" }, 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "b" }, 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "b" }, 2003, 3d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "b" }, 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "c" }, 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "c" }, 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "c" }, 2002, 100d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "c" }, 2003, 3d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "c" }, 2004, double.NaN, sharedDelta);
+
+            I("xx2['a', 'b'][2002] = 200;");
+            _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2002, 200d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "c" }, 2002, 100d, sharedDelta);
+
+            I("RESET; TIME 2001 2003;");
+            I("v = series(1);");
+            I("v[a] = 1; v[b] = 1;");
+            I("#s = 'a', 'b';");
+            I("v[#s] = 1;");
+
+
+
+
+
+
         }
 
         [TestMethod]
