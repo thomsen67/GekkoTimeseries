@@ -3210,6 +3210,14 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTASSIGNMENT":
                         {
+                            if (node.listLoopAnchor != null && node.listLoopAnchor.Count>0)
+                            {
+                                foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
+                                {
+                                    node.Code.A("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(`" + kvp.Key + "`)))), null, false, EVariableType.Var))) {" + G.NL);
+                                }
+                            }                                                       
+
                             string type = HandleVar(node[3].Text);  //2 is options   
                             GetCodeFromAllChildren(node, node[2]);                         
                             if (G.Equal(type, "STRING2")) type = "string";
@@ -3228,6 +3236,13 @@ namespace Gekko.Parser.Gek
 
                             node.Code.A(node[0].Code).End();
 
+                            if (node.listLoopAnchor != null && node.listLoopAnchor.Count > 0)
+                            {
+                                foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
+                                {
+                                    node.Code.A("}"+G.NL);
+                                }
+                            }
                         }
                         break;
                     case "ASTPERCENT":
