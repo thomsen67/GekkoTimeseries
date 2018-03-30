@@ -2224,7 +2224,7 @@ dispOpt1h:				    INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
 // COMPARE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-compare:   				    COMPARE compareOpt1? namesList? -> ^({token("ASTCOMPARE", ASTCOMPARE, $COMPARE.Line)} ^(ASTOPT_ compareOpt1?) namesList?)				
+compare:   				    COMPARE compareOpt1? namesList? -> ^({token("ASTCOMPARECOMMAND", ASTCOMPARECOMMAND, $COMPARE.Line)} ^(ASTOPT_ compareOpt1?) namesList?)				
 						    ;
 
 compareOpt1:			    ISNOTQUAL

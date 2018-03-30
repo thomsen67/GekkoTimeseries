@@ -1097,6 +1097,13 @@ namespace Gekko
                 throw new GekkoException();
             }
         }
+        public static bool HasSigil(string varname)
+        {
+            bool hasSigil = false;
+            if (varname[0] == Globals.symbolScalar || varname[0] == Globals.symbolCollection) hasSigil = true;
+            return hasSigil;
+        }
+
 
         //Use together with CheckIVariableNameAndType()
         //See also G.AddSigil()

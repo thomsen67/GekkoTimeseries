@@ -79,7 +79,13 @@ namespace Gekko
         public GekkoTime t1;
         public GekkoTime t2;
     }
-    
+
+    public class SamHelper
+    {
+        public Series series1;
+        public Series series2;
+    }
+
     public class MyCustomAttribute : Attribute
     {
         public string Lag { get; set; }
@@ -1679,278 +1685,278 @@ namespace Gekko
             return coord;
         }
 
-        public static void readCsvOLDDELETE(Databank databank, string file, bool merge, ReadInfo readInfo)
-        {
-            if (!merge)
-            {
-                databank.Clear();
-            }
+        //public static void readCsvOLDDELETE(Databank databank, string file, bool merge, ReadInfo readInfo)
+        //{
+        //    if (!merge)
+        //    {
+        //        databank.Clear();
+        //    }
 
-            string freqHere = G.GetFreq(Program.options.freq);
+        //    string freqHere = G.GetFreq(Program.options.freq);
 
-            string fullFileNameAndPath = CreateFullPathAndFileName(file);
+        //    string fullFileNameAndPath = CreateFullPathAndFileName(file);
 
-            bool trailingY = false;
+        //    bool trailingY = false;
 
-            if (!File.Exists(fullFileNameAndPath))
-            {
-                G.Writeln2("*** ERROR: csv file does not exist");
-                throw new GekkoException();
-            }
+        //    if (!File.Exists(fullFileNameAndPath))
+        //    {
+        //        G.Writeln2("*** ERROR: csv file does not exist");
+        //        throw new GekkoException();
+        //    }
 
-            //should not contain זרו, so no need to use GetTextFromFile()
-            using (FileStream fs = WaitForFileStream(fullFileNameAndPath, GekkoFileReadOrWrite.Read))
-            using (StreamReader sr = new StreamReader(fs))
-            {
-                char delimiter = ';';
-                char periodIndicator = 'Y';
-                //This is an arbitrary size for this example.
-                int max = 100000000; //100 MB
-                char[] c = null;
-                int counter = 0;
-                int varCounter = -12345;
-                while (sr.Peek() >= 0)
-                {
-                    counter++;
-                    if (counter >= 2)
-                    {
-                        G.Writeln2("*** ERROR: File is > " + max / 1000000 + " MB");
-                        throw new GekkoException();
-                    }
-                    c = new char[max];
-                    int size = sr.Read(c, 0, c.Length);
-                    int ii = 0;
-                    int iiNewLine = 0;
-                    for (int i = 0; i < 1; i++)
-                    {
-                        ii = skipSpaces(c, ii);
-                        iiNewLine = skipPastNewLine(c, ii) - 2;  //new line is two characters \r\n
-                        //read periods
-                        int pcounter = 0;
-                        bool endOfLineEncountered = false;
-                        bool firstPeriod = true;
-                        GekkoTime per1 = GekkoTime.tNull;
-                        GekkoTime per2 = GekkoTime.tNull;
-                        for (pcounter = 0; pcounter < int.MaxValue; pcounter++)
-                        {
-                            if (c[ii] != delimiter)
-                            {
-                                G.Writeln2("*** ERROR regarding CSV read, first character is not a '" + delimiter + "'");
-                            }
-                            int iiOld = ii;
-                            ii = findChar(c, iiOld + 1, ';');
-                            if (ii == -12345 || ii > iiNewLine)
-                            {
-                                ii = iiNewLine;
-                                endOfLineEncountered = true;
-                            }
+        //    //should not contain זרו, so no need to use GetTextFromFile()
+        //    using (FileStream fs = WaitForFileStream(fullFileNameAndPath, GekkoFileReadOrWrite.Read))
+        //    using (StreamReader sr = new StreamReader(fs))
+        //    {
+        //        char delimiter = ';';
+        //        char periodIndicator = 'Y';
+        //        //This is an arbitrary size for this example.
+        //        int max = 100000000; //100 MB
+        //        char[] c = null;
+        //        int counter = 0;
+        //        int varCounter = -12345;
+        //        while (sr.Peek() >= 0)
+        //        {
+        //            counter++;
+        //            if (counter >= 2)
+        //            {
+        //                G.Writeln2("*** ERROR: File is > " + max / 1000000 + " MB");
+        //                throw new GekkoException();
+        //            }
+        //            c = new char[max];
+        //            int size = sr.Read(c, 0, c.Length);
+        //            int ii = 0;
+        //            int iiNewLine = 0;
+        //            for (int i = 0; i < 1; i++)
+        //            {
+        //                ii = skipSpaces(c, ii);
+        //                iiNewLine = skipPastNewLine(c, ii) - 2;  //new line is two characters \r\n
+        //                //read periods
+        //                int pcounter = 0;
+        //                bool endOfLineEncountered = false;
+        //                bool firstPeriod = true;
+        //                GekkoTime per1 = GekkoTime.tNull;
+        //                GekkoTime per2 = GekkoTime.tNull;
+        //                for (pcounter = 0; pcounter < int.MaxValue; pcounter++)
+        //                {
+        //                    if (c[ii] != delimiter)
+        //                    {
+        //                        G.Writeln2("*** ERROR regarding CSV read, first character is not a '" + delimiter + "'");
+        //                    }
+        //                    int iiOld = ii;
+        //                    ii = findChar(c, iiOld + 1, ';');
+        //                    if (ii == -12345 || ii > iiNewLine)
+        //                    {
+        //                        ii = iiNewLine;
+        //                        endOfLineEncountered = true;
+        //                    }
 
-                            String date = new String(c, iiOld + 1, ii - iiOld - 1);
-                            date = date.Trim();  //removes blanks at start and end
-                            date = date.ToLower();  //if q or m
+        //                    String date = new String(c, iiOld + 1, ii - iiOld - 1);
+        //                    date = date.Trim();  //removes blanks at start and end
+        //                    date = date.ToLower();  //if q or m
 
-                            if (date.EndsWith(periodIndicator.ToString(), true, null))
-                            {
-                                //remove 'Y' if it is there
-                                date = date.Remove(date.Length - 1);
-                                trailingY = true;
-                            }
+        //                    if (date.EndsWith(periodIndicator.ToString(), true, null))
+        //                    {
+        //                        //remove 'Y' if it is there
+        //                        date = date.Remove(date.Length - 1);
+        //                        trailingY = true;
+        //                    }
 
-                            int per = -12345;
-                            int subPer = -12345;
+        //                    int per = -12345;
+        //                    int subPer = -12345;
 
-                            try
-                            {
+        //                    try
+        //                    {
 
-                                string perTemp = "";
-                                string subPerTemp = "";
-                                if (G.Equal(freqHere, "a"))
-                                {
-                                    perTemp = date;
-                                    subPerTemp = "1";
-                                }
-                                else
-                                {
-                                    string[] temp = date.Split(new string[] { freqHere }, StringSplitOptions.None);
-                                    if (temp.Length != 2)
-                                    {
-                                        G.Writeln2("*** ERROR: Could not find freq '" + freqHere + "' in this date: '" + date + "'");
-                                        G.Writeln("           You may want to change the frequency: OPTION freq = ...", Color.Red);
-                                        throw new GekkoException();
-                                    }
-                                    perTemp = temp[0];
-                                    subPerTemp = temp[1];
-                                }
+        //                        string perTemp = "";
+        //                        string subPerTemp = "";
+        //                        if (G.Equal(freqHere, "a"))
+        //                        {
+        //                            perTemp = date;
+        //                            subPerTemp = "1";
+        //                        }
+        //                        else
+        //                        {
+        //                            string[] temp = date.Split(new string[] { freqHere }, StringSplitOptions.None);
+        //                            if (temp.Length != 2)
+        //                            {
+        //                                G.Writeln2("*** ERROR: Could not find freq '" + freqHere + "' in this date: '" + date + "'");
+        //                                G.Writeln("           You may want to change the frequency: OPTION freq = ...", Color.Red);
+        //                                throw new GekkoException();
+        //                            }
+        //                            perTemp = temp[0];
+        //                            subPerTemp = temp[1];
+        //                        }
 
-                                try
-                                {
-                                    per = int.Parse(perTemp);
-                                    subPer = int.Parse(subPerTemp);
-                                }
-                                catch
-                                {
-                                    G.Writeln2("*** ERROR: Could not parse this date: '" + date + "'");
-                                    G.Writeln("           You may want to change the frequency: OPTION freq = ...", Color.Red);
-                                    throw new GekkoException();
-                                }
+        //                        try
+        //                        {
+        //                            per = int.Parse(perTemp);
+        //                            subPer = int.Parse(subPerTemp);
+        //                        }
+        //                        catch
+        //                        {
+        //                            G.Writeln2("*** ERROR: Could not parse this date: '" + date + "'");
+        //                            G.Writeln("           You may want to change the frequency: OPTION freq = ...", Color.Red);
+        //                            throw new GekkoException();
+        //                        }
 
-                                GekkoTime gt = new GekkoTime((Program.options.freq), per, subPer);
+        //                        GekkoTime gt = new GekkoTime((Program.options.freq), per, subPer);
 
-                                if (firstPeriod)
-                                {
-                                    per1 = gt;
-                                    firstPeriod = false;
-                                }
-                                if (endOfLineEncountered)
-                                {
-                                    per2 = gt;
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                G.Writeln2("*** ERROR: unexpected error while reading csv file");
-                                throw new GekkoException();
-                            }
-                            if (endOfLineEncountered == true) break;
-                        }
+        //                        if (firstPeriod)
+        //                        {
+        //                            per1 = gt;
+        //                            firstPeriod = false;
+        //                        }
+        //                        if (endOfLineEncountered)
+        //                        {
+        //                            per2 = gt;
+        //                        }
+        //                    }
+        //                    catch (Exception e)
+        //                    {
+        //                        G.Writeln2("*** ERROR: unexpected error while reading csv file");
+        //                        throw new GekkoException();
+        //                    }
+        //                    if (endOfLineEncountered == true) break;
+        //                }
 
-                        G.Writeln("Csv data period = " + G.FromDateToString(per1) + " to " + G.FromDateToString(per2));
-                        readInfo.startPerInFile = per1.super;
-                        readInfo.endPerInFile = per2.super;
+        //                G.Writeln("Csv data period = " + G.FromDateToString(per1) + " to " + G.FromDateToString(per2));
+        //                readInfo.startPerInFile = per1.super;
+        //                readInfo.endPerInFile = per2.super;
 
-                        int expectedPeriodsPerLine = GekkoTime.Observations(per1, per2);
+        //                int expectedPeriodsPerLine = GekkoTime.Observations(per1, per2);
 
-                        //reading the data part, first the variable name, and then the numbers
+        //                //reading the data part, first the variable name, and then the numbers
 
-                        for (varCounter = 0; varCounter < int.MaxValue; varCounter++)
-                        {
-                            if (c[ii] == '\r' && c[ii + 1] == '\n')
-                            {
-                                if (size <= ii + 2) break;
-                            }
-                            //G.Writeln("---");
-                            //double[] ts = null;
-                            Series dataArray = null;
-                            String varName = "";
-                            endOfLineEncountered = false;
-                            bool firstItem = true;
-                            ii = skipSpaces(c, ii + 2) - 1;
-                            iiNewLine = skipPastNewLine(c, ii) - 2;  //new line is two characters \r\n
-                            for (int i5 = 0; i5 < int.MaxValue; i5++)
-                            {
+        //                for (varCounter = 0; varCounter < int.MaxValue; varCounter++)
+        //                {
+        //                    if (c[ii] == '\r' && c[ii + 1] == '\n')
+        //                    {
+        //                        if (size <= ii + 2) break;
+        //                    }
+        //                    //G.Writeln("---");
+        //                    //double[] ts = null;
+        //                    Series dataArray = null;
+        //                    String varName = "";
+        //                    endOfLineEncountered = false;
+        //                    bool firstItem = true;
+        //                    ii = skipSpaces(c, ii + 2) - 1;
+        //                    iiNewLine = skipPastNewLine(c, ii) - 2;  //new line is two characters \r\n
+        //                    for (int i5 = 0; i5 < int.MaxValue; i5++)
+        //                    {
 
-                                int iiOld = ii;
-                                ii = findChar(c, iiOld + 1, size, ';');
-                                if (ii == -12345 || ii > iiNewLine)
-                                {
-                                    ii = iiNewLine;
-                                    endOfLineEncountered = true;
-                                }
+        //                        int iiOld = ii;
+        //                        ii = findChar(c, iiOld + 1, size, ';');
+        //                        if (ii == -12345 || ii > iiNewLine)
+        //                        {
+        //                            ii = iiNewLine;
+        //                            endOfLineEncountered = true;
+        //                        }
 
-                                String s = new String(c, iiOld + 1, ii - iiOld - 1);
-                                s = s.Trim();
-                                if (firstItem)
-                                {
-                                    //var name
-                                    varName = s;
-                                    firstItem = false;
+        //                        String s = new String(c, iiOld + 1, ii - iiOld - 1);
+        //                        s = s.Trim();
+        //                        if (firstItem)
+        //                        {
+        //                            //var name
+        //                            varName = s;
+        //                            firstItem = false;
 
-                                    //Series ts=findOrCreateTimeSeriesInDataBank(
+        //                            //Series ts=findOrCreateTimeSeriesInDataBank(
 
-                                    if (!databank.ContainsVariable(varName))
-                                    {
-                                        Series data2 = new Series(G.GetFreq(freqHere), varName);  //TODO, FIX
-                                        databank.AddVariable(data2);
-                                        dataArray = data2;
-                                    }
-                                    else
-                                    {
-                                        dataArray = databank.GetVariable(varName);
-                                    }
-                                }
-                                else
-                                {
-                                    bool shouldSkip = false;
-                                    //number
-                                    double ss = double.NaN;
-                                    if (s == "")
-                                    {
-                                        shouldSkip = true;
-                                    }
-                                    else if (s == "#N/A" || s == "#NAME?" || s == "#I/T" || s == "#NAVN?")  //the last ones are the Danish codes
-                                    {
-                                        ss = double.NaN;
-                                    }
-                                    else
-                                    {
-                                        string s3 = s;
-                                        if (G.Equal(Program.options.interface_csv_decimalseparator, "period"))
-                                        {
-                                            //do nothing
-                                        }
-                                        else if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
-                                        {
-                                            s3 = s.Replace(",", ".");  //bit of a hack, will not handle 1.500,75   (--> 1500.75)
-                                        }
-                                        try
-                                        {
-                                            ss = double.Parse(s3, System.Globalization.CultureInfo.InvariantCulture);
-                                        }
-                                        catch
-                                        {
-                                            G.Writeln2("*** ERROR: Could not parse " + s + " as a number");
-                                            G.Writeln("+++ NOTE:  You may change separator: OPTION interface csv decimalseparator");
-                                            throw new GekkoException();
-                                        }
-                                    }
+        //                            if (!databank.ContainsVariable(varName))
+        //                            {
+        //                                Series data2 = new Series(G.GetFreq(freqHere), varName);  //TODO, FIX
+        //                                databank.AddVariable(data2);
+        //                                dataArray = data2;
+        //                            }
+        //                            else
+        //                            {
+        //                                dataArray = databank.GetVariable(varName);
+        //                            }
+        //                        }
+        //                        else
+        //                        {
+        //                            bool shouldSkip = false;
+        //                            //number
+        //                            double ss = double.NaN;
+        //                            if (s == "")
+        //                            {
+        //                                shouldSkip = true;
+        //                            }
+        //                            else if (s == "#N/A" || s == "#NAME?" || s == "#I/T" || s == "#NAVN?")  //the last ones are the Danish codes
+        //                            {
+        //                                ss = double.NaN;
+        //                            }
+        //                            else
+        //                            {
+        //                                string s3 = s;
+        //                                if (G.Equal(Program.options.interface_csv_decimalseparator, "period"))
+        //                                {
+        //                                    //do nothing
+        //                                }
+        //                                else if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
+        //                                {
+        //                                    s3 = s.Replace(",", ".");  //bit of a hack, will not handle 1.500,75   (--> 1500.75)
+        //                                }
+        //                                try
+        //                                {
+        //                                    ss = double.Parse(s3, System.Globalization.CultureInfo.InvariantCulture);
+        //                                }
+        //                                catch
+        //                                {
+        //                                    G.Writeln2("*** ERROR: Could not parse " + s + " as a number");
+        //                                    G.Writeln("+++ NOTE:  You may change separator: OPTION interface csv decimalseparator");
+        //                                    throw new GekkoException();
+        //                                }
+        //                            }
 
-                                    if (!shouldSkip)
-                                    {
-                                        if (ss == 1e+15d)  //we use this as code for missing, as in AREMOS.
-                                        {
-                                            ss = double.NaN;
-                                        }
-                                        GekkoTime gt2 = per1.Add(i5 - 1);
-                                        dataArray.SetData(gt2, ss);
-                                    }
-                                }
-                                if (endOfLineEncountered)
-                                {
-                                    //G.Writeln(i5);
-                                    if (i5 != expectedPeriodsPerLine)
-                                    {
-                                        G.Writeln2("*** ERROR: expected " + expectedPeriodsPerLine + " numbers for '" + varName + "'");
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                if (trailingY) G.Writeln("+++ NOTE: Trailing 'Y's were removed from dates (for instance '2010Y' becomes '2010')");
-                c = null;
-                sr.Close();
-                readInfo.variables = varCounter;
+        //                            if (!shouldSkip)
+        //                            {
+        //                                if (ss == 1e+15d)  //we use this as code for missing, as in AREMOS.
+        //                                {
+        //                                    ss = double.NaN;
+        //                                }
+        //                                GekkoTime gt2 = per1.Add(i5 - 1);
+        //                                dataArray.SetData(gt2, ss);
+        //                            }
+        //                        }
+        //                        if (endOfLineEncountered)
+        //                        {
+        //                            //G.Writeln(i5);
+        //                            if (i5 != expectedPeriodsPerLine)
+        //                            {
+        //                                G.Writeln2("*** ERROR: expected " + expectedPeriodsPerLine + " numbers for '" + varName + "'");
+        //                            }
+        //                            break;
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        if (trailingY) G.Writeln("+++ NOTE: Trailing 'Y's were removed from dates (for instance '2010Y' becomes '2010')");
+        //        c = null;
+        //        sr.Close();
+        //        readInfo.variables = varCounter;
 
 
-                //See almost identical code in readTsd() several places
-                if (merge)
-                {
-                    readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
-                    readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
-                }
-                else
-                {
-                    readInfo.startPerResultingBank = readInfo.startPerInFile;
-                    readInfo.endPerResultingBank = readInfo.endPerInFile;
-                }
-                Databank currentBank = Program.databanks.GetDatabank(databank.name);
-                currentBank.yearStart = readInfo.startPerResultingBank;
-                currentBank.yearEnd = readInfo.endPerResultingBank;
+        //        //See almost identical code in readTsd() several places
+        //        if (merge)
+        //        {
+        //            readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
+        //            readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
+        //        }
+        //        else
+        //        {
+        //            readInfo.startPerResultingBank = readInfo.startPerInFile;
+        //            readInfo.endPerResultingBank = readInfo.endPerInFile;
+        //        }
+        //        Databank currentBank = Program.databanks.GetDatabank(databank.name);
+        //        currentBank.yearStart = readInfo.startPerResultingBank;
+        //        currentBank.yearEnd = readInfo.endPerResultingBank;
 
-                return;
-            }
-        }
+        //        return;
+        //    }
+        //}
 
         public static void Index(string listName, string wildCard)
         {
@@ -7190,7 +7196,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                 }
-                Series ts = db.GetVariable(bnv.name);
+                Series ts = db.GetVariable(bnv.name);  //#getvar
                 if (ts == null && !ignoreNonExistingSeries)
                 {
                     G.Writeln2("*** ERROR: Could not find timeseries '" + bnv.name + "' in databank '" + bnv.bank + "'");
@@ -16473,7 +16479,7 @@ namespace Gekko
                 {
                     if (!filter.ContainsKey(s)) continue;  //ignore this
                 }
-                Series ts = work.GetVariable(s);  //can this not be moved before loop??
+                Series ts = work.GetVariable(s);  //can this not be moved before loop??  //#getvar
                 if (ts.type == ESeriesType.ArraySuper) continue;  //ignore it
                 foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
                 {                    
@@ -21071,7 +21077,7 @@ namespace Gekko
                 {
                     string s3 = var.name;
                     Databank db = GetBankFromBankNameVersion(var.bank);
-                    Series ts = db.GetVariable(s3);
+                    Series ts = db.GetVariable(s3);  //#getvar
                     if (ts == null)
                     {
                         //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
@@ -21224,7 +21230,7 @@ namespace Gekko
                 {
                     string s3 = var.name;
                     Databank db = GetBankFromBankNameVersion(var.bank);
-                    Series ts = db.GetVariable(s3);
+                    Series ts = db.GetVariable(s3); //#getvar
                     if (ts == null)
                     {
                         G.Writeln2("*** ERROR: Writing gnuplot file: variable " + s3 + " in '" + db.name + "' with freq '" + Program.options.freq + "' does not exist");
@@ -21241,7 +21247,7 @@ namespace Gekko
                     {
                         string s3 = var.name;
                         Databank db = GetBankFromBankNameVersion(var.bank);
-                        Series ts = db.GetVariable(s3);  //existence has been checked
+                        Series ts = db.GetVariable(s3);  //existence has been checked //#getvar
                         double data = ts.GetData(null, t);
                         if (G.isNumericalError(data))
                         {
@@ -21317,7 +21323,7 @@ namespace Gekko
                 foreach (BankNameVersion var in vars)
                 {
                     Databank db = GetBankFromBankNameVersion(var.bank);                    
-                    Series ts = db.GetVariable(var.name);
+                    Series ts = db.GetVariable(var.name);  //#getvar
                     if (ts == null)
                     {
                         //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
@@ -22791,7 +22797,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + db2 + " databank");
                 }
             }
-            return db.GetVariable(s).GetData(null, t);
+            return db.GetVariable(s).GetData(null, t);  //#getvar
         }
 
         //Used for tables, don't use for other stuff!
@@ -22819,7 +22825,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
-            return Program.databanks.GetFirst().GetVariable(s).GetData(null, t) - Program.databanks.GetRef().GetVariable(s).GetData(null, t);
+            return Program.databanks.GetFirst().GetVariable(s).GetData(null, t) - Program.databanks.GetRef().GetVariable(s).GetData(null, t);  //#getvar
         }
         public static void RevertSmpl(GekkoSmpl2 smplRemember, GekkoSmpl smpl)
         {
@@ -22845,7 +22851,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + db2 + " databank");
                 }
             }
-            return (db.GetVariable(s).GetData(null, t) / db.GetVariable(s).GetData(null, t.Add(-1)) - 1) * 100;
+            return (db.GetVariable(s).GetData(null, t) / db.GetVariable(s).GetData(null, t.Add(-1)) - 1) * 100;  //#getvar
         }
 
         //Used for tables, don't use for other stuff!
@@ -22873,8 +22879,8 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
-            double pch_base = (Program.databanks.GetRef().GetVariable(s).GetData(null, t) / Program.databanks.GetRef().GetVariable(s).GetData(null, t.Add(-1)) - 1) * 100;
-            double pch_work = (Program.databanks.GetFirst().GetVariable(s).GetData(null, t) / Program.databanks.GetFirst().GetVariable(s).GetData(null, t.Add(-1)) - 1) * 100;
+            double pch_base = (Program.databanks.GetRef().GetVariable(s).GetData(null, t) / Program.databanks.GetRef().GetVariable(s).GetData(null, t.Add(-1)) - 1) * 100;  //#getvar
+            double pch_work = (Program.databanks.GetFirst().GetVariable(s).GetData(null, t) / Program.databanks.GetFirst().GetVariable(s).GetData(null, t.Add(-1)) - 1) * 100;  //#getvar
             return pch_work - pch_base;
         }
 
@@ -22889,202 +22895,240 @@ namespace Gekko
 
         public static void Compare(O.Compare o)
         {
-            string type = "COMPARE";
-            if (G.Equal(o.opt_abs, "yes")) type = "COMPARE<abs>";
+
+            string type2 = "absolute";  //relative, //alphabetical
+            bool order = true;
+            List<string> variables = null;
+            if (o.listItems == null)
+            {
+                //variables = new List<string>();
+            }
+            else
+            {
+                variables = Program.UnfoldFlexibleListIntoListOfStrings(o.listItems);
+            }
+            string variablesType = null;  //"_s" etc.
+            bool dlog = false;
+            string block = null;
             string file = o.fileName;
             file = StripQuotes(file);
-            G.Writeln();
-            List<string> variables = o.listItems;
+            //TODO TODO 
+            //TODO TODO file should be path...
+            //TODO TODO 
 
-            if (file != null && file != "")  //is piped to special pipe-file (pipe2)
-            {
-                //if exception, these will be reset somewhere else, so no need to have a try-catch-finally regarding the file stream
-                Globals.pipe2 = true;
-                Globals.pipeFileHelper2.pipeFileFileWithPath = CreateFullPathAndFileName(file);
-                Globals.pipeFileHelper2.pipeFile = G.GekkoStreamWriter(WaitForFileStream(Globals.pipeFileHelper2.pipeFileFileWithPath, GekkoFileReadOrWrite.Write));
-            }
+            Sam(o.t1, o.t2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, variables, variablesType, dlog, block, file);
+            
 
-            GekkoTime tStart = o.t1;
-            GekkoTime tEnd = o.t2;
+            //string type = "COMPARE";
+            //if (G.Equal(o.opt_abs, "yes")) type = "COMPARE<abs>";
+           
+            //G.Writeln();
+            
 
-            Databank base2 = Program.databanks.GetRef();
-            Databank work = Program.databanks.GetFirst();
+            //if (file != null && file != "")  //is piped to special pipe-file (pipe2)
+            //{
+            //    //if exception, these will be reset somewhere else, so no need to have a try-catch-finally regarding the file stream
+            //    Globals.pipe2 = true;
+            //    Globals.pipeFileHelper2.pipeFileFileWithPath = CreateFullPathAndFileName(file);
+            //    Globals.pipeFileHelper2.pipeFile = G.GekkoStreamWriter(WaitForFileStream(Globals.pipeFileHelper2.pipeFileFileWithPath, GekkoFileReadOrWrite.Write));
+            //}
 
-            List<string> both = variables;  //may be null
-            List<string> listOfDifferentVars = new List<string>();
-            int count = 0;
+            //GekkoTime tStart = o.t1;
+            //GekkoTime tEnd = o.t2;
 
-            try
-            {
-                if (true)
-                {
-                    if (variables == null || variables.Count == 0)
-                    {
-                        //i.e. we are doing a databank compare, not a residual compare
-                        both = new List<string>();
-                        List<string> onlyWork = new List<string>();
-                        List<string> onlyGrund = new List<string>();
+            //Databank base2 = Program.databanks.GetRef();
+            //Databank work = Program.databanks.GetFirst();
 
-                        foreach (string tsString in work.storage.Keys) 
-                        {
-                            if (G.GetFreqFromKey(tsString) != Program.options.freq) continue;  //filter out other freqs
-                            Series tsGrund = base2.GetVariable(false, tsString);
-                            if (tsGrund == null)
-                            {
-                                onlyWork.Add(G.RemoveFreqFromKey(tsString));
-                            }
-                            else
-                            {
-                                both.Add(G.RemoveFreqFromKey(tsString));
-                            }
-                        }
-                        foreach (string tsString in base2.storage.Keys)  
-                        {
-                            if (G.GetFreqFromKey(tsString) != Program.options.freq) continue;  //filter out other freqs
-                            Series tsWork = work.GetVariable(false, tsString);
-                            if (tsWork == null)
-                            {
-                                onlyGrund.Add(G.RemoveFreqFromKey(tsString));
-                            }
-                        }
+            //List<string> both = variables;  //may be null
+            //List<string> listOfDifferentVars = new List<string>();
+            //int count = 0;
 
-                        both.Sort(StringComparer.InvariantCulture);
-                        onlyWork.Sort(StringComparer.InvariantCulture);
-                        onlyGrund.Sort(StringComparer.InvariantCulture);
+            //try
+            //{
 
-                        G.Writeln("Comparing " + both.Count + " common variables in Work (" + GetDatabankFileNameWithPath(Globals.Work) + ") and " + Globals.Ref + " (" + GetDatabankFileNameWithPath(Globals.Ref) + ") databanks");
-                        if (onlyWork.Count > 0) G.Writeln("There are " + onlyWork.Count + " variables in Work but not in " + Globals.Ref + " databank");
-                        if (onlyGrund.Count > 0) G.Writeln("There are " + onlyGrund.Count + " variables in " + Globals.Ref + " but not in Work databank");
-                        G.Writeln();
-                    }
-                    else
-                    {
-                        both.Sort(StringComparer.InvariantCulture);
-                    }
+            //    if (variables == null || variables.Count == 0)
+            //    {
+            //        //i.e. we are doing a databank compare, not a residual compare
+            //        both = new List<string>();
+            //        List<string> onlyWork = new List<string>();
+            //        List<string> onlyGrund = new List<string>();
 
-                    if (true)
-                    {
-                        //There is a little bit unnecessary overhead here, if compareType is "alphabetical". But never mind.
-                        foreach (string tsString in both)
-                        {
-                            Series ts = work.GetVariable(tsString);
-                            Series tsGrund = base2.GetVariable(tsString);
-                            if (ts == null)
-                            {
-                                G.Writeln("+++ WARNING: variable '" + tsString + "' not found in " + work.name + " databank");
-                                continue;
-                            }
-                            if (tsGrund == null)
-                            {
-                                G.Writeln("+++ WARNING: variable '" + tsString + "' not found in " + base2.name + " databank");
-                                continue;
-                            }
+            //        foreach (KeyValuePair<string, IVariable> kvp in work.storage)
+            //        {
+            //            Series ts = kvp.Value as Series;
+            //            if (ts == null) continue;
+            //            if (ts.freq != Program.options.freq) continue;
+            //            Series tsGrund = base2.GetIVariable(kvp.Key) as Series;
+            //            if (tsGrund == null)
+            //            {
+            //                onlyWork.Add(G.RemoveFreqFromName(kvp.Key));
+            //            }    
+            //            else
+            //            {
+            //                both.Add(G.RemoveFreqFromName(kvp.Key));
+            //            }                    
+            //        }
 
-                            count++;
+            //        foreach (KeyValuePair<string, IVariable> kvp in base2.storage)
+            //        {
+            //            Series ts = kvp.Value as Series;
+            //            if (ts == null) continue;
+            //            if (ts.freq != Program.options.freq) continue;
+            //            Series tsWork = work.GetIVariable(kvp.Key) as Series;
+            //            if (tsWork == null)
+            //            {
+            //                onlyGrund.Add(G.RemoveFreqFromName(kvp.Key));
+            //            }                        
+            //        }
 
-                            //See also similar code in Sam()
-                            bool isDifferent = false;
-                            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-                            {
-                                double varDelta = 0;
-                                double varPch = 0;
+            //        both.Sort(StringComparer.InvariantCulture);
+            //        onlyWork.Sort(StringComparer.InvariantCulture);
+            //        onlyGrund.Sort(StringComparer.InvariantCulture);
 
-                                double var1 = ts.GetData(null, t);
-                                double var2 = tsGrund.GetData(null, t);
-                                if (var1 == 0 && var2 == 0d)
-                                {
-                                    varPch = 0d;
-                                    varDelta = var1 - var2;
-                                }
-                                else if (var2 == 0)
-                                {
-                                    varPch = 100000d;
-                                    varDelta = var1 - var2;
-                                }
-                                else if (double.IsNaN(var1) && double.IsNaN(var2))
-                                {
-                                    //this is considered okay
-                                    varPch = 0d;
-                                    varDelta = 0d;
-                                }
-                                else if ((double.IsNaN(var1) && !double.IsNaN(var2)) || (!double.IsNaN(var1) && double.IsNaN(var2)))
-                                {
-                                    //this is considered a problem
-                                    varPch = double.PositiveInfinity;
-                                    varDelta = double.PositiveInfinity;
-                                }
-                                else
-                                {
-                                    varPch = ((var1 / var2 - 1d) * 100d);
-                                    varDelta = var1 - var2;
-                                }
+            //        G.Writeln("Comparing " + both.Count + " common series in Work (" + GetDatabankFileNameWithPath(Globals.Work) + ") and " + Globals.Ref + " (" + GetDatabankFileNameWithPath(Globals.Ref) + ") databanks");
+            //        if (onlyWork.Count > 0) G.Writeln("There are " + onlyWork.Count + " series in Work but not in " + Globals.Ref + " databank");
+            //        if (onlyGrund.Count > 0) G.Writeln("There are " + onlyGrund.Count + " series in " + Globals.Ref + " but not in Work databank");
+            //        G.Writeln();
+            //    }
+            //    else
+            //    {
+            //        both.Sort(StringComparer.InvariantCulture);
+            //    }
 
-                                if (Math.Abs(varPch / 100d) >= Program.options.databank_compare_trel)  //right-hand side here is relative, not percent, therefore division by 100
-                                {
-                                    double level = Math.Max(Math.Abs(var1), Math.Abs(var2));  //numerically largest in the two banks
-                                    if (double.IsNaN(level) || level >= Program.options.databank_compare_tabs)  //if nan, it is typically because 1 or both levels are missing
-                                    {
-                                        isDifferent = true;
-                                        break;  //stop the loop
-                                    }
-                                }
-                            }
+            //    if (true)
+            //    {
+            //        //There is a little bit unnecessary overhead here, if compareType is "alphabetical". But never mind.
+            //        foreach (string tsString in both)
+            //        {
+            //            IVariable iv = work.GetIVariable(tsString + Globals.freqIndicator + G.GetFreq(Program.options.freq));
+            //            IVariable ivGrund = base2.GetIVariable(tsString + Globals.freqIndicator + G.GetFreq(Program.options.freq));
+            //            if (iv == null)
+            //            {
+            //                G.Writeln("+++ WARNING: variable '" + tsString + "' not found in " + work.name + " databank");
+            //                continue;
+            //            }
+            //            if (ivGrund == null)
+            //            {
+            //                G.Writeln("+++ WARNING: variable '" + tsString + "' not found in " + base2.name + " databank");
+            //                continue;
+            //            }
+            //            Series ts = iv as Series;
+            //            Series tsGrund = ivGrund as Series;
+            //            if (ts == null || tsGrund == null) continue;  //not of series type
 
-                            if (isDifferent) listOfDifferentVars.Add(tsString);
-                        }
-                    }
+            //            //TODO TODO TODO
+            //            //TODO TODO TODO
+            //            //TODO TODO TODO array-series
+            //            //TODO TODO TODO
+            //            //TODO TODO TODO
+            //            //TODO TODO TODO
 
-                    //databank compare
-                    if (file != null)
-                    {
-                        G.Writeln(type.ToUpper() + " on " + both.Count + " variables, found " + listOfDifferentVars.Count + " differences.");
-                        G.Writeln();
-                    }
 
-                    if (listOfDifferentVars.Count > 0)
-                    {
-                        bool showPchRemember = Program.options.print_mulprt_pch;
-                        if (G.Equal(o.opt_abs, "yes")) Program.options.print_mulprt_pch = false;
+            //            count++;
 
-                        GekkoTime t1tmp = Globals.globalPeriodStart;
-                        GekkoTime t2tmp = Globals.globalPeriodEnd;
-                        if (!tStart.IsNull())
-                        {
-                            Globals.globalPeriodStart = tStart;
-                            Globals.globalPeriodEnd = tEnd;
-                        }
+            //            //See also similar code in Sam()
+            //            bool isDifferent = false;
+            //            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+            //            {
+            //                double varDelta = 0;
+            //                double varPch = 0;
 
-                        try
-                        {
-                            List temp = new List(listOfDifferentVars);
-                            Program.scalars.Add("#delete_me_12345", temp);
-                            //This is somewhat of a hack, calling a MULPRT command indirectly like that
-                            //But it really saves a lot of work, instead of wiring up to the Prt() method!
-                            Program.obeyCommandCalledFromGUI("MULPRT " + Globals.symbolCollection + "delete_me_12345;", new P());
-                        }
-                        finally
-                        {
-                            //to make sure everything is reset if there is an exception
-                            Program.options.print_mulprt_pch = showPchRemember;
-                            if (Program.scalars.ContainsKey(Globals.symbolCollection + "delete_me_12345")) Program.scalars.Remove(Globals.symbolCollection + "delete_me_12345");
-                            if (!tStart.IsNull())
-                            {
-                                Globals.globalPeriodStart = t1tmp;
-                                Globals.globalPeriodEnd = t2tmp;
-                            }
-                        }
-                    }
-                }
-                ReleasePipe2();  //will get run 2 times (also in finally block), but that is ok
-                G.Writeln();
-                G.Write(type.ToUpper() + " on " + both.Count + " variables, found " + listOfDifferentVars.Count + " differences. ");
-                if (file != null) G.Writeln("Result put in file '" + file + "'");
-                G.Writeln();
-            }
-            finally  //no catch block here, we use try-finally to close any files
-            {
-                ReleasePipe2();
-            }
+            //                double var1 = ts.GetData(null, t);
+            //                double var2 = tsGrund.GetData(null, t);
+            //                if (var1 == 0 && var2 == 0d)
+            //                {
+            //                    varPch = 0d;
+            //                    varDelta = var1 - var2;
+            //                }
+            //                else if (var2 == 0)
+            //                {
+            //                    varPch = 100000d;
+            //                    varDelta = var1 - var2;
+            //                }
+            //                else if (double.IsNaN(var1) && double.IsNaN(var2))
+            //                {
+            //                    //this is considered okay
+            //                    varPch = 0d;
+            //                    varDelta = 0d;
+            //                }
+            //                else if ((double.IsNaN(var1) && !double.IsNaN(var2)) || (!double.IsNaN(var1) && double.IsNaN(var2)))
+            //                {
+            //                    //this is considered a problem
+            //                    varPch = double.PositiveInfinity;
+            //                    varDelta = double.PositiveInfinity;
+            //                }
+            //                else
+            //                {
+            //                    varPch = ((var1 / var2 - 1d) * 100d);
+            //                    varDelta = var1 - var2;
+            //                }
+
+            //                if (Math.Abs(varPch / 100d) >= Program.options.databank_compare_trel)  //right-hand side here is relative, not percent, therefore division by 100
+            //                {
+            //                    double level = Math.Max(Math.Abs(var1), Math.Abs(var2));  //numerically largest in the two banks
+            //                    if (double.IsNaN(level) || level >= Program.options.databank_compare_tabs)  //if nan, it is typically because 1 or both levels are missing
+            //                    {
+            //                        isDifferent = true;
+            //                        break;  //stop the loop
+            //                    }
+            //                }
+            //            }
+
+            //            if (isDifferent) listOfDifferentVars.Add(tsString);
+            //        }
+            //    }
+
+            //    //databank compare
+            //    if (file != null)
+            //    {
+            //        G.Writeln(type.ToUpper() + " on " + both.Count + " variables, found " + listOfDifferentVars.Count + " differences.");
+            //        G.Writeln();
+            //    }
+
+            //    if (listOfDifferentVars.Count > 0)
+            //    {
+            //        bool showPchRemember = Program.options.print_mulprt_pch;
+            //        if (G.Equal(o.opt_abs, "yes")) Program.options.print_mulprt_pch = false;
+
+            //        GekkoTime t1tmp = Globals.globalPeriodStart;
+            //        GekkoTime t2tmp = Globals.globalPeriodEnd;
+            //        if (!tStart.IsNull())
+            //        {
+            //            Globals.globalPeriodStart = tStart;
+            //            Globals.globalPeriodEnd = tEnd;
+            //        }
+
+            //        try
+            //        {
+            //            List temp = new List(listOfDifferentVars);
+            //            Program.scalars.Add("#delete_me_12345", temp);
+            //            //This is somewhat of a hack, calling a MULPRT command indirectly like that
+            //            //But it really saves a lot of work, instead of wiring up to the Prt() method!
+            //            Program.obeyCommandCalledFromGUI("MULPRT " + Globals.symbolCollection + "delete_me_12345;", new P());
+            //        }
+            //        finally
+            //        {
+            //            //to make sure everything is reset if there is an exception
+            //            Program.options.print_mulprt_pch = showPchRemember;
+            //            if (Program.scalars.ContainsKey(Globals.symbolCollection + "delete_me_12345")) Program.scalars.Remove(Globals.symbolCollection + "delete_me_12345");
+            //            if (!tStart.IsNull())
+            //            {
+            //                Globals.globalPeriodStart = t1tmp;
+            //                Globals.globalPeriodEnd = t2tmp;
+            //            }
+            //        }
+            //    }
+
+            //    ReleasePipe2();  //will get run 2 times (also in finally block), but that is ok
+            //    G.Writeln();
+            //    G.Write(type.ToUpper() + " on " + both.Count + " variables, found " + listOfDifferentVars.Count + " differences. ");
+            //    if (file != null) G.Writeln("Result put in file '" + file + "'");
+            //    G.Writeln();
+            //}
+            //finally  //no catch block here, we use try-finally to close any files
+            //{
+            //    ReleasePipe2();
+            //}
         }
 
         //Used for tables, don't use for other stuff!
@@ -23102,7 +23146,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + db2 + " databank");
                 }
             }
-            return db.GetVariable(s).GetData(null, t) - db.GetVariable(s).GetData(null, t.Add(-1));
+            return db.GetVariable(s).GetData(null, t) - db.GetVariable(s).GetData(null, t.Add(-1));  //#getvar
         }
 
         //Used for tables, don't use for other stuff!
@@ -23130,8 +23174,8 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
-            double dif_base = Program.databanks.GetRef().GetVariable(s).GetData(null, t) - Program.databanks.GetRef().GetVariable(s).GetData(null, t.Add(-1));
-            double dif_work = Program.databanks.GetFirst().GetVariable(s).GetData(null, t) - Program.databanks.GetFirst().GetVariable(s).GetData(null, t.Add(-1));
+            double dif_base = Program.databanks.GetRef().GetVariable(s).GetData(null, t) - Program.databanks.GetRef().GetVariable(s).GetData(null, t.Add(-1)); //#getvar
+            double dif_work = Program.databanks.GetFirst().GetVariable(s).GetData(null, t) - Program.databanks.GetFirst().GetVariable(s).GetData(null, t.Add(-1)); //#getvar
             return dif_work - dif_base;
         }
 
@@ -23212,7 +23256,7 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                    Series ts = db.GetVariable(bnv.name);
+                    Series ts = db.GetVariable(bnv.name); //#getvar
                     if (ts == null)
                     {
                         //#642842749283
@@ -35109,7 +35153,7 @@ namespace Gekko
                 return;  //to avoid empty files, especially when dividing into blocks
             }
 
-            List<string> both = variables;  //may be null
+            List<string> both = variables;  //may be null            
 
             SortedList ordered = new SortedList();
             int count = 0;
@@ -35132,6 +35176,105 @@ namespace Gekko
                 samFileName = "residuals" + s + variablesType + ".txt";
             }
 
+            List<string> onlyWork2 = new List<string>();
+            List<string> onlyRef2 = new List<string>();
+            List<string> both2 = new List<string>();
+            List<string> differentTypeSeries2 = new List<string>();            
+            List<string> notFoundBoth2 = new List<string>();  //only when a list is given. Such a series is not found in either bank
+
+            List<SamHelper> items = new List<SamHelper>();
+            if (variables == null)
+            {
+                // --------------------------------------------
+                //looping over vars in Work and Ref banks
+                // --------------------------------------------
+
+                foreach (KeyValuePair<string, IVariable> kvp in work.storage)
+                {
+                    string varNameWithFreq = kvp.Key;
+                    Series ts = kvp.Value as Series;
+                    if (ts == null) continue;  //non-series
+                    //if (ts.freq != Program.options.freq) continue;
+                    Series tsGrund = base2.GetIVariable(kvp.Key) as Series;                    
+                    if (tsGrund == null)
+                    {
+                        onlyWork2.Add(varNameWithFreq);
+                    }
+                    else
+                    {
+                        //the series exists in both banks
+                        SamHandleTwoExistingSeries(onlyWork2, onlyRef2, both2, differentTypeSeries2, items, varNameWithFreq, ts, tsGrund);
+                    }
+                }
+
+                foreach (KeyValuePair<string, IVariable> kvp in base2.storage)
+                {
+                    Series ts = kvp.Value as Series;
+                    if (ts == null) continue;  //non-series
+                    //if (ts.freq != Program.options.freq) continue;
+                    Series tsWork = work.GetIVariable(kvp.Key) as Series;
+                    if (tsWork == null)  //otherwise we get dublets
+                    {
+                        items.Add(new SamHelper() { series1 = tsWork, series2 = ts });
+                        onlyRef2.Add(kvp.Key);
+                    }
+                }
+            }
+            else
+            {
+                // --------------------------------------------
+                //looping over a given list of variables
+                // --------------------------------------------
+            
+                foreach (string tsString in variables)
+                {
+                    //TODO: handle bank and freq, with chop
+                    string dbName, varName, freq;
+                    O.Chop(tsString, out dbName, out varName, out freq);
+
+                    if (G.HasSigil(varName)) continue;  //filter out non-series, like %s or #m
+
+                    Databank bank = work;
+                    if (dbName != null)
+                    {
+                        bank = Program.databanks.GetDatabank(dbName, true);
+                    }
+                    string freq2 = null;
+                    if (freq != null) freq2 = Globals.freqIndicator + freq;
+                    else freq2 = Globals.freqIndicator + G.GetFreq(Program.options.freq);
+
+                    string tsStringWithFreq = tsString + freq2;
+
+                    IVariable iv = bank.GetIVariable(tsStringWithFreq);
+                    IVariable ivGrund = base2.GetIVariable(tsStringWithFreq);
+
+                    if (iv == null && ivGrund == null)
+                    {
+                        notFoundBoth2.Add(tsStringWithFreq);
+                        continue;
+                    }
+
+                    //at this point, the series exists in at least one of the banks (we know it is a series, since non-series with sigils are filtered out by name above)
+
+                    Series ts = null;
+                    Series tsGrund = null;
+                    if (iv != null) ts = iv as Series;
+                    if (ivGrund != null) tsGrund = ivGrund as Series;
+
+                    if (ts == null && tsGrund == null) continue;  //this should not happen, just for safety
+
+                    if (ts == null) onlyRef2.Add(tsStringWithFreq);
+                    else if (tsGrund == null) onlyWork2.Add(tsStringWithFreq);
+                    else
+                    {
+                        //both exist and are of series type
+                        SamHandleTwoExistingSeries(onlyWork2, onlyRef2, both2, differentTypeSeries2, items, tsStringWithFreq, ts, tsGrund);
+                    }                    
+                }
+            }
+
+
+
             int pcounter = 0;
             //string fullPathAndFileName = CreateFullPathAndFileName(samFileName);
             string fullPathAndFileName = path;
@@ -35145,34 +35288,37 @@ namespace Gekko
                     List<string> onlyWork = new List<string>();
                     List<string> onlyGrund = new List<string>();
 
-                    foreach (string tsString in work.storage.Keys) 
+                    foreach (KeyValuePair<string, IVariable> kvp in work.storage)
                     {
-                        if (G.GetFreqFromKey(tsString) != Program.options.freq) continue;  //filter other freqs
-                        string s = G.RemoveFreqFromKey(tsString);
-                        Series tsGrund = base2.GetVariable(s);
+                        Series ts = kvp.Value as Series;
+                        if (ts == null) continue;
+                        if (ts.freq != Program.options.freq) continue;
+                        Series tsGrund = base2.GetIVariable(kvp.Key) as Series;                        
                         if (tsGrund == null)
                         {
-                            onlyWork.Add(s);
+                            onlyWork.Add(G.RemoveFreqFromName(kvp.Key));
                         }
                         else
-                        {
-                            both.Add(s);
-                        }
-                    }
-                    foreach (string tsString in base2.storage.Keys)  
-                    {
-                        if (G.GetFreqFromKey(tsString) != Program.options.freq) continue;  //filter other freqs
-                        string s = G.RemoveFreqFromKey(tsString);
-                        Series tsWork = work.GetVariable(s);
-                        if (tsWork == null)
-                        {
-                            onlyGrund.Add(s);
+                        {                            
+                            both.Add(G.RemoveFreqFromName(kvp.Key));                            
                         }
                     }
 
-                    both.Sort(StringComparer.InvariantCulture);
-                    onlyWork.Sort(StringComparer.InvariantCulture);
-                    onlyGrund.Sort(StringComparer.InvariantCulture);
+                    foreach (KeyValuePair<string, IVariable> kvp in base2.storage)
+                    {
+                        Series ts = kvp.Value as Series;
+                        if (ts == null) continue;
+                        if (ts.freq != Program.options.freq) continue;
+                        Series tsWork = work.GetIVariable(kvp.Key) as Series;
+                        if (tsWork == null)
+                        {
+                            onlyGrund.Add(G.RemoveFreqFromName(kvp.Key));
+                        }
+                    }
+
+                    both.Sort(StringComparer.OrdinalIgnoreCase);
+                    onlyWork.Sort(StringComparer.OrdinalIgnoreCase);
+                    onlyGrund.Sort(StringComparer.OrdinalIgnoreCase);
 
                     samFile.WriteLine("Comparing first-position (" + GetDatabankFileNameWithPath(Program.databanks.GetFirst().name) + ") and reference (" + GetDatabankFileNameWithPath(Program.databanks.GetRef().name) + ") databanks");
                     samFile.WriteLine();
@@ -35195,7 +35341,7 @@ namespace Gekko
                 {
                     //TODO: use Add1ToFileName kind of logic.
                     //maybe pack result in zip-file, res_check.zip, res_check1.zip of already there.
-                    both.Sort(StringComparer.InvariantCulture);
+                    both.Sort(StringComparer.OrdinalIgnoreCase);
                     samFile.WriteLine("Residual check, looking at '" + variablesType + "' type equations one by one");
                     if (order)
                     {
@@ -35210,72 +35356,98 @@ namespace Gekko
                     samFile.WriteLine();
                 }
 
+                List<string> differentType = new List<string>();
+
 
                 //There is a little bit unnecessary overhead here, if compareType is "alphabetical". But never mind.
                 foreach (string tsString in both)
                 {
-                    Series ts = work.GetVariable(tsString);
-                    Series tsGrund = base2.GetVariable(tsString);
-
-                    if (ts == null || tsGrund == null)
+                    IVariable iv = work.GetIVariable(tsString + Globals.freqIndicator + G.GetFreq(Program.options.freq));
+                    IVariable ivGrund = base2.GetIVariable(tsString + Globals.freqIndicator + G.GetFreq(Program.options.freq));
+                    if (iv == null)
                     {
-                        //Should not happen if SIM/RES autocreates variables
-                        if (ts == null) G.Writeln("+++ WARNING: Variable '" + tsString + "' was not found in Work databank");
-                        if (tsGrund == null) G.Writeln("+++ WARNING: Variable '" + tsString + "' was not found in " + Globals.Ref + " databank");
-                        pcounter++;
+                        G.Writeln("+++ WARNING: variable '" + tsString + "' not found in " + work.name + " databank");
                         continue;
                     }
-
+                    if (ivGrund == null)
+                    {
+                        G.Writeln("+++ WARNING: variable '" + tsString + "' not found in " + base2.name + " databank");
+                        continue;
+                    }
+                    Series ts = iv as Series;
+                    Series tsGrund = ivGrund as Series;
+                    if (ts == null || tsGrund == null) continue;  //not of series type        
+                    
                     count++;
 
+                    //TODO TODO TODO
+                    //TODO TODO TODO
+                    //TODO TODO TODO array-series
+                    //TODO TODO TODO
+                    //TODO TODO TODO
+                    //TODO TODO TODO
+
                     //See also similar code in Difprt()
+
                     double max = 0d;
-                    foreach (GekkoTime t in new GekkoTimeIterator( tStart, tEnd))
+
+                    if (ts.Type() != tsGrund.Type())
                     {
-                        double varDelta = 0;
-                        double varPch = 0;
+                        differentType.Add(tsString);
+                    }
+                    else if (ts.type == ESeriesType.ArraySuper)
+                    {
 
-                        double var1 = ts.GetData(null, t);
-                        double var2 = tsGrund.GetData(null, t);
-                        if (var1 == 0 && var2 == 0d)
+                    }
+                    else
+                    {                       
+                        foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
                         {
-                            varPch = 0d;
-                            varDelta = var1 - var2;
-                        }
-                        else if (var2 == 0)
-                        {
-                            varPch = 1e+100d;
-                            varDelta = var1 - var2;
-                        }
-                        else if (double.IsNaN(var1) && double.IsNaN(var2))
-                        {
-                            //this is considered okay
-                            varPch = 0d;
-                            varDelta = 0d;
-                        }
-                        else if ((double.IsNaN(var1) && !double.IsNaN(var2)) || (!double.IsNaN(var1) && double.IsNaN(var2)))
-                        {
-                            //this is considered a problem
-                            varPch = 1e+100d;
-                            varDelta = 1e+100;
-                        }
-                        else
-                        {
-                            varPch = ((var1 / var2 - 1d) * 100d);
-                            varDelta = var1 - var2;
-                        }
+                            double varDelta = 0;
+                            double varPch = 0;
 
-                        if (compareType == "absolute")
-                        {
-                            max = Math.Max(Math.Abs(varDelta), max);
-                        }
-                        else
-                        {
-                            max = Math.Max(Math.Abs(varPch), max);
-                        }
-                        if (G.isNumericalError(max))
-                        {
-                            //this is igonred
+                            double var1 = ts.GetData(null, t);
+                            double var2 = tsGrund.GetData(null, t);
+                            if (var1 == 0 && var2 == 0d)
+                            {
+                                varPch = 0d;
+                                varDelta = var1 - var2;
+                            }
+                            else if (var2 == 0)
+                            {
+                                varPch = 1e+100d;
+                                varDelta = var1 - var2;
+                            }
+                            else if (double.IsNaN(var1) && double.IsNaN(var2))
+                            {
+                                //this is considered okay
+                                varPch = 0d;
+                                varDelta = 0d;
+                            }
+                            else if ((double.IsNaN(var1) && !double.IsNaN(var2)) || (!double.IsNaN(var1) && double.IsNaN(var2)))
+                            {
+                                //this is considered a problem
+                                varPch = 1e+100d;
+                                varDelta = 1e+100;
+                            }
+                            else
+                            {
+                                varPch = ((var1 / var2 - 1d) * 100d);
+                                varDelta = var1 - var2;
+                            }
+
+                            if (compareType == "absolute")
+                            {
+                                max = Math.Max(Math.Abs(varDelta), max);
+                            }
+                            else
+                            {
+                                max = Math.Max(Math.Abs(varPch), max);
+                            }
+                            if (G.isNumericalError(max))
+                            {
+                                //this is igonred
+                            }
                         }
                     }
 
@@ -35320,17 +35492,21 @@ namespace Gekko
                     samFile.WriteLine();
                 }
                 int counter = 0;
-                foreach (DictionaryEntry key in ordered)
+                foreach (DictionaryEntry de in ordered)
                 {
                     counter++;
-                    string tsString = (string)key.Value;
+                    string tsString = (string)de.Value;
                     double number = 0;
                     if (order)
                     {
-                        number = (double)key.Key;
+                        number = (double)de.Key;
                     }
-                    Series ts = work.GetVariable(tsString);
-                    Series tsGrund = base2.GetVariable(tsString);
+
+                    IVariable iv = work.GetIVariable(tsString + Globals.freqIndicator + G.GetFreq(Program.options.freq));
+                    IVariable ivGrund = base2.GetIVariable(tsString + Globals.freqIndicator + G.GetFreq(Program.options.freq));
+
+                    Series ts = iv as Series;
+                    Series tsGrund = ivGrund as Series;
 
                     if (variables == null)
                     {
@@ -35405,14 +35581,68 @@ namespace Gekko
                 }
                 samFile.Flush();
             }
-            if (variables == null) G.Writeln("Databank compare on " + both.Count + " common variables, result put in file '" + samFileName + "'");
+            if (variables == null) G.Writeln2("Databank compare on " + both.Count + " common variables, result put in file '" + samFileName + "'");
             else
             {
-                G.Writeln("Residual check on " + both.Count + " equations of type " + variablesType + ", result put in file '" + samFileName + "'");
+                G.Writeln2("Residual check on " + both.Count + " equations of type " + variablesType + ", result put in file '" + samFileName + "'");
                 if (pcounter > 0) G.Writeln("+++ WARNING: " + pcounter + " variables were missing in either Work or " + Globals.Ref + " databank");
             }
         }
 
+        private static void SamHandleTwoExistingSeries(List<string> onlyWork2, List<string> onlyRef2, List<string> both2, List<string> differentTypeSeries2, List<SamHelper> items, string varNameWithFreq, Series ts, Series tsGrund)
+        {
+            if (ts.type != tsGrund.type)
+            {
+                differentTypeSeries2.Add(varNameWithFreq);
+            }
+            else
+            {
+                both2.Add(varNameWithFreq);
+
+                if (ts.type == ESeriesType.ArraySuper)
+                {
+                    //both series are array-series, compare the subseries
+                    if (ts.dimensions != tsGrund.dimensions)
+                    {
+                        //different number of dimensions
+                        differentTypeSeries2.Add(varNameWithFreq);
+                    }
+                    else
+                    {
+                        foreach (KeyValuePair<MapMultidimItem, IVariable> kvpsub in ts.dimensionsStorage.storage)
+                        {
+                            if (tsGrund.dimensionsStorage.storage.ContainsKey(kvpsub.Key))
+                            {
+                                //present both places, for instance x['a', 'b'] both places
+                                //these two are going to be checked
+                                both2.Add(varNameWithFreq + "[" + kvpsub.Key.ToString() + "]");
+                                items.Add(new SamHelper() { series1 = kvpsub.Value as Series, series2 = tsGrund.dimensionsStorage.storage[kvpsub.Key] as Series });
+                            }
+                            else
+                            {
+                                onlyWork2.Add(varNameWithFreq + "[" + kvpsub.Key.ToString() + "]");
+                            }
+                        }
+
+                        foreach (KeyValuePair<MapMultidimItem, IVariable> kvpsub in tsGrund.dimensionsStorage.storage)
+                        {
+                            if (ts.dimensionsStorage.storage.ContainsKey(kvpsub.Key))
+                            {
+                                //ignore, has been dealt with above
+                            }
+                            else
+                            {
+                                onlyRef2.Add(varNameWithFreq + "[" + kvpsub.Key.ToString() + "]");
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    items.Add(new SamHelper() { series1 = ts, series2 = tsGrund });
+                }
+            }
+        }
 
         public static void ReleasePipe()
         {
@@ -35573,7 +35803,7 @@ namespace Gekko
             Dictionary<string, string> precedents = eh.precedentsWithLagIndicator;
             string period = t.ToString();
 
-            Series tsls = Program.databanks.GetFirst().GetVariable(lhs);
+            Series tsls = Program.databanks.GetFirst().GetVariable(lhs);  //#getvar
 
             if (tsls == null)
             {
@@ -35652,7 +35882,7 @@ namespace Gekko
                 if (work.ContainsVariable(var))  //use tryGet for speedup
                 {
                     G.Writeln();
-                    Series ts = work.GetVariable(var);
+                    Series ts = work.GetVariable(var); //#getvar
 
                     G.Write(extra + "upd " + var + " " + tStart.super + " " + tEnd.super + " " + op + " ");
                     int counter = 0;
@@ -35673,7 +35903,7 @@ namespace Gekko
                         {
                             if (base2.ContainsVariable(var))
                             {
-                                Series tsgrund = base2.GetVariable(var);
+                                Series tsgrund = base2.GetVariable(var); //#getvar
                                 data = ts.GetData(null, t) - tsgrund.GetData(null, t);
                             }
                             else

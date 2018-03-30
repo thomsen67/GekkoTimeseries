@@ -3273,6 +3273,8 @@ namespace Gekko.Parser.Gek
 
                     case "ASTBANKVARNAMELIST":
                         {
+                            //TODO: Handle a list like {#m}, obtaining the names of the elements #0932854325
+                            
                             //In this case, if we override what has been made in subtree (where the items will produce O.Lookup(...)
                             //Instead, we convert it to a list of strings.
                             //See the structure under "ASTBANKVARNAME"
@@ -3289,7 +3291,7 @@ namespace Gekko.Parser.Gek
                                 string freq = null; if (child?[1]?[2]?[0]?[0]?.Text != null && child?[1]?[2]?[0]?[0]?.Text != "ASTIDENT") fail = true; else freq = child?[1]?[2]?[0]?[0]?[0]?.Text;
                                 if (fail)
                                 {
-                                    G.Writeln2("*** ERROR: List item is not a simple name compsed of bankname, varname and frequency");
+                                    G.Writeln2("*** ERROR: List item is not a simple name composed of bankname, varname and frequency");
                                     G.Writeln2("*** ERROR: Allowed examples: x, b:x, %x, #x, b:%x, b:x!q and similar simple names");
                                     throw new GekkoException();
                                 }
@@ -4645,8 +4647,11 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTCOMPARECOMMAND":
                         {
-                            node.Code.A("O.Compare o" + Num(node) + " = new O.Compare();" + G.NL);                            
-                            GetCodeFromAllChildren(node);
+                            node.Code.A("O.Compare o" + Num(node) + " = new O.Compare();" + G.NL);
+                            if (node[1] != null)
+                            {
+                                node.Code.A("o" + Num(node) + ".listItems = " + node[1].Code + ";" + G.NL);
+                            }                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;

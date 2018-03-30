@@ -960,8 +960,8 @@ namespace Gekko
             //freq is added for all no-sigil rhs
             //freq is added for lhs if it is no-sigil AND the type is SERIES or VAR
 
-            bool hasSigil = false; if (varname[0] == Globals.symbolScalar || varname[0] == Globals.symbolCollection) hasSigil = true;
-            
+            bool hasSigil = G.HasSigil(varname);
+
             string varnameWithFreq = varname;
 
             if ((!isLeftSideVariable && !hasSigil) || (isLeftSideVariable && !hasSigil && (type == EVariableType.Var || type == EVariableType.Series)))
@@ -976,7 +976,7 @@ namespace Gekko
             }
 
             return varnameWithFreq;
-        }
+        }        
 
         private static IVariable LookupHelperRightside(GekkoSmpl smpl, Map map, string dbName, string varnameWithFreq)
         {
@@ -2043,19 +2043,19 @@ namespace Gekko
         //    return varName;
         //}
 
-        private static Series GetLeftSideVariable(string dbName, string varName)
-        {
-            Databank db = Program.databanks.GetFirst();
-            if (dbName != null) db = Program.databanks.GetDatabank(dbName);
-            Series ts = db.GetVariable(varName);
-            if (ts == null)
-            {
-                ts = new Series(Program.options.freq, varName);
-                db.AddVariable(ts);
-            }
+        //private static Series GetLeftSideVariable(string dbName, string varName)
+        //{
+        //    Databank db = Program.databanks.GetFirst();
+        //    if (dbName != null) db = Program.databanks.GetDatabank(dbName);
+        //    Series ts = db.GetVariable(varName);
+        //    if (ts == null)
+        //    {
+        //        ts = new Series(Program.options.freq, varName);
+        //        db.AddVariable(ts);
+        //    }
 
-            return ts;
-        }
+        //    return ts;
+        //}
 
         public static void Chop(string input, out string dbName, out string varName, out string freq)
         {
@@ -2448,31 +2448,31 @@ namespace Gekko
             return a;
         }
 
-        public static IVariable ZGenr(string name)
-        {            
-            IVariable a = null;
-            if (Program.scalars.TryGetValue(name, out a))
-            {
-                if (a.Type() == EVariableType.String)
-                {
-                    //GENR y = %s; <-- %s is a STRING
-                    Series ts = Program.databanks.GetFirst().GetVariable(((ScalarString)a).string2);
-                    //a = new MetaTimeSeries(ts, null, null);
-                    a = ts;
-                }
-                else
-                {
-                    //GENR y = %x; <-- %x is a VAL
-                    //expected to be of VAL type, 
-                }
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolScalar + name + "' was not found");
-                throw new GekkoException();
-            }
-            return a;
-        }        
+        //public static IVariable ZGenr(string name)
+        //{            
+        //    IVariable a = null;
+        //    if (Program.scalars.TryGetValue(name, out a))
+        //    {
+        //        if (a.Type() == EVariableType.String)
+        //        {
+        //            //GENR y = %s; <-- %s is a STRING
+        //            Series ts = Program.databanks.GetFirst().GetVariable(((ScalarString)a).string2);
+        //            //a = new MetaTimeSeries(ts, null, null);
+        //            a = ts;
+        //        }
+        //        else
+        //        {
+        //            //GENR y = %x; <-- %x is a VAL
+        //            //expected to be of VAL type, 
+        //        }
+        //    }
+        //    else
+        //    {
+        //        G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolScalar + name + "' was not found");
+        //        throw new GekkoException();
+        //    }
+        //    return a;
+        //}        
 
         public static IVariable CreateValFromCache(ref IVariable a, string originalName)
         {
@@ -3042,34 +3042,34 @@ namespace Gekko
             return new List(newList);
         }
 
-        public static IVariable ZIndexer(string name)
-        {
-            IVariable a = null;
-            if (Program.scalars.TryGetValue(name, out a))
-            {
-                //VAL y = %s[2000]; <-- %s is a STRING
-                //GENR y = %s[2000]; <-- %s is a STRING
-                Series ts = Program.databanks.GetFirst().GetVariable(((ScalarString)a).string2);
-                //a = new MetaTimeSeries(ts, null, null);
-                a = ts;
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolScalar + name + "' was not found");
-                throw new GekkoException();
-            }
-            return a;
-        }
+        //public static IVariable ZIndexer(string name)
+        //{
+        //    IVariable a = null;
+        //    if (Program.scalars.TryGetValue(name, out a))
+        //    {
+        //        //VAL y = %s[2000]; <-- %s is a STRING
+        //        //GENR y = %s[2000]; <-- %s is a STRING
+        //        Series ts = Program.databanks.GetFirst().GetVariable(((ScalarString)a).string2);
+        //        //a = new MetaTimeSeries(ts, null, null);
+        //        a = ts;
+        //    }
+        //    else
+        //    {
+        //        G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolScalar + name + "' was not found");
+        //        throw new GekkoException();
+        //    }
+        //    return a;
+        //}
 
         //========================================
         //======================================== Z() variants end
         //========================================
         
-        public static IVariable Z_OLD(string name)
-        {
-            IVariable a = GetScalar(name);
-            return a;
-        }
+        //public static IVariable Z_OLD(string name)
+        //{
+        //    IVariable a = GetScalar(name);
+        //    return a;
+        //}
 
 
         // =================================== start comparisons ==================================
@@ -4060,8 +4060,8 @@ namespace Gekko
         public static double GetVal(GekkoSmpl smpl, IVariable a, int bankNumber)  //used in PRT and similar, can accept a list that will show itself as a being an integer with ._isName set.
         {            
             return a.GetValOLD(smpl);            
-        }               
-                
+        }
+
         public static Series GetTimeSeries(IVariable a)
         {
             if (a.Type() == EVariableType.Series)
@@ -4082,7 +4082,11 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            else throw new GekkoException();
+            else
+            {
+                G.Writeln2("*** ERROR: Cannot convert variable of " + G.GetTypeString(a) + " type into SERIES");
+                throw new GekkoException();
+            }
         }
 
         public static int ConvertToInt(IVariable a)
@@ -5843,7 +5847,7 @@ namespace Gekko
         {
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
-            public List<string> listItems = null;
+            public List listItems = null;
             public string opt_abs = null;
             public string fileName = null;
             public void Exe()

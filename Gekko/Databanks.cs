@@ -44,7 +44,13 @@ namespace Gekko
             return this.storage[1];
         }
 
-        public Databank GetDatabank(string databank) {            
+        public Databank GetDatabank(string databank)
+        {
+            return GetDatabank(databank, false);
+        }
+
+        public Databank GetDatabank(string databank, bool reportError)
+        {
             if (databank == "@")
             {
                 return this.GetRef();
@@ -56,7 +62,15 @@ namespace Gekko
                     if (G.Equal(db.name, databank)) return db;
                 }
             }
-            return null;            
+            if (reportError)
+            {
+                G.Writeln2("*** ERROR: Databank '" + databank + "' does not seem to be open");
+                throw new GekkoException();
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public bool OpenDatabank(ref Databank databank, EOpenType openType, int openPosition)

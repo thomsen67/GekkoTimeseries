@@ -9394,14 +9394,39 @@ namespace UnitTests
             _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2002, 200d, sharedDelta);
             _AssertSeries(First(), "xx3", new string[] { "a", "c" }, 2002, 100d, sharedDelta);
 
-            I("RESET; TIME 2001 2003;");
-            I("v = series(1);");
-            I("v[a] = 1; v[b] = 1;");
+            I("RESET; TIME 2001 2001;");
+            I("v = series(1);");            
             I("#s = 'a', 'b';");
             I("v[#s] = 1;");
+            _AssertSeries(First(), "v", new string[] { "a" }, 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "v", new string[] { "a" }, 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "v", new string[] { "a" }, 2002, double.NaN, sharedDelta);
+            _AssertSeries(First(), "v", new string[] { "b" }, 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "v", new string[] { "b" }, 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "v", new string[] { "b" }, 2002, double.NaN, sharedDelta);
 
-
-
+            I("RESET; TIME 2001 2001;");
+            I("series xx3 = series(3);");
+            I("series xx2 = series(2);");
+            I("#i = 'a', 'b';");
+            I("#i0 = ('b',);");
+            I("#j = 'x', 'y';");
+            I("#k = 'm', 'n';");
+            I("xx3[#i, #j, #k] = 5 + 0;");
+            I("xx3[#i, #j, #k] $ (#i0[#i]) = 6 + 0;");
+            I("xx2[#i, #j] = sum(#k, xx3[#i, #j, #k]) + 0;");
+            _AssertSeries(First(), "xx3", new string[] { "a", "x", "m" }, 2001, 5d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "x", "n" }, 2001, 5d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "y", "m" }, 2001, 5d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "a", "y", "n" }, 2001, 5d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "b", "x", "m" }, 2001, 6d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "b", "x", "n" }, 2001, 6d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "b", "y", "m" }, 2001, 6d, sharedDelta);
+            _AssertSeries(First(), "xx3", new string[] { "b", "y", "n" }, 2001, 6d, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "x" }, 2001, 10d, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "a", "y" }, 2001, 10d, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "b", "x" }, 2001, 12d, sharedDelta);
+            _AssertSeries(First(), "xx2", new string[] { "b", "y" }, 2001, 12d, sharedDelta);
 
 
 
