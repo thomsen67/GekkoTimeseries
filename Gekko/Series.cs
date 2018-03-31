@@ -121,6 +121,7 @@ namespace Gekko
         public ESeriesType type = ESeriesType.Normal;  //default
 
         public int dataOffsetLag = 0;  //only used in Series Light, to create lags/leads, never stored in protobuf since Series Light are never stored there
+        public MapMultidimItem mmi = null;  //only used for array-subseries, pointing to its indices, the 'a', 'b' in x['a', 'b'].
 
         private Series()
         {
@@ -208,7 +209,7 @@ namespace Gekko
                 this.name = variableName;
                 this.meta = new SeriesMetaInformation();
                 this.dimensions = dimensions;
-                this.dimensionsStorage = new MapMultidim(this);
+                this.dimensionsStorage = new MapMultidim();
                 this.data = null; //for safety this is killed off                
             }
             else
@@ -382,7 +383,7 @@ namespace Gekko
         {
             int tDim = 0;
             if (hasTimeDimension) tDim = 1;
-            this.dimensionsStorage = new MapMultidim(this);
+            this.dimensionsStorage = new MapMultidim();
             this.dimensions = dimensionsIncludingTimeDimension - tDim;
             this.type = ESeriesType.ArraySuper;
             //if (!hasTimeDimension) this.type = ESeriesType.Timeless;
@@ -1509,7 +1510,7 @@ namespace Gekko
                     G.Writeln("*** ERROR: " + keys.Length + " dimensional index used on " + this.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(this.name));
                     throw new GekkoException();
                 }
-                this.dimensionsStorage.TryGetValue(new MapMultidimItem(keys), out iv);
+                this.dimensionsStorage.TryGetValue(new MapMultidimItem(keys, null), out iv);
 
                 if (iv == null)
                 {
@@ -1550,7 +1551,7 @@ namespace Gekko
                         rv = new Series(ESeriesType.Normal, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq));
                         //ts.type = ESeriesType.ArraySub;
                         if (this.type == ESeriesType.Timeless) ((Series)rv).type = ESeriesType.Timeless;  //inherits from ghost                        
-                        this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys), rv);
+                        this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys, this), rv);
                     }
                 }
                 else
@@ -1805,7 +1806,7 @@ namespace Gekko
             {
                 //Clone the array-subseries
                 tsCopy.dimensions = this.dimensions;
-                tsCopy.dimensionsStorage = new MapMultidim(this);                
+                tsCopy.dimensionsStorage = new MapMultidim();                
                 foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
                 {
                     tsCopy.dimensionsStorage.storage.Add(kvp.Key, kvp.Value.DeepClone());
@@ -1845,15 +1846,22 @@ namespace Gekko
             if (this.type == ESeriesType.ArraySuper)
             {
                 //#parentpointer
-                //foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
-                //{
-                //    Series ts = kvp.Value as Series;
-                //    if (ts != null)
-                //    {
-                //        this.dimensionsStorage.SetParent(ts);
-                //    }
-                //}
+                foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
+                {
+                    Series subSeries = kvp.Value as Series;
+                    if (subSeries != null)
+                    {
+                        //best to keep these pointers out of protobuf                        
+                        ConnectArraysSeriesWithSubSeries(this, subSeries, kvp.Key);
+                    }
+                }
             }
+        }
+
+        private static void ConnectArraysSeriesWithSubSeries(Series arraySeries, Series subSeries, MapMultidimItem mmi)
+        {
+            mmi.parent = arraySeries;  //The mmi item points to the array-series
+            subSeries.mmi = mmi; //the sub-series points to the mmi, this way we can get from the sub-series all the way up to the array-series.                        
         }
     }
 
@@ -1898,7 +1906,7 @@ namespace Gekko
         [ProtoMember(7)]    
             
         private bool isDirty = false;  //do not keep this in protobuf
-        public Databank parentDatabank = null;  //do not keep this in protobuf
+        public Databank parentDatabank = null;  //do not keep this in protobuf        
 
         public void SetDirty(bool b1)
         {

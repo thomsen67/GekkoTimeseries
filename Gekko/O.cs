@@ -407,7 +407,7 @@ namespace Gekko
                         databank.AddIVariable(ts.name, ts);
                     }
 
-                    MapMultidimItem mmi = new MapMultidimItem(ss.ToArray());
+                    MapMultidimItem mmi = new MapMultidimItem(ss.ToArray(), ts);
                     IVariable iv = null; ts.dimensionsStorage.TryGetValue(mmi, out iv);
                     if (iv == null)
                     {

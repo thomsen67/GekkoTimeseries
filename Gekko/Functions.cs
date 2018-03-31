@@ -553,7 +553,7 @@ namespace Gekko
                     else if (x[0].Type() == EVariableType.Val)
                     {
                         ts = new Series(Program.options.freq, null);
-                        ts.dimensionsStorage = new MapMultidim(ts);
+                        ts.dimensionsStorage = new MapMultidim();
                         ts.dimensions = O.ConvertToInt(x[0]);
                         ts.type = ESeriesType.ArraySuper;
                         ts.meta = new SeriesMetaInformation();

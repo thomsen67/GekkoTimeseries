@@ -11,15 +11,15 @@ namespace Gekko
     {
         [ProtoMember(1)]
         public Dictionary<MapMultidimItem, IVariable> storage = new Dictionary<MapMultidimItem, IVariable>();
+        
+        //#parentpointer
+        //private Series parent = null;
 
         //#parentpointer
-        private Series parent = null;
-
-        //#parentpointer
-        public MapMultidim(Series ts)
-        {
-            this.parent = ts;
-        }
+        //public MapMultidim(Series ts)
+        //{
+        //    this.parent = ts;
+        //}
 
         public MapMultidim()
         {
@@ -27,30 +27,30 @@ namespace Gekko
         }
 
         //#parentpointer
-        public Series GetParent()
-        {
-            return this.parent;
-        }
+        //public Series GetParent()
+        //{
+        //    return this.parent;
+        //}
 
         //#parentpointer
-        public void SetParent(Series ts)
-        {
-            this.parent = ts;
-        }
+        //public void SetParent(Series ts)
+        //{
+        //    this.parent = ts;
+        //}
 
-        public IVariable this[params string[] s]
-        {
-            get
-            {
-                MapMultidimItem gmi = new MapMultidimItem(s);
-                return storage[gmi];
-            }
-            set
-            {
-                MapMultidimItem gmi = new MapMultidimItem(s);
-                storage[gmi] = value;
-            }
-        }
+        //public IVariable this[params string[] s]
+        //{
+        //    get
+        //    {
+        //        MapMultidimItem gmi = new MapMultidimItem(s, null);
+        //        return storage[gmi];
+        //    }
+        //    set
+        //    {
+        //        MapMultidimItem gmi = new MapMultidimItem(s, null);
+        //        storage[gmi] = value;
+        //    }
+        //}
 
         public bool TryGetValue(MapMultidimItem gmi, out IVariable iv)
         {            
@@ -74,12 +74,14 @@ namespace Gekko
         [ProtoMember(1)]
         public string[] storage = null;
 
+        public Series parent = null;  //do not store in protobuf
+
         private MapMultidimItem()
         {
             //only because protobuf needs it, not for outside use
         }
 
-        public MapMultidimItem(string[] s)
+        public MapMultidimItem(string[] s, Series parent)
         {
             this.storage = s;
         }        
@@ -94,6 +96,11 @@ namespace Gekko
             }
             first = first.Substring(0, first.Length - ", ".Length);
             return first;
+        }
+
+        public string Name()
+        {            
+            return this.parent.name + "[" + this.ToString() + "]";
         }
 
         public override int GetHashCode()
@@ -127,7 +134,8 @@ namespace Gekko
         {
             string[] ss = new string[this.storage.Length];
             Array.Copy(this.storage, ss, this.storage.Length);
-            return new MapMultidimItem(ss);
+            MapMultidimItem mmi = new MapMultidimItem(ss, this.parent);
+            return mmi;
         }
 
     }

@@ -2878,7 +2878,7 @@ namespace Gekko
                             }
                         }
 
-                        tsGhost.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(ss2), tsSub);
+                        tsGhost.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(ss2, tsGhost), tsSub);
                         
                     }
                     else
@@ -4234,7 +4234,7 @@ namespace Gekko
                         split2[i] = split[2 * i + 2];
                     }
 
-                    tsGhost.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(split2), ts);
+                    tsGhost.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(split2, tsGhost), ts);
                 }
             }
 
@@ -4716,7 +4716,7 @@ namespace Gekko
                                         //create it
                                         if (isMultiDim)
                                         {
-                                            MapMultidimItem mmi = new MapMultidimItem(dims.ToArray());
+                                            MapMultidimItem mmi = new MapMultidimItem(dims.ToArray(), ts);
                                             IVariable iv = null; ts.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
                                             if (iv == null)
                                             {
@@ -35153,10 +35153,10 @@ namespace Gekko
                 return;  //to avoid empty files, especially when dividing into blocks
             }
 
-            List<string> both = variables;  //may be null            
+            //List<string> both = variables;  //may be null            
 
             SortedList ordered = new SortedList();
-            int count = 0;
+            
 
             string samFileName = "";
 
@@ -35207,15 +35207,14 @@ namespace Gekko
                     }
                 }
 
-                foreach (KeyValuePair<string, IVariable> kvp in base2.storage)
+                foreach (KeyValuePair<string, IVariable> kvp in base2.storage)  //7737
                 {
                     Series ts = kvp.Value as Series;
                     if (ts == null) continue;  //non-series
                     //if (ts.freq != Program.options.freq) continue;
                     Series tsWork = work.GetIVariable(kvp.Key) as Series;
                     if (tsWork == null)  //otherwise we get dublets
-                    {
-                        items.Add(new SamHelper() { series1 = tsWork, series2 = ts });
+                    {                        
                         onlyRef2.Add(kvp.Key);
                     }
                 }
@@ -35261,6 +35260,7 @@ namespace Gekko
                     if (iv != null) ts = iv as Series;
                     if (ivGrund != null) tsGrund = ivGrund as Series;
 
+                   
                     if (ts == null && tsGrund == null) continue;  //this should not happen, just for safety
 
                     if (ts == null) onlyRef2.Add(tsStringWithFreq);
@@ -35273,7 +35273,12 @@ namespace Gekko
                 }
             }
 
-
+            
+            onlyWork2.Sort(StringComparer.OrdinalIgnoreCase);
+            onlyRef2.Sort(StringComparer.OrdinalIgnoreCase);
+            both2.Sort(StringComparer.OrdinalIgnoreCase);
+            differentTypeSeries2.Sort(StringComparer.OrdinalIgnoreCase);
+            notFoundBoth2.Sort(StringComparer.OrdinalIgnoreCase);
 
             int pcounter = 0;
             //string fullPathAndFileName = CreateFullPathAndFileName(samFileName);
@@ -35281,132 +35286,53 @@ namespace Gekko
             using (FileStream fs = WaitForFileStream(fullPathAndFileName + "\\" + samFileName, GekkoFileReadOrWrite.Write))
             using (StreamWriter samFile = G.GekkoStreamWriter(fs))
             {
-                if (variables == null)
-                {
-                    //i.e. we are doing a databank compare, not a residual compare
-                    both = new List<string>();
-                    List<string> onlyWork = new List<string>();
-                    List<string> onlyGrund = new List<string>();
-
-                    foreach (KeyValuePair<string, IVariable> kvp in work.storage)
-                    {
-                        Series ts = kvp.Value as Series;
-                        if (ts == null) continue;
-                        if (ts.freq != Program.options.freq) continue;
-                        Series tsGrund = base2.GetIVariable(kvp.Key) as Series;                        
-                        if (tsGrund == null)
-                        {
-                            onlyWork.Add(G.RemoveFreqFromName(kvp.Key));
-                        }
-                        else
-                        {                            
-                            both.Add(G.RemoveFreqFromName(kvp.Key));                            
-                        }
-                    }
-
-                    foreach (KeyValuePair<string, IVariable> kvp in base2.storage)
-                    {
-                        Series ts = kvp.Value as Series;
-                        if (ts == null) continue;
-                        if (ts.freq != Program.options.freq) continue;
-                        Series tsWork = work.GetIVariable(kvp.Key) as Series;
-                        if (tsWork == null)
-                        {
-                            onlyGrund.Add(G.RemoveFreqFromName(kvp.Key));
-                        }
-                    }
-
-                    both.Sort(StringComparer.OrdinalIgnoreCase);
-                    onlyWork.Sort(StringComparer.OrdinalIgnoreCase);
-                    onlyGrund.Sort(StringComparer.OrdinalIgnoreCase);
+                
+                    
 
                     samFile.WriteLine("Comparing first-position (" + GetDatabankFileNameWithPath(Program.databanks.GetFirst().name) + ") and reference (" + GetDatabankFileNameWithPath(Program.databanks.GetRef().name) + ") databanks");
                     samFile.WriteLine();
-                    samFile.WriteLine("There are the following " + both.Count + " variables in both banks:");
-                    G.PrintListWithCommasToFile(samFile, both);
+                    samFile.WriteLine("There are the following " + both2.Count + " variables in both banks:");
+                    G.PrintListWithCommasToFile(samFile, both2);
                     samFile.WriteLine();
                     samFile.WriteLine();
-                    samFile.WriteLine("There are the following " + onlyWork.Count + " variables in Work but not in " + Globals.Ref + " databank:");
-                    G.PrintListWithCommasToFile(samFile, onlyWork);
-                    if (onlyWork.Count == 0) samFile.WriteLine("[none]");
+                    samFile.WriteLine("There are the following " + onlyWork2.Count + " variables in Work but not in " + Globals.Ref + " databank:");
+                    G.PrintListWithCommasToFile(samFile, onlyWork2);
+                    if (onlyWork2.Count == 0) samFile.WriteLine("[none]");
                     samFile.WriteLine();
                     samFile.WriteLine();
-                    samFile.WriteLine("There are the following " + onlyGrund.Count + " variables in " + Globals.Ref + " but not in Work databank:");
-                    G.PrintListWithCommasToFile(samFile, onlyGrund);
-                    if (onlyGrund.Count == 0) samFile.WriteLine("[none]");
+                    samFile.WriteLine("There are the following " + onlyRef2.Count + " variables in " + Globals.Ref + " but not in Work databank:");
+                    G.PrintListWithCommasToFile(samFile, onlyRef2);
+                    if (onlyRef2.Count == 0) samFile.WriteLine("[none]");
                     samFile.WriteLine();
                     samFile.WriteLine();
-                }
-                else
-                {
-                    //TODO: use Add1ToFileName kind of logic.
-                    //maybe pack result in zip-file, res_check.zip, res_check1.zip of already there.
-                    both.Sort(StringComparer.OrdinalIgnoreCase);
-                    samFile.WriteLine("Residual check, looking at '" + variablesType + "' type equations one by one");
-                    if (order)
-                    {
-                        if (compareType == "absolute") samFile.WriteLine("Ordered by absolute differences");
-                        if (compareType == "relative") samFile.WriteLine("Ordered by relative differences");
-                        if (compareType == "alphabetical") samFile.WriteLine("Ordered alphabetically");
-                    }
-                    samFile.WriteLine("The following " + both.Count + " equations are checked:");
-                    samFile.WriteLine();
-                    G.PrintListWithCommasToFile(samFile, both);
-                    samFile.WriteLine();
-                    samFile.WriteLine();
-                }
+                
+                
 
                 List<string> differentType = new List<string>();
 
-
+                int count = 0;
                 //There is a little bit unnecessary overhead here, if compareType is "alphabetical". But never mind.
-                foreach (string tsString in both)
+                foreach (SamHelper sh in items)
                 {
-                    IVariable iv = work.GetIVariable(tsString + Globals.freqIndicator + G.GetFreq(Program.options.freq));
-                    IVariable ivGrund = base2.GetIVariable(tsString + Globals.freqIndicator + G.GetFreq(Program.options.freq));
-                    if (iv == null)
-                    {
-                        G.Writeln("+++ WARNING: variable '" + tsString + "' not found in " + work.name + " databank");
-                        continue;
-                    }
-                    if (ivGrund == null)
-                    {
-                        G.Writeln("+++ WARNING: variable '" + tsString + "' not found in " + base2.name + " databank");
-                        continue;
-                    }
-                    Series ts = iv as Series;
-                    Series tsGrund = ivGrund as Series;
-                    if (ts == null || tsGrund == null) continue;  //not of series type        
-                    
                     count++;
-
-                    //TODO TODO TODO
-                    //TODO TODO TODO
-                    //TODO TODO TODO array-series
-                    //TODO TODO TODO
-                    //TODO TODO TODO
-                    //TODO TODO TODO
-
-                    //See also similar code in Difprt()
-
+                    Series ts = sh.series1;
+                    Series tsGrund = sh.series2;
+                    
                     double max = 0d;
-
-                    if (ts.Type() != tsGrund.Type())
-                    {
-                        differentType.Add(tsString);
-                    }
-                    else if (ts.type == ESeriesType.ArraySuper)
-                    {
-
-                    }
-                    else
-                    {                       
+                    
+                    
+                                           
                         foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
                         {
                             double varDelta = 0;
                             double varPch = 0;
 
-                            double var1 = ts.GetData(null, t);
+                        //if (ts == null)
+                        //{
+
+                        //}
+
+                        double var1 = ts.GetData(null, t);
                             double var2 = tsGrund.GetData(null, t);
                             if (var1 == 0 && var2 == 0d)
                             {
@@ -35449,7 +35375,7 @@ namespace Gekko
                                 //this is igonred
                             }
                         }
-                    }
+                    
 
                     if (G.isNumericalError(max))
                     {
@@ -35473,40 +35399,34 @@ namespace Gekko
                             else break;
                         }
                     }
-                    if (order) ordered.Add(-max1, tsString);
-                    else ordered.Add(tsString, tsString);
+                    if (order) ordered.Add(-max1, sh);
+                    else ordered.Add(sh.series1, sh);
                 }
 
-                if (variables == null)
-                {
+                
                     //databank compare
-                    samFile.WriteLine("Out of the " + both.Count + " common variables, there are residuals regarding " + ordered.Count + " of them:");
+                    samFile.WriteLine("Out of the " + both2.Count + " common series, there are differences regarding " + ordered.Count + " of them:");
                     if (ordered.Count == 0) samFile.WriteLine("[none]");
                     samFile.WriteLine();
-                }
-                else
-                {
-                    //equation residuals
-                    samFile.WriteLine("Out of the " + both.Count + " equations, there are residuals in " + ordered.Count + " of them:");
-                    if (ordered.Count == 0) samFile.WriteLine("[none]");
-                    samFile.WriteLine();
-                }
+                
+                
                 int counter = 0;
                 foreach (DictionaryEntry de in ordered)
                 {
                     counter++;
-                    string tsString = (string)de.Value;
+
+                    SamHelper sh = (SamHelper)de.Value;
+
+                    string tsString = sh.series1.name;
+
                     double number = 0;
                     if (order)
                     {
                         number = (double)de.Key;
                     }
-
-                    IVariable iv = work.GetIVariable(tsString + Globals.freqIndicator + G.GetFreq(Program.options.freq));
-                    IVariable ivGrund = base2.GetIVariable(tsString + Globals.freqIndicator + G.GetFreq(Program.options.freq));
-
-                    Series ts = iv as Series;
-                    Series tsGrund = ivGrund as Series;
+                    
+                    Series ts = sh.series1;
+                    Series tsGrund = sh.series2;
 
                     if (variables == null)
                     {
@@ -35581,12 +35501,12 @@ namespace Gekko
                 }
                 samFile.Flush();
             }
-            if (variables == null) G.Writeln2("Databank compare on " + both.Count + " common variables, result put in file '" + samFileName + "'");
-            else
+            G.Writeln2("Databank compare on " + both2.Count + " common series, result put in file '" + samFileName + "'");
+            if (notFoundBoth2.Count > 0)
             {
-                G.Writeln2("Residual check on " + both.Count + " equations of type " + variablesType + ", result put in file '" + samFileName + "'");
-                if (pcounter > 0) G.Writeln("+++ WARNING: " + pcounter + " variables were missing in either Work or " + Globals.Ref + " databank");
+                G.Writeln("+++ NOTE: " + notFoundBoth2.Count + " series not found");
             }
+            
         }
 
         private static void SamHandleTwoExistingSeries(List<string> onlyWork2, List<string> onlyRef2, List<string> both2, List<string> differentTypeSeries2, List<SamHelper> items, string varNameWithFreq, Series ts, Series tsGrund)
@@ -35642,6 +35562,11 @@ namespace Gekko
                     items.Add(new SamHelper() { series1 = ts, series2 = tsGrund });
                 }
             }
+            SamHelper sh = items[items.Count - 1];
+            //if(sh.series1==null || sh.series2==null)
+            //{
+
+            //}
         }
 
         public static void ReleasePipe()
