@@ -4166,7 +4166,7 @@ namespace UnitTests
                 Series tsGhost = db.GetIVariable(s) as Series;
                 if (tsGhost.type != ESeriesType.ArraySuper) throw new GekkoException();
                 if (tsGhost.dimensions == 0) throw new GekkoException();
-                IVariable iv = null; tsGhost.dimensionsStorage.TryGetValue(new MapMultidimItem(indexes, null), out iv);
+                IVariable iv = null; tsGhost.dimensionsStorage.TryGetValue(new MapMultidimItem(indexes), out iv);
                 ts = iv as Series;
             }
             else

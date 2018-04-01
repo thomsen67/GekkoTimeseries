@@ -4379,8 +4379,8 @@ namespace Gekko
                 List<string> onlyModelNotDatabank = new List<string>();
                 foreach (string s in Program.databanks.GetFirst().storage.Keys)
                 {
-                    if (G.GetFreqFromKey(s) != Program.options.freq) continue;
-                    string s2 = G.RemoveFreqFromKey(s);
+                    if (G.GetFreqFromName(s) != Program.options.freq) continue;
+                    string s2 = G.RemoveFreqFromName(s);
                     if (!Program.model.varsAType.ContainsKey(s2)) onlyDatabankNotModel.Add(s2);
                 }
                 foreach (string s in Program.model.varsAType.Keys)

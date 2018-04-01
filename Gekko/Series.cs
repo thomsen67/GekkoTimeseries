@@ -141,6 +141,21 @@ namespace Gekko
             }
         }
 
+        public string GetName()
+        {
+            if (this.name.StartsWith(Globals.seriesArraySubName))
+            {
+                return this.mmi.GetName();
+            }
+            else return this.name;
+        }
+
+        public string GetNameWithoutCurrentFreq(bool onlyRemoveCurrentFreq)
+        {            
+            string rv = G.RemoveFreqFromName(this.GetName(), onlyRemoveCurrentFreq);
+            return rv;
+        }
+
         //public Series(ETimeSeriesType type, GekkoSmpl smpl)
         //{
         //    // ------------------------------
@@ -1510,7 +1525,7 @@ namespace Gekko
                     G.Writeln("*** ERROR: " + keys.Length + " dimensional index used on " + this.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(this.name));
                     throw new GekkoException();
                 }
-                this.dimensionsStorage.TryGetValue(new MapMultidimItem(keys, null), out iv);
+                this.dimensionsStorage.TryGetValue(new MapMultidimItem(keys), out iv);
 
                 if (iv == null)
                 {
@@ -1550,8 +1565,9 @@ namespace Gekko
 
                         rv = new Series(ESeriesType.Normal, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq));
                         //ts.type = ESeriesType.ArraySub;
-                        if (this.type == ESeriesType.Timeless) ((Series)rv).type = ESeriesType.Timeless;  //inherits from ghost                        
-                        this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys, this), rv);
+                        if (this.type == ESeriesType.Timeless) ((Series)rv).type = ESeriesType.Timeless;  //inherits from ghost   
+                        MapMultidimItem mmi = new MapMultidimItem(keys, this);
+                        this.dimensionsStorage.AddIVariableWithOverwrite(mmi, rv);
                     }
                 }
                 else
@@ -1821,7 +1837,8 @@ namespace Gekko
                 if (this.meta.label != null) tsCopy.meta.label = this.meta.label;
                 if (this.meta.source != null) tsCopy.meta.source = this.meta.source;
                 if (this.meta.stamp != null) tsCopy.meta.stamp = this.meta.stamp;
-                //tsCopy.SetGhost(this.IsArrayTimeseries());                
+                //tsCopy.SetGhost(this.IsArrayTimeseries());           
+                if (this.mmi != null) tsCopy.mmi = this.mmi;  //for sub-series     
             }
             return tsCopy;
         }

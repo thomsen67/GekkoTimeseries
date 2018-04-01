@@ -304,39 +304,37 @@ namespace Gekko
         }
 
         // #09832752
-        public static string RemoveFreqFromKey(string s)
-        {
-            //DELETE SOON many places, keep in DISP etc.
-            //Use RemoveFreqFromName() instead
+        //public static string RemoveFreqFromKey(string s)
+        //{
+        //    //DELETE SOON many places, keep in DISP etc.
+        //    //Use RemoveFreqFromName() instead
                         
-            int i = s.IndexOf(Globals.freqIndicator);
-            if (i == 0)
-            {
-                G.Writeln2("*** ERROR: freq problem");
-                throw new GekkoException();
-            }
-            else if (i > 0)
-            {
-                return s.Substring(0, i);  //for instance, fy!q --> fy
-            }
-            return s;  //annual            
-        }
-
-        // #09832752
-        public static EFreq GetFreqFromKey(string s)
+        //    int i = s.IndexOf(Globals.freqIndicator);
+        //    if (i == 0)
+        //    {
+        //        G.Writeln2("*** ERROR: freq problem");
+        //        throw new GekkoException();
+        //    }
+        //    else if (i > 0)
+        //    {
+        //        return s.Substring(0, i);  //for instance, fy!q --> fy
+        //    }
+        //    return s;  //annual            
+        //}
+                
+        public static EFreq GetFreqFromName(string s)
         {
             //This will become faster when A freq has %a attached!
             int i = s.IndexOf(Globals.freqIndicator);
-            if (i == 0)
+            if (i <= 0)
             {
                 G.Writeln2("*** ERROR: freq problem");
                 throw new GekkoException();
             }
-            else if (i > 0)
+            else
             {
                 return G.GetFreq(s.Substring(i + 1));  //for instance, fy%q --> q --> .Quarterly
-            }
-            return EFreq.Annual;  //annual            
+            }                     
         }
 
         public static string AddCurrentFreqToName(string name)
@@ -356,12 +354,60 @@ namespace Gekko
         }
 
         public static string RemoveFreqFromName(string name)
+        {            
+            return RemoveFreqFromName(name, false);
+        }
+
+        public static string RemoveFreqFromName(string s, bool onlyRemoveCurrentFreq)
         {
+            //name may be: x, x!a, x!a, x!a[a, b], x!q['a', 'b'], x[a]
+            //may even contain a bank colon like b:x!q[a, b]
+
+            string rv = null;
+
+            string name = s;
+            string[] ss = s.Split('[');            
+
+            string rest = null;
+
+            if (ss.Length > 1)
+            {
+                name = ss[0];
+                rest = "[" + ss[1];
+            }
+
+            //now name is the part before '['
+
             string name2 = null;
             string freq2 = null;
-            ChopFreq(name, ref freq2, ref name2);
-            return name2;
+            G.ChopFreq(name, ref freq2, ref name2);
+
+            if (freq2 != null)
+            {
+                if (onlyRemoveCurrentFreq)
+                {
+                    if (G.Equal(freq2, G.GetFreq(Program.options.freq)))
+                    {
+                        rv = name2 + rest;  //rv is without !a, !q, etc.
+                    }
+                    else
+                    {
+                        rv = name + rest;  //rv may include !a, !q, etc.
+                    }
+                }
+                else
+                {
+                    //remove all
+                    rv = name2 + rest;   //rv is without !a, !q, etc.
+                }
+            }
+            else
+            {
+                rv = name + rest;  //rv is without !a, !q, etc. (because input does not contain it)
+            }
+            return rv;
         }
+
 
         public static void ChopFreq(string input, ref string freq, ref string varName)
         {

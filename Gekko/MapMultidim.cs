@@ -57,14 +57,16 @@ namespace Gekko
             return this.storage.TryGetValue(gmi, out iv);
         }
 
-        public void AddIVariableWithOverwrite(MapMultidimItem gmi, IVariable iv)
+        public void AddIVariableWithOverwrite(MapMultidimItem mmi, IVariable iv)
         {            
             if (iv.Type() == EVariableType.Series && ((Series)iv).type == ESeriesType.Light)
             {
                 throw new GekkoException(); //this check can be removed at some point
             }
-            if (this.storage.ContainsKey(gmi)) this.storage.Remove(gmi);
-            this.storage.Add(gmi, iv);
+            if (this.storage.ContainsKey(mmi)) this.storage.Remove(mmi);
+            this.storage.Add(mmi, iv);
+            Series ts = iv as Series;  //always so
+            if (ts != null) ts.mmi = mmi;  //so that the sub-series points to the mmi object, which in turn points to the array-series
         }
     }
 
@@ -81,9 +83,17 @@ namespace Gekko
             //only because protobuf needs it, not for outside use
         }
 
+        //Only used for lookup purposes, is going to be discarded afterwards
+        public MapMultidimItem(string[] s)
+        {
+            this.storage = s;
+        }
+
+        //Used for permanent storage, so the mmi must point to its parent
         public MapMultidimItem(string[] s, Series parent)
         {
             this.storage = s;
+            this.parent = parent;
         }        
 
         public override string ToString()
@@ -98,10 +108,10 @@ namespace Gekko
             return first;
         }
 
-        public string Name()
+        public string GetName()
         {            
             return this.parent.name + "[" + this.ToString() + "]";
-        }
+        }        
 
         public override int GetHashCode()
         {
