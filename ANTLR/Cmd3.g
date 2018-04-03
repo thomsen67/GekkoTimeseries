@@ -17,6 +17,18 @@
     Else, see <http://www.gnu.org/licenses/>.
 */
 
+//LIST logic:
+
+List items may be direct or delayed. PRT a, b is direct, points to objects. But LIST m = a, b is delayed, just names pointing to objects.
+
+//seriesnamesList, see below 
+//varnamesList are without parentheses, and are used in DISP, WRITE, etc. Items b:%x!q, but no sigil for seriesnamesList
+//listNaked is a comma-separated list of expressions (without parenthesis). For instance 'a', 'b' or %a+%b, %d, etc. Must have > 1 element (one element is caught by expression below)
+//expression is anything, but accepts a listNaked with parentheses, for instance ('a', 'b') or (%a+%b, %d). One element is ('a',), Python style.
+
+//for both, the items are converted to a simple list of strings
+//used in assignment (rhs) and FOR, for instance #m = a, b, b:c ---> converted to #m = ('a', 'b', 'b:c')
+
 grammar Cmd3;
 
 options {
@@ -1948,22 +1960,14 @@ expressionOrNothing:        expression -> expression
 // ------------------- flexible list --------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-							//bankvarnameList is list of b:%x!q type names. Accepts a single element
-							//listNaked is a comma-separated list of expressions (without parenthesis). For instance 'a', 'b' or %a+%b, %d, etc. Must have > 1 element (one element is caught by expression below)
-							//expression is anything, but accepts a listNaked with parentheses, for instance ('a', 'b') or (%a+%b, %d). One element is ('a',), Python style.
-
-//flexibleList and namesList are without parentheses, and are used in DISP, WRITE, etc.
-//for both, the items are converted to a simple list of strings
-
-//used in assignment (rhs) and FOR, for instance #m = a, b, b:c ---> converted to #m = ('a', 'b', 'b:c')
-flexibleList:               bankseriesnameList2      //several items with commas between
+seriesnamesList:            bankseriesnameList2      //several items with commas between
 						  | bankseriesnameList3      //single item with trailing comma
 						  | listNaked 
 						  | expression
 						    ;
 
 //used in DISP and WRITE, for instance WRITE x, %x, b:#x ---> converted to WRITE ('x', '%x', 'b:#x')
-namesList:                  bankvarnameList          //single item with no comma, or several items with commas between
+varnamesList:               bankvarnameList          //single item with no comma, or several items with commas between
 						  | bankvarnameList3         //single item with trailing comma
 						  | listNaked
 						  | expression
@@ -2120,15 +2124,15 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 
 //NOTE: ASTLEFTSIDE must always have ASTASSIGNMENT as parent, cf. #324683532
 
-assignment:				    assignmentType seriesOpt1? leftSide EQUAL flexibleList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) flexibleList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+assignment:				    assignmentType seriesOpt1? leftSide EQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) seriesnamesList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-						  | assignmentType seriesOpt1? leftSide PLUSEQUAL flexibleList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide flexibleList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide PLUSEQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide seriesnamesList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-						  | assignmentType seriesOpt1? leftSide MINUSEQUAL flexibleList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide flexibleList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide MINUSEQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide seriesnamesList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide MINUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-						  | assignmentType seriesOpt1? leftSide STAREQUAL flexibleList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide flexibleList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide STAREQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide seriesnamesList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide STAREQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-						  | assignmentType seriesOpt1? leftSide DIVEQUAL flexibleList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide flexibleList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide DIVEQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide seriesnamesList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
 						    ;
 
@@ -2211,7 +2215,7 @@ closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)
 
 
 disp:						DISP StringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, $DISP.Line)} StringInQuotes)
-						  | DISP dispOpt1? namesList -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) namesList)				
+						  | DISP dispOpt1? varnamesList -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) varnamesList)				
 						    ;
 
 dispOpt1:					ISNOTQUAL
@@ -2224,7 +2228,7 @@ dispOpt1h:				    INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
 // COMPARE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-compare:   				    COMPARE compareOpt1? namesList? -> ^({token("ASTCOMPARECOMMAND", ASTCOMPARECOMMAND, $COMPARE.Line)} ^(ASTOPT_ compareOpt1?) namesList?)				
+compare:   				    COMPARE compareOpt1? varnamesList? -> ^({token("ASTCOMPARECOMMAND", ASTCOMPARECOMMAND, $COMPARE.Line)} ^(ASTOPT_ compareOpt1?) varnamesList?)				
 						    ;
 
 compareOpt1:			    ISNOTQUAL
@@ -2255,7 +2259,7 @@ for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  func
 						    ;
 
 forHelper2:                 type? svarname EQUAL expression TO expression2 (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2) ^(ASTPLACEHOLDER expression3?))
-                          | type? svarname EQUAL flexibleList -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER flexibleList) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+                          | type? svarname EQUAL seriesnamesList -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER seriesnamesList) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
                           | type? svarname EQUAL expression -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
                             ;
                           
@@ -2685,8 +2689,8 @@ timefilterperiod:           expression ((doubleDot | TO) expression (BY expressi
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 						    //!!!2x2 identical lines ONLY because of token stuff
-write:					    WRITE  writeOpt1? namesList FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST namesList))
-						  | EXPORT writeOpt1? namesList FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST namesList))
+write:					    WRITE  writeOpt1? varnamesList FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST varnamesList))
+						  | EXPORT writeOpt1? varnamesList FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST varnamesList))
 						  | WRITE  writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST))
 						  | EXPORT writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST))
 						    ;

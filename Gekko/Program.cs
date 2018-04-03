@@ -35148,7 +35148,14 @@ namespace Gekko
             //TODO: error handling if var not found in one of the banks in residual check
             //TODO: option to use CalculateHistoricalVarianceForVariable() and CheckRelativeDifferenceSmart()
 
+            // =======================================
             bool removeCurrentFreqFromNames = true;
+            double crit = double.NaN;
+            string type = "smart...";
+            bool plot = true;
+            int plotExtraPeriods = 0;
+            bool residuals = false;
+            // =======================================
 
             if (variables != null && variables.Count == 0)
             {
@@ -35158,11 +35165,10 @@ namespace Gekko
             //List<string> both = variables;  //may be null            
 
             SortedList ordered = new SortedList();
-            
 
             string samFileName = "";
 
-            if (variables == null)
+            if (!residuals)
             {
                 //i.e. we are doing a databank compare, not a residual compare
                 samFileName = "compare_databanks.txt";
@@ -35181,7 +35187,7 @@ namespace Gekko
             List<string> onlyWork2 = new List<string>();
             List<string> onlyRef2 = new List<string>();
             List<string> both2 = new List<string>();
-            List<string> differentTypeSeries2 = new List<string>();            
+            List<string> differentTypeSeries2 = new List<string>();
             List<string> notFoundBoth2 = new List<string>();  //only when a list is given. Such a series is not found in either bank
 
             List<SamHelper> items = new List<SamHelper>();
@@ -35193,7 +35199,7 @@ namespace Gekko
 
                 foreach (KeyValuePair<string, IVariable> kvp in work.storage)
                 {
-                    string tsNameWithFreq = kvp.Key;                        
+                    string tsNameWithFreq = kvp.Key;
                     Series ts = kvp.Value as Series;
                     if (ts == null) continue;  //non-series
                     //if (ts.freq != Program.options.freq) continue;
@@ -35211,13 +35217,13 @@ namespace Gekko
 
                 foreach (KeyValuePair<string, IVariable> kvp in base2.storage)  //7737
                 {
-                    string tsNameWithFreq = kvp.Key;                    
+                    string tsNameWithFreq = kvp.Key;
                     Series ts = kvp.Value as Series;
                     if (ts == null) continue;  //non-series
                     //if (ts.freq != Program.options.freq) continue;
                     Series tsWork = work.GetIVariable(kvp.Key) as Series;
                     if (tsWork == null)  //otherwise we get dublets
-                    {                        
+                    {
                         onlyRef2.Add(MaybeRemoveFreq(tsNameWithFreq, removeCurrentFreqFromNames));
                     }
                 }
@@ -35227,7 +35233,7 @@ namespace Gekko
                 // --------------------------------------------
                 //looping over a given list of variables
                 // --------------------------------------------
-            
+
                 foreach (string tsString in variables)
                 {
                     //TODO: handle bank and freq, with chop
@@ -35263,7 +35269,7 @@ namespace Gekko
                     if (iv != null) ts = iv as Series;
                     if (ivGrund != null) tsGrund = ivGrund as Series;
 
-                   
+
                     if (ts == null && tsGrund == null) continue;  //this should not happen, just for safety
 
                     if (ts == null) onlyRef2.Add(MaybeRemoveFreq(tsNameWithFreq, removeCurrentFreqFromNames));
@@ -35272,11 +35278,11 @@ namespace Gekko
                     {
                         //both exist and are of series type
                         SamHandleTwoExistingSeries(onlyWork2, onlyRef2, both2, differentTypeSeries2, items, tsNameWithFreq, ts, tsGrund, removeCurrentFreqFromNames);
-                    }                    
+                    }
                 }
             }
 
-            
+
             onlyWork2.Sort(StringComparer.OrdinalIgnoreCase);
             onlyRef2.Sort(StringComparer.OrdinalIgnoreCase);
             both2.Sort(StringComparer.OrdinalIgnoreCase);
@@ -35288,26 +35294,43 @@ namespace Gekko
             string fullPathAndFileName = path;
             using (FileStream fs = WaitForFileStream(fullPathAndFileName + "\\" + samFileName, GekkoFileReadOrWrite.Write))
             using (StreamWriter samFile = G.GekkoStreamWriter(fs))
-            {                    
+            {
 
-                    samFile.WriteLine("Comparing first-position (" + GetDatabankFileNameWithPath(Program.databanks.GetFirst().name) + ") and reference (" + GetDatabankFileNameWithPath(Program.databanks.GetRef().name) + ") databanks");
+                samFile.WriteLine("Comparing first-position (" + GetDatabankFileNameWithPath(Program.databanks.GetFirst().name) + ") and reference (" + GetDatabankFileNameWithPath(Program.databanks.GetRef().name) + ") databanks");
+                samFile.WriteLine();
+                samFile.WriteLine("There are the following " + both2.Count + " series in both banks:");
+                G.PrintListWithCommasToFile(samFile, both2);
+                samFile.WriteLine();
+                samFile.WriteLine();
+                samFile.WriteLine("There are the following " + onlyWork2.Count + " series in Work but not in " + Globals.Ref + " databank:");
+                G.PrintListWithCommasToFile(samFile, onlyWork2);
+                if (onlyWork2.Count == 0) samFile.WriteLine("[none]");
+                samFile.WriteLine();
+                samFile.WriteLine();
+                samFile.WriteLine("There are the following " + onlyRef2.Count + " series in " + Globals.Ref + " but not in Work databank:");
+                G.PrintListWithCommasToFile(samFile, onlyRef2);
+                if (onlyRef2.Count == 0) samFile.WriteLine("[none]");
+
+                if (differentTypeSeries2.Count > 0)
+                {
                     samFile.WriteLine();
-                    samFile.WriteLine("There are the following " + both2.Count + " variables in both banks:");
-                    G.PrintListWithCommasToFile(samFile, both2);
+                    samFile.WriteLine();
+                    samFile.WriteLine("The following " + differentTypeSeries2.Count + " series were of different type (array-and non-array-series):");
+                    G.PrintListWithCommasToFile(samFile, differentTypeSeries2);
+                    if (differentTypeSeries2.Count == 0) samFile.WriteLine("[none]");
+                }
+
+                if (notFoundBoth2.Count > 0)
+                {
                     samFile.WriteLine();
                     samFile.WriteLine();
-                    samFile.WriteLine("There are the following " + onlyWork2.Count + " variables in Work but not in " + Globals.Ref + " databank:");
-                    G.PrintListWithCommasToFile(samFile, onlyWork2);
-                    if (onlyWork2.Count == 0) samFile.WriteLine("[none]");
-                    samFile.WriteLine();
-                    samFile.WriteLine();
-                    samFile.WriteLine("There are the following " + onlyRef2.Count + " variables in " + Globals.Ref + " but not in Work databank:");
-                    G.PrintListWithCommasToFile(samFile, onlyRef2);
-                    if (onlyRef2.Count == 0) samFile.WriteLine("[none]");
-                    samFile.WriteLine();
-                    samFile.WriteLine();
-                
-                
+                    samFile.WriteLine("The following " + notFoundBoth2.Count + " series were not found in Work or Ref:");
+                    G.PrintListWithCommasToFile(samFile, notFoundBoth2);
+                    if (notFoundBoth2.Count == 0) samFile.WriteLine("[none]");
+                }
+
+                samFile.WriteLine();
+                samFile.WriteLine();
 
                 List<string> differentType = new List<string>();
 
@@ -35318,15 +35341,15 @@ namespace Gekko
                     count++;
                     Series ts = sh.series1;
                     Series tsGrund = sh.series2;
-                    
+
                     double max = 0d;
-                    
-                    
-                                           
-                        foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-                        {
-                            double varDelta = 0;
-                            double varPch = 0;
+
+
+
+                    foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+                    {
+                        double varDelta = 0;
+                        double varPch = 0;
 
                         //if (ts == null)
                         //{
@@ -35334,49 +35357,49 @@ namespace Gekko
                         //}
 
                         double var1 = ts.GetData(null, t);
-                            double var2 = tsGrund.GetData(null, t);
-                            if (var1 == 0 && var2 == 0d)
-                            {
-                                varPch = 0d;
-                                varDelta = var1 - var2;
-                            }
-                            else if (var2 == 0)
-                            {
-                                varPch = 1e+100d;
-                                varDelta = var1 - var2;
-                            }
-                            else if (double.IsNaN(var1) && double.IsNaN(var2))
-                            {
-                                //this is considered okay
-                                varPch = 0d;
-                                varDelta = 0d;
-                            }
-                            else if ((double.IsNaN(var1) && !double.IsNaN(var2)) || (!double.IsNaN(var1) && double.IsNaN(var2)))
-                            {
-                                //this is considered a problem
-                                varPch = 1e+100d;
-                                varDelta = 1e+100;
-                            }
-                            else
-                            {
-                                varPch = ((var1 / var2 - 1d) * 100d);
-                                varDelta = var1 - var2;
-                            }
-
-                            if (compareType == "absolute")
-                            {
-                                max = Math.Max(Math.Abs(varDelta), max);
-                            }
-                            else
-                            {
-                                max = Math.Max(Math.Abs(varPch), max);
-                            }
-                            if (G.isNumericalError(max))
-                            {
-                                //this is igonred
-                            }
+                        double var2 = tsGrund.GetData(null, t);
+                        if (var1 == 0 && var2 == 0d)
+                        {
+                            varPch = 0d;
+                            varDelta = var1 - var2;
                         }
-                    
+                        else if (var2 == 0)
+                        {
+                            varPch = 1e+100d;
+                            varDelta = var1 - var2;
+                        }
+                        else if (double.IsNaN(var1) && double.IsNaN(var2))
+                        {
+                            //this is considered okay
+                            varPch = 0d;
+                            varDelta = 0d;
+                        }
+                        else if ((double.IsNaN(var1) && !double.IsNaN(var2)) || (!double.IsNaN(var1) && double.IsNaN(var2)))
+                        {
+                            //this is considered a problem
+                            varPch = 1e+100d;
+                            varDelta = 1e+100;
+                        }
+                        else
+                        {
+                            varPch = ((var1 / var2 - 1d) * 100d);
+                            varDelta = var1 - var2;
+                        }
+
+                        if (compareType == "absolute")
+                        {
+                            max = Math.Max(Math.Abs(varDelta), max);
+                        }
+                        else
+                        {
+                            max = Math.Max(Math.Abs(varPch), max);
+                        }
+                        if (G.isNumericalError(max))
+                        {
+                            //this is igonred
+                        }
+                    }
+
 
                     if (G.isNumericalError(max))
                     {
@@ -35404,13 +35427,13 @@ namespace Gekko
                     else ordered.Add(sh.series1, sh);
                 }
 
-                
-                    //databank compare
-                    samFile.WriteLine("Out of the " + both2.Count + " common series, there are differences regarding " + ordered.Count + " of them:");
-                    if (ordered.Count == 0) samFile.WriteLine("[none]");
-                    samFile.WriteLine();
-                
-                
+
+                //databank compare
+                samFile.WriteLine("Out of the " + both2.Count + " common series, there are differences regarding " + ordered.Count + " of them:");
+                if (ordered.Count == 0) samFile.WriteLine("[none]");
+                samFile.WriteLine();
+
+
                 int counter = 0;
                 foreach (DictionaryEntry de in ordered)
                 {
@@ -35425,7 +35448,7 @@ namespace Gekko
                     {
                         number = (double)de.Key;
                     }
-                    
+
                     Series ts = sh.series1;
                     Series tsGrund = sh.series2;
 
@@ -35438,7 +35461,7 @@ namespace Gekko
                     else
                     {
                         name = ts.GetName();
-                    }                    
+                    }
 
                     if (variables == null)
                     {
@@ -35474,7 +35497,7 @@ namespace Gekko
                     if (dlog) samFile.WriteLine("------------");
                     samFile.WriteLine();
 
-                    foreach (GekkoTime t in new GekkoTimeIterator( tStart, tEnd))
+                    foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
                     {
                         double varLevel = 0;
                         double varLevel2 = 0;
@@ -35518,7 +35541,6 @@ namespace Gekko
             {
                 G.Writeln("+++ NOTE: " + notFoundBoth2.Count + " series not found");
             }
-            
         }
 
         private static string MaybeRemoveFreq(string name, bool removeCurrentFreqFromNames)
