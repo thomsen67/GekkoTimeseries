@@ -407,6 +407,8 @@ namespace Gekko
         public static string reverseIndicator1 = "REVERSE1";
         public static string reverseIndicator2 = "REVERSE2";
 
+        public static int foldingButtonCounter = 0;
+
         public static string protectSymbol = "\u2714";
 
         public static Timer timer = new Timer();        
