@@ -17,17 +17,6 @@
     Else, see <http://www.gnu.org/licenses/>.
 */
 
-//LIST logic:
-
-List items may be direct or delayed. PRT a, b is direct, points to objects. But LIST m = a, b is delayed, just names pointing to objects.
-
-//seriesnamesList, see below 
-//varnamesList are without parentheses, and are used in DISP, WRITE, etc. Items b:%x!q, but no sigil for seriesnamesList
-//listNaked is a comma-separated list of expressions (without parenthesis). For instance 'a', 'b' or %a+%b, %d, etc. Must have > 1 element (one element is caught by expression below)
-//expression is anything, but accepts a listNaked with parentheses, for instance ('a', 'b') or (%a+%b, %d). One element is ('a',), Python style.
-
-//for both, the items are converted to a simple list of strings
-//used in assignment (rhs) and FOR, for instance #m = a, b, b:c ---> converted to #m = ('a', 'b', 'b:c')
 
 grammar Cmd3;
 
@@ -1960,18 +1949,20 @@ expressionOrNothing:        expression -> expression
 // ------------------- flexible list --------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-seriesnamesList:            bankseriesnameList2      //several items with commas between
-						  | bankseriesnameList3      //single item with trailing comma
-						  | listNaked 
-						  | expression
-						    ;
+//only use seriesnamesList, do not allow varnamesList or listWithoutParenthesis.
 
 //used in DISP and WRITE, for instance WRITE x, %x, b:#x ---> converted to WRITE ('x', '%x', 'b:#x')
 varnamesList:               bankvarnameList          //single item with no comma, or several items with commas between
 						  | bankvarnameList3         //single item with trailing comma
-						  | listNaked
+						  | listWithoutParenthesis
 						  | expression
-						    ;                 
+						    ;      
+
+seriesnamesList:            bankseriesnameList2      //several items with commas between
+						  | bankseriesnameList3      //single item with trailing comma
+						  | listWithoutParenthesis 
+						  | expression
+						    ;							           
 
 bankvarnameList:            bankvarname (COMMA2 bankvarname)* -> ^(ASTBANKVARNAMELIST bankvarname+);                       //a OR a,b OR a,b,c
 bankvarnameList2:           bankvarname (COMMA2 bankvarname)+ -> ^(ASTBANKVARNAMELIST bankvarname+); //mandatory comma     //a,b OR a,b,c
@@ -1981,7 +1972,7 @@ bankseriesnameList:         bankseriesname (COMMA2 bankseriesname)* -> ^(ASTBANK
 bankseriesnameList2:        bankseriesname (COMMA2 bankseriesname)+ -> ^(ASTBANKVARNAMELIST bankseriesname+); //mandatory comma     //a,b OR a,b,c
 bankseriesnameList3:        bankseriesname COMMA2 -> ^(ASTBANKVARNAMELIST bankseriesname);                                       //a,
 
-listNaked:                  expression (',' expression)+ -> ^(ASTLISTDEF expression+);                                     //must have comma
+listWithoutParenthesis:     expression (',' expression)+ -> ^(ASTLISTDEF expression+);                                     //must have comma
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- name START -------------------------------------------------------------------------------
