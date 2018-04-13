@@ -248,7 +248,7 @@ namespace Gekko.Parser.Gek
                 else if (G.equal(ce.ErrorNumber, "CS1501"))
                 {
                     //Se also #09835742345
-                    G.Writeln2("*** ERROR: A function is called with the wrong number of parameters");
+                    //G.Writeln2("*** ERROR: A function is called with the wrong number of arguments");
                     List<string> q = new List<string>();
                     foreach (Match match in Regex.Matches(ce.ErrorText, "'([^']*)'"))
                         q.Add(match.ToString());
@@ -258,9 +258,12 @@ namespace Gekko.Parser.Gek
                     if (q.Count == 1 && d.Count == 1)
                     {
                         int ii = int.Parse(d[0]);
-                        if (ii > 0) G.Writeln("*** The function " + q[0] + " does not accept " + (ii - 1) + " arguments", Color.Red);
-                        else G.Writeln("*** Problem with the function  " + q[0] + "", Color.Red);
+                        //if (ii > 0) G.Writeln("*** The function " + q[0] + " does not accept " + (ii - 1) + " arguments", Color.Red);
+                        //else G.Writeln("*** Problem with the function  " + q[0] + "", Color.Red);
                     }
+                    string name = null;
+                    if (q.Count > 0) name = q[0];
+                    G.Writeln("*** ERROR: A function " + name + " called with the wrong number of arguments");
                 }
                 else if (G.equal(ce.ErrorNumber, "CS0117"))
                 {                    
@@ -282,10 +285,10 @@ namespace Gekko.Parser.Gek
                         //}
                         //we use the last single quote match
                         G.Writeln("*** ERROR: The function " + q[q.Count - 1] + " does not seem to exist locally.", Color.Red);
-                        G.Writeln("           You may use use FUNCTION to define a function in your gcm file,", Color.Red);
-                        G.Writeln("           or the LIBRARY command to load user defined functions from file.", Color.Red);
-                        G.Writeln("           Please note that you must use the relevant FUNCTION or LIBRARY command inside", Color.Red);
-                        G.Writeln("           all gcm files using them. ", Color.Red);
+                        G.Writeln("           You may use use FUNCTION to define a function inside your gcm file,", Color.Red);
+                        G.Writeln("           or the OPTION library file = ... command to load user functions from file.", Color.Red);
+                        //G.Writeln("           Please note that you must use the relevant FUNCTION or LIBRARY command inside", Color.Red);
+                        //G.Writeln("           all gcm files using them. ", Color.Red);
                         //if (hit != null) G.Writeln("*** Note: a timeseries lag like " + hit + " should be " + hit.Replace("(", "[").Replace(")", "]") + " in Gekko 2.0", Color.Red);
                     }
                     else

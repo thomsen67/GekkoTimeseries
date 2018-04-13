@@ -100,6 +100,7 @@ Additionally, there are model, solve, equation options.
         public string interface_suggestions = "option"; //option or some or none or all   ---> //in the longer run: none, little, some, many, all
         public bool interface_table_printcodes = true;
         public int interface_zoom = 100;
+        public string library_file = "";
         public string menu_startfile = "menu.html";
         public bool model_cache = true;  //if using cache on file or not        
         public int model_cache_max = 20;  //model options are non-solving options. How many fixed models are kept in RAM        

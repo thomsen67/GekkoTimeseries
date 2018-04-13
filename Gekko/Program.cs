@@ -6207,6 +6207,12 @@ namespace Gekko
 
                 if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Handle start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
 
+                string libcode = null;
+                if (Program.options.library_file != null && Program.options.library_file != "")
+                {
+                    libcode = GetTextFromFileWithWait(Program.options.library_file);
+                }
+
                 if (fileName != "")
                 {
                     //a file
@@ -6215,6 +6221,9 @@ namespace Gekko
                         p.hasBeenCmdFile = true;
                     }
                     string input = GetTextFromFileWithWait(fileName);
+
+                    if (libcode != null) input = libcode + G.NL + G.NL + "//NOTE: Above code is from: " + Program.options.library_file + G.NL + G.NL + input;
+
                     commandLinesFlat = HandleObeyFiles2(input);
                     ph.isOneLinerFromGui = false;
                 }
@@ -6223,12 +6232,14 @@ namespace Gekko
                     //oneliner from GUI
                     if (text.Contains("\n"))
                     {
+                        if (libcode != null) text = libcode + G.NL + G.NL + "//NOTE: Above code is from: " + Program.options.library_file + G.NL + G.NL + text;
                         commandLinesFlat = HandleObeyFiles2(text);  //is handled exactly as if it was a file
                         ph.isOneLinerFromGui = false;  //is a more-liner........
                     }
                     else
                     {
                         string text0 = HandleOneLiners(text);
+                        if (libcode != null) text0 = libcode + G.NL + G.NL + "//NOTE: Above code is from: " + Program.options.library_file + G.NL + G.NL + text0;
                         commandLinesFlat = HandleObeyFiles2(text0);
                         ph.isOneLinerFromGui = true;
                         p.isOneLinerFromGui = true;
@@ -8659,34 +8670,58 @@ namespace Gekko
         {
             G.Writeln2("Starting html browser generation");
 
-            string cssName = "styles.css";
+            //tolower()
+
+            // ------------------------------------------------------
+            string settings_index_filename = "index.html";
+            string settings_find_filename = "find.html";
+            string settings_list_filename = "list.html";
+            string settings_css_filename = "styles.css";
+            string settings_dok_filename = "supdok.lst";
+            string settings_est_filename = "est.lst";
+            string settings_subfolder1 = "browser";
+            string settings_subfolder2 = "vars";
+            string settings_commands = "reset; model smec; read sim; read <ref> sim_f17;";
+            string settings_per0 = "2000";  //plot start
+            string settings_per1 = "2010";
+            string settings_per2 = "2025";
+            string settings_per_line = "2016";
+            string settings_find_title = "Variabelliste. Søg i browseren med Ctrl + F(find)";
+            // ------------------------------------------------------
+
+            string index_relative_url = "\\..\\" + settings_index_filename;
+            
+            List<string> files = new List<string>();
+            files.Add(settings_index_filename);
+            files.Add(settings_find_filename);
+            files.Add(settings_list_filename);
+            files.Add(settings_css_filename);
+            files.Add(settings_dok_filename);
+            files.Add(settings_est_filename);
+            files.Add(settings_subfolder1);
+            files.Add(settings_subfolder2);
+            foreach (string file in files)
+            {
+                if (file.Contains("/") || file.Contains("\\"))
+                {
+                    G.Writeln2("*** ERROR: '" + file + "' should not contain '/' or '\\'");
+                    throw new GekkoException();
+                }
+            }            
+
+            string rootFolder = Program.options.folder_working + "\\" + settings_subfolder1;
+            string subFolder = Program.options.folder_working + "\\" + settings_subfolder1 + "\\" + settings_subfolder2;            
+
+            BrowserHandleFolders(rootFolder, subFolder);
+
+            Program.obeyCommandCalledFromGUI(settings_commands, new P());
+
             int gap = 20;
-            string subdir = "browser";
-            GekkoTime tLine = new GekkoTime(EFreq.Annual, 2016, 1);
-
-            var matches1 = Directory.GetFiles(Program.options.folder_working + "\\" + subdir + "\\", "*.css");
-            var matches2 = Directory.GetFiles(Program.options.folder_working + "\\" + subdir + "\\", "index.html");
-            var matches3 = Directory.GetFiles(Program.options.folder_working + "\\" + subdir + "\\", "find.html");
-
-            DialogResult result = MessageBox.Show("All files except .css files in folder '" + Program.options.folder_working + "\\" + subdir + "' will be deleted", "Gekko helper", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);
-            if (result == DialogResult.Yes)
-            {
-                //ok
-            }
-            else
-            {
-                return;
-            }
-
-            foreach (string file in Directory.GetFiles(Program.options.folder_working + "\\" + subdir + "\\").Except(matches1).Except(matches2).Except(matches3))
-            {
-                File.Delete(file);
-            }
-
-            GekkoTime tStart = Globals.globalPeriodStart;
-            GekkoTime tStartPlot = Globals.globalPeriodStart.Add(-10);
-            GekkoTime tEnd = Globals.globalPeriodEnd;
-
+            
+            GekkoTime tStartPlot = new GekkoTime(EFreq.Annual, G.IntParse(settings_per0), 1);
+            GekkoTime tStart = new GekkoTime(EFreq.Annual, G.IntParse(settings_per1), 1);            
+            GekkoTime tEnd = new GekkoTime(EFreq.Annual, G.IntParse(settings_per2), 1);
+            GekkoTime tLine = new GekkoTime(EFreq.Annual, G.IntParse(settings_per_line), 1);
 
             string bank1 = Path.GetFileName(Program.databanks.GetFirst().FileNameWithPath);
             string bank2 = Path.GetFileName(Program.databanks.GetRef().FileNameWithPath);
@@ -8706,7 +8741,7 @@ namespace Gekko
             // -------------------------------------------
 
             GekkoDictionary<string, List<Tuple<string, string>>> doc = new GekkoDictionary<string, List<Tuple<string, string>>>(StringComparer.OrdinalIgnoreCase);
-            string dokFileName = Program.options.folder_working + "\\" + "supdok.lst";
+            string dokFileName = Program.options.folder_working + "\\" + settings_dok_filename;
             string dok2 = Program.GetTextFromFileWithWait(dokFileName);
             List<string> dok = G.ExtractLinesFromText(dok2);
             for (int i = 0; i < dok.Count; i++)
@@ -8729,12 +8764,12 @@ namespace Gekko
                 }
                 doc[varname].Add(new Tuple<string, string>(path, descr));
 
-            }            
+            }
 
             List<string> vars2 = new List<string>();
 
             GekkoDictionary<string, List<string>> est2 = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
-            string est = Program.GetTextFromFileWithWait(Program.options.folder_working + "\\" + "est.lst");
+            string est = Program.GetTextFromFileWithWait(Program.options.folder_working + "\\" + settings_est_filename);
             List<string> lines = G.ExtractLinesFromText(est);
             int listI = -12345;
             for (int i = 0; i < lines.Count; i++)
@@ -8743,7 +8778,7 @@ namespace Gekko
                 {
                     if (listI != -12345)
                     {
-                        
+
                         List<TokenHelper> a = Program.GetTokensWithLeftBlanks(lines[listI + 1].Trim(), 5, true);
                         string varLine = null;
                         for (int i2 = 0; i2 < a.Count; i2++)
@@ -8762,9 +8797,9 @@ namespace Gekko
                                 }
                                 varLine = a[i2].s;
                                 break;
-                            }                            
+                            }
                         }
-                                                
+
                         List<string> xx = new List<string>();
                         for (int ii = listI; ii < i; ii++)
                         {
@@ -8796,8 +8831,8 @@ namespace Gekko
                 sb.AppendLine("<table cellpadding = `0` cellspacing = `0` width = `800px` border = `0`>");
                 sb.AppendLine("<tr>");
                 sb.AppendLine("<td width = `80%`><big><b> " + var + "</b></big></td>");
-                sb.AppendLine("<td width = `10%`><small><a href=`find.html`>Søg</a></small></td>");
-                sb.AppendLine("<td width = `10%`><small><a href=`index.html`>Hjem</a></small></td>");
+                sb.AppendLine("<td width = `10%`><small><a href=`" + settings_find_filename + "`>Søg</a></small></td>");
+                sb.AppendLine("<td width = `10%`><small><a href=`" + index_relative_url + "`>Hjem</a></small></td>");
                 sb.AppendLine("</tr>");
                 sb.AppendLine("</table>");
 
@@ -8877,7 +8912,7 @@ namespace Gekko
                     }
                     WriteHtml(sb, sb4.ToString());
 
-                }         
+                }
 
                 if (ts1.label != null) WriteHtml(sb, "Label: " + ts1.label);
 
@@ -8893,8 +8928,8 @@ namespace Gekko
                         WriteHtml(sb, "Seneste beregning: " + src2);
                     }
                 }
-                
-                List <Tuple<string, string>> tuples = null; doc.TryGetValue(var, out tuples);
+
+                List<Tuple<string, string>> tuples = null; doc.TryGetValue(var, out tuples);
                 if (tuples != null)
                 {
                     int counter = -1;
@@ -8910,7 +8945,7 @@ namespace Gekko
                         sb.Append("</tr>");
                     }
                     sb.Append("</table>");
-                }               
+                }
 
 
                 if (Program.model != null)
@@ -8930,9 +8965,9 @@ namespace Gekko
                     }
 
                     EquationHelper eq = Program.FindEquationByMeansOfVariableName(var);
-                                        
+
                     if (eq != null && eq.equationCode != null)
-                    {                        
+                    {
                         foreach (string s in eq.precedentsWithLagIndicator.Keys)
                         {
                             string jvar = null;
@@ -8989,7 +9024,7 @@ namespace Gekko
                         if (jNameAutoGen) equationText += G.NL + G.NL + "J-led: " + jName;
                         InsertLinksIntoEquation(equationText, true, sb2);
                         WriteHtmlPreCode(sb, sb2.ToString());
-                    }                   
+                    }
 
                 }
 
@@ -8997,7 +9032,7 @@ namespace Gekko
                 if (est2.ContainsKey(var))
                 {
                     List<string> xx = est2[var];
-                    foreach(string s in xx)
+                    foreach (string s in xx)
                     {
                         xxx += s + G.NL;
                     }
@@ -9038,7 +9073,7 @@ namespace Gekko
                     o0.t2 = tEnd;
 
                     o0.prtType = "plot";
-                    o0.opt_filename = Program.options.folder_working + "\\" + subdir + "\\" + var.ToLower() + ".svg";
+                    o0.opt_filename = subFolder + "\\" + var.ToLower() + ".svg";
 
                     o0.opt_xlineafter = tLine;
 
@@ -9086,9 +9121,9 @@ namespace Gekko
                     }
 
                     o0.Exe();
-                                        
+
                 }
-                
+
                 if (true)
                 {
                     GekkoTime t = Globals.tNull;
@@ -9098,7 +9133,7 @@ namespace Gekko
                     o0.t2 = tEnd;
 
                     o0.prtType = "plot";
-                    o0.opt_filename = Program.options.folder_working + "\\" + subdir + "\\" + var.ToLower() + "___p" + ".svg";
+                    o0.opt_filename = subFolder + "\\" + var.ToLower() + "___p" + ".svg";
 
                     o0.opt_xlineafter = tLine;
 
@@ -9110,7 +9145,7 @@ namespace Gekko
 
                     {
                         List<int> bankNumbers = null;
-                        
+
                         o0.printCodes = new List<OptString>();
                         o0.printCodes.Add(new OptString("p", "yes"));
 
@@ -9120,7 +9155,7 @@ namespace Gekko
                             ope0.label = bank2.ToLower().Replace(".gbk", "") + ":" + var;
                             ope0.linetype = "lines";
                             ope0.dashtype = "3";
-                            
+
 
                             bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o0, ope0));
                             foreach (int bankNumber in bankNumbers)
@@ -9154,9 +9189,9 @@ namespace Gekko
 
                     }
 
-                    o0.Exe();                    
+                    o0.Exe();
                 }
-                
+
                 sb.AppendLine("<img src = `" + var.ToLower() + ".svg" + "`>");
 
                 sb.AppendLine("<p/>");
@@ -9215,7 +9250,7 @@ namespace Gekko
                 x.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
                 x.AppendLine("<html>");
                 x.AppendLine("  <head>");
-                x.AppendLine("    <link rel=`stylesheet` href=`styles.css` type=`text/css`>");
+                x.AppendLine("    <link rel=`stylesheet` href=`" + settings_css_filename + @"` type=`text/css`>");
                 x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
                 x.AppendLine("    <title>" + var + "</title>");
                 x.AppendLine("  </head>");
@@ -9235,15 +9270,12 @@ namespace Gekko
                 x.AppendLine("  // -->");
                 x.AppendLine("  </script >");
 
-                x.AppendLine("  <body>");
-                //x.AppendLine("  <big><b>" + var + "</b></big><br>");
-                //x.Append("<pre><code>");
+                x.AppendLine("  <body>");                
                 x.Append(sb);
-                //x.Append("</code></pre>");
                 x.AppendLine("  </body>");
                 x.AppendLine("</html>");
 
-                string pathAndFilename = Program.options.folder_working + "\\" + subdir + "\\" + var.ToLower() + ".html";
+                string pathAndFilename = subFolder + "\\" + var.ToLower() + ".html";
                 using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
@@ -9255,7 +9287,7 @@ namespace Gekko
             x2.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
             x2.AppendLine("<html>");
             x2.AppendLine("  <head>");
-            x2.AppendLine("    <link rel=`stylesheet` href=`styles.css` type=`text/css`>");
+            x2.AppendLine("    <link rel=`stylesheet` href=`" + settings_css_filename + "` type=`text/css`>");
             x2.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
             x2.AppendLine("    <title>List of vars</title>");
             x2.AppendLine("  </head>");
@@ -9264,9 +9296,9 @@ namespace Gekko
 
             x2.AppendLine("  <table cellpadding = `0` cellspacing = `0` width = `1000px` border = `0`> ");
             x2.AppendLine("  <tr>");
-            x2.AppendLine("  <td width = `70 %` ><b><big>SMECdok, version 3. Søg i browseren med Ctrl + F(find) </big></b></td>");
-            x2.AppendLine("  <td width = `10 %` ><small ><a href = `find.html` > Søg </a></small ></td >");
-            x2.AppendLine("  <td width = `20 %` ><small ><a href = `index.html` > Hjem </a></small ></td >");
+            x2.AppendLine("  <td width = `70 %` ><b><big>" + settings_find_title + "</big></b></td>");
+            x2.AppendLine("  <td width = `10 %` ><small ><a href = `" + settings_find_filename + "` > Søg </a></small ></td >");
+            x2.AppendLine("  <td width = `20 %` ><small ><a href = `" + index_relative_url + "` > Hjem </a></small ></td >");
             x2.AppendLine("  </tr>");
             x2.AppendLine("  </table>");
 
@@ -9294,7 +9326,7 @@ namespace Gekko
             x2.AppendLine("  </p>");
             x2.AppendLine("  </body>");
             x2.AppendLine("</html>");
-            string pathAndFilename2 = Program.options.folder_working + "\\" + subdir + "\\" + "index" + ".html";
+            string pathAndFilename2 = subFolder + "\\" + settings_list_filename;
             using (FileStream fs = Program.WaitForFileStream(pathAndFilename2, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
@@ -9309,7 +9341,7 @@ namespace Gekko
             StringBuilder x3 = new StringBuilder();
             x3.AppendLine("<html>");
             x3.AppendLine("<head>");
-            x3.AppendLine("<link rel = `stylesheet` href = `styles.css` type = `text/css` >");
+            x3.AppendLine("<link rel = `stylesheet` href = `" + settings_css_filename + "` type = `text/css` >");
             x3.AppendLine("</head>");
 
             x3.AppendLine("<script LANGUAGE = `JavaScript` SRC = `variable.js` ></script>");
@@ -9345,7 +9377,7 @@ namespace Gekko
                 tekst = document.form1.tekst.value;
                 fundet = false;
 
-                //document.writeln(`<head><link rel = `stylesheet` href = `styles.css` type = `text/css` > </head>`);
+                //document.writeln(`<head><link rel = `stylesheet` href = `" + settings_css_filename + @"` type = `text/css` > </head>`);
 
                 document.writeln(`Søgning efter variablen: '` + tekst + `'<br><br>`);
 
@@ -9378,7 +9410,7 @@ namespace Gekko
                 {
                     document.writeln(`... gav intet resultat.<br>`);
                 } //endif
-                document.writeln(`<br><br><a href=find.html>Søg igen</a> <br> <a href=index.html>Gå til hovedside</a>`);
+                document.writeln(`<br><br><a href=" + settings_find_filename + @">Søg igen</a> <br> <a href=" + settings_index_filename + @">Gå til hovedside</a>`);
                 tekst1.free;
                 tekst.free;
             }  //endfunction
@@ -9413,7 +9445,7 @@ namespace Gekko
             {
                 document.writeln(`... gav intet resultat.<br>`);
             } //endif
-            document.writeln(`<br><br><a href=find.html>Søg igen</a> <br> <a href=index.html>Gå til hovedside</a>`);
+            document.writeln(`<br><br><a href=" + settings_find_filename + @">Søg igen</a> <br> <a href=" + settings_index_filename + @">Gå til hovedside</a>`);
             tekst.free;
             tekst2.free;
         }  //endfunction
@@ -9449,7 +9481,7 @@ namespace Gekko
             x3.AppendLine("</body>");
             x3.AppendLine("</html>");
 
-            string pathAndFilename3 = Program.options.folder_working + "\\" + subdir + "\\" + "find" + ".html";
+            string pathAndFilename3 = subFolder + "\\" + settings_find_filename;
             using (FileStream fs = Program.WaitForFileStream(pathAndFilename3, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
@@ -9458,6 +9490,37 @@ namespace Gekko
 
             G.Writeln2("End of html browser generation");
 
+        }
+
+        private static void BrowserHandleFolders(string rootFolder, string varsFolder)
+        {
+            if (!Directory.Exists(rootFolder))
+            {
+                G.Writeln2("*** ERROR: Folder '" + rootFolder + "' does not exist");
+                throw new GekkoException();
+            }
+
+            if (!Directory.Exists(varsFolder))
+            {
+                Directory.CreateDirectory(varsFolder);
+            }
+            else
+            {
+                DialogResult result = MessageBox.Show("All existing files in '" + varsFolder + "' will be deleted", "Gekko helper", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);
+                if (result == DialogResult.Yes)
+                {
+                    //ok
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: User abort");
+                    throw new GekkoException();
+                }
+                foreach (string file in Directory.GetFiles(varsFolder + "\\"))
+                {
+                    File.Delete(file);
+                }
+            }
         }
 
         private static void FoldingButtonEnd(StringBuilder sb)
