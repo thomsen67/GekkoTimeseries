@@ -8669,6 +8669,7 @@ namespace Gekko
         public static void Browser()
         {
             G.Writeln2("Starting html browser generation");
+            DateTime dt0 = DateTime.Now;
 
             //tolower()
 
@@ -8679,17 +8680,19 @@ namespace Gekko
             string settings_css_filename = "styles.css";
             string settings_dok_filename = "supdok.lst";
             string settings_est_filename = "est.lst";
-            string settings_subfolder1 = "browser";
-            string settings_subfolder2 = "vars";
+            string settings_flowchart_filename = "SMECpilediagram.wmf"; //ret også i index.html
+            string settings_subfolder2 = "vars"; //ret også i index.html
             string settings_commands = "reset; model smec; read sim; read <ref> sim_f17;";
             string settings_per0 = "2000";  //plot start
             string settings_per1 = "2010";
             string settings_per2 = "2025";
             string settings_per_line = "2016";
-            string settings_find_title = "Variabelliste. Søg i browseren med Ctrl + F(find)";
+            string settings_list_title = "Variabelliste. Søg i browseren med Ctrl + F(find)";
             // ------------------------------------------------------
 
-            string index_relative_url = "\\..\\" + settings_index_filename;
+            string browserFolder = "browser";
+            
+            string index_relative_url = "..\\" + settings_index_filename;
             
             List<string> files = new List<string>();
             files.Add(settings_index_filename);
@@ -8698,10 +8701,12 @@ namespace Gekko
             files.Add(settings_css_filename);
             files.Add(settings_dok_filename);
             files.Add(settings_est_filename);
-            files.Add(settings_subfolder1);
+            files.Add(settings_flowchart_filename);
+            files.Add(browserFolder);
             files.Add(settings_subfolder2);
             foreach (string file in files)
             {
+                if (file == null) continue;
                 if (file.Contains("/") || file.Contains("\\"))
                 {
                     G.Writeln2("*** ERROR: '" + file + "' should not contain '/' or '\\'");
@@ -8709,10 +8714,28 @@ namespace Gekko
                 }
             }            
 
-            string rootFolder = Program.options.folder_working + "\\" + settings_subfolder1;
-            string subFolder = Program.options.folder_working + "\\" + settings_subfolder1 + "\\" + settings_subfolder2;            
+            string rootFolder = Program.options.folder_working + "\\" + browserFolder;
+            string subFolder = Program.options.folder_working + "\\" + browserFolder + "\\" + settings_subfolder2;
+            
+            BrowserCleanupFolders(rootFolder, subFolder);
 
-            BrowserHandleFolders(rootFolder, subFolder);
+            //index.html and styles.css is copied to root folder of browser system
+            List<string> filesToCopy = new List<string>();
+            filesToCopy.Add(settings_index_filename);
+            filesToCopy.Add(settings_css_filename);
+            filesToCopy.Add(settings_flowchart_filename);
+
+            foreach (string fileToCopy in filesToCopy)
+            {
+                string fileNameIndex = Program.options.folder_working + "\\" + fileToCopy;
+                string fileNameIndex2 = rootFolder + "\\" + fileToCopy;
+                if (!File.Exists(fileNameIndex))
+                {
+                    G.Writeln2("*** ERROR: '" + fileNameIndex + "' was not found");
+                    throw new GekkoException();
+                }
+                File.Copy(fileNameIndex, fileNameIndex2);
+            }
 
             Program.obeyCommandCalledFromGUI(settings_commands, new P());
 
@@ -8831,8 +8854,8 @@ namespace Gekko
                 sb.AppendLine("<table cellpadding = `0` cellspacing = `0` width = `800px` border = `0`>");
                 sb.AppendLine("<tr>");
                 sb.AppendLine("<td width = `80%`><big><b> " + var + "</b></big></td>");
-                sb.AppendLine("<td width = `10%`><small><a href=`" + settings_find_filename + "`>Søg</a></small></td>");
-                sb.AppendLine("<td width = `10%`><small><a href=`" + index_relative_url + "`>Hjem</a></small></td>");
+                sb.AppendLine("<td width = `10%`><a href=`..\\" + settings_find_filename + "`>Søg</a></td>");
+                sb.AppendLine("<td width = `10%`><a href=`" + index_relative_url + "`>Hjem</a></td>");
                 sb.AppendLine("</tr>");
                 sb.AppendLine("</table>");
 
@@ -8938,10 +8961,10 @@ namespace Gekko
                     {
                         counter++;
                         string s = null;
-                        if (counter == 0) s = "<small>Dokumentation:&nbsp;&nbsp;</small>";
+                        if (counter == 0) s = "Dokumentation:&nbsp;&nbsp;";
                         sb.Append("<tr>");
                         sb.Append("<td width = `1%`>" + s + "</td>");
-                        sb.Append("<td width = `99%`><small><a href = `" + tuple.Item1 + "`>" + tuple.Item2 + "</a></small></td>");
+                        sb.Append("<td width = `99%`><a href = `" + tuple.Item1 + "`>" + tuple.Item2 + "</a></td>");
                         sb.Append("</tr>");
                     }
                     sb.Append("</table>");
@@ -9250,7 +9273,8 @@ namespace Gekko
                 x.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
                 x.AppendLine("<html>");
                 x.AppendLine("  <head>");
-                x.AppendLine("    <link rel=`stylesheet` href=`" + settings_css_filename + @"` type=`text/css`>");
+                x.AppendLine("    <link rel=`stylesheet` href=`..\\" + settings_css_filename + @"` type=`text/css`>");
+                x.AppendLine("    <link rel = `shortcut icon` href = `https://dors.dk/sites/dors.dk/files/punkt-bomaerke.ico` type = `image/vnd.microsoft.icon`>");
                 x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
                 x.AppendLine("    <title>" + var + "</title>");
                 x.AppendLine("  </head>");
@@ -9287,7 +9311,8 @@ namespace Gekko
             x2.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
             x2.AppendLine("<html>");
             x2.AppendLine("  <head>");
-            x2.AppendLine("    <link rel=`stylesheet` href=`" + settings_css_filename + "` type=`text/css`>");
+            x2.AppendLine("    <link rel=`stylesheet` href=`..\\" + settings_css_filename + "` type=`text/css`>");
+            x2.AppendLine("    <link rel = `shortcut icon` href = `https://dors.dk/sites/dors.dk/files/punkt-bomaerke.ico` type = `image/vnd.microsoft.icon`>");
             x2.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
             x2.AppendLine("    <title>List of vars</title>");
             x2.AppendLine("  </head>");
@@ -9296,9 +9321,9 @@ namespace Gekko
 
             x2.AppendLine("  <table cellpadding = `0` cellspacing = `0` width = `1000px` border = `0`> ");
             x2.AppendLine("  <tr>");
-            x2.AppendLine("  <td width = `70 %` ><b><big>" + settings_find_title + "</big></b></td>");
-            x2.AppendLine("  <td width = `10 %` ><small ><a href = `" + settings_find_filename + "` > Søg </a></small ></td >");
-            x2.AppendLine("  <td width = `20 %` ><small ><a href = `" + index_relative_url + "` > Hjem </a></small ></td >");
+            x2.AppendLine("  <td width = `70 %` ><b><big>" + settings_list_title + "</big></b></td>");
+            x2.AppendLine("  <td width = `10 %` ><a href = `" + settings_find_filename + "` > Søg </a></td >");
+            x2.AppendLine("  <td width = `20 %` ><a href = `" + settings_index_filename + "` > Hjem </a></td >");
             x2.AppendLine("  </tr>");
             x2.AppendLine("  </table>");
 
@@ -9326,7 +9351,7 @@ namespace Gekko
             x2.AppendLine("  </p>");
             x2.AppendLine("  </body>");
             x2.AppendLine("</html>");
-            string pathAndFilename2 = subFolder + "\\" + settings_list_filename;
+            string pathAndFilename2 = rootFolder + "\\" + settings_list_filename;
             using (FileStream fs = Program.WaitForFileStream(pathAndFilename2, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
@@ -9341,7 +9366,8 @@ namespace Gekko
             StringBuilder x3 = new StringBuilder();
             x3.AppendLine("<html>");
             x3.AppendLine("<head>");
-            x3.AppendLine("<link rel = `stylesheet` href = `" + settings_css_filename + "` type = `text/css` >");
+            x3.AppendLine("<link rel = `stylesheet` href = `..\\" + settings_css_filename + "` type = `text/css` >");
+            x3.AppendLine("<link rel = `shortcut icon` href = `https://dors.dk/sites/dors.dk/files/punkt-bomaerke.ico` type = `image/vnd.microsoft.icon`>");
             x3.AppendLine("</head>");
 
             x3.AppendLine("<script LANGUAGE = `JavaScript` SRC = `variable.js` ></script>");
@@ -9359,7 +9385,7 @@ namespace Gekko
             string js = @"            
 
             function varnavns() {
-                var varnavn = [" + s1 + @"];
+                var varnavn = [" + s1.ToLower() + @"];
                 return varnavn;
             }
 
@@ -9369,6 +9395,7 @@ namespace Gekko
             }
 
             function findvarnavn(){
+                var content = [];
                 var varnavn = varnavns();
                 var beskriv = beskrivs();
                 antal = varnavn.length;
@@ -9377,18 +9404,17 @@ namespace Gekko
                 tekst = document.form1.tekst.value;
                 fundet = false;
 
-                //document.writeln(`<head><link rel = `stylesheet` href = `" + settings_css_filename + @"` type = `text/css` > </head>`);
-
-                document.writeln(`Søgning efter variablen: '` + tekst + `'<br><br>`);
+                content.push(`Søgning efter variablen: '` + tekst + `'<br><br>`);
 
                 for (var i = 0; i < antal; i++)
                 {
                     tekst1 = varnavn[i];
                     if (tekst1.toUpperCase() == tekst.toUpperCase())
                     {
-                        fundet = true;
-                        document.writeln(`<b><a href=` + varnavn[i] + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
-                        document.writeln(`<br>` + beskriv[i] + `<br><hr><br>`);
+                        fundet = true;                        
+
+                        content.push(`<b><a href=" + settings_subfolder2 + @"/` + varnavn[i] + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
+                        content.push(`<br>` + beskriv[i] + `<br><hr><br>`);
                     } //endif
                 } //endfor
 
@@ -9400,19 +9426,20 @@ namespace Gekko
                         if (tekst1.toUpperCase() != tekst.toUpperCase())
                         {
                             fundet = true;                            
-                            document.writeln(`<a href=` + varnavn[i] + `.html style='text-decoration:none;'>` + varnavn[i] + `</a>`);
-                            document.writeln(`<br>` + beskriv[i] + `<br><br>`);
+                            content.push(`<a href=" + settings_subfolder2 + @"/` + varnavn[i] + `.html style='text-decoration:none;'>` + varnavn[i] + `</a>`);
+                            content.push(`<br>` + beskriv[i] + `<br><br>`);
                         } //endif
                     } //endif
                 } //endfor
 
                 if (fundet == false)
                 {
-                    document.writeln(`... gav intet resultat.<br>`);
+                    content.push(`... gav intet resultat.<br>`);
                 } //endif
-                document.writeln(`<br><br><a href=" + settings_find_filename + @">Søg igen</a> <br> <a href=" + settings_index_filename + @">Gå til hovedside</a>`);
+                content.push(`<br><br><a href=" + settings_find_filename + @">Søg igen</a> <br> <a href=" + settings_index_filename + @">Gå til hovedside</a>`);
                 tekst1.free;
                 tekst.free;
+                document.body.innerHTML = content.join(``);
             }  //endfunction
 
             function check(event) {
@@ -9422,6 +9449,7 @@ namespace Gekko
 
         function findbeskriv()
         {
+            var content = [];
             var varnavn = varnavns();
             var beskriv = beskrivs();
             antal = varnavn.length;
@@ -9429,7 +9457,7 @@ namespace Gekko
             tekst2 = new String;
             tekst = document.form2.tekst.value;
 
-            document.writeln(`Søgeresultat<br>Søgning efter teksten: '` + tekst + `' i variabelliste<br><br>`);
+            content.push(`Søgeresultat<br>Søgning efter teksten: '` + tekst + `' i variabelliste<br><br>`);
             fundet = false;
             for (var i = 0; i < antal; i++)
             {
@@ -9437,17 +9465,18 @@ namespace Gekko
                 if (tekst2.toUpperCase().indexOf(tekst.toUpperCase()) != -1)
                 {
                     fundet = true;
-                    document.writeln(`<b><a href=` + varnavn[i] + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);                    
-                    document.writeln(`<br>` + beskriv[i] + `<br><br>`);
+                    content.push(`<b><a href=" + settings_subfolder2 + @"/` + varnavn[i] + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);                    
+                    content.push(`<br>` + beskriv[i] + `<br><br>`);
                 } //endif
             } //endfor
             if (fundet == false)
             {
-                document.writeln(`... gav intet resultat.<br>`);
+                content.push(`... gav intet resultat.<br>`);
             } //endif
-            document.writeln(`<br><br><a href=" + settings_find_filename + @">Søg igen</a> <br> <a href=" + settings_index_filename + @">Gå til hovedside</a>`);
+            content.push(`<br><br><a href=" + settings_find_filename + @">Søg igen</a> <br> <a href=" + settings_index_filename + @">Gå til hovedside</a>`);
             tekst.free;
             tekst2.free;
+            document.body.innerHTML = content.join(``);
         }  //endfunction
 
         function check2(event) {
@@ -9481,44 +9510,48 @@ namespace Gekko
             x3.AppendLine("</body>");
             x3.AppendLine("</html>");
 
-            string pathAndFilename3 = subFolder + "\\" + settings_find_filename;
+            string pathAndFilename3 = rootFolder + "\\" + settings_find_filename;
             using (FileStream fs = Program.WaitForFileStream(pathAndFilename3, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
                 sw.Write(x3.Replace('`', '\"'));
             }
 
-            G.Writeln2("End of html browser generation");
+            G.Writeln2("End of html browser generation, " + G.Seconds(dt0));
 
         }
 
-        private static void BrowserHandleFolders(string rootFolder, string varsFolder)
-        {
-            if (!Directory.Exists(rootFolder))
-            {
-                G.Writeln2("*** ERROR: Folder '" + rootFolder + "' does not exist");
-                throw new GekkoException();
-            }
+        private static void BrowserCleanupFolders(string rootFolder, string varsFolder)
+        {            
+            List<string> folders = new List<string> { rootFolder, varsFolder };
 
-            if (!Directory.Exists(varsFolder))
+            foreach (string folder in folders)
             {
-                Directory.CreateDirectory(varsFolder);
-            }
-            else
-            {
-                DialogResult result = MessageBox.Show("All existing files in '" + varsFolder + "' will be deleted", "Gekko helper", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);
-                if (result == DialogResult.Yes)
+                if (!Directory.Exists(folder))
                 {
-                    //ok
+                    Directory.CreateDirectory(folder);
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: User abort");
-                    throw new GekkoException();
-                }
-                foreach (string file in Directory.GetFiles(varsFolder + "\\"))
-                {
-                    File.Delete(file);
+                    string[] files = Directory.GetFiles(folder + "\\");
+                    if (files.Length > 0)
+                    {
+                        DialogResult result = MessageBox.Show("All " + files.Length + " files in '" + folder + "' will be deleted", "Gekko helper", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                        if (result == DialogResult.Yes)
+                        {
+                            //ok
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: User abort");
+                            throw new GekkoException();
+                        }
+                    }
+
+                    foreach (string file in files)
+                    {
+                        File.Delete(file);
+                    }
                 }
             }
         }
@@ -13419,6 +13452,7 @@ namespace Gekko
             x.AppendLine("<html>");
             x.AppendLine("  <head>");
             x.AppendLine("    <link rel=`stylesheet` href=`" + path + "styles.css` type=`text/css`>");
+            x.AppendLine("    <link rel = `shortcut icon` href = `https://dors.dk/sites/dors.dk/files/punkt-bomaerke.ico` type = `image/vnd.microsoft.icon`>");
             x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
             x.AppendLine("    <title>" + title + "</title>");
             x.AppendLine("  </head>");
