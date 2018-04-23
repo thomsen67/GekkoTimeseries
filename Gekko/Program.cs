@@ -8671,28 +8671,128 @@ namespace Gekko
             G.Writeln2("Starting html browser generation");
             DateTime dt0 = DateTime.Now;
 
-            //tolower()
+            string pathAndFile = Program.options.folder_working + "\\" + "browser.json";
+            string jsonCode = G.RemoveComments(GetTextFromFileWithWait(pathAndFile));
 
-            // ------------------------------------------------------
-            string settings_index_filename = "index.html";
-            string settings_find_filename = "find.html";
-            string settings_list_filename = "list.html";
-            string settings_css_filename = "styles.css";
-            string settings_dok_filename = "supdok.lst";
-            string settings_est_filename = "est.lst";
-            string settings_flowchart_filename = "SMECpilediagram.wmf"; //ret også i index.html
-            string settings_subfolder2 = "vars"; //ret også i index.html
-            string settings_commands = "reset; model smec; read sim; read <ref> sim_f17;";
-            string settings_per0 = "2000";  //plot start
-            string settings_per1 = "2010";
-            string settings_per2 = "2025";
-            string settings_per_line = "2016";
-            string settings_list_title = "Variabelliste. Søg i browseren med Ctrl + F(find)";
-            // ------------------------------------------------------
+            System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+            Dictionary<string, object> jsonTree = null;
+            try
+            {
+                jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
+            }
+            catch (Exception e)
+            {
+                G.Writeln2("+++ WARNING: The .json file does not seem correctly formatted.");
+                G.Writeln("             " + e.Message);
+                //throw;
+            }           
 
-            string browserFolder = "browser";
+            // -------------------------------------------------------------
+
+            string settings_index_filename = null;
+            try { settings_index_filename = (string)jsonTree["index_filename"]; } catch { }
+            if (settings_index_filename == null)
+            {
+                G.Writeln2("*** ERROR: JSON: index_filename not found"); throw new GekkoException();
+            }
+
+            string settings_list_filename = null;
+            try { settings_list_filename = (string)jsonTree["list_filename"]; } catch { }
+            if (settings_list_filename == null)
+            {
+                G.Writeln2("*** ERROR: JSON: list_filename not found"); throw new GekkoException();
+            }
+
+            string settings_find_filename = null;
+            try { settings_find_filename = (string)jsonTree["find_filename"]; } catch { }
+            if (settings_find_filename == null)
+            {
+                G.Writeln2("*** ERROR: JSON: find_filename not found"); throw new GekkoException();
+            }
+
+            string settings_css_filename = null;
+            try { settings_css_filename = (string)jsonTree["css_filename"]; } catch { }
+            if (settings_css_filename == null)
+            {
+                G.Writeln2("*** ERROR: JSON: css_filename not found"); throw new GekkoException();
+            }
+
+            string settings_dok_filename = null;
+            try { settings_dok_filename = (string)jsonTree["dok_filename"]; } catch { }
+            if (settings_dok_filename == null)
+            {
+                G.Writeln2("*** ERROR: JSON: dok_filename not found"); throw new GekkoException();
+            }
+
+            string settings_est_filename = null;
+            try { settings_est_filename = (string)jsonTree["est_filename"]; } catch { }
+            if (settings_est_filename == null)
+            {
+                G.Writeln2("*** ERROR: JSON: est_filename not found"); throw new GekkoException();
+            }
+
+            string settings_flowchart_filename = null;  
+            try { settings_flowchart_filename = (string)jsonTree["flowchart_filename"]; } catch { }
+            if (settings_flowchart_filename == null)
+            {
+                G.Writeln2("*** ERROR: JSON: flowchart_filename not found"); throw new GekkoException();
+            }
+
+            string settings_vars_foldername = null; 
+            try { settings_vars_foldername = (string)jsonTree["vars_foldername"]; } catch { }
+            if (settings_vars_foldername == null)
+            {
+                G.Writeln2("*** ERROR: JSON: vars_foldername not found"); throw new GekkoException();
+            }
+
+            string settings_commands = null;
+            try { settings_commands = (string)jsonTree["commands"]; } catch { }
+            if (settings_commands == null)
+            {
+                G.Writeln2("*** ERROR: JSON: commands not found"); throw new GekkoException();
+            }
+
+            string settings_plot_start = null;
+            try { settings_plot_start = (string)jsonTree["plot_start"]; } catch { }
+            if (settings_plot_start == null)
+            {
+                G.Writeln2("*** ERROR: JSON: plot_start not found"); throw new GekkoException();
+            }
+
+            string settings_plot_end = null;
+            try { settings_plot_end = (string)jsonTree["plot_end"]; } catch { }
+            if (settings_plot_end == null)
+            {
+                G.Writeln2("*** ERROR: JSON: plot_end not found"); throw new GekkoException();
+            }
+
+            string settings_plot_line = null;
+            try { settings_plot_line = (string)jsonTree["plot_line"]; } catch { }
+            if (settings_plot_line == null)
+            {
+                G.Writeln2("*** ERROR: JSON: plot_line not found"); throw new GekkoException();
+            }
+
+            string settings_print_start = null;
+            try { settings_print_start = (string)jsonTree["print_start"]; } catch { }
+            if (settings_print_start == null)
+            {
+                G.Writeln2("*** ERROR: JSON: print_start not found"); throw new GekkoException();
+            }
             
-            string index_relative_url = "..\\" + settings_index_filename;
+            string settings_print_end = null;
+            try { settings_print_end = (string)jsonTree["print_end"]; } catch { }
+            if (settings_print_end == null)
+            {
+                G.Writeln2("*** ERROR: JSON: print_end not found"); throw new GekkoException();
+            }
+
+
+            // -------------------------------------------------------------
+
+            string list_title = "Variabelliste. Søg i browseren med Ctrl + F(find)";
+            
+            string browserFolder = "browser";
             
             List<string> files = new List<string>();
             files.Add(settings_index_filename);
@@ -8703,7 +8803,7 @@ namespace Gekko
             files.Add(settings_est_filename);
             files.Add(settings_flowchart_filename);
             files.Add(browserFolder);
-            files.Add(settings_subfolder2);
+            files.Add(settings_vars_foldername);
             foreach (string file in files)
             {
                 if (file == null) continue;
@@ -8715,7 +8815,7 @@ namespace Gekko
             }            
 
             string rootFolder = Program.options.folder_working + "\\" + browserFolder;
-            string subFolder = Program.options.folder_working + "\\" + browserFolder + "\\" + settings_subfolder2;
+            string subFolder = Program.options.folder_working + "\\" + browserFolder + "\\" + settings_vars_foldername;
             
             BrowserCleanupFolders(rootFolder, subFolder);
 
@@ -8741,17 +8841,28 @@ namespace Gekko
 
             int gap = 20;
             
-            GekkoTime tStartPlot = new GekkoTime(EFreq.Annual, G.IntParse(settings_per0), 1);
-            GekkoTime tStart = new GekkoTime(EFreq.Annual, G.IntParse(settings_per1), 1);            
-            GekkoTime tEnd = new GekkoTime(EFreq.Annual, G.IntParse(settings_per2), 1);
-            GekkoTime tLine = new GekkoTime(EFreq.Annual, G.IntParse(settings_per_line), 1);
+            GekkoTime plotStart = new GekkoTime(EFreq.Annual, G.IntParse(settings_plot_start), 1);
+            GekkoTime plotEnd = new GekkoTime(EFreq.Annual, G.IntParse(settings_plot_end), 1);
+            GekkoTime plot_line = new GekkoTime(EFreq.Annual, G.IntParse(settings_plot_line), 1);
+            GekkoTime print_start = new GekkoTime(EFreq.Annual, G.IntParse(settings_print_start), 1);            
+            GekkoTime print_end = new GekkoTime(EFreq.Annual, G.IntParse(settings_print_end), 1);            
 
             string bank1 = Path.GetFileName(Program.databanks.GetFirst().FileNameWithPath);
             string bank2 = Path.GetFileName(Program.databanks.GetRef().FileNameWithPath);
 
             MetaList ml = Program.scalars["#all"] as MetaList;
             List<string> vars = ml.list;
-            //vars = new List<string> { "fcp", "phk", "jphk", "fee", "jfee", "fy", "tg", "peesq", "ktiorn" };
+
+            if (Globals.runningOnTTComputer)
+            {
+                DialogResult result = MessageBox.Show("Only a few vars?", "Vars", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                if (result == DialogResult.Yes)
+                {
+                    vars = new List<string> { "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn" };
+                }                
+            }
+
+            vars.Sort(StringComparer.OrdinalIgnoreCase);
 
             // -------------------------------------------
             // Data generation
@@ -8855,7 +8966,7 @@ namespace Gekko
                 sb.AppendLine("<tr>");
                 sb.AppendLine("<td width = `80%`><big><b> " + var + "</b></big></td>");
                 sb.AppendLine("<td width = `10%`><a href=`..\\" + settings_find_filename + "`>Søg</a></td>");
-                sb.AppendLine("<td width = `10%`><a href=`" + index_relative_url + "`>Hjem</a></td>");
+                sb.AppendLine("<td width = `10%`><a href=`..\\" + settings_index_filename + "`>Hjem</a></td>");
                 sb.AppendLine("</tr>");
                 sb.AppendLine("</table>");
 
@@ -9092,13 +9203,13 @@ namespace Gekko
                     GekkoTime t = Globals.tNull;
                     O.Prt o0 = new O.Prt();
 
-                    o0.t1 = tStartPlot;
-                    o0.t2 = tEnd;
+                    o0.t1 = plotStart;
+                    o0.t2 = plotEnd;
 
                     o0.prtType = "plot";
                     o0.opt_filename = subFolder + "\\" + var.ToLower() + ".svg";
 
-                    o0.opt_xlineafter = tLine;
+                    o0.opt_xlineafter = plot_line;
 
                     {
                         List<int> bankNumbers = null;
@@ -9152,13 +9263,13 @@ namespace Gekko
                     GekkoTime t = Globals.tNull;
                     O.Prt o0 = new O.Prt();
 
-                    o0.t1 = tStartPlot;
-                    o0.t2 = tEnd;
+                    o0.t1 = plotStart;
+                    o0.t2 = print_end;
 
                     o0.prtType = "plot";
                     o0.opt_filename = subFolder + "\\" + var.ToLower() + "___p" + ".svg";
 
-                    o0.opt_xlineafter = tLine;
+                    o0.opt_xlineafter = plot_line;
 
                     //will always keep a window of at least -1% to 1%, and will cut outside -100% to 100%.
                     o0.opt_yminhard = -100d;
@@ -9239,7 +9350,7 @@ namespace Gekko
                     sb3.AppendLine();
                     sb3.AppendLine("Period        value        %  " + G.Blanks(gap) + "Period        value        %  ");
                     int counter = 0;
-                    foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
+                    foreach (GekkoTime gt in new GekkoTimeIterator(print_start, print_end))
                     {
                         counter++;
                         if (hasFilter)  //some periods are set via TIMEFILTER
@@ -9321,7 +9432,7 @@ namespace Gekko
 
             x2.AppendLine("  <table cellpadding = `0` cellspacing = `0` width = `1000px` border = `0`> ");
             x2.AppendLine("  <tr>");
-            x2.AppendLine("  <td width = `70 %` ><b><big>" + settings_list_title + "</big></b></td>");
+            x2.AppendLine("  <td width = `70 %` ><b><big>" + list_title + "</big></b></td>");
             x2.AppendLine("  <td width = `10 %` ><a href = `" + settings_find_filename + "` > Søg </a></td >");
             x2.AppendLine("  <td width = `20 %` ><a href = `" + settings_index_filename + "` > Hjem </a></td >");
             x2.AppendLine("  </tr>");
@@ -9339,7 +9450,7 @@ namespace Gekko
 
                 x2.Append("<tr>");
                 x2.Append("<td width = `20%`>");
-                x2.Append(HtmlLink(var2));
+                x2.Append(HtmlLink(var2, settings_vars_foldername + "/" + var2.ToLower() + ".html"));
                 x2.Append("</td>");
                 x2.Append("<td width = `80%`>");
                 x2.Append(expl);
@@ -9413,7 +9524,7 @@ namespace Gekko
                     {
                         fundet = true;                        
 
-                        content.push(`<b><a href=" + settings_subfolder2 + @"/` + varnavn[i] + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
+                        content.push(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i] + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
                         content.push(`<br>` + beskriv[i] + `<br><hr><br>`);
                     } //endif
                 } //endfor
@@ -9426,7 +9537,7 @@ namespace Gekko
                         if (tekst1.toUpperCase() != tekst.toUpperCase())
                         {
                             fundet = true;                            
-                            content.push(`<a href=" + settings_subfolder2 + @"/` + varnavn[i] + `.html style='text-decoration:none;'>` + varnavn[i] + `</a>`);
+                            content.push(`<a href=" + settings_vars_foldername + @"/` + varnavn[i] + `.html style='text-decoration:none;'>` + varnavn[i] + `</a>`);
                             content.push(`<br>` + beskriv[i] + `<br><br>`);
                         } //endif
                     } //endif
@@ -9465,7 +9576,7 @@ namespace Gekko
                 if (tekst2.toUpperCase().indexOf(tekst.toUpperCase()) != -1)
                 {
                     fundet = true;
-                    content.push(`<b><a href=" + settings_subfolder2 + @"/` + varnavn[i] + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);                    
+                    content.push(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i] + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);                    
                     content.push(`<br>` + beskriv[i] + `<br><br>`);
                 } //endif
             } //endfor
@@ -18879,10 +18990,12 @@ namespace Gekko
             Program.model.m2.fromEqNumberToBNumber = Program.model.m2.fromEqNumberToBNumberFeedbackNEW;
             Program.model.m2.fromBNumberToEqNumber = Program.model.m2.fromBNumberToEqNumberFeedbackNEW;
 
+            //#ttsv: make failsafe version possible
             Object[] args = new Object[1];
             args[0] = Program.model.b;
             Program.model.m2.assemblyPrologueEpilogue.InvokeMember("prologue", BindingFlags.InvokeMethod, null, null, args);
 
+            //#ttsv: make failsafe version possible
             args = new Object[1];
             args[0] = Program.model.b;
             Program.model.m2.assemblyNewton.InvokeMember("simulPrologue", BindingFlags.InvokeMethod, null, null, args);
@@ -19830,7 +19943,7 @@ namespace Gekko
                 {
                     if (i != o.data.Length - 1)
                     {
-                        G.Writeln2("*** ERROR: You can only use 'REP *' on the last UPD item");
+                        G.Writeln2("*** ERROR: You can only use 'REP *' on the last SERIES item");
                         throw new GekkoException();
                     }
                     data2.Add(data);
@@ -28861,63 +28974,7 @@ namespace Gekko
             }
             return double.NaN;
         }
-
-        public static void SolveDfsane(double[] b, Type assembly)
-        {
-            //Does not seem very robust for solving: chokes on ADAM model...
-            double krit = Math.Pow(Program.options.solve_newton_conv_abs, 2);  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2
-            //Ehm, RSS is divided by 2 now!
-            int n = model.m2.fromEqNumberToBNumber.Length;
-
-            IElementalAccessVector residuals = new DenseVector(n);
-            IElementalAccessVector x0 = new DenseVector(n);
-
-            int numericalProblem = -12345;
-            do
-            {
-                //put all endogenous with no lag into x (vector of endogenous)
-                for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
-                {
-                    x0.SetValue(i, b[model.m2.fromEqNumberToBNumber[i]]);
-                }
-                residuals = new DenseVector(n);
-                numericalProblem = -12345;
-
-                //Globals.timer.Start("RSS");
-                double rss = rssFunction(out numericalProblem, residuals, x0, assembly);  //res are altered as a side-effect, x is unaltered - implicitly also calculates b array   //TODO: does this work with feedback?
-                //Globals.timer.Stop("RSS");
-
-                bool flag = false;
-                if (numericalProblem != -12345)
-                {
-                    if (!flag) G.Writeln("+++ WARNING: starting values cause numerical errors");
-                    flag = true;  //So we don't get the warning message more than once for each year
-                    if (Globals.disableStartingValuesFix == 1)
-                    {
-                        G.Writeln2("*** ERROR: simulation is aborted");
-                        return;
-                    }
-                    FixStartingValuesNumericalError(b, numericalProblem, assembly);
-                }
-            }
-            while (numericalProblem != -12345);
-
-            //residuals are altered as a side-effect, x is unaltered - implicitly also calculates b array
-
-            //Globals.timer.Start("RSS");
-            double rss0 = RSS(residuals, x0, assembly);
-            //Globals.timer.Stop("RSS");
-
-            double[] par = new double[n];
-            for (int i1 = 0; i1 < n; i1++)
-            {
-                par[i1] = x0.GetValue(i1);
-            }
-            DfsaneSolver.Solve(par, assembly);
-
-            //converged
-            //simulateResults[0] = 123;
-        }
+        
 
         //TODO: Not strict regarding use of b[] -- actually puts result into Program.model.b[] via RSS(). These are typically the same, but what if not
         public static void SolveNewtonAlgorithm(double[] b, Type assembly, NewtonAlgorithmHelper nah)
@@ -28962,43 +29019,45 @@ namespace Gekko
                     Globals.scaleNewtonValues = new double[n];
                 }
 
-
-
                 IElementalAccessVector residuals = new DenseVector(n);
                 IElementalAccessVector x0 = new DenseVector(n);
 
-                int numericalProblem = -12345;
-                do
+                if (false)
                 {
-                    //put all endogenous with no lag into x (vector of endogenous)
-                    for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
+                    //old starting value stuff
+                    int numericalProblem = -12345;
+                    do
                     {
-                        x0.SetValue(i, b[model.m2.fromEqNumberToBNumber[i]]);
-                    }
-                    residuals = new DenseVector(n);
-                    numericalProblem = -12345;
-
-                    double rss = rssFunction(out numericalProblem, residuals, x0, assembly);  //res are altered as a side-effect, x is unaltered - implicitly also calculates b array   //TODO: does this work with feedback?
-
-                    bool flag = false;
-                    if (numericalProblem != -12345)
-                    {
-                        if (!flag)
+                        //put all endogenous with no lag into x (vector of endogenous)
+                        for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
                         {
-                            G.Writeln("+++ WARNING: In period " + nah.t + " the starting values cause numerical errors");
+                            x0.SetValue(i, b[model.m2.fromEqNumberToBNumber[i]]);
                         }
-                        flag = true;  //So we don't get the warning message more than once for each year
-                        if (Globals.disableStartingValuesFix == 1)
-                        {
+                        residuals = new DenseVector(n);
+                        numericalProblem = -12345;
 
-                            G.Writeln2("*** ERROR simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " the Newton algorithm had starting value problems");
-                            G.Writeln("+++ NOTE: You may try feeding the problem to the Gauss algorithm -- has better error handling facilitites");
-                            throw new GekkoException();
+                        double rss = rssFunction(out numericalProblem, residuals, x0, assembly);  //res are altered as a side-effect, x is unaltered - implicitly also calculates b array   //TODO: does this work with feedback?
+
+                        bool flag = false;
+                        if (numericalProblem != -12345)
+                        {
+                            if (!flag)
+                            {
+                                G.Writeln("+++ WARNING: In period " + nah.t + " the starting values cause numerical errors");
+                            }
+                            flag = true;  //So we don't get the warning message more than once for each year
+                            if (Globals.disableStartingValuesFix == 1)
+                            {
+
+                                G.Writeln2("*** ERROR simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " the Newton algorithm had starting value problems");
+                                G.Writeln("+++ NOTE: You may try feeding the problem to the Gauss algorithm -- has better error handling facilitites");
+                                throw new GekkoException();
+                            }
+                            FixStartingValuesNumericalError(b, numericalProblem, assembly);
                         }
-                        FixStartingValuesNumericalError(b, numericalProblem, assembly);
                     }
+                    while (numericalProblem != -12345);
                 }
-                while (numericalProblem != -12345);
 
                 //residuals are altered as a side-effect, x is unaltered - implicitly also calculates b array
 
@@ -29007,12 +29066,12 @@ namespace Gekko
 
                 if (Globals.solveScaleNewton)
                 {
-                    for (int i = 0; i < residuals.Length; i++)
-                    {
-                        double res = Math.Abs(residuals.GetValue(i));
-                        if (res < 0.01d) Globals.scaleNewtonValues[i] = 1d;
-                        else Globals.scaleNewtonValues[i] = 1d / res;
-                    }
+                    //for (int i = 0; i < residuals.Length; i++)
+                    //{
+                    //    double res = Math.Abs(residuals.GetValue(i));
+                    //    if (res < 0.01d) Globals.scaleNewtonValues[i] = 1d;
+                    //    else Globals.scaleNewtonValues[i] = 1d / res;
+                    //}
                 }
 
                 if (Globals.emitRCode)
@@ -29029,6 +29088,7 @@ namespace Gekko
                 }
 
                 RSS(residuals, x0, assembly);  //residuals are by-product (b[] also altered)
+
                 double rss0 = RssNonScaled(residuals);
 
                 if (Program.options.solve_print_details) G.Writeln("SQRT(RSS) start = " + Math.Sqrt(rss0) + " #residuals = " + residuals.Length);
@@ -29081,37 +29141,40 @@ namespace Gekko
                         DateTime t0 = DateTime.Now;
                         Jacobi(x0, assembly);
 
-                        int e = 2; e = e - 1; if (e == 2)
+                        if (false)
                         {
-                            StreamWriter w = new StreamWriter("b:\\j.mtx");
-                            int nnn = Program.model.jacobiMatrixDense.GetLength(0);
-                            int xsum = 0;
-                            for (int i = 0; i < nnn; i++)
+                            int e = 2; e = e - 1; if (e == 2)
                             {
-                                for (int j = 0; j < nnn; j++)
+                                StreamWriter w = new StreamWriter("b:\\j.mtx");
+                                int nnn = Program.model.jacobiMatrixDense.GetLength(0);
+                                int xsum = 0;
+                                for (int i = 0; i < nnn; i++)
                                 {
-                                    double xx = Program.model.jacobiMatrixDense[i, j];
-                                    if (xx != 0d)
+                                    for (int j = 0; j < nnn; j++)
                                     {
-                                        xsum++;
+                                        double xx = Program.model.jacobiMatrixDense[i, j];
+                                        if (xx != 0d)
+                                        {
+                                            xsum++;
+                                        }
                                     }
                                 }
-                            }
-                            w.WriteLine("%%MatrixMarket matrix coordinate real general ");
-                            w.WriteLine(n + "   " + n + "   " + xsum);
-                            for (int i = 0; i < nnn; i++)
-                            {
-                                for (int j = 0; j < nnn; j++)
+                                w.WriteLine("%%MatrixMarket matrix coordinate real general ");
+                                w.WriteLine(n + "   " + n + "   " + xsum);
+                                for (int i = 0; i < nnn; i++)
                                 {
-                                    double xx = Program.model.jacobiMatrixDense[i, j];
-                                    if (xx != 0d)
+                                    for (int j = 0; j < nnn; j++)
                                     {
-                                        w.WriteLine((i + 1) + "   " + (j + 1) + "   " + xx);
+                                        double xx = Program.model.jacobiMatrixDense[i, j];
+                                        if (xx != 0d)
+                                        {
+                                            w.WriteLine((i + 1) + "   " + (j + 1) + "   " + xx);
+                                        }
                                     }
                                 }
+                                w.Flush();
+                                w.Close();
                             }
-                            w.Flush();
-                            w.Close();
                         }
 
                         if (Program.options.solve_print_details)
@@ -29910,38 +29973,56 @@ namespace Gekko
             int numericalProblem = -12345;
             double f = double.PositiveInfinity;
 
-            if (true)
+            double newtonStartingValuesFixExtra = 0d;
+            if (Globals.newtonStartingValuesFix)
             {
-                //This puts vector x (the feedback variables) into the corresponding b[] slots
-                for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
+                for (int i = 0; i < Globals.newtonStartingValuesHelper1; i++)
                 {
-                    model.b[model.m2.fromEqNumberToBNumber[i]] = x.GetValue(i);
+                    newtonStartingValuesFixExtra += Globals.newtonStartingValuesHelper2[i];
                 }
-                Object[] args = new Object[1];
-                args[0] = Program.model.b;
-                //This simulates the recursive part of the simultaneous block, where the right values (vector x)
-                //regarding the feedback variables are needed in b[]
-                assembly.InvokeMember("simulPrologue", BindingFlags.InvokeMethod, null, null, args);
+            }
+            if (newtonStartingValuesFixExtra < 0) throw new GekkoException();  //just an assert, delete at some point.
 
-                numericalProblem = -12345;
-                model.r = new double[model.m2.fromEqNumberToBNumber.Length];
-                SimulateResiduals(model.b, model.r, assembly);  //residuals in the feedback equations
-                //y er residualer, mens x er endogene
-                for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
-                {
-                    if (G.isNumericalError(model.r[i]))
-                    {
-                        numericalProblem = i;
-                    }
-                    residuals.SetValue(i, model.r[i]);
-                }
-                f = 0d;
-                for (int i = 0; i < residuals.Length; i++)
-                {
-                    double number = residuals.GetValue(i);
-                    f += number * number;
-                }
+            //This puts vector x (the feedback variables) into the corresponding b[] slots
+            for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
+            {
+                model.b[model.m2.fromEqNumberToBNumber[i]] = x.GetValue(i);
+            }
+            Object[] args = new Object[1];
+            args[0] = Program.model.b;
+            //This simulates the recursive part of the simultaneous block, where the right values (vector x)
+            //regarding the feedback variables are needed in b[]
+            assembly.InvokeMember("simulPrologue", BindingFlags.InvokeMethod, null, null, args);
 
+            numericalProblem = -12345;
+            model.r = new double[model.m2.fromEqNumberToBNumber.Length];
+            SimulateResiduals(model.b, model.r, assembly);  //residuals in the feedback equations
+                                                            //y er residualer, mens x er endogene
+            for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
+            {
+                if (G.isNumericalError(model.r[i]))
+                {
+                    numericalProblem = i;
+                }
+                residuals.SetValue(i, model.r[i]);
+            }
+
+            f = 0d;
+            for (int i = 0; i < residuals.Length; i++)
+            {
+                double number = residuals.GetValue(i);
+                if (Globals.newtonStartingValuesFix)
+                {
+                    //The error must accumulate, so if the residual is negative, something more is subtracted.
+                    if (number < 0) number += -newtonStartingValuesFixExtra;
+                    else number += newtonStartingValuesFixExtra;
+                }                
+                f += number * number;
+            }
+
+            if (Globals.newtonStartingValuesFix)
+            {
+                Globals.newtonStartingValuesHelper1 = 0;
             }
 
             return f;

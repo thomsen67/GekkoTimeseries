@@ -42,9 +42,16 @@ namespace Gekko
     {
         public static string versionInternal = "v14";  // "v14";
 
-        public static bool testFileChange = true;
+        //Newton starting values start ------------------------------------
+        public static bool newtonStartingValuesFix = true;
+        public static int newtonStartingValuesHelper1 = 0;
+        public static double[] newtonStartingValuesHelper2 = new double[1000];
+        public const double special_value1 = 0.1d;
+        public const double special_value2 = 1e6d;
+        public static int disableStartingValuesFix = 0;
+        //Newton starting values end --------------------------------------
 
-        //public static bool megaHackFix = true;
+        public static bool testFileChange = true;
 
         public static string extensionPlot = "gpt";
         public static string extensionCommand = "gcm";        
@@ -284,9 +291,8 @@ namespace Gekko
         public static string decompText2 = "[Decomp. error]";
         public static string decompText2a = "[Right hand side]";
         
-        public static int solveJacobiSparse = 0;
-        public static int disableStartingValuesFix = 1;
-
+        public static int solveJacobiSparse = 0;        
+        
         public static int solveNewtonSimpleBacktrack = 1;
         public static bool solveNewtonOnlyFeedback = false;  //should always be false
 

@@ -81,6 +81,56 @@ namespace Gekko
             }
         }
 
+        public static double Exp(double x)
+        {
+            return Math.Exp(x);
+        }
+
+        public static double Abs(double x)
+        {
+            return Math.Abs(x);
+        }
+
+        public static double Log(double x)
+        {
+            return Math.Log(x);
+        }
+
+        public static double Special_Log(double x)
+        {
+            if (x < 0)
+            {
+                double d = NewtonStartingValuesFixHelper1(x);
+                return Math.Log(d);
+            }
+            else return Math.Log(x);
+        }
+        
+        public static double Pow(double x1, double x2)
+        {            
+            return Math.Pow(x1, x2);
+        }
+
+        public static double Special_Pow(double x1, double x2)
+        {
+            if (x1 < 0)
+            {
+                double d = NewtonStartingValuesFixHelper1(x1);
+                return Math.Pow(d, x2);
+            }
+            else return Math.Pow(x1, x2);
+        }
+
+        private static double NewtonStartingValuesFixHelper1(double x)
+        {
+            double distance = -x + Globals.special_value1;
+            if (distance < 0) throw new GekkoException();  //just an assert, delete at some point
+            Globals.newtonStartingValuesHelper2[Globals.newtonStartingValuesHelper1] = distance;
+            Globals.newtonStartingValuesHelper1++;
+            double d = Globals.special_value1;
+            return d;
+        }
+
         public static IVariable Add(IVariable x, IVariable y, GekkoTime t)
         {
             return x.Add(y, t);

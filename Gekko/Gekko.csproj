@@ -185,7 +185,6 @@
       <DependentUpon>GuiDialogMakeShortcut.cs</DependentUpon>
     </Compile>
     <Compile Include="CrossThreadStuff.cs" />
-    <Compile Include="DfsaneSolver.cs" />
     <Compile Include="Genr.cs" />
     <Compile Include="GListBox.cs">
       <SubType>Component</SubType>

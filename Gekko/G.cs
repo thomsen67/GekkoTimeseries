@@ -359,6 +359,24 @@ namespace Gekko
             return varFormat(level1, 12);
         }
 
+        public static string RemoveComments(string input)
+        {
+            var blockComments = @"/\*(.*?)\*/";
+            var lineComments = @"//(.*?)\r?\n";
+            var strings = @"""((\\[^\n]|[^""\n])*)""";
+            var verbatimStrings = @"@(""[^""]*"")+";
+            string noComments = Regex.Replace(input,
+                blockComments + "|" + lineComments + "|" + strings + "|" + verbatimStrings,
+                me =>  {
+                    if (me.Value.StartsWith("/*") || me.Value.StartsWith("//"))
+                        return me.Value.StartsWith("//") ? Environment.NewLine : "";
+                    // Keep the literal strings
+                    return me.Value;
+                },
+                RegexOptions.Singleline);
+            return noComments;
+        }
+
         public static string Seconds(DateTime t0)
         {
             double milliseconds = (DateTime.Now - t0).TotalMilliseconds;
