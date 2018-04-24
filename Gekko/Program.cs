@@ -18995,10 +18995,12 @@ namespace Gekko
             args[0] = Program.model.b;
             Program.model.m2.assemblyPrologueEpilogue.InvokeMember("prologue", BindingFlags.InvokeMethod, null, null, args);
 
-            //#ttsv: make failsafe version possible
-            args = new Object[1];
-            args[0] = Program.model.b;
-            Program.model.m2.assemblyNewton.InvokeMember("simulPrologue", BindingFlags.InvokeMethod, null, null, args);
+            if (false)
+            {
+                args = new Object[1];
+                args[0] = Program.model.b;
+                Program.model.m2.assemblyNewton.InvokeMember("simulPrologue", BindingFlags.InvokeMethod, null, null, args);
+            }
 
             Program.SolveNewtonAlgorithm(Program.model.b, Program.model.m2.assemblyNewton, nah);
 
@@ -29058,6 +29060,14 @@ namespace Gekko
                     }
                     while (numericalProblem != -12345);
                 }
+                else
+                {
+                    //initializing 
+                    for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
+                    {
+                        x0.SetValue(i, model.b[model.m2.fromEqNumberToBNumber[i]]);
+                    }
+                }
 
                 //residuals are altered as a side-effect, x is unaltered - implicitly also calculates b array
 
@@ -29087,10 +29097,28 @@ namespace Gekko
                     //}
                 }
 
+                double[] slet = model.b;
+
                 RSS(residuals, x0, assembly);  //residuals are by-product (b[] also altered)
 
-                double rss0 = RssNonScaled(residuals);
+                if (true)
+                {
+                    //hack here
+                    for (int i = 0; i < residuals.Length; i++)
+                    {
+                        double number = residuals.GetValue(i);
+                        if (double.IsNaN(number))
+                        {
+                            //we will accept infinity, for instance 1/0
+                            G.Writeln2("*** ERROR simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " the Newton algorithm had starting value problems");
+                            G.Writeln("+++ NOTE: You may try 'OPTION solve failsafe = yes;' to handle this problem.");
+                            throw new GekkoException();
+                        }
+                    }
+                }
 
+                double rss0 = RssNonScaled(residuals);
+                                
                 if (Program.options.solve_print_details) G.Writeln("SQRT(RSS) start = " + Math.Sqrt(rss0) + " #residuals = " + residuals.Length);
 
                 double[] residualsArray = new double[residuals.Length];
@@ -29179,8 +29207,8 @@ namespace Gekko
 
                         if (Program.options.solve_print_details)
                         {
-                            if (Globals.runningOnTTComputer) G.Writeln("New " + residuals.Length + " Jacobi matrix constructed:" + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds", Color.Orange);
-                            else G.Writeln("New Jacobi " + residuals.Length + " matrix constructed:" + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds");
+                            if (Globals.runningOnTTComputer) G.Writeln("New " + residuals.Length + "x" + residuals.Length + " Jacobi matrix constructed: " + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds", Color.Orange);
+                            else G.Writeln("New Jacobi " + residuals.Length + "x" + residuals.Length + " matrix constructed: " + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds");
                         }
 
                         IElementalAccessVector dx = new DenseVector(n);
@@ -29189,8 +29217,8 @@ namespace Gekko
                         bool ok = InvertMatrix(residuals, dx);  //jacobyMatrix is also used
                         if (Program.options.solve_print_details)
                         {
-                            if (Globals.runningOnTTComputer) G.Writeln("Jacobi " + residuals.Length + " matrix inverted: " + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds", Color.Orange);
-                            else G.Writeln("Jacobi " + residuals.Length + " matrix inverted: " + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds");
+                            if (Globals.runningOnTTComputer) G.Writeln("Jacobi " + residuals.Length + "x" + residuals.Length + " matrix inverted: " + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds", Color.Orange);
+                            else G.Writeln("Jacobi " + residuals.Length + "x" + residuals.Length + " matrix inverted: " + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds");
                         }
 
                         if (ok == false)
@@ -29769,8 +29797,6 @@ namespace Gekko
                 G.Writeln("---> " + model.varsBTypeInverted[Program.model.m2.fromEqNumberToBNumberFeedbackNEW[maxI]]);
             }
 
-
-
             if (double.IsNaN(rssNonScaled)) rssNonScaled = double.MaxValue;  //should count as being worse than anything
             return rssNonScaled;
         }
@@ -29968,21 +29994,11 @@ namespace Gekko
             return a;
         }
 
-        private static double RSS(IElementalAccessVector residuals, IElementalAccessVector x, Type assembly)
+        private static void RSS(IElementalAccessVector residuals, IElementalAccessVector x, Type assembly)
         {
             int numericalProblem = -12345;
-            double f = double.PositiveInfinity;
-
-            double newtonStartingValuesFixExtra = 0d;
-            if (Globals.newtonStartingValuesFix)
-            {
-                for (int i = 0; i < Globals.newtonStartingValuesHelper1; i++)
-                {
-                    newtonStartingValuesFixExtra += Globals.newtonStartingValuesHelper2[i];
-                }
-            }
-            if (newtonStartingValuesFixExtra < 0) throw new GekkoException();  //just an assert, delete at some point.
-
+            //double f = double.PositiveInfinity;
+            
             //This puts vector x (the feedback variables) into the corresponding b[] slots
             for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
             {
@@ -29992,12 +30008,37 @@ namespace Gekko
             args[0] = Program.model.b;
             //This simulates the recursive part of the simultaneous block, where the right values (vector x)
             //regarding the feedback variables are needed in b[]
+
+            if (Globals.newtonStartingValuesFix)
+            {
+                //preparing to call simulPrologue and simulFeedbackAll
+                Globals.newtonStartingValuesHelper1 = 0;
+            }
+
             assembly.InvokeMember("simulPrologue", BindingFlags.InvokeMethod, null, null, args);
 
             numericalProblem = -12345;
             model.r = new double[model.m2.fromEqNumberToBNumber.Length];
             SimulateResiduals(model.b, model.r, assembly);  //residuals in the feedback equations
                                                             //y er residualer, mens x er endogene
+
+            if (Globals.runningOnTTComputer)
+            {
+                G.Writeln2("==========> " + model.b[1] + ", " + model.b[6]);
+            }
+
+            double newtonStartingValuesFixExtra = 0d;
+            if (Globals.newtonStartingValuesFix)
+            {
+                //G.Writeln2("Newton starting values:");
+                for (int i = 0; i < Globals.newtonStartingValuesHelper1; i++)
+                {
+                    newtonStartingValuesFixExtra += Globals.newtonStartingValuesHelper2[i];
+                    //G.Writeln2(i + " " + Globals.newtonStartingValuesHelper2[i]);
+                }
+            }
+            if (newtonStartingValuesFixExtra < 0) throw new GekkoException();  //just an assert, delete at some point.
+
             for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
             {
                 if (G.isNumericalError(model.r[i]))
@@ -30007,25 +30048,37 @@ namespace Gekko
                 residuals.SetValue(i, model.r[i]);
             }
 
-            f = 0d;
-            for (int i = 0; i < residuals.Length; i++)
+            if (Globals.newtonStartingValuesFix)
             {
-                double number = residuals.GetValue(i);
-                if (Globals.newtonStartingValuesFix)
+                //f = 0d;
+                for (int i = 0; i < residuals.Length; i++)
                 {
+                    double number = residuals.GetValue(i);
+                    //double number0 = number;
+
                     //The error must accumulate, so if the residual is negative, something more is subtracted.
-                    if (number < 0) number += -newtonStartingValuesFixExtra;
-                    else number += newtonStartingValuesFixExtra;
-                }                
-                f += number * number;
+                    if (number < 0)
+                    {
+                        residuals.SetValue(i, residuals.GetValue(i) - newtonStartingValuesFixExtra);
+                    }
+                    else
+                    {
+                        residuals.SetValue(i, residuals.GetValue(i) + newtonStartingValuesFixExtra);
+                    }
+
+                    //if (number * number < number0 * number0) throw new GekkoException(); //assert
+                    //f += number * number;                
+                }
             }
 
             if (Globals.newtonStartingValuesFix)
             {
-                Globals.newtonStartingValuesHelper1 = 0;
+                //do not record more
+                Globals.newtonStartingValuesHelper1 = -12345;
             }
 
-            return f;
+
+            //return f;
         }
 
         private static void FixStartingValuesNumericalError(double[] b, int numericalProblem, Type assembly)
@@ -30691,6 +30744,7 @@ namespace Gekko
                 counter++;
                 int eq_j = model.m2.fromBNumberToEqNumberFeedbackNEW[j];
                 model.b[j] += delta;
+
 
                 assembly.InvokeMember("simulPrologue", BindingFlags.InvokeMethod, null, null, new Object[] { model.b });
                 SimulateResiduals(model.b, model.r, assembly);

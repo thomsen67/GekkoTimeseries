@@ -114,7 +114,7 @@ namespace Gekko
         public static double Special_Pow(double x1, double x2)
         {
             if (x1 < 0)
-            {
+            {                
                 double d = NewtonStartingValuesFixHelper1(x1);
                 return Math.Pow(d, x2);
             }
@@ -123,11 +123,20 @@ namespace Gekko
 
         private static double NewtonStartingValuesFixHelper1(double x)
         {
+            if (Globals.newtonStartingValuesHelper1 == -12345) return x;
+
             double distance = -x + Globals.special_value1;
             if (distance < 0) throw new GekkoException();  //just an assert, delete at some point
             Globals.newtonStartingValuesHelper2[Globals.newtonStartingValuesHelper1] = distance;
+
+            if (Globals.runningOnTTComputer)
+            {
+                G.Writeln("==========================================> Distance (" + Globals.newtonStartingValuesHelper1 + "): " + distance, Color.DarkMagenta);
+            }
+
             Globals.newtonStartingValuesHelper1++;
-            double d = Globals.special_value1;
+            double d = Globals.special_value1;            
+
             return d;
         }
 
