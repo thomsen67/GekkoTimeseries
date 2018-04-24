@@ -28947,36 +28947,7 @@ namespace Gekko
                 }
             }
             return;
-        }
-
-        //res is altered as a side-effect, and b array too. But x is unaltered.
-        public static double rssFunction(out int numericalProblem, IElementalAccessVector res, IElementalAccessVector x, Type assembly)
-        {
-            numericalProblem = runModel(res, x, assembly);  //res is residuals, implicitly also calculates b array
-            double rss = Blas.Default.Dot(res, res);
-            return rss;
-        }
-
-        //res is altered as a side-effect, and b array too. But x is unaltered.
-        public static double rssFunction2(out int numericalProblem, double[] res, double[] x, Type assembly)
-        {
-            int n = res.Length;
-            IElementalAccessVector x2 = new DenseVector(res.Length);
-            IElementalAccessVector res2 = new DenseVector(n);
-            for (int i1 = 0; i1 < n; i1++)
-            {
-                res2.SetValue(i1, res[i1]);
-                x2.SetValue(i1, x[i1]);
-            }
-            numericalProblem = runModel(res2, x2, assembly);  //res is residuals, implicitly also calculates b array
-            for (int i1 = 0; i1 < n; i1++)
-            {
-                res[i1] = res2.GetValue(i1);
-                //x[i1]=x2.GetValue(i1);  //unaltered
-            }
-            return double.NaN;
-        }
-        
+        }        
 
         //TODO: Not strict regarding use of b[] -- actually puts result into Program.model.b[] via RSS(). These are typically the same, but what if not
         public static void SolveNewtonAlgorithm(double[] b, Type assembly, NewtonAlgorithmHelper nah)
@@ -29016,87 +28987,14 @@ namespace Gekko
                 //Ehm, RSS is divided by 2 now!
                 int n = model.m2.fromEqNumberToBNumber.Length;
 
-                if (Globals.solveScaleNewton)
-                {
-                    Globals.scaleNewtonValues = new double[n];
-                }
-
                 IElementalAccessVector residuals = new DenseVector(n);
                 IElementalAccessVector x0 = new DenseVector(n);
-
-                if (false)
-                {
-                    //old starting value stuff
-                    int numericalProblem = -12345;
-                    do
-                    {
-                        //put all endogenous with no lag into x (vector of endogenous)
-                        for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
-                        {
-                            x0.SetValue(i, b[model.m2.fromEqNumberToBNumber[i]]);
-                        }
-                        residuals = new DenseVector(n);
-                        numericalProblem = -12345;
-
-                        double rss = rssFunction(out numericalProblem, residuals, x0, assembly);  //res are altered as a side-effect, x is unaltered - implicitly also calculates b array   //TODO: does this work with feedback?
-
-                        bool flag = false;
-                        if (numericalProblem != -12345)
-                        {
-                            if (!flag)
-                            {
-                                G.Writeln("+++ WARNING: In period " + nah.t + " the starting values cause numerical errors");
-                            }
-                            flag = true;  //So we don't get the warning message more than once for each year
-                            if (Globals.disableStartingValuesFix == 1)
-                            {
-
-                                G.Writeln2("*** ERROR simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " the Newton algorithm had starting value problems");
-                                G.Writeln("+++ NOTE: You may try feeding the problem to the Gauss algorithm -- has better error handling facilitites");
-                                throw new GekkoException();
-                            }
-                            FixStartingValuesNumericalError(b, numericalProblem, assembly);
-                        }
-                    }
-                    while (numericalProblem != -12345);
-                }
-                else
-                {
-                    //initializing 
-                    for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
-                    {
-                        x0.SetValue(i, model.b[model.m2.fromEqNumberToBNumber[i]]);
-                    }
-                }
-
+                
                 //residuals are altered as a side-effect, x is unaltered - implicitly also calculates b array
 
                 IElementalAccessVector residualsBase = new DenseVector(residuals.Length);
                 Blas.Default.Copy(residuals, residualsBase);
-
-                if (Globals.solveScaleNewton)
-                {
-                    //for (int i = 0; i < residuals.Length; i++)
-                    //{
-                    //    double res = Math.Abs(residuals.GetValue(i));
-                    //    if (res < 0.01d) Globals.scaleNewtonValues[i] = 1d;
-                    //    else Globals.scaleNewtonValues[i] = 1d / res;
-                    //}
-                }
-
-                if (Globals.emitRCode)
-                {
-                    //using (FileStream fs=WaitForFileStream(Globals.localTempFilesLocation + "\\" + "R1.r",GekkoFileReadOrWrite.Write))
-                    //using (StreamWriter res2 = new StreamWriter(fs)  <<<<< should append here
-                    //{
-                    //    res2.WriteLine("scale <- rep(NA," + Program.model.fromEqNumberToBNumberFeedbackNEW.Length + ")");
-                    //    for (int i = 0; i < Program.model.fromEqNumberToBNumberFeedbackNEW.Length; i++)
-                    //    {
-                    //        res2.WriteLine("scale[" + (i + 1) + "] <- " + Globals.scaleNewtonValues[i]);
-                    //    }
-                    //}
-                }
-
+                
                 double[] slet = model.b;
 
                 RSS(residuals, x0, assembly);  //residuals are by-product (b[] also altered)
@@ -29572,191 +29470,7 @@ namespace Gekko
                 //s.WriteLine("evals;");
                 //s.Execute();
             }
-
-
-
-
-
-        }
-
-        //TODO: Not strict regarding use of b[] -- actually puts result into Program.model.b[] via RSS(). These are typically the same, but what if not
-        public static void LinearizeOLD_DELETE_AT_SOME_POINT()
-        {
-
-            ParserOLD.OrderAndCompileModel(ECompiledModelType.Newton, false, false);
-            Type assembly = GetAssemblyFromModelType(ECompiledModelType.Newton);
-
-
-            int n = model.m2.fromEqNumberToBNumberFeedbackNEW.Length;
-            double delta = Globals.jacobiDeltaProbe;
-
-            ////no, simulPrologue is recursive set, but it should be empty anyway...
-            assembly.InvokeMember("simulPrologue", BindingFlags.InvokeMethod, null, null, new Object[] { model.b });
-            model.r = new double[model.b.Length];
-            SimulateResiduals(model.b, model.r, assembly);
-
-            double[] bOriginal = new double[model.b.Length];
-            Array.Copy(model.b, bOriginal, model.b.Length);
-            double[] rOriginal = new double[model.r.Length];
-            Array.Copy(model.r, rOriginal, model.r.Length);
-
-            double[,] e = new double[n, n];
-
-            int counter = -1;
-            foreach (int j in model.m2.fromEqNumberToBNumberFeedbackNEW)
-            {
-                //G.Writeln(counter + "  " + j);
-                counter++;
-                int eq_j = model.m2.fromBNumberToEqNumberFeedbackNEW[j];
-                model.b[j] += delta;
-
-                ////no, simulPrologue is recursive set, but it should be empty anyway...
-                assembly.InvokeMember("simulPrologue", BindingFlags.InvokeMethod, null, null, new Object[] { model.b });
-                SimulateResiduals(model.b, model.r, assembly);
-
-                foreach (int i in model.m2.fromEqNumberToBNumberFeedbackNEW)
-                {
-                    int eq_i = model.m2.fromBNumberToEqNumberFeedbackNEW[i];
-                    double grad = (model.r[eq_i] - rOriginal[eq_i]) / delta;
-                    double grad2;
-                    if (eq_i == eq_j) grad2 = 1d - grad;
-                    else grad2 = -grad;
-                    //G.Writeln((i) + "," + (j) + "  " + grad2);
-                    e[eq_i, eq_j] = grad2;
-
-                }
-
-                Array.Copy(bOriginal, model.b, model.b.Length);
-                Array.Copy(rOriginal, model.r, model.r.Length);
-            }
-
-            double[,] f = new double[n, n];
-            double[] w = G.CreateArrayDouble(n, Program.options.solve_gauss_damp);
-
-
-            //FIXFIXFIX
-            //FIXFIXFIX
-            double[] b = new double[] { .12, .13, .14 };
-            b = new double[n];
-            //FIXFIXFIX
-            //FIXFIXFIX
-
-
-            bool gekkoWay = true;
-
-            for (int i = 0; i < n; i++)
-            {
-                //rows
-                for (int j = 0; j < n; j++)
-                {
-                    if (!gekkoWay)
-                    {
-                        //if (i < j)
-                        //{
-                        //    //upper
-                        //    f[i, j] = e[i, j];
-                        //}
-                        //else if (i > j)
-                        //{
-                        //    //lower
-                        //    double xx = e[i, j];
-                        //    double sum = 0d;
-                        //    for (int k = 0; k < n; k++)
-                        //    {
-                        //        double yy = xx * f[j, k];
-                        //        sum += yy;
-                        //    }
-                        //    f[i, j] = sum;
-                        //}
-                        //else if (i == j)
-                        //{
-                        //    //diagonal
-                        //    if (w[i] != 1d)
-                        //    {
-                        //        f[i, j] = 1d - w[i] + w[i] * e[i, j];
-                        //    }
-                        //    else
-                        //    {
-                        //        f[i, j] = e[i, j];
-                        //    }
-                        //}
-
-                    }
-                    else
-                    {
-                        if (i < j)
-                        {
-                            //upper
-                            f[i, j] += e[i, j];
-                        }
-                        else if (i > j)
-                        {
-                            //lower
-                            double eij = e[i, j];
-                            if (eij != 0d)
-                            {
-                                for (int k = 0; k < n; k++)
-                                {
-                                    f[i, k] += eij * f[j, k];
-                                }
-                                b[i] += eij * b[j];
-                            }
-                        }
-                        else if (i == j)
-                        {
-                            //diagonal
-                            f[i, j] += e[i, j];
-                        }
-                    }
-                }
-            }
-
-            //if (gekkoWay)
-            //{
-
-            //    for (int i = 0; i < n; i++)
-            //    {
-            //        for (int j = 0; j < n; j++)
-            //        {
-            //            f[i, j] = w[i] * f[i, j];
-            //        }
-            //        f[i, i] = f[i, i] + (1 - w[i]);
-            //    }
-            //}
-
-            if (n < 10)
-            {
-                for (int i = 0; i < n; i++)
-                {
-                    for (int j = 0; j < n; j++)
-                    {
-                        G.Write(f[i, j] + " ");
-                    }
-                    G.Write("   " + b[i]);
-                    G.Writeln();
-                }
-                G.Writeln();
-            }
-
-            //double[] lambda = new double[n];
-            //double[] lambdai = new double[n];
-            //double[,] vl = new double[n, n];
-            //double[,] vr = new double[n, n];
-            //G.Writeln("Start finding eigen values");
-            ////Globals.deleteMe = f;
-            //bool ok = alglib.nsevd.rmatrixevd(f, n, 0, ref lambda, ref lambdai, ref vl, ref vr);
-            //G.Writeln("OK " + ok);
-            //double largest = 0d;
-            //for (int i = 0; i < lambda.Length; i++)
-            //{
-            //    double modulus = Math.Sqrt(lambda[i] * lambda[i] + lambdai[i] * lambdai[i]);
-            //    G.Writeln(G.levelFormat(modulus, 10) + " " + G.levelFormat(lambda[i], 10) + " " + G.levelFormat(lambdai[i], 10));
-            //    largest = Math.Max(largest, modulus);
-            //}
-            //G.Writeln("LARGEST LAMBDA = " + largest);
-            //G.Writeln();
-
-        }
+        }        
 
         private static void AbortNewtonAlgorithm(NewtonAlgorithmHelper nah, bool printError)
         {
@@ -29998,47 +29712,29 @@ namespace Gekko
         {
             int numericalProblem = -12345;
             //double f = double.PositiveInfinity;
-            
+
             //This puts vector x (the feedback variables) into the corresponding b[] slots
             for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
             {
                 model.b[model.m2.fromEqNumberToBNumber[i]] = x.GetValue(i);
             }
-            Object[] args = new Object[1];
-            args[0] = Program.model.b;
+
             //This simulates the recursive part of the simultaneous block, where the right values (vector x)
             //regarding the feedback variables are needed in b[]
 
-            if (Globals.newtonStartingValuesFix)
-            {
-                //preparing to call simulPrologue and simulFeedbackAll
-                Globals.newtonStartingValuesHelper1 = 0;
-            }
-
-            assembly.InvokeMember("simulPrologue", BindingFlags.InvokeMethod, null, null, args);
-
             numericalProblem = -12345;
             model.r = new double[model.m2.fromEqNumberToBNumber.Length];
-            SimulateResiduals(model.b, model.r, assembly);  //residuals in the feedback equations
-                                                            //y er residualer, mens x er endogene
+
+            //Keep SimulateSimulPrologue() and SimulateResiduals() together
+            SimulateSimulPrologue(assembly);            
+            SimulateResiduals(model.b, model.r, assembly);  
 
             if (Globals.runningOnTTComputer)
             {
                 G.Writeln2("==========> " + model.b[1] + ", " + model.b[6]);
             }
 
-            double newtonStartingValuesFixExtra = 0d;
-            if (Globals.newtonStartingValuesFix)
-            {
-                //G.Writeln2("Newton starting values:");
-                for (int i = 0; i < Globals.newtonStartingValuesHelper1; i++)
-                {
-                    newtonStartingValuesFixExtra += Globals.newtonStartingValuesHelper2[i];
-                    //G.Writeln2(i + " " + Globals.newtonStartingValuesHelper2[i]);
-                }
-            }
-            if (newtonStartingValuesFixExtra < 0) throw new GekkoException();  //just an assert, delete at some point.
-
+            
             for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
             {
                 if (G.isNumericalError(model.r[i]))
@@ -30046,39 +29742,20 @@ namespace Gekko
                     numericalProblem = i;
                 }
                 residuals.SetValue(i, model.r[i]);
-            }
-
-            if (Globals.newtonStartingValuesFix)
-            {
-                //f = 0d;
-                for (int i = 0; i < residuals.Length; i++)
-                {
-                    double number = residuals.GetValue(i);
-                    //double number0 = number;
-
-                    //The error must accumulate, so if the residual is negative, something more is subtracted.
-                    if (number < 0)
-                    {
-                        residuals.SetValue(i, residuals.GetValue(i) - newtonStartingValuesFixExtra);
-                    }
-                    else
-                    {
-                        residuals.SetValue(i, residuals.GetValue(i) + newtonStartingValuesFixExtra);
-                    }
-
-                    //if (number * number < number0 * number0) throw new GekkoException(); //assert
-                    //f += number * number;                
-                }
-            }
-
-            if (Globals.newtonStartingValuesFix)
-            {
-                //do not record more
-                Globals.newtonStartingValuesHelper1 = -12345;
-            }
-
+            }            
+            
 
             //return f;
+        }
+
+        private static void SimulateSimulPrologue(Type assembly)
+        {
+            if (Globals.newtonStartingValuesFix)
+            {
+                //preparing to call simulPrologue and simulFeedbackAll
+                Globals.newtonStartingValuesHelper1 = 0;
+            }
+            assembly.InvokeMember("simulPrologue", BindingFlags.InvokeMethod, null, null, new Object[] { model.b });
         }
 
         private static void FixStartingValuesNumericalError(double[] b, int numericalProblem, Type assembly)
@@ -30670,6 +30347,41 @@ namespace Gekko
             args[1] = r;
             args[2] = Globals.scaleNewtonValues;
             assembly.InvokeMember("simulFeedbackAll", BindingFlags.InvokeMethod, null, null, args);
+            
+            if (Globals.newtonStartingValuesFix)
+            {
+                double newtonStartingValuesFixExtra = 0d;
+                for (int i = 0; i < Globals.newtonStartingValuesHelper1; i++)
+                {
+                    newtonStartingValuesFixExtra += Globals.newtonStartingValuesHelper2[i];
+                    //G.Writeln2(i + " " + Globals.newtonStartingValuesHelper2[i]);
+                }
+                for (int i = 0; i < r.Length; i++)
+                {
+                    double number = r[i];
+                    //double number0 = number;
+
+                    //The error must accumulate, so if the residual is negative, something more is subtracted.
+                    if (number < 0)
+                    {
+                        r[i] += -newtonStartingValuesFixExtra;
+                    }
+                    else
+                    {
+                        r[i] += newtonStartingValuesFixExtra;                        
+                    }
+
+                    //if (number * number < number0 * number0) throw new GekkoException(); //assert
+                    //f += number * number;                
+                }
+            }
+
+            if (Globals.newtonStartingValuesFix)
+            {
+                //do not record more
+                Globals.newtonStartingValuesHelper1 = -12345;
+            }
+
             return;
         }
 
@@ -30684,32 +30396,6 @@ namespace Gekko
             return;
         }
 
-
-        //The model's residuals (y) depend upon the values of the endogenous (x),
-        //for each year simulated (same number of y and x).
-        public static int runModel(IElementalAccessVector y, IElementalAccessVector x, Type assembly)
-        {
-            int numericalProblem = -12345;
-            //y er residualer, mens x er endogene
-            for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
-            {
-                model.b[model.m2.fromEqNumberToBNumber[i]] = x.GetValue(i);
-            }
-
-            model.r = new double[model.m2.fromEqNumberToBNumber.Length];
-            SimulateResiduals(model.b, model.r, assembly);
-
-            //y er residualer, mens x er endogene
-            for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
-            {
-                if (G.isNumericalError(model.r[i]))
-                {
-                    numericalProblem = i;
-                }
-                y.SetValue(i, model.r[i]);
-            }
-            return numericalProblem;  //problem identifies if there is an inf or NaN (-12345 means no problem)
-        }
 
         public static void Jacobi(IElementalAccessVector x, Type assembly)
         {
@@ -30730,7 +30416,8 @@ namespace Gekko
                 Program.model.jacobiMatrix = new SparseRowMatrix(n, n, 5);  //seems faster
             }
 
-            assembly.InvokeMember("simulPrologue", BindingFlags.InvokeMethod, null, null, new Object[] { model.b });
+            //Keep SimulateSimulPrologue() and SimulateResiduals() together
+            SimulateSimulPrologue(assembly);
             SimulateResiduals(model.b, model.r, assembly);
 
             double[] bOriginal = new double[model.b.Length];
@@ -30745,8 +30432,8 @@ namespace Gekko
                 int eq_j = model.m2.fromBNumberToEqNumberFeedbackNEW[j];
                 model.b[j] += delta;
 
-
-                assembly.InvokeMember("simulPrologue", BindingFlags.InvokeMethod, null, null, new Object[] { model.b });
+                //Keep SimulateSimulPrologue() and SimulateResiduals() together
+                SimulateSimulPrologue(assembly);
                 SimulateResiduals(model.b, model.r, assembly);
 
                 foreach (int i in model.m2.fromEqNumberToBNumberFeedbackNEW)

@@ -218,8 +218,7 @@ namespace Gekko
         public static bool useNewRTFVersionForHelpTab = false; //handles links inside rtf files. but a bit unstable.        
 
         public static double[] scaleNewtonValues = new double[0];
-        public static bool emitRCode = false;
-
+        
         public static int freezeDecompRows = 1;
         public static int freezeDecompCols = 1;
         public static int guiTableCellWidth = 100;

@@ -101,14 +101,15 @@ namespace Gekko
             if (x < 0)
             {
                 double d = NewtonStartingValuesFixHelper1(x);
-                return Math.Log(d);
+                return O.Log(d);
             }
-            else return Math.Log(x);
+            else return O.Log(x);
         }
         
         public static double Pow(double x1, double x2)
-        {            
-            return Math.Pow(x1, x2);
+        {
+            //special treatment of x^2
+            return x2 == 2d ? x1 * x1 : Math.Pow(x1, x2);
         }
 
         public static double Special_Pow(double x1, double x2)
@@ -116,9 +117,9 @@ namespace Gekko
             if (x1 < 0)
             {                
                 double d = NewtonStartingValuesFixHelper1(x1);
-                return Math.Pow(d, x2);
+                return O.Pow(d, x2);
             }
-            else return Math.Pow(x1, x2);
+            else return O.Pow(x1, x2);
         }
 
         private static double NewtonStartingValuesFixHelper1(double x)
