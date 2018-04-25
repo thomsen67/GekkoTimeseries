@@ -46,9 +46,7 @@ namespace Gekko
         public static bool newtonStartingValuesFix = true;
         public static int newtonStartingValuesHelper1 = -12345;
         public static double[] newtonStartingValuesHelper2 = new double[1000];
-        public const double special_value1 = 1.0d;
-        public const double special_value2 = 1e6d;
-        public static int disableStartingValuesFix = 0;
+        public const double special_value1 = 0.000001d;                
         //Newton starting values end --------------------------------------
 
         public static bool testFileChange = true;

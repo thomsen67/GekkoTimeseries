@@ -3922,7 +3922,7 @@ namespace UnitTests
         {
             I("RESET;");
             I("SYS 'di'+'r';");  //SYS 'dir' is ok
-            FAIL("SYS 'di'+'rr';");
+            I("SYS 'di'+'rr';");  //fails with a warning now.
         }
 
         [TestMethod]

@@ -5531,11 +5531,11 @@ namespace Gekko
             for (int i6 = 0; i6 < int.MaxValue; i6++)
             {
                 FindDiagonal(rowsIndexes, columnsIndexes, model.m2.simulFeedback);
-                if (!Globals.solveNewtonOnlyFeedback) FindRecursive(rowsIndexes, columnsIndexes, simulRecursive);
+                if (!(Globals.solveNewtonOnlyFeedback && Globals.runningOnTTComputer)) FindRecursive(rowsIndexes, columnsIndexes, simulRecursive);
 
                 //this one is good:
                 //These are simple equations with 1 var on right-hand side
-                if (!Globals.solveNewtonOnlyFeedback) FindRowsWithSum1(rowsIndexes, columnsIndexes, simulRecursive);
+                if (!(Globals.solveNewtonOnlyFeedback && Globals.runningOnTTComputer)) FindRowsWithSum1(rowsIndexes, columnsIndexes, simulRecursive);
 
 
                 //this one is bad:
@@ -5560,7 +5560,7 @@ namespace Gekko
                 if (!flag) break;
             }
 
-            if (Globals.solveNewtonOnlyFeedback)
+            if (!(Globals.solveNewtonOnlyFeedback && Globals.runningOnTTComputer))
             {
                 Program.model.m2.simulFeedback.Sort();  //easier comparable to gauss-seidel inner loop
             }
@@ -12798,14 +12798,7 @@ namespace Gekko
                     return "";
                 }
 
-                if (s2.Length == 5)
-                {
-                    if (G.equal(s2, "eigen"))
-                    {
-                        Eigen();
-                        return "";  //no need for the parser to chew on this afterwards!
-                    }
-                }
+              
 
 
                 if (s2.Length == 5)
@@ -16525,17 +16518,7 @@ namespace Gekko
                 Globals.fastGauss = fastGaussRemember;
             }
         }
-
-        public static void Eigen()
-        {
-            //Globals.fastGauss = false;  //never for RES, problem is that prologue and epilogue eqs feed into each other
-            SimOptions so = new SimOptions();
-            so.isEigen = true;
-            so.method = "gauss";
-            GekkoTime tStart = Globals.globalPeriodStart;
-            GekkoTime tEnd = Globals.globalPeriodEnd;
-            Program.SimFast(tStart, tEnd, so);
-        }
+              
 
         public static void Trimvars()
         {
@@ -17536,37 +17519,20 @@ namespace Gekko
                             }
                             else if (modelType == ECompiledModelType.Gauss || modelType == ECompiledModelType.GaussFailSafe)
                             {
-                                if (so.isEigen)
+
+                                if (IsStacked())
                                 {
-                                    if (true)
-                                    {
-                                        Linearize(isDampedPointers);
-                                    }
-                                    else
-                                    {
-                                        Globals.solveNewtonOnlyFeedback = true;
-                                        LinearizeOLD_DELETE_AT_SOME_POINT();
-                                        Globals.solveNewtonOnlyFeedback = false;
-                                        Program.model = null;  //safety
-                                    }
-                                    throw new GekkoException();  //use the return below instead of the exception!
-                                    //return;  //do not try to write anything back to databanks etc. We should be able to simulate after an eigenvalue analysis.
+                                    G.Writeln2("*** ERROR: You cannot use option 'forward method = stacked' together with the Gauss algorithm");
+                                    throw new GekkoException();
                                 }
-                                else
+                                if (so.isFix && hasEndoExo)
                                 {
-                                    if (IsStacked())
-                                    {
-                                        G.Writeln2("*** ERROR: You cannot use option 'forward method = stacked' together with the Gauss algorithm");
-                                        throw new GekkoException();
-                                    }
-                                    if (so.isFix && hasEndoExo)
-                                    {
-                                        //This should never happen
-                                        G.Writeln2("*** ERROR: Trying to solve SIM<fix> with Gauss Seidel");
-                                        throw new GekkoException();
-                                    }
-                                    SolveGauss(usingFairTaylor || usingNewtonFairTaylor, Program.model.b, isDampedPointers, isDampedPointersArray, out culprit, modelType, t, checkoff);
+                                    //This should never happen
+                                    G.Writeln2("*** ERROR: Trying to solve SIM<fix> with Gauss Seidel");
+                                    throw new GekkoException();
                                 }
+                                SolveGauss(usingFairTaylor || usingNewtonFairTaylor, Program.model.b, isDampedPointers, isDampedPointersArray, out culprit, modelType, t, checkoff);
+
                             }
                             else if (modelType == ECompiledModelType.Newton)
                             {
@@ -28989,15 +28955,15 @@ namespace Gekko
 
                 IElementalAccessVector residuals = new DenseVector(n);
                 IElementalAccessVector x0 = new DenseVector(n);
-                
-                //residuals are altered as a side-effect, x is unaltered - implicitly also calculates b array
-
+                for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
+                {
+                    x0.SetValue(i, b[model.m2.fromEqNumberToBNumber[i]]);
+                }
+                RSS(residuals, x0, assembly);  //residuals are by-product (b[] also altered)
                 IElementalAccessVector residualsBase = new DenseVector(residuals.Length);
                 Blas.Default.Copy(residuals, residualsBase);
-                
-                double[] slet = model.b;
 
-                RSS(residuals, x0, assembly);  //residuals are by-product (b[] also altered)
+                double[] slet = model.b;
 
                 if (true)
                 {
@@ -29338,139 +29304,7 @@ namespace Gekko
             metaIt: ;
             }  //ii
         }
-
-        //TODO: Not strict regarding use of b[] -- actually puts result into Program.model.b[] via RSS(). These are typically the same, but what if not
-        public static void Linearize(List<int> isDampedPointers)
-        {
-            bool useDamp = true;
-            //if (Globals.testing)
-            //{
-            //    Program.options.solve_gauss_damp = 1.00d;  //no damp
-            //}
-
-            Type assembly = Program.model.m2.assemblyGauss;
-            if (assembly == null)
-            {
-                G.Writeln("No Gauss-Seidel module found");
-                throw new GekkoException();
-            }
-            List<int> simul = Program.GetLeftsideBNumbers();
-
-            Object[] args = new Object[2];
-            args[0] = model.b;
-            args[1] = model.simulateResults;
-
-            int n = simul.Count;
-            double delta = Globals.jacobiDeltaProbe;
-            List<int> damp = new List<int>();
-            if (useDamp) damp = isDampedPointers;  //set to true to see damp effect
-
-
-            //bOriginal contains values corresponding to databank (possibly initialized lagged endogenous)
-            double[] bOriginal = new double[model.b.Length];
-            Array.Copy(model.b, bOriginal, model.b.Length);
-
-            if (true)
-            {
-                Program.model.m2.assemblyPrologueEpilogue.InvokeMember("prologue", BindingFlags.InvokeMethod, null, null, args);
-                RunOneGaussIterationWithDamping(damp, assembly, args, bOriginal);
-            }
-
-            //bNoShock contains values corresponding to running prologue followed by exactly 1 iteration (possibly with damping)
-            double[] bNoShock = new double[model.b.Length];
-            Array.Copy(model.b, bNoShock, model.b.Length);
-
-            double[,] e = new double[n, n];
-
-            for (int j = 0; j < simul.Count; j++)
-            {
-                Array.Copy(bOriginal, model.b, model.b.Length);
-
-                EquationHelper eh = Program.model.equations[simul[j]];
-                int bj = eh.bNumberLhs;
-                model.b[bj] += delta;
-
-                if (true)
-                {
-                    Program.model.m2.assemblyPrologueEpilogue.InvokeMember("prologue", BindingFlags.InvokeMethod, null, null, args);
-                    RunOneGaussIterationWithDamping(damp, assembly, args, bOriginal);
-                }
-
-                for (int i = 0; i < simul.Count; i++)
-                {
-                    //int bi = simul[i];
-                    EquationHelper eh2 = Program.model.equations[simul[i]];
-                    int bi = eh2.bNumberLhs;
-                    double grad = (model.b[bi] - bNoShock[bi]) / delta;
-                    e[i, j] = grad;
-                }
-            }
-
-            double[,] f = e;
-            //double[] w = G.CreateArrayDouble(n, Program.options.solve_gauss_damp);
-
-            if (n < 10)
-            {
-                G.Writeln("Matrix");
-                for (int i = 0; i < n; i++)
-                {
-                    for (int j = 0; j < n; j++)
-                    {
-                        G.Write(e[i, j] + " ");
-                    }
-                    //G.Write("   " + b[i]);
-                    G.Writeln();
-                }
-                G.Writeln();
-            }
-
-            double[] lambda = new double[n];
-            double[] lambdai = new double[n];
-            double[,] vl = new double[n, n];
-            double[,] vr = new double[n, n];
-            G.Writeln("Start finding eigen values");
-
-
-            if (true)
-            {
-                StreamWriter w = new StreamWriter("b:\\data.txt");
-                int iMax = 0;
-                int jMax = 0;
-                for (int i = 0; i < n; i++)
-                {
-                    for (int j = 0; j < n; j++)
-                    {
-                        if (f[i, j] != 0d)
-                        {
-                            w.WriteLine((i + 1) + " " + (j + 1) + " " + f[i, j]);
-                            iMax = Math.Max(i, iMax);
-                            jMax = Math.Max(j, jMax);
-                        }
-                    }
-                }
-
-                int min = Math.Min(iMax, jMax);
-                for (int i = min + 1; i < n; i++)
-                {
-                    if (f[i, i] != 0) throw new GekkoException();  //should not be possible
-                    w.WriteLine((i + 1) + " " + (i + 1) + " 1e-20");  //hack
-                }
-
-                w.Flush();
-                w.Close();
-
-                //Use new R-interface instead!
-                //RSimpleInterface s = new RSimpleInterface("b:\\test1.r");
-                ////should we try sparsematrix??
-                //s.WriteLine("library(Matrix);");
-                //s.WriteLine("x = scan('b:\\\\data.txt',what=list(integer(),integer(),numeric()));");
-                //s.WriteLine("N= sparseMatrix(i=x[[1]],j=x[[2]],x=x[[3]]);");
-                //s.WriteLine("f = matrix(N, " + n + ", " + n + ");");
-                //s.WriteLine("evals <- eigen(f, only.values = TRUE)$values;");
-                //s.WriteLine("evals;");
-                //s.Execute();
-            }
-        }        
+                       
 
         private static void AbortNewtonAlgorithm(NewtonAlgorithmHelper nah, bool printError)
         {
@@ -29731,7 +29565,7 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer)
             {
-                G.Writeln2("==========> " + model.b[1] + ", " + model.b[6]);
+                G.Writeln2("values of endogenous ==========> " + model.b[0] + ", " + model.b[2] + ", " + model.b[4], Color.Brown);
             }
 
             

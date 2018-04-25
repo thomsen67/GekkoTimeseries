@@ -124,20 +124,19 @@ namespace Gekko
 
         private static double NewtonStartingValuesFixHelper1(double x)
         {
+            //x is < 0 here
             if (Globals.newtonStartingValuesHelper1 == -12345) return x;
-
-            double distance = -x + Globals.special_value1;
-            if (distance < 0) throw new GekkoException();  //just an assert, delete at some point
-            Globals.newtonStartingValuesHelper2[Globals.newtonStartingValuesHelper1] = distance;
-
-            if (Globals.runningOnTTComputer)
+            double distance = -x + Globals.special_value1;  //distance will be > 0
+            if (Globals.newtonStartingValuesHelper1 < Globals.newtonStartingValuesHelper2.Length)
             {
-                G.Writeln("==========================================> Distance (" + Globals.newtonStartingValuesHelper1 + "): " + distance, Color.DarkMagenta);
+                Globals.newtonStartingValuesHelper2[Globals.newtonStartingValuesHelper1] = distance;
+                Globals.newtonStartingValuesHelper1++;
             }
-
-            Globals.newtonStartingValuesHelper1++;
+            else
+            {
+                //ignore recording of this distance
+            }
             double d = Globals.special_value1;            
-
             return d;
         }
 
