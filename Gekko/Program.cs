@@ -58,6 +58,7 @@ using System.Diagnostics;
 using System.Collections.ObjectModel;
 using GAMS;
 using System.Linq;
+using OfficeOpenXml;
 
 namespace Gekko
 {
@@ -161,6 +162,12 @@ namespace Gekko
         public string bank = null;
         public string name = null;
         public string version = null; //not used 
+        public override string ToString()
+        {
+            string s = name;
+            if (bank != null && bank != "") s = bank + ":" + s;
+            return "'" + s + "'";
+        }
     }
 
     public class Zipper
@@ -20826,10 +20833,10 @@ namespace Gekko
                     SevenZipCompressor tmp = new SevenZipCompressor();
                     tmp.ArchiveFormat = OutArchiveFormat.Zip;
                     //tmp.CompressionLevel = CompressionLevel.Low;  //could be better than .Fast??
-                    tmp.CompressionLevel = CompressionLevel.Fast;
+                    tmp.CompressionLevel = SevenZip.CompressionLevel.Fast;
                     if (zipFileName.ToLower().EndsWith("." + Globals.extensionDatabank + "") && Program.options.databank_file_gbk_compress == false)
                     {
-                        tmp.CompressionLevel = CompressionLevel.None;
+                        tmp.CompressionLevel = SevenZip.CompressionLevel.None;
                     }
                     if (!System.IO.Directory.Exists(folderInfo.FullName))
                     {
@@ -21464,7 +21471,7 @@ namespace Gekko
                     if (ts == null)
                     {
                         //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
-                        G.Writeln2("*** ERROR: Writing tsp file: variable " + var + " does not exist");
+                        G.Writeln2("*** ERROR: Writing tsp file: variable " + var.name + " does not exist");
                         throw new GekkoException();
                     }
                     WriteTspRecord(per1, per2, file, ts, isCaps);
@@ -29584,10 +29591,10 @@ namespace Gekko
 
         private static void SimulateSimulPrologue(Type assembly)
         {
-            if (Globals.newtonStartingValuesFix)
+            if (Program.options.solve_newton_robust)
             {
                 //preparing to call simulPrologue and simulFeedbackAll
-                Globals.newtonStartingValuesHelper1 = 0;
+                Globals.newtonRobustHelper1 = 0;
             }
             assembly.InvokeMember("simulPrologue", BindingFlags.InvokeMethod, null, null, new Object[] { model.b });
         }
@@ -30182,12 +30189,12 @@ namespace Gekko
             args[2] = Globals.scaleNewtonValues;
             assembly.InvokeMember("simulFeedbackAll", BindingFlags.InvokeMethod, null, null, args);
             
-            if (Globals.newtonStartingValuesFix)
+            if (Program.options.solve_newton_robust)
             {
                 double newtonStartingValuesFixExtra = 0d;
-                for (int i = 0; i < Globals.newtonStartingValuesHelper1; i++)
+                for (int i = 0; i < Globals.newtonRobustHelper1; i++)
                 {
-                    newtonStartingValuesFixExtra += Globals.newtonStartingValuesHelper2[i];
+                    newtonStartingValuesFixExtra += Globals.newtonRobustHelper2[i];
                     //G.Writeln2(i + " " + Globals.newtonStartingValuesHelper2[i]);
                 }
                 for (int i = 0; i < r.Length; i++)
@@ -30210,10 +30217,10 @@ namespace Gekko
                 }
             }
 
-            if (Globals.newtonStartingValuesFix)
+            if (Program.options.solve_newton_robust)
             {
                 //do not record more
-                Globals.newtonStartingValuesHelper1 = -12345;
+                Globals.newtonRobustHelper1 = -12345;
             }
 
             return;
@@ -30788,6 +30795,7 @@ namespace Gekko
 
         public static TableLight ReadExcelWorkbook(string file, Databank databank, string sheetName)
         {
+
             int threadID = (int)AppDomain.GetCurrentThreadId();  //should be ok, just not for "fibre" threads (on SQL server)... never mind
             if (!File.Exists(file))
             {
@@ -30982,493 +30990,522 @@ namespace Gekko
 
         public static ExcelDataForCplot CreateExcelWorkbook2(ExcelOptions eo, O.Prt oPrt, bool isMulprt)
         {
-            Excel.Workbook objBook = null;
-
-        //TODO: #89073253245
-        //this method transposes the input-table itself, which is a bit stupid since the table
-        //is easy to transpose when it is constructed (with option rows/cols)
- 
-            string stampText = null;
-            //TODO: think about extensions. If no extension given, it seems append=yes does not work properly.
-            ExcelDataForCplot cplotData = new ExcelDataForCplot();  //only used if called from CSHEET, data are fetched and returned, but not used for normal WPLOT use.
-            bool copyLocal = true;
-            int threadID = (int)AppDomain.GetCurrentThreadId();  //should be ok, just not for "fibre" threads (on SQL server)... never mind
-            //int managedThreadId = Thread.CurrentThread.ManagedThreadId;  //duer ikke, er ikke distinkt nok
-            int blue = System.Drawing.ColorTranslator.ToOle(Globals.LightBlueWord);
-            bool blueColors = Program.options.interface_excel_modernlook;
-            string version = GetExcelVersion(eOfficeApp.eOfficeApp_Excel);
-            if (eo.fileName != null) G.Write("Calling Excel " + version + " ... ");
-            //see MS bug 320369
-            //without, there was a bug on Excel 2003 (english version), where the language was set to
-            //something different that english.
-            System.Globalization.CultureInfo oldCI = System.Threading.Thread.CurrentThread.CurrentCulture;
-            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-
-            Excel.Workbooks objBooks = null;
-            Excel.Sheets objSheets = null;
-            Excel.Worksheet objSheet = null;
-            Excel.Range range = null;
-            Excel.Worksheet newSheet = null;
-
-            bool isStamp = false; if (oPrt != null && G.equal(oPrt.opt_stamp, "yes")) isStamp = true;
-            bool isDates = true; if (oPrt != null && G.equal(oPrt.opt_dates, "no")) isDates = false;
-            bool isNames = true; if (oPrt != null && G.equal(oPrt.opt_names, "no")) isNames = false;
-            bool isColors = true; if (oPrt != null && G.equal(oPrt.opt_colors, "no")) isColors = false;
-            bool isAppend = false; if (oPrt != null && G.equal(oPrt.opt_append, "yes")) isAppend = true;
-            string sheet = null; if (oPrt != null) sheet = oPrt.opt_sheet;
-
-
-            bool isRows;
-            bool isCols;
-            HandleRowsCols(oPrt, out isRows, out isCols);
-
-            bool isTranspose = false;
-            if (isCols) isTranspose = true;  //Normally, SHEET has timeseries running in rows, unlike PRT default. So isTranspose means running in rows.
-
-            string startCell = "a1"; if (oPrt != null && oPrt.opt_cell != null) startCell = oPrt.opt_cell;
-
-            int datesInt = 0; if (isDates) datesInt++;
-            int namesInt = 0; if (isNames) namesInt++;
-
-            string fileNameWithPath = null;
-            string fileName3 = null;
-            string fileNameOriginalFile = null;
-            string fileNameTempLocalFile = null;
-
-            string ext = null;
-
-            string fileName = null;
-            if (oPrt != null && oPrt.opt_filename != null) fileName = oPrt.opt_filename;
-            else if (eo.fileName != null) fileName = eo.fileName;
-
-            if (fileName != null)
+            if (G.equal(Program.options.sheet_engine, "epplus"))
             {
-                fileNameWithPath = CreateFullPathAndFileName(fileName);
-                fileName3 = fileNameWithPath;
-                if (fileName3.ToLower().EndsWith(".xls")) fileName3 = fileName3.Substring(0, fileName3.Length - 4);
-                if (fileName3.ToLower().EndsWith(".xlsx")) fileName3 = fileName3.Substring(0, fileName3.Length - 5);
-                //fileName3 is stripped of .xls or .xlsx
-                fileNameOriginalFile = "";
+                string fileNameWithPath = null;
+                string fileName = null;
+                if (oPrt != null && oPrt.opt_filename != null) fileName = oPrt.opt_filename;
+                else if (eo.fileName != null) fileName = eo.fileName;
 
-                //A bit hacky...........
-                if (version == "2000" || version == "2003" || version == "95" || version == "97" || version == "XP")
+                if (fileName != null)
                 {
-                    ext = "xls";
+                    //??? copylocal?
+                    fileNameWithPath = AddExtension(CreateFullPathAndFileName(fileName), ".xlsx");
                 }
-                else
+
+                //Creates a blank workbook. Use the using statment, so the package is disposed when we are done.
+                using (var p = new ExcelPackage())
                 {
-                    //"2007"
-                    //"2010"
-                    //"Unrecognized version", including successor to 2010
-                    ext = "xlsx";
+                    //A workbook must have at least on cell, so lets add one... 
+                    var ws = p.Workbook.Worksheets.Add("MySheet");
+                    //To set values in the spreadsheet use the Cells indexer.
+                    ws.Cells["A1"].Value = "This is cell A1";
+                    //Save the new workbook. We haven't specified the filename so use the Save as method.
+                    p.SaveAs(new FileInfo(fileNameWithPath));
                 }
-                fileNameOriginalFile = fileName3 + "." + ext;
+                return null;
             }
-
-            fileNameTempLocalFile = fileNameOriginalFile;  //3a is original file, 4 may become a local copy below
-
-            if (copyLocal)
+            else
             {
-                fileNameTempLocalFile = GetTempTsdFilePath(ext);
-                if (isAppend)
-                {
-                    try
-                    {
-                        WaitForFileCopy(fileNameOriginalFile, fileNameTempLocalFile);
-                    }
-                    catch (Exception e)
-                    {
-                        G.Writeln();
-                        G.Writeln("*** ERROR: Could not find file: " + fileNameOriginalFile);
-                        throw new GekkoException();
-                    }
-                }
-            }
 
-            try
-            {
-                if (!eo.isCplot)
+                Excel.Workbook objBook = null;
+
+                //TODO: #89073253245
+                //this method transposes the input-table itself, which is a bit stupid since the table
+                //is easy to transpose when it is constructed (with option rows/cols)
+
+                string stampText = null;
+                //TODO: think about extensions. If no extension given, it seems append=yes does not work properly.
+                ExcelDataForCplot cplotData = new ExcelDataForCplot();  //only used if called from CSHEET, data are fetched and returned, but not used for normal WPLOT use.
+                bool copyLocal = true;
+                int threadID = (int)AppDomain.GetCurrentThreadId();  //should be ok, just not for "fibre" threads (on SQL server)... never mind
+                                                                     //int managedThreadId = Thread.CurrentThread.ManagedThreadId;  //duer ikke, er ikke distinkt nok
+                int blue = System.Drawing.ColorTranslator.ToOle(Globals.LightBlueWord);
+                bool blueColors = Program.options.interface_excel_modernlook;
+                string version = GetExcelVersion(eOfficeApp.eOfficeApp_Excel);
+                if (eo.fileName != null) G.Write("Calling Excel " + version + " ... ");
+                //see MS bug 320369
+                //without, there was a bug on Excel 2003 (english version), where the language was set to
+                //something different that english.
+                System.Globalization.CultureInfo oldCI = System.Threading.Thread.CurrentThread.CurrentCulture;
+                System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
+                Excel.Workbooks objBooks = null;
+                Excel.Sheets objSheets = null;
+                Excel.Worksheet objSheet = null;
+                Excel.Range range = null;
+                Excel.Worksheet newSheet = null;
+
+                bool isStamp = false; if (oPrt != null && G.equal(oPrt.opt_stamp, "yes")) isStamp = true;
+                bool isDates = true; if (oPrt != null && G.equal(oPrt.opt_dates, "no")) isDates = false;
+                bool isNames = true; if (oPrt != null && G.equal(oPrt.opt_names, "no")) isNames = false;
+                bool isColors = true; if (oPrt != null && G.equal(oPrt.opt_colors, "no")) isColors = false;
+                bool isAppend = false; if (oPrt != null && G.equal(oPrt.opt_append, "yes")) isAppend = true;
+                string sheet = null; if (oPrt != null) sheet = oPrt.opt_sheet;
+
+
+                bool isRows;
+                bool isCols;
+                HandleRowsCols(oPrt, out isRows, out isCols);
+
+                bool isTranspose = false;
+                if (isCols) isTranspose = true;  //Normally, SHEET has timeseries running in rows, unlike PRT default. So isTranspose means running in rows.
+
+                string startCell = "a1"; if (oPrt != null && oPrt.opt_cell != null) startCell = oPrt.opt_cell;
+
+                int datesInt = 0; if (isDates) datesInt++;
+                int namesInt = 0; if (isNames) namesInt++;
+
+                string fileNameWithPath = null;
+                string fileName3 = null;
+                string fileNameOriginalFile = null;
+                string fileNameTempLocalFile = null;
+
+                string ext = null;
+
+                string fileName = null;
+                if (oPrt != null && oPrt.opt_filename != null) fileName = oPrt.opt_filename;
+                else if (eo.fileName != null) fileName = eo.fileName;
+
+                if (fileName != null)
                 {
+                    fileNameWithPath = CreateFullPathAndFileName(fileName);
+                    fileName3 = fileNameWithPath;
+                    if (fileName3.ToLower().EndsWith(".xls")) fileName3 = fileName3.Substring(0, fileName3.Length - 4);
+                    if (fileName3.ToLower().EndsWith(".xlsx")) fileName3 = fileName3.Substring(0, fileName3.Length - 5);
+                    //fileName3 is stripped of .xls or .xlsx
+                    fileNameOriginalFile = "";
+
+                    //A bit hacky...........
+                    if (version == "2000" || version == "2003" || version == "95" || version == "97" || version == "XP")
+                    {
+                        ext = "xls";
+                    }
+                    else
+                    {
+                        //"2007"
+                        //"2010"
+                        //"Unrecognized version", including successor to 2010
+                        ext = "xlsx";
+                    }
+                    fileNameOriginalFile = fileName3 + "." + ext;
+                }
+
+                fileNameTempLocalFile = fileNameOriginalFile;  //3a is original file, 4 may become a local copy below
+
+                if (copyLocal)
+                {
+                    fileNameTempLocalFile = GetTempTsdFilePath(ext);
                     if (isAppend)
-                    {
-                        //TODO, BUG: there is a problem here, if fileNameWithPath has no extension
-
-                        if (Globals.objApp == null)
-                        {
-                            Globals.objApp = new Excel.Application();
-                        }
-                        else if (Globals.excelLastThreadID != threadID)
-                        {
-                            //#5298375235
-                            Globals.excelLastThreadID = threadID;
-                            System.Runtime.InteropServices.Marshal.FinalReleaseComObject(Globals.objApp);
-                            Globals.objApp = null;
-                            GC.Collect();
-                            GC.WaitForPendingFinalizers();
-                            // GC needs to be called twice in order to get the Finalizers called
-                            // - the first time in, it simply makes a list of what is to be
-                            // finalized, the second time in, it actually is finalizing. Only
-                            // then will the object do its automatic ReleaseComObject.
-                            GC.Collect();
-                            GC.WaitForPendingFinalizers();
-                            Globals.objApp = new Excel.Application();
-                        }
-
-                        objBooks = Globals.objApp.Workbooks;
-                        objBook = objBooks.Open(fileNameTempLocalFile,
-                            Type.Missing, Type.Missing, Type.Missing, Type.Missing,
-                            Type.Missing, Type.Missing, Type.Missing, Type.Missing,
-                            Type.Missing, Type.Missing, Type.Missing, Type.Missing,
-                            Type.Missing, Type.Missing);
-                        objSheets = objBook.Worksheets;
-                        if (sheet == null)
-                        {
-                            objSheet = (Excel.Worksheet)objSheets.get_Item(1);
-                        }
-                        else
-                        {
-                            bool match = ExcelSheetCheckMatch(objSheets, sheet);
-                            if (match)
-                            {
-                                objSheet = ExcelSheetTryGetSheet(objSheets, sheet);
-
-                            }
-                            else
-                            {
-                                //creating a new one
-                                objSheet = (Excel.Worksheet)objSheets.Add(objSheets[1], Type.Missing, Type.Missing, Type.Missing);
-                                objSheet.Name = sheet;
-                            }
-                            // The first argument below inserts the new worksheet as the first one
-                        }
-                    }
-                    else
-                    {
-                        // Instantiate Excel and start a new workbook.
-                        Globals.objApp = new Excel.Application();
-                        objBooks = Globals.objApp.Workbooks;
-                        objBook = objBooks.Add(Missing.Value);
-                        objSheets = objBook.Worksheets;
-                        objSheet = (Excel.Worksheet)objSheets.get_Item(1);
-                        if (sheet != null)
-                        {
-                            objSheet.Name = sheet;
-                        }
-                    }
-                }
-
-                Excel.Range range0 = null;
-
-                if (!eo.isCplot) range0 = objSheet.get_Range(startCell, Missing.Value);
-
-                if (isStamp)
-                {
-                    StampTypes type = StampTypes.Normal;
-                    if(isMulprt)type = StampTypes.Multiplier; //we drop .Base for now...
-
-                    List<string> lines = GetDatabankInfo(type);
-                    string ss = GetDateTimeStamp() + ". ";
-                    foreach (string s in lines)
-                    {
-                        ss = ss + s + ". ";
-                    }
-                    if (ss.EndsWith(". ")) ss = ss.Substring(0, ss.Length - 2);
-                    cplotData.stamp = ss;
-                    if (!eo.isCplot) if (isColors) range0.Font.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Gray);
-                    if (!eo.isCplot) range0.set_Value(Missing.Value, cplotData.stamp);
-                    if (!eo.isCplot) range0 = range0.get_Offset(1, 0);
-                }
-
-                if (oPrt != null && oPrt.opt_title != null)
-                {
-                    cplotData.heading = oPrt.opt_title;
-                    if (!eo.isCplot) if (isColors) range0.Font.Bold = true;
-                    if (!eo.isCplot) range0.set_Value(Missing.Value, cplotData.heading);
-                    if (!eo.isCplot) range0 = range0.get_Offset(1, 0);
-                }
-
-
-                // ======================== DATA MATRIX ===================================
-
-                //Get the range where the starting cell has the address
-                //m_sStartingCell and its dimensions are m_iNumRows x m_iNumCols.
-                int dataRows = eo.excelData.GetLength(0);
-                int dataCols = eo.excelData.GetLength(1);
-
-                int[,] excelColumnLabelsAnnual = new int[1, dataCols];
-                if (options.freq == EFreq.Annual)
-                {
-                    for (int i = 0; i < eo.excelColumnLabels.Length; i++)
-                    {
-                        //should never give an error
-                        excelColumnLabelsAnnual[0, i] = int.Parse(eo.excelColumnLabels[0, i]);
-                    }
-                }
-
-                if (isTranspose)
-                {
-                    if (!eo.isCplot) range = range0.get_Offset(namesInt, datesInt);
-                    if (!eo.isCplot) range = range.get_Resize(dataCols, dataRows);
-                    double[,] data = Transpose(eo.excelData);
-                    if (!eo.isCplot) range.set_Value(Missing.Value, data);
-                    cplotData.data = data;
-                }
-                else
-                {
-                    if (!eo.isCplot) range = range0.get_Offset(datesInt, namesInt);
-                    if (!eo.isCplot) range = range.get_Resize(dataRows, dataCols);
-                    double[,] data = eo.excelData;
-                    if (!eo.isCplot) range.set_Value(Missing.Value, data);
-                    cplotData.data = data;
-                }
-
-                string na = "na()";
-                if (G.equal(Program.options.interface_excel_language, "danish")) na = "ikke.tilgængelig()";
-
-                if (!eo.isCplot)
-                {
-                    Globals.objApp.DisplayAlerts = false;
-                    bool success = (bool)range.Replace(
-                        "9,99999E+99",
-                        "=" + na,
-                        1, //XlLookAt.xlWhole,
-                        1, //XlSearchOrder.xlByRows,
-                        true, Type.Missing, Type.Missing, Type.Missing);
-                    success = (bool)range.Replace(
-                        "9.99999E+99",
-                        "=" + na,
-                        1, //XlLookAt.xlWhole,
-                        1, //XlSearchOrder.xlByRows,
-                        true, Type.Missing, Type.Missing, Type.Missing);
-                    success = (bool)range.Replace(  //309827520439857
-                        "65535",
-                        "=" + na,
-                        1, //XlLookAt.xlWhole,
-                        1, //XlSearchOrder.xlByRows,
-                        true, Type.Missing, Type.Missing, Type.Missing);
-                    Globals.objApp.DisplayAlerts = true;
-                }
-
-                //DATES ROW ---------------------------------------------------------------------
-                //range = objSheet.get_Range("B2", Missing.Value);
-
-                if (isDates)
-                {
-
-                    if (!eo.isCplot)
-                    {
-                        if (isTranspose)
-                        {
-                            range = range0.get_Offset(namesInt, 0);
-                            range = range.get_Resize(dataCols, 1);
-                        }
-                        else
-                        {
-                            range = range0.get_Offset(0, namesInt);
-                            range = range.get_Resize(1, dataCols);
-                        }
-                    }
-
-                    string[,] data2 = null;
-
-                    if (options.freq == EFreq.Annual)
-                    {
-                        //else the cells are left-justified and with a green triangle (warning)
-
-                        int[,] data = null;
-                        if (isTranspose)
-                        {
-                            data = Transpose(excelColumnLabelsAnnual);
-                            if (!eo.isCplot) range.set_Value(Missing.Value, data);
-                        }
-                        else
-                        {
-                            data = excelColumnLabelsAnnual;
-                            if (!eo.isCplot) range.set_Value(Missing.Value, data);
-                        }
-                        data2 = ConvertToString(data);
-                    }
-                    else
-                    {
-                        string[,] data3 = null;
-                        if (isTranspose)
-                        {
-                            data3 = Transpose(eo.excelColumnLabels);
-                            if (!eo.isCplot) range.set_Value(Missing.Value, data3);
-                        }
-                        else
-                        {
-                            data3 = eo.excelColumnLabels;
-                            if (!eo.isCplot) range.set_Value(Missing.Value, data3);
-                        }
-                        data2 = data3;
-                    }
-                    cplotData.dates = data2;
-                }
-
-                //====================== VARIABLE NAMES COLUMN -----------------------------------------------------------------
-
-                if (isNames)
-                {
-                    string[,] labels = null;
-                    if (isTranspose)
-                    {
-                        if (!eo.isCplot) range = range0.get_Offset(0, datesInt);
-                        if (!eo.isCplot) range = range.get_Resize(1, dataRows);
-                        labels = Transpose(eo.excelRowLabels);
-                        if (!eo.isCplot) range.set_Value(Missing.Value, labels);
-                    }
-                    else
-                    {
-                        if (!eo.isCplot) range = range0.get_Offset(datesInt, 0);
-                        if (!eo.isCplot) range = range.get_Resize(dataRows, 1);
-                        labels = eo.excelRowLabels;
-                        if (!eo.isCplot) range.set_Value(Missing.Value, labels);
-                    }
-                    cplotData.varnames = labels;
-                }
-
-                cplotData.transpose = isTranspose;
-                if (eo.isCplot) return cplotData;
-
-                //====================== coloring ==============================
-
-                if (isColors)
-                {
-                    if (isTranspose)  //dates running downwards
-                    {
-                        if (isNames)
-                        {
-                            //Names row
-                            range = range0.get_Offset(0, 0);
-                            range = range.get_Resize(1, dataRows + datesInt);
-                            if (blueColors)
-                            {
-                                range.Interior.Color = blue;
-                                range.Font.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.White);
-                            }
-                            else
-                            {
-                                range.Borders[Excel.XlBordersIndex.xlEdgeTop].Weight = Excel.XlBorderWeight.xlMedium;
-                                range.Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlMedium;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (isDates)
-                        {
-                            //Dates row
-                            range = range0.get_Offset(0, 0);
-                            range = range.get_Resize(1, dataCols + namesInt);
-                            if (blueColors)
-                            {
-                                range.Interior.Color = blue;
-                                range.Font.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.White);
-                            }
-                            else
-                            {
-                                range.Borders[Excel.XlBordersIndex.xlEdgeTop].Weight = Excel.XlBorderWeight.xlMedium;
-                                range.Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlMedium;
-                            }
-                        }
-                    }
-
-                    //Data border
-                    if (isTranspose)
-                    {
-                        range = range0.get_Offset(0, 0);
-                        range = range.get_Resize(dataCols + namesInt, dataRows + datesInt);
-                    }
-                    else
-                    {
-                        range = range0.get_Offset(0, 0);
-                        range = range.get_Resize(dataRows + datesInt, dataCols + namesInt);
-                    }
-                    if (blueColors)
-                    {
-                        range.Borders[Excel.XlBordersIndex.xlEdgeTop].Weight = Excel.XlBorderWeight.xlMedium;
-                        range.Borders[Excel.XlBordersIndex.xlEdgeTop].Color = blue;
-                        range.Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlMedium;
-                        range.Borders[Excel.XlBordersIndex.xlEdgeBottom].Color = blue;
-                        range.Borders[Excel.XlBordersIndex.xlEdgeLeft].Weight = Excel.XlBorderWeight.xlMedium;
-                        range.Borders[Excel.XlBordersIndex.xlEdgeLeft].Color = blue;
-                        range.Borders[Excel.XlBordersIndex.xlEdgeRight].Weight = Excel.XlBorderWeight.xlMedium;
-                        range.Borders[Excel.XlBordersIndex.xlEdgeRight].Color = blue;
-                    }
-                    else
-                    {
-                        range.Borders[Excel.XlBordersIndex.xlEdgeTop].Weight = Excel.XlBorderWeight.xlMedium;
-                        range.Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlMedium;
-                    }
-
-                }
-
-                // ===================== put cursor =========================
-
-                if (fileName == null)
-                {
-                    //Return control of Excel to the user.
-                    Globals.objApp.Visible = true;
-                    Globals.objApp.UserControl = true;
-                }
-                else
-                {
-                    // Save the Workbook and quit Excel.
-                    Globals.objApp.DisplayAlerts = false;
-                    if (isAppend == false)
-                    {
-                        if (File.Exists(fileNameTempLocalFile)) WaitForFileDelete(fileNameTempLocalFile);  //probably not necessary
-                    }
-                    if (isAppend)
-                    {
-                        objBook.Save();
-                    }
-                    else
-                    {
-                        objBook.SaveCopyAs(fileNameTempLocalFile);
-                        //objBook.SaveAs(fileName4, Missing.Value, Missing.Value,
-                        //    Missing.Value, false, false, Excel.XlSaveAsAccessMode.xlNoChange,
-                        //    false, false, Missing.Value, Missing.Value, Missing.Value);
-                    }
-
-                    if (copyLocal)
                     {
                         try
                         {
-                            //Maybe use WaitForFileCopy() here at some point.
-                            //Not sure why fileNameOriginalFile is deleted first (safety?)
-                            WaitForFileCopy(fileNameTempLocalFile, fileNameOriginalFile);
+                            WaitForFileCopy(fileNameOriginalFile, fileNameTempLocalFile);
                         }
                         catch (Exception e)
                         {
                             G.Writeln();
-                            G.Writeln("*** ERROR: Could not write Excel file -- is it open/blocked?: " + fileNameOriginalFile);
+                            G.Writeln("*** ERROR: Could not find file: " + fileNameOriginalFile);
                             throw new GekkoException();
                         }
                     }
-
-                    ExcelCleanup(ref objBook, ref objBooks, ref objSheets, ref objSheet, ref range, ref newSheet, ref range0);
-                    if (!Globals.setPrintMute) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameOriginalFile);
                 }
-                return null;
-            }
-            catch (Exception theException)
-            {
-                //G.Writeln(" ...did not finish");
-                String errorMessage;
-                errorMessage = "*** ERROR: Excel failed with the following error: ";
-                errorMessage = String.Concat(errorMessage, theException.Message);
-                errorMessage = String.Concat(errorMessage, " Line: ");
-                errorMessage = String.Concat(errorMessage, theException.Source);
-                G.Writeln(errorMessage);
+
+                try
+                {
+                    if (!eo.isCplot)
+                    {
+                        if (isAppend)
+                        {
+                            //TODO, BUG: there is a problem here, if fileNameWithPath has no extension
+
+                            if (Globals.objApp == null)
+                            {
+                                Globals.objApp = new Excel.Application();
+                            }
+                            else if (Globals.excelLastThreadID != threadID)
+                            {
+                                //#5298375235
+                                Globals.excelLastThreadID = threadID;
+                                System.Runtime.InteropServices.Marshal.FinalReleaseComObject(Globals.objApp);
+                                Globals.objApp = null;
+                                GC.Collect();
+                                GC.WaitForPendingFinalizers();
+                                // GC needs to be called twice in order to get the Finalizers called
+                                // - the first time in, it simply makes a list of what is to be
+                                // finalized, the second time in, it actually is finalizing. Only
+                                // then will the object do its automatic ReleaseComObject.
+                                GC.Collect();
+                                GC.WaitForPendingFinalizers();
+                                Globals.objApp = new Excel.Application();
+                            }
+
+                            objBooks = Globals.objApp.Workbooks;
+                            objBook = objBooks.Open(fileNameTempLocalFile,
+                                Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+                                Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+                                Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+                                Type.Missing, Type.Missing);
+                            objSheets = objBook.Worksheets;
+                            if (sheet == null)
+                            {
+                                objSheet = (Excel.Worksheet)objSheets.get_Item(1);
+                            }
+                            else
+                            {
+                                bool match = ExcelSheetCheckMatch(objSheets, sheet);
+                                if (match)
+                                {
+                                    objSheet = ExcelSheetTryGetSheet(objSheets, sheet);
+
+                                }
+                                else
+                                {
+                                    //creating a new one
+                                    objSheet = (Excel.Worksheet)objSheets.Add(objSheets[1], Type.Missing, Type.Missing, Type.Missing);
+                                    objSheet.Name = sheet;
+                                }
+                                // The first argument below inserts the new worksheet as the first one
+                            }
+                        }
+                        else
+                        {
+                            // Instantiate Excel and start a new workbook.
+                            Globals.objApp = new Excel.Application();
+                            objBooks = Globals.objApp.Workbooks;
+                            objBook = objBooks.Add(Missing.Value);
+                            objSheets = objBook.Worksheets;
+                            objSheet = (Excel.Worksheet)objSheets.get_Item(1);
+                            if (sheet != null)
+                            {
+                                objSheet.Name = sheet;
+                            }
+                        }
+                    }
+
+                    Excel.Range range0 = null;
+
+                    if (!eo.isCplot) range0 = objSheet.get_Range(startCell, Missing.Value);
+
+                    if (isStamp)
+                    {
+                        StampTypes type = StampTypes.Normal;
+                        if (isMulprt) type = StampTypes.Multiplier; //we drop .Base for now...
+
+                        List<string> lines = GetDatabankInfo(type);
+                        string ss = GetDateTimeStamp() + ". ";
+                        foreach (string s in lines)
+                        {
+                            ss = ss + s + ". ";
+                        }
+                        if (ss.EndsWith(". ")) ss = ss.Substring(0, ss.Length - 2);
+                        cplotData.stamp = ss;
+                        if (!eo.isCplot) if (isColors) range0.Font.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Gray);
+                        if (!eo.isCplot) range0.set_Value(Missing.Value, cplotData.stamp);
+                        if (!eo.isCplot) range0 = range0.get_Offset(1, 0);
+                    }
+
+                    if (oPrt != null && oPrt.opt_title != null)
+                    {
+                        cplotData.heading = oPrt.opt_title;
+                        if (!eo.isCplot) if (isColors) range0.Font.Bold = true;
+                        if (!eo.isCplot) range0.set_Value(Missing.Value, cplotData.heading);
+                        if (!eo.isCplot) range0 = range0.get_Offset(1, 0);
+                    }
+
+
+                    // ======================== DATA MATRIX ===================================
+
+                    //Get the range where the starting cell has the address
+                    //m_sStartingCell and its dimensions are m_iNumRows x m_iNumCols.
+                    int dataRows = eo.excelData.GetLength(0);
+                    int dataCols = eo.excelData.GetLength(1);
+
+                    int[,] excelColumnLabelsAnnual = new int[1, dataCols];
+                    if (options.freq == EFreq.Annual)
+                    {
+                        for (int i = 0; i < eo.excelColumnLabels.Length; i++)
+                        {
+                            //should never give an error
+                            excelColumnLabelsAnnual[0, i] = int.Parse(eo.excelColumnLabels[0, i]);
+                        }
+                    }
+
+                    if (isTranspose)
+                    {
+                        if (!eo.isCplot) range = range0.get_Offset(namesInt, datesInt);
+                        if (!eo.isCplot) range = range.get_Resize(dataCols, dataRows);
+                        double[,] data = Transpose(eo.excelData);
+                        if (!eo.isCplot) range.set_Value(Missing.Value, data);
+                        cplotData.data = data;
+                    }
+                    else
+                    {
+                        if (!eo.isCplot) range = range0.get_Offset(datesInt, namesInt);
+                        if (!eo.isCplot) range = range.get_Resize(dataRows, dataCols);
+                        double[,] data = eo.excelData;
+                        if (!eo.isCplot) range.set_Value(Missing.Value, data);
+                        cplotData.data = data;
+                    }
+
+                    string na = "na()";
+                    if (G.equal(Program.options.interface_excel_language, "danish")) na = "ikke.tilgængelig()";
+
+                    if (!eo.isCplot)
+                    {
+                        Globals.objApp.DisplayAlerts = false;
+                        bool success = (bool)range.Replace(
+                            "9,99999E+99",
+                            "=" + na,
+                            1, //XlLookAt.xlWhole,
+                            1, //XlSearchOrder.xlByRows,
+                            true, Type.Missing, Type.Missing, Type.Missing);
+                        success = (bool)range.Replace(
+                            "9.99999E+99",
+                            "=" + na,
+                            1, //XlLookAt.xlWhole,
+                            1, //XlSearchOrder.xlByRows,
+                            true, Type.Missing, Type.Missing, Type.Missing);
+                        success = (bool)range.Replace(  //309827520439857
+                            "65535",
+                            "=" + na,
+                            1, //XlLookAt.xlWhole,
+                            1, //XlSearchOrder.xlByRows,
+                            true, Type.Missing, Type.Missing, Type.Missing);
+                        Globals.objApp.DisplayAlerts = true;
+                    }
+
+                    //DATES ROW ---------------------------------------------------------------------
+                    //range = objSheet.get_Range("B2", Missing.Value);
+
+                    if (isDates)
+                    {
+
+                        if (!eo.isCplot)
+                        {
+                            if (isTranspose)
+                            {
+                                range = range0.get_Offset(namesInt, 0);
+                                range = range.get_Resize(dataCols, 1);
+                            }
+                            else
+                            {
+                                range = range0.get_Offset(0, namesInt);
+                                range = range.get_Resize(1, dataCols);
+                            }
+                        }
+
+                        string[,] data2 = null;
+
+                        if (options.freq == EFreq.Annual)
+                        {
+                            //else the cells are left-justified and with a green triangle (warning)
+
+                            int[,] data = null;
+                            if (isTranspose)
+                            {
+                                data = Transpose(excelColumnLabelsAnnual);
+                                if (!eo.isCplot) range.set_Value(Missing.Value, data);
+                            }
+                            else
+                            {
+                                data = excelColumnLabelsAnnual;
+                                if (!eo.isCplot) range.set_Value(Missing.Value, data);
+                            }
+                            data2 = ConvertToString(data);
+                        }
+                        else
+                        {
+                            string[,] data3 = null;
+                            if (isTranspose)
+                            {
+                                data3 = Transpose(eo.excelColumnLabels);
+                                if (!eo.isCplot) range.set_Value(Missing.Value, data3);
+                            }
+                            else
+                            {
+                                data3 = eo.excelColumnLabels;
+                                if (!eo.isCplot) range.set_Value(Missing.Value, data3);
+                            }
+                            data2 = data3;
+                        }
+                        cplotData.dates = data2;
+                    }
+
+                    //====================== VARIABLE NAMES COLUMN -----------------------------------------------------------------
+
+                    if (isNames)
+                    {
+                        string[,] labels = null;
+                        if (isTranspose)
+                        {
+                            if (!eo.isCplot) range = range0.get_Offset(0, datesInt);
+                            if (!eo.isCplot) range = range.get_Resize(1, dataRows);
+                            labels = Transpose(eo.excelRowLabels);
+                            if (!eo.isCplot) range.set_Value(Missing.Value, labels);
+                        }
+                        else
+                        {
+                            if (!eo.isCplot) range = range0.get_Offset(datesInt, 0);
+                            if (!eo.isCplot) range = range.get_Resize(dataRows, 1);
+                            labels = eo.excelRowLabels;
+                            if (!eo.isCplot) range.set_Value(Missing.Value, labels);
+                        }
+                        cplotData.varnames = labels;
+                    }
+
+                    cplotData.transpose = isTranspose;
+                    if (eo.isCplot) return cplotData;
+
+                    //====================== coloring ==============================
+
+                    if (isColors)
+                    {
+                        if (isTranspose)  //dates running downwards
+                        {
+                            if (isNames)
+                            {
+                                //Names row
+                                range = range0.get_Offset(0, 0);
+                                range = range.get_Resize(1, dataRows + datesInt);
+                                if (blueColors)
+                                {
+                                    range.Interior.Color = blue;
+                                    range.Font.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.White);
+                                }
+                                else
+                                {
+                                    range.Borders[Excel.XlBordersIndex.xlEdgeTop].Weight = Excel.XlBorderWeight.xlMedium;
+                                    range.Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlMedium;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (isDates)
+                            {
+                                //Dates row
+                                range = range0.get_Offset(0, 0);
+                                range = range.get_Resize(1, dataCols + namesInt);
+                                if (blueColors)
+                                {
+                                    range.Interior.Color = blue;
+                                    range.Font.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.White);
+                                }
+                                else
+                                {
+                                    range.Borders[Excel.XlBordersIndex.xlEdgeTop].Weight = Excel.XlBorderWeight.xlMedium;
+                                    range.Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlMedium;
+                                }
+                            }
+                        }
+
+                        //Data border
+                        if (isTranspose)
+                        {
+                            range = range0.get_Offset(0, 0);
+                            range = range.get_Resize(dataCols + namesInt, dataRows + datesInt);
+                        }
+                        else
+                        {
+                            range = range0.get_Offset(0, 0);
+                            range = range.get_Resize(dataRows + datesInt, dataCols + namesInt);
+                        }
+                        if (blueColors)
+                        {
+                            range.Borders[Excel.XlBordersIndex.xlEdgeTop].Weight = Excel.XlBorderWeight.xlMedium;
+                            range.Borders[Excel.XlBordersIndex.xlEdgeTop].Color = blue;
+                            range.Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlMedium;
+                            range.Borders[Excel.XlBordersIndex.xlEdgeBottom].Color = blue;
+                            range.Borders[Excel.XlBordersIndex.xlEdgeLeft].Weight = Excel.XlBorderWeight.xlMedium;
+                            range.Borders[Excel.XlBordersIndex.xlEdgeLeft].Color = blue;
+                            range.Borders[Excel.XlBordersIndex.xlEdgeRight].Weight = Excel.XlBorderWeight.xlMedium;
+                            range.Borders[Excel.XlBordersIndex.xlEdgeRight].Color = blue;
+                        }
+                        else
+                        {
+                            range.Borders[Excel.XlBordersIndex.xlEdgeTop].Weight = Excel.XlBorderWeight.xlMedium;
+                            range.Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlMedium;
+                        }
+
+                    }
+
+                    // ===================== put cursor =========================
+
+                    if (fileName == null)
+                    {
+                        //Return control of Excel to the user.
+                        Globals.objApp.Visible = true;
+                        Globals.objApp.UserControl = true;
+                    }
+                    else
+                    {
+                        // Save the Workbook and quit Excel.
+                        Globals.objApp.DisplayAlerts = false;
+                        if (isAppend == false)
+                        {
+                            if (File.Exists(fileNameTempLocalFile)) WaitForFileDelete(fileNameTempLocalFile);  //probably not necessary
+                        }
+                        if (isAppend)
+                        {
+                            objBook.Save();
+                        }
+                        else
+                        {
+                            objBook.SaveCopyAs(fileNameTempLocalFile);
+                            //objBook.SaveAs(fileName4, Missing.Value, Missing.Value,
+                            //    Missing.Value, false, false, Excel.XlSaveAsAccessMode.xlNoChange,
+                            //    false, false, Missing.Value, Missing.Value, Missing.Value);
+                        }
+
+                        if (copyLocal)
+                        {
+                            try
+                            {
+                                //Maybe use WaitForFileCopy() here at some point.
+                                //Not sure why fileNameOriginalFile is deleted first (safety?)
+                                WaitForFileCopy(fileNameTempLocalFile, fileNameOriginalFile);
+                            }
+                            catch (Exception e)
+                            {
+                                G.Writeln();
+                                G.Writeln("*** ERROR: Could not write Excel file -- is it open/blocked?: " + fileNameOriginalFile);
+                                throw new GekkoException();
+                            }
+                        }
+
+                        ExcelCleanup(ref objBook, ref objBooks, ref objSheets, ref objSheet, ref range, ref newSheet, ref range0);
+                        if (!Globals.setPrintMute) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameOriginalFile);
+                    }
+                    return null;
+                }
+                catch (Exception theException)
+                {
+                    //G.Writeln(" ...did not finish");
+                    String errorMessage;
+                    errorMessage = "*** ERROR: Excel failed with the following error: ";
+                    errorMessage = String.Concat(errorMessage, theException.Message);
+                    errorMessage = String.Concat(errorMessage, " Line: ");
+                    errorMessage = String.Concat(errorMessage, theException.Source);
+                    G.Writeln(errorMessage);
+                    //see MS bug 320369
+                    System.Threading.Thread.CurrentThread.CurrentCulture = oldCI;
+                    throw new GekkoException();
+                }
+
                 //see MS bug 320369
                 System.Threading.Thread.CurrentThread.CurrentCulture = oldCI;
-                throw new GekkoException();
             }
-
-            //see MS bug 320369
-            System.Threading.Thread.CurrentThread.CurrentCulture = oldCI;
         }
 
         private static void ExcelCleanup(ref Excel.Workbook objBook, ref Excel.Workbooks objBooks, ref Excel.Sheets objSheets, ref Excel.Worksheet objSheet, ref Excel.Range range, ref Excel.Worksheet newSheet, ref Excel.Range range0)

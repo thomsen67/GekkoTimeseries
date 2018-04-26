@@ -881,6 +881,7 @@ Y2                    = 'Y2'                       ;
 	EXE            = 'EXE'           ;
     EXIT             = 'EXIT';
     EXO              = 'EXO'             ;
+	ROBUST              = 'ROBUST'             ;
     EXP              = 'EXP';
     EXPORT = 'EXPORT';
     EXTERNAL = 'EXTERNAL';
@@ -1436,6 +1437,7 @@ d.Add("Y" ,Y);
 										d.Add("exe"   , EXE     );
                                         d.Add("exit"    , EXIT       );
                                         d.Add("exo"     , EXO       );
+										d.Add("robust"     , ROBUST       );
                                         d.Add("exp"     , EXP       );
                                         d.Add("EXPORT", EXPORT);
                                         d.Add("EXTERNAL", EXTERNAL);
@@ -3320,8 +3322,9 @@ optionType :
              | SOLVE METHOD '='? optionSolveMethodOptions -> SOLVE METHOD ^(ASTSTRINGSIMPLE optionSolveMethodOptions)
              | SOLVE NEWTON question -> SOLVE NEWTON question
 			 | SOLVE NEWTON BACKTRACK '='? yesNoSimple -> SOLVE NEWTON BACKTRACK ^(ASTBOOL yesNoSimple)
-			 | SOLVE NEWTON CONV ABS '='? numberIntegerOrDouble -> SOLVE NEWTON CONV ABS numberIntegerOrDouble
-             | SOLVE NEWTON INVERT '='? optionSolveNewtonInvert -> SOLVE NEWTON INVERT ^(ASTSTRINGSIMPLE optionSolveNewtonInvert)
+			 | SOLVE NEWTON CONV ABS '='? numberIntegerOrDouble -> SOLVE NEWTON CONV ABS numberIntegerOrDouble             
+			 | SOLVE NEWTON ROBUST '='? yesNoSimple -> SOLVE NEWTON ROBUST ^(ASTBOOL yesNoSimple)			 
+			 | SOLVE NEWTON INVERT '='? optionSolveNewtonInvert -> SOLVE NEWTON INVERT ^(ASTSTRINGSIMPLE optionSolveNewtonInvert)
              | SOLVE NEWTON ITERMAX '='? Integer -> SOLVE NEWTON ITERMAX ^(ASTINTEGER Integer)
              | SOLVE NEWTON UPDATEFREQ '='? Integer -> SOLVE NEWTON UPDATEFREQ ^(ASTINTEGER Integer)
              | SOLVE PRINT '='? yesNoSimple -> SOLVE PRINT ^(ASTBOOL yesNoSimple)  //obsolete
@@ -3580,6 +3583,7 @@ ident                     : Ident|
 							EXE|
                             EXIT|
                             EXO|
+							ROBUST|
                             EXPORT|
                             EXP|
                             EXTERNAL|
@@ -3930,15 +3934,19 @@ fileNameFirstPart         : fileNameFirstPart1  //   c:\xx
 						  ;
 						  //For instance READ c:\a.b\c.d, cannot be c:a.b\c.d
 						    //ok to use name before colon, drive indicator should start with a letter.
-fileNameFirstPart1        : name ':' GLUEBACKSLASH fileNamePart -> ^(ASTFILENAMEFIRST1 name fileNamePart);
+fileNameFirstPart1        : name ':' slashHelper1 fileNamePart -> ^(ASTFILENAMEFIRST1 name fileNamePart);
                           //For instance READ \a.b\c.d, cannot be READ\a.b\c.d
-fileNameFirstPart2        : BACKSLASH fileNamePart -> ^(ASTFILENAMEFIRST2 fileNamePart);
+
+fileNameFirstPart2        : slashHelper2 fileNamePart -> ^(ASTFILENAMEFIRST2 fileNamePart);
                           //For instance READ a.b
 fileNameFirstPart3        : fileNamePart -> ^(ASTFILENAMEFIRST3 fileNamePart);
 							//stuff like 'a.7z' or 'a b.doc' or 'æøå.doc' must be in quotes.
 fileNamePart              : fileNamePartHelper (GLUEDOT DOT fileNamePartHelper)* -> ^(ASTFILENAMEPART fileNamePartHelper+);
 
 fileNamePartHelper        : name | scalarName;
+
+slashHelper1              : GLUEBACKSLASH | DIV;
+slashHelper2              : BACKSLASH | DIV;
 
 						  //If æøåÆØÅ then you need to put inside ''. Also with blanks. And parts beginning with a digit will not work either (5file.7z)
 url                       : urlFirstPart (DIV urlPart)* -> ^(ASTURL urlFirstPart urlPart*)

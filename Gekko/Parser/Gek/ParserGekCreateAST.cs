@@ -471,7 +471,16 @@ namespace Gekko.Parser.Gek
                 if (ph.isOneLinerFromGui == true && lineNo != 1)
                 {
                     G.Writeln("*** ERROR: Parsing this line:");
-                    G.Writeln("    " + G.ReplaceGlueNew(inputFileLines[0]), Color.Blue);
+                    string sss = null;
+                    for (int i = inputFileLines.Count - 1; i >= 0; i--)
+                    {
+                        if (inputFileLines[i] != null && inputFileLines[i].Trim() != "")
+                        {
+                            sss = inputFileLines[i];
+                            break;
+                        }
+                    }
+                    G.Writeln("    " + G.ReplaceGlueNew(sss), Color.Blue);
                     G.Writeln("*** ERROR: " + errorMessage);
                 }
                 else
@@ -647,7 +656,16 @@ namespace Gekko.Parser.Gek
                     if (ph.isOneLinerFromGui == true && lineNo != 1)
                     {
                         G.Writeln("*** ERROR: Parsing this line:");
-                        G.Writeln("    " + G.ReplaceGlueNew(inputFileLines[0]), Color.Blue);
+                        string sss = null;
+                        for (int i = inputFileLines.Count - 1; i >= 0; i--)
+                        {
+                            if (inputFileLines[i] != null && inputFileLines[i].Trim() != "")
+                            {
+                                sss = inputFileLines[i];
+                                break;
+                            }
+                        }
+                        G.Writeln("    " + G.ReplaceGlueNew(sss), Color.Blue);
                         G.Writeln("*** ERROR: " + errorMessage);
                     }
                     else
@@ -720,30 +738,7 @@ namespace Gekko.Parser.Gek
                 }
             }
             if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");
-
-            if (Globals.runningOnTTComputer)
-            {                
-                List<string> xxxx = new List<string>();                
-                if (ph.isOneLinerFromGui == false)
-                {
-                    //xxxx.Add(lineTemp2);
-                    for (int i = 0; i < lineTemp2.Count; i++)
-                    {
-                        string s = G.ReplaceGlueNew(lineTemp2[i]);
-                        List<string> yy = new List<string>();
-                        yy.Add(s);
-                        TranslateLine(yy, lineTemp2Numbers[i]);
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < inputFileLines.Count; i++)
-                    {
-                        xxxx.Add(G.ReplaceGlueNew(inputFileLines[i]));
-                    }
-                    TranslateLine(xxxx, null);
-                }                
-            }                       
+                                               
         }
 
         private static void CheckForBadDouble(string lineTemp)
@@ -772,61 +767,7 @@ namespace Gekko.Parser.Gek
                     break;  //no more of these messages
                 }
             }
-        }
-
-        private static void TranslateLine(List<string> xxxx, string lineNumber)
-        {
-            string translated = null;
-            bool isGekko18 = false;
-
-            if (G.equal(Program.options.interface_mode, "sim"))
-            {
-                translated = Translators.Translate1(false, xxxx);
-                isGekko18 = true;
-            }
-            else
-            {
-                translated = Translator2.Translate2(false, xxxx);
-            }
-            
-            List<string> translatedLines = G.RemoveEmptyLines(G.ExtractLinesFromText(translated));
-
-            string before = G.ExtractTextFromLines(xxxx).ToString();
-            string after = G.ExtractTextFromLines(translatedLines).ToString();
-
-            after = after.Replace(Globals.restartSnippet, "");
-            before = before.Replace(" ", "");
-            after = after.Replace(" ", "");
-            before = before.Replace("\r\n", "");
-            after = after.Replace("\r\n", "");            
-            if (before.EndsWith(";")) before = before.Substring(0, before.Length - 1);
-            if (after.EndsWith(";")) after = after.Substring(0, after.Length - 1);
-            before = before.ToLower().Trim();
-            after = after.ToLower().Trim();
-
-            if (before == "" || after == "")
-            {
-                //do nothing
-            }
-            else
-            {
-                if (before == after)
-                {
-                    //do nothing
-                }
-                else
-                {
-                    if (isGekko18) G.Writeln2("    Suggestion (translating from Gekko 1.8 syntax):");
-                    else G.Writeln2("    Suggestion (translating from AREMOS syntax):");
-                    foreach (string s12 in translatedLines)
-                    {
-                        if (s12.Trim() == Globals.restartSnippet) continue; //skip that here, only good for files
-                        G.Writeln("    --> " + lineNumber + " " + s12, Color.Blue);
-                    }
-                    G.Writeln();
-                }
-            }
-        }        
+        }       
 
         public static void PrintAST(CommonTree node, int depth)
         {

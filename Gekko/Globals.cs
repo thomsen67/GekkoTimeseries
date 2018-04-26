@@ -43,10 +43,10 @@ namespace Gekko
         public static string versionInternal = "v14";  // "v14";
 
         //Newton starting values start ------------------------------------
-        public static bool newtonStartingValuesFix = true;
-        public static int newtonStartingValuesHelper1 = -12345;
-        public static double[] newtonStartingValuesHelper2 = new double[1000];
-        public const double special_value1 = 0.000001d;                
+        //public static bool newtonStartingValuesFix = true;
+        public static int newtonRobustHelper1 = -12345;
+        public static double[] newtonRobustHelper2 = new double[1000];
+        public const double newtonRobustHelper3 = 0.000001d;                
         //Newton starting values end --------------------------------------
 
         public static bool testFileChange = true;

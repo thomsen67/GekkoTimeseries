@@ -1468,7 +1468,7 @@ namespace Gekko
                         sb.AppendLine(eh.csCodeRhs);
                         sb.AppendLine(";");
                         sb.AppendLine();
-                        if (Globals.newtonStartingValuesFix) NewtonStartingValuesFixHelper2(sb);
+                        if (Program.options.solve_newton_robust) NewtonStartingValuesFixHelper2(sb);
                         codeNewton.Append(sb);
 
                     }
@@ -1489,7 +1489,7 @@ namespace Gekko
                         sb.AppendLine(")");
                         sb.AppendLine(";");
                         sb.AppendLine();
-                        if (Globals.newtonStartingValuesFix) NewtonStartingValuesFixHelper2(sb);
+                        if (Program.options.solve_newton_robust) NewtonStartingValuesFixHelper2(sb);
                         codeNewton.Append(sb);
                     }
                     codeNewton.AppendLine("}");
@@ -1512,7 +1512,7 @@ namespace Gekko
                         sb.AppendLine(" ); ");
                         sb.Append("break;");
                         sb.AppendLine();
-                        if (Globals.newtonStartingValuesFix) NewtonStartingValuesFixHelper2(sb);
+                        if (Program.options.solve_newton_robust) NewtonStartingValuesFixHelper2(sb);
                         codeNewton.Append(sb);
                     }
                     codeNewton.AppendLine("}");  //case

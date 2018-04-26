@@ -125,18 +125,18 @@ namespace Gekko
         private static double NewtonStartingValuesFixHelper1(double x)
         {
             //x is < 0 here
-            if (Globals.newtonStartingValuesHelper1 == -12345) return x;
-            double distance = -x + Globals.special_value1;  //distance will be > 0
-            if (Globals.newtonStartingValuesHelper1 < Globals.newtonStartingValuesHelper2.Length)
+            if (Globals.newtonRobustHelper1 == -12345) return x;
+            double distance = -x + Globals.newtonRobustHelper3;  //distance will be > 0
+            if (Globals.newtonRobustHelper1 < Globals.newtonRobustHelper2.Length)
             {
-                Globals.newtonStartingValuesHelper2[Globals.newtonStartingValuesHelper1] = distance;
-                Globals.newtonStartingValuesHelper1++;
+                Globals.newtonRobustHelper2[Globals.newtonRobustHelper1] = distance;
+                Globals.newtonRobustHelper1++;
             }
             else
             {
                 //ignore recording of this distance
             }
-            double d = Globals.special_value1;            
+            double d = Globals.newtonRobustHelper3;            
             return d;
         }
 
@@ -3649,7 +3649,7 @@ namespace Gekko
                 }
                 if(errorCounter > 0)
                 {
-                    G.Writeln("+++ WARNING: COPY: Note that " + errorCounter + " variables were not copied");
+                    G.Writeln("+++ WARNING: COPY: Note that " + errorCounter + " variables were not copied, see names above.");
                 }
             }
 
