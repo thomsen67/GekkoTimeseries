@@ -147,7 +147,10 @@ namespace Gekko
 
         [ProtoMember(14)]
         private bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]
-        
+
+        [ProtoMember(15)]
+        public string units;
+
         private bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf
 
@@ -194,6 +197,7 @@ namespace Gekko
             tsCopy.lastPeriodPositionInArray = this.lastPeriodPositionInArray;
             if (this.label != null) tsCopy.label = string.Copy(this.label);  //using string.Copy() probably not be necessary, but we use it for extra safety
             if (this.source != null) tsCopy.source = string.Copy(this.source); //using string.Copy() probably not be necessary, but we use it for extra safety                        
+            if (this.units != null) tsCopy.units = string.Copy(this.units); //using string.Copy() probably not be necessary, but we use it for extra safety                        
             if (this.stamp != null) tsCopy.stamp = string.Copy(this.stamp); //using string.Copy() probably not be necessary, but we use it for extra safety                        
             tsCopy.isGhost = this.isGhost;
             tsCopy.isTimeless = this.isTimeless;            

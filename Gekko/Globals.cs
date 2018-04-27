@@ -46,8 +46,10 @@ namespace Gekko
         //public static bool newtonStartingValuesFix = true;
         public static int newtonRobustHelper1 = -12345;
         public static double[] newtonRobustHelper2 = new double[1000];
-        public const double newtonRobustHelper3 = 0.000001d;                
+        public const double newtonRobustHelper3 = 0.000001d;
         //Newton starting values end --------------------------------------
+
+        public static string libHelper = "//The code is from this file: ";
 
         public static bool testFileChange = true;
 

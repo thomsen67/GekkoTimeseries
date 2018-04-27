@@ -393,6 +393,20 @@ namespace Gekko.Parser.Gek
 
         public static void PrintLexerErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
         {
+            string sdeduct = null;
+            int deduct = 0;
+            int ih = 0;
+            foreach (string s in inputFileLines)
+            {
+                if (s.Contains(Globals.libHelper))
+                {
+                    deduct = ih + 2;
+                    sdeduct = s;
+                    break;
+                }
+                ih++;
+            }
+
             if (Globals.threadIsInProcessOfAborting) return;
             if (ph.fileName == null && ph.commandsText == null)
             {
@@ -491,11 +505,11 @@ namespace Gekko.Parser.Gek
                             string fn = ph.fileName;
                             if (fn == null || fn == "")
                             {
-                                G.Writeln("*** ERROR: Parsing user input block, line " + lineNo + " pos " + positionNo);
+                                G.Writeln("*** ERROR: Parsing user input block, line " + (lineNo - deduct) + " pos " + positionNo);
                             }
                             else
                             {
-                                G.Writeln("*** ERROR: Parsing file: " + fn + " line " + lineNo + " pos " + positionNo);
+                                G.Writeln("*** ERROR: Parsing file: " + fn + " line " + (lineNo - deduct) + " pos " + positionNo);
                             }
 
                             string e2 = errorMessage.Replace("Der blev udløst en undtagelse af typen ", "");
@@ -514,12 +528,12 @@ namespace Gekko.Parser.Gek
 
                     if (previousLineProbablyCulprit && lineNo > 1)
                     {
-                        G.Writeln("    " + "Line " + (lineNo - 1) + " may be the real cause of the problem");
+                        G.Writeln("    " + "Line " + (lineNo - deduct - 1) + " may be the real cause of the problem");
                         string lineBefore = inputFileLines[lineNo - 1 - 1];
-                        G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueNew(lineBefore), Color.Blue);
+                        G.Writeln("    " + "[" + G.IntFormat(lineNo - deduct - 1, 4) + "]:" + "   " + G.ReplaceGlueNew(lineBefore), Color.Blue);
                     }
 
-                    G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + G.ReplaceGlueNew(line0), Color.Blue);
+                    G.Write("    " + "[" + G.IntFormat(lineNo - deduct, 4) + "]:" + "   " + G.ReplaceGlueNew(line0), Color.Blue);
                     G.Write(G.ReplaceGlueNew(line1), Color.Red);
                     G.Writeln(G.ReplaceGlueNew(line2), Color.Blue);
 
@@ -535,12 +549,32 @@ namespace Gekko.Parser.Gek
                     WriteLinkToHelpFile2(G.ReplaceGlueNew(line));
                     if (number == 1) ExtraErrorMessages(G.ReplaceGlueNew(line));
                 }
+
+                if (lineNo - deduct < 0)
+                {
+                    G.Writeln2("+++ NOTE: The line is probably from a library file, cf. the FUNCTION command.");
+                    G.Writeln("          " + G.ReplaceGlueNew(sdeduct).Replace("//", ""));
+                }
             }
             if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");
         }
 
         public static void PrintParserErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
-        {            
+        {
+            string sdeduct = null;
+            int deduct = 0;
+            int ih = 0;
+            foreach (string s in inputFileLines)
+            {
+                if (s.Contains(Globals.libHelper))
+                {
+                    deduct = ih + 2;
+                    sdeduct = s;
+                    break;
+                }
+                ih++;
+            }
+
             List<string> lineTemp2 = new List<string>();
             List<string> lineTemp2Numbers = new List<string>();
             if (Globals.threadIsInProcessOfAborting) return;
@@ -676,7 +710,7 @@ namespace Gekko.Parser.Gek
                             string extra = "";
                             if (lineNo >= 1 && positionNo > 0)
                             {
-                                extra = " line " + lineNo + " pos " + positionNo;
+                                extra = " line " + (lineNo - deduct) + " pos " + positionNo;
                             }
 
                             if (fn == null || fn == "")
@@ -705,7 +739,7 @@ namespace Gekko.Parser.Gek
                             if (lineTemp != null && lineTemp != "")
                             {
                                 lineTemp2.Add(lineTemp);  //used for suggestions later on
-                                lineTemp2Numbers.Add("    " + "[" + G.IntFormat(lineNo, 4) + "]:");
+                                lineTemp2Numbers.Add("    " + "[" + G.IntFormat(lineNo - deduct, 4) + "]:");
                             }
                             string line0 = lineTemp.Substring(0, positionNo - 1);
                             string line1 = lineTemp.Substring(positionNo - 1, 1);
@@ -713,12 +747,12 @@ namespace Gekko.Parser.Gek
 
                             if (previousLineProbablyCulprit && lineNo > 1)
                             {
-                                G.Writeln("    " + "Line " + (lineNo - 1) + " may be the real cause of the problem");
+                                G.Writeln("    " + "Line " + (lineNo - deduct - 1) + " may be the real cause of the problem");
                                 string lineBefore = inputFileLines[lineNo - 1 - 1];
                                 G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueNew(lineBefore), Color.Blue);
                             }
 
-                            G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + G.ReplaceGlueNew(line0), Color.Blue);
+                            G.Write("    " + "[" + G.IntFormat(lineNo - deduct, 4) + "]:" + "   " + G.ReplaceGlueNew(line0), Color.Blue);
                             G.Write(G.ReplaceGlueNew(line1), Color.Red);
                             G.Writeln(G.ReplaceGlueNew(line2), Color.Blue);
 
@@ -735,6 +769,12 @@ namespace Gekko.Parser.Gek
                 {
                     WriteLinkToHelpFile2(G.ReplaceGlueNew(line));
                     if (number == 1) ExtraErrorMessages(G.ReplaceGlueNew(line));
+                }
+
+                if (lineNo - deduct < 0)
+                {
+                    G.Writeln2("+++ NOTE: The line is probably from a library file, cf. the FUNCTION command.");
+                    G.Writeln("          " + G.ReplaceGlueNew(sdeduct).Replace("//", ""));
                 }
             }
             if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");

@@ -60,6 +60,7 @@ tokens {
 	ASTSERIES;
 	ASTSERIESLHS;
 	ASTSERIESRHS;
+	ASTOPT_STRING_UNITS;
 	ASTOPT_STRING_PX;
 	ASTOPT_STRING_BOLD;
 	ASTOPT_STRING_BROWSER;
@@ -477,6 +478,7 @@ ASTOPT_STRING_Y2;
 	ASTOPT_STRING_SEC;
     ASTOPT_STRING_REF;
     ASTOPT_STRING_SERIES;
+	ASTOPT_STRING_SER;
     ASTOPT_STRING_SHEET;
     ASTOPT_STRING_SOURCE;
     ASTOPT_STRING_SPLINE;
@@ -766,6 +768,7 @@ Y2                    = 'Y2'                       ;
     X = 'X';
 	Y = 'Y';
 	
+	UNITS = 'UNITS';
 	MDATEFORMAT = 'MDATEFORMAT';
 	THOUSANDSSEPARATOR = 'THOUSANDSSEPARATOR';
 	XEDIT = 'XEDIT';
@@ -1316,6 +1319,7 @@ d.Add("Y" ,Y);
 										d.Add("XEDIT"    ,   XEDIT     );
 
 										d.Add("MDATEFORMAT"    ,   MDATEFORMAT     );
+										d.Add("UNITS"    ,   UNITS     );
 										d.Add("THOUSANDSSEPARATOR"    ,   THOUSANDSSEPARATOR     );
 											
 										d.Add("MISSING"    ,   MISSING     );
@@ -1922,6 +1926,7 @@ docOpt2                   : docOpt2h*;
 docOpt2h                  : LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expression)
 						  | SOURCE EQUAL expression -> ^(ASTOPT_STRING_SOURCE expression)
 						  | STAMP EQUAL expression -> ^(ASTOPT_STRING_STAMP expression)					
+						  | UNITS EQUAL expression -> ^(ASTOPT_STRING_UNITS expression)	
 						  ;
 
 collapse				  : COLLAPSE nameBankHelper '=' nameBankHelper collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, $COLLAPSE.Line)} nameBankHelper nameBankHelper collapseMethod?);
@@ -2339,6 +2344,7 @@ readOpt1h                 : MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | PCIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PCIM yesNo?)
 						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
 						  | PRN (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRN yesNo?)
+						  | SER (EQUAL yesNo)? -> ^(ASTOPT_STRING_SER yesNo?)
 						  | PX (EQUAL yesNo)? -> ^(ASTOPT_STRING_PX yesNo?)
 						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
   						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)
@@ -3415,6 +3421,7 @@ ident                     : Ident|
 							ADDBANK|
 							THOUSANDSSEPARATOR|
 							MDATEFORMAT|
+							UNITS|
                             LINESPOINTS|
 							CONTINUE|
 							//LINES|

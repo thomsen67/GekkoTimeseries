@@ -1924,6 +1924,7 @@ namespace Gekko
             public string opt_csv = null;
             public string opt_prn = null;
             public string opt_pcim = null;
+            public string opt_ser = null;
             public string opt_xls = null;
             public string opt_xlsx = null;
             public string opt_merge = null;
@@ -1986,6 +1987,7 @@ namespace Gekko
                 if (G.equal(this.opt_xlsx, "yes")) hlp.Type = EDataFormat.Xlsx;
                 if (G.equal(this.opt_gdx, "yes")) hlp.Type = EDataFormat.Gdx;
                 if (G.equal(this.opt_px, "yes")) hlp.Type = EDataFormat.Px;
+                if (G.equal(this.opt_ser, "yes")) hlp.Type = EDataFormat.Ser;
                 if (G.equal(this.opt_cols, "yes")) hlp.Orientation = "cols";
 
                 hlp.gdxopt = this.opt_gdxopt;                
@@ -3208,6 +3210,7 @@ namespace Gekko
         {
             public string opt_label = null;
             public string opt_source = null;
+            public string opt_units = null;
             public string opt_stamp = null;
             public string opt_browser = null;      
             public List<string> listItems0 = null;  //left side     
@@ -3222,6 +3225,7 @@ namespace Gekko
                     ExtractBankAndRestHelper h = Program.ExtractBankAndRest(s, EExtrackBankAndRest.GetDatabankAndTimeSeries);
                     if (opt_label != null) h.ts.label = opt_label;
                     if (opt_source != null) h.ts.source = opt_source;
+                    if (opt_units != null) h.ts.units = opt_units;
                     if (opt_stamp != null) h.ts.stamp = opt_stamp;
                     h.ts.SetDirty(true);
                 }

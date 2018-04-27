@@ -3926,12 +3926,39 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void Test__DatabankSerFormat()
+        {
+            I("RESET;");
+            I("READ <ser> " + Globals.ttPath2 + @"\regres\Databanks\test;");
+            AssertHelper(First(), "xx1", 2000, double.NaN, sharedDelta);
+            AssertHelper(First(), "xx1", 2001, 1d, sharedDelta);
+            AssertHelper(First(), "xx1", 2002, -2d, sharedDelta);
+            AssertHelper(First(), "xx1", 2003, 1e5d, sharedDelta);
+            AssertHelper(First(), "xx1", 2004, -1.23d, sharedDelta);
+            AssertHelper(First(), "xx1", 2005, double.NaN, sharedDelta);
+
+            AssertHelper(First(), "xx2", 2000, double.NaN, sharedDelta);
+            AssertHelper(First(), "xx2", 2001, 3d, sharedDelta);
+            AssertHelper(First(), "xx2", 2002, 3d, sharedDelta);
+            AssertHelper(First(), "xx2", 2003, 3d, sharedDelta);
+            AssertHelper(First(), "xx2", 2004, 3d, sharedDelta);
+            AssertHelper(First(), "xx2", 2005, double.NaN, sharedDelta);
+
+            AssertHelper(First(), "xx3", EFreq.Quarterly, 2000, 4, double.NaN, sharedDelta);
+            AssertHelper(First(), "xx3", EFreq.Quarterly, 2001, 1, 1d, sharedDelta);
+            AssertHelper(First(), "xx3", EFreq.Quarterly, 2001, 2, 2, sharedDelta);
+            AssertHelper(First(), "xx3", EFreq.Quarterly, 2001, 3, 3d, sharedDelta);
+            AssertHelper(First(), "xx3", EFreq.Quarterly, 2001, 4, 4, sharedDelta);
+            AssertHelper(First(), "xx3", EFreq.Quarterly, 2002, 1, double.NaN, sharedDelta);
+        }
+
+        [TestMethod]
         public void Test__Tell()
         {
             I("RESET;");
             I("TELL<nocr>'hel'+'lo1';");
             I("TELL 'hel'+'lo2';");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("hello1hello2"));
+            
         }
 
         [TestMethod]

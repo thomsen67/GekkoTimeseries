@@ -1873,6 +1873,10 @@ namespace Gekko
             {
                 return new ScalarString(ts.stamp);
             }
+            else if (G.equal(s2, "units"))
+            {
+                return new ScalarString(ts.units);
+            }
             else if (G.equal(s2, "perStart"))
             {
                 return new ScalarDate(ts.GetPeriodFirst());
