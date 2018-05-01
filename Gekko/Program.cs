@@ -31177,7 +31177,7 @@ namespace Gekko
             return matrix;
         }
 
-        public static object[][] ToJaggedArray(double[,] twoDimensionalArray)
+        public static object[][] ToJaggedArray<T>(T[,] twoDimensionalArray)
         {
             int rowsFirstIndex = twoDimensionalArray.GetLowerBound(0);
             int rowsLastIndex = twoDimensionalArray.GetUpperBound(0);
@@ -31268,8 +31268,6 @@ namespace Gekko
                     int rowcounter = 1;  //1-based
                     int colcounter = 1;  //1-based
 
-
-
                     if (isStamp)
                     {
                         StampTypes type = StampTypes.Normal;
@@ -31283,10 +31281,7 @@ namespace Gekko
                         }
                         if (ss.EndsWith(". ")) ss = ss.Substring(0, ss.Length - 2);
                         cplotData.stamp = ss;
-                        //if (!eo.isCplot) if (isColors) range0.Font.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Gray);
-                        //if (!eo.isCplot) range0.set_Value(Missing.Value, cplotData.stamp);
-                        //if (!eo.isCplot) range0 = range0.get_Offset(1, 0);
-                        //ws.Cells.SelectMany()
+                        
                         if (!eo.isCplot)
                         {
                             ws.Cells[rowcounter, 1].Value = cplotData.stamp;
@@ -31298,9 +31293,7 @@ namespace Gekko
                     if (oPrt != null && oPrt.opt_title != null)
                     {
                         cplotData.heading = oPrt.opt_title;
-                        //if (!eo.isCplot) if (isColors) range0.Font.Bold = true;
-                        //if (!eo.isCplot) range0.set_Value(Missing.Value, cplotData.heading);
-                        //if (!eo.isCplot) range0 = range0.get_Offset(1, 0);
+                        
                         if (!eo.isCplot)
                         {
                             ws.Cells[rowcounter, 1].Value = cplotData.heading;
@@ -31329,32 +31322,23 @@ namespace Gekko
 
                     int d1 = rowcounter + datesInt;
                     int d2 = 1 + namesInt;
-                    //int data3 = rowcounter + datesInt + dataRows;
-                    //int data4 = 1 + namesInt + dataCols;
 
                     if (isTranspose)
                     {
                         d1 = rowcounter + namesInt;
                         d2 = 1 + datesInt;
-                        //data3 = rowcounter + namesInt + dataCols;
-                        //data4 = 1 + datesInt + dataRows;
                         data = Transpose(eo.excelData);
                     }
 
                     if (!eo.isCplot)
-                    {
-                        //ws.Cells[data1, data2, data3, data4].Value = data;
-                        //ws.Cells[d1, d2, d1 + data.GetLength(0) - 1, d2 + data.GetLength(1) - 1].Value = data;
-                        //
-
-                        List<object[]> xx = new List<object[]>();    
+                    {                           
                         ws.Cells[d1, d2, d1 + data.GetLength(0) - 1, d2 + data.GetLength(1) - 1].LoadFromArrays(ToJaggedArray(data));
                     }
                     else cplotData.data = data;
 
                     string na = "na()";
                     if (G.equal(Program.options.interface_excel_language, "danish")) na = "ikke.tilgængelig()";
-                    //List<Tuple<int, int>> nans = new List<Tuple<int, int>>();
+                    
                     for (int i = 0; i < data.GetLength(0); i++)
                     {
                         for (int j = 0; j < data.GetLength(1); j++)
@@ -31367,74 +31351,51 @@ namespace Gekko
                     }
 
                     //DATES ROW ---------------------------------------------------------------------
-                    //range = objSheet.get_Range("B2", Missing.Value);
-
+                    
                     if (isDates)
                     {
-
-                        //if (!eo.isCplot)
-                        //{
-                        //    if (isTranspose)
-                        //    {
-                        //        range = range0.get_Offset(namesInt, 0);
-                        //        range = range.get_Resize(dataCols, 1);
-                        //    }
-                        //    else
-                        //    {
-                        //        range = range0.get_Offset(0, namesInt);
-                        //        range = range.get_Resize(1, dataCols);
-                        //    }
-                        //}
-
-                        string[,] data2 = null;
+                        
+                        object[,] data2 = null;
+                        object[][] data22 = null;
 
                         if (options.freq == EFreq.Annual)
                         {
                             //else the cells are left-justified and with a green triangle (warning)
-
                             int[,] datatmp = null;
                             if (isTranspose)
                             {
-                                datatmp = Transpose(excelColumnLabelsAnnual);
-                                //if (!eo.isCplot) range.set_Value(Missing.Value, data);
+                                datatmp = Transpose(excelColumnLabelsAnnual);                                
                             }
                             else
                             {
-                                datatmp = excelColumnLabelsAnnual;
-                                //if (!eo.isCplot) range.set_Value(Missing.Value, data);
+                                datatmp = excelColumnLabelsAnnual;                                
                             }
-                            data2 = ConvertToString(datatmp);
+                            data22 = ToJaggedArray(datatmp);                            
                         }
                         else
                         {
                             string[,] data3 = null;
                             if (isTranspose)
                             {
-                                data3 = Transpose(eo.excelColumnLabels);
-                                //if (!eo.isCplot) range.set_Value(Missing.Value, data3);
+                                data3 = Transpose(eo.excelColumnLabels);                                
                             }
                             else
                             {
-                                data3 = eo.excelColumnLabels;
-                                //if (!eo.isCplot) range.set_Value(Missing.Value, data3);
-                            }
-                            data2 = data3;
+                                data3 = eo.excelColumnLabels;                             
+                            }                            
+                            data22 = ToJaggedArray(data3);
                         }
 
                         if (isTranspose)
-                        {
-                            ws.Cells[d1 + namesInt + data2.GetLength(0), d2 + data2.GetLength(1)].Value = data2;
-                            //range = range0.get_Offset(namesInt, 0);
-                            //range = range.get_Resize(dataCols, 1);
+                        {                            
+                            ws.Cells[d1 , d2 - 1, d1  + data22.Length - 1, d2 - 1 + data22[0].Length - 1].LoadFromArrays(data22);                            
                         }
                         else
-                        {
-                            ws.Cells[d1 + data2.GetLength(0), d2 + namesInt + data2.GetLength(1)].Value = data2;
-                            //range = range0.get_Offset(0, namesInt);
-                            //range = range.get_Resize(1, dataCols);
+                        {                         
+                            ws.Cells[d1 - 1, d2 , d1 - 1 + data22.Length - 1, d2 + data22[0].Length - 1].LoadFromArrays(data22);
                         }
                         
-                        cplotData.dates = data2;
+                        cplotData.dates = (string[,]) data2;
                     }
 
                     //====================== VARIABLE NAMES COLUMN -----------------------------------------------------------------
@@ -31443,20 +31404,14 @@ namespace Gekko
                     {
                         string[,] labels = null;
                         if (isTranspose)
-                        {
-                            //if (!eo.isCplot) range = range0.get_Offset(0, datesInt);
-                            //if (!eo.isCplot) range = range.get_Resize(1, dataRows);
-                            labels = Transpose(eo.excelRowLabels);
-                            //if (!eo.isCplot) range.set_Value(Missing.Value, labels);
-                            ws.Cells[d1 + labels.GetLength(0), d2 + datesInt + labels.GetLength(1)].Value = labels;
+                        {                            
+                            labels = Transpose(eo.excelRowLabels);                         
+                            ws.Cells[d1 - 1, d2 , d1 - 1 + labels.GetLength(0) - 1, d2 + labels.GetLength(1) - 1].LoadFromArrays(ToJaggedArray(labels));
                         }
                         else
-                        {
-                            //if (!eo.isCplot) range = range0.get_Offset(datesInt, 0);
-                            //if (!eo.isCplot) range = range.get_Resize(dataRows, 1);
-                            labels = eo.excelRowLabels;
-                            //if (!eo.isCplot) range.set_Value(Missing.Value, labels);
-                            ws.Cells[d1 + datesInt + labels.GetLength(0), d2 + labels.GetLength(1)].Value = labels;
+                        {                            
+                            labels = eo.excelRowLabels;                         
+                            ws.Cells[d1, d2 - 1, d1 + labels.GetLength(0) - 1, d2 - 1 + labels.GetLength(1) - 1].LoadFromArrays(ToJaggedArray(labels));
                         }
                         cplotData.varnames = labels;
                     }
@@ -31537,54 +31492,6 @@ namespace Gekko
 
                     //}
 
-                    // ===================== put cursor =========================
-
-                    //if (fileName == null)
-                    //{
-                    //    //Return control of Excel to the user.
-                    //    Globals.objApp.Visible = true;
-                    //    Globals.objApp.UserControl = true;
-                    //}
-                    //else
-                    //{
-                    //    // Save the Workbook and quit Excel.
-                    //    Globals.objApp.DisplayAlerts = false;
-                    //    if (isAppend == false)
-                    //    {
-                    //        if (File.Exists(fileNameTempLocalFile)) WaitForFileDelete(fileNameTempLocalFile);  //probably not necessary
-                    //    }
-                    //    if (isAppend)
-                    //    {
-                    //        objBook.Save();
-                    //    }
-                    //    else
-                    //    {
-                    //        objBook.SaveCopyAs(fileNameTempLocalFile);
-                    //        //objBook.SaveAs(fileName4, Missing.Value, Missing.Value,
-                    //        //    Missing.Value, false, false, Excel.XlSaveAsAccessMode.xlNoChange,
-                    //        //    false, false, Missing.Value, Missing.Value, Missing.Value);
-                    //    }
-
-                    //    if (copyLocal)
-                    //    {
-                    //        try
-                    //        {
-                    //            //Maybe use WaitForFileCopy() here at some point.
-                    //            //Not sure why fileNameOriginalFile is deleted first (safety?)
-                    //            WaitForFileCopy(fileNameTempLocalFile, fileNameOriginalFile);
-                    //        }
-                    //        catch (Exception e)
-                    //        {
-                    //            G.Writeln();
-                    //            G.Writeln("*** ERROR: Could not write Excel file -- is it open/blocked?: " + fileNameOriginalFile);
-                    //            throw new GekkoException();
-                    //        }
-                    //    }
-
-                    //    ExcelCleanup(ref objBook, ref objBooks, ref objSheets, ref objSheet, ref range, ref newSheet, ref range0);
-                    //    if (!Globals.setPrintMute) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameOriginalFile);
-                    //}
-                    //return null;
                     
                     //Save the new workbook. We haven't specified the filename so use the Save as method.
                     p.SaveAs(new FileInfo(fileNameWithPath));
@@ -32441,9 +32348,22 @@ namespace Gekko
         }
 
 
-        public static int[,] Transpose(int[,] x)
+        //public static int[,] Transpose(int[,] x)
+        //{
+        //    int[,] y = new int[x.GetLength(1), x.GetLength(0)];
+        //    for (int i = 0; i < x.GetLength(0); i++)
+        //    {
+        //        for (int j = 0; j < x.GetLength(1); j++)
+        //        {
+        //            y[j, i] = x[i, j];
+        //        }
+        //    }
+        //    return y;
+        //}
+
+        public static T[,] Transpose<T>(T[,] x)
         {
-            int[,] y = new int[x.GetLength(1), x.GetLength(0)];
+            T[,] y = new T[x.GetLength(1), x.GetLength(0)];
             for (int i = 0; i < x.GetLength(0); i++)
             {
                 for (int j = 0; j < x.GetLength(1); j++)
