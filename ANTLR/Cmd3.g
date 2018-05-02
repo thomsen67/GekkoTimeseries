@@ -53,6 +53,7 @@ tokens {
 	ASTLOGICALIN;
 	ASTDATE2;
 	ASTSTRINGINQUOTES;
+	ASTOPT_STRING_UNITS;
 	ASTDOUBLE;
 	ASTDOLLARCONDITIONALVARIABLE;
 	ASTINDEXERELEMENTIDENT;
@@ -1204,6 +1205,7 @@ Y2                    = 'Y2'                       ;
     TESTSIM          = 'TESTSIM'         ;
     TIME             = 'TIME'            ;
     TIMEFILTER         = 'TIMEFILTER'        ;
+	UNITS = 'UNITS';
     TIMESPAN         = 'TIMESPAN'        ;
     TITLE         = 'TITLE'        ;
     TO               = 'TO'            ;
@@ -1394,6 +1396,7 @@ d.Add("Y" ,Y);
                                         d.Add("_GDIFF"             ,   UGDIFF     );
                                         d.Add("_LEV"    ,   ULEV     );
                                         d.Add("_PCH"    ,   UPCH     );
+										d.Add("UNITS"    ,   UNITS     );
                                         d.Add("a"       , A       );
 										d.Add("DEFAULT"       , DEFAULT       );
 										d.Add("LOGIC"       , LOGIC       );
@@ -3025,6 +3028,29 @@ listItemWildRange:          wildcardWithBank ->                        wildcardW
 						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)   //accepts stuff like 0e. Integers are caught via expression.												
 						    ;
 
+
+
+
+
+fileNameFirstPart1        : name ':' slashHelper1 fileNamePart -> ^(ASTFILENAMEFIRST1 name fileNamePart);
+                          //For instance READ \a.b\c.d, cannot be READ\a.b\c.d
+
+fileNameFirstPart2        : slashHelper2 fileNamePart -> ^(ASTFILENAMEFIRST2 fileNamePart);
+                          //For instance READ a.b
+fileNameFirstPart3        : fileNamePart -> ^(ASTFILENAMEFIRST3 fileNamePart);
+							//stuff like 'a.7z' or 'a b.doc' or 'זרו.doc' must be in quotes.
+fileNamePart              : fileNamePartHelper (GLUEDOT DOT fileNamePartHelper)* -> ^(ASTFILENAMEPART fileNamePartHelper+);
+
+fileNamePartHelper        : name | scalarName;
+
+slashHelper1              : GLUEBACKSLASH | DIV;
+slashHelper2              : BACKSLASH | DIV;
+
+
+
+
+
+
 						    //If זרוֶ״ֵ then you need to put inside ''. Also with blanks. And parts beginning with a digit will not work either (5file.7z)
 fileName:                   fileNameFirstPart (GLUEBACKSLASH fileNamePart)* -> ^(ASTFILENAME fileNameFirstPart fileNamePart*)
 						  | expression
@@ -3035,15 +3061,18 @@ fileNameFirstPart:          fileNameFirstPart1  //   c:\xx
 						    ;
 						    //For instance READ c:\a.b\c.d, cannot be c:a.b\c.d
 						    //ok to use name before colon, drive indicator should start with a letter.
-fileNameFirstPart1:         name ':' GLUEBACKSLASH fileNamePart -> ^(ASTFILENAMEFIRST1 name fileNamePart);
+fileNameFirstPart1:         name ':' slashHelper1 fileNamePart -> ^(ASTFILENAMEFIRST1 name fileNamePart);
                             //For instance READ \a.b\c.d, cannot be READ\a.b\c.d
-fileNameFirstPart2:         BACKSLASH fileNamePart -> ^(ASTFILENAMEFIRST2 fileNamePart);
+fileNameFirstPart2:         slashHelper2 fileNamePart -> ^(ASTFILENAMEFIRST2 fileNamePart);
                             //For instance READ a.b
 fileNameFirstPart3:         fileNamePart -> ^(ASTFILENAMEFIRST3 fileNamePart);
 							//stuff like 'a.7z' or 'a b.doc' or 'זרו.doc' must be in quotes.
 fileNamePart:               fileNamePartHelper (GLUEDOT DOT fileNamePartHelper)* -> ^(ASTFILENAMEPART fileNamePartHelper+);
 
 fileNamePartHelper:         varname;  //has to be restricted later on: do not allow a!b or #a.
+
+slashHelper1:               GLUEBACKSLASH | DIV;
+slashHelper2:               BACKSLASH | DIV;
 
 fileNameStar:               fileName
 						  | star -> ASTFILENAMESTAR

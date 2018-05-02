@@ -136,6 +136,7 @@ namespace Gekko
             this.textBox1.TabStop = false;
             this.textBox1.Text = "";
             this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.richTextBox777_KeyDown);
+            this.textBox1.KeyUp += new System.Windows.Forms.KeyEventHandler(this.richTextBox777_KeyUp);
             this.splitContainer1.Panel1.Controls.Add(this.textBox1);
 
             //
@@ -1350,6 +1351,7 @@ namespace Gekko
                 }
                 else if (type == "disp")
                 {
+                    //See also #98075243587
                     Globals.guiHomeMainEnabled = true;
                     //disp link, non-shown frn type eq
                     //for instance input0 = "fY#disp:fY"
@@ -1369,6 +1371,7 @@ namespace Gekko
                 }
                 else if (type == "disp2")
                 {
+                    //See also #98075243587
                     Globals.guiHomeMainEnabled = true;
                     //disp link, shown frn type eq
                     //for instance input0 = "fY#disp2:fY"
@@ -1378,6 +1381,7 @@ namespace Gekko
                 }
                 else if (type == "disp3")
                 {
+                    //See also #98075243587
                     Globals.guiHomeMainEnabled = true;
                     //disp link, shown frn type eq
                     //for instance input0 = "fY#disp3:fY"
@@ -1387,6 +1391,7 @@ namespace Gekko
                 }
                 else if (type == "help")
                 {
+                    //See also #98075243587
                     //for instance input0 = "simulate#help:sim"
                     if (input == "<null>")
                     {

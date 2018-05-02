@@ -2122,6 +2122,11 @@ namespace Gekko
                     extension = "prn";
                     isGbk = false;
                 }
+                if (oRead.Type == EDataFormat.Ser)
+                {
+                    extension = "ser";
+                    isGbk = false;
+                }
                 if (oRead.Type == EDataFormat.Xls)
                 {
                     extension = "xls";
@@ -2285,6 +2290,15 @@ namespace Gekko
                         //    throw new GekkoException();
                         //}
                         Program.ReadPxHelper(databankTemp, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
+                    }
+                    else if (oRead.Type == EDataFormat.Ser)
+                    {
+                        if (dates != null)
+                        {
+                            G.Writeln2("*** ERROR: At the moment, you cannot use period truncation in PX data import");
+                            throw new GekkoException();
+                        }
+                        Program.ReadSer(databank, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
                     }
                     else
                     {
@@ -3604,6 +3618,166 @@ namespace Gekko
                 if (smallWarnings > 0) G.Writeln2("+++ WARNING: " + smallWarnings + " numbers numerically smaller than 1.0e-37 were set to 0");
 
             }
+        }
+
+        public static void ReadSer(Databank databank, AllFreqsHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
+        {
+            //TODO TODO TODO
+            //handle merge, date truncation, etc...
+
+            // x1 2001 2004 10 m -20 30.0
+
+            int emptyWarnings = 0;
+            int firstYearWarnings = 0;
+
+            DateTime dt1 = DateTime.Now;
+
+            int variableCounter = 0;
+
+            if (!merge)
+            {
+                databank.Clear();
+            }
+
+            char[] c = new char[] { ' ' };
+            double[] tempArray = new double[10000];
+
+            int n = 0;
+
+            int year1 = int.MaxValue;
+            int year2 = int.MinValue;
+
+            //Is all code without זרו, so no need to use GetTextFromFile() to handle ANSI
+            using (FileStream fs = WaitForFileStream(fileLocal, GekkoFileReadOrWrite.Read))
+            using (StreamReader sr = new StreamReader(fs))
+            {
+                while (sr.Peek() >= 0)
+                {
+                    string line = sr.ReadLine().Trim();
+                    n++;
+                    if (line == "" || line.StartsWith("//")) continue;
+                    string[] linesplit = line.Split(c, StringSplitOptions.RemoveEmptyEntries);
+                    string varname = linesplit[0];
+                    if (linesplit.Length < 3)
+                    {
+                        G.Writeln2("*** ERROR: READ<ser>: Expected two dates for series '" + varname + "' (line " + n + ")");
+                        throw new GekkoException();
+                    }
+
+                    string per1 = linesplit[1];
+                    GekkoTime gt1 = G.FromStringToDate(per1, true);
+                    year1 = Math.Min(year1, gt1.super);
+
+                    string per2 = linesplit[2];
+                    GekkoTime gt2 = G.FromStringToDate(per2, true);
+                    year2 = Math.Max(year2, gt2.super);
+
+                    if (gt1.freq != gt2.freq)
+                    {
+                        G.Writeln2("*** ERROR: READ<ser>: Dates for series '" + varname + "' have different frequencies (line " + n + ")");
+                        throw new GekkoException();
+                    }
+
+                    int obs = GekkoTime.Observations(gt1, gt2);
+                    int obs2 = linesplit.Length - 3;
+
+                    if (obs < 1)
+                    {
+                        G.Writeln2("*** ERROR: READ<ser>: Invalid time period for series '" + varname + "' (line " + n + ")");
+                        throw new GekkoException();
+                    }
+
+                    if (obs > 10000)
+                    {
+                        G.Writeln2("*** ERROR: READ<ser>: More then 10000 periods for series '" + varname + "' (line " + n + ")");
+                        throw new GekkoException();
+                    }
+
+                    if (obs2 == 0)
+                    {
+                        G.Writeln2("*** ERROR: READ<ser>: Expected > 0 observations for series '" + varname + "' (line " + n + ")");
+                        throw new GekkoException();
+                    }
+
+                    if (obs != obs2 && obs2 > 1)  //for obs2 = 1, any timeperiod is ok.
+                    {
+                        G.Writeln2("*** ERROR: READ<ser>: Expected " + obs + " observations for for series '" + varname + "', got " + obs2 + " (line " + n + ")");
+                        throw new GekkoException();
+                    }
+
+                    Series ts = FindOrCreateTimeSeriesInDataBank(databank, varname, gt1.freq);
+
+                    for (int i = 3; i < linesplit.Length; i++)
+                    {
+                        int ii = i - 3;  //starts with 0
+                        string s = linesplit[i];
+
+                        double ss = double.NaN;
+
+                        if (G.Equal(s, "m"))
+                        {
+                            //do nothing, it is a missing value.
+                        }
+                        else
+                        {
+                            try
+                            {
+                                ss = double.Parse(s, System.Globalization.CultureInfo.InvariantCulture);
+                            }
+                            catch
+                            {
+                                G.Writeln2("*** ERROR: READ<ser>: Could not understand '" + s + "' as a number for series '" + varname + "' (line " + n + ")");
+                                throw new GekkoException();
+                            }
+                        }
+
+                        tempArray[ii] = ss;
+                    }
+
+                    if (obs2 == 1)
+                    {
+                        for (int i = 1; i < obs; i++)
+                        {
+                            tempArray[i] = tempArray[0];  //copy the first value to the rest
+                        }
+                    }
+
+                    ts.SetDataSequence(gt1, gt2, tempArray);
+                    ts.Trim();  //to save RAM
+
+
+                }
+            }
+
+            readInfo.startPerInFile = year1;
+            readInfo.endPerInFile = year2;
+            readInfo.nanCounter = 0;
+            //readInfo.databankVersion = "(vers: PCIM " + ver + ")";
+
+            readInfo.variables = n;  //does not count emptyWarnings
+            readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
+
+            //See almost identical code in readTsd and readCsv
+            if (merge)
+            {
+                readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
+                readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
+            }
+            else
+            {
+                readInfo.startPerResultingBank = readInfo.startPerInFile;
+                readInfo.endPerResultingBank = readInfo.endPerInFile;
+            }
+            Databank currentBank = Program.databanks.GetDatabank(databank.name);
+            currentBank.yearStart = readInfo.startPerResultingBank;
+            currentBank.yearEnd = readInfo.endPerResultingBank;
+
+            //if (firstYearWarnings > 0) G.Writeln("+++ WARNING: " + firstYearWarnings + " variables had data before databank time period (data skipped)");
+
+            readInfo.databank.info1 = readInfo.info1;
+            readInfo.databank.date = readInfo.date;
+            readInfo.databank.FileNameWithPath = readInfo.fileName;
+
         }
 
         public static void ReadPxHelper(Databank databank, AllFreqsHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
@@ -26070,12 +26244,12 @@ namespace Gekko
             }
         }
 
-        private static List<TokenHelper> GetTokensWithLeftBlanks(string s)
+        public static List<TokenHelper> GetTokensWithLeftBlanks(string s)
         {
             return GetTokensWithLeftBlanks(s, 0);
         }
 
-        private static List<TokenHelper> GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd)
+        public static List<TokenHelper> GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd)
         {
             StringTokenizer2 tok = new StringTokenizer2(s, false, false);
             tok.IgnoreWhiteSpace = false;
@@ -29597,10 +29771,10 @@ namespace Gekko
             try
             {
                 p.Start();
-                exited = p.WaitForExit(5000);  //5 sec, should always be able to do it in < 1 sec
+                exited = p.WaitForExit(1 * 60 * 1000);  //1 minute, has been > 5 sec at DORS
                 if (!exited)
                 {
-                    MessageBox.Show("*** ERROR: The gnuplot call did not respond within 5 seconds, so the " + G.NL + "gnuplot call was aborted.");
+                    MessageBox.Show("*** ERROR: The gnuplot call did not respond within 60 seconds, so the " + G.NL + "gnuplot call was aborted.");
                     msg = true;
                     throw new GekkoException();
                 }
@@ -36601,6 +36775,7 @@ namespace Gekko
         Prn,
         Pcim,
         Px,
+        Ser,
         Xls,
         Xlsx,
         Gdx

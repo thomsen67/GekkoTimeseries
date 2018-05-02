@@ -1836,6 +1836,7 @@ namespace Gekko
                 tsCopy.meta.lastPeriodPositionInArray = this.meta.lastPeriodPositionInArray;
                 if (this.meta.label != null) tsCopy.meta.label = this.meta.label;
                 if (this.meta.source != null) tsCopy.meta.source = this.meta.source;
+                if (this.meta.units != null) tsCopy.meta.source = this.meta.units;
                 if (this.meta.stamp != null) tsCopy.meta.stamp = this.meta.stamp;
                 //tsCopy.SetGhost(this.IsArrayTimeseries());           
                 if (this.mmi != null) tsCopy.mmi = this.mmi;  //for sub-series     
@@ -1920,8 +1921,9 @@ namespace Gekko
         /// </summary>        
         [ProtoMember(5)]
         public string stamp;                
-        [ProtoMember(7)]    
-            
+        [ProtoMember(6)]        
+        public string units;             
+
         private bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf        
 

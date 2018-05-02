@@ -2024,6 +2024,10 @@ namespace Gekko
             {
                 return new ScalarString(ts.meta.stamp);
             }
+            else if (G.Equal(s2, "units"))
+            {
+                return new ScalarString(ts.meta.units);
+            }
             else if (G.Equal(s2, "perStart"))
             {
                 return new ScalarDate(ts.GetPeriodFirst());

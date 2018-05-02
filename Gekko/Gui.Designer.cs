@@ -1203,10 +1203,58 @@ namespace Gekko
             }
         }
 
+        private void richTextBox777_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.C)
+            {
+                //Ctrl-C
+                //See also #98075243587
+                string s = Clipboard.GetText(TextDataFormat.Text);
+
+                List<TokenHelper> ths = Program.GetTokensWithLeftBlanks(s, 10);
+
+                List<string> x = new List<string>();
+                x.Add("disp");
+                x.Add("disp2");
+                x.Add("disp3");
+                x.Add("help");
+                x.Add("stacktrace");
+
+                for (int i = 0; i < ths.Count; i++)
+                {
+                    if (ths[i].s == "#" && ths[i + 1].leftblanks == null && x.Contains(ths[i + 1].s.ToLower()) && ths[i + 2].leftblanks == null && ths[i + 2].s == ":")
+                    {
+                        ths[i].s = null;
+                        ths[i + 1].s = null;
+                        ths[i + 2].s = null;
+                        ths[i + 3].s = null;
+                    }
+                }
+
+                string ss = null; 
+                foreach(TokenHelper th in ths)
+                {
+                    ss += th.leftblanks;
+                    ss += th.s;
+                }
+
+                Clipboard.SetText(ss, TextDataFormat.Text);
+                e.Handled = true;
+            }
+        }
+
         private void richTextBox777_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
         {
+            //if (e.Control && e.KeyCode == Keys.V)
+            //{
+            //    //Ctrl-C
+            //    string s = Clipboard.GetText(TextDataFormat.Text);
+            //    Clipboard.SetText(s, TextDataFormat.Text);
+            //    e.Handled = true;
+            //}
+            //else if (!(e.Alt || e.Control || e.Shift))
 
-          if (!(e.Alt || e.Control || e.Shift))
+            if (!(e.Alt || e.Control || e.Shift))
             {
                 if ((e.KeyCode >= Keys.A && e.KeyCode <= Keys.Z) || (e.KeyCode >= Keys.D0 && e.KeyCode <= Keys.D9))
                 {

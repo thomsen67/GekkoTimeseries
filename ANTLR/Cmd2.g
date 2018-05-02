@@ -1911,7 +1911,8 @@ doc                       : DOC listItemsWildRange0 docOpt2 -> ^({token("ASTDOC"
 docOpt2                   : docOpt2h*;
 docOpt2h                  : LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expression)
 						  | SOURCE EQUAL expression -> ^(ASTOPT_STRING_SOURCE expression)
-						  | STAMP EQUAL expression -> ^(ASTOPT_STRING_STAMP expression)					
+						  | STAMP EQUAL expression -> ^(ASTOPT_STRING_STAMP expression)							  
+						  | UNITS EQUAL expression -> ^(ASTOPT_STRING_UNITS expression)							  				
 						  ;
 
 collapse				  : COLLAPSE nameBankHelper '=' nameBankHelper collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, $COLLAPSE.Line)} nameBankHelper nameBankHelper collapseMethod?);
@@ -2333,6 +2334,7 @@ readOpt1h                 : MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
 						  | PRN (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRN yesNo?)
 						  | PX (EQUAL yesNo)? -> ^(ASTOPT_STRING_PX yesNo?)
+						  | SER (EQUAL yesNo)? -> ^(ASTOPT_STRING_SER yesNo?)
 						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
   						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)
@@ -3399,6 +3401,7 @@ ident                     : Ident|
 			DETECT|
 							X|
 							Y|
+							UNITS|
 							REBASE|
 							LAGFIX|
 							ADDBANK|
