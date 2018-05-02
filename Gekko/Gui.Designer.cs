@@ -1205,21 +1205,20 @@ namespace Gekko
 
         private void richTextBox777_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
         {
-            if (e.Control && e.KeyCode == Keys.C)
+            if ((e.Control && e.KeyCode == Keys.C) || e.KeyCode == Keys.C)
             {
+                //the above is equal to just e.KeyCode == Keys.C. The thing is, if a plain c or C is entered, it is caught elsewhere, since focus
+                //is set to lower panel. So this more or less catches the aftermath of a Ctrl-C.
                 //Ctrl-C
                 //See also #98075243587
                 string s = Clipboard.GetText(TextDataFormat.Text);
-
                 List<TokenHelper> ths = Program.GetTokensWithLeftBlanks(s, 10);
-
                 List<string> x = new List<string>();
                 x.Add("disp");
                 x.Add("disp2");
                 x.Add("disp3");
                 x.Add("help");
                 x.Add("stacktrace");
-
                 for (int i = 0; i < ths.Count; i++)
                 {
                     if (ths[i].s == "#" && ths[i + 1].leftblanks == null && x.Contains(ths[i + 1].s.ToLower()) && ths[i + 2].leftblanks == null && ths[i + 2].s == ":")
@@ -1230,22 +1229,20 @@ namespace Gekko
                         ths[i + 3].s = null;
                     }
                 }
-
-                string ss = null; 
-                foreach(TokenHelper th in ths)
+                string ss = null;
+                foreach (TokenHelper th in ths)
                 {
                     ss += th.leftblanks;
                     ss += th.s;
                 }
-
                 Clipboard.SetText(ss, TextDataFormat.Text);
-                e.Handled = true;
-            }
+                e.Handled = true;                
+            }            
         }
 
         private void richTextBox777_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
         {
-            //if (e.Control && e.KeyCode == Keys.V)
+            //if (e.Control && e.KeyCode == Keys.C)
             //{
             //    //Ctrl-C
             //    string s = Clipboard.GetText(TextDataFormat.Text);
@@ -1318,8 +1315,11 @@ namespace Gekko
                 e.Handled = true;
             }
             else if (e.Control && e.KeyCode == Keys.C)
-            {                
-                Clipboard.SetText(this.textBox2.SelectedText);     //to avoid formatting, colors etc. when pasting to Word, in a mail
+            {
+                if (this.textBox2.SelectedText != null)
+                {
+                    Clipboard.SetText(this.textBox2.SelectedText);     //to avoid formatting, colors etc. when pasting to Word, in a mail
+                }
                 e.Handled = true;
             }
             else if (e.Control && e.KeyCode == Keys.M)
