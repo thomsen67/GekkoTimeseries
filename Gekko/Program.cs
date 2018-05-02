@@ -27800,10 +27800,10 @@ namespace Gekko
             try
             {
                 p.Start();
-                exited = p.WaitForExit(5000);  //5 sec, should always be able to do it in < 1 sec
+                exited = p.WaitForExit(1 * 60 * 1000);  //1 minute, has been > 5 sec at DORS
                 if (!exited)
                 {
-                    MessageBox.Show("*** ERROR: The gnuplot call did not respond within 5 seconds, so the " + G.NL + "gnuplot call was aborted.");
+                    MessageBox.Show("*** ERROR: The gnuplot call did not respond within 60 seconds, so the " + G.NL + "gnuplot call was aborted.");
                     msg = true;
                     throw new GekkoException();
                 }
