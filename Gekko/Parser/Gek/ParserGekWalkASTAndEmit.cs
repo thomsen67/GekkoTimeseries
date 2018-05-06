@@ -4186,6 +4186,8 @@ namespace Gekko.Parser.Gek
                                 freelists = "|||" + freelists + "|||";
                             }
 
+                            givenLabel = givenLabel.Replace(G.NL, "");  //remove any newlines, else C# code will become invalid.
+
                             node.Code.A("ope" + Num(node) + ".label = O.SubstituteScalarsAndLists(`" + freelists + givenLabel + "`, false);" + G.NL);
                             node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2);" + G.NL);
                             ASTNode child = node.GetChild("ASTPRTELEMENTOPTIONFIELD");

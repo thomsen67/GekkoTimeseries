@@ -504,23 +504,41 @@ namespace Gekko
         public string s2Type = null;
     }
 
-    public class TokenHelper
-    {
-        public string s = null;
-        public string type = null;
-        public string leftblanks = null;
-        public override string ToString()
-        {
-            return s;
-        }
-    }
-
     public class StackHelper
     {
         public string line;  //has a lot of text added
         public string file;
         public int line2;  //as a simple int
     }
+
+    public class TokenHelper
+    {
+        public string s = null;
+        public string type = null;
+        public string leftblanks = null;
+        //below is advanced (recursive) stuff
+        public string subnodesType = null;  // "(", "[" or "{".
+        public List<TokenHelper> subnodes = null;        
+
+        public override string ToString()
+        {
+            if (subnodes != null)
+            {
+                if (s != null)
+                {
+                    G.Writeln2("*** ERROR: #875627897");
+                    throw new GekkoException();
+                }                
+                string ss = null;
+                foreach (TokenHelper tha in subnodes)
+                {
+                    ss += tha.ToString();
+                }                
+                return ss;
+            }
+            else return leftblanks + s;
+        }
+    }    
 
     /// <summary>
     /// Simple helper class
@@ -15686,199 +15704,277 @@ namespace Gekko
 
             if (isGms)
             {
-                List<TokenHelper> tokens = GetTokensWithLeftBlanks(textInputRaw); 
-                List<List<string>> eqLines = new List<List<string>>();
-                List<string> temp = new List<string>();
-                foreach (TokenHelper token in tokens)
-                {
-                    if (token.type == "EOL")
-                    {
-                        eqLines.Add(temp);
-                        temp = new List<string>();
-                    }
-                    else if (token.s == ",")
-                    {                        
-                        //do nothing
-                    }
-                    else
-                    {
-                        temp.Add(token.s);
-                    }
-                }
-                G.Writeln2("Read " + eqLines.Count + " lines from csv file");
-
-                Program.modelGams = new ModelGams();
-                //Program.modelGams.equations = eqLines;
-
-                Dictionary<string, List<ModelGamsEquation>> xx = new Dictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
-
-                bool first = true;
-                foreach (List<string> line in eqLines)
-                {
-                    if (first)
-                    {
-                        first = false;
-                        continue;
-                    }
-                    ModelGamsEquation e = new ModelGamsEquation();
-                    if (line.Count == null || line.Count == 0) continue;  //probably will not happen
-                    if (line.Count < 5)
-                    {
-                        G.Writeln2("*** ERROR: Expected 5 cols per line");
-                        throw new GekkoException();
-                    }
-                    e.nameRaw = StripQuotes2(line[0]);
-                    e.setsRaw = StripQuotes2(line[1]);
-                    e.conditionalsRaw = StripQuotes2(line[2]);
-                    e.lhsRaw = StripQuotes2(line[3]);
-                    e.rhsRaw = StripQuotes2(line[4]);
-
-                    List<TokenHelper> fields = GetTokensWithLeftBlanks(e.lhsRaw); 
-                    string varName = null;
-                    foreach (TokenHelper t in fields)
-                    {
-                        if(t.type=="Word")
-                        {
-                            if (G.Equal(t.s, "log") || G.Equal(t.s, "exp")) continue;  //this logic could be improved... how to distinguish functions log(x) and sets y(t) ??
-                            varName = t.s;
-                            break;
-                        }
-                    }
-                    if (varName==null)
-                    {
-                        G.Writeln2("*** Could not find variable name in: " + fields[0].s);
-                        throw new GekkoException();
-                    }
-                    
-                    if(xx.ContainsKey(varName))
-                    {
-                        xx[varName].Add(e);  //can have more than one eq with same lhs variable
-                    }
-                    else
-                    {
-                        List<ModelGamsEquation> e2 = new List<ModelGamsEquation>();
-                        e2.Add(e);
-                        xx.Add(varName, e2);
-                    }
-                }
-                Program.modelGams.equations = xx;
-                G.Writeln("Found " + xx.Count + " distinct equations");
-
+                ReadGamsModel(textInputRaw);
 
             }
             else
             {
+                ReadGekkoModel(fileName, dt0, textInputRaw);
+            }
+        }
 
-                //TODO: keep the old version, so model command can be undone (like undo sim)
-                Program.model = new Model();
-                Program.model.modelInfo.fileName = fileName;
-                //this also creates Program.model.varlist if there is a varlist
+        private static void ReadGekkoModel(string fileName, DateTime dt0, string textInputRaw)
+        {
+            //TODO: keep the old version, so model command can be undone (like undo sim)
+            Program.model = new Model();
+            Program.model.modelInfo.fileName = fileName;
+            //this also creates Program.model.varlist if there is a varlist
 
-                ModelCommentsHelper modelCommentsHelper = new ModelCommentsHelper();
-                string textInput = Program.HandleModelFiles(textInputRaw, modelCommentsHelper);
+            ModelCommentsHelper modelCommentsHelper = new ModelCommentsHelper();
+            string textInput = Program.HandleModelFiles(textInputRaw, modelCommentsHelper);
 
-                string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + modelCommentsHelper.modelHashTrue + ".mdl";
+            string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + modelCommentsHelper.modelHashTrue + ".mdl";
 
-                if (Program.options.model_cache == true)
+            if (Program.options.model_cache == true)
+            {
+                if (File.Exists(mdlFileNameAndPath))
                 {
-                    if (File.Exists(mdlFileNameAndPath))
-                    {
-                        try
-                        {
-                            DateTime dt1 = DateTime.Now;
-                            //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                            //RuntimeTypeModel serializer = TypeModel.Create();
-                            //serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-                            // ----- DESERIALIZE
-                            //DeleteFolder(outputPath);
-                            //Directory.CreateDirectory(outputPath);
-                            //WaitForZipRead(outputPath, mdlFileNameAndPath);
-                            using (FileStream fs = WaitForFileStream(mdlFileNameAndPath, GekkoFileReadOrWrite.Read))
-                            {
-                                Program.model = Serializer.Deserialize<Model>(fs);
-                            }
-
-                            GetListsFromModelListHelper();
-
-                            //=============================================
-                            //FOR SAFETY: see mail from TKD 5/3 2013
-                            Program.model.simulateResults = new double[10];
-                            //=============================================
-
-                            G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
-                            Program.model.modelInfo.loadedFromMdlFile = true;
-                            Program.model.modelInfo.fileName = fileName;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
-                        }
-                        catch
-                        {
-                            //do nothing, we then have to parse the file
-                            Program.model.modelInfo.loadedFromMdlFile = false;
-                        }
-                    }
-                }
-                else
-                {
-                    Program.model.modelInfo.loadedFromMdlFile = false;
-                }
-
-                Program.model.modelInfo.date = modelCommentsHelper.dateText;
-                Program.model.modelInfo.info = modelCommentsHelper.infoText;
-                Program.model.signatureStatus = modelCommentsHelper.signatureStatus;
-                Program.model.signatureFoundInFileHeader = modelCommentsHelper.signatureFoundInFileHeader;
-                Program.model.modelHashTrue = modelCommentsHelper.modelHashTrue;
-
-                string parsingSeconds = null;
-                if (Program.model.modelInfo.loadedFromMdlFile)
-                {
-                    //Needs to load lists into Program.list, and varlist too
-                    GuiSetModelName();
-                }
-                else
-                {
-                    DateTime t1 = DateTime.Now;
-                    ParserOLD.EmitModelFromANTLR(textInput, fileName);
-                    parsingSeconds = G.Seconds(t1);
-
-                    ParserOLD.OrderAndCompileModel(ECompiledModelType.Gauss, true, false);  //default.
-
-                    try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
+                    try
                     {
                         DateTime dt1 = DateTime.Now;
-
-                        PutListsIntoModelListHelper();
-
                         //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                        RuntimeTypeModel serializer = TypeModel.Create();
-                        serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-
-
-                        // ----- SERIALIZE
-                        //string outputPath = Globals.localTempFilesLocation;
+                        //RuntimeTypeModel serializer = TypeModel.Create();
+                        //serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+                        // ----- DESERIALIZE
                         //DeleteFolder(outputPath);
                         //Directory.CreateDirectory(outputPath);
-                        string protobufFileName = Globals.gekkoVersion + "_" + model.modelHashTrue + ".mdl";
-                        string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                        using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
+                        //WaitForZipRead(outputPath, mdlFileNameAndPath);
+                        using (FileStream fs = WaitForFileStream(mdlFileNameAndPath, GekkoFileReadOrWrite.Read))
                         {
-                            //Serializer.Serialize(fs, m);
-                            serializer.Serialize(fs, Program.model);
+                            Program.model = Serializer.Deserialize<Model>(fs);
                         }
-                        //Program.WaitForZipWrite(outputPath, Globals.localTempFilesLocation + "\\" + protobufFileName);
-                        G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
+
+                        GetListsFromModelListHelper();
+
+                        //=============================================
+                        //FOR SAFETY: see mail from TKD 5/3 2013
+                        Program.model.simulateResults = new double[10];
+                        //=============================================
+
+                        G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
+                        Program.model.modelInfo.loadedFromMdlFile = true;
+                        Program.model.modelInfo.fileName = fileName;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
                     }
-                    catch (Exception e)
+                    catch
                     {
-                        //do nothing, not the end of the world if it fails
+                        //do nothing, we then have to parse the file
+                        Program.model.modelInfo.loadedFromMdlFile = false;
                     }
                 }
-
-                HandleVarlist(modelCommentsHelper);
-
-                Program.model.modelInfo.timeUsedParsing = parsingSeconds;
-                Program.model.modelInfo.timeUsedTotal = G.Seconds(dt0);
-
-                Program.model.modelInfo.Print();
             }
+            else
+            {
+                Program.model.modelInfo.loadedFromMdlFile = false;
+            }
+
+            Program.model.modelInfo.date = modelCommentsHelper.dateText;
+            Program.model.modelInfo.info = modelCommentsHelper.infoText;
+            Program.model.signatureStatus = modelCommentsHelper.signatureStatus;
+            Program.model.signatureFoundInFileHeader = modelCommentsHelper.signatureFoundInFileHeader;
+            Program.model.modelHashTrue = modelCommentsHelper.modelHashTrue;
+
+            string parsingSeconds = null;
+            if (Program.model.modelInfo.loadedFromMdlFile)
+            {
+                //Needs to load lists into Program.list, and varlist too
+                GuiSetModelName();
+            }
+            else
+            {
+                DateTime t1 = DateTime.Now;
+                ParserOLD.EmitModelFromANTLR(textInput, fileName);
+                parsingSeconds = G.Seconds(t1);
+
+                ParserOLD.OrderAndCompileModel(ECompiledModelType.Gauss, true, false);  //default.
+
+                try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
+                {
+                    DateTime dt1 = DateTime.Now;
+
+                    PutListsIntoModelListHelper();
+
+                    //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
+                    RuntimeTypeModel serializer = TypeModel.Create();
+                    serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+
+
+                    // ----- SERIALIZE
+                    //string outputPath = Globals.localTempFilesLocation;
+                    //DeleteFolder(outputPath);
+                    //Directory.CreateDirectory(outputPath);
+                    string protobufFileName = Globals.gekkoVersion + "_" + model.modelHashTrue + ".mdl";
+                    string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
+                    using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
+                    {
+                        //Serializer.Serialize(fs, m);
+                        serializer.Serialize(fs, Program.model);
+                    }
+                    //Program.WaitForZipWrite(outputPath, Globals.localTempFilesLocation + "\\" + protobufFileName);
+                    G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
+                }
+                catch (Exception e)
+                {
+                    //do nothing, not the end of the world if it fails
+                }
+            }
+
+            HandleVarlist(modelCommentsHelper);
+
+            Program.model.modelInfo.timeUsedParsing = parsingSeconds;
+            Program.model.modelInfo.timeUsedTotal = G.Seconds(dt0);
+
+            Program.model.modelInfo.Print();
+        }
+
+        public static List<TokenHelper> GetTokensWithLeftBlanksAdvanced(string textInputRaw)
+        {
+            int i = 0;
+            List<TokenHelper> tokens2 = GetTokensWithLeftBlanksAdvancedHelper(GetTokensWithLeftBlanks(textInputRaw), ref i, null);
+            return tokens2;
+        }
+
+        public static List<TokenHelper> GetTokensWithLeftBlanksAdvancedHelper(List<TokenHelper> input, ref int startI, string startparen)
+        {
+            List<TokenHelper> output = new List<TokenHelper>();
+            //if (first != null) output.Add(first);  //a left parenthesis      
+            string endparen = null;
+            if (startparen != null)
+            {
+                Globals.parentheses.TryGetValue(startparen, out endparen);
+                output.Add(input[startI - 1]);  //add the left parenthesis here
+            }
+            for (int i = startI; i < input.Count; i++)
+            {                
+                if (Globals.parentheses.ContainsKey(input[i].s))
+                {
+                    //found a new left parenthesis                          
+                    startI = i + 1;
+                    List<TokenHelper> sub = GetTokensWithLeftBlanksAdvancedHelper(input, ref startI, input[i].s);
+                    //sub.Add(input[startI]);
+                    TokenHelper temp = new TokenHelper();
+                    temp.subnodes = sub;
+                    temp.subnodesType = input[i].s;                    
+                    output.Add(temp);
+                    i = startI;
+                }
+                else if (endparen != null && input[i].s == endparen)
+                {
+                    //got to the end
+                    //List<TokenHelper> temp = new List<TokenHelper>();
+                    //for (int ii = startI - 1; ii <= i; ii++)
+                    //{
+                    //    temp.Add(input[ii]);
+                    //}
+
+                    startI = i;
+                    output.Add(input[i]);  //add the right parenthesis here
+                    return output;
+                }
+                else
+                {
+                    output.Add(input[i]);
+                }
+            }
+            if (endparen != null)
+            {
+                G.Writeln2("*** ERROR: Could not find matching '" + endparen + "' parenthesis");
+                throw new GekkoException();
+            }
+            return output;
+        }
+
+        private static void ReadGamsModel(string textInputRaw)
+        { 
+
+            string txt = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "token.txt");
+            int i = 0; 
+            List<TokenHelper> tokens2 = GetTokensWithLeftBlanksAdvanced(txt);
+
+
+            foreach (TokenHelper tok in tokens2)
+            {
+                string s = tok.ToString();
+            }
+
+
+
+            List<TokenHelper> tokens = GetTokensWithLeftBlanks(textInputRaw);
+            List<List<string>> eqLines = new List<List<string>>();
+            List<string> temp = new List<string>();
+            foreach (TokenHelper token in tokens)
+            {
+                if (token.type == "EOL")
+                {
+                    eqLines.Add(temp);
+                    temp = new List<string>();
+                }
+                else if (token.s == ",")
+                {
+                    //do nothing
+                }
+                else
+                {
+                    temp.Add(token.s);
+                }
+            }
+            G.Writeln2("Read " + eqLines.Count + " lines from csv file");
+
+            Program.modelGams = new ModelGams();
+            //Program.modelGams.equations = eqLines;
+
+            Dictionary<string, List<ModelGamsEquation>> xx = new Dictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
+
+            bool first = true;
+            foreach (List<string> line in eqLines)
+            {
+                if (first)
+                {
+                    first = false;
+                    continue;
+                }
+                ModelGamsEquation e = new ModelGamsEquation();
+                if (line.Count == null || line.Count == 0) continue;  //probably will not happen
+                if (line.Count < 5)
+                {
+                    G.Writeln2("*** ERROR: Expected 5 cols per line");
+                    throw new GekkoException();
+                }
+                e.nameRaw = StripQuotes2(line[0]);
+                e.setsRaw = StripQuotes2(line[1]);
+                e.conditionalsRaw = StripQuotes2(line[2]);
+                e.lhsRaw = StripQuotes2(line[3]);
+                e.rhsRaw = StripQuotes2(line[4]);
+
+                List<TokenHelper> fields = GetTokensWithLeftBlanks(e.lhsRaw);
+                string varName = null;
+                foreach (TokenHelper t in fields)
+                {
+                    if (t.type == "Word")
+                    {
+                        if (G.Equal(t.s, "log") || G.Equal(t.s, "exp")) continue;  //this logic could be improved... how to distinguish functions log(x) and sets y(t) ??
+                        varName = t.s;
+                        break;
+                    }
+                }
+                if (varName == null)
+                {
+                    G.Writeln2("*** Could not find variable name in: " + fields[0].s);
+                    throw new GekkoException();
+                }
+
+                if (xx.ContainsKey(varName))
+                {
+                    xx[varName].Add(e);  //can have more than one eq with same lhs variable
+                }
+                else
+                {
+                    List<ModelGamsEquation> e2 = new List<ModelGamsEquation>();
+                    e2.Add(e);
+                    xx.Add(varName, e2);
+                }
+            }
+            Program.modelGams.equations = xx;
+            G.Writeln("Found " + xx.Count + " distinct equations");
         }
 
         private static void HandleVarlist(ModelCommentsHelper modelCommentsHelper)
@@ -26251,7 +26347,7 @@ namespace Gekko
 
         public static List<TokenHelper> GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd)
         {
-            StringTokenizer2 tok = new StringTokenizer2(s, false, false);
+            StringTokenizer2 tok = new StringTokenizer2(s, false, false);                        
             tok.IgnoreWhiteSpace = false;
             tok.SymbolChars = new char[] { '!', '#', '%', '&', '/', '(', ')', '=', '?', '@', '$', '{', '[', ']', '}', '+', '|', '^', '¨', '~', '*', '<', '>', '\\', ';', ',', ':', '.', '-' };
             Token token;
