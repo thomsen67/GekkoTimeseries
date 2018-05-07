@@ -511,36 +511,7 @@ namespace Gekko
         public int line2;  //as a simple int
     }
 
-    public class TokenHelper
-    {
-        public string s = null;
-        public TokenKind type = TokenKind.Unknown;
-        public string leftblanks = null;
-        public int line = -12345;
-        public int column = -12345;
-        //below is advanced (recursive) stuff
-        public string subnodesType = null;  // "(", "[" or "{".
-        public List<TokenHelper> subnodes = null;        
-
-        public override string ToString()
-        {
-            if (subnodes != null)
-            {
-                if (s != null)
-                {
-                    G.Writeln2("*** ERROR: #875627897");
-                    throw new GekkoException();
-                }                
-                string ss = null;
-                foreach (TokenHelper tha in subnodes)
-                {
-                    ss += tha.ToString();
-                }                
-                return ss;
-            }
-            else return leftblanks + s;
-        }
-    }    
+        
 
     /// <summary>
     /// Simple helper class
@@ -14996,7 +14967,7 @@ namespace Gekko
                     int length = (eq.lhsRaw + " = ").Length;
 
                     GekkoDictionary<string, string> knownVars = GetKnownVars(eq.rhsRaw, true);
-                    List<TokenHelper> tokens = GetTokensWithLeftBlanks(eq.rhsRaw);  //slack, tokenizing two times
+                    List<TokenHelper> tokens = StringTokenizer2.GetTokensWithLeftBlanks(eq.rhsRaw);  //slack, tokenizing two times
 
                     for (int i = 0; i < tokens.Count; i++)
                     {
@@ -15050,7 +15021,7 @@ namespace Gekko
         private static GekkoDictionary<string, string> GetKnownVars(string input, bool useDatabank)
         {
             GekkoDictionary<string, string> knownVars = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            List<TokenHelper> tokens = GetTokensWithLeftBlanks(input);
+            List<TokenHelper> tokens = StringTokenizer2.GetTokensWithLeftBlanks(input);
             foreach (TokenHelper token in tokens)
             {
                 if (token.type == TokenKind.Word)
@@ -15828,73 +15799,7 @@ namespace Gekko
             Program.model.modelInfo.Print();
         }
 
-        public static List<TokenHelper> GetTokensWithLeftBlanksRecursive(string textInputRaw)
-        {
-            return GetTokensWithLeftBlanksRecursive(textInputRaw, null, null, null, null);
-        }
-
-        public static List<TokenHelper> GetTokensWithLeftBlanksRecursive(string textInputRaw, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
-        {
-            int i = 0;
-            List<TokenHelper> tokens = GetTokensWithLeftBlanks(textInputRaw, 0, commentsClosed, commentsNonClosed, commentsClosedOnlyStartOfLine, commentsNonClosedOnlyStartOfLine);
-            List<TokenHelper> tokens2 = GetTokensWithLeftBlanksRecursiveHelper(tokens, ref i, null);
-            return tokens2;
-        }
-
-        public static List<TokenHelper> GetTokensWithLeftBlanksRecursiveHelper(List<TokenHelper> input, ref int startI, string startparen)
-        {
-            List<TokenHelper> output = new List<TokenHelper>();
-            //if (first != null) output.Add(first);  //a left parenthesis      
-            string endparen = null;
-            if (startparen != null)
-            {
-                Globals.parentheses.TryGetValue(startparen, out endparen);
-                output.Add(input[startI - 1]);  //add the left parenthesis here
-            }
-            for (int i = startI; i < input.Count; i++)
-            {
-                if (Globals.parentheses.ContainsKey(input[i].s))
-                {
-                    //found a new left parenthesis                          
-                    startI = i + 1;
-                    List<TokenHelper> sub = GetTokensWithLeftBlanksRecursiveHelper(input, ref startI, input[i].s);
-                    //sub.Add(input[startI]);
-                    TokenHelper temp = new TokenHelper();
-                    temp.subnodes = sub;
-                    temp.subnodesType = input[i].s;
-                    output.Add(temp);
-                    i = startI;
-                }
-                else if (endparen != null && input[i].s == endparen)
-                {
-                    //got to the end
-                    //List<TokenHelper> temp = new List<TokenHelper>();
-                    //for (int ii = startI - 1; ii <= i; ii++)
-                    //{
-                    //    temp.Add(input[ii]);
-                    //}
-
-                    startI = i;
-                    output.Add(input[i]);  //add the right parenthesis here
-                    return output;
-                }
-                else
-                {
-                    if (Globals.parenthesesInvert.ContainsKey(input[i].s))
-                    {
-                        G.Writeln2("*** ERROR: Missing a '" + Globals.parenthesesInvert[input[i].s] + "' parenthesis");
-                        throw new GekkoException();
-                    }
-                    output.Add(input[i]);
-                }
-            }
-            if (endparen != null)
-            {
-                G.Writeln2("*** ERROR: Missing a '" + endparen + "' parenthesis");
-                throw new GekkoException();
-            }
-            return output;
-        }
+        
 
         private static void ReadGamsModel(string textInputRaw)
         { 
@@ -15904,14 +15809,14 @@ namespace Gekko
             Tuple<string, string> tag = new Tuple<string, string> ( "/*", "*/" );
             List<Tuple<string, string>> tags = new List<Tuple<string, string>>();
             tags.Add(tag);
-            List<TokenHelper> tokens2 = GetTokensWithLeftBlanksRecursive(txt, tags, null, null, null);
+            List<TokenHelper> tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags, null, null, null);
             
             foreach (TokenHelper tok in tokens2)
             {
                 string s = tok.ToString();
             }
 
-            List<TokenHelper> tokens = GetTokensWithLeftBlanks(textInputRaw);
+            List<TokenHelper> tokens = StringTokenizer2.GetTokensWithLeftBlanks(textInputRaw);
             List<List<string>> eqLines = new List<List<string>>();
             List<string> temp = new List<string>();
             foreach (TokenHelper token in tokens)
@@ -15958,7 +15863,7 @@ namespace Gekko
                 e.lhsRaw = StripQuotes2(line[3]);
                 e.rhsRaw = StripQuotes2(line[4]);
 
-                List<TokenHelper> fields = GetTokensWithLeftBlanks(e.lhsRaw);
+                List<TokenHelper> fields = StringTokenizer2.GetTokensWithLeftBlanks(e.lhsRaw);
                 string varName = null;
                 foreach (TokenHelper t in fields)
                 {
@@ -26132,7 +26037,7 @@ namespace Gekko
                 }
 
                 int twenty = 20;
-                List<TokenHelper> a = GetTokensWithLeftBlanks(ss[1], 20);  //puts in 20 empty tokens at the end
+                List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(ss[1], 20);  //puts in 20 empty tokens at the end
 
                 //Now we walk though the tokens to mark all that are bound with sum, 
                 //for instance sum(#m1, xx3[#m1, #m2]) --> sum(¤m1, xx3[¤m1, #m2])
@@ -26353,57 +26258,7 @@ namespace Gekko
             }
         }
 
-        public static List<TokenHelper> GetTokensWithLeftBlanks(string s)
-        {
-            return GetTokensWithLeftBlanks(s, 0);
-        }
-
-        public static List<TokenHelper> GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd)
-        {
-            return GetTokensWithLeftBlanks(s, emptyTokensAtEnd, null, null, null, null);
-        }
-
-        public static List<TokenHelper> GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
-        {
-            StringTokenizer2 tok = new StringTokenizer2(s, false, false);
-            if (commentsClosed != null) tok.commentsClosed = commentsClosed;
-            if (commentsNonClosed != null) tok.commentsNonClosed = commentsNonClosed;
-            if (commentsClosedOnlyStartOfLine != null) tok.commentsClosed = commentsClosed;
-            if (commentsNonClosedOnlyStartOfLine != null) tok.commentsNonClosed = commentsNonClosed;
-
-            tok.IgnoreWhiteSpace = false;
-            tok.SymbolChars = new char[] { '!', '#', '%', '&', '/', '(', ')', '=', '?', '@', '$', '{', '[', ']', '}', '+', '|', '^', '¨', '~', '*', '<', '>', '\\', ';', ',', ':', '.', '-' };
-            Token token;
-            int numberCounter = 0;
-            List<TokenHelper> a = new List<TokenHelper>();
-            string white = null;
-            do
-            {
-                token = tok.Next();
-                string value = token.Value;
-                TokenKind kind = token.Kind;
-                TokenHelper two = new TokenHelper();
-                two.s = value;
-                two.type = kind;
-                two.leftblanks = white;
-
-                if (kind == TokenKind.WhiteSpace)
-                {
-                    white = value;
-                }
-                else
-                {
-                    two.line = token.Line;
-                    two.column = token.Column;
-                    a.Add(two);
-                    white = null;
-                }
-
-            } while (token.Kind != TokenKind.EOF);
-            for (int i = 0; i < emptyTokensAtEnd; i++) a.Add(new TokenHelper());
-            return a;
-        }
-
+        
         private static void PrintHelper3(GekkoSmpl smpl, EPrintTypes type, EFreq sameFreq, Table table, int count, int i, int j, int iPlot, string printCode, bool isLogTransform, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, int sumOver, int[] skipCounter, O.Prt.Element cc)
         {
             string format = "f" + cc.widthFinal + "." + cc.decFinal;

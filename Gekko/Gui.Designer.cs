@@ -1212,7 +1212,7 @@ namespace Gekko
                 //Ctrl-C
                 //See also #98075243587
                 string s = Clipboard.GetText(TextDataFormat.Text);
-                List<TokenHelper> ths = Program.GetTokensWithLeftBlanks(s, 10);
+                List<TokenHelper> ths = StringTokenizer2.GetTokensWithLeftBlanks(s, 10);
                 List<string> x = new List<string>();
                 x.Add("disp");
                 x.Add("disp2");

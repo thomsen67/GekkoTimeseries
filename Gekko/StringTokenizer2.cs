@@ -19,10 +19,41 @@ using System.Text;
 
 namespace Gekko
 {
-	/// <summary>
-	/// StringTokenizer tokenized string (or stream) into tokens.
-	/// </summary>
-	public class StringTokenizer2
+    public class TokenHelper
+    {
+        public string s = null;
+        public TokenKind type = TokenKind.Unknown;
+        public string leftblanks = null;
+        public int line = -12345;
+        public int column = -12345;
+        //below is advanced (recursive) stuff
+        public string subnodesType = null;  // "(", "[" or "{".
+        public List<TokenHelper> subnodes = null;
+
+        public override string ToString()
+        {
+            if (subnodes != null)
+            {
+                if (s != null)
+                {
+                    G.Writeln2("*** ERROR: #875627897");
+                    throw new GekkoException();
+                }
+                string ss = null;
+                foreach (TokenHelper tha in subnodes)
+                {
+                    ss += tha.ToString();
+                }
+                return ss;
+            }
+            else return leftblanks + s;
+        }
+    }
+
+    /// <summary>
+    /// StringTokenizer tokenized string (or stream) into tokens.
+    /// </summary>
+    public class StringTokenizer2
 	{
 		const char EOF = (char)0;
 
@@ -517,5 +548,125 @@ namespace Gekko
 
 			return false;
 		}
-	}
+
+        public static List<TokenHelper> GetTokensWithLeftBlanks(string s)
+        {
+            return GetTokensWithLeftBlanks(s, 0);
+        }
+
+        public static List<TokenHelper> GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd)
+        {
+            return GetTokensWithLeftBlanks(s, emptyTokensAtEnd, null, null, null, null);
+        }
+
+        public static List<TokenHelper> GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
+        {
+            StringTokenizer2 tok = new StringTokenizer2(s, false, false);
+            if (commentsClosed != null) tok.commentsClosed = commentsClosed;
+            if (commentsNonClosed != null) tok.commentsNonClosed = commentsNonClosed;
+            if (commentsClosedOnlyStartOfLine != null) tok.commentsClosed = commentsClosed;
+            if (commentsNonClosedOnlyStartOfLine != null) tok.commentsNonClosed = commentsNonClosed;
+
+            tok.IgnoreWhiteSpace = false;
+            tok.SymbolChars = new char[] { '!', '#', '%', '&', '/', '(', ')', '=', '?', '@', '$', '{', '[', ']', '}', '+', '|', '^', '¨', '~', '*', '<', '>', '\\', ';', ',', ':', '.', '-' };
+            Token token;
+            int numberCounter = 0;
+            List<TokenHelper> a = new List<TokenHelper>();
+            string white = null;
+            do
+            {
+                token = tok.Next();
+                string value = token.Value;
+                TokenKind kind = token.Kind;
+                TokenHelper two = new TokenHelper();
+                two.s = value;
+                two.type = kind;
+                two.leftblanks = white;
+
+                if (kind == TokenKind.WhiteSpace)
+                {
+                    white = value;
+                }
+                else
+                {
+                    two.line = token.Line;
+                    two.column = token.Column;
+                    a.Add(two);
+                    white = null;
+                }
+
+            } while (token.Kind != TokenKind.EOF);
+            for (int i = 0; i < emptyTokensAtEnd; i++) a.Add(new TokenHelper());
+            return a;
+        }
+
+        public static List<TokenHelper> GetTokensWithLeftBlanksRecursive(string textInputRaw)
+        {
+            return GetTokensWithLeftBlanksRecursive(textInputRaw, null, null, null, null);
+        }
+
+        public static List<TokenHelper> GetTokensWithLeftBlanksRecursive(string textInputRaw, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
+        {
+            int i = 0;
+            List<TokenHelper> tokens = GetTokensWithLeftBlanks(textInputRaw, 0, commentsClosed, commentsNonClosed, commentsClosedOnlyStartOfLine, commentsNonClosedOnlyStartOfLine);
+            List<TokenHelper> tokens2 = GetTokensWithLeftBlanksRecursiveHelper(tokens, ref i, null);
+            return tokens2;
+        }
+
+        public static List<TokenHelper> GetTokensWithLeftBlanksRecursiveHelper(List<TokenHelper> input, ref int startI, string startparen)
+        {
+            List<TokenHelper> output = new List<TokenHelper>();
+            //if (first != null) output.Add(first);  //a left parenthesis      
+            string endparen = null;
+            if (startparen != null)
+            {
+                Globals.parentheses.TryGetValue(startparen, out endparen);
+                output.Add(input[startI - 1]);  //add the left parenthesis here
+            }
+            for (int i = startI; i < input.Count; i++)
+            {
+                if (Globals.parentheses.ContainsKey(input[i].s))
+                {
+                    //found a new left parenthesis                          
+                    startI = i + 1;
+                    List<TokenHelper> sub = GetTokensWithLeftBlanksRecursiveHelper(input, ref startI, input[i].s);
+                    //sub.Add(input[startI]);
+                    TokenHelper temp = new TokenHelper();
+                    temp.subnodes = sub;
+                    temp.subnodesType = input[i].s;
+                    output.Add(temp);
+                    i = startI;
+                }
+                else if (endparen != null && input[i].s == endparen)
+                {
+                    //got to the end
+                    //List<TokenHelper> temp = new List<TokenHelper>();
+                    //for (int ii = startI - 1; ii <= i; ii++)
+                    //{
+                    //    temp.Add(input[ii]);
+                    //}
+
+                    startI = i;
+                    output.Add(input[i]);  //add the right parenthesis here
+                    return output;
+                }
+                else
+                {
+                    if (Globals.parenthesesInvert.ContainsKey(input[i].s))
+                    {
+                        G.Writeln2("*** ERROR: Missing a '" + Globals.parenthesesInvert[input[i].s] + "' parenthesis");
+                        throw new GekkoException();
+                    }
+                    output.Add(input[i]);
+                }
+            }
+            if (endparen != null)
+            {
+                G.Writeln2("*** ERROR: Missing a '" + endparen + "' parenthesis");
+                throw new GekkoException();
+            }
+            return output;
+        }
+
+    }
 }
