@@ -73,6 +73,9 @@ namespace Gekko
         public static List<string> lagFunctions = new List<string> { "dlog", "dif", "diff", "pch", "dlogy", "dify", "diffy", "pchy", "movsum", "movavg", "lag", "avgt", "sumt" };
                 
         public static Dictionary<string, string> parentheses = new Dictionary<string, string> { { "(", ")" }, { "[", "]" }, { "{", "}" } };
+        public static Dictionary<string, string> parenthesesInvert = new Dictionary<string, string> { { ")", "(" }, { "]", "[" }, { "}", "{" } };
+
+        
 
         public static bool newSplit = true;
         public static string splitSTART2 = "//[[splitSTART]]";

@@ -12,10 +12,8 @@
  * 
  **********************************************************/
 
-//TT: Not used much anymore, was used for parsing models before ANTLR was introduced. Now it mostly tokenizes
-//    stuff regarding TSP utilities. It is a good tokenizer though!
-
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -44,15 +42,18 @@ namespace Gekko
         bool specialLoopSignsAcceptedAsWords;
         bool treatQuotesAsUnknown;
 
+        public List<Tuple<string, string>> commentsClosed = new List<Tuple<string, string>>();  //for instance /* ... */
+        public List<string> commentsNonClosed = new List<string>();  //for instance //, or !! in GAMS 
+        public List<Tuple<string, string>> commentsClosedOnlyStartOfLine = new List<Tuple<string, string>>(); //only at start of line, for instance $ontext ... $offtext
+        public List<string> commentsNonClosedOnlyStartOfLine = new List<string>();  //only at start of line, for instance * in GAMS
+
         public StringTokenizer2(TextReader reader, bool specialLoopSignsAcceptedAsWords, bool treatQuotesAsUnknown)
-		{
+		{            
             this.specialLoopSignsAcceptedAsWords = specialLoopSignsAcceptedAsWords;
             this.treatQuotesAsUnknown = treatQuotesAsUnknown;
             if (reader == null)
 				throw new ArgumentNullException("reader");
-
 			data = reader.ReadToEnd();
-
 			Reset();
 		}
 
@@ -62,9 +63,7 @@ namespace Gekko
             this.treatQuotesAsUnknown = treatQuotesAsUnknown;
             if (data == null)
 				throw new ArgumentNullException("data");
-
 			this.data = data;
-
 			Reset();
 		}
 
@@ -91,7 +90,6 @@ namespace Gekko
 		{
 			this.ignoreWhiteSpace = false;
 			this.symbolChars = new char[]{'=', '+', '-', '/', ',', '.', '*', '~', '!', '@', '#', '$', '%', '^', '&', '(', ')', '{', '}', '[', ']', ':', ';', '<', '>', '?', '|', '\\'};
-
 			line = 1;
 			column = 1;
 			pos = 0;
@@ -110,7 +108,6 @@ namespace Gekko
 			char ret = data[pos];
 			pos++;
 			column++;
-
 			return ret;
 		}
 
@@ -125,13 +122,30 @@ namespace Gekko
 			return new Token(kind, tokenData, saveLine, saveCol);
 		}
 
-		public Token Next()
-		{
-			ReadToken:
+        public bool MatchString(string s)
+        {
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (char.ToUpperInvariant(LA(i)) != char.ToUpperInvariant(s[i])) return false;
+            }
+            return true;
+        }
 
-			char ch = LA(0);
-            
+        public Token Next()
+		{
+            ReadToken:
+            char ch = LA(0);
             //if (ch == '\x0000') ch = '\x0001';
+
+            foreach (Tuple<string, string> tags in commentsClosed)
+            {
+                if (MatchString(tags.Item1))
+                {
+                    //for instance '/*', look for the matching end, '*/'
+                    return ReadCommentClosed(tags);
+                }
+            }
+
 			switch (ch)
 			{
 				case EOF:
@@ -166,10 +180,8 @@ namespace Gekko
 					Consume();
 					if (LA(0) == '\n')
 						Consume();	// on DOS/Windows we have \r\n for new line
-
 					line++;
 					column=1;
-
 					return CreateToken(TokenKind.EOL);
 				}
 				case '\n':
@@ -177,14 +189,12 @@ namespace Gekko
 					StartRead();
 					Consume();
 					line++;
-					column=1;
-					
+					column=1;					
 					return CreateToken(TokenKind.EOL);
 				}
 
 				case '"':
 				{
-
                     if (treatQuotesAsUnknown)
                     {                        
                         StartRead();
@@ -197,7 +207,21 @@ namespace Gekko
                     }
 				}
 
-				default:
+                case '\'':
+                    {
+                        if (treatQuotesAsUnknown)
+                        {
+                            StartRead();
+                            Consume();
+                            return CreateToken(TokenKind.Unknown);
+                        }
+                        else
+                        {
+                            return ReadStringSingleQuotes();
+                        }
+                    }
+
+                default:
 				{
                     if (ch == '.')
                     {
@@ -332,18 +356,106 @@ namespace Gekko
 			return CreateToken(TokenKind.Word);
 		}
 
-		/// <summary>
+        /// <summary>
 		/// reads all characters until next " is found.
 		/// If "" (2 quotes) are found, then they are consumed as
 		/// part of the string
 		/// </summary>
 		/// <returns></returns>
 		protected Token ReadString()
+        {
+            StartRead();
+            Consume(); // read "
+            while (true)
+            {
+                char ch = LA(0);
+                if (ch == EOF)
+                    break;
+                else if (ch == '\r')    // handle CR in strings
+                {
+                    Consume();
+                    if (LA(0) == '\n')  // for DOS & windows
+                        Consume();
+                    line++;
+                    column = 1;
+                }
+                else if (ch == '\n')    // new line in quoted string
+                {
+                    Consume();
+                    line++;
+                    column = 1;
+                }
+                else if (ch == '"')
+                {
+                    Consume();
+                    if (LA(0) != '"')
+                        break;  // done reading, and this quotes does not have escape character
+                    else
+                        Consume(); // consume second ", because first was just an escape
+                }
+                else
+                    Consume();
+            }
+
+            return CreateToken(TokenKind.QuotedString);
+        }
+
+        /// <summary>
+		/// reads all characters until end of comment
+		/// </summary>
+		/// <returns></returns>
+		protected Token ReadCommentClosed(Tuple<string, string> tags)
+        {
+            StartRead();
+            for (int i = 0; i < tags.Item1.Length; i++)
+            {
+                Consume(); // consume tag, for instance '/*'
+            }
+            while (true)
+            {
+                char ch = LA(0);
+                if (ch == EOF)
+                    break;
+                else if (ch == '\r')    // handle CR in strings
+                {
+                    Consume();
+                    if (LA(0) == '\n')  // for DOS & windows
+                        Consume();
+                    line++;
+                    column = 1;
+                }
+                else if (ch == '\n')    // new line in quoted string
+                {
+                    Consume();
+                    line++;
+                    column = 1;
+                }
+                else if (MatchString(tags.Item2))
+                {
+                    //endtag found
+                    for (int i = 0; i < tags.Item2.Length; i++)
+                    {
+                        Consume(); // consume tag, for instance '*/'
+                    }
+                    break;
+                }
+                else
+                    Consume();
+            }
+
+            return CreateToken(TokenKind.Comment);
+        }
+
+        /// <summary>
+        /// reads all characters until next ' is found.
+        /// If '' (2 single quotes) are found, then they are consumed as
+        /// part of the string
+        /// </summary>
+        /// <returns></returns>
+        protected Token ReadStringSingleQuotes()
 		{
 			StartRead();
-
-			Consume(); // read "
-
+			Consume(); // read '
 			while (true)
 			{
 				char ch = LA(0);
@@ -354,21 +466,19 @@ namespace Gekko
 					Consume();
 					if (LA(0) == '\n')	// for DOS & windows
 						Consume();
-
 					line++;
 					column = 1;
 				}
 				else if (ch == '\n')	// new line in quoted string
 				{
 					Consume();
-
 					line++;
 					column = 1;
 				}
-				else if (ch == '"')
+				else if (ch == '\'')
 				{
 					Consume();
-					if (LA(0) != '"')
+					if (LA(0) != '\'')
 						break;	// done reading, and this quotes does not have escape character
 					else
 						Consume(); // consume second ", because first was just an escape
@@ -376,7 +486,6 @@ namespace Gekko
 				else
 					Consume();
 			}
-
 			return CreateToken(TokenKind.QuotedString);
 		}
 

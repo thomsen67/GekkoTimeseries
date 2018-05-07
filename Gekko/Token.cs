@@ -18,6 +18,7 @@ namespace Gekko
 		Word,
 		Number,
 		QuotedString,
+        Comment,
 		WhiteSpace,
 		Symbol,
 		EOL,

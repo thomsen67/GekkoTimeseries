@@ -15826,14 +15826,20 @@ namespace Gekko
             Program.model.modelInfo.Print();
         }
 
-        public static List<TokenHelper> GetTokensWithLeftBlanksAdvanced(string textInputRaw)
+        public static List<TokenHelper> GetTokensWithLeftBlanksRecursive(string textInputRaw)
+        {
+            return GetTokensWithLeftBlanksRecursive(textInputRaw, null, null, null, null);
+        }
+
+        public static List<TokenHelper> GetTokensWithLeftBlanksRecursive(string textInputRaw, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
         {
             int i = 0;
-            List<TokenHelper> tokens2 = GetTokensWithLeftBlanksAdvancedHelper(GetTokensWithLeftBlanks(textInputRaw), ref i, null);
+            List<TokenHelper> tokens = GetTokensWithLeftBlanks(textInputRaw, 0, commentsClosed, commentsNonClosed, commentsClosedOnlyStartOfLine, commentsNonClosedOnlyStartOfLine);
+            List<TokenHelper> tokens2 = GetTokensWithLeftBlanksRecursiveHelper(tokens, ref i, null);
             return tokens2;
         }
 
-        public static List<TokenHelper> GetTokensWithLeftBlanksAdvancedHelper(List<TokenHelper> input, ref int startI, string startparen)
+        public static List<TokenHelper> GetTokensWithLeftBlanksRecursiveHelper(List<TokenHelper> input, ref int startI, string startparen)
         {
             List<TokenHelper> output = new List<TokenHelper>();
             //if (first != null) output.Add(first);  //a left parenthesis      
@@ -15844,16 +15850,16 @@ namespace Gekko
                 output.Add(input[startI - 1]);  //add the left parenthesis here
             }
             for (int i = startI; i < input.Count; i++)
-            {                
+            {
                 if (Globals.parentheses.ContainsKey(input[i].s))
                 {
                     //found a new left parenthesis                          
                     startI = i + 1;
-                    List<TokenHelper> sub = GetTokensWithLeftBlanksAdvancedHelper(input, ref startI, input[i].s);
+                    List<TokenHelper> sub = GetTokensWithLeftBlanksRecursiveHelper(input, ref startI, input[i].s);
                     //sub.Add(input[startI]);
                     TokenHelper temp = new TokenHelper();
                     temp.subnodes = sub;
-                    temp.subnodesType = input[i].s;                    
+                    temp.subnodesType = input[i].s;
                     output.Add(temp);
                     i = startI;
                 }
@@ -15872,12 +15878,17 @@ namespace Gekko
                 }
                 else
                 {
+                    if (Globals.parenthesesInvert.ContainsKey(input[i].s))
+                    {
+                        G.Writeln2("*** ERROR: Missing a '" + Globals.parenthesesInvert[input[i].s] + "' parenthesis");
+                        throw new GekkoException();
+                    }
                     output.Add(input[i]);
                 }
             }
             if (endparen != null)
             {
-                G.Writeln2("*** ERROR: Could not find matching '" + endparen + "' parenthesis");
+                G.Writeln2("*** ERROR: Missing a '" + endparen + "' parenthesis");
                 throw new GekkoException();
             }
             return output;
@@ -15887,16 +15898,16 @@ namespace Gekko
         { 
 
             string txt = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "token.txt");
-            int i = 0; 
-            List<TokenHelper> tokens2 = GetTokensWithLeftBlanksAdvanced(txt);
-
-
+            int i = 0;
+            Tuple<string, string> tag = new Tuple<string, string> ( "/*", "*/" );
+            List<Tuple<string, string>> tags = new List<Tuple<string, string>>();
+            tags.Add(tag);
+            List<TokenHelper> tokens2 = GetTokensWithLeftBlanksRecursive(txt, tags, null, null, null);
+            
             foreach (TokenHelper tok in tokens2)
             {
                 string s = tok.ToString();
             }
-
-
 
             List<TokenHelper> tokens = GetTokensWithLeftBlanks(textInputRaw);
             List<List<string>> eqLines = new List<List<string>>();
@@ -26347,7 +26358,17 @@ namespace Gekko
 
         public static List<TokenHelper> GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd)
         {
-            StringTokenizer2 tok = new StringTokenizer2(s, false, false);                        
+            return GetTokensWithLeftBlanks(s, emptyTokensAtEnd, null, null, null, null);
+        }
+
+        public static List<TokenHelper> GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
+        {
+            StringTokenizer2 tok = new StringTokenizer2(s, false, false);
+            if (commentsClosed != null) tok.commentsClosed = commentsClosed;
+            if (commentsNonClosed != null) tok.commentsNonClosed = commentsNonClosed;
+            if (commentsClosedOnlyStartOfLine != null) tok.commentsClosed = commentsClosed;
+            if (commentsNonClosedOnlyStartOfLine != null) tok.commentsNonClosed = commentsNonClosed;
+
             tok.IgnoreWhiteSpace = false;
             tok.SymbolChars = new char[] { '!', '#', '%', '&', '/', '(', ')', '=', '?', '@', '$', '{', '[', ']', '}', '+', '|', '^', '¨', '~', '*', '<', '>', '\\', ';', ',', ':', '.', '-' };
             Token token;
@@ -26358,7 +26379,7 @@ namespace Gekko
             {
                 token = tok.Next();
                 string value = token.Value;
-                string kind = token.Kind.ToString();
+                TokenKind kind = token.Kind;
                 TokenHelper two = new TokenHelper();
                 two.s = value; two.type = kind; two.leftblanks = white;
                 if (kind == "WhiteSpace")
