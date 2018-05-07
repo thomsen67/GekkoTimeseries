@@ -177,7 +177,16 @@ namespace Gekko
                 }
             }
 
-			switch (ch)
+            foreach (string tag in commentsNonClosed)
+            {
+                if (MatchString(tag))
+                {
+                    //for instance '//'
+                    return ReadCommentNonClosed(tag);
+                }
+            }
+
+            switch (ch)
 			{
 				case EOF:
 					return CreateToken(TokenKind.EOF, string.Empty);
@@ -495,6 +504,44 @@ namespace Gekko
         }
 
         /// <summary>
+		/// reads all characters until end of comment
+		/// </summary>
+		/// <returns></returns>
+		protected Token ReadCommentNonClosed(string tag)
+        {
+            StartRead();
+            for (int i = 0; i < tag.Length; i++)
+            {
+                Consume(); // consume tag, for instance '//'
+            }            
+            while (true)
+            {
+                char ch = LA(0);
+                if (ch == EOF)
+                    break;
+                else if (ch == '\r')    // handle CR in strings
+                {
+                    Consume();
+                    if (LA(0) == '\n')  // for DOS & windows
+                        Consume();
+                    line++;
+                    column = 1;
+                }
+                else if (ch == '\n')    // new line in quoted string
+                {
+                    Consume();
+                    line++;
+                    column = 1;
+                }                
+                else
+                {
+                    Consume();
+                }
+            }
+            return CreateToken(TokenKind.Comment);
+        }
+
+        /// <summary>
         /// reads all characters until next ' is found.
         /// If '' (2 single quotes) are found, then they are consumed as
         /// part of the string
@@ -613,14 +660,14 @@ namespace Gekko
             return tokens2;
         }
 
-        public static List<TokenHelper> GetTokensWithLeftBlanksRecursiveHelper(List<TokenHelper> input, ref int startI, string startparen)
+        public static List<TokenHelper> GetTokensWithLeftBlanksRecursiveHelper(List<TokenHelper> input, ref int startI, TokenHelper startparen)
         {
             List<TokenHelper> output = new List<TokenHelper>();
             //if (first != null) output.Add(first);  //a left parenthesis      
             string endparen = null;
             if (startparen != null)
             {
-                Globals.parentheses.TryGetValue(startparen, out endparen);
+                Globals.parentheses.TryGetValue(startparen.s, out endparen);
                 output.Add(input[startI - 1]);  //add the left parenthesis here
             }
             for (int i = startI; i < input.Count; i++)
@@ -629,7 +676,7 @@ namespace Gekko
                 {
                     //found a new left parenthesis                          
                     startI = i + 1;
-                    List<TokenHelper> sub = GetTokensWithLeftBlanksRecursiveHelper(input, ref startI, input[i].s);
+                    List<TokenHelper> sub = GetTokensWithLeftBlanksRecursiveHelper(input, ref startI, input[i]);
                     //sub.Add(input[startI]);
                     TokenHelper temp = new TokenHelper();
                     temp.subnodes = sub;
@@ -640,12 +687,6 @@ namespace Gekko
                 else if (endparen != null && input[i].s == endparen)
                 {
                     //got to the end
-                    //List<TokenHelper> temp = new List<TokenHelper>();
-                    //for (int ii = startI - 1; ii <= i; ii++)
-                    //{
-                    //    temp.Add(input[ii]);
-                    //}
-
                     startI = i;
                     output.Add(input[i]);  //add the right parenthesis here
                     return output;
@@ -654,15 +695,15 @@ namespace Gekko
                 {
                     if (Globals.parenthesesInvert.ContainsKey(input[i].s))
                     {
-                        G.Writeln2("*** ERROR: Missing a '" + Globals.parenthesesInvert[input[i].s] + "' parenthesis");
+                        G.Writeln2("*** ERROR: The '" + input[i].s + "' parenthesis at line " + input[i].line + " pos " + input[i].column + " does not have a corresponding '" + Globals.parenthesesInvert[input[i].s] + "'");
                         throw new GekkoException();
                     }
                     output.Add(input[i]);
                 }
             }
             if (endparen != null)
-            {
-                G.Writeln2("*** ERROR: Missing a '" + endparen + "' parenthesis");
+            {                
+                G.Writeln2("*** ERROR: The '" + startparen.s + "' parenthesis at line " + startparen.line + " pos " + startparen.column + " does not have a corresponding '" + endparen + "'");
                 throw new GekkoException();
             }
             return output;
