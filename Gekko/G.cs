@@ -1926,17 +1926,30 @@ namespace Gekko
             else return false;
         }
 
-        public static bool Round(out int rounded, double value)
-        {
-            //TODO: What about double.NaN????
-            bool flag = false;
+        public static bool ConvertToInt(out int rounded, double value)
+        {            
+            bool flag = true;
             rounded = Convert.ToInt32(value);  //this function rounds to nearest int, so -12.98 --> -13
-            double decimals = value - rounded;
-            if (Math.Abs(decimals) < 0.000001)
+            double decimals = value - rounded;            
+            if (G.isNumericalError(value) || Math.Abs(decimals) > 0.000001)
             {
-                flag = true;
+                flag = false;
             }
             return flag;
+        }
+
+        public static int ConvertToInt(double value)
+        {
+            //simpler method
+            bool flag = false;
+            int rounded = Convert.ToInt32(value);  //this function rounds to nearest int, so -12.98 --> -13
+            double decimals = value - rounded;
+            if (G.isNumericalError(value) || Math.Abs(decimals) > 0.000001)
+            {
+                G.Writeln2("*** ERROR: Could not convert " + value + " into integer");
+                throw new GekkoException();
+            }
+            return rounded;
         }
 
         /// <summary>

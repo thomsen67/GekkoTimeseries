@@ -511,6 +511,14 @@ namespace Gekko
                 ScalarVal x_val = x as ScalarVal;
                 x_val.val += step_val.val;
             }
+            else if (x.Type() == EVariableType.Date)
+            {
+                ScalarVal step_val = null;
+                if (step == null) step_val = Globals.scalarVal1;
+                else step_val = step as ScalarVal;                
+                ScalarDate x_date = x as ScalarDate;
+                x_date.date = x_date.date.Add(G.ConvertToInt(step_val.val));
+            }
             else if (x.Type() == EVariableType.String)
             {
                 //it is tested previously that step = null and start is metalist
@@ -581,7 +589,7 @@ namespace Gekko
                 ScalarVal max_val = max as ScalarVal;
                 if (max_val == null)
                 {
-                    G.Writeln2("*** ERROR: Expected max value to be VAL type");
+                    G.Writeln2("*** ERROR: Expected max value to be VAL type, you may try the val() function");
                     throw new GekkoException();
                 }
                 ScalarVal step_val = null;
@@ -589,7 +597,7 @@ namespace Gekko
                 else step_val = step as ScalarVal;
                 if (step_val == null)
                 {
-                    G.Writeln2("*** ERROR: Expected step value to be VAL type");
+                    G.Writeln2("*** ERROR: Expected step value to be VAL type, you may try the val() function");
                     throw new GekkoException();
                 }
                 if (step_val.val > 0)
@@ -604,6 +612,40 @@ namespace Gekko
                     //for instance: FOR VAL i = 11 to 1 by -2; (11, 9, 7, 5, 3, 1)
                     //max typically has step/1000000 added, so it might be 0.999998
                 }
+            }
+            else if (x.Type() == EVariableType.Date)
+            {
+                ScalarDate x_date = x as ScalarDate;
+                ScalarDate max_date = max as ScalarDate;
+                if (max_date == null)
+                {
+                    G.Writeln2("*** ERROR: Expected max value to be DATE type, you may try the date() function");
+                    throw new GekkoException();
+                }
+                ScalarVal step_val = null;
+                if (step == null) step_val = Globals.scalarVal1;
+                else step_val = step as ScalarVal;
+                if (step_val == null)
+                {
+                    G.Writeln2("*** ERROR: Expected step value to be VAL type, you may try the val() function");
+                    throw new GekkoException();
+                }
+                int step_int = O.ConvertToInt(step_val);
+                if (step_int == 0)
+                {
+                    G.Writeln2("*** ERROR: Step value cannot be 0");
+                    throw new GekkoException();
+                }
+
+                //GekkoTime gt = x_date.date.Add(step_int);
+                if (step_val.val > 0)
+                {
+                    return x_date.date.SmallerThanOrEqual(max_date.date);
+                }    
+                else
+                {                    
+                    return x_date.date.LargerThanOrEqual(max_date.date);
+                }            
             }
             else if (x.Type() == EVariableType.String)
             {
@@ -4110,7 +4152,7 @@ namespace Gekko
             }
             double d = ConvertToVal(a);
             int intValue = -12345;
-            if (!G.Round(out intValue, d))
+            if (!G.ConvertToInt(out intValue, d))
             {
                 if (reportError)
                 {
@@ -5375,7 +5417,7 @@ namespace Gekko
                 if (!G.isNumericalError(this.opt_pos))
                 {
                     hlp.openType = EOpenType.Pos;                    
-                    if (G.Round(out hlp.openTypePosition, opt_pos) == false)
+                    if (G.ConvertToInt(out hlp.openTypePosition, opt_pos) == false)
                     {
                         G.Writeln2("*** ERROR: OPEN<pos=...> should be integer value");
                         throw new GekkoException();

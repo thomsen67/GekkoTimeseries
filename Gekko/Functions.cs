@@ -1698,7 +1698,7 @@ namespace Gekko
             if (IsGekkoNull(x1)) return x1;
             double d2 = O.ConvertToVal(round);          
             int aaa1 = 0;
-            if (!G.Round(out aaa1, d2))
+            if (!G.ConvertToInt(out aaa1, d2))
             {
                 G.Writeln("*** ERROR: Could not convert decimals variable to integer");
                 throw new GekkoException();
