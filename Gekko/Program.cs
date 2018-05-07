@@ -514,8 +514,10 @@ namespace Gekko
     public class TokenHelper
     {
         public string s = null;
-        public string type = null;
+        public TokenKind type = TokenKind.Unknown;
         public string leftblanks = null;
+        public int line = -12345;
+        public int column = -12345;
         //below is advanced (recursive) stuff
         public string subnodesType = null;  // "(", "[" or "{".
         public List<TokenHelper> subnodes = null;        
@@ -15000,7 +15002,7 @@ namespace Gekko
                     {
                         TokenHelper token = tokens[i];
                         if (token.leftblanks != null) G.Write(token.leftblanks);
-                        if (token.type == "Word" && knownVars.ContainsKey(token.s))
+                        if (token.type == TokenKind.Word && knownVars.ContainsKey(token.s))
                         {
                             G.WriteLink(token.s, "disp:" + token.s);
                         }
@@ -15051,7 +15053,7 @@ namespace Gekko
             List<TokenHelper> tokens = GetTokensWithLeftBlanks(input);
             foreach (TokenHelper token in tokens)
             {
-                if (token.type == "Word")
+                if (token.type == TokenKind.Word)
                 {
                     List<ModelGamsEquation> e3 = null; Program.modelGams.equations.TryGetValue(token.s, out e3);
 
@@ -15914,7 +15916,7 @@ namespace Gekko
             List<string> temp = new List<string>();
             foreach (TokenHelper token in tokens)
             {
-                if (token.type == "EOL")
+                if (token.type == TokenKind.EOL)
                 {
                     eqLines.Add(temp);
                     temp = new List<string>();
@@ -15960,7 +15962,7 @@ namespace Gekko
                 string varName = null;
                 foreach (TokenHelper t in fields)
                 {
-                    if (t.type == "Word")
+                    if (t.type == TokenKind.Word)
                     {
                         if (G.Equal(t.s, "log") || G.Equal(t.s, "exp")) continue;  //this logic could be improved... how to distinguish functions log(x) and sets y(t) ??
                         varName = t.s;
@@ -26140,7 +26142,7 @@ namespace Gekko
                 // x[#i, 'a'] $ #j[#k]--> x[##i, 'a'] $ #j[##k]
                 for (int i = 0; i < a.Count - twenty; i++)
                 {
-                    if (a[i].s == "[" && a[i - 1].type == "Word")
+                    if (a[i].s == "[" && a[i - 1].type == TokenKind.Word)
                     {
                         //is 'x['
                         //very simple check, does not account for nesting etc....  
@@ -26184,7 +26186,7 @@ namespace Gekko
                 for (int i = 0; i < a.Count - twenty; i++)
                 {
                     GekkoDictionary<string, string> listNames = null;
-                    if (a[i].s == "sum" && a[i + 1].s == "(" && a[i + 2].s == "###" && a[i + 3].type == "Word" && a[i + 4].s == ",")
+                    if (a[i].s == "sum" && a[i + 1].s == "(" && a[i + 2].s == "###" && a[i + 3].type == TokenKind.Word && a[i + 4].s == ",")
                     {
                         //sum(#m1, xx3[#m1, #m2])
                         listNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -26200,7 +26202,7 @@ namespace Gekko
                         for (int i2 = i + 3; i2 < a.Count - twenty; i2++)
                         {
                             //Harvesting list names from here: sum((...), xx3[#m1, #m2])
-                            if (a[i2].s == "###" && a[i2 + 1].type == "Word")
+                            if (a[i2].s == "###" && a[i2 + 1].type == TokenKind.Word)
                             {
                                 if (!listNames.ContainsKey(a[i2 + 1].s)) listNames.Add(a[i2 + 1].s, "");  //the if is probably superfluous
                                 //a[i2].s = "###";                                
@@ -26225,7 +26227,7 @@ namespace Gekko
 
                             if (paren == 0) break;
 
-                            if (a[i2].s == "#" && a[i2 + 1].type == "Word" && listNames.ContainsKey(a[i2 + 1].s))
+                            if (a[i2].s == "#" && a[i2 + 1].type == TokenKind.Word && listNames.ContainsKey(a[i2 + 1].s))
                             {
                                 a[i2].s = "###";
                             }
@@ -26381,13 +26383,18 @@ namespace Gekko
                 string value = token.Value;
                 TokenKind kind = token.Kind;
                 TokenHelper two = new TokenHelper();
-                two.s = value; two.type = kind; two.leftblanks = white;
-                if (kind == "WhiteSpace")
+                two.s = value;
+                two.type = kind;
+                two.leftblanks = white;
+
+                if (kind == TokenKind.WhiteSpace)
                 {
                     white = value;
                 }
                 else
                 {
+                    two.line = token.Line;
+                    two.column = token.Column;
                     a.Add(two);
                     white = null;
                 }

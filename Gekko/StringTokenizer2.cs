@@ -86,18 +86,18 @@ namespace Gekko
 			set { this.ignoreWhiteSpace = value; }
 		}
 
-		private void Reset()
-		{
-			this.ignoreWhiteSpace = false;
-			this.symbolChars = new char[]{'=', '+', '-', '/', ',', '.', '*', '~', '!', '@', '#', '$', '%', '^', '&', '(', ')', '{', '}', '[', ']', ':', ';', '<', '>', '?', '|', '\\'};
-			line = 1;
-			column = 1;
-			pos = 0;
-		}
+        private void Reset()
+        {
+            this.ignoreWhiteSpace = false;
+            this.symbolChars = new char[] { '=', '+', '-', '/', ',', '.', '*', '~', '!', '@', '#', '$', '%', '^', '&', '(', ')', '{', '}', '[', ']', ':', ';', '<', '>', '?', '|', '\\' };
+            line = 1;
+            column = 1;
+            pos = 0;
+        }
 
 		protected char LA(int count)
 		{
-			if (pos + count >= data.Length)
+			if (pos + count < 0 || pos + count >= data.Length)
 				return EOF;
 			else
 				return data[pos+count];
@@ -405,12 +405,13 @@ namespace Gekko
 		/// </summary>
 		/// <returns></returns>
 		protected Token ReadCommentClosed(Tuple<string, string> tags)
-        {
+        {            
             StartRead();
             for (int i = 0; i < tags.Item1.Length; i++)
             {
                 Consume(); // consume tag, for instance '/*'
             }
+            int nestingLevel = 1;
             while (true)
             {
                 char ch = LA(0);
@@ -430,17 +431,33 @@ namespace Gekko
                     line++;
                     column = 1;
                 }
+                else if (MatchString(tags.Item1))
+                {
+                    //nested comment
+                    nestingLevel++;
+                    for (int i = 0; i < tags.Item1.Length; i++)
+                    {
+                        Consume(); // consume tag, for instance '/*'
+                    }                    
+                    //we are continuing from here
+                }
                 else if (MatchString(tags.Item2))
                 {
                     //endtag found
+                    nestingLevel--;
                     for (int i = 0; i < tags.Item2.Length; i++)
                     {
                         Consume(); // consume tag, for instance '*/'
                     }
-                    break;
+                    if (nestingLevel == 0)
+                    {
+                        break;
+                    }                    
                 }
                 else
+                {
                     Consume();
+                }
             }
 
             return CreateToken(TokenKind.Comment);
