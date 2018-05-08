@@ -1772,7 +1772,7 @@ namespace Gekko
 
                                         int index1, index2;
                                         //may enlarge the array with NaNs first and last
-                                        double[] data = rhs_series.GetDataSequence(out index1, out index2, tt1, tt2, false);
+                                        double[] data = rhs_series.GetDataSequence(out index1, out index2, tt1, tt2);
                                         //may enlarge the array with NaNs first and last
                                         lhs_series.SetDataSequence(tt1, tt2, data, index1);
                                         if (create) AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);

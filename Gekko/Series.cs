@@ -599,24 +599,9 @@ namespace Gekko
         /// <returns>A pointer to the data array that contains the data. This is a pointer to the REAL data, so
         /// DO NOT change the array values unless you know what you are doing!</returns>
         /// <exception cref="GekkoException">Exception if frequency of timeseries and periods differ.</exception>
-        public double[] GetDataSequence(out int index1, out int index2, GekkoTime gt1, GekkoTime gt2, bool setStartEndPeriods)
+        private double[] GetDataSequenceAbstract(out int index1, out int index2, GekkoTime gt1, GekkoTime gt2, bool setStartEndPeriods, bool clone)
         {
-            //NB NB NB NB NB
-            //NB NB NB NB NB
-            //NB NB NB NB NB   BEWARE: the array returned is a pointer to the REAL datacontainer for the timeseries. So do not alter the array unless you are ACTUALLY altering the timeseries (for instance UPD, GENR etc.)
-            //NB NB NB NB NB   ALSO BEWARE: if series_data_ignoremissing = true, any NaN/Inf must be changed into 0. But DO NOT DO THAT on the original double[] returned, only where it is used.
-            //NB NB NB NB NB
-            //NB NB NB NB NB
-            //      It might be called half overlapped like this:
-            //            +++++++++++++++++++++++
-            //      ---------------
-            //      if so, the array is resized before it is returned.
-            //      if the array is null, it will be created when calling this method.
-            //
-            //Also beware that if the array returned is touched afterwards, the timeseries will be dirty. This only happens in the 
-            //simulation code, though. See #98726527!
-
-            //DimensionCheck();
+            //generic method, not for outside use
 
             if (this.type == ESeriesType.Timeless)
             {
@@ -669,7 +654,19 @@ namespace Gekko
                     this.meta.firstPeriodPositionInArray = index1;
                 }
             }
-            return this.data.dataArray;
+            if (clone)
+            {
+                int size = index2 - index1 + 1;
+                double[] temp = new double[size];
+                Array.Copy(this.data.dataArray, index1, temp, 0, size);
+                index1 = 0;
+                index2 = temp.Length;
+                return temp;
+            }
+            else
+            {
+                return this.data.dataArray;
+            }
         }
 
         public void TooSmallOrTooLarge(int index1, int index2, out int tooSmall, out int tooLarge)
@@ -693,13 +690,26 @@ namespace Gekko
         /// <param name="per2">The end of the period.</param>
         /// <returns></returns>
         public double[] GetDataSequence(out int index1, out int index2, GekkoTime per1, GekkoTime per2)
+        {            
+            return GetDataSequenceAbstract(out index1, out index2, per1, per2, false, true);
+        }
+
+        public double[] GetDataSequenceUnsafePointerReadOnly(out int index1, out int index2, GekkoTime per1, GekkoTime per2)
         {
+            //will also set metadata regarding max-min periods            
+            return GetDataSequenceAbstract(out index1, out index2, per1, per2, true, false);
+        }
+
+        public double[] GetDataSequenceUnsafePointerAlter(out int index1, out int index2, GekkoTime per1, GekkoTime per2)
+        {
+            //will also set metadata regarding max-min periods
             if (this.type == ESeriesType.Timeless)
             {
                 G.Writeln2("*** ERROR: Timeless variable error #2");
                 throw new GekkoException();
             }
-            return GetDataSequence(out index1, out index2, per1, per2, false);
+            this.SetDirty(true); //we have to mark dirty manually
+            return GetDataSequenceAbstract(out index1, out index2, per1, per2, true, false);
         }
 
         /// <summary>

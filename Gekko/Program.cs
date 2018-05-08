@@ -3222,7 +3222,7 @@ namespace Gekko
                                 int index2;
                                 try
                                 {
-                                    double[] data = tsSource.GetDataSequence(out index1, out index2, firstTruncated, lastTruncated, false);
+                                    double[] data = tsSource.GetDataSequence(out index1, out index2, firstTruncated, lastTruncated);
                                     tsExisting.SetDataSequence(firstTruncated, lastTruncated, data, index1);
                                 }
                                 catch (Exception e)
@@ -3241,8 +3241,8 @@ namespace Gekko
                             //firstExisting is guaranteed to be != tNull, so lastExisting is so too
                             int index1;
                             int index2;
-                            double[] data = tsSource.GetDataSequence(out index1, out index2, firstSource, lastSource, true);
-                            tsExisting.SetDataSequence(firstSource, lastSource, data, index1);
+                            double[] data_beware_do_not_change = tsSource.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, firstSource, lastSource);
+                            tsExisting.SetDataSequence(firstSource, lastSource, data_beware_do_not_change, index1);
                         }
                     }
                 }
@@ -18668,14 +18668,14 @@ namespace Gekko
                 int id = atd.aNumber;
                 int index1 = -12345;
                 int index2 = -12345;
-                double[] x = null;
+                double[] x_beware_do_not_change = null;
                 Series ts = work.GetVariable(var);  //Could have an A-array with Series...
                 if (ts == null)
                 {
                     if (IsDjz(var))
                     {
                         length = obsWithLags;
-                        x = NAN;
+                        x_beware_do_not_change = NAN;
                         index1 = 0;
                     }
                     else
@@ -18686,11 +18686,12 @@ namespace Gekko
                     }
                 }
                 else
-                {
-                    x = ts.GetDataSequence(out index1, out index2, tStart0, tEnd, false);  //no setting of start/end period of timeseries
+                {                    
+                    x_beware_do_not_change = ts.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, tStart0, tEnd);  //no setting of start/end period of timeseries
                     length = index2 - index1 + 1;
                 }
-                Buffer.BlockCopy(x, 8 * index1, a, 8 * id * obsWithLags, 8 * length);  //TODO: what if out of bounds regarding x???
+                //BEWARE: Do not alter x here
+                Buffer.BlockCopy(x_beware_do_not_change, 8 * index1, a, 8 * id * obsWithLags, 8 * length);  //TODO: what if out of bounds regarding x???
                 //I guess after this loop is done, the whole of a[,] will be filled with data or NaN.
                 //It should not be possible that there is a 0 left originating from "double[,] a = new double[vars, obs];"
             }
@@ -18722,12 +18723,12 @@ namespace Gekko
                 //??? what if above is null??? << create it if djz?
                 int index1 = -12345;
                 int index2 = -12345;
-                double[] x = ts.GetDataSequence(out index1, out index2, tStart, tEnd, true);
+                double[] x_beware_if_changed = ts.GetDataSequenceUnsafePointerAlter(out index1, out index2, tStart, tEnd);
+                
                 //#98726527
-                //we have to indicate this manually here: normally GetDataSequence() is only for getting, but here stuff is put into it (to keep the method speedy)
-                ts.SetDirty(true);
+                
                 int length = index2 - index1 + 1;  //only done for sim period, not from tStart0 (i.e. lags)
-                Buffer.BlockCopy(a, 8 * id * obsWithLags + 8 * (obsWithLags - obsSimPeriod), x, 8 * (index1), 8 * length); //TODO: what if out of bounds regarding x???
+                Buffer.BlockCopy(a, 8 * id * obsWithLags + 8 * (obsWithLags - obsSimPeriod), x_beware_if_changed, 8 * (index1), 8 * length); //TODO: what if out of bounds regarding x???
                 if(bNumberPointers!=null) {
                     int b = bNumberPointers[id];
                     if(b!=-12345) {
