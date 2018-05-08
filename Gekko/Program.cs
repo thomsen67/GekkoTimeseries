@@ -15799,17 +15799,18 @@ namespace Gekko
             Program.model.modelInfo.Print();
         }
 
-        
+
 
         private static void ReadGamsModel(string textInputRaw)
-        { 
+        {
 
-            string txt = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "token.txt");
-            int i = 0;
-            Tuple<string, string> tag = new Tuple<string, string> ( "/*", "*/" );
-            List<Tuple<string, string>> tags = new List<Tuple<string, string>>();
-            tags.Add(tag);
-            List<TokenHelper> tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags, null, null, null);
+            string txt = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "model.gms");
+            int i = 0;            
+            var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
+            var tags2 = new List<string>() { "//" };
+            var tags3 = new List<Tuple<string, string>>() { new Tuple<string, string>("$ontext", "$offtext") };
+            var tags4 = new List<string>() { "*", "#" };
+            List<TokenHelper> tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
             
             foreach (TokenHelper tok in tokens2)
             {

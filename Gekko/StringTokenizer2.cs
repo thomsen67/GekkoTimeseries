@@ -186,6 +186,29 @@ namespace Gekko
                 }
             }
 
+            //find \r, \rn or \n
+            if (LA(-1) == EOF || LA(-1) == '\r' || LA(-1) == '\n' || (LA(-2) == '\r' && LA(-1) == 'n'))
+            {
+                //previous token was a newline or non-existing (so we are at the first char of the file)
+                foreach (Tuple<string, string> tags in commentsClosedOnlyStartOfLine)
+                {
+                    if (MatchString(tags.Item1))
+                    {
+                        //for instance '$ontext', look for the matching end, '$offtext' (GAMS)
+                        return ReadCommentClosed(tags);
+                    }
+                }
+
+                foreach (string tag in commentsNonClosedOnlyStartOfLine)
+                {
+                    if (MatchString(tag))
+                    {
+                        //for instance '*' (GAMS)
+                        return ReadCommentNonClosed(tag);
+                    }
+                }
+            }
+
             switch (ch)
 			{
 				case EOF:
@@ -457,7 +480,7 @@ namespace Gekko
                 char ch = LA(0);
                 if (ch == EOF)
                     break;
-                else if (ch == '\r')    // handle CR in strings
+                else if (ch == '\r')    // handle CR in comments
                 {
                     Consume();
                     if (LA(0) == '\n')  // for DOS & windows
@@ -465,7 +488,7 @@ namespace Gekko
                     line++;
                     column = 1;
                 }
-                else if (ch == '\n')    // new line in quoted string
+                else if (ch == '\n')    // new line in comment
                 {
                     Consume();
                     line++;
@@ -508,7 +531,7 @@ namespace Gekko
 		/// </summary>
 		/// <returns></returns>
 		protected Token ReadCommentNonClosed(string tag)
-        {
+        {            
             StartRead();
             for (int i = 0; i < tag.Length; i++)
             {
@@ -519,19 +542,21 @@ namespace Gekko
                 char ch = LA(0);
                 if (ch == EOF)
                     break;
-                else if (ch == '\r')    // handle CR in strings
+                else if (ch == '\r')    // handle CR in comment
                 {
-                    Consume();
-                    if (LA(0) == '\n')  // for DOS & windows
-                        Consume();
-                    line++;
-                    column = 1;
+                    //Consume();
+                    //if (LA(0) == '\n')  // for DOS & windows
+                    //    Consume();
+                    //line++;
+                    //column = 1;
+                    break;
                 }
                 else if (ch == '\n')    // new line in quoted string
                 {
-                    Consume();
-                    line++;
-                    column = 1;
+                    //Consume();
+                    //line++;
+                    //column = 1;
+                    break;
                 }                
                 else
                 {
@@ -611,8 +636,8 @@ namespace Gekko
             StringTokenizer2 tok = new StringTokenizer2(s, false, false);
             if (commentsClosed != null) tok.commentsClosed = commentsClosed;
             if (commentsNonClosed != null) tok.commentsNonClosed = commentsNonClosed;
-            if (commentsClosedOnlyStartOfLine != null) tok.commentsClosed = commentsClosed;
-            if (commentsNonClosedOnlyStartOfLine != null) tok.commentsNonClosed = commentsNonClosed;
+            if (commentsClosedOnlyStartOfLine != null) tok.commentsClosedOnlyStartOfLine = commentsClosedOnlyStartOfLine;
+            if (commentsNonClosedOnlyStartOfLine != null) tok.commentsNonClosedOnlyStartOfLine = commentsNonClosedOnlyStartOfLine;
 
             tok.IgnoreWhiteSpace = false;
             tok.SymbolChars = new char[] { '!', '#', '%', '&', '/', '(', ')', '=', '?', '@', '$', '{', '[', ']', '}', '+', '|', '^', '¨', '~', '*', '<', '>', '\\', ';', ',', ':', '.', '-' };
@@ -622,7 +647,7 @@ namespace Gekko
             string white = null;
             do
             {
-                token = tok.Next();
+                token = tok.Next();  //this is where the action is!
                 string value = token.Value;
                 TokenKind kind = token.Kind;
                 TokenHelper two = new TokenHelper();
