@@ -29029,9 +29029,9 @@ namespace Gekko
                     o.opt_filename = AddExtension(o.opt_filename, ".emf");
                     extension = "emf";
                 }
-                if (extension != "emf" && extension != "png" && extension != "svg")
+                if (extension != "emf" && extension != "png" && extension != "svg" && extension != "pdf")
                 {
-                    G.Writeln2("*** ERROR: In PLOT, expected file type is emf, png or svg");
+                    G.Writeln2("*** ERROR: In PLOT, expected file type is emf, png, svg or pdf");
                     throw new GekkoException();
                 }
             }
@@ -29247,6 +29247,11 @@ namespace Gekko
                 linewidthCorrection = 2d / 3d;
                 pointsizeCorrection = 0.8d / 0.5d;
             }
+            else if (G.Equal(extension, "pdf"))
+            {
+                linewidthCorrection = 2d / 3d;
+                pointsizeCorrection = 2d / 3d;
+            }
 
 
             List<int> boxesY = new List<int>();
@@ -29301,17 +29306,23 @@ namespace Gekko
             }            
 
             string enhanced = null;
-            if (G.Equal(extension, "emf"))
+            string pdfSize = null;
+            if (G.Equal(extension, "emf") || G.Equal(extension, "pdf"))
             {
                 enhanced = " enhanced";
                 fontsize = 0.95 * fontsize;
+                if (G.Equal(extension, "pdf"))
+                {
+                    pdfSize = " size 4, 3";  //default is 5 x 3 inches, too wide.
+                }
             }
             else
             {
                 fontsize = 0.75 * fontsize;
             }
-                        
-            txt.AppendLine("set terminal " + extension + enhanced + " font '" + font + "," + (zoom * fontsize) + "'"); ;
+            
+            txt.AppendLine("set terminal " + extension + enhanced + " font '" + font + "," + (zoom * fontsize) + "'" + pdfSize); ;            
+
             txt.AppendLine("set output \"" + file2 + "\"");
             txt.AppendLine("set key " + key);            
 
@@ -29331,6 +29342,10 @@ namespace Gekko
             else if (G.Equal(extension, "png"))
             {
                 fontfactor = 1.0d / 1.2d;
+            }
+            else if (G.Equal(extension, "pdf"))
+            {
+                fontfactor = .8d;
             }
 
             double siz1 = (1.5d * zoom * fontsize * fontfactor);
