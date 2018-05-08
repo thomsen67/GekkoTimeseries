@@ -6665,6 +6665,39 @@ namespace UnitTests
                 }
             }
 
+            for (int i = start; i <= end; i++)
+            {
+                tsA1.SetData(new GekkoTime(EFreq.Annual, i, 1), (double)i);
+                {
+                    int index1 = 0;
+                    int index2 = 0;
+                    double[] data = tsA2.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, new GekkoTime(EFreq.Annual, i, 1), new GekkoTime(EFreq.Annual, i, 1));
+                    Assert.AreEqual(index1, index2);
+                    data[index1] = (double)i;
+                }
+
+                for (int j = 1; j <= 4; j++)
+                {
+                    tsQ1.SetData(new GekkoTime(EFreq.Quarterly, i, j), (double)i + (double)j / 100d);
+                    {
+                        int index1 = 0;
+                        int index2 = 0;
+                        double[] data = tsQ2.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, new GekkoTime(EFreq.Quarterly, i, j), new GekkoTime(EFreq.Quarterly, i, j));
+                        Assert.AreEqual(index1, index2);
+                        data[index1] = (double)i + (double)j / 100d;
+                    }
+                }
+                for (int j = 1; j <= 12; j++)
+                {
+                    tsM1.SetData(new GekkoTime(EFreq.Monthly, i, j), (double)i + (double)j / 100d);
+                    int index1 = 0;
+                    int index2 = 0;
+                    double[] data = tsM2.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, new GekkoTime(EFreq.Monthly, i, j), new GekkoTime(EFreq.Monthly, i, j));
+                    Assert.AreEqual(index1, index2);
+                    data[index1] = (double)i + (double)j / 100d;
+                }
+            }
+
             //testing that data is correct when reading
 
             for (int i = start; i <= end; i++)

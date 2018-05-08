@@ -1254,13 +1254,13 @@ namespace Gekko
             int index2 = -12345;
             double[] data = ts.GetDataSequence(out index1, out index2, t1, t2);
 
-            double[] data2 = new double[index2 - index1 + 1];  //we copy the array, to avoid mishaps if it is altered in the median method (= a little bit slack)
-            for (int i = index1; i <= index2; i++)
-            {
-                data2[i - index1] = data[i];
-            }
+            //double[] data2 = new double[index2 - index1 + 1];  //we copy the array, to avoid mishaps if it is altered in the median method (= a little bit slack)
+            //for (int i = index1; i <= index2; i++)
+            //{
+            //    data2[i - index1] = data[i];
+            //}
 
-            double median = Program.Percentile(data2, percent2);
+            double median = Program.Percentile(data, percent2);
 
             ScalarVal z2 = new ScalarVal(median);
             return z2;

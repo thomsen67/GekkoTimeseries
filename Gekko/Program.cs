@@ -3222,8 +3222,8 @@ namespace Gekko
                                 int index2;
                                 try
                                 {
-                                    double[] data = tsSource.GetDataSequence(out index1, out index2, firstTruncated, lastTruncated);
-                                    tsExisting.SetDataSequence(firstTruncated, lastTruncated, data, index1);
+                                    double[] data_beware_do_not_alter = tsSource.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, firstTruncated, lastTruncated);
+                                    tsExisting.SetDataSequence(firstTruncated, lastTruncated, data_beware_do_not_alter, index1);
                                 }
                                 catch (Exception e)
                                 {
@@ -5792,7 +5792,7 @@ namespace Gekko
             else
             {
                 //also sets index1 and index2.
-                dataArray = ts.GetDataSequence(out index1, out index2, per1, per2);
+                dataArray = ts.GetDataSequence(out index1, out index2, per1, per2);  //a little bit slack not to use a pointer
             }
 
             int count2 = 0;
@@ -5945,7 +5945,7 @@ namespace Gekko
             else
             {
                 //also sets index1 and index2.
-                dataArray = ts.GetDataSequence(out index1, out index2, per1, per2);
+                dataArray = ts.GetDataSequence(out index1, out index2, per1, per2);  //a little bit slack not to use a pointer
             }
 
             int count2 = 0;
@@ -10068,6 +10068,7 @@ namespace Gekko
                     //#280935728439 should handle banknames, and should search if in data mode.
                     //maybe look at COPY and fetch from there.
                     //destination (lhs) should also allow banknames.
+                    //this method is going to die, so we use the clone stuff below
                     x = ts.GetDataSequence(out index1, out index2, tStart0, tEnd);  //implicit ", false" ending this method, no setting of start/end period of timeseries
                     length = index2 - index1 + 1;
                     if (negative)

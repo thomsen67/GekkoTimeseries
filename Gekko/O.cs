@@ -1772,9 +1772,9 @@ namespace Gekko
 
                                         int index1, index2;
                                         //may enlarge the array with NaNs first and last
-                                        double[] data = rhs_series.GetDataSequence(out index1, out index2, tt1, tt2);
+                                        double[] data_beware_do_not_alter = rhs_series.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, tt1, tt2);
                                         //may enlarge the array with NaNs first and last
-                                        lhs_series.SetDataSequence(tt1, tt2, data, index1);
+                                        lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1);
                                         if (create) AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
                                         G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
                                     }
@@ -5808,8 +5808,8 @@ namespace Gekko
                                 //  change anything here.
                                 type1++;
                                 int index1, index2;
-                                double[] values = ts.GetDataSequence(out index1, out index2, this.t1, this.t2);
-                                ts2.SetDataSequence(t1, t2, values, index1);
+                                double[] values_beware_do_not_alter = ts.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, this.t1, this.t2);
+                                ts2.SetDataSequence(t1, t2, values_beware_do_not_alter, index1);
                                 ts2.Stamp();  //will get a new date stamp, since it is not cloning here
                             }
                             else
@@ -6334,7 +6334,7 @@ namespace Gekko
                     }
 
                     int index1; int index2;
-                    double[] dataArray = lhs.GetDataSequence(out index1, out index2, this.t1, this.t2); //Method will resize the double[] array if it is too small
+                    double[] dataArray = lhs.GetDataSequenceUnsafePointerAlter(out index1, out index2, this.t1, this.t2); //Method will resize the double[] array if it is too small
                     if (index2 - index1 + 1 != n)
                     {
                         G.Writeln2("*** ERROR: Sample error #9376201872");
