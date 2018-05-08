@@ -2861,6 +2861,7 @@ optionType:
 			 | SHEET COLS  '='? yesNoSimple -> SHEET COLS ^(ASTBOOL yesNoSimple)		
 			 
 			 | SERIES ARRAY IGNOREMISSING '='? yesNoSimple -> SERIES ARRAY IGNOREMISSING ^(ASTBOOL yesNoSimple)	
+			 | SERIES DATA IGNOREMISSING '='? yesNoSimple -> SERIES DATA IGNOREMISSING ^(ASTBOOL yesNoSimple)	
 
              | SOLVE question -> SOLVE question
              | SOLVE DATA CREATE AUTO '='? yesNoSimple -> SOLVE DATA CREATE AUTO ^(ASTBOOL yesNoSimple)
@@ -3027,28 +3028,6 @@ listItemWildRange:          wildcardWithBank ->                        wildcardW
 						  | expression ->						       expression
 						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)   //accepts stuff like 0e. Integers are caught via expression.												
 						    ;
-
-
-
-
-
-fileNameFirstPart1        : name ':' slashHelper1 fileNamePart -> ^(ASTFILENAMEFIRST1 name fileNamePart);
-                          //For instance READ \a.b\c.d, cannot be READ\a.b\c.d
-
-fileNameFirstPart2        : slashHelper2 fileNamePart -> ^(ASTFILENAMEFIRST2 fileNamePart);
-                          //For instance READ a.b
-fileNameFirstPart3        : fileNamePart -> ^(ASTFILENAMEFIRST3 fileNamePart);
-							//stuff like 'a.7z' or 'a b.doc' or 'זרו.doc' must be in quotes.
-fileNamePart              : fileNamePartHelper (GLUEDOT DOT fileNamePartHelper)* -> ^(ASTFILENAMEPART fileNamePartHelper+);
-
-fileNamePartHelper        : name | scalarName;
-
-slashHelper1              : GLUEBACKSLASH | DIV;
-slashHelper2              : BACKSLASH | DIV;
-
-
-
-
 
 
 						    //If זרוֶ״ֵ then you need to put inside ''. Also with blanks. And parts beginning with a digit will not work either (5file.7z)

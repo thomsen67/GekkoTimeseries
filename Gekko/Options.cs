@@ -137,7 +137,8 @@ Additionally, there are model, solve, equation options.
         public string r_exe_folder = "";  //there will probably be more R options later on
         public string r_exe_path = "";  //old name
 
-        public bool series_array_ignoremissing = false;
+        public bool series_array_ignoremissing = false;  //returns 0 (or skips) a non-existing array-series
+        public bool series_data_ignoremissing = false;  //returns 0 instead of NaN (missing) for an observation in an existing series or arrayseries.
 
         public bool sheet_mulprt_lev = false;  //n
         public bool sheet_mulprt_abs = true;  //m

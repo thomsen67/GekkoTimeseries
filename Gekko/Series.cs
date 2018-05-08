@@ -444,6 +444,7 @@ namespace Gekko
         /// <exception cref="GekkoException">Exception if frequency of timeseries and period do not match.</exception>
         public double GetData(GekkoSmpl smpl, GekkoTime t)
         {
+            double rv = double.NaN;
             if (this.freq != t.freq)
             {
                 FreqError(t);
@@ -460,12 +461,13 @@ namespace Gekko
                 }
                 else
                 {
-                    return double.NaN;
+                    goto End;
                 }
             }
             if (this.type == ESeriesType.Timeless)
             {
-                return this.data.dataArray[0];
+                rv = this.data.dataArray[0];
+                goto End;
             }
             else
             {
@@ -478,13 +480,20 @@ namespace Gekko
                     {
                         if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
                     }
-                    return double.NaN;  //out of bounds, we return a missing value (NaN)
+                    goto End;  //out of bounds, we return a missing value (NaN)                    
                 }
                 else
                 {
-                    return this.data.dataArray[index];
+                    rv = this.data.dataArray[index];
+                    goto End;
                 }
             }
+            End:
+            if (Program.options.series_data_ignoremissing)
+            {
+                if (G.isNumericalError(rv)) rv = 0d;
+            }
+            return rv;
         }
 
         private void FreqError(GekkoTime t)
@@ -595,6 +604,7 @@ namespace Gekko
             //NB NB NB NB NB
             //NB NB NB NB NB
             //NB NB NB NB NB   BEWARE: the array returned is a pointer to the REAL datacontainer for the timeseries. So do not alter the array unless you are ACTUALLY altering the timeseries (for instance UPD, GENR etc.)
+            //NB NB NB NB NB   ALSO BEWARE: if series_data_ignoremissing = true, any NaN/Inf must be changed into 0. But DO NOT DO THAT on the original double[] returned, only where it is used.
             //NB NB NB NB NB
             //NB NB NB NB NB
             //      It might be called half overlapped like this:
