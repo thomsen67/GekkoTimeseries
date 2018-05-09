@@ -126,125 +126,134 @@ namespace Gekko
 			return new Token(kind, tokenData, saveLine, saveCol);
 		}
 
-		public Token Next()
+		public Token Next(bool removeComments)
 		{
-			ReadToken:
+            ReadToken:
 
-			char ch = LA(0);
-            
-            //if (ch == '\x0000') ch = '\x0001';
-			switch (ch)
-			{
-				case EOF:
-					return CreateToken(TokenKind.EOF, string.Empty);
+            char ch = LA(0);
 
-				case ' ':
-				case '\t':
-				{
-					if (this.ignoreWhiteSpace)
-					{
-						Consume();
-						goto ReadToken;
-					}
-					else
-						return ReadWhitespace();
-				}
-				case '0':
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-				case '6':
-				case '7':
-				case '8':
-				case '9':
-					return ReadNumber(false);                
+            //HACK:
 
-				case '\r':
-				{
-					StartRead();
-					Consume();
-					if (LA(0) == '\n')
-						Consume();	// on DOS/Windows we have \r\n for new line
+            if (removeComments && ch == '/' && LA(1) == '/')
+            {
+                return ReadComment();                
+            }
+            else
+            {
 
-					line++;
-					column=1;
+                //if (ch == '\x0000') ch = '\x0001';
+                switch (ch)
+                {
+                    case EOF:
+                        return CreateToken(TokenKind.EOF, string.Empty);
 
-					return CreateToken(TokenKind.EOL);
-				}
-				case '\n':
-				{
-					StartRead();
-					Consume();
-					line++;
-					column=1;
-					
-					return CreateToken(TokenKind.EOL);
-				}
+                    case ' ':
+                    case '\t':
+                        {
+                            if (this.ignoreWhiteSpace)
+                            {
+                                Consume();
+                                goto ReadToken;
+                            }
+                            else
+                                return ReadWhitespace();
+                        }
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                        return ReadNumber(false);
 
-				case '"':
-				{
-
-                    if (treatQuotesAsUnknown)
-                    {                        
-                        StartRead();
-                        Consume();
-                        return CreateToken(TokenKind.Unknown);
-                    }
-                    else
-                    {
-                        return ReadString();
-                    }
-				}
-
-                case '\'':
-                    {
-
-                        if (treatQuotesAsUnknown)
+                    case '\r':
                         {
                             StartRead();
                             Consume();
-                            return CreateToken(TokenKind.Unknown);
+                            if (LA(0) == '\n')
+                                Consume();  // on DOS/Windows we have \r\n for new line
+
+                            line++;
+                            column = 1;
+
+                            return CreateToken(TokenKind.EOL);
                         }
-                        else
+                    case '\n':
                         {
-                            return ReadStringSingleQuotes();
-                        }
-                    }
+                            StartRead();
+                            Consume();
+                            line++;
+                            column = 1;
 
-                default:
-				{
-                    if (ch == '.')
-                    {
-                        //Code added by TT
-                        //In order to read .1234 as 0.1234
-                        char ch1 = LA(1);
-                        if (ch1 == '0' || ch1 == '1' || ch1 == '2' || ch1 == '3' || ch1 == '4' || ch1 == '5' || ch1 == '6' || ch1 == '7' || ch1 == '8' || ch1 == '9')
+                            return CreateToken(TokenKind.EOL);
+                        }
+
+                    case '"':
                         {
-                            //we have a "." followed by a digit
-                            return ReadNumber(true);
+
+                            if (treatQuotesAsUnknown)
+                            {
+                                StartRead();
+                                Consume();
+                                return CreateToken(TokenKind.Unknown);
+                            }
+                            else
+                            {
+                                return ReadString();
+                            }
                         }
-                    }
 
-                    if (Char.IsLetter(ch) || ch == '_' 
-                        || (this.specialLoopSignsAcceptedAsWords == true && (ch == '#' || ch == '|'))) //TT added this
-						return ReadWord();
-					else if (IsSymbol(ch))
-					{
-						StartRead();
-						Consume();
-						return CreateToken(TokenKind.Symbol);
-					}
-					else
-					{
-						StartRead();
-						Consume();
-						return CreateToken(TokenKind.Unknown);						
-					}
-				}
+                    case '\'':
+                        {
 
-			}
+                            if (treatQuotesAsUnknown)
+                            {
+                                StartRead();
+                                Consume();
+                                return CreateToken(TokenKind.Unknown);
+                            }
+                            else
+                            {
+                                return ReadStringSingleQuotes();
+                            }
+                        }
+
+                    default:
+                        {
+                            if (ch == '.')
+                            {
+                                //Code added by TT
+                                //In order to read .1234 as 0.1234
+                                char ch1 = LA(1);
+                                if (ch1 == '0' || ch1 == '1' || ch1 == '2' || ch1 == '3' || ch1 == '4' || ch1 == '5' || ch1 == '6' || ch1 == '7' || ch1 == '8' || ch1 == '9')
+                                {
+                                    //we have a "." followed by a digit
+                                    return ReadNumber(true);
+                                }
+                            }
+
+                            if (Char.IsLetter(ch) || ch == '_'
+                                || (this.specialLoopSignsAcceptedAsWords == true && (ch == '#' || ch == '|'))) //TT added this
+                                return ReadWord();
+                            else if (IsSymbol(ch))
+                            {
+                                StartRead();
+                                Consume();
+                                return CreateToken(TokenKind.Symbol);
+                            }
+                            else
+                            {
+                                StartRead();
+                                Consume();
+                                return CreateToken(TokenKind.Unknown);
+                            }
+                        }
+                }
+            }
 		}
 
 		/// <summary>
@@ -348,6 +357,8 @@ namespace Gekko
 			return CreateToken(TokenKind.Word);
 		}
 
+
+
 		/// <summary>
 		/// reads all characters until next " is found.
 		/// If "" (2 quotes) are found, then they are consumed as
@@ -395,6 +406,50 @@ namespace Gekko
 
 			return CreateToken(TokenKind.QuotedString);
 		}
+
+
+
+        /// <summary>
+        /// reads all characters until next " is found.
+        /// If "" (2 quotes) are found, then they are consumed as
+        /// part of the string
+        /// </summary>
+        /// <returns></returns>
+        protected Token ReadComment()
+        {
+            StartRead();
+
+            Consume(); // read /
+            Consume(); // read /
+
+            while (true)
+            {
+                char ch = LA(0);
+                if (ch == EOF)
+                    break;
+                else if (ch == '\r')    // handle CR in strings
+                {
+                    Consume();
+                    if (LA(0) == '\n')  // for DOS & windows
+                        Consume();
+
+                    line++;
+                    column = 1;
+                    break;
+                }
+                else if (ch == '\n')    // new line in quoted string
+                {
+                    Consume();
+
+                    line++;
+                    column = 1;
+                    break;
+                }                
+                else
+                    Consume();
+            }
+            return CreateToken(TokenKind.Comment);
+        }
 
         /// <summary>
 		/// reads all characters until next " is found.

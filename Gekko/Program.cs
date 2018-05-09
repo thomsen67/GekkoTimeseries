@@ -8744,7 +8744,7 @@ namespace Gekko
             string white = null;
             do
             {
-                token = tok.Next();
+                token = tok.Next(removeComments);
                 string value = token.Value;
                 string kind = token.Kind.ToString();
                 TokenHelper two = new TokenHelper();
@@ -8756,7 +8756,18 @@ namespace Gekko
                 else
                 {
                     a.Add(two);
+                    //if (Globals.runningOnTTComputer)
+                    //{
+                    //    G.Writeln2(a.Count + "   " + two.s + " --- " + two.type);
+                    //}
                     white = null;
+                }
+                if (token.Kind == TokenKind.QuotedString)
+                {
+                    //hack so that a // comment gets a newline after
+                    TokenHelper two2 = new TokenHelper();
+                    two.type = TokenKind.EOL.ToString();
+                    a.Add(two2);
                 }
 
             } while (token.Kind != TokenKind.EOF);
@@ -8808,12 +8819,16 @@ namespace Gekko
                             //skip '://'(web address)
                         }
                         else
-                        {
+                        {                            
                             //finding a '//'
                             a[i].s = "";
                             a[i + 1].s = "";
                             for (int ii = i + 2; ii < n; ii++)
                             {
+                                if (G.equal(a[ii].s, "fim"))
+                                {
+
+                                }
                                 if (a[ii].type == "EOL")
                                 {
                                     i = ii;
@@ -9889,7 +9904,7 @@ namespace Gekko
                         int i1 = i; //start token, may be EOL
                         for (int iii = i; iii <= ii; iii++)
                         {
-                            if (a[iii].type != "EOL")
+                            if (a[iii].type != "EOL" && a[iii].type != "Comment")
                             {
                                 i1 = iii;
                                 break;
@@ -9945,8 +9960,8 @@ namespace Gekko
                     }
                     else
                     {
-                        int iEq = -12345;
                         //may be a composed name like x%i, x{%i}, x{i} or x[2000]
+                        int iEq = -12345;                        
                         for (int i = startI; i < th.Count; i++)
                         {
                             if (th[i].s == "=")
@@ -9958,15 +9973,14 @@ namespace Gekko
                         if (iEq != -12345)
                         {
                             //finding scalar vars in lhs name
-
-                            GekkoDictionary<string, List<string>> scalars = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+                            GekkoDictionary<string, List<string>> scalarsOnLhsInSerStatement = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
                             for (int i = startI; i < iEq; i++)
                             {
                                 string mem = null;
                                 if (BrowserIsScalar(th, i))
                                 {
                                     //a%i or a{%i} or a{i}
-                                    scalars.Add(th[i + 1].s, null);
+                                    scalarsOnLhsInSerStatement.Add(th[i + 1].s, null);
                                 }
                             }
 
@@ -9975,8 +9989,9 @@ namespace Gekko
                             for (int jj = j - 1; jj >= 0; jj--)
                             {
                                 List<TokenHelper> th2 = statements[jj];
-                                if (G.equal(th2[0].s, "for") && th2[1].type == "Word" && th2[2].s == "=" && scalars.ContainsKey(th2[1].s))
+                                if (G.equal(th2[0].s, "for") && th2[1].type == "Word" && th2[2].s == "=" && scalarsOnLhsInSerStatement.ContainsKey(th2[1].s))
                                 {
+                                    //We have found the definition of one of the scalars in the lhs SERIES name.
                                     List<string> rhsVars = new List<string>();
                                     for (int i2 = 3; i2 < th2.Count; i2++)
                                     {
@@ -9984,39 +9999,62 @@ namespace Gekko
                                         {
                                             rhsVars.Add(StripQuotes(th2[i2].s));
                                         }
-                                    }
-                                    scalars[th2[1].s] = rhsVars;
+                                    }                                    
+                                    scalarsOnLhsInSerStatement[th2[1].s] = rhsVars;                                    
                                 }
                             }
 
                             List<KeyValuePair<string, List<string>>> xx = new List<KeyValuePair<string, List<string>>>();
-                            foreach (KeyValuePair<string, List<string>> xxx in scalars) xx.Add(xxx);
+                            foreach (KeyValuePair<string, List<string>> xxx in scalarsOnLhsInSerStatement) xx.Add(xxx);
 
-                            if (scalars.Count == 0)
+                            if (scalarsOnLhsInSerStatement.Count == 0)
                             {
-                                //probably nothing to add, complicated name but no scalars found
+                                //probably nothing to add, complicated name but no scalars found, for instance fy[2000] = ...
+                                string name = th[startI].s;
+                                string s3 = GetTextFromLeftBlanksTokens(th, 0, th.Count - 1).Trim();
+                                BrowserAddItem(datagen, name, s3);
                             }
-                            else if (scalars.Count == 1)
+                            else if (scalarsOnLhsInSerStatement.Count == 1 && xx[0].Value != null)
                             {
-                                foreach (string xxxx in xx[0].Value)
+                                foreach (string listItem in xx[0].Value)
                                 {
+
+                                    string s7 = null;
                                     for (int i = startI; i < iEq; i++)
                                     {
-                                        string mem = null;
-                                        if (BrowserIsScalar(th, i))
+                                        if (th[i].s == "{" && th[i + 1].s == Globals.symbolMemvar.ToString() && th[i + 2].type == "Word" && th[i + 2].leftblanks == null && th[i + 3].s == "}" && G.equal(th[i + 2].s, xx[0].Key))
                                         {
-                                            if (G.equal(th[i + 1].s, xx[0].Key))
-                                            {
-
-                                            }
+                                            s7 += listItem;
+                                            i += 3;
+                                        }
+                                        else
+                                        {
+                                            s7 += th[i].s;
                                         }
                                     }
+
+                                    string s8 = null;
+                                    for (int i = startI; i < th.Count; i++)
+                                    {
+                                        if (th[i].s == "{" && th[i + 1].s == Globals.symbolMemvar.ToString() && th[i + 2].type == "Word" && th[i + 2].leftblanks == null && th[i + 3].s == "}" && G.equal(th[i + 2].s, xx[0].Key))
+                                        {
+                                            s8 += listItem;
+                                            i += 3;
+                                        }
+                                        else
+                                        {
+                                            s8 += th[i].s;
+                                        }
+                                    }
+
+
+                                    BrowserAddItem(datagen, s7, s8);
                                 }
                             }
                             else
                             {
-                                G.Writeln2("*** ERROR: Nested FOR not supported yet");
-                                throw new GekkoException();
+                                //G.Writeln2("*** ERROR: Nested FOR not supported yet");
+                                //throw new GekkoException();
                             }
                         }
                     }
@@ -10047,7 +10085,7 @@ namespace Gekko
 
         private static bool BrowserIsScalar(List<TokenHelper> th, int i)
         {
-            //if token i+1 is a scalar name
+            //if token i+1 is a scalar name, %i or {i}
             if ((th[i].s == Globals.symbolMemvar.ToString() && th[i + 1].type == "Word" && th[i + 1].leftblanks == null) || (th[i].s == "{" && th[i + 1].type == "Word" && th[i + 2].s == "}"))
             {
                 return true;
@@ -14367,7 +14405,7 @@ namespace Gekko
                                             bool simpleBlankSeparatedUpd = true;
                                             do
                                             {
-                                                token = tok.Next();
+                                                token = tok.Next(false);
                                                 string value = token.Value;
                                                 string kind = token.Kind.ToString();
                                                 if (kind == "EOF" || kind == "WhiteSpace" || kind == "Number" || (kind == "Word" && value.ToLower() == "m") || (kind == "Symbol" && value == "-"))
@@ -30902,7 +30940,7 @@ namespace Gekko
                 List<string> alType = new List<string>();
                 do
                 {
-                    token = tok.Next();
+                    token = tok.Next(false);
                     al.Add(token.Value); alType.Add(token.Kind.ToString());
                 } while (token.Kind != TokenKind.EOF);
                 //below is a very innocent hack that makes stopping easier
@@ -32637,7 +32675,7 @@ namespace Gekko
             //read into ArrayList alStart and alStartType
             do
             {
-                token = tok.Next(); temp1 = token.Kind.ToString(); temp2 = token.Value;
+                token = tok.Next(false); temp1 = token.Kind.ToString(); temp2 = token.Value;
                 al.Add(temp2); alType.Add(temp1);
             } while (token.Kind != TokenKind.EOF);
             //adding extra blanks, to avoid problems with overrun when probing alStart[i+x]
