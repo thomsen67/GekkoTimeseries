@@ -139,7 +139,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Series constructor error");
                 throw new GekkoException();
             }
-        }
+        }        
 
         public string GetName()
         {
@@ -696,7 +696,12 @@ namespace Gekko
 
         public double[] GetDataSequenceUnsafePointerReadOnly(out int index1, out int index2, GekkoTime per1, GekkoTime per2)
         {
-            //will also set metadata regarding max-min periods            
+            //will also set metadata regarding max-min periods       
+            if (this.type == ESeriesType.Timeless)
+            {
+                G.Writeln2("*** ERROR: Timeless variable error #2");
+                throw new GekkoException();
+            }
             return GetDataSequenceAbstract(out index1, out index2, per1, per2, true, false);
         }
 
@@ -1087,6 +1092,10 @@ namespace Gekko
                         }
                     }
                 }
+
+                //this.data.GetDataArray_ONLY_FOR_INTERNAL_USE() = newDataArray;
+                //this.data.SetDataArray_ONLY_FOR_INTERNAL_USE(newDataArray);
+
                 this.data.dataArray = newDataArray;
                 index = GetArrayIndex(gt);
             }
@@ -1913,6 +1922,7 @@ namespace Gekko
         [ProtoMember(3)]
         //Do not access directly, use GetAnchorPeriodPositionInArray(), so the .lagOffset is included
         public int anchorPeriodPositionInArray = -123454321;
+        
     }
 
     [ProtoContract]

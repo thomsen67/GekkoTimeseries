@@ -5786,6 +5786,9 @@ namespace Gekko
                 index1 = ts.meta.firstPeriodPositionInArray;
                 index2 = ts.meta.lastPeriodPositionInArray;
                 dataArray = ts.data.dataArray;
+
+
+
                 per1 = ts.GetPeriodFirst();
                 per2 = ts.GetPeriodLast();
             }
