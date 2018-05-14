@@ -21400,11 +21400,11 @@ namespace Gekko
                     success = false;
                     if (type == "copy")
                     {
-                        G.Writeln("+++ WARNING: File '" + pathAndFilenameSource + "' or '" + pathAndFilenameDestination + "' seems blocked for copying. Retrying... (" + (i * gap) + " seconds)");
+                        G.Writeln("+++ WARNING: File '" + pathAndFilenameSource + "' or '" + pathAndFilenameDestination + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
                     }
                     else if (type == "delete")
                     {
-                        G.Writeln("+++ WARNING: File '" + pathAndFilenameSource + "' seems blocked for deleting. Retrying... (" + (i * gap) + " seconds)");
+                        G.Writeln("+++ WARNING: File '" + pathAndFilenameSource + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
                     }
                     System.Threading.Thread.Sleep(gap * 1000);  //2 seconds
                     continue;
@@ -25995,103 +25995,103 @@ namespace Gekko
             return s2;
         }
 
-        private static void Cplot(string transpose, string dates, string labels, ExcelDataForCplot ed)
-        {
-            int rows = ed.data.GetLength(0);
-            int cols = ed.data.GetLength(1);
-            string[,] x = new string[rows + 1, cols + 1]; //hmmm what if not there...
+        //private static void Cplot(string transpose, string dates, string labels, ExcelDataForClip ed)
+        //{
+        //    int rows = ed.data.GetLength(0);
+        //    int cols = ed.data.GetLength(1);
+        //    string[,] x = new string[rows + 1, cols + 1]; //hmmm what if not there...
 
-            bool hasDates = true;
-            if (G.equal(dates, "no"))
-            {
-                hasDates = false;
-            }
+        //    bool hasDates = true;
+        //    if (G.equal(dates, "no"))
+        //    {
+        //        hasDates = false;
+        //    }
 
-            bool hasLabels = true;
-            if (G.equal(labels, "no"))
-            {
-                hasLabels = false;
-            }
+        //    bool hasLabels = true;
+        //    if (G.equal(labels, "no"))
+        //    {
+        //        hasLabels = false;
+        //    }
 
-            bool isTranspose = false;
-            if (G.equal(transpose, "yes"))
-            {
-                isTranspose = true;
-            }
+        //    bool isTranspose = false;
+        //    if (G.equal(transpose, "yes"))
+        //    {
+        //        isTranspose = true;
+        //    }
 
-            x[0, 0] = "";
+        //    x[0, 0] = "";
 
-            if (isTranspose)
-            {
-                for (int col = 0; col < cols; col++)
-                {
-                    if (hasLabels) x[0, col + 1] = ed.varnames[0, col];
-                }
-                for (int row = 0; row < rows; row++)
-                {
-                    if (hasDates) x[row + 1, 0] = ed.dates[row, 0];
-                }
-            }
-            else
-            {
-                for (int col = 0; col < cols; col++)
-                {
-                    if (hasDates) x[0, col + 1] = ed.dates[0, col];
-                }
-                for (int row = 0; row < rows; row++)
-                {
-                    if (hasLabels) x[row + 1, 0] = ed.varnames[row, 0];
-                }
-            }
+        //    if (isTranspose)
+        //    {
+        //        for (int col = 0; col < cols; col++)
+        //        {
+        //            if (hasLabels) x[0, col + 1] = ed.varnames[0, col];
+        //        }
+        //        for (int row = 0; row < rows; row++)
+        //        {
+        //            if (hasDates) x[row + 1, 0] = ed.dates[row, 0];
+        //        }
+        //    }
+        //    else
+        //    {
+        //        for (int col = 0; col < cols; col++)
+        //        {
+        //            if (hasDates) x[0, col + 1] = ed.dates[0, col];
+        //        }
+        //        for (int row = 0; row < rows; row++)
+        //        {
+        //            if (hasLabels) x[row + 1, 0] = ed.varnames[row, 0];
+        //        }
+        //    }
 
-            for (int row = 0; row < rows; row++)
-            {
-                for (int col = 0; col < cols; col++)
-                {
-                    x[row + 1, col + 1] = PrepareDataForClipboard(ed.data[row, col]);
-                }
-            }
+        //    for (int row = 0; row < rows; row++)
+        //    {
+        //        for (int col = 0; col < cols; col++)
+        //        {
+        //            x[row + 1, col + 1] = PrepareDataForClipboard(ed.data[row, col]);
+        //        }
+        //    }
 
-            int rowStart = 0;
-            int colStart = 0;
+        //    int rowStart = 0;
+        //    int colStart = 0;
 
-            if (isTranspose)
-            {
-                if (!hasLabels) rowStart = 1;
-                if (!hasDates) colStart = 1;
-            }
-            else
-            {
-                if (!hasLabels) colStart = 1;
-                if (!hasDates) rowStart = 1;
-            }
+        //    if (isTranspose)
+        //    {
+        //        if (!hasLabels) rowStart = 1;
+        //        if (!hasDates) colStart = 1;
+        //    }
+        //    else
+        //    {
+        //        if (!hasLabels) colStart = 1;
+        //        if (!hasDates) rowStart = 1;
+        //    }
 
-            StringBuilder s = new StringBuilder();
-            if (ed.stamp != null)
-            {
-                s.Append(ed.stamp);
-                s.Append("\n");
-            }
+        //    StringBuilder s = new StringBuilder();
+        //    if (ed.stamp != null)
+        //    {
+        //        s.Append(ed.stamp);
+        //        s.Append("\n");
+        //    }
 
-            if (ed.heading != null)
-            {
-                s.Append(ed.heading);
-                s.Append("\n");
-            }
+        //    if (ed.heading != null)
+        //    {
+        //        s.Append(ed.heading);
+        //        s.Append("\n");
+        //    }
 
-            for (int i = rowStart; i < rows + 1; i++)
-            {
-                for (int j = colStart; j < cols + 1; j++)
-                {
-                    if (j - colStart > 0) s.Append("\t");
-                    string s2 = x[i, j];
-                    s.Append(s2);
-                }
-                if (i < rows) s.Append("\n");
-            }
-            System.Windows.Forms.Clipboard.SetText(s.ToString(), System.Windows.Forms.TextDataFormat.Text);
-            G.Writeln2("CSHEET: You may now paste (Ctrl-V) cells into your spreadsheet (e.g. Excel)");
-        }
+        //    for (int i = rowStart; i < rows + 1; i++)
+        //    {
+        //        for (int j = colStart; j < cols + 1; j++)
+        //        {
+        //            if (j - colStart > 0) s.Append("\t");
+        //            string s2 = x[i, j];
+        //            s.Append(s2);
+        //        }
+        //        if (i < rows) s.Append("\n");
+        //    }
+        //    System.Windows.Forms.Clipboard.SetText(s.ToString(), System.Windows.Forms.TextDataFormat.Text);
+        //    G.Writeln2("CSHEET: You may now paste (Ctrl-V) cells into your spreadsheet (e.g. Excel)");
+        //}
 
         private static void GraphThreadFunction(Object o)
         {
@@ -27574,7 +27574,7 @@ namespace Gekko
             string subtitle2 = null;
             if (!NullOrEmpty(subtitle)) subtitle2 = subtitle;
             if (!NullOrEmpty(o.opt_subtitle)) subtitle2 = o.opt_subtitle;
-            if (!NullOrEmpty(subtitle2)) subtitle2 = "\\n{/*0.80 " + subtitle2 + "}";
+            if (!NullOrEmpty(subtitle2)) subtitle2 = "\\n{0.80 " + subtitle2 + "}";
             string title2 = null;
             if (!NullOrEmpty(title)) title2 = title;
             if (!NullOrEmpty(o.opt_title)) title2 = o.opt_title;
@@ -27585,12 +27585,12 @@ namespace Gekko
             else
             {
                 if (setTitlePlaceholder) txt.AppendLine("set title " + Globals.QT + " " + Globals.QT);
-            }            
+            }
 
             foreach (string s in xlines)
             {
                 GekkoTime gt = G.FromStringToDate(s);
-                double d = G.FromDateToFloating(gt) + GetXAdjustmentForInsideTics(isInside);                
+                double d = G.FromDateToFloating(gt) + GetXAdjustmentForInsideTics(isInside);
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
@@ -27627,14 +27627,14 @@ namespace Gekko
             {
                 //txt.AppendLine("set style line 102 lc rgb '#d3d3d3' dt 3 lw 1.5");  //line width looks ok in Gekko window, with lw 1 it looks bad there.
                 txt.AppendLine("set style line 102 " + gridstyle);  //lt 0 or dt 3 gives ugly lines when viewed in Gekko
-                txt.AppendLine("set grid back ls 102");                
+                txt.AppendLine("set grid back ls 102");
             }
             else if (G.equal(grid, "yline"))
             {
                 txt.AppendLine("set style line 102 " + gridstyle);  //lt 0 or dt 3 gives ugly lines when viewed in Gekko
-                txt.AppendLine("set grid ytics back ls 102");                
+                txt.AppendLine("set grid ytics back ls 102");
             }
-            else if (G.equal(grid, "xline")) 
+            else if (G.equal(grid, "xline"))
             {
                 txt.AppendLine("set style line 102 " + gridstyle);  //lt 0 or dt 3 gives ugly lines when viewed in Gekko                
                 txt.AppendLine("set grid xtics back ls 102");
@@ -27678,7 +27678,7 @@ namespace Gekko
                 }
 
                 bool deduct = false;
-                if (extra <= 0.40) deduct = true;            
+                if (extra <= 0.40) deduct = true;
 
                 if (Program.options.plot_xlabels_digits != 4 && Program.options.plot_xlabels_digits != 2)
                 {
@@ -27698,14 +27698,14 @@ namespace Gekko
                     {
                         if (years > 2 * 48) skip = 10;
                         else if (years > 48) skip = 5;
-                        else if (years > 24) skip = 2;                        
+                        else if (years > 24) skip = 2;
                     }
                     else
                     {
                         //4 digits
                         if (years > 2 * 24) skip = 10;
                         else if (years > 24) skip = 5;
-                        else if (years > 12) skip = 2;                        
+                        else if (years > 12) skip = 2;
                     }
 
                     string tx = t.ToString();
@@ -27716,7 +27716,7 @@ namespace Gekko
                     if (deduct && t == t2) tx = null;
 
                     string tlabel = "\"" + tx + "\"";
-                    
+
                     ss += tlabel + " " + t + " " + "0, ";  //0 is major tic
                     if ((Program.options.freq == EFreq.Monthly && years <= 25) || (Program.options.freq == EFreq.Quarterly && years <= 75))
                     {
@@ -27739,7 +27739,7 @@ namespace Gekko
                         //only show whole first year if monthly and m1-m4 or quarterly and q1-q2
                         double tStart = (double)t1 - 0.000000001d;                      //deducts a small number to activate the first x-axis label
                         txt.AppendLine("set xrange [" + tStart.ToString() + ":]");      //see above
-                    }                    
+                    }
                 }
             }
             else
@@ -27780,7 +27780,7 @@ namespace Gekko
             {
                 txt.AppendLine("f(x) = (sgn(x+1.2345e-30) + 1)/2");  //1 if x > 0, else 0. 1.2345e-30 added to avoid 0 becoming 0.5
             }
-            
+
             //int boxesCounter = 0;    
             //boxesY = new List<int>();
             //boxesY2 = new List<int>();
@@ -27820,7 +27820,7 @@ namespace Gekko
                     text = text.Replace("temp" + rr, "gekkoplot");
                     File.WriteAllText(Program.options.folder_working + "\\" + "gekkoplot.dat", text);
                     G.Writeln2("Dumped gnuplot files gekkoplot.gp (script) and gekkoplot.dat (data) in the working folder");
-                    
+
                 }
                 catch
                 {
@@ -28027,7 +28027,7 @@ namespace Gekko
 
                 try
                 {
-                    if(linewidthCorrection!=1d)
+                    if (linewidthCorrection != 1d)
                     {
                         double temp = double.Parse(linewidth);
                         linewidth = (temp * linewidthCorrection).ToString();
@@ -28124,7 +28124,7 @@ namespace Gekko
                         else
                         {
                             xAdjustment = "($" + (quarterFix + 1) + " " + minus + d + "):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
-                        }                        
+                        }
                     }
                 }
                 else if (G.equal(linetype, "filledcurve") || G.equal(linetype, "filledcurves"))
@@ -28195,7 +28195,7 @@ namespace Gekko
                         minMax[5] = Math.Max(minMax[5], dataMax[i]);
                     }
                     if (isInside)
-                    {                        
+                    {
                         xAdjustment = "($" + (quarterFix + 1) + "+" + GetXAdjustmentForInsideTics(isInside) + "):" + (i + quarterFix + 2);
                     }
                     else
@@ -28250,7 +28250,7 @@ namespace Gekko
 
         private static string GetText(XmlNode x, string def)
         {
-            return GetText(null, null, null, x, def);           
+            return GetText(null, null, null, x, def);
         }
 
         private static string GetText(string y1, string y2, XmlNode y3, XmlNode y4, string y5)
@@ -28258,13 +28258,13 @@ namespace Gekko
             //it seems the xml reader auto-trims the strings
             string s = y5; //maybe null, "", or a real string
 
-            if(y4 != null)
+            if (y4 != null)
             {
                 if (y4.InnerText.StartsWith("//"))
                 {
                     //do nothing, as if the tag does not even exist
                 }
-                else 
+                else
                 {
                     s = y4.InnerText;  //if <tag></tag> or <tag/>, s will be = "". We say that this overrides prior settings.                
                 }
@@ -28300,7 +28300,7 @@ namespace Gekko
             {
                 //For instance PLOT x1<color='red'>, x2;
                 s = y1;
-            }            
+            }
 
             return s;
         }
@@ -28308,7 +28308,7 @@ namespace Gekko
         private static List<string> GetText(XmlNodeList x)
         {
             List<string> ss = new List<string>();
-            foreach(XmlNode y in x)
+            foreach (XmlNode y in x)
             {
                 ss.Add(GetText(y));
             }
@@ -28510,11 +28510,11 @@ namespace Gekko
             string left = null;
             string right = null;
             if (!NullOrEmpty(ymin))
-            {                
+            {
                 left = ymin;
             }
             else
-            {                
+            {
                 if (!NullOrEmpty(yminhard) && !NullOrEmpty(yminsoft))
                 {
                     left = yminhard + " < * < " + yminsoft;
@@ -28558,11 +28558,11 @@ namespace Gekko
                 }
             }
             return left + ":" + right;
-        }            
+        }
 
         private static string GnuplotHeading(O.Prt o, Gpt gpt)
         {
-            string heading = null;            
+            string heading = null;
             try { heading = gpt.title; } catch (NullReferenceException) { };
             if (o.opt_title != null) heading = o.opt_title;
             return heading;
@@ -28756,7 +28756,7 @@ namespace Gekko
 
                 double sum = 0d;
                 double count = 0d;
-                foreach (GekkoTime gt in new GekkoTimeIterator( gt0, gt1))
+                foreach (GekkoTime gt in new GekkoTimeIterator(gt0, gt1))
                 {
                     double x = ts.GetData(gt);
                     sum += x;
@@ -29148,7 +29148,7 @@ namespace Gekko
                 }
             }
             return;
-        }        
+        }
 
         //TODO: Not strict regarding use of b[] -- actually puts result into Program.model.b[] via RSS(). These are typically the same, but what if not
         public static void SolveNewtonAlgorithm(double[] b, Type assembly, NewtonAlgorithmHelper nah)
@@ -29217,7 +29217,7 @@ namespace Gekko
                 }
 
                 double rss0 = RssNonScaled(residuals);
-                                
+
                 if (Program.options.solve_print_details) G.Writeln("SQRT(RSS) start = " + Math.Sqrt(rss0) + " #residuals = " + residuals.Length);
 
                 double[] residualsArray = new double[residuals.Length];
@@ -29528,18 +29528,18 @@ namespace Gekko
                                 break;
                             }
                         }
-                    newIt: ;
+                        newIt:;
                     }
                 }
-            converged: ;
+                converged:;
                 //converged
                 Program.model.simulateResults[0] = iterations;
                 Program.model.simulateResults[1] = Math.Sqrt(RssNonScaled(residuals));
                 return;
-            metaIt: ;
+                metaIt:;
             }  //ii
         }
-                       
+
 
         private static void AbortNewtonAlgorithm(NewtonAlgorithmHelper nah, bool printError)
         {
@@ -29795,15 +29795,15 @@ namespace Gekko
             model.r = new double[model.m2.fromEqNumberToBNumber.Length];
 
             //Keep SimulateSimulPrologue() and SimulateResiduals() together
-            SimulateSimulPrologue(assembly);            
-            SimulateResiduals(model.b, model.r, assembly);  
+            SimulateSimulPrologue(assembly);
+            SimulateResiduals(model.b, model.r, assembly);
 
             if (Globals.runningOnTTComputer)
             {
                 G.Writeln2("values of endogenous ==========> " + model.b[0] + ", " + model.b[2] + ", " + model.b[4], Color.Brown);
             }
 
-            
+
             for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
             {
                 if (G.isNumericalError(model.r[i]))
@@ -29811,8 +29811,8 @@ namespace Gekko
                     numericalProblem = i;
                 }
                 residuals.SetValue(i, model.r[i]);
-            }            
-            
+            }
+
 
             //return f;
         }
@@ -30416,7 +30416,7 @@ namespace Gekko
             args[1] = r;
             args[2] = Globals.scaleNewtonValues;
             assembly.InvokeMember("simulFeedbackAll", BindingFlags.InvokeMethod, null, null, args);
-            
+
             if (Program.options.solve_newton_robust)
             {
                 double newtonStartingValuesFixExtra = 0d;
@@ -30437,7 +30437,7 @@ namespace Gekko
                     }
                     else
                     {
-                        r[i] += newtonStartingValuesFixExtra;                        
+                        r[i] += newtonStartingValuesFixExtra;
                     }
 
                     //if (number * number < number0 * number0) throw new GekkoException(); //assert
@@ -31002,7 +31002,7 @@ namespace Gekko
                 Type.Missing, editable, Type.Missing, Type.Missing, Type.Missing,
                 Type.Missing, Type.Missing);
             return book;
-        }        
+        }
 
         public static string GetExcelColumnName(int columnNumber)
         {
@@ -31039,7 +31039,7 @@ namespace Gekko
             Excel.Workbooks workbooks = null;
             Excel.Workbook wkb = null;
             Excel.Sheets objSheets = null;
-            Excel.Worksheet sheet = null;            
+            Excel.Worksheet sheet = null;
             Excel.Range range = null;
             Excel.Range temprange = null;
             Excel.Range last = null;
@@ -31226,7 +31226,7 @@ namespace Gekko
             int columnsLastIndex = twoDimensionalArray.GetUpperBound(1);
             int numberOfColumns = columnsLastIndex + 1;
 
-            
+
             object[][] jaggedArray = new object[numberOfRows][];
             //List<object[]> xx = new List<object[]>(numberOfRows);
             object[][] xx = new object[numberOfRows][];
@@ -31236,7 +31236,7 @@ namespace Gekko
                 //jaggedArray[i] = (object[])new T[numberOfColumns];
 
                 xx[i] = new object[numberOfColumns];
-                
+
 
                 for (int j = columnsFirstIndex; j <= columnsLastIndex; j++)
                 {
@@ -31247,7 +31247,7 @@ namespace Gekko
             return xx;
         }
 
-        public static ExcelDataForCplot CreateExcelWorkbook2(ExcelOptions eo, O.Prt oPrt, bool isMulprt)
+        public static ExcelDataForClip CreateExcelWorkbook2(ExcelOptions eo, O.Prt oPrt, bool isMulprt)
         {
             if (G.equal(Program.options.sheet_engine, "epplus"))
             {
@@ -31259,7 +31259,7 @@ namespace Gekko
             }
         }
 
-        private static ExcelDataForCplot CreateExcelWorkbookPIA(ExcelOptions eo, O.Prt oPrt, bool isMulprt)
+        private static ExcelDataForClip CreateExcelWorkbookPIA(ExcelOptions eo, O.Prt oPrt, bool isMulprt)
         {
             Excel.Workbook objBook = null;
 
@@ -31269,7 +31269,7 @@ namespace Gekko
 
             string stampText = null;
             //TODO: think about extensions. If no extension given, it seems append=yes does not work properly.
-            ExcelDataForCplot cplotData = new ExcelDataForCplot();  //only used if called from CLIP, data are fetched and returned, but not used for normal WPLOT use.
+            ExcelDataForClip clipData = new ExcelDataForClip();  //only used if called from CLIP, data are fetched and returned, but not used for normal WPLOT use.
             bool copyLocal = true;
             int threadID = (int)AppDomain.GetCurrentThreadId();  //should be ok, just not for "fibre" threads (on SQL server)... never mind
                                                                  //int managedThreadId = Thread.CurrentThread.ManagedThreadId;  //duer ikke, er ikke distinkt nok
@@ -31366,7 +31366,7 @@ namespace Gekko
 
             try
             {
-                if (!eo.isCplot)
+                if (!eo.isClip)
                 {
                     if (isAppend)
                     {
@@ -31438,7 +31438,7 @@ namespace Gekko
 
                 Excel.Range range0 = null;
 
-                if (!eo.isCplot) range0 = objSheet.get_Range(startCell, Missing.Value);
+                if (!eo.isClip) range0 = objSheet.get_Range(startCell, Missing.Value);
 
                 if (isStamp)
                 {
@@ -31452,18 +31452,18 @@ namespace Gekko
                         ss = ss + s + ". ";
                     }
                     if (ss.EndsWith(". ")) ss = ss.Substring(0, ss.Length - 2);
-                    cplotData.stamp = ss;
-                    if (!eo.isCplot) if (isColors) range0.Font.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Gray);
-                    if (!eo.isCplot) range0.set_Value(Missing.Value, cplotData.stamp);
-                    if (!eo.isCplot) range0 = range0.get_Offset(1, 0);
+                    clipData.stamp = ss;
+                    if (!eo.isClip) if (isColors) range0.Font.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Gray);
+                    if (!eo.isClip) range0.set_Value(Missing.Value, clipData.stamp);
+                    if (!eo.isClip) range0 = range0.get_Offset(1, 0);
                 }
 
                 if (oPrt != null && oPrt.opt_title != null)
                 {
-                    cplotData.heading = oPrt.opt_title;
-                    if (!eo.isCplot) if (isColors) range0.Font.Bold = true;
-                    if (!eo.isCplot) range0.set_Value(Missing.Value, cplotData.heading);
-                    if (!eo.isCplot) range0 = range0.get_Offset(1, 0);
+                    clipData.heading = oPrt.opt_title;
+                    if (!eo.isClip) if (isColors) range0.Font.Bold = true;
+                    if (!eo.isClip) range0.set_Value(Missing.Value, clipData.heading);
+                    if (!eo.isClip) range0 = range0.get_Offset(1, 0);
                 }
 
 
@@ -31486,25 +31486,25 @@ namespace Gekko
 
                 if (isTranspose)
                 {
-                    if (!eo.isCplot) range = range0.get_Offset(namesInt, datesInt);
-                    if (!eo.isCplot) range = range.get_Resize(dataCols, dataRows);
+                    if (!eo.isClip) range = range0.get_Offset(namesInt, datesInt);
+                    if (!eo.isClip) range = range.get_Resize(dataCols, dataRows);
                     double[,] data = Transpose(eo.excelData);
-                    if (!eo.isCplot) range.set_Value(Missing.Value, data);
-                    cplotData.data = data;
+                    if (!eo.isClip) range.set_Value(Missing.Value, data);
+                    clipData.data = data;
                 }
                 else
                 {
-                    if (!eo.isCplot) range = range0.get_Offset(datesInt, namesInt);
-                    if (!eo.isCplot) range = range.get_Resize(dataRows, dataCols);
+                    if (!eo.isClip) range = range0.get_Offset(datesInt, namesInt);
+                    if (!eo.isClip) range = range.get_Resize(dataRows, dataCols);
                     double[,] data = eo.excelData;
-                    if (!eo.isCplot) range.set_Value(Missing.Value, data);
-                    cplotData.data = data;
+                    if (!eo.isClip) range.set_Value(Missing.Value, data);
+                    clipData.data = data;
                 }
 
                 string na = "na()";
                 if (G.equal(Program.options.interface_excel_language, "danish")) na = "ikke.tilgængelig()";
 
-                if (!eo.isCplot)
+                if (!eo.isClip)
                 {
                     Globals.objApp.DisplayAlerts = false;
                     bool success = (bool)range.Replace(
@@ -31534,7 +31534,7 @@ namespace Gekko
                 if (isDates)
                 {
 
-                    if (!eo.isCplot)
+                    if (!eo.isClip)
                     {
                         if (isTranspose)
                         {
@@ -31558,12 +31558,12 @@ namespace Gekko
                         if (isTranspose)
                         {
                             data = Transpose(excelColumnLabelsAnnual);
-                            if (!eo.isCplot) range.set_Value(Missing.Value, data);
+                            if (!eo.isClip) range.set_Value(Missing.Value, data);
                         }
                         else
                         {
                             data = excelColumnLabelsAnnual;
-                            if (!eo.isCplot) range.set_Value(Missing.Value, data);
+                            if (!eo.isClip) range.set_Value(Missing.Value, data);
                         }
                         data2 = ConvertToString(data);
                     }
@@ -31573,16 +31573,16 @@ namespace Gekko
                         if (isTranspose)
                         {
                             data3 = Transpose(eo.excelColumnLabels);
-                            if (!eo.isCplot) range.set_Value(Missing.Value, data3);
+                            if (!eo.isClip) range.set_Value(Missing.Value, data3);
                         }
                         else
                         {
                             data3 = eo.excelColumnLabels;
-                            if (!eo.isCplot) range.set_Value(Missing.Value, data3);
+                            if (!eo.isClip) range.set_Value(Missing.Value, data3);
                         }
                         data2 = data3;
                     }
-                    cplotData.dates = data2;
+                    clipData.dates = data2;
                 }
 
                 //====================== VARIABLE NAMES COLUMN -----------------------------------------------------------------
@@ -31592,23 +31592,23 @@ namespace Gekko
                     string[,] labels = null;
                     if (isTranspose)
                     {
-                        if (!eo.isCplot) range = range0.get_Offset(0, datesInt);
-                        if (!eo.isCplot) range = range.get_Resize(1, dataRows);
+                        if (!eo.isClip) range = range0.get_Offset(0, datesInt);
+                        if (!eo.isClip) range = range.get_Resize(1, dataRows);
                         labels = Transpose(eo.excelRowLabels);
-                        if (!eo.isCplot) range.set_Value(Missing.Value, labels);
+                        if (!eo.isClip) range.set_Value(Missing.Value, labels);
                     }
                     else
                     {
-                        if (!eo.isCplot) range = range0.get_Offset(datesInt, 0);
-                        if (!eo.isCplot) range = range.get_Resize(dataRows, 1);
+                        if (!eo.isClip) range = range0.get_Offset(datesInt, 0);
+                        if (!eo.isClip) range = range.get_Resize(dataRows, 1);
                         labels = eo.excelRowLabels;
-                        if (!eo.isCplot) range.set_Value(Missing.Value, labels);
+                        if (!eo.isClip) range.set_Value(Missing.Value, labels);
                     }
-                    cplotData.varnames = labels;
+                    clipData.varnames = labels;
                 }
 
-                cplotData.transpose = isTranspose;
-                if (eo.isCplot) return cplotData;
+                clipData.transpose = isTranspose;
+                if (eo.isClip) return clipData;
 
                 //====================== coloring ==============================
 
@@ -31750,10 +31750,18 @@ namespace Gekko
             System.Threading.Thread.CurrentThread.CurrentCulture = oldCI;
         }
 
-        private static ExcelDataForCplot CreateExcelWorkbookEPPlus(ExcelOptions eo, O.Prt oPrt, bool isMulprt)
+        private static ExcelDataForClip CreateExcelWorkbookEPPlus(ExcelOptions eo, O.Prt oPrt, bool isMulprt)
         {
-            //FIX appending, involves reading first, instead of starting blank. Use reading code.
 
+            //1. append-     filename-     sheet-            show fakefilename sheet='Data'
+            //2. append-     filename-     sheet+            show fakefilename sheet=sheetname
+            //3. append-     filename+     sheet-            store filename sheet='Data'                        ...as above just silent
+            //4. append-     filename+     sheet+            store filename sheet=sheetname                     ...as above just silent
+            //5. append+     filename-     sheet-            FAIL
+            //6. append+     filename-     sheet+            FAIL
+            //7. append+     filename+     sheet-            append to filename, 'Sheet1' (first sheet)         ...use existing file
+            //8. append+     filename+     sheet+            append to filename, sheetname                      ...use existing file
+            
             try
             {
 
@@ -31779,8 +31787,27 @@ namespace Gekko
                 }
                 fileNameWithPathOriginal = fileNameWithPath;
 
+                bool isAppend = false; if (oPrt != null && G.equal(oPrt.opt_append, "yes")) isAppend = true;
+
+                //Deal with non-existing files
+                if (isAppend)
+                {
+                    if (fileNameWithPathOriginal == null)
+                    {
+                        //(5) and (6)
+                        G.Writeln2("*** ERROR: You cannot use SHEET<append> without indicating a xlsx filename.");
+                        throw new GekkoException();
+                    }
+
+                    if (!File.Exists(fileNameWithPathOriginal))
+                    {
+                        G.Writeln2("*** ERROR: You cannot use SHEET<append> on a non-existing file: " + fileNameWithPathOriginal);
+                        throw new GekkoException();
+                    }
+                }
+
                 //Creates a blank workbook. Use the using statment, so the package is disposed when we are done.
-                using (var p = new ExcelPackage())
+                using (ExcelPackage excel = isAppend ? new ExcelPackage(new FileInfo(fileNameWithPathOriginal)) : new ExcelPackage())
                 {
 
                     if (copyLocal)
@@ -31792,7 +31819,7 @@ namespace Gekko
                     bool isDates = true; if (oPrt != null && G.equal(oPrt.opt_dates, "no")) isDates = false;
                     bool isNames = true; if (oPrt != null && G.equal(oPrt.opt_names, "no")) isNames = false;
                     bool isColors = true; if (oPrt != null && G.equal(oPrt.opt_colors, "no")) isColors = false;
-                    bool isAppend = false; if (oPrt != null && G.equal(oPrt.opt_append, "yes")) isAppend = true;
+
                     string sheet = null; if (oPrt != null) sheet = oPrt.opt_sheet;
                     bool isRows;
                     bool isCols;
@@ -31802,20 +31829,48 @@ namespace Gekko
                     //string startCell = "a1"; if (oPrt != null && oPrt.opt_cell != null) startCell = oPrt.opt_cell;
                     int datesInt = 0; if (isDates) datesInt++;
                     int namesInt = 0; if (isNames) namesInt++;
-                    ExcelDataForCplot cplotData = new ExcelDataForCplot();
+                    ExcelDataForClip clipData = new ExcelDataForClip();
+                    
+                    ExcelWorksheet ws = null;
 
-                    string sheetName = "Data";  //default
-                    if (sheet != null) sheetName = sheet;
-                    ExcelWorksheet ws = p.Workbook.Worksheets.Add(sheetName);
-
-                    //var ws = p.Workbook.Worksheets[1];  //1-based (?)
-
-                    //ws.Cells["A1"].Value = "This is cell A1";
+                    if (isAppend)
+                    {
+                        if (sheet != null)
+                        {
+                            //(8)
+                            //try to locate the sheet, fail if it is not there
+                            ws = excel.Workbook.Worksheets[sheet];
+                            if (ws == null)
+                            {
+                                //we create it if it is not already there
+                                ws = excel.Workbook.Worksheets.Add(sheet);
+                            }
+                        }
+                        else
+                        {
+                            //(7)
+                            //no sheet given, we take the one in the first position
+                            ws = excel.Workbook.Worksheets.First<ExcelWorksheet>();
+                        }
+                    }
+                    else
+                    {
+                        if (sheet != null)
+                        {
+                            //(2) and (4)
+                            ws = excel.Workbook.Worksheets.Add(sheet);  //fresh workbook, add fresh sheet with the given name
+                        }
+                        else
+                        {
+                            //(1) and (3)
+                            ws = excel.Workbook.Worksheets.Add("Data");  //fresh workbook with no sheet name given, we use default name
+                        }
+                    }                    
 
                     int rowcounter = 1;  //1-based
                     int colcounter = 1;  //1-based
 
-                    if (!eo.isCplot)
+                    if (!eo.isClip)
                     {
                         //See identical #98oiwu543w
                         string s2 = "a1";
@@ -31828,7 +31883,7 @@ namespace Gekko
 
                         rowcounter += rowOffset;
                         colcounter += colOffset;
-                    }                    
+                    }
 
                     if (isStamp)
                     {
@@ -31842,13 +31897,13 @@ namespace Gekko
                             ss = ss + s + ". ";
                         }
                         if (ss.EndsWith(". ")) ss = ss.Substring(0, ss.Length - 2);
-                        cplotData.stamp = ss;
+                        clipData.stamp = ss;
 
-                        if (!eo.isCplot)
+                        if (!eo.isClip)
                         {
-                            ws.Cells[rowcounter, colcounter].Value = cplotData.stamp;
+                            ws.Cells[rowcounter, colcounter].Value = clipData.stamp;
                             //ws.Cells[rowcounter, colcounter].Value = cplotData.heading;                            
-                            ExcelRange range = ws.Cells[rowcounter, colcounter, rowcounter, colcounter];                            
+                            ExcelRange range = ws.Cells[rowcounter, colcounter, rowcounter, colcounter];
                             range.Style.Font.Color.SetColor(System.Drawing.Color.Gray);
                             rowcounter++;
                         }
@@ -31857,13 +31912,13 @@ namespace Gekko
 
                     if (oPrt != null && oPrt.opt_title != null)
                     {
-                        cplotData.heading = oPrt.opt_title;
+                        clipData.heading = oPrt.opt_title;
 
-                        if (!eo.isCplot)
+                        if (!eo.isClip)
                         {
-                            ws.Cells[rowcounter, colcounter].Value = cplotData.heading;                            
+                            ws.Cells[rowcounter, colcounter].Value = clipData.heading;
                             ExcelRange range = ws.Cells[rowcounter, colcounter, rowcounter, colcounter];
-                            range.Style.Font.Bold = true;                            
+                            range.Style.Font.Bold = true;
                             rowcounter++;
                         }
                     }
@@ -31897,7 +31952,7 @@ namespace Gekko
                         data = Transpose(eo.excelData);
                     }
 
-                    if (!eo.isCplot)
+                    if (!eo.isClip)
                     {
                         ws.Cells[d1, d2, d1 + data.GetLength(0) - 1, d2 + data.GetLength(1) - 1].LoadFromArrays(ToJaggedArray(data));
                         if (isColors)
@@ -31909,7 +31964,7 @@ namespace Gekko
                             range.Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Medium, Globals.LightBlueWord);
                         }
                     }
-                    else cplotData.data = data;
+                    else clipData.data = data;
 
                     string na = "na()";
                     if (G.equal(Program.options.interface_excel_language, "danish")) na = "ikke.tilgængelig()";
@@ -31963,23 +32018,23 @@ namespace Gekko
 
                         if (isTranspose)
                         {
-                            ws.Cells[d1, d2 - 1, d1 + data22.Length - 1, d2 - 1 + data22[0].Length - 1].LoadFromArrays(data22);                            
+                            ws.Cells[d1, d2 - 1, d1 + data22.Length - 1, d2 - 1 + data22[0].Length - 1].LoadFromArrays(data22);
                         }
                         else
                         {
-                            ws.Cells[d1 - 1, d2, d1 - 1 + data22.Length - 1, d2 + data22[0].Length - 1].LoadFromArrays(data22);                            
+                            ws.Cells[d1 - 1, d2, d1 - 1 + data22.Length - 1, d2 + data22[0].Length - 1].LoadFromArrays(data22);
                             if (isColors)
                             {
                                 int minus = 0;
                                 if (isNames) minus = 1;
-                                ExcelRange range = ws.Cells[d1 - 1, d2 - minus, d1 - 1 + data22.Length - 1, d2 + data22[0].Length - 1];                                
+                                ExcelRange range = ws.Cells[d1 - 1, d2 - minus, d1 - 1 + data22.Length - 1, d2 + data22[0].Length - 1];
                                 range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
                                 range.Style.Fill.BackgroundColor.SetColor(Globals.LightBlueWord);
                                 range.Style.Font.Color.SetColor(Color.White);
                             }
                         }
 
-                        cplotData.dates = (string[,])data2;
+                        clipData.dates = (string[,])data2;
                     }
 
                     //====================== VARIABLE NAMES COLUMN -----------------------------------------------------------------
@@ -32007,88 +32062,15 @@ namespace Gekko
                             labels = eo.excelRowLabels;
                             ws.Cells[d1, d2 - 1, d1 + labels.GetLength(0) - 1, d2 - 1 + labels.GetLength(1) - 1].LoadFromArrays(ToJaggedArray(labels));
                         }
-                        cplotData.varnames = labels;
+                        clipData.varnames = labels;
                     }
 
-                    cplotData.transpose = isTranspose;
-                    if (eo.isCplot) return cplotData;
-
-                    //====================== coloring ==============================
-
-                    //if (isColors)
-                    //{
-                    //    if (isTranspose)  //dates running downwards
-                    //    {
-                    //        if (isNames)
-                    //        {
-                    //            //Names row
-                    //            range = range0.get_Offset(0, 0);
-                    //            range = range.get_Resize(1, dataRows + datesInt);
-                    //            if (blueColors)
-                    //            {
-                    //                range.Interior.Color = blue;
-                    //                range.Font.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.White);
-                    //            }
-                    //            else
-                    //            {
-                    //                range.Borders[Excel.XlBordersIndex.xlEdgeTop].Weight = Excel.XlBorderWeight.xlMedium;
-                    //                range.Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlMedium;
-                    //            }
-                    //        }
-                    //    }
-                    //    else
-                    //    {
-                    //        if (isDates)
-                    //        {
-                    //            //Dates row
-                    //            range = range0.get_Offset(0, 0);
-                    //            range = range.get_Resize(1, dataCols + namesInt);
-                    //            if (blueColors)
-                    //            {
-                    //                range.Interior.Color = blue;
-                    //                range.Font.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.White);
-                    //            }
-                    //            else
-                    //            {
-                    //                range.Borders[Excel.XlBordersIndex.xlEdgeTop].Weight = Excel.XlBorderWeight.xlMedium;
-                    //                range.Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlMedium;
-                    //            }
-                    //        }
-                    //    }
-
-                    //    //Data border
-                    //    if (isTranspose)
-                    //    {
-                    //        range = range0.get_Offset(0, 0);
-                    //        range = range.get_Resize(dataCols + namesInt, dataRows + datesInt);
-                    //    }
-                    //    else
-                    //    {
-                    //        range = range0.get_Offset(0, 0);
-                    //        range = range.get_Resize(dataRows + datesInt, dataCols + namesInt);
-                    //    }
-                    //    if (blueColors)
-                    //    {
-                    //        range.Borders[Excel.XlBordersIndex.xlEdgeTop].Weight = Excel.XlBorderWeight.xlMedium;
-                    //        range.Borders[Excel.XlBordersIndex.xlEdgeTop].Color = blue;
-                    //        range.Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlMedium;
-                    //        range.Borders[Excel.XlBordersIndex.xlEdgeBottom].Color = blue;
-                    //        range.Borders[Excel.XlBordersIndex.xlEdgeLeft].Weight = Excel.XlBorderWeight.xlMedium;
-                    //        range.Borders[Excel.XlBordersIndex.xlEdgeLeft].Color = blue;
-                    //        range.Borders[Excel.XlBordersIndex.xlEdgeRight].Weight = Excel.XlBorderWeight.xlMedium;
-                    //        range.Borders[Excel.XlBordersIndex.xlEdgeRight].Color = blue;
-                    //    }
-                    //    else
-                    //    {
-                    //        range.Borders[Excel.XlBordersIndex.xlEdgeTop].Weight = Excel.XlBorderWeight.xlMedium;
-                    //        range.Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlMedium;
-                    //    }
-
-                    //}
+                    clipData.transpose = isTranspose;
+                    if (eo.isClip) return clipData;
 
 
                     //Save the new workbook. We haven't specified the filename so use the Save as method.
-                    p.SaveAs(new FileInfo(fileNameWithPath));
+                    excel.SaveAs(new FileInfo(fileNameWithPath));
 
                     if (copyLocal)
                     {
@@ -32098,6 +32080,7 @@ namespace Gekko
                             {
                                 if (File.Exists(fileNameWithPathOriginal)) WaitForFileDelete(fileNameWithPathOriginal);  //probably not necessary
                                 WaitForFileCopy(fileNameWithPath, fileNameWithPathOriginal);
+                                if (!Globals.setPrintMute) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameWithPathOriginal);
                             }
                             catch (Exception e)
                             {
@@ -32111,14 +32094,28 @@ namespace Gekko
 
                 if (fileNameWithPathOriginal == null)
                 {
-                    System.Diagnostics.Process.Start(fileNameWithPath);  //seems faster than below
-                                                                         //System.Diagnostics.Process.Start("excel.exe", fileNameWithPath);                 
+                    try
+                    {
+                        System.Diagnostics.Process.Start(fileNameWithPath);  //seems faster than below
+                                                                             //System.Diagnostics.Process.Start("excel.exe", fileNameWithPath);                 
+                    }
+                    catch (Exception e)
+                    {                        
+                        G.Writeln2("*** ERROR: Opening the produced .xlsx file with an external program associated with .xlsx");
+                        G.Writeln("    files (such as for example Microsoft Excel) failed.", Color.Red);
+                        G.Writeln("*** ERROR: " + e.Message);
+                    }
                 }
             }
             catch (Exception e)
-            {
-                if (e.Message != null && e.Message != "")
-                    G.Writeln2("*** ERROR: " + e.Message);
+            {                
+                if (!(e is GekkoException))
+                {
+                    if (e.Message != null && e.Message != "")
+                    {
+                        G.Writeln2("*** ERROR: " + e.Message);
+                    }
+                }
                 throw;
             }
 
@@ -32602,7 +32599,8 @@ namespace Gekko
                 case eOfficeApp.eOfficeApp_Outlook: { return "Outlook"; } break;
                 case eOfficeApp.eOfficeApp_Access: { return "Access"; } break;
                 case eOfficeApp.eOfficeApp_PowerPoint: { return "Powerpoint"; } break;
-                default: { /*ASSERT(false);*/
+                default:
+                    { /*ASSERT(false);*/
                         return string.Empty; } break; // added another ???
             }
         }
@@ -32617,7 +32615,8 @@ namespace Gekko
                 case eOfficeApp.eOfficeApp_Outlook: { return "Outlook.Application"; } break;
                 case eOfficeApp.eOfficeApp_Access: { return "Access.Application"; } break;
                 case eOfficeApp.eOfficeApp_PowerPoint: { return "Powerpoint.Application"; } break;
-                default: { /*ASSERT(false);*/ return string.Empty; } break; // added another ???
+                default: { /*ASSERT(false);*/
+                        return string.Empty; } break; // added another ???
             }
         }
 
@@ -34594,7 +34593,7 @@ namespace Gekko
         public string labels = null;
         public string colors = null;
         public string append = null;
-        public bool isCplot = false;
+        public bool isClip = false;
         public string[,] excelRowLabels = null;
         public string[,] excelColumnLabels = null;
         public double[,] excelData = null;
@@ -34635,7 +34634,7 @@ namespace Gekko
         }
     }
 
-    public class ExcelDataForCplot
+    public class ExcelDataForClip
     {
         public bool transpose = false;
         public double[,] data;

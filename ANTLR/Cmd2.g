@@ -687,7 +687,10 @@ ASTOPT_STRING_Y2;
 	ASTXEDIT;
 
 	// --- tokens1 start ---
-		     REMOTE = 'REMOTE';
+		     PIA = 'PIA';
+			 EPPLUS = 'EPPLUS';
+			 REMOTE = 'REMOTE';
+			 ENGINE = 'ENGINE';
 			 OFFSET = 'OFFSET';
 			 DETECT = 'DETECT';
 			 GRIDSTYLE = 'GRIDSTYLE';
@@ -1237,7 +1240,10 @@ Y2                    = 'Y2'                       ;
 										
 // --- tokens2 start ---
             			
+d.Add("PIA", PIA);
+d.Add("EPPLUS", EPPLUS);
 d.Add("REMOTE", REMOTE);
+d.Add("ENGINE", ENGINE);
             d.Add("GRIDSTYLE", GRIDSTYLE);
             d.Add("BOLD", BOLD);
             d.Add("ITALIC", ITALIC);
@@ -3266,6 +3272,7 @@ optionType :
 			 | R EXE PATH '='? fileName -> R EXE PATH ^(ASTSTRINGSIMPLE fileName)  //obsolete, same as above and for legacy
 			 
 			 | SHEET question -> SHEET question
+			 | SHEET ENGINE '='? optionSheetEngine -> SHEET ENGINE ^(ASTSTRINGSIMPLE optionSheetEngine)
 			 | SHEET MULPRT (GDIF|GDIFF) '='? yesNoSimple -> SHEET MULPRT GDIF ^(ASTBOOL yesNoSimple)
              | SHEET MULPRT ABS '='? yesNoSimple -> SHEET MULPRT ABS ^(ASTBOOL yesNoSimple)
              | SHEET MULPRT LEV '='? yesNoSimple -> SHEET MULPRT LEV ^(ASTBOOL yesNoSimple)
@@ -3376,6 +3383,7 @@ optionType :
 			 optionInterfaceSuggestions: NONE | OPTION; // | SOME | ALL;
 			 optionInterfaceExcelLanguage: DANISH | ENGLISH;
 			 optionInterfaceExcelDecimalseparator: PERIOD | COMMA;
+			 optionSheetEngine: PIA | EPPLUS;
 			 optionSolveNewtonInvert: LU | ITER;
 			 optionSolveForwardMethodOptions : STACKED | FAIR | NFAIR | NONE ;
 			 optionSolveForwardTerminalOptions : EXO | CONST | GROWTH ;
@@ -3412,6 +3420,9 @@ ident                     : Ident|
             NONANNUAL|
             DIGITS|
 			REMOTE|
+			ENGINE|
+			PIA|
+			EPPLUS|
 			OFFSET|
 			DETECT|
 							X|
