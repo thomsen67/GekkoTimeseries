@@ -147,7 +147,7 @@ Additionally, there are model, solve, equation options.
         public bool sheet_prt_gdif = false;  //dp
         public bool sheet_cols = false;
         public bool sheet_rows = true;
-        public string sheet_engine = "epplus";  //pia or epplus
+        public string sheet_engine = "internal";  //internal or excel
 
         public bool solve_data_create_auto = true;
         public bool solve_data_ignoremissing = false;

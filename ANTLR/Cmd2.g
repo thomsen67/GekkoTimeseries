@@ -3383,7 +3383,7 @@ optionType :
 			 optionInterfaceSuggestions: NONE | OPTION; // | SOME | ALL;
 			 optionInterfaceExcelLanguage: DANISH | ENGLISH;
 			 optionInterfaceExcelDecimalseparator: PERIOD | COMMA;
-			 optionSheetEngine: PIA | EPPLUS;
+			 optionSheetEngine: EXCEL | INTERNAL;
 			 optionSolveNewtonInvert: LU | ITER;
 			 optionSolveForwardMethodOptions : STACKED | FAIR | NFAIR | NONE ;
 			 optionSolveForwardTerminalOptions : EXO | CONST | GROWTH ;

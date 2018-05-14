@@ -2517,9 +2517,11 @@ namespace Gekko
 
             if (matrixName == null)
             {
+                int counter = 0;
                 for (int row = 1 + rowOffset; row < 1 + rowOffset + n; row++)
                 {
                     TimeSeries ts = Program.GetTimeSeriesFromString(o.listItems[row - 1 - rowOffset], O.ECreatePossibilities.Must); //O
+                    counter++;
                     for (int col = 1 + colOffset; col < 1 + colOffset + obs; col++)
                     {
                         double v = double.NaN;
@@ -2529,6 +2531,7 @@ namespace Gekko
                         ts.SetData(o.t1.Add(col - 1 - colOffset), v);
                     }
                 }
+                G.Writeln2(counter + "series imported");
             }
             else
             {
@@ -31020,8 +31023,150 @@ namespace Gekko
             return columnName;
         }
 
-
         public static TableLight ReadExcelWorkbook(string file, Databank databank, string sheetName)
+        {
+            if (Program.options.sheet_engine == "internal")
+            {
+                return ReadExcelWorkbookEPPlus(file, databank, sheetName);
+            }
+            else
+            {
+                return ReadExcelWorkbookPIA(file, databank, sheetName);
+            }
+        }
+
+        public static TableLight ReadExcelWorkbookEPPlus(string file, Databank databank, string sheetName)
+        {            
+            if (!File.Exists(file))
+            {
+                G.Writeln2("*** ERROR: File " + file + " does not seem to exist");
+                throw new GekkoException();
+            }
+
+            TableLight matrix = new TableLight();
+
+            try
+            {
+
+                using (ExcelPackage excel2 = new ExcelPackage(new FileInfo(file)))
+                {
+                    ExcelWorksheet ws = null;
+                    if (sheetName != null)
+                    {
+                        ws = excel2.Workbook.Worksheets[sheetName];
+                        if (ws == null)
+                        {
+                            G.Writeln2("*** ERROR: Could not find sheet '" + sheetName + "' inside " + file);
+                            throw new GekkoException();
+                        }
+                    }
+                    else
+                    {
+                        ws = excel2.Workbook.Worksheets.First<ExcelWorksheet>();
+                    }
+
+                    var start = ws.Dimension.Start;
+                    var end = ws.Dimension.End;
+
+                    //for (int row = 1; row <= end.Row; row++)
+                    //{ // Row by row...
+                    //    for (int col = 1; col <= end.Column; col++)
+                    //    { // ... Cell by cell...
+                    //        object cellValue = ws.Cells[row, col].Text;
+                    //    }
+                    //}
+
+                    object[,] intput = (object[,])ws.Cells[1, 1, end.Row, end.Column].Value;
+                    int rows2 = intput.GetLength(0);
+                    int cols2 = intput.GetLength(1);
+
+                    //beware, this array is 0-based
+                    for (int i = 0; i < end.Row; i++)
+                    { // Row by row...
+                        for (int j = 0; j < end.Column; j++)
+                        { // ... Cell by cell...
+                            //Object cellValue = intput[row, col];
+                            //Type t = cellValue.GetType();
+                            //if(cellValue.GetType()==typeof(Double))
+                            //{
+                            //    Double d = (Double)cellValue;
+                            //    break;
+                            //}
+
+
+                            Object temp = intput[i, j];
+                            if (temp == null) continue;
+                            CellLight cell;
+                            if (temp.GetType() == typeof(double))
+                            {
+                                cell = new CellLight((double)temp);
+                            }
+                            else if (temp.GetType() == typeof(int))
+                            {
+                                int iData = (int)temp;
+
+                                //-2146826281 = #Div/0!
+                                //-2146826246 = #N/A
+                                //-2146826259 = #Name?
+                                //-2146826288 = #Null!
+                                //-2146826252 = #Num!
+                                //-2146826265 = #Ref!  
+                                //-2146826273 = #Value!
+
+                                if (iData == -2146826246)
+                                {
+                                    //just like it is in a csv file. The -2146826246 is really a hexadecimal error code from Excel, stating that the number is N/A.
+                                    cell = new CellLight("#N/A");
+                                }
+                                else if (iData == -2146826259)
+                                {
+                                    cell = new CellLight("#Name?");
+                                }
+                                else if (iData == -2146826281)
+                                {
+                                    cell = new CellLight("#Div/0");
+                                }
+                                else
+                                {
+                                    cell = new CellLight((double)iData);
+                                }
+                            }
+                            else if (temp.GetType() == typeof(string))
+                            {
+                                cell = new CellLight((string)temp);
+                            }
+                            else
+                            {
+                                G.Writeln2("*** ERROR: Cell " + GetExcelCell(i, j, false) + " seems to be neither text or number.");
+                                G.Writeln("           It has type " + temp.GetType().ToString(), Color.Red);
+                                throw new GekkoException();
+                            }
+                            matrix.Add(i + 1, j + 1, cell);  //i and j are 0-based, matrix needs to be 1-based.
+
+                        }
+                    }
+
+
+
+                }
+            }
+            catch (Exception e)
+            {
+                if (!(e is GekkoException))
+                {
+                    if (e.Message != null && e.Message != "")
+                    {
+                        G.Writeln2("*** ERROR: " + e.Message);
+                        G.Writeln("+++ NOTE: You may set 'OPTION sheet engine = excel;' to use the Excel engine from Gekko 2.2");
+                    }
+                }
+                throw;
+            }
+            
+            return matrix;
+        }
+
+        public static TableLight ReadExcelWorkbookPIA(string file, Databank databank, string sheetName)
         {
 
             int threadID = (int)AppDomain.GetCurrentThreadId();  //should be ok, just not for "fibre" threads (on SQL server)... never mind
@@ -31189,6 +31334,7 @@ namespace Gekko
                 //if you need to handle stuff
                 G.Writeln2("*** ERROR: Get data from Excel failed with the following message:");
                 G.Writeln(ex.Message, Color.Red);
+                G.Writeln("+++ NOTE: You may set 'OPTION sheet engine = internal;' to use an internal Excel engine.");
             }
             finally
             {
@@ -31249,7 +31395,7 @@ namespace Gekko
 
         public static ExcelDataForClip CreateExcelWorkbook2(ExcelOptions eo, O.Prt oPrt, bool isMulprt)
         {
-            if (G.equal(Program.options.sheet_engine, "epplus"))
+            if (G.equal(Program.options.sheet_engine, "internal"))
             {
                 return CreateExcelWorkbookEPPlus(eo, oPrt, isMulprt);
             }
@@ -31741,6 +31887,7 @@ namespace Gekko
                 errorMessage = String.Concat(errorMessage, " Line: ");
                 errorMessage = String.Concat(errorMessage, theException.Source);
                 G.Writeln(errorMessage);
+                G.Writeln("+++ NOTE: You may set 'OPTION sheet engine = internal;' to use an internal Excel engine");
                 //see MS bug 320369
                 System.Threading.Thread.CurrentThread.CurrentCulture = oldCI;
                 throw new GekkoException();
@@ -31776,8 +31923,8 @@ namespace Gekko
 
                 if (fileNameWithPath != null && G.equal(Path.GetExtension(fileNameWithPath), "xls"))
                 {
-                    G.Writeln2("*** ERROR: With 'OPTION sheet engine = epplus;', only xlsx files are allowed. Please use 'OPTION sheet engine = pia;' for xls files;");
-                    G.Writeln("           Please Note that option 'pia' demands that Excel is installed on your machine.");
+                    G.Writeln2("*** ERROR: With 'OPTION sheet engine = internal;', only xlsx files are allowed. Please use 'OPTION sheet engine = excel;' for xls files;");
+                    G.Writeln("           Please Note that option 'excel' demands that Excel is installed on your machine.");
                     throw new GekkoException();
                 }
 
@@ -32114,6 +32261,7 @@ namespace Gekko
                     if (e.Message != null && e.Message != "")
                     {
                         G.Writeln2("*** ERROR: " + e.Message);
+                        G.Writeln("+++ NOTE: You may set 'OPTION sheet engine = excel;' to use the Excel engine from Gekko 2.2");
                     }
                 }
                 throw;
