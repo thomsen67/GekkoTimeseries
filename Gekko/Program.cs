@@ -32021,7 +32021,7 @@ namespace Gekko
                     {
                         //See identical #98oiwu543w
                         string s2 = "a1";
-                        if (oPrt.opt_cell != null) s2 = oPrt.opt_cell;
+                        if (oPrt != null && oPrt.opt_cell != null) s2 = oPrt.opt_cell;
                         int index = s2.IndexOfAny(new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' });
                         string chars = s2.Substring(0, index);
                         int num = Int32.Parse(s2.Substring(index));
@@ -32120,9 +32120,10 @@ namespace Gekko
                     {
                         for (int j = 0; j < data.GetLength(1); j++)
                         {
-                            if (G.isNumericalError(data[i, j]))
+                            if (data[i, j] == 9.99999e99d || G.isNumericalError(data[i, j]))
                             {
-                                ws.Cells[d1 + i, d2 + j].Value = "=" + na;
+                                //ws.Cells[d1 + i, d2 + j].Value = "=" + na;
+                                ws.Cells[d1 + i, d2 + j].Formula = na;
                             }
                         }
                     }
