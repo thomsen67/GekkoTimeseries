@@ -3739,6 +3739,15 @@ namespace Gekko.Parser.Gek
                                 node.Code.A(nodeCode);
                             }
                         }
+                        break;                    
+                    case "ASTNAME3":
+                        {                            
+                            {
+                                bool x = false;                                
+                                string nodeCode = HandleString(node, node[0].Code.ToString(), x);
+                                node.Code.A(nodeCode);
+                            }
+                        }
                         break;
                     case "ASTTRUNCATE":
                         {
@@ -5138,9 +5147,8 @@ namespace Gekko.Parser.Gek
                             throw new GekkoException();
                         }
                     }
-                    else if (child.Text == "ASTSTRINGSIMPLE")
+                    else if (child.Text == "ASTSTRINGSIMPLE" || child.Text == "ASTNAME3")
                     {
-
                         bool resolvePath = false;
                         List<string> folder = new List<string>();
                         folder.Add("folder_bank");
@@ -5208,18 +5216,24 @@ namespace Gekko.Parser.Gek
             s3.Replace(@"\", @"\\");
             s3.Replace("_", " ");
             s3.Replace("`", "");
-            s3.Replace("true", "yes");
-            s3.Replace("false", "no");
+            if (!G.equal(node[0].Text, "freq"))
+            {  //OPTION freq = ...
+                s3.Replace("true", "yes");
+                s3.Replace("false", "no");
+            }
             s.AppendLine("G.Writeln();");
             //#987350932752
             //s.AppendLine("G.Writeln(Program.SubstituteAssignVars(`" + s3.ToString() + "`));");
 
             string sss = s1a.ToString();
             s1 = s1.Replace("_", " ");
-            sss = sss.Replace("True", "`yes`");
-            sss = sss.Replace("False", "`no`");
-            sss = sss.Replace("true", "`yes`");
-            sss = sss.Replace("false", "`no`");
+            if (!G.equal(node[0].Text, "freq"))
+            {
+                sss = sss.Replace("True", "`yes`");
+                sss = sss.Replace("False", "`no`");
+                sss = sss.Replace("true", "`yes`");
+                sss = sss.Replace("false", "`no`");
+            }
             //string ss = "IVariable iv = " + s1a + ";";
             //if (type == "string")
             //{

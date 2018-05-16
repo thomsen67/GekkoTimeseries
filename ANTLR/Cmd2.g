@@ -333,6 +333,7 @@ tokens {
     ASTMULBK;
     ASTN;
     ASTNAME2;
+	ASTNAME3;
     ASTNAME;
     ASTNAMEDIGIT;
     ASTNAMESLIST;
@@ -3202,7 +3203,8 @@ optionType :
              | FOLDER WORKING '='? fileName ->  FOLDER WORKING ^(ASTSTRINGSIMPLE fileName)
 
 			 | FREQ question -> FREQ question
-             | FREQ '='? optionFreq -> FREQ ^(ASTSTRINGSIMPLE optionFreq)
+             //| FREQ '='? optionFreq -> FREQ ^(ASTSTRINGSIMPLE optionFreq)
+			 | FREQ '='? name -> FREQ ^(ASTNAME3 name)
 
 			 | GAMS TIME DETECT AUTO '='? yesNoSimple -> GAMS TIME DETECT AUTO ^(ASTBOOL yesNoSimple)
 			 | GAMS EXE FOLDER '='? fileName -> GAMS EXE FOLDER ^(ASTSTRINGSIMPLE fileName)

@@ -194,7 +194,7 @@ Additionally, there are model, solve, equation options.
         public double solve_newton_conv_abs = 0.0001;  //this is for a sum (really RMSQ) over all equations, so it is really low for most purposes. 
         public string solve_newton_invert = "lu"; //lu or iter, lu is more precise -- only problem is that the matrix is not sparse. Should maybe find sparse LU module.
         public int solve_newton_itermax = 200;
-        public bool solve_newton_robust = false;
+        public bool solve_newton_robust = true;
         public int solve_newton_updatefreq = 15;  //fast steps are so fast now that we relax this from 10 -> 15
         public bool solve_print_details = false;
         public bool solve_print_iter = false;
