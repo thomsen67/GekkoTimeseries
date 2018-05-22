@@ -1184,14 +1184,17 @@ namespace Gekko.Parser.Gek
                                 internalName = SearchUpwardsInTree2(node, listName);                                
                             }
 
-                            if (internalName != null)
+                            string s = node[0].Code.ToString();
+                            if (internalName != null) s = internalName;
+
+                            if (w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP")
                             {
-                                node.Code.CA(internalName);
+                                node.Code.CA(Globals.reportInterior1 + s + Globals.reportInterior2);
                             }
                             else
                             {
-                                node.Code.CA(node[0].Code);
-                            }
+                                node.Code.CA(s);
+                            }                            
                             
                         }
                         break;
@@ -2156,10 +2159,19 @@ namespace Gekko.Parser.Gek
                                     sb1.AppendLine(GekkoSmplCommandHelper1(smplCommandNumber, "Unfold"));
                                     sb1.AppendLine("List " + tempName + " = new List();" + G.NL);
                                 }
-                                
+
                                 foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                 {
-                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ")))), null, false, EVariableType.Var))) {");  //false is regarding isLeftSide
+                                    string listname = Globals.symbolCollection + kvp.Key;  //add a # to the list ident, this is the way they are stored in node.functionDefAnchor
+                                    string internalName = SearchUpwardsInTree3(node, listname);
+                                    string s = SearchUpwardsInTree3(node, listname);
+                                                                        
+                                    if (s == null)
+                                    {
+                                        s = "O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ")))), null, false, EVariableType.Var)";  //false is regarding isLeftSide
+                                    }                                    
+
+                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(" + s + ")) {");
                                 }
 
                                 if (G.Equal(functionNameLower, "sum"))
@@ -2703,7 +2715,7 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("o" + Num(node) + ".guiGraphPrintCode = gh.printCode;" + G.NL); //printCode is from the Func<> call, is null if PLOT window buttons are not clicked
                                 node.Code.A("o" + Num(node) + ".guiGraphIsLogTransform = gh.isLogTransform;" + G.NL);
 
-                                
+                                node.Code.A("o" + Num(node) + ".labelHelper = smpl.labelHelper;" + G.NL);
 
                                 GetCodeFromAllChildren(node);
 
@@ -2821,20 +2833,23 @@ namespace Gekko.Parser.Gek
                                         internalName = SearchUpwardsInTree2(node, listName);
                                     }
 
-                                    if (internalName != null)
+                                    string s = node[1][i].Code.ToString();
+                                    if (internalName != null) s = internalName;
+                                    if (w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP")
                                     {
-                                        indexes += internalName;
+                                        indexes += Globals.reportInterior1 + s + Globals.reportInterior2;
                                     }
                                     else
                                     {
-                                        indexes += node[1][i].Code.ToString();
+                                        indexes += s;
                                     }
+                                    
                                     if (i < node[1].ChildrenCount() - 1) indexes += ", ";
                                 }
                             }
                             if (ivTempVar == null)
-                            {
-                                node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexes + "), smpl, " + node[0].Code + ", " + indexes + ")");
+                            {                                
+                                node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexes + "), smpl, " + node[0].Code + ", " + indexes + ")");                                
                             }
                             else
                             {

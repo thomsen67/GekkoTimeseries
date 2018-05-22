@@ -1028,6 +1028,11 @@ namespace Gekko
         private static IVariable LookupHelperRightside(GekkoSmpl smpl, Map map, string dbName, string varnameWithFreq, bool errorIfNotFound)
         {
             //Can either look up stuff in a Map, or in a databank
+
+            //if (Globals.runningOnTTComputer)
+            //{
+            //    G.Writeln2("---> LABELS(varname) = " + dbName + ":" + varnameWithFreq);
+            //}
                        
             IVariable rv = null;
             if (map == null)
@@ -2250,10 +2255,34 @@ namespace Gekko
             //a[1] or #a['q*']
             //#x[1, 2]                 
             //x['nz', 'w']    
+
+            if (true)
+            {
+                string s = null;
+                foreach (IVariable iv in indexes)
+                {
+                    if (iv.Type() == EVariableType.String)
+                    {
+                        s += ((ScalarString)iv).string2 + " ";
+                    }
+                }
+                //if (Globals.runningOnTTComputer)
+                //{
+                //    G.Writeln2("---> LABELS(indexes) = " + s);
+                //}
+            }
+
             IVariable rv = x.Indexer(smpl, indexes);
             return rv;
 
-        }   
+        }
+
+        public static IVariable ReportInterior(GekkoSmpl smpl, IVariable x)
+        {
+            if (smpl.labelHelper == null) smpl.labelHelper = new List<IVariable>();
+            smpl.labelHelper.Add(x);
+            return x;
+        }
 
         public static IVariable IndexerPlus(GekkoSmpl smpl, IVariable x, bool isLhs, IVariable y)
         {
@@ -6785,6 +6814,7 @@ namespace Gekko
             public string opt_pointtype = null;
             public double opt_pointsize = double.NaN;
             public string opt_fillstyle = null;
+            public List<IVariable> labelHelper = null;
             
             
             public long counter = -12345;

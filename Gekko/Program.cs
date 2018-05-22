@@ -107,6 +107,7 @@ namespace Gekko
         public int gekkoErrorI = 0;
         public int bankNumber = 0;  //0 is inactive, 1 is Ref databank
         public GekkoSmplCommand command = GekkoSmplCommand.Unknown;
+        public List<IVariable> labelHelper = null;
         public P p;
 
         public GekkoSmpl()
@@ -26009,7 +26010,7 @@ namespace Gekko
                 int count = 0;
                 foreach (string fl in freelists)
                 {
-                    IVariable iv = O.Lookup(null, null, null, "#" + fl, null, null, false, EVariableType.List, false);
+                    IVariable iv = O.Lookup(null, null, null, Globals.symbolCollection + fl, null, null, false, EVariableType.List, false);
                     if (iv == null)
                     {
                         fail = true; break;

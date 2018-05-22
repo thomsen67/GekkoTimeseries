@@ -293,6 +293,9 @@ namespace Gekko
         public static bool printStopWhenErrors = false;  //normally false
         public static bool printOnlyErrors = true;  //normally false
 
+        public const string reportInterior1 = "O.ReportInterior(smpl, ";
+        public const string reportInterior2 = ")";
+
         public static int guiTimerCounter = 0;
         public static System.Timers.Timer guiTimer = null;  //only runs when executing a command
 
