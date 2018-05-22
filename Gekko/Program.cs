@@ -9960,7 +9960,7 @@ namespace Gekko
                         //simple name
                         string name = th[startI].s;
                         string s3 = GetTextFromLeftBlanksTokens(th, 0, th.Count - 1).Trim();
-                        BrowserAddItem(datagen, name, s3);
+                        BrowserAddItem(datagen, name.Trim(), s3.Trim());
                     }
                     else
                     {
@@ -10016,7 +10016,7 @@ namespace Gekko
                                 //probably nothing to add, complicated name but no scalars found, for instance fy[2000] = ...
                                 string name = th[startI].s;
                                 string s3 = GetTextFromLeftBlanksTokens(th, 0, th.Count - 1).Trim();
-                                BrowserAddItem(datagen, name, s3);
+                                BrowserAddItem(datagen, name.Trim(), s3.Trim());
                             }
                             else if (scalarsOnLhsInSerStatement.Count == 1 && xx[0].Value != null)
                             {
@@ -10028,7 +10028,7 @@ namespace Gekko
                                     {
                                         if (th[i].s == "{" && th[i + 1].s == Globals.symbolMemvar.ToString() && th[i + 2].type == "Word" && th[i + 2].leftblanks == null && th[i + 3].s == "}" && G.equal(th[i + 2].s, xx[0].Key))
                                         {
-                                            s7 += listItem;
+                                            s7 += listItem;  //no blanks
                                             i += 3;
                                         }
                                         else
@@ -10041,18 +10041,17 @@ namespace Gekko
                                     for (int i = startI; i < th.Count; i++)
                                     {
                                         if (th[i].s == "{" && th[i + 1].s == Globals.symbolMemvar.ToString() && th[i + 2].type == "Word" && th[i + 2].leftblanks == null && th[i + 3].s == "}" && G.equal(th[i + 2].s, xx[0].Key))
-                                        {
-                                            s8 += listItem;
+                                        {                                            
+                                            s8 += th[i].leftblanks + listItem;  //with blanks
                                             i += 3;
                                         }
                                         else
                                         {
-                                            s8 += th[i].s;
+                                            s8 += th[i].leftblanks + th[i].s;
                                         }
                                     }
 
-
-                                    BrowserAddItem(datagen, s7, s8);
+                                    BrowserAddItem(datagen, s7.Trim(), s8.Trim());
                                 }
                             }
                             else
@@ -10077,6 +10076,10 @@ namespace Gekko
 
         private static void BrowserAddItem(GekkoDictionary<string, List<string>> datagen, string name, string s3)
         {
+            if (s3.Contains("rep"))
+            {
+
+            }
             if (datagen.ContainsKey(name))
             {
                 datagen[name].Add(s3);
