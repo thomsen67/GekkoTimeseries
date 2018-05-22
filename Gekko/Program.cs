@@ -24755,7 +24755,7 @@ namespace Gekko
                 // --------------- unfold labels start ---------------------------------
                 // ---------------------------------------------------------------------
 
-                if(unfoldLabels) UnfoldLabels(element.label, ref label, ref labels2);  //unfolding over #m1 and #m2 etc.                
+                if(unfoldLabels) UnfoldLabels(element.label, ref label, ref labels2, o.labelHelper);  //unfolding over #m1 and #m2 etc.                
 
                 // ---------------------------------------------------------------------
                 // --------------- unfold labels end -----------------------------------
@@ -25987,7 +25987,7 @@ namespace Gekko
             }
         }
 
-        private static void UnfoldLabels(string elementLabel, ref string label, ref List<string> labels2)
+        private static void UnfoldLabels(string elementLabel, ref string label, ref List<string> labels2, List<IVariable>labelHelper)
         {
             string rawLabel = elementLabel;
             

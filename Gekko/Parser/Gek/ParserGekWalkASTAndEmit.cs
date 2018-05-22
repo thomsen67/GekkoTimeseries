@@ -1187,8 +1187,9 @@ namespace Gekko.Parser.Gek
                             string s = node[0].Code.ToString();
                             if (internalName != null) s = internalName;
 
-                            if (w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP")
+                            if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent))
                             {
+                                //only for PRT-type or DISP, and only if the {} is not inside [] or {}.
                                 node.Code.CA(Globals.reportInterior1 + s + Globals.reportInterior2);
                             }
                             else
@@ -2714,9 +2715,7 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("o" + Num(node) + ".guiGraphIsRefreshing = gh.isRefreshing;" + G.NL);
                                 node.Code.A("o" + Num(node) + ".guiGraphPrintCode = gh.printCode;" + G.NL); //printCode is from the Func<> call, is null if PLOT window buttons are not clicked
                                 node.Code.A("o" + Num(node) + ".guiGraphIsLogTransform = gh.isLogTransform;" + G.NL);
-
-                                node.Code.A("o" + Num(node) + ".labelHelper = smpl.labelHelper;" + G.NL);
-
+                                
                                 GetCodeFromAllChildren(node);
 
                                 if (node.Text == "ASTPRT")
@@ -2731,6 +2730,9 @@ namespace Gekko.Parser.Gek
                                     Globals.prtCsSnippetsHeaders.Add(Globals.prtCsSnippetsCounter, w.headerCs.ToString());
                                 }
                                 node.Code.A("o" + Num(node) + ".printCsCounter = Globals.printCs.Count - 1;" + G.NL);
+
+                                node.Code.A("o" + Num(node) + ".labelHelper = smpl.labelHelper;" + G.NL);
+
                                 node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
 
                                 node.Code.A("return o" + Num(node) + ".emfName;" + G.NL);
@@ -2835,27 +2837,28 @@ namespace Gekko.Parser.Gek
 
                                     string s = node[1][i].Code.ToString();
                                     if (internalName != null) s = internalName;
-                                    if (w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP")
+
+                                    if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent))
                                     {
+                                        //only for PRT-type or DISP, and only if the [] is not inside [] or {}.
                                         indexes += Globals.reportInterior1 + s + Globals.reportInterior2;
                                     }
                                     else
                                     {
                                         indexes += s;
                                     }
-                                    
+
                                     if (i < node[1].ChildrenCount() - 1) indexes += ", ";
                                 }
                             }
                             if (ivTempVar == null)
-                            {                                
-                                node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexes + "), smpl, " + node[0].Code + ", " + indexes + ")");                                
+                            {
+                                node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexes + "), smpl, " + node[0].Code + ", " + indexes + ")");
                             }
                             else
                             {
                                 node.Code.A("O.IndexerSetData(smpl, ").A(node[0].Code).A(",  ").A(ivTempVar).A(", ").A(indexes).A(")");
                             }
-
                         }
                         break;
                     case "ASTINDEXER":
@@ -5450,6 +5453,19 @@ namespace Gekko.Parser.Gek
             while (tmp != null)
             {
                 if (tmp.Text == "ASTPRINT") return true;
+                tmp = tmp.Parent;
+            }
+            return false;
+        }
+
+        private static bool SearchUpwardsInTree6(ASTNode node)
+        {
+            //finds out if node is inside [] or {}
+            ASTNode tmp = node;
+            string rv = null;
+            while (tmp != null)
+            {
+                if (tmp.Text == "ASTCURLY" || tmp.Text == "ASTDOTORINDEXER") return true;
                 tmp = tmp.Parent;
             }
             return false;
