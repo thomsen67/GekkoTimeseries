@@ -50,7 +50,7 @@ namespace Gekko
 
         public static bool testFileChange = true;
 
-        //public static bool megaHackFix = true;
+        public static bool smartLabels = true;
 
         public static string extensionPlot = "gpt";
         public static string extensionCommand = "gcm";        

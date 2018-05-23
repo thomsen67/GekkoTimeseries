@@ -2274,15 +2274,23 @@ namespace Gekko
 
             IVariable rv = x.Indexer(smpl, indexes);
             return rv;
+        }        
 
-        }
-
-        public static IVariable ReportInterior(GekkoSmpl smpl, IVariable x)
+        public static IVariable ReportInterior(GekkoSmpl smpl, IVariable x, int i, bool active)
         {
-            if (smpl.labelHelper == null) smpl.labelHelper = new List<IVariable>();
-            smpl.labelHelper.Add(x);
+            if (Globals.smartLabels && active)
+            {                
+                smpl.labelHelper.Add(x);
+            }
             return x;
         }
+        public static void AddLabelHelper(GekkoSmpl smpl)
+        {
+            List<IVariable> temp = new List<IVariable>();
+            temp.AddRange(smpl.labelHelper);
+            smpl.labelHelper2.Add(temp);
+        }
+
 
         public static IVariable IndexerPlus(GekkoSmpl smpl, IVariable x, bool isLhs, IVariable y)
         {

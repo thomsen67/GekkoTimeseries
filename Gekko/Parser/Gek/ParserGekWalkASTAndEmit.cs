@@ -1190,7 +1190,7 @@ namespace Gekko.Parser.Gek
                             if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent))
                             {
                                 //only for PRT-type or DISP, and only if the {} is not inside [] or {}.
-                                node.Code.CA(Globals.reportInterior1 + s + Globals.reportInterior2);
+                                node.Code.CA(Globals.reportInterior1 + s + ", " + "0" + Globals.reportInterior2);
                             }
                             else
                             {
@@ -2794,6 +2794,7 @@ namespace Gekko.Parser.Gek
                             //LIGHTFIXME, isRhs
 
                             string indexes = null;
+                            string indexesReport = null;
                             for (int i = 0; i < node[1].ChildrenCount(); i++)
                             {
                                 ASTNode child = node[1][i];
@@ -2841,19 +2842,19 @@ namespace Gekko.Parser.Gek
                                     if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent))
                                     {
                                         //only for PRT-type or DISP, and only if the [] is not inside [] or {}.
-                                        indexes += Globals.reportInterior1 + s + Globals.reportInterior2;
+                                        indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
                                     }
-                                    else
-                                    {
-                                        indexes += s;
-                                    }
+                                    
+                                    indexes += s;  //always done as fallback
+                                    
 
                                     if (i < node[1].ChildrenCount() - 1) indexes += ", ";
                                 }
                             }
                             if (ivTempVar == null)
                             {
-                                node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexes + "), smpl, " + node[0].Code + ", " + indexes + ")");
+                                if (indexesReport == null) indexesReport = indexes;
+                                node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexes + "), smpl, " + node[0].Code + ", " + indexesReport + ")");
                             }
                             else
                             {
