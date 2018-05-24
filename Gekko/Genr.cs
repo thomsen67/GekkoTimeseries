@@ -7,7 +7,8 @@ using Gekko.Parser;
 namespace Gekko
 {
     public class TranslatedCode
-    {
+    {        
+
         public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
         public static readonly ScalarVal i111 = new ScalarVal(3d);
         public static readonly ScalarVal i113 = new ScalarVal(1d);
@@ -172,22 +173,16 @@ namespace Gekko
                 Series temp147 = new Series(ESeriesType.Normal, Program.options.freq, null); temp147.SetZero(smpl);
 
                 //lbl
-                bool lblFirst = true;
+                int lblCounter = -1;
 
                 foreach (IVariable listloop_k146 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("k")))), null, false, EVariableType.Var)))
                 {
-                    //lbl
-                    smpl.labelHelper.Clear();
-
-                    temp147.InjectAdd(smpl, temp147, O.Indexer(O.Indexer2(smpl, listloop_m144, listloop_n145, listloop_k146), smpl, O.Lookup(smpl, null, null, "x", null, null, false, EVariableType.Var), O.ReportInterior(smpl, listloop_m144, 0, lblFirst), O.ReportInterior(smpl, listloop_n145, 1, lblFirst), O.ReportInterior(smpl, listloop_k146, 2, lblFirst)));
 
                     //lbl
-                    if (lblFirst)
-                    {
-                        O.AddLabelHelper(smpl);
-                        lblFirst = false;
-                    }
+                    lblCounter++;
                     
+                    temp147.InjectAdd(smpl, temp147, O.Indexer(O.Indexer2(smpl, listloop_m144, listloop_n145, listloop_k146), smpl, O.Lookup(smpl, null, null, "x", null, null, false, EVariableType.Var), O.ReportInterior(smpl, listloop_m144, 0, lblCounter == 0), O.ReportInterior(smpl, listloop_n145, 1, lblCounter == 0), O.ReportInterior(smpl, listloop_k146, 2, lblCounter == 0)));
+                                        
                 }
                 smpl.command = smplCommandRemember149;
                 return temp147;
@@ -202,17 +197,16 @@ namespace Gekko
                 List temp150 = new List();
 
                 //lbl
-                List<List<IVariable>> lblTemp1 = new List<List<IVariable>>();                                
+                int lblCounter = 0;
 
                 foreach (IVariable listloop_m144 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("m")))), null, false, EVariableType.Var)))
                 {
                     foreach (IVariable listloop_n145 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("n")))), null, false, EVariableType.Var)))
                     {
                         //lbl
-                        smpl.labelHelper.Clear();
-                        bool lblFirst = true;  //record them all
+                        smpl.labelHelper.Clear();  //such loops are always the outermost, so we clear and record afterwards.                        
 
-                        temp150.Add(O.Add(smpl, O.Add(smpl, O.Indexer(O.Indexer2(smpl, listloop_m144), smpl, O.Lookup(smpl, null, null, "x1", null, null, false, EVariableType.Var), O.ReportInterior(smpl, listloop_m144, 0, lblFirst)), O.Indexer(O.Indexer2(smpl, listloop_n145), smpl, O.Lookup(smpl, null, null, "x2", null, null, false, EVariableType.Var), O.ReportInterior(smpl, listloop_n145, 0, lblFirst))), func148(listloop_m144, listloop_n145)));
+                        temp150.Add(O.Add(smpl, O.Add(smpl, O.Indexer(O.Indexer2(smpl, listloop_m144), smpl, O.Lookup(smpl, null, null, "x1", null, null, false, EVariableType.Var), O.ReportInterior(smpl, listloop_m144, 0, lblCounter == 0)), O.Indexer(O.Indexer2(smpl, listloop_n145), smpl, O.Lookup(smpl, null, null, "x2", null, null, false, EVariableType.Var), O.ReportInterior(smpl, listloop_n145, 0, lblCounter == 0))), func148(listloop_m144, listloop_n145)));
 
                         //lbl
                         O.AddLabelHelper(smpl);
@@ -256,7 +250,10 @@ namespace Gekko
 
                 o20.counter = 4;
                 o20.printCsCounter = Globals.printCs.Count - 1;
-                o20.labelHelper = smpl.labelHelper;
+
+                //lbl
+                o20.labelHelper2 = smpl.labelHelper2;
+
                 o20.Exe();
                 return o20.emfName;
             };
