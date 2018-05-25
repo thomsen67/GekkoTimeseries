@@ -1212,14 +1212,14 @@ namespace Gekko
                 //Ctrl-C
                 //See also #98075243587
                 string s = Clipboard.GetText(TextDataFormat.Text);
-                List<TokenHelper> ths = StringTokenizer2.GetTokensWithLeftBlanks(s, 10);
+                TokensHelper ths = StringTokenizer2.GetTokensWithLeftBlanks(s, 10);
                 List<string> x = new List<string>();
                 x.Add("disp");
                 x.Add("disp2");
                 x.Add("disp3");
                 x.Add("help");
                 x.Add("stacktrace");
-                for (int i = 0; i < ths.Count; i++)
+                for (int i = 0; i < ths.storage.Count; i++)
                 {
                     if (ths[i].s == "#" && ths[i + 1].leftblanks == null && x.Contains(ths[i + 1].s.ToLower()) && ths[i + 2].leftblanks == null && ths[i + 2].s == ":")
                     {
@@ -1230,7 +1230,7 @@ namespace Gekko
                     }
                 }
                 string ss = null;
-                foreach (TokenHelper th in ths)
+                foreach (TokenHelper th in ths.storage)
                 {
                     ss += th.leftblanks;
                     ss += th.s;

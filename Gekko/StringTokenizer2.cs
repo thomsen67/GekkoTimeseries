@@ -19,6 +19,36 @@ using System.Text;
 
 namespace Gekko
 {
+    public class TokensHelper
+    {
+        public TokensHelper(List<TokenHelper> x)
+        {
+            this.storage = x;
+        }
+
+        public List<TokenHelper> storage = new List<TokenHelper>();
+
+        public TokenHelper this[int index]
+        {
+
+            // The get accessor.
+            get
+            {
+                return this.storage[index];
+            }
+        }
+
+        public override string ToString()
+        {
+            string s = null;
+            foreach (TokenHelper th in this.storage)
+            {
+                s += th.ToString();
+            }
+            return s;
+        }
+    }
+
     public class TokenHelper
     {
         public string s = null;
@@ -28,7 +58,7 @@ namespace Gekko
         public int column = -12345;
         //below is advanced (recursive) stuff
         public string subnodesType = null;  // "(", "[" or "{".
-        public List<TokenHelper> subnodes = null;
+        public TokensHelper subnodes = null;
 
         public override string ToString()
         {
@@ -40,7 +70,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
                 string ss = null;
-                foreach (TokenHelper tha in subnodes)
+                foreach (TokenHelper tha in subnodes.storage)
                 {
                     ss += tha.ToString();
                 }
@@ -49,13 +79,13 @@ namespace Gekko
             else return leftblanks + s;
         }
 
-        public static List<List<TokenHelper>> SplitCommas(List<TokenHelper> ths)
+        public static List<List<TokenHelper>> SplitCommas(TokensHelper ths)
         {
             //Splits up in bits, depending on commas. For instance [1, 2] is split in 1 and 2. But [1, [2, 3]] is split in 1 and [2, 3].
             //Only splits for { and [.
             List<List<TokenHelper>> temp = new List<List<TokenHelper>>();
             List<TokenHelper> temp2 = new List<TokenHelper>();
-            for (int i = 0 + 1; i < ths.Count - 1; i++)  //omit the parentheses
+            for (int i = 0 + 1; i < ths.storage.Count - 1; i++)  //omit the parentheses
             {
                 if (ths[i].s == ",")
                 {
@@ -72,9 +102,9 @@ namespace Gekko
         }
 
 
-        public static void Print(List<TokenHelper> x, int level)
+        public static void Print(TokensHelper x, int level)
         {
-            foreach (TokenHelper th in x)
+            foreach (TokenHelper th in x.storage)
             {
                 if (th.subnodes != null)
                 {
@@ -96,21 +126,21 @@ namespace Gekko
     /// StringTokenizer tokenized string (or stream) into tokens.
     /// </summary>
     public class StringTokenizer2
-	{
-		const char EOF = (char)0;
+    {
+        const char EOF = (char)0;
 
-		int line;
-		int column;
-		int pos;	// position within data
+        int line;
+        int column;
+        int pos;    // position within data
 
-		string data;
+        string data;
 
-		bool ignoreWhiteSpace;
-		char[] symbolChars;
+        bool ignoreWhiteSpace;
+        char[] symbolChars;
 
-		int saveLine;
-		int saveCol;
-		int savePos;
+        int saveLine;
+        int saveCol;
+        int savePos;
 
         bool specialLoopSignsAcceptedAsWords;
         bool treatQuotesAsUnknown;
@@ -121,43 +151,43 @@ namespace Gekko
         public List<string> commentsNonClosedOnlyStartOfLine = new List<string>();  //only at start of line, for instance * in GAMS
 
         public StringTokenizer2(TextReader reader, bool specialLoopSignsAcceptedAsWords, bool treatQuotesAsUnknown)
-		{            
+        {
             this.specialLoopSignsAcceptedAsWords = specialLoopSignsAcceptedAsWords;
             this.treatQuotesAsUnknown = treatQuotesAsUnknown;
             if (reader == null)
-				throw new ArgumentNullException("reader");
-			data = reader.ReadToEnd();
-			Reset();
-		}
+                throw new ArgumentNullException("reader");
+            data = reader.ReadToEnd();
+            Reset();
+        }
 
-		public StringTokenizer2(string data, bool specialLoopSignsAcceptedAsWords, bool treatQuotesAsUnknown)
-		{
+        public StringTokenizer2(string data, bool specialLoopSignsAcceptedAsWords, bool treatQuotesAsUnknown)
+        {
             this.specialLoopSignsAcceptedAsWords = specialLoopSignsAcceptedAsWords;
             this.treatQuotesAsUnknown = treatQuotesAsUnknown;
             if (data == null)
-				throw new ArgumentNullException("data");
-			this.data = data;
-			Reset();
-		}
+                throw new ArgumentNullException("data");
+            this.data = data;
+            Reset();
+        }
 
-		/// <summary>
-		/// gets or sets which characters are part of TokenKind.Symbol
-		/// </summary>
-		public char[] SymbolChars
-		{
-			get { return this.symbolChars; }
-			set { this.symbolChars = value; }
-		}
+        /// <summary>
+        /// gets or sets which characters are part of TokenKind.Symbol
+        /// </summary>
+        public char[] SymbolChars
+        {
+            get { return this.symbolChars; }
+            set { this.symbolChars = value; }
+        }
 
-		/// <summary>
-		/// if set to true, white space characters will be ignored,
-		/// but EOL and whitespace inside of string will still be tokenized
-		/// </summary>
-		public bool IgnoreWhiteSpace
-		{
-			get { return this.ignoreWhiteSpace; }
-			set { this.ignoreWhiteSpace = value; }
-		}
+        /// <summary>
+        /// if set to true, white space characters will be ignored,
+        /// but EOL and whitespace inside of string will still be tokenized
+        /// </summary>
+        public bool IgnoreWhiteSpace
+        {
+            get { return this.ignoreWhiteSpace; }
+            set { this.ignoreWhiteSpace = value; }
+        }
 
         private void Reset()
         {
@@ -168,32 +198,32 @@ namespace Gekko
             pos = 0;
         }
 
-		protected char LA(int count)
-		{
-			if (pos + count < 0 || pos + count >= data.Length)
-				return EOF;
-			else
-				return data[pos+count];
-		}
+        protected char LA(int count)
+        {
+            if (pos + count < 0 || pos + count >= data.Length)
+                return EOF;
+            else
+                return data[pos + count];
+        }
 
-		protected char Consume()
-		{
-			char ret = data[pos];
-			pos++;
-			column++;
-			return ret;
-		}
+        protected char Consume()
+        {
+            char ret = data[pos];
+            pos++;
+            column++;
+            return ret;
+        }
 
-		protected Token CreateToken(TokenKind kind, string value)
-		{
-			return new Token(kind, value, line, column);
-		}
+        protected Token CreateToken(TokenKind kind, string value)
+        {
+            return new Token(kind, value, line, column);
+        }
 
-		protected Token CreateToken(TokenKind kind)
-		{
-			string tokenData = data.Substring(savePos, pos-savePos);
-			return new Token(kind, tokenData, saveLine, saveCol);
-		}
+        protected Token CreateToken(TokenKind kind)
+        {
+            string tokenData = data.Substring(savePos, pos - savePos);
+            return new Token(kind, tokenData, saveLine, saveCol);
+        }
 
         public bool MatchString(string s)
         {
@@ -205,7 +235,7 @@ namespace Gekko
         }
 
         public Token Next()
-		{
+        {
             ReadToken:
             char ch = LA(0);
             //if (ch == '\x0000') ch = '\x0001';
@@ -252,65 +282,65 @@ namespace Gekko
             }
 
             switch (ch)
-			{
-				case EOF:
-					return CreateToken(TokenKind.EOF, string.Empty);
+            {
+                case EOF:
+                    return CreateToken(TokenKind.EOF, string.Empty);
 
-				case ' ':
-				case '\t':
-				{
-					if (this.ignoreWhiteSpace)
-					{
-						Consume();
-						goto ReadToken;
-					}
-					else
-						return ReadWhitespace();
-				}
-				case '0':
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-				case '6':
-				case '7':
-				case '8':
-				case '9':
-					return ReadNumber(false);                
+                case ' ':
+                case '\t':
+                    {
+                        if (this.ignoreWhiteSpace)
+                        {
+                            Consume();
+                            goto ReadToken;
+                        }
+                        else
+                            return ReadWhitespace();
+                    }
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    return ReadNumber(false);
 
-				case '\r':
-				{
-					StartRead();
-					Consume();
-					if (LA(0) == '\n')
-						Consume();	// on DOS/Windows we have \r\n for new line
-					line++;
-					column=1;
-					return CreateToken(TokenKind.EOL);
-				}
-				case '\n':
-				{
-					StartRead();
-					Consume();
-					line++;
-					column=1;					
-					return CreateToken(TokenKind.EOL);
-				}
-
-				case '"':
-				{
-                    if (treatQuotesAsUnknown)
-                    {                        
+                case '\r':
+                    {
                         StartRead();
                         Consume();
-                        return CreateToken(TokenKind.Unknown);
+                        if (LA(0) == '\n')
+                            Consume();  // on DOS/Windows we have \r\n for new line
+                        line++;
+                        column = 1;
+                        return CreateToken(TokenKind.EOL);
                     }
-                    else
+                case '\n':
                     {
-                        return ReadString();
+                        StartRead();
+                        Consume();
+                        line++;
+                        column = 1;
+                        return CreateToken(TokenKind.EOL);
                     }
-				}
+
+                case '"':
+                    {
+                        if (treatQuotesAsUnknown)
+                        {
+                            StartRead();
+                            Consume();
+                            return CreateToken(TokenKind.Unknown);
+                        }
+                        else
+                        {
+                            return ReadString();
+                        }
+                    }
 
                 case '\'':
                     {
@@ -327,99 +357,99 @@ namespace Gekko
                     }
 
                 default:
-				{
-                    if (ch == '.')
                     {
-                        //Code added by TT
-                        //In order to read .1234 as 0.1234
-                        char ch1 = LA(1);
-                        if (ch1 == '0' || ch1 == '1' || ch1 == '2' || ch1 == '3' || ch1 == '4' || ch1 == '5' || ch1 == '6' || ch1 == '7' || ch1 == '8' || ch1 == '9')
+                        if (ch == '.')
                         {
-                            //we have a "." followed by a digit
-                            return ReadNumber(true);
+                            //Code added by TT
+                            //In order to read .1234 as 0.1234
+                            char ch1 = LA(1);
+                            if (ch1 == '0' || ch1 == '1' || ch1 == '2' || ch1 == '3' || ch1 == '4' || ch1 == '5' || ch1 == '6' || ch1 == '7' || ch1 == '8' || ch1 == '9')
+                            {
+                                //we have a "." followed by a digit
+                                return ReadNumber(true);
+                            }
+                        }
+
+                        if (Char.IsLetter(ch) || ch == '_'
+                            || (this.specialLoopSignsAcceptedAsWords == true && (ch == '#' || ch == '|'))) //TT added this
+                            return ReadWord();
+                        else if (IsSymbol(ch))
+                        {
+                            StartRead();
+                            Consume();
+                            return CreateToken(TokenKind.Symbol);
+                        }
+                        else
+                        {
+                            StartRead();
+                            Consume();
+                            return CreateToken(TokenKind.Unknown);
                         }
                     }
 
-                    if (Char.IsLetter(ch) || ch == '_' 
-                        || (this.specialLoopSignsAcceptedAsWords == true && (ch == '#' || ch == '|'))) //TT added this
-						return ReadWord();
-					else if (IsSymbol(ch))
-					{
-						StartRead();
-						Consume();
-						return CreateToken(TokenKind.Symbol);
-					}
-					else
-					{
-						StartRead();
-						Consume();
-						return CreateToken(TokenKind.Unknown);						
-					}
-				}
+            }
+        }
 
-			}
-		}
+        /// <summary>
+        /// save read point positions so that CreateToken can use those
+        /// </summary>
+        private void StartRead()
+        {
+            saveLine = line;
+            saveCol = column;
+            savePos = pos;
+        }
 
-		/// <summary>
-		/// save read point positions so that CreateToken can use those
-		/// </summary>
-		private void StartRead()
-		{
-			saveLine = line;
-			saveCol = column;
-			savePos = pos;
-		}
+        /// <summary>
+        /// reads all whitespace characters (does not include newline)
+        /// </summary>
+        /// <returns></returns>
+        protected Token ReadWhitespace()
+        {
+            StartRead();
 
-		/// <summary>
-		/// reads all whitespace characters (does not include newline)
-		/// </summary>
-		/// <returns></returns>
-		protected Token ReadWhitespace()
-		{
-			StartRead();
+            Consume(); // consume the looked-ahead whitespace char
 
-			Consume(); // consume the looked-ahead whitespace char
+            while (true)
+            {
+                char ch = LA(0);
+                if (ch == '\t' || ch == ' ')
+                    Consume();
+                else
+                    break;
+            }
 
-			while (true)
-			{
-				char ch = LA(0);
-				if (ch == '\t' || ch == ' ')
-					Consume();
-				else
-					break;
-			}
+            return CreateToken(TokenKind.WhiteSpace);
 
-			return CreateToken(TokenKind.WhiteSpace);
-			
-		}
+        }
 
-		/// <summary>
-		/// reads number. Number is: DIGIT+ ("." DIGIT*)?
-		/// </summary>
-		/// <returns></returns>
-		protected Token ReadNumber(bool hadDot)
-		{
-			StartRead();
-            
+        /// <summary>
+        /// reads number. Number is: DIGIT+ ("." DIGIT*)?
+        /// </summary>
+        /// <returns></returns>
+        protected Token ReadNumber(bool hadDot)
+        {
+            StartRead();
+
             //hadDot introduced as method argument by TT
-			//bool hadDot = false;
+            //bool hadDot = false;
 
             Boolean hadExponent = false;
             Boolean hadPlusMinus = false;
 
             Consume(); // read first digit
 
-			while (true)
-			{
-               
+            while (true)
+            {
+
                 char ch = LA(0);
-				if (Char.IsDigit(ch))
-					Consume();
-				else if (ch == '.' && !hadDot)
-				{
-					hadDot = true;
-					Consume();
-				}
+                if (Char.IsDigit(ch))
+                    Consume();
+                else if (ch == '.' && !hadDot)
+                {
+                    hadDot = true;
+                    Consume();
+                }
                 else if ((ch == 'e' || ch == 'E' || ch == 'd' || ch == 'D') && !hadExponent)  //Code (d/D) added by TT
                 {
                     hadExponent = true;
@@ -432,34 +462,34 @@ namespace Gekko
                 }
                 else
                     break;
-			}
+            }
 
-			return CreateToken(TokenKind.Number);
-		}
+            return CreateToken(TokenKind.Number);
+        }
 
-		/// <summary>
-		/// reads word. Word contains any alpha character or _
-		/// </summary>
-		protected Token ReadWord()
-		{
-			StartRead();
+        /// <summary>
+        /// reads word. Word contains any alpha character or _
+        /// </summary>
+        protected Token ReadWord()
+        {
+            StartRead();
 
-			Consume(); // consume first character of the word
+            Consume(); // consume first character of the word
 
-			while (true)
-			{
-				char ch = LA(0);
-				if (Char.IsLetter(ch) || ch == '_'
+            while (true)
+            {
+                char ch = LA(0);
+                if (Char.IsLetter(ch) || ch == '_'
                     || Char.IsDigit(ch)               //TT added this, in order to allow variable names like Cp4xh1
                     || (this.specialLoopSignsAcceptedAsWords == true && (ch == '#' || ch == '|'))  //TT added this
                     )
-					Consume();
-				else
-					break;
-			}
+                    Consume();
+                else
+                    break;
+            }
 
-			return CreateToken(TokenKind.Word);
-		}
+            return CreateToken(TokenKind.Word);
+        }
 
         /// <summary>
 		/// reads all characters until next " is found.
@@ -510,7 +540,7 @@ namespace Gekko
 		/// </summary>
 		/// <returns></returns>
 		protected Token ReadCommentClosed(Tuple<string, string> tags)
-        {            
+        {
             StartRead();
             for (int i = 0; i < tags.Item1.Length; i++)
             {
@@ -543,7 +573,7 @@ namespace Gekko
                     for (int i = 0; i < tags.Item1.Length; i++)
                     {
                         Consume(); // consume tag, for instance '/*'
-                    }                    
+                    }
                     //we are continuing from here
                 }
                 else if (MatchString(tags.Item2))
@@ -557,7 +587,7 @@ namespace Gekko
                     if (nestingLevel == 0)
                     {
                         break;
-                    }                    
+                    }
                 }
                 else
                 {
@@ -573,12 +603,12 @@ namespace Gekko
 		/// </summary>
 		/// <returns></returns>
 		protected Token ReadCommentNonClosed(string tag)
-        {            
+        {
             StartRead();
             for (int i = 0; i < tag.Length; i++)
             {
                 Consume(); // consume tag, for instance '//'
-            }            
+            }
             while (true)
             {
                 char ch = LA(0);
@@ -599,7 +629,7 @@ namespace Gekko
                     //line++;
                     //column = 1;
                     break;
-                }                
+                }
                 else
                 {
                     Consume();
@@ -615,65 +645,65 @@ namespace Gekko
         /// </summary>
         /// <returns></returns>
         protected Token ReadStringSingleQuotes()
-		{
-			StartRead();
-			Consume(); // read '
-			while (true)
-			{
-				char ch = LA(0);
-				if (ch == EOF)
-					break;
-				else if (ch == '\r')	// handle CR in strings
-				{
-					Consume();
-					if (LA(0) == '\n')	// for DOS & windows
-						Consume();
-					line++;
-					column = 1;
-				}
-				else if (ch == '\n')	// new line in quoted string
-				{
-					Consume();
-					line++;
-					column = 1;
-				}
-				else if (ch == '\'')
-				{
-					Consume();
-					if (LA(0) != '\'')
-						break;	// done reading, and this quotes does not have escape character
-					else
-						Consume(); // consume second ", because first was just an escape
-				}
-				else
-					Consume();
-			}
-			return CreateToken(TokenKind.QuotedString);
-		}
+        {
+            StartRead();
+            Consume(); // read '
+            while (true)
+            {
+                char ch = LA(0);
+                if (ch == EOF)
+                    break;
+                else if (ch == '\r')    // handle CR in strings
+                {
+                    Consume();
+                    if (LA(0) == '\n')  // for DOS & windows
+                        Consume();
+                    line++;
+                    column = 1;
+                }
+                else if (ch == '\n')    // new line in quoted string
+                {
+                    Consume();
+                    line++;
+                    column = 1;
+                }
+                else if (ch == '\'')
+                {
+                    Consume();
+                    if (LA(0) != '\'')
+                        break;  // done reading, and this quotes does not have escape character
+                    else
+                        Consume(); // consume second ", because first was just an escape
+                }
+                else
+                    Consume();
+            }
+            return CreateToken(TokenKind.QuotedString);
+        }
 
-		/// <summary>
-		/// checks whether c is a symbol character.
-		/// </summary>
-		protected bool IsSymbol(char c)
-		{
-			for (int i=0; i<symbolChars.Length; i++)
-				if (symbolChars[i] == c)
-					return true;
+        /// <summary>
+        /// checks whether c is a symbol character.
+        /// </summary>
+        protected bool IsSymbol(char c)
+        {
+            for (int i = 0; i < symbolChars.Length; i++)
+                if (symbolChars[i] == c)
+                    return true;
 
-			return false;
-		}
+            return false;
+        }
 
-        public static List<TokenHelper> GetTokensWithLeftBlanks(string s)
+        public static TokensHelper GetTokensWithLeftBlanks(string s)
         {
             return GetTokensWithLeftBlanks(s, 0);
         }
 
-        public static List<TokenHelper> GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd)
+        public static TokensHelper GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd)
         {
             return GetTokensWithLeftBlanks(s, emptyTokensAtEnd, null, null, null, null);
         }
 
-        public static List<TokenHelper> GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
+        public static TokensHelper GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
         {
             StringTokenizer2 tok = new StringTokenizer2(s, false, false);
             if (commentsClosed != null) tok.commentsClosed = commentsClosed;
@@ -711,43 +741,44 @@ namespace Gekko
 
             } while (token.Kind != TokenKind.EOF);
             for (int i = 0; i < emptyTokensAtEnd; i++) a.Add(new TokenHelper());
-            return a;
+            return new TokensHelper(a);
         }
 
-        public static List<TokenHelper> GetTokensWithLeftBlanksRecursive(string textInputRaw)
+        public static TokensHelper GetTokensWithLeftBlanksRecursive(string textInputRaw)
         {
             return GetTokensWithLeftBlanksRecursive(textInputRaw, null, null, null, null);
         }
 
-        public static List<TokenHelper> GetTokensWithLeftBlanksRecursive(string textInputRaw, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
+        public static TokensHelper GetTokensWithLeftBlanksRecursive(string textInputRaw, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
         {
             int i = 0;
-            List<TokenHelper> tokens = GetTokensWithLeftBlanks(textInputRaw, 0, commentsClosed, commentsNonClosed, commentsClosedOnlyStartOfLine, commentsNonClosedOnlyStartOfLine);
-            List<TokenHelper> tokens2 = GetTokensWithLeftBlanksRecursiveHelper(tokens, ref i, null);
+            TokensHelper tokens = GetTokensWithLeftBlanks(textInputRaw, 0, commentsClosed, commentsNonClosed, commentsClosedOnlyStartOfLine, commentsNonClosedOnlyStartOfLine);
+            TokensHelper tokens2 = GetTokensWithLeftBlanksRecursiveHelper(tokens, ref i, null);
             return tokens2;
-        }
+        } 
 
-        public static List<TokenHelper> GetTokensWithLeftBlanksRecursiveHelper(List<TokenHelper> input, ref int startI, TokenHelper startparen)
+        public static TokensHelper GetTokensWithLeftBlanksRecursiveHelper(TokensHelper input, ref int startI, TokenHelper startparen)
         {
+            //List<TokenHelper> input = input2.storage;
             List<TokenHelper> output = new List<TokenHelper>();
             //if (first != null) output.Add(first);  //a left parenthesis      
             string endparen = null;
             if (startparen != null)
             {
                 Globals.parentheses.TryGetValue(startparen.s, out endparen);
-                output.Add(input[startI - 1]);  //add the left parenthesis here
+                output.Add(input.storage[startI - 1]);  //add the left parenthesis here
             }
-            for (int i = startI; i < input.Count; i++)
+            for (int i = startI; i < input.storage.Count; i++)
             {
                 if (Globals.parentheses.ContainsKey(input[i].s))
                 {
                     //found a new left parenthesis                          
                     startI = i + 1;
-                    List<TokenHelper> sub = GetTokensWithLeftBlanksRecursiveHelper(input, ref startI, input[i]);
+                    TokensHelper sub = GetTokensWithLeftBlanksRecursiveHelper(input, ref startI, input[i]);
                     //sub.Add(input[startI]);
                     TokenHelper temp = new TokenHelper();
                     temp.subnodes = sub;
-                    temp.subnodesType = input[i].s;
+                    temp.subnodesType = input.storage[i].s;
                     output.Add(temp);
                     i = startI;
                 }
@@ -755,12 +786,12 @@ namespace Gekko
                 {
                     //got to the end
                     startI = i;
-                    output.Add(input[i]);  //add the right parenthesis here
-                    return output;
+                    output.Add(input.storage[i]);  //add the right parenthesis here                    
+                    return new TokensHelper(output);
                 }
                 else
                 {
-                    if (Globals.parenthesesInvert.ContainsKey(input[i].s))
+                    if (Globals.parenthesesInvert.ContainsKey(input.storage[i].s))
                     {
                         G.Writeln2("*** ERROR: The '" + input[i].s + "' parenthesis at line " + input[i].line + " pos " + input[i].column + " does not have a corresponding '" + Globals.parenthesesInvert[input[i].s] + "'");
                         throw new GekkoException();
@@ -773,7 +804,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: The '" + startparen.s + "' parenthesis at line " + startparen.line + " pos " + startparen.column + " does not have a corresponding '" + endparen + "'");
                 throw new GekkoException();
             }
-            return output;
+            return new TokensHelper(output);
         }
 
     }
