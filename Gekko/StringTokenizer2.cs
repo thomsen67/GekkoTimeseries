@@ -48,6 +48,48 @@ namespace Gekko
             }
             else return leftblanks + s;
         }
+
+        public static List<List<TokenHelper>> SplitCommas(List<TokenHelper> ths)
+        {
+            //Splits up in bits, depending on commas. For instance [1, 2] is split in 1 and 2. But [1, [2, 3]] is split in 1 and [2, 3].
+            //Only splits for { and [.
+            List<List<TokenHelper>> temp = new List<List<TokenHelper>>();
+            List<TokenHelper> temp2 = new List<TokenHelper>();
+            for (int i = 0 + 1; i < ths.Count - 1; i++)  //omit the parentheses
+            {
+                if (ths[i].s == ",")
+                {
+                    temp.Add(temp2);
+                    temp2 = new List<TokenHelper>();
+                }
+                else
+                {
+                    temp2.Add(ths[i]);
+                }                
+            }
+            temp.Add(temp2);
+            return temp;
+        }
+
+
+        public static void Print(List<TokenHelper> x, int level)
+        {
+            foreach (TokenHelper th in x)
+            {
+                if (th.subnodes != null)
+                {
+                    Print(th.subnodes, level + 1);
+                }
+                else
+                {
+                    int b = 0;
+                    if (th.leftblanks != null) b = th.leftblanks.Length;
+                    string bb = null;
+                    if (b > 0) bb = " [lb " + b.ToString() + "]";
+                    G.Writeln(G.Blanks(2 * level) + th.ToString() + "                    " + th.type.ToString() + bb);
+                }
+            }
+        }
     }
 
     /// <summary>

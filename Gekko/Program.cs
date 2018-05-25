@@ -15809,9 +15809,7 @@ namespace Gekko
 
         private static void ReadGamsModel(string textInputRaw)
         {
-
-            string txt = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "model.gms");
-            int i = 0;            
+            string txt = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "model.gms");                  
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
             var tags2 = new List<string>() { "//" };
             var tags3 = new List<Tuple<string, string>>() { new Tuple<string, string>("$ontext", "$offtext") };
@@ -25988,10 +25986,172 @@ namespace Gekko
             }
         }
 
-        private static void UnfoldLabels(string elementLabel, ref string label, ref List<string> labels2, List<List<IVariable>>labelHelper2)
+        public static void HandleLabels(List<TokenHelper> x, int level, List<IVariable> list, string[] freelists, ref int counter)
+        {
+            foreach (TokenHelper th in x)
+            {
+                if (th.subnodes != null)
+                {
+                    if (th.subnodesType == "[" || th.subnodesType == "{")
+                    {
+                        List<List<TokenHelper>> temp = TokenHelper.SplitCommas(th.subnodes);
+                        foreach (List<TokenHelper> temp2 in temp)  //does not include start and end parenthesis
+                        {
+                            counter++;
+                            if (temp2.Count == 2 && temp2[0].s == Globals.symbolCollection.ToString() && temp2[1].type == TokenKind.Word)
+                            {
+                                //We have a simple #x as this argument
+                                if (freelists.Contains(temp2[1].s, StringComparer.OrdinalIgnoreCase))
+                                {
+                                    //a free list has its string value put in
+                                    IVariable iv = list[counter];
+                                    if (iv.Type() == EVariableType.String)
+                                    {
+                                        string iv_string = O.ConvertToString(iv);
+                                        temp2[0].s = iv_string;
+                                        temp2[0].type = TokenKind.Word;
+                                        temp2[0].subnodes = null;
+                                        for (int ii = 1; ii < temp2.Count; ii++)
+                                        {
+                                            temp2[ii].s = null;
+                                            temp2[ii].type = TokenKind.Unknown;
+                                            temp2[ii].subnodes = null;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    //this is a bounded list, like sum(#i, x[#i]).
+                                    //in that case, we just keep the #i.
+                                }
+                            }
+                            else
+                            {
+                                //it is not a simple #x
+                                IVariable iv = list[counter];
+                                if (iv.Type() == EVariableType.String || iv.Type() == EVariableType.Date || iv.Type() == EVariableType.Val)
+                                {
+                                    string iv_string = iv.ToString();
+                                    temp2[0].s = iv_string;
+                                    temp2[0].type = TokenKind.Word;
+                                    temp2[0].subnodes = null;
+                                    for (int ii = 1; ii < temp2.Count; ii++)
+                                    {
+                                        temp2[ii].s = null;
+                                        temp2[ii].type = TokenKind.Unknown;
+                                        temp2[ii].subnodes = null;
+                                    }
+                                }
+
+                            }
+                            
+                        }
+                        
+                    }
+                    else
+                    {
+                        //The list only contains index values at the uppermost nesting level of [] or {} parentheses.
+                        //But we handle sub-nests regarding ()-parentheses.
+                        HandleLabels(th.subnodes, level + 1, list, freelists, ref counter);
+                    }
+                }
+                else
+                {
+                    //s += th.leftblanks + th.s;
+                }
+            }
+            
+        }
+
+        
+        private static void UnfoldLabels(string elementLabel, ref string label, ref List<string> labels2, List<List<IVariable>> labelHelper2)
         {
             if (Globals.smartLabels)
             {
+                /*
+                 * For instance p x1[#m]+x2[#n]+sum(#k,x[#m,#n,#k]);   
+                 * Here freelists will be 'm' and 'n'.
+                 * If these are a,b and x,y we get labelHelper2 like this:
+                 * 
+                 * a x a x e
+                 * a y a y e
+                 * b x b x e
+                 * b y b y e
+                 * 
+                 * labelHelper2 only records inside [] or {} at the top level (not nested)
+                 * 
+                 * The tokens are like this:                 
+                 */
+                //               
+                /*
+                  
+                x1 
+                  [
+                   #                    
+                   m                    
+                  ]                    
+                + 
+                 x2 
+                   [
+                   #                    
+                   n                    
+                   ]                    
+                 + 
+                 sum 
+                   (
+                   #                    
+                   k                    
+                   , 
+                   x                    
+                     [
+                     #                    
+                     m                    
+                     , 
+                     #                    
+                     n                    
+                     , 
+                     #                    
+                     k                    
+                     ]                    
+                   )                    
+                     EOF
+                     */
+
+                //So we walk the tokens, inserting from labelHelper2. Here, only STRING/DATE/VAL from labelHelper2are accepted, with 
+                //one exception: if the token is a #x AND the token is not in freelists, we keep the '#x' and not the string from
+                //labelHelper2. For instance: sum(#x, x[#x, #y, %s]). Here %s string is set in (easy). Also, the string in the
+                //place of #y is set in, because 'y' is in freelists. Regarding #x, it is kept as it is.
+
+                string[] ss = elementLabel.Split(new string[] { "|||" }, StringSplitOptions.RemoveEmptyEntries);
+                string rawLabel = ss[1];
+                string[] freelists = ss[0].Split(new string[] { "," }, StringSplitOptions.None);
+                for (int i = 0; i < freelists.Length; i++)
+                {
+                    freelists[i] = freelists[i].Trim();  //there may be a blank
+                }
+
+                //after this, free (uncontrolled) lists are in freelists, and rawLabel is the label.
+
+                var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };  //can in principle have such comments                         
+                List<TokenHelper> tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(rawLabel, tags1, null, null, null);
+
+                if (true && Globals.runningOnTTComputer)
+                {
+                    TokenHelper.Print(tokens2, 0);
+                }
+
+                List<string> s2 = new List<string>();
+                foreach (List<IVariable> list in labelHelper2)
+                {
+
+                    int counter = -1;                    
+                    HandleLabels(tokens2, 0, list, freelists, ref counter);                    
+                    string s = null;
+                    foreach (TokenHelper th in tokens2) s += th.ToString();
+                    s2.Add(s);
+                }
+                labels2 = s2;
+
 
             }
             else

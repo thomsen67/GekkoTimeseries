@@ -1190,7 +1190,7 @@ namespace Gekko.Parser.Gek
                             if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent))
                             {
                                 //only for PRT-type or DISP, and only if the {} is not inside [] or {}.
-                                node.Code.CA(Globals.reportInterior1 + s + ", " + "0" + Globals.reportInterior2);
+                                node.Code.CA(Globals.reportInterior1 + s + ", " + "0" + Globals.reportInterior2 + ", " + Globals.labelCounter);
                             }
                             else
                             {
@@ -2161,6 +2161,8 @@ namespace Gekko.Parser.Gek
                                     sb1.AppendLine("List " + tempName + " = new List();" + G.NL);
                                 }
 
+                                sb1.AppendLine("int " + Globals.labelCounter + " = 0;");
+
                                 foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                 {
                                     string listname = Globals.symbolCollection + kvp.Key;  //add a # to the list ident, this is the way they are stored in node.functionDefAnchor
@@ -2170,18 +2172,22 @@ namespace Gekko.Parser.Gek
                                     if (s == null)
                                     {
                                         s = "O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ")))), null, false, EVariableType.Var)";  //false is regarding isLeftSide
-                                    }                                    
-
+                                    }
+                                                                        
                                     sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(" + s + ")) {");
                                 }
 
                                 if (G.Equal(functionNameLower, "sum"))
                                 {
                                     sb1.AppendLine(tempName + ".InjectAdd(smpl, " + tempName + ", " + node[2].Code.ToString() + ");" + G.NL);
+                                    sb1.AppendLine(Globals.labelCounter + "++;"); //not done for unfold. This means that only first item in loop(s) is recorded.
                                 }
                                 else
                                 {
+                                    //unfold
+                                    sb1.AppendLine("O.ClearLabelHelper(smpl);"); //such loops are always the outermost, so we clear and record afterwards.
                                     sb1.AppendLine(tempName + ".Add(" + node[2].Code.ToString() + ");" + G.NL);
+                                    sb1.AppendLine("O.AddLabelHelper(smpl);");
                                 }
 
                                 foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
@@ -2731,7 +2737,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 node.Code.A("o" + Num(node) + ".printCsCounter = Globals.printCs.Count - 1;" + G.NL);
 
-                                node.Code.A("o" + Num(node) + ".labelHelper = smpl.labelHelper;" + G.NL);
+                                node.Code.A("o" + Num(node) + ".labelHelper2 = smpl.labelHelper2;" + G.NL);
 
                                 node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
 
@@ -2842,13 +2848,16 @@ namespace Gekko.Parser.Gek
                                     if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent))
                                     {
                                         //only for PRT-type or DISP, and only if the [] is not inside [] or {}.
-                                        indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
+                                        indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
                                     }
                                     
-                                    indexes += s;  //always done as fallback
-                                    
+                                    indexes += s;  //always done as fallback                                    
 
-                                    if (i < node[1].ChildrenCount() - 1) indexes += ", ";
+                                    if (i < node[1].ChildrenCount() - 1)
+                                    {
+                                        indexes += ", ";
+                                        indexesReport += ", ";
+                                    }
                                 }
                             }
                             if (ivTempVar == null)

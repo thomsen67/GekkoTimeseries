@@ -7,36 +7,33 @@ using Gekko.Parser;
 namespace Gekko
 {
     public class TranslatedCode
-    {        
-
+    {
         public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
-        public static readonly ScalarVal i111 = new ScalarVal(3d);
-        public static readonly ScalarVal i113 = new ScalarVal(1d);
-        public static readonly ScalarVal i115 = new ScalarVal(2d);
-        public static readonly ScalarVal i117 = new ScalarVal(11d);
-        public static readonly ScalarVal i119 = new ScalarVal(12d);
-        public static readonly ScalarVal i121 = new ScalarVal(51d);
-        public static readonly ScalarVal i123 = new ScalarVal(52d);
-        public static readonly ScalarVal i125 = new ScalarVal(511d);
-        public static readonly ScalarVal i127 = new ScalarVal(512d);
-        public static readonly ScalarVal i129 = new ScalarVal(1d);
-        public static readonly ScalarVal i131 = new ScalarVal(1d);
-        public static readonly ScalarVal i133 = new ScalarVal(1d);
-        public static readonly ScalarVal i135 = new ScalarVal(1d);
-        public static readonly ScalarVal i137 = new ScalarVal(1d);
-        public static readonly ScalarVal i139 = new ScalarVal(1d);
-        public static readonly ScalarVal i141 = new ScalarVal(1d);
-        public static readonly ScalarVal i143 = new ScalarVal(2d);
-        public static readonly ScalarVal i154 = new ScalarVal(1d);
-        public static readonly ScalarVal i156 = new ScalarVal(1d);
-        public static readonly ScalarVal i158 = new ScalarVal(1d);
-        public static readonly ScalarVal i163 = new ScalarVal(1d);
-        public static readonly ScalarVal i165 = new ScalarVal(2d);
-        public static void ClearTS(P p)
-        {
+        public static readonly ScalarVal i5 = new ScalarVal(3d);
+        public static readonly ScalarVal i7 = new ScalarVal(1d);
+        public static readonly ScalarVal i9 = new ScalarVal(2d);
+        public static readonly ScalarVal i11 = new ScalarVal(11d);
+        public static readonly ScalarVal i13 = new ScalarVal(12d);
+        public static readonly ScalarVal i15 = new ScalarVal(51d);
+        public static readonly ScalarVal i17 = new ScalarVal(52d);
+        public static readonly ScalarVal i19 = new ScalarVal(511d);
+        public static readonly ScalarVal i21 = new ScalarVal(512d);
+        public static readonly ScalarVal i23 = new ScalarVal(1d);
+        public static readonly ScalarVal i25 = new ScalarVal(1d);
+        public static readonly ScalarVal i27 = new ScalarVal(1d);
+        public static readonly ScalarVal i29 = new ScalarVal(1d);
+        public static readonly ScalarVal i31 = new ScalarVal(1d);
+        public static readonly ScalarVal i33 = new ScalarVal(1d);
+        public static readonly ScalarVal i35 = new ScalarVal(1d);
+        public static readonly ScalarVal i37 = new ScalarVal(2d);
+        public static readonly ScalarVal i48 = new ScalarVal(1d);
+        public static readonly ScalarVal i50 = new ScalarVal(1d);
+        public static readonly ScalarVal i52 = new ScalarVal(1d);
+        public static readonly ScalarVal i57 = new ScalarVal(1d);
+        public static readonly ScalarVal i59 = new ScalarVal(2d);
+        public static void ClearTS(P p) {
         }
-        public static void ClearScalar(P p)
-        {
+        public static void ClearScalar(P p) {
         }
 
         public static void CodeLines(P p)
@@ -46,182 +43,161 @@ namespace Gekko
             //[[splitSTART]]
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar107 = O.IvConvertTo(EVariableType.Var, O.ListDefHelper(new ScalarString(ScalarString.SubstituteScalarsInString(@"a", true, false)), new ScalarString(ScalarString.SubstituteScalarsInString(@"b", true, false))));
-            O.Lookup(smpl, null, null, "#m", null, ivTmpvar107, true, EVariableType.Var)
+            IVariable ivTmpvar1 = O.IvConvertTo(EVariableType.Var, O.ListDefHelper(new ScalarString(ScalarString.SubstituteScalarsInString(@"a", true, false)), new ScalarString(ScalarString.SubstituteScalarsInString(@"b", true, false))));
+            O.Lookup(smpl, null, null, "#m", null, ivTmpvar1, true, EVariableType.Var)
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar108 = O.IvConvertTo(EVariableType.Var, O.ListDefHelper(new ScalarString(ScalarString.SubstituteScalarsInString(@"x", true, false)), new ScalarString(ScalarString.SubstituteScalarsInString(@"y", true, false))));
-            O.Lookup(smpl, null, null, "#n", null, ivTmpvar108, true, EVariableType.Var)
+            IVariable ivTmpvar2 = O.IvConvertTo(EVariableType.Var, O.ListDefHelper(new ScalarString(ScalarString.SubstituteScalarsInString(@"x", true, false)), new ScalarString(ScalarString.SubstituteScalarsInString(@"y", true, false))));
+            O.Lookup(smpl, null, null, "#n", null, ivTmpvar2, true, EVariableType.Var)
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar109 = O.IvConvertTo(EVariableType.Var, O.ListDefHelper(new ScalarString(ScalarString.SubstituteScalarsInString(@"e", true, false)), new ScalarString(ScalarString.SubstituteScalarsInString(@"f", true, false))));
-            O.Lookup(smpl, null, null, "#k", null, ivTmpvar109, true, EVariableType.Var)
+            IVariable ivTmpvar3 = O.IvConvertTo(EVariableType.Var, O.ListDefHelper(new ScalarString(ScalarString.SubstituteScalarsInString(@"e", true, false)), new ScalarString(ScalarString.SubstituteScalarsInString(@"f", true, false))));
+            O.Lookup(smpl, null, null, "#k", null, ivTmpvar3, true, EVariableType.Var)
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar110 = O.IvConvertTo(EVariableType.Var, Functions.series(smpl, i111));
-            O.Lookup(smpl, null, null, "x", null, ivTmpvar110, true, EVariableType.Var)
+            IVariable ivTmpvar4 = O.IvConvertTo(EVariableType.Var, Functions.series(smpl, i5));
+            O.Lookup(smpl, null, null, "x", null, ivTmpvar4, true, EVariableType.Var)
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar112 = O.IvConvertTo(EVariableType.Var, i113);
-            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, true, EVariableType.Var), ivTmpvar112, new ScalarString("a"), new ScalarString("x"), new ScalarString("e"))
+            IVariable ivTmpvar6 = O.IvConvertTo(EVariableType.Var, i7);
+            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, true, EVariableType.Var), ivTmpvar6, new ScalarString("a"), new ScalarString("x"), new ScalarString("e"))
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar114 = O.IvConvertTo(EVariableType.Var, i115);
-            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, true, EVariableType.Var), ivTmpvar114, new ScalarString("b"), new ScalarString("x"), new ScalarString("e"))
+            IVariable ivTmpvar8 = O.IvConvertTo(EVariableType.Var, i9);
+            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, true, EVariableType.Var), ivTmpvar8, new ScalarString("b"), new ScalarString("x"), new ScalarString("e"))
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar116 = O.IvConvertTo(EVariableType.Var, i117);
-            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, true, EVariableType.Var), ivTmpvar116, new ScalarString("a"), new ScalarString("y"), new ScalarString("e"))
+            IVariable ivTmpvar10 = O.IvConvertTo(EVariableType.Var, i11);
+            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, true, EVariableType.Var), ivTmpvar10, new ScalarString("a"), new ScalarString("y"), new ScalarString("e"))
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar118 = O.IvConvertTo(EVariableType.Var, i119);
-            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, true, EVariableType.Var), ivTmpvar118, new ScalarString("b"), new ScalarString("y"), new ScalarString("e"))
+            IVariable ivTmpvar12 = O.IvConvertTo(EVariableType.Var, i13);
+            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, true, EVariableType.Var), ivTmpvar12, new ScalarString("b"), new ScalarString("y"), new ScalarString("e"))
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar120 = O.IvConvertTo(EVariableType.Var, i121);
-            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, true, EVariableType.Var), ivTmpvar120, new ScalarString("a"), new ScalarString("x"), new ScalarString("f"))
+            IVariable ivTmpvar14 = O.IvConvertTo(EVariableType.Var, i15);
+            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, true, EVariableType.Var), ivTmpvar14, new ScalarString("a"), new ScalarString("x"), new ScalarString("f"))
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar122 = O.IvConvertTo(EVariableType.Var, i123);
-            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, true, EVariableType.Var), ivTmpvar122, new ScalarString("b"), new ScalarString("x"), new ScalarString("f"))
+            IVariable ivTmpvar16 = O.IvConvertTo(EVariableType.Var, i17);
+            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, true, EVariableType.Var), ivTmpvar16, new ScalarString("b"), new ScalarString("x"), new ScalarString("f"))
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar124 = O.IvConvertTo(EVariableType.Var, i125);
-            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, true, EVariableType.Var), ivTmpvar124, new ScalarString("a"), new ScalarString("y"), new ScalarString("f"))
+            IVariable ivTmpvar18 = O.IvConvertTo(EVariableType.Var, i19);
+            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, true, EVariableType.Var), ivTmpvar18, new ScalarString("a"), new ScalarString("y"), new ScalarString("f"))
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar126 = O.IvConvertTo(EVariableType.Var, i127);
-            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, true, EVariableType.Var), ivTmpvar126, new ScalarString("b"), new ScalarString("y"), new ScalarString("f"))
+            IVariable ivTmpvar20 = O.IvConvertTo(EVariableType.Var, i21);
+            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, true, EVariableType.Var), ivTmpvar20, new ScalarString("b"), new ScalarString("y"), new ScalarString("f"))
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar128 = O.IvConvertTo(EVariableType.Var, Functions.series(smpl, i129));
-            O.Lookup(smpl, null, null, "x1", null, ivTmpvar128, true, EVariableType.Var)
+            IVariable ivTmpvar22 = O.IvConvertTo(EVariableType.Var, Functions.series(smpl, i23));
+            O.Lookup(smpl, null, null, "x1", null, ivTmpvar22, true, EVariableType.Var)
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar130 = O.IvConvertTo(EVariableType.Var, Functions.series(smpl, i131));
-            O.Lookup(smpl, null, null, "x2", null, ivTmpvar130, true, EVariableType.Var)
+            IVariable ivTmpvar24 = O.IvConvertTo(EVariableType.Var, Functions.series(smpl, i25));
+            O.Lookup(smpl, null, null, "x2", null, ivTmpvar24, true, EVariableType.Var)
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar132 = O.IvConvertTo(EVariableType.Var, i133);
-            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x1", null, null, true, EVariableType.Var), ivTmpvar132, new ScalarString("a"))
+            IVariable ivTmpvar26 = O.IvConvertTo(EVariableType.Var, i27);
+            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x1", null, null, true, EVariableType.Var), ivTmpvar26, new ScalarString("a"))
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar134 = O.IvConvertTo(EVariableType.Var, i135);
-            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x1", null, null, true, EVariableType.Var), ivTmpvar134, new ScalarString("b"))
+            IVariable ivTmpvar28 = O.IvConvertTo(EVariableType.Var, i29);
+            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x1", null, null, true, EVariableType.Var), ivTmpvar28, new ScalarString("b"))
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar136 = O.IvConvertTo(EVariableType.Var, i137);
-            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x2", null, null, true, EVariableType.Var), ivTmpvar136, new ScalarString("x"))
+            IVariable ivTmpvar30 = O.IvConvertTo(EVariableType.Var, i31);
+            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x2", null, null, true, EVariableType.Var), ivTmpvar30, new ScalarString("x"))
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar138 = O.IvConvertTo(EVariableType.Var, i139);
-            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x2", null, null, true, EVariableType.Var), ivTmpvar138, new ScalarString("y"))
+            IVariable ivTmpvar32 = O.IvConvertTo(EVariableType.Var, i33);
+            O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x2", null, null, true, EVariableType.Var), ivTmpvar32, new ScalarString("y"))
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar140 = O.IvConvertTo(EVariableType.Var, i141);
-            O.Lookup(smpl, null, null, "xa", null, ivTmpvar140, true, EVariableType.Var)
+            IVariable ivTmpvar34 = O.IvConvertTo(EVariableType.Var, i35);
+            O.Lookup(smpl, null, null, "xa", null, ivTmpvar34, true, EVariableType.Var)
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar142 = O.IvConvertTo(EVariableType.Var, i143);
-            O.Lookup(smpl, null, null, "xb", null, ivTmpvar142, true, EVariableType.Var)
+            IVariable ivTmpvar36 = O.IvConvertTo(EVariableType.Var, i37);
+            O.Lookup(smpl, null, null, "xb", null, ivTmpvar36, true, EVariableType.Var)
             ;
 
             p.SetText(@"¤23"); O.InitSmpl(smpl, p);
-            Func<IVariable, IVariable, IVariable> func148 = (IVariable listloop_m144, IVariable listloop_n145) =>
-            {
-                //SUM FUNCTION
+            Func<IVariable, IVariable, IVariable> func42 = (IVariable listloop_m38, IVariable listloop_n39) => {
+                var smplCommandRemember43 = smpl.command; smpl.command = GekkoSmplCommand.Sum;
+                Series temp41 = new Series(ESeriesType.Normal, Program.options.freq, null); temp41.SetZero(smpl);
 
-                var smplCommandRemember149 = smpl.command; smpl.command = GekkoSmplCommand.Sum;
-                Series temp147 = new Series(ESeriesType.Normal, Program.options.freq, null); temp147.SetZero(smpl);
+                int labelCounter = 0;
+                foreach (IVariable listloop_k40 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("k")))), null, false, EVariableType.Var))) {
+                    //temp41.InjectAdd(smpl, temp41, O.Indexer(O.Indexer2(smpl, listloop_m38, listloop_n39, listloop_k40), smpl, O.Lookup(smpl, null, null, "x", null, null, false, EVariableType.Var), O.ReportInterior(smpl, listloop_m38, 0, labelCounter)O.ReportInterior(smpl, listloop_n39, 1, labelCounter)O.ReportInterior(smpl, listloop_k40, 2, labelCounter)));
 
-                //lbl
-                int lblCounter = -1;
-
-                foreach (IVariable listloop_k146 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("k")))), null, false, EVariableType.Var)))
-                {
-
-                    //lbl
-                    lblCounter++;
-                    
-                    temp147.InjectAdd(smpl, temp147, O.Indexer(O.Indexer2(smpl, listloop_m144, listloop_n145, listloop_k146), smpl, O.Lookup(smpl, null, null, "x", null, null, false, EVariableType.Var), O.ReportInterior(smpl, listloop_m144, 0, lblCounter == 0), O.ReportInterior(smpl, listloop_n145, 1, lblCounter == 0), O.ReportInterior(smpl, listloop_k146, 2, lblCounter == 0)));
-                                        
+                    labelCounter++;
                 }
-                smpl.command = smplCommandRemember149;
-                return temp147;
+                smpl.command = smplCommandRemember43;
+                return temp41;
 
             };
 
-            Func<IVariable> func151 = () =>
-            {
-                //UNFOLD FUNCTION, always outermost
+            Func<IVariable> func45 = () => {
+                var smplCommandRemember46 = smpl.command; smpl.command = GekkoSmplCommand.Unfold;
+                List temp44 = new List();
 
-                var smplCommandRemember152 = smpl.command; smpl.command = GekkoSmplCommand.Unfold;
-                List temp150 = new List();
+                int labelCounter = 0;
+                foreach (IVariable listloop_m38 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("m")))), null, false, EVariableType.Var))) {
+                    foreach (IVariable listloop_n39 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("n")))), null, false, EVariableType.Var))) {
+                        O.ClearLabelHelper(smpl);
+                        temp44.Add(O.Add(smpl, O.Add(smpl, O.Indexer(O.Indexer2(smpl, listloop_m38), smpl, O.Lookup(smpl, null, null, "x1", null, null, false, EVariableType.Var), O.ReportInterior(smpl, listloop_m38, 0, labelCounter)), O.Indexer(O.Indexer2(smpl, listloop_n39), smpl, O.Lookup(smpl, null, null, "x2", null, null, false, EVariableType.Var), O.ReportInterior(smpl, listloop_n39, 0, labelCounter))), func42(listloop_m38, listloop_n39)));
 
-                //lbl
-                int lblCounter = 0;
-
-                foreach (IVariable listloop_m144 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("m")))), null, false, EVariableType.Var)))
-                {
-                    foreach (IVariable listloop_n145 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("n")))), null, false, EVariableType.Var)))
-                    {
-                        //lbl
-                        smpl.labelHelper.Clear();  //such loops are always the outermost, so we clear and record afterwards.                        
-
-                        temp150.Add(O.Add(smpl, O.Add(smpl, O.Indexer(O.Indexer2(smpl, listloop_m144), smpl, O.Lookup(smpl, null, null, "x1", null, null, false, EVariableType.Var), O.ReportInterior(smpl, listloop_m144, 0, lblCounter == 0)), O.Indexer(O.Indexer2(smpl, listloop_n145), smpl, O.Lookup(smpl, null, null, "x2", null, null, false, EVariableType.Var), O.ReportInterior(smpl, listloop_n145, 0, lblCounter == 0))), func148(listloop_m144, listloop_n145)));
-
-                        //lbl
                         O.AddLabelHelper(smpl);
                     }
                 }
-                smpl.command = smplCommandRemember152;
-                return temp150;
+                smpl.command = smplCommandRemember46;
+                return temp44;
 
             };
 
 
             Func<GraphHelper, string> print20 = (gh) =>
             {
-                //PRT FUNCTION
-
                 O.Prt o20 = new O.Prt();
                 o20.guiGraphIsRefreshing = gh.isRefreshing;
                 o20.guiGraphPrintCode = gh.printCode;
@@ -233,27 +209,18 @@ namespace Gekko
                     O.Prt.Element ope20 = new O.Prt.Element();
                     ope20.label = O.SubstituteScalarsAndLists("|||m, n|||x1[#m]+x2[#n]+sum(#k,x[#m,#n,#k])", false);
                     smpl = new GekkoSmpl(o20.t1.Add(-2), o20.t2);
-                    ope20.printCodesFinal = Program.GetElementPrintCodes(o20, ope20); bankNumbers = O.Prt.GetBankNumbers(null, ope20.printCodesFinal); foreach (int bankNumber in bankNumbers)
-                    {
+                    ope20.printCodesFinal = Program.GetElementPrintCodes(o20, ope20); bankNumbers = O.Prt.GetBankNumbers(null, ope20.printCodesFinal); foreach (int bankNumber in bankNumbers) {
                         smpl.bankNumber = bankNumber;
-
-                        //lbl
-                        smpl.labelHelper2.Clear();
-                        smpl.labelHelper.Clear();
-
-                        ope20.variable[bankNumber] = func151();
+                        ope20.variable[bankNumber] = func45();
                     }
                     smpl.bankNumber = 0;
                     o20.prtElements.Add(ope20);
                 }
 
 
-                o20.counter = 4;
+                o20.counter = 1;
                 o20.printCsCounter = Globals.printCs.Count - 1;
-
-                //lbl
                 o20.labelHelper2 = smpl.labelHelper2;
-
                 o20.Exe();
                 return o20.emfName;
             };
@@ -262,50 +229,50 @@ namespace Gekko
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar153 = O.IvConvertTo(EVariableType.Var, i154);
-            O.Lookup(smpl, null, null, "a", null, ivTmpvar153, true, EVariableType.Var)
+            IVariable ivTmpvar47 = O.IvConvertTo(EVariableType.Var, i48);
+            O.Lookup(smpl, null, null, "a", null, ivTmpvar47, true, EVariableType.Var)
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar155 = O.IvConvertTo(EVariableType.Var, i156);
-            O.Lookup(smpl, null, null, "b", null, ivTmpvar155, true, EVariableType.Var)
+            IVariable ivTmpvar49 = O.IvConvertTo(EVariableType.Var, i50);
+            O.Lookup(smpl, null, null, "b", null, ivTmpvar49, true, EVariableType.Var)
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar157 = O.IvConvertTo(EVariableType.Var, i158);
-            O.Lookup(smpl, null, null, "c", null, ivTmpvar157, true, EVariableType.Var)
+            IVariable ivTmpvar51 = O.IvConvertTo(EVariableType.Var, i52);
+            O.Lookup(smpl, null, null, "c", null, ivTmpvar51, true, EVariableType.Var)
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar159 = O.IvConvertTo(EVariableType.Var, new ScalarString(ScalarString.SubstituteScalarsInString(@"a", true, false)));
-            O.Lookup(smpl, null, null, "%s", null, ivTmpvar159, true, EVariableType.Var)
+            IVariable ivTmpvar53 = O.IvConvertTo(EVariableType.Var, new ScalarString(ScalarString.SubstituteScalarsInString(@"a", true, false)));
+            O.Lookup(smpl, null, null, "%s", null, ivTmpvar53, true, EVariableType.Var)
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar160 = O.IvConvertTo(EVariableType.Var, new ScalarString(ScalarString.SubstituteScalarsInString(@"e", true, false)));
-            O.Lookup(smpl, null, null, "%b", null, ivTmpvar160, true, EVariableType.Var)
+            IVariable ivTmpvar54 = O.IvConvertTo(EVariableType.Var, new ScalarString(ScalarString.SubstituteScalarsInString(@"e", true, false)));
+            O.Lookup(smpl, null, null, "%b", null, ivTmpvar54, true, EVariableType.Var)
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar161 = O.IvConvertTo(EVariableType.Var, new ScalarString(ScalarString.SubstituteScalarsInString(@"f", true, false)));
-            O.Lookup(smpl, null, null, "%e", null, ivTmpvar161, true, EVariableType.Var)
+            IVariable ivTmpvar55 = O.IvConvertTo(EVariableType.Var, new ScalarString(ScalarString.SubstituteScalarsInString(@"f", true, false)));
+            O.Lookup(smpl, null, null, "%e", null, ivTmpvar55, true, EVariableType.Var)
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar162 = O.IvConvertTo(EVariableType.Var, i163);
-            O.Lookup(smpl, null, null, "a", null, ivTmpvar162, true, EVariableType.Var)
+            IVariable ivTmpvar56 = O.IvConvertTo(EVariableType.Var, i57);
+            O.Lookup(smpl, null, null, "a", null, ivTmpvar56, true, EVariableType.Var)
             ;
 
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            IVariable ivTmpvar164 = O.IvConvertTo(EVariableType.Var, i165);
-            O.Lookup(smpl, null, null, "af", null, ivTmpvar164, true, EVariableType.Var)
+            IVariable ivTmpvar58 = O.IvConvertTo(EVariableType.Var, i59);
+            O.Lookup(smpl, null, null, "af", null, ivTmpvar58, true, EVariableType.Var)
             ;
 
             p.SetText(@"¤44"); O.InitSmpl(smpl, p);
@@ -318,7 +285,5 @@ namespace Gekko
 
 
         }
-
-        
     }
 }

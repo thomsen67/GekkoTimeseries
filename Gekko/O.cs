@@ -674,6 +674,10 @@ namespace Gekko
             return rv;
         }
 
+        public static void ClearLabelHelper(GekkoSmpl smpl)
+        {
+            smpl.labelHelper.Clear();
+        }
 
         public static bool ContinueIterating(double i, double max, double step) {
             if (step > 0)
@@ -2276,9 +2280,9 @@ namespace Gekko
             return rv;
         }        
 
-        public static IVariable ReportInterior(GekkoSmpl smpl, IVariable x, int i, bool active)
+        public static IVariable ReportInterior(GekkoSmpl smpl, IVariable x, int i, int loopNumber)
         {
-            if (Globals.smartLabels && active)
+            if (Globals.smartLabels && loopNumber == 0)
             {                
                 smpl.labelHelper.Add(x);
             }
