@@ -1190,7 +1190,7 @@ namespace Gekko.Parser.Gek
                             if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent))
                             {
                                 //only for PRT-type or DISP, and only if the {} is not inside [] or {}.
-                                node.Code.CA(Globals.reportInterior1 + s + ", " + "0" + Globals.reportInterior2 + ", " + Globals.labelCounter);
+                                node.Code.CA(Globals.reportInterior1 + s + ", " + "0" + ", " + Globals.labelCounter + Globals.reportInterior2);
                             }
                             else
                             {

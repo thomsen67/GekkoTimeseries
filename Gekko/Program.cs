@@ -24747,14 +24747,14 @@ namespace Gekko
                 if (xx0 != null) n = xx0.list.Count;
                 else if (xx1 != null) n = xx1.list.Count;
 
-                string label = null;
+                //string label = null;
                 List<string> labels2 = new List<string>();
 
                 // ---------------------------------------------------------------------
                 // --------------- unfold labels start ---------------------------------
                 // ---------------------------------------------------------------------
 
-                if(unfoldLabels) UnfoldLabels(element.label, ref label, ref labels2, o.labelHelper2);  //unfolding over #m1 and #m2 etc.                
+                if(unfoldLabels) UnfoldLabels(element.label, ref labels2, o.labelHelper2);  //unfolding over #m1 and #m2 etc.                
 
                 // ---------------------------------------------------------------------
                 // --------------- unfold labels end -----------------------------------
@@ -24914,7 +24914,8 @@ namespace Gekko
                         }
                         else
                         {
-                            lbl = label;
+                            //lbl = labels2[0];
+                            lbl = element.label;
                         }
 
                         int lines = -12345;
@@ -26065,7 +26066,7 @@ namespace Gekko
         }
 
         
-        private static void UnfoldLabels(string elementLabel, ref string label, ref List<string> labels2, List<List<IVariable>> labelHelper2)
+        private static void UnfoldLabels(string elementLabel, ref List<string> labels2, List<List<IVariable>> labelHelper2)
         {
             if (Globals.smartLabels)
             {
