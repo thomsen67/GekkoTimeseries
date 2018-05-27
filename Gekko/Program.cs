@@ -26123,12 +26123,18 @@ namespace Gekko
                 //labelHelper2. For instance: sum(#x, x[#x, #y, %s]). Here %s string is set in (easy). Also, the string in the
                 //place of #y is set in, because 'y' is in freelists. Regarding #x, it is kept as it is.
 
+                string[] freelists = new string[0];
+                string rawLabel = elementLabel;
                 string[] ss = elementLabel.Split(new string[] { "|||" }, StringSplitOptions.RemoveEmptyEntries);
-                string rawLabel = ss[1];
-                string[] freelists = ss[0].Split(new string[] { "," }, StringSplitOptions.None);
-                for (int i = 0; i < freelists.Length; i++)
+
+                if (ss.Length > 1)
                 {
-                    freelists[i] = freelists[i].Trim();  //there may be a blank
+                    rawLabel = ss[1];
+                    freelists = ss[0].Split(new string[] { "," }, StringSplitOptions.None);
+                    for (int i = 0; i < freelists.Length; i++)
+                    {
+                        freelists[i] = freelists[i].Trim();  //there may be a blank
+                    }
                 }
 
                 //after this, free (uncontrolled) lists are in freelists, and rawLabel is the label.
@@ -26136,7 +26142,7 @@ namespace Gekko
                 var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };  //can in principle have such comments                         
                 TokensHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(rawLabel, tags1, null, null, null);
 
-                if (true && Globals.runningOnTTComputer)
+                if (false && Globals.runningOnTTComputer)
                 {
                     TokenHelper.Print(tokens2, 0);
                     //TokenHelper.Print(tokens2.DeepClone(), 0);
