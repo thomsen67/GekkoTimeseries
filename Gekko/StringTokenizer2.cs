@@ -21,13 +21,17 @@ namespace Gekko
 {
     public class TokensHelper
     {
+        public List<TokenHelper> storage = new List<TokenHelper>();
+
+        public TokensHelper()
+        {         
+        }
+
         public TokensHelper(List<TokenHelper> x)
         {
             this.storage = x;
         }
-
-        public List<TokenHelper> storage = new List<TokenHelper>();
-
+        
         public TokenHelper this[int index]
         {
 
@@ -36,6 +40,22 @@ namespace Gekko
             {
                 return this.storage[index];
             }
+        }
+
+        public TokensHelper DeepClone()
+        {
+            TokensHelper tsh = new TokensHelper();
+            if (this.storage != null)
+            {
+                List<TokenHelper> xx = new List<TokenHelper>();
+                foreach (TokenHelper th in this.storage)
+                {
+                    TokenHelper yy = th.DeepClone();
+                    xx.Add(yy);
+                }
+                tsh.storage = xx;
+            }
+            return tsh;
         }
 
         public override string ToString()
@@ -60,6 +80,19 @@ namespace Gekko
         public string subnodesType = null;  // "(", "[" or "{".
         public TokensHelper subnodes = null;
 
+        public TokenHelper DeepClone()
+        {
+            TokenHelper th = new TokenHelper();
+            th.s = this.s;
+            th.type = this.type;
+            th.leftblanks = this.leftblanks;
+            th.column = this.column;
+            th.subnodesType = this.subnodesType;
+            th.subnodes = this.subnodes;
+            if (th.subnodes != null) th.subnodes = this.subnodes.DeepClone();
+            return th;
+        }
+
         public override string ToString()
         {
             if (subnodes != null)
@@ -79,22 +112,22 @@ namespace Gekko
             else return leftblanks + s;
         }
 
-        public static List<List<TokenHelper>> SplitCommas(TokensHelper ths)
+        public static List<TokensHelper> SplitCommas(TokensHelper ths)
         {
             //Splits up in bits, depending on commas. For instance [1, 2] is split in 1 and 2. But [1, [2, 3]] is split in 1 and [2, 3].
             //Only splits for { and [.
-            List<List<TokenHelper>> temp = new List<List<TokenHelper>>();
-            List<TokenHelper> temp2 = new List<TokenHelper>();
+            List<TokensHelper> temp = new List<TokensHelper>();
+            TokensHelper temp2 = new TokensHelper();
             for (int i = 0 + 1; i < ths.storage.Count - 1; i++)  //omit the parentheses
             {
                 if (ths[i].s == ",")
                 {
                     temp.Add(temp2);
-                    temp2 = new List<TokenHelper>();
+                    temp2 = new TokensHelper();
                 }
                 else
                 {
-                    temp2.Add(ths[i]);
+                    temp2.storage.Add(ths[i]);
                 }                
             }
             temp.Add(temp2);

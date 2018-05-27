@@ -25994,11 +25994,11 @@ namespace Gekko
                 {
                     if (th.subnodesType == "[" || th.subnodesType == "{")
                     {
-                        List<List<TokenHelper>> temp = TokenHelper.SplitCommas(th.subnodes);
-                        foreach (List<TokenHelper> temp2 in temp)  //does not include start and end parenthesis
+                        List<TokensHelper> temp = TokenHelper.SplitCommas(th.subnodes);
+                        foreach (TokensHelper temp2 in temp)  //does not include start and end parenthesis
                         {
                             counter++;
-                            if (temp2.Count == 2 && temp2[0].s == Globals.symbolCollection.ToString() && temp2[1].type == TokenKind.Word)
+                            if (temp2.storage.Count == 2 && temp2[0].s == Globals.symbolCollection.ToString() && temp2[1].type == TokenKind.Word)
                             {
                                 //We have a simple #x as this argument
                                 if (freelists.Contains(temp2[1].s, StringComparer.OrdinalIgnoreCase))
@@ -26008,10 +26008,11 @@ namespace Gekko
                                     if (iv.Type() == EVariableType.String)
                                     {
                                         string iv_string = O.ConvertToString(iv);
+                                        
                                         temp2[0].s = iv_string;
                                         temp2[0].type = TokenKind.Word;
                                         temp2[0].subnodes = null;
-                                        for (int ii = 1; ii < temp2.Count; ii++)
+                                        for (int ii = 1; ii < temp2.storage.Count; ii++)
                                         {
                                             temp2[ii].s = null;
                                             temp2[ii].type = TokenKind.Unknown;
@@ -26031,11 +26032,11 @@ namespace Gekko
                                 IVariable iv = list[counter];
                                 if (iv.Type() == EVariableType.String || iv.Type() == EVariableType.Date || iv.Type() == EVariableType.Val)
                                 {
-                                    string iv_string = iv.ToString();
+                                    string iv_string = O.ConvertToString(iv);
                                     temp2[0].s = iv_string;
                                     temp2[0].type = TokenKind.Word;
                                     temp2[0].subnodes = null;
-                                    for (int ii = 1; ii < temp2.Count; ii++)
+                                    for (int ii = 1; ii < temp2.storage.Count; ii++)
                                     {
                                         temp2[ii].s = null;
                                         temp2[ii].type = TokenKind.Unknown;
@@ -26138,21 +26139,17 @@ namespace Gekko
                 if (true && Globals.runningOnTTComputer)
                 {
                     TokenHelper.Print(tokens2, 0);
-                }
+                    //TokenHelper.Print(tokens2.DeepClone(), 0);
+                }                
 
-                List<string> s2 = new List<string>();
+                labels2 = new List<string>();
                 foreach (List<IVariable> list in labelHelper2)
                 {
-
-                    int counter = -1;                    
-                    HandleLabels(tokens2, 0, list, freelists, ref counter);                    
-                    string s = null;
-                    foreach (TokenHelper th in tokens2.storage) s += th.ToString();
-                    s2.Add(s);
-                }
-                labels2 = s2;
-
-
+                    int counter = -1;
+                    TokensHelper temp = tokens2.DeepClone();                                                    
+                    HandleLabels(temp, 0, list, freelists, ref counter);  //the temp object is changed here, therefore it is cloned before.                            
+                    labels2.Add(temp.ToString());
+                }                
             }
             else
             {
