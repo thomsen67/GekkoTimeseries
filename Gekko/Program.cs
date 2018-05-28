@@ -26008,17 +26008,7 @@ namespace Gekko
                                     IVariable iv = list[counter];
                                     if (iv.Type() == EVariableType.String)
                                     {
-                                        string iv_string = O.ConvertToString(iv);
-
-                                        temp2[0].s = iv_string;
-                                        temp2[0].type = TokenKind.Word;
-                                        temp2[0].subnodes = null;
-                                        for (int ii = 1; ii < temp2.storage.Count; ii++)
-                                        {
-                                            temp2[ii].s = null;
-                                            temp2[ii].type = TokenKind.Unknown;
-                                            temp2[ii].subnodes = null;
-                                        }
+                                        HandleLabelsInsertIVariables(th, temp2, O.ConvertToString(iv));
                                     }
                                 }
                                 else
@@ -26032,23 +26022,8 @@ namespace Gekko
                                 //it is not a simple #x
                                 IVariable iv = list[counter];
                                 if (iv.Type() == EVariableType.String || iv.Type() == EVariableType.Date || iv.Type() == EVariableType.Val)
-                                {
-                                    string iv_string = O.ConvertToString(iv);
-                                    temp2[0].s = iv_string;
-                                    temp2[0].type = TokenKind.Word;
-                                    temp2[0].subnodes = null;
-                                    for (int ii = 1; ii < temp2.storage.Count; ii++)
-                                    {
-                                        temp2[ii].s = null;
-                                        temp2[ii].type = TokenKind.Unknown;
-                                        temp2[ii].subnodes = null;
-                                    }
-                                    if (th.subnodesType == "{")
-                                    {
-                                        //Removing the '{'and '}'
-                                        th.subnodes[0].s = null;
-                                        th.subnodes[th.subnodes.storage.Count - 1].s = null;
-                                    }
+                                {                                    
+                                    HandleLabelsInsertIVariables(th, temp2, O.ConvertToString(iv));
                                 }
                             }                                
                             
@@ -26070,7 +26045,25 @@ namespace Gekko
             
         }
 
-        
+        private static void HandleLabelsInsertIVariables(TokenHelper th, TokensHelper temp2, string iv_string)
+        {
+            temp2[0].s = iv_string;
+            temp2[0].type = TokenKind.Word;
+            temp2[0].subnodes = null;
+            for (int ii = 1; ii < temp2.storage.Count; ii++)
+            {
+                temp2[ii].s = null;
+                temp2[ii].type = TokenKind.Unknown;
+                temp2[ii].subnodes = null;
+            }
+            if (th.subnodesType == "{")
+            {
+                //Removing the '{'and '}'
+                th.subnodes[0].s = null;
+                th.subnodes[th.subnodes.storage.Count - 1].s = null;
+            }
+        }
+
         private static void UnfoldLabels(string elementLabel, ref List<string> labels2, List<List<IVariable>> labelHelper2)
         {
             if (Globals.smartLabels)

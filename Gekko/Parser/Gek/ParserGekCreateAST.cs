@@ -192,6 +192,7 @@ namespace Gekko.Parser.Gek
             s2.AppendLine("{");
 
             s2.AppendLine("public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;");
+            s2.AppendLine("public static int " + Globals.labelCounter + ";");
             s2.Append(wh2.headerCs);
 
             s2.AppendLine("public static void ClearTS(P p) {");
