@@ -26009,7 +26009,7 @@ namespace Gekko
                                     if (iv.Type() == EVariableType.String)
                                     {
                                         string iv_string = O.ConvertToString(iv);
-                                        
+
                                         temp2[0].s = iv_string;
                                         temp2[0].type = TokenKind.Word;
                                         temp2[0].subnodes = null;
@@ -26043,9 +26043,14 @@ namespace Gekko
                                         temp2[ii].type = TokenKind.Unknown;
                                         temp2[ii].subnodes = null;
                                     }
+                                    if (th.subnodesType == "{")
+                                    {
+                                        //Removing the '{'and '}'
+                                        th.subnodes[0].s = null;
+                                        th.subnodes[th.subnodes.storage.Count - 1].s = null;
+                                    }
                                 }
-
-                            }
+                            }                                
                             
                         }
                         

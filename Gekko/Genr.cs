@@ -26,7 +26,7 @@ namespace Gekko
             Func<GraphHelper, string> print0 = (gh) =>
             {
                 O.Prt o0 = new O.Prt();
-                o0.guiGraphIsRefreshing = gh.isRefreshing;
+                int labelCounter = 0; o0.guiGraphIsRefreshing = gh.isRefreshing;
                 o0.guiGraphPrintCode = gh.printCode;
                 o0.guiGraphIsLogTransform = gh.isLogTransform;
                 o0.prtType = "p";
@@ -39,15 +39,14 @@ namespace Gekko
                     ope0.printCodesFinal = Program.GetElementPrintCodes(o0, ope0); bankNumbers = O.Prt.GetBankNumbers(null, ope0.printCodesFinal); foreach (int bankNumber in bankNumbers)
                     {
                         smpl.bankNumber = bankNumber;
-            //ope0.variable[bankNumber] = O.Lookup(smpl, null, (O.ReportInterior(smpl, new ScalarString(ScalarString.SubstituteScalarsInString(@"xa", true, false)), 0), labelCounter), null, false, EVariableType.Var);
-        }
+                        ope0.variable[bankNumber] = O.Lookup(smpl, null, (O.ReportInterior(smpl, new ScalarString(ScalarString.SubstituteScalarsInString(@"xa", true, false)), 0, labelCounter)), null, false, EVariableType.Var);
+                    }
                     smpl.bankNumber = 0;
                     o0.prtElements.Add(ope0);
                 }
 
-            //O.Lookup(smpl, null, (O.ReportInterior(smpl, new ScalarString(ScalarString.SubstituteScalarsInString(@"xa", true, false)), 0), labelCounter), null, false, EVariableType.Var);
 
-            o0.counter = 3;
+                o0.counter = 1;
                 o0.printCsCounter = Globals.printCs.Count - 1;
                 o0.labelHelper2 = smpl.labelHelper2;
                 o0.Exe();

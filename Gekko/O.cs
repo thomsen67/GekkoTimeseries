@@ -2295,6 +2295,21 @@ namespace Gekko
             smpl.labelHelper2.Add(temp);
         }
 
+        public static List<List<IVariable>> AddLabelHelper2(GekkoSmpl smpl)
+        {
+            List<List<IVariable>> rv = null;
+            if(smpl.labelHelper2!=null && smpl.labelHelper2.Count>0)
+            {
+                rv = smpl.labelHelper2;
+            }
+            else
+            {
+                rv = new List<List<Gekko.IVariable>>();
+                rv.Add(smpl.labelHelper);
+            }
+            return rv;            
+        }
+
 
         public static IVariable IndexerPlus(GekkoSmpl smpl, IVariable x, bool isLhs, IVariable y)
         {

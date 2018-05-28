@@ -2159,9 +2159,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     sb1.AppendLine(GekkoSmplCommandHelper1(smplCommandNumber, "Unfold"));
                                     sb1.AppendLine("List " + tempName + " = new List();" + G.NL);
-                                }
-
-                                sb1.AppendLine("int " + Globals.labelCounter + " = 0;");
+                                }                                
 
                                 foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                 {
@@ -2717,7 +2715,9 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("{" + G.NL);  //start Action
 
                                 node.Code.A("O.Prt o" + Num(node) + " = new O.Prt();" + G.NL);
-                                
+
+                                node.Code.A("int " + Globals.labelCounter + " = 0;");
+
                                 node.Code.A("o" + Num(node) + ".guiGraphIsRefreshing = gh.isRefreshing;" + G.NL);
                                 node.Code.A("o" + Num(node) + ".guiGraphPrintCode = gh.printCode;" + G.NL); //printCode is from the Func<> call, is null if PLOT window buttons are not clicked
                                 node.Code.A("o" + Num(node) + ".guiGraphIsLogTransform = gh.isLogTransform;" + G.NL);
@@ -2737,7 +2737,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 node.Code.A("o" + Num(node) + ".printCsCounter = Globals.printCs.Count - 1;" + G.NL);
 
-                                node.Code.A("o" + Num(node) + ".labelHelper2 = smpl.labelHelper2;" + G.NL);
+                                node.Code.A("o" + Num(node) + ".labelHelper2 = O.AddLabelHelper2(smpl);" + G.NL);
 
                                 node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
 
@@ -4687,7 +4687,8 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTDISP":
                         {                            
-                            node.Code.A("O.Disp o" + Num(node) + " = new O.Disp();" + G.NL);                            
+                            node.Code.A("O.Disp o" + Num(node) + " = new O.Disp();" + G.NL);
+                            node.Code.A("int " + Globals.labelCounter + " = 0;");
                             node.Code.A(node[0].Code);  //dates
                                                         
                             node.Code.A("o" + Num(node) + ".iv = " + node[1].Code + ";" + G.NL);
