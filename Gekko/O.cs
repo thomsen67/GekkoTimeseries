@@ -62,6 +62,17 @@ namespace Gekko
             public List<HandleEndoHelper> helper = null;
         }
 
+        public class LabelHelperIVariable
+        {
+            public int index;
+            public IVariable iv;
+            public LabelHelperIVariable(int index, IVariable iv)
+            {
+                this.index = index;
+                this.iv = iv;
+            }
+        }
+
         public class HandleEndoHelper
         {
             public GekkoTimes local = null;
@@ -674,10 +685,7 @@ namespace Gekko
             return rv;
         }
 
-        public static void ClearLabelHelper(GekkoSmpl smpl)
-        {
-            smpl.labelHelper.Clear();
-        }
+       
 
         public static bool ContinueIterating(double i, double max, double step) {
             if (step > 0)
@@ -2284,27 +2292,33 @@ namespace Gekko
         {
             if (Globals.smartLabels && loopNumber == 0)
             {                
-                smpl.labelHelper.Add(x);
+                smpl.labelHelper.Add(new LabelHelperIVariable(i, x));
             }
             return x;
         }
+
+        public static void ClearLabelHelper(GekkoSmpl smpl)
+        {
+            smpl.labelHelper.Clear();
+        }
+
         public static void AddLabelHelper(GekkoSmpl smpl)
         {
-            List<IVariable> temp = new List<IVariable>();
+            List<LabelHelperIVariable> temp = new List<LabelHelperIVariable>();
             temp.AddRange(smpl.labelHelper);
             smpl.labelHelper2.Add(temp);
         }
 
-        public static List<List<IVariable>> AddLabelHelper2(GekkoSmpl smpl)
+        public static List<List<LabelHelperIVariable>> AddLabelHelper2(GekkoSmpl smpl)
         {
-            List<List<IVariable>> rv = null;
+            List<List<LabelHelperIVariable>> rv = null;
             if(smpl.labelHelper2!=null && smpl.labelHelper2.Count>0)
             {
                 rv = smpl.labelHelper2;
             }
             else
             {
-                rv = new List<List<Gekko.IVariable>>();
+                rv = new List<List<LabelHelperIVariable>>();
                 rv.Add(smpl.labelHelper);
             }
             return rv;            
@@ -6841,7 +6855,7 @@ namespace Gekko
             public string opt_pointtype = null;
             public double opt_pointsize = double.NaN;
             public string opt_fillstyle = null;
-            public List<List<IVariable>> labelHelper2 = null;  //comes from smpl.labelHelper2. For PRT<m> for instance, there will be 2*n elements, where the n's are identical. This is because the expression is run 2 times for <m>, <q> and the like.
+            public List<List<O.LabelHelperIVariable>> labelHelper2 = null;  //comes from smpl.labelHelper2. For PRT<m> for instance, there will be 2*n elements, where the n's are identical. This is because the expression is run 2 times for <m>, <q> and the like.
                         
             public long counter = -12345;
 

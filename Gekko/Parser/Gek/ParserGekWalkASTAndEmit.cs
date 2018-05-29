@@ -2192,6 +2192,17 @@ namespace Gekko.Parser.Gek
                                 {
                                     sb1.AppendLine("}");
                                 }
+
+                                if (G.Equal(functionNameLower, "sum"))
+                                {
+                                    //after a sum(#m, ....) function, the labelCounter must be set to 0, if this sum() function is not inside another sum() function
+                                    bool b = SearchUpwardsInTree7(node.Parent);
+                                    if (!b)
+                                    {
+                                        sb1.AppendLine(Globals.labelCounter + " = 0;");
+                                    }
+                                }
+
                                 sb1.AppendLine(GekkoSmplCommandHelper2(smplCommandNumber));  //resets command name to what it was previously
                                 sb1.AppendLine("return " + tempName + ";" + G.NL);
                                 sb1.AppendLine("};");  //method def, must end with ;
@@ -5242,9 +5253,26 @@ namespace Gekko.Parser.Gek
 
         private static string[] IsGamsSumFunctionOrUnfoldFunction(ASTNode node, string functionName)
         {
+            return IsGamsSumFunctionOrUnfoldFunction(node, functionName, false);
+        }
+
+        private static string[] IsGamsSumFunction(ASTNode node, string functionName)
+        {
+            return IsGamsSumFunctionOrUnfoldFunction(node, functionName, true);
+        }
+
+        private static string[] IsGamsSumFunctionOrUnfoldFunction(ASTNode node, string functionName, bool onlySum)
+        {
             //returns null if it is NOT a GAMS-like sum() function
             string[] rv = null;
-            if (G.Equal(functionName, "sum") || G.Equal(functionName, "unfold")) rv = GetListnames(node);
+            if (onlySum)
+            {
+                if (G.Equal(functionName, "sum")) rv = GetListnames(node);
+            }
+            else
+            {
+                if (G.Equal(functionName, "sum") || G.Equal(functionName, "unfold")) rv = GetListnames(node);
+            }
 
             if (rv == null)
             {
@@ -5477,6 +5505,28 @@ namespace Gekko.Parser.Gek
             while (tmp != null)
             {
                 if (tmp.Text == "ASTCURLY" || tmp.Text == "ASTDOTORINDEXER") return true;
+                tmp = tmp.Parent;
+            }
+            return false;
+        }
+                
+        private static bool SearchUpwardsInTree7(ASTNode node)
+        {
+            //finds out if node is sum() function of type sum(#x, ...)
+            ASTNode tmp = node;
+            string rv = null;
+            while (tmp != null)
+            {
+                //if(IsGamsSumFunction(node, ))
+                if (tmp.Text == "ASTFUNCTION")
+                {
+                    string functionName = GetFunctionName(tmp);
+                    if (IsGamsSumFunction(tmp, functionName) != null)
+                    {
+                        //this is a gams-like sum
+                        return true;
+                    }
+                }                 
                 tmp = tmp.Parent;
             }
             return false;

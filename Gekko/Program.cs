@@ -107,8 +107,8 @@ namespace Gekko
         public int gekkoErrorI = 0;
         public int bankNumber = 0;  //0 is inactive, 1 is Ref databank
         public GekkoSmplCommand command = GekkoSmplCommand.Unknown;
-        public List<IVariable> labelHelper = new List<IVariable>(); //not created all the time, so ok
-        public List<List<IVariable>> labelHelper2 = new List<List<IVariable>>(); //not created all the time, so ok
+        public List<O.LabelHelperIVariable> labelHelper = new List<O.LabelHelperIVariable>(); //not created all the time, so ok
+        public List<List<O.LabelHelperIVariable>> labelHelper2 = new List<List<O.LabelHelperIVariable>>(); //not created all the time, so ok
         public P p;
 
         public GekkoSmpl()
@@ -25987,7 +25987,7 @@ namespace Gekko
             }
         }
 
-        public static void HandleLabels(TokensHelper x, int level, List<IVariable> list, string[] freelists, ref int counter)
+        public static bool HandleLabels(TokensHelper x, int level, List<O.LabelHelperIVariable> list, string[] freelists, ref int counter)
         {
             foreach (TokenHelper th in x.storage)
             {
@@ -25996,19 +25996,23 @@ namespace Gekko
                     if (th.subnodesType == "[" || th.subnodesType == "{")
                     {
                         List<TokensHelper> temp = TokenHelper.SplitCommas(th.subnodes);
+                        int ii = -1;
                         foreach (TokensHelper temp2 in temp)  //does not include start and end parenthesis
                         {
                             counter++;
+                            ii++;
                             if (temp2.storage.Count == 2 && temp2[0].s == Globals.symbolCollection.ToString() && temp2[1].type == TokenKind.Word)
                             {
                                 //We have a simple #x as this argument
                                 if (freelists.Contains(temp2[1].s, StringComparer.OrdinalIgnoreCase))
                                 {
                                     //a free list has its string value put in
-                                    IVariable iv = list[counter];
-                                    if (iv.Type() == EVariableType.String)
+                                    O.LabelHelperIVariable helper = list[counter];
+                                    if (helper.index != ii)
+                                        return true;
+                                    if (helper.iv.Type() == EVariableType.String)
                                     {
-                                        HandleLabelsInsertIVariables(th, temp2, O.ConvertToString(iv));
+                                        HandleLabelsInsertIVariables(th, temp2, O.ConvertToString(helper.iv));
                                     }
                                 }
                                 else
@@ -26020,10 +26024,12 @@ namespace Gekko
                             else
                             {
                                 //it is not a simple #x
-                                IVariable iv = list[counter];
-                                if (iv.Type() == EVariableType.String || iv.Type() == EVariableType.Date || iv.Type() == EVariableType.Val)
+                                O.LabelHelperIVariable helper = list[counter];
+                                if (helper.index != ii)
+                                    return true;
+                                if (helper.iv.Type() == EVariableType.String || helper.iv.Type() == EVariableType.Date || helper.iv.Type() == EVariableType.Val)
                                 {                                    
-                                    HandleLabelsInsertIVariables(th, temp2, O.ConvertToString(iv));
+                                    HandleLabelsInsertIVariables(th, temp2, O.ConvertToString(helper.iv));
                                 }
                             }                                
                             
@@ -26034,7 +26040,8 @@ namespace Gekko
                     {
                         //The list only contains index values at the uppermost nesting level of [] or {} parentheses.
                         //But we handle sub-nests regarding ()-parentheses.
-                        HandleLabels(th.subnodes, level + 1, list, freelists, ref counter);
+                        bool problem = HandleLabels(th.subnodes, level + 1, list, freelists, ref counter);
+                        if (problem) return true;                        
                     }
                 }
                 else
@@ -26042,6 +26049,7 @@ namespace Gekko
                     //s += th.leftblanks + th.s;
                 }
             }
+            return false;
             
         }
 
@@ -26064,7 +26072,7 @@ namespace Gekko
             }
         }
 
-        private static void UnfoldLabels(string elementLabel, ref List<string> labels2, List<List<IVariable>> labelHelper2)
+        private static void UnfoldLabels(string elementLabel, ref List<string> labels2, List<List<O.LabelHelperIVariable>> labelHelper2)
         {
             if (Globals.smartLabels)
             {
@@ -26148,11 +26156,16 @@ namespace Gekko
                 }                
 
                 labels2 = new List<string>();
-                foreach (List<IVariable> list in labelHelper2)
+                foreach (List<O.LabelHelperIVariable> list in labelHelper2)
                 {
                     int counter = -1;
                     TokensHelper temp = tokens2.DeepClone();                                                    
-                    HandleLabels(temp, 0, list, freelists, ref counter);  //the temp object is changed here, therefore it is cloned before.                            
+                    bool problem = HandleLabels(temp, 0, list, freelists, ref counter);  //the temp object is changed here, therefore it is cloned before.                            
+                    if (problem && Globals.runningOnTTComputer)
+                    {
+                        G.Writeln2("*** ERROR: index mismatch, labels");
+                        throw new GekkoException();
+                    }
                     labels2.Add(temp.ToString());
                 }                
             }
