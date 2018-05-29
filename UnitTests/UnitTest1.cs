@@ -10182,7 +10182,23 @@ namespace UnitTests
             Assert.AreEqual(table.Get(5, 7).number, 41d, 0.0001);
             Assert.AreEqual(table.Get(5, 8).number, 38d, 0.0001);
             Assert.AreEqual(table.Get(5, 9).number, 42d, 0.0001);
-            
+
+            //------------- more tests of labels ------------
+
+            I("reset;");
+            I("time 2001 2003;");
+            I("#a = a1, a2;");
+            I("%s = 'a3';");
+            I("a1 = 1;");
+            I("a2 = 2;");
+            I("a3 = 3;");
+
+            //I("p <n> {#a}, {%s};");
+            //table = Globals.lastPrtOrMulprtTable;            
+            //Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "a1");
+            //Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a2");
+            //Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a3");
+
         }
         [TestMethod]
         public void _Test_EndoExo()
