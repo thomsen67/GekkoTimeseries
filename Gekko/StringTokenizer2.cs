@@ -22,6 +22,7 @@ namespace Gekko
     public class TokensHelper
     {
         public List<TokenHelper> storage = new List<TokenHelper>();
+        public TokenHelper parent = null;
 
         public TokensHelper()
         {         
@@ -79,6 +80,7 @@ namespace Gekko
         //below is advanced (recursive) stuff
         public string subnodesType = null;  // "(", "[" or "{".
         public TokensHelper subnodes = null;
+        public TokensHelper parent = null;
 
         public TokenHelper DeepClone()
         {
@@ -792,6 +794,7 @@ namespace Gekko
 
         public static TokensHelper GetTokensWithLeftBlanksRecursiveHelper(TokensHelper input, ref int startI, TokenHelper startparen)
         {
+            TokensHelper rv = new TokensHelper();
             //List<TokenHelper> input = input2.storage;
             List<TokenHelper> output = new List<TokenHelper>();
             //if (first != null) output.Add(first);  //a left parenthesis      
@@ -819,8 +822,11 @@ namespace Gekko
                 {
                     //got to the end
                     startI = i;
-                    output.Add(input.storage[i]);  //add the right parenthesis here                    
-                    return new TokensHelper(output);
+                    output.Add(input[i]);  //add the right parenthesis here  
+                    input[i].parent = rv;
+                    rv.storage = output;
+                    return rv;                
+                    //return new TokensHelper(output);
                 }
                 else
                 {
@@ -830,6 +836,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     output.Add(input[i]);
+                    input[i].parent = rv;
                 }
             }
             if (endparen != null)
@@ -837,7 +844,9 @@ namespace Gekko
                 G.Writeln2("*** ERROR: The '" + startparen.s + "' parenthesis at line " + startparen.line + " pos " + startparen.column + " does not have a corresponding '" + endparen + "'");
                 throw new GekkoException();
             }
-            return new TokensHelper(output);
+            rv.storage = output;
+            return rv;
+            //return new TokensHelper(output);
         }
 
     }
