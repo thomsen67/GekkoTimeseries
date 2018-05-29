@@ -26003,9 +26003,45 @@ namespace Gekko
                             ii++;
                             if (temp2.storage.Count == 2 && temp2[0].s == Globals.symbolCollection.ToString() && temp2[1].type == TokenKind.Word)
                             {
-                                //We have a simple #x as this argument
-                                if (freelists.Contains(temp2[1].s, StringComparer.OrdinalIgnoreCase))
+                                string listname = temp2[1].s;
+                                TokenHelper parent = temp2[0];
+                                bool foundAsSumFunction = false;                                
+                                while (true)
                                 {
+                                    if (parent == null) break;
+                                    if (parent.subnodesType == "(")
+                                    {
+                                        TokenHelper left = parent.Sibling(-1);
+                                        if (left != null)
+                                        {
+                                            if (G.Equal(left.s, "sum"))
+                                            {
+                                                List<TokenList> split = TokenHelper.SplitCommas(parent.subnodes);
+                                                if (split.Count > 1 && split[0].storage.Count > 1)
+                                                {
+                                                    if (split[0][0].s == Globals.symbolCollection.ToString() && split[0][1].type == TokenKind.Word)
+                                                    {
+                                                        //handles sum(#i, ...)
+                                                        string listname2 = split[0][1].s;
+                                                        if(G.Equal(listname,listname2))
+                                                        {
+                                                            foundAsSumFunction = true;
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    parent = parent.parent;
+                                }
+
+                                if (!foundAsSumFunction)
+                                {
+
+                                    //We have a simple #x as this argument
+                                    //if (freelists.Contains(temp2[1].s, StringComparer.OrdinalIgnoreCase))
+                                    //{
                                     //a free list has its string value put in
                                     O.LabelHelperIVariable helper = list[counter];
                                     if (helper.index != ii)

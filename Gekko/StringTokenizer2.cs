@@ -40,6 +40,7 @@ namespace Gekko
             // The get accessor.
             get
             {
+                if (this.storage == null || index < 0 || index >= this.storage.Count) return null;
                 return this.storage[index];
             }
         }
@@ -107,7 +108,7 @@ namespace Gekko
             {
                 return null;
             }
-            return this.subnodes[ii];
+            return this.parent.subnodes[ii];
         }
 
         public override string ToString()
@@ -131,8 +132,7 @@ namespace Gekko
 
         public static List<TokenList> SplitCommas(TokenList ths)
         {
-            //Splits up in bits, depending on commas. For instance [1, 2] is split in 1 and 2. But [1, [2, 3]] is split in 1 and [2, 3].
-            //Only splits for { and [.
+            //Splits up in bits, depending on commas. For instance [1, 2] is split in 1 and 2. But [1, [2, 3]] is split in 1 and [2, 3].            
             List<TokenList> temp = new List<TokenList>();
             TokenList temp2 = new TokenList();
             for (int i = 0 + 1; i < ths.storage.Count - 1; i++)  //omit the parentheses
@@ -808,9 +808,12 @@ namespace Gekko
             TokenHelper parent = new TokenHelper();
             parent.subnodes = tokens2;
             parent.subnodesType = "artificial_parent";
+            int counter = -1;
             foreach (TokenHelper token in parent.subnodes.storage)
             {
+                counter++;
                 token.parent = parent;  //this parent is phoney. Just used to be able to find siblings etc.
+                token.id = counter;
             }
             return tokens2;
         } 
