@@ -14973,7 +14973,7 @@ namespace Gekko
                     int length = (eq.lhsRaw + " = ").Length;
 
                     GekkoDictionary<string, string> knownVars = GetKnownVars(eq.rhsRaw, true);
-                    TokensHelper tokens = StringTokenizer2.GetTokensWithLeftBlanks(eq.rhsRaw);  //slack, tokenizing two times
+                    TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(eq.rhsRaw);  //slack, tokenizing two times
 
                     for (int i = 0; i < tokens.storage.Count; i++)
                     {
@@ -15027,7 +15027,7 @@ namespace Gekko
         private static GekkoDictionary<string, string> GetKnownVars(string input, bool useDatabank)
         {
             GekkoDictionary<string, string> knownVars = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            TokensHelper tokens = StringTokenizer2.GetTokensWithLeftBlanks(input);
+            TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(input);
             foreach (TokenHelper token in tokens.storage)
             {
                 if (token.type == TokenKind.Word)
@@ -15814,14 +15814,14 @@ namespace Gekko
             var tags2 = new List<string>() { "//" };
             var tags3 = new List<Tuple<string, string>>() { new Tuple<string, string>("$ontext", "$offtext") };
             var tags4 = new List<string>() { "*", "#" };
-            TokensHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
+            TokenList tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
             
             foreach (TokenHelper tok in tokens2.storage)
             {
                 string s = tok.ToString();
             }
 
-            TokensHelper tokens = StringTokenizer2.GetTokensWithLeftBlanks(textInputRaw);
+            TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(textInputRaw);
             List<List<string>> eqLines = new List<List<string>>();
             List<string> temp = new List<string>();
             foreach (TokenHelper token in tokens.storage)
@@ -15868,7 +15868,7 @@ namespace Gekko
                 e.lhsRaw = StripQuotes2(line[3]);
                 e.rhsRaw = StripQuotes2(line[4]);
 
-                TokensHelper fields = StringTokenizer2.GetTokensWithLeftBlanks(e.lhsRaw);
+                TokenList fields = StringTokenizer2.GetTokensWithLeftBlanks(e.lhsRaw);
                 string varName = null;
                 foreach (TokenHelper t in fields.storage)
                 {
@@ -25987,7 +25987,7 @@ namespace Gekko
             }
         }
 
-        public static bool HandleLabels(TokensHelper x, int level, List<O.LabelHelperIVariable> list, string[] freelists, ref int counter)
+        public static bool HandleLabels(TokenList x, int level, List<O.LabelHelperIVariable> list, string[] freelists, ref int counter)
         {
             foreach (TokenHelper th in x.storage)
             {
@@ -25995,9 +25995,9 @@ namespace Gekko
                 {
                     if (th.subnodesType == "[" || th.subnodesType == "{")
                     {
-                        List<TokensHelper> temp = TokenHelper.SplitCommas(th.subnodes);
+                        List<TokenList> temp = TokenHelper.SplitCommas(th.subnodes);
                         int ii = -1;
-                        foreach (TokensHelper temp2 in temp)  //does not include start and end parenthesis
+                        foreach (TokenList temp2 in temp)  //does not include start and end parenthesis
                         {
                             counter++;
                             ii++;
@@ -26053,7 +26053,7 @@ namespace Gekko
             
         }
 
-        private static void HandleLabelsInsertIVariables(TokenHelper th, TokensHelper temp2, string iv_string)
+        private static void HandleLabelsInsertIVariables(TokenHelper th, TokenList temp2, string iv_string)
         {
             temp2[0].s = iv_string;
             temp2[0].type = TokenKind.Word;
@@ -26147,7 +26147,7 @@ namespace Gekko
                 //after this, free (uncontrolled) lists are in freelists, and rawLabel is the label.
 
                 var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };  //can in principle have such comments                         
-                TokensHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(rawLabel, tags1, null, null, null);
+                TokenList tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(rawLabel, tags1, null, null, null);
 
                 if (false && Globals.runningOnTTComputer)
                 {
@@ -26159,7 +26159,7 @@ namespace Gekko
                 foreach (List<O.LabelHelperIVariable> list in labelHelper2)
                 {
                     int counter = -1;
-                    TokensHelper temp = tokens2.DeepClone();                                                    
+                    TokenList temp = tokens2.DeepClone();                                                    
                     bool problem = HandleLabels(temp, 0, list, freelists, ref counter);  //the temp object is changed here, therefore it is cloned before.                            
                     if (problem && Globals.runningOnTTComputer)
                     {

@@ -19,16 +19,17 @@ using System.Text;
 
 namespace Gekko
 {
-    public class TokensHelper
+    public class TokenList
     {
-        public List<TokenHelper> storage = new List<TokenHelper>();
-        public TokenHelper parent = null;
+        //This is basically just a very simple list
 
-        public TokensHelper()
+        public List<TokenHelper> storage = new List<TokenHelper>();        
+
+        public TokenList()
         {         
         }
 
-        public TokensHelper(List<TokenHelper> x)
+        public TokenList(List<TokenHelper> x)
         {
             this.storage = x;
         }
@@ -43,9 +44,9 @@ namespace Gekko
             }
         }
 
-        public TokensHelper DeepClone()
+        public TokenList DeepClone()
         {
-            TokensHelper tsh = new TokensHelper();
+            TokenList tsh = new TokenList();
             if (this.storage != null)
             {
                 List<TokenHelper> xx = new List<TokenHelper>();
@@ -79,8 +80,9 @@ namespace Gekko
         public int column = -12345;
         //below is advanced (recursive) stuff
         public string subnodesType = null;  // "(", "[" or "{".
-        public TokensHelper subnodes = null;
-        public TokensHelper parent = null;
+        public TokenList subnodes = null;
+        public TokenHelper parent = null;
+        public int id = -12345;
 
         public TokenHelper DeepClone()
         {
@@ -89,10 +91,23 @@ namespace Gekko
             th.type = this.type;
             th.leftblanks = this.leftblanks;
             th.column = this.column;
+            th.parent = this.parent;
+            th.id = this.id;
             th.subnodesType = this.subnodesType;
             th.subnodes = this.subnodes;
             if (th.subnodes != null) th.subnodes = this.subnodes.DeepClone();
             return th;
+        }
+
+        public TokenHelper Sibling(int offset)
+        {
+            //-1 is left sibling, +1 is right sibling
+            int ii = this.id + offset;                        
+            if (ii < 0 || ii >= this.parent.subnodes.storage.Count)
+            {
+                return null;
+            }
+            return this.subnodes[ii];
         }
 
         public override string ToString()
@@ -114,18 +129,18 @@ namespace Gekko
             else return leftblanks + s;
         }
 
-        public static List<TokensHelper> SplitCommas(TokensHelper ths)
+        public static List<TokenList> SplitCommas(TokenList ths)
         {
             //Splits up in bits, depending on commas. For instance [1, 2] is split in 1 and 2. But [1, [2, 3]] is split in 1 and [2, 3].
             //Only splits for { and [.
-            List<TokensHelper> temp = new List<TokensHelper>();
-            TokensHelper temp2 = new TokensHelper();
+            List<TokenList> temp = new List<TokenList>();
+            TokenList temp2 = new TokenList();
             for (int i = 0 + 1; i < ths.storage.Count - 1; i++)  //omit the parentheses
             {
                 if (ths[i].s == ",")
                 {
                     temp.Add(temp2);
-                    temp2 = new TokensHelper();
+                    temp2 = new TokenList();
                 }
                 else
                 {
@@ -137,7 +152,7 @@ namespace Gekko
         }
 
 
-        public static void Print(TokensHelper x, int level)
+        public static void Print(TokenList x, int level)
         {
             foreach (TokenHelper th in x.storage)
             {
@@ -728,17 +743,17 @@ namespace Gekko
             return false;
         }
 
-        public static TokensHelper GetTokensWithLeftBlanks(string s)
+        public static TokenList GetTokensWithLeftBlanks(string s)
         {
             return GetTokensWithLeftBlanks(s, 0);
         }
 
-        public static TokensHelper GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd)
+        public static TokenList GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd)
         {
             return GetTokensWithLeftBlanks(s, emptyTokensAtEnd, null, null, null, null);
         }
 
-        public static TokensHelper GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
+        public static TokenList GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
         {
             StringTokenizer2 tok = new StringTokenizer2(s, false, false);
             if (commentsClosed != null) tok.commentsClosed = commentsClosed;
@@ -776,26 +791,33 @@ namespace Gekko
 
             } while (token.Kind != TokenKind.EOF);
             for (int i = 0; i < emptyTokensAtEnd; i++) a.Add(new TokenHelper());
-            return new TokensHelper(a);
+            return new TokenList(a);
         }
 
-        public static TokensHelper GetTokensWithLeftBlanksRecursive(string textInputRaw)
+        public static TokenList GetTokensWithLeftBlanksRecursive(string textInputRaw)
         {
             return GetTokensWithLeftBlanksRecursive(textInputRaw, null, null, null, null);
         }
 
-        public static TokensHelper GetTokensWithLeftBlanksRecursive(string textInputRaw, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
+        public static TokenList GetTokensWithLeftBlanksRecursive(string textInputRaw, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
         {
             int i = 0;
-            TokensHelper tokens = GetTokensWithLeftBlanks(textInputRaw, 0, commentsClosed, commentsNonClosed, commentsClosedOnlyStartOfLine, commentsNonClosedOnlyStartOfLine);
-            TokensHelper tokens2 = GetTokensWithLeftBlanksRecursiveHelper(tokens, ref i, null);
+            TokenList tokens = GetTokensWithLeftBlanks(textInputRaw, 0, commentsClosed, commentsNonClosed, commentsClosedOnlyStartOfLine, commentsNonClosedOnlyStartOfLine);
+            TokenList tokens2 = GetTokensWithLeftBlanksRecursiveHelper(tokens, ref i, null);
+            //the first-level elements of the TokenList do not have any parent. This is fixed here:
+            TokenHelper parent = new TokenHelper();
+            parent.subnodes = tokens2;
+            parent.subnodesType = "artificial_parent";
+            foreach (TokenHelper token in parent.subnodes.storage)
+            {
+                token.parent = parent;  //this parent is phoney. Just used to be able to find siblings etc.
+            }
             return tokens2;
         } 
 
-        public static TokensHelper GetTokensWithLeftBlanksRecursiveHelper(TokensHelper input, ref int startI, TokenHelper startparen)
+        public static TokenList GetTokensWithLeftBlanksRecursiveHelper(TokenList input, ref int startI, TokenHelper startparen)
         {
-            TokensHelper rv = new TokensHelper();
-            //List<TokenHelper> input = input2.storage;
+            TokenList rv = new TokenList();            
             List<TokenHelper> output = new List<TokenHelper>();
             //if (first != null) output.Add(first);  //a left parenthesis      
             string endparen = null;
@@ -810,11 +832,17 @@ namespace Gekko
                 {
                     //found a new left parenthesis                          
                     startI = i + 1;
-                    TokensHelper sub = GetTokensWithLeftBlanksRecursiveHelper(input, ref startI, input[i]);
-                    //sub.Add(input[startI]);
-                    TokenHelper temp = new TokenHelper();
+                    TokenList sub = GetTokensWithLeftBlanksRecursiveHelper(input, ref startI, input[i]);                    
+                    TokenHelper temp = new TokenHelper();  //new empty/placeholder TokenHelper with a list of TokenHelpers
                     temp.subnodes = sub;
                     temp.subnodesType = input.storage[i].s;
+                    int counter = -1;
+                    foreach (TokenHelper subnode in temp.subnodes.storage)
+                    {
+                        counter++;
+                        subnode.id = counter;
+                        subnode.parent = temp;
+                    }
                     output.Add(temp);
                     i = startI;
                 }
@@ -822,11 +850,8 @@ namespace Gekko
                 {
                     //got to the end
                     startI = i;
-                    output.Add(input[i]);  //add the right parenthesis here  
-                    input[i].parent = rv;
-                    rv.storage = output;
-                    return rv;                
-                    //return new TokensHelper(output);
+                    output.Add(input[i]);  //add the right parenthesis here                                                         
+                    return new TokenList(output);
                 }
                 else
                 {
@@ -836,18 +861,15 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     output.Add(input[i]);
-                    input[i].parent = rv;
+                    //input[i].parent = rv;
                 }
             }
             if (endparen != null)
             {                
                 G.Writeln2("*** ERROR: The '" + startparen.s + "' parenthesis at line " + startparen.line + " pos " + startparen.column + " does not have a corresponding '" + endparen + "'");
                 throw new GekkoException();
-            }
-            rv.storage = output;
-            return rv;
-            //return new TokensHelper(output);
+            }            
+            return new TokenList(output);
         }
-
     }
 }
