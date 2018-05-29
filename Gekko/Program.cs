@@ -26003,7 +26003,7 @@ namespace Gekko
                             ii++;
                             if (temp2.storage.Count == 2 && temp2[0].s == Globals.symbolCollection.ToString() && temp2[1].type == TokenKind.Word)
                             {
-                                string listname = temp2[1].s;
+                                string listName = temp2[1].s;
                                 TokenHelper parent = temp2[0];
                                 bool foundAsSumFunction = false;                                
                                 while (true)
@@ -26017,16 +26017,41 @@ namespace Gekko
                                             if (G.Equal(left.s, "sum"))
                                             {
                                                 List<TokenList> split = TokenHelper.SplitCommas(parent.subnodes);
-                                                if (split.Count > 1 && split[0].storage.Count > 1)
+                                                if (split.Count > 1)
                                                 {
-                                                    if (split[0][0].s == Globals.symbolCollection.ToString() && split[0][1].type == TokenKind.Word)
+                                                    TokenList firstSplit = split[0];
+                                                    if (firstSplit.storage.Count == 1)
                                                     {
-                                                        //handles sum(#i, ...)
-                                                        string listname2 = split[0][1].s;
-                                                        if(G.Equal(listname,listname2))
+                                                        if (firstSplit[0].subnodesType == "(")
                                                         {
-                                                            foundAsSumFunction = true;
-                                                            break;
+                                                            //handles sum((#i, #j), ...)
+                                                            List<TokenList> splitNew = TokenHelper.SplitCommas(firstSplit[0].subnodes);
+                                                            foreach (TokenList splitNewItem in splitNew)
+                                                            {
+                                                                string listName2 = HandleLabelsIsSimpleListName(splitNewItem);
+                                                                if (listName2 != null)
+                                                                {
+                                                                    if (G.Equal(listName, listName2))
+                                                                    {
+                                                                        foundAsSumFunction = true;
+                                                                        break;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (firstSplit.storage.Count > 1)
+                                                    {
+                                                        string listName2 = HandleLabelsIsSimpleListName(firstSplit);
+                                                        if(listName2!=null)
+                                                        {
+                                                            //handles sum(#i, ...)
+                                                            
+                                                            if (G.Equal(listName, listName2))
+                                                            {
+                                                                foundAsSumFunction = true;
+                                                                break;
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -26087,6 +26112,15 @@ namespace Gekko
             }
             return false;
             
+        }
+
+        private static string HandleLabelsIsSimpleListName(TokenList splitNewItem)
+        {
+            if (splitNewItem.storage.Count == 2 && splitNewItem[0].s == Globals.symbolCollection.ToString() && splitNewItem[1].type == TokenKind.Word)
+            {
+                return splitNewItem[1].s;
+            }
+            else return null;
         }
 
         private static void HandleLabelsInsertIVariables(TokenHelper th, TokenList temp2, string iv_string)
@@ -26194,16 +26228,31 @@ namespace Gekko
                 labels2 = new List<string>();
                 foreach (List<O.LabelHelperIVariable> list in labelHelper2)
                 {
-                    int counter = -1;
-                    TokenList temp = tokens2.DeepClone();                                                    
-                    bool problem = HandleLabels(temp, 0, list, freelists, ref counter);  //the temp object is changed here, therefore it is cloned before.                            
-                    if (problem && Globals.runningOnTTComputer)
+                    bool problem = false;
+                    string result = null;
+                    try
                     {
-                        G.Writeln2("*** ERROR: index mismatch, labels");
-                        throw new GekkoException();
+                        int counter = -1;
+                        TokenList temp = tokens2.DeepClone();
+                        problem = HandleLabels(temp, 0, list, freelists, ref counter);  //the temp object is changed here, therefore it is cloned before.                            
+                        if (!problem) result = temp.ToString();
                     }
-                    labels2.Add(temp.ToString());
-                }                
+                    catch (Exception e)
+                    {
+                        problem = true;
+                    }
+                    if (problem)
+                    {
+                        //this way, there is not a complete crash, and the users get something.
+                        //they may complain that the label is non-informative though.
+                        labels2.Add(rawLabel);
+                    }
+                    else
+                    {
+                        labels2.Add(result);
+                    }
+                    //
+                }               
             }
             else
             {
