@@ -2856,7 +2856,9 @@ namespace Gekko.Parser.Gek
                                     string s = node[1][i].Code.ToString();
                                     if (internalName != null) s = internalName;
 
-                                    if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent))
+                                    bool reportInterior = ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent));
+                                    
+                                    if (reportInterior)
                                     {
                                         //only for PRT-type or DISP, and only if the [] is not inside [] or {}.
                                         indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
@@ -2867,7 +2869,10 @@ namespace Gekko.Parser.Gek
                                     if (i < node[1].ChildrenCount() - 1)
                                     {
                                         indexes += ", ";
-                                        indexesReport += ", ";
+                                        if (reportInterior)
+                                        {
+                                            indexesReport += ", ";
+                                        }
                                     }
                                 }
                             }

@@ -9881,8 +9881,8 @@ namespace UnitTests
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2001"); //why is it not a date?
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2002"); //why is it not a date?
             Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "2003"); //why is it not a date?
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "sum(#m1, ");
-            Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "xx[#m1, 'x'])");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "sum(#m1");
+            Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], ", xx[#m1, x])");
             Assert.AreEqual(table.Get(3, 2).number, 5.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 2).number, 7.0000d, 0.0001);
             Assert.AreEqual(table.Get(5, 2).number, 9.0000d, 0.0001);
@@ -9892,8 +9892,8 @@ namespace UnitTests
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2001"); //why is it not a date?
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2002"); //why is it not a date?
             Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "2003"); //why is it not a date?
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "sum(#m2, ");
-            Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "xx['a', #m2])");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "sum(#m2");
+            Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], ", xx[a, #m2])");
             Assert.AreEqual(table.Get(3, 2).number, 8.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 2).number, 10.0000d, 0.0001);
             Assert.AreEqual(table.Get(5, 2).number, 12.0000d, 0.0001);

@@ -645,13 +645,16 @@ namespace Gekko
 
             if (setStartEndPeriods)  //only relevant if the returned arrays is actually tampered with, which is normally NOT the case (only for a[,] and b[] array stuff in simulation)
             {
-                if (index2 > this.meta.lastPeriodPositionInArray)
+                if (this.meta != null)
                 {
-                    this.meta.lastPeriodPositionInArray = index2;
-                }
-                if (index1 < this.meta.firstPeriodPositionInArray)
-                {
-                    this.meta.firstPeriodPositionInArray = index1;
+                    if (index2 > this.meta.lastPeriodPositionInArray)
+                    {
+                        this.meta.lastPeriodPositionInArray = index2;
+                    }
+                    if (index1 < this.meta.firstPeriodPositionInArray)
+                    {
+                        this.meta.firstPeriodPositionInArray = index1;
+                    }
                 }
             }
             if (clone)
