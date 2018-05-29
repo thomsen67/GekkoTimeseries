@@ -9998,7 +9998,191 @@ namespace UnitTests
             Assert.AreEqual(table.Get(3, 4).number, 15.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 4).number, 16.0000d, 0.0001);
 
+            // ------------------------ test of label substitution for arrays ----------------
 
+            I("reset;");
+            I("time 2001 2003;");
+            I("x1 = series(1);");
+            I("x2 = series(1);");
+            I("x3 = series(3);");
+            I("#a = a1, a2;");
+            I("#b = b1, b2;");
+            I("#c = c1, c2;");
+            I("x1[a1] = 1;");
+            I("x1[a2] = 2;");
+            I("x2[b1] = 3;");
+            I("x2[b2] = 4;");
+            I("x3[a1, b1, c1] = 5;");
+            I("x3[a1, b1, c2] = 6;");
+            I("x3[a1, b2, c1] = 7;");
+            I("x3[a1, b2, c2] = 8;");
+            I("x3[a2, b1, c1] = 9;");
+            I("x3[a2, b1, c2] = 10;");
+            I("x3[a2, b2, c1] = 11;");
+            I("x3[a2, b2, c2] = 12;");
+            
+            //Here, #a and #b are free/unfolded, so it is unfolded into 2x2 = 4 columns.
+            //The last sum() puts bounds on #a and #b, so the values of these are not in-substituted there
+            //first one is:
+            //x1[a1] + x2[b1] + sum((#a, #b), x3[#a, #b, c1]);, 1+3+32 = 36.
+            I("p <n> x1[#a] + x2[#b] + sum((#a, #b), x3[#a, #b, #c]);");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "2001"); //why is it not a date?
+            Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "2002"); //why is it not a date?
+            Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "2003"); //why is it not a date?
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x1[a1] +");
+            Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], " x2[b1] + sum");
+            Assert.AreEqual(table.Get(3, 2).CellText.TextData[0], "((#a, #b), x3");
+            Assert.AreEqual(table.Get(4, 2).CellText.TextData[0], "[#a, #b, c1])");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x1[a1] +");
+            Assert.AreEqual(table.Get(2, 3).CellText.TextData[0], " x2[b1] + sum");
+            Assert.AreEqual(table.Get(3, 3).CellText.TextData[0], "((#a, #b), x3");
+            Assert.AreEqual(table.Get(4, 3).CellText.TextData[0], "[#a, #b, c2])");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x1[a1] +");
+            Assert.AreEqual(table.Get(2, 4).CellText.TextData[0], " x2[b2] + sum");
+            Assert.AreEqual(table.Get(3, 4).CellText.TextData[0], "((#a, #b), x3");
+            Assert.AreEqual(table.Get(4, 4).CellText.TextData[0], "[#a, #b, c1])");            
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x1[a1] +");
+            Assert.AreEqual(table.Get(2, 5).CellText.TextData[0], " x2[b2] + sum");
+            Assert.AreEqual(table.Get(3, 5).CellText.TextData[0], "((#a, #b), x3");
+            Assert.AreEqual(table.Get(4, 5).CellText.TextData[0], "[#a, #b, c2])");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "x1[a2] +");
+            Assert.AreEqual(table.Get(2, 6).CellText.TextData[0], " x2[b1] + sum");
+            Assert.AreEqual(table.Get(3, 6).CellText.TextData[0], "((#a, #b), x3");
+            Assert.AreEqual(table.Get(4, 6).CellText.TextData[0], "[#a, #b, c1])");
+            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "x1[a2] +");
+            Assert.AreEqual(table.Get(2, 7).CellText.TextData[0], " x2[b1] + sum");
+            Assert.AreEqual(table.Get(3, 7).CellText.TextData[0], "((#a, #b), x3");
+            Assert.AreEqual(table.Get(4, 7).CellText.TextData[0], "[#a, #b, c2])");
+            Assert.AreEqual(table.Get(1, 8).CellText.TextData[0], "x1[a2] +");
+            Assert.AreEqual(table.Get(2, 8).CellText.TextData[0], " x2[b2] + sum");
+            Assert.AreEqual(table.Get(3, 8).CellText.TextData[0], "((#a, #b), x3");
+            Assert.AreEqual(table.Get(4, 8).CellText.TextData[0], "[#a, #b, c1])");
+            Assert.AreEqual(table.Get(1, 9).CellText.TextData[0], "x1[a2] +");
+            Assert.AreEqual(table.Get(2, 9).CellText.TextData[0], " x2[b2] + sum");
+            Assert.AreEqual(table.Get(3, 9).CellText.TextData[0], "((#a, #b), x3");
+            Assert.AreEqual(table.Get(4, 9).CellText.TextData[0], "[#a, #b, c2])");
+            Assert.AreEqual(table.Get(5, 2).number, 36d, 0.0001);
+            Assert.AreEqual(table.Get(5, 3).number, 40d, 0.0001);
+            Assert.AreEqual(table.Get(5, 4).number, 37d, 0.0001);
+            Assert.AreEqual(table.Get(5, 5).number, 41d, 0.0001);
+            Assert.AreEqual(table.Get(5, 6).number, 37d, 0.0001);
+            Assert.AreEqual(table.Get(5, 7).number, 41d, 0.0001);
+            Assert.AreEqual(table.Get(5, 8).number, 38d, 0.0001);
+            Assert.AreEqual(table.Get(5, 9).number, 42d, 0.0001);
+
+            I("p <n> x1[#a] + x2[#b] + sum(#a, sum(#b, x3[#a, #b, #c]));");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "2001"); //why is it not a date?
+            Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "2002"); //why is it not a date?
+            Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "2003"); //why is it not a date?
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x1[a1] + x2");
+            Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "[b1] + sum(#a");
+            Assert.AreEqual(table.Get(3, 2).CellText.TextData[0], ", sum(#b, x3[");
+            Assert.AreEqual(table.Get(4, 2).CellText.TextData[0], "#a, #b, c1]))");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x1[a1] + x2");
+            Assert.AreEqual(table.Get(2, 3).CellText.TextData[0], "[b1] + sum(#a");
+            Assert.AreEqual(table.Get(3, 3).CellText.TextData[0], ", sum(#b, x3[");
+            Assert.AreEqual(table.Get(4, 3).CellText.TextData[0], "#a, #b, c2]))");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x1[a1] + x2");
+            Assert.AreEqual(table.Get(2, 4).CellText.TextData[0], "[b2] + sum(#a");
+            Assert.AreEqual(table.Get(3, 4).CellText.TextData[0], ", sum(#b, x3[");
+            Assert.AreEqual(table.Get(4, 4).CellText.TextData[0], "#a, #b, c1]))");            
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x1[a1] + x2");
+            Assert.AreEqual(table.Get(2, 5).CellText.TextData[0], "[b2] + sum(#a");
+            Assert.AreEqual(table.Get(3, 5).CellText.TextData[0], ", sum(#b, x3[");
+            Assert.AreEqual(table.Get(4, 5).CellText.TextData[0], "#a, #b, c2]))");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "x1[a2] + x2");
+            Assert.AreEqual(table.Get(2, 6).CellText.TextData[0], "[b1] + sum(#a");
+            Assert.AreEqual(table.Get(3, 6).CellText.TextData[0], ", sum(#b, x3[");
+            Assert.AreEqual(table.Get(4, 6).CellText.TextData[0], "#a, #b, c1]))");
+            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "x1[a2] + x2");
+            Assert.AreEqual(table.Get(2, 7).CellText.TextData[0], "[b1] + sum(#a");
+            Assert.AreEqual(table.Get(3, 7).CellText.TextData[0], ", sum(#b, x3[");
+            Assert.AreEqual(table.Get(4, 7).CellText.TextData[0], "#a, #b, c2]))");
+            Assert.AreEqual(table.Get(1, 8).CellText.TextData[0], "x1[a2] + x2");
+            Assert.AreEqual(table.Get(2, 8).CellText.TextData[0], "[b2] + sum(#a");
+            Assert.AreEqual(table.Get(3, 8).CellText.TextData[0], ", sum(#b, x3[");
+            Assert.AreEqual(table.Get(4, 8).CellText.TextData[0], "#a, #b, c1]))");
+            Assert.AreEqual(table.Get(1, 9).CellText.TextData[0], "x1[a2] + x2");
+            Assert.AreEqual(table.Get(2, 9).CellText.TextData[0], "[b2] + sum(#a");
+            Assert.AreEqual(table.Get(3, 9).CellText.TextData[0], ", sum(#b, x3[");
+            Assert.AreEqual(table.Get(4, 9).CellText.TextData[0], "#a, #b, c2]))");
+            Assert.AreEqual(table.Get(5, 2).number, 36d, 0.0001);
+            Assert.AreEqual(table.Get(5, 3).number, 40d, 0.0001);
+            Assert.AreEqual(table.Get(5, 4).number, 37d, 0.0001);
+            Assert.AreEqual(table.Get(5, 5).number, 41d, 0.0001);
+            Assert.AreEqual(table.Get(5, 6).number, 37d, 0.0001);
+            Assert.AreEqual(table.Get(5, 7).number, 41d, 0.0001);
+            Assert.AreEqual(table.Get(5, 8).number, 38d, 0.0001);
+            Assert.AreEqual(table.Get(5, 9).number, 42d, 0.0001);
+
+            // ------------------------ test of label substitution for name-composition ----------------
+
+            //see above, same idea as for arrays
+            I("reset;");
+            I("time 2001 2003;");            
+            I("#a = a1, a2;");
+            I("#b = b1, b2;");
+            I("#c = c1, c2;");
+            I("x1a1 = 1;");
+            I("x1a2 = 2;");
+            I("x2b1 = 3;");
+            I("x2b2 = 4;");
+            I("x3a1b1c1 = 5;");
+            I("x3a1b1c2 = 6;");
+            I("x3a1b2c1 = 7;");
+            I("x3a1b2c2 = 8;");
+            I("x3a2b1c1 = 9;");
+            I("x3a2b1c2 = 10;");
+            I("x3a2b2c1 = 11;");
+            I("x3a2b2c2 = 12;");                        
+            I("p <n> x1{#a} + x2{#b} + sum(#a, sum(#b, x3{#a}{#b}{#c}));");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "2001"); //why is it not a date?
+            Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "2002"); //why is it not a date?
+            Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "2003"); //why is it not a date?
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x1a1 ");
+            Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "+ x2b1 + sum(");
+            Assert.AreEqual(table.Get(3, 2).CellText.TextData[0], "#a, sum(#b, x");
+            Assert.AreEqual(table.Get(4, 2).CellText.TextData[0], "3{#a}{#b}c1))");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x1a1 ");
+            Assert.AreEqual(table.Get(2, 3).CellText.TextData[0], "+ x2b1 + sum(");
+            Assert.AreEqual(table.Get(3, 3).CellText.TextData[0], "#a, sum(#b, x");
+            Assert.AreEqual(table.Get(4, 3).CellText.TextData[0], "3{#a}{#b}c2))");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x1a1 ");
+            Assert.AreEqual(table.Get(2, 4).CellText.TextData[0], "+ x2b2 + sum(");
+            Assert.AreEqual(table.Get(3, 4).CellText.TextData[0], "#a, sum(#b, x");
+            Assert.AreEqual(table.Get(4, 4).CellText.TextData[0], "3{#a}{#b}c1))");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x1a1 ");
+            Assert.AreEqual(table.Get(2, 5).CellText.TextData[0], "+ x2b2 + sum(");
+            Assert.AreEqual(table.Get(3, 5).CellText.TextData[0], "#a, sum(#b, x");
+            Assert.AreEqual(table.Get(4, 5).CellText.TextData[0], "3{#a}{#b}c2))");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "x1a2 ");
+            Assert.AreEqual(table.Get(2, 6).CellText.TextData[0], "+ x2b1 + sum(");
+            Assert.AreEqual(table.Get(3, 6).CellText.TextData[0], "#a, sum(#b, x");
+            Assert.AreEqual(table.Get(4, 6).CellText.TextData[0], "3{#a}{#b}c1))");
+            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "x1a2 ");
+            Assert.AreEqual(table.Get(2, 7).CellText.TextData[0], "+ x2b1 + sum(");
+            Assert.AreEqual(table.Get(3, 7).CellText.TextData[0], "#a, sum(#b, x");
+            Assert.AreEqual(table.Get(4, 7).CellText.TextData[0], "3{#a}{#b}c2))");
+            Assert.AreEqual(table.Get(1, 8).CellText.TextData[0], "x1a2 ");
+            Assert.AreEqual(table.Get(2, 8).CellText.TextData[0], "+ x2b2 + sum(");
+            Assert.AreEqual(table.Get(3, 8).CellText.TextData[0], "#a, sum(#b, x");
+            Assert.AreEqual(table.Get(4, 8).CellText.TextData[0], "3{#a}{#b}c1))");
+            Assert.AreEqual(table.Get(1, 9).CellText.TextData[0], "x1a2 ");
+            Assert.AreEqual(table.Get(2, 9).CellText.TextData[0], "+ x2b2 + sum(");
+            Assert.AreEqual(table.Get(3, 9).CellText.TextData[0], "#a, sum(#b, x");
+            Assert.AreEqual(table.Get(4, 9).CellText.TextData[0], "3{#a}{#b}c2))");
+            Assert.AreEqual(table.Get(5, 2).number, 36d, 0.0001);
+            Assert.AreEqual(table.Get(5, 3).number, 40d, 0.0001);
+            Assert.AreEqual(table.Get(5, 4).number, 37d, 0.0001);
+            Assert.AreEqual(table.Get(5, 5).number, 41d, 0.0001);
+            Assert.AreEqual(table.Get(5, 6).number, 37d, 0.0001);
+            Assert.AreEqual(table.Get(5, 7).number, 41d, 0.0001);
+            Assert.AreEqual(table.Get(5, 8).number, 38d, 0.0001);
+            Assert.AreEqual(table.Get(5, 9).number, 42d, 0.0001);
+            
         }
         [TestMethod]
         public void _Test_EndoExo()
