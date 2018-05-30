@@ -7021,7 +7021,7 @@ namespace Gekko
                 //public IVariable tsBase = null;
                 public IVariable[] variable = new IVariable[2];  //first and ref
                 public string label = null;
-                public string[] label2 = null;
+                public List<string> label2 = null;
                 //public string originalLabel = null;
                 public string endoExoIndicator = null;
                 //-- layout

@@ -24689,16 +24689,19 @@ namespace Gekko
                 else if (xx1 != null) n = xx1.list.Count;
 
                 //string label = null;
-                List<string> labels2 = new List<string>();
+                
+                //tt123
+                //List<string> labels2 = new List<string>();
 
                 // ---------------------------------------------------------------------
                 // --------------- unfold labels start ---------------------------------
                 // ---------------------------------------------------------------------
 
-                if (true)
-                {
-                    if (unfoldLabels) UnfoldLabels(element.label, ref labels2, o.labelHelper2);  //unfolding over #m1 and #m2 etc.                
-                }
+                //tt123
+                //if (false)
+                //{
+                //    if (unfoldLabels) UnfoldLabels(element.label, ref labels2, o.labelHelper2);  //unfolding over #m1 and #m2 etc.                
+                //}
 
                 // ---------------------------------------------------------------------
                 // --------------- unfold labels end -----------------------------------
@@ -24847,27 +24850,52 @@ namespace Gekko
 
                         explodeElement.printCodeFinal = printCode;
 
+                        // ----------------------------------------------------
+                        // Labels start
+                        // ----------------------------------------------------
+
                         string lbl = null;
+
+
+                        //if (!unfoldLabels && n == labelsHandmade.Count)
+                        //{
+                        //    lbl = labelsHandmade[i];
+                        //}
+                        //else if (labels2 != null && n == labels2.Count)
+                        //{
+                        //    lbl = labels2[i];
+                        //}
+                        //else
+                        //{
+                        //    string[] ss = element.label.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
+                        //    if (ss.Length > 1)
+                        //    {
+                        //        lbl = ss[1];
+                        //    }
+                        //    else
+                        //    {
+                        //        lbl = element.label;
+                        //    }
+                        //}
+
+                        //tt123
                         if (!unfoldLabels && n == labelsHandmade.Count)
                         {
                             lbl = labelsHandmade[i];
                         }
-                        else if (labels2 != null && n == labels2.Count)
+                        else if (element.label2 != null && n == element.label2.Count)
                         {
-                            lbl = labels2[i];
+                            lbl = element.label2[i];
                         }
                         else
                         {
-                            string[] ss = element.label.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
-                            if (ss.Length > 1)
-                            {
-                                lbl = ss[1];
-                            }
-                            else
-                            {
-                                lbl = element.label;
-                            }
+                            lbl = RemoveSplitter(element.label);
                         }
+
+
+                        // ----------------------------------------------------
+                        // Labels end
+                        // ----------------------------------------------------
 
                         int lines = -12345;
                         int widthHere = -12345;
@@ -24891,16 +24919,16 @@ namespace Gekko
                         //FIXME
                         if (G.Equal(element.printCodesFinal[0], "n") && iPrintCode > 0 && G.Equal(printCode, "p"))
                         {
-                            explodeElement.label2 = new string[] { "%" };
+                            explodeElement.label2 = new List<string> { "%" };
                         }
                         else if (G.Equal(element.printCodesFinal[0], "m") && iPrintCode > 0 && G.Equal(printCode, "q"))
                         {
-                            explodeElement.label2 = new string[] { "%" };
+                            explodeElement.label2 = new List<string> { "%" };
                         }
                         else
                         {
                             if (iPrintCode == 0) ; //c.label = c.label + "  (" + printCode.ToLower() + ")";
-                            else if (iPrintCode > 0) explodeElement.label2 = new string[] { "(" + printCode.ToLower() + ")" };
+                            else if (iPrintCode > 0) explodeElement.label2 = new List<string> { "(" + printCode.ToLower() + ")" };
                         }
 
                         containerExplode.Add(explodeElement);
@@ -25018,7 +25046,7 @@ namespace Gekko
                 IVariable ivWork = null;
                 IVariable ivRef = null;
                 string printCode = null;
-                string[] label = new string[] { "" };
+                List<string> label = new List<string> { "" };
 
                 if (j - 2 >= 0)
                 {
@@ -25114,7 +25142,7 @@ namespace Gekko
                                     {
 
                                     }
-                                    else if (labelMaxLine - ii - 1 >= label.Length)
+                                    else if (labelMaxLine - ii - 1 >= label.Count)
                                     {
 
                                     }
@@ -25847,6 +25875,22 @@ namespace Gekko
                 CrossThreadStuff.CopyButtonEnabled(true);
                 //PrtClipboard(table, false);
             }
+        }
+
+        private static string RemoveSplitter(string s)
+        {
+            string lbl;
+            string[] ss = s.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
+            if (ss.Length > 1)
+            {
+                lbl = ss[1];
+            }
+            else
+            {
+                lbl = s;
+            }
+
+            return lbl;
         }
 
         private static bool OprintHandleArraySeriesWithoutIndexer(O.Prt o, bool unfoldLabels, List<string> labelsHandmade)
@@ -28746,9 +28790,12 @@ namespace Gekko
             }
         }
 
-        private static int PrintCreateLabelsArrayNew(string label, int width, int numberOfLabelsRowsMax, int maxLength, out string[] labelsArray)
+        private static int PrintCreateLabelsArrayNew(string label, int width, int numberOfLabelsRowsMax, int maxLength, out List<string> labelsArray)
         {
-            labelsArray = new string[numberOfLabelsRowsMax];
+            //labelsArray = new string[numberOfLabelsRowsMax];
+
+            labelsArray = new List<string>(new string[numberOfLabelsRowsMax]);            
+
             int numberOfLabelsRows = -12345;
 
             //string label = graphVarsLabels[j];

@@ -65,6 +65,13 @@ namespace Gekko
                     {
                         smpl.bankNumber = bankNumber;
                         ope0.variable[bankNumber] = func69();
+
+                        //tt123
+                        List<string> labels2 = new List<string>();
+                        Program.UnfoldLabels(ope0.label, ref labels2, O.AddLabelHelper2(smpl));
+                        ope0.label2 = labels2;
+
+
                     }
                     smpl.bankNumber = 0;
                     o0.prtElements.Add(ope0);
@@ -79,6 +86,13 @@ namespace Gekko
                     {
                         smpl.bankNumber = bankNumber;
                         ope0.variable[bankNumber] = O.Lookup(smpl, null, (O.ReportInterior(smpl, O.Lookup(smpl, null, null, "%s", null, null, false, EVariableType.Var), 0, labelCounter)), null, false, EVariableType.Var);
+
+                        //tt123
+                        List<string> labels2 = new List<string>();                        
+                        Program.UnfoldLabels(ope0.label, ref labels2, O.AddLabelHelper2(smpl));
+                        ope0.label2 = labels2;
+
+
                     }
                     smpl.bankNumber = 0;
                     o0.prtElements.Add(ope0);
