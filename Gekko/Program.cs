@@ -24622,9 +24622,10 @@ namespace Gekko
             EPrintTypes type = EPrintTypes.Print;
             if (G.Equal(o.prtType, "plot")) type = EPrintTypes.Plot;
 
-            if (type == EPrintTypes.Print && (G.Equal(o.prtType, "gmulprt") || (o.printCodes.Count == 1 && G.Equal(o.printCodes[0].s1, "v") && G.Equal(o.printCodes[0].s2, "yes")))) {
+            if (type == EPrintTypes.Print && (G.Equal(o.prtType, "gmulprt") || (o.printCodes.Count == 1 && G.Equal(o.printCodes[0].s1, "v") && G.Equal(o.printCodes[0].s2, "yes"))))
+            {
 
-                for (int i = 0;i< o.prtElements.Count;i++)
+                for (int i = 0; i < o.prtElements.Count; i++)
                 {
                     //o.printCodes = new List<OptString>();
                     //o.printCodes.Add(new OptString("n", "yes"));
@@ -24641,11 +24642,11 @@ namespace Gekko
                     o.prtElements[i].printCodesFinal.Add("rp");
                     o.prtElements[i].printCodesFinal.Add("m");
                     o.prtElements[i].printCodesFinal.Add("q");
-                    
+
                 }
             }
 
-            bool rows = false; if (G.Equal(o.opt_rows, "yes")) rows = true;            
+            bool rows = false; if (G.Equal(o.opt_rows, "yes")) rows = true;
 
             if (NonSeriesCheck(o, type))
             {
@@ -24656,67 +24657,7 @@ namespace Gekko
             bool unfoldLabels = true;
             List<string> labelsHandmade = new List<string>();
 
-            if (o.prtElements.Count == 1 && ((o.prtElements[0].variable[0] != null && o.prtElements[0].variable[0].Type() == EVariableType.Series) || (o.prtElements[0].variable[1] != null && o.prtElements[0].variable[1].Type() == EVariableType.Series)))
-            {
-                bool[] banks = new bool[2];  //first, ref
-                foreach (string printCode in o.prtElements[0].printCodesFinal)
-                {
-                    int bankCombi = GetBankCombi(printCode);
-                    if (bankCombi == 0) banks[0] = true;
-                    else if (bankCombi == 1) banks[1] = true;
-                    else if (bankCombi == 2)
-                    {
-                        banks[0] = true;
-                        banks[1] = true;
-                    }
-                }
-
-                Series tsFirst = null;
-                Series tsRef = null;
-                if (banks[0]) tsFirst = o.prtElements[0].variable[0] as Series;
-                if (banks[1]) tsRef = o.prtElements[0].variable[1] as Series;
-
-                string name = null;
-                if (tsFirst != null) name = tsFirst.name;
-                else name = tsRef.name;
-                                
-                if ((tsFirst != null && tsFirst.type == ESeriesType.ArraySuper) || (tsRef != null && tsRef.type == ESeriesType.ArraySuper))
-                {
-                    //Print an array-timeseries
-
-                    List<MapMultidimItem> keys = null;
-
-                    if (tsFirst != null) keys = tsFirst.dimensionsStorage.storage.Keys.ToList();
-                    else if (tsRef != null) keys = tsRef.dimensionsStorage.storage.Keys.ToList();
-
-                    if (keys.Count == 0)
-                    {
-                        G.Writeln2("Array-series " + G.GetNameAndFreqPretty(name) + " has no elements");
-                        return;
-                    }
-                    keys.Sort(CompareMapMultidimItems);
-                    List m0 = new List(); //subseries first
-                    List m1 = new List(); //subseries ref
-                    foreach (MapMultidimItem key in keys)
-                    {
-                        try
-                        {
-                            if (banks[0]) m0.Add(tsFirst.dimensionsStorage.storage[key]);
-                            if (banks[1]) m1.Add(tsRef.dimensionsStorage.storage[key]);
-                        }
-                        catch
-                        {
-                            G.Writeln2("*** ERROR: Array elements do not match in first-position and ref databank");
-                            throw new GekkoException();
-                        }
-                        string bankName = null;                        
-                        labelsHandmade.Add(bankName + G.RemoveFreqFromName(name) + "[" + key.ToString() + "]");
-                    }
-                    if (banks[0]) o.prtElements[0].variable[0] = m0;
-                    if (banks[1]) o.prtElements[0].variable[1] = m1;                    
-                    unfoldLabels = false;
-                }
-            }
+            unfoldLabels = OprintHandleArraySeriesWithoutIndexer(o, unfoldLabels, labelsHandmade);
 
             List<O.Prt.Element> containerExplode = new List<O.Prt.Element>();
 
@@ -24888,14 +24829,14 @@ namespace Gekko
                             else if (temp0.freq == EFreq.Annual) freqs[1] = true;
                             else if (temp0.freq == EFreq.Quarterly) freqs[2] = true;
                             else if (temp0.freq == EFreq.Monthly) freqs[3] = true;
-                            
+
                         }
                         else if (temp1 != null)
                         {
                             if (temp1.freq == EFreq.Undated) freqs[0] = true;
                             else if (temp1.freq == EFreq.Annual) freqs[1] = true;
                             else if (temp1.freq == EFreq.Quarterly) freqs[2] = true;
-                            else if (temp1.freq == EFreq.Monthly) freqs[3] = true;                            
+                            else if (temp1.freq == EFreq.Monthly) freqs[3] = true;
                         }
 
                         if (explodeElement.variable[0] != null && !G.IsValueType(explodeElement.variable[0]) || explodeElement.variable[1] != null && !G.IsValueType(explodeElement.variable[1]))
@@ -25141,13 +25082,13 @@ namespace Gekko
                 int[] skipCounter = new int[4];
 
                 if (type == EPrintTypes.Plot) i++;
-                
 
 
-                    //remember there is a label column which gets number 1
+
+                //remember there is a label column which gets number 1
                 for (int year = y1; year <= y2; year++)
                 {
-                    
+
                     if (type != EPrintTypes.Plot) // ------------------------------------------------------------- (1)
                     {
                         i++;
@@ -25183,22 +25124,22 @@ namespace Gekko
                             }
                         }
                         i++;
-                        
-                        
-                        
+
+
+
                         //Non-plots have a first column with dates, plots have such a column for each series
                         //if (j == 1)  //then iv == null
                         {
                             // --------------------------                                
                             // --------------------------
-                            if ((sameFreq == EFreq.Undated || sameFreq == EFreq.Annual) && Globals.globalPeriodTimeFilters2.Count > 0 && ((Globals.globalPeriodTimeFilters2[0].freq == EFreq.Undated && Program.ShouldFilterPeriod(new Gekko.GekkoTime(EFreq.Undated, year, 1))) ||  (Globals.globalPeriodTimeFilters2[0].freq == EFreq.Annual && Program.ShouldFilterPeriod(new Gekko.GekkoTime(EFreq.Annual, year, 1)))))
+                            if ((sameFreq == EFreq.Undated || sameFreq == EFreq.Annual) && Globals.globalPeriodTimeFilters2.Count > 0 && ((Globals.globalPeriodTimeFilters2[0].freq == EFreq.Undated && Program.ShouldFilterPeriod(new Gekko.GekkoTime(EFreq.Undated, year, 1))) || (Globals.globalPeriodTimeFilters2[0].freq == EFreq.Annual && Program.ShouldFilterPeriod(new Gekko.GekkoTime(EFreq.Annual, year, 1)))))
                             {
                                 //kind of hack for annual to omit year if the year is filtered out
                                 i--;
                             }
                             else
                             {
-                                if(j==1)table.Set(i, j, year.ToString()); if (rows) table.SetAlign(i, j, Align.Right);
+                                if (j == 1) table.Set(i, j, year.ToString()); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                         }
 
@@ -25209,7 +25150,7 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (2)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly)) 
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
                         {
                             // --------------------------
                             EFreq freqInThisTableRow = EFreq.Monthly;
@@ -25899,6 +25840,73 @@ namespace Gekko
                 CrossThreadStuff.CopyButtonEnabled(true);
                 //PrtClipboard(table, false);
             }
+        }
+
+        private static bool OprintHandleArraySeriesWithoutIndexer(O.Prt o, bool unfoldLabels, List<string> labelsHandmade)
+        {
+            if (o.prtElements.Count == 1 && ((o.prtElements[0].variable[0] != null && o.prtElements[0].variable[0].Type() == EVariableType.Series) || (o.prtElements[0].variable[1] != null && o.prtElements[0].variable[1].Type() == EVariableType.Series)))
+            {
+                bool[] banks = new bool[2];  //first, ref
+                foreach (string printCode in o.prtElements[0].printCodesFinal)
+                {
+                    int bankCombi = GetBankCombi(printCode);
+                    if (bankCombi == 0) banks[0] = true;
+                    else if (bankCombi == 1) banks[1] = true;
+                    else if (bankCombi == 2)
+                    {
+                        banks[0] = true;
+                        banks[1] = true;
+                    }
+                }
+
+                Series tsFirst = null;
+                Series tsRef = null;
+                if (banks[0]) tsFirst = o.prtElements[0].variable[0] as Series;
+                if (banks[1]) tsRef = o.prtElements[0].variable[1] as Series;
+
+                string name = null;
+                if (tsFirst != null) name = tsFirst.name;
+                else name = tsRef.name;
+
+                if ((tsFirst != null && tsFirst.type == ESeriesType.ArraySuper) || (tsRef != null && tsRef.type == ESeriesType.ArraySuper))
+                {
+                    //Print an array-timeseries
+
+                    List<MapMultidimItem> keys = null;
+
+                    if (tsFirst != null) keys = tsFirst.dimensionsStorage.storage.Keys.ToList();
+                    else if (tsRef != null) keys = tsRef.dimensionsStorage.storage.Keys.ToList();
+
+                    if (keys.Count == 0)
+                    {
+                        G.Writeln2("Array-series " + G.GetNameAndFreqPretty(name) + " has no elements");
+                        throw new GekkoException();
+                    }
+                    keys.Sort(CompareMapMultidimItems);
+                    List m0 = new List(); //subseries first
+                    List m1 = new List(); //subseries ref
+                    foreach (MapMultidimItem key in keys)
+                    {
+                        try
+                        {
+                            if (banks[0]) m0.Add(tsFirst.dimensionsStorage.storage[key]);
+                            if (banks[1]) m1.Add(tsRef.dimensionsStorage.storage[key]);
+                        }
+                        catch
+                        {
+                            G.Writeln2("*** ERROR: Array elements do not match in first-position and ref databank");
+                            throw new GekkoException();
+                        }
+                        string bankName = null;
+                        labelsHandmade.Add(bankName + G.RemoveFreqFromName(name) + "[" + key.ToString() + "]");
+                    }
+                    if (banks[0]) o.prtElements[0].variable[0] = m0;
+                    if (banks[1]) o.prtElements[0].variable[1] = m1;
+                    unfoldLabels = false;
+                }
+            }
+
+            return unfoldLabels;
         }
 
         private static int GetBankCombi(string printCode)
