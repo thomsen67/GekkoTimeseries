@@ -1335,7 +1335,8 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: Window test, #08753205743"); throw new GekkoException();
+                        G.Writeln2("*** ERROR: TT NOTE: Window test, #08753205743");
+                        throw new GekkoException();
                     }
                 }
 
