@@ -229,6 +229,12 @@ namespace Gekko
             }
         }
 
+        public static void PrtElementHandleLabel(GekkoSmpl smpl, O.Prt.Element ope0)
+        {
+            ope0.label2 = new List<string>();
+            Program.UnfoldLabels(ope0.label, ref ope0.label2, O.AddLabelHelper2(smpl));
+        }
+
         public static void GetFromAndToDatabanks(string opt_from, string opt_to, ref Databank fromBank, ref Databank toBank)
         {
             if (opt_from != null)

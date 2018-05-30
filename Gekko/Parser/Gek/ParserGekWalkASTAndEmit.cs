@@ -4256,14 +4256,20 @@ namespace Gekko.Parser.Gek
                             {
                                 node.Code.A("bankNumbers = O.Prt.GetBankNumbers(Globals.tableOption, new List<string>(){o" + Num(node) + ".printcode}" + ");" + G.NL);
                             }
-                            node.Code.A("foreach(int bankNumber in bankNumbers) {" + G.NL);
+                            node.Code.A(G.NL);
+                            //node.Code.A("foreach(int bankNumber in bankNumbers) {" + G.NL);
 
+                            //tt123
+                            node.Code.A("for(int bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++) {" + G.NL);
+                            node.Code.A("int bankNumber = bankNumbers[bankNumberI];" + G.NL);
                             node.Code.A("smpl.bankNumber = bankNumber;" + G.NL);
                             node.Code.A(EmitLocalCacheForTimeLooping(w));
                                                         
                             //node.Code.A("smpl" 
                             node.Code.A("ope" + Num(node) + ".variable[bankNumber] = " + node[0].Code + ";" + G.NL);
                             
+                            node.Code.A("if(bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope" + Num(node) + ");" + G.NL);
+
                             node.Code.A("}" + G.NL);  //end of bankNumbers
                             node.Code.A("smpl.bankNumber = 0;" + G.NL);  //resetting, probably superfluous
                             node.Code.A("o" + Num(node) + ".prtElements.Add(ope" + Num(node) + ");" + G.NL);                            
