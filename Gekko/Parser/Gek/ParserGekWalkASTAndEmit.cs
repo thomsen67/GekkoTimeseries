@@ -4236,12 +4236,12 @@ namespace Gekko.Parser.Gek
                             if (freelists != null)
                             {
                                 freelists = freelists.Substring(0, freelists.Length - ", ".Length);
-                                freelists = "|||" + freelists + "|||";
+                                freelists = Globals.freelists + freelists + Globals.freelists;
                             }
 
                             givenLabel = givenLabel.Replace(G.NL, "");  //remove any newlines, else C# code will become invalid.
 
-                            node.Code.A("ope" + Num(node) + ".label = O.SubstituteScalarsAndLists(`" + freelists + givenLabel + "`, false);" + G.NL);
+                            node.Code.A("ope" + Num(node) + ".label = `" + freelists + givenLabel + "`;" + G.NL);
                             node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2);" + G.NL);
                             ASTNode child = node.GetChild("ASTPRTELEMENTOPTIONFIELD");
                             if (child != null) node.Code.A(child.Code);

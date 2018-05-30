@@ -293,6 +293,8 @@ namespace Gekko
         public static bool printStopWhenErrors = false;  //normally false
         public static bool printOnlyErrors = true;  //normally false
 
+        public const string freelists = "|||";
+
         public const string reportInterior1 = "O.ReportInterior(smpl, ";
         public const string reportInterior2 = ")";
         public const string labelCounter = "labelCounter";

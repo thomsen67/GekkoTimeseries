@@ -24858,8 +24858,15 @@ namespace Gekko
                         }
                         else
                         {
-                            //lbl = labels2[0];
-                            lbl = element.label;
+                            string[] ss = element.label.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
+                            if (ss.Length > 1)
+                            {
+                                lbl = ss[1];
+                            }
+                            else
+                            {
+                                lbl = element.label;
+                            }
                         }
 
                         int lines = -12345;
@@ -26213,7 +26220,7 @@ namespace Gekko
 
                 string[] freelists = new string[0];
                 string rawLabel = elementLabel;
-                string[] ss = elementLabel.Split(new string[] { "|||" }, StringSplitOptions.RemoveEmptyEntries);
+                string[] ss = elementLabel.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
 
                 if (ss.Length > 1)
                 {
@@ -26256,6 +26263,8 @@ namespace Gekko
                     {
                         //this way, there is not a complete crash, and the users get something.
                         //they may complain that the label is non-informative though.
+                        //string[] sss = rawLabel.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
+                        //if (ss.Length > 1) rawLabel = ss[1];
                         labels2.Add(rawLabel);
                     }
                     else
