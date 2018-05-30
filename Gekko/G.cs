@@ -1145,6 +1145,11 @@ namespace Gekko
         }
         public static bool HasSigil(string varname)
         {
+            if (varname == null || varname.Length == 0)
+            {
+                G.Writeln2("*** ERROR: Variable name with zero length");
+                throw new GekkoException();
+            }
             bool hasSigil = false;
             if (varname[0] == Globals.symbolScalar || varname[0] == Globals.symbolCollection) hasSigil = true;
             return hasSigil;

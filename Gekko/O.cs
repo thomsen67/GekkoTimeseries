@@ -884,36 +884,39 @@ namespace Gekko
                 IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable, type, errorIfNotFound);
                 return iv;
             }
-            else if (x.Type() == EVariableType.List)
-            {
-                //for instance PRT {#m}, where #m is a list of strings. Then #m will already have been looked up, when {} is called,
-                //so Lookup is called again, this time with a list as "key"
-                List x_list = x as List;
-                string[] items = Program.GetListOfStringsFromListOfIvariables(x_list.list.ToArray());
-                if (items == null)
-                {
-                    G.Writeln2("*** ERROR: The list contains non-string elements");
-                    throw new GekkoException();
-                }
-                else
-                {
-                    List<IVariable> rv = new List<IVariable>();
-                    foreach(string s in items)
-                    {
-                        string dbName, varName, freq; char firstChar; Chop(s, out dbName, out varName, out freq);
-                        IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable, type, errorIfNotFound);
-                        rv.Add(iv);
-                    }
-                    List m = new List(rv);
-                    return m;
-                }
-            }
+            //!!!!!!!!!!!!
+            //!!!!!!!!!!!!
+            //!!!!!!!!!!!! the stuff below seems obsolete, PRT {#m} or x{#m} or x[#m] is  made very differently now, via unfold() function.
+            //!!!!!!!!!!!!
+            //!!!!!!!!!!!!
+            //else if (x.Type() == EVariableType.List)
+            //{
+            //    //for instance PRT {#m}, where #m is a list of strings. Then #m will already have been looked up, when {} is called,
+            //    //so Lookup is called again, this time with a list as "key"
+            //    List x_list = x as List;
+            //    string[] items = Program.GetListOfStringsFromListOfIvariables(x_list.list.ToArray());
+            //    if (items == null)
+            //    {
+            //        G.Writeln2("*** ERROR: The list contains non-string elements");
+            //        throw new GekkoException();
+            //    }
+            //    else
+            //    {
+            //        List<IVariable> rv = new List<IVariable>();
+            //        foreach(string s in items)
+            //        {
+            //            string dbName, varName, freq; char firstChar; Chop(s, out dbName, out varName, out freq);
+            //            IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable, type, errorIfNotFound);
+            //            rv.Add(iv);
+            //        }
+            //        List m = new List(rv);
+            //        return m;
+            //    }
+            //}
             else
             {
-
-                G.Writeln2("*** ERROR: Var type error when looking up in databank");
+                G.Writeln2("*** ERROR: Expected variable name to be a string, but it is of " + G.GetTypeString(x) + " type");
                 throw new GekkoException();
-
             }
             return x;
         }
@@ -2078,24 +2081,28 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Expected list element to be of string type");
                 throw new GekkoException();
             }
-            string s = s1.string2;
-            int i = -12345;
-            if (int.TryParse(s, out i))
-            {
+            string x1_string = s1.string2;
 
+            bool x1IsInteger = false;
+            int i = -12345;
+            if (int.TryParse(x1_string, out i))
+            {
+                x1IsInteger = true;
+            }
+
+            if (x1IsInteger)
+            {
+                int i2 = O.ConvertToInt(x2);
+                int ii = i + i2;
+                if (minus) ii = i - i2;
+                return new ScalarString(ii.ToString());
+                //return new ScalarVal(ii);
             }
             else
             {
-                G.Writeln2("*** ERROR: Could not convert '" + s + "' into integer");
-                throw new GekkoException();
+                string s2 = O.ConvertToString(x2);
+                return new ScalarString(x1_string + s2);
             }
-                        
-            int i2 = O.ConvertToInt(x2);
-
-            int ii = i + i2;
-            if (minus) ii = i - i2;
-
-            return new ScalarVal(ii);
         }
         
 
@@ -7027,7 +7034,7 @@ namespace Gekko
                 //public IVariable tsBase = null;
                 public IVariable[] variable = new IVariable[2];  //first and ref
                 public string label = null;
-                public List<string> label2 = null;
+                public List<string> label2 = null;  //unfolded labels, for instance x{#m} unfolded into xa and xb.
                 //public string originalLabel = null;
                 public string endoExoIndicator = null;
                 //-- layout

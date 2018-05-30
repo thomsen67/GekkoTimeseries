@@ -24627,22 +24627,7 @@ namespace Gekko
 
                 for (int i = 0; i < o.prtElements.Count; i++)
                 {
-                    //o.printCodes = new List<OptString>();
-                    //o.printCodes.Add(new OptString("n", "yes"));
-                    //o.printCodes.Add(new OptString("p", "yes"));
-                    //o.printCodes.Add(new OptString("rn", "yes"));
-                    //o.printCodes.Add(new OptString("rp", "yes"));
-                    //o.printCodes.Add(new OptString("m", "yes"));
-                    //o.printCodes.Add(new OptString("q", "yes"));
-
-                    o.prtElements[i].printCodesFinal = new List<string>();
-                    o.prtElements[i].printCodesFinal.Add("n");
-                    o.prtElements[i].printCodesFinal.Add("p");
-                    o.prtElements[i].printCodesFinal.Add("rn");
-                    o.prtElements[i].printCodesFinal.Add("rp");
-                    o.prtElements[i].printCodesFinal.Add("m");
-                    o.prtElements[i].printCodesFinal.Add("q");
-
+                    o.prtElements[i].printCodesFinal = new List<string> { "n", "p", "rn", "rp", "m", "q" };
                 }
             }
 
@@ -24855,29 +24840,7 @@ namespace Gekko
                         // ----------------------------------------------------
 
                         string lbl = null;
-
-
-                        //if (!unfoldLabels && n == labelsHandmade.Count)
-                        //{
-                        //    lbl = labelsHandmade[i];
-                        //}
-                        //else if (labels2 != null && n == labels2.Count)
-                        //{
-                        //    lbl = labels2[i];
-                        //}
-                        //else
-                        //{
-                        //    string[] ss = element.label.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
-                        //    if (ss.Length > 1)
-                        //    {
-                        //        lbl = ss[1];
-                        //    }
-                        //    else
-                        //    {
-                        //        lbl = element.label;
-                        //    }
-                        //}
-
+                        
                         //tt123
                         if (!unfoldLabels && n == labelsHandmade.Count)
                         {

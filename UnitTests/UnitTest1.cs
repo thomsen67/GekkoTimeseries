@@ -10192,12 +10192,27 @@ namespace UnitTests
             I("a1 = 1;");
             I("a2 = 2;");
             I("a3 = 3;");
+            I("p <n> {#a}, {%s};");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "a1");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a2");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "a3");
 
-            //I("p <n> {#a}, {%s};");
-            //table = Globals.lastPrtOrMulprtTable;            
-            //Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "a1");
-            //Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a2");
-            //Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a3");
+            I("reset;");
+            I("time 2001 2003;");
+            I("#a = a1, a2;");
+            I("%s = 'a';");
+            I("%i2 = 3;");
+            I("%s2 = 'i';");
+            I("%s3 = 's2';");
+            I("a1 = 1;");
+            I("a2 = 2;");
+            I("a3 = 3;");
+            I("p <n> {#a}, {%s+%{%{''+%s3}+''}2+''};");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "a1");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a2");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "a3");
 
         }
         [TestMethod]
@@ -10236,9 +10251,10 @@ namespace UnitTests
         }
 
 
-    [TestMethod]
-        public void _Test_Print()
+        [TestMethod]
+        public void _Test_PrintMixedFrequencies()
         {
+            //made by running the code and copy-pasting to Excel.
             I("reset;");
             I("time 2001 2003;");
             I("xx1 = (1,2,3);");
@@ -10259,7 +10275,108 @@ namespace UnitTests
             I("xx4 = xx4 + 1000;");
             I("option freq a;");
             I("p xx1, xx2, {#m};");
+
+            double deltaHere = 0.0001d;
+
+            Table table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx1");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "%");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx2");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "%");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "xx3!q");
+            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "%");
+            Assert.AreEqual(table.Get(1, 8).CellText.TextData[0], "xx4!m");
+            Assert.AreEqual(table.Get(1, 9).CellText.TextData[0], "%");
+
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001");
+
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "m1");
+            Assert.AreEqual(table.Get(3, 8).number, 1001d);
+            Assert.AreEqual(table.Get(3, 9).number, double.NaN);
+
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "m2");
+            Assert.AreEqual(table.Get(4, 8).number, 1002d);
+            Assert.AreEqual(table.Get(4, 9).number, 0.0999, deltaHere);
+
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "m3");
+            Assert.AreEqual(table.Get(5, 8).number, 1003d);
+            Assert.AreEqual(table.Get(5, 9).number, 0.0998, deltaHere);
+
+            Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "mSUM");
+            Assert.AreEqual(table.Get(6, 8).number, 1003d);
+            Assert.AreEqual(table.Get(6, 9).number, 0.0998, deltaHere);
+
+            Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "q1");
+            Assert.AreEqual(table.Get(7, 6).number, 1001d);
+            Assert.AreEqual(table.Get(7, 7).number, double.NaN);
+
+            Assert.AreEqual(table.Get(8, 1).CellText.TextData[0], "m4");
+            Assert.AreEqual(table.Get(8, 8).number, 1004d);
+            Assert.AreEqual(table.Get(8, 9).number, 0.0997, deltaHere);
+
+            Assert.AreEqual(table.Get(9, 1).CellText.TextData[0], "m5");
+            Assert.AreEqual(table.Get(9, 8).number, 1005d);
+            Assert.AreEqual(table.Get(9, 9).number, 0.0996, deltaHere);
+
+            Assert.AreEqual(table.Get(10, 1).CellText.TextData[0], "m6");
+            Assert.AreEqual(table.Get(10, 8).number, 1006d);
+            Assert.AreEqual(table.Get(10, 9).number, 0.0995, deltaHere);
+
+            Assert.AreEqual(table.Get(11, 1).CellText.TextData[0], "mSUM");
+            Assert.AreEqual(table.Get(11, 8).number, 1006d);
+            Assert.AreEqual(table.Get(11, 9).number, 0.0995, deltaHere);
+
+            Assert.AreEqual(table.Get(12, 1).CellText.TextData[0], "q2");
+            Assert.AreEqual(table.Get(12, 6).number, 1002d);
+            Assert.AreEqual(table.Get(12, 7).number, 0.0999, deltaHere);
+
+            //skip until row 24
+
+            Assert.AreEqual(table.Get(24, 1).CellText.TextData[0], "qSUM");
+            Assert.AreEqual(table.Get(24, 6).number, 1004d);
+            Assert.AreEqual(table.Get(24, 7).number, 0.0997, deltaHere);
+
+            Assert.AreEqual(table.Get(25, 1).CellText.TextData[0], "a");
+            Assert.AreEqual(table.Get(25, 2).number, 1001d);
+            Assert.AreEqual(table.Get(25, 3).number, double.NaN);
+            Assert.AreEqual(table.Get(25, 4).number, 1004d);
+            Assert.AreEqual(table.Get(25, 5).number, double.NaN);
+
+            Assert.AreEqual(table.Get(27, 1).CellText.TextData[0], "2002");
+
+            //skip until row 70
+
+            Assert.AreEqual(table.Get(70, 1).CellText.TextData[0], "m12");
+            Assert.AreEqual(table.Get(70, 8).number, 1036d);
+            Assert.AreEqual(table.Get(70, 9).number, 0.0966, deltaHere);
+
+            Assert.AreEqual(table.Get(71, 1).CellText.TextData[0], "mSUM");
+            Assert.AreEqual(table.Get(71, 8).number, 1036d);
+            Assert.AreEqual(table.Get(71, 9).number, 0.0966, deltaHere);
+
+            Assert.AreEqual(table.Get(72, 1).CellText.TextData[0], "mSUM12");
+            Assert.AreEqual(table.Get(72, 8).number, 1036d);
+            Assert.AreEqual(table.Get(72, 9).number, 0.0966, deltaHere);
+
+            Assert.AreEqual(table.Get(73, 1).CellText.TextData[0], "q4");
+            Assert.AreEqual(table.Get(73, 6).number, 1012d);
+            Assert.AreEqual(table.Get(73, 7).number, 0.0989, deltaHere);
+
+            Assert.AreEqual(table.Get(74, 1).CellText.TextData[0], "qSUM");
+            Assert.AreEqual(table.Get(74, 6).number, 1012d);
+            Assert.AreEqual(table.Get(74, 7).number, 0.0989, deltaHere);
+
+            Assert.AreEqual(table.Get(75, 1).CellText.TextData[0], "a");
+            Assert.AreEqual(table.Get(75, 2).number, 1003d);
+            Assert.AreEqual(table.Get(75, 3).number, 0.0998, deltaHere);
+            Assert.AreEqual(table.Get(75, 4).number, 1006d);
+            Assert.AreEqual(table.Get(75, 5).number, 0.09950, deltaHere);
+            
         }
+
+
+
+        
 
         [TestMethod]
         public void _Test_List()
