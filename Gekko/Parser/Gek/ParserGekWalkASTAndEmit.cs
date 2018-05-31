@@ -1175,17 +1175,47 @@ namespace Gekko.Parser.Gek
                             break;
                         }
                     case "ASTCURLY":
-                        {                           
-                            
-                            string listName = GetSimpleHashName(node[0]);
-                            string internalName = null;
-                            if (listName != null)
+                        {
+                            string s = node[0].Code.ToString();
+                            ASTNode child = node;
+                            if (child[0].Text == "ASTPLUS" || child[0].Text == "ASTMINUS")
                             {
-                                internalName = SearchUpwardsInTree2(node, listName);                                
+                                //See also #980752345
+                                string listName = GetSimpleHashName(child[0][0]);
+                                string internalName = null;
+                                if (listName != null)
+                                {
+                                    internalName = SearchUpwardsInTree2(node, listName);
+                                }
+
+                                if (internalName != null)
+                                {
+                                    if (child[0].Text == "ASTPLUS")
+                                    {
+                                        s = "O.AddSpecial(" + internalName + ", " + child[0][1].Code + ", false)";
+                                    }
+                                    else
+                                    {
+                                        s = "O.AddSpecial(" + internalName + ", " + child[0][1].Code + ", true)";
+                                    }
+                                }
+                                else
+                                {
+                                    //keep the s from abive
+                                }
+                                
                             }
 
-                            string s = node[0].Code.ToString();
-                            if (internalName != null) s = internalName;
+                            else
+                            {
+                                string listName = GetSimpleHashName(node[0]);
+                                string internalName = null;
+                                if (listName != null)
+                                {
+                                    internalName = SearchUpwardsInTree2(node, listName);
+                                }                                
+                                if (internalName != null) s = internalName;
+                            }
 
                             if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent))
                             {
@@ -2801,7 +2831,7 @@ namespace Gekko.Parser.Gek
                     case "ASTDOTORINDEXER":
                         {
 
-                            string ivTempVar = SearchUpwardsInTree4(node);
+                            string ivTempVar = SearchUpwardsInTree4(node);  //checks if left-hand side
 
                             //isLhs is true if the indexer is on the left-hand side, and is the last indexer.
                             //For instance #m[2][3] = 'a' -----> here the [3] indexer will get "true"
@@ -2809,6 +2839,8 @@ namespace Gekko.Parser.Gek
                             //if (node.Parent.Text == "ASTLEFTSIDE") isLhs = "true";
 
                             //LIGHTFIXME, isRhs
+
+                            bool reportInterior = ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent));
 
                             string indexes = null;
                             string indexesReport = null;
@@ -2830,18 +2862,40 @@ namespace Gekko.Parser.Gek
                                     {
                                         if (child[0].Text == "ASTPLUS")
                                         {
-                                            indexes += "O.AddSpecial(" + internalName + ", " + child[0][1].Code + ", false)";
+                                            string s = "O.AddSpecial(" + internalName + ", " + child[0][1].Code + ", false)";
+                                            indexes += s;
+                                            if (reportInterior)
+                                            {
+                                                indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
+                                            }
                                         }
                                         else
                                         {
-                                            indexes += "O.AddSpecial(" + internalName + ", " + child[0][1].Code + ", true)";
+                                            string s = "O.AddSpecial(" + internalName + ", " + child[0][1].Code + ", true)";
+                                            indexes += s;
+                                            if (reportInterior)
+                                            {
+                                                indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
+                                            }
                                         }
                                     }
                                     else
                                     {
-                                        indexes += node[1][i].Code.ToString();
+                                        string s = node[1][i].Code.ToString();
+                                        indexes += s;
+                                        if (reportInterior)
+                                        {
+                                            indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
+                                        }
                                     }
-                                    if (i < node[1].ChildrenCount() - 1) indexes += ", ";
+                                    if (i < node[1].ChildrenCount() - 1)
+                                    {
+                                        indexes += ", ";
+                                        if (reportInterior)
+                                        {
+                                            indexesReport += ", ";
+                                        }
+                                    }
                                 }
                                 else
                                 {
@@ -2856,15 +2910,12 @@ namespace Gekko.Parser.Gek
                                     string s = node[1][i].Code.ToString();
                                     if (internalName != null) s = internalName;
 
-                                    bool reportInterior = ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent));
-                                    
+                                    indexes += s;  //always done as fallback                                    
                                     if (reportInterior)
                                     {
                                         //only for PRT-type or DISP, and only if the [] is not inside [] or {}.
                                         indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
                                     }
-                                    
-                                    indexes += s;  //always done as fallback                                    
 
                                     if (i < node[1].ChildrenCount() - 1)
                                     {
@@ -5524,7 +5575,7 @@ namespace Gekko.Parser.Gek
             string rv = null;
             while (tmp != null)
             {
-                if (tmp.Text == "ASTCURLY" || tmp.Text == "ASTDOTORINDEXER") return true;
+                if (tmp.Text == "ASTCURLY" || ((tmp.Text == "ASTINDEXER" || tmp.Text == "ASTDOT") && tmp.Parent.Text == "ASTDOTORINDEXER")) return true;
                 tmp = tmp.Parent;
             }
             return false;

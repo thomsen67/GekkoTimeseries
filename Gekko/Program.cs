@@ -26012,24 +26012,31 @@ namespace Gekko
             }
         }
 
-        public static bool HandleLabels(TokenList x, int level, List<O.LabelHelperIVariable> list, string[] freelists, ref int counter)
+        public static bool HandleLabels(TokenList tokenList, int level, List<O.LabelHelperIVariable> iVariableList, string[] uncontrolledSimpleLists, ref int counter)
         {
-            foreach (TokenHelper th in x.storage)
+            //it is checked that the IVariables from iVariableList match in number with the relevant {...} and x{...} in the tokenList.
+            //for x[..., ..., ...] they must also match in indexer position
+            //if any of this is wrong, the method returns true (= fail), and in that case
+            //the labels are not unfolded but just shown as they are.
+            //so there will be no catastrophic fail here, just labels that are not very informative.
+            //the counting check is quite a good check that the {...} and x[...] match.
+
+            foreach (TokenHelper token in tokenList.storage)
             {
-                if (th.subnodes != null)
+                if (token.subnodes != null)
                 {
-                    if (th.subnodesType == "[" || th.subnodesType == "{")
+                    if (token.subnodesType == "[" || token.subnodesType == "{")
                     {
-                        List<TokenList> temp = TokenHelper.SplitCommas(th.subnodes);
+                        List<TokenList> listOfTokensListsCommaSplit = TokenHelper.SplitCommas(token.subnodes);
                         int ii = -1;
-                        foreach (TokenList temp2 in temp)  //does not include start and end parenthesis
+                        foreach (TokenList tokenListCommaSplit in listOfTokensListsCommaSplit)  //does not include start and end parenthesis
                         {
                             counter++;
                             ii++;
-                            if (temp2.storage.Count == 2 && temp2[0].s == Globals.symbolCollection.ToString() && temp2[1].type == TokenKind.Word)
+                            if (tokenListCommaSplit.storage.Count == 2 && tokenListCommaSplit[0].s == Globals.symbolCollection.ToString() && tokenListCommaSplit[1].type == TokenKind.Word)
                             {
-                                string listName = temp2[1].s;
-                                TokenHelper parent = temp2[0];
+                                string listName = tokenListCommaSplit[1].s;
+                                TokenHelper parent = tokenListCommaSplit[0];
                                 bool foundAsSumFunction = false;                                
                                 while (true)
                                 {
@@ -26088,17 +26095,21 @@ namespace Gekko
 
                                 if (!foundAsSumFunction)
                                 {
-
-                                    //We have a simple #x as this argument
-                                    //if (freelists.Contains(temp2[1].s, StringComparer.OrdinalIgnoreCase))
-                                    //{
+                                    //We have a simple #x as this argument                                    
                                     //a free list has its string value put in
-                                    O.LabelHelperIVariable helper = list[counter];
+                                    if (counter >= iVariableList.Count)
+                                    {
+                                        return true;  //out of bounds, do not proceed. It seems we have more tokens found with {...} or x[...] than there are IVariables.
+                                    }
+                                    O.LabelHelperIVariable helper = iVariableList[counter];
                                     if (helper.index != ii)
+                                    {
+                                        //does not match the index position
                                         return true;
+                                    }
                                     if (helper.iv.Type() == EVariableType.String)
                                     {
-                                        HandleLabelsInsertIVariables(th, temp2, O.ConvertToString(helper.iv));
+                                        HandleLabelsInsertIVariables(token, tokenListCommaSplit, O.ConvertToString(helper.iv));
                                     }
                                 }
                                 else
@@ -26110,12 +26121,19 @@ namespace Gekko
                             else
                             {
                                 //it is not a simple #x
-                                O.LabelHelperIVariable helper = list[counter];
+                                if (counter >= iVariableList.Count)
+                                {
+                                    return true;  //out of bounds, do not proceed. It seems we have more tokens found with {...} or x[...] than there are IVariables.
+                                }
+                                O.LabelHelperIVariable helper = iVariableList[counter];
                                 if (helper.index != ii)
+                                {
+                                    //does not match the index position
                                     return true;
+                                }
                                 if (helper.iv.Type() == EVariableType.String || helper.iv.Type() == EVariableType.Date || helper.iv.Type() == EVariableType.Val)
                                 {                                    
-                                    HandleLabelsInsertIVariables(th, temp2, O.ConvertToString(helper.iv));
+                                    HandleLabelsInsertIVariables(token, tokenListCommaSplit, O.ConvertToString(helper.iv));
                                 }
                             }                                
                             
@@ -26126,14 +26144,21 @@ namespace Gekko
                     {
                         //The list only contains index values at the uppermost nesting level of [] or {} parentheses.
                         //But we handle sub-nests regarding ()-parentheses.
-                        bool problem = HandleLabels(th.subnodes, level + 1, list, freelists, ref counter);
-                        if (problem) return true;                        
+                        bool problem = HandleLabels(token.subnodes, level + 1, iVariableList, uncontrolledSimpleLists, ref counter);
+                        if (problem)
+                        {
+                            return true;
+                        }
                     }
                 }
                 else
                 {
                     //s += th.leftblanks + th.s;
                 }
+            }
+            if (level == 0 && (counter + 1 != iVariableList.Count)) //only when returning from the upmost level, where we can see if the numbers match.
+            {
+                return true;
             }
             return false;
             

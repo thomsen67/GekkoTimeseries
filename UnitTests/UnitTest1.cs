@@ -10205,14 +10205,46 @@ namespace UnitTests
             I("%i2 = 3;");
             I("%s2 = 'i';");
             I("%s3 = 's2';");
-            I("a1 = 1;");
-            I("a2 = 2;");
-            I("a3 = 3;");
-            I("p <n> {#a}, {%s+%{%{''+%s3}+''}2+''};");
+            I("a1z = 1;");
+            I("a2z = 2;");
+            I("a3z = 3;");
+            I("p <n> {#a+'z'}, {%s+%{%{''+%s3}+''}2+'z'};");  //in {#a...} a plus or minus is allowed. Nothing else.
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "a1");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a2");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "a3");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "a1z");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a2z");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "a3z");
+
+            I("reset;");
+            I("time 2001 2003;");
+            I("#a = a1, a2;");
+            I("%s = 'a3';");
+            I("xx = series(1);");
+            I("xx[a1] = 1;");
+            I("xx[a2] = 2;");
+            I("xx[a3] = 3;");
+            I("p <n> xx[#a], xx[%s];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx[a3]");
+
+            I("reset;");
+            I("time 2001 2003;");
+            I("#a = a1, a2;");
+            I("%s = 'a';");
+            I("%i2 = 3;");
+            I("%s2 = 'i';");
+            I("%s3 = 's2';");
+            I("xx = series(1);");
+            I("xx[a1z] = 1;");
+            I("xx[a2z] = 2;");
+            I("xx[a3z] = 3;");
+            I("%s9 = 'x';");
+            I("p <n> {%s9+%s9}[#a+'z'], {%s9+%s9}[%s+%{%{''+%s3}+''}2+'z'];");  //in {#a...} a plus or minus is allowed. Nothing else.
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx[a1z]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx[a2z]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx[a3z]");
 
         }
         [TestMethod]
