@@ -3050,7 +3050,7 @@ fileNameFirstPart3:         fileNamePart -> ^(ASTFILENAMEFIRST3 fileNamePart);
 							//stuff like 'a.7z' or 'a b.doc' or 'זרו.doc' must be in quotes.
 fileNamePart:               fileNamePartHelper (GLUEDOT DOT fileNamePartHelper)* -> ^(ASTFILENAMEPART fileNamePartHelper+);
 
-fileNamePartHelper:         varname;  //has to be restricted later on: do not allow a!b or #a.
+fileNamePartHelper:         name; //varname;  //varname....has to be restricted later on: do not allow a!b or #a.
 
 slashHelper1:               GLUEBACKSLASH | DIV;
 slashHelper2:               BACKSLASH | DIV;

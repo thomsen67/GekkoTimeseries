@@ -30086,9 +30086,17 @@ namespace Gekko
             }
 
             string emfName = path + "\\" + file2;
+            string exe = "wgnuplot51.exe";
 
             Process p = new Process();
-            p.StartInfo.FileName = Application.StartupPath + "\\gnuplot\\wgnuplot51.exe";
+            if (G.IsUnitTesting())
+            {
+                p.StartInfo.FileName = Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gnuplot\" + exe;                
+            }
+            else
+            {
+                p.StartInfo.FileName = Application.StartupPath + "\\gnuplot\\" + exe;
+            }
             //NOTE: quotes added because this path may contain blanks
             p.StartInfo.Arguments = Globals.QT + path + "\\" + file3 + Globals.QT;
             bool msg = false;

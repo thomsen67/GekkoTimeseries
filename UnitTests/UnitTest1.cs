@@ -10230,6 +10230,7 @@ namespace UnitTests
 
             I("reset;");
             I("time 2001 2003;");
+            I("function val f(series x, string s); return x[%s]; end;");
             I("#a = a1, a2;");
             I("%s = 'a';");
             I("%i2 = 3;");
@@ -10240,11 +10241,45 @@ namespace UnitTests
             I("xx[a2z] = 2;");
             I("xx[a3z] = 3;");
             I("%s9 = 'x';");
-            I("p <n> {%s9+%s9}[#a+'z'], {%s9+%s9}[%s+%{%{''+%s3}+''}2+'z'];");  //in {#a...} a plus or minus is allowed. Nothing else.
+            I("p <n> {%s9+%s9}[#a+'z'], {%s9+%s9}[%s+%{%{''+%s3}+''}2+'z'], f({%s9+%s9}, 'a3z');");  //in {#a...} a plus or minus is allowed. Nothing else.
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx[a1z]");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx[a2z]");
             Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx[a3z]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "f(xx, 'a3z')");
+
+            //test that indexers and labels work also when the variable (#set) is a function argument.
+            I("reset;");
+            I("FUNCTION string print_with_set(list #set); PRINT <n> qC[#set]; RETURN ''; END;");
+            I("series qc = series(1);");
+            I("qc[a] = 1;");
+            I("qc[b] = 2;");
+            I("list c = a, b;");
+            I("TELL print_with_set(#c); ");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "qC[a]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "qC[b]");
+
+            //This is fundamentally a test of PRT ... file=..., where file= accepts both a name and a string.
+            //So you can use file=sub\xx.txt or file='sub\xx.txt' or file=%s, where %s is a string.
+            //The test also tests PLOT.
+            I("reset;");
+            Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+            Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
+            Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp\analysis");
+            Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp\analysis\graphs");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("%output_path = 'Analysis\\Graphs\\';");  //remember \\ is really \
+            I("FUNCTION string plotx(string x); %fp1 = %output_path + %x + '1' + '.svg'; %fp2 = %output_path + %x + '2' + '.svg'; PLOT <title=%x> {%x} file = %fp1; PLOT <title=%x> {%x} file = {%fp2}; RETURN ''; END;");
+            I("qc = series(1);");
+            I("qc[a] = 1;");
+            I("qc[b] = 2;");
+            I("TELL plotx('qC');");
+            string[] ss = Directory.GetFiles(Globals.ttPath2 + @"\regres\Databanks\temp\analysis\graphs");
+            Assert.AreEqual(ss.Length, 2);
+            Assert.IsTrue(ss[0].EndsWith("qC1.svg"));
+            Assert.IsTrue(ss[1].EndsWith("qC2.svg"));
+
 
         }
         [TestMethod]
