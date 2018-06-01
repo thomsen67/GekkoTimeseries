@@ -512,7 +512,12 @@ namespace Gekko.Parser.Gek
                     }
                     break;
                 case "ASTFUNCTIONDEF2":
-                    {
+                    {                        
+                        if (SearchUpwardsInTree8(node) != null)
+                        {
+                            G.Writeln2("***ERROR: Function definition inside function definition is not allowed");
+                            throw new GekkoException();
+                        }
                         string returnType = node[0].Text;
                         string functionName = GetFunctionName2(node);  //node[1]
                         foreach (ASTNode child in node[2].ChildrenIterator())
@@ -537,8 +542,9 @@ namespace Gekko.Parser.Gek
                             }
                             node.functionDefAnchor.Add(s, "functionarg_" + ++Globals.counter);
                             if (node.functionDef == null) node.functionDef = new List<Tuple<string, string>>();
-                            node.functionDef.Add(new Tuple<string, string>("IVariable", "functionarg_" + Globals.counter));
+                            node.functionDef.Add(new Tuple<string, string>(type.ToLower(), "functionarg_" + Globals.counter));                            
                         }
+                        node.functionType = returnType.ToLower();
 
                     }
                     break;
@@ -1595,11 +1601,20 @@ namespace Gekko.Parser.Gek
 
                     case "ASTRETURN":
                         {
+                            //node.functionDef[]
+
                             node.Code.A(Globals.splitSTOP);
 
                             if (node.ChildrenCount() > 0)
                             {
-                                node.Code.A("return " + node[0].Code + ";" + G.NL);
+                                string type = SearchUpwardsInTree8(node);
+                                if (type == null)
+                                {
+                                    G.Writeln2("*** ERROR: Return of variable, but not inside function definition");
+                                    throw new GekkoException();
+                                }
+
+                                node.Code.A("return O.TypeCheck_" + type + "(" + node[0].Code + ", 0);" + G.NL);
                             }
                             else
                             {
@@ -1941,6 +1956,8 @@ namespace Gekko.Parser.Gek
                             //string vars = null; for (int i = 0; i < numberOfArguments; i++) vars += ", IVariable i" + (i + 1);
                             string vars = null;
 
+                            string typeChecks = null;
+
                             if (node.functionDef == null)
                             {
                                 //do nothing
@@ -1949,13 +1966,18 @@ namespace Gekko.Parser.Gek
                             {
                                 for (int i = 0; i < node.functionDef.Count; i++)
                                 {
-                                    vars += ", " + node.functionDef[i].Item1 + " " + node.functionDef[i].Item2;
+                                    vars += ", IVariable " + node.functionDef[i].Item2;  //type is checked later on
+                                }
+
+                                for (int i = 0; i < node.functionDef.Count; i++)
+                                {
+                                    typeChecks += node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + ", " + (i + 1) + ");" + G.NL;
                                 }
                             }
                             w.headerCs.AppendLine("public static void " + internalName + "() {" + G.NL);
                             w.headerCs.AppendLine(Globals.splitSTOP);
                             w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfArguments + ", `" + functionNameLower + "`);" + G.NL);
-                            w.headerCs.AppendLine("Globals.ufunctions" + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl smpl, P p" + vars + ") => { " + node[3].Code.ToString() + " ; return null; });" + G.NL);
+                            w.headerCs.AppendLine("Globals.ufunctions" + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl smpl, P p" + vars + ") => { " + typeChecks + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + "});" + G.NL);
                             w.headerCs.AppendLine(Globals.splitSTART);
                             w.headerCs.AppendLine("}" + G.NL);
 
@@ -1993,14 +2015,7 @@ namespace Gekko.Parser.Gek
                                 ////TODO: allow overloads
                                 //G.Writeln2("*** ERROR: User function with name '" + w.uFunctionsHelper.functionName + "' has already been defined");
                                 //throw new GekkoException();
-                            }
-                                                        
-                            //if (w.functionUserDefined.ContainsKey(w.uFunctionsHelper.functionName))
-                            //{
-                            //    G.Writeln2("*** ERROR: User function with name '" + w.uFunctionsHelper.functionName + "' has already been defined");
-                            //    throw new GekkoException();
-                            //}
-                            //w.functionUserDefined.Add(w.uFunctionsHelper.functionName, true);
+                            }                            
 
                             //We use ToLower(), since user functions are not distinguished by means of capitalization
                             string lhsClassNameCode = G.GetVariableType(w.uFunctionsHelper.lhsTypes.Count);
@@ -3325,9 +3340,10 @@ namespace Gekko.Parser.Gek
                             string convertTo = null;
 
                             string temp = node[1].Code.ToString();
-                            
-                            if (type != null) node.Code.A("IVariable " + ivTempVar + " = O.IvConvertTo(EVariableType." + type + ", ").A(temp).A(")").End();
-                            else  node.Code.A("IVariable " + ivTempVar + " = ").A(temp).End();
+
+                            //if (type != null) node.Code.A("IVariable " + ivTempVar + " = O.IvConvertTo(EVariableType." + type + ", ").A(temp).A(")").End();
+                            if (type != null) node.Code.A("IVariable " + ivTempVar + " = O.TypeCheck_" + type.ToLower() + "(").A(temp).A(", -1)").End(); //-1 means assignment
+                            else node.Code.A("IVariable " + ivTempVar + " = ").A(temp).End();
 
                             node.Code.A(node[0].Code).End();
 
@@ -5601,6 +5617,25 @@ namespace Gekko.Parser.Gek
                 tmp = tmp.Parent;
             }
             return false;
+        }
+
+        private static string SearchUpwardsInTree8(ASTNode node)
+        {
+            //Looking for function defintion (return value, not arguments)
+            ASTNode tmp = node.Parent;
+            ASTNode parent = null;
+            string rv = null;
+            while (tmp != null)
+            {
+                if (tmp.functionType != null)
+                {
+                    parent = tmp;
+                    rv = tmp.functionType;
+                    break;
+                }                
+                tmp = tmp.Parent;
+            }
+            return rv;
         }
 
         private static void ResetUFunctionHelpers(W w)

@@ -1199,8 +1199,11 @@ namespace Gekko
                 //p.numberOfServiceMessages = 0;
                 smpl.p = p;
             }
-        }        
+        }
 
+        
+
+        //how relates to ConvertToSeries()??
         public static IVariable ConvertToTimeSeries(GekkoSmpl smpl, IVariable x)
         {
             if (x.Type() == EVariableType.Series || x.Type() == EVariableType.Val) return x;
@@ -3714,7 +3717,13 @@ namespace Gekko
         {
             //used for avgt() or sumt() without period indication
             return x;
-        }        
+        }
+
+        // ------------------------------------------------------------------------------  
+        // ------------------------------------------------------------------------------
+        // --------------------- converters start ---------------------------------------
+        // ------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------
 
         public static GekkoTime ConvertToDate(IVariable x, GetDateChoices c)
         {            
@@ -3740,6 +3749,56 @@ namespace Gekko
         {
             return a.ConvertToList();
         }
+
+
+        public static Matrix ConvertToMatrix(IVariable a)
+        {
+            //O.GetListFromCache(
+            if (a.Type() != EVariableType.Matrix)
+            {
+                G.Writeln2("*** ERROR: This variable is not a matrix");
+                throw new GekkoException();
+            }
+            Matrix m = (Matrix)a;
+            return m;
+        }
+
+        //how relates to ConvertToTimeSeries()??
+        public static IVariable ConvertToSeries(IVariable x)
+        {
+            if (x.Type() == EVariableType.Series) return x;
+            else
+            {
+                G.Writeln2("*** ERROR: Cannot convert " + G.GetTypeString(x) + " into SERIES type");
+                throw new GekkoException();
+            }
+        }
+
+        public static IVariable ConvertToMap(IVariable x)
+        {
+            if (x.Type() == EVariableType.Map) return x;
+            else
+            {
+                G.Writeln2("*** ERROR: Cannot convert " + G.GetTypeString(x) + " into MAP type");
+                throw new GekkoException();
+            }
+        }
+
+        public static double ConvertToVal(GekkoTime t, IVariable a)
+        {
+            return a.GetVal(t);
+        }
+
+        public static double ConvertToVal(IVariable a)
+        {
+            return a.ConvertToVal();
+        }
+
+        // ------------------------------------------------------------------------------  
+        // ------------------------------------------------------------------------------
+        // ------------------------ converters end --------------------------------------
+        // ------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------
 
         public static List<string> GetStringList(IVariable a)
         {
@@ -3793,19 +3852,6 @@ namespace Gekko
             return (Matrix)lhs;
         }
 
-
-        public static Matrix ConvertToMatrix(IVariable a)
-        {
-            //O.GetListFromCache(
-            if (a.Type() != EVariableType.Matrix)
-            {
-                G.Writeln2("*** ERROR: This variable is not a matrix");
-                throw new GekkoException();
-            }
-            Matrix m = (Matrix)a;
-            return m;            
-        }
-        
         public static double[,] MultiplyMatrixScalar(double[,] a, double b, int m, int k)
         {
             double[,] c = new double[m, k];
@@ -4038,84 +4084,75 @@ namespace Gekko
         {
             return l;
         }
-
        
-        public static IVariable IvConvertTo(EVariableType type, IVariable a)
-        {
-            switch (type)
-            {
-                case EVariableType.Val:
-                    {
-                        if (a.Type() == EVariableType.Val) return a;
-                        else return new ScalarVal(a.ConvertToVal());
-                    }
-                    break;
-                case EVariableType.String:
-                    {
-                        if (a.Type() == EVariableType.String) return a;
-                        else return new ScalarString(a.ConvertToString());
-                    }
-                    break;
-                case EVariableType.Date:
-                    {
-                        if (a.Type() == EVariableType.Date) return a;
-                        else return new ScalarDate(a.ConvertToDate(GetDateChoices.Strict));
-                    }
-                    break;
-                case EVariableType.Series:
-                    {
-                        if (a.Type() == EVariableType.Series) return a;
-                        else
-                        {
-                            G.Writeln2("*** ERROR: Could not transform " + G.GetTypeString(a) + " into SERIES");
-                            throw new GekkoException();
-                        }
-                    }
-                    break;
-                case EVariableType.List:
-                    {
-                        if (a.Type() == EVariableType.List) return a;
-                        else return new List(a.ConvertToList());
-                    }
-                    break;
-                case EVariableType.Matrix:
-                    {
-                        if (a.Type() == EVariableType.Matrix) return a;
-                        else
-                        {
-                            G.Writeln2("*** ERROR: Could not transform " + G.GetTypeString(a) + " into MATRIX");
-                            throw new GekkoException();
-                        }
-                    }
-                    break;
-                case EVariableType.Map:
-                    {
-                        if (a.Type() == EVariableType.Map) return a;
-                        else
-                        {
-                            G.Writeln2("*** ERROR: Could not transform " + G.GetTypeString(a) + " into MAP");
-                            throw new GekkoException();
-                        }
-                    }
-                    break;
-                case EVariableType.Var:
-                    {
-                        return a;
-                    }
-                    break;
-                default: throw new GekkoException();  //should not be possible
-            }
-        }        
+        //public static IVariable IvConvertTo(EVariableType type, IVariable a)
+        //{
+        //    switch (type)
+        //    {
+        //        //case EVariableType.Val:
+        //        //    {
+        //        //        if (a.Type() == EVariableType.Val) return a;
+        //        //        else return new ScalarVal(a.ConvertToVal());
+        //        //    }
+        //        //    break;
+        //        //case EVariableType.String:
+        //        //    {
+        //        //        if (a.Type() == EVariableType.String) return a;
+        //        //        else return new ScalarString(a.ConvertToString());
+        //        //    }
+        //        //    break;
+        //        //case EVariableType.Date:
+        //        //    {
+        //        //        if (a.Type() == EVariableType.Date) return a;
+        //        //        else return new ScalarDate(a.ConvertToDate(GetDateChoices.Strict));
+        //        //    }
+        //        //    break;
+        //        //case EVariableType.Series:
+        //        //    {
+        //        //        if (a.Type() == EVariableType.Series) return a;
+        //        //        else
+        //        //        {
+        //        //            G.Writeln2("*** ERROR: Could not transform " + G.GetTypeString(a) + " into SERIES");
+        //        //            throw new GekkoException();
+        //        //        }
+        //        //    }
+        //        //    break;
+        //        //case EVariableType.List:
+        //        //    {
+        //        //        if (a.Type() == EVariableType.List) return a;
+        //        //        else return new List(a.ConvertToList());
+        //        //    }
+        //        //    break;
+        //        //case EVariableType.Matrix:
+        //        //    {
+        //        //        if (a.Type() == EVariableType.Matrix) return a;
+        //        //        else
+        //        //        {
+        //        //            G.Writeln2("*** ERROR: Could not transform " + G.GetTypeString(a) + " into MATRIX");
+        //        //            throw new GekkoException();
+        //        //        }
+        //        //    }
+        //        //    break;
+        //        case EVariableType.Map:
+        //            {
+        //                if (a.Type() == EVariableType.Map) return a;
+        //                else
+        //                {
+        //                    G.Writeln2("*** ERROR: Could not transform " + G.GetTypeString(a) + " into MAP");
+        //                    throw new GekkoException();
+        //                }
+        //            }
+        //            break;
+        //        case EVariableType.Var:
+        //            {
+        //                return a;
+        //            }
+        //            break;
+        //        default: throw new GekkoException();  //should not be possible
+        //    }
+        //}        
 
-        public static double ConvertToVal(GekkoTime t, IVariable a)
-        {            
-            return a.GetVal(t);
-        }
-
-        public static double ConvertToVal(IVariable a)
-        {
-            return a.ConvertToVal();
-        }
+        
 
         //public static void GetVal777(GekkoSmpl smpl, IVariable a, int bankNumber, O.Prt.Element e)  //used in PRT and similar, can accept a list that will show itself as a being an integer with ._isName set.
         //{
@@ -4213,6 +4250,153 @@ namespace Gekko
                 throw new GekkoException();
             }
         }
+
+        // ------------------- type checks start ---------------------------
+        // we do type checks as explicit functions since it is faster than using a switch
+        // position -1: assignment like STRING %s = 123; where type fails
+        // posiion 0: return value type is wrong, for instance "return 123" in a "function string f(...)"
+        // poisition i > 0: function argument, for instance f(123) in a "function string f(string x)"
+
+        public static IVariable TypeCheck_series(IVariable x, int position)
+        {
+            if (x.Type() != EVariableType.Series)
+            {
+                try
+                {
+                    x = O.ConvertToSeries(x); //ConvertToTimeSeries() is more complicated
+                }
+                catch (Exception e)
+                {
+                    if (position == -1) G.Writeln("*** ERROR: The right-hand side should be SERIES type");
+                    else if (position == 0) G.Writeln("*** ERROR: The return type should be SERIES");
+                    else G.Writeln("*** ERROR: Argument #" + position + " should be SERIES type");                    
+                    throw;
+                }
+            }
+            return x;
+        }
+
+        public static IVariable TypeCheck_val(IVariable x, int position)
+        {
+            if (x.Type() != EVariableType.Val)
+            {
+                try
+                {
+                    x = new ScalarVal(O.ConvertToVal(x));
+                }
+                catch (Exception e)
+                {
+                    if (position == -1) G.Writeln("*** ERROR: The right-hand side should be VAL type");
+                    else if (position == 0) G.Writeln("*** ERROR: The return type should be VAL");
+                    else G.Writeln("*** ERROR: Argument #" + position + " should be VAL type");
+                    throw;
+                }
+            }
+            return x;
+        }
+
+        public static IVariable TypeCheck_string(IVariable x, int position)
+        {
+            if (x.Type() != EVariableType.String)
+            {
+                try
+                {
+                    x = new ScalarString(O.ConvertToString(x));
+                }
+                catch (Exception e)
+                {
+                    if (position == -1) G.Writeln("*** ERROR: The right-hand side should be STRING type");
+                    else if (position == 0) G.Writeln("*** ERROR: The return type should be STRING");
+                    else G.Writeln("*** ERROR: Argument #" + position + " should be STRING type");
+                    throw;
+                }
+            }
+            return x;
+        }
+
+        public static IVariable TypeCheck_date(IVariable x, int position)
+        {
+            if (x.Type() != EVariableType.Date)
+            {
+                try
+                {
+                    x = new ScalarDate(O.ConvertToDate(x));
+                    //x= new ScalarDate(x.ConvertToDate(GetDateChoices.Strict)); same same
+                }
+                catch (Exception e)
+                {
+                    if (position == -1) G.Writeln("*** ERROR: The right-hand side should be DATE type");
+                    else if (position == 0) G.Writeln("*** ERROR: The return type should be DATE");
+                    else G.Writeln("*** ERROR: Argument #" + position + " should be DATE type");
+                    throw;
+                }
+            }
+            return x;
+        }
+
+        public static IVariable TypeCheck_list(IVariable x, int position)
+        {
+            if (x.Type() != EVariableType.List)
+            {
+                try
+                {
+                    x = new List(O.ConvertToList(x));
+                }
+                catch (Exception e)
+                {
+                    if (position == -1) G.Writeln("*** ERROR: The right-hand side should be LIST type");
+                    else if (position == 0) G.Writeln("*** ERROR: The return type should be LIST");
+                    else G.Writeln("*** ERROR: Argument #" + position + " should be LIST type");
+                    throw;
+                }
+            }
+            return x;
+        }
+
+        public static IVariable TypeCheck_matrix(IVariable x, int position)
+        {
+            if (x.Type() != EVariableType.Matrix)
+            {
+                try
+                {
+                    x = O.ConvertToMatrix(x);
+                }
+                catch (Exception e)
+                {
+                    if (position == -1) G.Writeln("*** ERROR: The right-hand side should be MATRIX type");
+                    else if (position == 0) G.Writeln("*** ERROR: The return type should be MATRIX");
+                    else G.Writeln("*** ERROR: Argument #" + position + " should be MATRIX type");
+                    throw;
+                }
+            }
+            return x;
+        }
+
+        public static IVariable TypeCheck_map(IVariable x, int position)
+        {
+            if (x.Type() != EVariableType.Map)
+            {
+                try
+                {
+                    x = O.ConvertToMap(x);
+                }
+                catch (Exception e)
+                {
+                    if (position == -1) G.Writeln("*** ERROR: The right-hand side should be MAP type");
+                    else if (position == 0) G.Writeln("*** ERROR: The return type should be MAP");
+                    else G.Writeln("*** ERROR: Argument #" + position + " should be MAP type");
+                    throw;
+                }
+            }
+            return x;
+        }
+
+        public static IVariable TypeCheck_var(IVariable x, int position)
+        {
+            return x;  //no checks
+        }
+
+        // -------------------- type checks end ----------------------------
 
         public static int ConvertToInt(IVariable a)
         {

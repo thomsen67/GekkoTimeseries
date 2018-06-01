@@ -10479,6 +10479,37 @@ namespace UnitTests
         [TestMethod]
         public void _Test_UserDefinedFunctions()
         {
+            
+            //Type check 1
+            I("FUNCTION val f(val %x); RETURN %x+%x; END;");
+            I("%v = f(3);");
+            _AssertScalarVal(First(), "%v", 6d);
+
+            //Type check 2, this should fail with type error
+            I("FUNCTION val f(string %x); RETURN %x+%x; END;");
+            FAIL("%v = f(3);");
+            
+            //Type check 3, this should fail with type error
+            I("FUNCTION string f(val %x); RETURN %x+%x; END;");
+            FAIL("%v = f(3);");
+            
+            //Type check 4, this should fail with type error
+            I("FUNCTION val f(val %x); RETURN %x+%x; END;");
+            FAIL("%v = f('3');");
+
+            //Type check 5
+            I("FUNCTION string f(string %x); RETURN %x+%x; END;");
+            I("%v = f('3');");
+            _AssertScalarString(First(), "%v", "33");
+
+            //Type check 6, this should fail with type error
+            I("FUNCTION string f(val %x); RETURN %x+%x; END;");
+            FAIL("%v = f('3');");
+
+            //Type check 7, this should fail with type error
+            I("FUNCTION val f(string %x); RETURN %x+%x; END;");
+            FAIL("%v = f('3');");
+
             I("function list add2(val %x, val %y); return (%x, %x +%y); end;");
             I("%v = add2(10, 20)[2];");
             _AssertScalarVal(First(), "%v", 30d);
