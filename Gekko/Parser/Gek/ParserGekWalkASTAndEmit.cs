@@ -3469,6 +3469,8 @@ namespace Gekko.Parser.Gek
                             //    }
                             //}
 
+                            string ivTempVar = SearchUpwardsInTree4(node);
+
 
                             string s = GetSimpleName(node);
                             string internalName = null;
@@ -3476,7 +3478,16 @@ namespace Gekko.Parser.Gek
                             bool functionHit = false;
                             if (internalName != null)
                             {
-                                node.Code.CA(internalName);
+                                if (isLeftSideVariable)
+                                {
+                                    node.Code.CA(internalName + " = " + ivTempVar + ";" + G.NL);
+                                }
+                                else
+                                {
+                                    node.Code.CA(internalName);
+                                }
+                                
+                                //node.Code.CA("[[" + internalName + " = " + ivTempVar + ";" + G.NL + "]]");
                                 functionHit = true;
                             }
 
@@ -3489,7 +3500,7 @@ namespace Gekko.Parser.Gek
                                     if (mapName == null) throw new GekkoException();
                                 }
 
-                                string ivTempVar = SearchUpwardsInTree4(node);
+                                
                                 if (ivTempVar == null) ivTempVar = "null";
 
                                 //Check for simple variable like b:x!q or b:%s
