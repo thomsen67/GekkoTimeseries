@@ -1412,7 +1412,19 @@ namespace Gekko.Parser.Gek
                                 indexes += node[1].Code.ToString();
                             }
 
-                            node.Code.A("O.ListContains(" + node[0].Code + "," + indexes + ")");
+
+
+                            if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent))
+                            {
+                                //only for PRT-type or DISP, and only if the [] is not inside [] or {}.
+                                node.Code.A("O.ListContains(" + node[0].Code + "," + Globals.reportInterior1 + indexes + ", " + "0" + ", " + Globals.labelCounter + Globals.reportInterior2 + ")");
+                            }
+                            else
+                            {
+                                node.Code.A("O.ListContains(" + node[0].Code + "," + indexes + ")");
+                            }
+
+                            
                         }
                         break;
                     case "ASTCOMPARE":

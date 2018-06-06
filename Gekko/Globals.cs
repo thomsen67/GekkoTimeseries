@@ -40,7 +40,7 @@ namespace Gekko
     /// </summary>
     public class Globals        
     {
-        public static string versionInternal = "v7"; 
+        public static string versionInternal = "v8"; 
 
         public static bool version30 = true;
 

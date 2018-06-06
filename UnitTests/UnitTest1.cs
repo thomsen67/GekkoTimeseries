@@ -10230,7 +10230,7 @@ namespace UnitTests
 
             I("reset;");
             I("time 2001 2003;");
-            I("function val f(series x, string s); return x[%s]; end;");
+            I("function series f(series x, string s); return x[%s]; end;");
             I("#a = a1, a2;");
             I("%s = 'a';");
             I("%i2 = 3;");
