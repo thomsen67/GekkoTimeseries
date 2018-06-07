@@ -251,7 +251,7 @@ namespace Gekko.Parser.Gek
                         }
 
                         Program.WriteErrorMessage(lineNumber - deduct, problemLine, text, originalFileName);
-                        if (lineHelper < 0) G.Writeln2("+++ NOTE: The error is probably from lib.gcm, line " + lineNumber, Color.Red);
+                        if (lineHelper < 0) G.Writeln2("+++ NOTE: The error is probably from " + Program.options.library_file + ", line " + lineNumber, Color.Red);
                         
                     }
                 }

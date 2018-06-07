@@ -6390,7 +6390,18 @@ namespace Gekko
                 string libcode = null;
                 if (Program.options.library_file != null && Program.options.library_file != "")
                 {
-                    libcode = GetTextFromFileWithWait(Program.options.library_file);
+                    if (ph.fileName != null && ph.fileName != "" && G.equal(Path.GetFileName(ph.fileName), Program.options.library_file))
+                    {
+                        //do not add lib.gcm to itself. Sometimes the user may RUN lib.gcm to test it out.
+                    }
+                    else if (ph.commandsText.Trim().ToLower() == "run lib;" || ph.commandsText.Trim().ToLower() == "run lib.gcm;")
+                    {
+                        //also do nothing, see above
+                    }
+                    else
+                    {
+                        libcode = GetTextFromFileWithWait(Program.options.library_file);
+                    }
                 }
 
                 if (fileName != "")

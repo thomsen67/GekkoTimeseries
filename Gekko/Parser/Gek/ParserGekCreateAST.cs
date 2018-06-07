@@ -553,7 +553,7 @@ namespace Gekko.Parser.Gek
 
                 if (lineNo - deduct < 0)
                 {
-                    G.Writeln2("+++ NOTE: The line is probably from a library file, cf. the FUNCTION command.");
+                    G.Writeln2("+++ NOTE: The error is probably from " + Program.options.library_file + ", cf. the FUNCTION/PROCEDURE commands.");
                     G.Writeln("          " + G.ReplaceGlueNew(sdeduct).Replace("//", ""));
                 }
             }
@@ -774,7 +774,7 @@ namespace Gekko.Parser.Gek
 
                 if (lineNo - deduct < 0)
                 {
-                    G.Writeln2("+++ NOTE: The line is probably from a library file, cf. the FUNCTION command.");
+                    G.Writeln2("+++ NOTE: The error is probably from " + Program.options.library_file + ", cf. the FUNCTION/PROCEDURE command.");
                     G.Writeln("          " + G.ReplaceGlueNew(sdeduct).Replace("//", ""));
                 }
             }

@@ -1925,17 +1925,17 @@ namespace Gekko.Parser.Gek
                             }
                             else
                             {
-                                if (Globals.uFunctionStorageCs.ContainsKey(functionName))  //case-insensitive anyway
+                                string s = functionName;
+                                if (node.Text == "ASTPROCEDURE")
                                 {
-                                    node.Code.A(Globals.uProc).A(".").A(functionName).A("(").A(Globals.functionP1Cs).A(", ").A(Globals.functionT1Cs).A(", ");
+                                    s = Globals.procedure + functionName;
+                                }
+                                if (Globals.uFunctionStorageCs.ContainsKey(s))  //case-insensitive anyway
+                                {                                    
+                                    node.Code.A(Globals.uProc).A(".").A(s).A("(").A(Globals.functionP1Cs).A(", ").A(Globals.functionT1Cs).A(", ");
                                 }
                                 else
-                                {
-                                    string s = functionName;
-                                    if (node.Text == "ASTPROCEDURE")
-                                    {
-                                        s = Globals.procedure + functionName;
-                                    }
+                                {                                    
                                     node.Code.A("Functions." + s + "(" + Globals.functionT1Cs + ", ");                                    
                                 }
 
