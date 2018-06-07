@@ -89,8 +89,11 @@ tokens {
 	ASTNAMEHELPER;
 	ASTINTERPOLATE;
 	ASTTABLEMAIN;
+	ASTPROCEDURE;
 	ASTLISTTRIM;
 	ASTPRTUSING;
+	ASTPROCEDUREDEFTYPE;
+	ASTPROCEDUREDEFNAME;
 	ASTOR;
 	ASTAND;
 	ASTNOT;
@@ -118,6 +121,7 @@ tokens {
     ASTCLEARALL;
     ASTCLONE;
     ASTCLOSE;
+	ASTPROCEDUREDEFCODE;
     ASTCLOSEALL;
     ASTCLOSEBANKS;
     ASTCLOSESTAR;
@@ -278,6 +282,10 @@ tokens {
     ASTINTEGER;
     ASTINTEGER;
     ASTINTEGERNEGATIVE;
+	ASTPROCEDUREDEF;
+    ASTPROCEDUREDEFARGS;
+    ASTPROCEDUREDEFRHSSIMPLE;
+    ASTPROCEDUREDEFARG;
     ASTITERSHOW;
     ASTLABEL1;
     ASTLABEL2;
@@ -771,6 +779,7 @@ Y2                    = 'Y2'                       ;
 
     X = 'X';
 	Y = 'Y';
+	PROCEDURE = 'PROCEDURE';
 	
 	UNITS = 'UNITS';
 	MDATEFORMAT = 'MDATEFORMAT';
@@ -1273,6 +1282,7 @@ d.Add("Y" ,Y);
 		d.Add("IMPULSES" , IMPULSES);
 		d.Add("OFFSET" , OFFSET);
 		d.Add("DETECT" , DETECT);
+		d.Add("PROCEDURE" , PROCEDURE);
 		
 										d.Add("SIZE",SIZE);
 										d.Add("CONTINUE",CONTINUE);
@@ -1809,6 +1819,7 @@ expr2                     :
 						  | exit           SEMICOLON!
 						  | findmissingdata SEMICOLON!
                           | for2
+						  | proceduredef   SEMICOLON!						
 						  | functiondef    SEMICOLON!						
                           | genr           SEMICOLON   ->    ^({token("ASTMETA¤"+($genr.text), ASTMETA, 0)} genr)
 						  | goto2          SEMICOLON!
@@ -1872,9 +1883,12 @@ expr2                     :
 						  | vers           SEMICOLON!
 						  | write          SEMICOLON!
 						  | x12a           SEMICOLON!
+						  | procedure      SEMICOLON!
                           ;						
 
 // --------------------------------------------------------------------------------------------------
+
+procedure                 : ident expression* -> ^(ASTPROCEDURE expression*);
 
 analyze                   : ANALYZE analyzeOpt1? analyzeElements -> ^({token("ASTANALYZE", ASTANALYZE, $ANALYZE.Line)} analyzeOpt1? analyzeElements );
 analyzeOpt1               : ISNOTQUAL
@@ -2013,6 +2027,11 @@ for2                      : forValHelper
 						  | forStringHelper
 						  | forDateHelper
 						  ;
+						  
+proceduredef              : PROCEDURE uDotIdent proceduredefRhsH1 SEMICOLON expressions? END -> ^({token("ASTPROCEDUREDEF", ASTPROCEDUREDEF, $PROCEDURE.Line)} ^(ASTPROCEDUREDEFTYPE) ^(ASTPROCEDUREDEFNAME uDotIdent) proceduredefRhsH1 ^(ASTPROCEDUREDEFCODE expressions?));
+proceduredefRhsH1         : proceduredefRhsH2+ -> ^(ASTPROCEDUREDEFARGS proceduredefRhsH2+);  //for instance "VAL x, DATE d
+proceduredefRhsH2         : proceduredefRhsH3 -> ^(ASTPROCEDUREDEFRHSSIMPLE proceduredefRhsH3+);  //for instance "VAL x"						  
+proceduredefRhsH3         : type ident -> ^(ASTPROCEDUREDEFARG type ident);  //for instance "VAL x"
 
 functiondef               : FUNCTION functionDefLhsH1 uDotIdent leftParen functiondefRhsH1 rightParen SEMICOLON expressions? END -> ^({token("ASTFUNCTIONDEF", ASTFUNCTIONDEF, $FUNCTION.Line)} ^(ASTFUNCTIONDEFTYPE functionDefLhsH1) ^(ASTFUNCTIONDEFNAME uDotIdent) functiondefRhsH1 ^(ASTFUNCTIONDEFCODE expressions?));
 
@@ -3437,6 +3456,7 @@ ident                     : Ident|
 							UNITS|
                             LINESPOINTS|
 							CONTINUE|
+							PROCEDURE|
 							//LINES|
 							BOXES|
 							FILLEDCURVES|

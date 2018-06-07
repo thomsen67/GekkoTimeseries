@@ -18,13 +18,15 @@ public static void C0(P p) {
 
 GekkoTime t = Globals.tNull;
 
+p.SetText(@"¤1");
+
+
 
 p.SetText(@"¤1");
-Program.options.freq = G.GetFreq(O.GetString((O.GetScalarFromCache(ref scalar3, "s", false, false))));
-G.Writeln();
-//G.Writeln("option freq = " + G.GetFreq(O.GetString((O.GetScalarFromCache(ref scalar3, "s", "no", "no")))) + "");
-ClearTS(p);
-Program.AdjustFreq();
+//double tempDouble2 = (UProc.f(p, t)).GetVal(t);
+//O.SetValFromCache(ref scalar3, "v", tempDouble2);
+
+
 
 
 

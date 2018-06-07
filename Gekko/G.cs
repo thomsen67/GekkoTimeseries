@@ -1434,7 +1434,8 @@ namespace Gekko
         
         public static string GetVariableType(int n)
         {
-            if (n == 1) return "IVariable";            
+            if (n == 0) return "void";
+            else if (n == 1) return "IVariable";            
             else return "GekkoTuple.Tuple" + n;
         }
 

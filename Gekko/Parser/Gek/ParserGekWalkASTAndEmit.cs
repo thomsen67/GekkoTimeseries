@@ -201,7 +201,7 @@ namespace Gekko.Parser.Gek
             }
             
             //See also #890752345
-            if (node.Text == "ASTIFSTATEMENTS" || node.Text == "ASTELSESTATEMENTS" || node.Text == "ASTFORSTATEMENTS" || node.Text == "ASTFUNCTIONDEFCODE")
+            if (node.Text == "ASTIFSTATEMENTS" || node.Text == "ASTELSESTATEMENTS" || node.Text == "ASTFORSTATEMENTS" || node.Text == "ASTFUNCTIONDEFCODE" || node.Text == "ASTPROCEDUREDEFCODE")
             {
                 relativeDepth = 0;  //new indentation level, used to know what is a command and what is stuff deeper down the tree
             }
@@ -230,6 +230,7 @@ namespace Gekko.Parser.Gek
             switch (node.Text)
             {
                 case "ASTFUNCTIONDEF":
+                case "ASTPROCEDUREDEF":
                     {
                         if (w.uFunctionsHelper != null)
                         {
@@ -1081,6 +1082,7 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTFUNCTIONDEFCODE":
+                    case "ASTPROCEDUREDEFCODE":
                         {
                             GetCodeFromAllChildren(node);
                             //AddSplitMarkers(node);                        
@@ -1442,6 +1444,7 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTFUNCTIONDEF":
+                    case "ASTPROCEDUREDEF":
                         {
                             //NOTE: Splitting
                             //      All content is put into the header, w.headerCs, so it will not be split
@@ -1942,11 +1945,13 @@ namespace Gekko.Parser.Gek
                         break;
                     
                     case "ASTFUNCTIONDEFARGS":
+                    case "ASTPROCEDUREDEFARGS":
                         {
                             //No code to be harvested, function args are completely primitive {type, name} items put in functionArguments container.
                         }
                         break;
                     case "ASTFUNCTIONDEFARG":
+                    case "ASTPROCEDUREDEFARG":
                         {
                             //No code to be harvested, function args are completely primitive {type, name} items put in functionArguments container.
                             //handled in ASTFUNCTIONDEFRHSSIMPLE and ASTFUNCTIONDEFRHSTUPLE
@@ -1972,6 +1977,7 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTFUNCTIONDEFRHSSIMPLE":
+                    case "ASTPROCEDUREDEFRHSSIMPLE":
                         {
                             //TODO TODO TODO check that args have different names                         
                             ASTNode child = node[0];
@@ -1988,22 +1994,31 @@ namespace Gekko.Parser.Gek
                         }
                         break;                    
                     case "ASTFUNCTIONDEFTYPE":
+                    case "ASTPROCEDUREDEFTYPE":
+                        {
+                            if (node.ChildrenCount() == 0)
+                            {
+                                //w.uFunctionsHelper.lhsTypes.Add("void");
+                            }
+                            else
                             {
                                 if (node[0].Text == "ASTFUNCTIONDEFLHSTUPLE")
-                                {                                    
+                                {
                                     foreach (ASTNode child in node[0].ChildrenIterator())
                                     {
                                         w.uFunctionsHelper.lhsTypes.Add(child.Text);
-                                    }                                    
+                                    }
                                 }
                                 else
                                 {
                                     w.uFunctionsHelper.lhsTypes.Add(node[0].Text);
                                 }
-
                             }
-                            break;
+
+                        }
+                        break;
                     case "ASTFUNCTIONDEFNAME":
+                    case "ASTPROCEDUREDEFNAME":
                         {
                             w.uFunctionsHelper.functionName = node[0].Text;
                         }
