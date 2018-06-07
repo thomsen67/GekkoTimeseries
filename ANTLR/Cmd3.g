@@ -65,6 +65,7 @@ tokens {
 	ASTEXPRESSIONNEW;
 	ASTFLEXIBLELIST;
 	ASTNAMESLIST;
+	ASTPROCEDURE;
 ASTNAME;
 ASTIDENT;
 ASTCURLYSIMPLE;
@@ -2110,7 +2111,10 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | time                 SEMICOLON!
 						  | timefilter           SEMICOLON!
 						  | write                SEMICOLON!
+						  //| procedure            SEMICOLON!
 						    ;
+
+//procedure: ident expression* -> ^(ASTPROCEDURE expression*);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ASSIGNMENT, VAL, STRING, DATE, SERIES, LIST, MATRIX, MAP, VAR
