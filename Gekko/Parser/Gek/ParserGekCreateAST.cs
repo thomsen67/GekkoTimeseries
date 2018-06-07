@@ -417,6 +417,7 @@ namespace Gekko.Parser.Gek
             int number = 0;
             foreach (string s in errors)
             {
+                if (s == null) continue;
                 number++;
                 if (errors.Count > 1)  //always just one
                 {

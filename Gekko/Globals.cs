@@ -135,6 +135,8 @@ namespace Gekko
 
         public static bool smart1 = true;
 
+        public static string procedure = "";// "procedure_";
+
         public static string functionT1Cs = "t";
         public static string functionT2Cs = "GekkoTime t";
 

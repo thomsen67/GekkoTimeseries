@@ -1484,6 +1484,10 @@ namespace Gekko.Parser.Gek
                             }
 
                             string method = Globals.splitSTOP;
+
+                            //string s = null;
+                            //if (node.Text == "ASTPROCEDUREDEF") s = Globals.procedure;
+
                             method += "public static " + lhsClassNameCode + " " + w.uFunctionsHelper.functionName.ToLower() + "(" + Globals.functionP2Cs + ", " + Globals.functionT2Cs + ", ";
 
                             for (int i = 0; i < w.uFunctionsHelper.storage.Count; i++)
@@ -1597,6 +1601,7 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTFUNCTION":
+                    case "ASTPROCEDURE":
                         {
                             string functionName = GetFunctionName(node);
 
@@ -1926,7 +1931,12 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
-                                    node.Code.A("Functions." + functionName + "(" + Globals.functionT1Cs + ", ");
+                                    string s = functionName;
+                                    if (node.Text == "ASTPROCEDURE")
+                                    {
+                                        s = Globals.procedure + functionName;
+                                    }
+                                    node.Code.A("Functions." + s + "(" + Globals.functionT1Cs + ", ");                                    
                                 }
 
                                 for (int i = 1; i < node.ChildrenCount(); i++)
@@ -1940,6 +1950,11 @@ namespace Gekko.Parser.Gek
                                     node.Code.CA(node.Code.ToString().Substring(0, node.Code.ToString().Length - 2));
                                 }
                                 node.Code.A(")");
+                                if (node.Text == "ASTPROCEDURE")
+                                {
+                                    node.Code.A(";" + G.NL);  //not inside expression
+                                }
+                                
                             }
                         }
                         break;
@@ -2020,7 +2035,8 @@ namespace Gekko.Parser.Gek
                     case "ASTFUNCTIONDEFNAME":
                     case "ASTPROCEDUREDEFNAME":
                         {
-                            w.uFunctionsHelper.functionName = node[0].Text;
+                            if (node.Text == "ASTPROCEDUREDEFNAME") w.uFunctionsHelper.functionName = Globals.procedure + node[0].Text;
+                            else w.uFunctionsHelper.functionName = node[0].Text;
                         }
                         break;
                     case "ASTGENERIC1":

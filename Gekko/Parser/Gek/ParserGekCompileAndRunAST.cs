@@ -152,6 +152,7 @@ namespace Gekko.Parser.Gek
 
         private static void HandleRunErrors(P p, Exception e)
         {
+            
             if (Globals.threadIsInProcessOfAborting)
             {
                 throw e;
@@ -170,6 +171,27 @@ namespace Gekko.Parser.Gek
                 List<string> commandLines;
 
                 Program.GetErrorLineAndText(p, p.GetDepth(), out lineNumber, out originalFileName, out commandLines);
+
+
+
+
+                //!!!!!!!!!!!!!!!!!!
+                string sdeduct = null;
+                int deduct = 0;
+                int ih = 0;
+                foreach (string s in commandLines)
+                {
+                    if (s.Contains(Globals.libHelper))
+                    {
+                        deduct = ih + 2;
+                        sdeduct = s;
+                        break;
+                    }
+                    ih++;
+                }
+                //!!!!!!!!!!!!!!!!!!
+
+
 
                 if (lineNumber <= 0)
                 {
@@ -211,13 +233,16 @@ namespace Gekko.Parser.Gek
                         string xx = "Running";
                         if (lexer == true) xx = "Problem parsing/lexing";
                         string text = null;
-                        string lineNumber3 = "" + lineNumber;
+                        int lineHelper = lineNumber - deduct;
+                        string lineNumber3 = "" + (lineNumber - deduct);
+                        
                         if (lineNumber == 0) lineNumber3 = "[unknown]";
+                        if (lineHelper <= 0) lineNumber3 = "[unknown]";
 
                         if (originalFileName == null || originalFileName == "")
                         {
                             //text block user input
-                            text = "*** ERROR: User input block, line " + lineNumber3 + ":";
+                            text = "*** ERROR: User input block, line " + (lineNumber3) + ":";
                         }
                         else
                         {
@@ -225,7 +250,8 @@ namespace Gekko.Parser.Gek
                             text = "*** ERROR: " + xx + " file '" + originalFileName + "', line " + lineNumber3;
                         }
 
-                        Program.WriteErrorMessage(lineNumber, problemLine, text, originalFileName);
+                        Program.WriteErrorMessage(lineNumber - deduct, problemLine, text, originalFileName);
+                        if (lineHelper < 0) G.Writeln2("+++ NOTE: The error is probably from lib.gcm, line " + lineNumber, Color.Red);
                         
                     }
                 }
@@ -284,9 +310,9 @@ namespace Gekko.Parser.Gek
                         //    if (line.Contains(s)) hit = s;
                         //}
                         //we use the last single quote match
-                        G.Writeln("*** ERROR: The function " + q[q.Count - 1] + " does not seem to exist locally.", Color.Red);
-                        G.Writeln("           You may use use FUNCTION to define a function inside your gcm file,", Color.Red);
-                        G.Writeln("           or the OPTION library file = ... command to load user functions from file.", Color.Red);
+                        G.Writeln("*** ERROR: The function/procedure " + q[q.Count - 1] + " does not seem to exist locally.", Color.Red);
+                        G.Writeln("           You may use use FUNCTION/PROCEDURE to define a function/procedure inside your gcm file,", Color.Red);
+                        G.Writeln("           or the OPTION library file = ... command to load user functions/procedures from file.", Color.Red);
                         //G.Writeln("           Please note that you must use the relevant FUNCTION or LIBRARY command inside", Color.Red);
                         //G.Writeln("           all gcm files using them. ", Color.Red);
                         //if (hit != null) G.Writeln("*** Note: a timeseries lag like " + hit + " should be " + hit.Replace("(", "[").Replace(")", "]") + " in Gekko 2.0", Color.Red);

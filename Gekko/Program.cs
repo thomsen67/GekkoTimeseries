@@ -7217,8 +7217,10 @@ namespace Gekko
         public static void WriteErrorMessage(int lineNumber, string problemLine, string text, string fileName)
         {
             if (Globals.threadIsInProcessOfAborting) return;
+            string s = G.IntFormat(lineNumber, 4);
+            if (lineNumber <= 0) s = "unknown line";
             G.Writeln(text, Color.Black, true);
-            G.Writeln("    " + "[" + G.IntFormat(lineNumber, 4) + "]:" + "   " + G.ReplaceGlueNew(problemLine), Color.Blue, true);
+            G.Writeln("    " + "[" + s + "]:" + "   " + G.ReplaceGlueNew(problemLine), Color.Blue, true);
         }
 
         private static string GetOriginalTableFileName(string fileName)

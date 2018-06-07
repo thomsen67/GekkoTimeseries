@@ -1888,7 +1888,7 @@ expr2                     :
 
 // --------------------------------------------------------------------------------------------------
 
-procedure                 : ident expression* -> ^(ASTPROCEDURE expression*);
+procedure                 : Ident expression* -> ^(ASTPROCEDURE Ident expression*);
 
 analyze                   : ANALYZE analyzeOpt1? analyzeElements -> ^({token("ASTANALYZE", ASTANALYZE, $ANALYZE.Line)} analyzeOpt1? analyzeElements );
 analyzeOpt1               : ISNOTQUAL
@@ -2029,7 +2029,7 @@ for2                      : forValHelper
 						  ;
 						  
 proceduredef              : PROCEDURE uDotIdent proceduredefRhsH1 SEMICOLON expressions? END -> ^({token("ASTPROCEDUREDEF", ASTPROCEDUREDEF, $PROCEDURE.Line)} ^(ASTPROCEDUREDEFTYPE) ^(ASTPROCEDUREDEFNAME uDotIdent) proceduredefRhsH1 ^(ASTPROCEDUREDEFCODE expressions?));
-proceduredefRhsH1         : proceduredefRhsH2+ -> ^(ASTPROCEDUREDEFARGS proceduredefRhsH2+);  //for instance "VAL x, DATE d
+proceduredefRhsH1         : (proceduredefRhsH2 (COMMA2 proceduredefRhsH2)*)? -> ^(ASTPROCEDUREDEFARGS proceduredefRhsH2+);  //for instance "VAL x, DATE d
 proceduredefRhsH2         : proceduredefRhsH3 -> ^(ASTPROCEDUREDEFRHSSIMPLE proceduredefRhsH3+);  //for instance "VAL x"						  
 proceduredefRhsH3         : type ident -> ^(ASTPROCEDUREDEFARG type ident);  //for instance "VAL x"
 
