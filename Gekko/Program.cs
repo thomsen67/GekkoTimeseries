@@ -15809,17 +15809,20 @@ namespace Gekko
 
         private static void ReadGamsModel(string textInputRaw)
         {
-            string txt = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "model.gms");                  
-            var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
-            var tags2 = new List<string>() { "//" };
-            var tags3 = new List<Tuple<string, string>>() { new Tuple<string, string>("$ontext", "$offtext") };
-            var tags4 = new List<string>() { "*", "#" };
-            TokenList tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
-            
-            foreach (TokenHelper tok in tokens2.storage)
+            if (false && Globals.runningOnTTComputer)
             {
-                string s = tok.ToString();
-            }
+                string txt = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "model.gms");
+                var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
+                var tags2 = new List<string>() { "//" };
+                var tags3 = new List<Tuple<string, string>>() { new Tuple<string, string>("$ontext", "$offtext") };
+                var tags4 = new List<string>() { "*", "#" };
+                TokenList tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
+
+                foreach (TokenHelper tok in tokens2.storage)
+                {
+                    string s = tok.ToString();
+                }
+            }            
 
             TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(textInputRaw);
             List<List<string>> eqLines = new List<List<string>>();
