@@ -4202,6 +4202,134 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void Test__Procedure()
+        {
+            //tests functions that look like procedures, and then procedures.
+
+            I("reset;");
+            I(@"            
+
+function val mulval(val x, val y);
+  return %x*%y;
+end;
+
+function date add3(date x);
+  return %x+3;
+end;
+
+function string shine(string x);
+  return %x+'shine';
+end;
+
+function list adda(list x);
+  return #x + 'a';
+end;
+
+function matrix mulmatrix(matrix x, matrix y);
+  return #x * #y;
+end;
+
+function series mulser(series x, series y);
+  return x* y;
+        end;
+
+// ----------------------------------------------------------------------
+// samme, nu som procedurer ---------------------------------------------
+// ----------------------------------------------------------------------
+
+procedure bold; tell 'hello'; end; bold;
+
+procedure mulval val x, val y;
+  tell '';
+  tell string(%x*%y);
+end;
+
+procedure add3 date x;
+        tell '';
+  tell string(%x+3);
+end;
+
+procedure shine string x;
+        tell '';
+  tell %x+'shine';
+end;
+
+procedure adda list x;
+        list add = #x + 'a';
+  list ? #add;
+end;
+
+        procedure mulmatrix matrix x, matrix y;
+  show #x * #y;
+end;
+
+        procedure mulser series x, series y;
+  prt x*y;
+end;
+
+// test af function ------------------------------------------
+
+val q1 = 3;
+val q2 = 4;
+val q3 = mulval(%q1, %q2);
+val q4 = mulval(mulval(%q1, %q2), mulval(%q1, %q2));
+
+date y = add3(2000a1+0);
+
+string y = shine('sun');
+
+list xx=x1,x2;
+list z = adda(#xx);
+
+matrix a = [1, 2 || 3, 4];
+matrix b = [9, 8 || 7, 6];
+matrix z = [1, 1 || 1, 1];
+matrix c = mulmatrix(#a, #b+#z);
+
+time 2000 2001;
+val v = 0;
+create xx, yy, zz;
+series xx = 2;
+series yy = 3;
+series zz = mulser(xx, yy);
+
+// test af procedure ------------------------------------------
+
+restart;
+
+bold;
+
+val q1 = 3;
+val q2 = 4;
+mulval %q1 %q2;
+
+add3 2000a1;
+
+shine 'sun';
+
+list xx=x1,x2;
+adda #xx;
+
+matrix a = [1, 2 || 3, 4];
+matrix b = [9, 8 || 7, 6];
+matrix z = [1, 1 || 1, 1];
+mulmatrix #a #b+#z;
+
+time 2000 2001;
+create xx, yy;
+series xx= 2;
+series yy= 3;
+mulser xx yy;
+
+            ");
+                        
+            I("procedure bold; tell 'adsf'; end; bold;");
+            FAIL("procedure write; tell 'adsf'; end;");
+            FAIL("procedure write; tell 'adsf'; end; write;");
+
+        }
+
+        [TestMethod]
         public void Test__Create()
         {
             //just testing that it parses

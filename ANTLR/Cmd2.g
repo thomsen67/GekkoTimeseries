@@ -1888,7 +1888,7 @@ expr2                     :
 
 // --------------------------------------------------------------------------------------------------
 
-procedure                 : Ident expression* -> ^(ASTPROCEDURE Ident expression*);
+procedure                 : identWithoutCommand expression* -> ^(ASTPROCEDURE identWithoutCommand expression*);
 
 analyze                   : ANALYZE analyzeOpt1? analyzeElements -> ^({token("ASTANALYZE", ASTANALYZE, $ANALYZE.Line)} analyzeOpt1? analyzeElements );
 analyzeOpt1               : ISNOTQUAL
@@ -2028,8 +2028,8 @@ for2                      : forValHelper
 						  | forDateHelper
 						  ;
 						  
-proceduredef              : PROCEDURE uDotIdent proceduredefRhsH1 SEMICOLON expressions? END -> ^({token("ASTPROCEDUREDEF", ASTPROCEDUREDEF, $PROCEDURE.Line)} ^(ASTPROCEDUREDEFTYPE) ^(ASTPROCEDUREDEFNAME uDotIdent) proceduredefRhsH1 ^(ASTPROCEDUREDEFCODE expressions?));
-proceduredefRhsH1         : (proceduredefRhsH2 (COMMA2 proceduredefRhsH2)*)? -> ^(ASTPROCEDUREDEFARGS proceduredefRhsH2+);  //for instance "VAL x, DATE d
+proceduredef              : PROCEDURE identWithoutCommand proceduredefRhsH1 SEMICOLON expressions? END -> ^({token("ASTPROCEDUREDEF", ASTPROCEDUREDEF, $PROCEDURE.Line)} ^(ASTPROCEDUREDEFTYPE) ^(ASTPROCEDUREDEFNAME identWithoutCommand) proceduredefRhsH1 ^(ASTPROCEDUREDEFCODE expressions?));
+proceduredefRhsH1         : (proceduredefRhsH2 (COMMA2 proceduredefRhsH2)*)? -> ^(ASTPROCEDUREDEFARGS proceduredefRhsH2*);  //for instance "VAL x, DATE d
 proceduredefRhsH2         : proceduredefRhsH3 -> ^(ASTPROCEDUREDEFRHSSIMPLE proceduredefRhsH3+);  //for instance "VAL x"						  
 proceduredefRhsH3         : type ident -> ^(ASTPROCEDUREDEFARG type ident);  //for instance "VAL x"
 
@@ -3423,16 +3423,12 @@ integer                   : Integer -> ^(ASTINTEGER Integer);
 integerNegative           : MINUS integer -> ^(ASTINTEGERNEGATIVE integer);
 doubleNegative            : MINUS double2 -> ^(ASTDOUBLENEGATIVE double2);
 
-ident                     : Ident|
-                            // --- tokens3 start ---			
-            
-			     
-            GRIDSTYLE|
+identWithoutCommand       : Ident |
+   GRIDSTYLE|
             BOLD|
-            ITALIC|
+            ITALIC|			
 			
-			ASER|
-            ASERIES|
+            
 			XLABELS|
 			YLABELS|
             ANNUAL|
@@ -3448,15 +3444,15 @@ ident                     : Ident|
 			DETECT|
 							X|
 							Y|
-							REBASE|
+							
 							LAGFIX|
 							ADDBANK|
 							THOUSANDSSEPARATOR|
 							MDATEFORMAT|
 							UNITS|
                             LINESPOINTS|
-							CONTINUE|
-							PROCEDURE|
+							
+							
 							//LINES|
 							BOXES|
 							FILLEDCURVES|
@@ -3521,7 +3517,7 @@ ident                     : Ident|
                             ABS|
 							DEFAULT|
 							LOGIC|
-                            ACCEPT|
+                            
                             ADD|
                             AFTER2|
                             AFTER|
@@ -3529,7 +3525,7 @@ ident                     : Ident|
                             ALIGNLEFT|
                             ALIGNRIGHT|
                             ALL|
-                            ANALYZE|
+                            
                             AND|
                             APPEND|
                             AREMOS|
@@ -3548,18 +3544,18 @@ ident                     : Ident|
                             CAPS|
                             CELL|
                             CHANGE|
-                            CHECKOFF|
+                            
                             CLEAR2|
-                            CLEAR|
+                            
                             CLIPBOARD|
-                            CLIP|
-                            CLONE|
+                            
+                            
                             CLOSEALL|
                             CLOSEBANKS|
-                            CLOSE|
-                            CLS|
+                            
+                            
                             CODE|
-                            COLLAPSE|
+                            
 							PX|
 							ARRAY|
 							BUGFIX|
@@ -3569,18 +3565,18 @@ ident                     : Ident|
                             COMMAND2|
                             COMMAND|
                             COMMA|
-                            COMPARE|
+                            
                             COMPRESS|
                             CONST|
                             CONV1|
                             CONV2|
                             CONV|
                             COPYLOCAL|
-                            COPY|
-                            COUNT|
+                            
+                            
                             CPLOT|
                             CREATEVARS|
-                            CREATE|
+                            
                             CSV|
                             CURROW|
                             DAMP|
@@ -3590,12 +3586,12 @@ ident                     : Ident|
                             DATAWIDTH|
                             DATA|
                             DATES|
-                            DATE|
+                            
                             DEBUG|
                             DECIMALSEPARATOR|
-                            DECOMP|
+                            
                             DEC|
-                            DELETE|
+                            
                             DETAILS|
                             DIALOG|
                             DIFF|
@@ -3604,25 +3600,25 @@ ident                     : Ident|
                             DING|
                             DIRECT|
                             DISPLAY|
-                            DISP|
-                            DOC|
-                            DOWNLOAD|
+                            
+                            
+                            
                             DP|
                             DUMOFF|
                             DUMOF|
                             DUMON|
                             DUMP|
                             D|
-                            EDIT|
+                            
                             EFTER|
-                            ELSE|
-                            ENDO|
-                            END|
+                            
+                            
                             ENGLISH|
                             EXCEL|
 							EXE|
-                            EXIT|
-                            EXO|
+
+                       
+
 							ROBUST|
                             EXPORT|
                             EXP|
@@ -3636,7 +3632,10 @@ ident                     : Ident|
                             FILEWIDTH|
                             FILE|
                             FILTER|
-                            FINDMISSINGDATA|
+
+						
+
+
                             FIRSTCOLWIDTH|
                             FIRST|
                             FIX|
@@ -3646,11 +3645,13 @@ ident                     : Ident|
                             FONT|
                             FORMAT|
                             FORWARD|
-                            FOR|
+                            
+						
+
                             FREQ|
                             FRML|
                             FROM|
-                            FUNCTION|
+                            
                             GAUSS|
 							GAMS|
                             GBK|
@@ -3663,34 +3664,46 @@ ident                     : Ident|
                             GMULPRT|
                             GNUPLOT|
                             GOAL|
-                            GOTO|
+                           
                             GRAPH|
                             GROWTH|
-                            HDG|
+                            
+							
+							
+
                             HEADING|
-                            HELP|
+                            
                             HIDELEFTBORDER|
                             HIDERIGHTBORDER|
                             HIDE|
                             HORIZON|
                             HPFILTER|
                             HTML|
-                            IF|
+                            
+							
+
+
                             IGNOREMISSINGVARS|
                             IGNOREMISSING|
                             IGNOREVARS|
-                            IMPORT|
-                            INDEX|
-                            INFO|
+                            
+							
+							
+							
+							
+							
+							
+							
+							INFO|
 							INFOFILE|
                             INIT|
-                            INI|
+                           
                             INTERFACE|
                             INTERNAL|
                             INVERT|
                             ITERMAX|
                             ITERMIN|
-                            ITERSHOW|
+                           
                             ITER|
                             KEEP|
                             LABELS|
@@ -3701,38 +3714,38 @@ ident                     : Ident|
                             LEV|
                             LINES|
                             LISTFILE|
-                            LIST|
+                           
                             LOG|
-							LOCK_|
-							UNLOCK_|
+							
+							
                             LU|
                             MACRO2|
                             MAIN|
-                            MATRIX|
+                            
 							COLNAMES|
 							ROWNAMES|
                             MAXLINES|
                             MAX|
-                            MEM|
+                            
                             MENUTABLE|
-                            MENU|
+								
                             MERGECOLS|
                             MERGE|
                             MESSAGE|
                             METHOD|
                             MIN|
                             MIXED|
-                            MODEL|
+                            
                             MODERNLOOK|
-                            MODE|
+                            
                             MP|
                             MULBK|
                             MULPCT|
-                            MULPRT|
+                            
                             MUTE|
                             M|
                             NAMES|
-                            NAME|
+                            
                             NDEC|
                             NDIFPRT|
                             NEWTON|
@@ -3758,61 +3771,57 @@ ident                     : Ident|
                             NWIDTH|
                             NYTVINDU|
                             N|
-                            OLS|
-                            OPEN|
-                            OPTION|
+                            
+                            
                             OR|
                             PARAM|
                             PATCH|
 							PATH|
-                            PAUSE|
+                           
                             PCH|
                             PCIMSTYLE|
                             PCIM|
                             PCTPRT|
                             PDEC|
                             PERIOD|
-                            PIPE|
+                            
                             PLOTCODE|
-                            PLOT|
+                           
                             POINTS|
 							POS|
                             PREFIX|
                             PRETTY|
                             PRIM|
                             PRINTCODES|
-                            PRINT|
-                            PRI|
+                            
                             PRN|
                             PROT|
                             PRTX|
-                            PRT|
+                            
                             PUDVALG|
                             PWIDTH|
-                            P|
+                            
                             Q|
-                            R_EXPORT|
-                            R_FILE|
-                            R_RUN|
+                            
                             RDP|
                             RD|
-                            READ|
+                            
                             REF|
                             REL|
-                            RENAME|
+                            
                             REORDER|
                             REPLACE|
                             REP|
-                            RESET|
+                            
                             RESPECT|
-                            RESTART|
+                           
                             RES|
-                            RETURN|
+                           
                             RING|
                             RN|
                             ROWS|
                             RP|
-                            RUN|
+                           
                             R|
                             SEARCH|
                             SECONDCOLWIDTH|
@@ -3821,8 +3830,7 @@ ident                     : Ident|
                             SERIES2|
 							SER3|
                             SERIES3|
-                            SERIES|
-                            SER|
+                            
                             SETBORDER|
                             SETBOTTOMBORDER|
                             SETDATES|
@@ -3832,59 +3840,58 @@ ident                     : Ident|
                             SETTOPBORDER|
                             SETVALUES|
                             SET|
-                            SHEET|
+                           
                             SHOWBORDERS|
                             SHOWPCH|
-                            SHOW|
-                            SIGN|
+                            
                             SIMPLE|
-                            SIM|
+                            
                             SKIP|
-                            SMOOTH|
+                           
                             SOLVE|
                             SOME|
                             SORT|
                             SOUND|
                             SOURCE|
                             SPECIALMINUS|
-                            SPLICE|
+                            
                             SPLIT|
                             STACKED|
                             STAMP|
                             STARTFILE|
                             STATIC|
                             STEP|
-                            STOP|
-                            STRING2|
+                            
+                            
                             STRIP|
                             SUFFIX|
                             SUGGESTIONS|
                             SWAP|
                             SYSTEM|
-                            SYS|
+                            
                             TABLE1|
                             TABLE2|
                             TABLEOLD|
-                            TABLE|
+                           
                             TABS|
-                            TARGET|
-                            TELL|
+                           
+                            
 							TEMP|
                             TERMINAL|
                             TESTRANDOMMODELCHECK|
                             TESTRANDOMMODEL|
                             TESTSIM|
                             TEST|
-                            TIMEFILTER|
+                            
                             TIMESPAN|
-                            TIME|
+                            
                             TITLE|
                             TOTAL|
                             TO|
-                            TRANSLATE|
+                            
                             TRANSPOSE|
                             TREL|
-                            TRUNCATE|
+                            
                             TSDX|
                             TSD|
                             TSP|
@@ -3898,14 +3905,14 @@ ident                     : Ident|
                             UGDIF|
                             ULEV|
                             UNDO|
-                            UNFIX|
-                            UNSWAP|
-                            UPCH|
+							 UPCH|    
+                            
+                           
                             UPDATEFREQ|
                             UPDX|
                             U|
                             VALUE|
-                            VAL|
+                            
                             VERSION|
                             VERS|
                             VPRT|
@@ -3915,9 +3922,9 @@ ident                     : Ident|
                             WINDOW|
                             WORKING|
                             WPLOT|
-                            WRITE|
+                            
                             WUDVALG|
-                            X12A|
+                            
                             XLSX|
                             XLS|
                             YES|
@@ -3927,10 +3934,630 @@ ident                     : Ident|
                             Y2MIN|
                             ZERO|
                             ZOOM|
-							XEDIT|	
+							
+                            ZVAR
+							;
+
+
+
+ident                     : Ident | 
+
+ACCEPT|
+ANALYZE|
+ASERIES|
+ASER|
+CHECKOFF|
+CLEAR|
+CLIP|
+CLONE|
+CLOSE|
+CLS|
+COLLAPSE|
+COMPARE|
+CONTINUE|
+COPY|
+COUNT|
+CREATE|
+DATE|
+DECOMP|
+DELETE|
+DISP|
+DOC|
+DOWNLOAD|
+EDIT|
+ELSE|
+ENDO|
+END|
+EXIT|
+EXO|
+FINDMISSINGDATA|
+FOR|
+FUNCTION|
+GOTO|
+HDG|
+HELP|
+IF|
+IMPORT|
+INDEX|
+INI|
+ITERSHOW|
+LIST|
+LOCK_|
+MATRIX|
+MEM|
+MENU|
+MODEL|
+MODE|
+MULPRT|
+NAME|
+OLS|
+OPEN|
+OPTION|
+PAUSE|
+PIPE|
+PLOT|
+PRINT|
+PRI|
+PROCEDURE|
+PRT|
+P|
+R_EXPORT|
+R_FILE|
+R_RUN|
+READ|
+REBASE|
+RENAME|
+RESET|
+RESTART|
+RETURN|
+RUN|
+SERIES|
+SER|
+SHEET|
+SHOW|
+SIGN|
+SIM|
+SMOOTH|
+SPLICE|
+STOP|
+STRING2|
+SYS|
+TABLE|
+TARGET|
+TELL|
+TIMEFILTER|
+TIME|
+TRANSLATE|
+TRUNCATE|
+UNFIX|
+UNLOCK_|
+UNSWAP|
+VAL|
+WRITE|
+X12A|
+XEDIT|
+
+
+		     
+            GRIDSTYLE|
+            BOLD|
+            ITALIC|			
+			
+            
+			XLABELS|
+			YLABELS|
+            ANNUAL|
+            AT2|
+            BETWEEN|
+            NONANNUAL|
+            DIGITS|
+			REMOTE|
+			ENGINE|
+			PIA|
+			EPPLUS|
+			OFFSET|
+			DETECT|
+							X|
+							Y|
+							
+							LAGFIX|
+							ADDBANK|
+							THOUSANDSSEPARATOR|
+							MDATEFORMAT|
+							UNITS|
+                            LINESPOINTS|
+							
+							
+							//LINES|
+							BOXES|
+							FILLEDCURVES|
+							STEPS|
+							//POINTS|
+							DOTS|
+							IMPULSES|
+							SIZE|
+							//TITLE|
+							SUBTITLE|
+							//FONT|
+							//FONTSIZE|
+							TICS|
+							GRID|
+							KEY|
+							PALETTE|
+							STACK|
+							BOXWIDTH|
+							BOXGAP|
+							SEPARATE|
+							XLINE|
+							XLINEBEFORE|
+							XLINEAFTER|
+							YMIRROR|
+							YTITLE|
+							YLINE|
+							//YMAX|
+							YMAXHARD|
+							YMAXSOFT|
+							//YMIN|
+							YMINHARD|
+							YMINSOFT|
+							XZEROAXIS|
+							Y2TITLE|
+							Y2LINE|
+							//Y2MAX|
+							Y2MAXHARD|
+							Y2MAXSOFT|
+							//Y2MIN|
+							Y2MINHARD|
+							Y2MINSOFT|
+							X2ZEROAXIS|
+							//LABEL|
+							ARROW|
+							//LINETYPE|
+							DASHTYPE|
+							LINEWIDTH|
+							LINECOLOR|
+							POINTTYPE|
+							POINTSIZE|
+							FILLSTYLE|
+							//LABEL|
+							Y2|							
+							USING|
+							MISSING|
+							IMPOSE|
+							CONSTANT|
+							INTERPOLATE|
+							PRORATE|
+							TRIM|
+							ERROR|
+                            ABS|
+							DEFAULT|
+							LOGIC|
+                            
+                            ADD|
+                            AFTER2|
+                            AFTER|
+                            ALIGNCENTER|
+                            ALIGNLEFT|
+                            ALIGNRIGHT|
+                            ALL|
+                            
+                            AND|
+                            APPEND|
+                            AREMOS|
+                            AS|
+                            AUTO|
+                            AVG|
+                            A|
+                            BACKTRACK|
+                            BANK1|
+                            BANK2|
+                            BANK|
+                            BOWL|
+                            BY|
+                            CACHE|
+                            CALC|
+                            CAPS|
+                            CELL|
+                            CHANGE|
+                            
+                            CLEAR2|
+                            
+                            CLIPBOARD|
+                            
+                            
+                            CLOSEALL|
+                            CLOSEBANKS|
+                            
+                            
+                            CODE|
+                            
+							PX|
+							ARRAY|
+							BUGFIX|
+                            COLORS|
+                            COLS|
+                            COMMAND1|
+                            COMMAND2|
+                            COMMAND|
+                            COMMA|
+                            
+                            COMPRESS|
+                            CONST|
+                            CONV1|
+                            CONV2|
+                            CONV|
+                            COPYLOCAL|
+                            
+                            
+                            CPLOT|
+                            CREATEVARS|
+                            
+                            CSV|
+                            CURROW|
+                            DAMP|
+							BROWSER|
+                            DANISH|
+                            DATABANK|
+                            DATAWIDTH|
+                            DATA|
+                            DATES|
+                            
+                            DEBUG|
+                            DECIMALSEPARATOR|
+                            
+                            DEC|
+                            
+                            DETAILS|
+                            DIALOG|
+                            DIFF|
+                            DIFPRT|
+                            DIF|
+                            DING|
+                            DIRECT|
+                            DISPLAY|
+                            
+                            
+                            
+                            DP|
+                            DUMOFF|
+                            DUMOF|
+                            DUMON|
+                            DUMP|
+                            D|
+                            
+                            EFTER|                            
+                            
+                            ENGLISH|
+                            EXCEL|
+							EXE|
+
+                       
+
+							ROBUST|
+                            EXPORT|
+                            EXP|
+                            EXTERNAL|
+                            FAILSAFE|
+                            FAIR|
+                            FAST|
+                            FEEDBACK|
+                            FEED|
+                            FIELDS|
+                            FILEWIDTH|
+                            FILE|
+                            FILTER|
+
+						
+
+
+                            FIRSTCOLWIDTH|
+                            FIRST|
+                            FIX|
+                            FLAT|
+                            FOLDER|
+                            FONTSIZE|
+                            FONT|
+                            FORMAT|
+                            FORWARD|
+                            
+						
+
+                            FREQ|
+                            FRML|
+                            FROM|
+                            
+                            GAUSS|
+							GAMS|
+                            GBK|
+							GDX|
+							GDXOPT|
+                            GDIFF|
+                            GDIF|
+                            GEKKO18|
+                            GENR|
+                            GMULPRT|
+                            GNUPLOT|
+                            GOAL|
+                           
+                            GRAPH|
+                            GROWTH|
+                            
+							
+							
+
+                            HEADING|
+                            
+                            HIDELEFTBORDER|
+                            HIDERIGHTBORDER|
+                            HIDE|
+                            HORIZON|
+                            HPFILTER|
+                            HTML|
+                            
+							
+
+
+                            IGNOREMISSINGVARS|
+                            IGNOREMISSING|
+                            IGNOREVARS|
+                            
+							
+							
+							
+							
+							
+							
+							
+							INFO|
+							INFOFILE|
+                            INIT|
+                           
+                            INTERFACE|
+                            INTERNAL|
+                            INVERT|
+                            ITERMAX|
+                            ITERMIN|
+                           
+                            ITER|
+                            KEEP|
+                            LABELS|
+                            LABEL|
+                            LAG|
+                            LANGUAGE|
+                            LAST|
+                            LEV|
+                            LINES|
+                            LISTFILE|
+                           
+                            LOG|
+							
+							
+                            LU|
+                            MACRO2|
+                            MAIN|
+                            
+							COLNAMES|
+							ROWNAMES|
+                            MAXLINES|
+                            MAX|
+                            
+                            MENUTABLE|
+								
+                            MERGECOLS|
+                            MERGE|
+                            MESSAGE|
+                            METHOD|
+                            MIN|
+                            MIXED|
+                            
+                            MODERNLOOK|
+                            
+                            MP|
+                            MULBK|
+                            MULPCT|
+                            
+                            MUTE|
+                            M|
+                            NAMES|
+                            
+                            NDEC|
+                            NDIFPRT|
+                            NEWTON|
+                            NEW|
+                            NEXT|
+                            NFAIR|
+                            NOABS|
+                            NOCR|
+                            NODIFF|
+                            NODIF|
+                            NOFILTER|
+                            NOGDIFF|
+                            NOGDIF|
+                            NOLEV|
+                            NONE|
+                            NONMODEL|
+                            NOPCH|
+							SAVE|
+                            NOTIFY|
+                            NOT|
+                            NOV|
+                            NO|
+                            NWIDTH|
+                            NYTVINDU|
+                            N|
+                            
+                            
+                            OR|
+                            PARAM|
+                            PATCH|
+							PATH|
+                           
+                            PCH|
+                            PCIMSTYLE|
+                            PCIM|
+                            PCTPRT|
+                            PDEC|
+                            PERIOD|
+                            
+                            PLOTCODE|
+                           
+                            POINTS|
+							POS|
+                            PREFIX|
+                            PRETTY|
+                            PRIM|
+                            PRINTCODES|
+                            
+                            PRN|
+                            PROT|
+                            PRTX|
+                            
+                            PUDVALG|
+                            PWIDTH|
+                            
+                            Q|
+                            
+                            RDP|
+                            RD|
+                            
+                            REF|
+                            REL|
+                            
+                            REORDER|
+                            REPLACE|
+                            REP|
+                            
+                            RESPECT|
+                           
+                            RES|
+                           
+                            RING|
+                            RN|
+                            ROWS|
+                            RP|
+                           
+                            R|
+                            SEARCH|
+                            SECONDCOLWIDTH|
+							SEC|
+                            SER2|
+                            SERIES2|
+							SER3|
+                            SERIES3|
+                            
+                            SETBORDER|
+                            SETBOTTOMBORDER|
+                            SETDATES|
+                            SETLEFTBORDER|
+                            SETRIGHTBORDER|
+                            SETTEXT|
+                            SETTOPBORDER|
+                            SETVALUES|
+                            SET|
+                           
+                            SHOWBORDERS|
+                            SHOWPCH|
+                            
+                            SIMPLE|
+                            
+                            SKIP|
+                           
+                            SOLVE|
+                            SOME|
+                            SORT|
+                            SOUND|
+                            SOURCE|
+                            SPECIALMINUS|
+                            
+                            SPLIT|
+                            STACKED|
+                            STAMP|
+                            STARTFILE|
+                            STATIC|
+                            STEP|
+                            
+                            
+                            STRIP|
+                            SUFFIX|
+                            SUGGESTIONS|
+                            SWAP|
+                            SYSTEM|
+                            
+                            TABLE1|
+                            TABLE2|
+                            TABLEOLD|
+                           
+                            TABS|
+                           
+                            
+							TEMP|
+                            TERMINAL|
+                            TESTRANDOMMODELCHECK|
+                            TESTRANDOMMODEL|
+                            TESTSIM|
+                            TEST|
+                            
+                            TIMESPAN|
+                            
+                            TITLE|
+                            TOTAL|
+                            TO|
+                            
+                            TRANSPOSE|
+                            TREL|
+                            
+                            TSDX|
+                            TSD|
+                            TSP|
+                            TXT|
+                            TYPE|
+                            UABS|
+                            UDIFF|
+                            UDIF|
+                            UDVALG|
+                            UGDIFF|
+                            UGDIF|
+                            ULEV|
+                            UNDO|
+							 UPCH|    
+                            
+                           
+                            UPDATEFREQ|
+                            UPDX|
+                            U|
+                            VALUE|
+                            
+                            VERSION|
+                            VERS|
+                            VPRT|
+                            V|
+                            WAIT|
+                            WIDTH|
+                            WINDOW|
+                            WORKING|
+                            WPLOT|
+                            
+                            WUDVALG|
+                            
+                            XLSX|
+                            XLS|
+                            YES|
+                            YMAX|
+                            YMIN|
+							Y2MAX|
+                            Y2MIN|
+                            ZERO|
+                            ZOOM|
+							
                             ZVAR
 							// --- tokens3 end ---
 ;
+
+
+
+
+
+
 
 
 identDigit                : identDigitHelper -> ^(ASTIDENTDIGIT identDigitHelper);

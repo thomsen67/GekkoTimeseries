@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 Cmd2.g 2018-06-07 10:49:47
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 Cmd2.g 2018-06-11 02:34:42
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -59,7 +59,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTOPD = 297;
     public const int ASTTABLESETTOPBORDER = 542;
     public const int SHOW = 1015;
-    public const int GLUE = 1119;
+    public const int GLUE = 1118;
     public const int MISSING = 901;
     public const int D = 761;
     public const int A = 695;
@@ -128,12 +128,12 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTOPT_STRING_GDX = 17;
     public const int ASTUPDOPERATORSTAR = 585;
     public const int ASTOPT_STRING_SUBTITLE = 316;
-    public const int DOUBLEVERTICALBAR2 = 1143;
+    public const int DOUBLEVERTICALBAR2 = 1142;
     public const int ASTOPT_STRING_RESPECT = 413;
-    public const int DOUBLEVERTICALBAR1 = 1142;
+    public const int DOUBLEVERTICALBAR1 = 1141;
     public const int ZERO = 1109;
     public const int ASTSIGN = 506;
-    public const int AT = 1118;
+    public const int AT = 1117;
     public const int AS = 712;
     public const int ASTOLS = 294;
     public const int NOFILTER = 925;
@@ -170,14 +170,14 @@ public partial class Cmd2Lexer : Lexer {
     public const int WUDVALG = 1100;
     public const int LISTFILE = 878;
     public const int TARGET = 1050;
-    public const int MINUS = 1141;
+    public const int MINUS = 1140;
     public const int HEADING = 844;
     public const int ASTOPT_STRING_GBK = 384;
     public const int ASTOPT_STRING_STAMP = 424;
     public const int NOLEV = 928;
     public const int ULEV = 1081;
     public const int ASTDOLLARHASHNAMESIMPLE = 113;
-    public const int COLON = 1131;
+    public const int COLON = 1130;
     public const int ASTOLSELEMENTS = 296;
     public const int ASTIFTRUE = 211;
     public const int DETECT = 618;
@@ -218,7 +218,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int PATH = 945;
     public const int MP = 905;
     public const int ASTSTRINGSTATEMENT = 519;
-    public const int RIGHTCURLY = 1136;
+    public const int RIGHTCURLY = 1135;
     public const int ASTFINDMISSINGDATA = 147;
     public const int ASTOPT_VAL_PWIDTH = 437;
     public const int ASTLOCK = 256;
@@ -302,7 +302,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTLIBRARY = 34;
     public const int ASTHPFILTER = 192;
     public const int ASTDECOMPITEMS = 102;
-    public const int EQUAL = 1116;
+    public const int EQUAL = 1115;
     public const int ASTOPT_STRING_AREMOS = 367;
     public const int ASTPRTELEMENTFILLSTYLE = 470;
     public const int FAILSAFE = 805;
@@ -374,7 +374,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTCOMPARE2 = 4;
     public const int KEY = 649;
     public const int GRID = 648;
-    public const int LISTPLUS = 1138;
+    public const int LISTPLUS = 1137;
     public const int ASTELSESTATEMENTS = 127;
     public const int ASTBANK = 57;
     public const int ASTOPT_STRING_LABELS = 391;
@@ -388,13 +388,13 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTLISTDIFFERENCE = 239;
     public const int MERGECOLS = 896;
     public const int MODERNLOOK = 904;
-    public const int Ident = 1113;
+    public const int Ident = 1144;
     public const int READ = 977;
     public const int ASTFUNCTIONDEFARG = 166;
     public const int TESTRANDOMMODEL = 1055;
     public const int ASTEXPRESSION = 135;
     public const int V_ = 1194;
-    public const int StringInQuotes = 1120;
+    public const int StringInQuotes = 1119;
     public const int ASTNEWTABLE = 289;
     public const int ASTFORVAL = 159;
     public const int ASTENDO = 130;
@@ -473,7 +473,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int SHEET = 1014;
     public const int ASTOPT_STRING_SAVE = 416;
     public const int BETWEEN = 628;
-    public const int Integer = 1134;
+    public const int Integer = 1133;
     public const int R_ = 1191;
     public const int FIRST = 816;
     public const int GDIF = 832;
@@ -539,7 +539,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int Y2MINHARD = 670;
     public const int UNSWAP = 1084;
     public const int DOC = 783;
-    public const int DateDef = 1137;
+    public const int DateDef = 1136;
     public const int UGDIF = 1079;
     public const int FOR = 823;
     public const int PCTPRT = 950;
@@ -562,7 +562,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTDOTS = 32;
     public const int ASTFORSTATEMENTS = 157;
     public const int Y2MAXSOFT = 669;
-    public const int DOT = 1127;
+    public const int DOT = 1126;
     public const int ASTOPT_STRING_FONT = 317;
     public const int ASTGENERIC1 = 178;
     public const int ASTVERS = 599;
@@ -577,7 +577,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTOPT_STRING_NAMES = 398;
     public const int ASTCLOSEBANKS = 72;
     public const int FEED = 809;
-    public const int COMMA2 = 1117;
+    public const int COMMA2 = 1116;
     public const int ASTTABLESETTEXT = 541;
     public const int PLOTCODE = 955;
     public const int ASTTELL = 547;
@@ -619,7 +619,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTTARGET = 546;
     public const int MULBK = 906;
     public const int ASTTABLESETBOTTOMBORDER = 537;
-    public const int ISSMALLEROREQUAL = 1130;
+    public const int ISSMALLEROREQUAL = 1129;
     public const int ASTCOLLAPSE = 75;
     public const int SYS = 1043;
     public const int ASTHDG = 190;
@@ -716,12 +716,12 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTFRMLCODE = 162;
     public const int ASTPRTELEMENTS = 462;
     public const int ASTCLEARALL = 67;
-    public const int ISEQUAL = 1128;
+    public const int ISEQUAL = 1127;
     public const int MIXED = 900;
     public const int AUTO = 713;
     public const int SETTEXT = 1011;
     public const int MESSAGE = 897;
-    public const int PLUS = 1133;
+    public const int PLUS = 1132;
     public const int ASTDP = 122;
     public const int INFOFILE = 859;
     public const int ASTAT = 55;
@@ -735,7 +735,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTOPT_STRING_MERGE = 394;
     public const int INTERPOLATE = 691;
     public const int ASTCOPYWILDCARD = 84;
-    public const int LISTMINUS = 1139;
+    public const int LISTMINUS = 1138;
     public const int SORT = 1025;
     public const int ASTDIF = 106;
     public const int ZOOM = 1110;
@@ -790,9 +790,9 @@ public partial class Cmd2Lexer : Lexer {
     public const int MENUTABLE = 894;
     public const int ASTOPT_STRING_BANK = 360;
     public const int ASTOPT_STRING_COLORS = 372;
-    public const int HAT = 1132;
+    public const int HAT = 1131;
     public const int RES = 985;
-    public const int VERTICALBAR = 1135;
+    public const int VERTICALBAR = 1134;
     public const int SYSTEM = 1044;
     public const int ASTOPT_STRING_XLSX = 433;
     public const int ASTDATE2 = 96;
@@ -801,7 +801,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTOPT_VAL_Y2MAXHARD = 343;
     public const int VAL = 1089;
     public const int ASTIDENTADVANCEDDOT = 197;
-    public const int ISNOTQUAL = 1114;
+    public const int ISNOTQUAL = 1113;
     public const int ASTOPT_STRING_FILLSTYLE = 357;
     public const int DECOMP = 772;
     public const int ASTPRTELEMENTNWIDTH = 458;
@@ -817,7 +817,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTWRITEWITHOPTIONS = 606;
     public const int ASTLABELS = 229;
     public const int ITERMIN = 867;
-    public const int ISLARGEROREQUAL = 1129;
+    public const int ISLARGEROREQUAL = 1128;
     public const int ASTYLINE = 24;
     public const int AREMOS = 711;
     public const int DELETE = 773;
@@ -914,7 +914,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int RDP = 976;
     public const int CURROW = 760;
     public const int WINDOW = 1096;
-    public const int RIGHTANGLE = 1115;
+    public const int RIGHTANGLE = 1114;
     public const int ASTPRTELEMENTPOINTTYPE = 468;
     public const int LEV = 874;
     public const int ASTR_EXPORTITEMS = 483;
@@ -940,7 +940,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int EOF = -1;
     public const int ASTTESTRANDOMMODELCHECK = 550;
     public const int ASTOPT_STRING_ROWS = 414;
-    public const int LEFTPAREN = 1144;
+    public const int LEFTPAREN = 1143;
     public const int ASTTABLE = 521;
     public const int ASTOPT_STRING_TARGET = 426;
     public const int IMPORT = 856;
@@ -977,7 +977,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTUNLOCK = 257;
     public const int ASTTABLEMAIN = 38;
     public const int ELSE = 792;
-    public const int RIGHTBRACKET = 1121;
+    public const int RIGHTBRACKET = 1120;
     public const int ASTSDP = 501;
     public const int ASTGEKKOLABEL = 177;
     public const int SEPARATE = 654;
@@ -1019,7 +1019,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTNAMESUBSIMPLE = 285;
     public const int GENR = 835;
     public const int OPTION = 940;
-    public const int HTTP = 1125;
+    public const int HTTP = 1124;
     public const int ASTEXO = 133;
     public const int ASTOPT_STRING_SEPARATE = 326;
     public const int ASTENDOQUESTION = 131;
@@ -1027,7 +1027,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTEXIT = 132;
     public const int ASTEFTER = 126;
     public const int ASTOPT_STRING_CSV = 374;
-    public const int GLUEDOT = 1126;
+    public const int GLUEDOT = 1125;
     public const int STEP = 1036;
     public const int LIBRARY = 995;
     public const int ASTCOLORS = 76;
@@ -1068,7 +1068,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTTRANSLATE = 560;
     public const int ASTPROCEDUREDEFRHSSIMPLE = 224;
     public const int ASTSERIESDOLLARCONDITION = 6;
-    public const int RIGHTPAREN = 1122;
+    public const int RIGHTPAREN = 1121;
     public const int ASTUPD = 571;
     public const int ASTOPT_STRING_MP = 395;
     public const int CREATEVARS = 758;
@@ -1150,7 +1150,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int ASTREBASE = 25;
     public const int ASTMATRIXINDEXER = 265;
     public const int FEEDBACK = 810;
-    public const int DOLLAR = 1123;
+    public const int DOLLAR = 1122;
     public const int ASTCLEAR = 66;
     public const int ASTOPT_DATE_XLINEAFTER = 329;
     public const int MAIN = 885;
@@ -1181,7 +1181,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int FILLEDCURVES = 639;
     public const int GMULPRT = 837;
     public const int ASTOPT_STRING_COLS = 373;
-    public const int PERCENT = 1124;
+    public const int PERCENT = 1123;
     public const int SERIES = 1004;
     public const int ASTTIMEPERIOD = 556;
     public const int ASTLISTSTRIP = 252;
@@ -1208,7 +1208,7 @@ public partial class Cmd2Lexer : Lexer {
     public const int NOGDIF = 926;
     public const int DATE = 767;
     public const int ASTTESTRANDOMMODEL = 549;
-    public const int LISTSTAR = 1140;
+    public const int LISTSTAR = 1139;
     public const int ASTLIST2OLD = 234;
     public const int ASTOPT_STRING_FROM = 383;
     public const int DATA = 764;
@@ -13726,8 +13726,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LISTSTAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:3948:27: ( '&*' )
-            // Cmd2.g:3948:29: '&*'
+            // Cmd2.g:4575:27: ( '&*' )
+            // Cmd2.g:4575:29: '&*'
             {
             	Match("&*"); 
 
@@ -13750,8 +13750,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LISTPLUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:3949:27: ( '&+' )
-            // Cmd2.g:3949:29: '&+'
+            // Cmd2.g:4576:27: ( '&+' )
+            // Cmd2.g:4576:29: '&+'
             {
             	Match("&+"); 
 
@@ -13774,8 +13774,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LISTMINUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:3950:27: ( '&-' )
-            // Cmd2.g:3950:29: '&-'
+            // Cmd2.g:4577:27: ( '&-' )
+            // Cmd2.g:4577:29: '&-'
             {
             	Match("&-"); 
 
@@ -13796,8 +13796,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4060:27: ( '\\n' )
-            // Cmd2.g:4060:29: '\\n'
+            // Cmd2.g:4687:27: ( '\\n' )
+            // Cmd2.g:4687:29: '\\n'
             {
             	Match('\n'); 
 
@@ -13815,8 +13815,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4061:27: ( '\\r\\n' )
-            // Cmd2.g:4061:29: '\\r\\n'
+            // Cmd2.g:4688:27: ( '\\r\\n' )
+            // Cmd2.g:4688:29: '\\r\\n'
             {
             	Match("\r\n"); 
 
@@ -13835,8 +13835,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4062:27: ( '0' .. '9' )
-            // Cmd2.g:4062:29: '0' .. '9'
+            // Cmd2.g:4689:27: ( '0' .. '9' )
+            // Cmd2.g:4689:29: '0' .. '9'
             {
             	MatchRange('0','9'); 
 
@@ -13854,7 +13854,7 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4063:27: ( 'a' .. 'z' | 'A' .. 'Z' )
+            // Cmd2.g:4690:27: ( 'a' .. 'z' | 'A' .. 'Z' )
             // Cmd2.g:
             {
             	if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
@@ -13885,16 +13885,16 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = HTTP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4065:27: ( H_ T_ T_ P_ ':' ( '//' ) )
-            // Cmd2.g:4065:29: H_ T_ T_ P_ ':' ( '//' )
+            // Cmd2.g:4692:27: ( H_ T_ T_ P_ ':' ( '//' ) )
+            // Cmd2.g:4692:29: H_ T_ T_ P_ ':' ( '//' )
             {
             	mH_(); 
             	mT_(); 
             	mT_(); 
             	mP_(); 
             	Match(':'); 
-            	// Cmd2.g:4065:46: ( '//' )
-            	// Cmd2.g:4065:47: '//'
+            	// Cmd2.g:4692:46: ( '//' )
+            	// Cmd2.g:4692:47: '//'
             	{
             		Match("//"); 
 
@@ -13920,10 +13920,10 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = WHITESPACE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4067:27: ( ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+ )
-            // Cmd2.g:4067:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
+            // Cmd2.g:4694:27: ( ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+ )
+            // Cmd2.g:4694:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
             {
-            	// Cmd2.g:4067:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
+            	// Cmd2.g:4694:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
             	int cnt1 = 0;
             	do 
             	{
@@ -13961,35 +13961,35 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt1) 
             		{
             			case 1 :
-            			    // Cmd2.g:4067:31: '\\t'
+            			    // Cmd2.g:4694:31: '\\t'
             			    {
             			    	Match('\t'); 
 
             			    }
             			    break;
             			case 2 :
-            			    // Cmd2.g:4067:38: ' '
+            			    // Cmd2.g:4694:38: ' '
             			    {
             			    	Match(' '); 
 
             			    }
             			    break;
             			case 3 :
-            			    // Cmd2.g:4067:44: '\\u000C'
+            			    // Cmd2.g:4694:44: '\\u000C'
             			    {
             			    	Match('\f'); 
 
             			    }
             			    break;
             			case 4 :
-            			    // Cmd2.g:4067:54: NEWLINE2
+            			    // Cmd2.g:4694:54: NEWLINE2
             			    {
             			    	mNEWLINE2(); 
 
             			    }
             			    break;
             			case 5 :
-            			    // Cmd2.g:4067:65: NEWLINE3
+            			    // Cmd2.g:4694:65: NEWLINE3
             			    {
             			    	mNEWLINE3(); 
 
@@ -14028,18 +14028,18 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = COMMENT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4069:27: ( ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
-            // Cmd2.g:4069:29: ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
+            // Cmd2.g:4696:27: ( ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
+            // Cmd2.g:4696:29: ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
             {
-            	// Cmd2.g:4069:29: ( '//' )
-            	// Cmd2.g:4069:30: '//'
+            	// Cmd2.g:4696:29: ( '//' )
+            	// Cmd2.g:4696:30: '//'
             	{
             		Match("//"); 
 
 
             	}
 
-            	// Cmd2.g:4069:36: (~ ( NEWLINE2 | NEWLINE3 ) )*
+            	// Cmd2.g:4696:36: (~ ( NEWLINE2 | NEWLINE3 ) )*
             	do 
             	{
             	    int alt2 = 2;
@@ -14054,7 +14054,7 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt2) 
             		{
             			case 1 :
-            			    // Cmd2.g:4069:37: ~ ( NEWLINE2 | NEWLINE3 )
+            			    // Cmd2.g:4696:37: ~ ( NEWLINE2 | NEWLINE3 )
             			    {
             			    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t') || (input.LA(1) >= '\u000B' && input.LA(1) <= '\uFFFF') ) 
             			    	{
@@ -14099,12 +14099,12 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = COMMENT_MULTILINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4070:27: ( '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/' )
-            // Cmd2.g:4070:29: '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/'
+            // Cmd2.g:4697:27: ( '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/' )
+            // Cmd2.g:4697:29: '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/'
             {
             	Match("/*"); 
 
-            	// Cmd2.g:4070:34: ( options {greedy=false; } : COMMENT_MULTILINE | . )*
+            	// Cmd2.g:4697:34: ( options {greedy=false; } : COMMENT_MULTILINE | . )*
             	do 
             	{
             	    int alt3 = 3;
@@ -14149,14 +14149,14 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt3) 
             		{
             			case 1 :
-            			    // Cmd2.g:4070:60: COMMENT_MULTILINE
+            			    // Cmd2.g:4697:60: COMMENT_MULTILINE
             			    {
             			    	mCOMMENT_MULTILINE(); 
 
             			    }
             			    break;
             			case 2 :
-            			    // Cmd2.g:4070:80: .
+            			    // Cmd2.g:4697:80: .
             			    {
             			    	MatchAny(); 
 
@@ -14193,8 +14193,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = Ident;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4073:27: ( ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
-            // Cmd2.g:4073:29: ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
+            // Cmd2.g:4700:27: ( ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
+            // Cmd2.g:4700:29: ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
             {
             	if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || input.LA(1) == '_' || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
             	{
@@ -14207,7 +14207,7 @@ public partial class Cmd2Lexer : Lexer {
             	    Recover(mse);
             	    throw mse;}
 
-            	// Cmd2.g:4073:42: ( DIGIT | LETTER | '_' )*
+            	// Cmd2.g:4700:42: ( DIGIT | LETTER | '_' )*
             	do 
             	{
             	    int alt4 = 2;
@@ -14267,10 +14267,10 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = Integer;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4075:27: ( ( DIGIT )+ )
-            // Cmd2.g:4075:29: ( DIGIT )+
+            // Cmd2.g:4702:27: ( ( DIGIT )+ )
+            // Cmd2.g:4702:29: ( DIGIT )+
             {
-            	// Cmd2.g:4075:29: ( DIGIT )+
+            	// Cmd2.g:4702:29: ( DIGIT )+
             	int cnt5 = 0;
             	do 
             	{
@@ -14286,7 +14286,7 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt5) 
             		{
             			case 1 :
-            			    // Cmd2.g:4075:29: DIGIT
+            			    // Cmd2.g:4702:29: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -14324,10 +14324,10 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = DigitsEDigits;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4077:27: ( ( DIGIT )+ ( E_ ) ( DIGIT )+ )
-            // Cmd2.g:4077:29: ( DIGIT )+ ( E_ ) ( DIGIT )+
+            // Cmd2.g:4704:27: ( ( DIGIT )+ ( E_ ) ( DIGIT )+ )
+            // Cmd2.g:4704:29: ( DIGIT )+ ( E_ ) ( DIGIT )+
             {
-            	// Cmd2.g:4077:29: ( DIGIT )+
+            	// Cmd2.g:4704:29: ( DIGIT )+
             	int cnt6 = 0;
             	do 
             	{
@@ -14343,7 +14343,7 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt6) 
             		{
             			case 1 :
-            			    // Cmd2.g:4077:29: DIGIT
+            			    // Cmd2.g:4704:29: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -14362,14 +14362,14 @@ public partial class Cmd2Lexer : Lexer {
             	loop6:
             		;	// Stops C# compiler whining that label 'loop6' has no statements
 
-            	// Cmd2.g:4077:37: ( E_ )
-            	// Cmd2.g:4077:39: E_
+            	// Cmd2.g:4704:37: ( E_ )
+            	// Cmd2.g:4704:39: E_
             	{
             		mE_(); 
 
             	}
 
-            	// Cmd2.g:4077:45: ( DIGIT )+
+            	// Cmd2.g:4704:45: ( DIGIT )+
             	int cnt7 = 0;
             	do 
             	{
@@ -14385,7 +14385,7 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt7) 
             		{
             			case 1 :
-            			    // Cmd2.g:4077:45: DIGIT
+            			    // Cmd2.g:4704:45: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -14423,10 +14423,10 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = DateDef;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4079:27: ( ( DIGIT )+ ( A_ | Q_ | M_ ) ( DIGIT )+ )
-            // Cmd2.g:4079:29: ( DIGIT )+ ( A_ | Q_ | M_ ) ( DIGIT )+
+            // Cmd2.g:4706:27: ( ( DIGIT )+ ( A_ | Q_ | M_ ) ( DIGIT )+ )
+            // Cmd2.g:4706:29: ( DIGIT )+ ( A_ | Q_ | M_ ) ( DIGIT )+
             {
-            	// Cmd2.g:4079:29: ( DIGIT )+
+            	// Cmd2.g:4706:29: ( DIGIT )+
             	int cnt8 = 0;
             	do 
             	{
@@ -14442,7 +14442,7 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt8) 
             		{
             			case 1 :
-            			    // Cmd2.g:4079:29: DIGIT
+            			    // Cmd2.g:4706:29: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -14472,7 +14472,7 @@ public partial class Cmd2Lexer : Lexer {
             	    Recover(mse);
             	    throw mse;}
 
-            	// Cmd2.g:4079:54: ( DIGIT )+
+            	// Cmd2.g:4706:54: ( DIGIT )+
             	int cnt9 = 0;
             	do 
             	{
@@ -14488,7 +14488,7 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt9) 
             		{
             			case 1 :
-            			    // Cmd2.g:4079:54: DIGIT
+            			    // Cmd2.g:4706:54: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -14526,10 +14526,10 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = IdentStartingWithInt;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4081:27: ( ( DIGIT | LETTER | '_' )+ )
-            // Cmd2.g:4081:29: ( DIGIT | LETTER | '_' )+
+            // Cmd2.g:4708:27: ( ( DIGIT | LETTER | '_' )+ )
+            // Cmd2.g:4708:29: ( DIGIT | LETTER | '_' )+
             {
-            	// Cmd2.g:4081:29: ( DIGIT | LETTER | '_' )+
+            	// Cmd2.g:4708:29: ( DIGIT | LETTER | '_' )+
             	int cnt10 = 0;
             	do 
             	{
@@ -14593,15 +14593,15 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = Double;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4086:27: ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? )
+            // Cmd2.g:4713:27: ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? )
             int alt17 = 3;
             alt17 = dfa17.Predict(input);
             switch (alt17) 
             {
                 case 1 :
-                    // Cmd2.g:4086:29: ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )?
+                    // Cmd2.g:4713:29: ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )?
                     {
-                    	// Cmd2.g:4086:29: ( DIGIT )+
+                    	// Cmd2.g:4713:29: ( DIGIT )+
                     	int cnt11 = 0;
                     	do 
                     	{
@@ -14617,7 +14617,7 @@ public partial class Cmd2Lexer : Lexer {
                     	    switch (alt11) 
                     		{
                     			case 1 :
-                    			    // Cmd2.g:4086:29: DIGIT
+                    			    // Cmd2.g:4713:29: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -14638,7 +14638,7 @@ public partial class Cmd2Lexer : Lexer {
 
                     	mGLUEDOTNUMBER(); 
                     	mDOT(); 
-                    	// Cmd2.g:4086:54: ( DIGIT )*
+                    	// Cmd2.g:4713:54: ( DIGIT )*
                     	do 
                     	{
                     	    int alt12 = 2;
@@ -14653,7 +14653,7 @@ public partial class Cmd2Lexer : Lexer {
                     	    switch (alt12) 
                     		{
                     			case 1 :
-                    			    // Cmd2.g:4086:54: DIGIT
+                    			    // Cmd2.g:4713:54: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -14668,7 +14668,7 @@ public partial class Cmd2Lexer : Lexer {
                     	loop12:
                     		;	// Stops C# compiler whining that label 'loop12' has no statements
 
-                    	// Cmd2.g:4086:61: ( Exponent )?
+                    	// Cmd2.g:4713:61: ( Exponent )?
                     	int alt13 = 2;
                     	int LA13_0 = input.LA(1);
 
@@ -14679,7 +14679,7 @@ public partial class Cmd2Lexer : Lexer {
                     	switch (alt13) 
                     	{
                     	    case 1 :
-                    	        // Cmd2.g:4086:61: Exponent
+                    	        // Cmd2.g:4713:61: Exponent
                     	        {
                     	        	mExponent(); 
 
@@ -14692,9 +14692,9 @@ public partial class Cmd2Lexer : Lexer {
                     }
                     break;
                 case 2 :
-                    // Cmd2.g:4087:29: ( DIGIT )+ Exponent
+                    // Cmd2.g:4714:29: ( DIGIT )+ Exponent
                     {
-                    	// Cmd2.g:4087:29: ( DIGIT )+
+                    	// Cmd2.g:4714:29: ( DIGIT )+
                     	int cnt14 = 0;
                     	do 
                     	{
@@ -14710,7 +14710,7 @@ public partial class Cmd2Lexer : Lexer {
                     	    switch (alt14) 
                     		{
                     			case 1 :
-                    			    // Cmd2.g:4087:29: DIGIT
+                    			    // Cmd2.g:4714:29: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -14734,11 +14734,11 @@ public partial class Cmd2Lexer : Lexer {
                     }
                     break;
                 case 3 :
-                    // Cmd2.g:4088:11: GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )?
+                    // Cmd2.g:4715:11: GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )?
                     {
                     	mGLUEDOTNUMBER(); 
                     	mDOT(); 
-                    	// Cmd2.g:4088:29: ( DIGIT )+
+                    	// Cmd2.g:4715:29: ( DIGIT )+
                     	int cnt15 = 0;
                     	do 
                     	{
@@ -14754,7 +14754,7 @@ public partial class Cmd2Lexer : Lexer {
                     	    switch (alt15) 
                     		{
                     			case 1 :
-                    			    // Cmd2.g:4088:29: DIGIT
+                    			    // Cmd2.g:4715:29: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -14773,7 +14773,7 @@ public partial class Cmd2Lexer : Lexer {
                     	loop15:
                     		;	// Stops C# compiler whining that label 'loop15' has no statements
 
-                    	// Cmd2.g:4088:36: ( Exponent )?
+                    	// Cmd2.g:4715:36: ( Exponent )?
                     	int alt16 = 2;
                     	int LA16_0 = input.LA(1);
 
@@ -14784,7 +14784,7 @@ public partial class Cmd2Lexer : Lexer {
                     	switch (alt16) 
                     	{
                     	    case 1 :
-                    	        // Cmd2.g:4088:36: Exponent
+                    	        // Cmd2.g:4715:36: Exponent
                     	        {
                     	        	mExponent(); 
 
@@ -14812,11 +14812,11 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4092:27: ( E_ ( '+' | '-' )? ( DIGIT )+ )
-            // Cmd2.g:4092:29: E_ ( '+' | '-' )? ( DIGIT )+
+            // Cmd2.g:4719:27: ( E_ ( '+' | '-' )? ( DIGIT )+ )
+            // Cmd2.g:4719:29: E_ ( '+' | '-' )? ( DIGIT )+
             {
             	mE_(); 
-            	// Cmd2.g:4092:32: ( '+' | '-' )?
+            	// Cmd2.g:4719:32: ( '+' | '-' )?
             	int alt18 = 2;
             	int LA18_0 = input.LA(1);
 
@@ -14846,7 +14846,7 @@ public partial class Cmd2Lexer : Lexer {
 
             	}
 
-            	// Cmd2.g:4092:47: ( DIGIT )+
+            	// Cmd2.g:4719:47: ( DIGIT )+
             	int cnt19 = 0;
             	do 
             	{
@@ -14862,7 +14862,7 @@ public partial class Cmd2Lexer : Lexer {
             	    switch (alt19) 
             		{
             			case 1 :
-            			    // Cmd2.g:4092:47: DIGIT
+            			    // Cmd2.g:4719:47: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -14898,14 +14898,14 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = StringInQuotes;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4095:27: ( ( '\\'' (~ '\\'' )* '\\'' ) )
-            // Cmd2.g:4095:29: ( '\\'' (~ '\\'' )* '\\'' )
+            // Cmd2.g:4722:27: ( ( '\\'' (~ '\\'' )* '\\'' ) )
+            // Cmd2.g:4722:29: ( '\\'' (~ '\\'' )* '\\'' )
             {
-            	// Cmd2.g:4095:29: ( '\\'' (~ '\\'' )* '\\'' )
-            	// Cmd2.g:4095:30: '\\'' (~ '\\'' )* '\\''
+            	// Cmd2.g:4722:29: ( '\\'' (~ '\\'' )* '\\'' )
+            	// Cmd2.g:4722:30: '\\'' (~ '\\'' )* '\\''
             	{
             		Match('\''); 
-            		// Cmd2.g:4095:35: (~ '\\'' )*
+            		// Cmd2.g:4722:35: (~ '\\'' )*
             		do 
             		{
             		    int alt20 = 2;
@@ -14920,7 +14920,7 @@ public partial class Cmd2Lexer : Lexer {
             		    switch (alt20) 
             			{
             				case 1 :
-            				    // Cmd2.g:4095:36: ~ '\\''
+            				    // Cmd2.g:4722:36: ~ '\\''
             				    {
             				    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '&') || (input.LA(1) >= '(' && input.LA(1) <= '\uFFFF') ) 
             				    	{
@@ -14968,8 +14968,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = GLUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4098:27: ( '¨' )
-            // Cmd2.g:4098:29: '¨'
+            // Cmd2.g:4725:27: ( '¨' )
+            // Cmd2.g:4725:29: '¨'
             {
             	Match('\u00A8'); 
 
@@ -14991,8 +14991,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = GLUEDOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4099:27: ( '£' )
-            // Cmd2.g:4099:29: '£'
+            // Cmd2.g:4726:27: ( '£' )
+            // Cmd2.g:4726:29: '£'
             {
             	Match('\u00A3'); 
 
@@ -15014,8 +15014,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = GLUEDOTNUMBER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4100:27: ( '§' )
-            // Cmd2.g:4100:29: '§'
+            // Cmd2.g:4727:27: ( '§' )
+            // Cmd2.g:4727:29: '§'
             {
             	Match('\u00A7'); 
 
@@ -15037,8 +15037,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = GLUESTAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4101:27: ( '½' )
-            // Cmd2.g:4101:29: '½'
+            // Cmd2.g:4728:27: ( '½' )
+            // Cmd2.g:4728:29: '½'
             {
             	Match('\u00BD'); 
 
@@ -15060,8 +15060,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LEFTANGLESPECIAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4102:27: ( '<=<' )
-            // Cmd2.g:4102:29: '<=<'
+            // Cmd2.g:4729:27: ( '<=<' )
+            // Cmd2.g:4729:29: '<=<'
             {
             	Match("<=<"); 
 
@@ -15084,8 +15084,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = MOD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4104:27: ( '¤' )
-            // Cmd2.g:4104:29: '¤'
+            // Cmd2.g:4731:27: ( '¤' )
+            // Cmd2.g:4731:29: '¤'
             {
             	Match('\u00A4'); 
 
@@ -15107,8 +15107,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = GLUEBACKSLASH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4105:27: ( '¨\\\\' )
-            // Cmd2.g:4105:29: '¨\\\\'
+            // Cmd2.g:4732:27: ( '¨\\\\' )
+            // Cmd2.g:4732:29: '¨\\\\'
             {
             	Match("¨\\"); 
 
@@ -15131,8 +15131,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = ISEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4108:27: ( '==' )
-            // Cmd2.g:4108:29: '=='
+            // Cmd2.g:4735:27: ( '==' )
+            // Cmd2.g:4735:29: '=='
             {
             	Match("=="); 
 
@@ -15155,8 +15155,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = ISNOTQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4109:27: ( '<>' )
-            // Cmd2.g:4109:29: '<>'
+            // Cmd2.g:4736:27: ( '<>' )
+            // Cmd2.g:4736:29: '<>'
             {
             	Match("<>"); 
 
@@ -15179,8 +15179,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = ISLARGEROREQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4110:21: ( '>=' )
-            // Cmd2.g:4110:23: '>='
+            // Cmd2.g:4737:21: ( '>=' )
+            // Cmd2.g:4737:23: '>='
             {
             	Match(">="); 
 
@@ -15203,8 +15203,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = ISSMALLEROREQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4111:27: ( '<=' )
-            // Cmd2.g:4111:29: '<='
+            // Cmd2.g:4738:27: ( '<=' )
+            // Cmd2.g:4738:29: '<='
             {
             	Match("<="); 
 
@@ -15227,8 +15227,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = AT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4113:27: ( '@' )
-            // Cmd2.g:4113:29: '@'
+            // Cmd2.g:4740:27: ( '@' )
+            // Cmd2.g:4740:29: '@'
             {
             	Match('@'); 
 
@@ -15250,8 +15250,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = HAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4114:27: ( '^' )
-            // Cmd2.g:4114:29: '^'
+            // Cmd2.g:4741:27: ( '^' )
+            // Cmd2.g:4741:29: '^'
             {
             	Match('^'); 
 
@@ -15273,8 +15273,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = SEMICOLON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4115:27: ( ';' )
-            // Cmd2.g:4115:29: ';'
+            // Cmd2.g:4742:27: ( ';' )
+            // Cmd2.g:4742:29: ';'
             {
             	Match(';'); 
 
@@ -15296,8 +15296,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = COLONGLUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4116:27: ( ':|' )
-            // Cmd2.g:4116:29: ':|'
+            // Cmd2.g:4743:27: ( ':|' )
+            // Cmd2.g:4743:29: ':|'
             {
             	Match(":|"); 
 
@@ -15320,8 +15320,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = COLON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4117:27: ( ':' )
-            // Cmd2.g:4117:29: ':'
+            // Cmd2.g:4744:27: ( ':' )
+            // Cmd2.g:4744:29: ':'
             {
             	Match(':'); 
 
@@ -15343,8 +15343,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = COMMA2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4118:27: ( ',' )
-            // Cmd2.g:4118:29: ','
+            // Cmd2.g:4745:27: ( ',' )
+            // Cmd2.g:4745:29: ','
             {
             	Match(','); 
 
@@ -15366,8 +15366,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = DOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4119:27: ( '.' )
-            // Cmd2.g:4119:29: '.'
+            // Cmd2.g:4746:27: ( '.' )
+            // Cmd2.g:4746:29: '.'
             {
             	Match('.'); 
 
@@ -15389,8 +15389,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = HASH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4120:27: ( '#' )
-            // Cmd2.g:4120:29: '#'
+            // Cmd2.g:4747:27: ( '#' )
+            // Cmd2.g:4747:29: '#'
             {
             	Match('#'); 
 
@@ -15412,8 +15412,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = PERCENT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4122:27: ( '%' )
-            // Cmd2.g:4122:29: '%'
+            // Cmd2.g:4749:27: ( '%' )
+            // Cmd2.g:4749:29: '%'
             {
             	Match('%'); 
 
@@ -15435,8 +15435,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = DOLLAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4124:27: ( '$' )
-            // Cmd2.g:4124:29: '$'
+            // Cmd2.g:4751:27: ( '$' )
+            // Cmd2.g:4751:29: '$'
             {
             	Match('$'); 
 
@@ -15458,8 +15458,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LEFTCURLY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4125:27: ( '{' )
-            // Cmd2.g:4125:29: '{'
+            // Cmd2.g:4752:27: ( '{' )
+            // Cmd2.g:4752:29: '{'
             {
             	Match('{'); 
 
@@ -15481,8 +15481,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = RIGHTCURLY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4126:27: ( '}' )
-            // Cmd2.g:4126:29: '}'
+            // Cmd2.g:4753:27: ( '}' )
+            // Cmd2.g:4753:29: '}'
             {
             	Match('}'); 
 
@@ -15504,8 +15504,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LEFTPAREN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4127:27: ( '(' )
-            // Cmd2.g:4127:29: '('
+            // Cmd2.g:4754:27: ( '(' )
+            // Cmd2.g:4754:29: '('
             {
             	Match('('); 
 
@@ -15527,8 +15527,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = RIGHTPAREN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4128:27: ( ')' )
-            // Cmd2.g:4128:29: ')'
+            // Cmd2.g:4755:27: ( ')' )
+            // Cmd2.g:4755:29: ')'
             {
             	Match(')'); 
 
@@ -15550,8 +15550,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LEFTBRACKETGLUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4129:27: ( '[_[' )
-            // Cmd2.g:4129:29: '[_['
+            // Cmd2.g:4756:27: ( '[_[' )
+            // Cmd2.g:4756:29: '[_['
             {
             	Match("[_["); 
 
@@ -15574,8 +15574,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LEFTBRACKETWILD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4130:27: ( '[¨[' )
-            // Cmd2.g:4130:29: '[¨['
+            // Cmd2.g:4757:27: ( '[¨[' )
+            // Cmd2.g:4757:29: '[¨['
             {
             	Match("[¨["); 
 
@@ -15598,8 +15598,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LEFTBRACKET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4131:27: ( '[' )
-            // Cmd2.g:4131:29: '['
+            // Cmd2.g:4758:27: ( '[' )
+            // Cmd2.g:4758:29: '['
             {
             	Match('['); 
 
@@ -15621,8 +15621,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = RIGHTBRACKET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4132:27: ( ']' )
-            // Cmd2.g:4132:29: ']'
+            // Cmd2.g:4759:27: ( ']' )
+            // Cmd2.g:4759:29: ']'
             {
             	Match(']'); 
 
@@ -15644,8 +15644,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = LEFTANGLESIMPLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4135:27: ( '<' )
-            // Cmd2.g:4135:29: '<'
+            // Cmd2.g:4762:27: ( '<' )
+            // Cmd2.g:4762:29: '<'
             {
             	Match('<'); 
 
@@ -15667,8 +15667,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = RIGHTANGLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4136:27: ( '>' )
-            // Cmd2.g:4136:29: '>'
+            // Cmd2.g:4763:27: ( '>' )
+            // Cmd2.g:4763:29: '>'
             {
             	Match('>'); 
 
@@ -15690,8 +15690,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = STAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4137:27: ( '*' )
-            // Cmd2.g:4137:29: '*'
+            // Cmd2.g:4764:27: ( '*' )
+            // Cmd2.g:4764:29: '*'
             {
             	Match('*'); 
 
@@ -15713,8 +15713,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = DOUBLEVERTICALBAR1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4138:27: ( '||' )
-            // Cmd2.g:4138:29: '||'
+            // Cmd2.g:4765:27: ( '||' )
+            // Cmd2.g:4765:29: '||'
             {
             	Match("||"); 
 
@@ -15737,8 +15737,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = DOUBLEVERTICALBAR2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4139:27: ( '|¨|' )
-            // Cmd2.g:4139:29: '|¨|'
+            // Cmd2.g:4766:27: ( '|¨|' )
+            // Cmd2.g:4766:29: '|¨|'
             {
             	Match("|¨|"); 
 
@@ -15761,8 +15761,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = VERTICALBAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4141:27: ( '|' )
-            // Cmd2.g:4141:29: '|'
+            // Cmd2.g:4768:27: ( '|' )
+            // Cmd2.g:4768:29: '|'
             {
             	Match('|'); 
 
@@ -15784,8 +15784,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = PLUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4142:27: ( '+' )
-            // Cmd2.g:4142:29: '+'
+            // Cmd2.g:4769:27: ( '+' )
+            // Cmd2.g:4769:29: '+'
             {
             	Match('+'); 
 
@@ -15807,8 +15807,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = MINUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4143:27: ( '-' )
-            // Cmd2.g:4143:29: '-'
+            // Cmd2.g:4770:27: ( '-' )
+            // Cmd2.g:4770:29: '-'
             {
             	Match('-'); 
 
@@ -15830,8 +15830,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = DIV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4144:27: ( '/' )
-            // Cmd2.g:4144:29: '/'
+            // Cmd2.g:4771:27: ( '/' )
+            // Cmd2.g:4771:29: '/'
             {
             	Match('/'); 
 
@@ -15853,8 +15853,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = STARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4145:27: ( '**' )
-            // Cmd2.g:4145:29: '**'
+            // Cmd2.g:4772:27: ( '**' )
+            // Cmd2.g:4772:29: '**'
             {
             	Match("**"); 
 
@@ -15877,8 +15877,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = EQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4146:27: ( '=' )
-            // Cmd2.g:4146:29: '='
+            // Cmd2.g:4773:27: ( '=' )
+            // Cmd2.g:4773:29: '='
             {
             	Match('='); 
 
@@ -15900,8 +15900,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = BACKSLASH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4147:27: ( '\\\\' )
-            // Cmd2.g:4147:29: '\\\\'
+            // Cmd2.g:4774:27: ( '\\\\' )
+            // Cmd2.g:4774:29: '\\\\'
             {
             	Match('\\'); 
 
@@ -15923,8 +15923,8 @@ public partial class Cmd2Lexer : Lexer {
     		{
             int _type = QUESTION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Cmd2.g:4148:27: ( '?' )
-            // Cmd2.g:4148:29: '?'
+            // Cmd2.g:4775:27: ( '?' )
+            // Cmd2.g:4775:29: '?'
             {
             	Match('?'); 
 
@@ -15944,8 +15944,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4151:12: ( ( 'a' | 'A' ) )
-            // Cmd2.g:4151:13: ( 'a' | 'A' )
+            // Cmd2.g:4778:12: ( ( 'a' | 'A' ) )
+            // Cmd2.g:4778:13: ( 'a' | 'A' )
             {
             	if ( input.LA(1) == 'A' || input.LA(1) == 'a' ) 
             	{
@@ -15973,8 +15973,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4152:12: ( ( 'b' | 'B' ) )
-            // Cmd2.g:4152:13: ( 'b' | 'B' )
+            // Cmd2.g:4779:12: ( ( 'b' | 'B' ) )
+            // Cmd2.g:4779:13: ( 'b' | 'B' )
             {
             	if ( input.LA(1) == 'B' || input.LA(1) == 'b' ) 
             	{
@@ -16002,8 +16002,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4153:12: ( ( 'c' | 'C' ) )
-            // Cmd2.g:4153:13: ( 'c' | 'C' )
+            // Cmd2.g:4780:12: ( ( 'c' | 'C' ) )
+            // Cmd2.g:4780:13: ( 'c' | 'C' )
             {
             	if ( input.LA(1) == 'C' || input.LA(1) == 'c' ) 
             	{
@@ -16031,8 +16031,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4154:12: ( ( 'd' | 'D' ) )
-            // Cmd2.g:4154:13: ( 'd' | 'D' )
+            // Cmd2.g:4781:12: ( ( 'd' | 'D' ) )
+            // Cmd2.g:4781:13: ( 'd' | 'D' )
             {
             	if ( input.LA(1) == 'D' || input.LA(1) == 'd' ) 
             	{
@@ -16060,8 +16060,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4155:12: ( ( 'e' | 'E' ) )
-            // Cmd2.g:4155:13: ( 'e' | 'E' )
+            // Cmd2.g:4782:12: ( ( 'e' | 'E' ) )
+            // Cmd2.g:4782:13: ( 'e' | 'E' )
             {
             	if ( input.LA(1) == 'E' || input.LA(1) == 'e' ) 
             	{
@@ -16089,8 +16089,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4156:12: ( ( 'f' | 'F' ) )
-            // Cmd2.g:4156:13: ( 'f' | 'F' )
+            // Cmd2.g:4783:12: ( ( 'f' | 'F' ) )
+            // Cmd2.g:4783:13: ( 'f' | 'F' )
             {
             	if ( input.LA(1) == 'F' || input.LA(1) == 'f' ) 
             	{
@@ -16118,8 +16118,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4157:12: ( ( 'g' | 'G' ) )
-            // Cmd2.g:4157:13: ( 'g' | 'G' )
+            // Cmd2.g:4784:12: ( ( 'g' | 'G' ) )
+            // Cmd2.g:4784:13: ( 'g' | 'G' )
             {
             	if ( input.LA(1) == 'G' || input.LA(1) == 'g' ) 
             	{
@@ -16147,8 +16147,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4158:12: ( ( 'h' | 'H' ) )
-            // Cmd2.g:4158:13: ( 'h' | 'H' )
+            // Cmd2.g:4785:12: ( ( 'h' | 'H' ) )
+            // Cmd2.g:4785:13: ( 'h' | 'H' )
             {
             	if ( input.LA(1) == 'H' || input.LA(1) == 'h' ) 
             	{
@@ -16176,8 +16176,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4159:12: ( ( 'i' | 'I' ) )
-            // Cmd2.g:4159:13: ( 'i' | 'I' )
+            // Cmd2.g:4786:12: ( ( 'i' | 'I' ) )
+            // Cmd2.g:4786:13: ( 'i' | 'I' )
             {
             	if ( input.LA(1) == 'I' || input.LA(1) == 'i' ) 
             	{
@@ -16205,8 +16205,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4160:12: ( ( 'j' | 'J' ) )
-            // Cmd2.g:4160:13: ( 'j' | 'J' )
+            // Cmd2.g:4787:12: ( ( 'j' | 'J' ) )
+            // Cmd2.g:4787:13: ( 'j' | 'J' )
             {
             	if ( input.LA(1) == 'J' || input.LA(1) == 'j' ) 
             	{
@@ -16234,8 +16234,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4161:12: ( ( 'k' | 'K' ) )
-            // Cmd2.g:4161:13: ( 'k' | 'K' )
+            // Cmd2.g:4788:12: ( ( 'k' | 'K' ) )
+            // Cmd2.g:4788:13: ( 'k' | 'K' )
             {
             	if ( input.LA(1) == 'K' || input.LA(1) == 'k' ) 
             	{
@@ -16263,8 +16263,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4162:12: ( ( 'l' | 'L' ) )
-            // Cmd2.g:4162:13: ( 'l' | 'L' )
+            // Cmd2.g:4789:12: ( ( 'l' | 'L' ) )
+            // Cmd2.g:4789:13: ( 'l' | 'L' )
             {
             	if ( input.LA(1) == 'L' || input.LA(1) == 'l' ) 
             	{
@@ -16292,8 +16292,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4163:12: ( ( 'm' | 'M' ) )
-            // Cmd2.g:4163:13: ( 'm' | 'M' )
+            // Cmd2.g:4790:12: ( ( 'm' | 'M' ) )
+            // Cmd2.g:4790:13: ( 'm' | 'M' )
             {
             	if ( input.LA(1) == 'M' || input.LA(1) == 'm' ) 
             	{
@@ -16321,8 +16321,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4164:12: ( ( 'n' | 'N' ) )
-            // Cmd2.g:4164:13: ( 'n' | 'N' )
+            // Cmd2.g:4791:12: ( ( 'n' | 'N' ) )
+            // Cmd2.g:4791:13: ( 'n' | 'N' )
             {
             	if ( input.LA(1) == 'N' || input.LA(1) == 'n' ) 
             	{
@@ -16350,8 +16350,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4165:12: ( ( 'o' | 'O' ) )
-            // Cmd2.g:4165:13: ( 'o' | 'O' )
+            // Cmd2.g:4792:12: ( ( 'o' | 'O' ) )
+            // Cmd2.g:4792:13: ( 'o' | 'O' )
             {
             	if ( input.LA(1) == 'O' || input.LA(1) == 'o' ) 
             	{
@@ -16379,8 +16379,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4166:12: ( ( 'p' | 'P' ) )
-            // Cmd2.g:4166:13: ( 'p' | 'P' )
+            // Cmd2.g:4793:12: ( ( 'p' | 'P' ) )
+            // Cmd2.g:4793:13: ( 'p' | 'P' )
             {
             	if ( input.LA(1) == 'P' || input.LA(1) == 'p' ) 
             	{
@@ -16408,8 +16408,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4167:12: ( ( 'q' | 'Q' ) )
-            // Cmd2.g:4167:13: ( 'q' | 'Q' )
+            // Cmd2.g:4794:12: ( ( 'q' | 'Q' ) )
+            // Cmd2.g:4794:13: ( 'q' | 'Q' )
             {
             	if ( input.LA(1) == 'Q' || input.LA(1) == 'q' ) 
             	{
@@ -16437,8 +16437,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4168:12: ( ( 'r' | 'R' ) )
-            // Cmd2.g:4168:13: ( 'r' | 'R' )
+            // Cmd2.g:4795:12: ( ( 'r' | 'R' ) )
+            // Cmd2.g:4795:13: ( 'r' | 'R' )
             {
             	if ( input.LA(1) == 'R' || input.LA(1) == 'r' ) 
             	{
@@ -16466,8 +16466,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4169:12: ( ( 's' | 'S' ) )
-            // Cmd2.g:4169:13: ( 's' | 'S' )
+            // Cmd2.g:4796:12: ( ( 's' | 'S' ) )
+            // Cmd2.g:4796:13: ( 's' | 'S' )
             {
             	if ( input.LA(1) == 'S' || input.LA(1) == 's' ) 
             	{
@@ -16495,8 +16495,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4170:12: ( ( 't' | 'T' ) )
-            // Cmd2.g:4170:13: ( 't' | 'T' )
+            // Cmd2.g:4797:12: ( ( 't' | 'T' ) )
+            // Cmd2.g:4797:13: ( 't' | 'T' )
             {
             	if ( input.LA(1) == 'T' || input.LA(1) == 't' ) 
             	{
@@ -16524,8 +16524,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4171:12: ( ( 'u' | 'U' ) )
-            // Cmd2.g:4171:13: ( 'u' | 'U' )
+            // Cmd2.g:4798:12: ( ( 'u' | 'U' ) )
+            // Cmd2.g:4798:13: ( 'u' | 'U' )
             {
             	if ( input.LA(1) == 'U' || input.LA(1) == 'u' ) 
             	{
@@ -16553,8 +16553,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4172:12: ( ( 'v' | 'V' ) )
-            // Cmd2.g:4172:13: ( 'v' | 'V' )
+            // Cmd2.g:4799:12: ( ( 'v' | 'V' ) )
+            // Cmd2.g:4799:13: ( 'v' | 'V' )
             {
             	if ( input.LA(1) == 'V' || input.LA(1) == 'v' ) 
             	{
@@ -16582,8 +16582,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4173:12: ( ( 'w' | 'W' ) )
-            // Cmd2.g:4173:13: ( 'w' | 'W' )
+            // Cmd2.g:4800:12: ( ( 'w' | 'W' ) )
+            // Cmd2.g:4800:13: ( 'w' | 'W' )
             {
             	if ( input.LA(1) == 'W' || input.LA(1) == 'w' ) 
             	{
@@ -16611,8 +16611,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4174:12: ( ( 'x' | 'X' ) )
-            // Cmd2.g:4174:13: ( 'x' | 'X' )
+            // Cmd2.g:4801:12: ( ( 'x' | 'X' ) )
+            // Cmd2.g:4801:13: ( 'x' | 'X' )
             {
             	if ( input.LA(1) == 'X' || input.LA(1) == 'x' ) 
             	{
@@ -16640,8 +16640,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4175:12: ( ( 'y' | 'Y' ) )
-            // Cmd2.g:4175:13: ( 'y' | 'Y' )
+            // Cmd2.g:4802:12: ( ( 'y' | 'Y' ) )
+            // Cmd2.g:4802:13: ( 'y' | 'Y' )
             {
             	if ( input.LA(1) == 'Y' || input.LA(1) == 'y' ) 
             	{
@@ -16669,8 +16669,8 @@ public partial class Cmd2Lexer : Lexer {
     {
     		try
     		{
-            // Cmd2.g:4176:12: ( ( 'z' | 'Z' ) )
-            // Cmd2.g:4176:13: ( 'z' | 'Z' )
+            // Cmd2.g:4803:12: ( ( 'z' | 'Z' ) )
+            // Cmd2.g:4803:13: ( 'z' | 'Z' )
             {
             	if ( input.LA(1) == 'Z' || input.LA(1) == 'z' ) 
             	{
@@ -20641,7 +20641,7 @@ public partial class Cmd2Lexer : Lexer {
 
         override public string Description
         {
-            get { return "4086:1: Double : ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? );"; }
+            get { return "4713:1: Double : ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? );"; }
         }
 
     }

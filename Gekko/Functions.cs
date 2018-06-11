@@ -187,6 +187,29 @@ namespace Gekko
             tsq1.parentDatabank.AddVariable(tsq2);
         }
 
+        public static IVariable list(GekkoTime t, params IVariable[] ivs)
+        {
+            List<string> l = new List<string>();
+            foreach (IVariable iv in ivs)
+            {
+                if (iv.Type() == EVariableType.String)
+                {
+                    string s = O.GetString(iv);
+                    l.Add(s);
+                }
+                else if (iv.Type() == EVariableType.List)
+                {
+                    l.AddRange(((MetaList)iv).list);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: list() function only accepts STRING or LIST arguments");
+                    throw new GekkoException();
+                }
+            }
+            return new MetaList(l);
+        }
+
         public static GekkoTuple.Tuple2 laspchain(GekkoTime t, IVariable plist, IVariable xlist, IVariable date)
         {            
             GekkoTuple.Tuple2 tuple = Program.GenrTuple("laspchain", plist, xlist, date.GetDate(O.GetDateChoices.Strict), Globals.globalPeriodStart, Globals.globalPeriodEnd);           

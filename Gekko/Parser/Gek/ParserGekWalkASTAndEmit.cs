@@ -1177,7 +1177,15 @@ namespace Gekko.Parser.Gek
                             }
                             else
                             {
-                                node.Code.A("return (" + G.GetVariableType(w.uFunctionsHelper.lhsTypes.Count) + ")(" + node[0].Code + ");" + G.NL);
+                                if (w.uFunctionsHelper.lhsTypes.Count == 0)
+                                {
+                                    //procedure, or later on functions without return values.
+                                    node.Code.A("return;" + G.NL);
+                                }
+                                else
+                                {
+                                    node.Code.A("return (" + G.GetVariableType(w.uFunctionsHelper.lhsTypes.Count) + ")(" + node[0].Code + ");" + G.NL);
+                                }
                             }
                             
                             node.Code.A(Globals.splitSTART);

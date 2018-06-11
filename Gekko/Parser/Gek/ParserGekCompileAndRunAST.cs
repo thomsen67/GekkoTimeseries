@@ -289,7 +289,11 @@ namespace Gekko.Parser.Gek
                     }
                     string name = null;
                     if (q.Count > 0) name = q[0];
-                    G.Writeln("*** ERROR: A function " + name + " called with the wrong number of arguments");
+
+                    string s, method;
+                    FuncProc(name, out s, out method);
+
+                    G.Writeln2("*** ERROR: A " + method + " '" + s + "' was called with the wrong number of arguments");
                 }
                 else if (G.equal(ce.ErrorNumber, "CS0117"))
                 {                    
@@ -309,9 +313,13 @@ namespace Gekko.Parser.Gek
                         //    else s = Program.StripQuotes(q[q.Count - 1]) + "(+" + i + ")";
                         //    if (line.Contains(s)) hit = s;
                         //}
+
+                        string s, method;
+                        FuncProc(q[q.Count - 1], out s, out method);
+
                         //we use the last single quote match
-                        G.Writeln("*** ERROR: The function/procedure " + q[q.Count - 1] + " does not seem to exist locally.", Color.Red);
-                        G.Writeln("           You may use use FUNCTION/PROCEDURE to define a function/procedure inside your gcm file,", Color.Red);
+                        G.Writeln2("*** ERROR: The " + method + " '" + s + "' does not seem to exist locally.", Color.Red);
+                        G.Writeln("           You may use use " + method.ToUpper() + " to define a " + method + " inside your gcm file,", Color.Red);
                         G.Writeln("           or the OPTION library file = ... command to load user functions/procedures from file.", Color.Red);
                         //G.Writeln("           Please note that you must use the relevant FUNCTION or LIBRARY command inside", Color.Red);
                         //G.Writeln("           all gcm files using them. ", Color.Red);
@@ -344,6 +352,19 @@ namespace Gekko.Parser.Gek
             if (p.lastFileSentToANTLR == "") text = "*** ERROR: Internal Gekko error regarding user input";
             WriteCompileErrorMessage(text, p.lastFileSentToANTLR);
             throw new GekkoException();
+        }
+
+        private static void FuncProc(string name, out string s, out string method)
+        {
+            bool procedure = false;
+            s = Program.StripQuotes(name.Trim()).Trim();
+            if (s.StartsWith(Globals.procedure))
+            {
+                s = s.Substring(Globals.procedure.Length, s.Length - Globals.procedure.Length);
+                procedure = true;
+            }
+            method = "function";
+            if (procedure) method = "procedure";
         }
 
         //TODO: Delete this when Parser.cs is deleted
