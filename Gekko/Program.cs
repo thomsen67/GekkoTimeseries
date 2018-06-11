@@ -24634,13 +24634,7 @@ namespace Gekko
                 }
             }
 
-            bool rows = false; if (G.Equal(o.opt_rows, "yes")) rows = true;
-
-            if (NonSeriesCheck(o, type))
-            {
-                NonSeriesHandling(o);
-                return;
-            }            
+            bool rows = false; if (G.Equal(o.opt_rows, "yes")) rows = true;                       
 
             List<O.Prt.Element> containerExplode = new List<O.Prt.Element>();
 
@@ -25856,6 +25850,7 @@ namespace Gekko
 
         public static bool OprintHandleArraySeriesWithoutIndex(O.Prt o, int i, List<string> labelsHandmade, ref List mm0, ref List mm1)
         {
+            //int i = 0;
             bool isArraySeriesWithoutIndex = false;
             if (((o.prtElements[i].variable[0] != null && o.prtElements[i].variable[0].Type() == EVariableType.Series) || (o.prtElements[i].variable[1] != null && o.prtElements[i].variable[1].Type() == EVariableType.Series)))
             {

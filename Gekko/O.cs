@@ -7058,8 +7058,10 @@ namespace Gekko
 
             public void Exe()
             {
+                List<Element> prtElementsRemember = this.prtElements;
 
-                for (int i = 0; i < this.prtElements.Count; i++)
+                bool flag = false;
+                for (int i = 0; i < prtElementsRemember.Count; i++)
                 {                    
                     List<string> labelsHandmade = new List<string>();
                     List mm0 = null;
@@ -7067,14 +7069,19 @@ namespace Gekko
                     bool isArraySeriesWithoutIndex = Program.OprintHandleArraySeriesWithoutIndex(this, i, labelsHandmade, ref mm0, ref mm1);
                     if (isArraySeriesWithoutIndex)
                     {
-                        this.prtElements[i].variable[0] = mm0;
-                        this.prtElements[i].variable[1] = mm1;
-                        Program.OPrint(this, isArraySeriesWithoutIndex, labelsHandmade);
+                        this.prtElements = new List<Element>();
+                        this.prtElements.Add(prtElementsRemember[i]);
+                        this.prtElements[0].variable[0] = mm0;
+                        this.prtElements[0].variable[1] = mm1;
+                        flag = true;  //met an array-series, continue to print one by one
                     }
                     else
                     {
-                        Program.OPrint(this, isArraySeriesWithoutIndex, labelsHandmade);
+                        //print them all in one go
                     }
+                    Program.OPrint(this, isArraySeriesWithoutIndex, labelsHandmade);
+                    if (flag) this.prtElements = prtElementsRemember;
+                    else break;
                 }
 
                 if (G.Equal(prtType, "mulprt") && G.Equal(Program.options.interface_mode, "data"))
