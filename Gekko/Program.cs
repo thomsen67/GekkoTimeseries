@@ -25854,10 +25854,10 @@ namespace Gekko
             return lbl;
         }
 
-        public static bool OprintHandleArraySeriesWithoutIndex(O.Prt o, int i, List<string> labelsHandmade)
+        public static bool OprintHandleArraySeriesWithoutIndex(O.Prt o, int i, List<string> labelsHandmade, ref List mm0, ref List mm1)
         {
             bool isArraySeriesWithoutIndex = false;
-            if (o.prtElements.Count == 1 && ((o.prtElements[i].variable[0] != null && o.prtElements[i].variable[0].Type() == EVariableType.Series) || (o.prtElements[i].variable[1] != null && o.prtElements[i].variable[1].Type() == EVariableType.Series)))
+            if (((o.prtElements[i].variable[0] != null && o.prtElements[i].variable[0].Type() == EVariableType.Series) || (o.prtElements[i].variable[1] != null && o.prtElements[i].variable[1].Type() == EVariableType.Series)))
             {
                 string label = o.prtElements[i].label;
 
@@ -25898,14 +25898,22 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     keys.Sort(CompareMapMultidimItems);
-                    List m0 = new List(); //subseries first
-                    List m1 = new List(); //subseries ref
+                    //List m0 = new List(); //subseries first
+                    //List m1 = new List(); //subseries ref
                     foreach (MapMultidimItem key in keys)
                     {
                         try
                         {
-                            if (banks[0]) m0.Add(tsFirst.dimensionsStorage.storage[key]);
-                            if (banks[1]) m1.Add(tsRef.dimensionsStorage.storage[key]);
+                            if (banks[0])
+                            {
+                                if (mm0 == null) mm0 = new Gekko.List();
+                                mm0.Add(tsFirst.dimensionsStorage.storage[key]);
+                            }
+                            if (banks[1])
+                            {
+                                if (mm1 == null) mm1 = new Gekko.List();
+                                mm1.Add(tsRef.dimensionsStorage.storage[key]);
+                            }
                         }
                         catch
                         {
@@ -25934,8 +25942,10 @@ namespace Gekko
                         labelsHandmade.Add(label + blanks + "[" + key.ToString() + "]");
                         //labelsHandmade.Add(bankName + G.RemoveFreqFromName(name) + "[" + key.ToString() + "]");
                     }
-                    if (banks[0]) o.prtElements[i].variable[0] = m0;
-                    if (banks[1]) o.prtElements[i].variable[1] = m1;
+                    //if (banks[0]) o.prtElements[i].variable[0] = m0;
+                    //if (banks[1]) o.prtElements[i].variable[1] = m1;
+                    //mm0 = m0;
+                    //mm1 = m1;
                     isArraySeriesWithoutIndex = true;
                 }
             }

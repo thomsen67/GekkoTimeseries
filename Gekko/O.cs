@@ -7062,9 +7062,13 @@ namespace Gekko
                 for (int i = 0; i < this.prtElements.Count; i++)
                 {                    
                     List<string> labelsHandmade = new List<string>();
-                    bool isArraySeriesWithoutIndex = Program.OprintHandleArraySeriesWithoutIndex(this, i, labelsHandmade);
-                    if (i == 0 && isArraySeriesWithoutIndex)
+                    List mm0 = null;
+                    List mm1 = null;
+                    bool isArraySeriesWithoutIndex = Program.OprintHandleArraySeriesWithoutIndex(this, i, labelsHandmade, ref mm0, ref mm1);
+                    if (isArraySeriesWithoutIndex)
                     {
+                        this.prtElements[i].variable[0] = mm0;
+                        this.prtElements[i].variable[1] = mm1;
                         Program.OPrint(this, isArraySeriesWithoutIndex, labelsHandmade);
                     }
                     else
