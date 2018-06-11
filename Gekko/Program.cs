@@ -24616,7 +24616,7 @@ namespace Gekko
             return true;
         }
 
-        public static void OPrint(O.Prt o)
+        public static void OPrint(O.Prt o, bool isArraySeriesWithoutIndex, List<string> labelsHandmade)
         {
             //string format = "f14.4";
             //TODO: we could check if there is 1 object printed and it is of type=normal. If so, the label could be printed.
@@ -24640,12 +24640,7 @@ namespace Gekko
             {
                 NonSeriesHandling(o);
                 return;
-            }
-
-            bool unfoldLabels = true;
-            List<string> labelsHandmade = new List<string>();
-
-            unfoldLabels = OprintHandleArraySeriesWithoutIndexer(o, unfoldLabels, labelsHandmade);
+            }            
 
             List<O.Prt.Element> containerExplode = new List<O.Prt.Element>();
 
@@ -24845,7 +24840,7 @@ namespace Gekko
                         string lbl = null;
                         
                         //tt123
-                        if (!unfoldLabels && n == labelsHandmade.Count)
+                        if (isArraySeriesWithoutIndex && n == labelsHandmade.Count)
                         {
                             lbl = labelsHandmade[i];
                         }
@@ -25859,14 +25854,15 @@ namespace Gekko
             return lbl;
         }
 
-        private static bool OprintHandleArraySeriesWithoutIndexer(O.Prt o, bool unfoldLabels, List<string> labelsHandmade)
+        public static bool OprintHandleArraySeriesWithoutIndex(O.Prt o, int i, List<string> labelsHandmade)
         {
-            if (o.prtElements.Count == 1 && ((o.prtElements[0].variable[0] != null && o.prtElements[0].variable[0].Type() == EVariableType.Series) || (o.prtElements[0].variable[1] != null && o.prtElements[0].variable[1].Type() == EVariableType.Series)))
+            bool isArraySeriesWithoutIndex = false;
+            if (o.prtElements.Count == 1 && ((o.prtElements[i].variable[0] != null && o.prtElements[i].variable[0].Type() == EVariableType.Series) || (o.prtElements[i].variable[1] != null && o.prtElements[i].variable[1].Type() == EVariableType.Series)))
             {
-                string label = o.prtElements[0].label;
+                string label = o.prtElements[i].label;
 
                 bool[] banks = new bool[2];  //first, ref
-                foreach (string printCode in o.prtElements[0].printCodesFinal)
+                foreach (string printCode in o.prtElements[i].printCodesFinal)
                 {
                     int bankCombi = GetBankCombi(printCode);
                     if (bankCombi == 0) banks[0] = true;
@@ -25880,8 +25876,8 @@ namespace Gekko
 
                 Series tsFirst = null;
                 Series tsRef = null;
-                if (banks[0]) tsFirst = o.prtElements[0].variable[0] as Series;
-                if (banks[1]) tsRef = o.prtElements[0].variable[1] as Series;
+                if (banks[0]) tsFirst = o.prtElements[i].variable[0] as Series;
+                if (banks[1]) tsRef = o.prtElements[i].variable[1] as Series;
 
                 string name = null;
                 if (tsFirst != null) name = tsFirst.name;
@@ -25938,13 +25934,13 @@ namespace Gekko
                         labelsHandmade.Add(label + blanks + "[" + key.ToString() + "]");
                         //labelsHandmade.Add(bankName + G.RemoveFreqFromName(name) + "[" + key.ToString() + "]");
                     }
-                    if (banks[0]) o.prtElements[0].variable[0] = m0;
-                    if (banks[1]) o.prtElements[0].variable[1] = m1;
-                    unfoldLabels = false;
+                    if (banks[0]) o.prtElements[i].variable[0] = m0;
+                    if (banks[1]) o.prtElements[i].variable[1] = m1;
+                    isArraySeriesWithoutIndex = true;
                 }
             }
 
-            return unfoldLabels;
+            return isArraySeriesWithoutIndex;
         }
 
         private static int GetBankCombi(string printCode)

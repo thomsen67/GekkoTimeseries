@@ -9740,6 +9740,11 @@ namespace UnitTests
             I("xx[b, x] = (4,5,6);");
             I("xx[a, y] = (7,8,9);");
             I("xx[b, y] = (14,15,16);");
+            I("yy = series(2);");
+            I("yy[a, x] = (11,12,13);");
+            I("yy[b, x] = (14,15,16);");
+            I("yy[a, y] = (17,18,19);");
+            I("yy[b, y] = (24,25,26);");
             I("#m1 = ('a', 'b');");
             I("#m2 = ('x', 'y');");
             I("#m3 = ('a', );");
@@ -9749,6 +9754,7 @@ namespace UnitTests
             I("xxbx = (4,5,6);");
             I("xxay = (7,8,9);");
             I("xxby = (14,15,16);");
+            
 
             /*                     
                                   xx['a', 'x'] 
@@ -9851,6 +9857,50 @@ namespace UnitTests
             Assert.AreEqual(table.Get(2, 5).number, 14.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 5).number, 15.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 5).number, 16.0000d, 0.0001);
+
+            I("p <n> xx;");  //printing without indices
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001"); //why is it not a date?
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx[a, x]");
+            Assert.AreEqual(table.Get(2, 2).number, 1.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 2).number, 2.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 2).number, 3.0000d, 0.0001);
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx[a, y]");
+            Assert.AreEqual(table.Get(2, 3).number, 7.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 3).number, 8.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 3).number, 9.0000d, 0.0001);
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx[b, x]");
+            Assert.AreEqual(table.Get(2, 4).number, 4.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 4).number, 5.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 4).number, 6.0000d, 0.0001);
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "xx[b, y]");
+            Assert.AreEqual(table.Get(2, 5).number, 14.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 5).number, 15.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 5).number, 16.0000d, 0.0001);
+
+            I("p <n> yy-xx;");  //printing without indices
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001"); //why is it not a date?
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "yy-xx  [a, x]");
+            Assert.AreEqual(table.Get(2, 2).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 2).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 2).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "yy-xx  [a, y]");
+            Assert.AreEqual(table.Get(2, 3).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 3).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 3).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "yy-xx  [b, x]");
+            Assert.AreEqual(table.Get(2, 4).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 4).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 4).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "yy-xx  [b, y]");
+            Assert.AreEqual(table.Get(2, 5).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 5).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 5).number, 10.0000d, 0.0001);
 
             I("p <n> xx;");  //will fold out its elements
             table = Globals.lastPrtOrMulprtTable;

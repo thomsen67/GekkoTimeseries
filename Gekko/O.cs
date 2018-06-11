@@ -7059,7 +7059,20 @@ namespace Gekko
             public void Exe()
             {
 
-                Program.OPrint(this);
+                for (int i = 0; i < this.prtElements.Count; i++)
+                {                    
+                    List<string> labelsHandmade = new List<string>();
+                    bool isArraySeriesWithoutIndex = Program.OprintHandleArraySeriesWithoutIndex(this, i, labelsHandmade);
+                    if (i == 0 && isArraySeriesWithoutIndex)
+                    {
+                        Program.OPrint(this, isArraySeriesWithoutIndex, labelsHandmade);
+                    }
+                    else
+                    {
+                        Program.OPrint(this, isArraySeriesWithoutIndex, labelsHandmade);
+                    }
+                }
+
                 if (G.Equal(prtType, "mulprt") && G.Equal(Program.options.interface_mode, "data"))
                 {
                     G.Writeln2("+++ WARNING: MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
