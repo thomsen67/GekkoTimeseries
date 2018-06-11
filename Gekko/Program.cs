@@ -24584,36 +24584,88 @@ namespace Gekko
         //    }
         //}
 
-        public static bool NonSeriesCheck(O.Prt oPrt, EPrintTypes type)
-        {            
+        public static bool AllSeriesCheck(O.Prt oPrt, EPrintTypes type)
+        {
+
+            //all are val or series
+            //at least one series
+            //no array-series
+
+            int seriesCounter = 0;
             if (type == EPrintTypes.Print)
             {
                 //check if elements are non-series, or lists with non-series
                 foreach (O.Prt.Element element in oPrt.prtElements)
                 {
-                    if (element.variable[0] == null || element.variable[1] != null || element.variable[0].Type() == EVariableType.Series)
+                    //if(element.variable[0]!=null && element.variable[0].Type()==EVariableType.Series)
+                    if (element.variable[0] != null)
                     {
-                        return false;
-                    }
-
-                    List temp = element.variable[0] as List;
-                    if (temp != null)
-                    {
-                        foreach (IVariable iv in temp.list)
+                        List temp = element.variable[0] as List;
+                        if (temp != null)
                         {
-                            if (iv.Type() == EVariableType.Series)
+                            foreach (IVariable iv in temp.list)
                             {
-                                return false;
+                                if (!IsSeriesType(iv)) return false;
+                                if (iv.Type() == EVariableType.Series) seriesCounter++;
                             }
                         }
+                        else
+                        {
+                            if (!IsSeriesType(element.variable[0])) return false;
+                            if (element.variable[0].Type() == EVariableType.Series) seriesCounter++;
+                        }
                     }
+
+                    if (element.variable[1] != null)
+                    {
+                        List temp = element.variable[1] as List;
+                        if (temp != null)
+                        {
+                            foreach (IVariable iv in temp.list)
+                            {
+                                if (!IsSeriesType(iv)) return false;
+                                if (iv.Type() == EVariableType.Series) seriesCounter++;
+                            }
+                        }
+                        else
+                        {
+                            if (!IsSeriesType(element.variable[1])) return false;
+                            if (element.variable[1].Type() == EVariableType.Series) seriesCounter++;
+                        }
+                    }                  
+                    
                 }
+                if (seriesCounter == 0) return false;
             }
             else
             {
-                return false;
+                //not prt
+                return true;
             }
             return true;
+        }
+
+        private static bool IsSeriesType(IVariable iv)
+        {
+            //if (iv == null) return false;
+            bool b = true;
+            if (iv.Type() != EVariableType.Series && iv.Type() != EVariableType.Val)
+            {
+                b = false;
+            }
+            else
+            {
+                Series ts = iv as Series;
+                if (ts != null)
+                {
+                    if (ts.type == ESeriesType.ArraySuper)
+                    {
+                        b = false;
+                    }
+                }
+            }
+
+            return b;
         }
 
         public static void OPrint(O.Prt o, bool isArraySeriesWithoutIndex, List<string> labelsHandmade)
@@ -25958,7 +26010,7 @@ namespace Gekko
             return bankCombi;
         }
 
-        private static void NonSeriesHandling(O.Prt oPrt)
+        public static void NonSeriesHandling(O.Prt oPrt)
         {
             foreach (O.Prt.Element element in oPrt.prtElements)
             {

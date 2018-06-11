@@ -7058,31 +7058,66 @@ namespace Gekko
 
             public void Exe()
             {
-                List<Element> prtElementsRemember = this.prtElements;
-
-                bool flag = false;
-                for (int i = 0; i < prtElementsRemember.Count; i++)
-                {                    
-                    List<string> labelsHandmade = new List<string>();
-                    List mm0 = null;
-                    List mm1 = null;
-                    bool isArraySeriesWithoutIndex = Program.OprintHandleArraySeriesWithoutIndex(this, i, labelsHandmade, ref mm0, ref mm1);
-                    if (isArraySeriesWithoutIndex)
+                //if all (including contents in lists) are normal series or vals (at least one series), and none is array-series
+                   //print normally in columns
+                   //else print them one by one separately like separate print commands.
+                
+                if (Program.AllSeriesCheck(this, EPrintTypes.Print))
+                {
+                    Program.OPrint(this, false, null);
+                }
+                else
+                {
+                    List<Element> prtElementsRemember = this.prtElements;
+                    for (int i = 0; i < prtElementsRemember.Count; i++)
                     {
+                        List<string> labelsHandmade = new List<string>();
+                        List mm0 = null;
+                        List mm1 = null;
+                        bool isArraySeriesWithoutIndex = Program.OprintHandleArraySeriesWithoutIndex(this, i, labelsHandmade, ref mm0, ref mm1);
                         this.prtElements = new List<Element>();
                         this.prtElements.Add(prtElementsRemember[i]);
-                        this.prtElements[0].variable[0] = mm0;
-                        this.prtElements[0].variable[1] = mm1;
-                        flag = true;  //met an array-series, continue to print one by one
+                        if (isArraySeriesWithoutIndex)
+                        {                            
+                            this.prtElements[0].variable[0] = mm0;
+                            this.prtElements[0].variable[1] = mm1;                            
+                        }
+                        else
+                        {                            
+                        }
+                        Program.OPrint(this, isArraySeriesWithoutIndex, labelsHandmade);
+                        this.prtElements = prtElementsRemember;
                     }
-                    else
-                    {
-                        //print them all in one go
-                    }
-                    Program.OPrint(this, isArraySeriesWithoutIndex, labelsHandmade);
-                    if (flag) this.prtElements = prtElementsRemember;
-                    else break;
+                    
+                    //Program.NonSeriesHandling(this);
+                    //turn;
                 }
+
+                
+
+                //bool flag = false;
+                //for (int i = 0; i < prtElementsRemember.Count; i++)
+                //{                    
+                //    List<string> labelsHandmade = new List<string>();
+                //    List mm0 = null;
+                //    List mm1 = null;
+                //    bool isArraySeriesWithoutIndex = Program.OprintHandleArraySeriesWithoutIndex(this, i, labelsHandmade, ref mm0, ref mm1);
+                //    if (isArraySeriesWithoutIndex)
+                //    {
+                //        this.prtElements = new List<Element>();
+                //        this.prtElements.Add(prtElementsRemember[i]);
+                //        this.prtElements[0].variable[0] = mm0;
+                //        this.prtElements[0].variable[1] = mm1;
+                //        flag = true;  //met an array-series, continue to print one by one
+                //    }
+                //    else
+                //    {
+                //        //print them all in one go
+                //    }
+                //    Program.OPrint(this, isArraySeriesWithoutIndex, labelsHandmade);
+                //    if (flag) this.prtElements = prtElementsRemember;
+                //    else break;
+                //}
 
                 if (G.Equal(prtType, "mulprt") && G.Equal(Program.options.interface_mode, "data"))
                 {
