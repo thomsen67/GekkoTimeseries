@@ -25863,6 +25863,8 @@ namespace Gekko
         {
             if (o.prtElements.Count == 1 && ((o.prtElements[0].variable[0] != null && o.prtElements[0].variable[0].Type() == EVariableType.Series) || (o.prtElements[0].variable[1] != null && o.prtElements[0].variable[1].Type() == EVariableType.Series)))
             {
+                string label = o.prtElements[0].label;
+
                 bool[] banks = new bool[2];  //first, ref
                 foreach (string printCode in o.prtElements[0].printCodesFinal)
                 {
@@ -25915,7 +25917,26 @@ namespace Gekko
                             throw new GekkoException();
                         }
                         string bankName = null;
-                        labelsHandmade.Add(bankName + G.RemoveFreqFromName(name) + "[" + key.ToString() + "]");
+
+                        bool isSimple = true;
+                        foreach (char c in label)
+                        {
+                            if (G.IsLetterOrDigitOrUnderscore(c) || c == ':' || c == '@' || c == Globals.freqIndicator)
+                            {
+                                //ok
+                            }
+                            else
+                            {
+                                isSimple = false;
+                                break;
+                            }
+                        }
+
+                        string blanks = "  ";
+                        if (isSimple) blanks = "";
+                                               
+                        labelsHandmade.Add(label + blanks + "[" + key.ToString() + "]");
+                        //labelsHandmade.Add(bankName + G.RemoveFreqFromName(name) + "[" + key.ToString() + "]");
                     }
                     if (banks[0]) o.prtElements[0].variable[0] = m0;
                     if (banks[1]) o.prtElements[0].variable[1] = m1;

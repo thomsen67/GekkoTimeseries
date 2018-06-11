@@ -549,7 +549,7 @@ namespace Gekko
                 this.data.dataArray[0] = value;
             }
            
-            if (this.type != ESeriesType.Light && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (this.type != ESeriesType.Light && this.meta != null && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             
             if (this.freq != t.freq)
             {
@@ -573,7 +573,7 @@ namespace Gekko
                 this.data.dataArray[index] = value;
                 //Start and end date for observations are adjusted.
                 //for the first obs put into a new timeseries, both the if's should trigger.
-                if (this.type != ESeriesType.Light)
+                if (this.type != ESeriesType.Light && this.meta != null)
                 {
                     if (index > this.meta.lastPeriodPositionInArray)
                     {
@@ -1250,36 +1250,87 @@ namespace Gekko
 
         private static Series ArithmeticsSeriesSeries(GekkoSmpl smpl, Series x1_series, Series x2_series, Func<double, double, double> a)
         {
-            Series rv_series;
-            GekkoTime window1, window2, windowNew1, windowNew2;
-            InitWindows(out window1, out window2, out windowNew1, out windowNew2);
+            if (x1_series.type == ESeriesType.ArraySuper && x2_series.type == ESeriesType.ArraySuper)
+            {                                
+                //This is typically used for printing differences
+                if (x1_series.dimensions != x2_series.dimensions)
+                {
+                    G.Writeln2("*** ERROR: The two array-series have different number of dimensions (" + x1_series.dimensions + " vs " + x2_series.dimensions + ")");
+                    throw new GekkoException();
+                }
 
-            //if smpl freq and x1/x2_series freq are the same,
-            //these windows will just be smpl.t0 to smpl.t3
-            //both for normal and light series. So common
-            //window will also be .t0 to .t3.
-            //-------------------------------------
-            GetStartEndPeriod(smpl, x1_series, ref window1, ref window2); //if light series, the returned period corresponds to array size, else smpl window is used
-            GetStartEndPeriod(smpl, x2_series, ref windowNew1, ref windowNew2); //if light series, the returned period corresponds to array size, else smpl window is used
-            FindCommonWindow(ref window1, ref window2, windowNew1, windowNew2);
-            //-------------------------------------
+                Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, "temp", x1_series.dimensions);
 
-            rv_series = new Series(ESeriesType.Light, window1, window2);  //also checks that nobs > 0   ---> this will most often be smpl.t0 to smpl.t3         
-            
-            // -------------------
-            // x2 is a SERIES
-            // -------------------
+                List<MapMultidimItem> keys1 = x1_series.dimensionsStorage.storage.Keys.ToList();
+                List<MapMultidimItem> keys2 = x2_series.dimensionsStorage.storage.Keys.ToList();
 
-            //Using Func<> instead of for instance raw '+' uses a bit more than double the time for simple double addition.
-            //But when dealing with GetData(), SetData() etc. the difference can not be seen.
-            //So for practical purposes, Func<> here does not cost performance.
-            //If raw arrays were being used over large samples, perhaps the difference would manifest.
-            foreach (GekkoTime t in new GekkoTimeIterator(window1, window2))
-            {
-                rv_series.SetData(t, a.Invoke(x1_series.GetData(smpl, t), x2_series.GetData(smpl, t)));
+                keys1.Sort(Program.CompareMapMultidimItems);
+                keys2.Sort(Program.CompareMapMultidimItems);
+
+                List m0 = new List(); //subseries first
+                List m1 = new List(); //subseries ref
+
+                if (keys1.Count != keys2.Count)
+                {
+                    G.Writeln2("*** ERROR: The two array-series have different number of elements (" + keys1.Count + " vs " + keys2.Count + ")");
+                    throw new GekkoException();
+                }
+
+                for (int i = 0; i < keys1.Count; i++)
+                {
+                    MapMultidimItem mm1 = keys1[i];
+                    MapMultidimItem mm2 = keys2[i];
+                    if (!mm1.Equals(mm2))
+                    {
+                        G.Writeln2("*** ERROR: Non-identical elements [" + mm1.ToString() + "] and [" + mm2.ToString() + "]");
+                        throw new GekkoException();
+                    }
+                    Series sub1 = x1_series.dimensionsStorage.storage[mm1] as Series;
+                    Series sub2 = x2_series.dimensionsStorage.storage[mm2] as Series;                    
+                    Series sub = new Series(ESeriesType.Normal, sub1.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(sub1.freq));                                        
+                    foreach (GekkoTime t in smpl.Iterate03())
+                    {
+                        sub.SetData(t, a.Invoke(sub1.GetData(smpl, t), sub2.GetData(smpl, t)));
+                    }
+                    temp.dimensionsStorage.AddIVariableWithOverwrite(mm1, sub);
+                }                
+                
+                return temp;
             }
+            else
+            {
 
-            return rv_series;
+                Series rv_series;
+                GekkoTime window1, window2, windowNew1, windowNew2;
+                InitWindows(out window1, out window2, out windowNew1, out windowNew2);
+
+                //if smpl freq and x1/x2_series freq are the same,
+                //these windows will just be smpl.t0 to smpl.t3
+                //both for normal and light series. So common
+                //window will also be .t0 to .t3.
+                //-------------------------------------
+                GetStartEndPeriod(smpl, x1_series, ref window1, ref window2); //if light series, the returned period corresponds to array size, else smpl window is used
+                GetStartEndPeriod(smpl, x2_series, ref windowNew1, ref windowNew2); //if light series, the returned period corresponds to array size, else smpl window is used
+                FindCommonWindow(ref window1, ref window2, windowNew1, windowNew2);
+                //-------------------------------------
+
+                rv_series = new Series(ESeriesType.Light, window1, window2);  //also checks that nobs > 0   ---> this will most often be smpl.t0 to smpl.t3         
+
+                // -------------------
+                // x2 is a SERIES
+                // -------------------
+
+                //Using Func<> instead of for instance raw '+' uses a bit more than double the time for simple double addition.
+                //But when dealing with GetData(), SetData() etc. the difference can not be seen.
+                //So for practical purposes, Func<> here does not cost performance.
+                //If raw arrays were being used over large samples, perhaps the difference would manifest.
+                foreach (GekkoTime t in new GekkoTimeIterator(window1, window2))
+                {
+                    rv_series.SetData(t, a.Invoke(x1_series.GetData(smpl, t), x2_series.GetData(smpl, t)));
+                }
+
+                return rv_series;
+            }
         }
 
         private static void InitWindows(out GekkoTime window1, out GekkoTime window2, out GekkoTime windowNew1, out GekkoTime windowNew2)
@@ -1793,7 +1844,7 @@ namespace Gekko
             }
             else
             {
-                this.meta.SetDirty(b1);
+                if (this.meta != null) this.meta.SetDirty(b1);
             }
         }
 
