@@ -24649,7 +24649,7 @@ namespace Gekko
         {
             //if (iv == null) return false;
             bool b = true;
-            if (iv.Type() != EVariableType.Series && iv.Type() != EVariableType.Val)
+            if (iv.Type() != EVariableType.Series && iv.Type() != EVariableType.Val && iv.Type() != EVariableType.GekkoNull)
             {
                 b = false;
             }

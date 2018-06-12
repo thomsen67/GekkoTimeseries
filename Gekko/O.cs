@@ -7058,16 +7058,20 @@ namespace Gekko
 
             public void Exe()
             {
-                //if all (including contents in lists) are normal series or vals (at least one series), and none is array-series
+                //series or vals can be printed in one table. This includes array-series without indexers (these are unfolded).
+                //if all (including contents in lists) are series or vals (at least one series),
                    //print normally in columns
                    //else print them one by one separately like separate print commands.
                 
                 if (Program.AllSeriesCheck(this, EPrintTypes.Print))
                 {
+                    //All vars are series or val (series may be x[#i] or x[%i]).
                     Program.OPrint(this, false, null);
                 }
                 else
                 {
+                    //Some of the vars are not series or val, so not possible to print them 
+                    //meaningfully in one table. One or more of the vars may be array-series (non-indexed)
                     List<Element> prtElementsRemember = this.prtElements;
                     for (int i = 0; i < prtElementsRemember.Count; i++)
                     {
@@ -7076,24 +7080,32 @@ namespace Gekko
                         List mm1 = null;
                         bool isArraySeriesWithoutIndex = Program.OprintHandleArraySeriesWithoutIndex(this, i, labelsHandmade, ref mm0, ref mm1);
                         this.prtElements = new List<Element>();
-                        this.prtElements.Add(prtElementsRemember[i]);
+                        this.prtElements.Add(prtElementsRemember[i]); //seen from Oprint(), it looks like there is only 1 variable to print
                         if (isArraySeriesWithoutIndex)
-                        {                            
+                        {
                             this.prtElements[0].variable[0] = mm0;
-                            this.prtElements[0].variable[1] = mm1;                            
+                            this.prtElements[0].variable[1] = mm1;
+                            Program.OPrint(this, isArraySeriesWithoutIndex, labelsHandmade);
+                        }
+                        else if (Program.AllSeriesCheck(this, EPrintTypes.Print))  //note that here, this.prtElements contains only 1 element (the current)!
+                        {
+                            Program.OPrint(this, false, null);
                         }
                         else
-                        {                            
+                        {
+                            //not series (including array-series and vals)                                                        
+                            if (this.prtElements[0].variable[0] == null || this.prtElements[0].variable[1] != null)
+                            {
+                                G.Writeln2("+++ WARNING: Skipped one variable for printing");
+                            }
+                            else
+                            {
+                                Program.NonSeriesHandling(this);
+                            }                                                        
                         }
-                        Program.OPrint(this, isArraySeriesWithoutIndex, labelsHandmade);
                         this.prtElements = prtElementsRemember;
-                    }
-                    
-                    //Program.NonSeriesHandling(this);
-                    //turn;
-                }
-
-                
+                    }                    
+                }                
 
                 //bool flag = false;
                 //for (int i = 0; i < prtElementsRemember.Count; i++)
