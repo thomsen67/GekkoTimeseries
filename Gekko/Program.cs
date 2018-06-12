@@ -24644,6 +24644,7 @@ namespace Gekko
             }
             return true;
         }
+        
 
         private static bool IsSeriesType(IVariable iv)
         {

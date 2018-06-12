@@ -10,27 +10,22 @@ public class TranslatedCode
 {
 public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
 public static int labelCounter;
-public static readonly ScalarVal i3 = new ScalarVal(1d);
-public static void FunctionDef4() {
+public static void FunctionDef89() {
 
 
 //[[splitSTOP]]
 
-O.PrepareUfunction(1, "f");
+O.PrepareUfunction(0, "g");
 
-Globals.ufunctions1.Add("f", (GekkoSmpl smpl, P p, IVariable functionarg_1) => { functionarg_1 = O.TypeCheck_val(functionarg_1, 1);
+Globals.ufunctions0.Add("g", (GekkoSmpl smpl, P p) => { 
+p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
-p.SetText(@"¤0"); O.InitSmpl(smpl, p);
-
-IVariable ivTmpvar2 = O.TypeCheck_var(O.Add(smpl, functionarg_1, i3), -1);
-//functionarg_1
-;
-
+Program.Tell(O.ConvertToString(new ScalarString(ScalarString.SubstituteScalarsInString(@"Hej", true, false))), false);
 p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
 
 //[[splitSTOP]]
-return O.TypeCheck_val(functionarg_1, 0);
+return null;
 
 //[[splitSTART]]
 
@@ -55,8 +50,12 @@ GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 //[[splitSTART]]
 p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
-FunctionDef4();
+FunctionDef89();
 
+
+p.SetText(@"¤2"); O.InitSmpl(smpl, p);
+
+O.FunctionLookup0("g")(smpl, p);
 
 
 //[[splitSTOP]]

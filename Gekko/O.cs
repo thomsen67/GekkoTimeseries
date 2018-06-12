@@ -4257,6 +4257,11 @@ namespace Gekko
         // posiion 0: return value type is wrong, for instance "return 123" in a "function string f(...)"
         // poisition i > 0: function argument, for instance f(123) in a "function string f(string x)"
 
+        public static IVariable TypeCheck_void(IVariable x, int position)
+        {
+            return x;
+        }
+
         public static IVariable TypeCheck_series(IVariable x, int position)
         {
             if (x.Type() != EVariableType.Series)
@@ -7063,6 +7068,170 @@ namespace Gekko
                 //print normally in columns
                 //else print them one by one separately like separate print commands.
 
+                //First, any array-series is exploded into a list
+                foreach (O.Prt.Element element in this.prtElements)
+                {
+                    ExplodeArraySeries(element);
+                }
+
+                if (Program.AllSeriesCheck(this, EPrintTypes.Print))
+                {
+                    //All vars are series or val (series may be x[#i] or x[%i]).
+                    Program.OPrint(this, false, null);
+                }
+                else
+                {
+                    //Some of the vars are not series or val, so not possible to print them 
+                    //meaningfully in one table. One or more of the vars may be array-series (non-indexed)
+                    List<Element> prtElementsRemember = this.prtElements;
+                    for (int i = 0; i < prtElementsRemember.Count; i++)
+                    {
+                        //List<string> labelsHandmade = new List<string>();
+                        //List mm0 = null;
+                        //List mm1 = null;
+                        //bool isArraySeriesWithoutIndex = Program.OprintHandleArraySeriesWithoutIndex(this, i, labelsHandmade, ref mm0, ref mm1);
+                        this.prtElements = new List<Element>();
+                        this.prtElements.Add(prtElementsRemember[i]); //seen from Oprint(), it looks like there is only 1 variable to print
+                        //if (isArraySeriesWithoutIndex)
+                        //{
+                        //    this.prtElements[0].variable[0] = mm0;
+                        //    this.prtElements[0].variable[1] = mm1;
+                        //    Program.OPrint(this, isArraySeriesWithoutIndex, labelsHandmade);
+                        //}
+                        if (Program.AllSeriesCheck(this, EPrintTypes.Print))  //note that here, this.prtElements contains only 1 element (the current)!
+                        {
+                            Program.OPrint(this, false, null);
+                        }
+                        else
+                        {
+                            //not series (including array-series and vals)                                                        
+                            if (this.prtElements[0].variable[0] == null || this.prtElements[0].variable[1] != null)
+                            {
+                                G.Writeln2("+++ WARNING: Skipped one variable for printing");
+                            }
+                            else
+                            {
+                                Program.NonSeriesHandling(this);
+                            }                                                        
+                        }
+                        this.prtElements = prtElementsRemember;
+                    }                    
+                }
+
+                if (G.Equal(prtType, "mulprt") && G.Equal(Program.options.interface_mode, "data"))
+                {
+                    G.Writeln2("+++ WARNING: MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
+                }
+
+            }
+
+            private static void ExplodeArraySeries(Element element)
+            {
+
+                //if(element.variable[0]!=null && element.variable[0].Type()==EVariableType.Series)
+
+                List<List> unfold = new List<List>();
+                unfold.Add(new List());
+                unfold.Add(new List());
+
+                List<List<MapMultidimItem>> check = new List<List<MapMultidimItem>>();
+                check.Add(new List<MapMultidimItem>());
+                check.Add(new List<MapMultidimItem>());
+
+                if (element.label2 == null) element.label2 = new List<string>();
+
+                int counter = 0;
+
+                for (int i = 0; i < 2; i++)
+                {
+                    if (element.variable[i] != null)
+                    {
+                        if (element.variable[i].Type() == EVariableType.Series && ((Series)element.variable[i]).type == ESeriesType.ArraySuper)
+                        {
+                            counter++;
+
+                            if (counter == 1)
+                            {
+                                if (element.label2 == null) element.label2 = new List<string>();
+                                element.label2.Clear();
+                            }
+
+                            Series tsFirst = element.variable[i] as Series;
+                            List<MapMultidimItem> keys = tsFirst.dimensionsStorage.storage.Keys.ToList();
+
+                            if (keys.Count == 0)
+                            {
+                                G.Writeln2("Array-series " + G.GetNameAndFreqPretty(tsFirst.name) + " has no elements");
+                                throw new GekkoException();
+                            }
+                            keys.Sort(Program.CompareMapMultidimItems);
+
+                            //List mm0 = new List();
+                            foreach (MapMultidimItem key in keys)
+                            {
+
+                                unfold[i].Add(tsFirst.dimensionsStorage.storage[key]);
+                                check[i].Add(key);
+
+                                string bankName = null;
+
+                                string label = element.label;
+
+                                bool isSimple = true;
+                                foreach (char c in label)
+                                {
+                                    if (G.IsLetterOrDigitOrUnderscore(c) || c == ':' || c == '@' || c == Globals.freqIndicator)
+                                    {
+                                        //ok
+                                    }
+                                    else
+                                    {
+                                        isSimple = false;
+                                        break;
+                                    }
+                                }
+
+                                string blanks = "  ";
+                                if (isSimple) blanks = "";
+
+                                if (counter == 1)
+                                {
+                                    element.label2.Add(label + blanks + "[" + key.ToString() + "]");
+                                }
+
+                                //labelsHandmade.Add(bankName + G.RemoveFreqFromName(name) + "[" + key.ToString() + "]");
+                            }
+                            element.variable[i] = unfold[i];
+                        }
+                    }
+                }
+                if (counter == 2)
+                {
+                    //both first and ref banks exist
+                    //we check that the elements conform
+                    if (check[0].Count != check[1].Count)
+                    {
+                        G.Writeln2("*** ERROR: Array-series '" + element.label + "' has different number of items in first and ref banks");
+                        throw new GekkoException();
+                    }
+                    for (int i = 0; i < check[0].Count; i++)
+                    {
+                        if (!check[0][i].Equals(check[1][i]))
+                        {
+                            G.Writeln2("*** ERROR: Array-series '" + element.label + "' has non-identical elements: [" + check[0][i].ToString() + "] vs [" + check[1][i].ToString() + "]");
+                            throw new GekkoException();
+                        }
+                    }
+                }
+            }
+
+            public void Exe_OLD_DELETE()
+            {
+                //series or vals can be printed in one table. This includes array-series without indexers (these are unfolded).
+                //if all (including contents in lists) are series or vals (at least one series),
+                //print normally in columns
+                //else print them one by one separately like separate print commands.
+
                 //First, any array-series is exploded into an 
                 //foreach (O.Prt.Element element in this.prtElements)
                 //{
@@ -7093,7 +7262,7 @@ namespace Gekko
 
                 //                Series tsFirst = element.variable[i] as Series;
                 //                List<MapMultidimItem> keys = tsFirst.dimensionsStorage.storage.Keys.ToList();
-                                
+
                 //                if (keys.Count == 0)
                 //                {
                 //                    G.Writeln2("Array-series " + G.GetNameAndFreqPretty(tsFirst.name) + " has no elements");
@@ -7104,10 +7273,10 @@ namespace Gekko
                 //                //List mm0 = new List();
                 //                foreach (MapMultidimItem key in keys)
                 //                {
-                                                                               
+
                 //                    unfold[i].Add(tsFirst.dimensionsStorage.storage[key]);
                 //                    check[i].Add(key);                             
-                                    
+
                 //                    string bankName = null;
 
                 //                    string label = element.label;
@@ -7196,11 +7365,11 @@ namespace Gekko
                             else
                             {
                                 Program.NonSeriesHandling(this);
-                            }                                                        
+                            }
                         }
                         this.prtElements = prtElementsRemember;
-                    }                    
-                }                
+                    }
+                }
 
                 //bool flag = false;
                 //for (int i = 0; i < prtElementsRemember.Count; i++)
@@ -7232,7 +7401,7 @@ namespace Gekko
                 }
 
             }
-            
+
             public static List<int> GetBankNumbers(string tableOrGraphGlobalPrintCode, List<string> printCodes)
             {               
                 

@@ -111,6 +111,15 @@ ASTRETURN;
 ASTFOR;
 ASTIF;
 ASTCOMPARE2;
+	ASTPROCEDURE;
+	ASTPROCEDUREDEFTYPE;
+	ASTPROCEDUREDEFNAME;
+	ASTPROCEDUREDEFCODE;
+	ASTPROCEDUREDEF;
+    ASTPROCEDUREDEFARGS;
+    ASTPROCEDUREDEFRHSSIMPLE;
+    ASTPROCEDUREDEFARG;
+
 	ASTLEFTBRACKETGLUE;
 	ASTSERIESOPERATOR;
 	ASTSERIESDOLLARCONDITION;
@@ -683,6 +692,7 @@ ASTOPT_STRING_Y2;
     ASTTIMEFILTER;
     ASTTIMEFILTERPERIOD;
     ASTTIMEFILTERPERIODS;
+	ASTFUNCTIONNAKED;
     ASTTIMEOPTIONFIELD;
     ASTTIMEPERIOD;
     ASTTIMEQUESTION;
@@ -781,6 +791,8 @@ ASTOPT_STRING_Y2;
 		DOTS = 'DOTS';
 		IMPULSES = 'IMPULSES';
 CONTINUE              = 'CONTINUE';
+VOID              = 'VOID';
+PROCEDURE              = 'PROCEDURE';
 SIZE                  = 'SIZE'                     ;
 //TITLE                 = 'TITLE'                    ;
 SUBTITLE              = 'SUBTITLE'                 ;
@@ -1331,6 +1343,8 @@ d.Add("Y" ,Y);
 		
 										d.Add("SIZE",SIZE);
 										d.Add("CONTINUE",CONTINUE);
+										d.Add("VOID",VOID);
+										d.Add("PROCEDURE",PROCEDURE);
 										//d.Add("TITLE",TITLE);
 										d.Add("SUBTITLE",SUBTITLE);
 										//d.Add("FONT",FONT);
@@ -2098,6 +2112,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | option				 SEMICOLON!
 						  | pipe				 SEMICOLON!
 						  | print                SEMICOLON!
+						  | procedureDef         SEMICOLON!
 						  | read                 SEMICOLON!
 						  | reset                SEMICOLON!
 						  | restart              SEMICOLON!
@@ -2110,8 +2125,9 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | tell                 SEMICOLON!
 						  | time                 SEMICOLON!
 						  | timefilter           SEMICOLON!
-						  | write                SEMICOLON!
-						  //| procedure            SEMICOLON!
+						  | write                SEMICOLON!						  
+						  | functionNaked        SEMICOLON!   //naked function outside expression
+						  | procedure            SEMICOLON!   //procedure call
 						    ;
 
 //procedure: ident expression* -> ^(ASTPROCEDURE expression*);
@@ -2270,7 +2286,7 @@ functionArg:                (functionArgElement (',' functionArgElement)*)? -> ^
 functionArgElement:         type svarname -> ^(ASTPLACEHOLDER type svarname);
 functionStatements:         statements2* -> ^(ASTFUNCTIONDEFCODE statements2*);
 functionStatements2:        functionStatements;  //alias
-type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX ;
+type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX | VOID;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // GOTO
@@ -2382,6 +2398,30 @@ pipeOpt1h:                  HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
 						  | CONTINUE (EQUAL yesNo)? -> ^(ASTOPT_STRING_CONTINUE yesNo?)						
 						  | STOP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STOP yesNo?)											
 						    ;
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// PROCEDURE CALL
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+procedure:					identWithoutCommand expression* -> ^(ASTPROCEDURE identWithoutCommand expression*);  
+functionNaked:              ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTFUNCTIONNAKED ident expression*);      
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// PROCEDURE DEFINITION
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+identWithoutCommand : Ident;
+
+//proceduredef              : PROCEDURE identWithoutCommand proceduredefRhsH1 SEMICOLON expressions? END -> ^({token("ASTPROCEDUREDEF", ASTPROCEDUREDEF, $PROCEDURE.Line)} ^(ASTPROCEDUREDEFTYPE) ^(ASTPROCEDUREDEFNAME identWithoutCommand) proceduredefRhsH1 ^(ASTPROCEDUREDEFCODE expressions?));
+//proceduredefRhsH1         : (proceduredefRhsH2 (COMMA2 proceduredefRhsH2)*)? -> ^(ASTPROCEDUREDEFARGS proceduredefRhsH2*);  //for instance "VAL x, DATE d
+//proceduredefRhsH2         : proceduredefRhsH3 -> ^(ASTPROCEDUREDEFRHSSIMPLE proceduredefRhsH3+);  //for instance "VAL x"						
+//proceduredefRhsH3         : type ident -> ^(ASTPROCEDUREDEFARG type ident);  //for instance "VAL x"
+
+procedureDef:				PROCEDURE ident procedureArg SEMICOLON procedureStatements END -> ^({token("ASTPROCEDUREDEF", ASTPROCEDUREDEF, $PROCEDURE.Line)} ASTPLACEHOLDER ident procedureArg procedureStatements);
+procedureArg:                (procedureArgElement (',' procedureArgElement)*)? -> ^(ASTPLACEHOLDER procedureArgElement*);
+procedureArgElement:         type svarname -> ^(ASTPLACEHOLDER type svarname);
+procedureStatements:         statements2* -> ^(ASTPROCEDUREDEFCODE statements2*);
+//procedureStatements2:        procedureStatements;  //alias
+//type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // PRINT, PLOT, SHEET, CLIP
@@ -3207,6 +3247,8 @@ ident2: 					Ident|
 							MDATEFORMAT|
                             LINESPOINTS|
 							CONTINUE|
+							VOID|
+							PROCEDURE|
 							//LINES|
 							BOXES|
 							FILLEDCURVES|

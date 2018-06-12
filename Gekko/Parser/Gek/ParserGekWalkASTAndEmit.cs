@@ -1616,10 +1616,25 @@ namespace Gekko.Parser.Gek
                             //node.functionDef[]
 
                             node.Code.A(Globals.splitSTOP);
+                            string type = SearchUpwardsInTree8(node);
 
-                            if (node.ChildrenCount() > 0)
+                            if (G.Equal(type, "void"))
                             {
-                                string type = SearchUpwardsInTree8(node);
+                                if (node.ChildrenCount() > 0)
+                                {
+                                    G.Writeln2("*** ERROR: RETURN <variable> used, should be just RETURN with no variable");
+                                    throw new GekkoException();
+                                }
+                                node.Code.A("return null;" + G.NL);
+                            }
+                            else if (node.ChildrenCount() == 0)
+                            {
+                                //#9807235423 return problem, should it be return true?? C1(), C2(), ...
+                                node.Code.A("return;" + G.NL);  //probably the node[0].Code is always empty here (should be)
+
+                            }
+                            else
+                            {
                                 if (type == null)
                                 {
                                     G.Writeln2("*** ERROR: Return of variable, but not inside function definition");
@@ -1627,11 +1642,6 @@ namespace Gekko.Parser.Gek
                                 }
 
                                 node.Code.A("return O.TypeCheck_" + type + "(" + node[0].Code + ", 0);" + G.NL);
-                            }
-                            else
-                            {
-                                //#9807235423 return problem, should it be return true?? C1(), C2(), ...
-                                node.Code.A("return;" + G.NL);  //probably the node[0].Code is always empty here (should be)
                             }
 
                             node.Code.A(Globals.splitSTART);
@@ -2153,6 +2163,8 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTFUNCTION":
+                    case "ASTFUNCTIONNAKED":
+                    case "ASTPROCEDURE":
                         {
                             string functionNameLower = GetFunctionName(node);                            
                             string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionNameLower);  //also checks that the name is "sum"
@@ -2355,6 +2367,11 @@ namespace Gekko.Parser.Gek
                                     }
                                     int numberOfArguments = node.ChildrenCount() - 1;
                                     node.Code.A("O.FunctionLookup").A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(args).A(")");
+
+                                    if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTPROCEDURE")
+                                    {
+                                        node.Code.A(";" + G.NL);
+                                    }
                                 }
 
                             }                        
