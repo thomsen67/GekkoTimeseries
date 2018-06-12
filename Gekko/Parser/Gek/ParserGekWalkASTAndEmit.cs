@@ -1630,6 +1630,11 @@ namespace Gekko.Parser.Gek
                             else if (node.ChildrenCount() == 0)
                             {
                                 //#9807235423 return problem, should it be return true?? C1(), C2(), ...
+                                if (!G.Equal(type, "void"))
+                                {
+                                    G.Writeln2("*** ERROR: RETURN with no variable used, should be RETURN <variable>");
+                                    throw new GekkoException();
+                                }
                                 node.Code.A("return;" + G.NL);  //probably the node[0].Code is always empty here (should be)
 
                             }

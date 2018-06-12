@@ -10,34 +10,7 @@ public class TranslatedCode
 {
 public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
 public static int labelCounter;
-public static void FunctionDef89() {
-
-
-//[[splitSTOP]]
-
-O.PrepareUfunction(0, "g");
-
-Globals.ufunctions0.Add("g", (GekkoSmpl smpl, P p) => { 
-p.SetText(@"¤1"); O.InitSmpl(smpl, p);
-
-Program.Tell(O.ConvertToString(new ScalarString(ScalarString.SubstituteScalarsInString(@"Hej", true, false))), false);
-p.SetText(@"¤1"); O.InitSmpl(smpl, p);
-
-
-//[[splitSTOP]]
-return null;
-
-//[[splitSTART]]
-
-
-return null; 
-});
-
-
-//[[splitSTART]]
-
-}
-
+public static readonly ScalarVal i23 = new ScalarVal(1d);
 public static void ClearTS(P p) {
 }
 public static void ClearScalar(P p) {
@@ -48,14 +21,11 @@ public static void CodeLines(P p)
 GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 
 //[[splitSTART]]
-p.SetText(@"¤1"); O.InitSmpl(smpl, p);
+p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-FunctionDef89();
-
-
-p.SetText(@"¤2"); O.InitSmpl(smpl, p);
-
-O.FunctionLookup0("g")(smpl, p);
+IVariable ivTmpvar22 = O.TypeCheck_var(O.Add(smpl, i23, O.FunctionLookup0("f")(smpl, p)), -1);
+O.Lookup(smpl, null, null, "%y", null, ivTmpvar22, true, EVariableType.Var)
+;
 
 
 //[[splitSTOP]]

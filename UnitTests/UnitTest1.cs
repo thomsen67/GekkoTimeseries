@@ -10626,6 +10626,21 @@ namespace UnitTests
         [TestMethod]
         public void _Test_UserDefinedFunctions()
         {
+            I("RESET;");
+            I("FUNCTION void f(); %x = 111; END;");
+            I("f();");
+            FAIL("f(1);");
+            FAIL("%y = f();");
+            _AssertScalarVal(First(), "%x", 111d);
+
+            I("RESET;");
+            I("FUNCTION val f(); %x = 111; RETURN 2; END;");
+            I("f();");  //discarding the return 2 is ok
+            _AssertScalarVal(First(), "%x", 111d);
+            FAIL("f(1);");
+            I("%y = f();");
+            _AssertScalarVal(First(), "%y", 2d);
+
             //Type check 1
             I("RESET;");
             I("FUNCTION val f(val %x); %x = %x +1; RETURN %x; END;");
