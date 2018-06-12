@@ -7060,9 +7060,104 @@ namespace Gekko
             {
                 //series or vals can be printed in one table. This includes array-series without indexers (these are unfolded).
                 //if all (including contents in lists) are series or vals (at least one series),
-                   //print normally in columns
-                   //else print them one by one separately like separate print commands.
-                
+                //print normally in columns
+                //else print them one by one separately like separate print commands.
+
+                //First, any array-series is exploded into an 
+                //foreach (O.Prt.Element element in this.prtElements)
+                //{
+                //    //if(element.variable[0]!=null && element.variable[0].Type()==EVariableType.Series)
+
+                //    List<List> unfold = new List<List>();
+                //    unfold.Add(new List());
+                //    unfold.Add(new List());
+
+                //    List<List<MapMultidimItem>> check = new List<List<MapMultidimItem>>();
+                //    check.Add(new List<MapMultidimItem>());
+                //    check.Add(new List<MapMultidimItem>());
+
+                //    if (element.label2 == null) element.label2 = new List<string>();
+
+                //    int counter = 0;
+
+                //    for (int i = 0; i < 2; i++)
+                //    {
+                //        if (element.variable[i] != null)
+                //        {
+                //            if (element.variable[i].Type() == EVariableType.Series && ((Series)element.variable[i]).type == ESeriesType.ArraySuper)
+                //            {
+                //                counter++;
+
+                //                if (element.label2 == null) element.label2 = new List<string>();
+                //                element.label2.Clear();
+
+                //                Series tsFirst = element.variable[i] as Series;
+                //                List<MapMultidimItem> keys = tsFirst.dimensionsStorage.storage.Keys.ToList();
+                                
+                //                if (keys.Count == 0)
+                //                {
+                //                    G.Writeln2("Array-series " + G.GetNameAndFreqPretty(tsFirst.name) + " has no elements");
+                //                    throw new GekkoException();
+                //                }
+                //                keys.Sort(Program.CompareMapMultidimItems);
+
+                //                //List mm0 = new List();
+                //                foreach (MapMultidimItem key in keys)
+                //                {
+                                                                               
+                //                    unfold[i].Add(tsFirst.dimensionsStorage.storage[key]);
+                //                    check[i].Add(key);                             
+                                    
+                //                    string bankName = null;
+
+                //                    string label = element.label;
+
+                //                    bool isSimple = true;
+                //                    foreach (char c in label)
+                //                    {
+                //                        if (G.IsLetterOrDigitOrUnderscore(c) || c == ':' || c == '@' || c == Globals.freqIndicator)
+                //                        {
+                //                            //ok
+                //                        }
+                //                        else
+                //                        {
+                //                            isSimple = false;
+                //                            break;
+                //                        }
+                //                    }
+
+                //                    string blanks = "  ";
+                //                    if (isSimple) blanks = "";
+
+                //                    if (counter == 1) element.label2.Add(label + blanks + "[" + key.ToString() + "]");
+
+                //                    //labelsHandmade.Add(bankName + G.RemoveFreqFromName(name) + "[" + key.ToString() + "]");
+                //                }
+                //                element.variable[i] = unfold[i];
+                //            }
+                //        }
+                //    }
+                //    if (counter == 2)
+                //    {
+                //        //both first and ref banks exist
+                //        //we check that the elements conform
+                //        if (check[0].Count != check[1].Count)
+                //        {
+                //            G.Writeln2("*** ERROR: Array-series '" + element.label + "' has different number of items in first and ref banks");
+                //            throw new GekkoException();
+                //        }
+                //        for (int i = 0; i < check[0].Count; i++)
+                //        {
+                //            if (!check[0][i].Equals(check[1][i]))
+                //            {
+                //                G.Writeln2("*** ERROR: Array-series '" + element.label + "' has mismatching elements:");
+                //                G.Writeln2("           [" + check[0][i].ToString() + "] vs [" + check[1][i].ToString() + "]");
+                //                throw new GekkoException();
+                //            }
+                //        }
+                //    }
+                //}
+
                 if (Program.AllSeriesCheck(this, EPrintTypes.Print))
                 {
                     //All vars are series or val (series may be x[#i] or x[%i]).
