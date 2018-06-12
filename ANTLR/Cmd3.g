@@ -2409,7 +2409,7 @@ functionNaked:              ident leftParenGlue (expression (',' expression)*)? 
 // PROCEDURE DEFINITION
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-identWithoutCommand : Ident;
+identWithoutCommand         : Ident -> ^(ASTIDENT Ident);
 
 //proceduredef              : PROCEDURE identWithoutCommand proceduredefRhsH1 SEMICOLON expressions? END -> ^({token("ASTPROCEDUREDEF", ASTPROCEDUREDEF, $PROCEDURE.Line)} ^(ASTPROCEDUREDEFTYPE) ^(ASTPROCEDUREDEFNAME identWithoutCommand) proceduredefRhsH1 ^(ASTPROCEDUREDEFCODE expressions?));
 //proceduredefRhsH1         : (proceduredefRhsH2 (COMMA2 proceduredefRhsH2)*)? -> ^(ASTPROCEDUREDEFARGS proceduredefRhsH2*);  //for instance "VAL x, DATE d

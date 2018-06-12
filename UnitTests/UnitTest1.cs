@@ -10627,12 +10627,25 @@ namespace UnitTests
         public void _Test_UserDefinedFunctions()
         {
             I("RESET;");
+            I("PROCEDURE f; %x = 111; END;");
+            I("f;");                 
+            _AssertScalarVal(First(), "%x", 111d);
+            FAIL("f 1;");
+
+            I("RESET;");
+            I("PROCEDURE f val %z; %x = %z; END;");
+            I("f 7;");
+            _AssertScalarVal(First(), "%x", 7d);
+
+     FAIL("f;"); //!!!
+
+            I("RESET;");
             I("FUNCTION void f(); %x = 111; END;");
             I("f();");
+            _AssertScalarVal(First(), "%x", 111d);
             FAIL("f(1);");
             FAIL("%y = f();");
-            _AssertScalarVal(First(), "%x", 111d);
-
+            
             I("RESET;");
             I("FUNCTION val f(); %x = 111; RETURN 2; END;");
             I("f();");  //discarding the return 2 is ok

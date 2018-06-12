@@ -439,7 +439,7 @@ namespace Gekko.Parser.Gek
             }
             
             //See also #890752345
-            if (node.Text == "ASTIFSTATEMENTS" || node.Text == "ASTELSESTATEMENTS" || node.Text == "ASTFORSTATEMENTS" || node.Text == "ASTFUNCTIONDEFCODE")
+            if (node.Text == "ASTIFSTATEMENTS" || node.Text == "ASTELSESTATEMENTS" || node.Text == "ASTFORSTATEMENTS" || node.Text == "ASTFUNCTIONDEFCODE" || node.Text == "ASTPROCEDUREDEFCODE")
             {
                 relativeDepth = 0;  //new indentation level, used to know what is a command and what is stuff deeper down the tree
             }
@@ -512,6 +512,8 @@ namespace Gekko.Parser.Gek
                     }
                     break;
                 case "ASTFUNCTIONDEF2":
+                case "ASTPROCEDUREDEF":
+
                     {                        
                         if (SearchUpwardsInTree8(node) != null)
                         {
@@ -544,7 +546,10 @@ namespace Gekko.Parser.Gek
                             if (node.functionDef == null) node.functionDef = new List<Tuple<string, string>>();
                             node.functionDef.Add(new Tuple<string, string>(type.ToLower(), "functionarg_" + Globals.counter));                            
                         }
-                        node.functionType = returnType.ToLower();
+                        string ftype = null;
+                        if (node.Text == "ASTPROCEDUREDEF") ftype = "void";
+                        else ftype = returnType.ToLower();
+                        node.functionType = ftype;
 
                     }
                     break;
@@ -1967,6 +1972,7 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTFUNCTIONDEF2":
+                    case "ASTPROCEDUREDEF":
                         {
                             StringBuilder sb = new StringBuilder();
                             
