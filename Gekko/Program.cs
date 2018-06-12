@@ -21778,6 +21778,7 @@ namespace Gekko
 
         public static void InitUfunctionsAndArithmeticsAndMore()
         {
+            Globals.ufunctions0 = new Dictionary<string, Func<GekkoSmpl, P, IVariable>>(StringComparer.OrdinalIgnoreCase);
             Globals.ufunctions1 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
             Globals.ufunctions2 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
             Globals.ufunctions3 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
