@@ -102,6 +102,8 @@ namespace Gekko
         public static Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions9 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
         public static Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions10 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
 
+        public const string procedure = "procedure___";
+
         public static string databankformatUrl = @"www.t-t.dk/gekko/databankformat";
 
         public static System.Windows.Forms.Form mFrmDummyHost = new System.Windows.Forms.Form();

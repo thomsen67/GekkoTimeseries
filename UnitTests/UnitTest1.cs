@@ -10636,7 +10636,7 @@ namespace UnitTests
             I("PROCEDURE f val %z; %x = %z; END;");
             I("f 7;");
             _AssertScalarVal(First(), "%x", 7d);
-            FAIL("f;"); //!!!                       
+            FAIL("f;");                      
 
             I("RESET;");
             I("FUNCTION void f(); %x = 111; END;");

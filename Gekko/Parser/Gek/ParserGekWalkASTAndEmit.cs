@@ -1978,6 +1978,12 @@ namespace Gekko.Parser.Gek
                             
                             string returnTypeLower = node[0].Text.ToLower();
                             string functionNameLower = node[1][0].Text.ToLower();
+
+                            if (node.Text == "ASTPROCEDUREDEF")
+                            {
+                                functionNameLower = Globals.procedure + functionNameLower;
+                            }
+
                             int numberOfArguments = node[2].ChildrenCount();
                             
                             string internalName = "FunctionDef" + ++Globals.counter;
@@ -2007,6 +2013,7 @@ namespace Gekko.Parser.Gek
                                     typeChecks += node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + ", " + (i + 1) + ");" + G.NL;
                                 }
                             }
+
                             w.headerCs.AppendLine("public static void " + internalName + "() {" + G.NL);
                             w.headerCs.AppendLine(Globals.splitSTOP);
                             w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfArguments + ", `" + functionNameLower + "`);" + G.NL);
@@ -2177,7 +2184,13 @@ namespace Gekko.Parser.Gek
                     case "ASTFUNCTIONNAKED":
                     case "ASTPROCEDURE":
                         {
-                            string functionNameLower = GetFunctionName(node);                            
+                            string functionNameLower = GetFunctionName(node);
+
+                            if (node.Text == "ASTPROCEDURE")
+                            {
+                                functionNameLower = Globals.procedure + functionNameLower;
+                            }
+                                                      
                             string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionNameLower);  //also checks that the name is "sum"
 
                             if (listNames != null)

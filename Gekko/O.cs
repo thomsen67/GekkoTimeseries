@@ -3459,6 +3459,18 @@ namespace Gekko
         // USER FUNCTION STUFF START
         // USER FUNCTION STUFF START
 
+        private static void FunctionErrorMessage(string name, int n)
+        {
+            if (name.StartsWith(Globals.procedure))
+            {
+                G.Writeln2("*** ERROR: Cannot find procedure '" + name.Substring(Globals.procedure.Length) + "' with " + n + " arguments");
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with " + n + " arguments");
+            }
+        }
+
         public static Func<GekkoSmpl, P, IVariable> FunctionLookup0(string name)
         {
             //NOTE: the number of args is hardcoded two places below
@@ -3466,11 +3478,11 @@ namespace Gekko
             Globals.ufunctions0.TryGetValue(name, out rv);
             if (rv == null)
             {
-                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 0 arguments");
+                FunctionErrorMessage(name, 0);
                 throw new GekkoException();
             }
             return rv;
-        }
+        }        
 
         public static Func<GekkoSmpl, P, IVariable, IVariable> FunctionLookup1(string name)
         {
@@ -3479,7 +3491,7 @@ namespace Gekko
             Globals.ufunctions1.TryGetValue(name, out rv);
             if (rv == null)
             {
-                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 1 argument");
+                FunctionErrorMessage(name, 1);
                 throw new GekkoException();
             }
             return rv;
@@ -3492,7 +3504,7 @@ namespace Gekko
             Globals.ufunctions2.TryGetValue(name, out rv);
             if (rv == null)
             {
-                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 2 arguments");
+                FunctionErrorMessage(name, 2);
                 throw new GekkoException();
             }
             return rv;
@@ -3505,7 +3517,7 @@ namespace Gekko
             Globals.ufunctions3.TryGetValue(name, out rv);
             if (rv == null)
             {
-                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 3 arguments");
+                FunctionErrorMessage(name, 3);
                 throw new GekkoException();
             }
             return rv;
@@ -3518,7 +3530,7 @@ namespace Gekko
             Globals.ufunctions4.TryGetValue(name, out rv);
             if (rv == null)
             {
-                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 4 arguments");
+                FunctionErrorMessage(name, 4);
                 throw new GekkoException();
             }
             return rv;
@@ -3531,7 +3543,7 @@ namespace Gekko
             Globals.ufunctions5.TryGetValue(name, out rv);
             if (rv == null)
             {
-                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 5 arguments");
+                FunctionErrorMessage(name, 5);
                 throw new GekkoException();
             }
             return rv;
@@ -3544,7 +3556,7 @@ namespace Gekko
             Globals.ufunctions6.TryGetValue(name, out rv);
             if (rv == null)
             {
-                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 6 arguments");
+                FunctionErrorMessage(name, 6);
                 throw new GekkoException();
             }
             return rv;
@@ -3557,7 +3569,7 @@ namespace Gekko
             Globals.ufunctions7.TryGetValue(name, out rv);
             if (rv == null)
             {
-                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 7 arguments");
+                FunctionErrorMessage(name, 7);
                 throw new GekkoException();
             }
             return rv;
@@ -3570,7 +3582,7 @@ namespace Gekko
             Globals.ufunctions8.TryGetValue(name, out rv);
             if (rv == null)
             {
-                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 8 arguments");
+                FunctionErrorMessage(name, 8);
                 throw new GekkoException();
             }
             return rv;
@@ -3583,7 +3595,7 @@ namespace Gekko
             Globals.ufunctions9.TryGetValue(name, out rv);
             if (rv == null)
             {
-                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 9 arguments");
+                FunctionErrorMessage(name, 9);
                 throw new GekkoException();
             }
             return rv;
@@ -3596,7 +3608,7 @@ namespace Gekko
             Globals.ufunctions10.TryGetValue(name, out rv);
             if (rv == null)
             {
-                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with 10 arguments");
+                FunctionErrorMessage(name, 10);
                 throw new GekkoException();
             }
             return rv;
