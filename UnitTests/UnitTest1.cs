@@ -10636,7 +10636,17 @@ namespace UnitTests
             I("PROCEDURE f val %z; %x = %z; END;");
             I("f 7;");
             _AssertScalarVal(First(), "%x", 7d);
-            FAIL("f;");                      
+            FAIL("f;");
+
+            //It is not allowed to use a command name for a procedure name
+            I("RESET;");
+            FAIL("PROCEDURE time; tell 'hello'; END;");
+            FAIL("PROCEDURE time date %d1, date %d2; tell 'hello'; END;");
+
+            //But other name bits (tokens) that are used in commands are ok.
+            I("RESET;");
+            I("PROCEDURE gdx; tell 'hello'; END;");
+            I("PROCEDURE gdx date %d1, date %d2; tell 'hello'; END;");
 
             I("RESET;");
             I("FUNCTION void f(); %x = 111; END;");
@@ -10652,7 +10662,7 @@ namespace UnitTests
             FAIL("f(1);");
             I("%y = f();");
             _AssertScalarVal(First(), "%y", 2d);
-
+                        
             //Type check 1
             I("RESET;");
             I("FUNCTION val f(val %x); %x = %x +1; RETURN %x; END;");
