@@ -15809,18 +15809,26 @@ namespace Gekko
 
         private static void ReadGamsModel(string textInputRaw)
         {
-            if (false && Globals.runningOnTTComputer)
+            if (true && Globals.runningOnTTComputer)
             {
                 string txt = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "model.gms");
                 var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
                 var tags2 = new List<string>() { "//" };
                 var tags3 = new List<Tuple<string, string>>() { new Tuple<string, string>("$ontext", "$offtext") };
                 var tags4 = new List<string>() { "*", "#" };
-                TokenList tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
+                                
+                TokenHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
 
-                foreach (TokenHelper tok in tokens2.storage)
+                foreach (TokenHelper tok in tokens2.subnodes.storage)
                 {
                     string s = tok.ToString();
+                    if (G.Equal(tok.s, "equation"))
+                    {
+                        if (tok.Sibling(-1) == null || tok.Sibling(-1).s == ";" || tok.Sibling(-1).type == TokenKind.EOL)
+                        {
+
+                        }
+                    }
                 }
             }            
 
@@ -26210,9 +26218,10 @@ namespace Gekko
                                     //does not match the index position
                                     return true;
                                 }
+                                
                                 if (helper.iv.Type() == EVariableType.String || helper.iv.Type() == EVariableType.Date || helper.iv.Type() == EVariableType.Val)
-                                {                                    
-                                    HandleLabelsInsertIVariables(token, tokenListCommaSplit, O.ConvertToString(helper.iv));
+                                {
+                                    HandleLabelsInsertIVariables(token, tokenListCommaSplit, ((ScalarString)Functions.tostring(null, helper.iv)).string2);
                                 }
                             }                                
                             
@@ -26346,7 +26355,7 @@ namespace Gekko
                 //after this, free (uncontrolled) lists are in freelists, and rawLabel is the label.
 
                 var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };  //can in principle have such comments                         
-                TokenList tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(rawLabel, tags1, null, null, null);
+                TokenList tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(rawLabel, tags1, null, null, null).subnodes;
 
                 if (false && Globals.runningOnTTComputer)
                 {

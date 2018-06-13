@@ -83,6 +83,8 @@ namespace Gekko
         public string subnodesType = null;  // "(", "[" or "{".
         public TokenList subnodes = null;
         public TokenHelper parent = null;
+        public TokenHelper siblingBefore = null;
+        public TokenHelper siblingAfter = null;
         public int id = -12345;
 
         public TokenHelper DeepClone()
@@ -794,28 +796,49 @@ namespace Gekko
             return new TokenList(a);
         }
 
-        public static TokenList GetTokensWithLeftBlanksRecursive(string textInputRaw)
+        public static TokenHelper GetTokensWithLeftBlanksRecursive(string textInputRaw)
         {
             return GetTokensWithLeftBlanksRecursive(textInputRaw, null, null, null, null);
         }
 
-        public static TokenList GetTokensWithLeftBlanksRecursive(string textInputRaw, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
+        public static TokenHelper GetTokensWithLeftBlanksRecursive(string textInputRaw, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
         {
+            //TokenList is basically just a very simple List<TokenHelper>
+            //TokenHelper contains the token and other info, and may contain a TokenList (for instance the contents of a (...) parenthesis)
+            //
+            //             TokenHelper                    this node is artificial and contains nothing but a TokenList
+            //                 |
+            //                 |
+            //              TokenList                     a + (b + c) --> at this level only a + (...) is seen
+            //              /     \
+            //             /       \
+            //      TokenHelper    TokenHelper            the TokenHelper with children will be empty with a TokenList containing what is inside the parenthesis. Before and after this token there will be '(' and ')'
+            //                        /
+            //                       /
+            //                  TokenList                 b + c --> at this level only b + c is seen
+            //                  /       \
+            //                 /         \
+            //          TokenHelper    TokenHelper
+
+
             int i = 0;
             TokenList tokens = GetTokensWithLeftBlanks(textInputRaw, 0, commentsClosed, commentsNonClosed, commentsClosedOnlyStartOfLine, commentsNonClosedOnlyStartOfLine);
             TokenList tokens2 = GetTokensWithLeftBlanksRecursiveHelper(tokens, ref i, null);
             //the first-level elements of the TokenList do not have any parent. This is fixed here:
             TokenHelper parent = new TokenHelper();
             parent.subnodes = tokens2;
-            parent.subnodesType = "artificial_parent";
-            int counter = -1;
-            foreach (TokenHelper token in parent.subnodes.storage)
-            {
-                counter++;
-                token.parent = parent;  //this parent is phoney. Just used to be able to find siblings etc.
-                token.id = counter;
-            }
-            return tokens2;
+            parent.subnodesType = "artificial_parent_at_the_top_of_the_node_tree";
+
+            OrganizeSubnodes(parent);
+
+            //int counter = -1;
+            //foreach (TokenHelper token in parent.subnodes.storage)
+            //{
+            //    counter++;
+            //    token.parent = parent;
+            //    token.id = counter;
+            //}
+            return parent;
         } 
 
         public static TokenList GetTokensWithLeftBlanksRecursiveHelper(TokenList input, ref int startI, TokenHelper startparen)
@@ -835,17 +858,11 @@ namespace Gekko
                 {
                     //found a new left parenthesis                          
                     startI = i + 1;
-                    TokenList sub = GetTokensWithLeftBlanksRecursiveHelper(input, ref startI, input[i]);                    
+                    TokenList sub = GetTokensWithLeftBlanksRecursiveHelper(input, ref startI, input[i]);
                     TokenHelper temp = new TokenHelper();  //new empty/placeholder TokenHelper with a list of TokenHelpers
                     temp.subnodes = sub;
                     temp.subnodesType = input.storage[i].s;
-                    int counter = -1;
-                    foreach (TokenHelper subnode in temp.subnodes.storage)
-                    {
-                        counter++;
-                        subnode.id = counter;
-                        subnode.parent = temp;
-                    }
+                    OrganizeSubnodes(temp);
                     output.Add(temp);
                     i = startI;
                 }
@@ -873,6 +890,20 @@ namespace Gekko
                 throw new GekkoException();
             }            
             return new TokenList(output);
+        }
+
+        private static void OrganizeSubnodes(TokenHelper temp)
+        {
+            int counter = -1;
+            for (int ii = 0; ii < temp.subnodes.storage.Count; ii++)
+            {
+                TokenHelper subnode = temp.subnodes[ii];
+                counter++;
+                subnode.id = counter;
+                subnode.parent = temp;
+                if (ii - 1 >= 0) subnode.siblingBefore = temp.subnodes[ii - 1];
+                if (ii + 1 < temp.subnodes.storage.Count) subnode.siblingAfter = temp.subnodes[ii + 1];
+            }
         }
     }
 }
