@@ -87,6 +87,11 @@ namespace Gekko
         public TokenHelper siblingAfter = null;
         public int id = -12345;
 
+        public string LineAndPosText()
+        {
+            return "line " + this.line + " pos " + this.column;
+        }
+
         public TokenHelper DeepClone()
         {
             TokenHelper th = new TokenHelper();
@@ -877,7 +882,7 @@ namespace Gekko
                 {
                     if (Globals.parenthesesInvert.ContainsKey(input.storage[i].s))
                     {
-                        G.Writeln2("*** ERROR: The '" + input[i].s + "' parenthesis at line " + input[i].line + " pos " + input[i].column + " does not have a corresponding '" + Globals.parenthesesInvert[input[i].s] + "'");
+                        G.Writeln2("*** ERROR: The '" + input[i].s + "' parenthesis at " + input[i].LineAndPosText() + " does not have a corresponding '" + Globals.parenthesesInvert[input[i].s] + "'");
                         throw new GekkoException();
                     }
                     output.Add(input[i]);
@@ -885,8 +890,8 @@ namespace Gekko
                 }
             }
             if (endparen != null)
-            {                
-                G.Writeln2("*** ERROR: The '" + startparen.s + "' parenthesis at line " + startparen.line + " pos " + startparen.column + " does not have a corresponding '" + endparen + "'");
+            {
+                G.Writeln2("*** ERROR: The '" + startparen.s + "' parenthesis at " + startparen.LineAndPosText() + " does not have a corresponding '" + endparen + "'");
                 throw new GekkoException();
             }            
             return new TokenList(output);
@@ -894,6 +899,7 @@ namespace Gekko
 
         private static void OrganizeSubnodes(TokenHelper temp)
         {
+            //temp is an empty node (.s == null) with subnodes
             int counter = -1;
             for (int ii = 0; ii < temp.subnodes.storage.Count; ii++)
             {
@@ -904,6 +910,8 @@ namespace Gekko
                 if (ii - 1 >= 0) subnode.siblingBefore = temp.subnodes[ii - 1];
                 if (ii + 1 < temp.subnodes.storage.Count) subnode.siblingAfter = temp.subnodes[ii + 1];
             }
+            temp.line = temp.subnodes[0].line;
+            temp.column = temp.subnodes[0].column;
         }
     }
 }

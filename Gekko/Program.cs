@@ -15816,7 +15816,7 @@ namespace Gekko
                 var tags2 = new List<string>() { "//" };
                 var tags3 = new List<Tuple<string, string>>() { new Tuple<string, string>("$ontext", "$offtext") };
                 var tags4 = new List<string>() { "*", "#" };
-                                
+
                 TokenHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
 
                 foreach (TokenHelper tok in tokens2.subnodes.storage)
@@ -15826,11 +15826,112 @@ namespace Gekko
                     {
                         if (tok.Sibling(-1) == null || tok.Sibling(-1).s == ";" || tok.Sibling(-1).type == TokenKind.EOL)
                         {
+                            //either first in file, or ';' before, or newline before
+                            //apparantly, ending with ';' in equation is not mandatory
+
+                            int i = 1;
+
+                            string name = tok.Sibling(i)?.s;
+                            if (name == null)
+                            {
+                                G.Writeln2("*** ERROR: Expected eq name, " + tok.Sibling(i).LineAndPosText());
+                                throw new GekkoException();
+                            }
+                            i++;
+                            TokenHelper parentheses = tok.Sibling(i);
+                            if (parentheses.subnodes == null || parentheses.subnodesType != "(")
+                            {
+                                G.Writeln2("*** ERROR: Expected set definition with parentheses '(' and ')', " + tok.Sibling(i).LineAndPosText());
+                                throw new GekkoException();
+                            }                            
+
+                            string sets = parentheses.ToString();
+                            i++;
+                            string semicolon = tok.Sibling(i)?.s;
+                            if (semicolon != ";")
+                            {
+                                G.Writeln2("*** ERROR: Expected set definition to end with ';', " + tok.Sibling(i).LineAndPosText());
+                                throw new GekkoException();
+                            }
+
+                            i++;                            
+
+                            if (tok.Sibling(i).type == TokenKind.EOL) i++;  //consume a newline
+
+                            //now we are ready for the equation definition
+
+                            string name2 = tok.Sibling(i)?.s;
+                            if (!G.Equal(name, name2))
+                            {
+                                G.Writeln2("*** ERROR: Eq names '" + name + "' and '" + name2 + "' do not match, " + tok.Sibling(i).LineAndPosText());
+                                throw new GekkoException();
+                            }
+
+                            i++;
+                            TokenHelper parentheses2 = tok.Sibling(i);
+                            if (parentheses2.subnodes == null || parentheses2.subnodesType != "(")
+                            {
+                                G.Writeln2("*** ERROR: Expected set definition with parentheses '(' and ')', " + tok.Sibling(i).LineAndPosText());
+                                throw new GekkoException();
+                            }
+
+                            string dollar = null;
+                            i++;
+                            TokenHelper dollarToken = tok.Sibling(i);
+                            if (dollarToken.s == "$")
+                            {
+                                i++;
+                                TokenHelper parentheses3 = tok.Sibling(i);
+                                if (parentheses3.subnodes == null || parentheses3.subnodesType != "(")
+                                {
+                                    G.Writeln2("*** ERROR: Expected dollar definition with parentheses '(' and ')', " + tok.Sibling(i).LineAndPosText());
+                                    throw new GekkoException();
+                                }
+                                dollar = parentheses3.ToString();
+                                i++;
+                            }
+
+                            if (!(tok.Sibling(i)?.s == "." && tok.Sibling(i + 1)?.s == "."))
+                            {
+                                //two dots
+                                G.Writeln2("*** ERROR: Expected '..' in eq definition, " + tok.Sibling(i).LineAndPosText());
+                                throw new GekkoException();                                
+                            }
+
+                            i++;
+                            i++;
+
+                            //find lhs of equation -----------------------------------------
+                            int i1Start = i;
+                            int j = -12345;
+                            for (j = 0; j < int.MaxValue; j++)
+                            {
+                                if (tok.Sibling(i1Start + j)?.s == "=" && G.Equal(tok.Sibling(i1Start + j + 1)?.s, "e") && tok.Sibling(i1Start + j + 2)?.s == "=")
+                                {
+                                    break;
+                                }
+                            }
+                            int i1End = i1Start + j - 1;
+
+                            //find rhs of equation -------------------------------------------
+                            int i2Start = i1End + 3;                            
+                            for (j = 0; j < int.MaxValue; j++)
+                            {
+                                if (tok.Sibling(i2Start + j)?.s == ";")
+                                {
+                                    break;
+                                }
+                            }
+                            int i2End = i2Start + j - 1;
+
+
+
+
 
                         }
                     }
                 }
-            }            
+            }
 
             TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(textInputRaw);
             List<List<string>> eqLines = new List<List<string>>();
