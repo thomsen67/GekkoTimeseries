@@ -71,26 +71,7 @@ namespace Gekko
             return s;
         }
 
-        public List<TokenList> SplitCommas()
-        {
-            //Splits up in bits, depending on commas. For instance [1, 2] is split in 1 and 2. But [1, [2, 3]] is split in 1 and [2, 3].            
-            List<TokenList> temp = new List<TokenList>();
-            TokenList temp2 = new TokenList();
-            for (int i = 0 + 1; i < this.storage.Count - 1; i++)  //omit the parentheses
-            {
-                if (this[i].s == ",")
-                {
-                    temp.Add(temp2);
-                    temp2 = new TokenList();
-                }
-                else
-                {
-                    temp2.storage.Add(this[i]);
-                }
-            }
-            temp.Add(temp2);
-            return temp;
-        }
+        
 
 
     }
@@ -149,6 +130,31 @@ namespace Gekko
         //if (ii - 1 >= 0) subnode.siblingBefore = temp.subnodes[ii - 1];
         //if (ii + 1 < temp.subnodes.storage.Count) subnode.siblingAfter = temp.subnodes[ii + 1];
 
+        public List<TokenList> SplitCommas()
+        {
+            //Splits up in bits, depending on commas. For instance [1, 2] is split in 1 and 2. But [1, [2, 3]] is split in 1 and [2, 3].            
+            //Note that the commas are preserved, so a, b, c --> [a] [,] [b] [,] [c], where
+            //  tokens 0, 2, 4 are the list items.
+            //This is done so that the comma can be reached (for instance: deleted)
+            if (this.subnodes == null) return null;
+            List<TokenList> temp = new List<TokenList>();
+            TokenList temp2 = new TokenList();
+            for (int i = 0 + 1; i < this.subnodes.storage.Count - 1; i++)  //omit the parentheses
+            {
+                if (this.subnodes[i].s == ",")
+                {   
+                    temp.Add(new TokenList(new List<TokenHelper>() { this.subnodes[i] }));
+                    temp.Add(temp2);
+                    temp2 = new TokenList();
+                }
+                else
+                {
+                    temp2.storage.Add(this.subnodes[i]);
+                }
+            }
+            temp.Add(temp2);
+            return temp;
+        }
         public TokenHelper SiblingBefore()
         {
             return this.Offset(-1);

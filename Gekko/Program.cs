@@ -15815,7 +15815,7 @@ namespace Gekko
                 {
                     //a pattern like "x(" with no blanks in between
                     TokenHelper child = node.Offset(1).subnodes.storage[0];
-                    List<TokenList> split = node.Offset(1).subnodes.SplitCommas();
+                    List<TokenList> split = node.Offset(1).SplitCommas();
                     TokenList last = split[split.Count - 1];
                     //if(last.storage.Count==1)
                 }
@@ -26356,11 +26356,14 @@ namespace Gekko
                 {
                     if (token.subnodesType == "[" || token.subnodesType == "{")
                     {
-                        List<TokenList> listOfTokensListsCommaSplit = token.subnodes.SplitCommas();
+                        List<TokenList> listOfTokensListsCommaSplit = token.SplitCommas();
                         int ii = -1;
-                        foreach (TokenList tokenListCommaSplit in listOfTokensListsCommaSplit)  //does not include start and end parenthesis
+
+                        for(int i5 = 0;i5< listOfTokensListsCommaSplit.Count;i5+=2) 
+                        //foreach (TokenList tokenListCommaSplit in listOfTokensListsCommaSplit)  //does not include start and end parenthesis
                         {
-                            counter++;
+                                TokenList tokenListCommaSplit = listOfTokensListsCommaSplit[i5];
+                                counter++;
                             ii++;
                             if (tokenListCommaSplit.storage.Count == 2 && tokenListCommaSplit[0].s == Globals.symbolCollection.ToString() && tokenListCommaSplit[1].type == TokenKind.Word)
                             {
@@ -26377,8 +26380,8 @@ namespace Gekko
                                         {
                                             if (G.Equal(left.s, "sum"))
                                             {
-                                                List<TokenList> split = parent.subnodes.SplitCommas();
-                                                if (split.Count > 1)
+                                                List<TokenList> split = parent.SplitCommas();
+                                                if (split.Count >= 3)
                                                 {
                                                     TokenList firstSplit = split[0];
                                                     if (firstSplit.storage.Count == 1)
@@ -26386,10 +26389,12 @@ namespace Gekko
                                                         if (firstSplit[0].subnodesType == "(")
                                                         {
                                                             //handles sum((#i, #j), ...)
-                                                            List<TokenList> splitNew = firstSplit[0].subnodes.SplitCommas();
-                                                            foreach (TokenList splitNewItem in splitNew)
+                                                            List<TokenList> splitNew = firstSplit[0].SplitCommas();
+                                                                for(int i6=0;i6<splitNew.Count;i6+=2) 
+                                                            //foreach (TokenList splitNewItem in splitNew)
                                                             {
-                                                                string listName2 = HandleLabelsIsSimpleListName(splitNewItem);
+                                                                        TokenList splitNewItem = splitNew[i6];
+                                                                        string listName2 = HandleLabelsIsSimpleListName(splitNewItem);
                                                                 if (listName2 != null)
                                                                 {
                                                                     if (G.Equal(listName, listName2))
