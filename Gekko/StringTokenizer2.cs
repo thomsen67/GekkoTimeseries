@@ -143,7 +143,7 @@ namespace Gekko
             {
                 if (this.subnodes[i].s == ",")
                 {   
-                    temp.Add(new TokenList(new List<TokenHelper>() { this.subnodes[i] }));
+                    //temp.Add(new TokenList(new List<TokenHelper>() { this.subnodes[i] }));
                     temp.Add(temp2);
                     temp2 = new TokenList();
                 }

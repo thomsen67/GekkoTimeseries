@@ -26358,18 +26358,15 @@ namespace Gekko
                     {
                         List<TokenList> listOfTokensListsCommaSplit = token.SplitCommas();
                         int ii = -1;
-
-                        for(int i5 = 0;i5< listOfTokensListsCommaSplit.Count;i5+=2) 
-                        //foreach (TokenList tokenListCommaSplit in listOfTokensListsCommaSplit)  //does not include start and end parenthesis
+                        foreach (TokenList tokenListCommaSplit in listOfTokensListsCommaSplit)  //does not include start and end parenthesis
                         {
-                                TokenList tokenListCommaSplit = listOfTokensListsCommaSplit[i5];
-                                counter++;
+                            counter++;
                             ii++;
                             if (tokenListCommaSplit.storage.Count == 2 && tokenListCommaSplit[0].s == Globals.symbolCollection.ToString() && tokenListCommaSplit[1].type == TokenKind.Word)
                             {
                                 string listName = tokenListCommaSplit[1].s;
                                 TokenHelper parent = tokenListCommaSplit[0];
-                                bool foundAsSumFunction = false;                                
+                                bool foundAsSumFunction = false;
                                 while (true)
                                 {
                                     if (parent == null) break;
@@ -26381,7 +26378,7 @@ namespace Gekko
                                             if (G.Equal(left.s, "sum"))
                                             {
                                                 List<TokenList> split = parent.SplitCommas();
-                                                if (split.Count >= 3)
+                                                if (split.Count > 1)
                                                 {
                                                     TokenList firstSplit = split[0];
                                                     if (firstSplit.storage.Count == 1)
@@ -26390,11 +26387,9 @@ namespace Gekko
                                                         {
                                                             //handles sum((#i, #j), ...)
                                                             List<TokenList> splitNew = firstSplit[0].SplitCommas();
-                                                                for(int i6=0;i6<splitNew.Count;i6+=2) 
-                                                            //foreach (TokenList splitNewItem in splitNew)
+                                                            foreach (TokenList splitNewItem in splitNew)
                                                             {
-                                                                        TokenList splitNewItem = splitNew[i6];
-                                                                        string listName2 = HandleLabelsIsSimpleListName(splitNewItem);
+                                                                string listName2 = HandleLabelsIsSimpleListName(splitNewItem);
                                                                 if (listName2 != null)
                                                                 {
                                                                     if (G.Equal(listName, listName2))
@@ -26409,10 +26404,10 @@ namespace Gekko
                                                     else if (firstSplit.storage.Count > 1)
                                                     {
                                                         string listName2 = HandleLabelsIsSimpleListName(firstSplit);
-                                                        if(listName2!=null)
+                                                        if (listName2 != null)
                                                         {
                                                             //handles sum(#i, ...)
-                                                            
+
                                                             if (G.Equal(listName, listName2))
                                                             {
                                                                 foundAsSumFunction = true;
@@ -26465,15 +26460,15 @@ namespace Gekko
                                     //does not match the index position
                                     return true;
                                 }
-                                
+
                                 if (helper.iv.Type() == EVariableType.String || helper.iv.Type() == EVariableType.Date || helper.iv.Type() == EVariableType.Val)
                                 {
                                     HandleLabelsInsertIVariables(token, tokenListCommaSplit, ((ScalarString)Functions.tostring(null, helper.iv)).string2);
                                 }
-                            }                                
-                            
+                            }
+
                         }
-                        
+
                     }
                     else
                     {
@@ -26496,7 +26491,7 @@ namespace Gekko
                 return true;
             }
             return false;
-            
+
         }
 
         private static string HandleLabelsIsSimpleListName(TokenList splitNewItem)
