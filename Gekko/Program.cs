@@ -15822,6 +15822,8 @@ namespace Gekko
             }
             else
             {
+                //an empty node with children
+
                 foreach (TokenHelper child in node.subnodes.storage)
                 {
                     WalkTokens(child);
@@ -26593,7 +26595,9 @@ namespace Gekko
                 //after this, free (uncontrolled) lists are in freelists, and rawLabel is the label.
 
                 var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };  //can in principle have such comments                         
-                TokenList tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(rawLabel, tags1, null, null, null).subnodes;
+                
+                TokenHelper helperParent = StringTokenizer2.GetTokensWithLeftBlanksRecursive(rawLabel, tags1, null, null, null);
+                TokenList tokens2 = helperParent.subnodes;
 
                 if (false && Globals.runningOnTTComputer)
                 {
@@ -26609,7 +26613,8 @@ namespace Gekko
                     try
                     {
                         int counter = -1;
-                        TokenList temp = tokens2.DeepClone(null);
+                        
+                        TokenList temp = tokens2.DeepClone(helperParent);
                         problem = HandleLabels(temp, 0, list, freelists, ref counter);  //the temp object is changed here, therefore it is cloned before.                            
                         if (!problem) result = temp.ToString();
                     }

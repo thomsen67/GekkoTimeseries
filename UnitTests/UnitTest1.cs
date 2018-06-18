@@ -10028,6 +10028,8 @@ namespace UnitTests
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2001"); //why is it not a date?
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2002"); //why is it not a date?
             Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "2003"); //why is it not a date?
+            //string tmp0 = table.Get(1, 2).CellText.TextData[0];
+            //string tmp1 = table.Get(2, 2).CellText.TextData[0];
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "sum(#m1");
             Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], ", xx[#m1, x])");
             Assert.AreEqual(table.Get(3, 2).number, 5.0000d, 0.0001);

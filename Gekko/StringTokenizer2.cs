@@ -185,17 +185,19 @@ namespace Gekko
             temp.column = temp.subnodes[0].column;
         }
 
-        
+
 
         public TokenHelper Offset(int offset)
         {
+
             //-1 is left sibling, +1 is right sibling
-            int ii = this.id + offset;                        
+            int ii = this.id + offset;
             if (ii < 0 || ii >= this.parent.subnodes.storage.Count)
             {
                 return null;
             }
             return this.parent.subnodes[ii];
+
         }
 
         public TokenHelper OffsetInterval(int start, int end)
@@ -897,10 +899,10 @@ namespace Gekko
             return new TokenList(a);
         }
 
-        public static TokenHelper GetTokensWithLeftBlanksRecursive(string textInputRaw)
-        {
-            return GetTokensWithLeftBlanksRecursive(textInputRaw, null, null, null, null);
-        }
+        //public static TokenHelper GetTokensWithLeftBlanksRecursive(string textInputRaw)
+        //{
+        //    return GetTokensWithLeftBlanksRecursive(textInputRaw, null, null, null, null);
+        //}
 
         public static TokenHelper GetTokensWithLeftBlanksRecursive(string textInputRaw, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
         {
@@ -945,7 +947,10 @@ namespace Gekko
 
         public static TokenList GetTokensWithLeftBlanksRecursiveHelper(TokenList input, ref int startI, TokenHelper startparen)
         {
-            TokenList rv = new TokenList();            
+            TokenList rv = new TokenList();  
+            
+            
+                      
             List<TokenHelper> output = new List<TokenHelper>();
             //if (first != null) output.Add(first);  //a left parenthesis      
             string endparen = null;
@@ -990,8 +995,11 @@ namespace Gekko
             {
                 G.Writeln2("*** ERROR: The '" + startparen.s + "' parenthesis at " + startparen.LineAndPosText() + " does not have a corresponding '" + endparen + "'");
                 throw new GekkoException();
-            }            
-            return new TokenList(output);
+            }
+
+            TokenList temp3 = new TokenList(output);
+            
+            return temp3;
         }
 
         
