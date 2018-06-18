@@ -130,21 +130,20 @@ namespace Gekko
         //if (ii - 1 >= 0) subnode.siblingBefore = temp.subnodes[ii - 1];
         //if (ii + 1 < temp.subnodes.storage.Count) subnode.siblingAfter = temp.subnodes[ii + 1];
 
-        public List<TokenList> SplitCommas()
+        public List<Tuple<TokenList, TokenHelper>> SplitCommas()
         {
             //Splits up in bits, depending on commas. For instance [1, 2] is split in 1 and 2. But [1, [2, 3]] is split in 1 and [2, 3].            
-            //Note that the commas are preserved, so a, b, c --> [a] [,] [b] [,] [c], where
-            //  tokens 0, 2, 4 are the list items.
-            //This is done so that the comma can be reached (for instance: deleted)
+            //Note that the commas are preserved as the second part of the tuple.
+            //The last item (or the 1 item if there is only 1) will have null as second part of tuple.
             if (this.subnodes == null) return null;
-            List<TokenList> temp = new List<TokenList>();
+            List<Tuple<TokenList, TokenHelper>> temp = new List<Tuple<TokenList, TokenHelper>>();
             TokenList temp2 = new TokenList();
             for (int i = 0 + 1; i < this.subnodes.storage.Count - 1; i++)  //omit the parentheses
             {
                 if (this.subnodes[i].s == ",")
-                {   
+                {
                     //temp.Add(new TokenList(new List<TokenHelper>() { this.subnodes[i] }));
-                    temp.Add(temp2);
+                    temp.Add(new Tuple<TokenList, TokenHelper>(temp2, this.subnodes[i]));
                     temp2 = new TokenList();
                 }
                 else
@@ -152,7 +151,7 @@ namespace Gekko
                     temp2.storage.Add(this.subnodes[i]);
                 }
             }
-            temp.Add(temp2);
+            temp.Add(new Tuple<TokenList, TokenHelper>(temp2, null));
             return temp;
         }
         public TokenHelper SiblingBefore()

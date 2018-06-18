@@ -15815,8 +15815,8 @@ namespace Gekko
                 {
                     //a pattern like "x(" with no blanks in between
                     TokenHelper child = node.Offset(1).subnodes.storage[0];
-                    List<TokenList> split = node.Offset(1).SplitCommas();
-                    TokenList last = split[split.Count - 1];
+                    List<Tuple<TokenList, TokenHelper>> split = node.Offset(1).SplitCommas();
+                    Tuple<TokenList, TokenHelper> last = split[split.Count - 1];
                     //if(last.storage.Count==1)
                 }
 
@@ -26356,16 +26356,16 @@ namespace Gekko
                 {
                     if (token.subnodesType == "[" || token.subnodesType == "{")
                     {
-                        List<TokenList> listOfTokensListsCommaSplit = token.SplitCommas();
+                        List<Tuple<TokenList, TokenHelper>> listOfTokensListsCommaSplit = token.SplitCommas();
                         int ii = -1;
-                        foreach (TokenList tokenListCommaSplit in listOfTokensListsCommaSplit)  //does not include start and end parenthesis
+                        foreach (Tuple<TokenList, TokenHelper> tokenListCommaSplit in listOfTokensListsCommaSplit)  //does not include start and end parenthesis
                         {
                             counter++;
                             ii++;
-                            if (tokenListCommaSplit.storage.Count == 2 && tokenListCommaSplit[0].s == Globals.symbolCollection.ToString() && tokenListCommaSplit[1].type == TokenKind.Word)
+                            if (tokenListCommaSplit.Item1.storage.Count == 2 && tokenListCommaSplit.Item1[0].s == Globals.symbolCollection.ToString() && tokenListCommaSplit.Item1[1].type == TokenKind.Word)
                             {
-                                string listName = tokenListCommaSplit[1].s;
-                                TokenHelper parent = tokenListCommaSplit[0];
+                                string listName = tokenListCommaSplit.Item1[1].s;
+                                TokenHelper parent = tokenListCommaSplit.Item1[0];
                                 bool foundAsSumFunction = false;
                                 while (true)
                                 {
@@ -26377,19 +26377,19 @@ namespace Gekko
                                         {
                                             if (G.Equal(left.s, "sum"))
                                             {
-                                                List<TokenList> split = parent.SplitCommas();
+                                                List<Tuple<TokenList, TokenHelper>> split = parent.SplitCommas();
                                                 if (split.Count > 1)
                                                 {
-                                                    TokenList firstSplit = split[0];
+                                                    TokenList firstSplit = split[0].Item1;
                                                     if (firstSplit.storage.Count == 1)
                                                     {
                                                         if (firstSplit[0].subnodesType == "(")
                                                         {
                                                             //handles sum((#i, #j), ...)
-                                                            List<TokenList> splitNew = firstSplit[0].SplitCommas();
-                                                            foreach (TokenList splitNewItem in splitNew)
+                                                            List<Tuple<TokenList,TokenHelper>> splitNew = firstSplit[0].SplitCommas();
+                                                            foreach (Tuple<TokenList, TokenHelper> splitNewItem in splitNew)
                                                             {
-                                                                string listName2 = HandleLabelsIsSimpleListName(splitNewItem);
+                                                                string listName2 = HandleLabelsIsSimpleListName(splitNewItem.Item1);
                                                                 if (listName2 != null)
                                                                 {
                                                                     if (G.Equal(listName, listName2))
@@ -26438,7 +26438,7 @@ namespace Gekko
                                     }
                                     if (helper.iv.Type() == EVariableType.String)
                                     {
-                                        HandleLabelsInsertIVariables(token, tokenListCommaSplit, O.ConvertToString(helper.iv));
+                                        HandleLabelsInsertIVariables(token, tokenListCommaSplit.Item1, O.ConvertToString(helper.iv));
                                     }
                                 }
                                 else
@@ -26463,7 +26463,7 @@ namespace Gekko
 
                                 if (helper.iv.Type() == EVariableType.String || helper.iv.Type() == EVariableType.Date || helper.iv.Type() == EVariableType.Val)
                                 {
-                                    HandleLabelsInsertIVariables(token, tokenListCommaSplit, ((ScalarString)Functions.tostring(null, helper.iv)).string2);
+                                    HandleLabelsInsertIVariables(token, tokenListCommaSplit.Item1, ((ScalarString)Functions.tostring(null, helper.iv)).string2);
                                 }
                             }
 
