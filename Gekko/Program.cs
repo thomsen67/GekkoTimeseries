@@ -15815,7 +15815,9 @@ namespace Gekko
                 {
                     //a pattern like "x(" with no blanks in between
                     TokenHelper child = node.Offset(1).subnodes.storage[0];
-                    List<TokenList> split = TokenHelper.SplitCommas(node.Offset(1).subnodes);
+                    List<TokenList> split = node.Offset(1).subnodes.SplitCommas();
+                    TokenList last = split[split.Count - 1];
+                    //if(last.storage.Count==1)
                 }
 
                 return;
@@ -26354,7 +26356,7 @@ namespace Gekko
                 {
                     if (token.subnodesType == "[" || token.subnodesType == "{")
                     {
-                        List<TokenList> listOfTokensListsCommaSplit = TokenHelper.SplitCommas(token.subnodes);
+                        List<TokenList> listOfTokensListsCommaSplit = token.subnodes.SplitCommas();
                         int ii = -1;
                         foreach (TokenList tokenListCommaSplit in listOfTokensListsCommaSplit)  //does not include start and end parenthesis
                         {
@@ -26375,7 +26377,7 @@ namespace Gekko
                                         {
                                             if (G.Equal(left.s, "sum"))
                                             {
-                                                List<TokenList> split = TokenHelper.SplitCommas(parent.subnodes);
+                                                List<TokenList> split = parent.subnodes.SplitCommas();
                                                 if (split.Count > 1)
                                                 {
                                                     TokenList firstSplit = split[0];
@@ -26384,7 +26386,7 @@ namespace Gekko
                                                         if (firstSplit[0].subnodesType == "(")
                                                         {
                                                             //handles sum((#i, #j), ...)
-                                                            List<TokenList> splitNew = TokenHelper.SplitCommas(firstSplit[0].subnodes);
+                                                            List<TokenList> splitNew = firstSplit[0].subnodes.SplitCommas();
                                                             foreach (TokenList splitNewItem in splitNew)
                                                             {
                                                                 string listName2 = HandleLabelsIsSimpleListName(splitNewItem);

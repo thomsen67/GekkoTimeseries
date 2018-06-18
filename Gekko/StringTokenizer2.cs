@@ -71,7 +71,28 @@ namespace Gekko
             return s;
         }
 
-        
+        public List<TokenList> SplitCommas()
+        {
+            //Splits up in bits, depending on commas. For instance [1, 2] is split in 1 and 2. But [1, [2, 3]] is split in 1 and [2, 3].            
+            List<TokenList> temp = new List<TokenList>();
+            TokenList temp2 = new TokenList();
+            for (int i = 0 + 1; i < this.storage.Count - 1; i++)  //omit the parentheses
+            {
+                if (this[i].s == ",")
+                {
+                    temp.Add(temp2);
+                    temp2 = new TokenList();
+                }
+                else
+                {
+                    temp2.storage.Add(this[i]);
+                }
+            }
+            temp.Add(temp2);
+            return temp;
+        }
+
+
     }
 
     public class TokenHelper
@@ -235,26 +256,7 @@ namespace Gekko
             else return leftblanks + s;
         }
 
-        public static List<TokenList> SplitCommas(TokenList ths)
-        {
-            //Splits up in bits, depending on commas. For instance [1, 2] is split in 1 and 2. But [1, [2, 3]] is split in 1 and [2, 3].            
-            List<TokenList> temp = new List<TokenList>();
-            TokenList temp2 = new TokenList();
-            for (int i = 0 + 1; i < ths.storage.Count - 1; i++)  //omit the parentheses
-            {
-                if (ths[i].s == ",")
-                {
-                    temp.Add(temp2);
-                    temp2 = new TokenList();
-                }
-                else
-                {
-                    temp2.storage.Add(ths[i]);
-                }                
-            }
-            temp.Add(temp2);
-            return temp;
-        }
+        
 
 
         public static void Print(TokenList x, int level)
