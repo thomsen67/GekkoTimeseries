@@ -2088,8 +2088,7 @@ statements:                 statements2*;
 statements2:                SEMICOLON -> //stray semicolon is ok, nothing is written
                           | assignment           SEMICOLON!
 						  | accept               SEMICOLON!
-						  | analyze              SEMICOLON!
-						  | accept               SEMICOLON!
+						  | analyze              SEMICOLON!						  
 						  | clone                SEMICOLON!
 						  | close                SEMICOLON!
 						  | cls                  SEMICOLON!

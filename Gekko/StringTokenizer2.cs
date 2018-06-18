@@ -70,6 +70,8 @@ namespace Gekko
             }
             return s;
         }
+
+        
     }
 
     public class TokenHelper
@@ -87,9 +89,70 @@ namespace Gekko
         public TokenHelper siblingAfter = null;
         public int id = -12345;
 
+        public TokenHelper()
+        {
+
+        }
+
+        public TokenHelper(TokenList tl, string type)
+        {
+            //TokenHelper parent = new TokenHelper();
+            this.subnodes = tl;
+            if (type == null)
+            {
+                this.subnodesType = "artificial_parent_at_the_top_of_the_node_tree";
+            }
+            else
+            {
+                this.subnodesType = type;
+            }
+            OrganizeSubnodes(this);
+        }
+
         public string LineAndPosText()
         {
             return "line " + this.line + " pos " + this.column;
+        }
+
+        public int Search(int i1Start, List<string>ss)
+        {
+            int j = -12345;
+            for (j = 0; j < int.MaxValue; j++)
+            {                
+                bool ok = true;
+                for (int i = 0; i < ss.Count; i++)
+                {
+                    TokenHelper xx = this.Offset(i1Start + j + i);
+                    if (xx == null)
+                    {
+                        return -12345;  //end of tokens
+                    }
+                    if (!G.Equal(xx.s, ss[i]))
+                    {
+                        ok = false;
+                        break;
+                    }
+                }
+                if (ok) break;
+            }
+            return i1Start + j;
+        }
+
+        private static void OrganizeSubnodes(TokenHelper temp)
+        {
+            //temp is an empty node (.s == null) with subnodes
+            int counter = -1;
+            for (int ii = 0; ii < temp.subnodes.storage.Count; ii++)
+            {
+                TokenHelper subnode = temp.subnodes[ii];
+                counter++;
+                subnode.id = counter;
+                subnode.parent = temp;
+                if (ii - 1 >= 0) subnode.siblingBefore = temp.subnodes[ii - 1];
+                if (ii + 1 < temp.subnodes.storage.Count) subnode.siblingAfter = temp.subnodes[ii + 1];
+            }
+            temp.line = temp.subnodes[0].line;
+            temp.column = temp.subnodes[0].column;
         }
 
         public TokenHelper DeepClone()
@@ -107,7 +170,7 @@ namespace Gekko
             return th;
         }
 
-        public TokenHelper Sibling(int offset)
+        public TokenHelper Offset(int offset)
         {
             //-1 is left sibling, +1 is right sibling
             int ii = this.id + offset;                        
@@ -116,6 +179,18 @@ namespace Gekko
                 return null;
             }
             return this.parent.subnodes[ii];
+        }
+
+        public TokenHelper OffsetInterval(int start, int end)
+        {
+            TokenList rv2 = new TokenList();
+            for (int i = start; i <= end; i++)
+            {
+                rv2.storage.Add(this.parent.subnodes[this.id+i]);
+            }
+            TokenHelper rv = new TokenHelper();
+            rv.subnodes = rv2;
+            return rv;
         }
 
         public override string ToString()
@@ -830,11 +905,10 @@ namespace Gekko
             TokenList tokens = GetTokensWithLeftBlanks(textInputRaw, 0, commentsClosed, commentsNonClosed, commentsClosedOnlyStartOfLine, commentsNonClosedOnlyStartOfLine);
             TokenList tokens2 = GetTokensWithLeftBlanksRecursiveHelper(tokens, ref i, null);
             //the first-level elements of the TokenList do not have any parent. This is fixed here:
-            TokenHelper parent = new TokenHelper();
-            parent.subnodes = tokens2;
-            parent.subnodesType = "artificial_parent_at_the_top_of_the_node_tree";
-
-            OrganizeSubnodes(parent);
+            TokenHelper parent = new TokenHelper(tokens2, null);
+            //parent.subnodes = tokens2;
+            //parent.subnodesType = "artificial_parent_at_the_top_of_the_node_tree";
+            //OrganizeSubnodes(parent);
 
             //int counter = -1;
             //foreach (TokenHelper token in parent.subnodes.storage)
@@ -844,7 +918,9 @@ namespace Gekko
             //    token.id = counter;
             //}
             return parent;
-        } 
+        }
+
+        
 
         public static TokenList GetTokensWithLeftBlanksRecursiveHelper(TokenList input, ref int startI, TokenHelper startparen)
         {
@@ -864,10 +940,10 @@ namespace Gekko
                     //found a new left parenthesis                          
                     startI = i + 1;
                     TokenList sub = GetTokensWithLeftBlanksRecursiveHelper(input, ref startI, input[i]);
-                    TokenHelper temp = new TokenHelper();  //new empty/placeholder TokenHelper with a list of TokenHelpers
-                    temp.subnodes = sub;
-                    temp.subnodesType = input.storage[i].s;
-                    OrganizeSubnodes(temp);
+                    TokenHelper temp = new TokenHelper(sub, input.storage[i].s);  //new empty/placeholder TokenHelper with a list of TokenHelpers
+                    //temp.subnodes = sub;
+                    //temp.subnodesType =;
+                    //OrganizeSubnodes(temp);
                     output.Add(temp);
                     i = startI;
                 }
@@ -897,21 +973,6 @@ namespace Gekko
             return new TokenList(output);
         }
 
-        private static void OrganizeSubnodes(TokenHelper temp)
-        {
-            //temp is an empty node (.s == null) with subnodes
-            int counter = -1;
-            for (int ii = 0; ii < temp.subnodes.storage.Count; ii++)
-            {
-                TokenHelper subnode = temp.subnodes[ii];
-                counter++;
-                subnode.id = counter;
-                subnode.parent = temp;
-                if (ii - 1 >= 0) subnode.siblingBefore = temp.subnodes[ii - 1];
-                if (ii + 1 < temp.subnodes.storage.Count) subnode.siblingAfter = temp.subnodes[ii + 1];
-            }
-            temp.line = temp.subnodes[0].line;
-            temp.column = temp.subnodes[0].column;
-        }
+        
     }
 }

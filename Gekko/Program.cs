@@ -15811,6 +15811,8 @@ namespace Gekko
         {
             if (true && Globals.runningOnTTComputer)
             {
+                int eqCounter = 0;
+
                 string txt = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "model.gms");
                 var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
                 var tags2 = new List<string>() { "//" };
@@ -15818,199 +15820,310 @@ namespace Gekko
                 var tags4 = new List<string>() { "*", "#" };
 
                 TokenHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
+                Dictionary<string, List<ModelGamsEquation>> xx = new Dictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
 
                 foreach (TokenHelper tok in tokens2.subnodes.storage)
                 {
                     string s = tok.ToString();
                     if (G.Equal(tok.s, "equation"))
                     {
-                        if (tok.Sibling(-1) == null || tok.Sibling(-1).s == ";" || tok.Sibling(-1).type == TokenKind.EOL)
+                        if (tok.Offset(-1) == null || tok.Offset(-1).s == ";" || tok.Offset(-1).type == TokenKind.EOL)
                         {
                             //either first in file, or ';' before, or newline before
                             //apparantly, ending with ';' in equation is not mandatory
 
                             int i = 1;
 
-                            string name = tok.Sibling(i)?.s;
-                            if (name == null)
+                            string name3 = tok.Offset(i)?.s;
+                            string sets3 = null;
+
+                            if (name3 == null)
                             {
-                                G.Writeln2("*** ERROR: Expected eq name, " + tok.Sibling(i).LineAndPosText());
+                                G.Writeln2("*** ERROR: Expected eq name, " + tok.Offset(i).LineAndPosText());
                                 throw new GekkoException();
                             }
                             i++;
-                            TokenHelper parentheses = tok.Sibling(i);
-                            if (parentheses.subnodes == null || parentheses.subnodesType != "(")
-                            {
-                                G.Writeln2("*** ERROR: Expected set definition with parentheses '(' and ')', " + tok.Sibling(i).LineAndPosText());
-                                throw new GekkoException();
-                            }                            
 
-                            string sets = parentheses.ToString();
+                            TokenHelper parentheses = tok.Offset(i);
+                            if (parentheses.subnodesType == "(")
+                            {
+                                sets3 = parentheses.ToString();
+                            }
                             i++;
-                            string semicolon = tok.Sibling(i)?.s;
+
+                            string semicolon = tok.Offset(i)?.s;
                             if (semicolon != ";")
                             {
-                                G.Writeln2("*** ERROR: Expected set definition to end with ';', " + tok.Sibling(i).LineAndPosText());
+                                G.Writeln2("*** ERROR: Expected set definition to end with ';', " + tok.Offset(i).LineAndPosText());
                                 throw new GekkoException();
                             }
+                            i++;
 
-                            i++;                            
+                            if (tok.Offset(i).type == TokenKind.EOL) i++;  //consume a newline
 
-                            if (tok.Sibling(i).type == TokenKind.EOL) i++;  //consume a newline
+                            int iEqStart = i;
 
+                            //-----------------------------------------------
                             //now we are ready for the equation definition
+                            //-----------------------------------------------
 
-                            string name2 = tok.Sibling(i)?.s;
-                            if (!G.Equal(name, name2))
-                            {
-                                G.Writeln2("*** ERROR: Eq names '" + name + "' and '" + name2 + "' do not match, " + tok.Sibling(i).LineAndPosText());
-                                throw new GekkoException();
-                            }
+                            //The equation is of this form:
 
-                            i++;
-                            TokenHelper parentheses2 = tok.Sibling(i);
-                            if (parentheses2.subnodes == null || parentheses2.subnodesType != "(")
-                            {
-                                G.Writeln2("*** ERROR: Expected set definition with parentheses '(' and ')', " + tok.Sibling(i).LineAndPosText());
-                                throw new GekkoException();
-                            }
+                            //e_pi(i,ds,t) $ (tx0(t) and d1i(i,ds,t)) .. pI(i,ds,t)*qI(i,ds,t) =E= vI(i,ds,t);
 
+                            //Tokenized in tree structure it looks like this:
+
+                            //e_pi(...) $ (...) .. pI(...)*qI(...) =E= vI(...);
+
+                            //So the following:
+                            // varname
+                            // maybe a set parenthesis
+                            // maybe a dollar
+                            //     if so either a (...) or a variable with a (...)
+                            // a '..' always
+                            // a leftside until '=e='
+                            // a rightside after'=e=' until semicolon
+
+                            string name = null;
                             string dollar = null;
-                            i++;
-                            TokenHelper dollarToken = tok.Sibling(i);
-                            if (dollarToken.s == "$")
+                            string sets = null;
+                            string lhs = null;
+                            string rhs = null;
+
+                            ////find two dots
+                            //int iDots = tok.Search(i, new List<string>() { ".", "." });
+                            //if (iDots == -12345)
+                            //{
+                            //    //two dots
+                            //    G.Writeln2("*** ERROR: Expected '..' in eq definition, " + tok.Offset(i).LineAndPosText());
+                            //    throw new GekkoException();
+                            //}
+
+                            name = tok.Offset(i)?.s;
+                            if (!G.Equal(name3, name))
                             {
+                                G.Writeln2("*** ERROR: Eq names '" + name3 + "' and '" + name + "' do not match, " + tok.Offset(i).LineAndPosText());
+                                throw new GekkoException();
+                            }
+                            i++;
+
+                            //this may be parentheses
+                            TokenHelper tok2 = tok.Offset(i);
+                            if (tok2.subnodesType == "(")
+                            {
+                                sets = tok2.subnodes.ToString();
                                 i++;
-                                TokenHelper parentheses3 = tok.Sibling(i);
-                                if (parentheses3.subnodes == null || parentheses3.subnodesType != "(")
+
+                                if (tok.Offset(i).s == "$")
                                 {
-                                    G.Writeln2("*** ERROR: Expected dollar definition with parentheses '(' and ')', " + tok.Sibling(i).LineAndPosText());
-                                    throw new GekkoException();
+                                    i++;
+
+                                    TokenHelper tok3 = tok.Offset(i);
+                                    if (tok3.subnodesType == "(")
+                                    {
+                                        dollar = tok3.subnodes.ToString();
+                                        i++;
+                                    }
+                                    else
+                                    {
+                                        string s7 = tok.Offset(i).ToString();
+                                        if (!G.IsIdent(s7))
+                                        {
+                                            G.Writeln2("*** ERROR: Expected a name instead of '" + s7 + "' , " + tok.Offset(i).LineAndPosText());
+                                            throw new GekkoException();
+                                        }
+                                        i++;
+
+                                        string s8 = tok.Offset(i).ToString();
+                                        if (!(tok.Offset(i).subnodesType == "("))
+                                        {
+                                            G.Writeln2("*** ERROR: Expected a (...) parenthesis instead of '" + s8 + "' , " + tok.Offset(i).LineAndPosText());
+                                            throw new GekkoException();
+                                        }
+                                        i++;
+                                    }
                                 }
-                                dollar = parentheses3.ToString();
-                                i++;
                             }
 
-                            if (!(tok.Sibling(i)?.s == "." && tok.Sibling(i + 1)?.s == "."))
+                            if (tok.Offset(i)?.s == "." && tok.Offset(i + 1)?.s == ".")
                             {
-                                //two dots
-                                G.Writeln2("*** ERROR: Expected '..' in eq definition, " + tok.Sibling(i).LineAndPosText());
-                                throw new GekkoException();                                
+                                //good
                             }
+                            else
+                            {
+                                G.Writeln2("*** ERROR: Expected '..' in eq definition, " + tok.Offset(i).LineAndPosText());
+                                throw new GekkoException();
+                            }
+                            i++;
+                            i++;
 
-                            i++;
-                            i++;
+                            //now ready for the contents of the equation
 
                             //find lhs of equation -----------------------------------------
                             int i1Start = i;
-                            int j = -12345;
-                            for (j = 0; j < int.MaxValue; j++)
+
+                            List<string> eqsign = new List<string>() { "=", "e", "=" };
+
+                            int iEqual = tok.Search(i1Start, eqsign);
+
+                            if (iEqual == -12345)
                             {
-                                if (tok.Sibling(i1Start + j)?.s == "=" && G.Equal(tok.Sibling(i1Start + j + 1)?.s, "e") && tok.Sibling(i1Start + j + 2)?.s == "=")
+                                G.Writeln2("*** ERROR: Could not find '=e=' in eq definition, " + tok.Offset(i).LineAndPosText());
+                                throw new GekkoException();
+                            }
+
+                            int i1End = iEqual - 1;
+                            int i2Start = i1End + eqsign.Count + 1;
+                            int iSemi = tok.Search(i2Start, new List<string>() { ";" });
+
+                            int iEqEnd = iSemi;
+
+                            lhs = tok.OffsetInterval(i1Start, i1End).ToString().Trim();
+                            rhs = tok.OffsetInterval(i2Start, iSemi - 1).ToString().Trim();
+
+                            eqCounter++;
+
+                            if (eqCounter < 10)
+                            {
+                                G.Writeln2("Eqname:  " + name);
+                                G.Writeln("Sets:    " + sets);
+                                G.Writeln("Dollar:  " + dollar);
+                                G.Writeln("LHS:     " + lhs);
+                                G.Writeln("RHS:     " + rhs);
+                            }
+
+                            ModelGamsEquation e = new ModelGamsEquation();
+                            e.nameRaw = name;
+                            e.setsRaw = sets;
+                            e.conditionalsRaw = dollar;
+                            e.lhsRaw = lhs;
+                            e.rhsRaw = rhs;
+
+                            //TokenList xxx = tok.OffsetInterval(iEqStart, iEqEnd);
+
+                            //TODO TODO
+                            //use already tokenized lhs
+
+                            TokenList fields = StringTokenizer2.GetTokensWithLeftBlanks(e.lhsRaw);
+                            string varName = null;
+                            foreach (TokenHelper t in fields.storage)
+                            {
+                                if (t.type == TokenKind.Word)
                                 {
+                                    if (G.Equal(t.s, "log") || G.Equal(t.s, "exp")) continue;  //this logic could be improved... how to distinguish functions log(x) and sets y(t) ??
+                                    varName = t.s;
                                     break;
                                 }
                             }
-                            int i1End = i1Start + j - 1;
-
-                            //find rhs of equation -------------------------------------------
-                            int i2Start = i1End + 3;                            
-                            for (j = 0; j < int.MaxValue; j++)
+                            if (varName == null)
                             {
-                                if (tok.Sibling(i2Start + j)?.s == ";")
-                                {
-                                    break;
-                                }
+                                G.Writeln2("*** ERROR: Could not find variable name in: " + fields[0].s);
+                                throw new GekkoException();
                             }
-                            int i2End = i2Start + j - 1;
 
-
-
+                            if (xx.ContainsKey(varName))
+                            {
+                                xx[varName].Add(e);  //can have more than one eq with same lhs variable
+                            }
+                            else
+                            {
+                                List<ModelGamsEquation> e2 = new List<ModelGamsEquation>();
+                                e2.Add(e);
+                                xx.Add(varName, e2);
+                            }
 
 
                         }
                     }
                 }
+                Program.modelGams = new ModelGams();
+                Program.modelGams.equations = xx;
+                G.Writeln2("Found " + xx.Count + " distinct equations");
             }
-
-            TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(textInputRaw);
-            List<List<string>> eqLines = new List<List<string>>();
-            List<string> temp = new List<string>();
-            foreach (TokenHelper token in tokens.storage)
+            else
             {
-                if (token.type == TokenKind.EOL)
-                {
-                    eqLines.Add(temp);
-                    temp = new List<string>();
-                }
-                else if (token.s == ",")
-                {
-                    //do nothing
-                }
-                else
-                {
-                    temp.Add(token.s);
-                }
-            }
-            G.Writeln2("Read " + eqLines.Count + " lines from csv file");
 
-            Program.modelGams = new ModelGams();
-            //Program.modelGams.equations = eqLines;
-
-            Dictionary<string, List<ModelGamsEquation>> xx = new Dictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
-
-            bool first = true;
-            foreach (List<string> line in eqLines)
-            {
-                if (first)
+                TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(textInputRaw);
+                List<List<string>> eqLines = new List<List<string>>();
+                List<string> temp = new List<string>();
+                foreach (TokenHelper token in tokens.storage)
                 {
-                    first = false;
-                    continue;
-                }
-                ModelGamsEquation e = new ModelGamsEquation();
-                if (line.Count == null || line.Count == 0) continue;  //probably will not happen
-                if (line.Count < 5)
-                {
-                    G.Writeln2("*** ERROR: Expected 5 cols per line");
-                    throw new GekkoException();
-                }
-                e.nameRaw = StripQuotes2(line[0]);
-                e.setsRaw = StripQuotes2(line[1]);
-                e.conditionalsRaw = StripQuotes2(line[2]);
-                e.lhsRaw = StripQuotes2(line[3]);
-                e.rhsRaw = StripQuotes2(line[4]);
-
-                TokenList fields = StringTokenizer2.GetTokensWithLeftBlanks(e.lhsRaw);
-                string varName = null;
-                foreach (TokenHelper t in fields.storage)
-                {
-                    if (t.type == TokenKind.Word)
+                    if (token.type == TokenKind.EOL)
                     {
-                        if (G.Equal(t.s, "log") || G.Equal(t.s, "exp")) continue;  //this logic could be improved... how to distinguish functions log(x) and sets y(t) ??
-                        varName = t.s;
-                        break;
+                        eqLines.Add(temp);
+                        temp = new List<string>();
+                    }
+                    else if (token.s == ",")
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        temp.Add(token.s);
                     }
                 }
-                if (varName == null)
-                {
-                    G.Writeln2("*** Could not find variable name in: " + fields[0].s);
-                    throw new GekkoException();
-                }
+                G.Writeln2("Read " + eqLines.Count + " lines from csv file");
 
-                if (xx.ContainsKey(varName))
+                Program.modelGams = new ModelGams();
+                //Program.modelGams.equations = eqLines;
+
+                Dictionary<string, List<ModelGamsEquation>> xx = new Dictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
+
+                bool first = true;
+                foreach (List<string> line in eqLines)
                 {
-                    xx[varName].Add(e);  //can have more than one eq with same lhs variable
+                    if (first)
+                    {
+                        first = false;
+                        continue;
+                    }
+                    ModelGamsEquation e = new ModelGamsEquation();
+                    if (line.Count == null || line.Count == 0) continue;  //probably will not happen
+                    if (line.Count < 5)
+                    {
+                        G.Writeln2("*** ERROR: Expected 5 cols per line");
+                        throw new GekkoException();
+                    }
+                    e.nameRaw = StripQuotes2(line[0]);
+                    e.setsRaw = StripQuotes2(line[1]);
+                    e.conditionalsRaw = StripQuotes2(line[2]);
+                    e.lhsRaw = StripQuotes2(line[3]);
+                    e.rhsRaw = StripQuotes2(line[4]);
+
+                    TokenList fields = StringTokenizer2.GetTokensWithLeftBlanks(e.lhsRaw);
+                    string varName = null;
+                    foreach (TokenHelper t in fields.storage)
+                    {
+                        if (t.type == TokenKind.Word)
+                        {
+                            if (G.Equal(t.s, "log") || G.Equal(t.s, "exp")) continue;  //this logic could be improved... how to distinguish functions log(x) and sets y(t) ??
+                            varName = t.s;
+                            break;
+                        }
+                    }
+                    if (varName == null)
+                    {
+                        G.Writeln2("*** ERROR: Could not find variable name in: " + fields[0].s);
+                        throw new GekkoException();
+                    }
+
+                    if (xx.ContainsKey(varName))
+                    {
+                        xx[varName].Add(e);  //can have more than one eq with same lhs variable
+                    }
+                    else
+                    {
+                        List<ModelGamsEquation> e2 = new List<ModelGamsEquation>();
+                        e2.Add(e);
+                        xx.Add(varName, e2);
+                    }
                 }
-                else
-                {
-                    List<ModelGamsEquation> e2 = new List<ModelGamsEquation>();
-                    e2.Add(e);
-                    xx.Add(varName, e2);
-                }
+                Program.modelGams.equations = xx;
+                G.Writeln("Found " + xx.Count + " distinct equations");
             }
-            Program.modelGams.equations = xx;
-            G.Writeln("Found " + xx.Count + " distinct equations");
         }
+
+        
 
         private static void HandleVarlist(ModelCommentsHelper modelCommentsHelper)
         {
@@ -26231,7 +26344,7 @@ namespace Gekko
                                     if (parent == null) break;
                                     if (parent.subnodesType == "(")
                                     {
-                                        TokenHelper left = parent.Sibling(-1);
+                                        TokenHelper left = parent.Offset(-1);
                                         if (left != null)
                                         {
                                             if (G.Equal(left.s, "sum"))

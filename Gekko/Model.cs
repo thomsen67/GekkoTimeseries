@@ -404,6 +404,8 @@ namespace Gekko
         public string lhs = null;
         public string rhs = null;
 
+        public TokenHelper token = null;
+
 
     }
 }

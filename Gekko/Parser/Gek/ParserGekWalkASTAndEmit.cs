@@ -2825,7 +2825,7 @@ namespace Gekko.Parser.Gek
 
                                 node.Code.A("O.Prt o" + Num(node) + " = new O.Prt();" + G.NL);
 
-                                node.Code.A("int " + Globals.labelCounter + " = 0;");
+                                node.Code.A("" + Globals.labelCounter + " = 0;");
 
                                 node.Code.A("o" + Num(node) + ".guiGraphIsRefreshing = gh.isRefreshing;" + G.NL);
                                 node.Code.A("o" + Num(node) + ".guiGraphPrintCode = gh.printCode;" + G.NL); //printCode is from the Func<> call, is null if PLOT window buttons are not clicked
@@ -4850,7 +4850,7 @@ namespace Gekko.Parser.Gek
                     case "ASTDISP":
                         {                            
                             node.Code.A("O.Disp o" + Num(node) + " = new O.Disp();" + G.NL);
-                            node.Code.A("int " + Globals.labelCounter + " = 0;");
+                            node.Code.A("" + Globals.labelCounter + " = 0;");
                             node.Code.A(node[0].Code);  //dates
                                                         
                             node.Code.A("o" + Num(node) + ".iv = " + node[1].Code + ";" + G.NL);
