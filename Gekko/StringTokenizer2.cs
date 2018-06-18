@@ -45,7 +45,7 @@ namespace Gekko
             }
         }
 
-        public TokenList DeepClone()
+        public TokenList DeepClone(TokenHelper parent)
         {
             TokenList tsh = new TokenList();
             if (this.storage != null)
@@ -53,7 +53,7 @@ namespace Gekko
                 List<TokenHelper> xx = new List<TokenHelper>();
                 foreach (TokenHelper th in this.storage)
                 {
-                    TokenHelper yy = th.DeepClone();
+                    TokenHelper yy = th.DeepClone(parent);
                     xx.Add(yy);
                 }
                 tsh.storage = xx;
@@ -76,18 +76,34 @@ namespace Gekko
 
     public class TokenHelper
     {
-        public string s = null;
+        public string s = null;  //note that if subnodes != null, any string s here will be ignored. So you cannot BOTH has a string here, and a TokenList with subtokens. In this sense, the token containging the subtokens needs to be an empty placeholder.
         public TokenKind type = TokenKind.Unknown;
-        public string leftblanks = null;
+        public string leftblanks = null; //if subnodes != null, leftblanks will always be = null.
         public int line = -12345;
         public int column = -12345;
         //below is advanced (recursive) stuff
         public string subnodesType = null;  // "(", "[" or "{".
         public TokenList subnodes = null;
         public TokenHelper parent = null;
-        public TokenHelper siblingBefore = null;
-        public TokenHelper siblingAfter = null;
+        //public TokenHelper siblingBefore = null;
+        //public TokenHelper siblingAfter = null;
         public int id = -12345;
+
+        public TokenHelper DeepClone(TokenHelper parent)
+        {
+            TokenHelper th = new TokenHelper();
+            th.s = this.s;
+            th.type = this.type;
+            th.leftblanks = this.leftblanks;
+            th.column = this.column;
+            th.parent = parent;
+            th.id = this.id;
+            th.subnodesType = this.subnodesType;            
+            th.subnodes = this.subnodes;
+            if (th.subnodes != null) th.subnodes = this.subnodes.DeepClone(th);
+            return th;
+        }       
+
 
         public TokenHelper()
         {
@@ -100,7 +116,7 @@ namespace Gekko
             this.subnodes = tl;
             if (type == null)
             {
-                this.subnodesType = "artificial_parent_at_the_top_of_the_node_tree";
+                this.subnodesType = Globals.artificial;
             }
             else
             {
@@ -108,6 +124,20 @@ namespace Gekko
             }
             OrganizeSubnodes(this);
         }
+
+        //if (ii - 1 >= 0) subnode.siblingBefore = temp.subnodes[ii - 1];
+        //if (ii + 1 < temp.subnodes.storage.Count) subnode.siblingAfter = temp.subnodes[ii + 1];
+
+        public TokenHelper SiblingBefore()
+        {
+            return this.Offset(-1);
+        }
+
+        public TokenHelper SiblingAfter()
+        {
+            return this.Offset(1);
+        }
+
 
         public string LineAndPosText()
         {
@@ -148,27 +178,14 @@ namespace Gekko
                 counter++;
                 subnode.id = counter;
                 subnode.parent = temp;
-                if (ii - 1 >= 0) subnode.siblingBefore = temp.subnodes[ii - 1];
-                if (ii + 1 < temp.subnodes.storage.Count) subnode.siblingAfter = temp.subnodes[ii + 1];
+                //if (ii - 1 >= 0) subnode.siblingBefore = temp.subnodes[ii - 1];
+                //if (ii + 1 < temp.subnodes.storage.Count) subnode.siblingAfter = temp.subnodes[ii + 1];
             }
             temp.line = temp.subnodes[0].line;
             temp.column = temp.subnodes[0].column;
         }
 
-        public TokenHelper DeepClone()
-        {
-            TokenHelper th = new TokenHelper();
-            th.s = this.s;
-            th.type = this.type;
-            th.leftblanks = this.leftblanks;
-            th.column = this.column;
-            th.parent = this.parent;
-            th.id = this.id;
-            th.subnodesType = this.subnodesType;
-            th.subnodes = this.subnodes;
-            if (th.subnodes != null) th.subnodes = this.subnodes.DeepClone();
-            return th;
-        }
+        
 
         public TokenHelper Offset(int offset)
         {
@@ -188,16 +205,20 @@ namespace Gekko
             {
                 rv2.storage.Add(this.parent.subnodes[this.id+i]);
             }
-            TokenHelper rv = new TokenHelper();
-            rv.subnodes = rv2;
+            TokenHelper rv = new TokenHelper(rv2, null);
             return rv;
+        }
+
+        public string ToStringTrim()
+        {
+            return this.ToString().Trim();
         }
 
         public override string ToString()
         {
             if (subnodes != null)
             {
-                if (s != null)
+                if (s != null && !(s == Globals.artificial))
                 {
                     G.Writeln2("*** ERROR: #875627897");
                     throw new GekkoException();

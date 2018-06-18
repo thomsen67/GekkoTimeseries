@@ -392,11 +392,11 @@ namespace Gekko
 
     public class ModelGamsEquation
     {
-        public string nameRaw = null;
-        public string setsRaw = null;
-        public string conditionalsRaw = null;
-        public string lhsRaw = null;
-        public string rhsRaw = null;
+        public string nameGams = null;
+        public string setsGams = null;
+        public string dollarGams = null;
+        public string lhsGams = null;
+        public string rhsGams = null;
 
         public string name = null;
         public string sets = null;
@@ -404,7 +404,8 @@ namespace Gekko
         public string lhs = null;
         public string rhs = null;
 
-        public TokenHelper token = null;
+        public TokenHelper lhsTokensGams = null;
+        public TokenHelper rhsTokensGams = null;
 
 
     }

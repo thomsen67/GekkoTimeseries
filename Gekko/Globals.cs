@@ -75,7 +75,7 @@ namespace Gekko
         public static Dictionary<string, string> parentheses = new Dictionary<string, string> { { "(", ")" }, { "[", "]" }, { "{", "}" } };
         public static Dictionary<string, string> parenthesesInvert = new Dictionary<string, string> { { ")", "(" }, { "]", "[" }, { "}", "{" } };
 
-        
+        public static string artificial = "artificial_parent_at_the_top_of_the_node_tree";
 
         public static bool newSplit = true;
         public static string splitSTART2 = "//[[splitSTART]]";
