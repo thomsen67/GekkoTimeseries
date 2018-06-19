@@ -15810,14 +15810,27 @@ namespace Gekko
             if (node.subnodes == null)
             {
                 //a leaf node
-
-                if (node.Offset(1) != null && node.Offset(1).subnodes != null && node.Offset(1).subnodesType == "(" && node.Offset(1).subnodes[0].leftblanks == null)
+                TokenHelper nextNode = node.Offset(1);
+                if (nextNode != null && nextNode.subnodes != null && nextNode.subnodesType == "(" && nextNode.subnodes[0].leftblanks == null)
                 {
                     //a pattern like "x(" with no blanks in between
-                    TokenHelper child = node.Offset(1).subnodes.storage[0];
-                    List<Tuple<TokenList, TokenHelper>> split = node.Offset(1).SplitCommas();
+                    //TokenHelper child0 = nextNode.subnodes.storage[0];
+                    List<Tuple<TokenList, TokenHelper>> split = nextNode.SplitCommas();
                     Tuple<TokenList, TokenHelper> last = split[split.Count - 1];
-                    //if(last.storage.Count==1)
+                    if (last.Item1.storage.Count == 1)
+                    {
+                        if (G.Equal(last.Item1.storage[0].s, "t"))
+                        {
+                            last.Item1.storage[0].s = null;
+                            last.Item1.storage[0].leftblanks = null;
+
+                            if (split.Count - 2 >= 0)
+                            {
+                                split[split.Count - 2].Item1.storage[0].s = null;
+                                split[split.Count - 2].Item1.storage[0].leftblanks = null;
+                            }
+                        }
+                    }
                 }
 
                 return;
