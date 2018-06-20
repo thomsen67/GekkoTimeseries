@@ -276,8 +276,8 @@ namespace Gekko.Parser.Gek
                         //{
                         //    if (i == 0) continue;
                         //    string s = null;
-                        //    if (i <= 0) s = Program.StripQuotes(q[q.Count - 1]) + "(" + i + ")";
-                        //    else s = Program.StripQuotes(q[q.Count - 1]) + "(+" + i + ")";
+                        //    if (i <= 0) s = G.StripQuoates(q[q.Count - 1]) + "(" + i + ")";
+                        //    else s = G.StripQuoates(q[q.Count - 1]) + "(+" + i + ")";
                         //    if (line.Contains(s)) hit = s;
                         //}
                         //we use the last single quote match

@@ -4334,7 +4334,7 @@ namespace Gekko.Parser.Gek
                                 if (node.specialExpressionAndLabelInfo[2] != "")
                                 {
                                     givenLabel = node.specialExpressionAndLabelInfo[2];
-                                    givenLabel = Program.StripQuotes(givenLabel);
+                                    givenLabel = G.StripQuotes(givenLabel);
                                     givenLabel = Globals.labelCheatString + givenLabel;
                                 }
                                 else givenLabel = node.specialExpressionAndLabelInfo[1];                                
@@ -4797,7 +4797,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTSTRINGINQUOTES":
                         {
-                            string s = Program.StripQuotes(node[0].Text);
+                            string s = G.StripQuotes(node[0].Text);
                             //for instance, @"this is a ""word"" shown", where "" are kind of @-escaped.
                             //but @ will keep backslashes.
                             s = s.Replace("\"", "\"\"");
@@ -4883,7 +4883,7 @@ namespace Gekko.Parser.Gek
                     case "ASTDISPSEARCH":
                         {
                             node.Code.A("O.Disp o" + Num(node) + " = new O.Disp();" + G.NL);
-                            node.Code.A("o" + Num(node) + ".searchName = `" + Program.StripQuotes(node[0].Text) + "`;" + G.NL);                            
+                            node.Code.A("o" + Num(node) + ".searchName = `" + G.StripQuotes(node[0].Text) + "`;" + G.NL);                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -5006,7 +5006,7 @@ namespace Gekko.Parser.Gek
                             if (node.specialExpressionAndLabelInfo[2] != "")
                             {
                                 givenLabel = node.specialExpressionAndLabelInfo[2];
-                                givenLabel = Program.StripQuotes(givenLabel);
+                                givenLabel = G.StripQuotes(givenLabel);
                             }
                             else givenLabel = node.specialExpressionAndLabelInfo[1];                            
                             
@@ -6770,7 +6770,7 @@ namespace Gekko.Parser.Gek
                         //    //{
                         //    //    s4 += child2.Text;
                         //    //}
-                        //    //s4 = Program.StripQuotes(s4);
+                        //    //s4 = G.StripQuoates(s4);
                         //    //temp += ("@`" + s4 + "`");  //@ because it can contain slashes
 
                         //    temp += ("O.ConvertToString(" + child[0].Code + ")");  //@ because it can contain slashes

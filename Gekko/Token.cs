@@ -12,7 +12,7 @@ using System;
 
 namespace Gekko
 {
-	public enum TokenKind
+	public enum ETokenType
 	{
 		Unknown,
 		Word,
@@ -30,9 +30,9 @@ namespace Gekko
 		int line;
 		int column;
 		string value;
-		TokenKind kind;
+		ETokenType kind;
 
-		public Token(TokenKind kind, string value, int line, int column)
+		public Token(ETokenType kind, string value, int line, int column)
 		{
 			this.kind = kind;
 			this.value = value;
@@ -45,7 +45,7 @@ namespace Gekko
 			get { return this.column; }
 		}
 
-		public TokenKind Kind
+		public ETokenType Kind
 		{
 			get { return this.kind; }
 		}

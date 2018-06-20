@@ -2070,13 +2070,13 @@ namespace Gekko
                 string as2 = null;
                 if (open)
                 {
-                    file = StripQuotes(oRead.openFileNames[i][0]);
+                    file = G.StripQuotes(oRead.openFileNames[i][0]);
                     as2 = oRead.openFileNames[i][1];
                     if (as2 == "") as2 = null;
                 }
                 else
                 {
-                    file = StripQuotes(oRead.FileName);
+                    file = G.StripQuotes(oRead.FileName);
                     as2 = oRead.As;
                 }
 
@@ -13793,7 +13793,7 @@ namespace Gekko
                                                     break;
                                                 }
                                                 if (kind == "Number") numberCounter++;
-                                            } while (token.Kind != TokenKind.EOF);
+                                            } while (token.Kind != ETokenType.EOF);
 
                                             //Must have at least two numbers to be activated
                                             if (simpleBlankSeparatedUpd && numberCounter == 1)
@@ -14204,7 +14204,7 @@ namespace Gekko
 
         public static void AddAbstract(string s, bool run, bool isLibrary, P p)
         {
-            s = StripQuotes(s);
+            s = G.StripQuotes(s);
             if (run)
             {
                 s = Program.AddExtension(s, "." + Globals.extensionCommand);
@@ -14328,7 +14328,7 @@ namespace Gekko
             Program.options.print_filewidth = int.MaxValue;
             try
             {
-                s = StripQuotes(s);
+                s = G.StripQuotes(s);
 
                 List<string> vars = new List<string>();
                 List<string> expl = new List<string>();
@@ -14979,7 +14979,7 @@ namespace Gekko
                     {
                         TokenHelper token = tokens[i];
                         if (token.leftblanks != null) G.Write(token.leftblanks);
-                        if (token.type == TokenKind.Word && knownVars.ContainsKey(token.s))
+                        if (token.type == ETokenType.Word && knownVars.ContainsKey(token.s))
                         {
                             G.WriteLink(token.s, "disp:" + token.s);
                         }
@@ -15030,7 +15030,7 @@ namespace Gekko
             TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(input);
             foreach (TokenHelper token in tokens.storage)
             {
-                if (token.type == TokenKind.Word)
+                if (token.type == ETokenType.Word)
                 {
                     List<ModelGamsEquation> e3 = null; Program.modelGams.equations.TryGetValue(token.s, out e3);
 
@@ -15643,7 +15643,7 @@ namespace Gekko
             string fileName = o.fileName;
             P p = o.p;
 
-            fileName = StripQuotes(fileName);
+            fileName = G.StripQuotes(fileName);
 
             //Random random = new Random();
             Globals.modelRandomID = Program.RandomInt(11111111, 99999999);  //used in GetModelInfoPath()
@@ -15807,32 +15807,195 @@ namespace Gekko
 
         public static void WalkTokens(TokenHelper node)
         {
-            if (node.subnodes == null)
+            if (node.HasNoChildren())
             {
-                //a leaf node
-                TokenHelper nextNode = node.Offset(1);
-                if (nextNode != null && nextNode.subnodes != null && nextNode.subnodesType == "(" && nextNode.subnodes[0].leftblanks == null)
+                //not a sub-node
+                if (node.s != null && node.type == ETokenType.Word)
                 {
-                    //a pattern like "x(" with no blanks in between
-                    //TokenHelper child0 = nextNode.subnodes.storage[0];
-                    List<Tuple<TokenList, TokenHelper>> split = nextNode.SplitCommas();
-                    Tuple<TokenList, TokenHelper> last = split[split.Count - 1];
-                    if (last.Item1.storage.Count == 1)
+                    //a leaf node
+                    //patterns like "log(" or "exp(" or "sum(" are skipped, also stuff like "*(" is avoided
+                    TokenHelper nextNode = node.Offset(1);
+                    if (nextNode != null && nextNode.HasChildren() && nextNode.SubnodesType() == "(" && nextNode.subnodes[0].leftblanks == null)
                     {
-                        if (G.Equal(last.Item1.storage[0].s, "t"))
-                        {
-                            last.Item1.storage[0].s = null;
-                            last.Item1.storage[0].leftblanks = null;
+                        //a pattern like "x(" with no blanks in between                    
 
-                            if (split.Count - 2 >= 0)
+                        if (Globals.gamsFunctions.ContainsKey(node.s))
+                        {
+                            //"sum(" or "log(" or "exp("
+                            if (G.Equal(node.s, "sum"))
                             {
-                                split[split.Count - 2].Item1.storage[0].s = null;
-                                split[split.Count - 2].Item1.storage[0].leftblanks = null;
+                                if (nextNode.subnodes.Count() > 0)
+                                {
+                                    TokenHelper first = nextNode.subnodes[1];  //skips parenthesis
+                                    if (first.HasNoChildren())
+                                    {
+                                        //stuff like "sum(i, x(i))"
+                                        if (first.type == ETokenType.Word && G.Equal(nextNode.subnodes[2].s, ","))
+                                        {
+                                            //checks that it has "sum(x," pattern
+                                            first.s = "#" + first.s;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //stuff like "sum((i, j), x(i, j))"
+                                        List<TokenHelperComma> list2 = first.SplitCommas();
+                                        foreach (TokenHelperComma item in list2)
+                                        {
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            if (item.list.Count() == 1 && item.list[0].type == ETokenType.Word)
+                                            {
+                                                item.list[0].s = "#" + item.list[0].s;
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    //a "sum()" --> not handled
+                                }
+                            }
+                        }
+                        else
+                        {
+                            //now we look at the arguments, x(a1, a2, 's', t) or x(a1, a2, 's', t-1) or x(a1, a2, 's')
+                            List<TokenHelperComma> split = nextNode.SplitCommas();
+
+                            bool removeParenthesis = false;
+                            for (int iSplit = 0; iSplit < split.Count; iSplit++)
+                            {
+                                TokenHelperComma helper = split[iSplit];
+                                if (helper.list.storage.Count == 0)
+                                {
+                                    //empty parenthesis, how is that possible?
+                                }
+                                else if (helper.list.storage.Count == 1)
+                                {
+                                    if (helper.list[0].type == ETokenType.Word)
+                                    {
+                                        if (iSplit == split.Count - 1 && helper.list[0].s == "t")
+                                        {
+                                            //remove the trailing t
+                                            helper.list[0].Clear();
+                                            if (helper.comma == null)
+                                            {
+                                                removeParenthesis = true;  //t is the only argument as in "x(t)" which becomes "x" not "x()"
+                                            }
+                                            else
+                                            {
+                                                helper.comma.Clear();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            //x(i) --> x(#i) --actually--> x[#i]
+                                            helper.list[0].s = "#" + helper.list[0].s;
+                                        }
+                                    }
+                                    else if (helper.list[0].type == ETokenType.QuotedString)
+                                    {
+                                        //remove the quotes
+                                        helper.list[0].s = G.StripQuotes(helper.list[0].s);
+                                    }
+                                }
+                                else if (helper.list.storage.Count == 3)  //t and plusminus and number
+                                {
+
+                                    //the ... argument in (... , ... , ... , ...) is an expression, for instance t-1 etc.
+                                    if (helper.list[0].type == ETokenType.Word)
+                                    {
+                                        if (iSplit == split.Count - 1 && helper.list[0].s == "t")
+                                        {
+                                            //must be last and must begin with "t", like in "x(a, 'b', t-1)"
+                                            if (helper.list[1] != null && (helper.list[1].s == "-" || helper.list[1].s == "+"))
+                                            {
+                                                //...t+... or ...t-...
+                                                if (helper.list[2] != null && (helper.list[2].type == ETokenType.Number))
+                                                {
+                                                    string plusMinus = helper.list[1].s;
+                                                    if (plusMinus != "+" && plusMinus != "-")
+                                                    {
+                                                        G.Writeln2("*** ERROR: Expected t plus/minus an integer, " + helper.list[2].LineAndPosText());
+                                                        throw new GekkoException();
+                                                    }
+                                                    string number = helper.list[2].s;
+                                                    int iNumber = -12345;
+                                                    bool ok = int.TryParse(number, out iNumber);
+                                                    if (!ok)
+                                                    {
+                                                        G.Writeln2("*** ERROR: Expected '" + number + "' to be an integer, " + helper.list[2].LineAndPosText());
+                                                        throw new GekkoException();
+                                                    }
+                                                    if (plusMinus == "-") iNumber = -iNumber;
+
+
+                                                    //x(t-1) --> x[-1]
+                                                    //x(i, t-1) --> x[#i][-1]
+                                                    if (iSplit == 0)
+                                                    {
+                                                        //helper.comma will be = null
+                                                    }
+                                                    else
+                                                    {
+                                                        helper.comma.s = "][";
+                                                    }
+                                                    helper.list[0].Clear();  //kill the 't'completely including blanks
+                                                    helper.list[1].leftblanks = null;  //no blanks to the left of for instance '-1'
+
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (removeParenthesis)
+                            {
+                                nextNode.subnodes[0].Clear();
+                                nextNode.subnodes[nextNode.subnodes.Count() - 1].Clear();
+                            }
+                            else
+                            {
+                                nextNode.subnodes[0].s = "[";
+                                nextNode.subnodes[nextNode.subnodes.Count() - 1].s = "]";
+                                nextNode.subnodes[nextNode.subnodes.Count() - 1].leftblanks = null; //we do not want x[#i, #j ], x[#i, #j] is nicer.
                             }
                         }
                     }
                 }
+            
+                return;
+            }
+            else
+            {
+                //an empty node with children
 
+                foreach (TokenHelper child in node.subnodes.storage)
+                {
+                    WalkTokens(child);
+                }
+            }
+        }
+
+        public static void WalkTokensHandleParentheses(TokenHelper node)
+        {
+            if (node.HasNoChildren())
+            {
+                //not a sub-node
+                if (node.s == "[") node.s = "(";
+                else if (node.s == "{") node.s = "(";
+                else if (node.s == "]") node.s = ")";
+                else if (node.s == "}") node.s = "}";
                 return;
             }
             else
@@ -15851,6 +16014,8 @@ namespace Gekko
         {
             if (true && Globals.runningOnTTComputer)
             {
+                StringBuilder sb = new StringBuilder();
+
                 int eqCounter = 0;
 
                 string txt = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "model.gms");
@@ -15867,7 +16032,7 @@ namespace Gekko
                     string s = tok.ToString();
                     if (G.Equal(tok.s, "equation"))
                     {
-                        if (tok.Offset(-1) == null || tok.Offset(-1).s == ";" || tok.Offset(-1).type == TokenKind.EOL)
+                        if (tok.Offset(-1) == null || tok.Offset(-1).s == ";" || tok.Offset(-1).type == ETokenType.EOL)
                         {
                             //either first in file, or ';' before, or newline before
                             //apparantly, ending with ';' in equation is not mandatory
@@ -15885,7 +16050,7 @@ namespace Gekko
                             i++;
 
                             TokenHelper parentheses = tok.Offset(i);
-                            if (parentheses.subnodesType == "(")
+                            if (parentheses.SubnodesType() == "(")
                             {
                                 sets3 = parentheses.ToString();
                             }
@@ -15899,7 +16064,7 @@ namespace Gekko
                             }
                             i++;
 
-                            if (tok.Offset(i).type == TokenKind.EOL) i++;  //consume a newline
+                            if (tok.Offset(i).type == ETokenType.EOL) i++;  //consume a newline
 
                             int iEqStart = i;
 
@@ -15942,7 +16107,7 @@ namespace Gekko
 
                             //this may be parentheses
                             TokenHelper tok2 = tok.Offset(i);
-                            if (tok2.subnodesType == "(")
+                            if (tok2.SubnodesType() == "(")
                             {
                                 setsGams = tok2.subnodes.ToString();
                                 i++;
@@ -15952,7 +16117,7 @@ namespace Gekko
                                     i++;
 
                                     TokenHelper tok3 = tok.Offset(i);
-                                    if (tok3.subnodesType == "(")
+                                    if (tok3.SubnodesType() == "(")
                                     {
                                         dollarGams = tok3.subnodes.ToString();
                                         i++;
@@ -15968,7 +16133,7 @@ namespace Gekko
                                         i++;
 
                                         string s8 = tok.Offset(i).ToString();
-                                        if (!(tok.Offset(i).subnodesType == "("))
+                                        if (!(tok.Offset(i).SubnodesType() == "("))
                                         {
                                             G.Writeln2("*** ERROR: Expected a (...) parenthesis instead of '" + s8 + "' , " + tok.Offset(i).LineAndPosText());
                                             throw new GekkoException();
@@ -16041,12 +16206,15 @@ namespace Gekko
                             TokenHelper lhsTokensGekko = e.lhsTokensGams.DeepClone(null);
                             TokenHelper rhsTokensGekko = e.rhsTokensGams.DeepClone(null);
 
+                            WalkTokens(lhsTokensGekko);
                             WalkTokens(rhsTokensGekko);
+
+                            sb.Append(lhsTokensGekko.ToStringTrim() + " = " + rhsTokensGekko.ToStringTrim() + ";" + G.NL);
 
                             string varname = null;
                             varname = lhsTokensGams.subnodes[0].ToStringTrim();  //will also work for p(t)*x(t) =e= ... type of eqsa
 
-                            if (lhsTokensGams.subnodes[1] != null && lhsTokensGams.subnodes[1].subnodesType == "(")
+                            if (lhsTokensGams.subnodes[1] != null && lhsTokensGams.subnodes[1].SubnodesType() == "(")
                             {
                                 if (G.Equal(varname, "log") || G.Equal(varname, "exp"))
                                 {
@@ -16057,8 +16225,9 @@ namespace Gekko
                                     varname = null; //ignore it
                                 }
                             }
-                            
-                            if (varname != null) {
+
+                            if (varname != null)
+                            {
                                 if (xx.ContainsKey(varname))
                                 {
                                     xx[varname].Add(e);  //can have more than one eq with same lhs variable
@@ -16080,6 +16249,12 @@ namespace Gekko
                 Program.modelGams = new ModelGams();
                 Program.modelGams.equations = xx;
                 G.Writeln2("Found " + xx.Count + " distinct equations");
+
+                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\equations.gcm", Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {
+                    sw.Write(sb);
+                }
             }
             else
             {
@@ -16089,7 +16264,7 @@ namespace Gekko
                 List<string> temp = new List<string>();
                 foreach (TokenHelper token in tokens.storage)
                 {
-                    if (token.type == TokenKind.EOL)
+                    if (token.type == ETokenType.EOL)
                     {
                         eqLines.Add(temp);
                         temp = new List<string>();
@@ -16125,17 +16300,17 @@ namespace Gekko
                         G.Writeln2("*** ERROR: Expected 5 cols per line");
                         throw new GekkoException();
                     }
-                    e.nameGams = StripQuotes2(line[0]);
-                    e.setsGams = StripQuotes2(line[1]);
-                    e.dollarGams = StripQuotes2(line[2]);
-                    e.lhsGams = StripQuotes2(line[3]);
-                    e.rhsGams = StripQuotes2(line[4]);
+                    e.nameGams = G.StripQuotes2(line[0]);
+                    e.setsGams = G.StripQuotes2(line[1]);
+                    e.dollarGams = G.StripQuotes2(line[2]);
+                    e.lhsGams = G.StripQuotes2(line[3]);
+                    e.rhsGams = G.StripQuotes2(line[4]);
 
                     TokenList fields = StringTokenizer2.GetTokensWithLeftBlanks(e.lhsGams);
                     string varName = null;
                     foreach (TokenHelper t in fields.storage)
                     {
-                        if (t.type == TokenKind.Word)
+                        if (t.type == ETokenType.Word)
                         {
                             if (G.Equal(t.s, "log") || G.Equal(t.s, "exp")) continue;  //this logic could be improved... how to distinguish functions log(x) and sets y(t) ??
                             varName = t.s;
@@ -16290,7 +16465,7 @@ namespace Gekko
                 }
             }
 
-            fileName = StripQuotes(fileName);
+            fileName = G.StripQuotes(fileName);
             //NOTE: If there is an error, Globals.pipeFile will be closed and disposed somewhere else in the
             //      code. So no need to think about using an "using" statement here.    
             
@@ -16569,27 +16744,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Internal error while converting prn file");
                 throw new GekkoException();
             }
-        }
-
-        public static string StripQuotes(string s)
-        {
-            if (s == null) return null;
-            if (s.StartsWith("'") && s.EndsWith("'"))
-            {
-                s = s.Substring(1, s.Length - 2);
-            }
-            return s;
-        }
-
-        public static string StripQuotes2(string s)
-        {
-            if (s == null) return null;
-            if (s.StartsWith("\"") && s.EndsWith("\""))
-            {
-                s = s.Substring(1, s.Length - 2);
-            }
-            return s;
-        }
+        }        
 
         private static void ReadHelper(ref string fileName, ref bool cancel, ref bool createOpenFile, string extension, bool isBase, bool open)
         {
@@ -20361,7 +20516,7 @@ namespace Gekko
             }
 
             string fileName = o.fileName;
-            fileName = StripQuotes(fileName);
+            fileName = G.StripQuotes(fileName);
             bool isCaps = true; if (G.Equal(o.opt_caps, "no")) isCaps = false;
             GekkoTime tStart = o.t1;
             GekkoTime tEnd = o.t2;
@@ -20739,7 +20894,7 @@ namespace Gekko
                 }
             }
 
-            file = StripQuotes(file);
+            file = G.StripQuotes(file);
             bool isUsingOptionFolderBank = false;
             if (Program.options.folder && Program.options.folder_bank != "") isUsingOptionFolderBank = true;
 
@@ -20899,7 +21054,7 @@ namespace Gekko
                 }                
             }
 
-            file = StripQuotes(file);
+            file = G.StripQuotes(file);
             bool isUsingOptionFolderBank = false;
             if (Program.options.folder && Program.options.folder_bank != "") isUsingOptionFolderBank = true;
 
@@ -23372,7 +23527,7 @@ namespace Gekko
             bool dlog = false;
             string block = null;
             string file = o.fileName;
-            file = StripQuotes(file);
+            file = G.StripQuotes(file);
             //TODO TODO 
             //TODO TODO file should be path...
             //TODO TODO 
@@ -26365,44 +26520,44 @@ namespace Gekko
 
             foreach (TokenHelper token in tokenList.storage)
             {
-                if (token.subnodes != null)
+                if (token.HasChildren())
                 {
-                    if (token.subnodesType == "[" || token.subnodesType == "{")
+                    if (token.SubnodesType() == "[" || token.SubnodesType() == "{")
                     {
-                        List<Tuple<TokenList, TokenHelper>> listOfTokensListsCommaSplit = token.SplitCommas();
+                        List<TokenHelperComma> listOfTokensListsCommaSplit = token.SplitCommas();
                         int ii = -1;
-                        foreach (Tuple<TokenList, TokenHelper> tokenListCommaSplit in listOfTokensListsCommaSplit)  //does not include start and end parenthesis
+                        foreach (TokenHelperComma tokenListCommaSplit in listOfTokensListsCommaSplit)  //does not include start and end parenthesis
                         {
                             counter++;
                             ii++;
-                            if (tokenListCommaSplit.Item1.storage.Count == 2 && tokenListCommaSplit.Item1[0].s == Globals.symbolCollection.ToString() && tokenListCommaSplit.Item1[1].type == TokenKind.Word)
+                            if (tokenListCommaSplit.list.storage.Count == 2 && tokenListCommaSplit.list[0].s == Globals.symbolCollection.ToString() && tokenListCommaSplit.list[1].type == ETokenType.Word)
                             {
-                                string listName = tokenListCommaSplit.Item1[1].s;
-                                TokenHelper parent = tokenListCommaSplit.Item1[0];
+                                string listName = tokenListCommaSplit.list[1].s;
+                                TokenHelper parent = tokenListCommaSplit.list[0];
                                 bool foundAsSumFunction = false;
                                 while (true)
                                 {
                                     if (parent == null) break;
-                                    if (parent.subnodesType == "(")
+                                    if (parent.SubnodesType() == "(")
                                     {
                                         TokenHelper left = parent.Offset(-1);
                                         if (left != null)
                                         {
                                             if (G.Equal(left.s, "sum"))
                                             {
-                                                List<Tuple<TokenList, TokenHelper>> split = parent.SplitCommas();
+                                                List<TokenHelperComma> split = parent.SplitCommas();
                                                 if (split.Count > 1)
                                                 {
-                                                    TokenList firstSplit = split[0].Item1;
+                                                    TokenList firstSplit = split[0].list;
                                                     if (firstSplit.storage.Count == 1)
                                                     {
-                                                        if (firstSplit[0].subnodesType == "(")
+                                                        if (firstSplit[0].SubnodesType() == "(")
                                                         {
                                                             //handles sum((#i, #j), ...)
-                                                            List<Tuple<TokenList,TokenHelper>> splitNew = firstSplit[0].SplitCommas();
-                                                            foreach (Tuple<TokenList, TokenHelper> splitNewItem in splitNew)
+                                                            List<TokenHelperComma> splitNew = firstSplit[0].SplitCommas();
+                                                            foreach (TokenHelperComma splitNewItem in splitNew)
                                                             {
-                                                                string listName2 = HandleLabelsIsSimpleListName(splitNewItem.Item1);
+                                                                string listName2 = HandleLabelsIsSimpleListName(splitNewItem.list);
                                                                 if (listName2 != null)
                                                                 {
                                                                     if (G.Equal(listName, listName2))
@@ -26451,7 +26606,7 @@ namespace Gekko
                                     }
                                     if (helper.iv.Type() == EVariableType.String)
                                     {
-                                        HandleLabelsInsertIVariables(token, tokenListCommaSplit.Item1, O.ConvertToString(helper.iv));
+                                        HandleLabelsInsertIVariables(token, tokenListCommaSplit.list, O.ConvertToString(helper.iv));
                                     }
                                 }
                                 else
@@ -26476,7 +26631,7 @@ namespace Gekko
 
                                 if (helper.iv.Type() == EVariableType.String || helper.iv.Type() == EVariableType.Date || helper.iv.Type() == EVariableType.Val)
                                 {
-                                    HandleLabelsInsertIVariables(token, tokenListCommaSplit.Item1, ((ScalarString)Functions.tostring(null, helper.iv)).string2);
+                                    HandleLabelsInsertIVariables(token, tokenListCommaSplit.list, ((ScalarString)Functions.tostring(null, helper.iv)).string2);
                                 }
                             }
 
@@ -26509,7 +26664,7 @@ namespace Gekko
 
         private static string HandleLabelsIsSimpleListName(TokenList splitNewItem)
         {
-            if (splitNewItem.storage.Count == 2 && splitNewItem[0].s == Globals.symbolCollection.ToString() && splitNewItem[1].type == TokenKind.Word)
+            if (splitNewItem.storage.Count == 2 && splitNewItem[0].s == Globals.symbolCollection.ToString() && splitNewItem[1].type == ETokenType.Word)
             {
                 return splitNewItem[1].s;
             }
@@ -26519,15 +26674,15 @@ namespace Gekko
         private static void HandleLabelsInsertIVariables(TokenHelper th, TokenList temp2, string iv_string)
         {
             temp2[0].s = iv_string;
-            temp2[0].type = TokenKind.Word;
+            temp2[0].type = ETokenType.Word;
             temp2[0].subnodes = null;
             for (int ii = 1; ii < temp2.storage.Count; ii++)
             {
                 temp2[ii].s = null;
-                temp2[ii].type = TokenKind.Unknown;
+                temp2[ii].type = ETokenType.Unknown;
                 temp2[ii].subnodes = null;
             }
-            if (th.subnodesType == "{")
+            if (th.SubnodesType() == "{")
             {
                 //Removing the '{'and '}'
                 th.subnodes[0].s = null;
@@ -34003,7 +34158,7 @@ namespace Gekko
                 {
                     token = tok.Next();
                     al.Add(token.Value); alType.Add(token.Kind.ToString());
-                } while (token.Kind != TokenKind.EOF);
+                } while (token.Kind != ETokenType.EOF);
                 //below is a very innocent hack that makes stopping easier
                 //like this, our tokens will end with these 3: {""/"EOF"}  {""/""}  {""/""}
                 al.Add("");
@@ -35376,7 +35531,7 @@ namespace Gekko
             {
                 token = tok.Next(); temp1 = token.Kind.ToString(); temp2 = token.Value;
                 al.Add(temp2); alType.Add(temp1);
-            } while (token.Kind != TokenKind.EOF);
+            } while (token.Kind != ETokenType.EOF);
             //adding extra blanks, to avoid problems with overrun when probing alStart[i+x]
             for (int i = 1; i < Globals.extra; i++)
             {

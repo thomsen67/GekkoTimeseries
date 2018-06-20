@@ -488,6 +488,26 @@ namespace Gekko
             return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
         }
 
+        public static string StripQuotes(string s)
+        {
+            if (s == null) return null;
+            if (s.StartsWith("'") && s.EndsWith("'"))
+            {
+                s = s.Substring(1, s.Length - 2);
+            }
+            return s;
+        }
+
+        public static string StripQuotes2(string s)
+        {
+            if (s == null) return null;
+            if (s.StartsWith("\"") && s.EndsWith("\""))
+            {
+                s = s.Substring(1, s.Length - 2);
+            }
+            return s;
+        }
+
         //Maybe allowTurtle should be removed
         public static bool IsSimpleToken(string varName, bool allowFreqIndicator)
         {

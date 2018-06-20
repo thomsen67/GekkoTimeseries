@@ -2475,7 +2475,7 @@ namespace Gekko
                 string s = ss.Trim();  //will also remove any newline characters!
 
                 bool quotes = false;     
-                string s2 = Program.StripQuotes(s);
+                string s2 = G.StripQuotes(s);
                 if (s2.Length != s.Length)
                 {
                     s = s2;
@@ -5813,7 +5813,7 @@ namespace Gekko
                         try
                         {
                             string v = value.Trim();
-                            v = Program.StripQuotes(v);
+                            v = G.StripQuotes(v);
                             Program.databanks.GetFirst().AddIVariableWithOverwrite(varname, new ScalarString(v));
                             G.Writeln2("STRING " + varname + " = '" + v + "'");
                         }

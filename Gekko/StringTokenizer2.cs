@@ -33,6 +33,11 @@ namespace Gekko
         {
             this.storage = x;
         }
+
+        public int Count()
+        {
+            return this.storage.Count;
+        }
         
         public TokenHelper this[int index]
         {
@@ -70,26 +75,42 @@ namespace Gekko
             }
             return s;
         }
+    }
 
-        
+    public class TokenHelperComma
+    {
+        public TokenHelper comma = null;
+        public TokenList list = null;
+        public TokenHelperComma(TokenHelper comma, TokenList list)
+        {
+            this.comma = comma;
+            this.list = list;
+        }
 
-
+        public override string ToString()
+        {
+            string s = null;
+            if (this.comma != null) s += this.comma.ToString();
+            s += this.list.ToString();
+            return s;
+        }
     }
 
     public class TokenHelper
     {
         public string s = null;  //note that if subnodes != null, any string s here will be ignored. So you cannot BOTH has a string here, and a TokenList with subtokens. In this sense, the token containging the subtokens needs to be an empty placeholder.
-        public TokenKind type = TokenKind.Unknown;
+        public ETokenType type = ETokenType.Unknown;
         public string leftblanks = null; //if subnodes != null, leftblanks will always be = null.
         public int line = -12345;
         public int column = -12345;
         //below is advanced (recursive) stuff
-        public string subnodesType = null;  // "(", "[" or "{".
+        //public string subnodesType = null;  // "(", "[" or "{".
         public TokenList subnodes = null;
         public TokenHelper parent = null;
         //public TokenHelper siblingBefore = null;
         //public TokenHelper siblingAfter = null;
         public int id = -12345;
+        public bool artificialTopNode = false; //if true, it has subnodes, and the subnodes are not enclosed in parentheses
 
         public TokenHelper DeepClone(TokenHelper parent)
         {
@@ -100,9 +121,10 @@ namespace Gekko
             th.column = this.column;
             th.parent = parent;
             th.id = this.id;
-            th.subnodesType = this.subnodesType;            
+            th.artificialTopNode = this.artificialTopNode;
+            //th.subnodesType = this.subnodesType;            
             th.subnodes = this.subnodes;
-            if (th.subnodes != null) th.subnodes = this.subnodes.DeepClone(th);
+            if (th.HasChildren()) th.subnodes = this.subnodes.DeepClone(th);
             return th;
         }       
 
@@ -118,40 +140,81 @@ namespace Gekko
             this.subnodes = tl;
             if (type == null)
             {
-                this.subnodesType = Globals.artificial;
+                this.artificialTopNode = true;
             }
             else
             {
-                this.subnodesType = type;
+                //this.subnodesType = type;
             }
             OrganizeSubnodes(this);
+        }
+
+        public string SubnodesType()
+        {
+            if (!this.HasChildren()) return null;  //should not be called like this
+            if (this.artificialTopNode) return Globals.artificial;
+            return this.subnodes[0].s;  //the first item is also the subnode-type      
+        }
+
+        public bool HasNoChildren()
+        {
+            if (this.subnodes == null)
+            {
+                //leaf node
+                //this.s can be = null here, if node has been cleared
+                return true;
+            }
+            else
+            {
+                //internal node
+                if (this.s != null)
+                {
+                    throw new GekkoException();  //must no contain anything
+                }
+                return false;
+            }
+        }
+
+        public bool HasChildren()
+        {
+            return !HasNoChildren();
+        }
+
+        public void Clear()
+        {
+            this.s = null;
+            this.leftblanks = null;
+            this.subnodes = null;
+            //this.subnodesType = null;
         }
 
         //if (ii - 1 >= 0) subnode.siblingBefore = temp.subnodes[ii - 1];
         //if (ii + 1 < temp.subnodes.storage.Count) subnode.siblingAfter = temp.subnodes[ii + 1];
 
-        public List<Tuple<TokenList, TokenHelper>> SplitCommas()
+        public List<TokenHelperComma> SplitCommas()
         {
             //Splits up in bits, depending on commas. For instance [1, 2] is split in 1 and 2. But [1, [2, 3]] is split in 1 and [2, 3].            
             //Note that the commas are preserved as the second part of the tuple.
             //The last item (or the 1 item if there is only 1) will have null as second part of tuple.
             if (this.subnodes == null) return null;
-            List<Tuple<TokenList, TokenHelper>> temp = new List<Tuple<TokenList, TokenHelper>>();
+            List<TokenHelperComma> temp = new List<TokenHelperComma>();
             TokenList temp2 = new TokenList();
+            TokenHelper previousComma = null;
             for (int i = 0 + 1; i < this.subnodes.storage.Count - 1; i++)  //omit the parentheses
             {
                 if (this.subnodes[i].s == ",")
                 {
-                    //temp.Add(new TokenList(new List<TokenHelper>() { this.subnodes[i] }));
-                    temp.Add(new Tuple<TokenList, TokenHelper>(temp2, this.subnodes[i]));
+                    //TokenHelper thisComma = this.subnodes[i];
+                    temp.Add(new TokenHelperComma(previousComma, temp2));
                     temp2 = new TokenList();
+                    previousComma = this.subnodes[i];
                 }
                 else
                 {
                     temp2.storage.Add(this.subnodes[i]);
                 }
             }
-            temp.Add(new Tuple<TokenList, TokenHelper>(temp2, null));
+            temp.Add(new TokenHelperComma(previousComma, temp2));
             return temp;
         }
         public TokenHelper SiblingBefore()
@@ -198,7 +261,7 @@ namespace Gekko
         {
             //temp is an empty node (.s == null) with subnodes
             int counter = -1;
-            for (int ii = 0; ii < temp.subnodes.storage.Count; ii++)
+            for (int ii = 0; ii < temp.subnodes.Count(); ii++)
             {
                 TokenHelper subnode = temp.subnodes[ii];
                 counter++;
@@ -218,7 +281,7 @@ namespace Gekko
 
             //-1 is left sibling, +1 is right sibling
             int ii = this.id + offset;
-            if (ii < 0 || ii >= this.parent.subnodes.storage.Count)
+            if (ii < 0 || ii >= this.parent.subnodes.Count())
             {
                 return null;
             }
@@ -376,12 +439,12 @@ namespace Gekko
             return ret;
         }
 
-        protected Token CreateToken(TokenKind kind, string value)
+        protected Token CreateToken(ETokenType kind, string value)
         {
             return new Token(kind, value, line, column);
         }
 
-        protected Token CreateToken(TokenKind kind)
+        protected Token CreateToken(ETokenType kind)
         {
             string tokenData = data.Substring(savePos, pos - savePos);
             return new Token(kind, tokenData, saveLine, saveCol);
@@ -446,7 +509,7 @@ namespace Gekko
             switch (ch)
             {
                 case EOF:
-                    return CreateToken(TokenKind.EOF, string.Empty);
+                    return CreateToken(ETokenType.EOF, string.Empty);
 
                 case ' ':
                 case '\t':
@@ -479,7 +542,7 @@ namespace Gekko
                             Consume();  // on DOS/Windows we have \r\n for new line
                         line++;
                         column = 1;
-                        return CreateToken(TokenKind.EOL);
+                        return CreateToken(ETokenType.EOL);
                     }
                 case '\n':
                     {
@@ -487,7 +550,7 @@ namespace Gekko
                         Consume();
                         line++;
                         column = 1;
-                        return CreateToken(TokenKind.EOL);
+                        return CreateToken(ETokenType.EOL);
                     }
 
                 case '"':
@@ -496,7 +559,7 @@ namespace Gekko
                         {
                             StartRead();
                             Consume();
-                            return CreateToken(TokenKind.Unknown);
+                            return CreateToken(ETokenType.Unknown);
                         }
                         else
                         {
@@ -510,7 +573,7 @@ namespace Gekko
                         {
                             StartRead();
                             Consume();
-                            return CreateToken(TokenKind.Unknown);
+                            return CreateToken(ETokenType.Unknown);
                         }
                         else
                         {
@@ -539,13 +602,13 @@ namespace Gekko
                         {
                             StartRead();
                             Consume();
-                            return CreateToken(TokenKind.Symbol);
+                            return CreateToken(ETokenType.Symbol);
                         }
                         else
                         {
                             StartRead();
                             Consume();
-                            return CreateToken(TokenKind.Unknown);
+                            return CreateToken(ETokenType.Unknown);
                         }
                     }
 
@@ -581,7 +644,7 @@ namespace Gekko
                     break;
             }
 
-            return CreateToken(TokenKind.WhiteSpace);
+            return CreateToken(ETokenType.WhiteSpace);
 
         }
 
@@ -626,7 +689,7 @@ namespace Gekko
                     break;
             }
 
-            return CreateToken(TokenKind.Number);
+            return CreateToken(ETokenType.Number);
         }
 
         /// <summary>
@@ -650,7 +713,7 @@ namespace Gekko
                     break;
             }
 
-            return CreateToken(TokenKind.Word);
+            return CreateToken(ETokenType.Word);
         }
 
         /// <summary>
@@ -694,7 +757,7 @@ namespace Gekko
                     Consume();
             }
 
-            return CreateToken(TokenKind.QuotedString);
+            return CreateToken(ETokenType.QuotedString);
         }
 
         /// <summary>
@@ -757,7 +820,7 @@ namespace Gekko
                 }
             }
 
-            return CreateToken(TokenKind.Comment);
+            return CreateToken(ETokenType.Comment);
         }
 
         /// <summary>
@@ -797,7 +860,7 @@ namespace Gekko
                     Consume();
                 }
             }
-            return CreateToken(TokenKind.Comment);
+            return CreateToken(ETokenType.Comment);
         }
 
         /// <summary>
@@ -840,7 +903,7 @@ namespace Gekko
                 else
                     Consume();
             }
-            return CreateToken(TokenKind.QuotedString);
+            return CreateToken(ETokenType.QuotedString);
         }
 
         /// <summary>
@@ -883,13 +946,13 @@ namespace Gekko
             {
                 token = tok.Next();  //this is where the action is!
                 string value = token.Value;
-                TokenKind kind = token.Kind;
+                ETokenType kind = token.Kind;
                 TokenHelper two = new TokenHelper();
                 two.s = value;
                 two.type = kind;
                 two.leftblanks = white;
 
-                if (kind == TokenKind.WhiteSpace)
+                if (kind == ETokenType.WhiteSpace)
                 {
                     white = value;
                 }
@@ -901,7 +964,7 @@ namespace Gekko
                     white = null;
                 }
 
-            } while (token.Kind != TokenKind.EOF);
+            } while (token.Kind != ETokenType.EOF);
             for (int i = 0; i < emptyTokensAtEnd; i++) a.Add(new TokenHelper());
             return new TokenList(a);
         }

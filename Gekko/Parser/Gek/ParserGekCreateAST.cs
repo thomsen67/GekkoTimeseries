@@ -1033,7 +1033,7 @@ namespace Gekko.Parser.Gek
             {
                 token = tok.Next();
                 al.Add(token.Value); alType.Add(token.Kind.ToString());
-            } while (token.Kind != TokenKind.EOF);            
+            } while (token.Kind != ETokenType.EOF);            
             for (int i = 0; i < al.Count; i++)
             {
                 if (alType[i] == "Number" && al[i].EndsWith("."))

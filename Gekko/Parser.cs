@@ -202,7 +202,7 @@ namespace Gekko
                     int i = s.LastIndexOf('=');
                     if (i == -1) continue;
                     string token = s007.Substring(0, i).Trim();
-                    token = Program.StripQuotes(token).Trim();
+                    token = G.StripQuotes(token).Trim();
                     ss2.Add(token);
                 }
 
