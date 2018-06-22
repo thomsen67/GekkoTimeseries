@@ -15907,15 +15907,16 @@ namespace Gekko
                                         helper.list[0].s = G.StripQuotes(helper.list[0].s);
                                     }
                                 }
-                                else if (helper.list.storage.Count == 3)  //t and plusminus and number
+                                else if (helper.list.storage.Count == 3)  //x and plusminus and number
                                 {
 
                                     //the ... argument in (... , ... , ... , ...) is an expression, for instance t-1 etc.
                                     if (helper.list[0].type == ETokenType.Word)
                                     {
-                                        if (iSplit == split.Count - 1 && helper.list[0].s == "t")
+                                        //if (iSplit == split.Count - 1 && helper.list[0].s == "t")                                        
+                                        if (true)
                                         {
-                                            //must be last and must begin with "t", like in "x(a, 'b', t-1)"
+                                            //does not need to be last. Can be "t" in "x(a, 'b', t-1)", but also "a" in "x(y, a-1, t)"
                                             if (helper.list[1] != null && (helper.list[1].s == "-" || helper.list[1].s == "+"))
                                             {
                                                 //...t+... or ...t-...
@@ -15935,22 +15936,29 @@ namespace Gekko
                                                         G.Writeln2("*** ERROR: Expected '" + number + "' to be an integer, " + helper.list[2].LineAndPosText());
                                                         throw new GekkoException();
                                                     }
-                                                    if (plusMinus == "-") iNumber = -iNumber;
+                                                    //if (plusMinus == "-") iNumber = -iNumber;
 
 
-                                                    //x(t-1) --> x[-1]
-                                                    //x(i, t-1) --> x[#i][-1]
-                                                    if (iSplit == 0)
+                                                    if (iSplit == split.Count - 1 && helper.list[0].s == "t")
                                                     {
-                                                        //helper.comma will be = null
+
+                                                        //x(t-1) --> x[-1]
+                                                        //x(i, t-1) --> x[#i][-1]
+                                                        if (iSplit == 0)
+                                                        {
+                                                            //helper.comma will be = null
+                                                        }
+                                                        else
+                                                        {
+                                                            helper.comma.s = "][";
+                                                        }
+                                                        helper.list[0].Clear();  //kill the 't'completely including blanks
+                                                        helper.list[1].leftblanks = null;  //no blanks to the left of for instance '-1'
                                                     }
                                                     else
                                                     {
-                                                        helper.comma.s = "][";
+                                                        helper.list[0].s = "#" + helper.list[0].s;
                                                     }
-                                                    helper.list[0].Clear();  //kill the 't'completely including blanks
-                                                    helper.list[1].leftblanks = null;  //no blanks to the left of for instance '-1'
-
 
                                                 }
                                             }
@@ -15995,7 +16003,7 @@ namespace Gekko
                 if (node.s == "[") node.s = "(";
                 else if (node.s == "{") node.s = "(";
                 else if (node.s == "]") node.s = ")";
-                else if (node.s == "}") node.s = "}";
+                else if (node.s == "}") node.s = ")";
                 return;
             }
             else
@@ -16004,7 +16012,7 @@ namespace Gekko
 
                 foreach (TokenHelper child in node.subnodes.storage)
                 {
-                    WalkTokens(child);
+                    WalkTokensHandleParentheses(child);
                 }
             }
         }
@@ -16018,7 +16026,10 @@ namespace Gekko
 
                 int eqCounter = 0;
 
-                string txt = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "model.gms");
+                //GAMS comments: star as first char, $ontext/offtext, # as end of line, /* */, 
+
+                //string txt = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "model.gms");
+                string txt = textInputRaw;
                 var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
                 var tags2 = new List<string>() { "//" };
                 var tags3 = new List<Tuple<string, string>>() { new Tuple<string, string>("$ontext", "$offtext") };
@@ -16206,10 +16217,36 @@ namespace Gekko
                             TokenHelper lhsTokensGekko = e.lhsTokensGams.DeepClone(null);
                             TokenHelper rhsTokensGekko = e.rhsTokensGams.DeepClone(null);
 
+                            //if (lhsTokensGams.ToString().ToLower().Contains("qx('tot',t)"))
+                            //{
+
+                            //}
+
+                            WalkTokensHandleParentheses(lhsTokensGekko); //changes '[' and '{' into '('
+                            WalkTokensHandleParentheses(rhsTokensGekko); //changes '[' and '{' into '('
                             WalkTokens(lhsTokensGekko);
                             WalkTokens(rhsTokensGekko);
 
-                            sb.Append(lhsTokensGekko.ToStringTrim() + " = " + rhsTokensGekko.ToStringTrim() + ";" + G.NL);
+                            //sb.Append(lhsTokensGekko.ToStringTrim() + " = " + rhsTokensGekko.ToStringTrim() + ";" + G.NL);
+
+                            string lhs = lhsTokensGekko.ToStringTrim();
+                            string rhs = rhsTokensGekko.ToStringTrim();
+
+                            if(lhs.Contains("pI[#i,#ds]*qI[#i,#ds]")) {
+
+                            }
+
+
+                            if (lhs.Contains("$") || rhs.Contains("$"))
+                            {
+
+                            }
+                            else
+                            {
+                                sb.Append("PRT " + lhs + ";" + G.NL);
+                                sb.Append("PRT " + rhs + ";" + G.NL);
+                                sb.AppendLine();
+                            }
 
                             string varname = null;
                             varname = lhsTokensGams.subnodes[0].ToStringTrim();  //will also work for p(t)*x(t) =e= ... type of eqsa
@@ -16250,7 +16287,7 @@ namespace Gekko
                 Program.modelGams.equations = xx;
                 G.Writeln2("Found " + xx.Count + " distinct equations");
 
-                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\equations.gcm", Program.GekkoFileReadOrWrite.Write))
+                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\model.gcm", Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
                     sw.Write(sb);

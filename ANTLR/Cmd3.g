@@ -1967,6 +1967,8 @@ expressionOrNothing:        expression -> expression
 // ------------------- flexible list --------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
+seqOfBankvarnames:          bankvarname (COMMA2 bankvarname)* ->  ^(ASTBANKVARNAMELIST bankvarname+);
+
 //only use seriesnamesList, do not allow varnamesList or listWithoutParenthesis.
 
 //used in DISP and WRITE, for instance WRITE x, %x, b:#x ---> converted to WRITE ('x', '%x', 'b:#x')
@@ -2215,7 +2217,7 @@ cls:					    CLS -> ^({token("ASTCLS", ASTCLS, $CLS.Line)});
 // CLOSE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 							
-close:					    CLOSE closeOpt1? listItems -> ^({token("ASTCLOSE", ASTCLOSE, $CLOSE.Line)} listItems closeOpt1?)
+close:					    CLOSE closeOpt1? seqOfBankvarnames -> ^({token("ASTCLOSE", ASTCLOSE, $CLOSE.Line)} seqOfBankvarnames closeOpt1?)
 						  | CLOSE closeOpt1? star -> ^({token("ASTCLOSESTAR", ASTCLOSESTAR, $CLOSE.Line)} closeOpt1?)
 						    ;
 closeOpt1:				    ISNOTQUAL | leftAngle closeOpt1h* RIGHTANGLE -> ^(ASTOPT1 closeOpt1h*);
