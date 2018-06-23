@@ -16040,44 +16040,29 @@ namespace Gekko
 
                 foreach (TokenHelper tok in tokens2.subnodes.storage)
                 {
-                    string s = tok.ToString();
-                    if (G.Equal(tok.s, "equation"))
+                    
+                    if (tok.s == "." && tok.Offset(1).s == "." && tok.Offset(1).leftblanks == null)
                     {
-                        if (tok.Offset(-1) == null || tok.Offset(-1).s == ";" || tok.Offset(-1).type == ETokenType.EOL)
+                        if (tok.Offset(2).s == "\\" || tok.Offset(2).s == "/")
                         {
-                            //either first in file, or ';' before, or newline before
-                            //apparantly, ending with ';' in equation is not mandatory
-
-                            int i = 1;
-
-                            string name3 = tok.Offset(i)?.s;
-                            string sets3 = null;
-
-                            if (name3 == null)
+                            //this may be part of a path, $GDXIN ..\Data\ADAM\estbk_okt16.gdx
+                        }
+                        else
+                        {
+                            int iEqStart = 0;
+                            //searches for '..' with no blank between (could be improved)
+                            //now we search backwards for start of line
+                            for (int i2 = -1; i2 > -int.MaxValue; i2--)
                             {
-                                G.Writeln2("*** ERROR: Expected eq name, " + tok.Offset(i).LineAndPosText());
-                                throw new GekkoException();
+                                int iLineStart = -12345;
+                                if (tok.Offset(i2) == null || tok.Offset(i2).type == ETokenType.EOL)
+                                {
+                                    iEqStart = i2 + 1;
+                                    break;
+                                }
                             }
-                            i++;
 
-                            TokenHelper parentheses = tok.Offset(i);
-                            if (parentheses.SubnodesType() == "(")
-                            {
-                                sets3 = parentheses.ToString();
-                            }
-                            i++;
-
-                            string semicolon = tok.Offset(i)?.s;
-                            if (semicolon != ";")
-                            {
-                                G.Writeln2("*** ERROR: Expected set definition to end with ';', " + tok.Offset(i).LineAndPosText());
-                                throw new GekkoException();
-                            }
-                            i++;
-
-                            if (tok.Offset(i).type == ETokenType.EOL) i++;  //consume a newline
-
-                            int iEqStart = i;
+                            int i = iEqStart;
 
                             //-----------------------------------------------
                             //now we are ready for the equation definition
@@ -16109,16 +16094,12 @@ namespace Gekko
                             TokenHelper rhsTokensGams = null;
 
                             nameGams = tok.Offset(i)?.s;
-                            if (!G.Equal(name3, nameGams))
-                            {
-                                G.Writeln2("*** ERROR: Eq names '" + name3 + "' and '" + nameGams + "' do not match, " + tok.Offset(i).LineAndPosText());
-                                throw new GekkoException();
-                            }
+
                             i++;
 
                             //this may be parentheses
                             TokenHelper tok2 = tok.Offset(i);
-                            if (tok2.SubnodesType() == "(")
+                            if (tok2.SubnodesTypeParenthesisStart())
                             {
                                 setsGams = tok2.subnodes.ToString();
                                 i++;
@@ -16128,7 +16109,7 @@ namespace Gekko
                                     i++;
 
                                     TokenHelper tok3 = tok.Offset(i);
-                                    if (tok3.SubnodesType() == "(")
+                                    if (tok3.SubnodesTypeParenthesisStart())
                                     {
                                         dollarGams = tok3.subnodes.ToString();
                                         i++;
@@ -16144,7 +16125,7 @@ namespace Gekko
                                         i++;
 
                                         string s8 = tok.Offset(i).ToString();
-                                        if (!(tok.Offset(i).SubnodesType() == "("))
+                                        if (!(tok.Offset(i).SubnodesTypeParenthesisStart()))
                                         {
                                             G.Writeln2("*** ERROR: Expected a (...) parenthesis instead of '" + s8 + "' , " + tok.Offset(i).LineAndPosText());
                                             throw new GekkoException();
@@ -16232,7 +16213,8 @@ namespace Gekko
                             string lhs = lhsTokensGekko.ToStringTrim();
                             string rhs = rhsTokensGekko.ToStringTrim();
 
-                            if(lhs.Contains("pI[#i,#ds]*qI[#i,#ds]")) {
+                            if (lhs.Contains("pI[#i,#ds]*qI[#i,#ds]"))
+                            {
 
                             }
 

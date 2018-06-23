@@ -200,6 +200,28 @@ namespace Gekko
             return rv;
         }
 
+        //is recursive
+        public static List<IVariable> ExplodeIvariables(IVariable iv)
+        {
+            List<IVariable> temp = new List<IVariable>();
+            if (iv.Type() == EVariableType.List)
+            {
+                foreach (IVariable temp2 in ((List)iv).list)
+                {
+                    if (temp2.Type() == EVariableType.List)
+                    {
+                        List<IVariable> temp3 = ExplodeIvariables(temp2);
+                        temp.AddRange(temp3);
+                    }
+                    else
+                    {
+                        temp.Add(temp2);
+                    }
+                }
+            }
+            else temp.Add(iv);
+            return temp;
+        }
 
         public static void SeriesQuestion()
         {
@@ -2103,8 +2125,8 @@ namespace Gekko
             }
             else
             {
-                string s2 = O.ConvertToString(x2);
-                return new ScalarString(x1_string + s2);
+                G.Writeln2("*** ERROR: Expected '" + x1_string + "' to be integer type");
+                throw new GekkoException();
             }
         }
         
@@ -3755,6 +3777,10 @@ namespace Gekko
         public static string ConvertToString(string s)
         {
             return s;
+        }
+        public static IVariable AlternativeConvertToString(IVariable iv)
+        {
+            return iv;
         }
 
         public static List<IVariable> ConvertToList(IVariable a)
@@ -5520,7 +5546,7 @@ namespace Gekko
         public class Close
         {
             public string name = null;  //only if '*' is indicated, not used otherwise
-            public List<string> listItems = null;
+            public List listItems = null;
             public string opt_save = null;
             public void Exe()
             {
@@ -5547,14 +5573,19 @@ namespace Gekko
                 }
                 else
                 {
-                    foreach (string dbName in this.listItems)
+                    foreach (IVariable iv in this.listItems.list)
                     {
-                        if (G.Equal(dbName, Globals.Work) || G.Equal(dbName, Globals.Ref))
+                        List<IVariable> list = ExplodeIvariables(iv);
+                        foreach (IVariable iv2 in list)
                         {
-                            G.Writeln2("*** ERROR: Databanks '" + Globals.Work + "' or '" + Globals.Ref + "' cannot be closed (see CLEAR command)");
-                            throw new GekkoException();
+                            string dbName = iv2.ConvertToString();
+                            if (G.Equal(dbName, Globals.Work) || G.Equal(dbName, Globals.Ref))
+                            {
+                                G.Writeln2("*** ERROR: Databanks '" + Globals.Work + "' or '" + Globals.Ref + "' cannot be closed (see CLEAR command)");
+                                throw new GekkoException();
+                            }
+                            databanks.Add(dbName);
                         }
-                        databanks.Add(dbName);
                     }
                 }
                 foreach (string databank in databanks)
@@ -5597,6 +5628,7 @@ namespace Gekko
             }
 
             
+
         }
 
         public class Open

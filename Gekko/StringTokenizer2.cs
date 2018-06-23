@@ -156,6 +156,18 @@ namespace Gekko
             return this.subnodes[0].s;  //the first item is also the subnode-type      
         }
 
+        public bool SubnodesTypeParenthesisStart()
+        {
+            if (this.SubnodesType() == "(" || this.SubnodesType() == "[" || this.SubnodesType() == "{") return true;
+            return false;
+        }
+
+        public bool SubnodesTypeParenthesisEnd()
+        {
+            if (this.SubnodesType() == ")" || this.SubnodesType() == "]" || this.SubnodesType() == "}") return true;
+            return false;
+        }
+
         public bool HasNoChildren()
         {
             if (this.subnodes == null)

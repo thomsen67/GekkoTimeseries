@@ -851,9 +851,9 @@ namespace Gekko.Parser.Gek
                     case "ASTCLOSE":
                         {                            
                             node.Code.A("O.Close o" + Num(node) + " = new O.Close();" + G.NL);
-                            node.Code.A("o" + Num(node) + ".name = `" + node[0].Text + "`;" + G.NL);
-                            GetCodeFromAllChildren(node);
-                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            //node.Code.A("o" + Num(node) + ".name = `" + node[0].Text + "`;" + G.NL);
+                            node.Code.A("o" + Num(node) + ".listItems = " + node[0].Code + ";" + G.NL);                            
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
                         break;
                     case "ASTRESET":
@@ -3439,30 +3439,55 @@ namespace Gekko.Parser.Gek
                         {
                             //TODO: Handle a list like {#m}, obtaining the names of the elements #0932854325
                             
+
+                            if (true && Globals.runningOnTTComputer)
+                            {
+
+                            }
+                            
                             //In this case, if we override what has been made in subtree (where the items will produce O.Lookup(...)
                             //Instead, we convert it to a list of strings.
                             //See the structure under "ASTBANKVARNAME"
-                            string code = "O.CreateListFromStrings(new string[] {";
+                            
+                            string code = "new List(new List<IVariable> {";
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
-                                bool fail = false;
-                                if (child.Text != "ASTBANKVARNAME") fail = true; //should not be possible
-                                string bankname = null; if (child?[0]?[0]?[0]?.Text != null && child?[0]?[0]?[0]?.Text != "ASTIDENT") fail = true; else bankname = child?[0]?[0]?[0]?[0]?.Text;
-                                string sigil = child?[1]?[0]?[0]?.Text;
-                                if (sigil == "ASTPERCENT") sigil = Globals.symbolScalar.ToString();
-                                else if (sigil == "ASTHASH") sigil = Globals.symbolCollection.ToString();
-                                string varname = null; if (child?[1]?[1]?[0]?[0]?.Text != null && child?[1]?[1]?[0]?[0]?.Text != "ASTIDENT") fail = true; else varname = child?[1]?[1]?[0]?[0]?[0]?.Text;
-                                string freq = null; if (child?[1]?[2]?[0]?[0]?.Text != null && child?[1]?[2]?[0]?[0]?.Text != "ASTIDENT") fail = true; else freq = child?[1]?[2]?[0]?[0]?[0]?.Text;
-                                if (fail)
+                                string name = null;
+                                if (false)
                                 {
-                                    G.Writeln2("*** ERROR: List item is not a simple name composed of bankname, varname and frequency");
-                                    G.Writeln2("*** ERROR: Allowed examples: x, b:x, %x, #x, b:%x, b:x!q and similar simple names");
-                                    throw new GekkoException();
+                                    bool fail = false;
+                                    if (child.Text != "ASTBANKVARNAME") fail = true; //should not be possible
+                                    string bankname = null; if (child?[0]?[0]?[0]?.Text != null && child?[0]?[0]?[0]?.Text != "ASTIDENT") fail = true; else bankname = child?[0]?[0]?[0]?[0]?.Text;
+                                    string sigil = child?[1]?[0]?[0]?.Text;
+                                    if (sigil == "ASTPERCENT") sigil = Globals.symbolScalar.ToString();
+                                    else if (sigil == "ASTHASH") sigil = Globals.symbolCollection.ToString();
+                                    string varname = null; if (child?[1]?[1]?[0]?[0]?.Text != null && child?[1]?[1]?[0]?[0]?.Text != "ASTIDENT") fail = true; else varname = child?[1]?[1]?[0]?[0]?[0]?.Text;
+                                    string freq = null; if (child?[1]?[2]?[0]?[0]?.Text != null && child?[1]?[2]?[0]?[0]?.Text != "ASTIDENT") fail = true; else freq = child?[1]?[2]?[0]?[0]?[0]?.Text;
+                                    if (fail)
+                                    {
+                                        G.Writeln2("*** ERROR: List item is not a simple name composed of bankname, varname and frequency");
+                                        G.Writeln2("*** ERROR: Allowed examples: x, b:x, %x, #x, b:%x, b:x!q and similar simple names");
+                                        throw new GekkoException();
+                                    }
+                                    name = sigil + varname;
+                                    if (freq != null) name = name + Globals.freqIndicator + freq;
+                                    if (bankname != null) name = bankname + Globals.symbolBankColon + name;
                                 }
-                                string name = sigil + varname;
-                                if (freq != null) name = name + Globals.freqIndicator + freq;
-                                if (bankname != null) name = bankname + Globals.symbolBankColon + name;
-                                code += "`" + name + "`, ";
+                                else
+                                {
+                                    if (child.AlternativeCode == null)
+                                    {
+                                        G.Writeln2("*** ERROR #64537346");
+                                        throw new GekkoException();
+                                    }
+                                    name = child.AlternativeCode.ToString();
+                                    if (name == null || name == "")
+                                    {
+                                        G.Writeln2("*** ERROR #64537346");
+                                        throw new GekkoException();
+                                    }
+                                }
+                                code += name + ", ";
                             }
                             code = code.Substring(0, code.Length - ", ".Length);
                             code += "})";
@@ -3626,12 +3651,14 @@ namespace Gekko.Parser.Gek
                                     string simpleFreqText = Globals.QT + simpleFreq + Globals.QT;
                                     if (simpleFreq == "") simpleFreqText = "null";
 
-
-
                                     string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." + type + ")";
-
                                     node.Code.CA(lookupCode);
 
+                                    node.AlternativeCode = new GekkoSB();
+                                    string ss = sigil + simpleName;
+                                    if (simpleBankText != "null") ss = simpleBankText + Globals.symbolBankColon + ss;
+                                    if (simpleFreqText != "null") ss = ss + Globals.freqIndicator + simpleFreqText;
+                                    node.AlternativeCode.A("new ScalarString(" + Globals.QT + ss + Globals.QT + ")");
                                 }
                                 else
                                 {
@@ -3652,9 +3679,10 @@ namespace Gekko.Parser.Gek
                                         bankNameCs = node[0][0].Code.ToString();
                                         nameAndBankCode = "(" + bankNameCs + ")" + ".Add(smpl, O.scalarStringColon)" + ".Add(smpl, " + node[1].Code + ")";
                                     }
-
                                     node.Code.A("O.Lookup(smpl, " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." + type + ")");
-
+                                    
+                                    node.AlternativeCode = new GekkoSB();
+                                    node.AlternativeCode.A("" + nameAndBankCode + "");     
                                 }
                             }
                         }

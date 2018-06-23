@@ -40,7 +40,9 @@ namespace Gekko.Parser
 
         //public string Code = null; //the C# code produced while walking the tree
         public Parser.Gek.GekkoSB Code = new Parser.Gek.GekkoSB(); //the C# code produced while walking the tree
-        
+
+        public Parser.Gek.GekkoSB AlternativeCode = null;  //used for ASTVARIABLEANDNAME
+
         public string CodeSentFromSubTree = null; //the C# code produced while walking the tree
         //public GekkoStringBuilder s = null;
         public ASTNode Parent = null;

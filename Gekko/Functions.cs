@@ -1549,12 +1549,19 @@ namespace Gekko
             return x.Type() == EVariableType.Val || x.Type() == EVariableType.Series || x.Type() == EVariableType.Series;
         }
 
+        //same as power()
         public static IVariable pow(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             if (IsGekkoNull(x1)) return x1;
             return O.Power(smpl, x1, x2);            
         }
-        
+
+        //same as pow()
+        public static IVariable power(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        {
+            return pow(smpl, x1, x2);
+        }
+
         [MyCustom(Lag = "lag=1")]
         public static IVariable pch(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
         {
@@ -1570,6 +1577,20 @@ namespace Gekko
                 throw new GekkoException();
             }
             return null;
+        }
+
+        public static IVariable seq(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        {
+            int i1 = O.ConvertToInt(x1);
+            int i2 = O.ConvertToInt(x2);
+            //List m = new List()
+            List<IVariable> mm = new List<IVariable>();
+            for (int i = i1; i <= i2; i++)
+            {
+                ScalarVal d = new ScalarVal(i);
+                mm.Add(d);
+            }
+            return new List(mm);
         }
 
         private static bool IsGekkoNull(IVariable x1)
@@ -1811,7 +1832,8 @@ namespace Gekko
                 List<IVariable> l = ((List)x).list;
                 foreach (IVariable iv in l)
                 {
-                    string ss = O.ConvertToString(iv);
+                    IVariable iv2 = tostring(smpl, iv);
+                    string ss = O.ConvertToString(iv2);
                     s += ss + ", ";
                 }                
                 if (s.EndsWith(", ")) s = s.Substring(0, s.Length - 2);
@@ -1819,6 +1841,28 @@ namespace Gekko
             else if (x.Type() == EVariableType.Series)
             {
                 G.Writeln2("*** ERROR: Cannot convert a SERIES to a STRING");
+                throw new GekkoException();
+            }
+            return new ScalarString(s);
+        }
+
+        public static IVariable strings(GekkoSmpl smpl, IVariable x)
+        {
+            string s = null;
+            if (x.Type() == EVariableType.List)
+            {
+                List m = x as List;
+                List<IVariable> m2 = new List<IVariable>();
+                foreach (IVariable iv in m.list)
+                {
+                    IVariable iv2 = tostring(smpl, iv);
+                    m2.Add(iv2);
+                }
+                return new List(m2);
+            }
+            else 
+            {
+                G.Writeln2("*** ERROR: Expected a LIST variable as argument");
                 throw new GekkoException();
             }
             return new ScalarString(s);
