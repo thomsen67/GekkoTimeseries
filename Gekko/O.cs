@@ -5660,8 +5660,12 @@ namespace Gekko
 
         public class Open
         {
-            public List<List<string>> openFileNames = new List<List<string>>();
+            //public List<List<string>> openFileNames = new List<List<string>>();
             //public string fileName = null;
+
+            public List openFileNames = null;
+            public List openFileNamesAs = null;
+
             public string opt_tsd = null;
             public string opt_gbk = null;
             public string opt_gdx = null;
@@ -5704,7 +5708,32 @@ namespace Gekko
                 }
 
                 ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
-                hlp.openFileNames = this.openFileNames;                
+
+
+                //hlp.openFileNames = this.openFileNames;
+                hlp.openFileNames = new List<List<string>>();
+
+                if (openFileNamesAs != null && openFileNames.list.Count != openFileNamesAs.list.Count)
+                {
+                    G.Writeln2("*** ERROR: Provided " + openFileNames.list.Count + "filenames, but got only " + openFileNamesAs.list.Count + " alias (AS) names");
+                    throw new GekkoException();
+                }
+
+                for (int i = 0; i < openFileNames.list.Count; i++)
+                {
+                    List<string> temp = new List<string>();
+                    temp.Add(openFileNames.list[i].ConvertToString());
+                    if (openFileNamesAs != null)
+                    {
+                        temp.Add(openFileNamesAs.list[i].ConvertToString());
+                    }
+                    else
+                    {
+                        temp.Add(null);
+                    }
+                    hlp.openFileNames.Add(temp);
+                }
+                              
                 if (this.opt_csv == "yes") hlp.Type = EDataFormat.Csv;
                 if (this.opt_prn == "yes") hlp.Type = EDataFormat.Prn;
                 if (this.opt_pcim == "yes") hlp.Type = EDataFormat.Pcim;

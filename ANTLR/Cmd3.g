@@ -83,7 +83,7 @@ ASTIDENTDIGIT;
 	ASTLISTFILE;
 	ASTMAPDEF;
 	ASTMAPITEM;
-
+	ASTFILENAMELIST;
 	ASTDOLLARCONDITIONAL;
 	ASTLISTDEF;
 ASTOR;
@@ -1967,7 +1967,16 @@ expressionOrNothing:        expression -> expression
 // ------------------- flexible list --------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
+//accepts b:x!q but also {%s}-stuff including {#m}
 seqOfBankvarnames:          bankvarname (COMMA2 bankvarname)* ->  ^(ASTBANKVARNAMELIST bankvarname+);
+
+//accepts filenames without hyphens, but also strings (for instance 'text' or %s). So data.gbk or 'data.gbk' but not {'data.gbk'}.
+//distinguishing between a or 'a' is not interesting here, as it is for seqOfBankvarnames
+//accepts a, c:\a.b, '...', %s, #m.
+seqOfFileNames:             fileName (COMMA2 fileName)* ->  ^(ASTFILENAMELIST fileName+);
+seqOfFileNamesStar:         star -> ^(ASTFILENAMELIST ASTFILENAMESTAR)
+						  | fileName (COMMA2 fileName)* ->  ^(ASTFILENAMELIST fileName+)
+						    ;
 
 //only use seriesnamesList, do not allow varnamesList or listWithoutParenthesis.
 
@@ -2354,8 +2363,10 @@ olsOpt1h:                   dates -> ^(ASTDATES dates)
 // OPEN
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
+//open:                       OPEN openOpt1? openHelper (COMMA2 openHelper)* -> ^({token("ASTOPEN", ASTOPEN, $OPEN.Line)} openOpt1? openHelper+);
 open:                       OPEN openOpt1? openHelper (COMMA2 openHelper)* -> ^({token("ASTOPEN", ASTOPEN, $OPEN.Line)} openOpt1? openHelper+);
-openHelper:                 fileNameStar (AS name)? -> ^(ASTOPENHELPER ^(ASTFILENAME fileNameStar) ^(ASTAS name?));
+
+openHelper:                 seqOfFileNamesStar (AS seqOfBankvarnames)? -> ^(ASTOPENHELPER ^(ASTFILENAME seqOfFileNamesStar) ^(ASTAS seqOfBankvarnames?));
 openOpt1:                   ISNOTQUAL | leftAngle openOpt1h* RIGHTANGLE -> openOpt1h*;
 openOpt1h:                  TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
