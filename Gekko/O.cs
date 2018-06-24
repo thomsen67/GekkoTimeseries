@@ -2098,36 +2098,43 @@ namespace Gekko
             //Program.OPrint(smpl, x);
         }
 
-        public static IVariable AddSpecial(IVariable x1, IVariable x2, bool minus)
+        public static IVariable AddSpecial(GekkoSmpl smpl, IVariable x1, IVariable x2, bool minus)
         {
-            ScalarString s1 = x1 as ScalarString;
-            if (s1 == null)
+            bool specialAdd = false;
+            if (x1.Type() == EVariableType.String && x2.Type() == EVariableType.Val)
             {
-                G.Writeln2("*** ERROR: Expected list element to be of string type");
-                throw new GekkoException();
-            }
-            string x1_string = s1.string2;
+                string x1_string = ((ScalarString)x1).string2;
+                bool x1IsInteger = false;
+                int i1 = 0;
+                if (int.TryParse(x1_string, out i1))
+                {
+                    x1IsInteger = true;
+                }
 
-            bool x1IsInteger = false;
-            int i = -12345;
-            if (int.TryParse(x1_string, out i))
-            {
-                x1IsInteger = true;
-            }
+                double x2_val = ((ScalarVal)x2).val;
+                bool x2IsInteger = false;
+                int i2 = 0;
+                if (int.TryParse(x1_string, out i2))
+                {
+                    x2IsInteger = true;
+                }
 
-            if (x1IsInteger)
+                if (x1IsInteger && x2IsInteger)
+                {
+                    int ii = i1 + i2;
+                    if (minus) ii = i1 - i2;
+                    return new ScalarString(ii.ToString());
+                }
+            }
+            if (minus)
             {
-                int i2 = O.ConvertToInt(x2);
-                int ii = i + i2;
-                if (minus) ii = i - i2;
-                return new ScalarString(ii.ToString());
-                //return new ScalarVal(ii);
+                return Subtract(smpl, x1, x2);
             }
             else
             {
-                G.Writeln2("*** ERROR: Expected '" + x1_string + "' to be integer type");
-                throw new GekkoException();
+                return Add(smpl, x1, x2);
             }
+
         }
         
 
@@ -5582,6 +5589,26 @@ namespace Gekko
                             if (G.Equal(dbName, Globals.Work) || G.Equal(dbName, Globals.Ref))
                             {
                                 G.Writeln2("*** ERROR: Databanks '" + Globals.Work + "' or '" + Globals.Ref + "' cannot be closed (see CLEAR command)");
+                                throw new GekkoException();
+                            }
+                            if (dbName.Contains(Globals.symbolBankColon))
+                            {
+                                G.Writeln2("*** ERROR: Bankname not accepted as part of name");
+                                throw new GekkoException();
+                            }
+                            if (dbName.Contains(Globals.symbolScalar))
+                            {
+                                G.Writeln2("*** ERROR: Scalarname ("+Globals.symbolScalar+") not accepted, use {%x} instead of %x");
+                                throw new GekkoException();
+                            }
+                            if (dbName.Contains(Globals.symbolCollection))
+                            {
+                                G.Writeln2("*** ERROR: Collectionname (" + Globals.symbolCollection + ") not accepted, use {#x} instead of #x");
+                                throw new GekkoException();
+                            }
+                            if (dbName.Contains(Globals.freqIndicator))
+                            {
+                                G.Writeln2("*** ERROR: Frequency (" + Globals.freqIndicator + ") not accepted as part of name");
                                 throw new GekkoException();
                             }
                             databanks.Add(dbName);

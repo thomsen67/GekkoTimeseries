@@ -1203,11 +1203,11 @@ namespace Gekko.Parser.Gek
                                 {
                                     if (child[0].Text == "ASTPLUS")
                                     {
-                                        s = "O.AddSpecial(" + internalName + ", " + child[0][1].Code + ", false)";
+                                        s = "O.AddSpecial(smpl, " + internalName + ", " + child[0][1].Code + ", false)";
                                     }
                                     else
                                     {
-                                        s = "O.AddSpecial(" + internalName + ", " + child[0][1].Code + ", true)";
+                                        s = "O.AddSpecial(smpl, " + internalName + ", " + child[0][1].Code + ", true)";
                                     }
                                 }
                                 else
@@ -2930,7 +2930,7 @@ namespace Gekko.Parser.Gek
                                     {
                                         if (child[0].Text == "ASTPLUS")
                                         {
-                                            string s = "O.AddSpecial(" + internalName + ", " + child[0][1].Code + ", false)";
+                                            string s = "O.AddSpecial(smpl, " + internalName + ", " + child[0][1].Code + ", false)";
                                             indexes += s;
                                             if (reportInterior)
                                             {
@@ -2939,7 +2939,7 @@ namespace Gekko.Parser.Gek
                                         }
                                         else
                                         {
-                                            string s = "O.AddSpecial(" + internalName + ", " + child[0][1].Code + ", true)";
+                                            string s = "O.AddSpecial(smpl, " + internalName + ", " + child[0][1].Code + ", true)";
                                             indexes += s;
                                             if (reportInterior)
                                             {
@@ -3646,18 +3646,18 @@ namespace Gekko.Parser.Gek
 
                                     string hasSigilText = "false";
                                     if (sigil != null) hasSigilText = "true";
-                                    string simpleBankText = Globals.QT + simpleBank + Globals.QT;
-                                    if (simpleBank == "") simpleBankText = "null";
-                                    string simpleFreqText = Globals.QT + simpleFreq + Globals.QT;
-                                    if (simpleFreq == "") simpleFreqText = "null";
+                                    string simpleBankText777 = Globals.QT+simpleBank+ Globals.QT;
+                                    if (simpleBank == "") simpleBankText777 = "null";
+                                    string simpleFreqText777 = Globals.QT+simpleFreq+ Globals.QT;
+                                    if (simpleFreq == "") simpleFreqText777 = "null";
 
-                                    string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." + type + ")";
+                                    string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText777 + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText777  + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." + type + ")";
                                     node.Code.CA(lookupCode);
 
                                     node.AlternativeCode = new GekkoSB();
                                     string ss = sigil + simpleName;
-                                    if (simpleBankText != "null") ss = simpleBankText + Globals.symbolBankColon + ss;
-                                    if (simpleFreqText != "null") ss = ss + Globals.freqIndicator + simpleFreqText;
+                                    if (simpleBankText777 != "null") ss = simpleBank + Globals.symbolBankColon + ss;
+                                    if (simpleFreqText777 != "null") ss = ss + Globals.freqIndicator + simpleFreq;
                                     node.AlternativeCode.A("new ScalarString(" + Globals.QT + ss + Globals.QT + ")");
                                 }
                                 else

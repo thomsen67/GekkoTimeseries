@@ -217,7 +217,7 @@ namespace UnitTests
         double sharedTableDelta = 0.0001d;  //printing
 
         [TestMethod]
-        public void _Test_OpenClose2()
+        public void _Test_OpenClose()
         {
             I("RESET; TIME 2010 2012;");
             I("OPEN <edit> b1;");
@@ -685,6 +685,7 @@ namespace UnitTests
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
 
         }
+               
 
         [TestMethod]
         public void _Test_SumUnfoldDollarPrint()
