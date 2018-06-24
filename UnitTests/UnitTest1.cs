@@ -260,7 +260,11 @@ namespace UnitTests
             I("#m1 = b1, b2;");
             I("#m2 = c1, c2;");
             I("OPEN {#m1} as {#m2};");
-            I("OPEN {#m1};");
+            I("CLOSE {#m2};");
+            //------
+            I("#m1 = '" + Globals.ttPath2 + @"\regres\{%s3}\temp\b1', '" + Globals.ttPath2 + @"\regres\{%s3}\temp\b2';");
+            I("#m2 = c1, c2;");
+            I("OPEN {#m1} as {#m2};");
             I("CLOSE {#m2};");
 
         }
