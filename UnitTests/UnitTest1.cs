@@ -257,11 +257,11 @@ namespace UnitTests
             I("OPEN '" + Globals.ttPath2 + @"\regres\{%s3}\temp\b2' as c2;");
             I("CLOSE {%s4};");
             //------
-            //I("#m1 = b1, b2;");
-            //I("#m2 = c1, c2;");
-            //I("OPEN {#m1} as {#m2};");
-            //I("OPEN {#m1};");
-            //I("CLOSE {#m2};");
+            I("#m1 = b1, b2;");
+            I("#m2 = c1, c2;");
+            I("OPEN {#m1} as {#m2};");
+            I("OPEN {#m1};");
+            I("CLOSE {#m2};");
 
         }
 

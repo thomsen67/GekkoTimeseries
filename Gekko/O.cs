@@ -5580,10 +5580,10 @@ namespace Gekko
                 }
                 else
                 {
-                    foreach (IVariable iv in this.listItems.list)
+                    foreach (IVariable iv2 in this.listItems.list)
                     {
-                        List<IVariable> list = ExplodeIvariables(iv);                        
-                        foreach (IVariable iv2 in list)
+                        //List<IVariable> list = ExplodeIvariables(iv);                        
+                        //foreach (IVariable iv2 in list)
                         {
                             string dbName = iv2.ConvertToString();
                             if (G.Equal(dbName, Globals.Work) || G.Equal(dbName, Globals.Ref))
