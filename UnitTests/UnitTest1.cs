@@ -219,6 +219,9 @@ namespace UnitTests
         [TestMethod]
         public void _Test_OpenClose()
         {
+            Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+
             I("RESET; TIME 2010 2012;");
             I("OPEN <edit> b1;");
             I("xx = 5;");
@@ -226,10 +229,40 @@ namespace UnitTests
             I("OPEN <edit> b2;");
             I("xx = 6;");
             I("CLOSE b2;");
-            //I("OPEN b1, b2;");
-            I("OPEN b1;");
-            I("OPEN b2;");
+            //------
+            I("OPEN b1; OPEN b2;");            
+            I("CLOSE b1; CLOSE b2;");
+            //------
+            I("OPEN b1, b2;");
             I("CLOSE b1, b2;");
+            //------
+            I("OPEN b1, b2 as c1, c2;");
+            I("CLOSE c1, c2;");
+            //------
+            I("OPEN " + Globals.ttPath2 + @"\regres\Databanks\temp\b1, " + Globals.ttPath2 + @"\regres\Databanks\temp\b2 as c1, c2;");
+            I("CLOSE c1, c2;");
+            //------
+            I("OPEN '" + Globals.ttPath2 + @"\regres\Databanks\temp\b1', '" + Globals.ttPath2 + @"\regres\Databanks\temp\b2' as c1, c2;");
+            I("CLOSE c1, c2;");
+            //------
+            I("%s1 = 'b1'; %s2 = 'b2';");
+            I("OPEN %s1, %s2 as c1, c2;");
+            I("CLOSE c1, c2;");
+            //------            
+            I("OPEN {%s1}, {%s2} as c1, c2;");  //is ok, since {...} is caught as filename
+            I("CLOSE c1, c2;");
+            //------
+            I("%s3 = 'Databanks';");
+            I("%s4 = 'c2';");
+            I("OPEN '" + Globals.ttPath2 + @"\regres\{%s3}\temp\b2' as c2;");
+            I("CLOSE {%s4};");
+            //------
+            //I("#m1 = b1, b2;");
+            //I("#m2 = c1, c2;");
+            //I("OPEN {#m1} as {#m2};");
+            //I("OPEN {#m1};");
+            //I("CLOSE {#m2};");
+
         }
 
         [TestMethod]

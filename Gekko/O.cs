@@ -5582,7 +5582,7 @@ namespace Gekko
                 {
                     foreach (IVariable iv in this.listItems.list)
                     {
-                        List<IVariable> list = ExplodeIvariables(iv);
+                        List<IVariable> list = ExplodeIvariables(iv);                        
                         foreach (IVariable iv2 in list)
                         {
                             string dbName = iv2.ConvertToString();
@@ -5715,7 +5715,7 @@ namespace Gekko
 
                 if (openFileNamesAs != null && openFileNames.list.Count != openFileNamesAs.list.Count)
                 {
-                    G.Writeln2("*** ERROR: Provided " + openFileNames.list.Count + "filenames, but got only " + openFileNamesAs.list.Count + " alias (AS) names");
+                    G.Writeln2("*** ERROR: Provided " + openFileNames.list.Count + " filenames, but got only " + openFileNamesAs.list.Count + " alias (AS) names");
                     throw new GekkoException();
                 }
 
