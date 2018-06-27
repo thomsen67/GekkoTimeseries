@@ -54,6 +54,7 @@ tokens {
 	ASTDATE2;
 	ASTSTRINGINQUOTES;
 	ASTOPT_STRING_UNITS;
+	ASTOPT_STRING_SORT;
 	ASTDOUBLE;
 	ASTDOLLARCONDITIONALVARIABLE;
 	ASTINDEXERELEMENTIDENT;
@@ -137,6 +138,8 @@ ASTCOMPARE2;
 	ASTOPT_STRING_GDXOPT;
 	ASTOPT_STRING_R;
 	ASTOPT_VAL_INDEX;
+	ASTOPT_VAL_ABS;
+	ASTOPT_VAL_REL;
 	ASTOPT_STRING_FILE;
 	ASTOPT_STRING_ARRAY;
 	ASTXLINE;
@@ -754,6 +757,7 @@ ASTOPT_STRING_Y2;
 	ASTXEDIT;
 
 	// --- tokens1 start ---
+	
 	GMS = 'GMS';
 	ELEMENTS = 'ELEMENTS';
 	NOMAX = 'NOMAX';
@@ -2252,14 +2256,17 @@ dispOpt1h:				    INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
 // COMPARE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-compare:   				    COMPARE compareOpt1? varnamesList? -> ^({token("ASTCOMPARECOMMAND", ASTCOMPARECOMMAND, $COMPARE.Line)} ^(ASTOPT_ compareOpt1?) varnamesList?)				
-						    ;
-
+compare:   				    COMPARE compareOpt1? seqOfBankvarnames? (FILE EQUAL fileName)? -> ^({token("ASTCOMPARECOMMAND", ASTCOMPARECOMMAND, $COMPARE.Line)} ^(ASTOPT_ compareOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?) ^(ASTPLACEHOLDER fileName?));
 compareOpt1:			    ISNOTQUAL
 						  | leftAngle2          compareOpt1h* RIGHTANGLE -> ^(ASTOPT1 compareOpt1h*)							
 						  | leftAngleNo2 dates? compareOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) compareOpt1h*)
                             ;
-compareOpt1h:				INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
+compareOpt1h:				INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?)
+						  | SORT EQUAL name -> ^(ASTOPT_STRING_SORT name?)  //alpha, rel, abs
+						  | DUMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_DUMP yesNo?)
+						  | ABS EQUAL expression -> ^(ASTOPT_VAL_ABS expression)
+						  | REL EQUAL expression -> ^(ASTOPT_VAL_REL expression)
+						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ENDO/EXO
@@ -2363,9 +2370,7 @@ olsOpt1h:                   dates -> ^(ASTDATES dates)
 // OPEN
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-//open:                       OPEN openOpt1? openHelper (COMMA2 openHelper)* -> ^({token("ASTOPEN", ASTOPEN, $OPEN.Line)} openOpt1? openHelper+);
 open:                       OPEN openOpt1? openHelper (COMMA2 openHelper)* -> ^({token("ASTOPEN", ASTOPEN, $OPEN.Line)} openOpt1? openHelper+);
-
 openHelper:                 seqOfFileNamesStar (AS seqOfBankvarnames)? -> ^(ASTOPENHELPER ^(ASTFILENAME seqOfFileNamesStar) ^(ASTAS seqOfBankvarnames?));
 openOpt1:                   ISNOTQUAL | leftAngle openOpt1h* RIGHTANGLE -> openOpt1h*;
 openOpt1h:                  TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)

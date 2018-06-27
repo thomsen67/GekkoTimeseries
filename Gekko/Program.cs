@@ -7384,7 +7384,7 @@ namespace Gekko
 
         public static List<BankNameVersion> GetInfoFromStringWildcard(string s, string defaultBank, bool decorateWithFirstDatabankName)
         {
-            string dbName, varName, freq; char firstChar; O.Chop(s, out dbName, out varName, out freq); firstChar = varName[0];
+            string dbName, varName, freq; char firstChar; string[] indexes; O.Chop(s, out dbName, out varName, out freq, out indexes); firstChar = varName[0];
 
             if (dbName == null) dbName = defaultBank;
             if (dbName == null && decorateWithFirstDatabankName) dbName = Program.databanks.GetFirst().name;            
@@ -11010,6 +11010,19 @@ namespace Gekko
                 keys = null;  //signals a problem
             }
 
+            return keys;
+        }
+
+        public static IVariable[] GetListOfIVariablesFromListOfStrings(string[] indexes)
+        {
+            IVariable[] keys = new IVariable[indexes.Length];
+            int stringCount = 0;
+            int i = -1;
+            foreach (string s in indexes)
+            {
+                i++;
+                keys[i] = new ScalarString(indexes[i]);
+            }
             return keys;
         }
 
@@ -14969,11 +14982,15 @@ namespace Gekko
             {
                 foreach (ModelGamsEquation eq in eqs)
                 {
-                    G.Write2(eq.lhsGams + " = ");
-                    int length = (eq.lhsGams + " = ").Length;
 
-                    GekkoDictionary<string, string> knownVars = GetKnownVars(eq.rhsGams, true);
-                    TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(eq.rhsGams);  //slack, tokenizing two times
+                    string lhs = eq.lhs;
+                    string rhs = eq.rhs;
+
+                    G.Write2(lhs + " = ");
+                    int length = (rhs + " = ").Length;
+
+                    GekkoDictionary<string, string> knownVars = GetKnownVars(rhs, true);
+                    TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(rhs);  //slack, tokenizing two times
 
                     for (int i = 0; i < tokens.storage.Count; i++)
                     {
@@ -16176,7 +16193,7 @@ namespace Gekko
 
                             eqCounter++;
 
-                            if (eqCounter < 10)
+                            if (false && eqCounter < 10)
                             {
                                 G.Writeln2("Eqname:  " + nameGams);
                                 G.Writeln("Sets:    " + setsGams);
@@ -16186,14 +16203,16 @@ namespace Gekko
                             }
 
                             ModelGamsEquation e = new ModelGamsEquation();
-                            e.nameGams = nameGams;
-                            e.setsGams = setsGams;
-                            e.dollarGams = dollarGams;
-                            e.lhsGams = lhsGams;
-                            e.rhsGams = rhsGams;
-
-                            e.lhsTokensGams = lhsTokensGams;
-                            e.rhsTokensGams = rhsTokensGams;
+                            if (true)
+                            {
+                                e.nameGams = nameGams;
+                                e.setsGams = setsGams;
+                                e.dollarGams = dollarGams;
+                                e.lhsGams = lhsGams;
+                                e.rhsGams = rhsGams;
+                                e.lhsTokensGams = lhsTokensGams;
+                                e.rhsTokensGams = rhsTokensGams;                                
+                            }
 
                             TokenHelper lhsTokensGekko = e.lhsTokensGams.DeepClone(null);
                             TokenHelper rhsTokensGekko = e.rhsTokensGams.DeepClone(null);
@@ -16212,13 +16231,7 @@ namespace Gekko
 
                             string lhs = lhsTokensGekko.ToStringTrim();
                             string rhs = rhsTokensGekko.ToStringTrim();
-
-                            if (lhs.Contains("pI[#i,#ds]*qI[#i,#ds]"))
-                            {
-
-                            }
-
-
+                                                        
                             if (lhs.Contains("$") || rhs.Contains("$"))
                             {
 
@@ -16228,6 +16241,12 @@ namespace Gekko
                                 sb.Append("PRT " + lhs + ";" + G.NL);
                                 sb.Append("PRT " + rhs + ";" + G.NL);
                                 sb.AppendLine();
+                            }
+
+                            if (true)
+                            {                                
+                                e.lhs = lhs;
+                                e.rhs = rhs;
                             }
 
                             string varname = null;
@@ -16269,10 +16288,13 @@ namespace Gekko
                 Program.modelGams.equations = xx;
                 G.Writeln2("Found " + xx.Count + " distinct equations");
 
-                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\model.gcm", Program.GekkoFileReadOrWrite.Write))
-                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                if (Globals.runningOnTTComputer)
                 {
-                    sw.Write(sb);
+                    using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\model.gcm", Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        sw.Write(sb);
+                    }
                 }
             }
             else
@@ -23530,18 +23552,10 @@ namespace Gekko
 
         public static void Compare(O.Compare o)
         {
-
-            string type2 = "absolute";  //relative, //alphabetical
+            string type2 = o.opt_sort;
             bool order = true;
-            List<string> variables = null;
-            if (o.listItems == null)
-            {
-                //variables = new List<string>();
-            }
-            else
-            {
-                variables = Program.UnfoldFlexibleListIntoListOfStrings(o.listItems);
-            }
+            List<string> variables = O.Restrict(o.listItems, false, false, false);
+            
             string variablesType = null;  //"_s" etc.
             bool dlog = false;
             string block = null;
@@ -23551,9 +23565,8 @@ namespace Gekko
             //TODO TODO file should be path...
             //TODO TODO 
 
-            Sam(o.t1, o.t2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, variables, variablesType, dlog, block, file);
+            Sam(o.t1, o.t2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, variables, variablesType, dlog, block, file, o.fileName, o.opt_dump, o.opt_abs, o.opt_rel);
             
-
             //string type = "COMPARE";
             //if (G.Equal(o.opt_abs, "yes")) type = "COMPARE<abs>";
            
@@ -36052,13 +36065,13 @@ namespace Gekko
             GekkoTime gt1 = new GekkoTime((Program.options.freq), t1, 1);
             GekkoTime gt2 = new GekkoTime((Program.options.freq), t2, 1);
 
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, d_type, "_d", dlog, block, path);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, g_type, "_g", dlog, block, path);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, i_type, "_i", dlog, block, path);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, k_type, "_k", dlog, block, path);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, s_type, "_s", dlog, block, path);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, after_i_type, "_after_i", dlog, block, path);
-            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, after_d_type, "_after_d", dlog, block, path);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, d_type, "_d", dlog, block, path, null, null, double.NaN, double.NaN);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, g_type, "_g", dlog, block, path, null, null, double.NaN, double.NaN);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, i_type, "_i", dlog, block, path, null, null, double.NaN, double.NaN);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, k_type, "_k", dlog, block, path, null, null, double.NaN, double.NaN);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, s_type, "_s", dlog, block, path, null, null, double.NaN, double.NaN);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, after_i_type, "_after_i", dlog, block, path, null, null, double.NaN, double.NaN);
+            Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, after_d_type, "_after_d", dlog, block, path, null, null, double.NaN, double.NaN);
         }
 
         public static string GetModelInfoPath()
@@ -36166,14 +36179,16 @@ namespace Gekko
         public static void Sam(GekkoTime tStart, GekkoTime tEnd, Databank base2, Databank work, string type, bool order)
         {
             //Called in order to compare databanks, 5 last args inactive
-            Sam(tStart, tEnd, base2, work, type, order, null, null, false, null, null);
+            Sam(tStart, tEnd, base2, work, type, order, null, null, false, null, null, null, null, double.NaN, double.NaN);
         }
 
-        public static void Sam(GekkoTime tStart, GekkoTime tEnd, Databank base2, Databank work, string compareType, bool order, List<string> variables, string variablesType, bool dlog, string block, string path)
+        public static void Sam(GekkoTime tStart, GekkoTime tEnd, Databank base2, Databank work, string compareType, bool order, List<string> variables, string variablesType, bool dlog, string block, string path, string fileName, string dump, double crit_abs, double crit_rel)
         {
             //TODO: could be more clearly coded, with 6 compareTypes (3 databank and 3 residuals), doing a 'variables == null' is not too pretty
             //TODO: error handling if var not found in one of the banks in residual check
             //TODO: option to use CalculateHistoricalVarianceForVariable() and CheckRelativeDifferenceSmart()
+
+            if (compareType != null) compareType = compareType.ToLower();
 
             // =======================================
             bool removeCurrentFreqFromNames = true;
@@ -36183,6 +36198,27 @@ namespace Gekko
             int plotExtraPeriods = 0;
             bool residuals = false;
             // =======================================
+
+            if (compareType == "abs" || compareType == "absolute")
+            {
+                compareType = "absolute";
+                order = true;
+            }
+            else if (compareType == "rel" || compareType == "relative")
+            {
+                compareType = "relative";
+                order = true;
+            }
+            else if (compareType == "alpha" || compareType == null)
+            {
+                compareType = "alphabetical";
+                order = false;
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Expected SORT to be alpha, abs or rel.");
+                throw new GekkoException();
+            }
 
             if (variables != null && variables.Count == 0)
             {
@@ -36199,6 +36235,8 @@ namespace Gekko
             {
                 //i.e. we are doing a databank compare, not a residual compare
                 samFileName = "compare_databanks.txt";
+                if (fileName != null) samFileName = fileName;
+                if (!Path.HasExtension(samFileName)) samFileName = samFileName + ".txt";
                 path = Program.options.folder_working;
             }
             else
@@ -36264,8 +36302,8 @@ namespace Gekko
                 foreach (string tsString in variables)
                 {
                     //TODO: handle bank and freq, with chop
-                    string dbName, varName, freq;
-                    O.Chop(tsString, out dbName, out varName, out freq);
+                    string dbName, varName, freq; string[] indexes;
+                    O.Chop(tsString, out dbName, out varName, out freq, out indexes);
 
                     if (G.HasSigil(varName)) continue;  //filter out non-series, like %s or #m
 
@@ -36309,12 +36347,13 @@ namespace Gekko
                 }
             }
 
-
             onlyWork2.Sort(StringComparer.OrdinalIgnoreCase);
             onlyRef2.Sort(StringComparer.OrdinalIgnoreCase);
             both2.Sort(StringComparer.OrdinalIgnoreCase);
             differentTypeSeries2.Sort(StringComparer.OrdinalIgnoreCase);
             notFoundBoth2.Sort(StringComparer.OrdinalIgnoreCase);
+
+            bool dumpList = false;
 
             int pcounter = 0;
             //string fullPathAndFileName = CreateFullPathAndFileName(samFileName);
@@ -36370,18 +36409,13 @@ namespace Gekko
                     Series tsGrund = sh.series2;
 
                     double max = 0d;
-
-
+                    double maxAbs = 0d;
+                    double maxRel = 0d;
 
                     foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
                     {
                         double varDelta = 0;
                         double varPch = 0;
-
-                        //if (ts == null)
-                        //{
-
-                        //}
 
                         double var1 = ts.GetData(null, t);
                         double var2 = tsGrund.GetData(null, t);
@@ -36413,14 +36447,17 @@ namespace Gekko
                             varDelta = var1 - var2;
                         }
 
-                        if (compareType == "absolute")
+                        if (compareType == "absolute" || compareType == "alphabetical")
                         {
                             max = Math.Max(Math.Abs(varDelta), max);
                         }
-                        else
+                        else if(compareType == "relative")
                         {
                             max = Math.Max(Math.Abs(varPch), max);
                         }
+                        maxAbs= Math.Max(Math.Abs(varDelta), maxAbs);
+                        maxRel = Math.Max(Math.Abs(varPch / 100d), maxRel);
+
                         if (G.isNumericalError(max))
                         {
                             //this is igonred
@@ -36432,9 +36469,26 @@ namespace Gekko
                     {
                         //This probably never happens... for safety...
                         max = 1e+100d;
+                        maxAbs = 1e+100d;
+                        maxRel = 1e+100d;
                     }
 
-                    if (max == 0) continue;  //don't show vars if they are identical
+                    //if (max == 0) continue;  //don't show vars if they are identical
+                    //if no <abs=...> or <rel=...> are given, crit_abs and crit_rel are = 0.
+
+                    if (crit_abs < 0) crit_abs = 0;
+                    if (crit_rel < 0) crit_rel = 0;
+                                        
+                    if (maxRel > crit_rel && maxAbs > crit_abs)
+                    {
+                        //show this one
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+
                     double max1 = max * (1d + count / 12345678912d) + count / 12345678912d;
                     if (order)
                     {
@@ -36451,7 +36505,7 @@ namespace Gekko
                         }
                     }
                     if (order) ordered.Add(-max1, sh);
-                    else ordered.Add(sh.series1, sh);
+                    else ordered.Add(sh.series1.GetNameWithoutCurrentFreq(true), sh);
                 }
 
 
@@ -36460,6 +36514,7 @@ namespace Gekko
                 if (ordered.Count == 0) samFile.WriteLine("[none]");
                 samFile.WriteLine();
 
+                List<string> dif = new List<string>();
 
                 int counter = 0;
                 foreach (DictionaryEntry de in ordered)
@@ -36489,6 +36544,8 @@ namespace Gekko
                     {
                         name = ts.GetName();
                     }
+
+                    dif.Add(name);
 
                     if (variables == null)
                     {
@@ -36562,8 +36619,15 @@ namespace Gekko
                     samFile.WriteLine();
                 }
                 samFile.Flush();
+                if (dif.Count > 0 && G.Equal(dump, "yes"))
+                {
+                    List m = new Gekko.List(dif);
+                    Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "dif", m);
+                    dumpList = true;
+                }
             }
             G.Writeln2("Databank compare on " + both2.Count + " common series, result put in file '" + samFileName + "'");
+            if(dumpList) G.Writeln2("The list " + Globals.symbolCollection + "dif contains the different variables");
             if (notFoundBoth2.Count > 0)
             {
                 G.Writeln("+++ NOTE: " + notFoundBoth2.Count + " series not found");
@@ -36584,8 +36648,6 @@ namespace Gekko
             }
             else
             {
-                both2.Add(MaybeRemoveFreq(tsNameWithFreq, removeCurrentFreqFromNames));
-
                 if (ts.type == ESeriesType.ArraySuper)
                 {
                     //both series are array-series, compare the subseries
@@ -36603,7 +36665,7 @@ namespace Gekko
                                 //present both places, for instance x['a', 'b'] both places
                                 //these two are going to be checked
                                 both2.Add(MaybeRemoveFreq(tsNameWithFreq, removeCurrentFreqFromNames) + "[" + kvpsub.Key.ToString() + "]");
-                                items.Add(new SamHelper() { series1 = kvpsub.Value as Series, series2 = tsGrund.dimensionsStorage.storage[kvpsub.Key] as Series });
+                                items.Add(new SamHelper() { series1 = kvpsub.Value as Series, series2 = tsGrund.dimensionsStorage.storage[kvpsub.Key] as Series });                                
                             }
                             else
                             {
@@ -36626,10 +36688,11 @@ namespace Gekko
                 }
                 else
                 {
+                    both2.Add(MaybeRemoveFreq(tsNameWithFreq, removeCurrentFreqFromNames));
                     items.Add(new SamHelper() { series1 = ts, series2 = tsGrund });
                 }
             }
-            SamHelper sh = items[items.Count - 1];
+            //SamHelper sh = items[items.Count - 1];
             //if(sh.series1==null || sh.series2==null)
             //{
 

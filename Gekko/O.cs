@@ -901,10 +901,23 @@ namespace Gekko
             //This calls the more general Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression)
 
             if (x.Type() == EVariableType.String)
-            {                
-                string dbName, varName, freq; char firstChar; Chop((x as ScalarString).string2, out dbName, out varName, out freq);                
+            {
+
+                IVariable rv = null;
+                string dbName, varName, freq; string[] indexes; char firstChar;
+                Chop((x as ScalarString).string2, out dbName, out varName, out freq, out indexes);
                 IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable, type, errorIfNotFound);
-                return iv;
+
+                if (indexes != null)
+                {
+                    rv = iv.Indexer(smpl, Program.GetListOfIVariablesFromListOfStrings(indexes));
+                }
+                else
+                {
+                    rv = iv;
+                }
+
+                return rv;
             }
             //!!!!!!!!!!!!
             //!!!!!!!!!!!!
@@ -1173,6 +1186,39 @@ namespace Gekko
             
             return rv;
         }
+
+        public static List<string> Restrict(List m, bool allowBank, bool allowSigil, bool allowFreq)
+        {
+            if (m == null) return null;
+            List<string> rv = new List<string>();
+            foreach (IVariable iv in m.list)
+            {
+                string s = iv.ConvertToString();
+                if (!allowBank && s.Contains(Globals.symbolBankColon))
+                {
+                    G.Writeln2("*** ERROR: Bankname not accepted as part of name");
+                    throw new GekkoException();
+                }
+                if (!allowSigil && s.Contains(Globals.symbolScalar))
+                {
+                    G.Writeln2("*** ERROR: Scalar symbol (" + Globals.symbolScalar + ") not accepted, use {%x} instead of %x");
+                    throw new GekkoException();
+                }
+                if (!allowSigil && s.Contains(Globals.symbolCollection))
+                {
+                    G.Writeln2("*** ERROR: Collection symbol (" + Globals.symbolCollection + ") not accepted, use {#x} instead of #x");
+                    throw new GekkoException();
+                }
+                if (!allowFreq && s.Contains(Globals.freqIndicator))
+                {
+                    G.Writeln2("*** ERROR: Frequency (" + Globals.freqIndicator + ") not accepted as part of name");
+                    throw new GekkoException();
+                }
+                rv.Add(s);
+            }
+            return rv;
+        }
+
 
         public static List CreateListFromStrings(string[] input)
         {
@@ -2136,7 +2182,7 @@ namespace Gekko
             }
 
         }
-        
+
 
         //private static string DecorateWithTilde(string varName, string freq)
         //{
@@ -2161,8 +2207,36 @@ namespace Gekko
         //    return ts;
         //}
 
-        public static void Chop(string input, out string dbName, out string varName, out string freq)
+        public static void ChopIndexer(string s, out string name, out string rest)
         {
+            name = s;
+            string[] ss = s.Split('[');
+            rest = null;
+            if (ss.Length > 1)
+            {
+                name = ss[0];
+                rest = "[" + ss[1];
+            }
+        }
+
+        public static void Chop(string input2, out string dbName, out string varName, out string freq, out string[] indexes)
+        {
+            indexes = null;
+
+            string input, rest;
+            ChopIndexer(input2, out input, out rest);
+
+            if (rest != null)
+            {
+                rest = rest.Trim();
+                if (!(rest.StartsWith("[") && rest.EndsWith("]")))
+                {
+                    G.Writeln2("*** ERROR: Expected indexer to start with '[' and end with ']'");
+                    throw new GekkoException();
+                }
+                indexes = rest.Substring(1, rest.Length - 2).Split(',');
+            }
+
             //When it returns, all returned strings are guaranteed not to contain colon or !.
             string[] ss = input.Split(Globals.symbolBankColon2);
             if (ss.Length > 2)
@@ -2313,7 +2387,7 @@ namespace Gekko
             //#x[1, 2]                 
             //x['nz', 'w']    
 
-            if (true)
+            if (false)
             {
                 string s = null;
                 foreach (IVariable iv in indexes)
@@ -5580,39 +5654,15 @@ namespace Gekko
                 }
                 else
                 {
-                    foreach (IVariable iv2 in this.listItems.list)
-                    {
-                        //List<IVariable> list = ExplodeIvariables(iv);                        
-                        //foreach (IVariable iv2 in list)
+                    List<string> names = Restrict(this.listItems, false, false, false);
+                    foreach (string dbName in names)
+                    {                        
+                        if (G.Equal(dbName, Globals.Work) || G.Equal(dbName, Globals.Ref))
                         {
-                            string dbName = iv2.ConvertToString();
-                            if (G.Equal(dbName, Globals.Work) || G.Equal(dbName, Globals.Ref))
-                            {
-                                G.Writeln2("*** ERROR: Databanks '" + Globals.Work + "' or '" + Globals.Ref + "' cannot be closed (see CLEAR command)");
-                                throw new GekkoException();
-                            }
-                            if (dbName.Contains(Globals.symbolBankColon))
-                            {
-                                G.Writeln2("*** ERROR: Bankname not accepted as part of name");
-                                throw new GekkoException();
-                            }
-                            if (dbName.Contains(Globals.symbolScalar))
-                            {
-                                G.Writeln2("*** ERROR: Scalarname ("+Globals.symbolScalar+") not accepted, use {%x} instead of %x");
-                                throw new GekkoException();
-                            }
-                            if (dbName.Contains(Globals.symbolCollection))
-                            {
-                                G.Writeln2("*** ERROR: Collectionname (" + Globals.symbolCollection + ") not accepted, use {#x} instead of #x");
-                                throw new GekkoException();
-                            }
-                            if (dbName.Contains(Globals.freqIndicator))
-                            {
-                                G.Writeln2("*** ERROR: Frequency (" + Globals.freqIndicator + ") not accepted as part of name");
-                                throw new GekkoException();
-                            }
-                            databanks.Add(dbName);
+                            G.Writeln2("*** ERROR: Databanks '" + Globals.Work + "' or '" + Globals.Ref + "' cannot be closed (see CLEAR command)");
+                            throw new GekkoException();
                         }
+                        databanks.Add(dbName);
                     }
                 }
                 foreach (string databank in databanks)
@@ -6266,8 +6316,11 @@ namespace Gekko
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
             public List listItems = null;
-            public string opt_abs = null;
+            public string opt_sort = null;
+            public string opt_dump = null;
             public string fileName = null;
+            public double opt_abs = 0d; //important that this i 0
+            public double opt_rel = 0d; //important that this i 0
             public void Exe()
             {
                 Program.Compare(this);

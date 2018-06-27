@@ -202,7 +202,7 @@ namespace Gekko
             if (dims.Length == 1 && dims[0].Type() == EVariableType.String)
             {
                 string s = O.ConvertToString(dims[0]);
-                string dbName, varName, freq; O.Chop(s, out dbName, out varName, out freq);        
+                string dbName, varName, freq; string[] indexes; O.Chop(s, out dbName, out varName, out freq, out indexes);  
                 if(dbName!=null)
                 {
                     G.Writeln2("*** ERROR: You cannot state bank name (with colon) on the left-hand side in a MAP element");

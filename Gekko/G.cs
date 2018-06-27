@@ -365,16 +365,8 @@ namespace Gekko
 
             string rv = null;
 
-            string name = s;
-            string[] ss = s.Split('[');            
-
-            string rest = null;
-
-            if (ss.Length > 1)
-            {
-                name = ss[0];
-                rest = "[" + ss[1];
-            }
+            string name, rest;
+            O.ChopIndexer(s, out name, out rest);
 
             //now name is the part before '['
 
@@ -408,10 +400,13 @@ namespace Gekko
             return rv;
         }
 
+        
 
         public static void ChopFreq(string input, ref string freq, ref string varName)
         {
+            
             if (input == null) return;
+            
             string[] ss2 = input.Split(Globals.freqIndicator);
             if (ss2.Length > 2)
             {

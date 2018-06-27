@@ -4834,10 +4834,15 @@ namespace Gekko.Parser.Gek
                     case "ASTCOMPARECOMMAND":
                         {
                             node.Code.A("O.Compare o" + Num(node) + " = new O.Compare();" + G.NL);
-                            if (node[1] != null)
+                            GetCodeFromAllChildren(node, node[0]);
+                            if (node[1][0] != null)
                             {
-                                node.Code.A("o" + Num(node) + ".listItems = " + node[1].Code + ";" + G.NL);
-                            }                            
+                                node.Code.A("o" + Num(node) + ".listItems = " + node[1][0].Code + ";" + G.NL);
+                            }
+                            if (node[2][0] != null)
+                            {
+                                node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[2][0].Code + ");" + G.NL);
+                            }
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;

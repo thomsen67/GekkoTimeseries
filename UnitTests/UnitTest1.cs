@@ -230,6 +230,12 @@ namespace UnitTests
             I("xx = 6;");
             I("CLOSE b2;");
             //------
+            //------
+            //------
+            FAIL("OPEN a:b1;");
+            FAIL("OPEN a:b1!q;");
+            FAIL("OPEN b1!q;");
+            //------
             I("OPEN b1; OPEN b2;");            
             I("CLOSE b1; CLOSE b2;");
             //------
@@ -238,6 +244,8 @@ namespace UnitTests
             //------
             I("OPEN b1, b2 as c1, c2;");
             I("CLOSE c1, c2;");
+            //------
+            FAIL("OPEN b1, b2 as c1, c2, c3;");            
             //------
             I("OPEN " + Globals.ttPath2 + @"\regres\Databanks\temp\b1, " + Globals.ttPath2 + @"\regres\Databanks\temp\b2 as c1, c2;");
             I("CLOSE c1, c2;");
@@ -261,6 +269,11 @@ namespace UnitTests
             I("#m2 = c1, c2;");
             I("OPEN {#m1} as {#m2};");
             I("CLOSE {#m2};");
+            //------
+            I("#m1 = ('b1',);");
+            I("#m1a = (#m1, 'b2');");            
+            I("OPEN {#m1a};");
+            I("CLOSE {#m1a};");
             //------
             I("#m1 = '" + Globals.ttPath2 + @"\regres\{%s3}\temp\b1', '" + Globals.ttPath2 + @"\regres\{%s3}\temp\b2';");
             I("#m2 = c1, c2;");
