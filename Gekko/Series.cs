@@ -1635,10 +1635,23 @@ namespace Gekko
                         }
                         else
                         {
-
-                            string txt = null; foreach (string ss in keys) txt += "'" + ss + "', ";
+                            List<string> warnings = new List<string>();
+                            
+                            string txt = null;
+                            foreach (string ss in keys)
+                            {
+                                if (ss.Length != ss.Trim().Length)
+                                {
+                                    warnings.Add("Please note that the element '" + ss + "' contains blanks at start or end of string");
+                                }
+                                txt += "'" + ss + "', ";
+                            }
                             G.Writeln2("*** ERROR: The arrayseries " + G.GetNameAndFreqPretty(this.name) + " did not contain this element:");
-                            G.Writeln("*** ERROR: [" + txt.Substring(0, txt.Length - 2) + "]");
+                            G.Writeln("           [" + txt.Substring(0, txt.Length - 2) + "]", Color.Red);
+                            foreach(string warning in warnings)
+                            {
+                                G.Writeln("+++ NOTE: " + warning);
+                            }
                             G.Writeln("+++ NOTE: You may ignore such errors with OPTION series array ignoremissing = yes;");
                             throw new GekkoException();
                         }

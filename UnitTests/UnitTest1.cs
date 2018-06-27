@@ -217,6 +217,88 @@ namespace UnitTests
         double sharedTableDelta = 0.0001d;  //printing
 
         [TestMethod]
+        public void _Test_Compare()
+        {
+            I("time 2001 2002;");
+            I("yy = series(1);");
+            I("yy[i] = (1000, 1000);");
+            I("xx = series(2);");
+            I("xx[a, x] = (100, 100);");
+            I("xx[b, x] = (200, 200);");
+            I("xx[a, y] = (300, 300);");
+            I("xx[b, y] = (400, 400);");
+            I("#m1 = a, b;");
+            I("#m2 = ('a',);");  //"#m2 = a;" does not work as intended
+            I("clone;");
+            I("xx[b, y] = (401, 402);");
+            I("yy[i] = (1002, 1004);");
+            I("yy[j] = 2000;");
+
+            I("option print width = 1000000;");
+
+            I("compare;");  //should work without params            
+            I("%s = getfile('compare_databanks.txt');");
+            string ss = (First().GetIVariable("%s") as ScalarString).ConvertToString();
+            Assert.IsTrue(ss.Contains("Out of the 5 common series, there are differences regarding 2 of them"));
+            //_AssertScalarString
+
+            I("compare<dump>;");
+            I("p #dif;");
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 2);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 2, "yy[i]");
+            
+            I("compare < dump sort = rel >;");
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 2);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 2, "yy[i]");
+
+            I("compare < dump sort = abs >;");
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 2);
+            _AssertListString(First(), "#dif", 1, "yy[i]");
+            _AssertListString(First(), "#dif", 2, "xx[b, y]");
+            
+            I("compare < dump abs = 1.01 >;");  //no effect
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 2);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 2, "yy[i]");
+
+            I("compare < dump abs = 2.01 >;");  //xx[b, y] is filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);            
+            _AssertListString(First(), "#dif", 1, "yy[i]");
+
+            I("compare < dump abs = 4.01 >;");  //all are filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 0);            
+
+            I("compare < dump rel = 0.0039 >;");  //no effect
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 2);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 2, "yy[i]");
+
+            I("compare < dump rel = 0.0041 >;");  //yy[i] is filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            
+            I("compare < dump rel = 0.0051 >;");  //all are filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 0);            
+
+            I("compare < dump abs = 2.01 rel = 0.0041 >;"); //all are filtered out, abs catches xx[b, y] and rel catches yy[i]
+            I("p #dif;");
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 0);
+
+        }
+
+        [TestMethod]
         public void _Test_OpenClose()
         {
             Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");

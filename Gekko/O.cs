@@ -2235,6 +2235,14 @@ namespace Gekko
                     throw new GekkoException();
                 }
                 indexes = rest.Substring(1, rest.Length - 2).Split(',');
+                for (int i = 0; i < indexes.Length; i++)
+                {
+                    indexes[i] = indexes[i].Trim();
+                }
+                for (int i = 0; i < indexes.Length; i++)
+                {
+                    indexes[i] = G.StripQuotes(indexes[i]);  //probably not relevant now, but may be later on
+                }
             }
 
             //When it returns, all returned strings are guaranteed not to contain colon or !.
@@ -7258,7 +7266,12 @@ namespace Gekko
                         else
                         {
                             //not series (including array-series and vals)                                                        
-                            if (this.prtElements[0].variable[0] == null || this.prtElements[0].variable[1] != null)
+                            if (this.prtElements[0].variable[0].Type() == EVariableType.List && ((List)this.prtElements[0].variable[0]).list.Count == 0)
+                            {
+                                G.Writeln2(Program.RemoveSplitter(this.prtElements[0].label));
+                                G.Writeln("[empty list]");
+                            }
+                            else if (this.prtElements[0].variable[0] == null || this.prtElements[0].variable[1] != null)
                             {
                                 G.Writeln2("+++ WARNING: Skipped one variable for printing");
                             }

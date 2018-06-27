@@ -1786,6 +1786,13 @@ namespace Gekko
             return new ScalarVal(i);
         }
 
+        public static IVariable getfile(GekkoSmpl smpl, IVariable x1)
+        {
+            string s1 = O.ConvertToString(x1);
+            string txt = Program.GetTextFromFileWithWait(s1);
+            return new ScalarString(txt);
+        }
+
         public static IVariable trim(GekkoSmpl smpl, IVariable x1)
         {
             string s1 = O.ConvertToString(x1);

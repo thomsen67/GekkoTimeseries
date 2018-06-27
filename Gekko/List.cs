@@ -13,13 +13,14 @@ namespace Gekko
         //Abstract class containing a List
         //Used for pointing to Lists without having to create/clone them.      
 
-        public bool isNameList = true;        
+        public bool isNameList = true;
 
         [ProtoMember(1)]
-        public List<IVariable> list = null;
+        public List<IVariable> list = null;  
 
         public List()
         {
+            this.list = new List<IVariable>(); //empty list with 0 items
         }
 
         public List(List<IVariable> list)

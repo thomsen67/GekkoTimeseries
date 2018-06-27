@@ -140,6 +140,7 @@ ASTCOMPARE2;
 	ASTOPT_VAL_INDEX;
 	ASTOPT_VAL_ABS;
 	ASTOPT_VAL_REL;
+	ASTOPT_VAL_PCH;
 	ASTOPT_STRING_FILE;
 	ASTOPT_STRING_ARRAY;
 	ASTXLINE;
@@ -2266,6 +2267,7 @@ compareOpt1h:				INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?)
 						  | DUMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_DUMP yesNo?)
 						  | ABS EQUAL expression -> ^(ASTOPT_VAL_ABS expression)
 						  | REL EQUAL expression -> ^(ASTOPT_VAL_REL expression)
+						  | PCH EQUAL expression -> ^(ASTOPT_VAL_PCH expression)
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------

@@ -25053,7 +25053,7 @@ namespace Gekko
                     {
                         List temp = element.variable[0] as List;
                         if (temp != null)
-                        {
+                        {                            
                             foreach (IVariable iv in temp.list)
                             {
                                 if (!IsSeriesType(iv)) return false;
@@ -26336,7 +26336,7 @@ namespace Gekko
             }
         }
 
-        private static string RemoveSplitter(string s)
+        public static string RemoveSplitter(string s)
         {
             string lbl;
             string[] ss = s.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
@@ -26464,6 +26464,8 @@ namespace Gekko
 
         public static void NonSeriesHandling(O.Prt oPrt)
         {
+            string pling = null;
+            pling = "'";
             foreach (O.Prt.Element element in oPrt.prtElements)
             {
                 IVariable var = element.variable[0];
@@ -26475,7 +26477,7 @@ namespace Gekko
                     {
                         if (iv.Type() == EVariableType.String)
                         {
-                            s += ((ScalarString)iv).string2 + ", ";
+                            s += pling + ((ScalarString)iv).string2 + pling + ", ";
                         }
                         else if (iv.Type() == EVariableType.Date)
                         {
@@ -26490,7 +26492,7 @@ namespace Gekko
                             s += "[" + iv.Type().ToString() + "]" + ", ";
                         }
                     }
-                    G.Writeln2(element.label);
+                    G.Writeln2(Program.RemoveSplitter(element.label));
                     if (temp.list.Count > 0)
                     {
                         s = s.Substring(0, s.Length - ", ".Length);
@@ -26510,7 +26512,7 @@ namespace Gekko
                     else if (var.Type() == EVariableType.String)
                     {
                         G.Writeln2(element.label);
-                        G.Writeln(((ScalarString)var).string2);
+                        G.Writeln(pling + ((ScalarString)var).string2 + pling);
                     }
                     else if (var.Type() == EVariableType.Val)
                     {
@@ -36190,6 +36192,8 @@ namespace Gekko
 
             if (compareType != null) compareType = compareType.ToLower();
 
+            List<string> dif = new List<string>();
+
             // =======================================
             bool removeCurrentFreqFromNames = true;
             double crit = double.NaN;
@@ -36514,7 +36518,7 @@ namespace Gekko
                 if (ordered.Count == 0) samFile.WriteLine("[none]");
                 samFile.WriteLine();
 
-                List<string> dif = new List<string>();
+                
 
                 int counter = 0;
                 foreach (DictionaryEntry de in ordered)
@@ -36619,7 +36623,7 @@ namespace Gekko
                     samFile.WriteLine();
                 }
                 samFile.Flush();
-                if (dif.Count > 0 && G.Equal(dump, "yes"))
+                if (G.Equal(dump, "yes"))
                 {
                     List m = new Gekko.List(dif);
                     Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "dif", m);
@@ -36627,7 +36631,7 @@ namespace Gekko
                 }
             }
             G.Writeln2("Databank compare on " + both2.Count + " common series, result put in file '" + samFileName + "'");
-            if(dumpList) G.Writeln2("The list " + Globals.symbolCollection + "dif contains the different variables");
+            if (dumpList) G.Writeln2("List " + Globals.symbolCollection + "dif contains the " + dif.Count + " different variables");
             if (notFoundBoth2.Count > 0)
             {
                 G.Writeln("+++ NOTE: " + notFoundBoth2.Count + " series not found");
