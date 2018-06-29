@@ -110,7 +110,7 @@ namespace Gekko
         }
         
         public IVariable Negate(GekkoSmpl t)
-        {
+        {            
             return new ScalarVal(-this.val);
         }        
 
@@ -153,6 +153,7 @@ namespace Gekko
 
         public IVariable Add(GekkoSmpl smpl, IVariable input)
         {
+            if (G.IsGekkoNull(input)) return input;
             switch (input.Type())
             {
                 case EVariableType.Val:
@@ -195,6 +196,7 @@ namespace Gekko
 
         public IVariable Subtract(GekkoSmpl smpl, IVariable input)
         {
+            if (G.IsGekkoNull(input)) return input;
             switch (input.Type())
             {
                 case EVariableType.Val:
@@ -223,6 +225,7 @@ namespace Gekko
 
         public IVariable Multiply(GekkoSmpl smpl, IVariable input)
         {
+            if (G.IsGekkoNull(input)) return input;
             switch (input.Type())
             {
                 case EVariableType.Val:
@@ -263,6 +266,7 @@ namespace Gekko
 
         public IVariable Divide(GekkoSmpl smpl, IVariable input)
         {
+            if (G.IsGekkoNull(input)) return input;
             switch (input.Type())
             {
                 case EVariableType.Val:
@@ -291,6 +295,7 @@ namespace Gekko
 
         public IVariable Power(GekkoSmpl smpl, IVariable input)
         {
+            if (G.IsGekkoNull(input)) return input;
             switch (input.Type())
             {
                 case EVariableType.Val:

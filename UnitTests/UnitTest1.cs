@@ -230,8 +230,8 @@ namespace UnitTests
             I("#m1 = a, b;");
             I("#m2 = ('a',);");  //"#m2 = a;" does not work as intended
             I("clone;");
-            I("xx[b, y] = (401, 402);");
-            I("yy[i] = (1002, 1004);");
+            I("xx[b, y] = (400.4, 402);");
+            I("yy[i] = (1000.2, 1004);");
             I("yy[j] = 2000;");
 
             I("option print width = 1000000;");
@@ -286,7 +286,23 @@ namespace UnitTests
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
             _AssertListString(First(), "#dif", 1, "xx[b, y]");
-            
+
+            if (true)
+            {
+                //same as above but with pch instead of rel
+
+                I("compare < dump pch = 100*0.0039 >;");  //no effect
+                I("p <n m q> {#dif};");
+                _AssertListSize(First(), "#dif", 2);
+                _AssertListString(First(), "#dif", 1, "xx[b, y]");
+                _AssertListString(First(), "#dif", 2, "yy[i]");
+
+                I("compare < dump pch = 100*0.0041 >;");  //yy[i] is filtered out
+                I("p <n m q> {#dif};");
+                _AssertListSize(First(), "#dif", 1);
+                _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            }
+
             I("compare < dump rel = 0.0051 >;");  //all are filtered out
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 0);            
@@ -295,6 +311,265 @@ namespace UnitTests
             I("p #dif;");
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 0);
+
+            // ---------------------------------------
+            // ---------------------------------------
+            // -------- truncated time ---------------
+            // ---------------------------------------
+            // ---------------------------------------
+
+            I("compare<2001 2001>;");  //should work without params            
+            I("%s = getfile('compare_databanks.txt');");
+            ss = (First().GetIVariable("%s") as ScalarString).ConvertToString();
+            Assert.IsTrue(ss.Contains("Out of the 5 common series, there are differences regarding 2 of them"));
+            //_AssertScalarString
+
+            I("compare<2001 2001 dump>;");
+            I("p #dif;");
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 2);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 2, "yy[i]");
+
+            I("compare <2001 2001 dump sort = rel >;");
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 2);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 2, "yy[i]");
+
+            I("compare <2001 2001 dump sort = abs >;");
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 2);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 2, "yy[i]");
+            
+            I("compare <2001 2001 dump abs = 0.199 >;");  //no effect
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 2);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 2, "yy[i]");
+
+            I("compare <2001 2001 dump abs = 0.201 >;");  //yy[i] is filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+
+            I("compare <2001 2001 dump abs = 0.401 >;");  //all are filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 0);
+
+            I("compare <2001 2001 dump rel = 0.0001 >;");  //no effect
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 2);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            _AssertListString(First(), "#dif", 2, "yy[i]");
+
+            I("compare <2001 2001 dump rel = 0.0003 >;");  //yy[i] is filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+
+            if (true)
+            {
+                //same as above but with pch instead of rel
+
+                I("compare <2001 2001 dump pch = 100*0.0001 >;");  //no effect
+                I("p <n m q> {#dif};");
+                _AssertListSize(First(), "#dif", 2);
+                _AssertListString(First(), "#dif", 1, "xx[b, y]");
+                _AssertListString(First(), "#dif", 2, "yy[i]");
+
+                I("compare <2001 2001 dump pch = 100*0.0003 >;");  //yy[i] is filtered out
+                I("p <n m q> {#dif};");
+                _AssertListSize(First(), "#dif", 1);
+                _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            }
+
+            I("compare <2001 2001 dump rel = 0.0011 >;");  //all are filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 0);
+
+
+            // ---------------------------------------
+            // ---------------------------------------
+            // -------- restricted on xx -------------
+            // ---------------------------------------
+            // ---------------------------------------
+            
+            I("compare<2001 2001>xx;");  //should work without params            
+            I("%s = getfile('compare_databanks.txt');");
+            ss = (First().GetIVariable("%s") as ScalarString).ConvertToString();
+            Assert.IsTrue(ss.Contains("Out of the 4 common series, there are differences regarding 1 of them"));
+            //_AssertScalarString
+
+            I("compare<2001 2001 dump>xx;");
+            I("p #dif;");
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");            
+
+            I("compare <2001 2001 dump sort = rel >xx;");
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");            
+
+            I("compare <2001 2001 dump sort = abs >xx;");
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");            
+
+            I("compare <2001 2001 dump abs = 0.199 >xx;");  //no effect
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            
+            I("compare <2001 2001 dump abs = 0.201 >xx;");  //yy[i] is filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+
+            I("compare <2001 2001 dump abs = 0.401 >xx;");  //all are filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 0);
+
+            I("compare <2001 2001 dump rel = 0.0001 >xx;");  //no effect
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");            
+
+            I("compare <2001 2001 dump rel = 0.0003 >xx;");  //yy[i] is filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+            
+            I("compare <2001 2001 dump rel = 0.0011 >xx;");  //all are filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 0);
+
+            // ---------------------------------------
+            // ---------------------------------------
+            // -------- restricted on #r -------------
+            // ---------------------------------------
+            // ---------------------------------------
+
+            I("#r = ('xx',);");  //should work without params            
+
+            I("compare<2001 2001>{#r};");  //should work without params            
+            I("%s = getfile('compare_databanks.txt');");
+            ss = (First().GetIVariable("%s") as ScalarString).ConvertToString();
+            Assert.IsTrue(ss.Contains("Out of the 4 common series, there are differences regarding 1 of them"));
+            //_AssertScalarString
+
+            I("compare<2001 2001 dump>{#r};");
+            I("p #dif;");
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+
+            I("compare <2001 2001 dump sort = rel >{#r};");
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+
+            I("compare <2001 2001 dump sort = abs >{#r};");
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+
+            I("compare <2001 2001 dump abs = 0.199 >{#r};");  //no effect
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+
+            I("compare <2001 2001 dump abs = 0.201 >{#r};");  //yy[i] is filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+
+            I("compare <2001 2001 dump abs = 0.401 >{#r};");  //all are filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 0);
+
+            I("compare <2001 2001 dump rel = 0.0001 >{#r};");  //no effect
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+
+            I("compare <2001 2001 dump rel = 0.0003 >{#r};");  //yy[i] is filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+
+            I("compare <2001 2001 dump rel = 0.0011 >{#r};");  //all are filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 0);
+
+            // ---------------------------------------
+            // ---------------------------------------
+            // -------- quarters ---------------------
+            // ---------------------------------------
+            // ---------------------------------------
+
+            I("reset;");
+            I("option freq q;");
+            I("time 2001q1 2001q2;");
+            I("yy = series(1);");
+            I("yy!q[i] = (1000, 1000);");
+            I("xx = series(2);");
+            I("xx!q[a, x] = (100, 100);");
+            I("xx!q[b, x] = (200, 200);");
+            I("xx!q[a, y] = (300, 300);");
+            I("xx!q[b, y] = (400, 400);");
+            I("#m1 = a, b;");
+            I("#m2 = ('a',);");  //"#m2 = a;" does not work as intended
+            I("clone;");
+            I("xx!q[b, y] = (400.4, 402);");
+            I("yy!q[i] = (1000.2, 1004);");
+            I("yy!q[j] = 2000;");
+
+            //just some simple tests
+
+            I("compare <2001q1 2001q1 dump abs = 0.201 >;");  //yy[i] is filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
+
+            I("compare <2001q1 2001q1 dump abs = 0.401 >;");  //all are filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 0);
+
+            // ---------------------------------------
+            // ---------------------------------------
+            // -------- non-array quarters -----------
+            // ---------------------------------------
+            // ---------------------------------------
+
+            I("reset;");
+            I("option freq q;");
+            I("time 2001q1 2001q2;");            
+            I("yyi!q = (1000, 1000);");            
+            I("xxax!q = (100, 100);");
+            I("xxbx!q = (200, 200);");
+            I("xxay!q = (300, 300);");
+            I("xxby!q = (400, 400);");
+            I("#m1 = a, b;");
+            I("#m2 = ('a',);");  //"#m2 = a;" does not work as intended
+            I("clone;");
+            I("xxby!q = (400.4, 402);");
+            I("yyi!q = (1000.2, 1004);");
+            I("yyj!q = 2000;");
+
+            //just some simple tests
+
+            I("compare <2001q1 2001q1 dump abs = 0.201 >;");  //yy[i] is filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 1);
+            _AssertListString(First(), "#dif", 1, "xxby");
+
+            I("compare <2001q1 2001q1 dump abs = 0.401 >;");  //all are filtered out
+            I("p <n m q> {#dif};");
+            _AssertListSize(First(), "#dif", 0);
+
 
         }
 

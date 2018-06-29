@@ -1243,7 +1243,7 @@ namespace Gekko
         public static IVariable percentile(GekkoSmpl t, IVariable x1, IVariable percent)
         {
             //Mimics Excel's percentile function, see unit tests
-            if (IsGekkoNull(x1)) return x1;
+            if (G.IsGekkoNull(x1)) return x1;
             GekkoTime t1 = Globals.globalPeriodStart;
             GekkoTime t2 = Globals.globalPeriodEnd;
 
@@ -1268,7 +1268,7 @@ namespace Gekko
 
         public static IVariable abs(GekkoSmpl smpl, IVariable x1)
         {
-            if (IsGekkoNull(x1)) return x1;
+            if (G.IsGekkoNull(x1)) return x1;
             IVariable rv = null;
             if (x1.Type() == EVariableType.Val)
             {
@@ -1328,7 +1328,7 @@ namespace Gekko
 
         public static IVariable iif(GekkoSmpl t, IVariable i1, IVariable op, IVariable i2, IVariable o1, IVariable o2)
         {
-            if (IsGekkoNull(i1) && IsGekkoNull(i1)) return i1;
+            if (G.IsGekkoNull(i1) && G.IsGekkoNull(i1)) return i1;
             double result=double.NaN;
             if (!IsValOrTimeseries(i1))
             {
@@ -1430,12 +1430,22 @@ namespace Gekko
             return new ScalarVal(result);            
         }
 
-        public static IVariable list(GekkoSmpl smpl)
+        //!! practical for empty lists and singletons, for instance #m = list(); or #m = list('a');
+        //!! for other cases, ('a', 'b') is shorter than list('a', 'b') but yields the same.
+        public static IVariable list(GekkoSmpl smpl, params IVariable[] x)
         {
-            //empty list
-            List rv = new List();
-            rv.list = new List<IVariable>();
-            return rv;
+            if (x == null || x.Length == 0)
+            {
+                //empty list
+                List rv = new List();
+                rv.list = new List<IVariable>();
+                return rv;
+            }
+            else
+            {
+                List rv = new List(new List<IVariable>(x));
+                return rv;
+            }
         }
 
         public static IVariable map(GekkoSmpl smpl)
@@ -1448,7 +1458,7 @@ namespace Gekko
 
         public static IVariable log(GekkoSmpl smpl, IVariable x1)
         {
-            if (IsGekkoNull(x1)) return x1;
+            if (G.IsGekkoNull(x1)) return x1;
             IVariable rv = null;
             if (x1.Type() == EVariableType.Val)
             {
@@ -1480,7 +1490,7 @@ namespace Gekko
 
         public static IVariable exp(GekkoSmpl smpl, IVariable x1)
         {
-            if (IsGekkoNull(x1)) return x1;
+            if (G.IsGekkoNull(x1)) return x1;
             IVariable rv = null;
             if (x1.Type() == EVariableType.Val)
             {
@@ -1513,7 +1523,7 @@ namespace Gekko
 
         public static IVariable sqrt(GekkoSmpl smpl, IVariable x1)
         {
-            if (IsGekkoNull(x1)) return x1;
+            if (G.IsGekkoNull(x1)) return x1;
             IVariable rv = null;
             if (x1.Type() == EVariableType.Val)
             {
@@ -1552,7 +1562,7 @@ namespace Gekko
         //same as power()
         public static IVariable pow(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
-            if (IsGekkoNull(x1)) return x1;
+            if (G.IsGekkoNull(x1)) return x1;
             return O.Power(smpl, x1, x2);            
         }
 
@@ -1565,7 +1575,7 @@ namespace Gekko
         [MyCustom(Lag = "lag=1")]
         public static IVariable pch(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
         {
-            if (IsGekkoNull(x1)) return x1;
+            if (G.IsGekkoNull(x1)) return x1;
             Program.RevertSmpl(smplOriginal, smpl);
             if (x1.Type() == EVariableType.Series)
             {
@@ -1593,15 +1603,12 @@ namespace Gekko
             return new List(mm);
         }
 
-        private static bool IsGekkoNull(IVariable x1)
-        {
-            return x1.Type() == EVariableType.GekkoNull;
-        }
+        
 
         [MyCustom(Lag = "lag=1")]
         public static IVariable dlog(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
         {
-            if (IsGekkoNull(x1)) return x1;
+            if (G.IsGekkoNull(x1)) return x1;
             Program.RevertSmpl(smplOriginal, smpl);
             if (x1.Type() == EVariableType.Series)
             {
@@ -1618,7 +1625,7 @@ namespace Gekko
         [MyCustom(Lag = "lag=1")]
         public static IVariable dif(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
         {
-            if (IsGekkoNull(x1)) return x1;
+            if (G.IsGekkoNull(x1)) return x1;
             Program.RevertSmpl(smplOriginal, smpl);
             if (x1.Type() == EVariableType.Series)
             {
@@ -1635,7 +1642,7 @@ namespace Gekko
         [MyCustom(Lag = "lag=[2]")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
         public static IVariable lag(GekkoSmpl2 smpl2, GekkoSmpl smpl, IVariable x1, IVariable ilag)
         {
-            if (IsGekkoNull(x1)) return x1;
+            if (G.IsGekkoNull(x1)) return x1;
             Program.RevertSmpl(smpl2, smpl);
             return O.Indexer(smpl2, smpl, x1, O.Negate(smpl, ilag));
         }
@@ -1643,7 +1650,7 @@ namespace Gekko
         [MyCustom(Lag = "lag=[2]-1")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
         public static IVariable movsum(GekkoSmpl2 smpl2, GekkoSmpl smpl, IVariable x1, IVariable ilags)
         {
-            if (IsGekkoNull(x1)) return x1;
+            if (G.IsGekkoNull(x1)) return x1;
             Program.RevertSmpl(smpl2, smpl);
             return MovAvgSum(smpl, x1, ilags, false);            
         }
@@ -1651,7 +1658,7 @@ namespace Gekko
         [MyCustom(Lag = "lag=[2]-1")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
         public static IVariable movavg(GekkoSmpl2 smpl2, GekkoSmpl smpl, IVariable x1, IVariable ilags)
         {
-            if (IsGekkoNull(x1)) return x1;
+            if (G.IsGekkoNull(x1)) return x1;
             Program.RevertSmpl(smpl2, smpl);
             return MovAvgSum(smpl, x1, ilags, true);
         }
@@ -1716,7 +1723,7 @@ namespace Gekko
 
         public static IVariable round(GekkoSmpl smpl, IVariable x1, IVariable round)
         {
-            if (IsGekkoNull(x1)) return x1;
+            if (G.IsGekkoNull(x1)) return x1;
             double d2 = O.ConvertToVal(round);          
             int aaa1 = 0;
             if (!G.ConvertToInt(out aaa1, d2))
@@ -1906,7 +1913,7 @@ namespace Gekko
 
         public static IVariable val(GekkoSmpl smpl, IVariable x1)  //'string' not allowed as method name
         {
-            if (IsGekkoNull(x1)) return x1;
+            if (G.IsGekkoNull(x1)) return x1;
             double v = double.NaN;
             if (x1.Type() == EVariableType.Val)
             {

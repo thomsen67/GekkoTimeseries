@@ -2262,11 +2262,11 @@ compareOpt1:			    ISNOTQUAL
 						  | leftAngle2          compareOpt1h* RIGHTANGLE -> ^(ASTOPT1 compareOpt1h*)							
 						  | leftAngleNo2 dates? compareOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) compareOpt1h*)
                             ;
-compareOpt1h:				INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?)
-						  | SORT EQUAL name -> ^(ASTOPT_STRING_SORT name?)  //alpha, rel, abs
-						  | DUMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_DUMP yesNo?)
-						  | ABS EQUAL expression -> ^(ASTOPT_VAL_ABS expression)
+compareOpt1h:				ABS EQUAL expression -> ^(ASTOPT_VAL_ABS expression)
+						  | DUMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_DUMP yesNo?)						  
+						  | INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?)
 						  | REL EQUAL expression -> ^(ASTOPT_VAL_REL expression)
+						  | SORT EQUAL name -> ^(ASTOPT_STRING_SORT name?)  //alpha, rel, abs
 						  | PCH EQUAL expression -> ^(ASTOPT_VAL_PCH expression)
 						    ;
 

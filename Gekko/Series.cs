@@ -122,6 +122,7 @@ namespace Gekko
 
         public int dataOffsetLag = 0;  //only used in Series Light, to create lags/leads, never stored in protobuf since Series Light are never stored there
         public MapMultidimItem mmi = null;  //only used for array-subseries, pointing to its indices, the 'a', 'b' in x['a', 'b'].
+        public bool isNotFoundArraySubSeries = false;  //used when for instance x['a'] does not hit anything and returns a timeless series with value 0.
 
         private Series()
         {
@@ -1167,7 +1168,7 @@ namespace Gekko
 
         //minus, abs(), log(), exp(), sqrt()
         public static Series ArithmeticsSeries(GekkoSmpl smpl, Series x1_series, Func<double, double> a)
-        {
+        {            
             Series rv_series;
             if (x1_series.type == ESeriesType.Normal || x1_series.type == ESeriesType.Timeless)
             {
@@ -1197,7 +1198,7 @@ namespace Gekko
 
         //pch(), dlog(), dif()
         public static Series ArithmeticsSeriesLag(GekkoSmpl smpl, Series x1_series, Func<double, double, double> a)
-        {
+        {            
             Series rv_series;
             if (x1_series.type == ESeriesType.Normal || x1_series.type == ESeriesType.Timeless)
             {
@@ -1228,7 +1229,7 @@ namespace Gekko
         }
 
         public static Series ArithmeticsSeriesVal(GekkoSmpl smpl, Series x1_series, double x2_val, Func<double, double, double> a)
-        {
+        {            
             Series rv_series;
             GekkoTime window1, window2, windowNew1, windowNew2;
             InitWindows(out window1, out window2, out windowNew1, out windowNew2);
@@ -1400,6 +1401,8 @@ namespace Gekko
 
         public IVariable Add(GekkoSmpl smpl, IVariable input)
         {
+            if (G.IsGekkoNull(input)) return input;
+
             //-------------------------------------
             //x1 = SERIES (this)
             //x2 = SERIES or VAL or MATRIX 1x1 (input)
@@ -1418,6 +1421,8 @@ namespace Gekko
 
         public IVariable Subtract(GekkoSmpl smpl, IVariable input)
         {
+            if (G.IsGekkoNull(input)) return input;
+
             //-------------------------------------
             //x1 = SERIES (this)
             //x2 = SERIES or VAL or MATRIX 1x1 (input)
@@ -1436,6 +1441,8 @@ namespace Gekko
 
         public IVariable Multiply(GekkoSmpl smpl, IVariable input)
         {
+            if (G.IsGekkoNull(input)) return input;
+
             //-------------------------------------
             //x1 = SERIES (this)
             //x2 = SERIES or VAL or MATRIX 1x1 (input)
@@ -1454,6 +1461,7 @@ namespace Gekko
 
         public IVariable Divide(GekkoSmpl smpl, IVariable input)
         {
+            if (G.IsGekkoNull(input)) return input;
             //-------------------------------------
             //x1 = SERIES (this)
             //x2 = SERIES or VAL or MATRIX 1x1 (input)
@@ -1472,6 +1480,8 @@ namespace Gekko
 
         public IVariable Power(GekkoSmpl smpl, IVariable input)
         {
+            if (G.IsGekkoNull(input)) return input;
+
             //-------------------------------------
             //x1 = SERIES (this)
             //x2 = SERIES or VAL or MATRIX 1x1 (input)
@@ -1617,26 +1627,29 @@ namespace Gekko
                     {
                         if (Program.options.series_array_ignoremissing)
                         {
-                            if (command == GekkoSmplCommand.Sum)
-                            {
-                                rv = new Series(ESeriesType.Timeless, this.freq, null);
-                                ((Series)rv).SetTimelessData(0d);
-                            }
-                            else if (command == GekkoSmplCommand.Unfold)
-                            {
-                                rv = new GekkoNull();
-                            }
-                            else
-                            {
-                                //when does this happen -- table?
-                                rv = new Series(ESeriesType.Timeless, this.freq, null);
-                                ((Series)rv).SetTimelessData(double.NaN);
-                            }
+
+
+
+                            rv = new Series(ESeriesType.Timeless, this.freq, null);
+                            ((Series)rv).SetTimelessData(0d);
+                            ((Series)rv).isNotFoundArraySubSeries = true;
+
+
+                            //if (command == GekkoSmplCommand.Unfold)
+                            //{
+                            //    rv = new GekkoNull();
+                            //}
+                            //else //GekkoSmplCommand.Sum but also others
+                            //{
+                            //    rv = new Series(ESeriesType.Timeless, this.freq, null);
+                            //    ((Series)rv).SetTimelessData(0d);
+                            //    ((Series)rv).isNotFoundArraySubSeries = true;
+                            //}
                         }
                         else
                         {
                             List<string> warnings = new List<string>();
-                            
+
                             string txt = null;
                             foreach (string ss in keys)
                             {
@@ -1648,11 +1661,11 @@ namespace Gekko
                             }
                             G.Writeln2("*** ERROR: The arrayseries " + G.GetNameAndFreqPretty(this.name) + " did not contain this element:");
                             G.Writeln("           [" + txt.Substring(0, txt.Length - 2) + "]", Color.Red);
-                            foreach(string warning in warnings)
+                            foreach (string warning in warnings)
                             {
                                 G.Writeln("+++ NOTE: " + warning);
                             }
-                            G.Writeln("+++ NOTE: You may ignore such errors with OPTION series array ignoremissing = yes;");
+                            G.Writeln("+++ NOTE: You may ignore such errors with 'OPTION series array ignoremissing = yes;'");
                             throw new GekkoException();
                         }
                     }

@@ -6329,6 +6329,7 @@ namespace Gekko
             public string fileName = null;
             public double opt_abs = 0d; //important that this i 0
             public double opt_rel = 0d; //important that this i 0
+            public double opt_pch = 0d; //important that this i 0
             public void Exe()
             {
                 Program.Compare(this);

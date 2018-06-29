@@ -337,6 +337,11 @@ namespace Gekko
             }                     
         }
 
+        public static bool IsGekkoNull(IVariable x1)
+        {
+            return x1.Type() == EVariableType.GekkoNull;
+        }
+
         public static string AddCurrentFreqToName(string name)
         {
             return AddFreqToName(name, Program.options.freq);

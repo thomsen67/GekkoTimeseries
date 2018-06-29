@@ -394,7 +394,7 @@ namespace Gekko
     {
         public string nameGams = null;
         public string setsGams = null;
-        public string dollarGams = null;
+        public string conditionalsGams = null;
         public string lhsGams = null;
         public string rhsGams = null;
 
