@@ -21473,14 +21473,13 @@ namespace Gekko
 
             string pathAndFilename = CreateFullPathAndFileName(filename);
             int counter = 0;
-            using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
-            using (StreamWriter file = G.GekkoStreamWriter(fs))
-            {
+            if(true)
+            { 
                 //Writing to csv/prn file                              
 
                 if (format == EdataFormat.Prn)
                 {
-                    file.Write(G.varFormat("name", prnWidth));
+                    //file.Write(G.varFormat("name", prnWidth));
                     
                     if (cols)
                     {
@@ -21499,22 +21498,22 @@ namespace Gekko
                 {
                     if (format == EdataFormat.Csv)
                     {
-                        file.Write(";" + t.ToString());
+                        //file.Write(";" + t.ToString());
                         tab.Add(i, j, new CellLight(t.ToString())); j++;
                     }
                     else
                     {
-                        file.Write(G.varFormat(" " + t.ToString(), prnWidth));  //both prn and gnuplot
+                        //file.Write(G.varFormat(" " + t.ToString(), prnWidth));  //both prn and gnuplot
                         tab.Add(i, j, new CellLight(G.varFormat(" " + t.ToString(), prnWidth))); j++;
                     }
                 }
-                file.WriteLine();
+                //file.WriteLine();
                 i++;
                                 
                 foreach (BankNameVersion var in vars)
                 {
                     j = 1;
-                    string s3 = var.name;
+                    string s3 = var.name;                    
                     Databank db = GetBankFromBankNameVersion(var.bank);
                     TimeSeries ts = db.GetVariable(s3);
                     if (ts == null)
@@ -21530,17 +21529,17 @@ namespace Gekko
                     counter++;
                     if (format == EdataFormat.Csv)
                     {
-                        file.Write(s3);
+                        //file.Write(s3);
                         tab.Add(i, j, new CellLight(s3)); j++;                        
                     }
                     else
                     {
-                        file.Write(G.varFormat(s3, prnWidth));  //prn and gnuplot
+                        //file.Write(G.varFormat(s3, prnWidth));  //prn and gnuplot
                         tab.Add(i, j, new CellLight(G.varFormat(s3, prnWidth))); j++;
                     }
                     foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                     {
-                        if (format == EdataFormat.Csv) file.Write(";");
+                        //if (format == EdataFormat.Csv) file.Write(";");
                         double data = ts.GetData(t);
                         if (G.isNumericalError(data))
                         {
@@ -21548,12 +21547,12 @@ namespace Gekko
                             {
                                 if (format == EdataFormat.Csv)
                                 {
-                                    file.Write(""); //write nothing, indicates out-of-sample
+                                    //file.Write(""); //write nothing, indicates out-of-sample
                                     tab.Add(i, j, new CellLight("")); j++;
                                 }
                                 else
                                 {
-                                    file.Write(G.varFormat(" \"\"", prnWidth)); //write "", indicates out-of-sample
+                                    //file.Write(G.varFormat(" \"\"", prnWidth)); //write "", indicates out-of-sample
                                     tab.Add(i, j, new CellLight(G.varFormat(" \"\"", prnWidth))); j++;
                                 }
                             }
@@ -21563,11 +21562,11 @@ namespace Gekko
                                 if (format == EdataFormat.Csv)
                                 {
                                     tab.Add(i, j, new CellLight(s)); j++;
-                                    file.Write(s);
+                                    //file.Write(s);
                                 }
                                 else
                                 {
-                                    file.Write(G.varFormat(s, prnWidth));
+                                    //file.Write(G.varFormat(s, prnWidth));
                                     tab.Add(i, j, new CellLight(G.varFormat(s, prnWidth))); j++;
                                 }
                             }
@@ -21592,12 +21591,12 @@ namespace Gekko
                             {
                                 if (data < 0)
                                 {
-                                    file.Write(s);
+                                    //file.Write(s);
                                     tab.Add(i, j, new CellLight(s)); j++;
                                 }
                                 else
                                 {
-                                    file.Write(" " + s);
+                                    //file.Write(" " + s);
                                     tab.Add(i, j, new CellLight(" " + s)); j++;
                                 }
                             }
@@ -21606,31 +21605,35 @@ namespace Gekko
                                 //prn and gnuplot
                                 if (data < 0)
                                 {
-                                    file.Write(G.varFormat(s, prnWidth));
+                                    //file.Write(G.varFormat(s, prnWidth));
                                     tab.Add(i, j, new CellLight(G.varFormat(s, prnWidth))); j++;
                                 }
                                 else
                                 {
-                                    file.Write(G.varFormat(" " + s, prnWidth));
+                                    //file.Write(G.varFormat(" " + s, prnWidth));
                                     tab.Add(i, j, new CellLight(G.varFormat(" " + s, prnWidth))); j++;
                                 }
                             }
                         }
                     }
-                    file.WriteLine();
+                    //file.WriteLine();
                     i++;
                 }
 
-                file.Flush();
+                //file.Flush();
             }
 
-            G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
-                        
-            using (FileStream fs = WaitForFileStream(pathAndFilename + "w", GekkoFileReadOrWrite.Write))
+            if (cols)
+            {
+                tab = tab.Transpose();
+            }
+            
+            using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
             {
                 for (int ii = 1; ii <= tab.GetRowMaxNumber(); ii++)
                 {
+                    if (ii == 1 && cols && format == EdataFormat.Prn) file.Write(" ");  //strange that this is necessary
                     for (int jj = 1; jj <= tab.GetColMaxNumber(); jj++)
                     {
                         CellLight c = tab.Get(ii, jj);
@@ -21646,8 +21649,11 @@ namespace Gekko
                         }
                     }
                     file.WriteLine();
-                }                
-            }            
+                }
+                file.Flush();
+            }
+
+            G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
 
             return counter;
         }
@@ -35774,8 +35780,7 @@ namespace Gekko
             if (row > rowMax) rowMax = row;
             if (col > colMax) colMax = col;
             long key = GetKey(row, col);
-            storage.Add(key, value);
-            G.Writeln2("!!! added " + row + " " + col + " --> " + value.text);
+            storage.Add(key, value);            
         }
 
         public CellLight Get(int row, int col)
