@@ -25469,14 +25469,7 @@ namespace Gekko
 
             if (numberOfOtherVariables == 0 && numberOfGekkoNullVariables > 0)
             {
-                if (Program.options.series_array_ignoremissing)
-                {
-                    G.Writeln2("Nothing to print, because of missing array-series. Try 'OPTION series array ignoremissing = no;' to see which.");
-                }
-                else
-                {
-                    G.Writeln2("Nothing to print, because of missing array-series.");
-                }
+                G.Writeln2("+++ WARNING: Non-existing array-series (skipped)");
                 return;
             }
 

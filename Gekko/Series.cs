@@ -1627,12 +1627,9 @@ namespace Gekko
                     {
                         if (Program.options.series_array_ignoremissing)
                         {
-
-
-
                             rv = new Series(ESeriesType.Timeless, this.freq, null);
-                            ((Series)rv).SetTimelessData(0d);
-                            ((Series)rv).isNotFoundArraySubSeries = true;
+                            (rv as Series).SetTimelessData(0d);
+                            (rv as Series).isNotFoundArraySubSeries = true;
 
 
                             //if (command == GekkoSmplCommand.Unfold)
