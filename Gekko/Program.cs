@@ -31166,6 +31166,8 @@ namespace Gekko
                 throw new GekkoException();
             }
 
+            WriteXlsError(file);
+
             TableLight matrix = new TableLight();
 
             try
@@ -31280,13 +31282,22 @@ namespace Gekko
                     if (e.Message != null && e.Message != "")
                     {
                         G.Writeln2("*** ERROR: " + e.Message);
-                        G.Writeln("+++ NOTE: You may set 'OPTION sheet engine = excel;' to use the Excel engine from Gekko 2.2");
+                        WriteExcelError();
                     }
                 }
                 throw;
             }
             
             return matrix;
+        }
+
+        private static void WriteExcelError()
+        {
+            G.Writeln("+++ NOTE: You may set 'OPTION sheet engine = excel;' to use the Excel engine from Gekko 2.2.");
+            G.Writeln("          Gekko 2.4 uses 'engine = internal' instead of 'engine = excel'. The new engine is");
+            G.Writeln("          faster and more robust, but only supports .xslx, and not .xls files. In order to");
+            G.Writeln("          use .xls files, you must use 'engine = excel'. If you encounter unexpected errors, please");
+            G.Writeln("          try to see if 'engine = excel' solves them (requires Excel).");
         }
 
         public static TableLight ReadExcelWorkbookPIA(string file, Databank databank, string sheetName)
@@ -32044,12 +32055,7 @@ namespace Gekko
                 if (oPrt != null && oPrt.opt_filename != null) fileNameWithPath = oPrt.opt_filename;
                 else if (eo.fileName != null) fileNameWithPath = eo.fileName;
 
-                if (fileNameWithPath != null && G.equal(Path.GetExtension(fileNameWithPath), "xls"))
-                {
-                    G.Writeln2("*** ERROR: With 'OPTION sheet engine = internal;', only xlsx files are allowed. Please use 'OPTION sheet engine = excel;' for xls files;");
-                    G.Writeln("           Please Note that option 'excel' demands that Excel is installed on your machine.");
-                    throw new GekkoException();
-                }
+                WriteXlsError(fileNameWithPath);
 
                 if (fileNameWithPath != null)
                 {
@@ -32100,7 +32106,7 @@ namespace Gekko
                     int datesInt = 0; if (isDates) datesInt++;
                     int namesInt = 0; if (isNames) namesInt++;
                     ExcelDataForClip clipData = new ExcelDataForClip();
-                    
+
                     ExcelWorksheet ws = null;
 
                     if (isAppend)
@@ -32135,7 +32141,7 @@ namespace Gekko
                             //(1) and (3)
                             ws = excel.Workbook.Worksheets.Add("Data");  //fresh workbook with no sheet name given, we use default name
                         }
-                    }                    
+                    }
 
                     int rowcounter = 1;  //1-based
                     int colcounter = 1;  //1-based
@@ -32371,7 +32377,7 @@ namespace Gekko
                                                                              //System.Diagnostics.Process.Start("excel.exe", fileNameWithPath);                 
                     }
                     catch (Exception e)
-                    {                        
+                    {
                         G.Writeln2("*** ERROR: Opening the produced .xlsx file with an external program associated with .xlsx");
                         G.Writeln("    files (such as for example Microsoft Excel) failed.", Color.Red);
                         G.Writeln("*** ERROR: " + e.Message);
@@ -32385,13 +32391,24 @@ namespace Gekko
                     if (e.Message != null && e.Message != "")
                     {
                         G.Writeln2("*** ERROR: " + e.Message);
-                        G.Writeln("+++ NOTE: You may set 'OPTION sheet engine = excel;' to use the Excel engine from Gekko 2.2");
+                        WriteExcelError();
                     }
                 }
                 throw;
             }
 
             return null;
+        }
+
+        private static void WriteXlsError(string fileNameWithPath)
+        {
+            if (fileNameWithPath != null && G.equal(Path.GetExtension(fileNameWithPath), ".xls"))
+            {
+                G.Writeln2("*** ERROR: With 'OPTION sheet engine = internal;', only xlsx files are allowed.");
+                G.Writeln("           Please use 'OPTION sheet engine = excel;' for xls files.", Color.Red);
+                G.Writeln("           Note that option 'engine = excel' requires that Excel is installed on your machine.", Color.Red);
+                throw new GekkoException();
+            }
         }
 
         private static void ExcelCleanup(ref Excel.Workbook objBook, ref Excel.Workbooks objBooks, ref Excel.Sheets objSheets, ref Excel.Worksheet objSheet, ref Excel.Range range, ref Excel.Worksheet newSheet, ref Excel.Range range0)
@@ -34470,7 +34487,7 @@ namespace Gekko
                 string date = this.date;
                 if (date == null || date == "" || date == strange) date = "[empty]";
                 string ext = "";
-                if (Path.GetExtension(this.fileName).ToLower() == "bnk") ext = ".bnk";
+                if (Path.GetExtension(this.fileName).ToLower() == ".bnk") ext = ".bnk";
                 tab.CurRow.SetText(1, "DATABANK " + Path.GetFileNameWithoutExtension(this.fileName));
                 //tab.CurRow.SetText(1, "DATABANK " + Path.GetFileNameWithoutExtension(this.dbName));
                 tab.CurRow.SetBottomBorder(1, 1);
