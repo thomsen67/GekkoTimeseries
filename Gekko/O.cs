@@ -5055,6 +5055,7 @@ namespace Gekko
             public string opt_gnuplot= null;            
             public string opt_caps = null;
             public string opt_series = null;
+            public string opt_cols = null;
             public string type = null;  //THIS IS NOT WORKING PROPERLY!!
             public void Exe()
             {                

@@ -2561,7 +2561,8 @@ writeOpt1h                : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
 						  | CAPS (EQUAL yesNo)? -> ^(ASTOPT_STRING_CAPS yesNo?)		
 						  | GNUPLOT (EQUAL yesNo)? -> ^(ASTOPT_STRING_GNUPLOT yesNo?)
 						  | SERIES EQUAL exportType -> ^(ASTOPT_STRING_SERIES exportType)												
-						  | SERIES -> ^(ASTOPT_STRING_SERIES ASTOPN)												  				
+						  | SERIES -> ^(ASTOPT_STRING_SERIES ASTOPN)	
+						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)											  				
 						  ;
 
 //writeOpt2                 : leftAngle R (EQUAL yesNo)? RIGHTANGLE -> ^(ASTOPT_STRING_R yesNo?);
