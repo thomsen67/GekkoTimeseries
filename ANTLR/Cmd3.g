@@ -1972,8 +1972,12 @@ expressionOrNothing:        expression -> expression
 // ------------------- flexible list --------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-//accepts b:x!q but also {%s}-stuff including {#m}
-seqOfBankvarnames:          bankvarname (COMMA2 bankvarname)* ->  ^(ASTBANKVARNAMELIST bankvarname+);
+//accepts b:x!q but also {%s}-stuff including {#m}, and indexers like x['a'] or x[a]
+//seqOfBankvarnames:          bankvarname (COMMA2 bankvarname)* ->  ^(ASTBANKVARNAMELIST bankvarname+);
+
+seqOfBankvarnames:          leftSideIndexerExpression (COMMA2 leftSideIndexerExpression)* ->  ^(ASTBANKVARNAMELIST leftSideIndexerExpression+);
+
+  
 
 //accepts filenames without hyphens, but also strings (for instance 'text' or %s). So data.gbk or 'data.gbk' but not {'data.gbk'}.
 //distinguishing between a or 'a' is not interesting here, as it is for seqOfBankvarnames

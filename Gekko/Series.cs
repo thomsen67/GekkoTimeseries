@@ -1524,7 +1524,7 @@ namespace Gekko
 
             if (this.type == ESeriesType.ArraySuper)
             {
-                rv = this.FindArraySeries(smpl.command, indexes, false);
+                rv = this.FindArraySeries(indexes, false);
             }
             else {
 
@@ -1589,7 +1589,7 @@ namespace Gekko
             return this.name == null;  //then this.meta will also be null, but we only test .name
         }
 
-        private IVariable FindArraySeries(GekkoSmplCommand command, IVariable[] indexes, bool isLhs)
+        private IVariable FindArraySeries(IVariable[] indexes, bool isLhs)
         {
             if (indexes.Length == 0)
             {
@@ -1600,8 +1600,28 @@ namespace Gekko
 
             string[] keys = Program.GetListOfStringsFromListOfIvariables(indexes);
 
-            if (keys != null)
-            {              
+            if (keys == null)
+            {
+                //FAIL
+                string s = null;
+                foreach (IVariable iv in indexes)
+                {
+                    s += iv.Type().ToString() + ", ";
+                }
+                G.Writeln2("*** ERROR: Series []-index with these argument types: " + s.Substring(0, s.Length - (", ").Length));
+                throw new GekkoException();
+            }
+
+            rv = FindArraySeriesHelper(isLhs, keys);
+
+            return rv;
+        }
+
+        private IVariable FindArraySeriesHelper(bool isLhs, string[] keys)
+        {
+            IVariable rv;
+            if (true)
+            {
 
                 if (this.dimensionsStorage == null)
                 {
@@ -1688,22 +1708,11 @@ namespace Gekko
                 }
 
             }
-            else
-            {
-                //FAIL
-                string s = null;
-                foreach (IVariable iv in indexes)
-                {
-                    s += iv.Type().ToString() + ", ";
-                }
-                G.Writeln2("*** ERROR: Series []-index with these argument types: " + s.Substring(0, s.Length - (", ").Length));
-                throw new GekkoException();
-            }
+            
 
             return rv;
         }
-               
-        
+
         public static bool IsLagOrLead(int i)
         {
             return i > -100 && i < 100;
@@ -1846,7 +1855,7 @@ namespace Gekko
             else 
             {
                 //Will fail with an error if not all indexes are of STRING type                                
-                IVariable iv = this.FindArraySeries(smpl.command, indexes, true);  //if not found, it will be created (since we are on the lhs) and inherit the timeless status from this timeseries.
+                IVariable iv = this.FindArraySeries(indexes, true);  //if not found, it will be created (since we are on the lhs) and inherit the timeless status from this timeseries.
                 Series ts = iv as Series;
                 if (ts == null)
                 {

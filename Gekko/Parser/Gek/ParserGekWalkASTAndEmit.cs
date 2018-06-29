@@ -3009,11 +3009,24 @@ namespace Gekko.Parser.Gek
                             {
                                 if (indexesReport == null) indexesReport = indexes;
                                 node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexes + "), smpl, " + node[0].Code + ", " + indexesReport + ")");
+                                if (node[0].AlternativeCode != null)
+                                {
+                                    node.AlternativeCode = new GekkoSB();
+                                    node.AlternativeCode.A("(").A(node[0].AlternativeCode).A(")");
+                                    for (int i = 0; i < node[1].ChildrenCount(); i++)
+                                    {
+                                        if (i == 0) node.AlternativeCode.A(".Add(smpl, new ScalarString(\"[\"))");
+                                        node.AlternativeCode = node.AlternativeCode.A(".Add(smpl, ").A(node[1][i].Code).A(")");
+                                        if (i < node[1].ChildrenCount() - 1) node.AlternativeCode.A(".Add(smpl, new ScalarString(\", \"))");
+                                        if (i == node[1].ChildrenCount() - 1) node.AlternativeCode.A(".Add(smpl, new ScalarString(\"]\"))");
+                                    }
+                                }
                             }
                             else
                             {
                                 node.Code.A("O.IndexerSetData(smpl, ").A(node[0].Code).A(",  ").A(ivTempVar).A(", ").A(indexes).A(")");
                             }
+                            
                         }
                         break;
                     case "ASTINDEXER":

@@ -36373,10 +36373,16 @@ namespace Gekko
                     if (freq != null) freq2 = Globals.freqIndicator + freq;
                     else freq2 = Globals.freqIndicator + G.GetFreq(Program.options.freq);
 
-                    string tsNameWithFreq = tsString + freq2;
+                    string tsNameWithFreq = varName + freq2;
 
                     IVariable iv = bank.GetIVariable(tsNameWithFreq);
                     IVariable ivGrund = base2.GetIVariable(tsNameWithFreq);
+
+                    if (indexes != null)
+                    {
+                        iv = iv.Indexer(null, Program.GetListOfIVariablesFromListOfStrings(indexes));
+                        ivGrund = ivGrund.Indexer(null, Program.GetListOfIVariablesFromListOfStrings(indexes));
+                    }
 
                     if (iv == null && ivGrund == null)
                     {
