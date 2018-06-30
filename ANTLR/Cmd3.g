@@ -1977,7 +1977,7 @@ expressionOrNothing:        expression -> expression
 
 seqOfBankvarnames:          leftSideIndexerExpression (COMMA2 leftSideIndexerExpression)* ->  ^(ASTBANKVARNAMELIST leftSideIndexerExpression+);
 
-  
+seqOfBankvarnamesAtLeast1:  leftSideIndexerExpression (COMMA2 leftSideIndexerExpression)+ ->  ^(ASTBANKVARNAMELIST leftSideIndexerExpression+);
 
 //accepts filenames without hyphens, but also strings (for instance 'text' or %s). So data.gbk or 'data.gbk' but not {'data.gbk'}.
 //distinguishing between a or 'a' is not interesting here, as it is for seqOfBankvarnames
@@ -1988,13 +1988,6 @@ seqOfFileNamesStar:         star -> ^(ASTFILENAMELIST ASTFILENAMESTAR)
 						    ;
 
 //only use seriesnamesList, do not allow varnamesList or listWithoutParenthesis.
-
-//used in DISP and WRITE, for instance WRITE x, %x, b:#x ---> converted to WRITE ('x', '%x', 'b:#x')
-varnamesList:               bankvarnameList          //single item with no comma, or several items with commas between
-						  | bankvarnameList3         //single item with trailing comma
-						  | listWithoutParenthesis
-						  | expression
-						    ;      
 
 seriesnamesList:            bankseriesnameList2      //several items with commas between
 						  | bankseriesnameList3      //single item with trailing comma
@@ -2157,15 +2150,28 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 
 //NOTE: ASTLEFTSIDE must always have ASTASSIGNMENT as parent, cf. #324683532
 
-assignment:				    assignmentType seriesOpt1? leftSide EQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) seriesnamesList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+//assignment:				    assignmentType seriesOpt1? leftSide EQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) seriesnamesList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+//						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+//						  | assignmentType seriesOpt1? leftSide PLUSEQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide seriesnamesList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+//						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+//						  | assignmentType seriesOpt1? leftSide MINUSEQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide seriesnamesList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+//						  | assignmentType seriesOpt1? leftSide MINUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+//						  | assignmentType seriesOpt1? leftSide STAREQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide seriesnamesList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+//						  | assignmentType seriesOpt1? leftSide STAREQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+//						  | assignmentType seriesOpt1? leftSide DIVEQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide seriesnamesList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+//						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+//						    ;
+
+
+assignment:				    assignmentType seriesOpt1? leftSide EQUAL seqOfBankvarnamesAtLeast1 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast1 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-						  | assignmentType seriesOpt1? leftSide PLUSEQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide seriesnamesList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide PLUSEQUAL seqOfBankvarnamesAtLeast1 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide seqOfBankvarnamesAtLeast1) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-						  | assignmentType seriesOpt1? leftSide MINUSEQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide seriesnamesList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide MINUSEQUAL seqOfBankvarnamesAtLeast1 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide seqOfBankvarnamesAtLeast1) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide MINUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-						  | assignmentType seriesOpt1? leftSide STAREQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide seriesnamesList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide STAREQUAL seqOfBankvarnamesAtLeast1 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide seqOfBankvarnamesAtLeast1) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide STAREQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-						  | assignmentType seriesOpt1? leftSide DIVEQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide seriesnamesList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide DIVEQUAL seqOfBankvarnamesAtLeast1 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide seqOfBankvarnamesAtLeast1) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
 						    ;
 
@@ -2248,7 +2254,7 @@ closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)
 
 
 disp:						DISP StringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, $DISP.Line)} StringInQuotes)
-						  | DISP dispOpt1? varnamesList -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) varnamesList)				
+						  | DISP dispOpt1? seqOfBankvarnames -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) seqOfBankvarnames) //varnameslist				
 						    ;
 
 dispOpt1:					ISNOTQUAL
@@ -2753,8 +2759,8 @@ timefilterperiod:           expression ((doubleDot | TO) expression (BY expressi
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 						    //!!!2x2 identical lines ONLY because of token stuff
-write:					    WRITE  writeOpt1? varnamesList FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST varnamesList))
-						  | EXPORT writeOpt1? varnamesList FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST varnamesList))
+write:					    WRITE  writeOpt1? seqOfBankvarnames FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST seqOfBankvarnames))
+						  | EXPORT writeOpt1? seqOfBankvarnames FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST seqOfBankvarnames))
 						  | WRITE  writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST))
 						  | EXPORT writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST))
 						    ;

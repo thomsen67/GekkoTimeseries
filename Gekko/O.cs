@@ -1187,7 +1187,28 @@ namespace Gekko
             return rv;
         }
 
-        public static List<string> Restrict(List m, bool allowBank, bool allowSigil, bool allowFreq)
+        public static IVariable GetIVariableFromString(string dbName, string varName, string freq, string[] indexes)
+        {
+            string freq2 = null;
+            if (freq != null) freq2 = Globals.freqIndicator + freq;
+            else freq2 = Globals.freqIndicator + G.GetFreq(Program.options.freq);
+            string tsNameWithFreq = varName + freq2;
+            Databank bank = null;
+            if (dbName == null) bank = Program.databanks.GetFirst();
+            else bank = Program.databanks.GetDatabank(dbName);
+            if (dbName != null)
+            {
+                bank = Program.databanks.GetDatabank(dbName, true);
+            }
+            IVariable iv = bank.GetIVariable(tsNameWithFreq);
+            if (indexes != null)
+            {
+                iv = iv.Indexer(null, Program.GetListOfIVariablesFromListOfStrings(indexes));
+            }
+            return iv;
+        }
+
+        public static List<string> Restrict(List m, bool allowBank, bool allowSigil, bool allowFreq, bool allowIndexes)
         {
             if (m == null) return null;
             List<string> rv = new List<string>();
@@ -1212,6 +1233,11 @@ namespace Gekko
                 if (!allowFreq && s.Contains(Globals.freqIndicator))
                 {
                     G.Writeln2("*** ERROR: Frequency (" + Globals.freqIndicator + ") not accepted as part of name");
+                    throw new GekkoException();
+                }
+                if (!allowIndexes && (s.Contains("[") || s.Contains("]")))
+                {
+                    G.Writeln2("*** ERROR: Index [...] not accepted as part of name");
                     throw new GekkoException();
                 }
                 rv.Add(s);
@@ -5662,7 +5688,7 @@ namespace Gekko
                 }
                 else
                 {
-                    List<string> names = Restrict(this.listItems, false, false, false);
+                    List<string> names = Restrict(this.listItems, false, false, false, false);
                     foreach (string dbName in names)
                     {                        
                         if (G.Equal(dbName, Globals.Work) || G.Equal(dbName, Globals.Ref))

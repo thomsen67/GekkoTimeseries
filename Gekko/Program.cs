@@ -23582,7 +23582,7 @@ namespace Gekko
 
             string type2 = o.opt_sort;
             bool order = true;
-            List<string> variables = O.Restrict(o.listItems, false, false, false);
+            List<string> variables = O.Restrict(o.listItems, true, false, false, true);
             
             string variablesType = null;  //"_s" etc.
             bool dlog = false;
@@ -36363,26 +36363,13 @@ namespace Gekko
                     O.Chop(tsString, out dbName, out varName, out freq, out indexes);
 
                     if (G.HasSigil(varName)) continue;  //filter out non-series, like %s or #m
+                                        
+                    IVariable iv = O.GetIVariableFromString(dbName, varName, freq, indexes);
+                    IVariable ivGrund = O.GetIVariableFromString("Ref", varName, freq, indexes);
 
-                    Databank bank = work;
-                    if (dbName != null)
-                    {
-                        bank = Program.databanks.GetDatabank(dbName, true);
-                    }
-                    string freq2 = null;
-                    if (freq != null) freq2 = Globals.freqIndicator + freq;
-                    else freq2 = Globals.freqIndicator + G.GetFreq(Program.options.freq);
-
-                    string tsNameWithFreq = varName + freq2;
-
-                    IVariable iv = bank.GetIVariable(tsNameWithFreq);
-                    IVariable ivGrund = base2.GetIVariable(tsNameWithFreq);
-
-                    if (indexes != null)
-                    {
-                        iv = iv.Indexer(null, Program.GetListOfIVariablesFromListOfStrings(indexes));
-                        ivGrund = ivGrund.Indexer(null, Program.GetListOfIVariablesFromListOfStrings(indexes));
-                    }
+                    //string tsNameWithFreq = varName;
+                    //if (freq != null) tsNameWithFreq = Globals.freqIndicator + freq;
+                    string tsNameWithFreq = tsString;                    
 
                     if (iv == null && ivGrund == null)
                     {
@@ -36396,7 +36383,6 @@ namespace Gekko
                     Series tsGrund = null;
                     if (iv != null) ts = iv as Series;
                     if (ivGrund != null) tsGrund = ivGrund as Series;
-
 
                     if (ts == null && tsGrund == null) continue;  //this should not happen, just for safety
 
@@ -36570,8 +36556,16 @@ namespace Gekko
                             else break;
                         }
                     }
-                    if (order) ordered.Add(-max1, sh);
-                    else ordered.Add(sh.series1.GetNameWithoutCurrentFreq(true), sh);
+                    
+                    if (order)
+                    {
+                        ordered.Add(-max1, sh);
+                    }
+                    else
+                    {
+                        string key = sh.series1.GetNameWithoutCurrentFreq(true);
+                        if (!ordered.ContainsKey(key)) ordered.Add(key, sh);  //skip dublets here when printing
+                    }
                 }
 
 
@@ -36692,13 +36686,15 @@ namespace Gekko
                     dumpList = true;
                 }
             }
-            G.Writeln2("Databank compare on " + both2.Count + " common series, " + seriesShown + " differences shown in file '" + samFileName + "'");
+            G.Writeln2("Databank compare on " + both2.Count + " common series, " + ordered.Count + " differences shown in file '" + samFileName + "'");
             if (dumpList) G.Writeln2("List " + Globals.symbolCollection + "dif contains the " + dif.Count + " different variables");
             if (notFoundBoth2.Count > 0)
             {
                 G.Writeln("+++ NOTE: " + notFoundBoth2.Count + " series not found");
             }
         }
+
+        
 
         private static string MaybeRemoveFreq(string name, bool removeCurrentFreqFromNames)
         {            

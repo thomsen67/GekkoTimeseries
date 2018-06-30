@@ -632,7 +632,7 @@ namespace UnitTests
             I("OPEN {#m1a};");
             I("CLOSE {#m1a};");
             //------
-            I("#m1 = '" + Globals.ttPath2 + @"\regres\{%s3}\temp\b1', '" + Globals.ttPath2 + @"\regres\{%s3}\temp\b2';");
+            I("#m1 = ('" + Globals.ttPath2 + @"\regres\{%s3}\temp\b1', '" + Globals.ttPath2 + @"\regres\{%s3}\temp\b2');");
             I("#m2 = c1, c2;");
             I("OPEN {#m1} as {#m2};");
             I("CLOSE {#m2};");
@@ -793,7 +793,7 @@ namespace UnitTests
 
             I("RESET; TIME 2001 2001;");
             I("v = series(1);");
-            I("#s = 'a', 'b';");
+            I("#s = ('a', 'b');");
             I("v[#s] = 1;");
             _AssertSeries(First(), "v", new string[] { "a" }, 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "v", new string[] { "a" }, 2001, 1d, sharedDelta);
@@ -805,10 +805,10 @@ namespace UnitTests
             I("RESET; TIME 2001 2001;");
             I("series xx3 = series(3);");
             I("series xx2 = series(2);");
-            I("#i = 'a', 'b';");
+            I("#i = a, b;");
             I("#i0 = ('b',);");
-            I("#j = 'x', 'y';");
-            I("#k = 'm', 'n';");
+            I("#j = x, y;");
+            I("#k = m, n;");
             I("xx3[#i, #j, #k] = 5 + 0;");
             I("xx3[#i, #j, #k] $ (#i0[#i]) = 6 + 0;");
             I("xx2[#i, #j] = sum(#k, xx3[#i, #j, #k]) + 0;");
@@ -983,9 +983,9 @@ namespace UnitTests
         private static void DatabanksTestHelper8()
         {
             I("xx1 = series(1);");
-            I("xx1[a] = 101, 102, 103;");
-            I("xx1[b] = 201, 202, 203;");
-            I("xx2 = 100, 101, 102;");
+            I("xx1[a] = (101, 102, 103);");
+            I("xx1[b] = (201, 202, 203);");
+            I("xx2 = (100, 101, 102);");
             I("%v = 100;");
             I("#m = [100, 101];");
         }
@@ -1074,7 +1074,7 @@ namespace UnitTests
             I("%v = 1 $ (0 == 1);");
             _AssertScalarVal(First(), "%v", 0d);
 
-            I("xx1 = 1, 2, 3;");
+            I("xx1 = (1, 2, 3);");
             I("xx = 100 $ (xx1 == 2);");
             _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx", 2000, 0d, sharedDelta);
