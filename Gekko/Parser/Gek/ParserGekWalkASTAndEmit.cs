@@ -811,11 +811,11 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.Clear o" + Num(node) + " = new O.Clear();" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;");
-                            if (node[0].ChildrenCount() > 0)
+                            if (node[1].ChildrenCount() > 0)
                             {
-                                node.Code.A("o" + Num(node) + ".name = `" + node[0][0].Text + "`;" + G.NL);
+                                node.Code.A("o" + Num(node) + ".name = " + node[1][0].Code + ";" + G.NL);
                             }
-                            GetCodeFromAllChildren(node);
+                            GetCodeFromAllChildren(node, node[0]);  //options
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -850,8 +850,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTCLOSE":
                         {                            
-                            node.Code.A("O.Close o" + Num(node) + " = new O.Close();" + G.NL);
-                            //node.Code.A("o" + Num(node) + ".name = `" + node[0].Text + "`;" + G.NL);
+                            node.Code.A("O.Close o" + Num(node) + " = new O.Close();" + G.NL);                            
                             node.Code.A("o" + Num(node) + ".listItems = " + node[0].Code + ";" + G.NL);                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }

@@ -22080,45 +22080,61 @@ namespace Gekko
         {
             //Take care with filename, when clearing: only wipe it out if it is Work or Ref banks, other banks may be OPENed banks that we would like to write back to when CLOSEing
 
-            if (o.name != null && (o.opt_first != null || o.opt_ref != null))
-            {
-                G.Writeln2("*** ERROR: You should use 'CLEAR<first>;' or  'CLEAR<ref>;'");
-                throw new GekkoException();
-            }
+            List<string> names = O.Restrict(o.name, false, false, false, false);
 
-            if (o.name != null)
+            if (names == null)
             {
-                if (Program.databanks.GetDatabank(o.name) == null)
+                if (G.Equal(o.opt_first, "yes"))
                 {
-                    G.Writeln2("*** ERROR: Trying to clear non-existing databank '" + o.name + "'");
-                    throw new GekkoException();
+                    Program.databanks.GetFirst().Clear();
+                    if (Program.databanks.GetFirst().name == Globals.Work || Program.databanks.GetFirst().name == Globals.Ref) Program.databanks.GetFirst().FileNameWithPath = null;
+                    G.Writeln2("Cleared first databank ('" + Program.databanks.GetFirst().name + "')");
+                }
+                if (G.Equal(o.opt_ref, "yes"))
+                {
+                    Program.databanks.GetRef().Clear();
+                    if (Program.databanks.GetRef().name == Globals.Work || Program.databanks.GetRef().name == Globals.Ref) Program.databanks.GetRef().FileNameWithPath = null;
+                    G.Writeln2("Cleared ref databank ('" + Program.databanks.GetRef().name + "')");
                 }
 
-                Databank db1 = Program.databanks.GetDatabank(o.name);
-                db1.Clear();
-                if (db1.name == Globals.Work || db1.name == Globals.Ref) db1.FileNameWithPath = null;
-                G.Writeln2("Cleared databank: " + o.name);
+                if (!G.Equal(o.opt_first, "yes") && !G.Equal(o.opt_ref, "yes"))
+                {
+                    //Before: Cleared 'Work' and 'Ref' regardless of position
+                    Program.databanks.GetFirst().Clear();
+                    Program.databanks.GetRef().Clear();
+                    if (Program.databanks.GetFirst().name == Globals.Work || Program.databanks.GetFirst().name == Globals.Ref) Program.databanks.GetFirst().FileNameWithPath = null;
+                    if (Program.databanks.GetRef().name == Globals.Work || Program.databanks.GetRef().name == Globals.Ref) Program.databanks.GetRef().FileNameWithPath = null;
+                    G.Writeln2("Cleared first and ref databanks ('" + Program.databanks.GetFirst().name + "' and '" + Program.databanks.GetRef().name + "')");
+                }
             }
-            if (G.Equal(o.opt_first, "yes"))
+            else
             {
-                Program.databanks.GetFirst().Clear();
-                if (Program.databanks.GetFirst().name == Globals.Work || Program.databanks.GetFirst().name == Globals.Ref) Program.databanks.GetFirst().FileNameWithPath = null;
-                G.Writeln2("Cleared first databank ('" + Program.databanks.GetFirst().name + "')");
-            }
-            if (G.Equal(o.opt_ref, "yes"))
-            {
-                Program.databanks.GetRef().Clear();
-                if (Program.databanks.GetRef().name == Globals.Work || Program.databanks.GetRef().name == Globals.Ref) Program.databanks.GetRef().FileNameWithPath = null;
-                G.Writeln2("Cleared ref databank ('" + Program.databanks.GetRef().name + "')");
-            }
-            if (o.name == null && !G.Equal(o.opt_first, "yes") && !G.Equal(o.opt_ref, "yes"))
-            {
-                //Before: Cleared 'Work' and 'Ref' regardless of position
-                Program.databanks.GetFirst().Clear();
-                Program.databanks.GetRef().Clear();
-                if (Program.databanks.GetFirst().name == Globals.Work || Program.databanks.GetFirst().name == Globals.Ref) Program.databanks.GetFirst().FileNameWithPath = null;
-                if (Program.databanks.GetRef().name == Globals.Work || Program.databanks.GetRef().name == Globals.Ref) Program.databanks.GetRef().FileNameWithPath = null;
-                G.Writeln2("Cleared first and ref databanks ('" + Program.databanks.GetFirst().name + "' and '" + Program.databanks.GetRef().name + "')");
+
+                foreach (string name in names)
+                {
+
+                    if (o.name != null && (o.opt_first != null || o.opt_ref != null))
+                    {
+                        G.Writeln2("*** ERROR: You should use 'CLEAR<first>;' or  'CLEAR<ref>;'");
+                        throw new GekkoException();
+                    }
+
+                    if (o.name != null)
+                    {
+                        if (Program.databanks.GetDatabank(name) == null)
+                        {
+                            G.Writeln2("*** ERROR: Trying to clear non-existing databank '" + name + "'");
+                            throw new GekkoException();
+                        }
+
+                        Databank db1 = Program.databanks.GetDatabank(name);
+                        db1.Clear();
+                        if (db1.name == Globals.Work || db1.name == Globals.Ref) db1.FileNameWithPath = null;
+                        G.Writeln2("Cleared databank: " + name);
+                    }
+                    
+                    
+                }
             }
         }
 

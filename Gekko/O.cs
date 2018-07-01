@@ -1208,43 +1208,62 @@ namespace Gekko
             return iv;
         }
 
-        public static List<string> Restrict(List m, bool allowBank, bool allowSigil, bool allowFreq, bool allowIndexes)
+        //See also Restrict()
+        public static List Restrict2(List m, bool allowBank, bool allowSigil, bool allowFreq, bool allowIndexes)
         {
             if (m == null) return null;
+            foreach (IVariable iv in m.list)
+            {
+                string s = RestrictHelper(allowBank, allowSigil, allowFreq, allowIndexes, iv);
+                //don't use the string, just test it
+            }
+            return m;
+        }
+
+        //See also Restrict2()
+        public static List<string> Restrict(List m, bool allowBank, bool allowSigil, bool allowFreq, bool allowIndexes)
+        {
+            if (m == null) return null;            
             List<string> rv = new List<string>();
             foreach (IVariable iv in m.list)
             {
-                string s = iv.ConvertToString();
-                if (!allowBank && s.Contains(Globals.symbolBankColon))
-                {
-                    G.Writeln2("*** ERROR: Bankname not accepted as part of name");
-                    throw new GekkoException();
-                }
-                if (!allowSigil && s.Contains(Globals.symbolScalar))
-                {
-                    G.Writeln2("*** ERROR: Scalar symbol (" + Globals.symbolScalar + ") not accepted, use {%x} instead of %x");
-                    throw new GekkoException();
-                }
-                if (!allowSigil && s.Contains(Globals.symbolCollection))
-                {
-                    G.Writeln2("*** ERROR: Collection symbol (" + Globals.symbolCollection + ") not accepted, use {#x} instead of #x");
-                    throw new GekkoException();
-                }
-                if (!allowFreq && s.Contains(Globals.freqIndicator))
-                {
-                    G.Writeln2("*** ERROR: Frequency (" + Globals.freqIndicator + ") not accepted as part of name");
-                    throw new GekkoException();
-                }
-                if (!allowIndexes && (s.Contains("[") || s.Contains("]")))
-                {
-                    G.Writeln2("*** ERROR: Index [...] not accepted as part of name");
-                    throw new GekkoException();
-                }
+                string s = RestrictHelper(allowBank, allowSigil, allowFreq, allowIndexes, iv);
                 rv.Add(s);
             }
             return rv;
         }
 
+        private static string RestrictHelper(bool allowBank, bool allowSigil, bool allowFreq, bool allowIndexes, IVariable iv)
+        {
+            string s = iv.ConvertToString();
+            if (!allowBank && s.Contains(Globals.symbolBankColon))
+            {
+                G.Writeln2("*** ERROR: Bankname not accepted as part of name");
+                throw new GekkoException();
+            }
+            if (!allowSigil && s.Contains(Globals.symbolScalar))
+            {
+                G.Writeln2("*** ERROR: Scalar symbol (" + Globals.symbolScalar + ") not accepted, use {%x} instead of %x");
+                throw new GekkoException();
+            }
+            if (!allowSigil && s.Contains(Globals.symbolCollection))
+            {
+                G.Writeln2("*** ERROR: Collection symbol (" + Globals.symbolCollection + ") not accepted, use {#x} instead of #x");
+                throw new GekkoException();
+            }
+            if (!allowFreq && s.Contains(Globals.freqIndicator))
+            {
+                G.Writeln2("*** ERROR: Frequency (" + Globals.freqIndicator + ") not accepted as part of name");
+                throw new GekkoException();
+            }
+            if (!allowIndexes && (s.Contains("[") || s.Contains("]")))
+            {
+                G.Writeln2("*** ERROR: Index [...] not accepted as part of name");
+                throw new GekkoException();
+            }
+
+            return s;
+        }
 
         public static List CreateListFromStrings(string[] input)
         {
@@ -5109,7 +5128,7 @@ namespace Gekko
 
         public class Clear
         {
-            public string name = null;
+            public List name = null;
             public P p = null;
             public string opt_first = null;
             public string opt_ref = null;

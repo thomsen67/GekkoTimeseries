@@ -1987,22 +1987,6 @@ seqOfFileNamesStar:         star -> ^(ASTFILENAMELIST ASTFILENAMESTAR)
 						  | fileName (COMMA2 fileName)* ->  ^(ASTFILENAMELIST fileName+)
 						    ;
 
-//only use seriesnamesList, do not allow varnamesList or listWithoutParenthesis.
-
-seriesnamesList:            bankseriesnameList2      //several items with commas between
-						  | bankseriesnameList3      //single item with trailing comma
-						  | listWithoutParenthesis 
-						  | expression
-						    ;							           
-
-bankvarnameList:            bankvarname (COMMA2 bankvarname)* -> ^(ASTBANKVARNAMELIST bankvarname+);                       //a OR a,b OR a,b,c
-bankvarnameList2:           bankvarname (COMMA2 bankvarname)+ -> ^(ASTBANKVARNAMELIST bankvarname+); //mandatory comma     //a,b OR a,b,c
-bankvarnameList3:           bankvarname COMMA2 -> ^(ASTBANKVARNAMELIST bankvarname);                                       //a,
-
-bankseriesnameList:         bankseriesname (COMMA2 bankseriesname)* -> ^(ASTBANKVARNAMELIST bankseriesname+);                       //a OR a,b OR a,b,c
-bankseriesnameList2:        bankseriesname (COMMA2 bankseriesname)+ -> ^(ASTBANKVARNAMELIST bankseriesname+); //mandatory comma     //a,b OR a,b,c
-bankseriesnameList3:        bankseriesname COMMA2 -> ^(ASTBANKVARNAMELIST bankseriesname);                                       //a,
-
 listWithoutParenthesis:     expression (',' expression)+ -> ^(ASTLISTDEF expression+);                                     //must have comma
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -2101,10 +2085,12 @@ statements:                 statements2*;
 statements2:                SEMICOLON -> //stray semicolon is ok, nothing is written
                           | assignment           SEMICOLON!
 						  | accept               SEMICOLON!
-						  | analyze              SEMICOLON!						  
+						  | analyze              SEMICOLON!		
+			              | clear                SEMICOLON!		
 						  | clone                SEMICOLON!
 						  | close                SEMICOLON!
 						  | cls                  SEMICOLON!
+						  | collapse             SEMICOLON!
 						  | compare              SEMICOLON!
 						  | disp                 SEMICOLON!
 						  | endo                 SEMICOLON!
@@ -2226,6 +2212,16 @@ analyzeOpt1h:               LAG EQUAL expression -> ^(ASTOPT_VAL_LAG expression)
 						    ;		
 							
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
+// CLEAR
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+							
+clear:					    CLEAR clearOpt1? seqOfBankvarnames? -> ^({token("ASTCLEAR", ASTCLEAR, $CLEAR.Line)} ^(ASTPLACEHOLDER clearOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
+clearOpt1:				    ISNOTQUAL | leftAngle clearOpt1h* RIGHTANGLE -> ^(ASTOPT1 clearOpt1h*);
+clearOpt1h:				    FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)	
+                          | REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_REF yesNo?)
+						    ;	
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 // CLONE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -2247,21 +2243,13 @@ close:					    CLOSE closeOpt1? seqOfBankvarnames -> ^({token("ASTCLOSE", ASTCLO
 closeOpt1:				    ISNOTQUAL | leftAngle closeOpt1h* RIGHTANGLE -> ^(ASTOPT1 closeOpt1h*);
 closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)							
 						    ;		
-														
+												
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
-// DISP
+// COLLAPSE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-disp:						DISP StringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, $DISP.Line)} StringInQuotes)
-						  | DISP dispOpt1? seqOfBankvarnames -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) seqOfBankvarnames) //varnameslist				
-						    ;
-
-dispOpt1:					ISNOTQUAL
-						  | leftAngle2          dispOpt1h* RIGHTANGLE -> ^(ASTOPT1 dispOpt1h*)							
-						  | leftAngleNo2 dates? dispOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) dispOpt1h*)
-                            ;
-dispOpt1h:				    INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
+collapse:				    COLLAPSE seqOfBankvarnames '=' seqOfBankvarnames collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, $COLLAPSE.Line)} seqOfBankvarnames seqOfBankvarnames collapseMethod?);
+collapseMethod:			    FIRST|LAST|AVG|TOTAL;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // COMPARE
@@ -2279,6 +2267,21 @@ compareOpt1h:				ABS EQUAL expression -> ^(ASTOPT_VAL_ABS expression)
 						  | SORT EQUAL name -> ^(ASTOPT_STRING_SORT name?)  //alpha, rel, abs
 						  | PCH EQUAL expression -> ^(ASTOPT_VAL_PCH expression)
 						    ;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// DISP
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+disp:						DISP StringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, $DISP.Line)} StringInQuotes)
+						  | DISP dispOpt1? seqOfBankvarnames -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) seqOfBankvarnames) //varnameslist				
+						    ;
+
+dispOpt1:					ISNOTQUAL
+						  | leftAngle2          dispOpt1h* RIGHTANGLE -> ^(ASTOPT1 dispOpt1h*)							
+						  | leftAngleNo2 dates? dispOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) dispOpt1h*)
+                            ;
+dispOpt1h:				    INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
+
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ENDO/EXO
@@ -2302,7 +2305,7 @@ for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  func
 						    ;
 
 forHelper2:                 type? svarname EQUAL expression TO expression2 (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2) ^(ASTPLACEHOLDER expression3?))
-                          | type? svarname EQUAL seriesnamesList -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER seriesnamesList) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+                          | type? svarname EQUAL seqOfBankvarnamesAtLeast1 -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER seqOfBankvarnamesAtLeast1) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
                           | type? svarname EQUAL expression -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
                             ;
                           
