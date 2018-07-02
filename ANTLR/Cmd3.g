@@ -2092,6 +2092,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | cls                  SEMICOLON!
 						  | collapse             SEMICOLON!
 						  | compare              SEMICOLON!
+						  | copy                 SEMICOLON!
 						  | disp                 SEMICOLON!
 						  | endo                 SEMICOLON!
 						  | exo                  SEMICOLON!
@@ -2102,6 +2103,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | if2
 						  | ini                  SEMICOLON!
 						  | ini                  SEMICOLON!
+						  | interpolate          SEMICOLON!
 						  | mem                  SEMICOLON!
 						  | model                SEMICOLON!
 		   			      | mode                 SEMICOLON!
@@ -2269,6 +2271,65 @@ compareOpt1h:				ABS EQUAL expression -> ^(ASTOPT_VAL_ABS expression)
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
+// COPY
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+copy                      : COPY copyOpt1? listItemsWildRange (TO listItemsWildRange)? -> ^({token("ASTCOPY", ASTCOPY, $COPY.Line)} copyOpt1? listItemsWildRange listItemsWildRange?);
+copyOpt1                  : ISNOTQUAL
+						  | leftAngle2          copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 copyOpt1h*)		
+						  | leftAngleNo2 dates? copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) copyOpt1h*)
+						  ;
+copyOpt1h                 : RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT yesNo?)
+						  | ERROR (EQUAL yesNo)? -> ^(ASTOPT_STRING_ERROR yesNo?)
+						  | FROM EQUAL name -> ^(ASTOPT_STRING_FROM name)
+						  | FROM EQUAL AT GLUE? -> ^(ASTOPT_STRING_FROM ASTAT)
+						  | TO EQUAL name -> ^(ASTOPT_STRING_TO name)
+						  | TO EQUAL AT GLUE? -> ^(ASTOPT_STRING_TO ASTAT)
+						  ;
+
+listItemsWildRange        : listItemWildRange (COMMA2 listItemWildRange)* -> ^(ASTLISTITEMS (^(ASTLISTITEM listItemWildRange))+);   //puts in o.listItems
+
+listItemWildRange         : wildcardWithBank ->                        wildcardWithBank
+						  | rangeWithBank ->                           rangeWithBank							 
+						  | expression ->						       expression
+						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)   //accepts stuff like 0e. Integers are caught via expression.												
+						  ;
+
+wildcardWithBank          : name COLON wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK name) ^(ASTWILDCARD wildcard))
+						  | AT GLUE wildcard ->  ^(ASTWILDCARDWITHBANK ^(ASTBANK ASTAT) ^(ASTWILDCARD wildcard))
+						  | wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK) ^(ASTWILDCARD wildcard))
+						  ;						
+
+rangeWithBank             : name COLON range -> ^(ASTRANGEWITHBANK ^(ASTBANK name) range)
+						  | AT GLUE range -> ^(ASTRANGEWITHBANK ^(ASTBANK ASTAT) range)
+						  | range -> ^(ASTRANGEWITHBANK ^(ASTBANK) range)
+						  ;
+
+range                     : name doubleDot name -> name name;
+
+wildcard                  : identDigit wildSymbolEnd  //a?						  	
+						  | identDigit (wildSymbolMiddle identDigit)+ wildSymbolEnd?  //a?b a?b?, a?b?c a?b?c?, etc.
+						  | wildSymbolStart identDigit (wildSymbolMiddle identDigit)* wildSymbolEnd?  //?a ?a? ?a?b ?a?b?, etc.
+						  | wildSymbolFree //?
+						  ;
+
+wildSymbolFree            : star -> ASTWILDSTAR
+						  | question -> ASTWILDQUESTION
+						  ;
+
+wildSymbolStart           : starGlueRight -> ASTWILDSTAR
+						  | questionGlueRight -> ASTWILDQUESTION
+						  ;
+
+wildSymbolEnd             : starGlueLeft -> ASTWILDSTAR
+                          | questionGlueLeft -> ASTWILDQUESTION
+						  ;
+
+wildSymbolMiddle          : starGlueBoth -> ASTWILDSTAR
+                          | questionGlueBoth -> ASTWILDQUESTION
+						  ;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 // DISP
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -2343,6 +2404,13 @@ if2:						IF leftParen logical rightParen functionStatements (ELSE functionState
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 ini:					    INI -> ^({token("ASTINI", ASTINI, $INI.Line)});
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// INTERPOLATE
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+interpolate:				    INTERPOLATE seqOfBankvarnames '=' seqOfBankvarnames interpolateMethod? -> ^({token("ASTINTERPOLATE", ASTINTERPOLATE, $INTERPOLATE.Line)} seqOfBankvarnames seqOfBankvarnames interpolateMethod?);
+interpolateMethod:			    REPEAT | PRORATE;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // MEM
@@ -3087,6 +3155,7 @@ q:                          Q;
 m:                          M;
 u:                          U;
 
+/*
 listItems:                  listItem (COMMA2 listItem)*                   -> ^(ASTLISTITEMS (^(ASTLISTITEM listItem))+);   //puts in o.listItems
 listItems0:                 listItem (COMMA2 listItem)*                   -> ^(ASTLISTITEMS0 (^(ASTLISTITEM listItem))+);  //puts in o.listItems0
 listItems1:                 listItem (COMMA2 listItem)*                   -> ^(ASTLISTITEMS1 (^(ASTLISTITEM listItem))+);  //puts in o.listItems1
@@ -3107,6 +3176,7 @@ listItemWildRange:          wildcardWithBank ->                        wildcardW
 						  | expression ->						       expression
 						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)   //accepts stuff like 0e. Integers are caught via expression.												
 						    ;
+*/
 
 
 						    //If æøåÆØÅ then you need to put inside ''. Also with blanks. And parts beginning with a digit will not work either (5file.7z)
@@ -3136,6 +3206,7 @@ fileNameStar:               fileName
 						  | star -> ASTFILENAMESTAR
 						    ;
 
+/*
 wildcardWithBank:           name COLON wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK name) ^(ASTWILDCARD wildcard))
 						  | AT GLUE wildcard ->  ^(ASTWILDCARDWITHBANK ^(ASTBANK ASTAT) ^(ASTWILDCARD wildcard))
 						  | wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK) ^(ASTWILDCARD wildcard))
@@ -3169,6 +3240,8 @@ wildSymbolEnd:              starGlueLeft -> ASTWILDSTAR
 wildSymbolMiddle:           starGlueBoth -> ASTWILDSTAR
                           | questionGlueBoth -> ASTWILDQUESTION
 						    ;
+*/
+
 
 exportType:                 D -> ASTOPD
 						  | P  -> ASTOPP

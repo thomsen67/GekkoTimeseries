@@ -886,10 +886,8 @@ namespace Gekko.Parser.Gek
                     case "ASTCOLLAPSE":
                         {
                             node.Code.A("O.Collapse o" + Num(node) + " = new O.Collapse();" + G.NL);
-
                             node.Code.A("o" + Num(node) + ".lhs = " + node[0].Code + ";" + G.NL);
-                            node.Code.A("o" + Num(node) + ".rhs = " + node[1].Code + ";" + G.NL);
-                            
+                            node.Code.A("o" + Num(node) + ".rhs = " + node[1].Code + ";" + G.NL);                            
                             string type = "null";
                             if (node.ChildrenCount() >= 3) type = "`" + node[2].Text + "`";
                             node.Code.A("o" + Num(node) + ".type = " + type + ";" + G.NL);
@@ -899,15 +897,10 @@ namespace Gekko.Parser.Gek
                     case "ASTINTERPOLATE":
                         {
                             node.Code.A("O.Interpolate o" + Num(node) + " = new O.Interpolate();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".lhs = " + node[0].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".rhs = " + node[1].Code + ";" + G.NL);
                             string type = "null";
                             if (node.ChildrenCount() >= 3) type = "`" + node[2].Text + "`";
-                            string b1 = node[0][0].Code.ToString(); if (b1 == null) b1 = "``";
-                            string b0 = node[1][0].Code.ToString(); if (b0 == null) b0 = "``";
-
-                            node.Code.A("o" + Num(node) + ".b1 = O.ConvertToString(" + b1 + ");" + G.NL);
-                            node.Code.A("o" + Num(node) + ".b0 = O.ConvertToString(" + b0 + ");" + G.NL);
-                            node.Code.A("o" + Num(node) + ".v1 =  O.ConvertToString(" + node[0][1].Code + ");" + G.NL);
-                            node.Code.A("o" + Num(node) + ".v0 =  O.ConvertToString(" + node[1][1].Code + ");" + G.NL);
                             node.Code.A("o" + Num(node) + ".type = " + type + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }

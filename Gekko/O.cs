@@ -8033,16 +8033,15 @@ namespace Gekko
 
         public class Interpolate
         {
-            public string b0 = null;
-            public string b1 = null;
-            public string v0 = null;
-            public string v1 = null;
+            public List lhs = null;
+            public List rhs = null;
             public string type = null;
             public void Exe()
             {
-                Program.Interpolate(this.b1, this.v1, this.b0, this.v0, type);
+                Program.Interpolate(this.lhs, this.rhs, type);
             }
         }
+        
 
         public class Edit
         {
