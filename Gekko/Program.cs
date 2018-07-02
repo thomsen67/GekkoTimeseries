@@ -1198,12 +1198,12 @@ namespace Gekko
                 int col = 0;
                 foreach (string s in chunks)
                 {
-                    if (Globals.runningOnTTComputer && row == 1 && col == 0)
-                    {
-                        col++;
-                        matrix.Add(row, col, new CellLight("date"));
-                        G.Writeln2("+++ NOTE: Cheating!");                        
-                    }
+                    //if (Globals.runningOnTTComputer && row == 1 && col == 0)
+                    //{
+                    //    col++;
+                    //    matrix.Add(row, col, new CellLight("date"));
+                    //    G.Writeln2("+++ NOTE: Cheating!");                        
+                    //}
                     col++;
                     CellLight cell = new CellLight(s);
                     if (s != "") matrix.Add(row, col, cell);  //no need to keep empty cells in matrix (there can be many such)
