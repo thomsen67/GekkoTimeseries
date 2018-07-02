@@ -23990,147 +23990,169 @@ namespace Gekko
             return counter;
         }
 
-        public static void Collapse(string b1, string ss1, string b0, string ss0, string method)
+        public static void Collapse(List lhs, List rhs, string method)
         {
             //ErrorIfDatabanksSwapped(); 
 
-            Databank databank1 = GetDatabank(b1);
-            Databank databank0 = GetDatabank(b0);
-                        
-            if (method == null) method = "total";
-        
-            string name1;
-            EFreq eFreq1;
-            GetFreq(ss1, out name1, out eFreq1);
-
-            string name0;
-            EFreq eFreq0;
-            GetFreq(ss0, out name0, out eFreq0);
-                        
-            if (eFreq0 == EFreq.Undated || eFreq1 == EFreq.Undated)
+            if (lhs.list.Count != rhs.list.Count)
             {
-                G.Writeln2("*** ERROR: COLLAPSE cannot involve undated timeseries");
+                G.Writeln2("*** ERROR: " + lhs.list.Count + " items on left, " + rhs.list.Count + " items on right");
                 throw new GekkoException();
             }
 
-            Series ts0 = databank0.GetVariable(eFreq0, name0);
-            if (ts0 == null)
+            List<string> xlhs = O.Restrict(lhs, true, false, true, true);
+            List<string> xrhs = O.Restrict(rhs, true, false, true, true);
+
+            if (xlhs.Count != xrhs.Count)
             {
-                G.Writeln2("*** ERROR: Could not find variable '" + name0 + "' with frequency '" + eFreq0 + "' in '" + databank0.name + "' databank");
+                G.Writeln2("*** ERROR: Internal error #89353245");
                 throw new GekkoException();
             }
 
-            Series ts1 = databank1.GetVariable(eFreq1, name1);
-            if (ts1 == null)
+            for (int i = 0; i < xlhs.Count; i++)
             {
-                G.Writeln("+++ NOTE: Created new variable '" + name1 + "' with frequency '" + G.GetFreq(eFreq1) + "'");
-            }
-            else
-            {
-                //We wipe it completely out if it already exists!
-                databank1.RemoveVariable(eFreq1, name1);
-            }
-            ts1 = new Series(eFreq1, name1);
-            databank1.AddVariable(ts1);  //hmmm a mess with all this freq stuff!
 
-            GekkoTime first = ts0.GetPeriodFirst(); //start of high-freq timeseries
-            GekkoTime last = ts0.GetPeriodLast(); //end of high-freq timeseries
+                string yLhs = xlhs[i];
+                string yRhs = xrhs[i];
 
-            double vsum = double.NaN;
-            foreach (GekkoTime t in new GekkoTimeIterator(first, last))
-            {
-                double value = ts0.GetData(null, t);
-                if (eFreq1 == EFreq.Annual && eFreq0 == EFreq.Quarterly)
+                Series ts_lhs = O.GetIVariableFromString(yLhs, O.ECreatePossibilities.Must) as Series;
+                Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.None) as Series;
+
+                if (ts_lhs == null)
                 {
-                    //Conversion from Q to A
-                    if (t.sub == 1) vsum = 0d;
-                    GekkoTime ttemp = new GekkoTime(eFreq1, t.super, 1);
-                    if (G.Equal(method, "total"))
-                    {
-                        vsum += value;
-                        if (t.sub == Globals.freqQSubperiods) ts1.SetData(ttemp, vsum);
-                    }
-                    else if (G.Equal(method, "avg"))
-                    {
-                        vsum += value;
-                        if (t.sub == Globals.freqQSubperiods) ts1.SetData(ttemp, vsum / (double)Globals.freqQSubperiods);
-                    }
-                    else if (G.Equal(method, "first"))
-                    {
-                        if (t.sub == 1) ts1.SetData(ttemp, value);
-                    }
-                    else if (G.Equal(method, "last"))
-                    {
-                        if (t.sub == Globals.freqQSubperiods) ts1.SetData(ttemp, value);
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: wrong method in COLLAPSE: " + method + "'");
-                        throw new GekkoException();
-                    }
+                    G.Writeln2("*** ERROR: Cannot find: " + yRhs);
                 }
-                else if (eFreq1 == EFreq.Annual && eFreq0 == EFreq.Monthly)
+                                
+                if (method == null) method = "total";
+                                
+                EFreq eFreq0 = ts_rhs.freq;
+                EFreq eFreq1 = ts_lhs.freq;
+
+                if (eFreq0 == EFreq.Undated || eFreq1 == EFreq.Undated)
                 {
-                    //Conversion from M to A
-                    if (t.sub == 1) vsum = 0d;
-                    GekkoTime ttemp = new GekkoTime(eFreq1, t.super, 1);
-                    if (G.Equal(method, "total"))
-                    {
-                        vsum += value;
-                        if (t.sub == Globals.freqMSubperiods) ts1.SetData(ttemp, vsum);
-                    }
-                    else if (G.Equal(method, "avg"))
-                    {
-                        vsum += value;
-                        if (t.sub == Globals.freqMSubperiods) ts1.SetData(ttemp, vsum / (double)Globals.freqMSubperiods);
-                    }
-                    else if (G.Equal(method, "first"))
-                    {
-                        if (t.sub == 1) ts1.SetData(ttemp, value);
-                    }
-                    else if (G.Equal(method, "last"))
-                    {
-                        if (t.sub == Globals.freqMSubperiods) ts1.SetData(ttemp, value);
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: wrong method in COLLAPSE: " + method + "'");
-                        throw new GekkoException();
-                    }
-                }
-                else if (eFreq1 == EFreq.Quarterly && eFreq0 == EFreq.Monthly)
-                {
-                    //Conversion from M to Q
-                    int mPerQ = Globals.freqMSubperiods / Globals.freqQSubperiods;  //3
-                    int quarter = (t.sub - 1) / mPerQ + 1;
-                    if (t.sub % mPerQ == 1) vsum = 0d;
-                    GekkoTime ttemp = new GekkoTime(eFreq1, t.super, quarter);
-                    if (G.Equal(method, "total"))
-                    {
-                        vsum += value;
-                        if (t.sub % mPerQ == 0) ts1.SetData(ttemp, vsum);
-                    }
-                    else if (G.Equal(method, "avg"))
-                    {
-                        vsum += value;
-                        if (t.sub % mPerQ == 0) ts1.SetData(ttemp, vsum / (double)mPerQ);
-                    }
-                    else if (G.Equal(method, "first"))
-                    {
-                        if (t.sub % mPerQ == 1) ts1.SetData(ttemp, value);
-                    }
-                    else if (G.Equal(method, "last"))
-                    {
-                        if (t.sub % mPerQ == 0) ts1.SetData(ttemp, value);
-                    }
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: Cannot COLLAPSE frequency '" + eFreq0 + "' to frequency '" + eFreq1 + "'");
+                    G.Writeln2("*** ERROR: COLLAPSE cannot involve undated timeseries");
                     throw new GekkoException();
                 }
+
+                //Series ts0 = databank0.GetVariable(eFreq0, name0);
+                //if (ts0 == null)
+                //{
+                //    G.Writeln2("*** ERROR: Could not find variable '" + name0 + "' with frequency '" + eFreq0 + "' in '" + databank0.name + "' databank");
+                //    throw new GekkoException();
+                //}
+
+                //Series ts1 = databank1.GetVariable(eFreq1, name1);
+                //if (ts1 == null)
+                //{
+                //    G.Writeln("+++ NOTE: Created new variable '" + name1 + "' with frequency '" + G.GetFreq(eFreq1) + "'");
+                //}
+                //else
+                //{
+                //    //We wipe it completely out if it already exists!
+                //    databank1.RemoveVariable(eFreq1, name1);
+                //}
+                //ts1 = new Series(eFreq1, name1);
+                //databank1.AddVariable(ts1);  //hmmm a mess with all this freq stuff!
+
+                GekkoTime first = ts_rhs.GetPeriodFirst(); //start of high-freq timeseries
+                GekkoTime last = ts_rhs.GetPeriodLast(); //end of high-freq timeseries
+
+                double vsum = double.NaN;
+                foreach (GekkoTime t in new GekkoTimeIterator(first, last))
+                {
+                    double value = ts_rhs.GetData(null, t);
+                    if (eFreq1 == EFreq.Annual && eFreq0 == EFreq.Quarterly)
+                    {
+                        //Conversion from Q to A
+                        if (t.sub == 1) vsum = 0d;
+                        GekkoTime ttemp = new GekkoTime(eFreq1, t.super, 1);
+                        if (G.Equal(method, "total"))
+                        {
+                            vsum += value;
+                            if (t.sub == Globals.freqQSubperiods) ts_lhs.SetData(ttemp, vsum);
+                        }
+                        else if (G.Equal(method, "avg"))
+                        {
+                            vsum += value;
+                            if (t.sub == Globals.freqQSubperiods) ts_lhs.SetData(ttemp, vsum / (double)Globals.freqQSubperiods);
+                        }
+                        else if (G.Equal(method, "first"))
+                        {
+                            if (t.sub == 1) ts_lhs.SetData(ttemp, value);
+                        }
+                        else if (G.Equal(method, "last"))
+                        {
+                            if (t.sub == Globals.freqQSubperiods) ts_lhs.SetData(ttemp, value);
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: wrong method in COLLAPSE: " + method + "'");
+                            throw new GekkoException();
+                        }
+                    }
+                    else if (eFreq1 == EFreq.Annual && eFreq0 == EFreq.Monthly)
+                    {
+                        //Conversion from M to A
+                        if (t.sub == 1) vsum = 0d;
+                        GekkoTime ttemp = new GekkoTime(eFreq1, t.super, 1);
+                        if (G.Equal(method, "total"))
+                        {
+                            vsum += value;
+                            if (t.sub == Globals.freqMSubperiods) ts_lhs.SetData(ttemp, vsum);
+                        }
+                        else if (G.Equal(method, "avg"))
+                        {
+                            vsum += value;
+                            if (t.sub == Globals.freqMSubperiods) ts_lhs.SetData(ttemp, vsum / (double)Globals.freqMSubperiods);
+                        }
+                        else if (G.Equal(method, "first"))
+                        {
+                            if (t.sub == 1) ts_lhs.SetData(ttemp, value);
+                        }
+                        else if (G.Equal(method, "last"))
+                        {
+                            if (t.sub == Globals.freqMSubperiods) ts_lhs.SetData(ttemp, value);
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: wrong method in COLLAPSE: " + method + "'");
+                            throw new GekkoException();
+                        }
+                    }
+                    else if (eFreq1 == EFreq.Quarterly && eFreq0 == EFreq.Monthly)
+                    {
+                        //Conversion from M to Q
+                        int mPerQ = Globals.freqMSubperiods / Globals.freqQSubperiods;  //3
+                        int quarter = (t.sub - 1) / mPerQ + 1;
+                        if (t.sub % mPerQ == 1) vsum = 0d;
+                        GekkoTime ttemp = new GekkoTime(eFreq1, t.super, quarter);
+                        if (G.Equal(method, "total"))
+                        {
+                            vsum += value;
+                            if (t.sub % mPerQ == 0) ts_lhs.SetData(ttemp, vsum);
+                        }
+                        else if (G.Equal(method, "avg"))
+                        {
+                            vsum += value;
+                            if (t.sub % mPerQ == 0) ts_lhs.SetData(ttemp, vsum / (double)mPerQ);
+                        }
+                        else if (G.Equal(method, "first"))
+                        {
+                            if (t.sub % mPerQ == 1) ts_lhs.SetData(ttemp, value);
+                        }
+                        else if (G.Equal(method, "last"))
+                        {
+                            if (t.sub % mPerQ == 0) ts_lhs.SetData(ttemp, value);
+                        }
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Cannot COLLAPSE frequency '" + eFreq0 + "' to frequency '" + eFreq1 + "'");
+                        throw new GekkoException();
+                    }
+                }
+                G.Writeln("Collapsed '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")");
             }
-            G.Writeln("Collapsed '" + name1 + "' (" + eFreq1.ToString() + ") from '" + name0 + "' (" + eFreq0.ToString() + ")");
             return;
         }
 
@@ -36379,9 +36401,9 @@ namespace Gekko
                     O.Chop(tsString, out dbName, out varName, out freq, out indexes);
 
                     if (G.HasSigil(varName)) continue;  //filter out non-series, like %s or #m
-                                        
-                    IVariable iv = O.GetIVariableFromString(dbName, varName, freq, indexes);
-                    IVariable ivGrund = O.GetIVariableFromString("Ref", varName, freq, indexes);
+
+                    IVariable iv = O.GetIVariableFromString(dbName, varName, freq, indexes, O.ECreatePossibilities.None);
+                    IVariable ivGrund = O.GetIVariableFromString("Ref", varName, freq, indexes, O.ECreatePossibilities.None);
 
                     //string tsNameWithFreq = varName;
                     //if (freq != null) tsNameWithFreq = Globals.freqIndicator + freq;

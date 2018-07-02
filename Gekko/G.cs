@@ -2054,6 +2054,11 @@ namespace Gekko
             }
             return sb.ToString();
         }
+
+        public static string GetListWithCommas(string[] list)
+        {
+            return GetListWithCommas(new List<string>());
+        }
         
         /// <summary>
         /// For writing output to screen

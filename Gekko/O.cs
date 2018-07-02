@@ -28,6 +28,13 @@ namespace Gekko
         public static ScalarString scalarStringTilde = new ScalarString(Globals.freqIndicator.ToString());
         public static ScalarString scalarStringColon = new ScalarString(Globals.symbolBankColon.ToString());
 
+        public enum ECreateType
+        {
+            Find,        //error if not found
+            Create,      //created if not found
+            Overwrite    //overwritten if existing, else created
+        }
+
         public enum LagType
         {
             Pch,
@@ -1187,12 +1194,27 @@ namespace Gekko
             return rv;
         }
 
-        public static IVariable GetIVariableFromString(string dbName, string varName, string freq, string[] indexes)
+
+        public static IVariable GetIVariableFromString(string fullname, ECreatePossibilities type)
         {
+            string dbName, varName, freq; string[] indexes;
+            O.Chop(fullname, out dbName, out varName, out freq, out indexes);            
+            IVariable iv = O.GetIVariableFromString(dbName, varName, freq, indexes, type);
+            return iv;
+        }
+
+        public static IVariable GetIVariableFromString(string dbName, string varName, string freq, string[] indexes, ECreatePossibilities type)
+        {
+            //type is only relevant for series, ignored for others
+
             string freq2 = null;
-            if (freq != null) freq2 = Globals.freqIndicator + freq;
-            else freq2 = Globals.freqIndicator + G.GetFreq(Program.options.freq);
-            string tsNameWithFreq = varName + freq2;
+
+            string freq3 = null;
+            if (freq != null) freq3 = freq;
+            else freq3 = G.GetFreq(Program.options.freq);
+            freq2 = Globals.freqIndicator + freq3;
+
+            string nameWithFreq = varName + freq2;
             Databank bank = null;
             if (dbName == null) bank = Program.databanks.GetFirst();
             else bank = Program.databanks.GetDatabank(dbName);
@@ -1200,13 +1222,119 @@ namespace Gekko
             {
                 bank = Program.databanks.GetDatabank(dbName, true);
             }
-            IVariable iv = bank.GetIVariable(tsNameWithFreq);
-            if (indexes != null)
+            IVariable iv = bank.GetIVariable(nameWithFreq);
+
+            if (G.HasSigil(nameWithFreq))
             {
-                iv = iv.Indexer(null, Program.GetListOfIVariablesFromListOfStrings(indexes));
+                //%x or #x
+                if (indexes != null)
+                {
+                    G.Writeln2("*** ERROR: Name like " + nameWithFreq + "[" + G.GetListWithCommas(indexes) + "]" + " not allowed");
+                    throw new GekkoException();
+                }
+                else
+                {
+                    //just return iv
+                }
             }
+            else
+            {
+                //series name, not starting with % or #
+
+                if (indexes != null)
+                {
+                    //array-series
+
+                    MapMultidimItem mmi = new MapMultidimItem(indexes);
+
+                    if (iv == null)
+                    {
+                        G.Writeln2("*** ERROR: Series with the name " + nameWithFreq + " does not exist in '" + dbName + "' databank");
+                        throw new GekkoException();
+                    }
+
+                    //now we know that the series exists
+
+                    Series iv_series = iv as Series;
+
+                    if (iv_series.type == ESeriesType.ArraySuper)
+                    {
+                        G.Writeln2("*** ERROR: Series with the name " + nameWithFreq + " from '" + dbName + "' databank is not an array-series");
+                        throw new GekkoException();
+                    }
+                                        
+                    IVariable iv2 = null; iv_series.dimensionsStorage.TryGetValue(mmi, out iv2);
+
+                    if (iv2 == null)
+                    {
+                        if (type == ECreatePossibilities.Can || type == ECreatePossibilities.Must)
+                        {
+                            Series ts = new Series(G.GetFreq(freq3), null);
+                            iv_series.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts);
+                            iv = ts;
+                        }
+                        else
+                        {
+                            //do nothing, a null is returned
+                        }
+                    }
+                    else
+                    {
+                        //it does exist
+                        if (type == ECreatePossibilities.Must)
+                        {
+                            //overwriting
+                            Series ts = new Series(G.GetFreq(freq3), null);
+                            iv_series.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts);
+                            iv = ts;
+                        }
+                        else
+                        {
+                            //do nothing
+                        }
+                    }
+
+
+                }
+                else
+                {
+                    //normal series, not array-series
+                    if (iv == null)
+                    {
+                        if (type == ECreatePossibilities.Can || type == ECreatePossibilities.Must)
+                        {
+                            Series ts = new Series(G.GetFreq(freq3), nameWithFreq);
+                            bank.AddIVariable(nameWithFreq, ts);
+                        }
+                        else
+                        {
+                            //do nothing, a null is returned
+                        }
+                    }
+                    else
+                    {
+                        //it does exist
+                        if (type == ECreatePossibilities.Must)
+                        {
+                            //overwriting
+                            Series iv_series = iv as Series;
+                            Series ts = new Series(iv_series.freq, nameWithFreq);
+                            bank.RemoveIVariable(nameWithFreq);
+                            bank.AddIVariable(nameWithFreq, ts);
+                        }
+                        else
+                        {
+                            //do nothing
+                        }
+                    }
+                }
+
+            }
+
+            
             return iv;
         }
+                
 
         //See also Restrict()
         public static List Restrict2(List m, bool allowBank, bool allowSigil, bool allowFreq, bool allowIndexes)
@@ -7890,14 +8018,16 @@ namespace Gekko
 
         public class Collapse
         {
-            public string b0 = null;
-            public string b1 = null;
-            public string v0 = null;
-            public string v1 = null;
+            //public string b0 = null;
+            //public string b1 = null;
+            //public string v0 = null;
+            //public string v1 = null;
+            public List lhs = null;
+            public List rhs = null;
             public string type = null;            
             public void Exe()
             {
-                Program.Collapse(this.b1,this.v1, this.b0, this.v0, type);                
+                Program.Collapse(this.lhs, this.rhs, type);                
             }
         }
 

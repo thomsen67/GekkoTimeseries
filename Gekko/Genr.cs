@@ -22,8 +22,10 @@ GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 //[[splitSTART]]
 p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
-O.Compare o0 = new O.Compare();
-//o0.listItems = new List(O.ExplodeIvariables(new List(new List<IVariable> {(new ScalarString("xx")).Add(smpl, new ScalarString("[")).Add(smpl, new ScalarString("a")).Add(smpl, ", ").Add(smpl, new ScalarString("x")).Add(smpl, new ScalarString("]"))})));
+O.Collapse o0 = new O.Collapse();
+o0.lhs = new List(O.ExplodeIvariables(new List(new List<IVariable> {new ScalarString("x")})));
+o0.rhs = new List(O.ExplodeIvariables(new List(new List<IVariable> {(new ScalarString("x")).Add(smpl, new ScalarString("[")).Add(smpl, (new ScalarString("q"))).Add(smpl, new ScalarString("]"))})));
+o0.type = null;
 o0.Exe();
 
 
