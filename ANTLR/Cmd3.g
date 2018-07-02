@@ -1903,12 +1903,12 @@ value:                      function //must be before varname
 
 leftSide:                   leftSideDollarExpression -> leftSideDollarExpression;
 
-leftSideDollarExpression:   (leftSideIndexerExpression -> leftSideIndexerExpression)
+leftSideDollarExpression:   (bankvarnameIndexer -> bankvarnameIndexer)
 						    (DOLLAR lbla=dollarConditional -> ^(ASTDOLLAR $leftSideDollarExpression $lbla))*	
 						    ; 						
 
-leftSideIndexerExpression:  (bankvarname -> bankvarname)
-						    (lbla=dotOrIndexer -> ^(ASTDOTORINDEXER $leftSideIndexerExpression $lbla))*
+bankvarnameIndexer:  (bankvarname -> bankvarname)
+						    (lbla=dotOrIndexer -> ^(ASTDOTORINDEXER $bankvarnameIndexer $lbla))*
 						    ;
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -1975,9 +1975,9 @@ expressionOrNothing:        expression -> expression
 //accepts b:x!q but also {%s}-stuff including {#m}, and indexers like x['a'] or x[a]
 //seqOfBankvarnames:          bankvarname (COMMA2 bankvarname)* ->  ^(ASTBANKVARNAMELIST bankvarname+);
 
-seqOfBankvarnames:          leftSideIndexerExpression (COMMA2 leftSideIndexerExpression)* ->  ^(ASTBANKVARNAMELIST leftSideIndexerExpression+);
+seqOfBankvarnames:          bankvarnameIndexer (COMMA2 bankvarnameIndexer)* ->  ^(ASTBANKVARNAMELIST bankvarnameIndexer+);
 
-seqOfBankvarnamesAtLeast1:  leftSideIndexerExpression (COMMA2 leftSideIndexerExpression)+ ->  ^(ASTBANKVARNAMELIST leftSideIndexerExpression+);
+seqOfBankvarnamesAtLeast1:  bankvarnameIndexer (COMMA2 bankvarnameIndexer)+ ->  ^(ASTBANKVARNAMELIST bankvarnameIndexer+);
 
 //accepts filenames without hyphens, but also strings (for instance 'text' or %s). So data.gbk or 'data.gbk' but not {'data.gbk'}.
 //distinguishing between a or 'a' is not interesting here, as it is for seqOfBankvarnames
@@ -3197,7 +3197,9 @@ fileNameFirstPart3:         fileNamePart -> ^(ASTFILENAMEFIRST3 fileNamePart);
 							//stuff like 'a.7z' or 'a b.doc' or 'זרו.doc' must be in quotes.
 fileNamePart:               fileNamePartHelper (GLUEDOT DOT fileNamePartHelper)* -> ^(ASTFILENAMEPART fileNamePartHelper+);
 
-fileNamePartHelper:         name; //varname;  //varname....has to be restricted later on: do not allow a!b or #a.
+fileNamePartHelper:         name
+						  | identDigit  //cathes stuff like \05banker\bank etc.
+						    ;
 
 slashHelper1:               GLUEBACKSLASH | DIV;
 slashHelper2:               BACKSLASH | DIV;
@@ -3205,7 +3207,6 @@ slashHelper2:               BACKSLASH | DIV;
 fileNameStar:               fileName
 						  | star -> ASTFILENAMESTAR
 						    ;
-
 /*
 wildcardWithBank:           name COLON wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK name) ^(ASTWILDCARD wildcard))
 						  | AT GLUE wildcard ->  ^(ASTWILDCARDWITHBANK ^(ASTBANK ASTAT) ^(ASTWILDCARD wildcard))
