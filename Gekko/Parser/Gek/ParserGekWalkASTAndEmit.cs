@@ -4347,14 +4347,14 @@ namespace Gekko.Parser.Gek
                             }                            
                             node.Code.A("O.Prt.Element ope" + Num(node) + " = new O.Prt.Element();" + G.NL);  //this must be after the list start iterator code
 
-                            if (true)
-                            {
-                                ParseHelper ph = new ParseHelper();
-                                ph.commandsText = "x = " + givenLabel + ";" + G.NL;
-                                ph.commandsText = "tell 'adsf';" + G.NL;
-                                ph.isOneLinerFromGui = true;
-                                ConvertHelper ch = Gekko.Parser.Gek.ParserGekCreateAST.CreateAST(ph, new P());
-                            }
+                            //if (true)
+                            //{
+                            //    ParseHelper ph = new ParseHelper();
+                            //    ph.commandsText = "x = " + givenLabel + ";" + G.NL;
+                            //    ph.commandsText = "tell 'adsf';" + G.NL;
+                            //    ph.isOneLinerFromGui = true;
+                            //    ConvertHelper ch = Gekko.Parser.Gek.ParserGekCreateAST.CreateAST(ph, new P());
+                            //}
 
                             string freelists = null;
                             if (node.freeIndexedLists != null && node.freeIndexedLists.Count > 0)

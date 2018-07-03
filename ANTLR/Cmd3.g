@@ -1888,6 +1888,8 @@ primaryExpression:          leftParen! expression RIGHTPAREN!
                           | value
 						    ;
 
+
+
 value:                      function //must be before varname
 						  | bankvarname						
 						  | Integer -> ^(ASTINTEGER Integer)
@@ -1899,7 +1901,9 @@ value:                      function //must be before varname
 						  | matrix
 						  | list
 						  | map
+						  | leftBracketNoGlueWild wildcard RIGHTBRACKET -> ^(ASTINDEXERALONE wildcard) //also see rule indexerExpression
 						    ;
+					    
 
 leftSide:                   leftSideDollarExpression -> leftSideDollarExpression;
 
@@ -1975,9 +1979,11 @@ expressionOrNothing:        expression -> expression
 //accepts b:x!q but also {%s}-stuff including {#m}, and indexers like x['a'] or x[a]
 //seqOfBankvarnames:          bankvarname (COMMA2 bankvarname)* ->  ^(ASTBANKVARNAMELIST bankvarname+);
 
-seqOfBankvarnames:          bankvarnameIndexer (COMMA2 bankvarnameIndexer)* ->  ^(ASTBANKVARNAMELIST bankvarnameIndexer+);
+seqItem:                    listItemWildRange | bankvarnameIndexer;
 
-seqOfBankvarnamesAtLeast1:  bankvarnameIndexer (COMMA2 bankvarnameIndexer)+ ->  ^(ASTBANKVARNAMELIST bankvarnameIndexer+);
+seqOfBankvarnames:          seqItem (COMMA2 seqItem)* ->  ^(ASTBANKVARNAMELIST seqItem+);
+
+seqOfBankvarnamesAtLeast2:  seqItem (COMMA2 seqItem)+ ->  ^(ASTBANKVARNAMELIST seqItem+);
 
 //accepts filenames without hyphens, but also strings (for instance 'text' or %s). So data.gbk or 'data.gbk' but not {'data.gbk'}.
 //distinguishing between a or 'a' is not interesting here, as it is for seqOfBankvarnames
@@ -1987,7 +1993,57 @@ seqOfFileNamesStar:         star -> ^(ASTFILENAMELIST ASTFILENAMESTAR)
 						  | fileName (COMMA2 fileName)* ->  ^(ASTFILENAMELIST fileName+)
 						    ;
 
-listWithoutParenthesis:     expression (',' expression)+ -> ^(ASTLISTDEF expression+);                                     //must have comma
+// ------------------------------------------------------------------------------------------------------------------
+// ------------------- wildcards, ranges --------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------
+
+
+
+listItemsWildRange        : listItemWildRange (COMMA2 listItemWildRange)* -> ^(ASTLISTITEMS (^(ASTLISTITEM listItemWildRange))+);   //puts in o.listItems
+
+listItemWildRange         : wildcardWithBank ->                        wildcardWithBank
+						  | rangeWithBank ->                           rangeWithBank							 
+						  | expression ->						       expression
+						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)   //accepts stuff like 0e. Integers are caught via expression.												
+						  ;
+
+wildcardWithBank          : name COLON wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK name) ^(ASTWILDCARD wildcard))
+						  | AT GLUE wildcard ->  ^(ASTWILDCARDWITHBANK ^(ASTBANK ASTAT) ^(ASTWILDCARD wildcard))
+						  | wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK) ^(ASTWILDCARD wildcard))
+						  ;						
+
+rangeWithBank             : name COLON range -> ^(ASTRANGEWITHBANK ^(ASTBANK name) range)
+						  | AT GLUE range -> ^(ASTRANGEWITHBANK ^(ASTBANK ASTAT) range)
+						  | range -> ^(ASTRANGEWITHBANK ^(ASTBANK) range)
+						  ;
+
+range                     : name doubleDot name -> name name;
+
+wildcard:                 //
+						   identDigit (wildSymbolMiddle identDigit)+ wildSymbolEnd?  //a?b a?b?, a?b?c a?b?c?, etc.
+						   |  identDigit wildSymbolEnd  //a?						  	
+						  | wildSymbolStart identDigit (wildSymbolMiddle identDigit)* wildSymbolEnd?  //?a ?a? ?a?b ?a?b?, etc.
+						  | wildSymbolFree //?
+						  ;
+
+wildSymbolFree            : star -> ASTWILDSTAR
+						  | question -> ASTWILDQUESTION
+						  ;
+
+wildSymbolStart           : starGlueRight -> ASTWILDSTAR
+						  | questionGlueRight -> ASTWILDQUESTION
+						  ;
+
+wildSymbolEnd             : starGlueLeft -> ASTWILDSTAR
+                          | questionGlueLeft -> ASTWILDQUESTION
+						  ;
+
+wildSymbolMiddle          : starGlueBoth -> ASTWILDSTAR
+                          | questionGlueBoth -> ASTWILDQUESTION
+						  ;
+
+
+
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- name START -------------------------------------------------------------------------------
@@ -2151,15 +2207,15 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 //						    ;
 
 
-assignment:				    assignmentType seriesOpt1? leftSide EQUAL seqOfBankvarnamesAtLeast1 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast1 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+assignment:				    assignmentType seriesOpt1? leftSide EQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-						  | assignmentType seriesOpt1? leftSide PLUSEQUAL seqOfBankvarnamesAtLeast1 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide seqOfBankvarnamesAtLeast1) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide PLUSEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-						  | assignmentType seriesOpt1? leftSide MINUSEQUAL seqOfBankvarnamesAtLeast1 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide seqOfBankvarnamesAtLeast1) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide MINUSEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide MINUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-						  | assignmentType seriesOpt1? leftSide STAREQUAL seqOfBankvarnamesAtLeast1 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide seqOfBankvarnamesAtLeast1) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide STAREQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide STAREQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-						  | assignmentType seriesOpt1? leftSide DIVEQUAL seqOfBankvarnamesAtLeast1 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide seqOfBankvarnamesAtLeast1) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide DIVEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
 						    ;
 
@@ -2287,47 +2343,6 @@ copyOpt1h                 : RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT ye
 						  | TO EQUAL AT GLUE? -> ^(ASTOPT_STRING_TO ASTAT)
 						  ;
 
-listItemsWildRange        : listItemWildRange (COMMA2 listItemWildRange)* -> ^(ASTLISTITEMS (^(ASTLISTITEM listItemWildRange))+);   //puts in o.listItems
-
-listItemWildRange         : wildcardWithBank ->                        wildcardWithBank
-						  | rangeWithBank ->                           rangeWithBank							 
-						  | expression ->						       expression
-						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)   //accepts stuff like 0e. Integers are caught via expression.												
-						  ;
-
-wildcardWithBank          : name COLON wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK name) ^(ASTWILDCARD wildcard))
-						  | AT GLUE wildcard ->  ^(ASTWILDCARDWITHBANK ^(ASTBANK ASTAT) ^(ASTWILDCARD wildcard))
-						  | wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK) ^(ASTWILDCARD wildcard))
-						  ;						
-
-rangeWithBank             : name COLON range -> ^(ASTRANGEWITHBANK ^(ASTBANK name) range)
-						  | AT GLUE range -> ^(ASTRANGEWITHBANK ^(ASTBANK ASTAT) range)
-						  | range -> ^(ASTRANGEWITHBANK ^(ASTBANK) range)
-						  ;
-
-range                     : name doubleDot name -> name name;
-
-wildcard                  : identDigit wildSymbolEnd  //a?						  	
-						  | identDigit (wildSymbolMiddle identDigit)+ wildSymbolEnd?  //a?b a?b?, a?b?c a?b?c?, etc.
-						  | wildSymbolStart identDigit (wildSymbolMiddle identDigit)* wildSymbolEnd?  //?a ?a? ?a?b ?a?b?, etc.
-						  | wildSymbolFree //?
-						  ;
-
-wildSymbolFree            : star -> ASTWILDSTAR
-						  | question -> ASTWILDQUESTION
-						  ;
-
-wildSymbolStart           : starGlueRight -> ASTWILDSTAR
-						  | questionGlueRight -> ASTWILDQUESTION
-						  ;
-
-wildSymbolEnd             : starGlueLeft -> ASTWILDSTAR
-                          | questionGlueLeft -> ASTWILDQUESTION
-						  ;
-
-wildSymbolMiddle          : starGlueBoth -> ASTWILDSTAR
-                          | questionGlueBoth -> ASTWILDQUESTION
-						  ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // DISP
@@ -2366,7 +2381,7 @@ for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  func
 						    ;
 
 forHelper2:                 type? svarname EQUAL expression TO expression2 (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2) ^(ASTPLACEHOLDER expression3?))
-                          | type? svarname EQUAL seqOfBankvarnamesAtLeast1 -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER seqOfBankvarnamesAtLeast1) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+                          | type? svarname EQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
                           | type? svarname EQUAL expression -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
                             ;
                           
@@ -3155,30 +3170,6 @@ q:                          Q;
 m:                          M;
 u:                          U;
 
-/*
-listItems:                  listItem (COMMA2 listItem)*                   -> ^(ASTLISTITEMS (^(ASTLISTITEM listItem))+);   //puts in o.listItems
-listItems0:                 listItem (COMMA2 listItem)*                   -> ^(ASTLISTITEMS0 (^(ASTLISTITEM listItem))+);  //puts in o.listItems0
-listItems1:                 listItem (COMMA2 listItem)*                   -> ^(ASTLISTITEMS1 (^(ASTLISTITEM listItem))+);  //puts in o.listItems1
-listItems2:                 listItem (COMMA2 listItem)*                   -> ^(ASTLISTITEMS2 (^(ASTLISTITEM listItem))+);  //puts in o.listItems2
-listItemsWildRange:         listItemWildRange (COMMA2 listItemWildRange)* -> ^(ASTLISTITEMS (^(ASTLISTITEM listItemWildRange))+);   //puts in o.listItems
-listItemsWildRange0:        listItemWildRange (COMMA2 listItemWildRange)* -> ^(ASTLISTITEMS0 (^(ASTLISTITEM listItemWildRange))+);  //puts in o.listItems0
-listItemsWildRange1:        listItemWildRange (COMMA2 listItemWildRange)* -> ^(ASTLISTITEMS1 (^(ASTLISTITEM listItemWildRange))+);  //puts in o.listItems1
-listItemsWildRange2:        listItemWildRange (COMMA2 listItemWildRange)* -> ^(ASTLISTITEMS2 (^(ASTLISTITEM listItemWildRange))+);  //puts in o.listItems2
-
-                            //expression catches a, b:a, %s, 'a', 'b:a', the first two as nameWithBank, but cannot catch for instance 'b':'a' or %b:%a
-						    //not much sense in allowing @ here
-listItem:                   expression ->							   expression						
-						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)            //accepts stuff like 0e. Integers are caught via expression.												
-						    ;
-						    //generalizes listItem
-listItemWildRange:          wildcardWithBank ->                        wildcardWithBank
-						  | rangeWithBank ->                           rangeWithBank							 
-						  | expression ->						       expression
-						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)   //accepts stuff like 0e. Integers are caught via expression.												
-						    ;
-*/
-
-
 						    //If æøåÆØÅ then you need to put inside ''. Also with blanks. And parts beginning with a digit will not work either (5file.7z)
 fileName:                   fileNameFirstPart (GLUEBACKSLASH fileNamePart)* -> ^(ASTFILENAME fileNameFirstPart fileNamePart*)
 						  | expression
@@ -3207,41 +3198,6 @@ slashHelper2:               BACKSLASH | DIV;
 fileNameStar:               fileName
 						  | star -> ASTFILENAMESTAR
 						    ;
-/*
-wildcardWithBank:           name COLON wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK name) ^(ASTWILDCARD wildcard))
-						  | AT GLUE wildcard ->  ^(ASTWILDCARDWITHBANK ^(ASTBANK ASTAT) ^(ASTWILDCARD wildcard))
-						  | wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK) ^(ASTWILDCARD wildcard))
-						    ; 	
-
-rangeWithBank:              name COLON range -> ^(ASTRANGEWITHBANK ^(ASTBANK name) range)
-						  | AT GLUE range -> ^(ASTRANGEWITHBANK ^(ASTBANK ASTAT) range)
-						  | range -> ^(ASTRANGEWITHBANK ^(ASTBANK) range)
-						    ;
-
-range:                      name doubleDot name -> name name;
-
-wildcard:                   identDigit wildSymbolEnd  //a?						  	
-						  | identDigit (wildSymbolMiddle identDigit)+ wildSymbolEnd?  //a?b a?b?, a?b?c a?b?c?, etc.
-						  | wildSymbolStart identDigit (wildSymbolMiddle identDigit)* wildSymbolEnd?  //?a ?a? ?a?b ?a?b?, etc.
-						  | wildSymbolFree //?
-						    ;
-
-wildSymbolFree:             star -> ASTWILDSTAR
-						  | question -> ASTWILDQUESTION
-						    ;
-
-wildSymbolStart:            starGlueRight -> ASTWILDSTAR
-						  | questionGlueRight -> ASTWILDQUESTION
-						    ;
-
-wildSymbolEnd:              starGlueLeft -> ASTWILDSTAR
-                          | questionGlueLeft -> ASTWILDQUESTION
-						    ;
-
-wildSymbolMiddle:           starGlueBoth -> ASTWILDSTAR
-                          | questionGlueBoth -> ASTWILDQUESTION
-						    ;
-*/
 
 
 exportType:                 D -> ASTOPD

@@ -13595,49 +13595,13 @@ namespace Gekko
                         // Handle stand-alone [a*b*c*d] that may look like a 1x1 matrix
                         // -------------------------------------------------------------
                         if (c2 == '[')
-                        {
-                            bool isProbablyStandAloneWildcardWithStars = false;
-                            //if this '[' is glued to a name just before, it will have been handled above
-                            //and given symbolGlueChar6: '[_[', and we would not end here
-                            //So this must be a stand-alone '[', not an indexer on a name
-                            for (int ii = i + 1; ii < lineNewVersion.Length; ii++)
-                            {
-                                if (lineNewVersion[ii] == ']')
-                                {
-                                    string s = lineNewVersion.Substring(i + 1, ii - (i + 1));
-                                    if (s.Contains("*"))
-                                    {
-                                        string[] ss = s.Split('*');
-                                        if (ss.Length > 1)
-                                        {
-                                            isProbablyStandAloneWildcardWithStars = true;  //looks good, we just need to check the bits
-                                            //now we try to falsify it
-                                            foreach (string sss in ss)
-                                            {
-                                                foreach (char c in sss)
-                                                {
-                                                    if (!G.IsLetterOrDigitOrUnderscore(c))
-                                                    {
-                                                        isProbablyStandAloneWildcardWithStars = false;
-                                                    }
-                                                }
-                                            }
-                                            //now it could be [a*b] or [*a] or [a*] or [a**b] or [1*2] or [a*5]
-                                            if (s.StartsWith("*")) isProbablyStandAloneWildcardWithStars = false; //[*a]
-                                            if (s.EndsWith("*")) isProbablyStandAloneWildcardWithStars = false;  //[a*]
-                                            if (s.Contains("**")) isProbablyStandAloneWildcardWithStars = false;  //[a**b]
-                                            if (char.IsDigit(s[0])) isProbablyStandAloneWildcardWithStars = false;  //[1*a]
-                                        }
-                                    }
-                                }
-                            }
-                            if (isProbablyStandAloneWildcardWithStars)
+                        {                            
+                            if (CheckIfLooksLikeWildcard(lineNewVersion, i))
                             {
                                 sb.Append(Globals.symbolGlueChar7);
                                 continue;
                             }
                         }
-
 
                         // -------------------------------------------------------------
                         // Handle @
@@ -13957,6 +13921,64 @@ namespace Gekko
 
             return inputFileLines2;
         }
+
+        private static bool CheckIfLooksLikeWildcard(string lineNewVersion, int i)
+        {
+            //finds [a*b?] patterns, handled like {'a*b?'}
+            //problem is that [a*b] looks like a matrix definition, therefore this code.
+            int iRight = -12345;
+
+            for (int ii = i + 1; ii < lineNewVersion.Length; ii++)
+            {
+                if (lineNewVersion[ii] == ']')
+                {
+                    iRight = ii;
+                    break;
+                }
+            }
+            if (iRight == -12345) return false;
+
+            string inside = lineNewVersion.Substring(i + 1, iRight - i - 1);
+            
+            //seems this regex splits after '*' and '?', but keeps these delimiters
+            string[] ss = Regex.Matches(inside, @"[-\*?]|[^\*?-]+")
+                .Cast<Match>()
+                .Select(m => m.Value)
+                .ToList()
+                .ToArray<string>();
+
+            int starCount = 0;
+            int qCount = 0;
+            for (int ii = 0; ii < ss.Length; ii++)
+            {
+                if (ss[ii] == "*")
+                {
+                    starCount++;
+                }
+                else if (ss[ii] == "?")
+                {
+                    qCount++;
+                }
+                else
+                {
+                    foreach (char c in ss[ii])
+                    {
+                        if (!G.IsLetterOrDigitOrUnderscore(c))
+                        {
+                            //must be clean '0_ab_12x' type of word
+                            //blanks not allowed
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            //if (starCount > 1) return false;  //only 1 accepted here, else use {'...'}
+            if (starCount + qCount == 0) return false;
+            return true;
+        }
+
+       
 
         private static int GetNextIdent(string lineNewVersion, int i, out string ident)
         {
