@@ -1101,8 +1101,8 @@ namespace Gekko
 
             if (Program.CheckIfLooksLikeWildcard(varnameWithFreq))
             {
-                List<string> output = Program.MatchWildcardInDatabank(varnameWithFreq, null);
-                rv = new List(output);
+                //a pattern like {'a*'} or rather {'a*!a'} is caught here
+                rv = HandleWildcards(varnameWithFreq);                
             }
             else
             {
@@ -1203,6 +1203,16 @@ namespace Gekko
             return rv;
         }
 
+        public static List HandleWildcards(string varnameWithFreq)
+        {
+            List<string> output = Program.MatchWildcardInDatabank(varnameWithFreq, Program.databanks.GetFirst());
+            List<IVariable> output2 = new List<IVariable>();
+            foreach (string s in output)
+            {
+                output2.Add(O.GetIVariableFromString(s, ECreatePossibilities.None));
+            }
+            return new List(output2);
+        }
 
         public static IVariable GetIVariableFromString(string fullname, ECreatePossibilities type)
         {

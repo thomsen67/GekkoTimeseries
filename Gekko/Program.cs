@@ -7650,7 +7650,7 @@ namespace Gekko
                 foreach (IVariable iv in input)
                 {
                     string s = O.ConvertToString(iv);
-                    if (s.Contains(Globals.freqIndicator)) continue;  //#09875230984, filters out fy=q, fy=m, etc. A bit of a hack. Could also check the second-last char to see if it is '='
+                    //if (s.Contains(Globals.freqIndicator)) continue;  //#09875230984, filters out fy=q, fy=m, etc. A bit of a hack. Could also check the second-last char to see if it is '='
                     if (wc.IsMatch(s)) found.Add(s);
                 }
             }

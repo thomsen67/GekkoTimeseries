@@ -303,9 +303,15 @@ namespace Gekko
                     if (index.Type() == EVariableType.String)
                     {
                         //string vars = null;                    
-                        ExtractBankAndRestHelper h = Program.ExtractBankAndRest(((ScalarString)index).string2, EExtrackBankAndRest.GetDatabank);
-                        List<string> output = Program.MatchWildcardInDatabank(h.name, h.databank);
-                        rv = new List(output);
+                        //ExtractBankAndRestHelper h = Program.ExtractBankAndRest(((ScalarString)index).string2, EExtrackBankAndRest.GetDatabank);
+                        //List<string> output = Program.MatchWildcardInDatabank(h.name, h.databank);
+                        //rv = new List(output);
+                        string s = ((ScalarString)index).string2;
+                        if (s.StartsWith(Globals.firstCheatString + Globals.symbolBankColon2))
+                        {
+                            s = s.Substring((Globals.firstCheatString + Globals.symbolBankColon2).Length);
+                        }
+                        rv = O.HandleWildcards(s);
                     }
                     else
                     {
