@@ -13940,30 +13940,42 @@ namespace Gekko
         {
             //finds [a*b?] patterns, handled like {'a*b?'}
             //note that [bank:a*b?] is also allowed
+            //note that [bank:a*b?!q] is also allowed
             //problem is that [a*b] looks like a matrix definition, therefore this code.
             
-
             string[] sss = inside.Split(Globals.symbolBankColon2);
 
             if (sss.Length > 2) return false;
-
+            
             string bank = null;
             string rest = null;
-
             if (sss.Length == 1)
             {
-                rest = inside;
+                rest = sss[0];
             }
             else
             {
                 bank = sss[0];
                 rest = sss[1];
             }
+            if (bank != null && !G.IsSimpleToken(bank)) return false;
 
-            if (!G.IsSimpleToken(bank)) return false;
-            
+            string rest1 = null;
+            string rest2 = null;  //freq
+            string[] ssss = rest.Split(Globals.freqIndicator);
+            if (ssss.Length == 1)
+            {
+                rest1 = ssss[0];
+            }
+            else
+            {
+                rest1 = ssss[0];
+                rest2 = ssss[1];
+            }
+            if (rest2 != null && !G.IsSimpleToken(rest2)) return false;
+
             //seems this regex splits after '*' and '?', but keeps these delimiters
-            string[] ss = Regex.Matches(rest, @"[-\*?]|[^\*?-]+")
+            string[] ss = Regex.Matches(rest1, @"[-\*?]|[^\*?-]+")
                 .Cast<Match>()
                 .Select(m => m.Value)
                 .ToList()
