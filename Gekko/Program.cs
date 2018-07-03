@@ -13595,11 +13595,25 @@ namespace Gekko
                         // Handle stand-alone [a*b*c*d] that may look like a 1x1 matrix
                         // -------------------------------------------------------------
                         if (c2 == '[')
-                        {                            
-                            if (CheckIfLooksLikeWildcard(lineNewVersion, i))
+                        {
+                            int iRight = -12345;
+
+                            for (int ii = i + 1; ii < lineNewVersion.Length; ii++)
                             {
-                                sb.Append(Globals.symbolGlueChar7);
-                                continue;
+                                if (lineNewVersion[ii] == ']')
+                                {
+                                    iRight = ii;
+                                    break;
+                                }
+                            }
+                            if (iRight != -12345)
+                            {
+                                string inside = lineNewVersion.Substring(i + 1, iRight - i - 1);
+                                if (CheckIfLooksLikeWildcard(inside))
+                                {
+                                    sb.Append(Globals.symbolGlueChar7);
+                                    continue;
+                                }
                             }
                         }
 
@@ -13922,26 +13936,34 @@ namespace Gekko
             return inputFileLines2;
         }
 
-        private static bool CheckIfLooksLikeWildcard(string lineNewVersion, int i)
+        public static bool CheckIfLooksLikeWildcard(string inside)
         {
             //finds [a*b?] patterns, handled like {'a*b?'}
+            //note that [bank:a*b?] is also allowed
             //problem is that [a*b] looks like a matrix definition, therefore this code.
-            int iRight = -12345;
+            
 
-            for (int ii = i + 1; ii < lineNewVersion.Length; ii++)
+            string[] sss = inside.Split(Globals.symbolBankColon2);
+
+            if (sss.Length > 2) return false;
+
+            string bank = null;
+            string rest = null;
+
+            if (sss.Length == 1)
             {
-                if (lineNewVersion[ii] == ']')
-                {
-                    iRight = ii;
-                    break;
-                }
+                rest = inside;
             }
-            if (iRight == -12345) return false;
+            else
+            {
+                bank = sss[0];
+                rest = sss[1];
+            }
 
-            string inside = lineNewVersion.Substring(i + 1, iRight - i - 1);
+            if (!G.IsSimpleToken(bank)) return false;
             
             //seems this regex splits after '*' and '?', but keeps these delimiters
-            string[] ss = Regex.Matches(inside, @"[-\*?]|[^\*?-]+")
+            string[] ss = Regex.Matches(rest, @"[-\*?]|[^\*?-]+")
                 .Cast<Match>()
                 .Select(m => m.Value)
                 .ToList()
@@ -26811,380 +26833,121 @@ namespace Gekko
 
         public static void UnfoldLabels(string elementLabel, ref List<string> labels2, List<List<O.LabelHelperIVariable>> labelHelper2)
         {
-            if (Globals.smartLabels)
-            {
-                /*
-                 * For instance p x1[#m]+x2[#n]+sum(#k,x[#m,#n,#k]);   
-                 * Here freelists will be 'm' and 'n'.
-                 * If these are a,b and x,y we get labelHelper2 like this:
-                 * 
-                 * a x a x e
-                 * a y a y e
-                 * b x b x e
-                 * b y b y e
-                 * 
-                 * labelHelper2 only records inside [] or {} at the top level (not nested)
-                 * 
-                 * The tokens are like this:                 
+            //string elementLabel = G.ReplaceGlueNew(xelementLabel);
+
+            labels2 = new List<string>();
+
+            /*
+             * For instance p x1[#m]+x2[#n]+sum(#k,x[#m,#n,#k]);   
+             * Here freelists will be 'm' and 'n'.
+             * If these are a,b and x,y we get labelHelper2 like this:
+             * 
+             * a x a x e
+             * a y a y e
+             * b x b x e
+             * b y b y e
+             * 
+             * labelHelper2 only records inside [] or {} at the top level (not nested)
+             * 
+             * The tokens are like this:                 
+             */
+            //               
+            /*
+
+            x1 
+              [
+               #                    
+               m                    
+              ]                    
+            + 
+             x2 
+               [
+               #                    
+               n                    
+               ]                    
+             + 
+             sum 
+               (
+               #                    
+               k                    
+               , 
+               x                    
+                 [
+                 #                    
+                 m                    
+                 , 
+                 #                    
+                 n                    
+                 , 
+                 #                    
+                 k                    
+                 ]                    
+               )                    
+                 EOF
                  */
-                //               
-                /*
-                  
-                x1 
-                  [
-                   #                    
-                   m                    
-                  ]                    
-                + 
-                 x2 
-                   [
-                   #                    
-                   n                    
-                   ]                    
-                 + 
-                 sum 
-                   (
-                   #                    
-                   k                    
-                   , 
-                   x                    
-                     [
-                     #                    
-                     m                    
-                     , 
-                     #                    
-                     n                    
-                     , 
-                     #                    
-                     k                    
-                     ]                    
-                   )                    
-                     EOF
-                     */
 
-                //So we walk the tokens, inserting from labelHelper2. Here, only STRING/DATE/VAL from labelHelper2are accepted, with 
-                //one exception: if the token is a #x AND the token is not in freelists, we keep the '#x' and not the string from
-                //labelHelper2. For instance: sum(#x, x[#x, #y, %s]). Here %s string is set in (easy). Also, the string in the
-                //place of #y is set in, because 'y' is in freelists. Regarding #x, it is kept as it is.
+            //So we walk the tokens, inserting from labelHelper2. Here, only STRING/DATE/VAL from labelHelper2are accepted, with 
+            //one exception: if the token is a #x AND the token is not in freelists, we keep the '#x' and not the string from
+            //labelHelper2. For instance: sum(#x, x[#x, #y, %s]). Here %s string is set in (easy). Also, the string in the
+            //place of #y is set in, because 'y' is in freelists. Regarding #x, it is kept as it is.
 
-                string[] freelists = new string[0];
-                string rawLabel = elementLabel;
-                string[] ss = elementLabel.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
+            string[] freelists = new string[0];
+            string rawLabel = elementLabel;
+            string[] ss = elementLabel.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
 
-                if (ss.Length > 1)
-                {
-                    rawLabel = ss[1];
-                    freelists = ss[0].Split(new string[] { "," }, StringSplitOptions.None);
-                    for (int i = 0; i < freelists.Length; i++)
-                    {
-                        freelists[i] = freelists[i].Trim();  //there may be a blank
-                    }
-                }
-
-                //after this, free (uncontrolled) lists are in freelists, and rawLabel is the label.
-
-                var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };  //can in principle have such comments                         
-                
-                TokenHelper helperParent = StringTokenizer2.GetTokensWithLeftBlanksRecursive(rawLabel, tags1, null, null, null);
-                TokenList tokens2 = helperParent.subnodes;
-
-                if (false && Globals.runningOnTTComputer)
-                {
-                    TokenHelper.Print(tokens2, 0);
-                    //TokenHelper.Print(tokens2.DeepClone(), 0);
-                }                
-
-                labels2 = new List<string>();
-                foreach (List<O.LabelHelperIVariable> list in labelHelper2)
-                {
-                    bool problem = false;
-                    string result = null;
-                    try
-                    {
-                        int counter = -1;
-                        
-                        TokenList temp = tokens2.DeepClone(helperParent);
-                        problem = HandleLabels(temp, 0, list, freelists, ref counter);  //the temp object is changed here, therefore it is cloned before.                            
-                        if (!problem) result = temp.ToString();
-                    }
-                    catch (Exception e)
-                    {
-                        problem = true;
-                    }
-                    if (problem)
-                    {
-                        //this way, there is not a complete crash, and the users get something.
-                        //they may complain that the label is non-informative though.
-                        //string[] sss = rawLabel.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
-                        //if (ss.Length > 1) rawLabel = ss[1];
-                        labels2.Add(rawLabel);
-                    }
-                    else
-                    {
-                        labels2.Add(result);
-                    }
-                    //
-                }               
-            }
-            else
+            if (ss.Length > 1)
             {
+                rawLabel = ss[1];
+                freelists = ss[0].Split(new string[] { "," }, StringSplitOptions.None);
+                for (int i = 0; i < freelists.Length; i++)
+                {
+                    freelists[i] = freelists[i].Trim();  //there may be a blank
+                }
+            }
 
-                //string rawLabel = elementLabel;
+            //after this, free (uncontrolled) lists are in freelists, and rawLabel is the label.
 
-                ////returns either label or label2
-                //bool fail = false;
-                ////label = null;
-                //if (elementLabel.StartsWith("|||"))
-                //{
+            var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };  //can in principle have such comments                         
 
-                //    string[] ss = elementLabel.Split(new string[] { "|||" }, StringSplitOptions.RemoveEmptyEntries);
-                //    rawLabel = ss[1];
-                //    string[] freelists = ss[0].Split(new string[] { "," }, StringSplitOptions.None);
+            TokenHelper helperParent = StringTokenizer2.GetTokensWithLeftBlanksRecursive(rawLabel, tags1, null, null, null);
+            TokenList tokens2 = helperParent.subnodes;
 
-                //    for (int i = 0; i < freelists.Length; i++)
-                //    {
-                //        freelists[i] = freelists[i].Trim();  //there may be a blank
-                //    }
+            if (false && Globals.runningOnTTComputer)
+            {
+                TokenHelper.Print(tokens2, 0);
+                //TokenHelper.Print(tokens2.DeepClone(), 0);
+            }
 
-                //    string[][] xxx = new string[freelists.Length][];
-                //    int count = 0;
-                //    foreach (string fl in freelists)
-                //    {
-                //        IVariable iv = O.Lookup(null, null, null, Globals.symbolCollection + fl, null, null, false, EVariableType.List, false);
-                //        if (iv == null)
-                //        {
-                //            fail = true; break;
-                //        }
-                //        else
-                //        {
-                //            List zz = iv as List;
-                //            if (zz == null)
-                //            {
-                //                fail = true; break;
-                //            }
-                //            List<string> names = new List<string>();
-                //            foreach (IVariable iv2 in zz.list)
-                //            {
-                //                ScalarString ssss = iv2 as ScalarString;
-                //                if (ssss == null)
-                //                {
-                //                    fail = true; break;
-                //                }
-                //                names.Add(ssss.string2);
-                //            }
-                //            //string[] names = Program.GetListOfStringsFromListOfIvariables(new IVariable[] { iv });
-                //            //if (names == null)
-                //            //{
-                //            //    fail = true; break;
-                //            //}
-                //            xxx[count] = names.ToArray();
-                //        }
+            
+            foreach (List<O.LabelHelperIVariable> list in labelHelper2)
+            {
+                bool problem = false;
+                string result = null;
+                try
+                {
+                    int counter = -1;
 
-                //        count++;
-                //    }
-
-                //    int twenty = 20;
-                //    TokensHelper a = StringTokenizer2.GetTokensWithLeftBlanks(ss[1], 20);  //puts in 20 empty tokens at the end
-
-                //    //Now we walk though the tokens to mark all that are bound with sum, 
-                //    //for instance sum(#m1, xx3[#m1, #m2]) --> sum(¤m1, xx3[¤m1, #m2])
-                //    //or sum((#m1, #m2), xx3[#m1, #m2]) --> sum((¤m1, ¤m2), xx3[¤m1, ¤m2])
-                //    //It is like they did not exist
-
-                //    // x[#i, 'a'] $ #j[#k]--> x[##i, 'a'] $ #j[##k]
-                //    for (int i = 0; i < a.Count - twenty; i++)
-                //    {
-                //        if (a[i].s == "[" && a[i - 1].type == TokenKind.Word)
-                //        {
-                //            //is 'x['
-                //            //very simple check, does not account for nesting etc....  
-                //            int count2 = 1;
-                //            for (int i2 = i + 1; i2 < a.Count - twenty; i2++)
-                //            {
-                //                if (a[i2].s == "[") count2++;
-                //                if (a[i2].s == "]") count2--;
-                //                if (count2 == 0) break;
-                //                if (a[i2].s == "#") a[i2].s = "##";
-                //            }
-                //        }
-                //    }
-
-                //    // x{#i, 'a'} --> x{##i, 'a'}
-                //    for (int i = 0; i < a.Count - twenty; i++)
-                //    {
-                //        if (a[i].s == "{")
-                //        {
-                //            //is 'x{'
-                //            //very simple check, does not account for nesting etc....  
-                //            int count2 = 1;
-                //            for (int i2 = i + 1; i2 < a.Count - twenty; i2++)
-                //            {
-                //                if (a[i2].s == "{") count2++;
-                //                if (a[i2].s == "}") count2--;
-                //                if (count2 == 0) break;
-                //                if (a[i2].s == "#") a[i2].s = "##";
-                //            }
-                //        }
-                //    }
-
-                //    // x[##i, 'a'] $ #j[##k] --> x[#i, 'a'] $ ###j[#k]
-                //    for (int i = 0; i < a.Count - twenty; i++)
-                //    {
-                //        if (a[i].s == "#") a[i].s = "###";
-                //        else if (a[i].s == "##") a[i].s = "#";
-                //    }
-
-                //    int start = 0;
-                //    for (int i = 0; i < a.Count - twenty; i++)
-                //    {
-                //        GekkoDictionary<string, string> listNames = null;
-                //        if (a[i].s == "sum" && a[i + 1].s == "(" && a[i + 2].s == "###" && a[i + 3].type == TokenKind.Word && a[i + 4].s == ",")
-                //        {
-                //            //sum(#m1, xx3[#m1, #m2])
-                //            listNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                //            listNames.Add(a[i + 3].s, "");
-                //            //a[i + 2].s = "###";
-                //            start = 5;
-                //        }
-                //        else if (a[i].s == "sum" && a[i + 1].s == "(" && a[i + 2].s == "(" && a[i + 3].s == "###")
-                //        {
-                //            //sum((#m1, #m2), xx3[#m1, #m2]) 
-                //            listNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-                //            for (int i2 = i + 3; i2 < a.Count - twenty; i2++)
-                //            {
-                //                //Harvesting list names from here: sum((...), xx3[#m1, #m2])
-                //                if (a[i2].s == "###" && a[i2 + 1].type == TokenKind.Word)
-                //                {
-                //                    if (!listNames.ContainsKey(a[i2 + 1].s)) listNames.Add(a[i2 + 1].s, "");  //the if is probably superfluous
-                //                                                                                              //a[i2].s = "###";                                
-                //                }
-                //                if (a[i2].s == ")" && a[i2 + 1].s == ",")
-                //                {
-                //                    start = i2 + 2;
-                //                    break;
-                //                }
-                //            }
-                //        }
-                //        if (listNames != null)
-                //        {
-
-                //            int paren = 1;
-                //            for (int i2 = i + start; i2 < a.Count - twenty; i2++)
-                //            {
-                //                //counting parentheses
-
-                //                if (a[i2].s == "(") paren++;
-                //                if (a[i2].s == ")") paren--;
-
-                //                if (paren == 0) break;
-
-                //                if (a[i2].s == "#" && a[i2 + 1].type == TokenKind.Word && listNames.ContainsKey(a[i2 + 1].s))
-                //                {
-                //                    a[i2].s = "###";
-                //                }
-                //            }
-                //        }
-                //    }
-
-                //    if (freelists.Length == 1)
-                //    {
-                //        int j0 = 0;
-                //        foreach (string list0 in xxx[j0])
-                //        {
-                //            string ss2 = null;
-                //            for (int i = 0; i < a.Count - twenty; i++)
-                //            {
-
-                //                bool flag = false;
-                //                UnfoldLabelsHelper(a, list0, ref ss2, ref i, freelists[j0], ref flag);
-
-                //                if (!flag)
-                //                {
-                //                    string x = a[i].s;
-                //                    if (x == "###") x = "#";
-                //                    ss2 += a[i].leftblanks + x;
-                //                }
-                //            }
-                //            labels2.Add(ss2);
-                //        }
-                //    }
-                //    else if (freelists.Length == 2)
-                //    {
-                //        int j0 = 0;
-                //        int j1 = 1;
-                //        foreach (string list0 in xxx[j0])
-                //        {
-                //            foreach (string list1 in xxx[j1])
-                //            {
-                //                string ss2 = null;
-                //                for (int i = 0; i < a.Count - twenty; i++)
-                //                {
-
-                //                    bool flag = false;
-                //                    UnfoldLabelsHelper(a, list0, ref ss2, ref i, freelists[j0], ref flag);
-                //                    UnfoldLabelsHelper(a, list1, ref ss2, ref i, freelists[j1], ref flag);
-
-                //                    if (!flag)
-                //                    {
-                //                        string x = a[i].s;
-                //                        if (x == "###") x = "#";
-                //                        ss2 += a[i].leftblanks + x;
-                //                    }
-
-                //                }
-                //                labels2.Add(ss2);
-                //            }
-                //        }
-                //    }
-                //    else if (freelists.Length == 3)
-                //    {
-                //        int j0 = 0;
-                //        int j1 = 1;
-                //        int j2 = 2;
-                //        foreach (string list0 in xxx[j0])
-                //        {
-                //            foreach (string list1 in xxx[j1])
-                //            {
-                //                foreach (string list2 in xxx[j2])
-                //                {
-                //                    string ss2 = null;
-                //                    for (int i = 0; i < a.Count - twenty; i++)
-                //                    {
-
-                //                        bool flag = false;
-                //                        UnfoldLabelsHelper(a, list0, ref ss2, ref i, freelists[j0], ref flag);
-                //                        UnfoldLabelsHelper(a, list1, ref ss2, ref i, freelists[j1], ref flag);
-                //                        UnfoldLabelsHelper(a, list2, ref ss2, ref i, freelists[j2], ref flag);
-
-                //                        if (!flag)
-                //                        {
-                //                            string x = a[i].s;
-                //                            if (x == "###") x = "#";
-                //                            ss2 += a[i].leftblanks + x;
-                //                        }
-
-                //                    }
-                //                    labels2.Add(ss2);
-                //                }
-                //            }
-                //        }
-                //    }
-                //    else
-                //    {
-                //        fail = true;
-                //    }
-                //}
-                //else
-                //{
-                //    label = elementLabel;
-                //}
-
-                //if (fail)
-                //{
-                //    labels2 = null;
-                //    label = rawLabel;
-                //}
+                    TokenList temp = tokens2.DeepClone(helperParent);
+                    problem = HandleLabels(temp, 0, list, freelists, ref counter);  //the temp object is changed here, therefore it is cloned before.                            
+                    if (!problem) result = temp.ToString();
+                }
+                catch (Exception e)
+                {
+                    problem = true;
+                }
+                if (problem)
+                {
+                    //this way, there is not a complete crash, and the users get something.
+                    //they may complain that the label is non-informative though.
+                    //string[] sss = rawLabel.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
+                    //if (ss.Length > 1) rawLabel = ss[1];
+                    labels2.Add(rawLabel);
+                }
+                else
+                {
+                    labels2.Add(result);
+                }
+                //
             }
 
             return;

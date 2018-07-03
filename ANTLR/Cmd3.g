@@ -1901,9 +1901,10 @@ value:                      function //must be before varname
 						  | matrix
 						  | list
 						  | map
-						  | leftBracketNoGlueWild wildcard RIGHTBRACKET -> ^(ASTINDEXERALONE wildcard) //also see rule indexerExpression
+						  | leftBracketNoGlueWild wildRange RIGHTBRACKET -> ^(ASTINDEXERALONE wildRange) //also see rule indexerExpression
 						    ;
-					    
+
+wildRange:                  wildcardWithBank | rangeWithBank;					    
 
 leftSide:                   leftSideDollarExpression -> leftSideDollarExpression;
 

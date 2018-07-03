@@ -1868,14 +1868,15 @@ namespace Gekko
             //int length = s.Length;
             //TODO:
             //what about error position if glue stuff is removed?? Do some logic...
-            s = s.Replace(Globals.symbolGlueChar1.ToString(), "");
+            
             s = s.Replace(Globals.symbolGlueChar2, "");
             s = s.Replace(Globals.symbolGlueChar3, "");
             s = s.Replace(Globals.symbolGlueChar4, "");
             s = s.Replace(Globals.symbolGlueChar5, "<");  //--> fixme, this is a workaround
             s = s.Replace(Globals.symbolGlueChar6, "[");  //--> fixme, this is a workaround, #098523
             s = s.Replace(Globals.symbolGlueChar6a, "["); //--> is this necessary?
-            s = s.Replace(Globals.symbolGlueChar7, "[");            
+            s = s.Replace(Globals.symbolGlueChar7, "[");
+            s = s.Replace(Globals.symbolGlueChar1.ToString(), "");  //must be after symbolGlueChar7
             s = Regex.Replace(s, "s___er", "ser", RegexOptions.IgnoreCase);  //#098275432874
             s = Regex.Replace(s, "s___eries", "series", RegexOptions.IgnoreCase);
             s = Regex.Replace(s, "s____er", "ser", RegexOptions.IgnoreCase);

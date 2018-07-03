@@ -773,6 +773,9 @@ namespace Gekko.Parser.Gek
                     }
                     line = line + "  ";  //hack to avoid ending problems.....
                     string lineTemp = line;
+
+                    lineTemp = G.ReplaceGlueNew(lineTemp);
+
                     string line0 = lineTemp.Substring(0, positionNo - 1);
                     string line1 = lineTemp.Substring(positionNo - 1, 1);
                     string line2 = lineTemp.Substring(positionNo - 1 + 1);
@@ -784,9 +787,9 @@ namespace Gekko.Parser.Gek
                         G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueNew(lineBefore), Color.Blue);
                     }
 
-                    G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + G.ReplaceGlueNew(line0), Color.Blue);
-                    G.Write(G.ReplaceGlueNew(line1), Color.Red);
-                    G.Writeln(G.ReplaceGlueNew(line2), Color.Blue);
+                    G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + line0, Color.Blue);
+                    G.Write(line1, Color.Red);
+                    G.Writeln(line2, Color.Blue);
 
                     G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
                     G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
@@ -963,6 +966,9 @@ namespace Gekko.Parser.Gek
                                 lineTemp2.Add(lineTemp);  //used for suggestions later on
                                 lineTemp2Numbers.Add("    " + "[" + G.IntFormat(lineNo, 4) + "]:");
                             }
+
+                            lineTemp = G.ReplaceGlueNew(lineTemp);
+
                             string line0 = lineTemp.Substring(0, positionNo - 1);
                             string line1 = lineTemp.Substring(positionNo - 1, 1);
                             string line2 = lineTemp.Substring(positionNo - 1 + 1);
@@ -974,9 +980,9 @@ namespace Gekko.Parser.Gek
                                 G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueNew(lineBefore), Color.Blue);
                             }
 
-                            G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + G.ReplaceGlueNew(line0), Color.Blue);
-                            G.Write(G.ReplaceGlueNew(line1), Color.Red);
-                            G.Writeln(G.ReplaceGlueNew(line2), Color.Blue);
+                            G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + line0, Color.Blue);
+                            G.Write(line1, Color.Red);
+                            G.Writeln(line2, Color.Blue);
 
                             G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
                             G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);

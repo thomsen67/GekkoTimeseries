@@ -260,7 +260,7 @@ namespace Gekko
 
         public static void PrtElementHandleLabel(GekkoSmpl smpl, O.Prt.Element ope0)
         {
-            ope0.label2 = new List<string>();
+            ope0.label2 = null;
             Program.UnfoldLabels(ope0.label, ref ope0.label2, O.AddLabelHelper2(smpl));
         }
 
@@ -1413,8 +1413,19 @@ namespace Gekko
             rv = ib.GetIVariable(varnameWithFreq);
             if (rv == null)
             {
-                G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in " + ib.Message());
-                throw new GekkoException();
+
+                string dbName2, varname2, freq2; string[] indexes2;
+                Chop(varnameWithFreq, out dbName2, out varname2, out freq2, out indexes2);
+                if (Program.CheckIfLooksLikeWildcard(varname2))
+                {
+                    List<string> output = Program.MatchWildcardInDatabank(varnameWithFreq, null);
+                    rv = new List(output);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in " + ib.Message());
+                    throw new GekkoException();
+                }
             }
 
             return rv;
@@ -2590,7 +2601,7 @@ namespace Gekko
 
         public static IVariable ReportInterior(GekkoSmpl smpl, IVariable x, int i, int loopNumber)
         {
-            if (Globals.smartLabels && loopNumber == 0)
+            if (loopNumber == 0)
             {                
                 smpl.labelHelper.Add(new LabelHelperIVariable(i, x));
             }
