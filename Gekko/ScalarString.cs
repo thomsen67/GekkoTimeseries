@@ -311,7 +311,7 @@ namespace Gekko
                         {
                             s = s.Substring((Globals.firstCheatString + Globals.symbolBankColon2).Length);
                         }
-                        rv = O.HandleWildcards(s);
+                        rv = O.HandleWildcards(s, true);
                     }
                     else
                     {

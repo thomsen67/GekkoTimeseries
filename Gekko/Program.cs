@@ -696,6 +696,7 @@ namespace Gekko
     {
         public int int1;
         public int int2;
+        
     }
 
     public class NewtonFairTaylorHelper
@@ -12189,10 +12190,12 @@ namespace Gekko
             return ExtractBankAndRest(input, type, true);
         }
 
+        public static TwoInts f(int x) { return new TwoInts(); }
+
         //Does not allow wildcards in bankname
         //returns whether there is a ':' or not
         public static ExtractBankAndRestHelper ExtractBankAndRest(string input, EExtrackBankAndRest type, bool errorIfTimeseriesIsNotFound)
-        {
+        {                        
             //If noErrorIfTimeseriesIsNotFound = false, and the timeseries is not fund, the h.ts will be = null
             ExtractBankAndRestHelper h = new ExtractBankAndRestHelper();
             string[] split = input.Split(':');

@@ -1102,7 +1102,7 @@ namespace Gekko
             if (Program.CheckIfLooksLikeWildcard(varnameWithFreq))
             {
                 //a pattern like {'a*'} or rather {'a*!a'} is caught here
-                rv = HandleWildcards(varnameWithFreq);                
+                rv = HandleWildcards(varnameWithFreq, false);                
             }
             else
             {
@@ -1203,9 +1203,10 @@ namespace Gekko
             return rv;
         }
 
-        public static List HandleWildcards(string varnameWithFreq)
+        public static List HandleWildcards(string varnameWithFreq, bool strings)
         {
             List<string> output = Program.MatchWildcardInDatabank(varnameWithFreq, Program.databanks.GetFirst());
+            if (strings) return new List(output);
             List<IVariable> output2 = new List<IVariable>();
             foreach (string s in output)
             {
