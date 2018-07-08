@@ -31,6 +31,7 @@ options {
 
 tokens {
 	ASTDOLLAR;
+	ASTOBJECTFUNCTION;
 	ASTLEFTSIDE;
 	ASTASSIGNMENT;
 	ASTCNAME;
@@ -1889,7 +1890,6 @@ primaryExpression:          leftParen! expression RIGHTPAREN!
 						    ;
 
 
-
 value:                      function //must be before varname
 						  | bankvarname						
 						  | Integer -> ^(ASTINTEGER Integer)
@@ -1922,13 +1922,14 @@ bankvarnameIndexer:  (bankvarname -> bankvarname)
 	
 indexerAlone:			    (leftBracketNoGlue|leftBracketNoGlueWild) indexerExpressionHelper RIGHTBRACKET -> ^(ASTINDEXERALONE indexerExpressionHelper); //also see rule indexerExpression
 						
-dotOrIndexer:               GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
-						  //| leftBracketGlue indexerExpressionHelper3 RIGHTBRACKET -> ^(ASTINDEXERSIMPLE indexerExpressionHelper3) //simple ident, x[a, 85] --> x['a', '85']
+dotOrIndexer:               GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)			
 						  | leftBracketGlue indexerExpressionHelper2 RIGHTBRACKET -> ^(ASTINDEXER indexerExpressionHelper2)
 						    ;
 
+//objectFunction:             GLUEDOT DOT leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTOBJECTFUNCTION expression*);
+
 						    //just like b1:fy!q, we can use #m.fy!q, where fy!q is the varname.
-dotHelper:				    varname | function | Integer;
+dotHelper:				    function | varname | Integer;
 indexerExpressionHelper2:   (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper+;
 //indexerExpressionHelper3:   (indexerExpressionHelper4 (',' indexerExpressionHelper4)*) -> indexerExpressionHelper4+;
 //indexerExpressionHelper4:   ident | Integer;
