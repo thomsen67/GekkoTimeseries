@@ -47,6 +47,13 @@ namespace Gekko
         {
             G.Writeln2("*** ERROR: Object method .append() not available for type " + G.GetTypeString(this));
             throw new GekkoException();
+            List<string> xx = null;
+        }
+
+        public IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x)
+        {
+            G.Writeln2("*** ERROR: Object method .extend() not available for type " + G.GetTypeString(this));
+            throw new GekkoException();
         }
 
         // ----------------------------------------------------

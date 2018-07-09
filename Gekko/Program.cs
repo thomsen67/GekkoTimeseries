@@ -24074,7 +24074,7 @@ namespace Gekko
                 string yRhs = xrhs[i];
 
                 Series ts_lhs = O.GetIVariableFromString(yLhs, O.ECreatePossibilities.Must) as Series;
-                Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.None) as Series;
+                Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReturnNull) as Series;
 
                 if (ts_lhs == null)
                 {
@@ -24218,7 +24218,7 @@ namespace Gekko
                 string yRhs = xrhs[ii];
 
                 Series ts_lhs = O.GetIVariableFromString(yLhs, O.ECreatePossibilities.Must) as Series;
-                Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.None) as Series;
+                Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReturnNull) as Series;
 
                 if (ts_lhs == null)
                 {
@@ -25205,14 +25205,14 @@ namespace Gekko
             }
             else
             {
-                Series ts = iv as Series;
-                if (ts != null)
-                {
-                    if (ts.type == ESeriesType.ArraySuper)
-                    {
-                        b = false;
-                    }
-                }
+                //Series ts = iv as Series;
+                //if (ts != null)
+                //{
+                //    if (ts.type == ESeriesType.ArraySuper)
+                //    {
+                //        b = false;
+                //    }
+                //}
             }
 
             return b;
@@ -36175,8 +36175,8 @@ namespace Gekko
 
                     if (G.HasSigil(varName)) continue;  //filter out non-series, like %s or #m
 
-                    IVariable iv = O.GetIVariableFromString(dbName, varName, freq, indexes, O.ECreatePossibilities.None);
-                    IVariable ivGrund = O.GetIVariableFromString("Ref", varName, freq, indexes, O.ECreatePossibilities.None);
+                    IVariable iv = O.GetIVariableFromString(dbName, varName, freq, indexes, O.ECreatePossibilities.NoneReturnNull);
+                    IVariable ivGrund = O.GetIVariableFromString("Ref", varName, freq, indexes, O.ECreatePossibilities.NoneReturnNull);
 
                     //string tsNameWithFreq = varName;
                     //if (freq != null) tsNameWithFreq = Globals.freqIndicator + freq;

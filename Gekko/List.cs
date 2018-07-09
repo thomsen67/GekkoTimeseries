@@ -57,6 +57,27 @@ namespace Gekko
             }
         }
 
+        public IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x)
+        {
+            List x_list = x as List;
+            if (x_list == null)
+            {
+                G.Writeln2("*** ERROR: Object method .extend() expects a LIST argument, got " + G.GetTypeString(x));
+                throw new GekkoException();
+            }
+            if (isLhs)
+            {
+                this.list.AddRange(x_list.list);
+                return new GekkoNull();
+            }
+            else
+            {
+                List temp = this.DeepClone() as List;
+                temp.list.AddRange(x_list.list);
+                return temp;
+            }
+        }
+
         // ----------------------------------------------------
         // --------------object functions end------------------
         // ----------------------------------------------------
@@ -350,14 +371,14 @@ namespace Gekko
                 int i = O.ConvertToInt(dims[0]);
                 if (i < 1 || i > this.list.Count)
                 {
-                    G.Writeln2("*** ERROR: Illegal LIST indexer [" + i + "]");
+                    G.Writeln2("*** ERROR: List index [" + i + "] out of range 1.." + this.list.Count);
                     throw new GekkoException();
                 }
                 this.list[i - 1] = rhsExpression.DeepClone();
             }
             else
             {
-                G.Writeln2("*** ERROR: Unexpected indexer type on LIST (left-hand side)");
+                G.Writeln2("*** ERROR: Expected indexer type VAL on LIST object (left-hand side)");
                 throw new GekkoException();
             }
         }

@@ -38,6 +38,12 @@ namespace Gekko
             throw new GekkoException();
         }
 
+        public IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x)
+        {
+            G.Writeln2("*** ERROR: Object method .extend() not available for type " + G.GetTypeString(this));
+            throw new GekkoException();
+        }
+
         // ----------------------------------------------------
         // --------------object functions end------------------
         // ----------------------------------------------------     

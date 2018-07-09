@@ -22,19 +22,18 @@ namespace Gekko
             val = d;
         }
 
-        // ----------------------------------------------------
-        // --------------object functions start----------------
-        // ----------------------------------------------------
-
         public IVariable append(bool isLhs, GekkoSmpl smpl, IVariable x)
         {
             G.Writeln2("*** ERROR: Object method .append() not available for type " + G.GetTypeString(this));
             throw new GekkoException();
+            List<string> xx = null;
         }
 
-        // ----------------------------------------------------
-        // --------------object functions end------------------
-        // ----------------------------------------------------
+        public IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x)
+        {
+            G.Writeln2("*** ERROR: Object method .extend() not available for type " + G.GetTypeString(this));
+            throw new GekkoException();
+        }
 
         public double GetValOLD(GekkoSmpl t)
         {

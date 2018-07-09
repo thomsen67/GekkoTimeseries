@@ -68,6 +68,8 @@ namespace Gekko
 
         IVariable append(bool isLhs, GekkoSmpl smpl, IVariable x);
 
+        IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x);
+
         // ----------------------------------------------------
         // --------------object functions end------------------
         // ----------------------------------------------------

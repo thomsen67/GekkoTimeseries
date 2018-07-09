@@ -435,7 +435,7 @@ namespace Gekko
                     foreach (IVariable iv in ((List)vars[j]).list)
                     {
                         string s = O.ConvertToString(iv);
-                        Series tmp = Program.GetTimeSeriesFromString(s, O.ECreatePossibilities.None);
+                        Series tmp = Program.GetTimeSeriesFromString(s, O.ECreatePossibilities.NoneReturnNull);
                         tss.Add(tmp);
                     }
                 }

@@ -300,7 +300,8 @@ namespace Gekko
 
         public enum ECreatePossibilities
         {
-            None,
+            NoneReturnNull,
+            NoneReportError,
             Can,
             Must
         }
@@ -926,35 +927,28 @@ namespace Gekko
 
                 return rv;
             }
-            //!!!!!!!!!!!!
-            //!!!!!!!!!!!!
-            //!!!!!!!!!!!! the stuff below seems obsolete, PRT {#m} or x{#m} or x[#m] is  made very differently now, via unfold() function.
-            //!!!!!!!!!!!!
-            //!!!!!!!!!!!!
-            //else if (x.Type() == EVariableType.List)
-            //{
-            //    //for instance PRT {#m}, where #m is a list of strings. Then #m will already have been looked up, when {} is called,
-            //    //so Lookup is called again, this time with a list as "key"
-            //    List x_list = x as List;
-            //    string[] items = Program.GetListOfStringsFromListOfIvariables(x_list.list.ToArray());
-            //    if (items == null)
-            //    {
-            //        G.Writeln2("*** ERROR: The list contains non-string elements");
-            //        throw new GekkoException();
-            //    }
-            //    else
-            //    {
-            //        List<IVariable> rv = new List<IVariable>();
-            //        foreach(string s in items)
-            //        {
-            //            string dbName, varName, freq; char firstChar; Chop(s, out dbName, out varName, out freq);
-            //            IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable, type, errorIfNotFound);
-            //            rv.Add(iv);
-            //        }
-            //        List m = new List(rv);
-            //        return m;
-            //    }
-            //}
+            else if (x.Type() == EVariableType.List)
+            {
+                //for instance PRT {('a', 'b')}. A controlled unfold like PRT {#m} will not get here.
+                List x_list = x as List;
+                string[] items = Program.GetListOfStringsFromListOfIvariables(x_list.list.ToArray());
+                if (items == null)
+                {
+                    G.Writeln2("*** ERROR: The list contains non-string elements");
+                    throw new GekkoException();
+                }
+                else
+                {
+                    List<IVariable> rv = new List<IVariable>();
+                    foreach (string s in items)
+                    {
+                        IVariable iv = GetIVariableFromString(s, ECreatePossibilities.NoneReportError);
+                        rv.Add(iv);
+                    }
+                    List m = new List(rv);
+                    return m;
+                }
+            }
             else
             {
                 G.Writeln2("*** ERROR: Expected variable name to be a string, but it is of " + G.GetTypeString(x) + " type");
@@ -1210,7 +1204,7 @@ namespace Gekko
             List<IVariable> output2 = new List<IVariable>();
             foreach (string s in output)
             {
-                output2.Add(O.GetIVariableFromString(s, ECreatePossibilities.None));
+                output2.Add(O.GetIVariableFromString(s, ECreatePossibilities.NoneReturnNull));
             }
             return new List(output2);
         }
@@ -1351,6 +1345,26 @@ namespace Gekko
 
             }
 
+            if (iv == null && type == ECreatePossibilities.NoneReportError)
+            {
+                //G.Writeln2("*** ERROR: Could not find ")
+                string vname = varName;
+                if (freq != null) vname += Globals.freqIndicator + freq;
+                if (dbName != null) vname = dbName + Globals.symbolBankColon2 + vname;
+                string s = null;
+                if (indexes != null)
+                {
+                    s = "";
+                    foreach (string ix in indexes)
+                    {
+                        s += ix + ", ";
+                    }
+                    s = s.Substring(0, s.Length - 2);
+                }
+                vname = vname + s;
+                G.Writeln2("*** ERROR: Could not find variable '" + vname + "'");
+                throw new GekkoException();
+            }
             
             return iv;
         }
@@ -3255,7 +3269,7 @@ namespace Gekko
         
         public static IVariable GetTimeSeriesFromCache(GekkoSmpl smpl, ref IVariable a, string originalName, int bankNumber)
         {
-            return GetTimeSeriesFromCache(smpl, ref a, originalName, bankNumber, ECreatePossibilities.None);
+            return GetTimeSeriesFromCache(smpl, ref a, originalName, bankNumber, ECreatePossibilities.NoneReturnNull);
         }
 
         public static IVariable GetTimeSeriesFromCache(GekkoSmpl smpl, ref IVariable a, string originalName, int bankNumber, ECreatePossibilities autoCreate)
@@ -3315,7 +3329,7 @@ namespace Gekko
 
         public static Series GetTimeSeries(GekkoSmpl smpl, string originalName, int bankNumber)
         {
-            return GetTimeSeries(smpl, originalName, bankNumber, ECreatePossibilities.None);
+            return GetTimeSeries(smpl, originalName, bankNumber, ECreatePossibilities.NoneReturnNull);
         }
 
         //public static MetaTimeSeries GetTimeSeries(string originalName, int bankNumber)
@@ -3349,7 +3363,7 @@ namespace Gekko
 
         public static Series FindTimeSeries(string originalName, int bankNumber)
         {
-            return FindTimeSeries(originalName, bankNumber, ECreatePossibilities.None);
+            return FindTimeSeries(originalName, bankNumber, ECreatePossibilities.NoneReturnNull);
         }
 
 
@@ -7425,6 +7439,11 @@ namespace Gekko
                 //print normally in columns
                 //else print them one by one separately like separate print commands.
 
+                //foreach (O.Prt.Element element in this.prtElements)
+                //{
+                //    ExplodeIvariables(element.variable[0]);
+                //}
+
                 //First, any array-series is exploded into a list
                 foreach (O.Prt.Element element in this.prtElements)
                 {
@@ -7500,7 +7519,12 @@ namespace Gekko
                 check.Add(new List<MapMultidimItem>());
                 check.Add(new List<MapMultidimItem>());
 
-                if (element.label2 == null) element.label2 = new List<string>();
+                string label = element.label;
+
+                if (element.label2 != null && element.label2.Count==1)
+                {
+                    label = element.label2[0];
+                }
 
                 int counter = 0;
 
@@ -7536,9 +7560,7 @@ namespace Gekko
                                 check[i].Add(key);
 
                                 string bankName = null;
-
-                                string label = element.label;
-
+                                                                
                                 bool isSimple = true;
                                 foreach (char c in label)
                                 {
@@ -7553,7 +7575,7 @@ namespace Gekko
                                     }
                                 }
 
-                                string blanks = "  ";
+                                string blanks = " ";
                                 if (isSimple) blanks = "";
 
                                 if (counter == 1)
