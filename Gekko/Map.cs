@@ -26,7 +26,21 @@ namespace Gekko
         public Map(GekkoDictionary<string, IVariable> map)
         {
             this.storage = map;
-        }                
+        }
+
+        // ----------------------------------------------------
+        // --------------object functions start----------------
+        // ----------------------------------------------------
+
+        public IVariable append(GekkoSmpl smpl, IVariable x)
+        {
+            G.Writeln2("*** ERROR: Object method .append() not available for type " + G.GetTypeString(this));
+            throw new GekkoException();
+        }
+
+        // ----------------------------------------------------
+        // --------------object functions end------------------
+        // ----------------------------------------------------     
 
         //!!!This has nothing to do #m1+#m2 etc., see Add(GekkoSmpl t, IVariable x) instead.
         //   This method is just to avoid x.list.Add(...)
@@ -227,7 +241,15 @@ namespace Gekko
             Map temp = new Map();
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
             {
-                temp.storage.Add(kvp.Key, kvp.Value.DeepClone());
+                if (!Object.ReferenceEquals(this, kvp.Value))
+                {
+                    temp.storage.Add(kvp.Key, kvp.Value.DeepClone());
+                }
+                else
+                {
+                    //map containing itself
+                    temp.storage.Add(kvp.Key, kvp.Value);
+                }
             }
             return temp;
         }
@@ -236,7 +258,10 @@ namespace Gekko
         {            
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
             {
-                kvp.Value.DeepTrim();
+                if (!Object.ReferenceEquals(this, kvp.Value))
+                {
+                    kvp.Value.DeepTrim();
+                }                
             }            
         }
 
@@ -245,7 +270,10 @@ namespace Gekko
             if (this.storage == null) this.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
             {
-                kvp.Value.DeepCleanup();
+                if (!Object.ReferenceEquals(this, kvp.Value))
+                {
+                    kvp.Value.DeepCleanup();
+                }
             }
         }
 

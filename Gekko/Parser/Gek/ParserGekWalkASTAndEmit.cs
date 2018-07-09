@@ -2179,8 +2179,10 @@ namespace Gekko.Parser.Gek
                             node.Code.CA(node[0].Code);
                         }
                         break;
+
                     case "ASTFUNCTION":
                     case "ASTFUNCTIONNAKED":
+                    case "ASTOBJECTFUNCTION":
                     case "ASTPROCEDURE":
                         {
                             string functionNameLower = GetFunctionName(node);
@@ -2189,7 +2191,8 @@ namespace Gekko.Parser.Gek
                             {
                                 functionNameLower = Globals.procedure + functionNameLower;
                             }
-                                                      
+
+                            //will always be null for ASTOBJECTFUNCTION
                             string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionNameLower);  //also checks that the name is "sum"
 
                             if (listNames != null)
@@ -2243,7 +2246,7 @@ namespace Gekko.Parser.Gek
                                 sb1.AppendLine("Func<" + iv + "> " + funcName + " = (" + parentListLoopVars1 + ") => {");
                                 //sb1.AppendLine("public static IVariable " + tempName + "(GekkoSmpl smpl" + parentListLoopVars1 + ") {");
                                 if (G.Equal(functionNameLower, "sum"))
-                                {                                    
+                                {
                                     sb1.AppendLine(GekkoSmplCommandHelper1(smplCommandNumber, "Sum"));
                                     sb1.AppendLine("Series " + tempName + " = new Series(ESeriesType.Normal, Program.options.freq, null); " + tempName + ".SetZero(smpl);" + G.NL);
                                 }
@@ -2251,19 +2254,19 @@ namespace Gekko.Parser.Gek
                                 {
                                     sb1.AppendLine(GekkoSmplCommandHelper1(smplCommandNumber, "Unfold"));
                                     sb1.AppendLine("List " + tempName + " = new List();" + G.NL);
-                                }                                
+                                }
 
                                 foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
                                 {
                                     string listname = Globals.symbolCollection + kvp.Key;  //add a # to the list ident, this is the way they are stored in node.functionDefAnchor
                                     string internalName = SearchUpwardsInTree3(node, listname);
                                     string s = SearchUpwardsInTree3(node, listname);
-                                                                        
+
                                     if (s == null)
                                     {
                                         s = "O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ")))), null, false, EVariableType.Var)";  //false is regarding isLeftSide
                                     }
-                                                                        
+
                                     sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(" + s + ")) {");
                                 }
 
@@ -2308,10 +2311,10 @@ namespace Gekko.Parser.Gek
                             {
                                 //Not a sum() or unfold() function that is going to be looped                                
 
-                                
+
 
                                 string meta = null;
-                                if (Globals.gekkoInbuiltFunctions.TryGetValue(functionNameLower, out meta))
+                                if (node.Text=="ASTOBJECTFUNCTION" || Globals.gekkoInbuiltFunctions.TryGetValue(functionNameLower, out meta))
                                 {
                                     string extra = null;
                                     int lagIndex = -12345;
@@ -2357,7 +2360,7 @@ namespace Gekko.Parser.Gek
                                         else
                                         {
                                             //ignore
-                                        }                                        
+                                        }
                                     }
 
                                     string args = null;
@@ -2373,13 +2376,20 @@ namespace Gekko.Parser.Gek
                                             {
                                                 extra = "O.Smpl(smpl, O.Add(smpl, " + node[i].Code + ", new ScalarVal(" + lagIndexOffset + "d))), ";
                                             }
-                                        }                                        
-                                        
+                                        }
+
                                         args += ", " + node[i].Code;
-                                        
+
                                     }
                                     int numberOfArguments = node.ChildrenCount() - 1;
-                                    node.Code.A("Functions." + functionNameLower).A("(" + extra + Globals.functionT1Cs + "").A(args).A(")");
+                                    if (node.Text == "ASTOBJECTFUNCTION")
+                                    {
+                                        node.Code.A("." + functionNameLower).A("(" + extra + Globals.functionT1Cs + "").A(args).A(")");
+                                    }
+                                    else
+                                    {
+                                        node.Code.A("Functions." + functionNameLower).A("(" + extra + Globals.functionT1Cs + "").A(args).A(")");
+                                    }
                                 }
                                 else
                                 {
@@ -2397,10 +2407,10 @@ namespace Gekko.Parser.Gek
                                     }
                                 }
 
-                            }                        
+                            }
                         }
                         break;
-                    
+
                     case "ASTFUNCTIONDEFARGS":
                         {
                             //No code to be harvested, function args are completely primitive {type, name} items put in functionArguments container.
@@ -2997,7 +3007,15 @@ namespace Gekko.Parser.Gek
                             if (ivTempVar == null)
                             {
                                 if (indexesReport == null) indexesReport = indexes;
-                                node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexes + "), smpl, " + node[0].Code + ", " + indexesReport + ")");
+
+                                if (node[1][0].Text == "ASTOBJECTFUNCTION")
+                                {
+                                    node.Code.A(node[0].Code).A(node[1][0].Code);
+                                }
+                                else
+                                {
+                                    node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexes + "), smpl, " + node[0].Code + ", " + indexesReport + ")");
+                                }
                                 if (node[0].AlternativeCode != null)
                                 {
                                     node.AlternativeCode = new GekkoSB();
@@ -3014,8 +3032,9 @@ namespace Gekko.Parser.Gek
                             else
                             {
                                 node.Code.A("O.IndexerSetData(smpl, ").A(node[0].Code).A(",  ").A(ivTempVar).A(", ").A(indexes).A(")");
+
                             }
-                            
+
                         }
                         break;
                     case "ASTINDEXER":
@@ -5425,6 +5444,7 @@ namespace Gekko.Parser.Gek
 
         private static string[] IsGamsSumFunctionOrUnfoldFunction(ASTNode node, string functionName, bool onlySum)
         {
+            if (node.Text == "ASTOBJECTFUNCTION") return null;
             //returns null if it is NOT a GAMS-like sum() function
             string[] rv = null;
             if (onlySum)

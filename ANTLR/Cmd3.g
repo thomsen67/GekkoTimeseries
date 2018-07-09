@@ -1929,7 +1929,7 @@ dotOrIndexer:               GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
 //objectFunction:             GLUEDOT DOT leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTOBJECTFUNCTION expression*);
 
 						    //just like b1:fy!q, we can use #m.fy!q, where fy!q is the varname.
-dotHelper:				    function | varname | Integer;
+dotHelper:				    objectFunction | varname | Integer;
 indexerExpressionHelper2:   (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper+;
 //indexerExpressionHelper3:   (indexerExpressionHelper4 (',' indexerExpressionHelper4)*) -> indexerExpressionHelper4+;
 //indexerExpressionHelper4:   ident | Integer;
@@ -1957,6 +1957,7 @@ mapItem:                    assignmentMap -> ^(ASTMAPITEM assignmentMap);
 listFile:                   HASH leftParenGlue LISTFILE name RIGHTPAREN -> ^(ASTLISTFILE name);
 
 function:                   ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTFUNCTION ident expression*);
+objectFunction:             ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTOBJECTFUNCTION ident expression*);
 					
 dollarConditional:          LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)  //logicalOr can contain a listWithIndexer
 						  | bankvarnameindex -> ^(ASTDOLLARCONDITIONALVARIABLE bankvarnameindex)  //does not need parenthesis						

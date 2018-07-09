@@ -22,6 +22,20 @@ namespace Gekko
             val = d;
         }
 
+        // ----------------------------------------------------
+        // --------------object functions start----------------
+        // ----------------------------------------------------
+
+        public IVariable append(GekkoSmpl smpl, IVariable x)
+        {
+            G.Writeln2("*** ERROR: Object method .append() not available for type " + G.GetTypeString(this));
+            throw new GekkoException();
+        }
+
+        // ----------------------------------------------------
+        // --------------object functions end------------------
+        // ----------------------------------------------------
+
         public double GetValOLD(GekkoSmpl t)
         {
             return this.val;

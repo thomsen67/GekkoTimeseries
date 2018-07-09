@@ -22,11 +22,31 @@ GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 //[[splitSTART]]
 p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
-O.Collapse o0 = new O.Collapse();
-o0.lhs = new List(O.ExplodeIvariables(new List(new List<IVariable> {new ScalarString("x")})));
-o0.rhs = new List(O.ExplodeIvariables(new List(new List<IVariable> {(new ScalarString("x")).Add(smpl, new ScalarString("[")).Add(smpl, (new ScalarString("q"))).Add(smpl, new ScalarString("]"))})));
-o0.type = null;
+Func<GraphHelper, string> print0 = (gh) =>
+{
+O.Prt o0 = new O.Prt();
+labelCounter = 0;o0.guiGraphIsRefreshing = gh.isRefreshing;
+o0.guiGraphPrintCode = gh.printCode;
+o0.guiGraphIsLogTransform = gh.isLogTransform;
+o0.prtType = "p";
+
+
+
+
+    IVariable ivTmpvar83 = O.TypeCheck_var(O.Lookup(smpl, null, null, "#m", null, null, false, EVariableType.Var).append(smpl, O.Lookup(smpl, null, null, "#m", null, null, false, EVariableType.Var)), -1);
+    O.Lookup(smpl, null, null, "#n", null, ivTmpvar83, true, EVariableType.Var)
+    ;
+
+
+
+    o0.counter = 11;
+o0.printCsCounter = Globals.printCs.Count - 1;
+o0.labelHelper2 = O.AddLabelHelper2(smpl);
 o0.Exe();
+return o0.emfName;
+};
+Globals.printCs.Add(Globals.printCs.Count, print0); 
+print0(new GraphHelper());
 
 
 //[[splitSTOP]]

@@ -62,6 +62,16 @@ namespace Gekko
         //      That will speed up i=i+1 stuff up a lot.
         //      How to do this consistently without duplicating code???
 
+        // ----------------------------------------------------
+        // --------------object functions start----------------
+        // ----------------------------------------------------
+
+        IVariable append(GekkoSmpl smpl, IVariable x);
+
+        // ----------------------------------------------------
+        // --------------object functions end------------------
+        // ----------------------------------------------------
+
         IVariable Add(GekkoSmpl smpl, IVariable x); //returns a new object! z = x.Add(y) creates a new z (does not alter x or y).        
         
         IVariable Subtract(GekkoSmpl smpl, IVariable x);

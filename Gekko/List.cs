@@ -38,6 +38,21 @@ namespace Gekko
             this.list = m;
         }
 
+        // ----------------------------------------------------
+        // --------------object functions start----------------
+        // ----------------------------------------------------
+
+        public IVariable append(GekkoSmpl smpl, IVariable x)
+        {
+            List x_list = this;
+            x_list.Add(x);
+            return x_list;
+        }
+
+        // ----------------------------------------------------
+        // --------------object functions end------------------
+        // ----------------------------------------------------
+
         //!!!This has nothing to do #m1+#m2 etc., see Add(GekkoSmpl t, IVariable x) instead.
         //   This method is just to avoid x.list.Add(...)
         public void Add(IVariable x)
@@ -350,7 +365,15 @@ namespace Gekko
             {
                 foreach (IVariable iv in this.list)
                 {
-                    temp.Add(iv.DeepClone());
+                    if (!Object.ReferenceEquals(this, iv))
+                    {                        
+                        temp.Add(iv.DeepClone());
+                    }
+                    else
+                    {
+                        //a list containing itself
+                        temp.Add(iv);
+                    }
                 }
             }
             return new List(temp);
@@ -360,7 +383,10 @@ namespace Gekko
         {            
             foreach (IVariable iv in this.list)
             {
-                iv.DeepClone();
+                if (!Object.ReferenceEquals(this, iv))
+                {
+                    iv.DeepTrim();
+                }
             }         
         }
 
@@ -369,7 +395,10 @@ namespace Gekko
             if (this.list == null) this.list = new List<IVariable>();
             foreach (IVariable iv in this.list)
             {
-                iv.DeepCleanup();
+                if (!Object.ReferenceEquals(this, iv))
+                {
+                    iv.DeepCleanup();
+                }
             }
         }
     }

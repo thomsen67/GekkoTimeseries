@@ -39,6 +39,20 @@ namespace Gekko
             string2 = s;
             //_isName = isName;
         }
+        // ----------------------------------------------------
+        // --------------object functions start----------------
+        // ----------------------------------------------------
+
+        public IVariable append(GekkoSmpl smpl, IVariable x)
+        {
+            G.Writeln2("*** ERROR: Object method .append() not available for type " + G.GetTypeString(this));
+            throw new GekkoException();
+        }
+
+        // ----------------------------------------------------
+        // --------------object functions end------------------
+        // ----------------------------------------------------
+
 
         public static string SubstituteScalarsInString(string s, string reportError, string avoidVal)
         {
