@@ -33,7 +33,7 @@ o0.prtType = "p";
 
 
 
-    IVariable ivTmpvar83 = O.TypeCheck_var(O.Lookup(smpl, null, null, "#m", null, null, false, EVariableType.Var).append(smpl, O.Lookup(smpl, null, null, "#m", null, null, false, EVariableType.Var)), -1);
+    IVariable ivTmpvar83 = null;
     O.Lookup(smpl, null, null, "#n", null, ivTmpvar83, true, EVariableType.Var)
     ;
 

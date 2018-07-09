@@ -2183,6 +2183,7 @@ namespace Gekko.Parser.Gek
                     case "ASTFUNCTION":
                     case "ASTFUNCTIONNAKED":
                     case "ASTOBJECTFUNCTION":
+                    case "ASTOBJECTFUNCTIONNAKED":
                     case "ASTPROCEDURE":
                         {
                             string functionNameLower = GetFunctionName(node);
@@ -2314,7 +2315,7 @@ namespace Gekko.Parser.Gek
 
 
                                 string meta = null;
-                                if (node.Text=="ASTOBJECTFUNCTION" || Globals.gekkoInbuiltFunctions.TryGetValue(functionNameLower, out meta))
+                                if (node.Text=="ASTOBJECTFUNCTION" || node.Text == "ASTOBJECTFUNCTIONNAKED" || Globals.gekkoInbuiltFunctions.TryGetValue(functionNameLower, out meta))
                                 {
                                     string extra = null;
                                     int lagIndex = -12345;
@@ -2384,7 +2385,11 @@ namespace Gekko.Parser.Gek
                                     int numberOfArguments = node.ChildrenCount() - 1;
                                     if (node.Text == "ASTOBJECTFUNCTION")
                                     {
-                                        node.Code.A("." + functionNameLower).A("(" + extra + Globals.functionT1Cs + "").A(args).A(")");
+                                        node.Code.A("." + functionNameLower).A("(false, " + extra + Globals.functionT1Cs + "").A(args).A(")");
+                                    }
+                                    else if (node.Text == "ASTOBJECTFUNCTIONNAKED")
+                                    {
+                                        node.Code.A("." + functionNameLower).A("(true, " + extra + Globals.functionT1Cs + "").A(args).A(")");
                                     }
                                     else
                                     {
@@ -3011,6 +3016,10 @@ namespace Gekko.Parser.Gek
                                 if (node[1][0].Text == "ASTOBJECTFUNCTION")
                                 {
                                     node.Code.A(node[0].Code).A(node[1][0].Code);
+                                }
+                                else if (node[1][0].Text == "ASTOBJECTFUNCTIONNAKED")
+                                {
+                                    node.Code.A(node[0].Code).A(node[1][0].Code).A(";" + G.NL);
                                 }
                                 else
                                 {
@@ -5444,7 +5453,7 @@ namespace Gekko.Parser.Gek
 
         private static string[] IsGamsSumFunctionOrUnfoldFunction(ASTNode node, string functionName, bool onlySum)
         {
-            if (node.Text == "ASTOBJECTFUNCTION") return null;
+            if (node.Text == "ASTOBJECTFUNCTION" || node.Text == "ASTOBJECTFUNCTIONNAKED") return null;
             //returns null if it is NOT a GAMS-like sum() function
             string[] rv = null;
             if (onlySum)

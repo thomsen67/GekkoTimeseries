@@ -88,6 +88,7 @@ ASTIDENTDIGIT;
 	ASTFILENAMELIST;
 	ASTDOLLARCONDITIONAL;
 	ASTLISTDEF;
+	ASTOBJECTFUNCTIONNAKED;
 ASTOR;
 ASTAND;
 ASTNOT;
@@ -1926,13 +1927,9 @@ dotOrIndexer:               GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
 						  | leftBracketGlue indexerExpressionHelper2 RIGHTBRACKET -> ^(ASTINDEXER indexerExpressionHelper2)
 						    ;
 
-//objectFunction:             GLUEDOT DOT leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTOBJECTFUNCTION expression*);
-
 						    //just like b1:fy!q, we can use #m.fy!q, where fy!q is the varname.
 dotHelper:				    objectFunction | varname | Integer;
 indexerExpressionHelper2:   (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper+;
-//indexerExpressionHelper3:   (indexerExpressionHelper4 (',' indexerExpressionHelper4)*) -> indexerExpressionHelper4+;
-//indexerExpressionHelper4:   ident | Integer;
 
 matrix:                     matrixCol;
 matrixCol:                  leftBracketNoGlue matrixRow ((doubleVerticalBar|SEMICOLON) matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
@@ -2186,6 +2183,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | timefilter           SEMICOLON!
 						  | write                SEMICOLON!						  
 						  | functionNaked        SEMICOLON!   //naked function outside expression
+						  | objectFunctionNaked  SEMICOLON!   //naked object function outside expression
 						  | procedure            SEMICOLON!   //procedure call
 						    ;
 
@@ -2398,6 +2396,7 @@ functionArgElement:         type svarname -> ^(ASTPLACEHOLDER type svarname);
 functionStatements:         statements2* -> ^(ASTFUNCTIONDEFCODE statements2*);
 functionStatements2:        functionStatements;  //alias
 type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX | VOID;
+objectFunctionNaked:        bankvarname GLUEDOT DOT ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTDOTORINDEXER bankvarname ^(ASTDOT ^(ASTOBJECTFUNCTIONNAKED  ident expression*)));
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // GOTO

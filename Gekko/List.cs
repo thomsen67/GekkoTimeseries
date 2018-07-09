@@ -42,11 +42,19 @@ namespace Gekko
         // --------------object functions start----------------
         // ----------------------------------------------------
 
-        public IVariable append(GekkoSmpl smpl, IVariable x)
+        public IVariable append(bool isLhs, GekkoSmpl smpl, IVariable x)
         {
-            List x_list = this;
-            x_list.Add(x);
-            return x_list;
+            if (isLhs)
+            {                
+                this.Add(x);
+                return new GekkoNull();
+            }
+            else
+            {
+                List temp = this.DeepClone() as List;
+                temp.Add(x);
+                return temp;
+            }
         }
 
         // ----------------------------------------------------
