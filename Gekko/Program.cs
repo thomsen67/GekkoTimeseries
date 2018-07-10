@@ -25218,7 +25218,7 @@ namespace Gekko
             return b;
         }
 
-        public static void OPrint(O.Prt o, bool isArraySeriesWithoutIndex, List<string> labelsHandmade)
+        public static void OPrint(O.Prt o, List<string> labelsHandmade)
         {
             //string format = "f14.4";
             //TODO: we could check if there is 1 object printed and it is of type=normal. If so, the label could be printed.
