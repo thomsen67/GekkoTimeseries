@@ -26940,6 +26940,7 @@ namespace Gekko
                     int counter = -1;
 
                     TokenList temp = tokens2.DeepClone(helperParent);
+
                     problem = HandleLabels(temp, 0, list, freelists, ref counter);  //the temp object is changed here, therefore it is cloned before.                            
                     if (!problem) result = temp.ToString();
                 }
