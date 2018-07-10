@@ -7465,8 +7465,16 @@ namespace Gekko
 
                 //next problem is that array-series should be unfolded
 
+                bool allSeries = true;
                 foreach (O.Prt.Element element in this.prtElements)
                 {
+
+                    //TODO PERFORM CHECH -- USE STRINGS AND getname() from subseries
+                    //TODO PERFORM CHECH -- USE STRINGS AND getname() from subseries
+                    //TODO PERFORM CHECH -- USE STRINGS AND getname() from subseries
+                    //TODO PERFORM CHECH -- USE STRINGS AND getname() from subseries
+                    //TODO PERFORM CHECH -- USE STRINGS AND getname() from subseries
+
                     List<List<MapMultidimItem>> check = new List<List<MapMultidimItem>>();
                     check.Add(new List<MapMultidimItem>());
                     check.Add(new List<MapMultidimItem>());
@@ -7475,32 +7483,82 @@ namespace Gekko
                     int jj = -1;
                     for (int i = 0; i < 2; i++)
                     {
-                        
+
                         if (element.variable[i] != null)
                         {
-                            counter++;                            
-
-                            if (counter == 1 && element.variable[i].Type() != EVariableType.List) jj++;
+                            counter++;
 
                             if (element.variable[i].Type() == EVariableType.Series)
                             {
+                                if (counter == 1) jj++;
                                 if (((Series)element.variable[i]).type == ESeriesType.ArraySuper)
                                 {
                                     //counter++;
                                     List unfold = new List();
                                     List<string> labels = new List<string>();
+
                                     ExplodeArraySeriesHelper(element.variable[i] as Series, check, element.label2[jj], counter, i, unfold, labels);
                                     element.variable[i] = unfold;
                                     if (counter == 1)
                                     {
-                                        
                                         element.label2 = labels;
                                     }
                                 }
                             }
+                            else if (element.variable[i].Type() == EVariableType.List)
+                            {
+                                for (int k = 0; k < ((List)element.variable[i]).list.Count(); k++)
+                                {
+
+
+
+                                    if ((((List)element.variable[i]).list[k]).Type() == EVariableType.Series)
+                                    {
+                                        if (counter == 1) jj++;
+                                        if (((Series)(((List)element.variable[i]).list[k])).type == ESeriesType.ArraySuper)
+                                        {
+                                            //counter++;
+                                            List unfold = new List();
+                                            List<string> labels = new List<string>();
+
+                                            ExplodeArraySeriesHelper((((List)element.variable[i]).list[k]) as Series, check, element.label2[jj], counter, i, unfold, labels);
+                                            ((List)element.variable[i]).list[k] = unfold;
+                                            if (counter == 1)
+                                            {
+                                                element.label2 = labels;
+                                            }
+                                        }
+                                    }
+                                    else if ((((List)element.variable[i]).list[k]).Type() == EVariableType.List)
+                                    {
+                                        throw new GekkoException();  //should not be possible
+                                    }
+                                    else
+                                    {
+                                        if (counter == 1) jj++;
+                                        allSeries = false;
+                                    }
+
+
+
+
+
+
+
+
+
+
+
+                                }
+                            }
+                            else
+                            {
+                                if (counter == 1) jj++;
+                                allSeries = false;
+                            }
                         }
                     }
-                }                               
+                }                         
 
                 if (Program.AllSeriesCheck(this, EPrintTypes.Print))
                 {
