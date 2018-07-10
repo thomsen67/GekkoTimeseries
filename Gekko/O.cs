@@ -7507,11 +7507,19 @@ namespace Gekko
                             }
                             else if (element.variable[i].Type() == EVariableType.List)
                             {
+
+
+
+
+
+
+
+
+
+                                List<IVariable> newList = new List<IVariable>();
                                 for (int k = 0; k < ((List)element.variable[i]).list.Count(); k++)
                                 {
-
-
-
+                                    
                                     if ((((List)element.variable[i]).list[k]).Type() == EVariableType.Series)
                                     {
                                         if (counter == 1) jj++;
@@ -7522,11 +7530,18 @@ namespace Gekko
                                             List<string> labels = new List<string>();
 
                                             ExplodeArraySeriesHelper((((List)element.variable[i]).list[k]) as Series, check, element.label2[jj], counter, i, unfold, labels);
-                                            ((List)element.variable[i]).list[k] = unfold;
+
+                                            newList.AddRange(unfold.list);
+
+                                            //((List)element.variable[i]).list[k] = unfold;
                                             if (counter == 1)
                                             {
                                                 element.label2 = labels;
                                             }
+                                        }
+                                        else
+                                        {
+                                            newList.Add(((List)element.variable[i]).list[k]);
                                         }
                                     }
                                     else if ((((List)element.variable[i]).list[k]).Type() == EVariableType.List)
@@ -7537,19 +7552,15 @@ namespace Gekko
                                     {
                                         if (counter == 1) jj++;
                                         allSeries = false;
+                                        newList.Add(((List)element.variable[i]).list[k]);
                                     }
 
-
-
-
-
-
-
-
-
-
-
                                 }
+                                element.variable[i] = new List(newList);
+
+
+
+
                             }
                             else
                             {
