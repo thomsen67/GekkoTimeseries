@@ -25137,8 +25137,7 @@ namespace Gekko
         {
 
             //all are val or series
-            //at least one series
-            //no array-series
+            //at least one series            
 
             int seriesCounter = 0;
             if (type == EPrintTypes.Print)
@@ -25223,6 +25222,8 @@ namespace Gekko
             //string format = "f14.4";
             //TODO: we could check if there is 1 object printed and it is of type=normal. If so, the label could be printed.
             //  if .meta is augmented with a pointer to the array-series, the label for x[a] could be taken via that pointer.
+
+            
 
             EPrintTypes type = EPrintTypes.Print;
             if (G.Equal(o.prtType, "plot")) type = EPrintTypes.Plot;
@@ -25444,11 +25445,7 @@ namespace Gekko
                         string lbl = null;
 
                         //tt123
-                        if (isArraySeriesWithoutIndex && n == labelsHandmade.Count)
-                        {
-                            lbl = labelsHandmade[i];
-                        }
-                        else if (element.label2 != null && n == element.label2.Count)
+                        if (element.label2 != null && n == element.label2.Count)
                         {
                             lbl = element.label2[i];
                         }
