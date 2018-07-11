@@ -1585,7 +1585,7 @@ namespace Gekko
             return transpose;
         }
 
-        private static string GetExcelCell(int row, int col, bool transpose)
+        public static string GetExcelCell(int row, int col, bool transpose)
         {
             string coord = null;
             if (!transpose)
@@ -2423,7 +2423,7 @@ namespace Gekko
             }
             else
             {
-                matrix = ReadExcelWorkbook(file, databank, null);
+                matrix = ReadExcelWorkbook(file, null);
             }
             GetTimeseriesFromWorkbookMatrix(dates, oRead, databank, matrix, readInfo);
         }
@@ -2460,7 +2460,7 @@ namespace Gekko
             string matrixName = null;
             if (G.equal(o.opt_matrix, "yes"))
             {
-                if(o.listItems.Count==0 || o.listItems.Count > 1)
+                if (o.listItems.Count == 0 || o.listItems.Count > 1)
                 {
                     G.Writeln2("*** ERROR: For SHEET<import matrix>, only 1 matrix name must be provided");
                     throw new GekkoException();
@@ -2469,16 +2469,16 @@ namespace Gekko
             }
 
             bool isMissing = false;
-            if(G.equal(o.opt_missing,"yes"))
+            if (G.equal(o.opt_missing, "yes"))
             {
                 isMissing = true;
-            }                       
+            }
 
             //do copylocal
             string fileName = o.fileName;
             fileName = AddExtension(fileName, ".xlsx");
             fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
-            TableLight matrix = ReadExcelWorkbook(fileName, Program.databanks.GetFirst(), o.opt_sheet);
+            TableLight matrix = ReadExcelWorkbook(fileName, o.opt_sheet);
 
             bool transpose = false;  //corresponding to row-wise reading
             if (G.equal(o.opt_cols, "yes"))
@@ -2487,7 +2487,7 @@ namespace Gekko
                 if (matrixName != null) G.Writeln2("+++ NOTE: Because of <rows> option, the matrix #" + matrixName + " is transposed");
             }
 
-            if(transpose)
+            if (transpose)
             {
                 //reading downwards by cols
                 matrix = matrix.Transpose();
@@ -2499,11 +2499,8 @@ namespace Gekko
             //See identical #98oiwu543w
             string s = "a1";
             if (o.opt_cell != null) s = o.opt_cell;
-            int index = s.IndexOfAny(new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' });
-            string chars = s.Substring(0, index);
-            int num = Int32.Parse(s.Substring(index));
-            int rowOffset = num - 1;
-            int colOffset = ExcelColumnNameToNumber(chars) - 1;
+            int rowOffset, colOffset;
+            FromXls(s, out rowOffset, out colOffset, false);
 
             if (transpose)
             {
@@ -2549,24 +2546,49 @@ namespace Gekko
 
                 if (isMissing) mm = new Matrix(rr, cc, double.NaN);
                 else mm = new Matrix(rr, cc);
-                
+
                 for (int row = 1 + rowOffset; row < 1 + rowOffset + matrix.GetRowMaxNumber(); row++)
-                {                    
+                {
                     for (int col = 1 + colOffset; col < 1 + colOffset + matrix.GetColMaxNumber(); col++)
                     {
                         double v = double.NaN;
                         CellLight cell = matrix.Get(row, col);
                         if (cell.type == ECellLightType.None) continue;
                         v = GetValueFromSpreadsheetCell(transpose, row, col, v, cell);
-                        mm.data[row - 1 - rowOffset, col - 1 - colOffset] = v;                        
+                        mm.data[row - 1 - rowOffset, col - 1 - colOffset] = v;
                     }
                 }
                 if (Program.scalars.ContainsKey(Globals.symbolList + matrixName))
                 {
                     Program.scalars.Remove(Globals.symbolList + matrixName);
-                }                                
+                }
                 Program.scalars.Add(Globals.symbolList + matrixName, mm);
                 G.Writeln2("Matrix #" + matrixName + " imported (" + rr + "x" + cc + ")");
+            }
+        }
+
+        public static void FromXls(string s, out int rowOffset, out int colOffset, bool transpose)
+        {
+            //0-based
+            int i_data, j_data; Program.FromXls1Based(s, out i_data, out j_data, transpose);            
+            rowOffset = i_data - 1;
+            colOffset = j_data - 1;
+        }
+
+        public static void FromXls1Based(string s, out int rowOffset, out int colOffset, bool transpose)
+        {
+            int index = s.IndexOfAny(new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' });
+            string chars = s.Substring(0, index);
+            int num = Int32.Parse(s.Substring(index));
+            if (transpose)
+            {
+                rowOffset = ExcelColumnNameToNumber(chars);
+                colOffset = num;
+            }
+            else
+            {
+                rowOffset = num;
+                colOffset = ExcelColumnNameToNumber(chars);
             }
         }
 
@@ -31146,19 +31168,19 @@ namespace Gekko
             return columnName;
         }
 
-        public static TableLight ReadExcelWorkbook(string file, Databank databank, string sheetName)
+        public static TableLight ReadExcelWorkbook(string file, string sheetName)
         {
             if (Program.options.sheet_engine == "internal")
             {
-                return ReadExcelWorkbookEPPlus(file, databank, sheetName);
+                return ReadExcelWorkbookEPPlus(file, sheetName);
             }
             else
             {
-                return ReadExcelWorkbookPIA(file, databank, sheetName);
+                return ReadExcelWorkbookPIA(file, sheetName);
             }
         }
 
-        public static TableLight ReadExcelWorkbookEPPlus(string file, Databank databank, string sheetName)
+        public static TableLight ReadExcelWorkbookEPPlus(string file, string sheetName)
         {            
             if (!File.Exists(file))
             {
@@ -31222,11 +31244,16 @@ namespace Gekko
                             Object temp = intput[i, j];
                             if (temp == null) continue;
                             CellLight cell;
-                            if (temp.GetType() == typeof(double))
+                            Type t = temp.GetType();
+                            if (t == typeof(double))
                             {
                                 cell = new CellLight((double)temp);
                             }
-                            else if (temp.GetType() == typeof(int))
+                            else if (t == typeof(DateTime))
+                            {
+                                cell = new CellLight((DateTime)temp);
+                            }
+                            else if (t == typeof(int))
                             {
                                 int iData = (int)temp;
 
@@ -31262,9 +31289,10 @@ namespace Gekko
                             }
                             else
                             {
-                                G.Writeln2("*** ERROR: Cell " + GetExcelCell(i, j, false) + " seems to be neither text or number.");
-                                G.Writeln("           It has type " + temp.GetType().ToString(), Color.Red);
-                                throw new GekkoException();
+                                //G.Writeln2("+++ WARNING: Cell " + GetExcelCell(i, j, false) + " seems to be neither text or number.");
+                                //G.Writeln("           It has type " + temp.GetType().ToString(), Color.Red);
+                                //throw new GekkoException();
+                                cell = new CellLight("");
                             }
                             matrix.Add(i + 1, j + 1, cell);  //i and j are 0-based, matrix needs to be 1-based.
 
@@ -31300,7 +31328,7 @@ namespace Gekko
             G.Writeln("          try to see if 'engine = excel' solves them (requires Excel).");
         }
 
-        public static TableLight ReadExcelWorkbookPIA(string file, Databank databank, string sheetName)
+        public static TableLight ReadExcelWorkbookPIA(string file, string sheetName)
         {
 
             int threadID = (int)AppDomain.GetCurrentThreadId();  //should be ok, just not for "fibre" threads (on SQL server)... never mind
@@ -31415,6 +31443,10 @@ namespace Gekko
                             if (temp.GetType() == typeof(double))
                             {
                                 cell = new CellLight((double)temp);
+                            }
+                            else if (temp.GetType() == typeof(DateTime))
+                            {
+                                cell = new CellLight((DateTime)temp);
                             }
                             else if (temp.GetType() == typeof(int))
                             {
@@ -35744,26 +35776,38 @@ namespace Gekko
     {
         None,
         String,
-        Double
+        Double,
+        DateTime
     }
 
     public struct CellLight
     {
         public double data;
         public string text;
+        public DateTime dateTime;
         public ECellLightType type;
 
         public CellLight(double input)
         {
             text = null;
             data = input;
+            dateTime = DateTime.MinValue;
             type = ECellLightType.Double;
+        }
+
+        public CellLight(DateTime input)
+        {
+            text = null;
+            data = double.NaN;
+            dateTime = input;
+            type = ECellLightType.DateTime;
         }
 
         public CellLight(string input)
         {
             text = input;
             data = double.NaN;
+            dateTime = DateTime.MinValue;
             type = ECellLightType.String;
         }
 

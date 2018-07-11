@@ -132,7 +132,88 @@ namespace Gekko
             string s1 = O.GetString(x1);
             string s2 = O.GetString(x2);
             return new ScalarString(s1 + s2);            
-        }        
+        }
+
+        public static IVariable collapse(GekkoTime t, IVariable fileName, IVariable sheetName, IVariable data, IVariable dates, IVariable names, IVariable cols)
+        {
+            //IVariable rv = null;
+
+            string fileName_string = O.GetString(fileName);
+            string sheetName_string = O.GetString(sheetName);
+            string data_string = O.GetString(data);
+            string names_string = O.GetString(names);
+            string dates_string = O.GetString(dates);
+            string cols_string = O.GetString(cols);
+
+            bool isTranspose = false;
+            if (G.equal(cols_string, "yes")) isTranspose = true;
+
+            string fn = Program.CreateFullPathAndFileName(Program.AddExtension(fileName_string, "." + "xlsx"));
+
+            //string s = Program.GetTextFromFileWithWait(fileName_string);
+
+            TableLight matrix = null;
+            matrix = Program.ReadExcelWorkbook(fn, sheetName_string);
+            G.Writeln2("Read " + matrix.GetRowMaxNumber() + "x" + matrix.GetColMaxNumber() + " matrix from file");
+            if (isTranspose) matrix = matrix.Transpose();
+
+            //Expects series to run row-wise (first col is names, first row is dates)
+
+            int i_data, j_data; Program.FromXls1Based(data_string, out i_data, out j_data, isTranspose);
+            int i_names, j_names; Program.FromXls1Based(names_string, out i_names, out j_names, isTranspose);
+            int i_dates, j_dates; Program.FromXls1Based(dates_string, out i_dates, out j_dates, isTranspose);
+
+            //expects dates to run i a row
+            List<DateTime> dts = new List<DateTime>();
+            for (int j = j_dates; j < matrix.GetColMaxNumber(); j++)
+            {
+                CellLight c = matrix.Get(i_dates, j);
+                if (c.type == ECellLightType.Double)
+                {
+                    DateTime temp = DateTime.MinValue;
+                    try
+                    {
+                        temp = DateTime.FromOADate(c.data);
+                    }
+                    catch
+                    {
+                        G.Writeln2("*** ERROR: Cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " does not seem to be a date");
+                        throw new GekkoException();
+                    }
+
+                    if (temp.Year < 1500 || temp.Year > 2500)
+                    {
+                        G.Writeln2("*** ERROR: Cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " does not seem to make sense (year = " + temp.Year + ")");
+                        throw new GekkoException();
+                    }
+                    dts.Add(temp);
+                }
+                else if (c.type == ECellLightType.DateTime)
+                {
+                    dts.Add(c.dateTime);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Expected cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " to be date format, is " + c.type.ToString());
+                    throw new GekkoException();
+                }
+            }
+
+            //G.Writeln();
+            for (int ii = 0; ii < dts.Count; ii++)
+            {
+                if (ii > 0)
+                {
+                    TimeSpan span = dts[ii] - dts[ii - 1];
+                    double days = span.TotalDays;
+                    double hours = span.TotalHours;
+                    G.Writeln("---> days: " + days + ", hours: " + hours);
+                }
+                if (ii > 20) break;
+            }
+
+            return new ScalarString("");
+        }
 
         //rename to substring()??
         public static IVariable piece(GekkoTime t, IVariable x1, IVariable x2, IVariable x3)
