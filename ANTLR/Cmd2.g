@@ -54,7 +54,11 @@ options {
 
 //Token definitions I
 tokens {
-    ASTCOMPARE2;
+    ASTOPT_STRING_NAMECELL;
+ASTOPT_STRING_DATECELL;
+ASTOPT_STRING_METHOD;
+ASTOPT_STRING_METHOD;
+	ASTCOMPARE2;
 	ASTSERIESOPERATOR;
 	ASTSERIESDOLLARCONDITION;
 	ASTSERIES;
@@ -435,6 +439,7 @@ ASTOPT_STRING_Y2;
     ASTOPT_STRING_CELL;
 	ASTOPT_STRING_CONSTANT;
     ASTOPT_STRING_COLLAPSE;
+	ASTOPT_STRING_FREQ;
     ASTOPT_STRING_COLORS;
     ASTOPT_STRING_COLS;
     ASTOPT_STRING_CSV;
@@ -780,7 +785,10 @@ Y2                    = 'Y2'                       ;
     X = 'X';
 	Y = 'Y';
 	PROCEDURE = 'PROCEDURE';
-	
+	NAMECELL = 'NAMECELL';
+	DATECELL = 'DATECELL';
+
+
 	UNITS = 'UNITS';
 	MDATEFORMAT = 'MDATEFORMAT';
 	THOUSANDSSEPARATOR = 'THOUSANDSSEPARATOR';
@@ -1283,6 +1291,8 @@ d.Add("Y" ,Y);
 		d.Add("OFFSET" , OFFSET);
 		d.Add("DETECT" , DETECT);
 		d.Add("PROCEDURE" , PROCEDURE);
+		d.Add("NAMECELL" , NAMECELL);
+		d.Add("DATECELL" , DATECELL);
 		
 										d.Add("SIZE",SIZE);
 										d.Add("CONTINUE",CONTINUE);
@@ -1951,7 +1961,7 @@ docOpt2h                  : LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expr
 						  ;
 
 collapse				  : COLLAPSE nameBankHelper '=' nameBankHelper collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, $COLLAPSE.Line)} nameBankHelper nameBankHelper collapseMethod?);
-collapseMethod			  : FIRST|LAST|AVG|TOTAL;
+collapseMethod			  : FIRST|LAST|AVG|TOTAL|COUNT;
 
 interpolate				  : INTERPOLATE nameBankHelper '=' nameBankHelper interpolateMethod? -> ^({token("ASTINTERPOLATE", ASTINTERPOLATE, $INTERPOLATE.Line)} nameBankHelper nameBankHelper interpolateMethod?);
 interpolateMethod		  : REPEAT | PRORATE;
@@ -2376,7 +2386,14 @@ readOpt1h                 : MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
   						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)
 						  | ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)
+						  | SHEET '=' expression -> ^(ASTOPT_STRING_SHEET expression)
+						  | CELL '=' expression -> ^(ASTOPT_STRING_CELL expression)
+						  | NAMECELL '=' expression -> ^(ASTOPT_STRING_NAMECELL expression)
+						  | DATECELL '=' expression -> ^(ASTOPT_STRING_DATECELL expression)
+						  | METHOD '=' name -> ^(ASTOPT_STRING_METHOD name)
+						  | COLLAPSE '=' name -> ^(ASTOPT_STRING_COLLAPSE name)
 						  ;
+
 identOrStar               : ident -> ident
 						  | star -> ASTBANKISSTARCHEATCODE
 						  ;
@@ -4000,6 +4017,8 @@ PLOT|
 PRINT|
 PRI|
 PROCEDURE|
+DATECELL|
+NAMECELL|
 PRT|
 P|
 R_EXPORT|

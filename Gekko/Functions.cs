@@ -18,15 +18,7 @@ namespace Gekko
             Times,
             Divide            
         }
-
-        public enum ECollapseMethod
-        {
-            Total,
-            Avg,
-            First,
-            Last,
-            Count
-        }
+        
 
         public enum ESumDim {
             Rows,
@@ -143,235 +135,203 @@ namespace Gekko
             return new ScalarString(s1 + s2);            
         }
 
-        public static IVariable collapse(GekkoTime t, IVariable fileName, IVariable sheetName, IVariable data, IVariable dates, IVariable names, IVariable cols, IVariable destFreq, IVariable method2)
-        {
-            //IVariable rv = null;
+        //public static IVariable collapse(GekkoTime t, IVariable fileName, IVariable sheetName, IVariable data, IVariable dates, IVariable names, IVariable cols, IVariable destFreq, IVariable method2)
+        //{
+        //    //IVariable rv = null;
             
             
-            string fileName_string = O.GetString(fileName);
-            string sheetName_string = O.GetString(sheetName);
-            string data_string = O.GetString(data);
-            string names_string = O.GetString(names);
-            string dates_string = O.GetString(dates);
-            string cols_string = O.GetString(cols);
-            string destFreq_string = O.GetString(destFreq);
-            string method_string = O.GetString(method2);
+        //    string fileName_string = O.GetString(fileName);
+        //    string sheetName_string = O.GetString(sheetName);
+        //    string data_string = O.GetString(data);
+        //    string names_string = O.GetString(names);
+        //    string dates_string = O.GetString(dates);
+        //    string cols_string = O.GetString(cols);
+        //    string destFreq_string = O.GetString(destFreq);
+        //    string method_string = O.GetString(method2);
 
-            ECollapseMethod method = ECollapseMethod.Total;
-            if (G.equal(method_string, "avg")) method = ECollapseMethod.Avg;
-            else if (G.equal(method_string, "first")) method = ECollapseMethod.First;
-            else if (G.equal(method_string, "last")) method = ECollapseMethod.Last;
-            else if (G.equal(method_string, "count")) method = ECollapseMethod.Count;
+        //    ECollapseMethod method = ECollapseMethod.Total;
+        //    if (G.equal(method_string, "avg")) method = ECollapseMethod.Avg;
+        //    else if (G.equal(method_string, "first")) method = ECollapseMethod.First;
+        //    else if (G.equal(method_string, "last")) method = ECollapseMethod.Last;
+        //    else if (G.equal(method_string, "count")) method = ECollapseMethod.Count;
 
-            EFreq freq = G.GetFreq(destFreq_string);
+        //    EFreq freq = G.GetFreq(destFreq_string);
 
-            bool isTranspose = false;
-            if (G.equal(cols_string, "yes")) isTranspose = true;
+        //    bool isTranspose = false;
+        //    if (G.equal(cols_string, "yes")) isTranspose = true;
 
-            string fn = Program.CreateFullPathAndFileName(Program.AddExtension(fileName_string, "." + "xlsx"));
+        //    string fn = Program.CreateFullPathAndFileName(Program.AddExtension(fileName_string, "." + "xlsx"));
 
-            //string s = Program.GetTextFromFileWithWait(fileName_string);
+        //    //string s = Program.GetTextFromFileWithWait(fileName_string);
 
-            TableLight matrix = null;
-            matrix = Program.ReadExcelWorkbook(fn, sheetName_string);
-            G.Writeln2("Read " + matrix.GetRowMaxNumber() + "x" + matrix.GetColMaxNumber() + " matrix from file");
-            if (isTranspose) matrix = matrix.Transpose();
+        //    TableLight matrix = null;
+        //    matrix = Program.ReadExcelWorkbook(fn, sheetName_string);
+        //    G.Writeln2("Read " + matrix.GetRowMaxNumber() + "x" + matrix.GetColMaxNumber() + " matrix from file");
+        //    if (isTranspose) matrix = matrix.Transpose();
 
-            //Expects series to run row-wise (first col is names, first row is dates)
+        //    //Expects series to run row-wise (first col is names, first row is dates)
 
-            int i_data, j_data; Program.FromXls1Based(data_string, out i_data, out j_data, isTranspose);
-            int i_names, j_names; Program.FromXls1Based(names_string, out i_names, out j_names, isTranspose);
-            int i_dates, j_dates; Program.FromXls1Based(dates_string, out i_dates, out j_dates, isTranspose);
+        //    int i_data, j_data; Program.FromXls1Based(data_string, out i_data, out j_data, isTranspose);
+        //    int i_names, j_names; Program.FromXls1Based(names_string, out i_names, out j_names, isTranspose);
+        //    int i_dates, j_dates; Program.FromXls1Based(dates_string, out i_dates, out j_dates, isTranspose);
 
-            if (i_data != i_names)
-            {
-                G.Writeln2("*** ERROR: Positions " + names_string + " for names and " + data_string + " for data do not correspond");
-                throw new GekkoException();
-            }
+        //    if (i_data != i_names)
+        //    {
+        //        G.Writeln2("*** ERROR: Positions " + names_string + " for names and " + data_string + " for data do not correspond");
+        //        throw new GekkoException();
+        //    }
 
-            if (j_data != j_dates)
-            {
-                G.Writeln2("*** ERROR: Positions " + dates_string + " for names and " + data_string + " for data do not correspond");
-                throw new GekkoException();
-            }
+        //    if (j_data != j_dates)
+        //    {
+        //        G.Writeln2("*** ERROR: Positions " + dates_string + " for names and " + data_string + " for data do not correspond");
+        //        throw new GekkoException();
+        //    }
 
-            //expects dates to run i a row
-            List<DateTime> dateList = new List<DateTime>();
-            for (int j = j_dates; j < matrix.GetColMaxNumber(); j++)
-            {
-                CellLight c = matrix.Get(i_dates, j);
-                if (c.type == ECellLightType.Double)
-                {
-                    DateTime temp = DateTime.MinValue;
-                    try
-                    {
-                        temp = DateTime.FromOADate(c.data);
-                    }
-                    catch
-                    {
-                        G.Writeln2("*** ERROR: Cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " does not seem to be a date");
-                        throw new GekkoException();
-                    }
+        //    //expects dates to run i a row
+        //    List<DateTime> dateList = new List<DateTime>();
+        //    for (int j = j_dates; j < matrix.GetColMaxNumber(); j++)
+        //    {
+        //        CellLight c = matrix.Get(i_dates, j);
+        //        if (c.type == ECellLightType.Double)
+        //        {
+        //            DateTime temp = DateTime.MinValue;
+        //            try
+        //            {
+        //                temp = DateTime.FromOADate(c.data);
+        //            }
+        //            catch
+        //            {
+        //                G.Writeln2("*** ERROR: Cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " does not seem to be a date");
+        //                throw new GekkoException();
+        //            }
 
-                    if (temp.Year < 1500 || temp.Year > 2500)
-                    {
-                        G.Writeln2("*** ERROR: Cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " does not seem to make sense (year = " + temp.Year + ")");
-                        throw new GekkoException();
-                    }
-                    dateList.Add(temp);
-                }
-                else if (c.type == ECellLightType.DateTime)
-                {
-                    dateList.Add(c.dateTime);
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: Expected cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " to be date format, is " + c.type.ToString());
-                    throw new GekkoException();
-                }
-            }
+        //            if (temp.Year < 1500 || temp.Year > 2500)
+        //            {
+        //                G.Writeln2("*** ERROR: Cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " does not seem to make sense (year = " + temp.Year + ")");
+        //                throw new GekkoException();
+        //            }
+        //            dateList.Add(temp);
+        //        }
+        //        else if (c.type == ECellLightType.DateTime)
+        //        {
+        //            dateList.Add(c.dateTime);
+        //        }
+        //        else
+        //        {
+        //            G.Writeln2("*** ERROR: Expected cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " to be date format, is " + c.type.ToString());
+        //            throw new GekkoException();
+        //        }
+        //    }
 
-            List<string> nameList = new List<string>();
-            for (int i = i_names; i < matrix.GetRowMaxNumber(); i++)
-            {
-                CellLight c = matrix.Get(i, j_names);
-                if (c.type != ECellLightType.String)
-                {
-                    G.Writeln2("*** ERROR: Expected cell " + Program.GetExcelCell(i, j_names, isTranspose) + " to be a string, is " + c.type.ToString());
-                    throw new GekkoException();
-                }
-                string s = c.text;
-                if (!G.IsSimpleToken(s))
-                {
-                    G.Writeln2("*** ERROR: Expected cell " + Program.GetExcelCell(i, j_names, isTranspose) + " to be a variable nane, is '" + c.type.ToString() + "'");
-                    throw new GekkoException();
-                }
-                nameList.Add(s);
-            }
+        //    List<string> nameList = new List<string>();
+        //    for (int i = i_names; i < matrix.GetRowMaxNumber(); i++)
+        //    {
+        //        CellLight c = matrix.Get(i, j_names);
+        //        if (c.type != ECellLightType.String)
+        //        {
+        //            G.Writeln2("*** ERROR: Expected cell " + Program.GetExcelCell(i, j_names, isTranspose) + " to be a string, is " + c.type.ToString());
+        //            throw new GekkoException();
+        //        }
+        //        string s = c.text;
+        //        if (!G.IsSimpleToken(s))
+        //        {
+        //            G.Writeln2("*** ERROR: Expected cell " + Program.GetExcelCell(i, j_names, isTranspose) + " to be a variable nane, is '" + c.type.ToString() + "'");
+        //            throw new GekkoException();
+        //        }
+        //        nameList.Add(s);
+        //    }
 
-            int nameCounter = 0;
-            for (int i = i_data; i < matrix.GetRowMaxNumber(); i++)
-            {
-                string varname = nameList[i - i_data];
-                TimeSeries ts = new TimeSeries(freq, varname);
-                TimeSeries counter = new TimeSeries(freq, null);  //will be discared afterwards but practical here
-                for (int j = j_data; j < matrix.GetColMaxNumber(); j++)
-                {
-                    DateTime dt = dateList[j - j_data];
-                    CellLight c = matrix.Get(i, j);
+        //    int nameCounter = 0;
+        //    for (int i = i_data; i < matrix.GetRowMaxNumber(); i++)
+        //    {
+        //        string varname = nameList[i - i_data];
+        //        TimeSeries ts = new TimeSeries(freq, varname);
+        //        TimeSeries counter = new TimeSeries(freq, null);  //will be discared afterwards but practical here
+        //        for (int j = j_data; j < matrix.GetColMaxNumber(); j++)
+        //        {
+        //            DateTime dt = dateList[j - j_data];
+        //            CellLight c = matrix.Get(i, j);
 
-                    double v = Program.GetValueFromSpreadsheetCell(isTranspose, i, j, c);
+        //            double v = Program.GetValueFromSpreadsheetCell(isTranspose, i, j, c);
 
-                    if (freq == EFreq.Monthly)
-                    {
-                        GekkoTime gt = new GekkoTime(freq, dt.Year, dt.Month);
-                        HandleCollapseData(ts, counter, v, gt, method);
-                    }
-                    else if (freq == EFreq.Quarterly)
-                    {
-                        int mPerQ = Globals.freqMSubperiods / Globals.freqQSubperiods;  //3
-                        int quarter = (dt.Month - 1) / mPerQ + 1;
-                        GekkoTime gt = new GekkoTime(freq, dt.Year, quarter);
-                        HandleCollapseData(ts, counter, v, gt, method);
-                    }
-                    else if (freq == EFreq.Annual)
-                    {
-                        GekkoTime gt = new GekkoTime(freq, dt.Year, 1);
-                        HandleCollapseData(ts, counter, v, gt, method);
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: Expected frequency a, q or m");
-                        throw new GekkoException();
-                    }
+        //            if (freq == EFreq.Monthly)
+        //            {
+        //                GekkoTime gt = new GekkoTime(freq, dt.Year, dt.Month);
+        //                HandleCollapseData(ts, counter, v, gt, method);
+        //            }
+        //            else if (freq == EFreq.Quarterly)
+        //            {
+        //                int mPerQ = Globals.freqMSubperiods / Globals.freqQSubperiods;  //3
+        //                int quarter = (dt.Month - 1) / mPerQ + 1;
+        //                GekkoTime gt = new GekkoTime(freq, dt.Year, quarter);
+        //                HandleCollapseData(ts, counter, v, gt, method);
+        //            }
+        //            else if (freq == EFreq.Annual)
+        //            {
+        //                GekkoTime gt = new GekkoTime(freq, dt.Year, 1);
+        //                HandleCollapseData(ts, counter, v, gt, method);
+        //            }
+        //            else
+        //            {
+        //                G.Writeln2("*** ERROR: Expected frequency a, q or m");
+        //                throw new GekkoException();
+        //            }
 
-                }
+        //        }
 
-                if (method == ECollapseMethod.Avg)
-                {
-                    foreach (GekkoTime gt in new GekkoTimeIterator(ts.GetRealDataPeriodFirst(), ts.GetRealDataPeriodLast()))
-                    {
-                        if (!double.IsNaN(ts.GetData(gt)))
-                        {
-                            ts.SetData(gt, ts.GetData(gt) / counter.GetData(gt));
-                        }
-                    }
-                }
-                else if (method == ECollapseMethod.Count)
-                {
-                    foreach (GekkoTime gt in new GekkoTimeIterator(ts.GetRealDataPeriodFirst(), ts.GetRealDataPeriodLast()))
-                    {
-                        ts.SetData(gt, counter.GetData(gt));
-                    }
-                }
+        //        if (method == ECollapseMethod.Avg)
+        //        {
+        //            foreach (GekkoTime gt in new GekkoTimeIterator(ts.GetRealDataPeriodFirst(), ts.GetRealDataPeriodLast()))
+        //            {
+        //                if (!double.IsNaN(ts.GetData(gt)))
+        //                {
+        //                    ts.SetData(gt, ts.GetData(gt) / counter.GetData(gt));
+        //                }
+        //            }
+        //        }
+        //        else if (method == ECollapseMethod.Count)
+        //        {
+        //            foreach (GekkoTime gt in new GekkoTimeIterator(ts.GetRealDataPeriodFirst(), ts.GetRealDataPeriodLast()))
+        //            {
+        //                ts.SetData(gt, counter.GetData(gt));
+        //            }
+        //        }
 
-                GekkoTime t1 = new GekkoTime(EFreq.Monthly, 2000, 1);
-                GekkoTime t2 = new GekkoTime(EFreq.Monthly, 2005, 1);
+        //        GekkoTime t1 = new GekkoTime(EFreq.Monthly, 2000, 1);
+        //        GekkoTime t2 = new GekkoTime(EFreq.Monthly, 2005, 1);
 
 
-                if (!t1.IsNull())
-                {
-                    ts.Truncate(t1, t2);
-                }               
+        //        if (!t1.IsNull())
+        //        {
+        //            ts.Truncate(t1, t2);
+        //        }               
 
-                string nameWithFreq= Program.AddFreqAtEndOfVariableName(varname, freq);
-                TimeSeries ts2 = null; Program.databanks.GetFirst().storage.TryGetValue(nameWithFreq, out ts2);
+        //        string nameWithFreq= Program.AddFreqAtEndOfVariableName(varname, freq);
+        //        TimeSeries ts2 = null; Program.databanks.GetFirst().storage.TryGetValue(nameWithFreq, out ts2);
 
-                GekkoTime tt1 = ts.GetRealDataPeriodFirst();
-                GekkoTime tt2 = ts.GetRealDataPeriodLast();
-                if (!tt1.IsNull())
-                {
-                    //there is some data in ts
-                    if (ts2 == null)
-                    {
-                        Program.databanks.GetFirst().AddVariable(G.GetFreq(freq), ts);
-                    }
-                    else
-                    {
-                        foreach (GekkoTime gt in new GekkoTimeIterator(tt1, tt2))
-                        {
-                            ts2.SetData(gt, ts.GetData(gt));
-                        }
-                    }
-                }
-            }
+        //        GekkoTime tt1 = ts.GetRealDataPeriodFirst();
+        //        GekkoTime tt2 = ts.GetRealDataPeriodLast();
+        //        if (!tt1.IsNull())
+        //        {
+        //            //there is some data in ts
+        //            if (ts2 == null)
+        //            {
+        //                Program.databanks.GetFirst().AddVariable(G.GetFreq(freq), ts);
+        //            }
+        //            else
+        //            {
+        //                foreach (GekkoTime gt in new GekkoTimeIterator(tt1, tt2))
+        //                {
+        //                    ts2.SetData(gt, ts.GetData(gt));
+        //                }
+        //            }
+        //        }
+        //    }
 
-            return new ScalarString("Finished collapse()");
-        }
+        //    return new ScalarString("Finished collapse()");
+        //}
 
-        private static void HandleCollapseData(TimeSeries ts, TimeSeries counter, double data, GekkoTime gt, ECollapseMethod method)
-        {
-            if (double.IsNaN(ts.GetData(gt)))
-            {
-                ts.SetData(gt, data);
-            }
-            else
-            {
-                if (method == ECollapseMethod.First)
-                {
-                    //skip it if something already there
-                }
-                else if (method == ECollapseMethod.Last)
-                {
-                    //overwrite (no summing) if something already there
-                    ts.SetData(gt, data);
-                }
-                else
-                {
-                    ts.SetData(gt, ts.GetData(gt) + data);
-                }
-            }
-
-            if (double.IsNaN(counter.GetData(gt)))
-            {
-                counter.SetData(gt, 1d);  //first one
-            }
-            else
-            {
-                counter.SetData(gt, counter.GetData(gt) + 1d); //add 1
-            }
-
-        }
+        
 
         //rename to substring()??
         public static IVariable piece(GekkoTime t, IVariable x1, IVariable x2, IVariable x3)

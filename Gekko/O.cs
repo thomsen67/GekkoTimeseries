@@ -1933,11 +1933,25 @@ namespace Gekko
             public string opt_first = null;
             public string opt_ref = null;
             public string opt_array = null;
+            public string opt_method = null;
+            public string opt_collapse = null;
+            public string opt_sheet = null;
+            public string opt_cell = null;
+            public string opt_namecell = null;
+            public string opt_datecell = null;
+
             public string type = null;  //read or import
+            
             
             public P p = null;
             public void Exe()
             {
+                if (opt_collapse != null)
+                {
+                    Program.CollapsePoints(this);
+                    return;
+                }
+
                 ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
                 hlp.t1 = this.t1;
                 hlp.t2 = this.t2;
@@ -2154,6 +2168,8 @@ namespace Gekko
                 }
 
             }
+
+            
 
             private static void CreateMissingModelVariables()
             {

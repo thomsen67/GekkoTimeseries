@@ -196,6 +196,15 @@ namespace Gekko
         }
     }
 
+    public enum ECollapseMethod
+    {
+        Total,
+        Avg,
+        First,
+        Last,
+        Count
+    }
+
     public enum EPrtCollapseTypes
     {
         Avg,
@@ -23683,6 +23692,299 @@ namespace Gekko
             return counter;
         }
 
+        private static void HandleCollapseData(TimeSeries ts, TimeSeries counter, double data, GekkoTime gt, ECollapseMethod method, ref GekkoTime gt_min, ref GekkoTime gt_max)
+        {
+            if (gt_min.IsNull()) gt_min = gt;
+            else
+            {
+                if (gt.StrictlySmallerThan(gt_min)) gt_min = gt;
+            }
+
+            if (gt_max.IsNull()) gt_max = gt;
+            else
+            {
+                if (gt.StrictlyLargerThan(gt_max)) gt_max = gt;
+            }
+
+            if (double.IsNaN(ts.GetData(gt)))
+            {
+                ts.SetData(gt, data);
+            }
+            else
+            {
+                if (method == ECollapseMethod.First)
+                {
+                    //skip it if something already there
+                }
+                else if (method == ECollapseMethod.Last)
+                {
+                    //overwrite (no summing) if something already there
+                    ts.SetData(gt, data);
+                }
+                else
+                {
+                    ts.SetData(gt, ts.GetData(gt) + data);
+                }
+            }
+
+            if (double.IsNaN(counter.GetData(gt)))
+            {
+                counter.SetData(gt, 1d);  //first one
+            }
+            else
+            {
+                counter.SetData(gt, counter.GetData(gt) + 1d); //add 1
+            }
+
+        }
+
+        public static void CollapsePoints(O.Read o)
+        {
+            if (o.readTo != null)
+            {
+                G.Writeln2("*** ERROR: IMPORT<collapse=...> does not work with IMPORT ... TO ...");
+                throw new GekkoException();
+            }
+
+            if (o.opt_ref != null)
+            {
+                G.Writeln2("*** ERROR: IMPORT<collapse=...> does not work with <ref>");
+                throw new GekkoException();
+            }
+
+            if (o.opt_first != null)
+            {
+                G.Writeln2("*** ERROR: IMPORT<collapse=...> does not work with <first>");
+                throw new GekkoException();
+            }
+
+            if (o.opt_merge != null)
+            {
+                G.Writeln2("*** ERROR: IMPORT<collapse=...> does not work with <merge>");
+                throw new GekkoException();
+            }
+
+            if (o.opt_xls == null && o.opt_xlsx == null)
+            {
+                G.Writeln2("*** ERROR: IMPORT<collapse=...> should be used with <xls> or <xlsx>");
+                throw new GekkoException();
+            }
+            
+
+            ECollapseMethod emethod = ECollapseMethod.Total;
+            if (G.equal(o.opt_method, "avg")) emethod = ECollapseMethod.Avg;
+            else if (G.equal(o.opt_method, "first")) emethod = ECollapseMethod.First;
+            else if (G.equal(o.opt_method, "last")) emethod = ECollapseMethod.Last;
+            else if (G.equal(o.opt_method, "count")) emethod = ECollapseMethod.Count;
+
+            EFreq freq = G.GetFreq(o.opt_collapse);
+
+            bool isTranspose = false;
+            if (G.equal(o.opt_cols, "yes")) isTranspose = true;
+
+            string fn = Program.CreateFullPathAndFileName(Program.AddExtension(o.fileName, "." + "xlsx"));
+
+            //string s = Program.GetTextFromFileWithWait(fileName_string);
+
+            TableLight matrix = null;
+            matrix = Program.ReadExcelWorkbook(fn, o.opt_sheet);
+            G.Writeln2("Read " + matrix.GetRowMaxNumber() + "x" + matrix.GetColMaxNumber() + " matrix from file");
+            if (isTranspose) matrix = matrix.Transpose();
+
+            //Expects series to run row-wise (first col is names, first row is dates)
+
+            if (o.opt_cell == null)
+            {
+                o.opt_cell = "b2";
+            }
+
+            int i_data, j_data; Program.FromXls1Based(o.opt_cell, out i_data, out j_data, isTranspose);
+
+            if (i_data < 1 || j_data < 1)
+            {
+                G.Writeln2("*** ERROR: <cell=...> has an illegal value (cannot be first row or column)");
+                throw new GekkoException();
+            }
+
+            int i_names, j_names;
+            if (o.opt_namecell == null)
+            {
+                i_names = i_data;
+                j_names = j_data - 1;
+            }
+            else
+            {
+                Program.FromXls1Based(o.opt_namecell, out i_names, out j_names, isTranspose);
+            }
+
+            int i_dates, j_dates;
+            if (o.opt_datecell == null)
+            {
+                i_dates = i_data - 1;
+                j_dates = j_data;
+            }
+            else
+            {
+                Program.FromXls1Based(o.opt_datecell, out i_dates, out j_dates, isTranspose);
+            }
+
+            if (i_data != i_names)
+            {
+                G.Writeln2("*** ERROR: Positions " + o.opt_namecell + " for names and " + o.opt_cell + " for data do not correspond");
+                throw new GekkoException();
+            }
+
+            if (j_data != j_dates)
+            {
+                G.Writeln2("*** ERROR: Positions " + o.opt_datecell + " for names and " + o.opt_cell + " for data do not correspond");
+                throw new GekkoException();
+            }
+
+            //expects dates to run i a row
+            List<DateTime> dateList = new List<DateTime>();
+            for (int j = j_dates; j <= matrix.GetColMaxNumber(); j++)
+            {
+                CellLight c = matrix.Get(i_dates, j);
+                if (c.type == ECellLightType.Double)
+                {
+                    DateTime temp = DateTime.MinValue;
+                    try
+                    {
+                        temp = DateTime.FromOADate(c.data);
+                    }
+                    catch
+                    {
+                        G.Writeln2("*** ERROR: Cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " does not seem to be a date");
+                        throw new GekkoException();
+                    }
+
+                    if (temp.Year < 1500 || temp.Year > 2500)
+                    {
+                        G.Writeln2("*** ERROR: Cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " does not seem to make sense (year = " + temp.Year + ")");
+                        throw new GekkoException();
+                    }
+                    dateList.Add(temp);
+                }
+                else if (c.type == ECellLightType.DateTime)
+                {
+                    dateList.Add(c.dateTime);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Expected cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " to be date format, is " + c.type.ToString());
+                    throw new GekkoException();
+                }
+            }
+
+            List<string> nameList = new List<string>();
+            for (int i = i_names; i <= matrix.GetRowMaxNumber(); i++)
+            {
+                CellLight c = matrix.Get(i, j_names);
+                if (c.type != ECellLightType.String)
+                {
+                    G.Writeln2("*** ERROR: Expected cell " + Program.GetExcelCell(i, j_names, isTranspose) + " to be a string, is " + c.type.ToString());
+                    throw new GekkoException();
+                }
+                string s = c.text;
+                if (!G.IsSimpleToken(s))
+                {
+                    G.Writeln2("*** ERROR: Expected cell " + Program.GetExcelCell(i, j_names, isTranspose) + " to be a variable name, is '" + s + "'");
+                    throw new GekkoException();
+                }
+                nameList.Add(s);
+            }
+
+            GekkoTime gt_min = Globals.tNull;
+            GekkoTime gt_max = Globals.tNull;
+
+            for (int i = i_data; i <= matrix.GetRowMaxNumber(); i++)
+            {                
+                string varname = nameList[i - i_data];
+                TimeSeries ts = new TimeSeries(freq, varname);
+                TimeSeries counter = new TimeSeries(freq, null);  //will be discared afterwards but practical here
+                for (int j = j_data; j <= matrix.GetColMaxNumber(); j++)
+                {
+                    DateTime dt = dateList[j - j_data];
+                    CellLight c = matrix.Get(i, j);
+
+                    double v = Program.GetValueFromSpreadsheetCell(isTranspose, i, j, c);
+
+                    if (freq == EFreq.Monthly)
+                    {
+                        GekkoTime gt = new GekkoTime(freq, dt.Year, dt.Month);
+                        HandleCollapseData(ts, counter, v, gt, emethod, ref gt_min, ref gt_max);
+                    }
+                    else if (freq == EFreq.Quarterly)
+                    {
+                        int mPerQ = Globals.freqMSubperiods / Globals.freqQSubperiods;  //3
+                        int quarter = (dt.Month - 1) / mPerQ + 1;
+                        GekkoTime gt = new GekkoTime(freq, dt.Year, quarter);
+                        HandleCollapseData(ts, counter, v, gt, emethod, ref gt_min, ref gt_max);
+                    }
+                    else if (freq == EFreq.Annual)
+                    {
+                        GekkoTime gt = new GekkoTime(freq, dt.Year, 1);
+                        HandleCollapseData(ts, counter, v, gt, emethod, ref gt_min, ref gt_max);
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Expected frequency a, q or m");
+                        throw new GekkoException();
+                    }
+
+                }
+
+                if (emethod == ECollapseMethod.Avg)
+                {
+                    foreach (GekkoTime gt in new GekkoTimeIterator(ts.GetRealDataPeriodFirst(), ts.GetRealDataPeriodLast()))
+                    {
+                        if (!double.IsNaN(ts.GetData(gt)))
+                        {
+                            ts.SetData(gt, ts.GetData(gt) / counter.GetData(gt));
+                        }
+                    }
+                }
+                else if (emethod == ECollapseMethod.Count)
+                {
+                    foreach (GekkoTime gt in new GekkoTimeIterator(ts.GetRealDataPeriodFirst(), ts.GetRealDataPeriodLast()))
+                    {
+                        ts.SetData(gt, counter.GetData(gt));
+                    }
+                }                
+
+                if (!o.t1.IsNull())
+                {
+                    ts.Truncate(o.t1, o.t2);
+                }
+
+                string nameWithFreq = Program.AddFreqAtEndOfVariableName(varname, freq);
+                TimeSeries ts2 = null; Program.databanks.GetFirst().storage.TryGetValue(nameWithFreq, out ts2);
+
+                GekkoTime tt1 = ts.GetRealDataPeriodFirst();
+                GekkoTime tt2 = ts.GetRealDataPeriodLast();
+                if (!tt1.IsNull())
+                {
+                    //there is some data in ts
+                    if (ts2 == null)
+                    {
+                        Program.databanks.GetFirst().AddVariable(G.GetFreq(freq), ts);
+                    }
+                    else
+                    {
+                        foreach (GekkoTime gt in new GekkoTimeIterator(tt1, tt2))
+                        {
+                            ts2.SetData(gt, ts.GetData(gt));
+                        }
+                    }
+                }
+            }
+
+            int vars = matrix.GetRowMaxNumber() - i_data + 1;
+            int obs = matrix.GetColMaxNumber() - j_data + 1;
+            G.Writeln("Imported " + vars + " timeseries from " + obs + " data points");
+            G.Writeln("The collapsed series (" + G.GetFreqString(freq) + ") span the timeperiod " + gt_min.ToString() + " to " + gt_max.ToString());
+        }
+
         public static void Collapse(string b1, string ss1, string b0, string ss0, string method)
         {
             //ErrorIfDatabanksSwapped(); 
@@ -23691,6 +23993,11 @@ namespace Gekko
             Databank databank0 = GetDatabank(b0);
                         
             if (method == null) method = "total";
+            if (G.equal(method, "count"))
+            {
+                G.Writeln2("*** ERROR: method=count not implemented");
+                throw new GekkoException();
+            }
         
             string name1;
             EFreq eFreq1;
