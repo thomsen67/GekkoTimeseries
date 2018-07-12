@@ -2524,7 +2524,7 @@ namespace Gekko
                         double v = double.NaN;
                         CellLight cell = matrix.Get(row, col);
                         if (cell.type == ECellLightType.None) continue;
-                        v = GetValueFromSpreadsheetCell(transpose, row, col, v, cell);
+                        v = GetValueFromSpreadsheetCell(transpose, row, col, cell);
                         ts.SetData(o.t1.Add(col - 1 - colOffset), v);
                     }
                 }
@@ -2554,7 +2554,7 @@ namespace Gekko
                         double v = double.NaN;
                         CellLight cell = matrix.Get(row, col);
                         if (cell.type == ECellLightType.None) continue;
-                        v = GetValueFromSpreadsheetCell(transpose, row, col, v, cell);
+                        v = GetValueFromSpreadsheetCell(transpose, row, col, cell);
                         mm.data[row - 1 - rowOffset, col - 1 - colOffset] = v;
                     }
                 }
@@ -2592,8 +2592,9 @@ namespace Gekko
             }
         }
 
-        private static double GetValueFromSpreadsheetCell(bool transpose, int row, int col, double v, CellLight cell)
+        public static double GetValueFromSpreadsheetCell(bool transpose, int row, int col, CellLight cell)
         {
+            double v = double.NaN;
             if (cell.type == ECellLightType.String)
             {
                 if (IsNonAvailableText(cell.text))
@@ -2610,7 +2611,11 @@ namespace Gekko
             {
                 v = cell.data;
             }
-            else throw new GekkoException();
+            else
+            {
+                G.Writeln2("*** ERROR: Could not understand spreadsheet cell " + GetExcelCell(row, col, transpose) + " as a number");
+                throw new GekkoException();
+            }
             return v;
         }
 
@@ -31287,12 +31292,19 @@ namespace Gekko
                             {
                                 cell = new CellLight((string)temp);
                             }
+                            else if (temp.GetType() == typeof(OfficeOpenXml.ExcelErrorValue))
+                            {
+                                cell = new CellLight(double.NaN);
+                            }
                             else
                             {
+                                Type tt = temp.GetType();
+                                string ttt = temp.GetType().ToString();
+
                                 //G.Writeln2("+++ WARNING: Cell " + GetExcelCell(i, j, false) + " seems to be neither text or number.");
                                 //G.Writeln("           It has type " + temp.GetType().ToString(), Color.Red);
                                 //throw new GekkoException();
-                                cell = new CellLight("");
+                                cell = new CellLight("[data not recognized error]");
                             }
                             matrix.Add(i + 1, j + 1, cell);  //i and j are 0-based, matrix needs to be 1-based.
 
