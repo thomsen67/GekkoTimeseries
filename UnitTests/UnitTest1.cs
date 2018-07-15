@@ -5654,7 +5654,299 @@ mulser xx yy;
 
         [TestMethod]
         public void Test__Collapse()
-        {            
+        {
+            // --------- import<collapse> from Excel data points ----------------
+            // --------- import<collapse> from Excel data points ----------------
+            // --------- import<collapse> from Excel data points ----------------
+            // --------- import<collapse> from Excel data points ----------------
+            // --------- import<collapse> from Excel data points ----------------
+
+            for (int j = 0; j < 2; j++)
+            {
+
+                string filename = "datapoints";
+                if (j == 1) filename = "datapoints2";
+                string extra = null;
+                if (j == 1) extra = " sheet='data2' cols cell='d5'  namecell='d2'  datecell='b5' ";
+
+                I("RESET;");
+                string freq = "m";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                I("OPTION freq " + freq + ";");
+                I("IMPORT<xlsx "+extra+"collapse=" + freq + ">" + filename + ";");
+                for (int i = 1; i <= 2; i++)
+                {
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2017, 11)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2017, 12)), i * 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 1)), i * 2d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 2)), i * 3d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 3)), i * 4d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 4)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 5)), i * 5d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 6)), i * 6d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 7)), i * 7d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 8)), i * 8d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 9)), i * 9d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 10)), i * 10d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 11)), i * 11d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 12)), double.NaN);
+                }
+
+                I("RESET;");
+                freq = "q";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                I("OPTION freq " + freq + ";");
+                I("IMPORT<xlsx "+extra+"collapse=" + freq + ">" + filename + ";");
+                for (int i = 1; i <= 2; i++)
+                {
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2017, 3)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2017, 4)), i * 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 1)), i * 9d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 2)), i * 11d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 3)), i * 24d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 4)), i * 21d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2017, 1)), double.NaN);
+                }
+
+                I("RESET;");
+                freq = "a";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                I("OPTION freq " + freq + ";");
+                I("IMPORT<xlsx "+extra+"collapse=" + freq + ">" + filename + ";");
+                for (int i = 1; i <= 2; i++)
+                {
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2016, 1)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2017, 1)), i * 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2018, 1)), i * 65d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2019, 1)), double.NaN);
+                }
+
+                //avg ------------------------------------------------------------
+
+
+                I("RESET;");
+                freq = "m";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                I("OPTION freq " + freq + ";");
+                I("IMPORT<xlsx "+extra+"collapse=" + freq + " method=avg>" + filename + ";");
+                for (int i = 1; i <= 2; i++)
+                {
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2017, 11)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2017, 12)), i * 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 1)), i * 2d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 2)), i * 3d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 3)), i * 4d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 4)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 5)), i * 5d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 6)), i * 6d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 7)), i * 7d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 8)), i * 8d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 9)), i * 9d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 10)), i * 10d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 11)), i * 11d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 12)), double.NaN);
+                }
+
+                I("RESET;");
+                freq = "q";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                I("OPTION freq " + freq + ";");
+                I("IMPORT<xlsx "+extra+"collapse=" + freq + " method=avg>" + filename + ";");
+                for (int i = 1; i <= 2; i++)
+                {
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2017, 3)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2017, 4)), i * 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 1)), i * 3d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 2)), i * 5.5d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 3)), i * 8d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 4)), i * 10.5d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2017, 1)), double.NaN);
+                }
+
+                I("RESET;");
+                freq = "a";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                I("OPTION freq " + freq + ";");
+                I("IMPORT<xlsx "+extra+"collapse=" + freq + " method=avg>" + filename + ";");
+                for (int i = 1; i <= 2; i++)
+                {
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2016, 1)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2017, 1)), i * 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2018, 1)), i * 6.5d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2019, 1)), double.NaN);
+                }
+
+                //count ------------------------------------------------------------
+
+                I("RESET;");
+                freq = "m";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                I("OPTION freq " + freq + ";");
+                I("IMPORT<xlsx "+extra+"collapse=" + freq + " method=count>" + filename + ";");
+                for (int i = 1; i <= 2; i++)
+                {
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2017, 11)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2017, 12)), 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 1)), 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 2)), 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 3)), 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 4)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 5)), 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 6)), 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 7)), 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 8)), 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 9)), 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 10)), 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 11)), 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 12)), double.NaN);
+                }
+
+                I("RESET;");
+                freq = "q";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                I("OPTION freq " + freq + ";");
+                I("IMPORT<xlsx "+extra+"collapse=" + freq + " method=count>" + filename + ";");
+                for (int i = 1; i <= 2; i++)
+                {
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2017, 3)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2017, 4)), 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 1)), 3d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 2)), 2d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 3)), 3d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 4)), 2d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2017, 1)), double.NaN);
+                }
+
+                I("RESET;");
+                freq = "a";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                I("OPTION freq " + freq + ";");
+                I("IMPORT<xlsx "+extra+"collapse=" + freq + " method=count>" + filename + ";");
+                for (int i = 1; i <= 2; i++)
+                {
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2016, 1)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2017, 1)), 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2018, 1)), 10d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2019, 1)), double.NaN);
+                }
+
+                //first ------------------------------------------------------------
+
+                I("RESET;");
+                freq = "m";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                I("OPTION freq " + freq + ";");
+                I("IMPORT<xlsx "+extra+"collapse=" + freq + " method=first>" + filename + ";");
+                for (int i = 1; i <= 2; i++)
+                {
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2017, 11)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2017, 12)), i * 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 1)), i * 2d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 2)), i * 3d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 3)), i * 4d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 4)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 5)), i * 5d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 6)), i * 6d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 7)), i * 7d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 8)), i * 8d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 9)), i * 9d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 10)), i * 10d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 11)), i * 11d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 12)), double.NaN);
+                }
+
+                I("RESET;");
+                freq = "q";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                I("OPTION freq " + freq + ";");
+                I("IMPORT<xlsx "+extra+"collapse=" + freq + " method=first>" + filename + ";");
+                for (int i = 1; i <= 2; i++)
+                {
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2017, 3)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2017, 4)), i * 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 1)), i * 2d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 2)), i * 5d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 3)), i * 7d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 4)), i * 10d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2017, 1)), double.NaN);
+                }
+
+                I("RESET;");
+                freq = "a";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                I("OPTION freq " + freq + ";");
+                I("IMPORT<xlsx "+extra+"collapse=" + freq + " method=first>" + filename + ";");
+                for (int i = 1; i <= 2; i++)
+                {
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2016, 1)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2017, 1)), i * 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2018, 1)), i * 2d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2019, 1)), double.NaN);
+                }
+
+                //last ------------------------------------------------------------
+
+                I("RESET;");
+                freq = "m";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                I("OPTION freq " + freq + ";");
+                I("IMPORT<xlsx "+extra+"collapse=" + freq + " method=last>" + filename + ";");
+                for (int i = 1; i <= 2; i++)
+                {
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2017, 11)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2017, 12)), i * 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 1)), i * 2d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 2)), i * 3d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 3)), i * 4d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 4)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 5)), i * 5d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 6)), i * 6d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 7)), i * 7d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 8)), i * 8d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 9)), i * 9d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 10)), i * 10d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 11)), i * 11d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Monthly, 2018, 12)), double.NaN);
+                }
+
+                I("RESET;");
+                freq = "q";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                I("OPTION freq " + freq + ";");
+                I("IMPORT<xlsx "+extra+"collapse=" + freq + " method=last>" + filename + ";");
+                for (int i = 1; i <= 2; i++)
+                {
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2017, 3)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2017, 4)), i * 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 1)), i * 4d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 2)), i * 6d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 3)), i * 9d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2018, 4)), i * 11d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Quarterly, 2017, 1)), double.NaN);
+                }
+
+                I("RESET;");
+                freq = "a";
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                I("OPTION freq " + freq + ";");
+                I("IMPORT<xlsx "+extra+"collapse=" + freq + " method=last>" + filename + ";");
+                for (int i = 1; i <= 2; i++)
+                {
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2016, 1)), double.NaN);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2017, 1)), i * 1d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2018, 1)), i * 11d);
+                    Assert.AreEqual(First().GetVariable("ts" + i).GetData(new GekkoTime(EFreq.Annual, 2019, 1)), double.NaN);
+                }
+
+            }
+
+
+            // --------- collapse command ----------------
+            // --------- collapse command ----------------
+            // --------- collapse command ----------------
+            // --------- collapse command ----------------
+            // --------- collapse command ----------------
+
             I("RESET; MODE data;");
             I("TIME 2000 2003;");
             I("OPTION freq q;");
@@ -5837,6 +6129,9 @@ mulser xx yy;
             Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 3)), 9d);
             Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2000, 4)), double.NaN);
             Assert.AreEqual(First().GetVariable("x5").GetData(new GekkoTime(EFreq.Quarterly, 2001, 1)), double.NaN);
+
+            
+
         }
 
         [TestMethod]

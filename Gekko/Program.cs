@@ -23769,7 +23769,9 @@ namespace Gekko
                 G.Writeln2("*** ERROR: IMPORT<collapse=...> should be used with <xls> or <xlsx>");
                 throw new GekkoException();
             }
-            
+
+            string x = "xlsx";
+            if (o.opt_xls != null) x = "xls";
 
             ECollapseMethod emethod = ECollapseMethod.Total;
             if (G.equal(o.opt_method, "avg")) emethod = ECollapseMethod.Avg;
@@ -23782,7 +23784,7 @@ namespace Gekko
             bool isTranspose = false;
             if (G.equal(o.opt_cols, "yes")) isTranspose = true;
 
-            string fn = Program.CreateFullPathAndFileName(Program.AddExtension(o.fileName, "." + "xlsx"));
+            string fn = Program.CreateFullPathAndFileName(Program.AddExtension(o.fileName, "." + x));
 
             //string s = Program.GetTextFromFileWithWait(fileName_string);
 
@@ -23800,7 +23802,7 @@ namespace Gekko
 
             int i_data, j_data; Program.FromXls1Based(o.opt_cell, out i_data, out j_data, isTranspose);
 
-            if (i_data < 1 || j_data < 1)
+            if (i_data < 2 || j_data < 2)
             {
                 G.Writeln2("*** ERROR: <cell=...> has an illegal value (cannot be first row or column)");
                 throw new GekkoException();
@@ -23871,7 +23873,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Expected cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " to be date format, is " + c.type.ToString());
+                    G.Writeln2("*** ERROR: Expected cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " to be date format, is " + c.type.ToString() + ": '" + c.text + "'");
                     throw new GekkoException();
                 }
             }
