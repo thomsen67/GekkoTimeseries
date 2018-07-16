@@ -2560,7 +2560,7 @@ namespace Gekko.Parser.Gek
                             if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
                             {
                                 //specialExpressionAndLabelInfo[0] should be "ASTMETA" here
-                                nodeCode += "o" + numNode + ".meta = @`" + node.Parent.specialExpressionAndLabelInfo[1] + "`;" + G.NL;
+                                nodeCode += "o" + numNode + ".meta = @`" + G.ReplaceGlueNew(node.Parent.specialExpressionAndLabelInfo[1]) + "`;" + G.NL;
                             }
                             nodeCode += "o" + numNode + ".Exe();" + G.NL;
 
@@ -2926,6 +2926,7 @@ namespace Gekko.Parser.Gek
 
                             string indexes = null;
                             string indexesReport = null;
+                            
                             for (int i = 0; i < node[1].ChildrenCount(); i++)
                             {
                                 ASTNode child = node[1][i];
@@ -3059,41 +3060,20 @@ namespace Gekko.Parser.Gek
                             
                         }
                         break;
-                    case "ASTINDEXERELEMENT":  //For ASTINDEXER, see "["
+                    case "ASTINDEXERELEMENT":
                     case "ASTINDEXERELEMENTPLUS":
                         {
-                            //if (node.ChildrenCount() == 2)
-                            //{
-                            //    if (!node[0].Code.IsNull())
-                            //    {
-                            //        node.Code.A("(" + node[0].Code + ")" + ".Add(smpl, new ScalarString(\":\")).Add(smpl, " + node[1].Code + ")");
-                            //    }
-                            //    else
-                            //    {
-                            //        node.Code.A(node[1].Code);
-                            //    }
-                            //}
-                            //else if (node.ChildrenCount() == 3)
-                            //{
-                            //    if (node.Text == "ASTINDEXERELEMENTPLUS")
-                            //    {
-                            //        G.Writeln2("*** ERROR: You cannot use '+' as starting character in ranges");
-                            //        throw new GekkoException();
-                            //    }
-                            //    if (!node[0].Code.IsNull())
-                            //    {
-                            //        node.Code.A("new IVariablesFilterRange((" + node[0].Code + ")" + ".Add(smpl, new ScalarString(\":\")).Add(smpl, " + node[1].Code + "), " + node[2].Code + ")");
-                            //    }
-                            //    else
-                            //    {
-                            //        node.Code.A("new IVariablesFilterRange(" + node[1].Code + ", " + node[2].Code + ")");
-                            //    }
-                            //}
-                            //else throw new GekkoException();
-                            if (node.ChildrenCount() == 1) GetCodeFromAllChildren(node);
+                            if (node.ChildrenCount() == 1)
+                            {
+                                GetCodeFromAllChildren(node);
+                            }
                             else
                             {
                                 node.Code.A("(new Range(").A(node[0].Code).A(", ").A(node[1].Code).A("))");
+                            }
+                            if (node.specialExpressionAndLabelInfo != null)
+                            {
+                                node.Code.CA(Globals.reportLabel1 + "smpl, " + node.Code + ", `" + node.specialExpressionAndLabelInfo[1] + "|" + node.specialExpressionAndLabelInfo[2] + "|" + node.specialExpressionAndLabelInfo[3] + "`" + Globals.reportLabel2);
                             }
                         }
                         break;
@@ -4367,11 +4347,11 @@ namespace Gekko.Parser.Gek
                             {
                                 if (node.specialExpressionAndLabelInfo[2] != "")
                                 {
-                                    givenLabel = node.specialExpressionAndLabelInfo[2];
+                                    givenLabel = G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[2]);
                                     givenLabel = G.StripQuotes(givenLabel);
                                     givenLabel = Globals.labelCheatString + givenLabel;
                                 }
-                                else givenLabel = node.specialExpressionAndLabelInfo[1];                                
+                                else givenLabel = G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1]);                            
                             }                            
                             node.Code.A("O.Prt.Element ope" + Num(node) + " = new O.Prt.Element();" + G.NL);  //this must be after the list start iterator code
 
@@ -4953,7 +4933,7 @@ namespace Gekko.Parser.Gek
                             if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
                             {
                                 //specialExpressionAndLabelInfo[0] should be "ASTMETA" here
-                                node.Code.A("o").A(Num(node)).A(".meta = @`").A(node.Parent.specialExpressionAndLabelInfo[1]).A("`;").A(G.NL);
+                                node.Code.A("o").A(Num(node)).A(".meta = @`").A(G.ReplaceGlueNew(node.Parent.specialExpressionAndLabelInfo[1])).A("`;").A(G.NL);
                             }
                             node.Code.A(node[0].Code);  //listItems
                             node.Code.A(node[1].Code);  //dates
@@ -5044,7 +5024,7 @@ namespace Gekko.Parser.Gek
                             string givenLabel = null;
                             if (node.specialExpressionAndLabelInfo[2] != "")
                             {
-                                givenLabel = node.specialExpressionAndLabelInfo[2];
+                                givenLabel = G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[2]);
                                 givenLabel = G.StripQuotes(givenLabel);
                             }
                             else givenLabel = node.specialExpressionAndLabelInfo[1];                            
@@ -5854,7 +5834,7 @@ namespace Gekko.Parser.Gek
             if (directOption)
             {
                 nodeCode += "o" + Num(node) + ".direct = true;" + G.NL;
-                nodeCode += "o" + Num(node) + ".rawfood = " + "@`" + node.specialExpressionAndLabelInfo[1] + "`" + ";" + G.NL;
+                nodeCode += "o" + Num(node) + ".rawfood = " + "@`" + G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1]) + "`" + ";" + G.NL;
             }
             else
             {
@@ -5967,7 +5947,7 @@ namespace Gekko.Parser.Gek
             if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
             {
                 //specialExpressionAndLabelInfo[0] should be "ASTMETA" here
-                nodeCode += "o" + numNode + ".meta = @`" + node.Parent.specialExpressionAndLabelInfo[1] + "`;" + G.NL;
+                nodeCode += "o" + numNode + ".meta = @`" + G.ReplaceGlueNew(node.Parent.specialExpressionAndLabelInfo[1]) + "`;" + G.NL;
             }
             nodeCode += "o" + numNode + ".Exe();" + G.NL;
             return nodeCode;

@@ -304,6 +304,9 @@ namespace Gekko
         public const string reportInterior2 = ")";
         public const string labelCounter = "labelCounter";
 
+        public const string reportLabel1 = "O.ReportLabel(";
+        public const string reportLabel2 = ")";        
+
         public static int guiTimerCounter = 0;
         public static System.Timers.Timer guiTimer = null;  //only runs when executing a command
 

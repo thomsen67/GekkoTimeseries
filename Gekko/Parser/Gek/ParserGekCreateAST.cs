@@ -589,7 +589,7 @@ namespace Gekko.Parser.Gek
                 return;
             }
 
-             cmdNode.Text = ast.Text;
+            cmdNode.Text = ast.Text;
 
             if (ast.Text != null)
             {
@@ -621,16 +621,24 @@ namespace Gekko.Parser.Gek
                     {
                         flag = true;
                     }
+                    else if (ast.Text.StartsWith("ASTCURLY" + "¤"))
+                    {
+                        flag = true;
+                    }
+                    else if (ast.Text.StartsWith("ASTINDEXERELEMENT" + "¤"))
+                    {
+                        flag = true;
+                    }
                 }                
                 
                 if (flag)
                 {
                     string[] ss = ast.Text.Split('¤');
-                    for (int i = 0; i < ss.Length; i++)
-                    {                        
-                        ss[i] = G.ReplaceGlueNew(ss[i]);                        
-                    }
-                    cmdNode.Text = ss[0];
+                    //for (int i = 0; i < ss.Length; i++)
+                    //{                        
+                    //    ss[i] = G.ReplaceGlueNew(ss[i]);                        
+                    //}
+                    cmdNode.Text = G.ReplaceGlueNew(ss[0]);
                     cmdNode.specialExpressionAndLabelInfo = ss;
                 }
             }

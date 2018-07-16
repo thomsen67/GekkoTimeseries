@@ -2633,6 +2633,11 @@ namespace Gekko
             return x;
         }
 
+        public static IVariable ReportLabel(GekkoSmpl smpl, IVariable x, string s)
+        {            
+            return x;
+        }
+
         public static void ClearLabelHelper(GekkoSmpl smpl)
         {
             smpl.labelHelper.Clear();

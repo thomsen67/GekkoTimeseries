@@ -1964,9 +1964,11 @@ bankvarnameindex:           bankvarname ( leftBracketGlue expression RIGHTBRACKE
 					
 indexerExpressionHelper:    ident -> ^(ASTINDEXERELEMENTIDENT ident)   
 						  | expressionOrNothing doubleDot expressionOrNothing -> ^(ASTINDEXERELEMENT expressionOrNothing expressionOrNothing)     //'fm1'..'fm5'
-						  | expression -> ^(ASTINDEXERELEMENT expression)                                     //'fm*' or -2 or 2000 or 2010q3
+						  | expression -> ^({token("ASTINDEXERELEMENT¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTINDEXERELEMENT, 0)} expression)                                     //'fm*' or -2 or 2000 or 2010q3
 						  | PLUS expression -> ^(ASTINDEXERELEMENTPLUS expression)                            //+1
                             ;
+
+
 
 expressionOrNothing:        expression -> expression
 						  | -> ASTEMPTYRANGEELEMENT
@@ -2055,11 +2057,11 @@ name:                       name2 -> ^(ASTNAME name2);
 name2:                      (ident | nameCurlyStart) (GLUE! identDigit | nameCurly)* ;
 
 nameCurlyStart:             leftCurlyNoGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
-					      | leftCurlyNoGlue expression RIGHTCURLY -> ^(ASTCURLY expression)
+					      | leftCurlyNoGlue expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
 						    ;
 
 nameCurly:                  leftCurlyGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
-					      | leftCurlyGlue expression RIGHTCURLY -> ^(ASTCURLY expression)
+					      | leftCurlyGlue expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
 						    ;
 
 cname:                      name cnameHelper+ -> ^(ASTCNAME name cnameHelper+);
