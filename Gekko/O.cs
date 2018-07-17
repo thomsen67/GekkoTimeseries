@@ -80,6 +80,17 @@ namespace Gekko
             }
         }
 
+        public class LabelHelper2
+        {
+            public string s;
+            public IVariable iv;
+            public LabelHelper2(string s, IVariable iv)
+            {
+                this.s = s;
+                this.iv = iv;
+            }
+        }
+
         public class HandleEndoHelper
         {
             public GekkoTimes local = null;
@@ -2634,7 +2645,8 @@ namespace Gekko
         }
 
         public static IVariable ReportLabel(GekkoSmpl smpl, IVariable x, string s)
-        {            
+        {
+            smpl.labelHelper22.Add(new LabelHelper2(s, x));
             return x;
         }
 

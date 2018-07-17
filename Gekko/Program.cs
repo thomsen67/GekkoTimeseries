@@ -109,6 +109,7 @@ namespace Gekko
         public GekkoSmplCommand command = GekkoSmplCommand.Unknown;
         public List<O.LabelHelperIVariable> labelHelper = new List<O.LabelHelperIVariable>(); //not created all the time, so ok
         public List<List<O.LabelHelperIVariable>> labelHelper2 = new List<List<O.LabelHelperIVariable>>(); //not created all the time, so ok
+        public List<O.LabelHelper2> labelHelper22 = new List<O.LabelHelper2>();
         public P p;
 
         public GekkoSmpl()
