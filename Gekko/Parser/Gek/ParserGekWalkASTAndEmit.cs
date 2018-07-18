@@ -1217,10 +1217,19 @@ namespace Gekko.Parser.Gek
                                 if (internalName != null) s = internalName;
                             }
 
+                            
+
                             if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent))
                             {
                                 //only for PRT-type or DISP, and only if the {} is not inside [] or {}.
-                                node.Code.CA(Globals.reportInterior1 + s + ", " + "0" + ", " + Globals.labelCounter + Globals.reportInterior2);
+                                if (node.specialExpressionAndLabelInfo != null)
+                                {
+                                    node.Code.CA(Globals.reportLabel1 + "smpl, " + s + ", `" + node.specialExpressionAndLabelInfo[1] + "|" + node.specialExpressionAndLabelInfo[2] + "|" + node.specialExpressionAndLabelInfo[3] + "`" + Globals.reportLabel2);
+                                }
+                                else
+                                {
+                                    node.Code.CA(Globals.reportInterior1 + s + ", " + "0" + ", " + Globals.labelCounter + Globals.reportInterior2);
+                                }
                             }
                             else
                             {
