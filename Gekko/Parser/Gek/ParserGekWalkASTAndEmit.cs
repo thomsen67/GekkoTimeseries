@@ -1228,7 +1228,8 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
-                                    node.Code.CA(Globals.reportInterior1 + s + ", " + "0" + ", " + Globals.labelCounter + Globals.reportInterior2);
+                                    node.Code.CA(s);
+                                    //node.Code.CA(Globals.reportInterior1 + s + ", " + "0" + ", " + Globals.labelCounter + Globals.reportInterior2);
                                 }
                             }
                             else
@@ -2870,6 +2871,7 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("o" + Num(node) + ".printCsCounter = Globals.printCs.Count - 1;" + G.NL);
 
                                 node.Code.A("o" + Num(node) + ".labelHelper2 = O.AddLabelHelper2(smpl);" + G.NL);
+                                node.Code.A("o" + Num(node) + ".labelHelper22 = O.AddLabelHelper22(smpl);" + G.NL);
 
                                 node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
 
@@ -2932,6 +2934,7 @@ namespace Gekko.Parser.Gek
                             //LIGHTFIXME, isRhs
 
                             bool reportInterior = ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent));
+                            reportInterior = false;
 
                             string indexes = null;
                             string indexesReport = null;
@@ -4391,11 +4394,12 @@ namespace Gekko.Parser.Gek
                             {
                                 freelists = freelists.Substring(0, freelists.Length - ", ".Length);
                                 freelists = Globals.freelists + freelists + Globals.freelists;
-                            }
+                            }                            
 
+                            node.Code.A("ope" + Num(node) + ".label22 = `" + freelists + givenLabel + "`;" + G.NL);
                             givenLabel = givenLabel.Replace(G.NL, "");  //remove any newlines, else C# code will become invalid.
-
                             node.Code.A("ope" + Num(node) + ".label = `" + freelists + givenLabel + "`;" + G.NL);
+
                             node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2);" + G.NL);
                             ASTNode child = node.GetChild("ASTPRTELEMENTOPTIONFIELD");
                             if (child != null) node.Code.A(child.Code);

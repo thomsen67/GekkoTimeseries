@@ -2677,6 +2677,10 @@ namespace Gekko
             return rv;            
         }
 
+        public static List<O.LabelHelper2> AddLabelHelper22(GekkoSmpl smpl)
+        {
+            return smpl.labelHelper22;
+        }
 
         public static IVariable IndexerPlus(GekkoSmpl smpl, IVariable x, bool isLhs, IVariable y)
         {
@@ -7446,7 +7450,8 @@ namespace Gekko
             public double opt_pointsize = double.NaN;
             public string opt_fillstyle = null;
             public List<List<O.LabelHelperIVariable>> labelHelper2 = null;  //comes from smpl.labelHelper2. For PRT<m> for instance, there will be 2*n elements, where the n's are identical. This is because the expression is run 2 times for <m>, <q> and the like.
-                        
+            public List<O.LabelHelper2> labelHelper22 = null; //comes from smpl.labelHelper22
+
             public long counter = -12345;
 
             public void Exe()
@@ -8017,6 +8022,7 @@ namespace Gekko
                 //public IVariable tsBase = null;
                 public IVariable[] variable = new IVariable[2];  //first and ref
                 public string label = null;
+                public string label22 = null;
                 public List<string> label2 = null;  //unfolded labels, for instance x{#m} unfolded into xa and xb.
                 //public string originalLabel = null;
                 public string endoExoIndicator = null;

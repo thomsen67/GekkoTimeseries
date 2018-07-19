@@ -13937,6 +13937,18 @@ namespace Gekko
                 }
             }
 
+            if (Globals.runningOnTTComputer)
+            {
+                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\handleobey_" + inputFileLines2.Count + ".gcm", Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {
+                    foreach (string s in inputFileLines2)
+                    {
+                        sw.WriteLine(s);
+                    }
+                }
+            }
+
             return inputFileLines2;
         }
 
@@ -25445,16 +25457,23 @@ namespace Gekko
 
                         string lbl = null;
 
-                        //tt123
-                        if (element.label2 != null && n == element.label2.Count)
-                        {
-                            lbl = element.label2[i];
+                        if (o.labelHelper22 == null) {
+
+                            //tt123
+                            if (element.label2 != null && n == element.label2.Count)
+                            {
+                                lbl = element.label2[i];
+                            }
+                            else
+                            {
+                                lbl = RemoveSplitter(element.label);
+                            }
                         }
                         else
                         {
-                            lbl = RemoveSplitter(element.label);
+                            List<O.LabelHelper2> temp = o.labelHelper22;
+                           
                         }
-
 
                         // ----------------------------------------------------
                         // Labels end
