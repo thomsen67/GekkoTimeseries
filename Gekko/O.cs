@@ -272,7 +272,8 @@ namespace Gekko
         public static void PrtElementHandleLabel(GekkoSmpl smpl, O.Prt.Element ope0)
         {
             ope0.label2 = null;
-            Program.UnfoldLabels(ope0.label, ref ope0.label2, O.AddLabelHelper2(smpl));
+            ope0.label222 = smpl.labelHelper22;
+            Program.UnfoldLabels(ope0.label, ref ope0.label2, O.AddLabelHelper2(smpl));            
         }
 
         public static void GetFromAndToDatabanks(string opt_from, string opt_to, ref Databank fromBank, ref Databank toBank)
@@ -8023,7 +8024,9 @@ namespace Gekko
                 public IVariable[] variable = new IVariable[2];  //first and ref
                 public string label = null;
                 public string label22 = null;
+                
                 public List<string> label2 = null;  //unfolded labels, for instance x{#m} unfolded into xa and xb.
+                public List<O.LabelHelper2> label222 = null;
                 //public string originalLabel = null;
                 public string endoExoIndicator = null;
                 //-- layout

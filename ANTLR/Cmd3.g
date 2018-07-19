@@ -2554,7 +2554,7 @@ prtElements:                prtElement (COMMA2 prtElement)* -> ^(ASTPRTELEMENTS 
 prtElement:                 expression
                             gekkoLabel?
 							prtElementOptionField?
-							-> ^({token("ASTPRTELEMENT¤"+($expression.text)+"¤"+($gekkoLabel.text), ASTPRTELEMENT, 0)} ^(ASTEXPRESSION expression) gekkoLabel? prtElementOptionField?)
+							-> ^({token("ASTPRTELEMENT¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTPRTELEMENT, 0)} ^(ASTEXPRESSION expression) gekkoLabel? prtElementOptionField?)
 						    ;
 
 
