@@ -25459,6 +25459,9 @@ namespace Gekko
 
                         if (o.labelHelper22 == null) {
 
+
+
+
                             //tt123
                             if (element.label2 != null && n == element.label2.Count)
                             {
@@ -25471,8 +25474,74 @@ namespace Gekko
                         }
                         else
                         {
-                            List<O.LabelHelper2> temp = o.labelHelper22;
-                           
+
+                            G.Writeln2(element.label22);
+                            
+                            string[] w = element.label22.Split('|');
+                            string l = w[0];
+                            string tmp = w[1];
+                            string[] w2 = tmp.Substring(1, tmp.Length - 2).Split(',');
+                            G.Writeln("  " + l);
+                            G.Writeln("  " + w2[3]);
+                            string[] w3 = w2[3].Split(':');
+                            int i1 = int.Parse(w3[0]);
+                            int i2 = int.Parse(w3[1]);
+                            G.Writeln("  ---");
+                            foreach (O.LabelHelper2 y in element.label222)
+                            {
+                                string[] ss = y.s.Split('|');
+                                G.Writeln("  " + y.iv.ConvertToString());
+                                int count1 = 0;
+                                int length = 0;
+                                foreach (string s in ss)
+                                {
+                                    G.Writeln("  " + s);
+                                    if(count1==0) length = s.Length;
+                                    string s2 = s.Substring(1, s.Length - 2);
+                                    string[] sss = s2.Split(',');
+                                    
+                                    if (count1 > 0)
+                                    {
+                                        int count2 = 0;
+                                        foreach (string s3 in sss)
+                                        {
+                                            G.Writeln("    " + s3);
+                                            
+                                            if (count1 == 1 && count2 == 3)
+                                            {
+                                                
+                                                string[] w4 = s3.Split(':');
+                                                int ii1 = int.Parse(w4[0]);
+                                                int ii2 = int.Parse(w4[1]);
+                                                if (i1 != ii1)
+                                                {
+                                                    //TODO TODO TODO
+                                                    //TODO TODO TODO
+                                                    //TODO TODO TODO
+                                                    G.Writeln2("*** ERROR: Multiline expressions not supported in PRT/PLOT etc.");
+                                                    throw new GekkoException();
+                                                }
+                                                //G.Writeln("===> " + i1 + " " + i2 + " " + ii1 + " " + ii2);
+                                                int offset = ii2 - i2;
+                                                string xx= y.iv.ConvertToString();
+                                                G.Writeln("---> pos " + offset + " length " + length + " = " + xx);
+                                                string sNew = l;
+                                                string sNew2 = sNew.Substring(0, offset);
+                                                sNew2 = sNew2 + xx + sNew.Substring(offset + length, sNew.Length - offset - length);
+                                                G.Writeln("===> " + sNew2);
+
+
+                                            }
+                                            count2++;
+                                        }
+                                    }
+                                    count1++;
+                                }
+                            }
+                            G.Writeln("-------------------------");
+
+                            //List<O.LabelHelper2> temp = o.labelHelper22;
+
                         }
 
                         // ----------------------------------------------------

@@ -4426,7 +4426,8 @@ namespace Gekko.Parser.Gek
                             //node.Code.A("smpl" 
                             node.Code.A("ope" + Num(node) + ".variable[bankNumber] = " + node[0].Code + ";" + G.NL);
                             
-                            node.Code.A("if(bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope" + Num(node) + ");" + G.NL);
+                            //node.Code.A("if(bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope" + Num(node) + ");" + G.NL);
+                            node.Code.A("O.PrtElementHandleLabel(smpl, ope" + Num(node) + ");" + G.NL);
 
                             node.Code.A("}" + G.NL);  //end of bankNumbers
                             node.Code.A("smpl.bankNumber = 0;" + G.NL);  //resetting, probably superfluous

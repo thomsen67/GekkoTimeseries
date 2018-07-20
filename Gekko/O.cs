@@ -272,7 +272,8 @@ namespace Gekko
         public static void PrtElementHandleLabel(GekkoSmpl smpl, O.Prt.Element ope0)
         {
             ope0.label2 = null;
-            ope0.label222 = smpl.labelHelper22;
+            if (ope0.label222 == null) ope0.label222 = new List<LabelHelper2>();
+            ope0.label222.AddRange(smpl.labelHelper22);
             Program.UnfoldLabels(ope0.label, ref ope0.label2, O.AddLabelHelper2(smpl));            
         }
 
