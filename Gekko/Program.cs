@@ -25527,8 +25527,12 @@ namespace Gekko
                                                 G.Writeln("---> pos " + offset + " length " + length + " = " + xx);
                                                 string sNew = l;
                                                 string sNew2 = sNew.Substring(0, offset);
-                                                sNew2 = sNew2 + xx + sNew.Substring(offset + length, sNew.Length - offset - length);
-                                                G.Writeln("===> " + sNew2);
+                                                string sNew3 = xx;
+                                                string sNew4 = sNew.Substring(offset + length, sNew.Length - offset - length);
+
+
+
+                                                G.Writeln("===> " + sNew2 + sNew3 + sNew4);
 
 
                                             }
