@@ -13937,7 +13937,7 @@ namespace Gekko
                 }
             }
 
-            if (Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {
                 using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\handleobey_" + inputFileLines2.Count + ".gcm", Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
@@ -25458,10 +25458,7 @@ namespace Gekko
                         string lbl = null;
 
                         if (o.labelHelper22 == null) {
-
-
-
-
+                            
                             //tt123
                             if (element.label2 != null && n == element.label2.Count)
                             {
@@ -25475,27 +25472,37 @@ namespace Gekko
                         else
                         {
 
-                            G.Writeln2(element.label22);
+                            //G.Writeln2(element.label22);
                             
                             string[] w = element.label22.Split('|');
-                            string l = w[0];
+
+                            string[] result = new string[w[0].Length];
+                            int ci = 0;
+                            foreach (char c in w[0])
+                            {
+                                result[ci] = c.ToString();
+                                ci++;
+                            }
+
+                            //string l = w[0];
                             string tmp = w[1];
                             string[] w2 = tmp.Substring(1, tmp.Length - 2).Split(',');
-                            G.Writeln("  " + l);
-                            G.Writeln("  " + w2[3]);
+                            //G.Writeln("  " + result);
+                            //G.Writeln("  " + w2[3]);
                             string[] w3 = w2[3].Split(':');
                             int i1 = int.Parse(w3[0]);
                             int i2 = int.Parse(w3[1]);
-                            G.Writeln("  ---");
+                            //G.Writeln("  ---");
+                            //foreach recorded call of {} or []
                             foreach (O.LabelHelper2 y in element.label222)
                             {
                                 string[] ss = y.s.Split('|');
-                                G.Writeln("  " + y.iv.ConvertToString());
+                                //G.Writeln("  " + y.iv.ConvertToString());
                                 int count1 = 0;
                                 int length = 0;
                                 foreach (string s in ss)
                                 {
-                                    G.Writeln("  " + s);
+                                    //G.Writeln("  " + s);
                                     if(count1==0) length = s.Length;
                                     string s2 = s.Substring(1, s.Length - 2);
                                     string[] sss = s2.Split(',');
@@ -25505,7 +25512,7 @@ namespace Gekko
                                         int count2 = 0;
                                         foreach (string s3 in sss)
                                         {
-                                            G.Writeln("    " + s3);
+                                            //G.Writeln("    " + s3);
                                             
                                             if (count1 == 1 && count2 == 3)
                                             {
@@ -25524,15 +25531,29 @@ namespace Gekko
                                                 //G.Writeln("===> " + i1 + " " + i2 + " " + ii1 + " " + ii2);
                                                 int offset = ii2 - i2;
                                                 string xx= y.iv.ConvertToString();
-                                                G.Writeln("---> pos " + offset + " length " + length + " = " + xx);
-                                                string sNew = l;
-                                                string sNew2 = sNew.Substring(0, offset);
-                                                string sNew3 = xx;
-                                                string sNew4 = sNew.Substring(offset + length, sNew.Length - offset - length);
+                                                //G.Writeln("---> pos " + offset + " length " + length + " = " + xx);
+
+                                                result[offset] = xx;
+                                                for (int ii = offset + 1; ii < offset + length; ii++)
+                                                {
+                                                    result[ii] = null;
+                                                }
+                                                if (result[offset - 1] == "{" && result[offset + length] == "}")
+                                                {
+                                                    result[offset - 1] = null;
+                                                    result[offset + length] = null;
+                                                }                                                        
+
+                                                
+
+                                                //string sNew = l;
+                                                //string sNew2 = sNew.Substring(0, offset);
+                                                //string sNew3 = xx;
+                                                //string sNew4 = sNew.Substring(offset + length, sNew.Length - offset - length);
 
 
 
-                                                G.Writeln("===> " + sNew2 + sNew3 + sNew4);
+                                                //G.Writeln("===> " + u);
 
 
                                             }
@@ -25542,7 +25563,18 @@ namespace Gekko
                                     count1++;
                                 }
                             }
-                            G.Writeln("-------------------------");
+                            //G.Writeln("-------------------------");
+
+                            string u = null;
+                            foreach (string s5 in result)
+                            {
+                                if (s5 == null) continue;
+                                u = u + s5.Trim();
+                            }
+                            string result2 = G.ReplaceGlueNew(u);
+                            //G.Writeln2("===> " + result2);
+
+                            lbl = result2;
 
                             //List<O.LabelHelper2> temp = o.labelHelper22;
 
