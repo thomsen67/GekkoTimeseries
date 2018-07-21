@@ -25416,7 +25416,7 @@ namespace Gekko
                         int bankCombi = GetBankCombi(printCode);
 
                         //if ((bankCombi == 0 &&  explodeElement.variable[0].Type() == EVariableType.GekkoNull) || (bankCombi == 1 && explodeElement.variable[1].Type() == EVariableType.GekkoNull || bankCombi == 2 && (explodeElement.variable[0].Type() == EVariableType.GekkoNull || explodeElement.variable[1].Type() == EVariableType.GekkoNull)))
-                        
+
                         if ((bankCombi == 0 && IsNullSubSeries(explodeElement.variable[0])) || (bankCombi == 1 && IsNullSubSeries(explodeElement.variable[1])) || (bankCombi == 2 && (IsNullSubSeries(explodeElement.variable[0]) || IsNullSubSeries(explodeElement.variable[1]))))
                         {
                             //skip this column, probably a xx['something'] that is non-existing together with OPTION series array ignoremissing yes
@@ -25455,130 +25455,7 @@ namespace Gekko
                         // Labels start
                         // ----------------------------------------------------
 
-                        string lbl = null;
-
-                        if (o.labelHelper22 == null) {
-                            
-                            //tt123
-                            if (element.label2 != null && n == element.label2.Count)
-                            {
-                                lbl = element.label2[i];
-                            }
-                            else
-                            {
-                                lbl = RemoveSplitter(element.label);
-                            }
-                        }
-                        else
-                        {
-
-                            //G.Writeln2(element.label22);
-                            
-                            string[] w = element.label22.Split('|');
-
-                            string[] result = new string[w[0].Length];
-                            int ci = 0;
-                            foreach (char c in w[0])
-                            {
-                                result[ci] = c.ToString();
-                                ci++;
-                            }
-
-                            //string l = w[0];
-                            string tmp = w[1];
-                            string[] w2 = tmp.Substring(1, tmp.Length - 2).Split(',');
-                            //G.Writeln("  " + result);
-                            //G.Writeln("  " + w2[3]);
-                            string[] w3 = w2[3].Split(':');
-                            int i1 = int.Parse(w3[0]);
-                            int i2 = int.Parse(w3[1]);
-                            //G.Writeln("  ---");
-                            //foreach recorded call of {} or []
-                            foreach (O.LabelHelper2 y in element.label222)
-                            {
-                                string[] ss = y.s.Split('|');
-                                //G.Writeln("  " + y.iv.ConvertToString());
-                                int count1 = 0;
-                                int length = 0;
-                                foreach (string s in ss)
-                                {
-                                    //G.Writeln("  " + s);
-                                    if(count1==0) length = s.Length;
-                                    string s2 = s.Substring(1, s.Length - 2);
-                                    string[] sss = s2.Split(',');
-                                    
-                                    if (count1 > 0)
-                                    {
-                                        int count2 = 0;
-                                        foreach (string s3 in sss)
-                                        {
-                                            //G.Writeln("    " + s3);
-                                            
-                                            if (count1 == 1 && count2 == 3)
-                                            {
-                                                
-                                                string[] w4 = s3.Split(':');
-                                                int ii1 = int.Parse(w4[0]);
-                                                int ii2 = int.Parse(w4[1]);
-                                                if (i1 != ii1)
-                                                {
-                                                    //TODO TODO TODO
-                                                    //TODO TODO TODO
-                                                    //TODO TODO TODO
-                                                    G.Writeln2("*** ERROR: Multiline expressions not supported in PRT/PLOT etc.");
-                                                    throw new GekkoException();
-                                                }
-                                                //G.Writeln("===> " + i1 + " " + i2 + " " + ii1 + " " + ii2);
-                                                int offset = ii2 - i2;
-                                                string xx= y.iv.ConvertToString();
-                                                //G.Writeln("---> pos " + offset + " length " + length + " = " + xx);
-
-                                                result[offset] = xx;
-                                                for (int ii = offset + 1; ii < offset + length; ii++)
-                                                {
-                                                    result[ii] = null;
-                                                }
-                                                if (result[offset - 1] == "{" && result[offset + length] == "}")
-                                                {
-                                                    result[offset - 1] = null;
-                                                    result[offset + length] = null;
-                                                }                                                        
-
-                                                
-
-                                                //string sNew = l;
-                                                //string sNew2 = sNew.Substring(0, offset);
-                                                //string sNew3 = xx;
-                                                //string sNew4 = sNew.Substring(offset + length, sNew.Length - offset - length);
-
-
-
-                                                //G.Writeln("===> " + u);
-
-
-                                            }
-                                            count2++;
-                                        }
-                                    }
-                                    count1++;
-                                }
-                            }
-                            //G.Writeln("-------------------------");
-
-                            string u = null;
-                            foreach (string s5 in result)
-                            {
-                                if (s5 == null) continue;
-                                u = u + s5.Trim();
-                            }
-                            string result2 = G.ReplaceGlueNew(u);
-                            //G.Writeln2("===> " + result2);
-
-                            lbl = result2;
-
-                            //List<O.LabelHelper2> temp = o.labelHelper22;
-
-                        }
+                        string lbl = OPrintLabels(o, element, n, i);
 
                         // ----------------------------------------------------
                         // Labels end
@@ -26568,6 +26445,137 @@ namespace Gekko
                 CrossThreadStuff.CopyButtonEnabled(true);
                 //PrtClipboard(table, false);
             }
+        }
+
+        private static string OPrintLabels(O.Prt o, O.Prt.Element element, int n, int i)
+        {
+            string lbl = null;
+
+            if (o.labelHelper22 == null)
+            {
+
+                //tt123
+                if (element.label2 != null && n == element.label2.Count)
+                {
+                    lbl = element.label2[i];
+                }
+                else
+                {
+                    lbl = RemoveSplitter(element.label);
+                }
+            }
+            else
+            {
+
+                //G.Writeln2(element.label22);
+
+                string[] w = element.label22.Split('|');
+
+                string[] result = new string[w[0].Length];
+                int ci = 0;
+                foreach (char c in w[0])
+                {
+                    result[ci] = c.ToString();
+                    ci++;
+                }
+
+                //string l = w[0];
+                string tmp = w[1];
+                string[] w2 = tmp.Substring(1, tmp.Length - 2).Split(',');
+                //G.Writeln("  " + result);
+                //G.Writeln("  " + w2[3]);
+                string[] w3 = w2[3].Split(':');
+                int i1 = int.Parse(w3[0]);
+                int i2 = int.Parse(w3[1]);
+                //G.Writeln("  ---");
+                //foreach recorded call of {} or []
+                foreach (O.LabelHelper2 y in element.label222)
+                {
+                    string[] ss = y.s.Split('|');
+                    //G.Writeln("  " + y.iv.ConvertToString());
+                    int count1 = 0;
+                    int length = 0;
+                    foreach (string s in ss)
+                    {
+                        //G.Writeln("  " + s);
+                        if (count1 == 0) length = s.Length;
+                        string s2 = s.Substring(1, s.Length - 2);
+                        string[] sss = s2.Split(',');
+
+                        if (count1 > 0)
+                        {
+                            int count2 = 0;
+                            foreach (string s3 in sss)
+                            {
+                                //G.Writeln("    " + s3);
+
+                                if (count1 == 1 && count2 == 3)
+                                {
+
+                                    string[] w4 = s3.Split(':');
+                                    int ii1 = int.Parse(w4[0]);
+                                    int ii2 = int.Parse(w4[1]);
+                                    if (i1 != ii1)
+                                    {
+                                        //TODO TODO TODO
+                                        //TODO TODO TODO
+                                        //TODO TODO TODO
+                                        G.Writeln2("*** ERROR: Multiline expressions not supported in PRT/PLOT etc.");
+                                        throw new GekkoException();
+                                    }
+                                    //G.Writeln("===> " + i1 + " " + i2 + " " + ii1 + " " + ii2);
+                                    int offset = ii2 - i2;
+                                    string xx = y.iv.ConvertToString();
+                                    //G.Writeln("---> pos " + offset + " length " + length + " = " + xx);
+
+                                    result[offset] = xx;
+                                    for (int ii = offset + 1; ii < offset + length; ii++)
+                                    {
+                                        result[ii] = null;
+                                    }
+                                    if (result[offset - 1] == "{" && result[offset + length] == "}")
+                                    {
+                                        result[offset - 1] = null;
+                                        result[offset + length] = null;
+                                    }
+
+
+
+                                    //string sNew = l;
+                                    //string sNew2 = sNew.Substring(0, offset);
+                                    //string sNew3 = xx;
+                                    //string sNew4 = sNew.Substring(offset + length, sNew.Length - offset - length);
+
+
+
+                                    //G.Writeln("===> " + u);
+
+
+                                }
+                                count2++;
+                            }
+                        }
+                        count1++;
+                    }
+                }
+                //G.Writeln("-------------------------");
+
+                string u = null;
+                foreach (string s5 in result)
+                {
+                    if (s5 == null) continue;
+                    u = u + s5.Trim();
+                }
+                string result2 = G.ReplaceGlueNew(u);
+                //G.Writeln2("===> " + result2);
+
+                lbl = result2;
+
+                //List<O.LabelHelper2> temp = o.labelHelper22;
+
+            }
+
+            return lbl;
         }
 
         public static bool IsNullSubSeries(IVariable x)
