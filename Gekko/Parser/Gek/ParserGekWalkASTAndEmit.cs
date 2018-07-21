@@ -4396,7 +4396,7 @@ namespace Gekko.Parser.Gek
                                 freelists = Globals.freelists + freelists + Globals.freelists;
                             }                            
 
-                            node.Code.A("ope" + Num(node) + ".label22 = `" + freelists + node.specialExpressionAndLabelInfo[1] + "|" + node.specialExpressionAndLabelInfo[2] + "|" + node.specialExpressionAndLabelInfo[3] + "`;" + G.NL);
+                            node.Code.A("ope" + Num(node) + ".label22 = new List<string>() { `" + freelists + node.specialExpressionAndLabelInfo[1] + "|" + node.specialExpressionAndLabelInfo[2] + "|" + node.specialExpressionAndLabelInfo[3] + "`};" + G.NL);
                             givenLabel = givenLabel.Replace(G.NL, "");  //remove any newlines, else C# code will become invalid.
                             node.Code.A("ope" + Num(node) + ".label = `" + freelists + givenLabel + "`;" + G.NL);
 

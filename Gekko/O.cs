@@ -8024,7 +8024,7 @@ namespace Gekko
                 //public IVariable tsBase = null;
                 public IVariable[] variable = new IVariable[2];  //first and ref
                 public string label = null;
-                public string label22 = null;
+                public List<string> label22 = null;
                 
                 public List<string> label2 = null;  //unfolded labels, for instance x{#m} unfolded into xa and xb.
                 public List<O.LabelHelper2> label222 = null;

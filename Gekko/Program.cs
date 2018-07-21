@@ -25455,7 +25455,7 @@ namespace Gekko
                         // Labels start
                         // ----------------------------------------------------
 
-                        string lbl = OPrintLabels(o, element, n, i);
+                        List<string> lbl = OPrintLabels(o, element, n, i);
 
                         // ----------------------------------------------------
                         // Labels end
@@ -25475,7 +25475,7 @@ namespace Gekko
                             widthHere = explodeElement.widthFinal;
                         }
 
-                        int max2 = PrintCreateLabelsArrayNew(lbl, widthHere, lines, lines * widthHere, out explodeElement.label2);
+                        int max2 = PrintCreateLabelsArrayNew(lbl[0], widthHere, lines, lines * widthHere, out explodeElement.label2);
 
                         labelMaxLine = Math.Max(max2, labelMaxLine);
 
@@ -26447,9 +26447,9 @@ namespace Gekko
             }
         }
 
-        private static string OPrintLabels(O.Prt o, O.Prt.Element element, int n, int i)
+        private static List<string> OPrintLabels(O.Prt o, O.Prt.Element element, int n, int i)
         {
-            string lbl = null;
+            List<string> lbl = null;
 
             if (o.labelHelper22 == null)
             {
@@ -26457,11 +26457,11 @@ namespace Gekko
                 //tt123
                 if (element.label2 != null && n == element.label2.Count)
                 {
-                    lbl = element.label2[i];
+                    lbl[0] = element.label2[i];
                 }
                 else
                 {
-                    lbl = RemoveSplitter(element.label);
+                    lbl[0] = RemoveSplitter(element.label);
                 }
             }
             else
@@ -26469,7 +26469,7 @@ namespace Gekko
 
                 //G.Writeln2(element.label22);
 
-                string[] w = element.label22.Split('|');
+                string[] w = element.label22[0].Split('|');
 
                 string[] result = new string[w[0].Length];
                 int ci = 0;
@@ -26569,7 +26569,7 @@ namespace Gekko
                 string result2 = G.ReplaceGlueNew(u);
                 //G.Writeln2("===> " + result2);
 
-                lbl = result2;
+                lbl = new List<string>() { result2 };
 
                 //List<O.LabelHelper2> temp = o.labelHelper22;
 

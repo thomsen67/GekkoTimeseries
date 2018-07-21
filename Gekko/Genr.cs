@@ -132,7 +132,7 @@ namespace Gekko
                 {
                     List<int> bankNumbers = null;
                     O.Prt.Element ope12 = new O.Prt.Element();
-                    ope12.label22 = "|||d|||{#¨d}|[@104,287:287='{',<1190>,17:2]|[@108,291:291='}',<1165>,17:6]";
+                    //ope12.label22 = "|||d|||{#¨d}|[@104,287:287='{',<1190>,17:2]|[@108,291:291='}',<1165>,17:6]";
                     ope12.label = "|||d|||[<{THIS IS A LABEL}>][@104,287:287='{',<1190>,17:2]";
                     smpl = new GekkoSmpl(o12.t1.Add(-2), o12.t2);
                     ope12.printCodesFinal = Program.GetElementPrintCodes(o12, ope12); bankNumbers = O.Prt.GetBankNumbers(null, ope12.printCodesFinal);
