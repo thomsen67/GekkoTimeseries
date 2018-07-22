@@ -25236,7 +25236,16 @@ namespace Gekko
             //TODO: we could check if there is 1 object printed and it is of type=normal. If so, the label could be printed.
             //  if .meta is augmented with a pointer to the array-series, the label for x[a] could be taken via that pointer.
 
-            
+            foreach (var x in o.prtElements)
+            {
+                G.Write("-=-->");
+                foreach (var y in x.label222)
+                {
+                    string s = y.iv.ConvertToString();
+                    G.Write(s + ", ");
+                }
+                G.Writeln();
+            }
 
             EPrintTypes type = EPrintTypes.Print;
             if (G.Equal(o.prtType, "plot")) type = EPrintTypes.Plot;
@@ -25284,25 +25293,7 @@ namespace Gekko
                 if (xx0 != null) n = xx0.list.Count;
                 else if (xx1 != null) n = xx1.list.Count;
 
-                //string label = null;
                 
-                //tt123
-                //List<string> labels2 = new List<string>();
-
-                // ---------------------------------------------------------------------
-                // --------------- unfold labels start ---------------------------------
-                // ---------------------------------------------------------------------
-
-                //tt123
-                //if (false)
-                //{
-                //    if (unfoldLabels) UnfoldLabels(element.label, ref labels2, o.labelHelper2);  //unfolding over #m1 and #m2 etc.                
-                //}
-
-                // ---------------------------------------------------------------------
-                // --------------- unfold labels end -----------------------------------
-                // ---------------------------------------------------------------------
-
 
                 for (int i = 0; i < n; i++)  //this element may be a #-list with 2 timeseries, x1 and x2
                 {
@@ -25455,7 +25446,21 @@ namespace Gekko
                         // Labels start
                         // ----------------------------------------------------
 
-                        List<string> lbl = OPrintLabels(o, element, n, i);
+                        List<string> lbl = new List<string>() { "[error1]", "[error2]" };
+                        try
+                        {
+                            lbl = OPrintLabels(element, n, i);
+                        }
+                        catch
+                        {
+
+                        }
+
+                        if (lbl.Count != n)
+                        {
+                            G.Writeln2("*** ERROR: Mismatch");
+                            throw new GekkoException();
+                        }
 
                         // ----------------------------------------------------
                         // Labels end
@@ -25475,7 +25480,7 @@ namespace Gekko
                             widthHere = explodeElement.widthFinal;
                         }
 
-                        int max2 = PrintCreateLabelsArrayNew(lbl[0], widthHere, lines, lines * widthHere, out explodeElement.label2);
+                        int max2 = PrintCreateLabelsArrayNew(lbl[i], widthHere, lines, lines * widthHere, out explodeElement.label2);
 
                         labelMaxLine = Math.Max(max2, labelMaxLine);
 
@@ -26447,11 +26452,11 @@ namespace Gekko
             }
         }
 
-        private static List<string> OPrintLabels(O.Prt o, O.Prt.Element element, int n, int i)
+        private static List<string> OPrintLabels(O.Prt.Element element, int n, int i)
         {
             List<string> lbl = null;
 
-            if (o.labelHelper22 == null)
+            if (false)
             {
 
                 //tt123
