@@ -26454,7 +26454,7 @@ namespace Gekko
 
         private static List<string> OPrintLabels(O.Prt.Element element, int n, int i)
         {
-            List<string> lbl = null;
+            List<string> lbl = new List<string>();  //this must end up with as many strings as the element has subelements (sublist)
 
             if (false)
             {
@@ -26474,7 +26474,7 @@ namespace Gekko
 
                 //G.Writeln2(element.label22);
 
-                string[] w = element.label22[0].Split('|');
+                string[] w = RemoveSplitter(element.label22[0]).Split('|');  //raw label               
 
                 string[] result = new string[w[0].Length];
                 int ci = 0;
@@ -26494,7 +26494,7 @@ namespace Gekko
                 int i2 = int.Parse(w3[1]);
                 //G.Writeln("  ---");
                 //foreach recorded call of {} or []
-                foreach (O.LabelHelper2 y in element.label222)
+                foreach (O.LabelHelper2 y in element.label222)  //foreach RecordLabel()
                 {
                     string[] ss = y.s.Split('|');
                     //G.Writeln("  " + y.iv.ConvertToString());
@@ -26562,19 +26562,22 @@ namespace Gekko
                         }
                         count1++;
                     }
+
+                    string u = null;
+                    foreach (string s5 in result)
+                    {
+                        if (s5 == null) continue;
+                        u = u + s5.Trim();
+                    }
+                    string result2 = G.ReplaceGlueNew(u);
+                    //G.Writeln2("===> " + result2);
+
+                    lbl.Add(result2);
+
                 }
                 //G.Writeln("-------------------------");
 
-                string u = null;
-                foreach (string s5 in result)
-                {
-                    if (s5 == null) continue;
-                    u = u + s5.Trim();
-                }
-                string result2 = G.ReplaceGlueNew(u);
-                //G.Writeln2("===> " + result2);
-
-                lbl = new List<string>() { result2 };
+                
 
                 //List<O.LabelHelper2> temp = o.labelHelper22;
 
