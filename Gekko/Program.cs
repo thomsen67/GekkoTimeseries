@@ -26520,85 +26520,95 @@ namespace Gekko
                     counter++;
                     string[] ss = y.s.Split('|');
                     //G.Writeln("  " + y.iv.ConvertToString());
-                    int count1 = 0;
+                    int count1 = -1;
                     int length = 0;
-                    foreach (string s in ss)
+
+
+                    if (false)
                     {
-                        //G.Writeln("  " + s);
-                        if (count1 == 0) length = s.Length;                        
-                        string s2 = s.Substring(1, s.Length - 2);
-                        string[] sss = s2.Split(',');
 
-                        if (count1 > 0)
+                    }
+                    else
+                    {
+                        foreach (string s in ss)
                         {
-                            int count2 = 0;
-                            foreach (string s3 in sss)
+                            count1++;
+                            //if (count1 == 0) length = s.Length;
+                            length = ss[0].Length;
+
+                            if (count1 > 0)
                             {
-                                //G.Writeln("    " + s3);
-
-                                if (count1 == 1 && count2 == 3)
+                                string s2 = s.Substring(1, s.Length - 2);  //remove [ and ]                            
+                                string[] sss = s2.Split(',');
+                                int count2 = -1;
+                                foreach (string s3 in sss)
                                 {
-
-                                    string[] w4 = s3.Split(':');
-                                    int ii1 = int.Parse(w4[0]);
-                                    int ii2 = int.Parse(w4[1]);
-                                    if (i1 != ii1)
+                                    //G.Writeln("    " + s3);
+                                    count2++;
+                                    if (count1 == 1 && count2 == 3)
                                     {
-                                        //TODO TODO TODO
-                                        //TODO TODO TODO
-                                        //TODO TODO TODO
-                                        G.Writeln2("*** ERROR: Multiline expressions not supported in PRT/PLOT etc.");
-                                        throw new GekkoException();
+
+                                        string[] w4 = s3.Split(':');
+                                        int ii1 = int.Parse(w4[0]);
+                                        int ii2 = int.Parse(w4[1]);
+                                        if (i1 != ii1)
+                                        {
+                                            //TODO TODO TODO
+                                            //TODO TODO TODO
+                                            //TODO TODO TODO
+                                            G.Writeln2("*** ERROR: Multiline expressions not supported in PRT/PLOT etc.");
+                                            throw new GekkoException();
+                                        }
+                                        //G.Writeln("===> " + i1 + " " + i2 + " " + ii1 + " " + ii2);
+                                        int offset = ii2 - i2;
+                                        string xx = y.iv.ConvertToString();
+                                        //G.Writeln("---> pos " + offset + " length " + length + " = " + xx);
+
+                                        result[offset] = xx;
+                                        for (int ii = offset + 1; ii < offset + length; ii++)
+                                        {
+                                            result[ii] = null;
+                                        }
+                                        if (result[offset - 1] == "{" && result[offset + length] == "}")
+                                        {
+                                            result[offset - 1] = null;
+                                            result[offset + length] = null;
+                                        }
+
+
+
+                                        //string sNew = l;
+                                        //string sNew2 = sNew.Substring(0, offset);
+                                        //string sNew3 = xx;
+                                        //string sNew4 = sNew.Substring(offset + length, sNew.Length - offset - length);
+
+
+
+                                        //G.Writeln("===> " + u);
+
+
                                     }
-                                    //G.Writeln("===> " + i1 + " " + i2 + " " + ii1 + " " + ii2);
-                                    int offset = ii2 - i2;
-                                    string xx = y.iv.ConvertToString();
-                                    //G.Writeln("---> pos " + offset + " length " + length + " = " + xx);
-
-                                    result[offset] = xx;
-                                    for (int ii = offset + 1; ii < offset + length; ii++)
-                                    {
-                                        result[ii] = null;
-                                    }
-                                    if (result[offset - 1] == "{" && result[offset + length] == "}")
-                                    {
-                                        result[offset - 1] = null;
-                                        result[offset + length] = null;
-                                    }
-
-
-
-                                    //string sNew = l;
-                                    //string sNew2 = sNew.Substring(0, offset);
-                                    //string sNew3 = xx;
-                                    //string sNew4 = sNew.Substring(offset + length, sNew.Length - offset - length);
-
-
-
-                                    //G.Writeln("===> " + u);
-
 
                                 }
-                                count2++;
                             }
                         }
-                        count1++;
-                    }
 
-                    string u = null;
-                    foreach (string s5 in result)
-                    {
-                        if (s5 == null) continue;
-                        u = u + s5.Trim();
-                    }
-                    string result2 = G.ReplaceGlueNew(u);
-                    //G.Writeln2("===> " + result2);
+                        string u = null;
+                        foreach (string s5 in result)
+                        {
+                            if (s5 == null) continue;
+                            string s6 = s5;
+                            if (s5.Trim() != "") s6 = s5.Trim();  //just safety
+                            u = u + s6;
+                        }
+                        string result2 = G.ReplaceGlueNew(u);
+                        //G.Writeln2("===> " + result2);
 
-                    if (counter % nn == nn - 1)
-                    {
-                        lbl.Add(result2);
+                        if (counter % nn == nn - 1)
+                        {
+                            lbl.Add(result2);
+                        }
                     }
-
                 }
                 //G.Writeln("-------------------------");
 
