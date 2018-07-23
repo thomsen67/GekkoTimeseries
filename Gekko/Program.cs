@@ -25238,7 +25238,7 @@ namespace Gekko
 
             foreach (var x in o.prtElements)
             {
-                G.Write("-=-->");
+                //G.Write("-=-->");
                 foreach (var y in x.label222)
                 {
                     string s = y.iv.ConvertToString();

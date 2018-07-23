@@ -1224,7 +1224,7 @@ namespace Gekko.Parser.Gek
                                 //only for PRT-type or DISP, and only if the {} is not inside [] or {}.
                                 if (node.specialExpressionAndLabelInfo != null)
                                 {
-                                    node.Code.CA(Globals.reportLabel1 + "" + s + ", `" + ReportLabelHelper(node) + Globals.reportLabel2 + "`");
+                                    node.Code.CA(Globals.reportLabel1 + "" + s + ", `" + ReportLabelHelper(node) + "`" + Globals.reportLabel2);
                                 }
                                 else
                                 {
@@ -2935,6 +2935,8 @@ namespace Gekko.Parser.Gek
                             //LIGHTFIXME, isRhs
 
                             bool reportInterior = ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent));
+                            if (node[1].Text == "ASTDOT")
+                                reportInterior = false;  //never for #x.??? type indexing
                             
                             string indexes = null;
                             string indexesReport = null;
@@ -3089,7 +3091,7 @@ namespace Gekko.Parser.Gek
                             }
                             if (node.specialExpressionAndLabelInfo != null)
                             {
-                                node.Code.CA(Globals.reportLabel1 + node.Code + ", `" + ReportLabelHelper(node) + Globals.reportLabel2 + "`");
+                                node.Code.CA(Globals.reportLabel1 + node.Code + ", `" + ReportLabelHelper(node) + "`" + Globals.reportLabel2);
                             }
                         }
                         break;
