@@ -26456,6 +26456,8 @@ namespace Gekko
         {
             List<string> lbl = new List<string>();  //this must end up with as many strings as the element has subelements (sublist)
 
+            //for prt {#i}{#j} 
+
             if (false)
             {
 
@@ -26472,6 +26474,10 @@ namespace Gekko
             else
             {
 
+                //n is the number of subelements for the prtElement (for example if the item is a list like {#m}).
+
+                int nn = element.label222.Count / n;  //how many inserts per column
+                
                 //G.Writeln2(element.label22);
 
                 string[] w = RemoveSplitter(element.label22[0]).Split('|');  //raw label               
@@ -26483,7 +26489,7 @@ namespace Gekko
                     result[ci] = c.ToString();
                     ci++;
                 }
-
+                
                 //string l = w[0];
                 string tmp = w[1];
                 string[] w2 = tmp.Substring(1, tmp.Length - 2).Split(',');
@@ -26493,9 +26499,16 @@ namespace Gekko
                 int i1 = int.Parse(w3[0]);
                 int i2 = int.Parse(w3[1]);
                 //G.Writeln("  ---");
-                //foreach recorded call of {} or []
+
+                //result is the raw label, char by char
+                //the indexes i1 and i2 show the line and pos in the input file
+                //now we are going to insert items from RecordLabel() into this result string.
+
+                //foreach recorded call of {} or [], via RecordLabel()
+                int counter = -1;
                 foreach (O.LabelHelper2 y in element.label222)  //foreach RecordLabel()
                 {
+                    counter++;
                     string[] ss = y.s.Split('|');
                     //G.Writeln("  " + y.iv.ConvertToString());
                     int count1 = 0;
@@ -26572,7 +26585,10 @@ namespace Gekko
                     string result2 = G.ReplaceGlueNew(u);
                     //G.Writeln2("===> " + result2);
 
-                    lbl.Add(result2);
+                    if (counter % nn == nn - 1)
+                    {
+                        lbl.Add(result2);
+                    }
 
                 }
                 //G.Writeln("-------------------------");
