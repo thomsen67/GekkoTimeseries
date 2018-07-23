@@ -629,6 +629,10 @@ namespace Gekko.Parser.Gek
                     {
                         flag = true;
                     }
+                    else if (ast.Text.StartsWith("ASTINDEXERELEMENTIDENT" + "¤"))
+                    {
+                        flag = true;
+                    }
                 }                
                 
                 if (flag)

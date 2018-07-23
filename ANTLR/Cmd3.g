@@ -1962,7 +1962,7 @@ dollarConditional:          LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITI
 
 bankvarnameindex:           bankvarname ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 bankvarname expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!  //should catch #i0[#i], does not need a parenthesis!						
 					
-indexerExpressionHelper:    ident -> ^(ASTINDEXERELEMENTIDENT ident)   
+indexerExpressionHelper:    ident -> ^({token("ASTINDEXERELEMENTIDENT¤"+($ident.text)+"¤"+($ident.start)+"¤"+($ident.stop), ASTINDEXERELEMENTIDENT, 0)} ident)
 						  | expressionOrNothing doubleDot expressionOrNothing -> ^(ASTINDEXERELEMENT expressionOrNothing expressionOrNothing)     //'fm1'..'fm5'
 						  | expression -> ^({token("ASTINDEXERELEMENT¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTINDEXERELEMENT, 0)} expression)                                     //'fm*' or -2 or 2000 or 2010q3
 						  | PLUS expression -> ^(ASTINDEXERELEMENTPLUS expression)                            //+1

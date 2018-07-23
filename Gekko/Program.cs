@@ -25446,7 +25446,8 @@ namespace Gekko
                         // Labels start
                         // ----------------------------------------------------
 
-                        List<string> lbl = new List<string>() { "[error1]", "[error2]" };
+                        List<string> lbl = new List<string>();  //count = 0!
+
                         try
                         {
                             lbl = OPrintLabels(element, n, i);
@@ -26524,7 +26525,7 @@ namespace Gekko
                     foreach (string s in ss)
                     {
                         //G.Writeln("  " + s);
-                        if (count1 == 0) length = s.Length;
+                        if (count1 == 0) length = s.Length;                        
                         string s2 = s.Substring(1, s.Length - 2);
                         string[] sss = s2.Split(',');
 
