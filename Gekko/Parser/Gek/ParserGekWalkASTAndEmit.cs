@@ -1224,7 +1224,7 @@ namespace Gekko.Parser.Gek
                                 //only for PRT-type or DISP, and only if the {} is not inside [] or {}.
                                 if (node.specialExpressionAndLabelInfo != null)
                                 {
-                                    node.Code.CA(Globals.reportLabel1 + "smpl, " + s + ", `" + node.specialExpressionAndLabelInfo[1] + "|" + node.specialExpressionAndLabelInfo[2] + "|" + node.specialExpressionAndLabelInfo[3] + "`" + Globals.reportLabel2);
+                                    node.Code.CA(Globals.reportLabel1 + "" + s + ", `" + node.specialExpressionAndLabelInfo[1] + "|" + node.specialExpressionAndLabelInfo[2] + "|" + node.specialExpressionAndLabelInfo[3] + "`" + Globals.reportLabel2);
                                 }
                                 else
                                 {
@@ -1421,7 +1421,8 @@ namespace Gekko.Parser.Gek
                             if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent))
                             {
                                 //only for PRT-type or DISP, and only if the [] is not inside [] or {}.
-                                node.Code.A("O.ListContains(" + node[0].Code + "," + Globals.reportInterior1 + indexes + ", " + "0" + ", " + Globals.labelCounter + Globals.reportInterior2 + ")");
+                                //node.Code.A("O.ListContains(" + node[0].Code + "," + Globals.reportInterior1 + indexes + ", " + "0" + ", " + Globals.labelCounter + Globals.reportInterior2 + ")");
+                                node.Code.A("O.ListContains(" + node[0].Code + "," + Globals.reportLabel1 + indexes + Globals.reportLabel2 + ")");
                             }
                             else
                             {
@@ -2934,8 +2935,7 @@ namespace Gekko.Parser.Gek
                             //LIGHTFIXME, isRhs
 
                             bool reportInterior = ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent));
-                            reportInterior = false;
-
+                            
                             string indexes = null;
                             string indexesReport = null;
                             
@@ -2961,7 +2961,8 @@ namespace Gekko.Parser.Gek
                                             indexes += s;
                                             if (reportInterior)
                                             {
-                                                indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
+                                                //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
+                                                indexesReport += Globals.reportLabel1 + s + Globals.reportLabel2;
                                             }
                                         }
                                         else
@@ -2970,7 +2971,8 @@ namespace Gekko.Parser.Gek
                                             indexes += s;
                                             if (reportInterior)
                                             {
-                                                indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
+                                                //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
+                                                indexesReport += Globals.reportLabel1 + s + Globals.reportLabel2;
                                             }
                                         }
                                     }
@@ -2980,7 +2982,8 @@ namespace Gekko.Parser.Gek
                                         indexes += s;
                                         if (reportInterior)
                                         {
-                                            indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
+                                            //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
+                                            indexesReport += Globals.reportLabel1 + s + Globals.reportLabel2;
                                         }
                                     }
                                     if (i < node[1].ChildrenCount() - 1)
@@ -3009,7 +3012,8 @@ namespace Gekko.Parser.Gek
                                     if (reportInterior)
                                     {
                                         //only for PRT-type or DISP, and only if the [] is not inside [] or {}.
-                                        indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
+                                        //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
+                                        indexesReport += Globals.reportLabel1 + "" + s + Globals.reportLabel2;
                                     }
 
                                     if (i < node[1].ChildrenCount() - 1)
@@ -3085,7 +3089,7 @@ namespace Gekko.Parser.Gek
                             }
                             if (node.specialExpressionAndLabelInfo != null)
                             {
-                                node.Code.CA(Globals.reportLabel1 + "smpl, " + node.Code + ", `" + node.specialExpressionAndLabelInfo[1] + "|" + node.specialExpressionAndLabelInfo[2] + "|" + node.specialExpressionAndLabelInfo[3] + "`" + Globals.reportLabel2);
+                                node.Code.CA(Globals.reportLabel1 + "" + node.Code + ", `" + node.specialExpressionAndLabelInfo[1] + "|" + node.specialExpressionAndLabelInfo[2] + "|" + node.specialExpressionAndLabelInfo[3] + "`" + Globals.reportLabel2);
                             }
                         }
                         break;
