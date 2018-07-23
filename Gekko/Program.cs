@@ -26476,11 +26476,19 @@ namespace Gekko
 
                 //n is the number of subelements for the prtElement (for example if the item is a list like {#m}).
 
-                int nn = element.label222.Count / n;  //how many inserts per column
                 
+
                 //G.Writeln2(element.label22);
 
-                string[] w = RemoveSplitter(element.label22[0]).Split('|');  //raw label               
+                string[] w = RemoveSplitter(element.label22[0]).Split('|');  //raw label   
+
+                if (element.label222.Count == 0)
+                {
+                    lbl.Add(G.ReplaceGlueNew(w[0]));
+                    return lbl;
+                }
+
+                int nn = element.label222.Count / n;  //how many inserts per column
 
                 string[] result = new string[w[0].Length];
                 int ci = 0;
