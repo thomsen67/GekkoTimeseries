@@ -109,7 +109,7 @@ namespace Gekko
         public GekkoSmplCommand command = GekkoSmplCommand.Unknown;
         public List<O.LabelHelperIVariable> labelHelper = new List<O.LabelHelperIVariable>(); //not created all the time, so ok
         public List<List<O.LabelHelperIVariable>> labelHelper2 = new List<List<O.LabelHelperIVariable>>(); //not created all the time, so ok
-        public List<O.LabelHelper2> labelHelper22 = new List<O.LabelHelper2>();
+        public List<O.LabelHelper2> labelRecordedPieces = new List<O.LabelHelper2>();
         public P p;
 
         public GekkoSmpl()
@@ -25239,7 +25239,7 @@ namespace Gekko
             foreach (var x in o.prtElements)
             {
                 //G.Write("-=-->");
-                foreach (var y in x.label222)
+                foreach (var y in x.labelRecordedPieces)
                 {
                     string s = y.iv.ConvertToString();
                     G.Write(s + ", ");
@@ -26459,133 +26459,96 @@ namespace Gekko
 
             //for prt {#i}{#j} 
 
-            if (false)
-            {
+            //n is the number of subelements for the prtElement (for example if the item is a list like {#m}).
 
-                //tt123
-                if (element.label2 != null && n == element.label2.Count)
-                {
-                    lbl[0] = element.label2[i];
-                }
-                else
-                {
-                    lbl[0] = RemoveSplitter(element.label);
-                }
+            string[] w = RemoveSplitter(element.labelGiven[0]).Split('|');  //raw label   
+
+            if (element.labelRecordedPieces.Count == 0)
+            {
+                lbl.Add(G.ReplaceGlueNew(w[0]));
+                return lbl;
             }
-            else
+
+            int nn = element.labelRecordedPieces.Count / n;  //how many inserts per column
+
+            string[] result = new string[w[0].Length];
+            int ci = 0;
+            foreach (char c in w[0])
             {
+                result[ci] = c.ToString();
+                ci++;
+            }
 
-                //n is the number of subelements for the prtElement (for example if the item is a list like {#m}).
+            string tmp = w[1];
+            string[] w2 = tmp.Substring(1, tmp.Length - 2).Split(',');
 
+            string[] w3 = w2[3].Split(':');
+            int i1 = int.Parse(w3[0]);
+            int i2 = int.Parse(w3[1]);
 
+            //result is the raw label, char by char
+            //the indexes i1 and i2 show the line and pos in the input file
+            //now we are going to insert items from RecordLabel() into this result string.
 
-                //G.Writeln2(element.label22);
+            //foreach recorded call of {} or [], via RecordLabel()
+            int counter = -1;
+            foreach (O.LabelHelper2 y in element.labelRecordedPieces)  //foreach RecordLabel()
+            {
+                counter++;
+                string[] ss = y.s.Split('|');
+                int length = 0;
+                length = ss[0].Length;
 
-                string[] w = RemoveSplitter(element.label22[0]).Split('|');  //raw label   
+                string s2 = ss[1].Substring(1, ss[1].Length - 2);  //remove [ and ]                            
+                string[] sss = s2.Split(',');
 
-                if (element.label222.Count == 0)
+                string[] w4 = sss[3].Split(':');
+                int ii1 = int.Parse(w4[0]);
+                int ii2 = int.Parse(w4[1]);
+                if (i1 != ii1)
                 {
-                    lbl.Add(G.ReplaceGlueNew(w[0]));
-                    return lbl;
+                    //TODO TODO TODO
+                    //TODO TODO TODO
+                    //TODO TODO TODO
+                    G.Writeln2("*** ERROR: Multiline expressions not supported in PRT/PLOT etc.");
+                    throw new GekkoException();
                 }
 
-                int nn = element.label222.Count / n;  //how many inserts per column
+                int offset = ii2 - i2;
+                string xx = y.iv.ConvertToString();
 
-                string[] result = new string[w[0].Length];
-                int ci = 0;
-                foreach (char c in w[0])
+                result[offset] = xx;
+                for (int ii = offset + 1; ii < offset + length; ii++)
                 {
-                    result[ci] = c.ToString();
-                    ci++;
+                    result[ii] = null;
+                }
+                if (result[offset - 1] == "{" && result[offset + length] == "}")
+                {
+                    result[offset - 1] = null;
+                    result[offset + length] = null;
                 }
 
-                //string l = w[0];
-                string tmp = w[1];
-                string[] w2 = tmp.Substring(1, tmp.Length - 2).Split(',');
-                //G.Writeln("  " + result);
-                //G.Writeln("  " + w2[3]);
-                string[] w3 = w2[3].Split(':');
-                int i1 = int.Parse(w3[0]);
-                int i2 = int.Parse(w3[1]);
-                //G.Writeln("  ---");
-
-                //result is the raw label, char by char
-                //the indexes i1 and i2 show the line and pos in the input file
-                //now we are going to insert items from RecordLabel() into this result string.
-
-                //foreach recorded call of {} or [], via RecordLabel()
-                int counter = -1;
-                foreach (O.LabelHelper2 y in element.label222)  //foreach RecordLabel()
+                string u = null;
+                foreach (string s5 in result)
                 {
-                    counter++;
-                    string[] ss = y.s.Split('|');
-                    int length = 0;
-                    length = ss[0].Length;
-                                        
-                    for (int jj1 = 1; jj1 < 2; jj1++)
-                    {
-                        string s2 = ss[jj1].Substring(1, ss[jj1].Length - 2);  //remove [ and ]                            
-                        string[] sss = s2.Split(',');
-                                            
-                        for (int jj2 = 3; jj2 < 4; jj2++)
-                        {
-                            if (jj1 == 1 && jj2 == 3)
-                            {
+                    if (s5 == null) continue;
+                    string s6 = s5;
+                    if (s5.Trim() != "") s6 = s5.Trim();  //just safety
+                    u = u + s6;
+                }
+                string result2 = G.ReplaceGlueNew(u);
+                //G.Writeln2("===> " + result2);
 
-                                string[] w4 = sss[jj2].Split(':');
-                                int ii1 = int.Parse(w4[0]);
-                                int ii2 = int.Parse(w4[1]);
-                                if (i1 != ii1)
-                                {
-                                    //TODO TODO TODO
-                                    //TODO TODO TODO
-                                    //TODO TODO TODO
-                                    G.Writeln2("*** ERROR: Multiline expressions not supported in PRT/PLOT etc.");
-                                    throw new GekkoException();
-                                }
-
-                                int offset = ii2 - i2;
-                                string xx = y.iv.ConvertToString();
-
-                                result[offset] = xx;
-                                for (int ii = offset + 1; ii < offset + length; ii++)
-                                {
-                                    result[ii] = null;
-                                }
-                                if (result[offset - 1] == "{" && result[offset + length] == "}")
-                                {
-                                    result[offset - 1] = null;
-                                    result[offset + length] = null;
-                                }
-
-                            }
-
-                        }
-
-                    }
-
-                    string u = null;
-                    foreach (string s5 in result)
-                    {
-                        if (s5 == null) continue;
-                        string s6 = s5;
-                        if (s5.Trim() != "") s6 = s5.Trim();  //just safety
-                        u = u + s6;
-                    }
-                    string result2 = G.ReplaceGlueNew(u);
-                    //G.Writeln2("===> " + result2);
-
-                    if (counter % nn == nn - 1)
-                    {
-                        lbl.Add(result2);
-                    }
-
+                if (counter % nn == nn - 1)
+                {
+                    lbl.Add(result2);
                 }
 
             }
+
 
             return lbl;
-        }    
+        }
 
         public static bool IsNullSubSeries(IVariable x)
         {

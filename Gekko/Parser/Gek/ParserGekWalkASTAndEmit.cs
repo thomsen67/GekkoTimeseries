@@ -4402,7 +4402,7 @@ namespace Gekko.Parser.Gek
                                 freelists = Globals.freelists + freelists + Globals.freelists;
                             }                            
 
-                            node.Code.A("ope" + Num(node) + ".label22 = new List<string>() { `" + freelists + ReportLabelHelper(node) + "`};" + G.NL);
+                            node.Code.A("ope" + Num(node) + ".labelGiven = new List<string>() { `" + freelists + ReportLabelHelper(node) + "`};" + G.NL);
                             givenLabel = givenLabel.Replace(G.NL, "");  //remove any newlines, else C# code will become invalid.
                             node.Code.A("ope" + Num(node) + ".label = `" + freelists + givenLabel + "`;" + G.NL);
 

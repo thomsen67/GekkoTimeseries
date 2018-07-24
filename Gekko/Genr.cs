@@ -33,7 +33,7 @@ namespace Gekko
                 {
                     List<int> bankNumbers = null;
                     O.Prt.Element ope0 = new O.Prt.Element();
-                    ope0.label22 = new List<string>() { "{'a'}|[@2,2:2='{',<1190>,1:2]|[@4,6:6='}',<1165>,1:6]" };
+                    ope0.labelGiven = new List<string>() { "{'a'}|[@2,2:2='{',<1190>,1:2]|[@4,6:6='}',<1165>,1:6]" };
                     ope0.label = "[<{THIS IS A LABEL}>][@2,2:2='{',<1190>,1:2]";
                     smpl = new GekkoSmpl(o0.t1.Add(-2), o0.t2);
                     ope0.printCodesFinal = Program.GetElementPrintCodes(o0, ope0); bankNumbers = O.Prt.GetBankNumbers(null, ope0.printCodesFinal);

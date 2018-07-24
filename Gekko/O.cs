@@ -272,8 +272,8 @@ namespace Gekko
         public static void PrtElementHandleLabel(GekkoSmpl smpl, O.Prt.Element ope0)
         {
             ope0.label2 = null;
-            if (ope0.label222 == null) ope0.label222 = new List<LabelHelper2>();
-            ope0.label222.AddRange(smpl.labelHelper22);
+            if (ope0.labelRecordedPieces == null) ope0.labelRecordedPieces = new List<LabelHelper2>();
+            ope0.labelRecordedPieces.AddRange(smpl.labelRecordedPieces);
             Program.UnfoldLabels(ope0.label, ref ope0.label2, O.AddLabelHelper2(smpl));            
         }
 
@@ -2648,7 +2648,7 @@ namespace Gekko
 
         public static IVariable ReportLabel(GekkoSmpl smpl, IVariable x, string s)
         {
-            smpl.labelHelper22.Add(new LabelHelper2(s, x));
+            smpl.labelRecordedPieces.Add(new LabelHelper2(s, x));
             return x;
         }
 
@@ -2681,7 +2681,7 @@ namespace Gekko
 
         public static List<O.LabelHelper2> AddLabelHelper22(GekkoSmpl smpl)
         {
-            return smpl.labelHelper22;
+            return smpl.labelRecordedPieces;
         }
 
         public static IVariable IndexerPlus(GekkoSmpl smpl, IVariable x, bool isLhs, IVariable y)
@@ -8024,10 +8024,10 @@ namespace Gekko
                 //public IVariable tsBase = null;
                 public IVariable[] variable = new IVariable[2];  //first and ref
                 public string label = null;
-                public List<string> label22 = null;
+                public List<string> labelGiven = null;
                 
                 public List<string> label2 = null;  //unfolded labels, for instance x{#m} unfolded into xa and xb.
-                public List<O.LabelHelper2> label222 = null;
+                public List<O.LabelHelper2> labelRecordedPieces = null;
                 //public string originalLabel = null;
                 public string endoExoIndicator = null;
                 //-- layout
