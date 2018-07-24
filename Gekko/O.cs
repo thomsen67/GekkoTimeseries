@@ -2637,14 +2637,14 @@ namespace Gekko
             return rv;
         }        
 
-        public static IVariable ReportInterior(GekkoSmpl smpl, IVariable x, int i, int loopNumber)
-        {
-            if (loopNumber == 0)
-            {                
-                smpl.labelHelper.Add(new LabelHelperIVariable(i, x));
-            }
-            return x;
-        }
+        //public static IVariable ReportInterior(GekkoSmpl smpl, IVariable x, int i, int loopNumber)
+        //{
+        //    if (loopNumber == 0)
+        //    {                
+        //        smpl.labelHelper.Add(new LabelHelperIVariable(i, x));
+        //    }
+        //    return x;
+        //}
 
         public static IVariable ReportLabel(GekkoSmpl smpl, IVariable x, string s)
         {
