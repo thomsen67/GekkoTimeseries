@@ -7453,7 +7453,7 @@ namespace Gekko
             public double opt_pointsize = double.NaN;
             public string opt_fillstyle = null;
             //public List<List<O.LabelHelperIVariable>> labelHelper2 = null;  //comes from smpl.labelHelper2. For PRT<m> for instance, there will be 2*n elements, where the n's are identical. This is because the expression is run 2 times for <m>, <q> and the like.
-            public List<O.RecordedPieces> labelHelper22 = null; //comes from smpl.labelHelper22
+            //public List<O.RecordedPieces> labelHelper22 = null; //comes from smpl.labelHelper22
 
             public long counter = -12345;
 
