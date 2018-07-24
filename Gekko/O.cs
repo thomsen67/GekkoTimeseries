@@ -271,10 +271,10 @@ namespace Gekko
 
         public static void PrtElementHandleLabel(GekkoSmpl smpl, O.Prt.Element ope0)
         {
-            ope0.label2 = null;
+            //ope0.label2 = null;
             if (ope0.labelRecordedPieces == null) ope0.labelRecordedPieces = new List<RecordedPieces>();
             ope0.labelRecordedPieces.AddRange(smpl.labelRecordedPieces);
-            Program.UnfoldLabels(ope0.label, ref ope0.label2, O.AddLabelHelper2(smpl));            
+            //Program.UnfoldLabels(ope0.label, ref ope0.label2, O.AddLabelHelper2(smpl));            
         }
 
         public static void GetFromAndToDatabanks(string opt_from, string opt_to, ref Databank fromBank, ref Databank toBank)
@@ -2651,19 +2651,7 @@ namespace Gekko
             smpl.labelRecordedPieces.Add(new RecordedPieces(s, x));
             return x;
         }
-
-        public static void ClearLabelHelper(GekkoSmpl smpl)
-        {
-            //smpl.labelHelper.Clear();
-        }
-
-        public static void AddLabelHelper(GekkoSmpl smpl)
-        {
-            List<LabelHelperIVariable> temp = new List<LabelHelperIVariable>();
-            //temp.AddRange(smpl.labelHelper);
-            //smpl.labelHelper2.Add(temp);
-        }
-
+        
         public static List<List<LabelHelperIVariable>> AddLabelHelper2(GekkoSmpl smpl)
         {
             List<List<LabelHelperIVariable>> rv = null;
@@ -2678,12 +2666,7 @@ namespace Gekko
             //}
             rv = new List<List<LabelHelperIVariable>>();
             return rv;            
-        }
-
-        public static List<O.RecordedPieces> AddLabelHelper22(GekkoSmpl smpl)
-        {
-            return smpl.labelRecordedPieces;
-        }
+        }        
 
         public static IVariable IndexerPlus(GekkoSmpl smpl, IVariable x, bool isLhs, IVariable y)
         {
@@ -2701,65 +2684,7 @@ namespace Gekko
             }
         }
 
-        //public static IVariable Indexer(GekkoSmpl smpl, IVariable x, bool isLhs, IVariablesFilterRange y)
-        //{            
-        //    if (x == null)
-        //    {
-        //        //[y], where y is y1..y2
-        //        //['fx'..'fy']
-        //        ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);  //a bit cheating, but we save an interface method, and performance is not really an issue when indexing whole databanks
-        //        return ss.Indexer(smpl, y);
-        //    }
-        //    else
-        //    {
-        //        //x[y], where y is y1..y2
-        //        //a[1..3] or #a['fx'..'fy'] or #a[fx..fy]
-        //        return x.Indexer(smpl, y);
-        //    }
-        //}
-
-        //public static IVariable Indexer(GekkoSmpl smpl, IVariable x, bool isLhs, IVariablesFilterRange y1, IVariablesFilterRange y2)
-        //{
-        //    if (x == null)
-        //    {
-        //        G.Writeln2("*** ERROR: Invalid syntax");
-        //        throw new GekkoException();                
-        //    }
-        //    else
-        //    {                
-        //        //a[1..3, 2..5] or a[1..3, 5] or a[1, 2..5]                
-        //        return x.Indexer(smpl, y1, y2);
-        //    }
-        //}
-
-        //public static IVariable Indexer(GekkoSmpl smpl, IVariable x, bool isLhs, IVariable y1, IVariablesFilterRange y2)
-        //{
-        //    if (x == null)
-        //    {
-        //        G.Writeln2("*** ERROR: Invalid syntax");
-        //        throw new GekkoException();
-        //    }
-        //    else
-        //    {
-        //        //a[1..3, 2..5] or a[1..3, 5] or a[1, 2..5]                
-        //        return x.Indexer(smpl, y1, y2);
-        //    }
-        //}
-
-        //public static IVariable Indexer(GekkoSmpl smpl, IVariable x, bool isLhs, IVariablesFilterRange y1, IVariable y2)
-        //{
-        //    if (x == null)
-        //    {
-        //        G.Writeln2("*** ERROR: Invalid syntax");
-        //        throw new GekkoException();
-        //    }
-        //    else
-        //    {
-        //        //a[1..3, 2..5] or a[1..3, 5] or a[1, 2..5]                
-        //        return x.Indexer(smpl, y1, y2);
-        //    }
-        //}        
-
+        
         //========================================
         //======================================== Z() variants start
         //========================================

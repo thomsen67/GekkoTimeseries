@@ -2290,9 +2290,9 @@ namespace Gekko.Parser.Gek
                                 else
                                 {
                                     //unfold
-                                    sb1.AppendLine("O.ClearLabelHelper(smpl);"); //such loops are always the outermost, so we clear and record afterwards.
+                                    //sb1.AppendLine("O.ClearLabelHelper(smpl);"); //such loops are always the outermost, so we clear and record afterwards.
                                     sb1.AppendLine(tempName + ".Add(" + node[2].Code.ToString() + ");" + G.NL);
-                                    sb1.AppendLine("O.AddLabelHelper(smpl);");
+                                    //sb1.AppendLine("O.AddLabelHelper(smpl);");
                                 }
 
                                 foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
