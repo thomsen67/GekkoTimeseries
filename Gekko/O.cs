@@ -7949,8 +7949,7 @@ namespace Gekko
             public class Element
             {
                 public List<O.RecordedPieces> labelRecordedPieces = null;
-                public List<string> labelGiven = null;
-                //public string label = null;                
+                public List<string> labelGiven = null;                   
                 public List<string> label2 = null;  //unfolded labels, for instance x{#m} unfolded into xa and xb.
                 
                 public IVariable[] variable = new IVariable[2];  //first and ref

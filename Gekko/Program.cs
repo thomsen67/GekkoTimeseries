@@ -25236,16 +25236,16 @@ namespace Gekko
             //TODO: we could check if there is 1 object printed and it is of type=normal. If so, the label could be printed.
             //  if .meta is augmented with a pointer to the array-series, the label for x[a] could be taken via that pointer.
 
-            foreach (var x in o.prtElements)
-            {
-                //G.Write("-=-->");
-                foreach (var y in x.labelRecordedPieces)
-                {
-                    string s = y.iv.ConvertToString();
-                    G.Write(s + ", ");
-                }
-                G.Writeln();
-            }
+            //foreach (var x in o.prtElements)
+            //{
+            //    G.Write("-=-->");
+            //    foreach (var y in x.labelRecordedPieces)
+            //    {
+            //        string s = y.iv.ConvertToString();
+            //        G.Write(s + ", ");
+            //    }
+            //    G.Writeln();
+            //}
 
             EPrintTypes type = EPrintTypes.Print;
             if (G.Equal(o.prtType, "plot")) type = EPrintTypes.Plot;
