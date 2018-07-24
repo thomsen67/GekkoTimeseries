@@ -2654,13 +2654,13 @@ namespace Gekko
 
         public static void ClearLabelHelper(GekkoSmpl smpl)
         {
-            smpl.labelHelper.Clear();
+            //smpl.labelHelper.Clear();
         }
 
         public static void AddLabelHelper(GekkoSmpl smpl)
         {
             List<LabelHelperIVariable> temp = new List<LabelHelperIVariable>();
-            temp.AddRange(smpl.labelHelper);
+            //temp.AddRange(smpl.labelHelper);
             smpl.labelHelper2.Add(temp);
         }
 
@@ -2674,7 +2674,7 @@ namespace Gekko
             else
             {
                 rv = new List<List<LabelHelperIVariable>>();
-                rv.Add(smpl.labelHelper);
+                //rv.Add(smpl.labelHelper);
             }
             return rv;            
         }
