@@ -108,8 +108,8 @@ namespace Gekko
         public int bankNumber = 0;  //0 is inactive, 1 is Ref databank
         public GekkoSmplCommand command = GekkoSmplCommand.Unknown;
         //public List<O.LabelHelperIVariable> labelHelper = new List<O.LabelHelperIVariable>(); //not created all the time, so ok
-        public List<List<O.LabelHelperIVariable>> labelHelper2 = new List<List<O.LabelHelperIVariable>>(); //not created all the time, so ok
-        public List<O.LabelHelper2> labelRecordedPieces = new List<O.LabelHelper2>();
+        //public List<List<O.LabelHelperIVariable>> labelHelper2 = new List<List<O.LabelHelperIVariable>>(); //not created all the time, so ok
+        public List<O.RecordedPieces> labelRecordedPieces = new List<O.RecordedPieces>();
         public P p;
 
         public GekkoSmpl()
@@ -26492,7 +26492,7 @@ namespace Gekko
 
             //foreach recorded call of {} or [], via RecordLabel()
             int counter = -1;
-            foreach (O.LabelHelper2 y in element.labelRecordedPieces)  //foreach RecordLabel()
+            foreach (O.RecordedPieces y in element.labelRecordedPieces)  //foreach RecordLabel()
             {
                 counter++;
                 string[] ss = y.s.Split('|');
