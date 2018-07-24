@@ -26582,7 +26582,7 @@ namespace Gekko
             bool isArraySeriesWithoutIndex = false;
             if (((o.prtElements[i].variable[0] != null && o.prtElements[i].variable[0].Type() == EVariableType.Series) || (o.prtElements[i].variable[1] != null && o.prtElements[i].variable[1].Type() == EVariableType.Series)))
             {
-                string label = o.prtElements[i].label;
+                string label = o.prtElements[i].labelGiven[0];
 
                 bool[] banks = new bool[2];  //first, ref
                 foreach (string printCode in o.prtElements[i].printCodesFinal)
@@ -26711,7 +26711,7 @@ namespace Gekko
                             s += "[" + iv.Type().ToString() + "]" + ", ";
                         }
                     }
-                    G.Writeln2(Program.RemoveSplitter(element.label));
+                    G.Writeln2(Program.RemoveSplitter(element.labelGiven[0]));
                     if (temp.list.Count > 0)
                     {
                         s = s.Substring(0, s.Length - ", ".Length);
@@ -26726,26 +26726,26 @@ namespace Gekko
                 {
                     if (var.Type() == EVariableType.Matrix)
                     {
-                        Program.ShowMatrix((Matrix)var, element.label);
+                        Program.ShowMatrix((Matrix)var, element.labelGiven[0]);
                     }
                     else if (var.Type() == EVariableType.String)
                     {
-                        G.Writeln2(element.label);
+                        G.Writeln2(element.labelGiven[0]);
                         G.Writeln(pling + ((ScalarString)var).string2 + pling);
                     }
                     else if (var.Type() == EVariableType.Val)
                     {
-                        G.Writeln2(element.label);
+                        G.Writeln2(element.labelGiven[0]);
                         G.Writeln(((ScalarVal)var).val.ToString());
                     }
                     else if (var.Type() == EVariableType.Date)
                     {
-                        G.Writeln2(element.label);
+                        G.Writeln2(element.labelGiven[0]);
                         G.Writeln(((ScalarDate)var).date.ToString());
                     }
                     else if (var.Type() == EVariableType.Map)
                     {
-                        G.Writeln2(element.label);
+                        G.Writeln2(element.labelGiven[0]);
                         Map map = var as Map;
                                                 
                         if (map.storage.Count == 0)

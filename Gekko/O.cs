@@ -7633,7 +7633,7 @@ namespace Gekko
                             //not series (including array-series and vals)                                                        
                             if (this.prtElements[0].variable[0].Type() == EVariableType.List && ((List)this.prtElements[0].variable[0]).list.Count == 0)
                             {
-                                G.Writeln2(Program.RemoveSplitter(this.prtElements[0].label));
+                                G.Writeln2(Program.RemoveSplitter(this.prtElements[0].labelGiven[0]));
                                 G.Writeln("[empty list]");
                             }
                             else if (this.prtElements[0].variable[0] == null || this.prtElements[0].variable[1] != null)
@@ -7950,7 +7950,7 @@ namespace Gekko
             {
                 public List<O.RecordedPieces> labelRecordedPieces = null;
                 public List<string> labelGiven = null;
-                public string label = null;                
+                //public string label = null;                
                 public List<string> label2 = null;  //unfolded labels, for instance x{#m} unfolded into xa and xb.
                 
                 public IVariable[] variable = new IVariable[2];  //first and ref

@@ -4404,8 +4404,8 @@ namespace Gekko.Parser.Gek
 
                             node.Code.A("ope" + Num(node) + ".labelGiven = new List<string>() { `" + freelists + ReportLabelHelper(node) + "`};" + G.NL);
                             givenLabel = givenLabel.Replace(G.NL, "");  //remove any newlines, else C# code will become invalid.
-                            node.Code.A("ope" + Num(node) + ".label = `" + freelists + givenLabel + "`;" + G.NL);
-
+                            //node.Code.A("ope" + Num(node) + ".label = `" + freelists + givenLabel + "`;" + G.NL);
+                            
                             node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2);" + G.NL);
                             ASTNode child = node.GetChild("ASTPRTELEMENTOPTIONFIELD");
                             if (child != null) node.Code.A(child.Code);
