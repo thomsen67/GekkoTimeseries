@@ -25481,7 +25481,7 @@ namespace Gekko
                             widthHere = explodeElement.widthFinal;
                         }
 
-                        int max2 = PrintCreateLabelsArrayNew(lbl[i], widthHere, lines, lines * widthHere, out explodeElement.label2);
+                        int max2 = PrintCreateLabelsArrayNew(lbl[i], widthHere, lines, lines * widthHere, out explodeElement.labelOLD);
 
                         labelMaxLine = Math.Max(max2, labelMaxLine);
 
@@ -25489,16 +25489,16 @@ namespace Gekko
                         //FIXME
                         if (G.Equal(element.printCodesFinal[0], "n") && iPrintCode > 0 && G.Equal(printCode, "p"))
                         {
-                            explodeElement.label2 = new List<string> { "%" };
+                            explodeElement.labelOLD = new List<string> { "%" };
                         }
                         else if (G.Equal(element.printCodesFinal[0], "m") && iPrintCode > 0 && G.Equal(printCode, "q"))
                         {
-                            explodeElement.label2 = new List<string> { "%" };
+                            explodeElement.labelOLD = new List<string> { "%" };
                         }
                         else
                         {
                             if (iPrintCode == 0) ; //c.label = c.label + "  (" + printCode.ToLower() + ")";
-                            else if (iPrintCode > 0) explodeElement.label2 = new List<string> { "(" + printCode.ToLower() + ")" };
+                            else if (iPrintCode > 0) explodeElement.labelOLD = new List<string> { "(" + printCode.ToLower() + ")" };
                         }
 
                         containerExplode.Add(explodeElement);
@@ -25630,7 +25630,7 @@ namespace Gekko
                     ivWork = cc.variable[0];
                     ivRef = cc.variable[1];
                     printCode = cc.printCodeFinal;
-                    label = cc.label2;
+                    label = cc.labelOLD;
                 }
 
                 int bankCombi = GetBankCombi(printCode);
@@ -30110,7 +30110,7 @@ namespace Gekko
                 dataMin[i] = containerExplode[i].min;
                 dataMax[i] = containerExplode[i].max;
                 string label = "";
-                if (containerExplode[i].label2[0] != null) label = containerExplode[i].label2[0];
+                if (containerExplode[i].labelOLD[0] != null) label = containerExplode[i].labelOLD[0];
                 labelsNonBroken.Add(label);
             }
 

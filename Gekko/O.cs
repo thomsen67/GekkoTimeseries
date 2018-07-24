@@ -7408,7 +7408,7 @@ namespace Gekko
                 //      c[i1]
                 //      c[i2]
                 //      c[i3]
-                Explode();
+                Explode();  //unfolds any lists in the prtElements
 
                 //next problem is that array-series should be unfolded
 
@@ -7416,9 +7416,9 @@ namespace Gekko
                 foreach (O.Prt.Element element in this.prtElements)
                 {
                     List<string> label2Temp = new List<string>();
-                    if (element.label2 != null)
+                    if (element.labelOLD != null)
                     {
-                        foreach (string s in element.label2)
+                        foreach (string s in element.labelOLD)
                         {
                             label2Temp.Add(s);
                         }
@@ -7463,18 +7463,13 @@ namespace Gekko
                                     element.variable[i] = unfold;
                                     if (counter == 1)
                                     {
-                                        element.label2 = labels;                                        
+                                        element.labelOLD = labels;                                        
                                     }
                                 }
                             }
                             else if (element.variable[i].Type() == EVariableType.List)
                             {
-
-
-
-
-
-
+                                
 
                                 //List<IVariable> newList = new List<IVariable>();
                                 //List<string> newLabels = new List<string>();
@@ -7568,7 +7563,7 @@ namespace Gekko
                                             //((List)element.variable[i]).list[k] = unfold;
                                             if (counter == 1)
                                             {
-                                                element.label2 = labels;
+                                                element.labelOLD = labels;
                                             }
                                         }
                                         else
@@ -7950,7 +7945,7 @@ namespace Gekko
             {
                 public List<O.RecordedPieces> labelRecordedPieces = null;
                 public List<string> labelGiven = null;                   
-                public List<string> label2 = null;  //unfolded labels, for instance x{#m} unfolded into xa and xb.
+                public List<string> labelOLD = null;  //unfolded labels, for instance x{#m} unfolded into xa and xb.
                 
                 public IVariable[] variable = new IVariable[2];  //first and ref
 
