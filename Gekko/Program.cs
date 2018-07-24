@@ -26621,8 +26621,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     keys.Sort(CompareMapMultidimItems);
-                    //List m0 = new List(); //subseries first
-                    //List m1 = new List(); //subseries ref
+                    
                     foreach (MapMultidimItem key in keys)
                     {
                         try
@@ -26662,13 +26661,9 @@ namespace Gekko
                         string blanks = "  ";
                         if (isSimple) blanks = "";
                                                
-                        labelsHandmade.Add(label + blanks + "[" + key.ToString() + "]");
-                        //labelsHandmade.Add(bankName + G.RemoveFreqFromName(name) + "[" + key.ToString() + "]");
+                        labelsHandmade.Add(label + blanks + "[" + key.ToString() + "]");                        
                     }
-                    //if (banks[0]) o.prtElements[i].variable[0] = m0;
-                    //if (banks[1]) o.prtElements[i].variable[1] = m1;
-                    //mm0 = m0;
-                    //mm1 = m1;
+                    
                     isArraySeriesWithoutIndex = true;
                 }
             }
