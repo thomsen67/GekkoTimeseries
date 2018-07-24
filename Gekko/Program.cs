@@ -107,7 +107,7 @@ namespace Gekko
         public int gekkoErrorI = 0;
         public int bankNumber = 0;  //0 is inactive, 1 is Ref databank
         public GekkoSmplCommand command = GekkoSmplCommand.Unknown;
-        //public List<O.LabelHelperIVariable> labelHelper = new List<O.LabelHelperIVariable>(); //not created all the time, so ok
+        public List<O.LabelHelperIVariable> labelHelper = new List<O.LabelHelperIVariable>(); //not created all the time, so ok
         public List<List<O.LabelHelperIVariable>> labelHelper2 = new List<List<O.LabelHelperIVariable>>(); //not created all the time, so ok
         public List<O.LabelHelper2> labelRecordedPieces = new List<O.LabelHelper2>();
         public P p;
