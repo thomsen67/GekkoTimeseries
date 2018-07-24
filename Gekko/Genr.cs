@@ -50,8 +50,8 @@ namespace Gekko
 
                 o0.counter = 2;
                 o0.printCsCounter = Globals.printCs.Count - 1;
-                o0.labelHelper2 = O.AddLabelHelper2(smpl);
-                o0.labelHelper22 = O.AddLabelHelper22(smpl);
+                //o0.labelHelper2 = O.AddLabelHelper2(smpl);
+                //o0.labelHelper22 = O.AddLabelHelper22(smpl);
                 o0.Exe();
                 return o0.emfName;
             };

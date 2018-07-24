@@ -2871,7 +2871,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 node.Code.A("o" + Num(node) + ".printCsCounter = Globals.printCs.Count - 1;" + G.NL);
 
-                                node.Code.A("o" + Num(node) + ".labelHelper2 = O.AddLabelHelper2(smpl);" + G.NL);
+                                //node.Code.A("o" + Num(node) + ".labelHelper2 = O.AddLabelHelper2(smpl);" + G.NL);
                                 node.Code.A("o" + Num(node) + ".labelHelper22 = O.AddLabelHelper22(smpl);" + G.NL);
 
                                 node.Code.A("o" + Num(node) + ".Exe();" + G.NL);

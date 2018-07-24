@@ -2661,21 +2661,22 @@ namespace Gekko
         {
             List<LabelHelperIVariable> temp = new List<LabelHelperIVariable>();
             //temp.AddRange(smpl.labelHelper);
-            smpl.labelHelper2.Add(temp);
+            //smpl.labelHelper2.Add(temp);
         }
 
         public static List<List<LabelHelperIVariable>> AddLabelHelper2(GekkoSmpl smpl)
         {
             List<List<LabelHelperIVariable>> rv = null;
-            if(smpl.labelHelper2!=null && smpl.labelHelper2.Count>0)
-            {
-                rv = smpl.labelHelper2;
-            }
-            else
-            {
-                rv = new List<List<LabelHelperIVariable>>();
-                //rv.Add(smpl.labelHelper);
-            }
+            //if(smpl.labelHelper2!=null && smpl.labelHelper2.Count>0)
+            //{
+            //    rv = smpl.labelHelper2;
+            //}
+            //else
+            //{
+            //    rv = new List<List<LabelHelperIVariable>>();
+            //    //rv.Add(smpl.labelHelper);
+            //}
+            rv = new List<List<LabelHelperIVariable>>();
             return rv;            
         }
 
@@ -7451,7 +7452,7 @@ namespace Gekko
             public string opt_pointtype = null;
             public double opt_pointsize = double.NaN;
             public string opt_fillstyle = null;
-            public List<List<O.LabelHelperIVariable>> labelHelper2 = null;  //comes from smpl.labelHelper2. For PRT<m> for instance, there will be 2*n elements, where the n's are identical. This is because the expression is run 2 times for <m>, <q> and the like.
+            //public List<List<O.LabelHelperIVariable>> labelHelper2 = null;  //comes from smpl.labelHelper2. For PRT<m> for instance, there will be 2*n elements, where the n's are identical. This is because the expression is run 2 times for <m>, <q> and the like.
             public List<O.LabelHelper2> labelHelper22 = null; //comes from smpl.labelHelper22
 
             public long counter = -12345;
