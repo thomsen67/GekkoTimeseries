@@ -7408,6 +7408,7 @@ namespace Gekko
                 //      c[i1]
                 //      c[i2]
                 //      c[i3]
+                
                 Explode();  //unfolds any lists in the prtElements
 
                 //next problem is that array-series should be unfolded
