@@ -7358,8 +7358,7 @@ namespace Gekko
             public double opt_yline = double.NaN;
             public double opt_y2line = double.NaN;
             public string opt_xzeroaxis = null;
-            public string opt_x2zeroaxis = null;
-            
+            public string opt_x2zeroaxis = null;            
             
             public double opt_ymaxhard = double.NaN;
             public double opt_y2maxhard = double.NaN;
@@ -7377,9 +7376,7 @@ namespace Gekko
             public string opt_pointtype = null;
             public double opt_pointsize = double.NaN;
             public string opt_fillstyle = null;
-            //public List<List<O.LabelHelperIVariable>> labelHelper2 = null;  //comes from smpl.labelHelper2. For PRT<m> for instance, there will be 2*n elements, where the n's are identical. This is because the expression is run 2 times for <m>, <q> and the like.
-            //public List<O.RecordedPieces> labelHelper22 = null; //comes from smpl.labelHelper22
-
+            
             public long counter = -12345;
 
             public void Exe()
@@ -7665,13 +7662,7 @@ namespace Gekko
             }
 
             private static void ExplodeArraySeries(Element element)
-            {
-
-                //if(element.variable[0]!=null && element.variable[0].Type()==EVariableType.Series)
-
-                //List<List> unfold = new List<List>();
-                //unfold.Add(new List());
-                //unfold.Add(new List());
+            {               
 
                 List<List<MapMultidimItem>> check = new List<List<MapMultidimItem>>();
                 check.Add(new List<MapMultidimItem>());
@@ -7944,17 +7935,14 @@ namespace Gekko
 
             public class Element
             {
-                //public List<SubElement> subElements = null;
-
-                //public IVariable tsWork = null;
-                //public IVariable tsBase = null;
-                public IVariable[] variable = new IVariable[2];  //first and ref
-                public string label = null;
-                public List<string> labelGiven = null;
-                
-                public List<string> label2 = null;  //unfolded labels, for instance x{#m} unfolded into xa and xb.
                 public List<O.RecordedPieces> labelRecordedPieces = null;
-                //public string originalLabel = null;
+                public List<string> labelGiven = null;
+
+                public string label = null;                
+                public List<string> label2 = null;  //unfolded labels, for instance x{#m} unfolded into xa and xb.
+                
+                public IVariable[] variable = new IVariable[2];  //first and ref
+
                 public string endoExoIndicator = null;
                 //-- layout
                 public List<OptString> printCodes = new List<OptString>();
