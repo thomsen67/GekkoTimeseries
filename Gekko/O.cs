@@ -5241,7 +5241,7 @@ namespace Gekko
 
         public class Clear
         {
-            public List name = null;
+            public List names = null;
             public P p = null;
             public string opt_first = null;
             public string opt_ref = null;
@@ -6579,12 +6579,13 @@ namespace Gekko
 
         public class Create
         {
-            public List<string> listItems = null;
+            //public List<string> listItems = null;
+            public List names = null;
             public bool question = false;
             public P p = null;
             public void Exe()
             {
-                Program.Create(this.listItems, this.question, this);
+                Program.Create(this.names, this.question, this);
             }
         }
 

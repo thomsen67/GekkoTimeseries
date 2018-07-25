@@ -2151,6 +2151,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | collapse             SEMICOLON!
 						  | compare              SEMICOLON!
 						  | copy                 SEMICOLON!
+						  | create               SEMICOLON!
 						  | disp                 SEMICOLON!
 						  | endo                 SEMICOLON!
 						  | exo                  SEMICOLON!
@@ -2333,7 +2334,7 @@ compareOpt1h:				ABS EQUAL expression -> ^(ASTOPT_VAL_ABS expression)
 // COPY
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-copy                      : COPY copyOpt1? listItemsWildRange (TO listItemsWildRange)? -> ^({token("ASTCOPY", ASTCOPY, $COPY.Line)} copyOpt1? listItemsWildRange listItemsWildRange?);
+copy:                       COPY copyOpt1? listItemsWildRange (TO listItemsWildRange)? -> ^({token("ASTCOPY", ASTCOPY, $COPY.Line)} copyOpt1? listItemsWildRange listItemsWildRange?);
 copyOpt1                  : ISNOTQUAL
 						  | leftAngle2          copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 copyOpt1h*)		
 						  | leftAngleNo2 dates? copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) copyOpt1h*)
@@ -2346,6 +2347,12 @@ copyOpt1h                 : RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT ye
 						  | TO EQUAL AT GLUE? -> ^(ASTOPT_STRING_TO ASTAT)
 						  ;
 
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// CREATE
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+create:					    CREATE seqOfBankvarnames -> ^({token("ASTCREATE", ASTCREATE, $CREATE.Line)} ^(ASTPLACEHOLDER seqOfBankvarnames));
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // DISP

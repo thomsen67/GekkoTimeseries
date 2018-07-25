@@ -22152,7 +22152,7 @@ namespace Gekko
         {
             //Take care with filename, when clearing: only wipe it out if it is Work or Ref banks, other banks may be OPENed banks that we would like to write back to when CLOSEing
 
-            List<string> names = O.Restrict(o.name, false, false, false, false);
+            List<string> names = O.Restrict(o.names, false, false, false, false);
 
             if (names == null)
             {
@@ -22185,13 +22185,13 @@ namespace Gekko
                 foreach (string name in names)
                 {
 
-                    if (o.name != null && (o.opt_first != null || o.opt_ref != null))
+                    if (o.names != null && (o.opt_first != null || o.opt_ref != null))
                     {
                         G.Writeln2("*** ERROR: You should use 'CLEAR<first>;' or  'CLEAR<ref>;'");
                         throw new GekkoException();
                     }
 
-                    if (o.name != null)
+                    if (o.names != null)
                     {
                         if (Program.databanks.GetDatabank(name) == null)
                         {
@@ -23954,7 +23954,7 @@ namespace Gekko
             if (!G.IsUnitTesting()) ShowPeriodInStatusField("");
         }
 
-        public static void Create(List<string> varsInput, bool questionMark, O.Create o)
+        public static void Create(List varsInput, bool questionMark, O.Create o)
         {
             //ErrorIfDatabanksSwapped();
             if (varsInput == null && questionMark == true)
@@ -23973,27 +23973,35 @@ namespace Gekko
             }
             else
             {
-                List<string> vars = varsInput;
-                bool usedInCreateCommand = true;
-                int counter = CreateVariables(vars, usedInCreateCommand);
-                if (Program.options.databank_create_message)
-                {
-                    if (counter == 0) G.Writeln2("Did not create any variables");
-                    else
-                    {
-                        if (o.p.IsSimple())
-                        {
-                            if (counter == 1)
-                            {
-                                G.Writeln2("Created 1 variable with freq '" + Program.options.freq + "'" + " ");
-                            }
-                            else
-                            {
-                                G.Writeln2("Created " + counter + " variables with freq '" + Program.options.freq + "'" + " ");
-                            }
-                        }
-                    }
+                List<string> vars = O.Restrict(o.names, true, false, true, false);
+
+                foreach (string s in vars)
+                {                                    
+                    IVariable iv = O.GetIVariableFromString(s, O.ECreatePossibilities.Can);
                 }
+
+                G.Writeln2("Created: " + G.GetListWithCommas(vars));
+                   
+                //bool usedInCreateCommand = true;
+                //int counter = CreateVariables(vars, usedInCreateCommand);
+                //if (Program.options.databank_create_message)
+                //{
+                //    if (counter == 0) G.Writeln2("Did not create any variables");
+                //    else
+                //    {
+                //        if (o.p.IsSimple())
+                //        {
+                //            if (counter == 1)
+                //            {
+                //                G.Writeln2("Created 1 variable with freq '" + Program.options.freq + "'" + " ");
+                //            }
+                //            else
+                //            {
+                //                G.Writeln2("Created " + counter + " variables with freq '" + Program.options.freq + "'" + " ");
+                //            }
+                //        }
+                //    }
+                //}
                 //G.Writeln();
             }
         }
@@ -26459,6 +26467,7 @@ namespace Gekko
         {
             if (element.labelGiven.Count > 1)
             {
+                //this is the case for an array-series that has been unfolded
                 return element.labelGiven;
             }
 

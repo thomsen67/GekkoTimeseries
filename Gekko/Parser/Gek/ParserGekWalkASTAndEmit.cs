@@ -813,7 +813,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".p = p;");
                             if (node[1].ChildrenCount() > 0)
                             {
-                                node.Code.A("o" + Num(node) + ".name = " + node[1][0].Code + ";" + G.NL);
+                                node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);
                             }
                             GetCodeFromAllChildren(node, node[0]);  //options
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
@@ -964,11 +964,12 @@ namespace Gekko.Parser.Gek
                     case "ASTCREATE":
                         {
                             node.Code.A("O.Create o" + Num(node) + " = new O.Create();" + G.NL);
-                            node.Code.A(node[0].Code);
+                            node.Code.A("o" + Num(node) + ".names = " + node[0][0].Code + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
-                            break;
+                            break;                            
                         }
+                        break;                
                     case "ASTCREATEEXPRESSION":
                         {
                             node.Code.A("O.CreateExpression o" + Num(node) + " = new O.CreateExpression();" + G.NL);
