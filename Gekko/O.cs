@@ -7472,8 +7472,10 @@ namespace Gekko
                             else if (element.variable[i].Type() == EVariableType.List)
                             {
 
-                                G.Writeln2("+++ WARNING: List print not implemented");
-                                return;
+                                //for now, just do nothing
+
+                                //G.Writeln2("+++ WARNING: List print not implemented");
+                                //return;
 
                                 //List<IVariable> newList = new List<IVariable>();
                                 //List<string> newLabels = new List<string>();
