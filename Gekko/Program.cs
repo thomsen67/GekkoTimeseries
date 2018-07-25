@@ -25232,6 +25232,8 @@ namespace Gekko
 
         public static void OPrint(O.Prt o, List<string> labelsHandmade)
         {
+            //Note: it is ok for a prtElement in o to be a List containg Series
+            
             //string format = "f14.4";
             //TODO: we could check if there is 1 object printed and it is of type=normal. If so, the label could be printed.
             //  if .meta is augmented with a pointer to the array-series, the label for x[a] could be taken via that pointer.
@@ -26455,6 +26457,11 @@ namespace Gekko
 
         private static List<string> OPrintLabels(O.Prt.Element element, int n, int i)
         {
+            if (element.labelGiven.Count > 1)
+            {
+                return element.labelGiven;
+            }
+
             List<string> lbl = new List<string>();  //this must end up with as many strings as the element has subelements (sublist)
 
             //for prt {#i}{#j} 
@@ -26576,100 +26583,100 @@ namespace Gekko
             return lbl;
         }
 
-        public static bool OprintHandleArraySeriesWithoutIndex(O.Prt o, int i, List<string> labelsHandmade, ref List mm0, ref List mm1)
-        {
-            //int i = 0;
-            bool isArraySeriesWithoutIndex = false;
-            if (((o.prtElements[i].variable[0] != null && o.prtElements[i].variable[0].Type() == EVariableType.Series) || (o.prtElements[i].variable[1] != null && o.prtElements[i].variable[1].Type() == EVariableType.Series)))
-            {
-                string label = o.prtElements[i].labelGiven[0];
+        //public static bool OprintHandleArraySeriesWithoutIndex(O.Prt o, int i, List<string> labelsHandmade, ref List mm0, ref List mm1)
+        //{
+        //    //int i = 0;
+        //    bool isArraySeriesWithoutIndex = false;
+        //    if (((o.prtElements[i].variable[0] != null && o.prtElements[i].variable[0].Type() == EVariableType.Series) || (o.prtElements[i].variable[1] != null && o.prtElements[i].variable[1].Type() == EVariableType.Series)))
+        //    {
+        //        string label = o.prtElements[i].labelGiven[0];
 
-                bool[] banks = new bool[2];  //first, ref
-                foreach (string printCode in o.prtElements[i].printCodesFinal)
-                {
-                    int bankCombi = GetBankCombi(printCode);
-                    if (bankCombi == 0) banks[0] = true;
-                    else if (bankCombi == 1) banks[1] = true;
-                    else if (bankCombi == 2)
-                    {
-                        banks[0] = true;
-                        banks[1] = true;
-                    }
-                }
+        //        bool[] banks = new bool[2];  //first, ref
+        //        foreach (string printCode in o.prtElements[i].printCodesFinal)
+        //        {
+        //            int bankCombi = GetBankCombi(printCode);
+        //            if (bankCombi == 0) banks[0] = true;
+        //            else if (bankCombi == 1) banks[1] = true;
+        //            else if (bankCombi == 2)
+        //            {
+        //                banks[0] = true;
+        //                banks[1] = true;
+        //            }
+        //        }
 
-                Series tsFirst = null;
-                Series tsRef = null;
-                if (banks[0]) tsFirst = o.prtElements[i].variable[0] as Series;
-                if (banks[1]) tsRef = o.prtElements[i].variable[1] as Series;
+        //        Series tsFirst = null;
+        //        Series tsRef = null;
+        //        if (banks[0]) tsFirst = o.prtElements[i].variable[0] as Series;
+        //        if (banks[1]) tsRef = o.prtElements[i].variable[1] as Series;
 
-                string name = null;
-                if (tsFirst != null) name = tsFirst.name;
-                else name = tsRef.name;
+        //        string name = null;
+        //        if (tsFirst != null) name = tsFirst.name;
+        //        else name = tsRef.name;
 
-                if ((tsFirst != null && tsFirst.type == ESeriesType.ArraySuper) || (tsRef != null && tsRef.type == ESeriesType.ArraySuper))
-                {
-                    //Print an array-timeseries
+        //        if ((tsFirst != null && tsFirst.type == ESeriesType.ArraySuper) || (tsRef != null && tsRef.type == ESeriesType.ArraySuper))
+        //        {
+        //            //Print an array-timeseries
 
-                    List<MapMultidimItem> keys = null;
+        //            List<MapMultidimItem> keys = null;
 
-                    if (tsFirst != null) keys = tsFirst.dimensionsStorage.storage.Keys.ToList();
-                    else if (tsRef != null) keys = tsRef.dimensionsStorage.storage.Keys.ToList();
+        //            if (tsFirst != null) keys = tsFirst.dimensionsStorage.storage.Keys.ToList();
+        //            else if (tsRef != null) keys = tsRef.dimensionsStorage.storage.Keys.ToList();
 
-                    if (keys.Count == 0)
-                    {
-                        G.Writeln2("Array-series " + G.GetNameAndFreqPretty(name) + " has no elements");
-                        throw new GekkoException();
-                    }
-                    keys.Sort(CompareMapMultidimItems);
+        //            if (keys.Count == 0)
+        //            {
+        //                G.Writeln2("Array-series " + G.GetNameAndFreqPretty(name) + " has no elements");
+        //                throw new GekkoException();
+        //            }
+        //            keys.Sort(CompareMapMultidimItems);
                     
-                    foreach (MapMultidimItem key in keys)
-                    {
-                        try
-                        {
-                            if (banks[0])
-                            {
-                                if (mm0 == null) mm0 = new Gekko.List();
-                                mm0.Add(tsFirst.dimensionsStorage.storage[key]);
-                            }
-                            if (banks[1])
-                            {
-                                if (mm1 == null) mm1 = new Gekko.List();
-                                mm1.Add(tsRef.dimensionsStorage.storage[key]);
-                            }
-                        }
-                        catch
-                        {
-                            G.Writeln2("*** ERROR: Array elements do not match in first-position and ref databank");
-                            throw new GekkoException();
-                        }
-                        string bankName = null;
+        //            foreach (MapMultidimItem key in keys)
+        //            {
+        //                try
+        //                {
+        //                    if (banks[0])
+        //                    {
+        //                        if (mm0 == null) mm0 = new Gekko.List();
+        //                        mm0.Add(tsFirst.dimensionsStorage.storage[key]);
+        //                    }
+        //                    if (banks[1])
+        //                    {
+        //                        if (mm1 == null) mm1 = new Gekko.List();
+        //                        mm1.Add(tsRef.dimensionsStorage.storage[key]);
+        //                    }
+        //                }
+        //                catch
+        //                {
+        //                    G.Writeln2("*** ERROR: Array elements do not match in first-position and ref databank");
+        //                    throw new GekkoException();
+        //                }
+        //                string bankName = null;
 
-                        bool isSimple = true;
-                        foreach (char c in label)
-                        {
-                            if (G.IsLetterOrDigitOrUnderscore(c) || c == ':' || c == '@' || c == Globals.freqIndicator)
-                            {
-                                //ok
-                            }
-                            else
-                            {
-                                isSimple = false;
-                                break;
-                            }
-                        }
+        //                bool isSimple = true;
+        //                foreach (char c in label)
+        //                {
+        //                    if (G.IsLetterOrDigitOrUnderscore(c) || c == ':' || c == '@' || c == Globals.freqIndicator)
+        //                    {
+        //                        //ok
+        //                    }
+        //                    else
+        //                    {
+        //                        isSimple = false;
+        //                        break;
+        //                    }
+        //                }
 
-                        string blanks = "  ";
-                        if (isSimple) blanks = "";
+        //                string blanks = "  ";
+        //                if (isSimple) blanks = "";
                                                
-                        labelsHandmade.Add(label + blanks + "[" + key.ToString() + "]");                        
-                    }
+        //                labelsHandmade.Add(label + blanks + "[" + key.ToString() + "]");                        
+        //            }
                     
-                    isArraySeriesWithoutIndex = true;
-                }
-            }
+        //            isArraySeriesWithoutIndex = true;
+        //        }
+        //    }
 
-            return isArraySeriesWithoutIndex;
-        }
+        //    return isArraySeriesWithoutIndex;
+        //}
 
         private static int GetBankCombi(string printCode)
         {

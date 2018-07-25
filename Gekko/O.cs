@@ -7459,18 +7459,21 @@ namespace Gekko
                                     //EXPLODE EXPLODE EXPLODE
                                     //EXPLODE EXPLODE EXPLODE
 
-                                    //ExplodeArraySeriesHelper(element.variable[i] as Series, check, label2Temp[jj], counter, i, unfold, labels);
+                                    ExplodeArraySeriesHelper(element.variable[i] as Series, check, element.labelGiven, counter, i, unfold, labels);                                                                       
 
                                     element.variable[i] = unfold;
                                     if (counter == 1)
                                     {
-                                        element.labelOLD = labels;                                        
+                                        //element.labelOLD = labels;
+                                        element.labelGiven = labels; //overriding                           
                                     }
                                 }
                             }
                             else if (element.variable[i].Type() == EVariableType.List)
                             {
-                                
+
+                                G.Writeln2("+++ WARNING: List print not implemented");
+                                return;
 
                                 //List<IVariable> newList = new List<IVariable>();
                                 //List<string> newLabels = new List<string>();
@@ -7538,53 +7541,53 @@ namespace Gekko
                                 
 
 
-                                List<IVariable> newList = new List<IVariable>();
-                                for (int k = 0; k < ((List)element.variable[i]).list.Count(); k++)
-                                {
+                                //List<IVariable> newList = new List<IVariable>();
+                                //for (int k = 0; k < ((List)element.variable[i]).list.Count(); k++)
+                                //{
                                     
-                                    if ((((List)element.variable[i]).list[k]).Type() == EVariableType.Series)
-                                    {
-                                        if (counter == 1) jj++;
-                                        if (((Series)(((List)element.variable[i]).list[k])).type == ESeriesType.ArraySuper)
-                                        {
-                                            //counter++;
-                                            List unfold = new List();
-                                            List<string> labels = new List<string>();
+                                //    if ((((List)element.variable[i]).list[k]).Type() == EVariableType.Series)
+                                //    {
+                                //        if (counter == 1) jj++;
+                                //        if (((Series)(((List)element.variable[i]).list[k])).type == ESeriesType.ArraySuper)
+                                //        {
+                                //            //counter++;
+                                //            List unfold = new List();
+                                //            List<string> labels = new List<string>();
 
-                                            //EXPLODE EXPLODE EXPLODE
-                                            //EXPLODE EXPLODE EXPLODE
-                                            //EXPLODE EXPLODE EXPLODE
-                                            //EXPLODE EXPLODE EXPLODE
-                                            //EXPLODE EXPLODE EXPLODE
+                                //            //EXPLODE EXPLODE EXPLODE
+                                //            //EXPLODE EXPLODE EXPLODE
+                                //            //EXPLODE EXPLODE EXPLODE
+                                //            //EXPLODE EXPLODE EXPLODE
+                                //            //EXPLODE EXPLODE EXPLODE
 
-                                            //ExplodeArraySeriesHelper((((List)element.variable[i]).list[k]) as Series, check, label2Temp[jj], counter, i, unfold, labels);
+                                //            //ExplodeArraySeriesHelper((((List)element.variable[i]).list[k]) as Series, check, label2Temp[jj], counter, i, unfold, labels);
 
-                                            newList.AddRange(unfold.list);
+                                //            newList.AddRange(unfold.list);
 
-                                            //((List)element.variable[i]).list[k] = unfold;
-                                            if (counter == 1)
-                                            {
-                                                element.labelOLD = labels;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            newList.Add(((List)element.variable[i]).list[k]);
-                                        }
-                                    }
-                                    else if ((((List)element.variable[i]).list[k]).Type() == EVariableType.List)
-                                    {
-                                        throw new GekkoException();  //should not be possible
-                                    }
-                                    else
-                                    {
-                                        if (counter == 1) jj++;
-                                        allSeries = false;
-                                        newList.Add(((List)element.variable[i]).list[k]);
-                                    }
+                                //            //((List)element.variable[i]).list[k] = unfold;
+                                //            if (counter == 1)
+                                //            {
+                                //                element.labelOLD = labels;
+                                //            }
+                                //        }
+                                //        else
+                                //        {
+                                //            newList.Add(((List)element.variable[i]).list[k]);
+                                //        }
+                                //    }
+                                //    else if ((((List)element.variable[i]).list[k]).Type() == EVariableType.List)
+                                //    {
+                                //        throw new GekkoException();  //should not be possible
+                                //    }
+                                //    else
+                                //    {
+                                //        if (counter == 1) jj++;
+                                //        allSeries = false;
+                                //        newList.Add(((List)element.variable[i]).list[k]);
+                                //    }
 
-                                }
-                                element.variable[i] = new List(newList);
+                                //}
+                                //element.variable[i] = new List(newList);
 
 
                                 // -----------------------------------
@@ -7751,53 +7754,54 @@ namespace Gekko
             //    }
             //}
 
-            //private static void ExplodeArraySeriesHelper(Series tsFirst, List<List<MapMultidimItem>> check, string label, int counter, int i, List unfold, List<string> labels)
-            //{
-                
-            //    List<MapMultidimItem> keys = tsFirst.dimensionsStorage.storage.Keys.ToList();
+            private static void ExplodeArraySeriesHelper(Series tsFirst, List<List<MapMultidimItem>> check, List<string> label, int counter, int i, List unfold, List<string> labels)
+            {
 
-            //    if (keys.Count == 0)
-            //    {
-            //        G.Writeln2("Array-series " + G.GetNameAndFreqPretty(tsFirst.name) + " has no elements");
-            //        throw new GekkoException();
-            //    }
-            //    keys.Sort(Program.CompareMapMultidimItems);
+                List<MapMultidimItem> keys = tsFirst.dimensionsStorage.storage.Keys.ToList();
 
-            //    //List mm0 = new List();
-            //    foreach (MapMultidimItem key in keys)
-            //    {
+                if (keys.Count == 0)
+                {
+                    G.Writeln2("Array-series " + G.GetNameAndFreqPretty(tsFirst.name) + " has no elements");
+                    throw new GekkoException();
+                }
+                keys.Sort(Program.CompareMapMultidimItems);
 
-            //        unfold.Add(tsFirst.dimensionsStorage.storage[key]);
-            //        check[i].Add(key);
+                //List mm0 = new List();
+                foreach (MapMultidimItem key in keys)
+                {
 
-            //        string bankName = null;
+                    unfold.Add(tsFirst.dimensionsStorage.storage[key]);
+                    check[i].Add(key);
 
-            //        bool isSimple = true;
-            //        foreach (char c in label)
-            //        {
-            //            if (G.IsLetterOrDigitOrUnderscore(c) || c == ':' || c == '@' || c == Globals.freqIndicator)
-            //            {
-            //                //ok
-            //            }
-            //            else
-            //            {
-            //                isSimple = false;
-            //                break;
-            //            }
-            //        }
+                    string bankName = null;
 
-            //        string blanks = " ";
-            //        if (isSimple) blanks = "";
+                    bool isSimple = true;
+                    string label2 = label[0].Split('|')[0];
+                    foreach (char c in label2)
+                    {
+                        if (G.IsLetterOrDigitOrUnderscore(c) || c == ':' || c == '@' || c == Globals.freqIndicator)
+                        {
+                            //ok
+                        }
+                        else
+                        {
+                            isSimple = false;
+                            break;
+                        }
+                    }
 
-            //        if (counter == 1)
-            //        {
-            //            //element.label2.Add(label + blanks + "[" + key.ToString() + "]");
-            //            labels.Add(label + blanks + "[" + key.ToString() + "]");
-            //        }
+                    string blanks = " ";
+                    if (isSimple) blanks = "";
 
-            //        //labelsHandmade.Add(bankName + G.RemoveFreqFromName(name) + "[" + key.ToString() + "]");
-            //    }
-            //}
+                    if (counter == 1)
+                    {
+                        //element.label2.Add(label + blanks + "[" + key.ToString() + "]");
+                        labels.Add(label2 + blanks + "[" + key.ToString() + "]");
+                    }
+
+                    //labelsHandmade.Add(bankName + G.RemoveFreqFromName(name) + "[" + key.ToString() + "]");
+                }
+            }
 
             public static List<int> GetBankNumbers(string tableOrGraphGlobalPrintCode, List<string> printCodes)
             {               
