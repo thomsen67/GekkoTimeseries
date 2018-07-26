@@ -908,8 +908,11 @@ namespace Gekko.Parser.Gek
                     case "ASTDOC":
                         {
                             node.Code.A("O.Doc o" + Num(node) + " = new O.Doc();" + G.NL);
-                            GetCodeFromAllChildren(node);
+                            node.Code.A("o" + Num(node) + ".names = " + node[0][0].Code + ";" + G.NL);
+                            //node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
+                            GetCodeFromAllChildren(node, node[1]);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            break;
                         }
                         break;
                     case "ASTANALYZE":

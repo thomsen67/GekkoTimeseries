@@ -6176,18 +6176,26 @@ namespace Gekko
             public string opt_label = null;
             public string opt_source = null;
             public string opt_units = null;
-            public string opt_stamp = null;            
-            public List<string> listItems0 = null;  //left side     
+            public string opt_stamp = null;
+            public List names = null;
+                        
             public void Exe()
             {
-                foreach (string s in listItems0)
+                List<string> vars = Restrict(this.names, true, false, true, false);
+                foreach (string s in vars)
                 {
-                    ExtractBankAndRestHelper h = Program.ExtractBankAndRest(s, EExtrackBankAndRest.GetDatabankAndTimeSeries);
-                    if (opt_label != null) h.ts.meta.label = opt_label;
-                    if (opt_source != null) h.ts.meta.source = opt_source;
-                    if (opt_units != null) h.ts.meta.units = opt_units;
-                    if (opt_stamp != null) h.ts.meta.stamp = opt_stamp;
-                    h.ts.SetDirty(true);
+                    IVariable iv = GetIVariableFromString(s, ECreatePossibilities.NoneReportError);
+                    Series iv_series = iv as Series;
+                    if (iv_series == null)
+                    {
+                        G.Writeln2("*** ERROR: Only series are allowed");
+                        throw new GekkoException();
+                    }
+                    if (opt_label != null) iv_series.meta.label = opt_label;
+                    if (opt_source != null) iv_series.meta.source = opt_source;
+                    if (opt_units != null) iv_series.meta.units = opt_units;
+                    if (opt_stamp != null) iv_series.meta.stamp = opt_stamp;
+                    iv_series.meta.SetDirty(true);
                 }
             }         
         }

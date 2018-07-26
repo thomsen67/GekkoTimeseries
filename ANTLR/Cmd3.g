@@ -2154,6 +2154,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | create               SEMICOLON!
 						  | delete               SEMICOLON!
 						  | disp                 SEMICOLON!
+						  | doc                  SEMICOLON!
 						  | endo                 SEMICOLON!
 						  | exo                  SEMICOLON!
 						  | for2
@@ -2375,6 +2376,17 @@ dispOpt1:					ISNOTQUAL
                             ;
 dispOpt1h:				    INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
 
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// DOC
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+doc:                        DOC seqOfBankvarnames docOpt2 -> ^({token("ASTDOC", ASTDOC, $DOC.Line)} ^(ASTPLACEHOLDER seqOfBankvarnames) ^(ASTOPT_ docOpt2?));
+docOpt2:                    docOpt2h*;
+docOpt2h:                   LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expression)
+						  | SOURCE EQUAL expression -> ^(ASTOPT_STRING_SOURCE expression)
+						  | STAMP EQUAL expression -> ^(ASTOPT_STRING_STAMP expression)							  
+					      | UNITS EQUAL expression -> ^(ASTOPT_STRING_UNITS expression)							  				
+						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ENDO/EXO
