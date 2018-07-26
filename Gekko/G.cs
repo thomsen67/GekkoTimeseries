@@ -323,8 +323,7 @@ namespace Gekko
         //}
                 
         public static EFreq GetFreqFromName(string s)
-        {
-            //This will become faster when A freq has %a attached!
+        {            
             int i = s.IndexOf(Globals.freqIndicator);
             if (i <= 0)
             {
@@ -335,6 +334,16 @@ namespace Gekko
             {
                 return G.GetFreq(s.Substring(i + 1));  //for instance, fy%q --> q --> .Quarterly
             }                     
+        }
+
+        public static bool HasFreq(string s)
+        {            
+            int i = s.IndexOf(Globals.freqIndicator);
+            if (i <= 0)
+            {
+                return false;
+            }
+            return true;
         }
 
         public static bool IsGekkoNull(IVariable x1)

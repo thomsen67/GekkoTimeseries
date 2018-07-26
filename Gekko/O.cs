@@ -1416,6 +1416,7 @@ namespace Gekko
                 else
                 {
                     //just remove it
+                    bank.RemoveIVariable(nameWithFreq);
                 }
             }
             else
@@ -1462,12 +1463,33 @@ namespace Gekko
 
         private static void GetNameWithFreq(string varName, string freq, out string freq3, out string nameWithFreq)
         {
-            string freq2 = null;
+            //NOTE: it is kind of expected that varName is without any frequency (like x!q), but the method still works if it is the case            
+            //varName should be without bank, else use Chop()
+
             freq3 = null;
-            if (freq != null) freq3 = freq;
-            else freq3 = G.GetFreq(Program.options.freq);
-            freq2 = Globals.freqIndicator + freq3;
-            nameWithFreq = varName + freq2;
+            if (G.HasSigil(varName))
+            {
+                nameWithFreq = varName;
+            }
+            else
+            {
+                if (G.HasFreq(varName))
+                {
+                    nameWithFreq = varName;
+                }
+                else
+                {
+                    if (freq != null)
+                    {
+                        freq3 = freq;
+                    }
+                    else
+                    {
+                        freq3 = G.GetFreq(Program.options.freq);
+                    }
+                    nameWithFreq = varName + Globals.freqIndicator + freq3;
+                }
+            }
         }
 
         //See also Restrict()
@@ -6702,6 +6724,7 @@ namespace Gekko
         {
             public List names = null;
             public string opt_nonmodel = null;
+            public P p = null;
             public void Exe()
             {
                 if (G.Equal(opt_nonmodel, "yes"))

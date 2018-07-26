@@ -24386,6 +24386,7 @@ namespace Gekko
             {
                 string var = vars[i];                
                 O.RemoveIVariableFromString(var);
+                counter++;
             }
             
             if (counter == 0) G.Writeln("Did not delete any variables");
