@@ -17110,7 +17110,8 @@ namespace Gekko
         {
             GekkoTime tStart = o.t1;
             GekkoTime tEnd = o.t2;
-            List<string> vars= o.listItems;
+
+            List<string> vars = O.Restrict(o.names, false, false, false, false);  //only allows plain vars (idents)
 
             //GekkoTime tStart, tEnd; ConvertToGekkoTime(tp, out tStart, out tEnd);
 
@@ -17153,21 +17154,21 @@ namespace Gekko
                 hasModel = true;
                 try
                 {
-                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolCollection + "exod"]))
+                    foreach (string s in Program.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString(Globals.symbolCollection + "exod", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
                         exod.Add(s, "");
-                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolCollection + "exoj"]))
+                    foreach (string s in Program.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString(Globals.symbolCollection + "exoj", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
                         exoj.Add(s, "");
-                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolCollection + "exoz"]))
+                    foreach (string s in Program.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString(Globals.symbolCollection + "exoz", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
                         exoz.Add(s, "");
-                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolCollection + "exodjz"]))
+                    foreach (string s in Program.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString(Globals.symbolCollection + "exodjz", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
                         exodjz.Add(s, "");
-                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolCollection + "exo"]))
+                    foreach (string s in Program.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString(Globals.symbolCollection + "exo", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
                         exo.Add(s, "");
-                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolCollection + "exotrue"]))
+                    foreach (string s in Program.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString(Globals.symbolCollection + "exotrue", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
                         exotrue.Add(s, "");
-                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolCollection + "endo"]))
+                    foreach (string s in Program.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString(Globals.symbolCollection + "endo", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
                         endo.Add(s, "");
-                    foreach (string s in O.GetStringList(Program.scalars[Globals.symbolCollection + "all"]))
+                    foreach (string s in Program.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString(Globals.symbolCollection + "all", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
                         all.Add(s, "");
                 }
                 catch { };  //if error, we just ignore it, and the list will be empty.
@@ -17217,17 +17218,21 @@ namespace Gekko
                 }
             }
 
+            foreach(KeyValuePair<string, IVariable>kvp in work.storage) 
             //all variables in work databank
-            foreach (string ss in work.storage.Keys)
-            {                
+            //foreach (string ss in work.storage.Keys)
+            {
+                if (kvp.Value.Type() != EVariableType.Series) continue;
+                string ss =  kvp.Key;                
                 if (G.GetFreqFromName(ss) != Program.options.freq) continue;  //we filter out other freqs
                 string s = G.RemoveFreqFromName(ss);
                 if (hasFilter)
                 {
                     if (!filter.ContainsKey(s)) continue;  //ignore this
                 }
-                Series ts = work.GetVariable(s);  //can this not be moved before loop??  //#getvar
-                if (ts.type == ESeriesType.ArraySuper) continue;  //ignore it
+                Series ts = kvp.Value as Series;
+                //Series ts = work.GetVariable(s);  //can this not be moved before loop??  //#getvar
+                if (ts.type == ESeriesType.ArraySuper) continue;  //ignore it, but should not be possible
                 foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
                 {                    
                     double value = ts.GetData(null, t);
@@ -17300,12 +17305,18 @@ namespace Gekko
 
                     if (true)
                     {
-                        if (Program.scalars.ContainsKey(Globals.symbolCollection+ listname))
-                        {
-                            Program.scalars.Remove(Globals.symbolCollection + listname);
-                        }
+                        //if (Program.databanks.GetFirst().ContainsIVariable(Globals.symbolCollection + listname))
+                        //{
+                        //    Program.databanks.GetFirst().RemoveIVariable(Globals.symbolCollection + listname);
+                        //}
+
+                        //if (Program.scalars.ContainsKey(Globals.symbolCollection+ listname))
+                        //{
+                        //    Program.scalars.Remove(Globals.symbolCollection + listname);
+                        //}
                         list.Sort();
-                        Program.scalars.Add(Globals.symbolCollection + listname, new List(list));
+                        Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + listname, new List(list));
+                        //Program.scalars.Add(Globals.symbolCollection + listname, new List(list));
                         if (list.Count > 0)
                         {
                             string v = "variables";

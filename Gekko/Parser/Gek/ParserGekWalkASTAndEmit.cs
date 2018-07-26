@@ -1130,7 +1130,8 @@ namespace Gekko.Parser.Gek
                     case "ASTFINDMISSINGDATA": // <command> <period>
                         {
                             node.Code.A("O.Findmissingdata o" + Num(node) + " = new O.Findmissingdata();" + G.NL);
-                            GetCodeFromAllChildren(node);
+                            if (node[1][0] != null) node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);
+                            GetCodeFromAllChildren(node, node[0]);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
                         break;

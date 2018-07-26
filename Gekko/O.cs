@@ -6883,7 +6883,7 @@ namespace Gekko
         {            
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set            
-            public List<string> listItems = null;
+            public List names = null;
             public bool question = false;
             public double opt_replace = double.NaN;
             public void Exe()

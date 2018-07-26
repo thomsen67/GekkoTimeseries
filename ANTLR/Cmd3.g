@@ -2157,6 +2157,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | doc                  SEMICOLON!
 						  | endo                 SEMICOLON!
 						  | exo                  SEMICOLON!
+						  | findmissingdata      SEMICOLON!
 						  | for2
 						  | functionDef          SEMICOLON!
 						  | goto2                SEMICOLON!
@@ -2400,6 +2401,17 @@ eeOpt1:				     ISNOTQUAL
 
 eeHelper:              eeHelper2 (COMMA2 eeHelper2)* -> eeHelper2+;
 eeHelper2:             indexerExpression eeOpt1?  -> ^(ASTPLACEHOLDER indexerExpression eeOpt1?);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// FINDMISSINGDATA
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+findmissingdata:			FINDMISSINGDATA findmissingdataOpt1? seqOfBankvarnames? -> ^({token("ASTFINDMISSINGDATA", ASTFINDMISSINGDATA, $FINDMISSINGDATA.Line)} ^(ASTPLACEHOLDER findmissingdataOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
+findmissingdataOpt1:        ISNOTQUAL | leftAngle2          findmissingdataOpt1h* RIGHTANGLE -> ^(ASTOPT1 findmissingdataOpt1h*)							
+						  | leftAngleNo2 dates? findmissingdataOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) findmissingdataOpt1h*)
+                            ;
+findmissingdataOpt1h:       REPLACE EQUAL expression -> ^(ASTOPT_VAL_REPLACE expression);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // FOR
