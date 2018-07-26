@@ -68,6 +68,16 @@ namespace Gekko
             Series ts = iv as Series;  //always so
             if (ts != null) ts.mmi = mmi;  //so that the sub-series points to the mmi object, which in turn points to the array-series
         }
+
+        public void RemoveIVariable(MapMultidimItem mmi)
+        {
+            if (this.storage.ContainsKey(mmi)) this.storage.Remove(mmi);
+            else
+            {
+                G.Writeln2("*** ERROR: Could not remove variable");
+                throw new GekkoException();
+            }
+        }
     }
 
     [ProtoContract]

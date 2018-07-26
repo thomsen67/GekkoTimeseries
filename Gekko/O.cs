@@ -1222,6 +1222,14 @@ namespace Gekko
             return new List(output2);
         }
 
+        public static IVariable RemoveIVariableFromString(string fullname)
+        {
+            string dbName, varName, freq; string[] indexes;
+            O.Chop(fullname, out dbName, out varName, out freq, out indexes);
+            IVariable iv = O.RemoveIVariableFromString(dbName, varName, freq, indexes);
+            return iv;
+        }
+
         public static IVariable GetIVariableFromString(string fullname, ECreatePossibilities type)
         {
             string dbName, varName, freq; string[] indexes;
@@ -1234,14 +1242,9 @@ namespace Gekko
         {
             //type is only relevant for series, ignored for others
 
-            string freq2 = null;
-
-            string freq3 = null;
-            if (freq != null) freq3 = freq;
-            else freq3 = G.GetFreq(Program.options.freq);
-            freq2 = Globals.freqIndicator + freq3;
-
-            string nameWithFreq = varName + freq2;
+            string freq3, nameWithFreq;
+            GetNameWithFreq(varName, freq, out freq3, out nameWithFreq);
+                        
             Databank bank = null;
             if (dbName == null) bank = Program.databanks.GetFirst();
             else bank = Program.databanks.GetDatabank(dbName);
@@ -1381,7 +1384,91 @@ namespace Gekko
             
             return iv;
         }
-                
+
+        public static IVariable RemoveIVariableFromString(string dbName, string varName, string freq, string[] indexes)
+        {
+            string freq3, nameWithFreq;
+            GetNameWithFreq(varName, freq, out freq3, out nameWithFreq);
+
+            Databank bank = null;
+            if (dbName == null) bank = Program.databanks.GetFirst();
+            else bank = Program.databanks.GetDatabank(dbName);
+            if (dbName != null)
+            {
+                bank = Program.databanks.GetDatabank(dbName, true);
+            }
+            IVariable iv = bank.GetIVariable(nameWithFreq);
+
+            if (iv == null)
+            {
+                G.Writeln2("*** ERROR: Variable with the name " + nameWithFreq + " does not exist in '" + dbName + "' databank");
+                throw new GekkoException();
+            }
+
+            if (G.HasSigil(nameWithFreq))
+            {
+                //%x or #x
+                if (indexes != null)
+                {
+                    G.Writeln2("*** ERROR: Name like " + nameWithFreq + "[" + G.GetListWithCommas(indexes) + "]" + " not allowed");
+                    throw new GekkoException();
+                }
+                else
+                {
+                    //just remove it
+                }
+            }
+            else
+            {
+                //series name, not starting with % or #
+
+                if (indexes != null)
+                {
+                    //array-series
+
+                    MapMultidimItem mmi = new MapMultidimItem(indexes);
+                    
+                    //now we know that the series exists
+
+                    Series iv_series = iv as Series;
+
+                    if (iv_series.type == ESeriesType.ArraySuper)
+                    {
+                        G.Writeln2("*** ERROR: Series with the name " + nameWithFreq + " from '" + dbName + "' databank is not an array-series");
+                        throw new GekkoException();
+                    }
+
+                    IVariable iv2 = null; iv_series.dimensionsStorage.TryGetValue(mmi, out iv2);
+
+                    if (iv2 == null)
+                    {
+                        G.Writeln2("*** ERROR: Array-series " + nameWithFreq + "[" + G.GetListWithCommas(indexes) + "]" + " does not exist");
+                        throw new GekkoException();
+                    }
+                    else
+                    {
+                        iv_series.dimensionsStorage.RemoveIVariable(mmi);
+                    }
+
+                }
+                else
+                {
+                    //normal series, not array-series
+                    bank.RemoveIVariable(nameWithFreq);
+                }
+            }    
+            return iv;
+        }
+
+        private static void GetNameWithFreq(string varName, string freq, out string freq3, out string nameWithFreq)
+        {
+            string freq2 = null;
+            freq3 = null;
+            if (freq != null) freq3 = freq;
+            else freq3 = G.GetFreq(Program.options.freq);
+            freq2 = Globals.freqIndicator + freq3;
+            nameWithFreq = varName + freq2;
+        }
 
         //See also Restrict()
         public static List Restrict2(List m, bool allowBank, bool allowSigil, bool allowFreq, bool allowIndexes)
@@ -6613,22 +6700,22 @@ namespace Gekko
 
         public class Delete
         {
-            public List<string> listItems = null;
+            public List names = null;
             public string opt_nonmodel = null;
             public void Exe()
             {
                 if (G.Equal(opt_nonmodel, "yes"))
                 {
-                    if (this.listItems != null)
+                    if (this.names != null)
                     {
-                        G.Writeln2("*** ERROR: You cannot mix <nonmodel> and list items");
+                        G.Writeln2("*** ERROR: You cannot mix <nonmodel> and variables");
                         throw new GekkoException();
                     }
                     Program.Trimvars();
                 }
                 else
                 {
-                    Program.Delete(this.listItems);
+                    Program.Delete(this.names);
                 }
             }
         }

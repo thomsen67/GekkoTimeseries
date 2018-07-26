@@ -2152,6 +2152,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | compare              SEMICOLON!
 						  | copy                 SEMICOLON!
 						  | create               SEMICOLON!
+						  | delete               SEMICOLON!
 						  | disp                 SEMICOLON!
 						  | endo                 SEMICOLON!
 						  | exo                  SEMICOLON!
@@ -2353,6 +2354,12 @@ copyOpt1h                 : RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT ye
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 create:					    CREATE seqOfBankvarnames -> ^({token("ASTCREATE", ASTCREATE, $CREATE.Line)} ^(ASTPLACEHOLDER seqOfBankvarnames));
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// DELETE
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+delete:					    DELETE seqOfBankvarnames -> ^({token("ASTDELETE", ASTDELETE, $DELETE.Line)} ^(ASTPLACEHOLDER seqOfBankvarnames));
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // DISP

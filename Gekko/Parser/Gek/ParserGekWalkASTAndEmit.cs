@@ -946,14 +946,23 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
+                    //case "ASTDELETE":
+                    //    {
+                    //        node.Code.A("O.Delete o" + Num(node) + " = new O.Delete();" + G.NL);
+                    //        GetCodeFromAllChildren(node);
+                    //        //node.Code.A(node[0].Code);
+                    //        node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                    //        break;
+                    //    }
                     case "ASTDELETE":
                         {
                             node.Code.A("O.Delete o" + Num(node) + " = new O.Delete();" + G.NL);
-                            GetCodeFromAllChildren(node);
-                            //node.Code.A(node[0].Code);
+                            node.Code.A("o" + Num(node) + ".names = " + node[0][0].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                             break;
                         }
+                        break;
                     case "ASTDELETEALL":
                         {
                             node.Code.A("O.Delete o" + Num(node) + " = new O.Delete();" + G.NL);

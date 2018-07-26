@@ -24375,28 +24375,17 @@ namespace Gekko
             return databank1;
         }
 
-        public static void Delete(List<string> vars)
+        public static void Delete(List vars2)
         {
+            List<string> vars = O.Restrict(vars2, true, true, true, true);
+
             int counter = 0;
             G.Writeln();
 
             for (int i = 0; i < vars.Count; i++)
             {
-                //may contain nulls if ts not found in bank
-                List<Series> tss = Program.GetTimeSeriesFromStringWildcard(vars[i], null, true);
-                foreach (Series ts in tss)
-                {
-                    if (ts == null)
-                    {
-                        G.Writeln("+++ WARNING: DELETE: variable '" + vars[i] + "' does not exist");
-                    }
-                    else
-                    {
-                        if (ts.meta.parentDatabank.protect) Program.ProtectError("You cannot delete a timeseries in a non-editable databank (" + ts.meta.parentDatabank + ")");
-                        ts.meta.parentDatabank.RemoveVariable(ts.name);
-                        counter++;
-                    }
-                }
+                string var = vars[i];                
+                O.RemoveIVariableFromString(var);
             }
             
             if (counter == 0) G.Writeln("Did not delete any variables");
