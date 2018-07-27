@@ -8340,14 +8340,16 @@ namespace Gekko
 
         public class R_export
         {
-            public List<string> r_exportItems = null;
+            public List names = null;
             public string opt_target = null;
             public void Exe()
             {
                 string all = null;
-                foreach (string s in this.r_exportItems)
+                List<string> r_exportItems = Restrict(names, true, true, false, false);  //only matrices, #x
+                foreach (string s in r_exportItems)
                 {
-                    IVariable iv = null; Program.scalars.TryGetValue(Globals.symbolCollection + s, out iv);
+                    IVariable iv = O.GetIVariableFromString(s, ECreatePossibilities.NoneReportError);
+                    //IVariable iv = null; Program.scalars.TryGetValue(Globals.symbolCollection + s, out iv);
                     if (iv != null && iv.Type() == EVariableType.Matrix)
                     {
                         Matrix m = (Matrix)iv;
@@ -8356,7 +8358,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: Could not find matrix " + Globals.symbolCollection + s);
+                        G.Writeln2("*** ERROR: Could not find matrix " + s);
                         throw new GekkoException();
                     }
                 }

@@ -2174,9 +2174,13 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | ols  				 SEMICOLON!
 						  | open                 SEMICOLON!
 						  | option				 SEMICOLON!
+						  | pause                SEMICOLON!
 						  | pipe				 SEMICOLON!
 						  | print                SEMICOLON!
 						  | procedureDef         SEMICOLON!
+						  | r_file               SEMICOLON!
+						  | r_export             SEMICOLON!
+						  | r_run                SEMICOLON!
 						  | read                 SEMICOLON!
 						  | reset                SEMICOLON!
 						  | restart              SEMICOLON!
@@ -2571,6 +2575,12 @@ openOpt1h:                  TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 option:                     OPTION optionType -> ^({token("ASTOPTION", ASTOPTION, $OPTION.Line)} optionType);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
+// PAUSE
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+pause:                      PAUSE expression? -> ^({token("ASTPAUSE", ASTPAUSE, $PAUSE.Line)} expression?);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 // PIPE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -2779,6 +2789,20 @@ gdif:					    (GDIF|GDIFF) ('=' yesNoAppend -> ^(ASTGDIF yesNoAppend) | -> ^(AST
 v:    					    V ('=' yesNo -> ^(ASTV yesNo) | -> ^(ASTV ASTYES))
                           | NOV -> ^(ASTV ASTNO)
 						    ;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// R_FILE, R_EXPORT, R_RUN
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+r_file:   				    R_FILE fileName -> ^({token("ASTR_FILE", ASTR_FILE, $R_FILE.Line)} ^(ASTPLACEHOLDER fileName?));
+
+r_export:  				    R_EXPORT r_exportOpt1? seqOfBankvarnames -> ^({token("ASTR_EXPORT", ASTR_EXPORT, $R_EXPORT.Line)}  ^(ASTPLACEHOLDER r_exportOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames));
+r_exportOpt1:			    ISNOTQUAL | leftAngle r_exportOpt1h* RIGHTANGLE -> r_exportOpt1h*;
+r_exportOpt1h:              TARGET EQUAL expression -> ^(ASTOPT_STRING_TARGET expression);
+
+r_run:  				    R_RUN r_runOpt1? -> ^({token("ASTR_RUN", ASTR_RUN, $R_RUN.Line)}  r_runOpt1? );
+r_runOpt1:			        ISNOTQUAL | leftAngle r_runOpt1h* RIGHTANGLE -> r_runOpt1h*;
+r_runOpt1h:                 MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // READ and IMPORT

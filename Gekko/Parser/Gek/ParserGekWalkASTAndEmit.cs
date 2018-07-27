@@ -4734,14 +4734,15 @@ namespace Gekko.Parser.Gek
                     case "ASTR_FILE":
                         {
                             node.Code.A("O.R_file o" + Num(node) + " = new O.R_file();" + G.NL);
-                            GetCodeFromAllChildren(node);
+                            node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[0][0].Code + ");" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
                     case "ASTR_EXPORT":
                         {
                             node.Code.A("O.R_export o" + Num(node) + " = new O.R_export();" + G.NL);
-                            GetCodeFromAllChildren(node);
+                            GetCodeFromAllChildren(node, node[0]);
+                            node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
