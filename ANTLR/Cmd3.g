@@ -2161,11 +2161,13 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | for2
 						  | functionDef          SEMICOLON!
 						  | goto2                SEMICOLON!
+						  | hdg                  SEMICOLON!
 					      | help                 SEMICOLON!
 						  | if2
-						  | ini                  SEMICOLON!
+						  | index                SEMICOLON!
 						  | ini                  SEMICOLON!
 						  | interpolate          SEMICOLON!
+						  | lock_                SEMICOLON!
 						  | mem                  SEMICOLON!
 						  | model                SEMICOLON!
 		   			      | mode                 SEMICOLON!
@@ -2187,6 +2189,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | tell                 SEMICOLON!
 						  | time                 SEMICOLON!
 						  | timefilter           SEMICOLON!
+						  | unlock_              SEMICOLON!
 						  | write                SEMICOLON!						  
 						  | functionNaked        SEMICOLON!   //naked function outside expression
 						  | objectFunctionNaked  SEMICOLON!   //naked object function outside expression
@@ -2445,6 +2448,12 @@ objectFunctionNaked:        bankvarname GLUEDOT DOT ident leftParenGlue (express
 goto2:                      GOTO ident -> ^({token("ASTGOTO", ASTGOTO, $GOTO.Line)} ident);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
+// HDG
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+hdg:						HDG expression -> ^({token("ASTHDG", ASTHDG, $HDG.Line)} expression);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 // HELP
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -2455,6 +2464,17 @@ help:					    HELP name? -> ^({token("ASTHELP", ASTHELP, $HELP.Line)} name?);
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 if2:						IF leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIF", ASTIF, $IF.Line)} logical ^(ASTPLACEHOLDER functionStatements) ^(ASTPLACEHOLDER functionStatements2?));
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// IF
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+index:                      INDEX indexOpt1? SERIES? listItemsWildRange bankvarname? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} listItemsWildRange ^(ASTPLACEHOLDER bankvarname?) indexOpt1?);
+indexOpt1:                  ISNOTQUAL | leftAngle indexOpt1h* RIGHTANGLE -> ^(ASTOPT1 indexOpt1h*);							
+indexOpt1h:                 MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)	
+						  |	ADDBANK (EQUAL yesNo)? -> ^(ASTOPT_STRING_ADDBANK yesNo?)	
+						  | BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //name can be without quotes
+						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // INI
@@ -2468,6 +2488,13 @@ ini:					    INI -> ^({token("ASTINI", ASTINI, $INI.Line)});
 
 interpolate:				    INTERPOLATE seqOfBankvarnames '=' seqOfBankvarnames interpolateMethod? -> ^({token("ASTINTERPOLATE", ASTINTERPOLATE, $INTERPOLATE.Line)} seqOfBankvarnames seqOfBankvarnames interpolateMethod?);
 interpolateMethod:			    REPEAT | PRORATE;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// LOCK, UNLOCK
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+lock_:                      LOCK_ name -> ^({token("ASTLOCK", ASTLOCK, $LOCK_.Line)} name);
+unlock_:                    UNLOCK_ name -> ^({token("ASTUNLOCK", ASTUNLOCK, $UNLOCK_.Line)} name);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // MEM

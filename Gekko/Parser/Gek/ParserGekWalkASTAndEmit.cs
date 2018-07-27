@@ -823,7 +823,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.Lock o" + Num(node) + " = new O.Lock();" + G.NL);
                             //node.Code.A("o" + Num(node) + ".p = p;");
-                            node.Code.A("o" + Num(node) + ".bank = `" + node[0].Text + "`;" + G.NL);
+                            node.Code.A("o" + Num(node) + ".bank = O.ConvertToString(" + node[0].Code + ");" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -831,7 +831,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.Unlock o" + Num(node) + " = new O.Unlock();" + G.NL);
                             //node.Code.A("o" + Num(node) + ".p = p;");
-                            node.Code.A("o" + Num(node) + ".bank = `" + node[0].Text + "`;" + G.NL);
+                            node.Code.A("o" + Num(node) + ".bank = O.ConvertToString(" + node[0].Code + ");" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
