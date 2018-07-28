@@ -2182,6 +2182,8 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | r_export             SEMICOLON!
 						  | r_run                SEMICOLON!
 						  | read                 SEMICOLON!
+						  | rebase               SEMICOLON!
+						  | rename               SEMICOLON!
 						  | reset                SEMICOLON!
 						  | restart              SEMICOLON!
 						  | return2              SEMICOLON!
@@ -2803,6 +2805,27 @@ r_exportOpt1h:              TARGET EQUAL expression -> ^(ASTOPT_STRING_TARGET ex
 r_run:  				    R_RUN r_runOpt1? -> ^({token("ASTR_RUN", ASTR_RUN, $R_RUN.Line)}  r_runOpt1? );
 r_runOpt1:			        ISNOTQUAL | leftAngle r_runOpt1h* RIGHTANGLE -> r_runOpt1h*;
 r_runOpt1h:                 MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// REBASE
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+rebase:                     REBASE rebaseOpt1? seqOfBankvarnames rebaseDate1? rebaseDate2? -> ^({token("ASTREBASE", ASTREBASE, $REBASE.Line)} seqOfBankvarnames ^(ASTPLACEHOLDER rebaseDate1? rebaseDate2?) rebaseOpt1?);
+rebaseDate1:                expression;
+rebaseDate2:                expression;
+rebaseOpt1:                 ISNOTQUAL | leftAngle rebaseOpt1h* RIGHTANGLE -> ^(ASTOPT1 rebaseOpt1h*);							
+rebaseOpt1h:                BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //name can be without quotes
+						  | PREFIX EQUAL name -> ^(ASTOPT_STRING_PREFIX name) //name can be without quotes
+						  | INDEX EQUAL expression -> ^(ASTOPT_VAL_INDEX expression)
+						    ;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// REBASE
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+rename:                     RENAME renameOpt1? seqOfBankvarnames AS seqOfBankvarnames -> ^({token("ASTRENAME", ASTRENAME, $RENAME.Line)} seqOfBankvarnames seqOfBankvarnames renameOpt1?);
+renameOpt1:                 ISNOTQUAL | leftAngle renameOpt1h* RIGHTANGLE -> renameOpt1h*;
+renameOpt1h:                BANK EQUAL name -> ^(ASTOPT_STRING_BANK name);  //name can be without quotes
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // READ and IMPORT

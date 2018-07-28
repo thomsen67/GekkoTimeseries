@@ -1230,6 +1230,75 @@ namespace Gekko
             return iv;
         }
 
+        public static void AddIVariableWithOverwriteFromString(string fullname, IVariable iv)
+        {
+            string dbName, varName, freq; string[] indexes;
+            O.Chop(fullname, out dbName, out varName, out freq, out indexes);
+            AddIVariableWithOverwriteFromString(dbName, varName, freq, indexes, iv);
+        }
+
+        public static void AddIVariableWithOverwriteFromString(string dbName, string varName, string freq, string[] indexes, IVariable iv)
+        {            
+            string freq3, nameWithFreq;
+            GetNameWithFreq(varName, freq, out freq3, out nameWithFreq);
+
+            Databank bank = null;
+            if (dbName == null) bank = Program.databanks.GetFirst();
+            else bank = Program.databanks.GetDatabank(dbName);
+            if (dbName != null)
+            {
+                bank = Program.databanks.GetDatabank(dbName, true);
+            }
+            
+            if (G.HasSigil(nameWithFreq))
+            {
+                //%x or #x
+                if (indexes != null)
+                {
+                    G.Writeln2("*** ERROR: Name like " + nameWithFreq + "[" + G.GetListWithCommas(indexes) + "]" + " not allowed");
+                    throw new GekkoException();
+                }
+                else
+                {
+                    //just add it                    
+                    bank.AddIVariableWithOverwrite(nameWithFreq, iv);
+                }
+            }
+            else
+            {
+                //series name, not starting with % or #
+
+                if (indexes != null)
+                {
+                    //array-series
+
+                    MapMultidimItem mmi = new MapMultidimItem(indexes);
+
+                    //now we know that the series exists
+
+                    Series iv_series = iv as Series;
+
+                    if (iv_series.type == ESeriesType.ArraySuper)
+                    {
+                        G.Writeln2("*** ERROR: Series with the name " + nameWithFreq + " from '" + dbName + "' databank is not an array-series");
+                        throw new GekkoException();
+                    }
+
+                    iv_series.dimensionsStorage.AddIVariableWithOverwrite(mmi, iv);
+                    
+                }
+                else
+                {
+                    //normal series, not array-series                    
+                    bank.AddIVariableWithOverwrite(nameWithFreq, iv);
+                }
+            }
+            return;
+
+        }
+
+
+
         public static IVariable GetIVariableFromString(string fullname, ECreatePossibilities type)
         {
             string dbName, varName, freq; string[] indexes;
@@ -4221,30 +4290,30 @@ namespace Gekko
 
         }
 
-        public static Matrix GetMatrixFromString(IVariable name)
-        {
-            string name2 = name.ConvertToString();
-            IVariable lhs = null;            
-            if (Program.scalars.TryGetValue(Globals.symbolCollection + name2, out lhs))
-            {
-                //Scalar is already existing                
-                if (lhs.Type() == EVariableType.Matrix)
-                {
-                    //fine
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: " + Globals.symbolCollection + name2 + " is not a matrix");
-                    throw new GekkoException();
-                }
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: " + Globals.symbolCollection + name2 + " could not be found");
-                throw new GekkoException();
-            }
-            return (Matrix)lhs;
-        }
+        //public static Matrix GetMatrixFromString(IVariable name)
+        //{
+        //    string name2 = name.ConvertToString();
+        //    IVariable lhs = null;            
+        //    if (Program.scalars.TryGetValue(Globals.symbolCollection + name2, out lhs))
+        //    {
+        //        //Scalar is already existing                
+        //        if (lhs.Type() == EVariableType.Matrix)
+        //        {
+        //            //fine
+        //        }
+        //        else
+        //        {
+        //            G.Writeln2("*** ERROR: " + Globals.symbolCollection + name2 + " is not a matrix");
+        //            throw new GekkoException();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        G.Writeln2("*** ERROR: " + Globals.symbolCollection + name2 + " could not be found");
+        //        throw new GekkoException();
+        //    }
+        //    return (Matrix)lhs;
+        //}
 
         public static double[,] MultiplyMatrixScalar(double[,] a, double b, int m, int k)
         {
@@ -6637,15 +6706,24 @@ namespace Gekko
         public class Rename
         {            
             //public List<string> listItems = null;  //only temporary storage, use namesList1+2
-            public List<string> listItems0 = null;
-            public List<string> listItems1 = null;
+            public List names1 = null;
+            public List names2 = null;
+            
             public string opt_bank = null;
             public void Exe()
             {
                 //listItems = null;  //just for safety, should not be used.
-                
-                if (true)
+
+                if (opt_bank != null)
                 {
+                    G.Writeln2("*** ERROR: <bank> not yet implemented");
+                    throw new GekkoException();
+                }
+
+                List<string> listItems0 = Restrict(this.names1, true, true, true, false);
+                List<string> listItems1 = Restrict(this.names2, true, true, true, false);
+
+                
                     if (listItems0.Count != listItems1.Count)
                     {
                         G.Writeln2("*** ERROR: unequal number of items before and after AS");
@@ -6659,7 +6737,7 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                }
+                
                 //we are now sure lists are of same length and have no wildcards.                                
 
                 int counter = 0;
@@ -6667,14 +6745,19 @@ namespace Gekko
                 {
                     string s1 = listItems0[i];
                     string s2 = listItems1[i];
-                    if (s1.Contains(":") || s2.Contains(":"))
+
+                    IVariable iv1 = O.GetIVariableFromString(s1, ECreatePossibilities.NoneReportError);
+                    IVariable iv2 = O.GetIVariableFromString(s2, ECreatePossibilities.NoneReturnNull);
+
+                    if (iv2 != null)
                     {
-                        G.Writeln2("*** ERROR: Banknames not yet allowed for RENAME command.");
-                        G.Writeln("           You may try the <bank=...> option.");
+                        G.Writeln2("*** ERROR: Cannot rename " + s1 + " into " + s2 + " because the latter exists already");
                         throw new GekkoException();
                     }
-                    //the string may be with or without bank (bank:varname)
-                                     
+
+                    O.RemoveIVariableFromString(s1);
+                    
+
                     List<Series> tss = Program.GetTimeSeriesFromStringWildcard(s1, opt_bank);
                     foreach (Series ts in tss)
                     {
@@ -7134,7 +7217,7 @@ namespace Gekko
 
         public class Rebase
         {
-            public List<string> listItems = null;
+            public List names = null;
             public GekkoTime date1 = GekkoTime.tNull;
             public GekkoTime date2 = GekkoTime.tNull;
             public string opt_prefix = null;
@@ -7161,95 +7244,109 @@ namespace Gekko
                     G.Writeln2("*** ERROR: The first date must not be later than the last date");  //probably cannot happen
                     throw new GekkoException();
                 }
+
+                List<string> listItems = Restrict(this.names, true, false, true, true);
+
                 int counter = 0;
                 int count = 0;
-                for (int i = 0; i < this.listItems.Count; i++)
+                
+                for (int i = 0; i < listItems.Count; i++)
                 {
-                    List<Series> tss = Program.GetTimeSeriesFromStringWildcard(this.listItems[i], opt_bank);
-                    foreach (Series ts in tss)
+                    IVariable iv = O.GetIVariableFromString(listItems[i], ECreatePossibilities.NoneReportError);
+
+                    Series ts = iv as Series;
+
+                    if (ts.Type() != EVariableType.Series)
                     {
-                        if (ts.meta.parentDatabank.protect) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + ts.meta.parentDatabank + ")");
-                        
-                        GekkoTime ddate1 = date1;
-                        GekkoTime ddate2 = date2;
-
-                        if (date1.freq == EFreq.Annual && (ts.freq == EFreq.Quarterly || ts.freq == EFreq.Monthly))
-                        {
-                            //if a year is used for a quarterly series, q1-q4 is used.
-                            ddate1 = new GekkoTime(ts.freq, date1.super, 1);
-                            int end = -12345;
-                            if (ts.freq == EFreq.Quarterly)
-                            {
-                                end = Globals.freqQSubperiods;
-                            }
-                            else if (ts.freq == EFreq.Monthly)
-                            {
-                                end = Globals.freqMSubperiods;
-                            }
-                            else
-                            {
-                                G.Writeln2("*** ERROR: freq error #903853245");
-                                throw new GekkoException();
-                            }
-                            ddate2 = new GekkoTime(ts.freq, date1.super, end);
-                        }
-
-                        if (ddate1.freq != ts.freq || ddate2.freq != ts.freq)
-                        {
-                            G.Writeln2("*** ERROR: frequency of timeseries and frequency of period(s) do not match");
-                            throw new GekkoException();
-                        }
-
-                        double sum = 0d;
-                        double n = 0d;
-                        foreach (GekkoTime t in new GekkoTimeIterator(ddate1, ddate2))
-                        {
-                            sum += ts.GetData(null, t);
-                            n++;
-                        }
-
-                        if (G.isNumericalError(sum))
-                        {
-                            G.Writeln2("*** ERROR: Series " + ts.meta.parentDatabank + ":" + ts.name + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " contains missing values");
-                            throw new GekkoException();
-                        }
-                        if (sum == 0d)
-                        {
-                            G.Writeln2("*** ERROR: Series " + ts.meta.parentDatabank + ":" + ts.name + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " sums to 0, cannot rebase");
-                            throw new GekkoException();
-                        }                                               
-
-                        Series tsNew = null;
-                        if (opt_prefix != null)
-                        {
-                            tsNew = ts.DeepClone() as Series;
-                            tsNew.name = opt_prefix + ts.name;
-                            if (ts.meta.parentDatabank == null)
-                            {
-                                G.Writeln2("*** ERROR: Internal error #8796357826435");
-                                throw new GekkoException();
-                            }
-
-
-                            if (ts.meta.parentDatabank.ContainsVariable(tsNew.name))
-                            {
-                                ts.meta.parentDatabank.RemoveVariable(tsNew.name);
-                                counter++;
-                            }
-                            ts.meta.parentDatabank.AddVariable(tsNew);
-                        }
-                        else tsNew = ts;
-                        
-                        double[] data = tsNew.data.dataArray;
-                        for (int ii = 0; ii < data.Length; ii++)
-                        {
-                            //could use ts.firstPeriodPositionInArray etc., but better to do it for all since ts.ts.firstPeriodPositionInArray is not always correct
-                            data[ii] = data[ii] / (sum / n) * opt_index;
-                        }
-                        count++;
+                        G.Writeln2("*** ERROR: Expected series type");
+                        throw new GekkoException();
                     }
+
+                    //List<Series> tss = Program.GetTimeSeriesFromStringWildcard(listItems[i], opt_bank);
+                    //foreach (Series ts in tss)
+
+                    if (ts.meta.parentDatabank.protect) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + ts.meta.parentDatabank + ")");
+
+                    GekkoTime ddate1 = date1;
+                    GekkoTime ddate2 = date2;
+
+                    if (date1.freq == EFreq.Annual && (ts.freq == EFreq.Quarterly || ts.freq == EFreq.Monthly))
+                    {
+                        //if a year is used for a quarterly series, q1-q4 is used.
+                        ddate1 = new GekkoTime(ts.freq, date1.super, 1);
+                        int end = -12345;
+                        if (ts.freq == EFreq.Quarterly)
+                        {
+                            end = Globals.freqQSubperiods;
+                        }
+                        else if (ts.freq == EFreq.Monthly)
+                        {
+                            end = Globals.freqMSubperiods;
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: freq error #903853245");
+                            throw new GekkoException();
+                        }
+                        ddate2 = new GekkoTime(ts.freq, date1.super, end);
+                    }
+
+                    if (ddate1.freq != ts.freq || ddate2.freq != ts.freq)
+                    {
+                        G.Writeln2("*** ERROR: frequency of timeseries and frequency of period(s) do not match");
+                        throw new GekkoException();
+                    }
+
+                    double sum = 0d;
+                    double n = 0d;
+                    foreach (GekkoTime t in new GekkoTimeIterator(ddate1, ddate2))
+                    {
+                        sum += ts.GetData(null, t);
+                        n++;
+                    }
+
+                    if (G.isNumericalError(sum))
+                    {
+                        G.Writeln2("*** ERROR: Series " + ts.meta.parentDatabank + ":" + ts.name + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " contains missing values");
+                        throw new GekkoException();
+                    }
+                    if (sum == 0d)
+                    {
+                        G.Writeln2("*** ERROR: Series " + ts.meta.parentDatabank + ":" + ts.name + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " sums to 0, cannot rebase");
+                        throw new GekkoException();
+                    }
+
+                    Series tsNew = null;
+                    if (opt_prefix != null)
+                    {
+                        tsNew = ts.DeepClone() as Series;
+                        tsNew.name = opt_prefix + ts.name;
+                        if (ts.meta.parentDatabank == null)
+                        {
+                            G.Writeln2("*** ERROR: Internal error #8796357826435");
+                            throw new GekkoException();
+                        }
+
+
+                        if (ts.meta.parentDatabank.ContainsVariable(tsNew.name))
+                        {
+                            ts.meta.parentDatabank.RemoveVariable(tsNew.name);
+                            counter++;
+                        }
+                        ts.meta.parentDatabank.AddVariable(tsNew);
+                    }
+                    else tsNew = ts;
+
+                    double[] data = tsNew.data.dataArray;
+                    for (int ii = 0; ii < data.Length; ii++)
+                    {
+                        //could use ts.firstPeriodPositionInArray etc., but better to do it for all since ts.ts.firstPeriodPositionInArray is not always correct
+                        data[ii] = data[ii] / (sum / n) * opt_index;
+                    }
+                    count++;
+
                 }
-                G.Writeln2("Rebased " + count + " variables");
+                G.Writeln2("Rebased " + count + " series");
                 //if (counter > 0) G.Writeln("+++ NOTE: Prefix names replaced " + counter + " existing variables");
             }
         }

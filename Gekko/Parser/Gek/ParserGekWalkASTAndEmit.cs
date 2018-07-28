@@ -2908,7 +2908,9 @@ namespace Gekko.Parser.Gek
                     case "ASTREBASE":  //the REBASE command
                         {
                             node.Code.A("O.Rebase o" + Num(node) + " = new O.Rebase();" + G.NL);                                                        
-                            node.Code.A(node[0].Code);
+                            //node.Code.A(node[0].Code);
+
+                            node.Code.A("o" + Num(node) + ".names = " + node[0].Code + ";" + G.NL);
 
                             if (node[1][0] != null)
                             {
@@ -4467,12 +4469,16 @@ namespace Gekko.Parser.Gek
                     case "ASTRENAME":
                         {
                             //similar to ASTCOPY
-                            node.Code.A("O.Rename o" + Num(node) + " = new O.Rename();" + G.NL);                            
+                            node.Code.A("O.Rename o" + Num(node) + " = new O.Rename();" + G.NL);
+
+                            node.Code.A("o" + Num(node) + ".names1 = " + node[0].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".names2 = " + node[1].Code + ";" + G.NL);
+
                             //node.Code.A("o" + Num(node) + ".listItems = new List<string>();" + G.NL;
-                            node.Code.A(node[0].Code);  //list1
+                            //node.Code.A(node[0].Code);  //list1
                             //node.Code.A("o" + Num(node) + ".listItems1 = o" + Num(node) + ".listItems;" + G.NL;                            
                             //node.Code.A("o" + Num(node) + ".listItems = new List<string>();" + G.NL;
-                            node.Code.A(node[1].Code);  //list2
+                            //node.Code.A(node[1].Code);  //list2
                             if (node[2] != null) node.Code.A(node[2].Code); //options
                             //node.Code.A("o" + Num(node) + ".listItems2 = o" + Num(node) + ".listItems;" + G.NL;                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
