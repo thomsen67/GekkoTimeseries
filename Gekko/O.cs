@@ -6363,13 +6363,15 @@ namespace Gekko
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set            
             //public List<string> listItems = null;  //only temporary storage, use namesList1+2
-            public List<string> listItems0 = null;  //left side
-            public List<string> listItems1 = null;  //right side
+
+            public List names0 = null;
+            public List names1 = null;
+
             public string opt_from = null;
             public string opt_to = null;
             public string opt_error = null;
             public void Exe()
-            {                
+            {
                 //------------ Types -----------------------------------------------------------------------------------------------
                 //1. if RESPECT keyword and timeseries exists beforehand            -> inject data inside [t1, t2] in existing series
                 //2. if RESPECT keyword and timeseries does not exist beforehand    -> clone, truncate to [t1, t2], and add to databank
@@ -6388,9 +6390,20 @@ namespace Gekko
                 //These <FROM = ...> and <TO = ...> can be overridden by individual bank names like "COPY <FROM = adbk> a, b, simbk:c, d;". In that case, 'c' is taken from simbk.
                 //Note that <FROM/TO = @> is legal!
 
+                //TODO: Implement for array-series
+
+                List<string> listItems0 = O.Restrict(this.names0, true, true, true, false);
+                List<string> listItems1 = O.Restrict(this.names1, true, true, true, false);
+                
                 Databank localOptionFromBank = null; //is != null if <FROM = ...>
                 Databank localOptionToBank = null; //is != null if <TO  = ...>
                 GetFromAndToDatabanks(this.opt_from, this.opt_to, ref localOptionFromBank, ref localOptionToBank);
+
+                if (this.opt_from != null || this.opt_to != null)
+                {
+                    G.Writeln2("*** ERROR: <from> and <to> not yet implemented");
+                    throw new GekkoException();
+                }
 
                 int errorCounter = 0;
 

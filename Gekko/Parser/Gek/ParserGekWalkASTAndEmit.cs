@@ -945,7 +945,9 @@ namespace Gekko.Parser.Gek
                     case "ASTCOPY":
                         {
                             node.Code.A("O.Copy o" + Num(node) + " = new O.Copy();" + G.NL);
-                            GetCodeFromAllChildren(node);
+                            GetCodeFromAllChildren(node, node[0]);
+                            node.Code.A("o" + Num(node) + ".names0 = " + node[1].Code + ";" + G.NL);
+                            if (node[2] != null) node.Code.A("o" + Num(node) + ".names1 = " + node[2].Code + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;

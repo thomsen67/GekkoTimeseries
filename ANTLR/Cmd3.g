@@ -2352,7 +2352,7 @@ compareOpt1h:				ABS EQUAL expression -> ^(ASTOPT_VAL_ABS expression)
 // COPY
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-copy:                       COPY copyOpt1? listItemsWildRange (TO listItemsWildRange)? -> ^({token("ASTCOPY", ASTCOPY, $COPY.Line)} copyOpt1? listItemsWildRange listItemsWildRange?);
+copy:                       COPY copyOpt1? seqOfBankvarnames (TO seqOfBankvarnames)? -> ^({token("ASTCOPY", ASTCOPY, $COPY.Line)} ^(ASTPLACEHOLDER ^(ASTOPT_ copyOpt1?)) seqOfBankvarnames seqOfBankvarnames?);
 copyOpt1                  : ISNOTQUAL
 						  | leftAngle2          copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 copyOpt1h*)		
 						  | leftAngleNo2 dates? copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) copyOpt1h*)
