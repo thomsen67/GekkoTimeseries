@@ -2188,6 +2188,8 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | restart              SEMICOLON!
 						  | return2              SEMICOLON!
 						  | run                  SEMICOLON!
+						  | smooth               SEMICOLON!
+						  | splice               SEMICOLON!
 						  | stop                 SEMICOLON!
 						  | sys                  SEMICOLON!
 						  | table                SEMICOLON!
@@ -2871,6 +2873,31 @@ restart:                    RESTART -> ^({token("ASTRESTART", ASTRESTART, $RESTA
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 run:                        RUN fileNameStar -> ^({token("ASTRUN", ASTRUN, $RUN.Line)} fileNameStar);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// SMOOTH
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+smooth:                     SMOOTH seqOfBankvarnames EQUAL seqOfBankvarnames smoothOpt2? -> ^({token("ASTSMOOTH", ASTSMOOTH, $SMOOTH.Line)} seqOfBankvarnames seqOfBankvarnames smoothOpt2?);
+smoothOpt2:                 smoothOpt2h;  //can only choose 1
+smoothOpt2h:                SPLINE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SPLINE yesNo?)
+                          | REPEAT (EQUAL yesNo)? -> ^(ASTOPT_STRING_REPEAT yesNo?)
+                          | GEOMETRIC (EQUAL yesNo)? -> ^(ASTOPT_STRING_GEOMETRIC yesNo?)
+						  | LINEAR (EQUAL yesNo)? -> ^(ASTOPT_STRING_LINEAR yesNo?)
+						    ;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// SPLICE
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+splice:                     SPLICE seqOfBankvarnames EQUAL seqOfBankvarnames expression seqOfBankvarnames -> ^({token("ASTSPLICE", ASTSPLICE, $SPLICE.Line)} seqOfBankvarnames seqOfBankvarnames seqOfBankvarnames expression     )
+                          | SPLICE seqOfBankvarnames EQUAL seqOfBankvarnames seqOfBankvarnames            -> ^({token("ASTSPLICE", ASTSPLICE, $SPLICE.Line)} seqOfBankvarnames seqOfBankvarnames seqOfBankvarnames )  //no date
+						    ;
+spliceOpt1:                 ISNOTQUAL
+						  | leftAngle        spliceOpt1h* RIGHTANGLE -> spliceOpt1h*												
+                            ;
+spliceOpt1h:                KEEP EQUAL spliceOptions -> ^(ASTOPT_STRING_KEEP spliceOptions);
+spliceOptions:              FIRST | LAST;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // STOP

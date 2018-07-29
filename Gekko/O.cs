@@ -1244,12 +1244,10 @@ namespace Gekko
 
             Databank bank = null;
             if (dbName == null) bank = Program.databanks.GetFirst();
-            else bank = Program.databanks.GetDatabank(dbName);
-            if (dbName != null)
-            {
-                bank = Program.databanks.GetDatabank(dbName, true);
-            }
-            
+            else bank = Program.databanks.GetDatabank(dbName, true);
+
+            if (bank.protect) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
+
             if (G.HasSigil(nameWithFreq))
             {
                 //%x or #x
@@ -1316,11 +1314,8 @@ namespace Gekko
                         
             Databank bank = null;
             if (dbName == null) bank = Program.databanks.GetFirst();
-            else bank = Program.databanks.GetDatabank(dbName);
-            if (dbName != null)
-            {
-                bank = Program.databanks.GetDatabank(dbName, true);
-            }
+            else bank = Program.databanks.GetDatabank(dbName, true);
+            
             IVariable iv = bank.GetIVariable(nameWithFreq);
 
             if (G.HasSigil(nameWithFreq))
@@ -1458,14 +1453,13 @@ namespace Gekko
         {
             string freq3, nameWithFreq;
             GetNameWithFreq(varName, freq, out freq3, out nameWithFreq);
-
+            
             Databank bank = null;
             if (dbName == null) bank = Program.databanks.GetFirst();
-            else bank = Program.databanks.GetDatabank(dbName);
-            if (dbName != null)
-            {
-                bank = Program.databanks.GetDatabank(dbName, true);
-            }
+            else bank = Program.databanks.GetDatabank(dbName, true);
+
+            if (bank.protect) Program.ProtectError("You cannot remove a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
+            
             IVariable iv = bank.GetIVariable(nameWithFreq);
 
             if (iv == null)
@@ -6704,15 +6698,15 @@ namespace Gekko
         }
 
         public class Rename
-        {            
-            //public List<string> listItems = null;  //only temporary storage, use namesList1+2
+        {
+            
             public List names1 = null;
             public List names2 = null;
-            
+
             public string opt_bank = null;
             public void Exe()
             {
-                //listItems = null;  //just for safety, should not be used.
+                //actually also allows "rename" from one bank to another
 
                 if (opt_bank != null)
                 {
@@ -6723,21 +6717,21 @@ namespace Gekko
                 List<string> listItems0 = Restrict(this.names1, true, true, true, false);
                 List<string> listItems1 = Restrict(this.names2, true, true, true, false);
 
-                
-                    if (listItems0.Count != listItems1.Count)
+
+                if (listItems0.Count != listItems1.Count)
+                {
+                    G.Writeln2("*** ERROR: unequal number of items before and after AS");
+                    throw new GekkoException();
+                }
+                for (int i = 0; i < listItems0.Count; i++)
+                {
+                    if (listItems0[i].Contains("*") || listItems0[i].Contains("?") || listItems1[i].Contains("*") || listItems1[i].Contains("?"))
                     {
-                        G.Writeln2("*** ERROR: unequal number of items before and after AS");
+                        G.Writeln2("*** ERROR: RENAME: Wildcards not allowed");
                         throw new GekkoException();
                     }
-                    for (int i = 0; i < listItems0.Count; i++)
-                    {
-                        if (listItems0[i].Contains("*") || listItems0[i].Contains("?") || listItems1[i].Contains("*") || listItems1[i].Contains("?"))
-                        {
-                            G.Writeln2("*** ERROR: RENAME: Wildcards not allowed");
-                            throw new GekkoException();
-                        }
-                    }
-                
+                }
+
                 //we are now sure lists are of same length and have no wildcards.                                
 
                 int counter = 0;
@@ -6756,24 +6750,10 @@ namespace Gekko
                     }
 
                     O.RemoveIVariableFromString(s1);
-                    
-
-                    List<Series> tss = Program.GetTimeSeriesFromStringWildcard(s1, opt_bank);
-                    foreach (Series ts in tss)
-                    {
-                        //There is probably always only 1 here
-                        if (ts.meta.parentDatabank.ContainsVariable(s2))
-                        {
-                            G.Writeln2("*** ERROR: Databank " + ts.meta.parentDatabank.name + " already contains timeseries '" + s2 + "'");
-                            throw new GekkoException();
-                        }
-                        ts.meta.parentDatabank.RemoveVariable(ts.name);                        
-                        ts.name = s2;
-                        ts.meta.parentDatabank.AddVariable(ts);
-                        counter++;
-                    }
-                }                
-                G.Writeln2("Renamed " + counter + " timeseries in Work databank");
+                    O.AddIVariableWithOverwriteFromString(s2, iv1);  
+                    counter++;
+                }
+                G.Writeln2("Renamed " + counter + " timeseries");
             }
         }
 
