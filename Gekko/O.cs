@@ -5620,8 +5620,11 @@ namespace Gekko
             //public IVariable rhs = null;
             //public IVariable lhs = null;
 
-            public List<string> listItems0;
-            public List<string> listItems1;
+            
+
+            public List names0;
+            public List names1;
+
             public string opt_spline = null;
             public string opt_geometric = null;
             public string opt_linear = null;
@@ -5630,10 +5633,13 @@ namespace Gekko
             public void Exe()
             {
                 //If the method fails, no timeseries are touched. That is good!
-                
+
                 //all this could be sped up by means of using the internal arrays (GetDataSequence).
                 //so some room for improvement if it becomes a bottleneck.
                 //only done for missings enclosed by real numbers (no end-missings will be filled)  
+
+                List<string> listItems0 = Restrict(names0, true, false, true, true);
+                List<string> listItems1 = Restrict(names1, true, false, true, true);                
 
                 if (listItems0.Count != 1 || listItems1.Count != 1)
                 {
@@ -5641,8 +5647,11 @@ namespace Gekko
                     throw new GekkoException();
                 }
 
-                Series oldSeries = O.FindTimeSeries(this.listItems1[0], 1);
-                Series lhs = O.FindTimeSeries(this.listItems0[0], 1);
+                IVariable ivOld = O.GetIVariableFromString(listItems1[0], ECreatePossibilities.NoneReportError);
+                IVariable ivLhs = O.GetIVariableFromString(listItems0[0], ECreatePossibilities.Can);
+
+                Series oldSeries = O.ConvertToSeries(ivOld) as Series;
+                Series lhs = O.ConvertToSeries(ivLhs) as Series;
                                 
                 Series newSeriesTemp = oldSeries.DeepClone() as Series;  //brand new object, not present in Work (yet)                
 
@@ -5765,19 +5774,28 @@ namespace Gekko
                     lhs.SetData(gt, newSeriesTemp.GetData(null, gt));
                 }
                 lhs.Stamp();
-            }            
+                G.Writeln2("Smooth of '" + oldSeries.name + "', method = " + type.ToString().ToLower() + ", " + realStart.ToString() + "-" + realEnd.ToString());
+            }                 
+            
         }
 
         public class Splice
         {
             
-            public List<string> listItems0;
-            public List<string> listItems1;
-            public List<string> listItems2;
+            
+
+            public List names0 = null;
+            public List names1 = null;
+            public List names2 = null;
+
 
             public GekkoTime date = GekkoTime.tNull;
             public void Exe()
             {
+                List<string> listItems0 = Restrict(names0, true, false, true, true);
+                List<string> listItems1 = Restrict(names1, true, false, true, true);
+                List<string> listItems2 = Restrict(names2, true, false, true, true);
+
                 bool useSecondPartLevels = true;  //like aremos
 
                 if (listItems0.Count != 1 || listItems1.Count != 1 || listItems2.Count != 1)
@@ -5786,14 +5804,14 @@ namespace Gekko
                     throw new GekkoException();
                 }
 
-                Series ts1 = O.FindTimeSeries(listItems1[0], 1);
-                Series ts2 = O.FindTimeSeries(listItems2[0], 1);
-                Series ts3 = O.FindTimeSeries(listItems0[0], 1);
-                //if (ts3 == null)
-                //{
-                //    ts3 = new Series(Program.options.freq, lhs);
-                //    Program.databanks.GetPrim().AddVariable(ts3);
-                //}
+                IVariable iv1 = O.GetIVariableFromString(listItems1[0], ECreatePossibilities.NoneReportError);
+                IVariable iv2 = O.GetIVariableFromString(listItems2[0], ECreatePossibilities.NoneReportError);
+                IVariable iv3 = O.GetIVariableFromString(listItems0[0], ECreatePossibilities.Can);  //left side
+
+                Series ts1 = O.ConvertToSeries(iv1) as Series;
+                Series ts2 = O.ConvertToSeries(iv2) as Series;
+                Series ts3 = O.ConvertToSeries(iv3) as Series;
+
                 if (ts1.freq != ts2.freq)
                 {
                     G.Writeln2("*** ERROR: Different freq for the two timerseries");

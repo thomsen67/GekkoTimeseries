@@ -4541,16 +4541,24 @@ namespace Gekko.Parser.Gek
                             //{
                             //    node.Code.A(node[i].Code;
                             //}
-                            GetCodeFromAllChildren(node);
+                            node.Code.A("o" + Num(node) + ".names0 = " + node[0].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".names1 = " + node[1].Code + ";" + G.NL);
+                            //node.Code.A("o" + Num(node) + ".names2 = " + node[2].Code + ";" + G.NL);
+                            node.Code.A(node[2].Code);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
                     case "ASTSPLICE":
                         {
                             node.Code.A("O.Splice o" + Num(node) + " = new O.Splice();" + G.NL);
-                            node.Code.A(node[0].Code);
-                            node.Code.A(node[1].Code);
-                            node.Code.A(node[2].Code);                       
+                            //node.Code.A(node[0].Code);
+                            //node.Code.A(node[1].Code);
+                            //node.Code.A(node[2].Code);
+
+                            node.Code.A("o" + Num(node) + ".names0 = " + node[0].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".names1 = " + node[1].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".names2 = " + node[2].Code + ";" + G.NL);
+
                             if (node.ChildrenCount() > 3)
                             {
                                 node.Code.A("o" + Num(node) + ".date = O.ConvertToDate(" + node[3].Code + ", O.GetDateChoices.Strict);" + G.NL);
