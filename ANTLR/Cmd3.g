@@ -2198,8 +2198,10 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | tell                 SEMICOLON!
 						  | time                 SEMICOLON!
 						  | timefilter           SEMICOLON!
+						  | truncate             SEMICOLON!
 						  | unlock_              SEMICOLON!
 						  | write                SEMICOLON!	
+						  | x12a                 SEMICOLON!
 						  | xedit                SEMICOLON!					  
 						  | functionNaked        SEMICOLON!   //naked function outside expression
 						  | objectFunctionNaked  SEMICOLON!   //naked object function outside expression
@@ -3035,11 +3037,31 @@ reset:					    RESET -> ^(ASTRESET);
 return2:                    RETURN2 expression? -> ^({token("ASTRETURN", ASTRETURN, $RETURN2.Line)} expression?); //used in functions
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
+// TRUNCATE
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+truncate:                   TRUNCATE truncateOpt1? seqOfBankvarnames -> ^({token("ASTTRUNCATE", ASTTRUNCATE, $TRUNCATE.Line)} ^(ASTPLACEHOLDER ^(ASTOPT_ truncateOpt1?)) seqOfBankvarnames);
+truncateOpt1:               ISNOTQUAL | leftAngle truncateOpt1h? RIGHTANGLE -> truncateOpt1h?;
+truncateOpt1h:              dates -> ^(ASTDATES dates);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 // XEDIT
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 xedit:                      XEDIT fileNameStar -> ^({token("ASTXEDIT", ASTXEDIT, $XEDIT.Line)} ^(ASTHANDLEFILENAME fileNameStar));
 
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// X12A
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+x12a:					    X12A x12aOpt1? seqOfBankvarnames -> ^({token("ASTX12A", ASTX12A, $X12A.Line)} ^(ASTPLACEHOLDER ^(ASTOPT_ x12aOpt1?)) seqOfBankvarnames);
+x12aOpt1:                   ISNOTQUAL
+						  | leftAngle2          x12aOpt1h* RIGHTANGLE -> x12aOpt1h*
+						  | leftAngleNo2 dates? x12aOpt1h* RIGHTANGLE ->  ^(ASTDATES dates?) x12aOpt1h*
+						    ;
+x12aOpt1h:                  PARAM EQUAL expression -> ^(ASTOPT_STRING_PARAM expression)
+						  | BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //name can be without quotes
+						    ;
 
 //-----------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------

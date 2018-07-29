@@ -6696,22 +6696,26 @@ namespace Gekko
         {
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
-            public List<string> listItems = null;
+            public List names = null;
+
             public void Exe()
             {
+                List<string> listItems = Restrict(names, true, false, true, true);
                 int counter = 0;
-                foreach (string s in this.listItems)
+                foreach (string s in listItems)
                 {
-                    List<Series> tss = Program.GetTimeSeriesFromStringWildcard(s);
+                    IVariable iv = O.GetIVariableFromString(s, ECreatePossibilities.NoneReportError);
+                    Series ts = O.ConvertToSeries(iv) as Series;
+                    //List<Series> tss = Program.GetTimeSeriesFromStringWildcard(s);
                     //Now we are sure all the series are from Work
-                    foreach (Series ts in tss)
-                    {
+                    //foreach (Series ts in tss)
+                    //{
                         ts.Truncate(this.t1, this.t2);
                         counter++;
                         ts.Stamp();
-                    }                    
+                    //}                    
                 }
-                G.Writeln2("Truncated " + counter + " timeseries to " + t1 + "-" + t2 + "");
+                G.Writeln2("Truncated " + counter + " series to " + t1 + "-" + t2 + "");
             }
         }
 
@@ -8534,7 +8538,8 @@ namespace Gekko
         {
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
-            public List<string> listItems = null;
+            //public List<string> listItems = null;
+            public List names = null;
             public string opt_bank = null;
             public string opt_param = null;
             public void Exe()

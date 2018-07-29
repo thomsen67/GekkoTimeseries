@@ -4741,7 +4741,9 @@ namespace Gekko.Parser.Gek
                     case "ASTX12A":
                         {
                             node.Code.A("O.X12a o" + Num(node) + " = new O.X12a();" + G.NL);
-                            GetCodeFromAllChildren(node);
+                            GetCodeFromAllChildren(node, node[0]);
+                            node.Code.A("o" + Num(node) + ".names = " + node[1].Code + ";" + G.NL);
+                            //GetCodeFromAllChildren(node);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -4895,8 +4897,10 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.Truncate o" + Num(node) + " = new O.Truncate();" + G.NL);
                             node.Code.A(node[0].Code);  //options
+                            GetCodeFromAllChildren(node, node[0]);  //options
+                            node.Code.A("o" + Num(node) + ".names = " + node[1].Code + ";" + G.NL);
                             //node.Code.A("o" + Num(node) + ".listItems = new List<string>();" + G.NL;
-                            node.Code.A(node[1].Code);  //list1                            
+                            //node.Code.A(node[1].Code);  //list1                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
