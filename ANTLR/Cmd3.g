@@ -2155,6 +2155,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | delete               SEMICOLON!
 						  | disp                 SEMICOLON!
 						  | doc                  SEMICOLON!
+						  | edit                 SEMICOLON!
 						  | endo                 SEMICOLON!
 						  | exo                  SEMICOLON!
 						  | findmissingdata      SEMICOLON!
@@ -2198,7 +2199,8 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | time                 SEMICOLON!
 						  | timefilter           SEMICOLON!
 						  | unlock_              SEMICOLON!
-						  | write                SEMICOLON!						  
+						  | write                SEMICOLON!	
+						  | xedit                SEMICOLON!					  
 						  | functionNaked        SEMICOLON!   //naked function outside expression
 						  | objectFunctionNaked  SEMICOLON!   //naked object function outside expression
 						  | procedure            SEMICOLON!   //procedure call
@@ -2399,6 +2401,12 @@ docOpt2h:                   LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expr
 						  | STAMP EQUAL expression -> ^(ASTOPT_STRING_STAMP expression)							  
 					      | UNITS EQUAL expression -> ^(ASTOPT_STRING_UNITS expression)							  				
 						    ;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// EDIT
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+edit:                       EDIT fileNameStar -> ^({token("ASTEDIT", ASTEDIT, $EDIT.Line)} ^(ASTHANDLEFILENAME fileNameStar));
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ENDO/EXO
@@ -3026,6 +3034,11 @@ reset:					    RESET -> ^(ASTRESET);
 
 return2:                    RETURN2 expression? -> ^({token("ASTRETURN", ASTRETURN, $RETURN2.Line)} expression?); //used in functions
 
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// XEDIT
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+xedit:                      XEDIT fileNameStar -> ^({token("ASTXEDIT", ASTXEDIT, $XEDIT.Line)} ^(ASTHANDLEFILENAME fileNameStar));
 
 
 //-----------------------------------------------------------------------------------------------------------
