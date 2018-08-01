@@ -48,7 +48,7 @@ namespace Gekko
             }
             else
             {
-                string ss = G.bankpart(O.ConvertToString(x1));
+                string ss = G.Chop_BankPart(O.ConvertToString(x1));
                 return new ScalarString(ss);
             }
         }
@@ -65,7 +65,7 @@ namespace Gekko
             }
             else
             {
-                return new ScalarString(G.namepart(O.ConvertToString(x1)));
+                return new ScalarString(G.Chop_NamePart(O.ConvertToString(x1)));
             }
         }
 
@@ -81,7 +81,7 @@ namespace Gekko
             }
             else
             {
-                return new ScalarString(G.freqpart(O.ConvertToString(x1)));
+                return new ScalarString(G.Chop_FreqPart(O.ConvertToString(x1)));
             }
         }
 
@@ -97,7 +97,7 @@ namespace Gekko
             }
             else
             {
-                return new ScalarString(G.nameandfreqpart(O.ConvertToString(x1)));
+                return new ScalarString(G.Chop_NameAndFreqPart(O.ConvertToString(x1)));
             }
         }
 
@@ -113,7 +113,7 @@ namespace Gekko
             }
             else
             {
-                return new List(G.indexpart(O.ConvertToString(x1)));
+                return new List(G.Chop_IndexPart(O.ConvertToString(x1)));
             }
         }
 
@@ -132,7 +132,7 @@ namespace Gekko
             string freq = O.ConvertToString(ivfreq);
             string[] index = null;
             if (ivindex != null) index = Program.GetListOfStringsFromListOfIvariables(O.ConvertToList(ivindex).ToArray());
-            string s = G.fullname(bank, name, freq, index);
+            string s = G.Chop_FullName(bank, name, freq, index);
             return new ScalarString(s);
         }
 
@@ -147,7 +147,7 @@ namespace Gekko
             }
             else
             {
-                return new ScalarString(G.bankadd(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.Chop_BankAdd(O.ConvertToString(x1), O.ConvertToString(x2)));
             }
         }
 
@@ -163,7 +163,7 @@ namespace Gekko
             }
             else
             {
-                return new ScalarString(G.bankset(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.Chop_BankSet(O.ConvertToString(x1), O.ConvertToString(x2)));
             }
         }
 
@@ -179,7 +179,7 @@ namespace Gekko
             }
             else
             {
-                return new ScalarString(G.bankremove(O.ConvertToString(x1)));
+                return new ScalarString(G.Chop_BankRemove(O.ConvertToString(x1)));
             }
         }
 
@@ -195,7 +195,7 @@ namespace Gekko
             }
             else
             {
-                return new ScalarString(G.bankremove(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.Chop_BankRemove(O.ConvertToString(x1), O.ConvertToString(x2)));
             }
         }
 
@@ -211,7 +211,7 @@ namespace Gekko
             }
             else
             {
-                return new ScalarString(G.bankreplace(O.ConvertToString(x1), O.ConvertToString(x2), O.ConvertToString(x3)));
+                return new ScalarString(G.Chop_BankReplace(O.ConvertToString(x1), O.ConvertToString(x2), O.ConvertToString(x3)));
             }
         }
 
@@ -228,7 +228,7 @@ namespace Gekko
             }
             else
             {
-                return new ScalarString(G.freqadd(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.Chop_FreqAdd(O.ConvertToString(x1), O.ConvertToString(x2)));
             }
         }
 
@@ -244,7 +244,7 @@ namespace Gekko
             }
             else
             {
-                return new ScalarString(G.freqset(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.Chop_FreqSet(O.ConvertToString(x1), O.ConvertToString(x2)));
             }
         }
 
@@ -260,7 +260,7 @@ namespace Gekko
             }
             else
             {
-                return new ScalarString(G.freqremove(O.ConvertToString(x1)));
+                return new ScalarString(G.Chop_FreqRemove(O.ConvertToString(x1)));
             }
         }
 
@@ -276,7 +276,7 @@ namespace Gekko
             }
             else
             {
-                return new ScalarString(G.freqremove(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.Chop_FreqRemove(O.ConvertToString(x1), O.ConvertToString(x2)));
             }
         }
 
@@ -292,7 +292,7 @@ namespace Gekko
             }
             else
             {
-                return new ScalarString(G.freqreplace(O.ConvertToString(x1), O.ConvertToString(x2), O.ConvertToString(x3)));
+                return new ScalarString(G.Chop_FreqReplace(O.ConvertToString(x1), O.ConvertToString(x2), O.ConvertToString(x3)));
             }
         }
 
@@ -307,18 +307,44 @@ namespace Gekko
             }
             else
             {
-                return new ScalarString(G.nameset(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.Chop_NameSet(O.ConvertToString(x1), O.ConvertToString(x2)));
             }
         }
 
+        public static IVariable namesetprefix(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        {
+            if (x1.Type() == EVariableType.List)
+            {
+                List rv = new List();
+                foreach (IVariable item in (x1 as List).list) rv.Add(namesetprefix(smpl, item, x2));
+                return rv;
+            }
+            else
+            {
+                return new ScalarString(G.Chop_NameSetPrefix(O.ConvertToString(x1), O.ConvertToString(x2)));
+            }
+        }
 
+        public static IVariable namesetsuffix(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        {
+            if (x1.Type() == EVariableType.List)
+            {
+                List rv = new List();
+                foreach (IVariable item in (x1 as List).list) rv.Add(namesetsuffix(smpl, item, x2));
+                return rv;
+            }
+            else
+            {
+                return new ScalarString(G.Chop_NameSetSuffix(O.ConvertToString(x1), O.ConvertToString(x2)));
+            }
+        }
 
 
         // ===========================================================================================================================
         // ========================= functions to manipulate bankvarnames with indexes end ===========================================
         // ===========================================================================================================================
 
-        
+
         public static IVariable rotate(GekkoSmpl smpl, IVariable x1, IVariable dim)
         {
             int iDim = O.ConvertToInt(dim);
@@ -455,7 +481,7 @@ namespace Gekko
                     if (kvp.Key.StartsWith(name + "_", StringComparison.OrdinalIgnoreCase) && kvp.Key.EndsWith(Globals.freqIndicator + G.GetFreq(Program.options.freq), StringComparison.OrdinalIgnoreCase))
                     {
                         //starts with endo_ or exo_ and is of annual type
-                        fixes.Add(G.freqremove(kvp.Key));
+                        fixes.Add(G.Chop_FreqRemove(kvp.Key));
                     }
                 }
             }

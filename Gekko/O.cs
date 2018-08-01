@@ -1536,7 +1536,7 @@ namespace Gekko
             }
             else
             {
-                if (G.HasFreq(varName))
+                if (!G.HasFreq(varName))
                 {
                     nameWithFreq = varName;
                 }
@@ -5175,7 +5175,7 @@ namespace Gekko
                 foreach (string s in Program.databanks.GetFirst().storage.Keys)
                 {
                     if (G.GetFreqFromName(s) != Program.options.freq) continue;
-                    string s2 = G.freqremove(s);
+                    string s2 = G.Chop_FreqRemove(s);
                     if (!Program.model.varsAType.ContainsKey(s2)) onlyDatabankNotModel.Add(s2);
                 }
                 foreach (string s in Program.model.varsAType.Keys)

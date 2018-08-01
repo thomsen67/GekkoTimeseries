@@ -1501,7 +1501,7 @@ namespace Gekko
                             }
 
                             string varName = cellText.Trim();  //the name may contain blanks like 'elveff '
-                            varName = G.freqadd(varName, Program.options.freq);
+                            varName = G.Chop_FreqAdd(varName, Program.options.freq);
                             variableCounter++;
                             if (!databank.ContainsIVariable(varName))
                             {
@@ -4342,7 +4342,7 @@ namespace Gekko
                 int dimensionsWithoutTime = codes.Count;
 
                 //put in the array-timeseries ghost
-                string varNameWithFreq = G.freqadd(tableName, freq);
+                string varNameWithFreq = G.Chop_FreqAdd(tableName, freq);
                 Series tsGhost = new Series(G.GetFreq(freq), varNameWithFreq);
                 tsGhost.SetArrayTimeseries(dimensionsWithoutTime + 1, true);
                 Databank databank = Program.databanks.GetFirst();
@@ -4420,7 +4420,7 @@ namespace Gekko
                     if (true)
                     {
                         string name2 = codesCombi[j].Replace(Globals.pxInternalDelimiter, '_');
-                        string name3 = G.freqadd(name2, freq);
+                        string name3 = G.Chop_FreqAdd(name2, freq);
                         ts = new Series(G.GetFreq(freq), name3);
                         ts.meta.label = valuesCombi[j];
                         ts.meta.source = source;
@@ -4470,7 +4470,7 @@ namespace Gekko
                     }
 
                     //put in the timeseries
-                    string varNameWithFreq = G.freqadd(tableName, freq);
+                    string varNameWithFreq = G.Chop_FreqAdd(tableName, freq);
                     Databank databank = Program.databanks.GetFirst();
                     databank.AddIVariableWithOverwrite(ts.name, ts);
                     ts.SetDirty(true);
@@ -5215,9 +5215,9 @@ namespace Gekko
 
                         if (!G.StartsWithSigil(bnv.name))
                         {
-                            name = G.freqadd(name, Program.options.freq);
+                            name = G.Chop_FreqAdd(name, Program.options.freq);
                         }
-                        string nameWithoutFreq = G.freqremove(name);
+                        string nameWithoutFreq = G.Chop_FreqRemove(name);
 
                         Databank gdb = GetBankFromBankNameVersion(bnv.bank);
                         IVariable iv = gdb.GetIVariable(name);
@@ -5447,9 +5447,9 @@ namespace Gekko
                 
                 if (!G.StartsWithSigil(bnv.name))
                 {
-                    name = G.freqadd(name, Program.options.freq);
+                    name = G.Chop_FreqAdd(name, Program.options.freq);
                 }
-                string nameWithoutFreq = G.freqremove(name);
+                string nameWithoutFreq = G.Chop_FreqRemove(name);
 
                 Databank gdb = GetBankFromBankNameVersion(bnv.bank);
                 IVariable iv = gdb.GetIVariable(name);
@@ -5844,7 +5844,7 @@ namespace Gekko
             }
 
 
-            string varName2 = G.freqremove(varName);
+            string varName2 = G.Chop_FreqRemove(varName);
             if (varName.Length <= 16 && ts.meta.label != null && ts.meta.label.Length > 0)
             {
                 res.WriteLine(varName2 + G.Blanks(16 - varName2.Length) + ts.meta.label);
@@ -14451,7 +14451,7 @@ namespace Gekko
                             vars.Add(ts.name);
                             expl.Add(label);
                             both.Add(ts.name + "¤" + label); //A bit hacky, but an easy way to get the variables sorted without using LINQ or Dictionary
-                            both2.Add(G.freqremove(ts.name) + "¤" + label);
+                            both2.Add(G.Chop_FreqRemove(ts.name) + "¤" + label);
                             if (Program.options.freq != ts.freq)
                                 differentFreq = true;                            
                         }
@@ -14626,7 +14626,7 @@ namespace Gekko
                 string var = ts.name;
                 string bank = ts.meta.parentDatabank.name;                                
 
-                string varnameWithoutFreq = G.freqremove(ts.name);
+                string varnameWithoutFreq = G.Chop_FreqRemove(ts.name);
 
                 if (gamsStyle)
                 {                       
@@ -14736,7 +14736,7 @@ namespace Gekko
                         string first = keys[0].ToString();
                         string last = keys[keys.Count - 1].ToString();
 
-                        G.Writeln("First/last elements (alphabetically): " + G.freqremove(ts.name) + "[" + first + "]" + " ... " + G.freqremove(ts.name) + "[" + last + "]");
+                        G.Writeln("First/last elements (alphabetically): " + G.Chop_FreqRemove(ts.name) + "[" + first + "]" + " ... " + G.Chop_FreqRemove(ts.name) + "[" + last + "]");
                         if (ts.dimensions > 1)
                         {
                             G.Writeln("Dimension span: " + dimCount + " = " + dimCount2 + ", density: " + keys.Count + "/" + dimCount2 + " = " + Program.NumberFormat(100d * (keys.Count / dimCount2), "0.00") + "%");
@@ -14822,7 +14822,7 @@ namespace Gekko
 
                     G.Writeln();
                     G.Writeln("==========================================================================================");
-                    G.Writeln("SERIES " + bank + Globals.symbolBankColon + G.freqremove(ts.name));
+                    G.Writeln("SERIES " + bank + Globals.symbolBankColon + G.Chop_FreqRemove(ts.name));
                     if (true)
                     {
                         EEndoOrExo type1 = VariableTypeEndoExo(var);
@@ -17098,7 +17098,7 @@ namespace Gekko
                 foreach (string s in bank.storage.Keys)
                 {
                     if (G.GetFreqFromName(s) != Program.options.freq) continue;  //filter out other freqs
-                    string s2 = G.freqremove(s);
+                    string s2 = G.Chop_FreqRemove(s);
                     if (!Program.model.varsAType.ContainsKey(s2))
                     {
                         onlyDatabankNotModel.Add(s2);
@@ -17235,7 +17235,7 @@ namespace Gekko
                 if (kvp.Value.Type() != EVariableType.Series) continue;
                 string ss =  kvp.Key;                
                 if (G.GetFreqFromName(ss) != Program.options.freq) continue;  //we filter out other freqs
-                string s = G.freqremove(ss);
+                string s = G.Chop_FreqRemove(ss);
                 if (hasFilter)
                 {
                     if (!filter.ContainsKey(s)) continue;  //ignore this
@@ -22127,7 +22127,7 @@ namespace Gekko
             //Has an overload used for UPD statements etc.
             Series ts = null;
 
-            string varName2 = G.freqadd(varName, frequency);
+            string varName2 = G.Chop_FreqAdd(varName, frequency);
 
             //string varName2 = Program.AddFreqAtEndOfVariableName(varName, frequency);
 
@@ -24547,8 +24547,8 @@ namespace Gekko
             Matrix name_stats = new Matrix(9, 1, double.NaN);
             Matrix name_covar = new Matrix(m, m, double.NaN);
             Matrix name_corr = new Matrix(m, m, double.NaN);
-            Series name_predict = new Series(t1.freq, G.freqadd(name + "_predict", lhs_series.freq));  
-            Series name_residual = new Series(t1.freq, G.freqadd(name + "_residual", lhs_series.freq));
+            Series name_predict = new Series(t1.freq, G.Chop_FreqAdd(name + "_predict", lhs_series.freq));  
+            Series name_residual = new Series(t1.freq, G.Chop_FreqAdd(name + "_residual", lhs_series.freq));
 
             //double[] y = new double[n];
             //double[,] x = new double[n, m];
@@ -35657,7 +35657,7 @@ namespace Gekko
             foreach (string ss in Program.databanks.GetFirst().storage.Keys)
             {
                 if (G.GetFreqFromName(ss) != Program.options.freq) continue;  //filter other freqs
-                string s = G.freqremove(ss);
+                string s = G.Chop_FreqRemove(ss);
                 if (Program.model.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.varsZTypeAutoGenerated.ContainsKey(s)) continue;
                 if (Program.model.varsAType.ContainsKey(s))
                 {
@@ -36634,7 +36634,7 @@ namespace Gekko
 
         private static string MaybeRemoveFreq(string s1, bool removeCurrentFreqFromNames)
         {            
-            if (removeCurrentFreqFromNames) return G.freqremove(s1, G.GetFreq(Program.options.freq));
+            if (removeCurrentFreqFromNames) return G.Chop_FreqRemove(s1, G.GetFreq(Program.options.freq));
             else return s1;
         }
 

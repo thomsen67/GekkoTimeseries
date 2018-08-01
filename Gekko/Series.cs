@@ -174,11 +174,11 @@ namespace Gekko
         {
             if (onlyRemoveCurrentFreq)
             {
-                return G.freqremove(this.GetName(), G.GetFreq(Program.options.freq));
+                return G.Chop_FreqRemove(this.GetName(), G.GetFreq(Program.options.freq));
             }
             else
             {
-                return G.freqremove(this.GetName());
+                return G.Chop_FreqRemove(this.GetName());
             }            
         }
 
