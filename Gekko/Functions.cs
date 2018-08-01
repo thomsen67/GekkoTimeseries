@@ -201,17 +201,17 @@ namespace Gekko
 
 
         //See equivalent method in G.cs
-        public static IVariable bankreplace(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        public static IVariable bankreplace(GekkoSmpl smpl, IVariable x1, IVariable x2, IVariable x3)
         {
             if (x1.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(bankreplace(smpl, item, x2));
+                foreach (IVariable item in (x1 as List).list) rv.Add(bankreplace(smpl, item, x2, x3));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.bankreplace(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.bankreplace(O.ConvertToString(x1), O.ConvertToString(x2), O.ConvertToString(x3)));
             }
         }
 
@@ -282,17 +282,17 @@ namespace Gekko
 
 
         //See equivalent method in G.cs
-        public static IVariable freqreplace(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        public static IVariable freqreplace(GekkoSmpl smpl, IVariable x1, IVariable x2, IVariable x3)
         {
             if (x1.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(freqreplace(smpl, item, x2));
+                foreach (IVariable item in (x1 as List).list) rv.Add(freqreplace(smpl, item, x2, x3));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.freqreplace(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.freqreplace(O.ConvertToString(x1), O.ConvertToString(x2), O.ConvertToString(x3)));
             }
         }
 

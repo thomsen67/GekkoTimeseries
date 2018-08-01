@@ -451,18 +451,18 @@ namespace Gekko
         }
 
         //See equivalent method in Functions.cs
-        public static string bankreplace(string s1, string s2)
+        public static string bankreplace(string s1, string s2, string s3)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
-            string bankReplace = s2;
-            if (G.Equal(bankReplace, bank)) bank = bankReplace;
+            O.Chop(s1, out bank, out name, out freq, out index);            
+            if (G.Equal(s2, bank)) bank = s3;
             return O.UnChop(bank, name, freq, index);
         }
 
         //See equivalent method in Functions.cs
         public static string freqadd(string s1, string s2)
         {
+            //only adds a freq if there is no freq already
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
             if (freq == null)
@@ -475,12 +475,22 @@ namespace Gekko
             }
         }
 
+        public static string freqadd(string s1, EFreq freq)
+        {
+            return freqadd(s1, G.GetFreq(freq));
+        }
+
         //See equivalent method in Functions.cs
         public static string freqset(string s1, string s2)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
             return O.UnChop(bank, name, s2, index);
+        }
+
+        public static string freqset(string s1, EFreq freq)
+        {
+            return freqset(s1, G.GetFreq(freq));
         }
 
         //See equivalent method in Functions.cs
@@ -501,14 +511,23 @@ namespace Gekko
             return O.UnChop(bank, name, freq, index);
         }
 
+        public static string freqremove(string s1, EFreq freq)
+        {
+            return freqremove(s1, G.GetFreq(freq));
+        }
+
         //See equivalent method in Functions.cs
-        public static string freqreplace(string s1, string s2)
+        public static string freqreplace(string s1, string s2, string s3)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
-            string freqReplace = s2;
-            if (G.Equal(freqReplace, freq)) freq = freqReplace;
+            if (G.Equal(s2, freq)) freq = s3;
             return O.UnChop(bank, name, freq, index);
+        }
+
+        public static string freqreplace(string s1, EFreq freq2, EFreq freq3)
+        {
+            return freqreplace(s1, G.GetFreq(freq2), G.GetFreq(freq3));
         }
 
         //See equivalent method in Functions.cs
@@ -538,11 +557,7 @@ namespace Gekko
         {
             //If freq is a, it transforms x into x!a
             //But x!q will stay x!q.
-            if (!name.Contains(Globals.freqIndicator.ToString()))
-            {
-                name = name + Globals.freqIndicator + G.GetFreq(freq);
-            }
-            return name;
+            return G.freqadd(name, G.GetFreq(freq));
         }
          
 
