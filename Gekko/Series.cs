@@ -171,9 +171,15 @@ namespace Gekko
         }
 
         public string GetNameWithoutCurrentFreq(bool onlyRemoveCurrentFreq)
-        {            
-            string rv = G.RemoveFreqFromName(this.GetName(), onlyRemoveCurrentFreq);
-            return rv;
+        {
+            if (onlyRemoveCurrentFreq)
+            {
+                return G.freqremove(this.GetName(), G.GetFreq(Program.options.freq));
+            }
+            else
+            {
+                return G.freqremove(this.GetName());
+            }            
         }
 
         //public Series(ETimeSeriesType type, GekkoSmpl smpl)

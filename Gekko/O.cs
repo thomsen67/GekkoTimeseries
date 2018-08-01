@@ -2577,30 +2577,7 @@ namespace Gekko
 
         }
 
-
-        //private static string DecorateWithTilde(string varName, string freq)
-        //{
-        //    if (varName[0] != Globals.symbolMemvar && varName[0] != Globals.symbolList)
-        //    {
-        //        if (freq == null) varName += Globals.symbolTilde + G.GetFreq(Program.options.freq);
-        //    }
-        //    return varName;
-        //}
-
-        //private static Series GetLeftSideVariable(string dbName, string varName)
-        //{
-        //    Databank db = Program.databanks.GetFirst();
-        //    if (dbName != null) db = Program.databanks.GetDatabank(dbName);
-        //    Series ts = db.GetVariable(varName);
-        //    if (ts == null)
-        //    {
-        //        ts = new Series(Program.options.freq, varName);
-        //        db.AddVariable(ts);
-        //    }
-
-        //    return ts;
-        //}
-
+        
         public static void ChopIndexer(string s, out string name, out string rest)
         {
             name = s.Trim();
@@ -5174,7 +5151,7 @@ namespace Gekko
                 foreach (string s in Program.databanks.GetFirst().storage.Keys)
                 {
                     if (G.GetFreqFromName(s) != Program.options.freq) continue;
-                    string s2 = G.RemoveFreqFromName(s);
+                    string s2 = G.freqremove(s);
                     if (!Program.model.varsAType.ContainsKey(s2)) onlyDatabankNotModel.Add(s2);
                 }
                 foreach (string s in Program.model.varsAType.Keys)

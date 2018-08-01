@@ -322,34 +322,212 @@ namespace Gekko
         //    return s;  //annual            
         //}
                 
+        
+
         public static EFreq GetFreqFromName(string s)
-        {            
-            int i = s.IndexOf(Globals.freqIndicator);
-            if (i <= 0)
+        {
+            string f = G.freqpart(s);
+            if(f==null)
             {
                 G.Writeln2("*** ERROR: freq problem");
                 throw new GekkoException();
             }
             else
             {
-                return G.GetFreq(s.Substring(i + 1));  //for instance, fy%q --> q --> .Quarterly
+                return G.GetFreq(f);
             }                     
         }
 
         public static bool HasFreq(string s)
-        {            
-            int i = s.IndexOf(Globals.freqIndicator);
-            if (i <= 0)
-            {
-                return false;
-            }
-            return true;
+        {
+            if (G.freqpart(s) != null) return true;
+            return false;
         }
 
         public static bool IsGekkoNull(IVariable x1)
         {
             return x1.Type() == EVariableType.GekkoNull;
         }
+
+
+
+
+
+        // ===========================================================================================================================
+        // ========================= functions to manipulate bankvarnames with indexes start =========================================
+        // ===========================================================================================================================
+        
+        //See equivalent method in Functions.cs
+        public static string bankpart(string s1)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(s1, out bank, out name, out freq, out index);
+            string ss = "";
+            if (bank != null) ss = bank;
+            return ss;
+        }
+
+        //See equivalent method in Functions.cs
+        public static string namepart(string s1)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(s1, out bank, out name, out freq, out index);
+            return name;
+        }
+
+        //See equivalent method in Functions.cs
+        public static string freqpart(string s1)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(s1, out bank, out name, out freq, out index);
+            if (freq == null) return "";
+            else return freq;
+        }
+
+        //See equivalent method in Functions.cs
+        public static string nameandfreqpart(string s1)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(s1, out bank, out name, out freq, out index);
+            if (freq == null) return name;
+            else return name + Globals.freqIndicator + freq;
+        }
+
+        //See equivalent method in Functions.cs
+        public static List<string> indexpart(string s1)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(s1, out bank, out name, out freq, out index);
+            if (index == null) return new List<string>();
+            else return new List<string>(index);
+        }
+
+        //See equivalent method in Functions.cs
+        public static string fullname(string bank, string name, string freq, string[] index)
+        {
+            string s = O.UnChop(bank, name, freq, index);
+            return s;
+        }
+
+        //See equivalent method in Functions.cs
+        public static string bankadd(string s1, string s2)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(s1, out bank, out name, out freq, out index);
+            if (bank == null)
+            {
+                return O.UnChop(s2, name, freq, index);
+            }
+            else
+            {
+                return s1;
+            }
+        }
+
+        //See equivalent method in Functions.cs
+        public static string bankset(string s1, string s2)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(s1, out bank, out name, out freq, out index);
+            return O.UnChop(s2, name, freq, index);
+        }
+
+        //See equivalent method in Functions.cs
+        public static string bankremove(string s1)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(s1, out bank, out name, out freq, out index);
+            return O.UnChop(null, name, freq, index);
+        }
+
+        //See equivalent method in Functions.cs
+        public static string bankremove(string s1, string s2)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(s1, out bank, out name, out freq, out index);
+            string bankRemove = s2;
+            if (G.Equal(bankRemove, bank)) bank = null;
+            return O.UnChop(bank, name, freq, index);
+        }
+
+        //See equivalent method in Functions.cs
+        public static string bankreplace(string s1, string s2)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(s1, out bank, out name, out freq, out index);
+            string bankReplace = s2;
+            if (G.Equal(bankReplace, bank)) bank = bankReplace;
+            return O.UnChop(bank, name, freq, index);
+        }
+
+        //See equivalent method in Functions.cs
+        public static string freqadd(string s1, string s2)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(s1, out bank, out name, out freq, out index);
+            if (freq == null)
+            {
+                return O.UnChop(bank, name, s2, index);
+            }
+            else
+            {
+                return s1;
+            }
+        }
+
+        //See equivalent method in Functions.cs
+        public static string freqset(string s1, string s2)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(s1, out bank, out name, out freq, out index);
+            return O.UnChop(bank, name, s2, index);
+        }
+
+        //See equivalent method in Functions.cs
+        public static string freqremove(string s1)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(s1, out bank, out name, out freq, out index);
+            return O.UnChop(bank, name, null, index);
+        }
+
+        //See equivalent method in Functions.cs
+        public static string freqremove(string s1, string s2)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(s1, out bank, out name, out freq, out index);
+            string freqRemove = s2;
+            if (G.Equal(freqRemove, freq)) freq = null;
+            return O.UnChop(bank, name, freq, index);
+        }
+
+        //See equivalent method in Functions.cs
+        public static string freqreplace(string s1, string s2)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(s1, out bank, out name, out freq, out index);
+            string freqReplace = s2;
+            if (G.Equal(freqReplace, freq)) freq = freqReplace;
+            return O.UnChop(bank, name, freq, index);
+        }
+
+        //See equivalent method in Functions.cs
+        public static string nameset(string s1, string s2)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(s1, out bank, out name, out freq, out index);
+            name = s2;
+            return O.UnChop(bank, name, freq, index);
+        }
+
+        // ===========================================================================================================================
+        // ========================= functions to manipulate bankvarnames with indexes end ===========================================
+        // ===========================================================================================================================
+
+
+
+
+
 
         public static string AddCurrentFreqToName(string name)
         {
@@ -366,65 +544,7 @@ namespace Gekko
             }
             return name;
         }
-
-        public static string RemoveFreqFromName(string name)
-        {            
-            return RemoveFreqFromName(name, false);
-        }
-
-        public static string RemoveFreqFromName(string s, bool onlyRemoveCurrentFreq)
-        {
-            if (onlyRemoveCurrentFreq)
-            {                
-                return Functions.freqremove(s, G.GetFreq(Program.options.freq));
-            }
-            else
-            {
-                IVariable iv = Functions.freqremove(null, new ScalarString(s));
-                return iv.ConvertToString();
-            }
-            
-            //name may be: x, x!a, x!a, x!a[a, b], x!q[a, b ], x[a]
-            //may even contain a bank colon like b:x!q[a, b]
-
-            string rv = null;
-
-            string name, rest;
-            O.ChopIndexer(s, out name, out rest);
-
-            //now name is the part before '['
-
-            string name2 = null;
-            string freq2 = null;
-            G.ChopFreq(name, ref freq2, ref name2);
-
-            if (freq2 != null)
-            {
-                if (onlyRemoveCurrentFreq)
-                {
-                    if (G.Equal(freq2, G.GetFreq(Program.options.freq)))
-                    {
-                        rv = name2 + rest;  //rv is without !a, !q, etc.
-                    }
-                    else
-                    {
-                        rv = name + rest;  //rv may include !a, !q, etc.
-                    }
-                }
-                else
-                {
-                    //remove all
-                    rv = name2 + rest;   //rv is without !a, !q, etc.
-                }
-            }
-            else
-            {
-                rv = name + rest;  //rv is without !a, !q, etc. (because input does not contain it)
-            }
-            return rv;
-        }
-
-        
+         
 
         public static void ChopFreq(string input2, ref string freq, ref string varName)
         {
@@ -804,14 +924,7 @@ namespace Gekko
                 IVariable ivCopy = kvp.Value.DeepClone();
                 newDatabank.AddIVariable(kvp.Key, ivCopy);
             }
-        }
-
-        public static string RemoveFreqIndicator(string s)
-        {
-            int i = s.LastIndexOf(Globals.freqIndicator);
-            if (i < 0) return s;
-            return s.Substring(0, i);
-        }
+        }        
 
         public static string ReplaceFirstOccurrence(string original, string oldValue, string newValue)
         {

@@ -36,6 +36,8 @@ namespace Gekko
         // ========================= functions to manipulate bankvarnames with indexes start =========================================
         // ===========================================================================================================================
 
+
+        //See equivalent method in G.cs
         public static IVariable bankpart(GekkoSmpl smpl, IVariable x1)
         {
             if (x1.Type() == EVariableType.List)
@@ -46,20 +48,13 @@ namespace Gekko
             }
             else
             {
-                string ss = bankpart(O.ConvertToString(x1));
+                string ss = G.bankpart(O.ConvertToString(x1));
                 return new ScalarString(ss);
             }
         }
 
-        private static string bankpart(string s1)
-        {
-            string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
-            string ss = "";
-            if (bank != null) ss = bank;
-            return ss;
-        }
 
+        //See equivalent method in G.cs
         public static IVariable namepart(GekkoSmpl smpl, IVariable x1)
         {
             if (x1.Type() == EVariableType.List)
@@ -70,12 +65,12 @@ namespace Gekko
             }
             else
             {
-                string bank, name, freq; string[] index;
-                O.Chop(O.ConvertToString(x1), out bank, out name, out freq, out index);
-                return new ScalarString(name);
+                return new ScalarString(G.namepart(O.ConvertToString(x1)));
             }
         }
 
+
+        //See equivalent method in G.cs
         public static IVariable freqpart(GekkoSmpl smpl, IVariable x1)
         {
             if (x1.Type() == EVariableType.List)
@@ -86,13 +81,12 @@ namespace Gekko
             }
             else
             {
-                string bank, name, freq; string[] index;
-                O.Chop(O.ConvertToString(x1), out bank, out name, out freq, out index);
-                if (freq == null) return new ScalarString("");
-                else return new ScalarString(freq);
+                return new ScalarString(G.freqpart(O.ConvertToString(x1)));
             }
         }
 
+
+        //See equivalent method in G.cs
         public static IVariable nameandfreqpart(GekkoSmpl smpl, IVariable x1)
         {
             if (x1.Type() == EVariableType.List)
@@ -103,13 +97,12 @@ namespace Gekko
             }
             else
             {
-                string bank, name, freq; string[] index;
-                O.Chop(O.ConvertToString(x1), out bank, out name, out freq, out index);
-                if (freq == null) return new ScalarString(name);
-                else return new ScalarString(name + Globals.freqIndicator + freq);
+                return new ScalarString(G.nameandfreqpart(O.ConvertToString(x1)));
             }
         }
 
+
+        //See equivalent method in G.cs
         public static IVariable indexpart(GekkoSmpl smpl, IVariable x1)
         {
             if (x1.Type() == EVariableType.List)
@@ -120,18 +113,18 @@ namespace Gekko
             }
             else
             {
-                string bank, name, freq; string[] index;
-                O.Chop(O.ConvertToString(x1), out bank, out name, out freq, out index);
-                if (index == null) return new List();
-                else return new List(new List<string>(index));
+                return new List(G.indexpart(O.ConvertToString(x1)));
             }
         }
 
+
+        //See equivalent method in G.cs
         public static IVariable fullname(GekkoSmpl smpl, IVariable ivbank, IVariable ivname, IVariable ivfreq)
         {
             return fullname(smpl, ivbank, ivname, ivfreq, null);
         }
 
+        //See equivalent method in G.cs
         public static IVariable fullname(GekkoSmpl smpl, IVariable ivbank, IVariable ivname, IVariable ivfreq, IVariable ivindex)
         {
             string bank = O.ConvertToString(ivbank);
@@ -139,10 +132,11 @@ namespace Gekko
             string freq = O.ConvertToString(ivfreq);
             string[] index = null;
             if (ivindex != null) index = Program.GetListOfStringsFromListOfIvariables(O.ConvertToList(ivindex).ToArray());
-            string s = O.UnChop(bank, name, freq, index);
+            string s = G.fullname(bank, name, freq, index);
             return new ScalarString(s);
         }
 
+        //See equivalent method in G.cs
         public static IVariable bankadd(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             if (x1.Type() == EVariableType.List)
@@ -153,20 +147,12 @@ namespace Gekko
             }
             else
             {
-                string bank, name, freq; string[] index;
-                O.Chop(O.ConvertToString(x1), out bank, out name, out freq, out index);
-                if (bank == null)
-                {
-                    bank = O.ConvertToString(x2);
-                    return new ScalarString(O.UnChop(bank, name, freq, index));
-                }
-                else
-                {
-                    return x1.DeepClone();
-                }
+                return new ScalarString(G.bankadd(O.ConvertToString(x1), O.ConvertToString(x2)));
             }
         }
 
+
+        //See equivalent method in G.cs
         public static IVariable bankset(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             if (x1.Type() == EVariableType.List)
@@ -177,13 +163,12 @@ namespace Gekko
             }
             else
             {
-                string bank, name, freq; string[] index;
-                O.Chop(O.ConvertToString(x1), out bank, out name, out freq, out index);
-                bank = O.ConvertToString(x2);
-                return new ScalarString(O.UnChop(bank, name, freq, index));
+                return new ScalarString(G.bankset(O.ConvertToString(x1), O.ConvertToString(x2)));
             }
         }
 
+
+        //See equivalent method in G.cs
         public static IVariable bankremove(GekkoSmpl smpl, IVariable x1)
         {
             if (x1.Type() == EVariableType.List)
@@ -194,12 +179,12 @@ namespace Gekko
             }
             else
             {
-                string bank, name, freq; string[] index;
-                O.Chop(O.ConvertToString(x1), out bank, out name, out freq, out index);
-                return new ScalarString(O.UnChop(null, name, freq, index));
+                return new ScalarString(G.bankremove(O.ConvertToString(x1)));
             }
         }
 
+
+        //See equivalent method in G.cs
         public static IVariable bankremove(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             if (x1.Type() == EVariableType.List)
@@ -210,14 +195,12 @@ namespace Gekko
             }
             else
             {
-                string bank, name, freq; string[] index;
-                O.Chop(O.ConvertToString(x1), out bank, out name, out freq, out index);
-                string bankRemove = O.ConvertToString(x2);
-                if (G.Equal(bankRemove, bank)) bank = null;
-                return new ScalarString(O.UnChop(bank, name, freq, index));
+                return new ScalarString(G.bankremove(O.ConvertToString(x1), O.ConvertToString(x2)));
             }
         }
 
+
+        //See equivalent method in G.cs
         public static IVariable bankreplace(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             if (x1.Type() == EVariableType.List)
@@ -228,14 +211,13 @@ namespace Gekko
             }
             else
             {
-                string bank, name, freq; string[] index;
-                O.Chop(O.ConvertToString(x1), out bank, out name, out freq, out index);
-                string bankReplace = O.ConvertToString(x2);
-                if (G.Equal(bankReplace, bank)) bank = bankReplace;
-                return new ScalarString(O.UnChop(bank, name, freq, index));
+                return new ScalarString(G.bankreplace(O.ConvertToString(x1), O.ConvertToString(x2)));
             }
         }
 
+
+
+        //See equivalent method in G.cs
         public static IVariable freqadd(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             if (x1.Type() == EVariableType.List)
@@ -246,20 +228,12 @@ namespace Gekko
             }
             else
             {
-                string bank, name, freq; string[] index;
-                O.Chop(O.ConvertToString(x1), out bank, out name, out freq, out index);
-                if (freq == null)
-                {
-                    freq = O.ConvertToString(x2);
-                    return new ScalarString(O.UnChop(bank, name, freq, index));
-                }
-                else
-                {
-                    return x1.DeepClone();
-                }
+                return new ScalarString(G.freqadd(O.ConvertToString(x1), O.ConvertToString(x2)));
             }
         }
 
+
+        //See equivalent method in G.cs
         public static IVariable freqset(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             if (x1.Type() == EVariableType.List)
@@ -270,13 +244,12 @@ namespace Gekko
             }
             else
             {
-                string bank, name, freq; string[] index;
-                O.Chop(O.ConvertToString(x1), out bank, out name, out freq, out index);
-                freq = O.ConvertToString(x2);
-                return new ScalarString(O.UnChop(bank, name, freq, index));
+                return new ScalarString(G.freqset(O.ConvertToString(x1), O.ConvertToString(x2)));
             }
         }
 
+
+        //See equivalent method in G.cs
         public static IVariable freqremove(GekkoSmpl smpl, IVariable x1)
         {
             if (x1.Type() == EVariableType.List)
@@ -287,12 +260,12 @@ namespace Gekko
             }
             else
             {
-                string bank, name, freq; string[] index;
-                O.Chop(O.ConvertToString(x1), out bank, out name, out freq, out index);
-                return new ScalarString(O.UnChop(bank, name, null, index));
+                return new ScalarString(G.freqremove(O.ConvertToString(x1)));
             }
         }
 
+
+        //See equivalent method in G.cs
         public static IVariable freqremove(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             if (x1.Type() == EVariableType.List)
@@ -303,18 +276,12 @@ namespace Gekko
             }
             else
             {
-                return new ScalarString(freqremove(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.freqremove(O.ConvertToString(x1), O.ConvertToString(x2)));
             }
         }
 
-        public static string freqremove(string s1, string freqRemove)
-        {
-            string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);            
-            if (G.Equal(freqRemove, freq)) freq = null;
-            return O.UnChop(bank, name, freq, index);
-        }
 
+        //See equivalent method in G.cs
         public static IVariable freqreplace(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             if (x1.Type() == EVariableType.List)
@@ -325,14 +292,11 @@ namespace Gekko
             }
             else
             {
-                string bank, name, freq; string[] index;
-                O.Chop(O.ConvertToString(x1), out bank, out name, out freq, out index);
-                string freqReplace = O.ConvertToString(x2);
-                if (G.Equal(freqReplace, freq)) freq = freqReplace;
-                return new ScalarString(O.UnChop(bank, name, freq, index));
+                return new ScalarString(G.freqreplace(O.ConvertToString(x1), O.ConvertToString(x2)));
             }
         }
 
+        //See equivalent method in G.cs
         public static IVariable nameset(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             if (x1.Type() == EVariableType.List)
@@ -343,51 +307,18 @@ namespace Gekko
             }
             else
             {
-                string bank, name, freq; string[] index;
-                O.Chop(O.ConvertToString(x1), out bank, out name, out freq, out index);
-                name = O.ConvertToString(x2);
-                return new ScalarString(O.UnChop(bank, name, freq, index));
+                return new ScalarString(G.nameset(O.ConvertToString(x1), O.ConvertToString(x2)));
             }
         }
 
-        public static IVariable namesetprefix(GekkoSmpl smpl, IVariable x1, IVariable x2)
-        {
-            if (x1.Type() == EVariableType.List)
-            {
-                List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(namesetprefix(smpl, item, x2));
-                return rv;
-            }
-            else
-            {
-                string bank, name, freq; string[] index;
-                O.Chop(O.ConvertToString(x1), out bank, out name, out freq, out index);
-                string namePrefix = O.ConvertToString(x2).Trim();
-                return new ScalarString(O.UnChop(bank, namePrefix + name, freq, index));
-            }
-        }
 
-        public static IVariable namesetsuffix(GekkoSmpl smpl, IVariable x1, IVariable x2)
-        {
-            if (x1.Type() == EVariableType.List)
-            {
-                List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(namesetsuffix(smpl, item, x2));
-                return rv;
-            }
-            else
-            {
-                string bank, name, freq; string[] index;
-                O.Chop(O.ConvertToString(x1), out bank, out name, out freq, out index);
-                string nameSuffix = O.ConvertToString(x2).Trim();
-                return new ScalarString(O.UnChop(bank, name + nameSuffix, freq, index));
-            }
-        }
+
 
         // ===========================================================================================================================
         // ========================= functions to manipulate bankvarnames with indexes end ===========================================
         // ===========================================================================================================================
 
+        
         public static IVariable rotate(GekkoSmpl smpl, IVariable x1, IVariable dim)
         {
             int iDim = O.ConvertToInt(dim);
@@ -524,7 +455,7 @@ namespace Gekko
                     if (kvp.Key.StartsWith(name + "_", StringComparison.OrdinalIgnoreCase) && kvp.Key.EndsWith(Globals.freqIndicator + G.GetFreq(Program.options.freq), StringComparison.OrdinalIgnoreCase))
                     {
                         //starts with endo_ or exo_ and is of annual type
-                        fixes.Add(G.RemoveFreqIndicator(kvp.Key));
+                        fixes.Add(G.freqremove(kvp.Key));
                     }
                 }
             }
