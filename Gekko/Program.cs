@@ -1501,7 +1501,7 @@ namespace Gekko
                             }
 
                             string varName = cellText.Trim();  //the name may contain blanks like 'elveff '
-                            varName = G.AddCurrentFreqToName(varName);
+                            varName = G.freqadd(varName, Program.options.freq);
                             variableCounter++;
                             if (!databank.ContainsIVariable(varName))
                             {
@@ -4342,7 +4342,7 @@ namespace Gekko
                 int dimensionsWithoutTime = codes.Count;
 
                 //put in the array-timeseries ghost
-                string varNameWithFreq = G.AddFreqToName(tableName, G.GetFreq(freq));
+                string varNameWithFreq = G.freqadd(tableName, freq);
                 Series tsGhost = new Series(G.GetFreq(freq), varNameWithFreq);
                 tsGhost.SetArrayTimeseries(dimensionsWithoutTime + 1, true);
                 Databank databank = Program.databanks.GetFirst();
@@ -4420,7 +4420,7 @@ namespace Gekko
                     if (true)
                     {
                         string name2 = codesCombi[j].Replace(Globals.pxInternalDelimiter, '_');
-                        string name3 = G.AddFreqToName(name2, G.GetFreq(freq));
+                        string name3 = G.freqadd(name2, freq);
                         ts = new Series(G.GetFreq(freq), name3);
                         ts.meta.label = valuesCombi[j];
                         ts.meta.source = source;
@@ -4470,7 +4470,7 @@ namespace Gekko
                     }
 
                     //put in the timeseries
-                    string varNameWithFreq = G.AddFreqToName(tableName, G.GetFreq(freq));
+                    string varNameWithFreq = G.freqadd(tableName, freq);
                     Databank databank = Program.databanks.GetFirst();
                     databank.AddIVariableWithOverwrite(ts.name, ts);
                     ts.SetDirty(true);
@@ -5215,7 +5215,7 @@ namespace Gekko
 
                         if (!G.StartsWithSigil(bnv.name))
                         {
-                            name = G.AddCurrentFreqToName(name);
+                            name = G.freqadd(name, Program.options.freq);
                         }
                         string nameWithoutFreq = G.freqremove(name);
 
@@ -5447,7 +5447,7 @@ namespace Gekko
                 
                 if (!G.StartsWithSigil(bnv.name))
                 {
-                    name = G.AddCurrentFreqToName(name);
+                    name = G.freqadd(name, Program.options.freq);
                 }
                 string nameWithoutFreq = G.freqremove(name);
 
@@ -9448,7 +9448,7 @@ namespace Gekko
                         if (G.Equal(sss, tempName + (i + 1) + "." + e))
                         {
 
-                            string varName2 = null; string freq = null; G.ChopFreq(ts0.name, ref freq, ref varName2);
+                            string varName2 = null; string freq = null; O.ChopFreq(ts0.name, ref freq, ref varName2);
                             string varName = varName2 + "_" + e + Globals.freqIndicator + freq;
 
                             Series ts = new Series(o.t1.freq, varName);
@@ -22127,7 +22127,7 @@ namespace Gekko
             //Has an overload used for UPD statements etc.
             Series ts = null;
 
-            string varName2 = G.AddFreqToName(varName, frequency);
+            string varName2 = G.freqadd(varName, frequency);
 
             //string varName2 = Program.AddFreqAtEndOfVariableName(varName, frequency);
 
@@ -24547,8 +24547,8 @@ namespace Gekko
             Matrix name_stats = new Matrix(9, 1, double.NaN);
             Matrix name_covar = new Matrix(m, m, double.NaN);
             Matrix name_corr = new Matrix(m, m, double.NaN);
-            Series name_predict = new Series(t1.freq, G.AddFreqToName(name + "_predict", lhs_series.freq));
-            Series name_residual = new Series(t1.freq, G.AddFreqToName(name + "_residual", lhs_series.freq));
+            Series name_predict = new Series(t1.freq, G.freqadd(name + "_predict", lhs_series.freq));  
+            Series name_residual = new Series(t1.freq, G.freqadd(name + "_residual", lhs_series.freq));
 
             //double[] y = new double[n];
             //double[,] x = new double[n, m];

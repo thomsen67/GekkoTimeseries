@@ -174,7 +174,7 @@ namespace Gekko
         {
             if (!G.StartsWithSigil(variable))
             {
-                variable = G.AddCurrentFreqToName(variable);
+                variable = G.freqadd(variable, Program.options.freq);
             }
             IVariable iv = null;
             this.storage.TryGetValue(variable, out iv);

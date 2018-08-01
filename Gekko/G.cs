@@ -548,43 +548,18 @@ namespace Gekko
 
 
 
-        public static string AddCurrentFreqToName(string name)
-        {
-            return AddFreqToName(name, Program.options.freq);
-        }
+        //public static string AddCurrentFreqToName(string name)
+        //{
+        //    return AddFreqToName(name, Program.options.freq);
+        //}
 
-        public static string AddFreqToName(string name, EFreq freq)
-        {
-            //If freq is a, it transforms x into x!a
-            //But x!q will stay x!q.
-            return G.freqadd(name, G.GetFreq(freq));
-        }
-         
-
-        public static void ChopFreq(string input2, ref string freq, ref string varName)
-        {
-            string input = input2.Trim();
-            if (input == null) return;
-            
-            string[] ss2 = input.Split(Globals.freqIndicator);
-            if (ss2.Length > 2)
-            {
-                G.Writeln2("*** ERROR: More than 1 freq indicators ('!') in '" + input + "'");
-                throw new GekkoException();
-            }
-            else if (ss2.Length == 2)
-            {
-                varName = ss2[0].Trim();
-                freq = ss2[1].Trim();
-            }
-            else if (ss2.Length == 1)
-            {
-                varName = input;
-                freq = null;
-            }
-            return;
-        }
-
+        //public static string AddFreqToName(string name, EFreq freq)
+        //{
+        //    //If freq is a, it transforms x into x!a
+        //    //But x!q will stay x!q.
+        //    return G.freqadd(name, freq);
+        //}
+        
 
         public static string GetFreq(EFreq eFreq)
         {
@@ -1886,7 +1861,7 @@ namespace Gekko
         {
             //returns '%s' or 'x' or 'x' (Annual)
             string freq = null; string varname = null;
-            G.ChopFreq(input, ref freq, ref varname);
+            O.ChopFreq(input, ref freq, ref varname);
             string freqPretty = null;
             if (freq != null) freqPretty = " (" + G.GetFreqString(GetFreq(freq)) + ")";
             if(useQuotes) return "'" + varname + "'" + freqPretty;
@@ -2205,7 +2180,7 @@ namespace Gekko
 
         public static string GetListWithCommas(string[] list)
         {
-            return GetListWithCommas(new List<string>());
+            return GetListWithCommas(new List<string>(list));
         }
         
         /// <summary>
