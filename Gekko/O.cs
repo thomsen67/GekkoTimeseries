@@ -2603,16 +2603,38 @@ namespace Gekko
 
         public static void ChopIndexer(string s, out string name, out string rest)
         {
-            name = s;
+            name = s.Trim();
             string[] ss = s.Split('[');
             rest = null;
             if (ss.Length > 1)
             {
-                name = ss[0];
-                rest = "[" + ss[1];
+                name = ss[0].Trim();
+                rest = "[" + ss[1].Trim();
             }
         }
 
+        //See also Chop()
+        public static string UnChop(string bank, string name, string freq, string[] index)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                G.Writeln2("*** ERROR: Name cannot be null");
+                throw new GekkoException();
+            }
+            string s = name.Trim();
+            if (bank != null) s = bank.Trim() + Globals.symbolBankColon + s;
+            if (freq != null) s = s + Globals.freqIndicator + freq;
+            if (index != null && index.Length > 0)
+            {
+                s += "[";
+                s += G.GetListWithCommas(index);
+                s += "]";
+            }
+            return s;
+        }
+
+
+        //See also UnChop()
         public static void Chop(string input2, out string dbName, out string varName, out string freq, out string[] indexes)
         {
             indexes = null;
@@ -2621,8 +2643,7 @@ namespace Gekko
             ChopIndexer(input2, out input, out rest);
 
             if (rest != null)
-            {
-                rest = rest.Trim();
+            {                
                 if (!(rest.StartsWith("[") && rest.EndsWith("]")))
                 {
                     G.Writeln2("*** ERROR: Expected indexer to start with '[' and end with ']'");
@@ -2649,10 +2670,10 @@ namespace Gekko
             dbName = null;
             varName = null;
 
-            if (ss.Length == 1) varName = ss[0];
+            if (ss.Length == 1) varName = ss[0].Trim();
             else if (ss.Length == 2)
             {
-                dbName = ss[0]; varName = ss[1];
+                dbName = ss[0]; varName = ss[1].Trim();
             }
             //firstChar = varName[0];
 
@@ -4122,13 +4143,13 @@ namespace Gekko
             return label;
         }
         
-        public static List<string> SearchWildcard(IVariable a)
-        {
-            string s = O.ConvertToString(a);
-            List<string> l = new List<string>();
-            l = Program.MatchWildcardInDatabank(s, Program.databanks.GetFirst());            
-            return l;
-        }
+        //public static List<string> SearchWildcard(IVariable a)
+        //{
+        //    string s = O.ConvertToString(a);
+        //    List<string> l = new List<string>();
+        //    l = Program.MatchWildcardInDatabank(s, Program.databanks.GetFirst());            
+        //    return l;
+        //}
 
         public static Series IndirectionHelper(GekkoSmpl smpl, string variable)
         {

@@ -7680,12 +7680,12 @@ namespace Gekko
             //input.AddRange(db.storage.Keys);
             foreach (KeyValuePair<string, IVariable> kvp in db.storage)
             {
-                Series xx = kvp.Value as Series; if (xx != null && xx.type == ESeriesType.ArraySuper) continue;  //ignore ghosts
+                //Series xx = kvp.Value as Series; if (xx != null && xx.type == ESeriesType.ArraySuper) continue;  //ignore ghosts
                 input.Add(new ScalarString(kvp.Key));
             }
 
-            string endsWith = null;
-            if (Program.options.freq != EFreq.Annual) endsWith = Globals.freqIndicator + G.GetFreq(Program.options.freq);
+            //string endsWith = null;
+            string endsWith = Globals.freqIndicator + G.GetFreq(Program.options.freq);
             List<string> output = Program.MatchWildcard(wildcard, input, endsWith);
             return output;
         }

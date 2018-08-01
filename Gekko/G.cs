@@ -374,7 +374,17 @@ namespace Gekko
 
         public static string RemoveFreqFromName(string s, bool onlyRemoveCurrentFreq)
         {
-            //name may be: x, x!a, x!a, x!a[a, b], x!q['a', 'b'], x[a]
+            if (onlyRemoveCurrentFreq)
+            {                
+                return Functions.freqremove(s, G.GetFreq(Program.options.freq));
+            }
+            else
+            {
+                IVariable iv = Functions.freqremove(null, new ScalarString(s));
+                return iv.ConvertToString();
+            }
+            
+            //name may be: x, x!a, x!a, x!a[a, b], x!q[a, b ], x[a]
             //may even contain a bank colon like b:x!q[a, b]
 
             string rv = null;
@@ -416,9 +426,9 @@ namespace Gekko
 
         
 
-        public static void ChopFreq(string input, ref string freq, ref string varName)
+        public static void ChopFreq(string input2, ref string freq, ref string varName)
         {
-            
+            string input = input2.Trim();
             if (input == null) return;
             
             string[] ss2 = input.Split(Globals.freqIndicator);
@@ -429,8 +439,8 @@ namespace Gekko
             }
             else if (ss2.Length == 2)
             {
-                varName = ss2[0];
-                freq = ss2[1];
+                varName = ss2[0].Trim();
+                freq = ss2[1].Trim();
             }
             else if (ss2.Length == 1)
             {
