@@ -1072,7 +1072,7 @@ namespace Gekko
             //freq is added for all no-sigil rhs
             //freq is added for lhs if it is no-sigil AND the type is SERIES or VAR
 
-            bool hasSigil = G.HasSigil(varname);
+            bool hasSigil = G.Chop_HasSigil(varname);
 
             string varnameWithFreq = varname;
 
@@ -1238,9 +1238,8 @@ namespace Gekko
         }
 
         public static void AddIVariableWithOverwriteFromString(string dbName, string varName, string freq, string[] indexes, IVariable iv)
-        {            
-            string freq3, nameWithFreq;
-            GetNameWithFreq(varName, freq, out freq3, out nameWithFreq);
+        {
+            string nameWithFreq = GetNameWithFreq(varName, freq);
 
             Databank bank = null;
             if (dbName == null) bank = Program.databanks.GetFirst();
@@ -1248,7 +1247,7 @@ namespace Gekko
 
             if (bank.protect) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
 
-            if (G.HasSigil(nameWithFreq))
+            if (G.Chop_HasSigil(nameWithFreq))
             {
                 //%x or #x
                 if (indexes != null)
@@ -1309,8 +1308,7 @@ namespace Gekko
         {
             //type is only relevant for series, ignored for others
 
-            string freq3, nameWithFreq;
-            GetNameWithFreq(varName, freq, out freq3, out nameWithFreq);
+            string nameWithFreq = GetNameWithFreq(varName, freq);
                         
             Databank bank = null;
             if (dbName == null) bank = Program.databanks.GetFirst();
@@ -1318,7 +1316,7 @@ namespace Gekko
             
             IVariable iv = bank.GetIVariable(nameWithFreq);
 
-            if (G.HasSigil(nameWithFreq))
+            if (G.Chop_HasSigil(nameWithFreq))
             {
                 //%x or #x
                 if (indexes != null)
@@ -1363,7 +1361,7 @@ namespace Gekko
                     {
                         if (type == ECreatePossibilities.Can || type == ECreatePossibilities.Must)
                         {
-                            Series ts = new Series(G.GetFreq(freq3), null);
+                            Series ts = new Series(G.GetFreq(G.Chop_FreqPart(nameWithFreq)), null);
                             iv_series.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts);
                             iv = ts;
                         }
@@ -1378,7 +1376,7 @@ namespace Gekko
                         if (type == ECreatePossibilities.Must)
                         {
                             //overwriting
-                            Series ts = new Series(G.GetFreq(freq3), null);
+                            Series ts = new Series(G.GetFreq(G.Chop_FreqPart(nameWithFreq)), null);
                             iv_series.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts);
                             iv = ts;
                         }
@@ -1397,7 +1395,7 @@ namespace Gekko
                     {
                         if (type == ECreatePossibilities.Can || type == ECreatePossibilities.Must)
                         {
-                            Series ts = new Series(G.GetFreq(freq3), nameWithFreq);
+                            Series ts = new Series(G.GetFreq(G.Chop_FreqPart(nameWithFreq)), nameWithFreq);
                             bank.AddIVariable(nameWithFreq, ts);
                         }
                         else
@@ -1451,8 +1449,7 @@ namespace Gekko
 
         public static IVariable RemoveIVariableFromString(string dbName, string varName, string freq, string[] indexes)
         {
-            string freq3, nameWithFreq;
-            GetNameWithFreq(varName, freq, out freq3, out nameWithFreq);
+            string nameWithFreq = GetNameWithFreq(varName, freq);
             
             Databank bank = null;
             if (dbName == null) bank = Program.databanks.GetFirst();
@@ -1468,7 +1465,7 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            if (G.HasSigil(nameWithFreq))
+            if (G.Chop_HasSigil(nameWithFreq))
             {
                 //%x or #x
                 if (indexes != null)
@@ -1524,35 +1521,12 @@ namespace Gekko
             return iv;
         }
 
-        private static void GetNameWithFreq(string varName, string freq, out string freq3, out string nameWithFreq)
+        private static string GetNameWithFreq(string varName, string freq)
         {
-            //NOTE: it is kind of expected that varName is without any frequency (like x!q), but the method still works if it is the case            
-            //varName should be without bank, else use Chop()
-
-            freq3 = null;
-            if (G.HasSigil(varName))
-            {
-                nameWithFreq = varName;
-            }
-            else
-            {
-                if (!G.HasFreq(varName))
-                {
-                    nameWithFreq = varName;
-                }
-                else
-                {
-                    if (freq != null)
-                    {
-                        freq3 = freq;
-                    }
-                    else
-                    {
-                        freq3 = G.GetFreq(Program.options.freq);
-                    }
-                    nameWithFreq = varName + Globals.freqIndicator + freq3;
-                }
-            }
+            //Only used internally, when dealing with databanks. Not relevant for
+            //outside use.
+            if (freq == null) return G.Chop_FreqAdd(varName, Program.options.freq);
+            else return G.Chop_FreqAdd(varName, freq);
         }
 
         //See also Restrict()

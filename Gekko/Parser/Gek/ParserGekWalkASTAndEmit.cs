@@ -1331,13 +1331,15 @@ namespace Gekko.Parser.Gek
                             string xx = node?.Parent?.Parent?.Parent?.Text;
                             if (xx == "ASTASSIGNMENT")  //these do not have an o object
                             {
+                                node.Code.A("smpl.t0 = ").A(s1).A(";").A(G.NL);
                                 node.Code.A("smpl.t1 = ").A(s1).A(";").A(G.NL);
                                 node.Code.A("smpl.t2 = ").A(s2).A(";").A(G.NL);
+                                node.Code.A("smpl.t3 = ").A(s2).A(";").A(G.NL);
                             }
                             else
-                            {
+                            {                                
                                 node.Code.A("o").A(Num(node)).A(".t1 = ").A(s1).A(";").A(G.NL);
-                                node.Code.A("o").A(Num(node)).A(".t2 = ").A(s2).A(";").A(G.NL);
+                                node.Code.A("o").A(Num(node)).A(".t2 = ").A(s2).A(";").A(G.NL);                             
                             }
                         }
                         break;

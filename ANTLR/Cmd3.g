@@ -1995,6 +1995,10 @@ seqOfFileNamesStar:         star -> ^(ASTFILENAMELIST ASTFILENAMESTAR)
 						  | fileName (COMMA2 fileName)* ->  ^(ASTFILENAMELIST fileName+)
 						    ;
 
+//seqOfBankvarnamesWild:      seqItemWild (COMMA2 seqItemWild)* ->  ^(ASTBANKVARNAMELISTWILD seqItemWild+);
+
+//seqItemWild:                expression;    
+
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- wildcards, ranges --------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
@@ -2013,6 +2017,11 @@ wildcardWithBank          : name COLON wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBA
 						  | AT GLUE wildcard ->  ^(ASTWILDCARDWITHBANK ^(ASTBANK ASTAT) ^(ASTWILDCARD wildcard))
 						  | wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK) ^(ASTWILDCARD wildcard))
 						  ;						
+
+bankvarnameWild           : expression -> (AST          : name COLON wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK name) ^(ASTWILDCARD wildcard))
+						  | AT GLUE wildcard ->  ^(ASTWILDCARDWITHBANK ^(ASTBANK ASTAT) ^(ASTWILDCARD wildcard))
+						  | wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK) ^(ASTWILDCARD wildcard))
+						  ;
 
 rangeWithBank             : name COLON range -> ^(ASTRANGEWITHBANK ^(ASTBANK name) range)
 						  | AT GLUE range -> ^(ASTRANGEWITHBANK ^(ASTBANK ASTAT) range)
@@ -2484,7 +2493,7 @@ help:					    HELP name? -> ^({token("ASTHELP", ASTHELP, $HELP.Line)} name?);
 if2:						IF leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIF", ASTIF, $IF.Line)} logical ^(ASTPLACEHOLDER functionStatements) ^(ASTPLACEHOLDER functionStatements2?));
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
-// IF
+// INDEX
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 index:                      INDEX indexOpt1? SERIES? listItemsWildRange bankvarname? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} listItemsWildRange ^(ASTPLACEHOLDER bankvarname?) indexOpt1?);

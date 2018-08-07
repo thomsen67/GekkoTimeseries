@@ -163,7 +163,12 @@ namespace Gekko
         // ----------------------------------------------------
         public string GetName()
         {
-            if (this.name.StartsWith(Globals.seriesArraySubName))
+            if (this.name == null && Globals.runningOnTTComputer)
+            {
+                G.Writeln2("*** ERROR: Name error");
+                throw new GekkoException();
+            }
+            if (this.name == null || this.name.StartsWith(Globals.seriesArraySubName))
             {
                 return this.mmi.GetName();
             }

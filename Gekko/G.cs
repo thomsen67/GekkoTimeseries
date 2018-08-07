@@ -338,7 +338,7 @@ namespace Gekko
             }                     
         }
 
-        public static bool HasFreq(string s)
+        public static bool Chop_HasFreq(string s)
         {
             if (G.Chop_FreqPart(s) != null) return true;
             return false;
@@ -465,6 +465,7 @@ namespace Gekko
             //only adds a freq if there is no freq already
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
+            if (G.Chop_HasSigil(name)) return s1;
             if (freq == null)
             {
                 return O.UnChop(bank, name, s2, index);
@@ -485,6 +486,7 @@ namespace Gekko
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
+            if (G.Chop_HasSigil(name)) return s1;
             return O.UnChop(bank, name, s2, index);
         }
 
@@ -498,6 +500,7 @@ namespace Gekko
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
+            if (G.Chop_HasSigil(name)) return s1;
             return O.UnChop(bank, name, null, index);
         }
 
@@ -506,6 +509,7 @@ namespace Gekko
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
+            if (G.Chop_HasSigil(name)) return s1;
             string freqRemove = s2;
             if (G.Equal(freqRemove, freq)) freq = null;
             return O.UnChop(bank, name, freq, index);
@@ -521,6 +525,7 @@ namespace Gekko
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
+            if (G.Chop_HasSigil(name)) return s1;
             if (G.Equal(s2, freq)) freq = s3;
             return O.UnChop(bank, name, freq, index);
         }
@@ -1301,7 +1306,7 @@ namespace Gekko
                 throw new GekkoException();
             }
         }
-        public static bool HasSigil(string varname)
+        public static bool Chop_HasSigil(string varname)
         {
             if (varname == null || varname.Length == 0)
             {

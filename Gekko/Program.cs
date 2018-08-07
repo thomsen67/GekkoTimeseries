@@ -4352,8 +4352,9 @@ namespace Gekko
                 for (int j = 0; j < codesCombi.Count; j++)
                 {
                     Series ts = null;
-                                        
-                    ts = new Series(G.GetFreq(freq), null);
+                    
+                    ts = new Series(ESeriesType.Normal, G.GetFreq(freq), Globals.seriesArraySubName + Globals.freqIndicator + freq);
+
                     ts.meta.label = valuesCombi[j];
                     ts.meta.source = source;
                     ts.meta.stamp = Globals.dateStamp;                    
@@ -4696,12 +4697,7 @@ namespace Gekko
                         {
 
                             gdx.gdxSymbolInfo(i, ref varName, ref gdxDimensions, ref varType);
-
-                            if (varName.ToLower().StartsWith("s"))
-                            {
-
-                            }
-
+                            
                             string label = null; int records = -12345; int userInfo = -12345;
                             gdx.gdxSymbolInfoX(i, ref records, ref userInfo, ref label);
 
@@ -4894,7 +4890,7 @@ namespace Gekko
                                             IVariable iv = null; ts.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
                                             if (iv == null)
                                             {
-                                                ts2 = new Series(freq, null);  //has no name,  but will it be understood as SeriesLight??                                           
+                                                ts2 = new Series(ESeriesType.Normal, freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(freq));
                                                 if (timeDimNr == -12345) ts2.type = ESeriesType.Timeless;
                                                 ts.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts2);
                                             }
@@ -8263,6 +8259,109 @@ namespace Gekko
 
             double time = (DateTime.Now - t0).TotalMilliseconds;
             G.Writeln2("TIME: " + time / 1000d);
+        }
+
+        /// <summary>
+        /// Returns a filename based on the sourcefile and the targetMask, as used in the second argument in rename/copy operations.
+        /// targetMask may contain wildcards (* and ?).
+        /// 
+        /// This follows the rules of: http://superuser.com/questions/475874/how-does-the-windows-rename-command-interpret-wildcards
+        /// </summary>
+        /// <param name="sourcefile">filename to change to target without wildcards</param>
+        /// <param name="targetMask">mask with wildcards</param>
+        /// <returns>a valid target filename given sourcefile and targetMask</returns>
+        public static string GetTargetFileName(string sourcefile, string targetMask)
+        {
+            if (string.IsNullOrEmpty(sourcefile))
+                throw new ArgumentNullException("sourcefile");
+
+            if (string.IsNullOrEmpty(targetMask))
+                throw new ArgumentNullException("targetMask");
+
+            if (sourcefile.Contains('*') || sourcefile.Contains('?'))
+                throw new ArgumentException("sourcefile cannot contain wildcards");
+
+            // no wildcards: return complete mask as file
+            if (!targetMask.Contains('*') && !targetMask.Contains('?'))
+                return targetMask;
+
+            var maskReader = new StringReader(targetMask);
+            var sourceReader = new StringReader(sourcefile);
+            var targetBuilder = new StringBuilder();
+
+
+            while (maskReader.Peek() != -1)
+            {
+
+                int current = maskReader.Read();
+                int sourcePeek = sourceReader.Peek();
+                switch (current)
+                {
+                    case '*':
+                        int next = maskReader.Read();
+                        switch (next)
+                        {
+                            case -1:
+                            case '?':
+                                // Append all remaining characters from sourcefile
+                                targetBuilder.Append(sourceReader.ReadToEnd());
+                                break;
+                            default:
+                                // Read source until the last occurrance of 'next'.
+                                // We cannot seek in the StringReader, so we will create a new StringReader if needed
+                                string sourceTail = sourceReader.ReadToEnd();
+                                int lastIndexOf = sourceTail.LastIndexOf((char)next);
+                                // If not found, append everything and the 'next' char
+                                if (lastIndexOf == -1)
+                                {
+                                    targetBuilder.Append(sourceTail);
+                                    targetBuilder.Append((char)next);
+
+                                }
+                                else
+                                {
+                                    string toAppend = sourceTail.Substring(0, lastIndexOf + 1);
+                                    string rest = sourceTail.Substring(lastIndexOf + 1);
+                                    sourceReader.Dispose();
+                                    // go on with the rest...
+                                    sourceReader = new StringReader(rest);
+                                    targetBuilder.Append(toAppend);
+                                }
+                                break;
+                        }
+
+                        break;
+                    case '?':
+                        if (sourcePeek != -1 && sourcePeek != '.')
+                        {
+                            targetBuilder.Append((char)sourceReader.Read());
+                        }
+                        break;
+                    case '.':
+                        // eat all characters until the dot is found
+                        while (sourcePeek != -1 && sourcePeek != '.')
+                        {
+                            sourceReader.Read();
+                            sourcePeek = sourceReader.Peek();
+                        }
+
+                        targetBuilder.Append('.');
+                        // need to eat the . when we peeked it
+                        if (sourcePeek == '.')
+                            sourceReader.Read();
+
+                        break;
+                    default:
+                        if (sourcePeek != '.') sourceReader.Read(); // also consume the source's char if not .
+                        targetBuilder.Append((char)current);
+                        break;
+                }
+
+            }
+
+            sourceReader.Dispose();
+            maskReader.Dispose();
+            return targetBuilder.ToString().TrimEnd('.', ' ');
         }
 
         public static Table Dream(string options)
@@ -26714,6 +26813,9 @@ namespace Gekko
             pling = "'";
             foreach (O.Prt.Element element in oPrt.prtElements)
             {
+                string[] w = RemoveSplitter(element.labelGiven[0]).Split('|');  //raw label   
+                string labelGiven = G.ReplaceGlueNew(w[0]);
+
                 IVariable var = element.variable[0];
                 List temp = var as List;
                 if (temp != null)
@@ -26738,7 +26840,7 @@ namespace Gekko
                             s += "[" + iv.Type().ToString() + "]" + ", ";
                         }
                     }
-                    G.Writeln2(Program.RemoveSplitter(element.labelGiven[0]));
+                    G.Writeln2(labelGiven);
                     if (temp.list.Count > 0)
                     {
                         s = s.Substring(0, s.Length - ", ".Length);
@@ -26753,26 +26855,26 @@ namespace Gekko
                 {
                     if (var.Type() == EVariableType.Matrix)
                     {
-                        Program.ShowMatrix((Matrix)var, element.labelGiven[0]);
+                        Program.ShowMatrix((Matrix)var, labelGiven);
                     }
                     else if (var.Type() == EVariableType.String)
                     {
-                        G.Writeln2(element.labelGiven[0]);
+                        G.Writeln2(labelGiven);
                         G.Writeln(pling + ((ScalarString)var).string2 + pling);
                     }
                     else if (var.Type() == EVariableType.Val)
                     {
-                        G.Writeln2(element.labelGiven[0]);
+                        G.Writeln2(labelGiven);
                         G.Writeln(((ScalarVal)var).val.ToString());
                     }
                     else if (var.Type() == EVariableType.Date)
                     {
-                        G.Writeln2(element.labelGiven[0]);
+                        G.Writeln2(labelGiven);
                         G.Writeln(((ScalarDate)var).date.ToString());
                     }
                     else if (var.Type() == EVariableType.Map)
                     {
-                        G.Writeln2(element.labelGiven[0]);
+                        G.Writeln2(labelGiven);
                         Map map = var as Map;
                                                 
                         if (map.storage.Count == 0)
@@ -36298,7 +36400,7 @@ namespace Gekko
                     string dbName, varName, freq; string[] indexes;
                     O.Chop(tsString, out dbName, out varName, out freq, out indexes);
 
-                    if (G.HasSigil(varName)) continue;  //filter out non-series, like %s or #m
+                    if (G.Chop_HasSigil(varName)) continue;  //filter out non-series, like %s or #m
 
                     IVariable iv = O.GetIVariableFromString(dbName, varName, freq, indexes, O.ECreatePossibilities.NoneReturnNull);
                     IVariable ivGrund = O.GetIVariableFromString("Ref", varName, freq, indexes, O.ECreatePossibilities.NoneReturnNull);
