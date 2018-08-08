@@ -334,7 +334,8 @@ namespace Gekko.Parser.Gek
                     if (node.listLoopAnchor == null) node.listLoopAnchor = new GekkoDictionary<string, TwoStrings>(StringComparer.OrdinalIgnoreCase);
                     foreach (string s in node.freeIndexedLists.Keys)
                     {
-                        node.listLoopAnchor.Add(s, new TwoStrings(Globals.listLoopInternalName + s + ++Globals.counter, ""));
+                        //these are for an unfold function
+                        node.listLoopAnchor.Add(s, new TwoStrings(Globals.listLoopInternalName + s + ++Globals.counter, "unfold"));
                     }
                 }
                 else if (node.Text == "ASTPRTELEMENT")
@@ -569,7 +570,7 @@ namespace Gekko.Parser.Gek
                                     G.Writeln2("*** ERROR: The list " + Globals.symbolCollection + s + " is used several times for multidimensional looping in sum() or unfold() function");
                                     throw new GekkoException();
                                 }
-                                node.listLoopAnchor.Add(s, new TwoStrings(Globals.listLoopInternalName + s + ++Globals.counter, ""));
+                                node.listLoopAnchor.Add(s, new TwoStrings(Globals.listLoopInternalName + s + ++Globals.counter, functionName));
                             }
                         }
                     }
@@ -1206,9 +1207,15 @@ namespace Gekko.Parser.Gek
                                 //See also #980752345
                                 string listName = GetSimpleHashName(child[0][0]);
                                 string internalName = null;
+                                string internalFunction = null;
                                 if (listName != null)
                                 {
-                                    internalName = SearchUpwardsInTree2(node, listName);
+                                    TwoStrings two = SearchUpwardsInTree2(node, listName);
+                                    if (two != null)
+                                    {
+                                        internalName = two.s1;
+                                        internalFunction = two.s2;
+                                    }
                                 }
 
                                 if (internalName != null)
@@ -1233,9 +1240,15 @@ namespace Gekko.Parser.Gek
                             {
                                 string listName = GetSimpleHashName(node[0]);
                                 string internalName = null;
+                                string internalFunction = null;
                                 if (listName != null)
                                 {
-                                    internalName = SearchUpwardsInTree2(node, listName);
+                                    TwoStrings two= SearchUpwardsInTree2(node, listName);
+                                    if (two != null)
+                                    {
+                                        internalName = two.s1;
+                                        internalFunction = two.s2;
+                                    }
                                 }                                
                                 if (internalName != null) s = internalName;
                             }
@@ -1427,9 +1440,15 @@ namespace Gekko.Parser.Gek
 
                             string listName = GetSimpleHashName(child);
                             string internalName = null;
+                            string internalFunction = null;
                             if (listName != null)
                             {
-                                internalName = SearchUpwardsInTree2(node, listName);
+                                TwoStrings two = SearchUpwardsInTree2(node, listName);
+                                if (two != null)
+                                {
+                                    internalName = two.s1;
+                                    internalFunction = two.s2;
+                                }
                             }
 
                             if (internalName != null)
@@ -2977,9 +2996,16 @@ namespace Gekko.Parser.Gek
                                     //See also #980752345
                                     string listName = GetSimpleHashName(child[0][0]);
                                     string internalName = null;
+                                    string internalFunction = null;
                                     if (listName != null)
                                     {
-                                        internalName = SearchUpwardsInTree2(node, listName);
+                                        TwoStrings two = SearchUpwardsInTree2(node, listName);
+                                        if (two != null)
+                                        {
+                                            internalName = two.s1;
+                                            internalFunction = two.s2;
+                                        }
+
                                     }
 
                                     if (internalName != null)
@@ -3029,9 +3055,15 @@ namespace Gekko.Parser.Gek
 
                                     string listName = GetSimpleHashName(child[0]);
                                     string internalName = null;
+                                    string internalFunction = null;
                                     if (listName != null)
                                     {
-                                        internalName = SearchUpwardsInTree2(node, listName);
+                                        TwoStrings two= SearchUpwardsInTree2(node, listName);
+                                        if (two != null)
+                                        {
+                                            internalName = two.s1;
+                                            internalFunction = two.s2;
+                                        }
                                     }
 
                                     string s = node[1][i].Code.ToString();
@@ -5671,18 +5703,18 @@ namespace Gekko.Parser.Gek
         //}
 
         
-        private static string SearchUpwardsInTree2(ASTNode node, string listName)
+        private static TwoStrings SearchUpwardsInTree2(ASTNode node, string listName)
         {
             //Looks for list loop anchor, for instance looping in sum() or unfold()  -- or the left-hand side controlled lists in SERIES looping (like x[#i] = y[#i] + ...)
             ASTNode tmp = node.Parent;
-            string rv = null;         
+            TwoStrings rv = null;         
             while (tmp != null)
             {
                 bool ok = false;
                 if (tmp.listLoopAnchor != null && tmp.listLoopAnchor.ContainsKey(listName)) ok = true;
                 if (ok)
                 {
-                    rv = tmp.listLoopAnchor[listName].s1;
+                    rv = tmp.listLoopAnchor[listName];
                     break;
                 }
                 tmp = tmp.Parent;
