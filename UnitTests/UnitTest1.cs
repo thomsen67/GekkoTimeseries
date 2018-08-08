@@ -855,6 +855,67 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_SeriesLags()
+        {
+
+            I("reset; time 2000 2007;");
+            I("x1 = 1;");            
+            I("y1 = x1[-2];");
+            I("z1 = (x1+x1)[-2];");
+            I("w1 = pch(x1+x1)[-2];");
+            I("k1 = dif(pch(x1+x1))[-2];");
+
+            I("<2001 2006>x2 = 2;");
+            I("<2002 2005>y2 = x2[-2];");
+            I("<2002 2005>z2 = (x2+x2)[-2];");
+            I("<2002 2005>w2 = pch(x2+x2)[-2];");
+            I("<2002 2005>k2 = dif(pch(x2+x2))[-2];");
+
+            _AssertSeries(First(), "x1", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1", 2000, 2007, 1d, sharedDelta);            
+            _AssertSeries(First(), "x1", 2008, double.NaN, sharedDelta);
+
+            _AssertSeries(First(), "y1", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y1", 2002, 2007, 1d, sharedDelta);
+            _AssertSeries(First(), "y1", 2008, double.NaN, sharedDelta);
+
+            _AssertSeries(First(), "z1", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z1", 2002, 2007, 2d, sharedDelta);
+            _AssertSeries(First(), "z1", 2008, double.NaN, sharedDelta);
+
+            _AssertSeries(First(), "w1", 2002, double.NaN, sharedDelta);
+            _AssertSeries(First(), "w1", 2003, 2007, 0d, sharedDelta);
+            _AssertSeries(First(), "w1", 2008, double.NaN, sharedDelta);
+
+            _AssertSeries(First(), "k1", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "k1", 2004, 2007, 0d, sharedDelta);
+            _AssertSeries(First(), "k1", 2008, double.NaN, sharedDelta);
+
+            //---
+
+            _AssertSeries(First(), "x2", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2", 2001, 2006, 2d, sharedDelta);
+            _AssertSeries(First(), "x2", 2007, double.NaN, sharedDelta);
+
+            _AssertSeries(First(), "y2", 2002, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y2", 2003, 2005, 2d, sharedDelta);
+            _AssertSeries(First(), "y2", 2006, double.NaN, sharedDelta);
+
+            _AssertSeries(First(), "z2", 2002, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z2", 2003, 2005, 4d, sharedDelta);
+            _AssertSeries(First(), "z2", 2006, double.NaN, sharedDelta);
+
+            _AssertSeries(First(), "w2", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "w2", 2004, 2005, 0d, sharedDelta);
+            _AssertSeries(First(), "w2", 2006, double.NaN, sharedDelta);
+
+            _AssertSeries(First(), "k2", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "k2", 2005, 2005, 0d, sharedDelta);
+            _AssertSeries(First(), "k2", 2006, double.NaN, sharedDelta);
+
+        }
+
+        [TestMethod]
         public void _Test_SeriesIndexing()
         {
 
@@ -2265,7 +2326,7 @@ namespace UnitTests
         // --------------------------------------------------------------------------------
         
         [TestMethod]
-        public void Test__Gekko20()
+        public void _Test__Gekko20()
         {
             I("FOR i = a, b, c; END;");
             I("FOR val v = 0 to 10 by 2; END;");
@@ -5289,7 +5350,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Ini()
+        public void _Test__Ini()
         {
             I("RESET;");
             I("INI;");
@@ -5971,7 +6032,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Tell()
+        public void _Test__Tell()
         {
             I("RESET;");
             I("TELL<nocr>'hel'+'lo1';");
@@ -6423,7 +6484,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Hdg()
+        public void _Test__Hdg()
         {
             //Does not test the result of a simulation, only the commands
             I("RESET;");
@@ -6432,20 +6493,7 @@ namespace UnitTests
             I("HDG 'abe' + 'kat';");
             Assert.AreEqual(First().info1, "abekat");
         }
-
-        [TestMethod]
-        public void Test__Unswap()
-        {
-            //Is tested in OpenClose()
-        }
-
-        //[TestMethod]
-        //public void Test__Vers()
-        //{
-        //    I("RESET;");
-        //    I("VERS;");
-        //}
-
+        
         [TestMethod]
         public void Test__GotoLabel()
         {
@@ -7456,13 +7504,13 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Cls()
+        public void _Test__Cls()
         {
             I("CLS;");  //hard to check result of this here... never mind.
         }
 
         [TestMethod]
-        public void Test__Clear()
+        public void _Test__Clear()
         {
             //do a better test where banks are OPENed
 
@@ -7495,13 +7543,13 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Restart()
+        public void _Test__Restart()
         {
             I("RESTART;");
         }
 
         [TestMethod]
-        public void Test__Reset()
+        public void _Test__Reset()
         {
             I("RESET;");
         }
@@ -8938,7 +8986,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Random()
+        public void _Test__Random()
         {            
             I("RESET;");
             I("MATRIX mean = [10 || 11];");
@@ -9264,7 +9312,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Time()
+        public void _Test__Time()
         {
             //
             // Testing TIME            
@@ -9437,7 +9485,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__PipeAndTell()
+        public void _Test__PipeAndTell()
         {
             //
             // Testing of PIPE, PIPE<append>, PIPE<html>
@@ -13626,7 +13674,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__RAMLargeAware()
+        public void _Test__RAMLargeAware()
         {
             //Tests the version deployed
             //

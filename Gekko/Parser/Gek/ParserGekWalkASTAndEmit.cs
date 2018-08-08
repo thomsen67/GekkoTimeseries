@@ -1003,6 +1003,13 @@ namespace Gekko.Parser.Gek
                             }
                             else
                             {
+                                string a = node[1][0].AlternativeCode.ToString();
+                                if (Globals.runningOnTTComputer)
+                                {
+                                    //G.Writeln2("--> " + a);
+                                    node.Code.A("G.Writeln2(` ---> ` + O.ConvertToString(" + a + "));" + G.NL);
+                                }
+                                
                                 //node.Code.A("O.Endo o" + Num(node) + " = new O.Endo();" + G.NL);
                                 //node.Code.A("o" + Num(node) + ".gts = " + node[0][0].Code + G.NL);
                                 //node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
@@ -3033,9 +3040,16 @@ namespace Gekko.Parser.Gek
                                     indexes += s;  //always done as fallback                                    
                                     if (reportInterior)
                                     {
-                                        //only for PRT-type or DISP, and only if the [] is not inside [] or {}.
-                                        //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
-                                        indexesReport += Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
+                                        if (internalName != null)
+                                        {
+                                            indexesReport +=  s;
+                                        }
+                                        else
+                                        {
+                                            //only for PRT-type or DISP, and only if the [] is not inside [] or {}.
+                                            //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
+                                            indexesReport += Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
+                                        }
                                     }
 
                                     if (i < node[1].ChildrenCount() - 1)
