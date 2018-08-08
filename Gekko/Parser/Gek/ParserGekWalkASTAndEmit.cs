@@ -331,10 +331,10 @@ namespace Gekko.Parser.Gek
 
                     //ok to just reassign, we are not going to add to any of these dictionaries anyway
 
-                    if (node.listLoopAnchor == null) node.listLoopAnchor = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    if (node.listLoopAnchor == null) node.listLoopAnchor = new GekkoDictionary<string, TwoStrings>(StringComparer.OrdinalIgnoreCase);
                     foreach (string s in node.freeIndexedLists.Keys)
                     {
-                        node.listLoopAnchor.Add(s, Globals.listLoopInternalName + s + ++Globals.counter);
+                        node.listLoopAnchor.Add(s, new TwoStrings(Globals.listLoopInternalName + s + ++Globals.counter, ""));
                     }
                 }
                 else if (node.Text == "ASTPRTELEMENT")
@@ -561,7 +561,7 @@ namespace Gekko.Parser.Gek
                         string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionName);
                         if (listNames != null)
                         {
-                            if (node.listLoopAnchor == null) node.listLoopAnchor = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                            if (node.listLoopAnchor == null) node.listLoopAnchor = new GekkoDictionary<string, TwoStrings>(StringComparer.OrdinalIgnoreCase);
                             foreach (string s in listNames)
                             {
                                 if (node.listLoopAnchor.ContainsKey(s))
@@ -569,7 +569,7 @@ namespace Gekko.Parser.Gek
                                     G.Writeln2("*** ERROR: The list " + Globals.symbolCollection + s + " is used several times for multidimensional looping in sum() or unfold() function");
                                     throw new GekkoException();
                                 }
-                                node.listLoopAnchor.Add(s, Globals.listLoopInternalName + s + ++Globals.counter);
+                                node.listLoopAnchor.Add(s, new TwoStrings(Globals.listLoopInternalName + s + ++Globals.counter, ""));
                             }
                         }
                     }
@@ -2250,10 +2250,10 @@ namespace Gekko.Parser.Gek
                                     if (node2 == null) break;
                                     if (node2.listLoopAnchor != null)
                                     {
-                                        foreach (KeyValuePair<string, string> kvp in node2.listLoopAnchor)
+                                        foreach (KeyValuePair<string, TwoStrings> kvp in node2.listLoopAnchor)
                                         {
-                                            parentListLoopVars1 += "IVariable " + kvp.Value + ", ";
-                                            parentListLoopVars2 += kvp.Value + ", ";
+                                            parentListLoopVars1 += "IVariable " + kvp.Value.s1 + ", ";
+                                            parentListLoopVars2 += kvp.Value.s1 + ", ";
                                             parentListLoopCounter++;
                                         }
                                     }
@@ -2293,7 +2293,7 @@ namespace Gekko.Parser.Gek
                                     sb1.AppendLine("List " + tempName + " = new List();" + G.NL);
                                 }
 
-                                foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
+                                foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
                                 {
                                     string listname = Globals.symbolCollection + kvp.Key;  //add a # to the list ident, this is the way they are stored in node.functionDefAnchor
                                     string internalName = SearchUpwardsInTree3(node, listname);
@@ -2304,7 +2304,7 @@ namespace Gekko.Parser.Gek
                                         s = "O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ")))), null, false, EVariableType.Var)";  //false is regarding isLeftSide
                                     }
 
-                                    sb1.AppendLine("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(" + s + ")) {");
+                                    sb1.AppendLine("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(" + s + ")) {");
                                 }
 
                                 if (G.Equal(functionNameLower, "sum"))
@@ -2320,7 +2320,7 @@ namespace Gekko.Parser.Gek
                                     //sb1.AppendLine("O.AddLabelHelper(smpl);");
                                 }
 
-                                foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
+                                foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
                                 {
                                     sb1.AppendLine("}");
                                 }
@@ -3040,7 +3040,7 @@ namespace Gekko.Parser.Gek
                                     indexes += s;  //always done as fallback                                    
                                     if (reportInterior)
                                     {
-                                        if (internalName != null)
+                                        if (false && internalName != null)
                                         {
                                             indexesReport +=  s;
                                         }
@@ -3447,9 +3447,9 @@ namespace Gekko.Parser.Gek
                         {
                             if (node.listLoopAnchor != null && node.listLoopAnchor.Count>0)
                             {
-                                foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
+                                foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
                                 {
-                                    node.Code.A("foreach (IVariable " + kvp.Value + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(`" + kvp.Key + "`)))), null, false, EVariableType.Var))) {" + G.NL);
+                                    node.Code.A("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(`" + kvp.Key + "`)))), null, false, EVariableType.Var))) {" + G.NL);
                                 }
                             }                                                       
 
@@ -3474,7 +3474,7 @@ namespace Gekko.Parser.Gek
 
                             if (node.listLoopAnchor != null && node.listLoopAnchor.Count > 0)
                             {
-                                foreach (KeyValuePair<string, string> kvp in node.listLoopAnchor)
+                                foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
                                 {
                                     node.Code.A("}"+G.NL);
                                 }
@@ -5682,7 +5682,7 @@ namespace Gekko.Parser.Gek
                 if (tmp.listLoopAnchor != null && tmp.listLoopAnchor.ContainsKey(listName)) ok = true;
                 if (ok)
                 {
-                    rv = tmp.listLoopAnchor[listName];
+                    rv = tmp.listLoopAnchor[listName].s1;
                     break;
                 }
                 tmp = tmp.Parent;

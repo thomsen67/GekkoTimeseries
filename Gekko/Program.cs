@@ -505,6 +505,11 @@ namespace Gekko
         public string s1 = null;
         public string s2 = null;
         public string s2Type = null;
+        public TwoStrings(string s1, string s2)
+        {
+            this.s1 = s1;
+            this.s2 = s2;
+        }
     }
 
     public class StackHelper
@@ -1214,9 +1219,7 @@ namespace Gekko
                 var = s;
                 lag = "0";
             }
-            TwoStrings ts = new TwoStrings();
-            ts.s1 = var;
-            ts.s2 = lag;
+            TwoStrings ts = new TwoStrings(var, lag);
             return ts;
         }
 
