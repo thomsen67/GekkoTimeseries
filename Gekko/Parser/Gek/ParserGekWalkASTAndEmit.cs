@@ -1460,13 +1460,13 @@ namespace Gekko.Parser.Gek
                                 indexes += node[1].Code.ToString();
                             }
 
+                            bool xxx = ReportHelper2(internalName, internalFunction); //a controlled #x, bounded by sum
 
-
-                            if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent))
+                            if (((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent)) && (!xxx))
                             {
                                 //only for PRT-type or DISP, and only if the [] is not inside [] or {}.
                                 //node.Code.A("O.ListContains(" + node[0].Code + "," + Globals.reportInterior1 + indexes + ", " + "0" + ", " + Globals.labelCounter + Globals.reportInterior2 + ")");
-                                node.Code.A("O.ListContains(" + node[0].Code + "," + Globals.reportLabel1 + indexes + Globals.reportLabel2 + ")");
+                                node.Code.A("O.ListContains(" + node[0].Code + "," + Globals.reportLabel1 + indexes + ", `" + ReportLabelHelper(node) + "`" + Globals.reportLabel2 + ")");
                             }
                             else
                             {
@@ -3073,7 +3073,8 @@ namespace Gekko.Parser.Gek
                                                                   
                                     if (reportInterior)
                                     {
-                                        if (internalName != null && G.Equal(internalFunction, "sum"))
+                                        bool xxx = ReportHelper2(internalName, internalFunction);
+                                        if (xxx)
                                         {
                                             indexesReport += s;
                                         }
@@ -5352,6 +5353,11 @@ namespace Gekko.Parser.Gek
                 }
                 node.Code.A(Globals.splitSTOP);
             }
+        }
+
+        private static bool ReportHelper2(string internalName, string internalFunction)
+        {
+            return internalName != null && G.Equal(internalFunction, "sum");
         }
 
         private static string ReportLabelHelper(ASTNode node)

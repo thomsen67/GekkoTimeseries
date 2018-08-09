@@ -1960,7 +1960,7 @@ dollarConditional:          LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITI
 						  | bankvarnameindex -> ^(ASTDOLLARCONDITIONALVARIABLE bankvarnameindex)  //does not need parenthesis						
 						    ;
 
-bankvarnameindex:           bankvarname ( leftBracketGlue expression RIGHTBRACKET ) -> ^(ASTCOMPARE2 bankvarname expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!  //should catch #i0[#i], does not need a parenthesis!						
+bankvarnameindex:           bankvarname ( leftBracketGlue expression RIGHTBRACKET ) -> ^({token("ASTCOMPARE2¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCOMPARE2, 0)} bankvarname expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!
 					
 indexerExpressionHelper:    ident -> ^({token("ASTINDEXERELEMENTIDENT¤"+($ident.text)+"¤"+($ident.start)+"¤"+($ident.stop), ASTINDEXERELEMENTIDENT, 0)} ident)
 						  | expressionOrNothing doubleDot expressionOrNothing -> ^(ASTINDEXERELEMENT expressionOrNothing expressionOrNothing)     //'fm1'..'fm5'
@@ -2014,11 +2014,6 @@ listItemWildRange         : wildcardWithBank ->                        wildcardW
 						  ;
 
 wildcardWithBank          : name COLON wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK name) ^(ASTWILDCARD wildcard))
-						  | AT GLUE wildcard ->  ^(ASTWILDCARDWITHBANK ^(ASTBANK ASTAT) ^(ASTWILDCARD wildcard))
-						  | wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK) ^(ASTWILDCARD wildcard))
-						  ;						
-
-bankvarnameWild           : expression -> (AST          : name COLON wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK name) ^(ASTWILDCARD wildcard))
 						  | AT GLUE wildcard ->  ^(ASTWILDCARDWITHBANK ^(ASTBANK ASTAT) ^(ASTWILDCARD wildcard))
 						  | wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK) ^(ASTWILDCARD wildcard))
 						  ;

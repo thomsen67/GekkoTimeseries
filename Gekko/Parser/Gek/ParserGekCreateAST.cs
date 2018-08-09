@@ -633,6 +633,10 @@ namespace Gekko.Parser.Gek
                     {
                         flag = true;
                     }
+                    else if (ast.Text.StartsWith("ASTCOMPARE2" + "¤"))
+                    {
+                        flag = true;
+                    }
                 }                
                 
                 if (flag)
