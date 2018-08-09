@@ -3069,12 +3069,13 @@ namespace Gekko.Parser.Gek
                                     string s = node[1][i].Code.ToString();
                                     if (internalName != null) s = internalName;
 
-                                    indexes += s;  //always done as fallback                                    
+                                    indexes += s;  //always done as fallback      
+                                                                  
                                     if (reportInterior)
                                     {
-                                        if (false && internalName != null)
+                                        if (internalName != null && G.Equal(internalFunction, "sum"))
                                         {
-                                            indexesReport +=  s;
+                                            indexesReport += s;
                                         }
                                         else
                                         {
