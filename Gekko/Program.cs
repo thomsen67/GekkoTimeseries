@@ -25569,7 +25569,7 @@ namespace Gekko
                         // Labels start
                         // ----------------------------------------------------
 
-                        List<string> lbl = new List<string>();  //count = 0!
+                         List<string> lbl = new List<string>();  //count = 0!
 
                         try
                         {
@@ -26634,27 +26634,32 @@ namespace Gekko
                 string[] w4 = sss[3].Split(':');
                 int ii1 = int.Parse(w4[0]);
                 int ii2 = int.Parse(w4[1]);
+
+
+                bool skip = false;
                 if (i1 != ii1)
                 {
-                    //TODO TODO TODO
-                    //TODO TODO TODO
-                    //TODO TODO TODO
-                    G.Writeln2("*** ERROR: Multiline expressions not supported in PRT/PLOT etc.");
-                    throw new GekkoException();
+                    //just skip it
+                    //TODO: what about multiline PRT expressions??
+                    skip = true;
                 }
 
-                int offset = ii2 - i2;
-                string xx = y.iv.ConvertToString();
+                if (!skip)
+                {
 
-                result[offset] = xx;
-                for (int ii = offset + 1; ii < offset + length; ii++)
-                {
-                    result[ii] = null;
-                }
-                if (result[offset - 1] == "{" && result[offset + length] == "}")
-                {
-                    result[offset - 1] = null;
-                    result[offset + length] = null;
+                    int offset = ii2 - i2;
+                    string xx = y.iv.ConvertToString();
+
+                    result[offset] = xx;
+                    for (int ii = offset + 1; ii < offset + length; ii++)
+                    {
+                        result[ii] = null;
+                    }
+                    if (result[offset - 1] == "{" && result[offset + length] == "}")
+                    {
+                        result[offset - 1] = null;
+                        result[offset + length] = null;
+                    }
                 }
 
                 string u = null;

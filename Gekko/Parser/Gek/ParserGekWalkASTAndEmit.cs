@@ -1202,12 +1202,16 @@ namespace Gekko.Parser.Gek
                         {
                             string s = node[0].Code.ToString();
                             ASTNode child = node;
+
+                            string internalName = null;
+                            string internalFunction = null;
+
+
                             if (child[0].Text == "ASTPLUS" || child[0].Text == "ASTMINUS")
                             {
                                 //See also #980752345
                                 string listName = GetSimpleHashName(child[0][0]);
-                                string internalName = null;
-                                string internalFunction = null;
+                                
                                 if (listName != null)
                                 {
                                     TwoStrings two = SearchUpwardsInTree2(node, listName);
@@ -1239,8 +1243,7 @@ namespace Gekko.Parser.Gek
                             else
                             {
                                 string listName = GetSimpleHashName(node[0]);
-                                string internalName = null;
-                                string internalFunction = null;
+                                
                                 if (listName != null)
                                 {
                                     TwoStrings two= SearchUpwardsInTree2(node, listName);
@@ -1257,8 +1260,10 @@ namespace Gekko.Parser.Gek
 
                             if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent))
                             {
+                                bool xxx = ReportHelper2(internalName, internalFunction); //a controlled #x, bounded by sum
+
                                 //only for PRT-type or DISP, and only if the {} is not inside [] or {}.
-                                if (node.specialExpressionAndLabelInfo != null)
+                                if (node.specialExpressionAndLabelInfo != null && !xxx)
                                 {
                                     node.Code.CA(Globals.reportLabel1 + "" + s + ", `" + ReportLabelHelper(node) + "`" + Globals.reportLabel2);
                                 }
@@ -3157,10 +3162,12 @@ namespace Gekko.Parser.Gek
                             {
                                 node.Code.A("(new Range(").A(node[0].Code).A(", ").A(node[1].Code).A("))");
                             }
-                            if (node.specialExpressionAndLabelInfo != null)
-                            {
-                                node.Code.CA(Globals.reportLabel1 + node.Code + ", `" + ReportLabelHelper(node) + "`" + Globals.reportLabel2);
-                            }
+
+                            //reportLabel is dealt with in dotOrIndexer
+                            //if (node.specialExpressionAndLabelInfo != null)
+                            //{
+                            //    node.Code.CA(Globals.reportLabel1 + node.Code + ", `" + ReportLabelHelper(node) + "`" + Globals.reportLabel2);
+                            //}
                         }
                         break;
                     case "ASTINDEXERELEMENTBANK":                    
